@@ -16,7 +16,7 @@ class AccountBackend(object):
             raise APILogicException('User already registered', ErrorCodes.account_exists)
         return True
 
-    @classmethod
+    @staticmethod
     def authenticate(username=None, password=None):
         user = Account.get(username, password)
         if user and 'email' in user:
