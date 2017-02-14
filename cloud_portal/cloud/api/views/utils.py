@@ -136,11 +136,10 @@ def downloads(request):
             build_number = latest_version.split('.')[-1]        # Use the latest 3.0 public version
             downloads_path = updates_path + '/' + build_number + '/downloads.json'
             downloads_result = requests.get(downloads_path)
-            downloads_json = downloads_result.json()
             pass
 
         downloads_result.raise_for_status()
-        downloads_json = downloads_json.json()
+        downloads_json = downloads_result.json()
 
         downloads_json['releaseNotes'] = updates_record['release_notes']
         downloads_json['releaseUrl'] = updates_path + '/' + build_number + '/'
