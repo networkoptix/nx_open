@@ -38,6 +38,7 @@
 #include <ui/common/palette.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
+#include <ui/graphics/items/generic/graphics_tooltip_widget.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -72,14 +73,9 @@ const char* kSearchModelPropertyName = "_qn_searchModel";
 const char* kSearchSynchronizerPropertyName = "_qn_searchSynchronizer";
 const char* kFilterPropertyName = "_qn_filter";
 
-const int kNoDataFontPixelSize = 32;
-const int kNoDataFontWeight = QFont::Light;
-
 const auto kHtmlLabelNoInfoFormat = lit("<center><span style='font-weight: 500'>%1</span></center>");
 const auto kHtmlLabelDefaultFormat = lit("<center><span style='font-weight: 500'>%1</span> %2</center>");
 const auto kHtmlLabelUserFormat = lit("<center><span style='font-weight: 500'>%1</span> &mdash; %2</center>");
-
-const QSize kMaxThumbnailSize(224, 184);
 
 static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* item)
 {
@@ -93,134 +89,6 @@ static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* it
 }
 
 } // namespace
-
-// -------------------------------------------------------------------------- //
-// QnResourceBrowserToolTipWidget
-// -------------------------------------------------------------------------- //
-QnResourceBrowserToolTipWidget::QnResourceBrowserToolTipWidget(QGraphicsItem* parent):
-    base_type(parent),
-    m_proxyWidget(new Clickable<QGraphicsProxyWidget>(this)),
-    m_embeddedWidget(new QWidget()),
-    m_textLabel(new QnTextEditLabel(m_embeddedWidget)),
-    m_previewWidget(new QnResourcePreviewWidget(m_embeddedWidget))
-{
-    m_proxyWidget->setVisible(false);
-    m_proxyWidget->setWidget(m_embeddedWidget);
-    m_proxyWidget->installSceneEventFilter(this);
-
-    m_embeddedWidget->setAttribute(Qt::WA_TranslucentBackground);
-
-    /* To keep aspect ratio specify only maximum height for server request: */
-    m_previewWidget->setThumbnailSize(QSize(0, kMaxThumbnailSize.height()));
-    /* And specify maximum width and height for the widget: */
-    m_previewWidget->setMaximumSize(kMaxThumbnailSize);
-
-    auto dots = m_previewWidget->busyIndicator()->dots();
-    dots->setDotRadius(style::Metrics::kStandardPadding / 2.0);
-    dots->setDotSpacing(style::Metrics::kStandardPadding);
-
-    auto layout = new QVBoxLayout(m_embeddedWidget);
-    layout->setSizeConstraint(QLayout::SetFixedSize);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->addWidget(m_previewWidget);
-    layout->addWidget(m_textLabel);
-
-    auto graphicsLayout = new QGraphicsLinearLayout(Qt::Vertical);
-    graphicsLayout->setContentsMargins(0, 0, 0, 0);
-    graphicsLayout->addItem(m_proxyWidget);
-    setLayout(graphicsLayout);
-
-    QFont font;
-    font.setPixelSize(kNoDataFontPixelSize);
-    font.setWeight(kNoDataFontWeight);
-    m_previewWidget->setFont(font);
-
-    setThumbnailVisible(false);
-}
-
-bool QnResourceBrowserToolTipWidget::sceneEventFilter(QGraphicsItem* watched, QEvent* event)
-{
-    if (watched == m_proxyWidget
-        && event->type() == QEvent::GraphicsSceneMousePress
-        && static_cast<QGraphicsSceneMouseEvent*>(event)->button() == Qt::LeftButton)
-    {
-        thumbnailClicked();
-    }
-
-    return base_type::sceneEventFilter(watched, event);
-}
-
-void QnResourceBrowserToolTipWidget::forceLayoutUpdate()
-{
-    m_embeddedWidget->layout()->activate();
-}
-
-void QnResourceBrowserToolTipWidget::setText(const QString& text)
-{
-    m_textLabel->setText(text);
-    forceLayoutUpdate();
-}
-
-void QnResourceBrowserToolTipWidget::setThumbnailVisible(bool visible)
-{
-    if (m_previewWidget->isHidden() != visible)
-        return;
-
-    m_textLabel->setSizePolicy(
-        visible ? QSizePolicy::Ignored : QSizePolicy::Preferred,
-        QSizePolicy::Preferred);
-
-    m_textLabel->setWordWrapMode(visible
-        ? QTextOption::WrapAtWordBoundaryOrAnywhere
-        : QTextOption::ManualWrap);
-
-    m_previewWidget->setVisible(visible);
-    forceLayoutUpdate();
-
-    updateTailPos();
-}
-
-void QnResourceBrowserToolTipWidget::setResource(const QnResourcePtr& resource)
-{
-    if (m_previewWidget->targetResource() == resource)
-        return;
-
-    m_previewWidget->setTargetResource(resource);
-    forceLayoutUpdate();
-}
-
-const QnResourcePtr& QnResourceBrowserToolTipWidget::resource() const
-{
-    return m_previewWidget->targetResource();
-}
-
-void QnResourceBrowserToolTipWidget::updateTailPos()
-{
-    QRectF rect = this->rect();
-    QGraphicsWidget* parent = parentWidget();
-    QRectF enclosingRect = parent->geometry();
-
-    // half of the tooltip height in coordinates of enclosing rect
-    qreal halfHeight = mapRectToItem(parent, rect).height() / 2;
-
-    qreal parentPos = m_pointTo.y();
-
-    if (parentPos - halfHeight < 0)
-        setTailPos(QPointF(qRound(rect.left() - tailLength()), qRound(rect.top() + tailWidth())));
-    else if (parentPos + halfHeight > enclosingRect.height())
-        setTailPos(QPointF(qRound(rect.left() - tailLength()), qRound(rect.bottom() - tailWidth())));
-    else
-        setTailPos(QPointF(qRound(rect.left() - tailLength()), qRound((rect.top() + rect.bottom()) / 2)));
-
-    base_type::pointTo(m_pointTo);
-}
-
-void QnResourceBrowserToolTipWidget::pointTo(const QPointF& pos)
-{
-    m_pointTo = pos;
-    base_type::pointTo(pos);
-    updateTailPos();
-}
 
 // -------------------------------------------------------------------------- //
 // QnResourceBrowserWidget
@@ -628,7 +496,7 @@ void QnResourceBrowserWidget::setToolTipParent(QGraphicsWidget* widget)
     if (m_tooltipWidget)
         return;
 
-    m_tooltipWidget = new QnResourceBrowserToolTipWidget(widget);
+    m_tooltipWidget = new QnGraphicsToolTipWidget(widget);
     m_hoverProcessor = new HoverFocusProcessor(widget);
 
     m_tooltipWidget->setFocusProxy(widget);

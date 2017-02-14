@@ -38,52 +38,11 @@ class QnResourceSearchSynchronizer;
 class QnResourceTreeWidget;
 class QnCameraThumbnailManager;
 class QnTextEditLabel;
+class QnGraphicsToolTipWidget;
 
 namespace Ui {
     class ResourceBrowserWidget;
 }
-
-class QnResourceBrowserToolTipWidget: public QnStyledTooltipWidget
-{
-    Q_OBJECT
-    using base_type = QnStyledTooltipWidget;
-
-public:
-    QnResourceBrowserToolTipWidget(QGraphicsItem* parent = nullptr);
-
-    /**
-     * Set tooltip text.
-     * \param text                      New text for this tool tip's label.
-     * \reimp
-     */
-    void setText(const QString& text);
-
-    void setThumbnailVisible(bool visible);
-
-    void setResource(const QnResourcePtr& resource);
-    const QnResourcePtr& resource() const;
-
-    //reimp
-    void pointTo(const QPointF& pos);
-    virtual void updateTailPos() override;
-
-signals:
-    void thumbnailClicked();
-
-protected:
-    virtual bool sceneEventFilter(QGraphicsItem* watched, QEvent* event) override;
-
-private:
-    void forceLayoutUpdate();
-
-private:
-    QGraphicsProxyWidget* m_proxyWidget;
-    QWidget* m_embeddedWidget;
-    QnTextEditLabel* m_textLabel;
-    QnResourcePreviewWidget* m_previewWidget;
-    QPointF m_pointTo;
-};
-
 
 class QnResourceBrowserWidget: public QWidget, public QnWorkbenchContextAware, public QnActionTargetProvider, public ToolTipQueryable {
     Q_OBJECT
@@ -185,7 +144,7 @@ private:
     int m_filterTimerId;
 
     QnResourceTreeModel* m_resourceModel;
-    QnResourceBrowserToolTipWidget* m_tooltipWidget;
+    QnGraphicsToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_hoverProcessor;
 
     QMap<QnActions::IDType, QAction*> m_renameActions;
