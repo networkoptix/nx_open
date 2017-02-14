@@ -285,6 +285,28 @@ TEST_F(StunClientServerTest, AsyncClientUser)
     }
 }
 
+TEST_F(StunClientServerTest, cancellation)
+{
+    const auto address = startServer();
+
+    utils::TestSyncQueue<bool> reconnectEvents;
+    auto reconnectHandler =
+        [&reconnectEvents] { reconnectEvents.push(true); };
+
+    std::atomic<size_t> timerTicks(0);
+    const auto incrementTimer = [&timerTicks]() { ++timerTicks; };
+    const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
+
+    auto clientGuard = makeScopedGuard([this]() { client->pleaseStopSync(); });
+    client->connect(address);
+    client->addOnReconnectedHandler(reconnectHandler);
+    client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 50));
+
+    server.reset();
+}
+
 } // namespace test
 } // namespace hpm
 } // namespase nx
