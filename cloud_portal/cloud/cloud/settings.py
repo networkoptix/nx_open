@@ -46,8 +46,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'kombu.transport.django',
-    'djcelery',
+    'django_celery_results',
     'rest_framework',
     'corsheaders',
     'notifications',
@@ -195,8 +194,9 @@ REST_FRAMEWORK = {
 
 # Celery settings section
 
-BROKER_URL = 'django://'
-CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+BROKER_URL = 'rabbit'
+RESULT_PERSISTENT = True
+CELERY_RESULT_BACKEND = 'django-db'
 
 # / End of Celery settings section
 
