@@ -797,43 +797,37 @@
            <property name="flat">
             <bool>true</bool>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,1">
+           <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,1">
+            <property name="spacing">
+             <number>16</number>
+            </property>
             <item>
-             <widget class="QWidget" name="widget_4" native="true">
+             <widget class="QPushButton" name="exportScheduleButton">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_4">
-               <property name="spacing">
-                <number>16</number>
-               </property>
-               <item>
-                <widget class="QPushButton" name="exportScheduleButton">
-                 <property name="maximumSize">
-                  <size>
-                   <width>128</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>Copy Schedule...</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="exportWarningLabel">
-                 <property name="text">
-                  <string>Apply changes before copying schedule.</string>
-                 </property>
-                 <property name="wordWrap">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-              </layout>
+              <property name="minimumSize">
+               <size>
+                <width>128</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Copy Schedule...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="exportWarningLabel">
+              <property name="text">
+               <string>Apply changes before copying schedule.</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -909,7 +903,6 @@
   <tabstop>checkBoxMaxArchive</tabstop>
   <tabstop>recordBeforeSpinBox</tabstop>
   <tabstop>recordAfterSpinBox</tabstop>
-  <tabstop>exportScheduleButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>
