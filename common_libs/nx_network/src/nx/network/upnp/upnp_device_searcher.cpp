@@ -287,6 +287,12 @@ void DeviceSearcher::onSomeBytesRead(
 
 void DeviceSearcher::dispatchDiscoverPackets()
 {
+    if (qnGlobalSettings->isNewSystem())
+        return;
+
+    if (!qnGlobalSettings->isAutoDiscoveryEnabled() && !qnGlobalSettings->isUpnpPortMappingEnabled())
+        return;
+
     for(const  QnInterfaceAndAddr& iface: getAllIPv4Interfaces() )
     {
         const std::shared_ptr<AbstractDatagramSocket>& sock = getSockByIntf(iface);
