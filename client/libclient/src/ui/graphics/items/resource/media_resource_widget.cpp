@@ -228,6 +228,9 @@ void clearSensitivityRegion(MotionGrid& grid, const QPoint& at)
     }
 };
 
+//TODO: #vkutin This software trigger buttons implementation is a stub
+// Actual implementation will be done as soon as software triggers specification is ready.
+
 constexpr int kTriggerButtonWidth = 232;
 constexpr qreal kTriggerButtonOpacity = 0.5;
 
