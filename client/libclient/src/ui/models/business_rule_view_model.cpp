@@ -864,6 +864,8 @@ bool QnBusinessRuleViewModel::isValid(int column) const
 {
     switch (column)
     {
+        //TODO: #vkutin Add Software Triggers support
+
         case QnBusiness::SourceColumn:
         {
             auto filtered = filterEventResources(m_eventResources, m_eventType);
