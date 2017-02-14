@@ -159,6 +159,8 @@ signals:
 
     void openTile(const QString& systemId);
 
+    void switchPage(int pageIndex);
+
 private:
     void connectToSystemInternal(
         const QString& systemId,
@@ -169,8 +171,6 @@ private:
         const QnRaiiGuardPtr& completionTracker = QnRaiiGuardPtr());
 
     void handleStartupTileAction(const QString& systemId, bool initial);
-
-    void setupTestTileCase();
 
 private: // overrides
     bool eventFilter(QObject* obj, QEvent* event) override;

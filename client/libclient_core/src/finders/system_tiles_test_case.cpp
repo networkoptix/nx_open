@@ -13,7 +13,16 @@
 namespace {
 
 static constexpr auto kRemoveSystemTimeoutMs = 10000;
-static constexpr auto kNextActionPeriodMs = 3000;
+static constexpr auto kNextActionPeriodMs = 2000;
+static constexpr auto kImmediateActionDelayMs = 0;
+
+static const auto kCheckEmptyTileMessage =
+    lit("Please check if there is an empty item on the screen");
+
+int castTileToInt(QnTileTest test)
+{
+    return static_cast<int>(test);
+}
 
 void addServerToSystem(
     const QnSystemDescriptionPtr& baseSystem,
@@ -66,7 +75,7 @@ QnSystemDescriptionPtr createSystem(
 
     const auto number = ++systemNumber;
 
-    const auto systemName = lit("System #%1").arg(QString::number(number));
+    const auto systemName = lit("TILE TEST SYSTEM #%1").arg(QString::number(number));
     const auto systemId = systemName;
     const auto localSystemId = QUuid::createUuid();
     const auto system = QnLocalSystemDescription::create(systemId, localSystemId, systemName);
@@ -108,15 +117,49 @@ qreal setSystemMaxWeight(const QnSystemDescriptionPtr& system)
     return weight;
 }
 
-QnRaiiGuardPtr makeCompletionGaurd(
+QString getMessage(QnTileTest test)
+{
+    static const QHash<int, QString> kMessages =
+        {
+            { castTileToInt(QnTileTest::ChangeWeightOnCollapse),
+                lit("change order of systems on tile collapse")},
+            { castTileToInt(QnTileTest::ChangeVersion),
+                lit("change version of system for single tile")},
+            { castTileToInt(QnTileTest::MaximizeAppOnCollapse),
+                lit("maximize app on tile collapse")},
+            { castTileToInt(QnTileTest::SwitchPage),
+                lit("switch page on tile collpase")}
+        };
+
+    const auto it = kMessages.find(castTileToInt(test));
+    if (it == kMessages.end())
+    {
+        NX_ASSERT(false, "No message for specified tile test");
+        return QString();
+    }
+
+    return it.value();
+}
+
+template<typename RemoveGuardType>
+QnRaiiGuardPtr makeDelayedCompletionGuard(
+    const QString& prefinalMessage,
     QnTileTest id,
-    const QnSystemTilesTestCase::CompletionHandler& handler)
+    const QnSystemTilesTestCase::CompletionHandler& completionHandler,
+    const RemoveGuardType& systemRemoveGuard,
+    QnSystemTilesTestCase* parent)
 {
     return QnRaiiGuard::createDestructible(
-        [id, handler]()
+        [id, prefinalMessage, systemRemoveGuard, completionHandler, parent]()
         {
-            if (handler)
-                handler(id);
+            emit parent->messageChanged(prefinalMessage);
+            const auto finalizeCallback =
+                [id, systemRemoveGuard, completionHandler]()
+                {
+                    if (completionHandler)
+                        completionHandler(id);
+                };
+            executeDelayedParented(finalizeCallback, kRemoveSystemTimeoutMs, parent);
         });
 }
 
@@ -151,6 +194,9 @@ void QnSystemTilesTestCase::startTest(
                 case QnTileTest::ChangeVersion:
                     versionChangeTest(completionHandler);
                     break;
+            case QnTileTest::SwitchPage:
+                    switchPageTest(completionHandler);
+                    break;
                 default:
                     NX_ASSERT(false, "Wrong tile test identifier");
                     break;
@@ -162,9 +208,6 @@ void QnSystemTilesTestCase::startTest(
 
 void QnSystemTilesTestCase::changeWeightsTest(CompletionHandler completionHandler)
 {
-    const auto completionGuard = makeCompletionGaurd(
-        QnTileTest::ChangeWeightOnCollapse, completionHandler);
-
     const auto firstSystem = createSystem();
     const auto secondSystem = createSystem();
     const auto secondWeight = setSystemMaxWeight(secondSystem);
@@ -172,6 +215,10 @@ void QnSystemTilesTestCase::changeWeightsTest(CompletionHandler completionHandle
 
     const auto firstSystemRemoveGuard = addSystem(firstSystem, m_finder);
     const auto secondSystemRemoveGuard = addSystem(secondSystem, m_finder);
+
+    const auto completionGuard = makeDelayedCompletionGuard(kCheckEmptyTileMessage,
+        QnTileTest::ChangeWeightOnCollapse, completionHandler,
+        QList<QnRaiiGuardPtr>() << firstSystemRemoveGuard << secondSystemRemoveGuard, this);
 
     const auto setSystemsWeights =
         [firstLocalId = firstSystem->localId(), secondLocalId = secondSystem->localId()]
@@ -183,22 +230,14 @@ void QnSystemTilesTestCase::changeWeightsTest(CompletionHandler completionHandle
 
     setSystemsWeights(firstWeight, secondWeight);
 
-    const auto delayedRemoveSystems = QnRaiiGuard::createDestructible(
-        [this, firstSystemRemoveGuard, secondSystemRemoveGuard, completionGuard]()
-        {
-            executeDelayedParented(
-                [firstSystemRemoveGuard, secondSystemRemoveGuard, completionGuard](){},
-                kRemoveSystemTimeoutMs, this);
-        });
-
     const auto swapWeights =
-        [setSystemsWeights, firstWeight, secondWeight, delayedRemoveSystems]()
+        [setSystemsWeights, firstWeight, secondWeight, completionGuard]()
         {
             setSystemsWeights(secondWeight, firstWeight);
         };
 
     const auto collapseTile =
-        [this, swapWeights, delayedRemoveSystems]()
+        [this, swapWeights]()
         {
             collapseExpandedTile();
             executeDelayedParented(swapWeights, 100, this);
@@ -206,7 +245,7 @@ void QnSystemTilesTestCase::changeWeightsTest(CompletionHandler completionHandle
 
     const auto secondSystemId = secondSystem->id();
     const auto expandTile =
-        [this, collapseTile, delayedRemoveSystems, secondSystemId]()
+        [this, collapseTile, secondSystemId]()
         {
             emit openTile(secondSystemId);
             executeDelayedParented(collapseTile, kNextActionPeriodMs, this);
@@ -218,24 +257,22 @@ void QnSystemTilesTestCase::changeWeightsTest(CompletionHandler completionHandle
 
 void QnSystemTilesTestCase::maximizeTest(CompletionHandler completionHandler)
 {
-    const auto completionGuard = makeCompletionGaurd(
-        QnTileTest::MaximizeAppOnCollapse, completionHandler);
-
     const auto system = createSystem();
     const auto systemRemoveGuard = addSystem(system, m_finder);
+
+    const auto completionGuard = makeDelayedCompletionGuard(kCheckEmptyTileMessage,
+        QnTileTest::MaximizeAppOnCollapse, completionHandler, systemRemoveGuard, this);
+
     setSystemMaxWeight(system);
 
     openTile(system->id());
     emit restoreApp();
 
     const auto collapseTile =
-        [this, systemRemoveGuard, completionGuard]()
+        [this, completionGuard]()
         {
             emit collapseExpandedTile();
             emit makeFullscreen();
-
-            executeDelayedParented([systemRemoveGuard, completionGuard](){},
-                kRemoveSystemTimeoutMs, this);
         };
 
     executeDelayedParented(collapseTile, kNextActionPeriodMs, this);
@@ -243,40 +280,109 @@ void QnSystemTilesTestCase::maximizeTest(CompletionHandler completionHandler)
 
 void QnSystemTilesTestCase::versionChangeTest(CompletionHandler completionHandler)
 {
-    const auto completionGuard = makeCompletionGaurd(
-        QnTileTest::ChangeVersion, completionHandler);
-
     const auto system = createSystem(QUrl::fromUserInput(lit("127.0.0.1:7002")),
         QnSoftwareVersion(2, 6), QnAppInfo::ec2ProtoVersion() - 10);
     setSystemMaxWeight(system);
     const auto systemRemoveGuard = addSystem(system, m_finder);
 
+    const auto completionGuard = makeDelayedCompletionGuard(kCheckEmptyTileMessage,
+        QnTileTest::ChangeVersion, completionHandler, systemRemoveGuard, this);
+
     const auto changeServer =
-        [this, system, systemRemoveGuard, completionGuard]()
+        [this, system, completionGuard]()
         {
             removeServerFromSystem(system, system->servers().first().id);
             addServerToSystem(system);
-
-            executeDelayedParented([systemRemoveGuard, completionGuard](){},
-                kRemoveSystemTimeoutMs, this);
         };
 
     executeDelayedParented(changeServer, kNextActionPeriodMs, this);
+}
+
+void QnSystemTilesTestCase::switchPageTest(CompletionHandler completionHandler)
+{
+    QList<QnRaiiGuardPtr> systemRemoveGuards;
+
+    // We have 8 tiles per page as maximum. So, to have 2 pages we need 9 tiles.
+    static constexpr auto kTilesCountEnoughForTowPages = 9;
+    QnSystemDescriptionPtr maxWeightSystem;
+    for (auto i = 0; i != kTilesCountEnoughForTowPages; ++i)
+    {
+        maxWeightSystem = createSystem();
+        setSystemMaxWeight(maxWeightSystem);
+        systemRemoveGuards.append(addSystem(maxWeightSystem, m_finder));
+    }
+
+    const auto completionGuard = makeDelayedCompletionGuard(kCheckEmptyTileMessage,
+        QnTileTest::SwitchPage, completionHandler, systemRemoveGuards, this);
+
+    const auto switchToFirstPage =
+        [this, completionGuard]()
+        {
+            switchPage(0);
+        };
+
+    const auto switchToSecondPage =
+        [this, switchToFirstPage]()
+        {
+            emit switchPage(1);
+            executeDelayedParented(switchToFirstPage, kNextActionPeriodMs, this);
+        };
+    const auto collapseTileCallback =
+        [this, switchToSecondPage]()
+        {
+            emit collapseExpandedTile();
+            executeDelayedParented(switchToSecondPage, kImmediateActionDelayMs, this);
+        };
+
+    const auto openTileCallback =
+        [this, collapseTileCallback, id = maxWeightSystem->id()]()
+        {
+            emit openTile(id);
+            executeDelayedParented(collapseTileCallback, kNextActionPeriodMs, this);
+        };
+
+    executeDelayedParented(openTileCallback, kNextActionPeriodMs, this);
+}
+
+
+void QnSystemTilesTestCase::showAutohideMessage(
+    const QString& message,
+    qint64 hideDelay)
+{
+    emit messageChanged(message);
+
+    const auto hideMessage =
+        [this, message](){ emit messageChanged(QString());};
+
+    executeDelayedParented(hideMessage, hideDelay, this);
 }
 
 void QnSystemTilesTestCase::runTestSequence(
     QnTileTest current,
     int delay)
 {
+    if (current >= QnTileTest::Count)
+    {
+        showAutohideMessage(lit("Tests completed"), kNextActionPeriodMs * 2);
+        return;
+    }
+
+    if (m_currentTileTest != QnTileTest::Count)
+        return;
+
     const auto completionHandler =
         [this, delay](QnTileTest test)
         {
-            const auto nextTest = static_cast<QnTileTest>(static_cast<int>(test) + 1);
-            if (nextTest == QnTileTest::Count)
-                return;
-
+            const auto nextTest = static_cast<QnTileTest>(castTileToInt(test) + 1);
+            m_currentTileTest = QnTileTest::Count;
             runTestSequence(nextTest, delay);
         };
 
+    emit messageChanged(lit("Current test (%1 / %2): %3").arg(
+        QString::number(castTileToInt(current) + 1),
+        QString::number(castTileToInt(QnTileTest::Count)),
+        getMessage(current)));
+
+    m_currentTileTest = current;
     startTest(current, delay, completionHandler);
 }

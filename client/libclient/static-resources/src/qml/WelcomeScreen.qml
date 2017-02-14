@@ -171,6 +171,8 @@ Rectangle
 
                     target: context;
 
+                    onSwitchPage: { pageSwitcher.setPage(pageIndex); }
+
                     onOpenTile:
                     {
                         if (systemId.length == 0)
@@ -276,8 +278,14 @@ Rectangle
 
                 function setPage(index, animate)
                 {
-                    if (grid.watcher.currentItem)
-                        grid.watcher.currentItem.cancelAnimationOnCollapse();
+                    /**
+                      * TODO: #ynikitenkov add items watcher, refactor
+                      * it to don'use openTileHandler's items
+                      */
+                    openTileHandler.items.forEach(function(item)
+                    {
+                        item.cancelAnimationOnCollapse();
+                    })
 
                     switchPageAnimation.stop();
                     if (animate || (opacity == 0)) //< Opacity is 0 on first show

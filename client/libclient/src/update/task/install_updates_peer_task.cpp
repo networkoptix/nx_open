@@ -17,11 +17,13 @@
 #include <nx/utils/log/log.h>
 #include <network/router.h>
 
-namespace {
+namespace detail {
     const int checkTimeout = 20 * 60 * 1000;
     const int startPingTimeout = 1 * 60 * 1000;
     const int pingInterval = 10 * 1000;
     const int shortTimeout = 60 * 1000;
+
+    const QnSoftwareVersion kUnauthenticatedUpdateMinVersion(3, 0);
 
     void sortPeers(QList<QnUuid> &peers) {
         QnRouter *router = QnRouter::instance();
@@ -41,8 +43,7 @@ namespace {
             return leftDistance > rightDistance; // sort in descending order
         });
     }
-
-}
+} using namespace detail;
 
 QnInstallUpdatesPeerTask::QnInstallUpdatesPeerTask(QObject *parent) :
     QnNetworkPeerTask(parent),
@@ -76,15 +77,18 @@ void QnInstallUpdatesPeerTask::finish(int errorCode, const QSet<QnUuid> &failedP
     QnNetworkPeerTask::finish(errorCode, failedPeers);
 }
 
-void QnInstallUpdatesPeerTask::doStart() {
-    if (peers().isEmpty()) {
+void QnInstallUpdatesPeerTask::doStart()
+{
+    if (peers().isEmpty())
+    {
         finish(NoError);
         return;
     }
 
     m_ecServer = qnCommon->currentServer();
 
-    connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnInstallUpdatesPeerTask::at_resourceChanged);
+    connect(qnResPool, &QnResourcePool::resourceChanged,
+        this, &QnInstallUpdatesPeerTask::at_resourceChanged);
 
     m_stoppingPeers = m_restartingPeers = m_pendingPeers = peers();
 
@@ -93,20 +97,39 @@ void QnInstallUpdatesPeerTask::doStart() {
 
     m_serverByRequest.clear();
 
-    QList<QnUuid> peersList = peers().toList();
+    auto peersList = peers().toList();
     sortPeers(peersList);
 
-    NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Start installing update [%1].").arg(m_updateId), cl_logDEBUG1);
-    for (const QnUuid &id: peersList) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById(id).dynamicCast<QnMediaServerResource>();
-        if (!server) {
-            finish(InstallationFailed, QSet<QnUuid>() << id);
+    NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Start installing update [%1].").arg(m_updateId),
+        cl_logDEBUG1);
+
+    for (const auto& id: peersList)
+    {
+        const auto server = qnResPool->getResourceById<QnMediaServerResource>(id);
+        if (!server)
+        {
+            finish(InstallationFailed, {id});
             return;
         }
 
-        int handle = server->apiConnection()->installUpdate(m_updateId, true, this, SLOT(at_installUpdateResponse(int,QnUploadUpdateReply,int)));
-        if (handle < 0) {
-            finish(InstallationFailed, QSet<QnUuid>() << id);
+        int handle = -1;
+
+        if (server->getVersion() >= kUnauthenticatedUpdateMinVersion)
+        {
+            handle = server->apiConnection()->installUpdateUnauthenticated(
+                m_updateId, true,
+                this, SLOT(at_installUpdateResponse(int,QnUploadUpdateReply,int)));
+        }
+        else
+        {
+            handle = server->apiConnection()->installUpdate(
+                m_updateId, true,
+                this, SLOT(at_installUpdateResponse(int,QnUploadUpdateReply,int)));
+        }
+
+        if (handle < 0)
+        {
+            finish(InstallationFailed, {id});
             return;
         }
 
@@ -118,37 +141,42 @@ void QnInstallUpdatesPeerTask::doStart() {
 
     int peersSize = m_pendingPeers.size();
 
-    QTimer *progressTimer = new QTimer(this);
+    auto progressTimer = new QTimer(this);
     progressTimer->setInterval(1000);
     progressTimer->setSingleShot(false);
-    connect(progressTimer, &QTimer::timeout,  this, [this, peersSize] {
-        int progress = (checkTimeout - m_checkTimer->remainingTime()) * 100 / checkTimeout;
-        progress = qBound(0, progress, 100);
+    connect(progressTimer, &QTimer::timeout,  this,
+        [this, peersSize]
+        {
+            int progress = (checkTimeout - m_checkTimer->remainingTime()) * 100 / checkTimeout;
+            progress = qBound(0, progress, 100);
 
-        /* Count finished peers. */
-        int totalProgress = (peersSize - m_pendingPeers.size()) * 100;
+            /* Count finished peers. */
+            int totalProgress = (peersSize - m_pendingPeers.size()) * 100;
 
-        foreach (const QnUuid &peerId, m_pendingPeers) {
-            int peerProgress = progress;
-            /* Peer already restarted. */
-            if (!m_restartingPeers.contains(peerId))
-                peerProgress = qMax(progress, 99);
-            /* Peer already stopped. */
-            else if (!m_stoppingPeers.contains(peerId))
-                peerProgress = qMax(progress, 95);
-            emit peerProgressChanged(peerId, peerProgress);
+            for (const auto& peerId: m_pendingPeers)
+            {
+                int peerProgress = progress;
+                /* Peer already restarted. */
+                if (!m_restartingPeers.contains(peerId))
+                    peerProgress = qMax(progress, 99);
+                /* Peer already stopped. */
+                else if (!m_stoppingPeers.contains(peerId))
+                    peerProgress = qMax(progress, 95);
+                emit peerProgressChanged(peerId, peerProgress);
 
-            /* Count processing peers. */
-            totalProgress += peerProgress;
-        }
+                /* Count processing peers. */
+                totalProgress += peerProgress;
+            }
 
-        emit progressChanged(totalProgress / peersSize);
-    });
-    connect(this,   &QnInstallUpdatesPeerTask::finished,    progressTimer,    &QTimer::stop);
+            emit progressChanged(totalProgress / peersSize);
+        });
+
+    connect(this, &QnInstallUpdatesPeerTask::finished, progressTimer, &QTimer::stop);
     progressTimer->start();
 }
 
-void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr &resource) {
+void QnInstallUpdatesPeerTask::at_resourceChanged(const QnResourcePtr& resource)
+{
     QnUuid peerId = resource->getId();
 
     /* Stop ping timer if the main server has appeared online */

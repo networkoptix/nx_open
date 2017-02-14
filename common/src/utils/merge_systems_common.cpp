@@ -49,7 +49,7 @@ public:
             case notLocalOwner:
                 return tr("Can't connect to the other system "
                     "because current system is already connected to %1.",
-                    "%1 is name of cloud (like 'Nx Cloud')")
+                    "%1 is the cloud name (like 'Nx Cloud')")
                         .arg(QnAppInfo::cloudName());
             case backupFailed:
                 return tr("Cannot create database backup.");
@@ -68,15 +68,15 @@ public:
                     .arg(moduleInformation.systemName);
             case dependentSystemBoundToCloud:
                 return tr("In this version you can only merge systems which are not connected to %1.",
-                    "%1 is name of cloud (like 'Nx Cloud')")
+                    "%1 is the cloud name (like 'Nx Cloud')")
                     .arg(QnAppInfo::cloudName());
             case bothSystemBoundToCloud:
                 return tr("Both systems are connected to %1. Merge is not allowed.",
-                    "%1 is name of cloud (like 'Nx Cloud')")
+                    "%1 is the cloud name (like 'Nx Cloud')")
                     .arg(QnAppInfo::cloudName());
             case differentCloudHost:
                 return tr("These systems are built with different %1 URL. Merge is not allowed.",
-                    "%1 is name of cloud (like 'Nx Cloud')")
+                    "%1 is the cloud name (like 'Nx Cloud')")
                     .arg(QnAppInfo::cloudName());
             case unconfiguredSystem:
                 return tr("System name is not configured yet.");

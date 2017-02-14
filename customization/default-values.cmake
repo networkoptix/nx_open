@@ -29,6 +29,12 @@ set(prodUpdateFeedUrl "http://updates.hdwitness.com/updates.json")
 set(releaseNotesUrl "http://updates.hdwitness.com/releasenotes.json")
 set(testUpdateFeedUrl "http://updates.hdwitness.com/updates.json")
 
+if(beta)
+    set(updateFeedUrl ${testUpdateFeedUrl})
+else()
+    set(updateFeedUrl ${prodUpdateFeedUrl})
+endif()
+
 # Additional Features
 set(vmax "false")
 

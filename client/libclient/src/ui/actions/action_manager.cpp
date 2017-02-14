@@ -1231,7 +1231,7 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnRunningVideowallActionCondition(this));
 
-    factory(QnActions::DetachFromVideoWallAction).
+    factory(QnActions::ClearVideoWallScreen).
         flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
         text(tr("Clear Screen")).

@@ -26,8 +26,7 @@ enum class QnMessageBoxIcon
 enum class QnButtonDetection
 {
     NoDetection = 0x0,
-    DefaultButton = 0x1,
-    EscapeButton = 0x2
+    DefaultButton = 0x1
 };
 Q_DECLARE_FLAGS(QnButtonDetections, QnButtonDetection)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnButtonDetections)

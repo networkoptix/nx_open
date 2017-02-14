@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.7.0 FATAL_ERROR)
 
 set(customization "default" CACHE STRING "Product customization")
 set(box "none" CACHE STRING "Target box")
@@ -21,14 +21,13 @@ set(releaseVersion.full ${PROJECT_VERSION}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-if(NOT WIN32)
+if(NOT WIN32 AND NOT ANDROID AND NOT IOS)
     set(BUILD_SHARED_LIBS ON)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/build_utils/cmake
-    ${PROJECT_SOURCE_DIR}/cmake
-)
+    ${PROJECT_SOURCE_DIR}/cmake)
 
 include(CMakeParseArguments)
 include(utils)
@@ -43,6 +42,8 @@ include(project_utils)
 detect_platform()
 rdep_configure()
 
+include(android-ndk-workaround)
+
 include(package_versions)
 include(ec_protocol)
 include(maven_compatibility)
@@ -54,6 +55,7 @@ include(${customization_dir}/customization.cmake)
 include(properties)
 include(cloud_host)
 include(vms_parts)
+include(compiler_options)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
@@ -79,17 +81,19 @@ find_package(Qt5
         XmlPatterns
         Sql
         Concurrent
-        Multimedia
-        OpenGL
-        Qml
-        Quick
-        QuickWidgets
-        WebKit
-        WebKitWidgets
-        X11Extras
-)
+        Multimedia)
 
-include(compiler_options)
+if(withDesktopClient OR withMobileClient)
+    find_package(Qt5
+        COMPONENTS
+            OpenGL
+            Qml
+            Quick)
+endif()
+
+if(ANDROID)
+    find_package(Qt5 COMPONENTS AndroidExtras)
+endif()
 
 # Required for QN_DECLARE_METAOBJECT_HEADER
 include_directories("${PROJECT_SOURCE_DIR}/common_libs/nx_fusion/src")
@@ -112,5 +116,7 @@ endif()
 if(withTests)
     add_subdirectory(unit_tests)
 endif()
+
+include(fix_qt_vars)
 
 cmake_policy(SET CMP0058 NEW)
