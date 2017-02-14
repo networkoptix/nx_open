@@ -6,16 +6,15 @@
 #include <media_server_process.h>
 #include <nx/network/socket_global.h>
 
-MediaServerLauncher::MediaServerLauncher(const QString& tmpDir, bool optimizeStartupTime):
+MediaServerLauncher::MediaServerLauncher(const QString& tmpDir, DisabledFeatures disabledFeatures):
     m_workDirResource(tmpDir),
     m_serverEndpoint(HostAddress::localhost, 0),
     m_firstStartup(true)
 {
-    if (optimizeStartupTime)
-    {
+    if (disabledFeatures.testFlag(DisabledFeature::noResorseDiscovery))
         addSetting(QnServer::kNoResourceDiscovery, "1");
+    if (disabledFeatures.testFlag(DisabledFeature::noMonitorStatistics))
         addSetting(QnServer::kNoMonitorStatistics, "1");
-    }
 }
 
 MediaServerLauncher::~MediaServerLauncher()
