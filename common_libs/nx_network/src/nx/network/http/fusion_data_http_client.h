@@ -96,6 +96,13 @@ public:
             m_httpClient->doPost(m_url, m_requestContentType, std::move(m_requestBody));
     }
 
+    void setRequestTimeout(std::chrono::milliseconds timeout)
+    {
+        m_httpClient->setSendTimeoutMs(timeout.count());
+        m_httpClient->setResponseReadTimeoutMs(timeout.count());
+        m_httpClient->setMessageBodyReadTimeoutMs(timeout.count());
+    }
+
 protected:
     QUrl m_url;
     nx_http::StringType m_requestContentType;
