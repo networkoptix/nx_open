@@ -1,6 +1,6 @@
 #include "generate_data.h"
 
-#include "load_emulator.h"
+#include "data_generator.h"
 
 namespace nx {
 namespace cdb {
@@ -12,12 +12,12 @@ int generateSystems(
     const std::string& password,
     int testSystemsToGenerate)
 {
-    auto loadEmulator = std::make_unique<test::LoadEmulator>(
+    auto dataGenerator = std::make_unique<test::DataGenerator>(
         cdbUrl,
         login,
         password);
 
-    loadEmulator->createRandomSystems(testSystemsToGenerate);
+    dataGenerator->createRandomSystems(testSystemsToGenerate);
     return 0;
 }
 

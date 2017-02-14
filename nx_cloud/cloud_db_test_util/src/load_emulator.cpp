@@ -14,8 +14,7 @@ LoadEmulator::LoadEmulator(
     const std::string& accountPassword)
     :
     m_cdbUrl(cdbUrl),
-    m_transactionConnectionCount(100),
-    m_awaitedResponseCount(0)
+    m_transactionConnectionCount(100)
 {
     m_cdbClient.setCredentials(accountEmail, accountPassword);
 }
@@ -25,28 +24,6 @@ void LoadEmulator::setTransactionConnectionCount(int connectionCount)
     m_transactionConnectionCount = connectionCount;
 }
 
-void LoadEmulator::createRandomSystems(int systemCount)
-{
-    using namespace std::placeholders;
-
-    m_awaitedResponseCount = systemCount;
-
-    for (int i = 0; i < systemCount; ++i)
-    {
-        api::SystemRegistrationData registrationData;
-        registrationData.customization = QnAppInfo::customizationName().toStdString();
-        registrationData.name = "load_test_system_" + utils::generateRandomName(8);
-
-        m_cdbClient.systemManager()->bindSystem(
-            registrationData,
-            std::bind(&LoadEmulator::onSystemBound, this, registrationData, _1, _2));
-    }
-
-    QnMutexLocker lock(&m_mutex);
-    while (m_awaitedResponseCount > 0)
-        m_cond.wait(lock.mutex());
-}
-
 void LoadEmulator::start()
 {
     using namespace std::placeholders;
@@ -54,20 +31,6 @@ void LoadEmulator::start()
     // Fetching system list.
     m_cdbClient.systemManager()->getSystems(
         std::bind(&LoadEmulator::onSystemListReceived, this, _1, _2));
-}
-
-void LoadEmulator::onSystemBound(
-    api::SystemRegistrationData registrationData,
-    api::ResultCode resultCode,
-    api::SystemData system)
-{
-    if (resultCode != api::ResultCode::ok)
-    {
-        // TODO: Retrying request.
-    }
-
-    --m_awaitedResponseCount;
-    m_cond.wakeAll();
 }
 
 void LoadEmulator::onSystemListReceived(
