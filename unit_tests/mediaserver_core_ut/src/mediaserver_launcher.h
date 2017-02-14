@@ -16,13 +16,13 @@ class MediaServerLauncher: public QObject
 {
     Q_OBJECT
 public:
-    MediaServerLauncher(const QString& tmpDir = QString());
+    MediaServerLauncher(const QString& tmpDir = QString(), bool optimizeStartupTime = true);
     ~MediaServerLauncher();
 
     SocketAddress endpoint() const;
     int port() const;
 
-    void addSetting(const QString& name, const QString& value);
+    void addSetting(const QString& name, const QVariant& value);
 
     /**
      * Run media server at the current thread

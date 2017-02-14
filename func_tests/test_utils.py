@@ -78,7 +78,7 @@ class EnvironmentBuilder(object):
             if i < len(self._boxes_config):
                 box_config = self._boxes_config[i]
             else:
-                box_config = BoxConfig('funtest-box-%d' % i)
+                box_config = BoxConfig('box-%d' % i)
                 self._boxes_config.append(box_config)
             config.assign_box(box_config.name)
         self._cache.set(self.vagrant_boxes_cache_key, [config.to_dict() for config in self._boxes_config])
@@ -88,19 +88,18 @@ class EnvironmentBuilder(object):
         url = '%s://%s:%d/' % (http_schema, box.ip_address, MEDIASERVER_LISTEN_PORT)
         server = Server(config.name, box, url, self._cloud_host_rest_api)
         server.init(config.start, self._reset_servers)
-        server.storage.cleanup()
         if server.is_started() and not server.is_system_set_up() and config.setup == ServerConfig.SETUP_LOCAL:
             log.info('Setting up server %s:', server)
             server.setup_local_system()
         return server
 
-    def run_servers_merge(self, server_names, servers):
-        if not server_names:
+    def run_servers_merge(self, servers_config, servers):
+        if not servers_config:
             return
-        server_1 = servers[server_names[0]]
+        server_1 = servers[servers_config[0].name]
         assert server_1.is_started(), 'Requested merge of not started server: %s' % server_1
-        for name in server_names[1:]:
-            server_2 = servers[name]
+        for config in servers_config[1:]:
+            server_2 = servers[config.name]
             assert server_2.is_started(), 'Requested merge of not started server: %s' % server_2
             server_1.merge_systems(server_2)
 
@@ -130,7 +129,7 @@ class EnvironmentBuilder(object):
         servers = {config.name: self.init_server(http_schema, config, vagrant.boxes) for config in servers_config}
         self.run_servers_merge(merge_servers or [], servers)
         for name, server in servers.items():
-            log.info('%s: %r at %s ecs_guid=%r', name.upper(), server.name, server.url, server.ecs_guid)
+            log.info('%s: %r at %s ecs_guid=%r local_system_id=%r', name.upper(), server.name, server.url, server.ecs_guid, server.local_system_id)
         log.info('----- setup is complete; test follows ----------------------------->8 ----------------------------------------------')
         return SimpleNamespace(**servers)
 

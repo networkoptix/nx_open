@@ -85,7 +85,7 @@ static QnIOStateDataList genTestData()
     return result;
 }
 
-static void prepareDbTestData(MediaServerLauncher& launcher)
+static void prepareDbTestData(const MediaServerLauncher* const launcher)
 {
     ec2::ApiCameraData cameraData;
     auto resTypeId = qnResTypePool->getResourceTypeId(
@@ -104,12 +104,11 @@ static void prepareDbTestData(MediaServerLauncher& launcher)
 TEST(IoServerMonitorTest, main)
 {
     MediaServerLauncher launcher;
-    launcher.addSetting(QnServer::kNoResourceDiscovery, "1");
     ASSERT_TRUE(launcher.start());
     // Prevent opening stream from testCamera and moving camera to offline state
     qnGlobalSettings->setAutoUpdateThumbnailsEnabled(false);
 
-    prepareDbTestData(launcher);
+    prepareDbTestData(&launcher);
     auto testData = genTestData();
 
     auto httpClient = nx_http::AsyncHttpClient::create();

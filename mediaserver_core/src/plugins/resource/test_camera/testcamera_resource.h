@@ -12,8 +12,8 @@ class QnTestCameraResource : public QnPhysicalCameraResource
     Q_OBJECT
 
 public:
-    static constexpr const char kManufacturer[] = "NetworkOptix";
-    static constexpr const char kModel[] = "TestCameraLive";
+    static constexpr const char* const kManufacturer = "NetworkOptix";
+    static constexpr const char* const kModel = "TestCameraLive";
 
     QnTestCameraResource();
 

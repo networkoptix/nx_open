@@ -89,7 +89,7 @@ protected:
         fileDeletor = std::unique_ptr<QnFileDeletor>(new QnFileDeletor);
         pluginManager = std::unique_ptr<PluginManager>( new PluginManager);
 
-        platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction);
+        platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
 
         QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
         PluginManager::instance()->loadPlugins(MSSettings::roSettings());

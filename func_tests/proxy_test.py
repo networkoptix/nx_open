@@ -9,7 +9,7 @@ from test_utils import print_list
 def env(env_builder, server, http_schema):
     one = server()
     two = server()
-    return env_builder(http_schema, merge_servers=['one', 'two'], one=one, two=two)
+    return env_builder(http_schema, merge_servers=[one, two], one=one, two=two)
 
 # Use light 'api/moduleInformation' request for testing
 def test_proxy_light_request(env):
