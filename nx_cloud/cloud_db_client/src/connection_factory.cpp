@@ -36,7 +36,7 @@ void ConnectionFactory::connect(
 
 std::unique_ptr<api::Connection> ConnectionFactory::createConnection()
 {
-    auto connection = std::make_unique<Connection>(&m_endPointFetcher);
+    std::unique_ptr<api::Connection> connection = std::make_unique<Connection>(&m_endPointFetcher);
     connection->setRequestTimeout(kDefaultRequestTimeout);
     return connection;
 }
