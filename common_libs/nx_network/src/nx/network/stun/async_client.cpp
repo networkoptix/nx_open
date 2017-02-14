@@ -267,9 +267,15 @@ void AsyncClient::closeConnectionImpl(
     NX_LOGX(lm("Connection is closed: %1").arg(SystemError::toString(code)), cl_logINFO);
     m_state = State::disconnected;
 
-    auto connectingSocket = std::move(m_connectingSocket);
-    auto requestQueue = std::move(m_requestQueue);
-    auto requestsInProgress = std::move(m_requestsInProgress);
+    decltype(m_connectingSocket) connectingSocket;
+    connectingSocket.swap(m_connectingSocket);
+
+    decltype(m_requestQueue) requestQueue;
+    requestQueue.swap(m_requestQueue);
+
+    decltype(m_requestsInProgress) requestsInProgress;
+    requestsInProgress.swap(m_requestsInProgress);
+
     m_connectionTimers.clear();
 
     lock->unlock();
@@ -277,8 +283,10 @@ void AsyncClient::closeConnectionImpl(
         if (connectingSocket)
             connectingSocket->pleaseStopSync();
 
-        for (const auto& r: requestsInProgress) r.second.second(code, Message());
-        for (const auto& r: requestQueue) r.second.second(code, Message());
+        for (const auto& r: requestsInProgress)
+            r.second.second(code, Message());
+        for (const auto& r: requestQueue)
+            r.second.second(code, Message());
     }
     lock->relock();
 
