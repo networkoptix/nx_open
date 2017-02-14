@@ -22,9 +22,9 @@ NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
     []() { return std::make_unique<TCPServerSocket>(AF_INET); },
     []() { return std::make_unique<CloudStreamSocket>(AF_INET); });
 
-TEST(CloudStreamSocketTcpByIp, SimpleSyncSsl)
+TEST(CloudStreamSocketTcpByIp, TransferSyncSsl)
 {
-    network::test::socketSimpleSync(
+    network::test::socketTransferSync(
         [&]() { return std::make_unique<SslServerSocket>(new TCPServerSocket(AF_INET), false); },
         []() { return std::make_unique<SslSocket>(new CloudStreamSocket(AF_INET), false); });
 }
@@ -79,9 +79,9 @@ NX_NETWORK_CLIENT_SOCKET_TEST_CASE_EX(
     [&]() { return std::make_unique<CloudStreamSocket>(AF_INET); },
     SocketAddress(testHost));
 
-TEST_F(CloudStreamSocketTcpByHost, SimpleSyncSsl)
+TEST_F(CloudStreamSocketTcpByHost, TransferSyncSsl)
 {
-    network::test::socketSimpleSync(
+    network::test::socketTransferSync(
         [&]() { return std::make_unique<SslServerSocket>(new TestTcpServerSocket(testHost), false); },
         []() { return std::make_unique<SslSocket>(new CloudStreamSocket(AF_INET), false); },
         SocketAddress(testHost));
