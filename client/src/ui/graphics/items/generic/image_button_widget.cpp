@@ -242,7 +242,8 @@ void QnImageButtonWidget::clickInternal(QGraphicsSceneMouseEvent *event) {
 }
 
 void QnImageButtonWidget::click() {
-    clickInternal(NULL);
+    if (!m_state.testFlag(Pressed))
+        clickInternal(NULL);
 }
 
 void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {

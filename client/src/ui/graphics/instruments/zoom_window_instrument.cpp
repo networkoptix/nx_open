@@ -30,6 +30,7 @@
 namespace {
     const qreal zoomWindowMinSize = 0.1;
     const qreal zoomWindowMaxSize = 0.9;
+    static const qreal kMaxZoomWindowAr = 21.0 / 9.0;
 
 } // anonymous namespace
 
@@ -651,8 +652,19 @@ void ZoomWindowInstrument::dragMove(DragInfo *info) {
         return;
     }
 
+    qreal originalAr = aspectRatio(target()->size()) / aspectRatio(target()->channelLayout()->size());
+
+    // Here are the special algorithm by #rvasilenko
+    int resizeCoef = 1;
+    qreal targetAr = originalAr;
+    while (targetAr > kMaxZoomWindowAr)
+    {
+        ++resizeCoef;
+        targetAr = originalAr / resizeCoef;
+    }
+
     ensureSelectionItem();
-    selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()) / aspectRatio(target()->channelLayout()->size()), target()->rect());
+    selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), targetAr, target()->rect());
 }
 
 void ZoomWindowInstrument::finishDrag(DragInfo *) {
