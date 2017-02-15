@@ -1648,10 +1648,6 @@ to view more bookmarks</source>
 <context>
     <name>QnBackupSettingsDialog</name>
     <message>
-        <source>Global Settings	(affect all servers in the system)</source>
-        <translation>Глобальные параметры (влияют на все серверы в системе)</translation>
-    </message>
-    <message>
         <source>By Schedule</source>
         <translation>По расписанию</translation>
     </message>
@@ -1677,6 +1673,15 @@ to view more bookmarks</source>
         <source>All Streams</source>
         <comment>Cameras Backup</comment>
         <translation>Все потоки</translation>
+    </message>
+    <message>
+        <source>Global Settings</source>
+        <translation>Глобальные параметры</translation>
+    </message>
+    <message>
+        <source>affect all servers in the system</source>
+        <comment>Relates to &apos;Global Settings&apos; subject</comment>
+        <translation>влияют на все серверы в системе</translation>
     </message>
 </context>
 <context>
