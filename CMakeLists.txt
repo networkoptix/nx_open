@@ -65,6 +65,7 @@ rdep_add_package(qt)
 get_full_package_name(qt QT_DIR)
 set(QT_DIR ${PACKAGES_DIR}/${QT_DIR})
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
+set(CMAKE_FRAMEWORK_PATH "${QT_DIR}/lib")
 
 rdep_add_package(any/boost)
 rdep_add_package(any/qtservice)

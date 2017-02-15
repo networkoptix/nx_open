@@ -51,9 +51,6 @@ function(nx_add_target name type)
     endif()
 
     if(NOT NX_NO_PCH)
-        if(MACOSX)
-            set(pch_flags ADDITIONAL_FLAGS -iframework "${QT_DIR}/lib")
-        endif()
         add_precompiled_header(${name} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h" ${pch_flags})
     endif()
 
