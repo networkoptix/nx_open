@@ -84,7 +84,7 @@ public:
         soap_end(m_syncWrapper->getProxy()->soap);
         m_syncWrapper.reset();
 
-        //if we are here, it is garanteed that 
+        //if we are here, it is garanteed that
             //- completion handler is down the stack
             //- or no completion handler is running and it will never be launched
 
@@ -306,7 +306,7 @@ private:
         {
             m_state = done;
             if (m_httpStreamReader.message().type != nx_http::MessageType::response)
-                m_resultHandler(SOAP_FAULT);   
+                m_resultHandler(SOAP_FAULT);
 
             auto resultCode = deserializeResponse();
             m_resultHandler(resultCode);
@@ -322,20 +322,12 @@ private:
             if (!m_socket)
                 return;
 
-            auto readStatus = m_socket->readSomeAsync(
+            m_socket->readSomeAsync(
                 &m_responseBuffer,
                 [this](SystemError::ErrorCode errorCode, std::size_t bytesRead)
                 {
                     onSomeBytesRead(errorCode, bytesRead);
                 });
-
-            if (!readStatus)
-            {
-                m_state = done;
-                lock.unlock();
-                m_resultHandler(SOAP_FAULT);
-                return;
-            }
         }
     }
 
