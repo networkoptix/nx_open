@@ -23,6 +23,7 @@ QnStorageRebuildWidget::~QnStorageRebuildWidget()
 
 void QnStorageRebuildWidget::loadData(const QnStorageScanData& data, bool isBackup)
 {
+    QString placeholder = lit(" \t%p%");
     if (data.progress >= 0)
     {
         ui->progressBar->setValue(data.totalProgress * 100 + 0.5);
@@ -30,13 +31,13 @@ void QnStorageRebuildWidget::loadData(const QnStorageScanData& data, bool isBack
         {
             case Qn::RebuildState_PartialScan:
                 ui->progressBar->setFormat(isBackup
-                    ? tr("Fast Backup Scan... \t%p%", "%p is a placeholder for percent value, must be kept.")
-                    : tr("Fast Archive Scan... \t%p%", "%p is a placeholder for percent value, must be kept."));
+                    ? tr("Fast Backup Scan...") + placeholder
+                    : tr("Fast Archive Scan...") + placeholder);
                 break;
             case Qn::RebuildState_FullScan:
                 ui->progressBar->setFormat(isBackup
-                    ? tr("Reindexing Backup... \t%p%", "%p is a placeholder for percent value, must be kept.")
-                    : tr("Reindexing Archive... \t%p%", "%p is a placeholder for percent value, must be kept."));
+                    ? tr("Reindexing Backup...") + placeholder
+                    : tr("Reindexing Archive...") + placeholder);
                 break;
             default:
                 break;

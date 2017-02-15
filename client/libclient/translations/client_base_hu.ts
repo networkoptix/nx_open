@@ -1646,10 +1646,6 @@ több könyvjelző megjelenítéséhez</translation>
 <context>
     <name>QnBackupSettingsDialog</name>
     <message>
-        <source>Global Settings	(affect all servers in the system)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>By Schedule</source>
         <translation type="unfinished">Ütemezés szerint</translation>
     </message>
@@ -1674,6 +1670,15 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>All Streams</source>
         <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>affect all servers in the system</source>
+        <comment>Relates to &apos;Global Settings&apos; subject</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6026,23 +6031,19 @@ to %1</source>
 <context>
     <name>QnStorageRebuildWidget</name>
     <message>
-        <source>Fast Backup Scan... 	%p%</source>
-        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <source>Fast Backup Scan...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fast Archive Scan... 	%p%</source>
-        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <source>Fast Archive Scan...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reindexing Backup... 	%p%</source>
-        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <source>Reindexing Backup...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reindexing Archive... 	%p%</source>
-        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <source>Reindexing Archive...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6551,7 +6552,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>What to do with %n users with this role?</source>
+        <source>Please select the action to perform to %n users with this role</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
