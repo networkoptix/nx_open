@@ -6628,7 +6628,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>What to do with %n users with this role?</source>
+        <source>Please select the action to perform to %n users with this role</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
