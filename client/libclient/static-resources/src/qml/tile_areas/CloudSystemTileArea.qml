@@ -9,7 +9,7 @@ Column
     property string userName;
     property bool isConnectable: false;
 
-    spacing: 10; // TODO: check is bottom margin is 8px
+    spacing: 14; // TODO: check is bottom margin is 8px
 
     NxLabel
     {
