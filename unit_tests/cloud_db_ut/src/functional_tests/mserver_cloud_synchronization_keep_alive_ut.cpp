@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 
+#include <nx/utils/url_builder.h>
+
+#include <test_support/transaction_connection_helper.h>
+
 #include "ec2/cloud_vms_synchro_test_helper.h"
-#include "ec2/transaction_connection_helper.h"
 
 namespace nx {
 namespace cdb {
@@ -20,16 +23,16 @@ public:
 
 protected:
     std::chrono::milliseconds m_connectionInactivityTimeout;
-    TransactionConnectionHelper m_transactionConnectionHelper;
+    test::TransactionConnectionHelper m_transactionConnectionHelper;
     int m_connectionId;
 
     void testTransactionConnectionKeepAlive(
-        KeepAlivePolicy keepAlivePolicy);
+        test::KeepAlivePolicy keepAlivePolicy);
 };
 
 TEST_F(Ec2MserverCloudSynchronizationKeepAlive, connection_break)
 {
-    testTransactionConnectionKeepAlive(KeepAlivePolicy::noKeepAlive);
+    testTransactionConnectionKeepAlive(test::KeepAlivePolicy::noKeepAlive);
 
     // Waiting for connection to be dropped by cloud due to absense of keep-alive messages.
     ASSERT_TRUE(
@@ -41,7 +44,7 @@ TEST_F(Ec2MserverCloudSynchronizationKeepAlive, connection_break)
 
 TEST_F(Ec2MserverCloudSynchronizationKeepAlive, works)
 {
-    testTransactionConnectionKeepAlive(KeepAlivePolicy::enableKeepAlive);
+    testTransactionConnectionKeepAlive(test::KeepAlivePolicy::enableKeepAlive);
 
     std::this_thread::sleep_for(m_connectionInactivityTimeout + allowedConnectionClosureTimeError);
     const auto connectionState =
@@ -52,7 +55,7 @@ TEST_F(Ec2MserverCloudSynchronizationKeepAlive, works)
 }
 
 void Ec2MserverCloudSynchronizationKeepAlive::testTransactionConnectionKeepAlive(
-    KeepAlivePolicy keepAlivePolicy)
+    test::KeepAlivePolicy keepAlivePolicy)
 {
     ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
@@ -60,7 +63,8 @@ void Ec2MserverCloudSynchronizationKeepAlive::testTransactionConnectionKeepAlive
 
     m_connectionId =
         m_transactionConnectionHelper.establishTransactionConnection(
-            cdb()->endpoint(),
+            utils::UrlBuilder().setScheme("http")
+                .setHost(cdb()->endpoint().address.toString()).setPort(cdb()->endpoint().port),
             registeredSystemData().id,
             registeredSystemData().authKey,
             keepAlivePolicy);

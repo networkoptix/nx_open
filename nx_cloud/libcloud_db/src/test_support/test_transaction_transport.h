@@ -1,15 +1,12 @@
-
 #pragma once
 
 #include <transaction/transaction_transport_base.h>
-
 
 namespace nx {
 namespace cdb {
 namespace test {
 
-class TransactionTransport
-:
+class TransactionTransport:
     public ::ec2::QnTransactionTransportBase
 {
 public:
@@ -29,6 +26,6 @@ private:
     const std::string m_systemAuthKey;
 };
 
-}   // namespace test
-}   // namespace cdb
-}   // namespace nx
+} // namespace test
+} // namespace cdb
+} // namespace nx

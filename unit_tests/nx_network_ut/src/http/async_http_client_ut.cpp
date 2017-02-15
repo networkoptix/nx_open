@@ -166,8 +166,6 @@ TEST_F(AsyncHttpClientTest, ServerModRewrite)
 namespace {
 static void testHttpClientForFastRemove(const QUrl& url)
 {
-    nx_http::AsyncHttpClient::create()->doGet(url);
-
     // use different delays (10us - 0.5s) to catch problems on different stages
     for (uint time = 10; time < 500000; time *= 2)
     {
@@ -176,6 +174,7 @@ static void testHttpClientForFastRemove(const QUrl& url)
 
         // kill the client after some delay
         std::this_thread::sleep_for(std::chrono::microseconds(time));
+        client->pleaseStopSync();
     }
 }
 } // namespace

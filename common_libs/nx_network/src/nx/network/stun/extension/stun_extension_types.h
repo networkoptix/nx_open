@@ -104,6 +104,7 @@ enum AttributeType
     peerId,
     connectionId,
     cloudConnectVersion,
+    cloudConnectOptions,
 
     hostName = stun::attrs::userDefined + 0x200,
     hostNameList,
