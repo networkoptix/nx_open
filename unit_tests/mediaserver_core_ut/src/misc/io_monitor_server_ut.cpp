@@ -112,6 +112,8 @@ TEST(IoServerMonitorTest, main)
     auto testData = genTestData();
 
     auto httpClient = nx_http::AsyncHttpClient::create();
+    auto httpClientGuard = makeScopedGuard([&httpClient]() { httpClient->pleaseStopSync(); });
+
     httpClient->setUserName("admin");
     httpClient->setUserPassword("admin");
 
@@ -125,7 +127,7 @@ TEST(IoServerMonitorTest, main)
     auto ioParser = std::make_shared<IoMonitorParser>(testData);
     contentParser->setNextFilter(ioParser);
 
-    std::promise<void> AllDataProcessed;
+    std::promise<void> allDataProcessed;
     std::promise<void> ioServerStarted;
 
     QObject::connect(
@@ -139,19 +141,19 @@ TEST(IoServerMonitorTest, main)
 
     QObject::connect(
         httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
-        [contentParser, ioParser, &AllDataProcessed](nx_http::AsyncHttpClientPtr httpClient)
+        [contentParser, ioParser, &allDataProcessed](nx_http::AsyncHttpClientPtr httpClient)
         {
             const nx_http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
             ASSERT_TRUE(contentParser->processData(msgBodyBuf));
             if (ioParser->isEof())
-                AllDataProcessed.set_value();
+                allDataProcessed.set_value();
         });
 
     QObject::connect(
         httpClient.get(), &nx_http::AsyncHttpClient::done,
-        [&AllDataProcessed](nx_http::AsyncHttpClientPtr httpClient)
+        [&allDataProcessed](nx_http::AsyncHttpClientPtr httpClient)
         {
-            AllDataProcessed.set_value();
+            allDataProcessed.set_value();
         });
 
     auto camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(kTestCamPhysicalId);
@@ -174,7 +176,7 @@ TEST(IoServerMonitorTest, main)
 
     ASSERT_EQ(
         std::future_status::ready,
-        AllDataProcessed.get_future().wait_for(kMaxTestTime));
+        allDataProcessed.get_future().wait_for(kMaxTestTime));
 
 
     ASSERT_TRUE(ioParser->isEof());
