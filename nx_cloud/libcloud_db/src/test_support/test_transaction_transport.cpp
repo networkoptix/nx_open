@@ -1,6 +1,4 @@
-
-#include "transaction_transport.h"
-
+#include "test_transaction_transport.h"
 
 namespace nx {
 namespace cdb {
@@ -33,6 +31,6 @@ void TransactionTransport::fillAuthInfo(
     httpClient->setUserPassword(QString::fromStdString(m_systemAuthKey));
 }
 
-}   // namespace test
-}   // namespace cdb
-}   // namespace nx
+} // namespace test
+} // namespace cdb
+} // namespace nx

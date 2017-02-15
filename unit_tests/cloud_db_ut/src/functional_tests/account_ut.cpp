@@ -34,17 +34,17 @@ class Account:
 
 } // namespace
 
-// TODO: #ak following test should be broke into something like
+// TODO: #ak following test should be broken into something like:
 //
 //{
-//    havingIssuedAccountRegistrationRequest();
-//    expectingReceivalOfActiveAccountNotification();
-//    expectingAccountActivationCodeWorks();
+//    whenIssuedAccountRegistrationRequest();
+//    assertAccountActivationNotificationHasBeenSent();
+//    assertAccountActivationCodeWorks();
 //}
 //
 //{
-//    havingIssuedAccountRegistrationRequest();
-//    expectingFailureToBindSystemToAccount();
+//    whenIssuedAccountRegistrationRequest();
+//    assertAccountCannotBindSystem();
 //}
 
 TEST_F(Account, activation)

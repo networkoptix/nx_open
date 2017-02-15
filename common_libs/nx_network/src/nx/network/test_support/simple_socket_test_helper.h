@@ -1111,7 +1111,7 @@ void socketIsUsefulAfterCancelIo(
     if (!endpointToConnectTo)
         endpointToConnectTo = std::move(serverAddress);
 
-    ASSERT_FALSE((bool) server->accept()) << lastError();
+    ASSERT_FALSE((bool) server->accept());
 
     auto client = clientMaker();
     ASSERT_TRUE(client->setNonBlockingMode(true));
@@ -1120,6 +1120,7 @@ void socketIsUsefulAfterCancelIo(
     ASSERT_TRUE(client->connect(*endpointToConnectTo, kTestTimeout.count()));
     ASSERT_TRUE(client->setNonBlockingMode(true));
 
+    ASSERT_TRUE(server->setRecvTimeout(0));
     std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
     ASSERT_TRUE((bool) accepted);
     transferAsyncSync(client.get(), accepted.get());

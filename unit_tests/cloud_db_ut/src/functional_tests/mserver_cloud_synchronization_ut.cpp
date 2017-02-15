@@ -16,8 +16,9 @@
 #include <utils/common/app_info.h>
 #include <utils/common/id.h>
 
+#include <test_support/transaction_connection_helper.h>
+
 #include "ec2/cloud_vms_synchro_test_helper.h"
-#include "ec2/transaction_connection_helper.h"
 #include "email_manager_mocked.h"
 
 namespace nx {
