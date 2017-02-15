@@ -266,6 +266,7 @@ void QnWorkbench::setItem(Qn::ItemRole role, QnWorkbenchItem *item)
     if (!validLayout)
         return;
 
+    emit itemAboutToBeChanged(role);
     m_itemByRole[role] = item;
     emit itemChanged(role);
 

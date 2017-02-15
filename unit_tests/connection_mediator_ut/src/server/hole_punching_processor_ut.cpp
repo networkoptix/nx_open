@@ -11,6 +11,8 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/thread/sync_queue.h>
+
+#include <utils/common/guard.h>
 #include <utils/common/sync_call.h>
 
 #include <server/hole_punching_processor.h>
@@ -91,6 +93,7 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
 
         //requesting connect to the server
         nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
+        auto udpClientGuard = makeScopedGuard([&udpClient]() { udpClient.pleaseStopSync(); });
 
         nx::utils::promise<api::ResultCode> connectResultPromise;
 
@@ -156,8 +159,6 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
                     std::move(connectionResult),
                     std::placeholders::_1));
         ASSERT_EQ(api::ResultCode::notFound, resultCode);
-
-        udpClient.pleaseStopSync();
     }
 }
 
@@ -212,6 +213,7 @@ TEST_F(FtHolePunchingProcessorServerFailure, server_failure)
 
         //requesting connect to the server 
         nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
+        auto udpClientGuard = makeScopedGuard([&udpClient]() { udpClient.pleaseStopSync(); });
 
         boost::optional<api::ResultCode> connectResult;
 
@@ -262,8 +264,6 @@ TEST_F(FtHolePunchingProcessorServerFailure, server_failure)
                         std::placeholders::_1));
             ASSERT_EQ(api::ResultCode::notFound, resultCode);
         }
-
-        udpClient.pleaseStopSync();
     }
 }
 
@@ -277,6 +277,7 @@ TEST_F(FtHolePunchingProcessor, destruction)
     for (int i = 0; i < 100; ++i)
     {
         nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
+        auto udpClientGuard = makeScopedGuard([&udpClient]() { udpClient.pleaseStopSync(); });
 
         api::ConnectRequest connectRequest;
         connectRequest.originatingPeerId = QnUuid::createUuid().toByteArray();
@@ -294,8 +295,6 @@ TEST_F(FtHolePunchingProcessor, destruction)
                 connectResponsePromise.set_value();
             });
         connectResponsePromise.get_future().wait();
-
-        udpClient.pleaseStopSync();
     }
 }
 

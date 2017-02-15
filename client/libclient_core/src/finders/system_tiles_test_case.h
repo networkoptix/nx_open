@@ -12,6 +12,7 @@ enum class QnTileTest
     ChangeWeightOnCollapse = First,
     ChangeVersion,
     MaximizeAppOnCollapse,
+    SwitchPage,
 
     Count
 };
@@ -45,6 +46,10 @@ signals:
     void makeFullscreen();
     void restoreApp();
 
+    void switchPage(int pageNumber);
+
+    void messageChanged(const QString& message);
+
 private:
     void changeWeightsTest(CompletionHandler completionHandler);
 
@@ -52,6 +57,12 @@ private:
 
     void versionChangeTest(CompletionHandler completionHandler);
 
+    void switchPageTest(CompletionHandler completionHandler);
+
+    void showAutohideMessage(
+        const QString& message,
+        qint64 hideDelay);
 private:
     QnTestSystemsFinder* const m_finder;
+    QnTileTest m_currentTileTest = QnTileTest::Count;
 };

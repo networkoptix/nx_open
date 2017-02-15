@@ -81,5 +81,9 @@
 			</array>
 		</dict>
 	</dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app does not use photo library.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app does not use camera.</string>
 </dict>
 </plist>

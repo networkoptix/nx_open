@@ -1,15 +1,9 @@
-/**********************************************************
-* Sep 3, 2015
-* akolesnikov
-***********************************************************/
-
 #include "cdb_connection.h"
 
 #include <nx/network/socket_common.h>
 
 #include "cdb_request_path.h"
 #include "data/module_info.h"
-
 
 namespace nx {
 namespace cdb {
@@ -18,12 +12,14 @@ namespace client {
 Connection::Connection(
     network::cloud::CloudModuleUrlFetcher* const endPointFetcher)
     :
-    AsyncRequestsExecutor(endPointFetcher)
+    m_requestExecutor(endPointFetcher)
 {
     m_accountManager = std::make_unique<AccountManager>(endPointFetcher);
     m_systemManager = std::make_unique<SystemManager>(endPointFetcher);
     m_authProvider = std::make_unique<AuthProvider>(endPointFetcher);
     m_maintenanceManager = std::make_unique<MaintenanceManager>(endPointFetcher);
+
+    setRequestTimeout(m_requestExecutor.requestTimeout());
 }
 
 api::AccountManager* Connection::accountManager()
@@ -74,15 +70,29 @@ void Connection::setProxyVia(
     m_authProvider->setProxyVia(proxyEndpoint);
 }
 
+void Connection::setRequestTimeout(std::chrono::milliseconds timeout)
+{
+    m_accountManager->setRequestTimeout(timeout);
+    m_systemManager->setRequestTimeout(timeout);
+    m_authProvider->setRequestTimeout(timeout);
+    m_maintenanceManager->setRequestTimeout(timeout);
+    m_requestExecutor.setRequestTimeout(timeout);
+}
+
+std::chrono::milliseconds Connection::requestTimeout() const
+{
+    return m_requestExecutor.requestTimeout();
+}
+
 void Connection::ping(
     std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler)
 {
-    executeRequest(
+    m_requestExecutor.executeRequest(
         kPingPath,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::ModuleInfo()));
 }
 
-}   //client
-}   //cdb
-}   //nx
+} // namespace client
+} // namespace cdb
+} // namespace nx

@@ -63,4 +63,9 @@ ZoomableFlickable
         var size = content.boundedSize(width, height)
         resizeContent(size.width, size.height, false, true)
     }
+
+    function clear()
+    {
+        video.clear()
+    }
 }

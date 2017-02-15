@@ -25,8 +25,6 @@
 #include <client/forgotten_systems_manager.h>
 #include <client_core/client_core_settings.h>
 #include <finders/systems_finder.h>
-#include <finders/test_systems_finder.h>
-#include <finders/system_tiles_test_case.h>
 #include <helpers/system_helpers.h>
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
@@ -150,8 +148,6 @@ QnWorkbenchWelcomeScreen::QnWorkbenchWelcomeScreen(QObject* parent)
 
     connect(qnStartupTileManager, &QnStartupTileManager::tileActionRequested,
         this, &QnWorkbenchWelcomeScreen::handleStartupTileAction);
-
-    setupTestTileCase();
 }
 
 QnWorkbenchWelcomeScreen::~QnWorkbenchWelcomeScreen()
@@ -593,33 +589,4 @@ bool QnWorkbenchWelcomeScreen::eventFilter(QObject* obj, QEvent* event)
     }
 
     return base_type::eventFilter(obj, event);
-}
-
-void QnWorkbenchWelcomeScreen::setupTestTileCase()
-{
-    static constexpr auto kSomeFarPriority = 1000;
-    const auto testSystemsFinder = new QnTestSystemsFinder(qnSystemsFinder);
-    qnSystemsFinder->addSystemsFinder(testSystemsFinder, kSomeFarPriority);
-
-    const auto test = new QnSystemTilesTestCase(testSystemsFinder, this);
-
-    connect(test, &QnSystemTilesTestCase::openTile, this, &QnWorkbenchWelcomeScreen::openTile);
-    connect(test, &QnSystemTilesTestCase::collapseExpandedTile, this,
-        [this]() { emit openTile(QString());});
-    connect(test, &QnSystemTilesTestCase::restoreApp, this,
-        [this]()
-        {
-            const auto maximizeAction = action(QnActions::FullscreenAction);
-            if (maximizeAction->isChecked())
-                maximizeAction->toggle();
-        });
-    connect(test, &QnSystemTilesTestCase::makeFullscreen, this,
-        [this]()
-        {
-            const auto maximizeAction = action(QnActions::FullscreenAction);
-            if (!maximizeAction->isChecked())
-                maximizeAction->toggle();
-        });
-
-    //test->runTestSequence(QnTileTest::First, 3000);
 }

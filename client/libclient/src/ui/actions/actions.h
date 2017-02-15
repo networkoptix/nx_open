@@ -844,7 +844,7 @@ enum IDType
     /**
      * Detaches selected layout(s) from the videowall.
      */
-    DetachFromVideoWallAction,
+    ClearVideoWallScreen,
 
     /**
      * Deletes selected videowall item(s).
