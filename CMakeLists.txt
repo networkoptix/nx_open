@@ -104,6 +104,7 @@ add_subdirectory(appserver2)
 add_subdirectory(nx_cloud)
 
 if(withMediaServer)
+    rdep_add_package(any/apidoctool PATH_VARIABLE APIDOCTOOL_PATH)
     add_subdirectory(mediaserver_core)
     add_subdirectory(mediaserver)
     add_subdirectory(plugins)

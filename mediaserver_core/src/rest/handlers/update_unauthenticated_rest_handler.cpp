@@ -30,13 +30,15 @@ int QnUpdateUnauthenticatedRestHandler::executePost(
     }
 
     QnUploadUpdateReply reply;
-    reply.offset = ec2::AbstractUpdatesManager::NoError;
+    const bool res = QnServerUpdateTool::instance()->installUpdate(
+        updateId,
+        delayed
+            ? QnServerUpdateTool::UpdateType::Delayed
+            : QnServerUpdateTool::UpdateType::Instant);
 
-    if (delayed)
-        QnServerUpdateTool::instance()->installUpdateDelayed(updateId);
-    else if (!QnServerUpdateTool::instance()->installUpdate(updateId))
-        reply.offset = ec2::AbstractUpdatesManager::UnknownError;
-
+    reply.offset = res
+        ? ec2::AbstractUpdatesManager::NoError
+        : ec2::AbstractUpdatesManager::UnknownError;
     result.setReply(reply);
 
     return nx_http::StatusCode::ok;

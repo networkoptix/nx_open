@@ -30,6 +30,22 @@
 <context>
     <name>QnSystrayWindow</name>
     <message>
+        <source>Access denied.</source>
+        <translation>В доступе отказано.</translation>
+    </message>
+    <message>
+        <source>Specified database does not exist.</source>
+        <translation>Запрошенная база данных не существует.</translation>
+    </message>
+    <message>
+        <source>Specified parameter is invalid.</source>
+        <translation>Указан неверный параметр.</translation>
+    </message>
+    <message>
+        <source>Could not access installed services</source>
+        <translation>Невозможно получить доступ к установленным сервисам</translation>
+    </message>
+    <message>
         <source>No %1 services installed</source>
         <translation>Сервисы %1 не установлены</translation>
     </message>
@@ -66,52 +82,36 @@
         <translation>&amp;Выход</translation>
     </message>
     <message>
-        <source>Access denied.</source>
-        <translation>В доступе отказано.</translation>
-    </message>
-    <message>
-        <source>Specified database does not exist.</source>
-        <translation>Запрошенная база данных не существует.</translation>
-    </message>
-    <message>
-        <source>Specified parameter is invalid.</source>
-        <translation>Указан неверный параметр.</translation>
-    </message>
-    <message>
-        <source>Could not access installed services</source>
-        <translation>Невозможно получить доступ к установленным сервисам</translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation>Ошибка при попытке доступа к следующим сервисам:</translation>
     </message>
     <message>
         <source>Server has been stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер остановлен</translation>
     </message>
     <message>
         <source>Server has been started</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер запущен</translation>
     </message>
     <message>
         <source>Server will be stopped. Continue?</source>
-        <translation type="unfinished">Медиасервер будет остановлен. Продолжить?</translation>
+        <translation>Медиасервер будет остановлен. Продолжить?</translation>
     </message>
     <message>
         <source>Show Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать журнал сервера</translation>
     </message>
     <message>
         <source>Start Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Запустить сервер</translation>
     </message>
     <message>
         <source>Stop Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Остановить сервер</translation>
     </message>
     <message>
         <source>Server Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Открыть web-страницу сервера</translation>
     </message>
 </context>
 </TS>
