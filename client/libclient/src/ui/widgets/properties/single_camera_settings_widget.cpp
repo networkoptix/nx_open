@@ -480,7 +480,6 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
                     -1,
                     kFisheyeThumbnailSize,
                     QnThumbnailRequestData::JpgFormat,
-                    QSharedPointer<QnCameraThumbnailManager>(),
                     this);
             ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }

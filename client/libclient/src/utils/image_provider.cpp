@@ -1,5 +1,7 @@
 #include "image_provider.h"
 
+#include <client/client_globals.h>
+
 #include <utils/common/delayed.h>
 
 QnImageProvider::QnImageProvider(QObject* parent):
@@ -22,6 +24,16 @@ QnBasicImageProvider::QnBasicImageProvider(const QImage& image, QObject* parent)
 QImage QnBasicImageProvider::image() const
 {
     return m_image;
+}
+
+QSize QnBasicImageProvider::sizeHint() const
+{
+    return m_image.size();
+}
+
+Qn::ThumbnailStatus QnBasicImageProvider::status() const
+{
+    return Qn::ThumbnailStatus::Loaded;
 }
 
 void QnBasicImageProvider::doLoadAsync()

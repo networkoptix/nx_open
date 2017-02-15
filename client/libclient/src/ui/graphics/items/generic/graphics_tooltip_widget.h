@@ -27,8 +27,8 @@ public:
 
     void setImageProvider(QnImageProvider* provider);
 
-    void setResource(const QnResourcePtr& resource);
-    const QnResourcePtr& resource() const;
+    QSize maxThumbnailSize() const;
+    void setMaxThumbnailSize(const QSize& value);
 
     //reimp
     void pointTo(const QPointF& pos);
@@ -49,4 +49,5 @@ private:
     QnTextEditLabel* m_textLabel;
     QnResourcePreviewWidget* m_previewWidget;
     QPointF m_pointTo;
+    QSize m_maxThumbnailSize;
 };

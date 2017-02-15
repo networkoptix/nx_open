@@ -22,7 +22,6 @@ class QnNotificationListWidget;
 class QnNotificationWidget;
 class QnParticleItem;
 class QnToolTipWidget;
-class QnCameraThumbnailManager;
 class QnBlinkingImageButtonWidget;
 
 class QnNotificationsCollectionWidget: public Connective<GraphicsWidget>, public QnWorkbenchContextAware {
@@ -92,7 +91,6 @@ private:
     QMultiHash<QString, QnNotificationWidget*> m_itemsByLoadingSound;
     QMultiHash<QnUuid, QnNotificationWidget*> m_itemsByBusinessRuleId;
     QPointer<QnBlinkingImageButtonWidget> m_blinker;
-    QSharedPointer<QnCameraThumbnailManager> m_statusPixmapManager;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

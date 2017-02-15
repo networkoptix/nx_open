@@ -8,7 +8,6 @@
 
 namespace {
 
-static const QSize kMaxThumbnailSize(224, 184);
 static const int kNoDataFontPixelSize = 32;
 static const int kNoDataFontWeight = QFont::Light;
 
@@ -26,11 +25,6 @@ QnGraphicsToolTipWidget::QnGraphicsToolTipWidget(QGraphicsItem* parent):
     m_proxyWidget->installSceneEventFilter(this);
 
     m_embeddedWidget->setAttribute(Qt::WA_TranslucentBackground);
-
-    /* To keep aspect ratio specify only maximum height for server request: */
-    m_previewWidget->setThumbnailSize(QSize(0, kMaxThumbnailSize.height()));
-    /* And specify maximum width and height for the widget: */
-    m_previewWidget->setMaximumSize(kMaxThumbnailSize);
 
     auto dots = m_previewWidget->busyIndicator()->dots();
     dots->setDotRadius(style::Metrics::kStandardPadding / 2.0);
@@ -99,21 +93,28 @@ void QnGraphicsToolTipWidget::setThumbnailVisible(bool visible)
 
 void QnGraphicsToolTipWidget::setImageProvider(QnImageProvider* provider)
 {
-    //
-}
-
-void QnGraphicsToolTipWidget::setResource(const QnResourcePtr& resource)
-{
-    if (m_previewWidget->targetResource() == resource)
+    if (m_previewWidget->imageProvider() == provider)
         return;
 
-    m_previewWidget->setTargetResource(resource);
+    m_previewWidget->setImageProvider(provider);
     forceLayoutUpdate();
 }
 
-const QnResourcePtr& QnGraphicsToolTipWidget::resource() const
+QSize QnGraphicsToolTipWidget::maxThumbnailSize() const
 {
-    return m_previewWidget->targetResource();
+    return m_maxThumbnailSize;
+}
+
+void QnGraphicsToolTipWidget::setMaxThumbnailSize(const QSize& value)
+{
+    if (m_maxThumbnailSize == value)
+        return;
+
+    m_maxThumbnailSize = value;
+
+    // Specify maximum width and height for the widget
+    m_previewWidget->setMaximumSize(value);
+    forceLayoutUpdate();
 }
 
 void QnGraphicsToolTipWidget::updateTailPos()

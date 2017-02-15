@@ -36,9 +36,9 @@ class QnResourceTreeModel;
 class QnResourceSearchProxyModel;
 class QnResourceSearchSynchronizer;
 class QnResourceTreeWidget;
-class QnCameraThumbnailManager;
 class QnTextEditLabel;
 class QnGraphicsToolTipWidget;
+class QnCameraThumbnailManager;
 
 namespace Ui {
     class ResourceBrowserWidget;
@@ -120,6 +120,8 @@ private:
 
     void handleItemActivated(const QModelIndex& index, bool withMouse);
 
+    void setTooltipResource(const QnResourcePtr& camera);
+
 private slots:
     void updateFilter(bool force = false);
     void updateToolTipPosition();
@@ -149,6 +151,9 @@ private:
 
     QMap<QnActions::IDType, QAction*> m_renameActions;
     QnDisconnectHelperPtr m_disconnectHelper;
+
+    QScopedPointer<QnCameraThumbnailManager> m_thumbnailManager;
+    QnResourcePtr m_tooltipResource;
 };
 
 #endif // QN_RESOURCE_BROWSER_WIDGET_H
