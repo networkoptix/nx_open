@@ -708,20 +708,25 @@ void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDT
     const QnResourceList resList = qnResPool->getResources(record->resources);
     if (resList.isEmpty())
     {
-        const auto n = static_cast<int>(record->resources.size());
+        const auto count = static_cast<int>(record->resources.size());
         switch (actionId)
         {
             case QnActions::CameraSettingsAction:
-                QnMessageBox::warning(this, tr("These devices are removed from the System", "", n));
+                QnMessageBox::warning(this, QnDeviceDependentStrings::getDefaultNameFromSet(
+                    tr("These devices are removed from the System", "", count),
+                    tr("These cameras are removed from the System", "", count)));
                 break;
             case QnActions::ServerSettingsAction:
-                QnMessageBox::warning(this, tr("These servers are removed from the System", "", n));
+                QnMessageBox::warning(this, tr("These servers are removed from the System",
+                    "", count));
                 break;
             case QnActions::UserSettingsAction:
-                QnMessageBox::warning(this, tr("These users are removed from the System", "", n));
+                QnMessageBox::warning(this, tr("These users are removed from the System",
+                    "", count));
                 break;
             default:
-                QnMessageBox::warning(this, tr("These resources are removed from the System", "", n));
+                QnMessageBox::warning(this, tr("These resources are removed from the System",
+                    "", count));
                 break;
         }
 
