@@ -303,11 +303,11 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
         }
     }
 
-    /* If no input files were supplied --- open connection settings dialog.
+    /* If no input files were supplied --- open welcome page.
     * Do not try to connect in the following cases:
     * * we were not connected and clicked "Open in new window"
     * * we have opened exported exe-file
-    * Otherwise we should try to connect or show Login Dialog.
+    * Otherwise we should try to connect or show welcome page.
     */
     const auto welcomeScreen = instance<QnWorkbenchWelcomeScreen>();
     welcomeScreen->setVisibleControls(true);
