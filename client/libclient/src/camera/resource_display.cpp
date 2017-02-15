@@ -30,7 +30,7 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
     if (m_dataProvider)
     {
-        m_archiveReader = dynamic_cast<QnAbstractArchiveReader *>(m_dataProvider.data());
+        m_archiveReader = dynamic_cast<QnAbstractArchiveStreamReader *>(m_dataProvider.data());
         m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider *>(m_dataProvider.data());
 
         if (m_mediaProvider != NULL)
