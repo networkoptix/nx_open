@@ -6137,24 +6137,20 @@ to %1</source>
 <context>
     <name>QnStorageRebuildWidget</name>
     <message>
-        <source>Fast Backup Scan... 	%p%</source>
-        <comment>%p is a placeholder for percent value, must be kept.</comment>
-        <translation>Быстрое сканирование резервного архива... %p%</translation>
+        <source>Fast Backup Scan...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fast Archive Scan... 	%p%</source>
-        <comment>%p is a placeholder for percent value, must be kept.</comment>
-        <translation>Быстрое сканирование архива... %p%</translation>
+        <source>Fast Archive Scan...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reindexing Backup... 	%p%</source>
-        <comment>%p is a placeholder for percent value, must be kept.</comment>
-        <translation>Переиндексация резервного архива... %p%</translation>
+        <source>Reindexing Backup...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reindexing Archive... 	%p%</source>
-        <comment>%p is a placeholder for percent value, must be kept.</comment>
-        <translation>Переиндексация архива... %p%</translation>
+        <source>Reindexing Archive...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
