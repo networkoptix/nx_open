@@ -25,7 +25,7 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent) :
 
     QString title = lit("%1\t(%2)")
         .arg(tr("Global Settings"))
-        .arg(tr("affect all servers in the system"));
+        .arg(tr("affect all servers in the system", "Relates to 'Global Settings' subject"));
 
     ui->globalSettingsGroupBox->setTitle(title);
 
