@@ -18,102 +18,78 @@
     <name>MergeSystemsStatusStrings</name>
     <message>
         <source>The system was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Система не найдена.</translation>
     </message>
     <message>
         <source>The password or user name is invalid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Недопустимое имя пользователя или пароль.</translation>
     </message>
     <message>
         <source>This user does not have permissions for the requested operation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Этот пользователь не имеет разрешения для запрашиваемой операции.</translation>
     </message>
     <message>
         <source>Cannot create database backup.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удается создать резервную копию базы данных.</translation>
     </message>
     <message>
         <source>System name is not configured yet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя системы еще не настроено.</translation>
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Неизвестная ошибка.</translation>
     </message>
     <message>
         <source>The discovered system %1 has an incompatible version %2.</source>
         <comment>%1 is name of the system, %2 is version information</comment>
-        <translation type="unfinished"></translation>
+        <translation>Найденная система %1 несовместима с версией %2.</translation>
     </message>
     <message>
         <source>The discovered system %1 is in safe mode.</source>
         <comment>%1 is name of the system</comment>
-        <translation type="unfinished"></translation>
+        <translation>Найденная система %1 находится в безопасном режиме.</translation>
     </message>
     <message>
         <source>Could not configure the remote system %1.</source>
         <comment>%1 is name of the system</comment>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось настроить удаленную систему %1.</translation>
     </message>
     <message>
         <source>You are about to merge Systems with Starter licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation>Будут объедины системы с лицензиями Starter.</translation>
     </message>
     <message>
         <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-        <translation type="unfinished"></translation>
+        <translation>В системе разрешается использовать только одну Starter лицензию, поэтому вторая лицензия будет деактивирована.</translation>
     </message>
     <message>
         <source>Merge anyway?</source>
-        <translation type="unfinished"></translation>
+        <translation>Объединить?</translation>
     </message>
     <message>
         <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не удается подключиться к другой системе, поскольку нынешняя система уже подключена к %1.</translation>
     </message>
     <message>
         <source>In this version you can only merge systems which are not connected to %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">В этой версии можно объединять только системы, которые не связаны с %1.</translation>
     </message>
     <message>
         <source>Both systems are connected to %1. Merge is not allowed.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Обе системы подключены к %1. Объединение не допускается.</translation>
     </message>
     <message>
         <source>These systems are built with different %1 URL. Merge is not allowed.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessStringsHelper</name>
-    <message>
-        <source>Storage Failure</source>
-        <translation>Ошибка хранилища</translation>
-    </message>
-    <message>
-        <source>Network Issue</source>
-        <translation>Проблема с сетью</translation>
-    </message>
-    <message>
-        <source>Input on %1</source>
-        <translation>Тревожный вход на %1</translation>
-    </message>
-    <message>
-        <source>Motion on %1</source>
-        <translation>Движение на %1</translation>
-    </message>
-    <message>
-        <source>Storage Failure at %1</source>
-        <translation>Ошибка хранилища %1</translation>
-    </message>
-    <message>
-        <source>Network Issue at %1</source>
-        <translation>Проблема с сетью на %1</translation>
-    </message>
     <message>
         <source>Bookmark</source>
         <translation>Закладка</translation>
@@ -121,6 +97,10 @@
     <message>
         <source>Panic recording</source>
         <translation>Запись по тревоге</translation>
+    </message>
+    <message>
+        <source>Send email</source>
+        <translation>Отправить email</translation>
     </message>
     <message>
         <source>Write to log</source>
@@ -131,32 +111,24 @@
         <translation>Показать оповещение</translation>
     </message>
     <message>
-        <source>Play sound</source>
-        <translation>Воспроизвести звук</translation>
-    </message>
-    <message>
         <source>Repeat sound</source>
         <translation>Повторить звук</translation>
     </message>
     <message>
-        <source>Send email</source>
-        <translation>Отправить email</translation>
+        <source>Play sound</source>
+        <translation>Воспроизвести звук</translation>
     </message>
     <message>
         <source>Speak</source>
         <translation>Произнести</translation>
     </message>
     <message>
-        <source>Any Server Issue</source>
-        <translation>Любая проблема с сервером</translation>
+        <source>Storage Failure</source>
+        <translation>Ошибка хранилища</translation>
     </message>
     <message>
-        <source>Any Event</source>
-        <translation>Любое событие</translation>
-    </message>
-    <message>
-        <source>Undefined event has occurred on %1</source>
-        <translation>Неопределённое событие возникло на %1</translation>
+        <source>Network Issue</source>
+        <translation>Проблема с сетью</translation>
     </message>
     <message>
         <source>Server Failure</source>
@@ -173,6 +145,34 @@
     <message>
         <source>License Issue</source>
         <translation>Проблема с лицензией</translation>
+    </message>
+    <message>
+        <source>Any Server Issue</source>
+        <translation>Любая проблема с сервером</translation>
+    </message>
+    <message>
+        <source>Any Event</source>
+        <translation>Любое событие</translation>
+    </message>
+    <message>
+        <source>Undefined event has occurred on %1</source>
+        <translation>Неопределённое событие возникло на %1</translation>
+    </message>
+    <message>
+        <source>Input on %1</source>
+        <translation>Тревожный вход на %1</translation>
+    </message>
+    <message>
+        <source>Motion on %1</source>
+        <translation>Движение на %1</translation>
+    </message>
+    <message>
+        <source>Storage Failure at %1</source>
+        <translation>Ошибка хранилища %1</translation>
+    </message>
+    <message>
+        <source>Network Issue at %1</source>
+        <translation>Проблема с сетью на %1</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; Failure</source>
@@ -263,7 +263,7 @@
     </message>
     <message>
         <source>%1 --&gt; %2</source>
-        <translation>%1 --&gt; %2</translation>
+        <translation type="unfinished">%1 --&gt; %2</translation>
     </message>
     <message>
         <source>Server &apos;%1&apos; has a license problem</source>
@@ -296,7 +296,7 @@
     <message>
         <source>MAC #%1: %2 </source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation>MAC #%1: %2 </translation>
+        <translation type="unfinished">MAC #%1: %2 </translation>
     </message>
     <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -427,115 +427,115 @@
     <message>
         <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
         <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n раз, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+            <numerusform>%n раза, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+            <numerusform>%n раз, первый: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         </translation>
     </message>
     <message>
         <source>Device does not respond to network requests.</source>
-        <translation type="unfinished"></translation>
+        <translation>Устройство не отвечает на сетевые запросы.</translation>
     </message>
     <message>
         <source>Server stopped unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Произошла неожиданная остановка сервера.</translation>
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on following devices:</source>
-        <translation type="unfinished"></translation>
+        <translation>Недостаточно лицензий. Запись была отключена на следующих устройствах:</translation>
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-        <translation type="unfinished"></translation>
+        <translation>Недостаточно лицензий. Запись была отключена на следующих камерах:</translation>
     </message>
     <message>
         <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-        <translation type="unfinished"></translation>
+        <translation>Недостаточно лицензий. Запись была отключена на следующих модулях ввода-вывода:</translation>
     </message>
     <message numerus="yes">
         <source>Motion on Cameras</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Движение на камере</numerusform>
+            <numerusform>Движение на камерах</numerusform>
+            <numerusform>Движение на камерах</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Input Signal on Devices</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Входной сигнал на устройстве</numerusform>
+            <numerusform>Входной сигнал на устройствах</numerusform>
+            <numerusform>Входной сигнал на устройствах</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Input Signal on Cameras</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Входной сигнал на камере</numerusform>
+            <numerusform>Входной сигнал на камерах</numerusform>
+            <numerusform>Входной сигнал на камерах</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Devices Disconnected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Устройство отключено</numerusform>
+            <numerusform>Устройства отключены</numerusform>
+            <numerusform>Устройств отключены</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cameras Disconnected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Камера отключена</numerusform>
+            <numerusform>Камеры отключены</numerusform>
+            <numerusform>Камер отключено</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Devices IP Conflict</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Конфликт IP адреса устройства</numerusform>
+            <numerusform>Конфликт IP адреса устройств</numerusform>
+            <numerusform>Конфликт IP адреса устройств</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Cameras IP Conflict</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Конфликт IP адреса камеры</numerusform>
+            <numerusform>Конфликт IP адреса камер</numerusform>
+            <numerusform>Конфликт IP адреса камер</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
-        <source>(unknown)</source>
-        <translation>(неизвестно)</translation>
-    </message>
-    <message>
         <source>OK</source>
         <translation>ОК</translation>
-    </message>
-    <message>
-        <source>Media stream is opened but no media data was received.</source>
-        <translation>Поток подключен, но данные не поступают.</translation>
     </message>
     <message>
         <source>Server has been stopped.</source>
         <translation>Сервер был выключен.</translation>
     </message>
     <message>
+        <source>Media stream is opened but no media data was received.</source>
+        <translation>Поток подключен, но данные не поступают.</translation>
+    </message>
+    <message>
         <source>Unknown error. Please contact support.</source>
         <translation>Неизвестная ошибка. Пожалуйста, свяжитесь с техподдержкой.</translation>
+    </message>
+    <message>
+        <source>(unknown)</source>
+        <translation>(неизвестно)</translation>
     </message>
     <message>
         <source>Server %1 is not available.</source>
@@ -595,11 +595,11 @@
     </message>
     <message>
         <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-        <translation>Перезагрузите устройство, зайтем сбросьте его настройки к стандартным через веб-интерфейс.</translation>
+        <translation>Перезагрузите устройство, зайтем сбросьте его настройки к стандартным через web-интерфейс.</translation>
     </message>
     <message>
         <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-        <translation>Перезагрузите камеру, зайтем сбросьте её настройки к стандартным через веб-интерфейс.</translation>
+        <translation>Перезагрузите камеру, зайтем сбросьте её настройки к стандартным через web-интерфейс.</translation>
     </message>
     <message>
         <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
@@ -631,11 +631,11 @@
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
-        <translation>Если это не помогает, восстановите заводские настройки на веб-странице устройства.</translation>
+        <translation>Если это не помогает, восстановите заводские настройки на web-странице устройства.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation>Если это не помогает, восстановите заводские настройки на веб-странице камеры.</translation>
+        <translation>Если это не помогает, восстановите заводские настройки на web-странице камеры.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -675,7 +675,7 @@
     </message>
     <message>
         <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-        <translation>Перезагрузите модуль ввода/вывода, зайтем сбросьте его настройки к стандартным через веб-интерфейс.</translation>
+        <translation>Перезагрузите модуль ввода/вывода, зайтем сбросьте его настройки к стандартным через web-интерфейс.</translation>
     </message>
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
@@ -691,7 +691,7 @@
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation>Если это не помогает, восстановите заводские настройки на веб-странице модуля ввода/вывода.</translation>
+        <translation>Если это не помогает, восстановите заводские настройки на web-странице модуля ввода/вывода.</translation>
     </message>
     <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -723,7 +723,7 @@
     </message>
     <message>
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished">Убедитесь, что порт %1 доступен (напр. проброшен).</translation>
+        <translation type="unfinished">Убедитесь, что порт %2 доступен (например, проброшен). {1 ?}</translation>
     </message>
 </context>
 <context>
@@ -746,27 +746,27 @@
     </message>
     <message>
         <source>Could not find decoder for codec %1.</source>
-        <translation type="unfinished">Не найден кодировщик для кодек %1.</translation>
+        <translation>Не найден кодировщик для кодек %1.</translation>
     </message>
     <message>
         <source>Couldn&apos;t initialize resampling context, error code: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось инициализировать контекст, код ошибки: %1</translation>
     </message>
     <message>
         <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось выделить буферы, код ошибки: %1</translation>
     </message>
     <message>
         <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось отправить аудиоданные кодировщику, код ошибки: %1.</translation>
     </message>
     <message>
         <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось получить аудио пакет от кодировщика, код ошибки: %1.</translation>
     </message>
     <message>
         <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось получить аудиоданные от декодера, код ошибки: %1.</translation>
     </message>
 </context>
 <context>
@@ -823,11 +823,11 @@
     </message>
     <message>
         <source>Edge</source>
-        <translation>Edge</translation>
+        <translation type="unfinished">Edge</translation>
     </message>
     <message>
         <source>Vmax</source>
-        <translation>Vmax</translation>
+        <translation type="unfinished">Vmax</translation>
     </message>
     <message>
         <source>Video Wall</source>
@@ -847,7 +847,7 @@
     </message>
     <message>
         <source>Start</source>
-        <translation>Start</translation>
+        <translation type="unfinished">Start</translation>
     </message>
     <message>
         <source>Analog Encoder</source>
@@ -907,27 +907,27 @@
     </message>
     <message>
         <source>Invalid signature</source>
-        <translation type="unfinished">Неверная подпись</translation>
+        <translation>Неверная подпись</translation>
     </message>
     <message>
         <source>Invalid customization</source>
-        <translation type="unfinished">Неверная кастомизация</translation>
+        <translation>Неверная кастомизация</translation>
     </message>
     <message>
         <source>License is expired</source>
-        <translation type="unfinished"></translation>
+        <translation>Срок действия лицензии истек</translation>
     </message>
     <message>
         <source>Invalid type</source>
-        <translation type="unfinished">Неверный тип</translation>
+        <translation>Неверный тип</translation>
     </message>
     <message>
         <source>Free</source>
-        <translation type="unfinished"></translation>
+        <translation>Бесплатная</translation>
     </message>
     <message>
         <source>Free license</source>
-        <translation type="unfinished"></translation>
+        <translation>Бесплатная лицензия</translation>
     </message>
 </context>
 <context>
@@ -989,7 +989,7 @@
     <name>QnLocalSystemDescription</name>
     <message>
         <source>New Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Новый сервер</translation>
     </message>
 </context>
 <context>
@@ -1136,8 +1136,16 @@
         <translation>Низкое</translation>
     </message>
     <message>
+        <source>Medium</source>
+        <translation>Среднее</translation>
+    </message>
+    <message>
         <source>High</source>
         <translation>Высокое</translation>
+    </message>
+    <message>
+        <source>Best</source>
+        <translation>Лучшее</translation>
     </message>
     <message>
         <source>Preset</source>
@@ -1146,14 +1154,6 @@
     <message>
         <source>Undefined</source>
         <translation>Неопределено</translation>
-    </message>
-    <message>
-        <source>Medium</source>
-        <translation>Среднее</translation>
-    </message>
-    <message>
-        <source>Best</source>
-        <translation>Лучшее</translation>
     </message>
     <message>
         <source>Lst</source>
@@ -1188,7 +1188,7 @@
     <message>
         <source>-</source>
         <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation>-</translation>
+        <translation type="unfinished">-</translation>
     </message>
 </context>
 <context>
@@ -1227,14 +1227,14 @@
     </message>
     <message>
         <source>Invalid resource type for data export.</source>
-        <translation type="unfinished"></translation>
+        <translation>Недопустимый тип ресурса для экспорта данных.</translation>
     </message>
 </context>
 <context>
     <name>QnSystemDescription</name>
     <message>
         <source>&lt;Unnamed system&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Система без имени&gt;</translation>
     </message>
 </context>
 <context>
@@ -1269,153 +1269,153 @@
     <message>
         <source>ms</source>
         <comment>Suffix for displaying milliseconds</comment>
-        <translation type="unfinished"></translation>
+        <translation>мс</translation>
     </message>
     <message>
         <source>s</source>
         <comment>Suffix for displaying seconds</comment>
-        <translation type="unfinished"></translation>
+        <translation>с</translation>
     </message>
     <message>
         <source>m</source>
         <comment>Suffix for displaying minutes</comment>
-        <translation type="unfinished"></translation>
+        <translation>м</translation>
     </message>
     <message>
         <source>h</source>
         <comment>Suffix for displaying hours</comment>
-        <translation type="unfinished"></translation>
+        <translation>ч</translation>
     </message>
     <message>
         <source>d</source>
         <comment>Suffix for displaying days</comment>
-        <translation type="unfinished"></translation>
+        <translation>д</translation>
     </message>
     <message>
         <source>w</source>
         <comment>Suffix for displaying weeks</comment>
-        <translation type="unfinished"></translation>
+        <translation>w</translation>
     </message>
     <message>
         <source>M</source>
         <comment>Suffix for displaying months</comment>
-        <translation type="unfinished"></translation>
+        <translation>М</translation>
     </message>
     <message>
         <source>y</source>
         <comment>Suffix for displaying years</comment>
-        <translation type="unfinished"></translation>
+        <translation>г</translation>
     </message>
     <message>
         <source>msec</source>
         <comment>Long suffix for displaying milliseconds</comment>
-        <translation type="unfinished"></translation>
+        <translation>мсек</translation>
     </message>
     <message>
         <source>sec</source>
         <comment>Long suffix for displaying seconds</comment>
-        <translation type="unfinished"></translation>
+        <translation>сек</translation>
     </message>
     <message>
         <source>min</source>
         <comment>Long suffix for displaying minutes</comment>
-        <translation type="unfinished"></translation>
+        <translation>мин</translation>
     </message>
     <message>
         <source>hrs</source>
         <comment>Long suffix for displaying hours</comment>
-        <translation type="unfinished"></translation>
+        <translation>ч</translation>
     </message>
     <message>
         <source>days</source>
         <comment>Long suffix for displaying days</comment>
-        <translation type="unfinished"></translation>
+        <translation>дн</translation>
     </message>
     <message>
         <source>wks</source>
         <comment>Long suffix for displaying weeks</comment>
-        <translation type="unfinished"></translation>
+        <translation>нед</translation>
     </message>
     <message>
         <source>mos</source>
         <comment>Long suffix for displaying months</comment>
-        <translation type="unfinished"></translation>
+        <translation>мес</translation>
     </message>
     <message>
         <source>yrs</source>
         <comment>Long suffix for displaying years</comment>
-        <translation type="unfinished"></translation>
+        <translation>лет</translation>
     </message>
     <message numerus="yes">
         <source>milliseconds</source>
         <comment>Full suffix for displaying milliseconds</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>миллисекунда</numerusform>
+            <numerusform>миллисекунды</numerusform>
+            <numerusform>миллисекунд</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>seconds</source>
         <comment>Full suffix for displaying seconds</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>секунда</numerusform>
+            <numerusform>секунды</numerusform>
+            <numerusform>секунд</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>minutes</source>
         <comment>Full suffix for displaying minutes</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>минута</numerusform>
+            <numerusform>минуты</numerusform>
+            <numerusform>минут</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>hours</source>
         <comment>Full suffix for displaying hours</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>час</numerusform>
+            <numerusform>часа</numerusform>
+            <numerusform>часов</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>days</source>
         <comment>Full suffix for displaying days</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>день</numerusform>
+            <numerusform>дня</numerusform>
+            <numerusform>дней</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>weeks</source>
         <comment>Full suffix for displaying weeks</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>неделя</numerusform>
+            <numerusform>недели</numerusform>
+            <numerusform>недель</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>months</source>
         <comment>Full suffix for displaying months</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>месяц</numerusform>
+            <numerusform>месяца</numerusform>
+            <numerusform>месяцев</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>years</source>
         <comment>Full suffix for displaying years</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>год</numerusform>
+            <numerusform>года</numerusform>
+            <numerusform>лет</numerusform>
         </translation>
     </message>
 </context>
@@ -1442,59 +1442,59 @@
     <name>QnUserRolesManager</name>
     <message>
         <source>Owner</source>
-        <translation type="unfinished"></translation>
+        <translation>Владелец</translation>
     </message>
     <message>
         <source>Administrator</source>
-        <translation type="unfinished"></translation>
+        <translation>Администратор</translation>
     </message>
     <message>
         <source>Advanced Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Просмотр и настройка</translation>
     </message>
     <message>
         <source>Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Видео с камер и архив</translation>
     </message>
     <message>
         <source>Live Viewer</source>
-        <translation type="unfinished"></translation>
+        <translation>Только видео с камер</translation>
     </message>
     <message>
         <source>Custom Role</source>
-        <translation type="unfinished"></translation>
+        <translation>Настраиваемая роль</translation>
     </message>
     <message>
         <source>Custom</source>
-        <translation type="unfinished"></translation>
+        <translation>Настраиваемая</translation>
     </message>
     <message>
         <source>Has access to whole system and can do everything.</source>
-        <translation type="unfinished"></translation>
+        <translation>Имеет доступ к всей системе и может делать все.</translation>
     </message>
     <message>
         <source>Has access to whole system and can manage it. Can create users.</source>
-        <translation type="unfinished"></translation>
+        <translation>Имеет доступ к всей системе и может ей управлять. Может создавать пользователей.</translation>
     </message>
     <message>
         <source>Can manage all cameras and bookmarks.</source>
-        <translation type="unfinished"></translation>
+        <translation>Можно управлять всеми камерами и закладками.</translation>
     </message>
     <message>
         <source>Can view all cameras and export video.</source>
-        <translation type="unfinished"></translation>
+        <translation>Может просматривать все камеры и экспортировать видео.</translation>
     </message>
     <message>
         <source>Can view live video from all cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>Можно посмотреть живое видео со всех камер.</translation>
     </message>
     <message>
         <source>Custom user role.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пользовательская роль.</translation>
     </message>
     <message>
         <source>Custom permissions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Пользовательские полномочия.</translation>
     </message>
 </context>
 <context>
