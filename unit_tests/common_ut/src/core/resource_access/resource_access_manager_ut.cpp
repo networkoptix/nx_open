@@ -7,6 +7,7 @@
 #include <core/resource_management/user_roles_manager.h>
 
 #include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
 
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -413,6 +414,22 @@ TEST_F(QnResourceAccessManagerTest, checkVideowallLayoutAsAdvancedViewer)
     checkPermissions(layout, desired, forbidden);
 }
 
+/** Locked layouts on videowall still can be removed if the user has control permissions. */
+TEST_F(QnResourceAccessManagerTest, checkVideowallLockedLayout)
+{
+    loginAs(Qn::GlobalControlVideoWallPermission);
+
+    auto videowall = addVideoWall();
+    auto layout = createLayout(Qn::remote, true, videowall->getId());
+    qnResPool->addResource(layout);
+
+    Qn::Permissions desired = Qn::FullLayoutPermissions;
+    Qn::Permissions forbidden = Qn::AddRemoveItemsPermission | Qn::WriteNamePermission;
+    desired &= ~forbidden;
+
+    checkPermissions(layout, desired, forbidden);
+}
+
 /************************************************************************/
 /* Checking user access rights                                          */
 /************************************************************************/
@@ -457,6 +474,25 @@ TEST_F(QnResourceAccessManagerTest, checkDesktopCameraRemove)
     desired &= ~forbidden;
 
     checkPermissions(camera, desired, forbidden);
+}
+
+TEST_F(QnResourceAccessManagerTest, checkRemoveCameraAsAdmin)
+{
+    auto user = addUser(Qn::GlobalAdminPermission);
+    auto target = addCamera();
+
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::RemovePermission));
+}
+
+// EditCameras is not enough to be able to remove cameras
+TEST_F(QnResourceAccessManagerTest, checkRemoveCameraAsEditor)
+{
+    auto user = addUser(Qn::GlobalAccessAllMediaPermission | Qn::GlobalEditCamerasPermission);
+    auto target = addCamera();
+
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::WritePermission));
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::SavePermission));
+    ASSERT_FALSE(qnResourceAccessManager->hasPermission(user, target, Qn::RemovePermission));
 }
 
 TEST_F(QnResourceAccessManagerTest, checkUserRemoved)
@@ -557,6 +593,38 @@ TEST_F(QnResourceAccessManagerTest, checkCameraOnVideoWall)
     qnResPool->addResource(layout);
     ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
     ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ViewContentPermission));
+}
+
+TEST_F(QnResourceAccessManagerTest, checkShareLayoutToRole)
+{
+    loginAs(Qn::GlobalAdminPermission);
+
+    auto target = addCamera();
+
+    // Create role without access
+    auto role = createRole(Qn::NoGlobalPermissions);
+    qnUserRolesManager->addOrUpdateUserRole(role);
+
+    // Create user in role
+    auto user = addUser(Qn::NoGlobalPermissions, kTestUserName2);
+    user->setUserRoleId(role.id);
+
+    // Create own layout
+    auto layout = createLayout(Qn::remote);
+    qnResPool->addResource(layout);
+
+    // Place a camera on it
+    QnLayoutItemData item;
+    item.resource.id = target->getId();
+    item.resource.uniqueId = target->getUniqueId();
+    layout->addItem(item);
+
+    // Share layout to _role_
+    layout->setParentId(QnUuid());
+    qnSharedResourcesManager->setSharedResources(role, {layout->getId()});
+
+    // Make sure user got permissions
+    ASSERT_TRUE(qnResourceAccessManager->hasPermission(user, target, Qn::ReadPermission));
 }
 
 /************************************************************************/

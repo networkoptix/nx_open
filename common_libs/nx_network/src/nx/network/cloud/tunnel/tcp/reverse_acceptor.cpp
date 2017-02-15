@@ -11,15 +11,24 @@ namespace tcp {
 
 ReverseAcceptor::ReverseAcceptor(ConnectHandler connectHandler):
     m_connectHandler(std::move(connectHandler)),
-    m_httpServer(new nx_http::HttpStreamSocketServer(
-        nullptr, &m_httpMessageDispatcher, false, // TODO: think about SSL?
-        NatTraversalSupport::disabled))
+    m_httpServer(
+        new nx_http::HttpStreamSocketServer(
+            nullptr, &m_httpMessageDispatcher, false, // TODO: think about SSL?
+            NatTraversalSupport::disabled))
 {
+    bindToAioThread(getAioThread());
 }
 
 ReverseAcceptor::~ReverseAcceptor()
 {
-    m_httpServer.reset();
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
+}
+
+void ReverseAcceptor::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    Parent::bindToAioThread(aioThread);
+    m_httpServer->bindToAioThread(aioThread);
 }
 
 bool ReverseAcceptor::start(
@@ -27,7 +36,7 @@ bool ReverseAcceptor::start(
 {
     m_selfHostName = std::move(selfHostName);
     if (aioThread)
-        m_httpServer->bindToAioThread(aioThread);
+        bindToAioThread(aioThread);
 
     auto registration = m_httpMessageDispatcher.registerRequestProcessor<NxRcHandler>(
         nx_http::kAnyPath,
@@ -39,12 +48,6 @@ bool ReverseAcceptor::start(
 
     NX_CRITICAL(registration);
     return m_httpServer->bind(address) && m_httpServer->listen();
-}
-
-void ReverseAcceptor::pleaseStop()
-{
-    m_connectHandler = nullptr;
-    m_httpServer->pleaseStopSync();
 }
 
 SocketAddress ReverseAcceptor::address() const
@@ -69,6 +72,12 @@ void ReverseAcceptor::setKeepAliveOptions(boost::optional<KeepAliveOptions> valu
     m_keepAliveOptions = value;
 }
 
+void ReverseAcceptor::stopWhileInAioThread()
+{
+    m_connectHandler = nullptr;
+    m_httpServer->pleaseStopSync();
+}
+
 void ReverseAcceptor::fillNxRcHeaders(nx_http::HttpHeaders* headers) const
 {
     headers->emplace(kNxRcHostName, m_selfHostName);
@@ -81,7 +90,7 @@ void ReverseAcceptor::fillNxRcHeaders(nx_http::HttpHeaders* headers) const
         headers->emplace(kNxRcKeepAliveOptions, m_keepAliveOptions->toString().toUtf8());
 }
 
-void ReverseAcceptor::saveConnection(String hostName, nx_http::HttpServerConnection* connection) const
+void ReverseAcceptor::saveConnection(String hostName, nx_http::HttpServerConnection* connection)
 {
     auto socket = connection->takeSocket();
     connection->closeConnection(SystemError::badDescriptor);
@@ -101,7 +110,7 @@ void ReverseAcceptor::saveConnection(String hostName, nx_http::HttpServerConnect
     }
 
     socket.release();
-    m_httpServer->post(
+    post(
         [this, hostName=std::move(hostName),
             socket = std::unique_ptr<AbstractStreamSocket>(rawSocket)]() mutable
         {
@@ -110,7 +119,10 @@ void ReverseAcceptor::saveConnection(String hostName, nx_http::HttpServerConnect
         });
 }
 
-ReverseAcceptor::NxRcHandler::NxRcHandler(const ReverseAcceptor* acceptor):
+//-------------------------------------------------------------------------------------------------
+// ReverseAcceptor::NxRcHandler
+
+ReverseAcceptor::NxRcHandler::NxRcHandler(ReverseAcceptor* acceptor):
     m_acceptor(acceptor)
 {
 }
@@ -142,7 +154,7 @@ void ReverseAcceptor::NxRcHandler::processRequest(
     NX_LOGX(lm("Request from: %1").arg(hostNameIt->second), cl_logDEBUG2);
     connection->setSendCompletionHandler(
         [connection, acceptor = m_acceptor, hostName = std::move(hostNameIt->second)](
-            SystemError::ErrorCode code)
+            SystemError::ErrorCode code) mutable
         {
             if (code == SystemError::noError)
                 acceptor->saveConnection(hostName, connection);

@@ -232,7 +232,10 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply)
     NX_LOG(lit("QnDirectModuleFinder. Received success reply from url %1")
         .arg(url.toString()), cl_logDEBUG2);
 
-    emit responseReceived(moduleInformation, SocketAddress(url.host(), url.port()));
+    emit responseReceived(
+        moduleInformation,
+        SocketAddress(url.host(), url.port()),
+        reply->asyncHttpClient()->socket()->getForeignAddress().address);
 }
 
 void QnDirectModuleFinder::at_checkTimer_timeout() {

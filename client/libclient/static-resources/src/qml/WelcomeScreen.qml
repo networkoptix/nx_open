@@ -171,8 +171,17 @@ Rectangle
 
                     target: context;
 
+                    onSwitchPage: { pageSwitcher.setPage(pageIndex); }
+
                     onOpenTile:
                     {
+                        if (systemId.length == 0)
+                        {
+                            // Just try to collapse current tile;
+                            grid.watcher.resetCurrentItem();
+                            return;
+                        }
+
                         var foundItem = null;
                         var count = openTileHandler.items.length;
                         for (var i = 0; i != count; ++i)
@@ -229,7 +238,7 @@ Rectangle
                     SystemTile
                     {
                         id: tile
-
+                        view: grid;
                         visualParent: screenHolder
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.verticalCenter: parent.verticalCenter
@@ -243,9 +252,12 @@ Rectangle
                         isCloudTile: model.isCloudSystem
                         safeMode: model.safeMode;
 
-                        wrongVersion: model.wrongVersion
-                        isCompatibleInternal: model.isCompatibleInternal
-                        compatibleVersion: model.compatibleVersion
+                        wrongVersion: (model.wrongVersion && !model.wrongVersion.isNull()
+                            && model.wrongVersion.toString()) || "";
+                        isCompatibleInternal: model.isCompatibleInternal;
+                        compatibleVersion:(model.compatibleVersion
+                            && !model.compatibleVersion.isNull()
+                            && model.compatibleVersion.toString()) || "";
 
                         isRunning: model.isRunning;
                         isReachable: model.isReachable;
@@ -266,6 +278,15 @@ Rectangle
 
                 function setPage(index, animate)
                 {
+                    /**
+                      * TODO: #ynikitenkov add items watcher, refactor
+                      * it to don'use openTileHandler's items
+                      */
+                    openTileHandler.items.forEach(function(item)
+                    {
+                        item.cancelAnimationOnCollapse();
+                    })
+
                     switchPageAnimation.stop();
                     if (animate || (opacity == 0)) //< Opacity is 0 on first show
                     {

@@ -11,8 +11,8 @@ set(uri.protocol "nx-vms")
 
 set(nxtoolUpgradeCode "cc740987-5070-4750-b853-327417176031")
 set(short.company.name "${company.name}")
-set(company.support.link "${company.support.address}")
 set(backgroundImage "{}")
+set(defaultWebPages "{}")
 
 set(freeLicenseCount "4")
 set(freeLicenseIsTrial "true")
@@ -29,9 +29,13 @@ set(prodUpdateFeedUrl "http://updates.hdwitness.com/updates.json")
 set(releaseNotesUrl "http://updates.hdwitness.com/releasenotes.json")
 set(testUpdateFeedUrl "http://updates.hdwitness.com/updates.json")
 
+if(beta)
+    set(updateFeedUrl ${testUpdateFeedUrl})
+else()
+    set(updateFeedUrl ${prodUpdateFeedUrl})
+endif()
+
 # Additional Features
 set(vmax "false")
 
-# Cloud parameters
-set(cloudHost "cloud-test.hdw.mx")
-set(cloudName "Nx Cloud")
+set(customization.defines "")

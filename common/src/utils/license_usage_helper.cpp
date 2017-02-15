@@ -154,10 +154,10 @@ QString QnLicenseUsageHelper::getProposedUsageMsg() const {
 
 QString QnLicenseUsageHelper::getRequiredText(Qn::LicenseType licenseType) const {
     if (requiredLicenses(licenseType) > 0)
-        return tr("Activate %n more %2. ", "", requiredLicenses(licenseType)).arg(QnLicense::longDisplayName(licenseType));
+        return tr("Activate %n more %1. ", "", requiredLicenses(licenseType)).arg(QnLicense::longDisplayName(licenseType));
 
     if (isValid() && proposedLicenses(licenseType) > 0)
-        return tr("%n more %2 will be used. ", "", proposedLicenses(licenseType)).arg(QnLicense::longDisplayName(licenseType));
+        return tr("%n more %1 will be used. ", "", proposedLicenses(licenseType)).arg(QnLicense::longDisplayName(licenseType));
 
     return QString();
 }

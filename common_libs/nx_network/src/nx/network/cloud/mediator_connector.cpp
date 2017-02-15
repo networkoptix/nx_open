@@ -172,18 +172,29 @@ void MediatorConnector::fetchEndpoint()
         }
         else
         {
-            NX_LOGX( lit( "Fetched mediator address: %1" )
-                     .arg(url.toString() ), cl_logDEBUG1 );
+            NX_LOGX(lm("Fetched mediator url: %1").str(url), cl_logDEBUG1);
+            m_stunClient->connect(
+                SocketAddress(url.host(), url.port()),
+                false /* SSL disabled */,
+                [this](SystemError::ErrorCode code)
+                {
+                    auto setEndpoint = 
+                        [this]()
+                        {
+                            QnMutexLocker lk(&m_mutex);
+                            m_mediatorAddress = m_stunClient->remoteAddress();
+                            NX_LOGX(lm("Connected to mediator by: %1")
+                                .str(m_mediatorAddress), cl_logDEBUG1);
+                        };
 
-            auto address = SocketAddress(url.host(), url.port());
+                    if (code == SystemError::noError)
+                        setEndpoint();
 
-            {
-                QnMutexLocker lk(&m_mutex);
-                m_mediatorAddress = address;
-            }
-            m_stunClient->connect( std::move( address ) );
-            if (!isReady(*m_future))
-                m_promise->set_value( true );
+                    if (!isReady(*m_future))
+                        m_promise->set_value(code == SystemError::noError);
+
+                    m_stunClient->addOnReconnectedHandler(std::move(setEndpoint));
+                });
         }
     });
 }

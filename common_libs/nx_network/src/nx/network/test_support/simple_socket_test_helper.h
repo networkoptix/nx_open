@@ -282,12 +282,13 @@ void socketSimpleSyncFlags(
                 ASSERT_TRUE(accepted.get());
                 EXPECT_EQ(readNBytes(accepted.get(), testMessage.size()), kTestMessage);
             });
+        auto acceptThreadGuard = makeScopedGuard([&acceptThread]() { acceptThread.join(); });
 
         auto client = clientMaker();
         ASSERT_TRUE(client->connect(*endpointToConnectTo, kTestTimeout.count()));
         ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size())
             << lastError();
-        acceptThread.join();
+        acceptThreadGuard.fire();
 
         // MSG_DONTWAIT does not block on server and client:
         ASSERT_EQ(accepted->recv(buffer.data(), buffer.size(), MSG_DONTWAIT), -1);
@@ -311,18 +312,23 @@ void socketSimpleSyncFlags(
         // Send 1st part of message and start ot recv:
         ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
         nx::utils::thread serverRecvThread([&](){ recvWaitAll(accepted.get()); });
+        auto serverRecvThreadGuard =
+            makeScopedGuard([&serverRecvThread]() { serverRecvThread.join(); });
 
         // Send 2nd part of message with delay:
         std::this_thread::sleep_for(std::chrono::microseconds(500));
         ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
-        serverRecvThread.join();
+        serverRecvThreadGuard.fire();
 
         // MSG_WAITALL works an client as well:
         ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
         nx::utils::thread clientRecvThread([&](){ recvWaitAll(accepted.get()); });
+        auto clientRecvThreadGuard =
+            makeScopedGuard([&clientRecvThread]() { clientRecvThread.join(); });
+
         std::this_thread::sleep_for(std::chrono::microseconds(500));
         ASSERT_EQ(client->send(testMessage.data(), testMessage.size()), testMessage.size());
-        clientRecvThread.join();
+        clientRecvThreadGuard.fire();
 #endif
     };
 }
@@ -481,7 +487,7 @@ static void transferSyncAsync(AbstractStreamSocket* sender, AbstractStreamSocket
     Buffer buffer;
     buffer.reserve(kTestMessage.size());
 
-    std::promise<void> promise;
+    nx::utils::promise<void> promise;
     receiver->readAsyncAtLeast(
         &buffer, kTestMessage.size(),
         [&](SystemError::ErrorCode code, size_t size)
@@ -497,7 +503,7 @@ static void transferSyncAsync(AbstractStreamSocket* sender, AbstractStreamSocket
 
 static void transferAsyncSync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
 {
-    std::promise<void> promise;
+    nx::utils::promise<void> promise;
     sender->sendAsync(
         kTestMessage,
         [&](SystemError::ErrorCode code, size_t size)
@@ -523,7 +529,7 @@ static void transferSync(AbstractStreamSocket* sender, AbstractStreamSocket* rec
 
 static void transferAsync(AbstractStreamSocket* sender, AbstractStreamSocket* receiver)
 {
-    std::promise<void> sendPromise;
+    nx::utils::promise<void> sendPromise;
     sender->sendAsync(
         kTestMessage,
         [&](SystemError::ErrorCode code, size_t size)
@@ -536,7 +542,7 @@ static void transferAsync(AbstractStreamSocket* sender, AbstractStreamSocket* re
     Buffer buffer;
     buffer.reserve(kTestMessage.size());
 
-    std::promise<void> readPromise;
+    nx::utils::promise<void> readPromise;
     receiver->readAsyncAtLeast(
         &buffer, kTestMessage.size(),
         [&](SystemError::ErrorCode code, size_t size)
@@ -576,7 +582,7 @@ void socketSyncAsyncSwitch(
     ASSERT_TRUE(client->setSendTimeout(kTestTimeout.count()));
     ASSERT_TRUE(client->setRecvTimeout(kTestTimeout.count()));
 
-    std::promise<void> connectPromise;
+    nx::utils::promise<void> connectPromise;
     client->connectAsync(
         *endpointToConnectTo,
         [&](SystemError::ErrorCode code)
@@ -651,7 +657,7 @@ void socketTransferFragmentation(
     for (size_t runNumber = 0; runNumber <= kTestRuns; ++runNumber)
     {
         NX_LOG(lm("Start transfer %1").arg(runNumber), cl_logDEBUG1);
-        std::promise<void> promise;
+        nx::utils::promise<void> promise;
         client->sendAsync(
             kMessage,
             [&](SystemError::ErrorCode code, size_t size)
@@ -1105,7 +1111,7 @@ void socketIsUsefulAfterCancelIo(
     if (!endpointToConnectTo)
         endpointToConnectTo = std::move(serverAddress);
 
-    ASSERT_FALSE((bool) server->accept()) << lastError();
+    ASSERT_FALSE((bool) server->accept());
 
     auto client = clientMaker();
     ASSERT_TRUE(client->setNonBlockingMode(true));
@@ -1114,6 +1120,7 @@ void socketIsUsefulAfterCancelIo(
     ASSERT_TRUE(client->connect(*endpointToConnectTo, kTestTimeout.count()));
     ASSERT_TRUE(client->setNonBlockingMode(true));
 
+    ASSERT_TRUE(server->setRecvTimeout(0));
     std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
     ASSERT_TRUE((bool) accepted);
     transferAsyncSync(client.get(), accepted.get());
@@ -1265,6 +1272,23 @@ void socketAcceptCancelAsync(
     }
 }
 
+template<typename ServerSocketMaker>
+void serverSocketPleaseStopCancelsPostedCall(
+    const ServerSocketMaker& serverMaker)
+{
+    auto serverSocket = serverMaker();
+    nx::utils::promise<void> socketStopped;
+    serverSocket->post(
+        [&serverSocket, &socketStopped]()
+        {
+            serverSocket->post([]() { ASSERT_TRUE(false); });
+            serverSocket->pleaseStopSync();
+            socketStopped.set_value();
+        });
+    socketStopped.get_future().wait();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
+
 } // namespace test
 } // namespace network
 } // namespace nx
@@ -1314,6 +1338,8 @@ typedef nx::network::test::StopType StopType;
         { nx::network::test::socketAcceptCancelAsync(mkServer, StopType::cancelIo); } \
     Type(Name, AcceptPleaseStopAsync) \
         { nx::network::test::socketAcceptCancelAsync(mkServer, StopType::pleaseStop); } \
+    Type(Name, PleaseStopCancelsPostedCall) \
+        { nx::network::test::serverSocketPleaseStopCancelsPostedCall(mkServer); } \
 
 #define NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     Type(Name, SimpleSync) \

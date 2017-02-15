@@ -3,15 +3,15 @@
 
 #include <nx/streaming/abstract_archive_resource.h>
 #include <nx/streaming/config.h>
-#include "nx/streaming/media_data_packet.h"
+#include <nx/streaming/media_data_packet.h>
+#include <utils/common/aspect_ratio.h>
 
 class QnArchiveStreamReader;
 class QnAviArchiveDelegate;
 
 class QnAviResource : public QnAbstractArchiveResource
 {
-    Q_OBJECT;
-
+    Q_OBJECT
 public:
     QnAviResource(const QString& file);
     ~QnAviResource();
@@ -35,10 +35,18 @@ public:
     qint64 timeZoneOffset() const;
     QnAviArchiveDelegate* createArchiveDelegate() const;
     virtual bool hasVideo(const QnAbstractStreamDataProvider* dataProvider) const override;
+
+    /**
+     * @brief imageAspecRatio Returns aspect ratio for image
+     * @return Valid aspect ratio if resource is image
+     */
+    QnAspectRatio imageAspectRatio() const;
+
 private:
     QnStorageResourcePtr m_storage;
     QnMetaDataLightVector m_motionBuffer[CL_MAX_CHANNELS];
     qint64 m_timeZoneOffset;
+    QnAspectRatio m_imageAspectRatio;
 };
 
 #endif // QN_AVI_RESOURCE_H

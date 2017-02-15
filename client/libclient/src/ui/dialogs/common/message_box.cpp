@@ -52,7 +52,7 @@ QnMessageBoxPrivate::QnMessageBoxPrivate(QnMessageBox* parent) :
     buttonAccent(QnButtonAccent::Standard),
     escapeButton(nullptr),
     icon(QnMessageBoxIcon::NoIcon),
-    buttonDetection(QnButtonDetection::DefaultButton | QnButtonDetection::EscapeButton)
+    buttonDetection(QnButtonDetection::DefaultButton)
 {
 }
 
@@ -81,7 +81,7 @@ void QnMessageBoxPrivate::init()
             }
         });
 
-    q->ui->checkBox->hide();
+    q->ui->checkBoxWidget->hide();
     q->ui->secondaryLine->hide();
     q->ui->iconLabel->hide();
 
@@ -328,6 +328,7 @@ QPushButton* QnMessageBox::addButton(
         NX_ASSERT(!d->defaultButton, "Default button should not be set by now");
         d->defaultButton = result;
         d->buttonDetection &= ~int(QnButtonDetection::DefaultButton);
+        d->stylizeButtons();
     }
 
     return result;
@@ -405,6 +406,7 @@ void QnMessageBox::setDefaultButton(QAbstractButton* button, QnButtonAccent acce
 
     d->buttonAccent = accent;
     d->defaultButton = button;
+    d->buttonDetection &= ~int(QnButtonDetection::DefaultButton);
     d->stylizeButtons();
 }
 
@@ -571,7 +573,7 @@ void QnMessageBox::addCustomWidget(QWidget* widget, Layout layout, int stretch,
             break;
         case QnMessageBox::Layout::Content:
             ui->verticalLayout->insertWidget(
-                ui->verticalLayout->indexOf(ui->checkBox),
+                ui->verticalLayout->indexOf(ui->checkBoxWidget),
                 widget,
                 stretch,
                 alignment
@@ -616,12 +618,12 @@ void QnMessageBox::setCustomCheckBoxText(const QString& text)
 
 bool QnMessageBox::isCheckBoxEnabled() const
 {
-    return !ui->checkBox->isHidden();
+    return !ui->checkBoxWidget->isHidden();
 }
 
 void QnMessageBox::setCheckBoxEnabled(bool value)
 {
-    ui->checkBox->setVisible(value);
+    ui->checkBoxWidget->setVisible(value);
 }
 
 bool QnMessageBox::isChecked() const
@@ -646,10 +648,17 @@ int QnMessageBox::exec()
 
     if (d->buttonDetection.testFlag(QnButtonDetection::DefaultButton))
         d->detectDefaultButton();
-    if (d->buttonDetection.testFlag(QnButtonDetection::EscapeButton))
-        d->detectEscapeButton();
+
+    d->detectEscapeButton();
     if (d->buttonDetection)
         d->stylizeButtons();
+    NX_ASSERT(d->escapeButton);
+
+    if (d->informativeLabels.isEmpty() && d->customWidgets.isEmpty() && !isCheckBoxEnabled())
+    {
+        ui->verticalLayout->removeItem(ui->verticalSpacer);
+        delete ui->verticalSpacer;
+    }
 
     adjustSize();
 

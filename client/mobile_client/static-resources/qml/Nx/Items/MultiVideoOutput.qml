@@ -47,7 +47,15 @@ Item
             {
                 fillMode: QnVideoOutput.Stretch
 
-                Component.onCompleted: setPlayer(mediaPlayer, index)
+                Component.onCompleted:
+                {
+                    setPlayer(mediaPlayer, index)
+                    multiVideoOutput.clearRequested.connect(
+                        function()
+                        {
+                            clear()
+                        })
+                }
                 onSourceRectChanged:
                 {
                     if (index > 0 && __sourceSize.width > 0)
@@ -65,5 +73,12 @@ Item
                 }
             }
         }
+    }
+
+    signal clearRequested()
+
+    function clear()
+    {
+        clearRequested()
     }
 }

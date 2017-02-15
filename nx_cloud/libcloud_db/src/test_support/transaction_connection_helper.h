@@ -4,13 +4,13 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <transaction/connection_guard_shared_state.h>
 #include <transaction/transaction_transport_base.h>
 
-#include "transaction_transport.h"
+#include "test_transaction_transport.h"
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 enum class KeepAlivePolicy
 {
@@ -33,7 +33,7 @@ public:
      * @return New connection id.
      */
     ConnectionId establishTransactionConnection(
-        const SocketAddress& appserver2Endpoint,
+        const QUrl& appserver2BaseUrl,
         const std::string& login,
         const std::string& password,
         KeepAlivePolicy keepAlivePolicy = KeepAlivePolicy::enableKeepAlive);
@@ -77,12 +77,13 @@ private:
     std::atomic<ConnectionId> m_transactionConnectionIdSequence;
     nx::network::aio::Timer m_aioTimer;
 
-    ec2::ApiPeerData localPeer() const;
+    ::ec2::ApiPeerData localPeer() const;
 
     void onTransactionConnectionStateChanged(
-        ec2::QnTransactionTransportBase* /*connection*/,
-        ec2::QnTransactionTransportBase::State /*newState*/);
+        ::ec2::QnTransactionTransportBase* /*connection*/,
+        ::ec2::QnTransactionTransportBase::State /*newState*/);
 };
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

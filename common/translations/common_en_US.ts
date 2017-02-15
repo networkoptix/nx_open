@@ -46,11 +46,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The discovered system %1 is in safe mode.</source>
         <comment>%1 is name of the system</comment>
         <translation type="unfinished"></translation>
@@ -58,21 +53,6 @@
     <message>
         <source>Could not configure the remote system %1.</source>
         <comment>%1 is name of the system</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In this version you can only merge systems which are not connected to %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Both systems are connected to %1. Merge is not allowed.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -85,6 +65,26 @@
     </message>
     <message>
         <source>Merge anyway?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In this version you can only merge systems which are not connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Both systems are connected to %1. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -278,9 +278,9 @@
     </message>
     <message numerus="yes">
         <source>No data received during last %n seconds.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>No data received during last second.</numerusform>
+            <numerusform>No data received during last %n seconds.</numerusform>
         </translation>
     </message>
     <message>
@@ -430,9 +430,9 @@
     <message numerus="yes">
         <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
         <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n time, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+            <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
         </translation>
     </message>
     <message>
@@ -600,10 +600,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Could not parse device response. Url %1, request name %2.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -713,6 +709,10 @@
     </message>
     <message>
         <source>I/O Module initialization process is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure port %1 is accessible (e.g. forwarded).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -936,20 +936,6 @@
             <numerusform></numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>Activate %n more %2. </source>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n more %2 will be used. </source>
-        <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation type="unfinished"></translation>
@@ -970,6 +956,20 @@
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <source>Activate %n more %1. </source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more %1 will be used. </source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>QnLocalSystemDescription</name>
@@ -989,30 +989,30 @@
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Camera</numerusform>
+            <numerusform>%n Cameras</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n camera</numerusform>
+            <numerusform>%n cameras</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Device</numerusform>
+            <numerusform>%n Devices</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n device</numerusform>
+            <numerusform>%n devices</numerusform>
         </translation>
     </message>
     <message>
@@ -1049,16 +1049,16 @@
     </message>
     <message numerus="yes">
         <source>%n I/O Module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O Module</numerusform>
+            <numerusform>%n I/O Modules</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n I/O module(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n I/O module</numerusform>
+            <numerusform>%n I/O modules</numerusform>
         </translation>
     </message>
     <message>

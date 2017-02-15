@@ -47,8 +47,13 @@ Item
                 width: parent.availableWidth
                 showError: d.invalidCredentials
                 activeFocusOnTab: true
-                inputMethodHints: Qt.ImhEmailCharactersOnly | Qt.ImhPreferLatin
+                inputMethodHints:
+                    Qt.ImhSensitiveData
+                        | Qt.ImhEmailCharactersOnly
+                        | Qt.ImhPreferLatin
+                        | Qt.ImhNoAutoUppercase
 
+                onAccepted: nextItemInFocusChain(true).forceActiveFocus()
                 onActiveFocusChanged:
                 {
                     if (activeFocus && d.invalidCredentials)
@@ -67,9 +72,9 @@ Item
                 width: parent.availableWidth
                 showError: d.invalidCredentials
                 activeFocusOnTab: true
-                onAccepted: login()
                 inputMethodHints: Qt.ImhSensitiveData | Qt.ImhPreferLatin
 
+                onAccepted: login()
                 onActiveFocusChanged:
                 {
                     if (activeFocus && d.invalidCredentials)

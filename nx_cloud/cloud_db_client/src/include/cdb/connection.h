@@ -7,6 +7,7 @@
 #ifndef NX_CDB_API_CONNECTION_H
 #define NX_CDB_API_CONNECTION_H
 
+#include <chrono>
 #include <cstdint>
 #include <functional>
 #include <memory>
@@ -47,6 +48,7 @@ class BaseConnection
 {
 public:
     virtual ~BaseConnection() {}
+
     /**
      * Set credentials to use.
      * This method does not try to connect to cloud_db check credentials.
@@ -67,6 +69,9 @@ class Connection:
 {
 public:
     virtual ~Connection() {}
+
+    virtual void setRequestTimeout(std::chrono::milliseconds) = 0;
+    virtual std::chrono::milliseconds requestTimeout() const = 0;
 
     virtual api::AccountManager* accountManager() = 0;
     virtual api::SystemManager* systemManager() = 0;

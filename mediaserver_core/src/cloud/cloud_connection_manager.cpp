@@ -77,7 +77,13 @@ void CloudConnectionManager::setCloudCredentials(
         cl_logDEBUG2);
 
     if (!hasCloudBindingStatusChanged(cloudSystemId, cloudAuthKey))
+    {
+        NX_LOGX(lm("Cloud binding state remained unchanged. "
+            "Current credentials: %1:%2. New ones: %3:%4")
+            .arg(m_cloudSystemId).arg(m_cloudAuthKey).arg(cloudSystemId).arg(cloudAuthKey),
+            cl_logDEBUG2);
         return;
+    }
 
     m_cloudSystemId = cloudSystemId;
     m_cloudAuthKey = cloudAuthKey;
@@ -249,6 +255,8 @@ bool CloudConnectionManager::hasCloudBindingStatusChanged(
 
 bool CloudConnectionManager::makeSystemLocal()
 {
+    NX_LOGX(lm("Making system local"), cl_logDEBUG2);
+
     auto adminUser = qnResPool->getAdministrator();
     if (adminUser && !adminUser->isEnabled() && !qnGlobalSettings->localSystemId().isNull())
     {
@@ -269,6 +277,10 @@ bool CloudConnectionManager::boundToCloud(QnMutexLockerBase* const /*lk*/) const
 
 void CloudConnectionManager::cloudSettingsChanged()
 {
+    NX_LOGX(lm("Cloud settings has been changed. cloudSystemId %1, cloudAuthKey %2")
+        .arg(qnGlobalSettings->cloudSystemId()).arg(qnGlobalSettings->cloudAuthKey()),
+        cl_logDEBUG2);
+
     setCloudCredentials(
         qnGlobalSettings->cloudSystemId(),
         qnGlobalSettings->cloudAuthKey());

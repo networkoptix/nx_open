@@ -15,10 +15,6 @@ nx_http::BufferType readResponse(nx_http::HttpClient* httpClient)
     return response;
 }
 
-} // namespace api_requests_detail
-
-namespace {
-
 /**
  * Convert a JSON Object from string to map. If JSON is invalid or non-object, register a test
  * failure and return empty map.
@@ -46,7 +42,7 @@ static QByteArray jsonMapToStr(const QMap<QString, QVariant>& jsonMap)
     return QJsonDocument::fromVariant(QVariant(jsonMap)).toJson();
 }
 
-} // namespace
+} using namespace api_requests_detail;
 
 PreprocessRequestFunc keepOnlyJsonFields(const QSet<QString>& fields)
 {

@@ -128,11 +128,8 @@ angular.module('webadminApp')
                 $log.log("failed to get systemCloudInfo");
                 return mediaserver.getModuleInformation(true).then(function (r) {
                     $scope.serverInfo = r.data.reply;
-
                     $scope.settings.systemName = $scope.serverInfo.name.replace(/^Server\s/,'');
-
                     $scope.port = window.location.port;
-
                     if($scope.serverInfo.flags.canSetupNetwork){
                         mediaserver.networkSettings().then(function(r){
                             var settings = r.data.reply;
@@ -177,6 +174,7 @@ angular.module('webadminApp')
                     }
 
                     sendCredentialsToNativeClient();
+
                     $log.log("System is local - go to local success");
                     $scope.next('localSuccess');
                     return true;
@@ -348,6 +346,7 @@ angular.module('webadminApp')
             $scope.settings.remoteError = false;
 
             $log.log("Request /api/mergeSystems ...");
+            stopCheckingIfSystemIsReady();
             return mediaserver.mergeSystems(
                 systemUrl,
                 $scope.settings.remoteLogin,
@@ -479,6 +478,7 @@ angular.module('webadminApp')
                     $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}", message.data.id);
 
                     $log.log("Request /api/setupCloudSystem on mediaserver ...");
+                    stopCheckingIfSystemIsReady();
                     mediaserver.setupCloudSystem($scope.settings.systemName,
                         message.data.id,
                         message.data.authKey,
@@ -522,6 +522,7 @@ angular.module('webadminApp')
             $log.log("Initiate offline (local) system");
 
             $log.log("Request /api/setupLocalSystem on cloud portal ...");
+            stopCheckingIfSystemIsReady();
             mediaserver.setupLocalSystem($scope.settings.systemName,
                 $scope.settings.localLogin,
                 $scope.settings.localPassword,
@@ -624,11 +625,11 @@ angular.module('webadminApp')
             });
         }
 
-        function setFocusToInvalid(form){
+        /*function setFocusToInvalid(form){
             $timeout(function() {
                 $("[name='" + form.$name + "']").find('.ng-invalid:visible:first').focus();
             });
-        }
+        }*/
 
         function checkForm(form){
             touchForm(form);
@@ -649,24 +650,44 @@ angular.module('webadminApp')
             }
         }
 
-
+        var checkIfSystemIsReadyPoll = null;
         function checkIfSystemIsReady(){
-            var poll = $poll(reCheckSystem, Config.setup.slowPollingTimeout, Config.setup.firstPollingRequest);
+            checkIfSystemIsReadyPoll = $poll(reCheckSystem, Config.setup.slowPollingTimeout, Config.setup.firstPollingRequest);
             function reCheckSystem(){
                 return mediaserver.getModuleInformation(true).then(function(result){
-                    console.log(result);
-                    if(!result.data.reply.flags.newSystem){
-                        window.location.reload();
-                        $poll.cancel(poll);
+                    if(!result.data.reply.flags.cleanSystem){
+                        var data = result.data.reply;
+
+                        $scope.settings.systemName = data.systemName;
+                        if(data.cloudSystemID) {
+                            $log.log("Suddenly the system is in cloud! go to CloudSuccess");
+
+                            $scope.settings.cloudSystemID = data.cloudSystemID;
+                            $scope.settings.cloudEmail = null;
+
+                            $scope.portalSystemLink = Config.cloud.portalUrl + Config.cloud.portalSystemUrl.replace("{systemId}", $scope.settings.cloudSystemID);
+                            $scope.portalShortLink = Config.cloud.portalUrl;
+                            $scope.next("cloudSuccess");
+                        }else{
+                            $log.log("Suddenly the system is ready! go to localSuccess");
+                            $scope.port = window.location.port;
+                            $scope.next("localSuccess");
+                        }
+
+                        stopCheckingIfSystemIsReady(checkIfSystemIsReadyPoll);
                     }
                 });
             }
         }
-
-
-        function required(val){
-            return !!val && (!val.trim || val.trim() != '');
+        function stopCheckingIfSystemIsReady(){
+            if(checkIfSystemIsReadyPoll) {
+                $poll.cancel(checkIfSystemIsReadyPoll);
+            }
         }
+
+        /*function required(val){
+            return !!val && (!val.trim || val.trim() != '');
+        }*/
 
         /* Wizard workflow */
 
@@ -847,7 +868,7 @@ angular.module('webadminApp')
 
 
         function readCloudHost(){
-            return mediaserver.getModuleInformation().then(function (r) {
+            return mediaserver.getModuleInformation().then(function () {
                 $log.log("Read cloud portal url from module information: " + Config.cloud.portalUrl);
             });
         }
@@ -857,6 +878,9 @@ angular.module('webadminApp')
                 $scope.systemSettings = {};
 
                 for(var settingName in $scope.Config.settingsConfig){
+                    if(!$scope.Config.settingsConfig.hasOwnProperty(settingName)){
+                        continue;
+                    }
                     if(!$scope.Config.settingsConfig[settingName].setupWizard){
                         continue;
                     }

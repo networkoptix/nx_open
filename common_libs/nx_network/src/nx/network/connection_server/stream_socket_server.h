@@ -6,6 +6,7 @@
 #include <set>
 
 #include <nx/network/abstract_socket.h>
+#include <nx/network/aio/basic_pollable.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_factory.h>
 #include <nx/utils/log/log.h>
@@ -27,14 +28,13 @@ public:
 };
 
 template<class _ConnectionType>
-class StreamServerConnectionHolder
-    : public StreamConnectionHolder<_ConnectionType>
+class StreamServerConnectionHolder:
+    public StreamConnectionHolder<_ConnectionType>
 {
 public:
     typedef _ConnectionType ConnectionType;
 
-    StreamServerConnectionHolder()
-    :
+    StreamServerConnectionHolder():
         m_connectionsBeingClosedCount(0)
     {
     }
@@ -100,6 +100,9 @@ private:
     std::map<ConnectionType*, std::shared_ptr<ConnectionType>> m_connections;
 };
 
+// TODO #ak It seems to make sense to decouple 
+//   StreamSocketServer & StreamServerConnectionHolder responsibility.
+
 /**
  * Listens local tcp address, accepts incoming connections and forwards them to the specified handler.
  */
@@ -107,13 +110,12 @@ template<class CustomServerType, class ConnectionType>
     class StreamSocketServer
 :
     public StreamServerConnectionHolder<ConnectionType>,
-    public QnStoppableAsync
+    public nx::network::aio::BasicPollable
 {
     typedef StreamServerConnectionHolder<ConnectionType> BaseType;
     typedef StreamSocketServer<CustomServerType, ConnectionType> SelfType;
 
 public:
-    //!Initialization
     StreamSocketServer(
         bool sslRequired,
         nx::network::NatTraversalSupport natTraversalSupport)
@@ -122,6 +124,7 @@ public:
             sslRequired,
             natTraversalSupport))
     {
+        bindToAioThread(getAioThread());
     }
 
     ~StreamSocketServer()
@@ -129,35 +132,30 @@ public:
         pleaseStopSync(false);
     }
 
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override
     {
-        m_socket->pleaseStop(std::move(completionHandler));
+        nx::network::aio::BasicPollable::bindToAioThread(aioThread);
+        m_socket->bindToAioThread(aioThread);
     }
 
-    virtual void pleaseStopSync(bool assertIfCalledUnderMutex = true) override
+    bool bind(const SocketAddress& socketAddress)
     {
-        m_socket->pleaseStopSync(assertIfCalledUnderMutex);
+        return
+            m_socket->setRecvTimeout(0) &&
+            m_socket->setReuseAddrFlag(true) &&
+            m_socket->bind(socketAddress);
     }
 
-    //!Binds to specified addresses
-    /*!
-        \return false on error. Use \a SystemError::getLastOSErrorCode() for error information
-    */
-    bool bind( const SocketAddress& socketAddress )
-    {
-        return 
-            m_socket->setRecvTimeout( 0 ) &&
-            m_socket->setReuseAddrFlag( true ) &&
-            m_socket->bind( socketAddress );
-    }
-
-    //!Calls \a AbstractStreamServerSocket::listen
     bool listen()
     {
-        if( !m_socket->listen() )
+        using namespace std::placeholders;
+
+        if (!m_socket->setNonBlockingMode(true) ||
+            !m_socket->listen())
+        {
             return false;
-        m_socket->acceptAsync(std::bind(&SelfType::newConnectionAccepted, this,
-                                        std::placeholders::_1, std::placeholders::_2));
+        }
+        m_socket->acceptAsync(std::bind(&SelfType::newConnectionAccepted, this, _1, _2));
         return true;
     }
 
@@ -192,16 +190,6 @@ public:
         this->saveConnection(std::move(connection));
     }
 
-    void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
-    {
-        m_socket->bindToAioThread(aioThread);
-    }
-
-    void post(nx::utils::MoveOnlyFunc<void()> handler)
-    {
-        m_socket->post(std::move(handler));
-    }
-
     void setConnectionInactivityTimeout(boost::optional<std::chrono::milliseconds> value)
     {
         m_connectionInactivityTimeout = value;
@@ -215,6 +203,11 @@ public:
 protected:
     virtual std::shared_ptr<ConnectionType> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) = 0;
+
+    virtual void stopWhileInAioThread() override
+    {
+        m_socket.reset();
+    }
 
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_socket;

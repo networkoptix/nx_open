@@ -24,8 +24,12 @@ public:
         stun::AbstractAsyncClient::bindToAioThread(aioThread);
     }
 
-    virtual void connect(SocketAddress /*endpoint*/, bool /*useSsl*/ = false) override
+    virtual void connect(
+        SocketAddress /*endpoint*/, bool /*useSsl*/ = false,
+        ConnectHandler handler = nullptr) override
     {
+        if (handler)
+            post([handler = std::move(handler)]() { handler(SystemError::noError); });
     }
     
     virtual bool setIndicationHandler(

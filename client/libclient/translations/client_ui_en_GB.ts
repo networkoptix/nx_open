@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US" sourcelanguage="en">
+<TS version="2.1" language="en_GB" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -744,6 +744,16 @@
         <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Motion detection control</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Force motion detection for stream:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CameraInputBusinessEventWidget</name>
@@ -920,7 +930,7 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
         <source>Email or password is not recognized.</source>
-        <translation type="unfinished"></translation>
+        <translation>Email or password is not recognised.</translation>
     </message>
     <message>
         <location/>
@@ -1066,6 +1076,11 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Content type</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1714,6 +1729,14 @@ to the cloud&gt;</source>
     </message>
 </context>
 <context>
+    <name>MessageBox</name>
+    <message>
+        <location filename="../src/ui/dialogs/common/message_box.ui"/>
+        <source>Don&apos;t show this message again</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>MultipleCameraSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui"/>
@@ -1964,7 +1987,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Email or password is not recognized.</source>
-        <translation type="unfinished"></translation>
+        <translation>Email or password is not recognised.</translation>
     </message>
 </context>
 <context>
@@ -2731,32 +2754,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>1 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>0 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>1000 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>100 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source> TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>10 TB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2888,7 +2886,8 @@ to the cloud&gt;</source>
         <location/>
         <source>System time is synchronized with the Internet and is independent from server&apos;s local time.
 Selected server will be used as a time server if the system has no Internet access.</source>
-        <translation type="unfinished"></translation>
+        <translation>System time is synchronised with the Internet and is independent from server&apos;s local time.
+Selected server will be used as a time server if the system has no Internet access.</translation>
     </message>
 </context>
 <context>

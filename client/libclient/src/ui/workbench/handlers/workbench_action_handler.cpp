@@ -663,7 +663,10 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered()
             AddToLayoutParams addParams;
             addParams.usePosition = !position.isNull();
             addParams.position = position;
-            addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
+
+            // Live viewers must not open items on archive position
+            if (accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission))
+                addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
             addToLayout(layout, resources, addParams);
         }
     }
@@ -817,7 +820,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             text, extras, QDialogButtonBox::Ok, QDialogButtonBox::Ok,
             mainWindow());
 
-        messageBox.addCustomWidget(new QnResourceListView(modifiedResources));
+        messageBox.addCustomWidget(new QnResourceListView(modifiedResources, &messageBox));
         messageBox.exec();
         return;
     }
@@ -856,7 +859,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
         messageBox.addButton(tr("Move"), QDialogButtonBox::YesRole, QnButtonAccent::Standard);
         const auto skipButton = messageBox.addCustomButton(QnMessageBoxCustomButton::Skip,
             QDialogButtonBox::NoRole);
-        messageBox.addCustomWidget(new QnResourceListView(errorResources));
+        messageBox.addCustomWidget(new QnResourceListView(errorResources, &messageBox));
 
         const auto result = messageBox.exec();
         if (result == QDialogButtonBox::Cancel)
@@ -1522,7 +1525,7 @@ void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered()
         QDialogButtonBox::Yes | QDialogButtonBox::No, QDialogButtonBox::Yes,
         mainWindow());
 
-    messageBox.addCustomWidget(new QnResourceListView(resources));
+    messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
     auto result = messageBox.exec();
     if (result != QDialogButtonBox::Yes)
         return;

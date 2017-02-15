@@ -24,11 +24,11 @@ namespace rtu
 
     QString ApplicationInfo::supportUrl()
     {
-        return QStringLiteral("${company.support.link}");
+        return QStringLiteral("${supportUrl}");
     }
 
     QString ApplicationInfo::companyUrl()
     {
-        return QStringLiteral("${company.url}");
+        return QStringLiteral("${companyUrl}");
     }
 }

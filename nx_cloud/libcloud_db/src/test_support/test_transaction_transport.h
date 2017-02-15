@@ -1,21 +1,18 @@
-
 #pragma once
 
 #include <transaction/transaction_transport_base.h>
-
 
 namespace nx {
 namespace cdb {
 namespace test {
 
-class TransactionTransport
-:
-    public ec2::QnTransactionTransportBase
+class TransactionTransport:
+    public ::ec2::QnTransactionTransportBase
 {
 public:
     TransactionTransport(
         ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
-        ec2::ApiPeerData localPeer,
+        ::ec2::ApiPeerData localPeer,
         const std::string& systemId,
         const std::string& systemAuthKey);
 
@@ -29,6 +26,6 @@ private:
     const std::string m_systemAuthKey;
 };
 
-}   // namespace test
-}   // namespace cdb
-}   // namespace nx
+} // namespace test
+} // namespace cdb
+} // namespace nx

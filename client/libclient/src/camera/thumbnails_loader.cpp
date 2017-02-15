@@ -65,8 +65,6 @@ QnThumbnailsLoader::QnThumbnailsLoader(const QnMediaResourcePtr &resource, QnThu
     m_boundingSize(128, 96), /* That's 4:3 aspect ratio. */
     m_scaleContext(NULL),
     m_scaleBuffer(NULL),
-    m_scaleSourceSize(0, 0),
-    m_scaleTargetSize(0, 0),
     m_scaleSourceLine(0),
     m_scaleSourceFormat(0),
     m_helper(NULL),

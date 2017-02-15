@@ -95,10 +95,10 @@ namespace nx_api
             if( m_serializerState != SerializerState::needMoreBufferSpace )
             {
                 //message sent, triggerring completion handler
-                std::function<void( SystemError::ErrorCode )> sendCompletionHandler;
                 NX_ASSERT( !m_sendQueue.empty() );
                 //completion handler is allowed to remove this connection, so moving handler to local variable
-                sendCompletionHandler = std::move( m_sendQueue.front().handler );
+                std::function<void(SystemError::ErrorCode)> sendCompletionHandler;
+                sendCompletionHandler.swap( m_sendQueue.front().handler );
                 m_serializer.setMessage( nullptr );
                 m_sendQueue.pop_front();
 
@@ -326,7 +326,8 @@ namespace nx_api
         void reportErrorAndCloseConnection( SystemError::ErrorCode errorCode )
         {
             NX_ASSERT( !m_sendQueue.empty() );
-            auto handler = std::move( m_sendQueue.front().handler );
+            std::function<void(SystemError::ErrorCode)> handler;
+            handler.swap( m_sendQueue.front().handler );
             {
                 nx::utils::ObjectDestructionFlag::Watcher watcher(
                     &m_connectionFreedFlag);

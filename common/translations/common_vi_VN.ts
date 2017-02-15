@@ -46,11 +46,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The discovered system %1 is in safe mode.</source>
         <comment>%1 is name of the system</comment>
         <translation type="unfinished"></translation>
@@ -58,21 +53,6 @@
     <message>
         <source>Could not configure the remote system %1.</source>
         <comment>%1 is name of the system</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In this version you can only merge systems which are not connected to %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Both systems are connected to %1. Merge is not allowed.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -85,6 +65,26 @@
     </message>
     <message>
         <source>Merge anyway?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In this version you can only merge systems which are not connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Both systems are connected to %1. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -590,10 +590,6 @@
         <translation>Hãy chắc chắn rằng các camera được cắm vào mạng. Hãy thử khởi động lại máy ảnh.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation>Hãy chắc chắn rằng cổng %2 có thể truy cập (ví dụ chuyển tiếp).</translation>
-    </message>
-    <message>
         <source>Could not parse device response. Url %1, request name %2.</source>
         <translation>Không thể phân tích phản ứng thiết bị. Url %1, yêu cầu tên %2.</translation>
     </message>
@@ -704,6 +700,10 @@
     <message>
         <source>I/O Module initialization process is in progress.</source>
         <translation>I / O Module khởi tạo quá trình được tiến hành.</translation>
+    </message>
+    <message>
+        <source>Make sure port %1 is accessible (e.g. forwarded).</source>
+        <translation type="unfinished">Hãy chắc chắn rằng cổng %1 có thể truy cập (ví dụ chuyển tiếp).</translation>
     </message>
 </context>
 <context>
@@ -924,18 +924,6 @@
             <numerusform>%n %2 sẽ được sử dụng trong tổng số %1.</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>Activate %n more %2. </source>
-        <translation>
-            <numerusform>Kích hoạt %n hơn %2.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n more %2 will be used. </source>
-        <translation>
-            <numerusform>%n hơn %2 sẽ được sử dụng.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>Key bản quyền mà bạn đã nhập không hợp lệ. Hãy kiểm tra xem key bản quyền được nhập chính xác. Nếu vấn đề vẫn tiếp tục, vui lòng liên hệ với nhóm hỗ trợ để xác nhận nếu key bản quyền là hợp lệ hoặc để có được một chìa khóa giấy phép hợp lệ.</translation>
@@ -955,6 +943,18 @@
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
         <translation>Có một vấn đề kích hoạt key bản quyền của bạn. dữ liệu không hợp lệ nhận được. Hãy liên hệ với nhóm hỗ trợ để báo cáo vấn đề.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Activate %n more %1. </source>
+        <translation type="unfinished">
+            <numerusform>Kích hoạt %n hơn %1.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more %1 will be used. </source>
+        <translation type="unfinished">
+            <numerusform>%n hơn %1 sẽ được sử dụng.</numerusform>
+        </translation>
     </message>
 </context>
 <context>

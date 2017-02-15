@@ -32,6 +32,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/delegates/business_rule_item_delegate.h>
+#include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
@@ -226,6 +227,9 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
         ui->tableView->horizontalHeader()->setSectionResizeMode(column, QHeaderView::Fixed);
 
     ui->tableView->installEventFilter(this);
+
+    ui->tableView->setMinimumHeight(style::Metrics::kHeaderSize
+        + style::Metrics::kButtonHeight * style::Hints::kMinimumTableRows);
 
     ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate(this));
 

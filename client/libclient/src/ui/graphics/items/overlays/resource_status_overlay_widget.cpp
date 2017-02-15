@@ -182,11 +182,10 @@ void QnStatusOverlayWidget::setVisibleControls(Controls controls)
 
     const bool iconVisible = controls.testFlag(Control::kIcon);
     const bool captionVisible = controls.testFlag(Control::kCaption);
-    const bool centralVisible = (iconVisible || captionVisible);
-
-    const bool buttonVisible = controls.testFlag(Control::kButton);
     const bool descriptionVisible = controls.testFlag(Control::kDescription);
-    const bool extrasVisible = (buttonVisible || descriptionVisible);
+    const bool centralVisible = (iconVisible || captionVisible || descriptionVisible);
+
+    const bool extrasVisible = controls.testFlag(Control::kButton);
 
     m_imageItem.setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
     m_preloaderHolder->setVisible(preloaderVisible);
@@ -197,7 +196,6 @@ void QnStatusOverlayWidget::setVisibleControls(Controls controls)
     m_centralAreaImage->setVisible(iconVisible);
     m_caption->setVisible(captionVisible);
 
-    m_button->setVisible(buttonVisible);
     m_description->setVisible(descriptionVisible);
 
     m_visibleControls = controls;
@@ -306,13 +304,13 @@ void QnStatusOverlayWidget::setupCentralControls()
 void QnStatusOverlayWidget::setupExtrasControls()
 {
     setupButton(*m_button);
-    m_button->setVisible(false);
 
     /* Even though there's only one button in the extras holder,
      * a container widget with a layout must be created, otherwise
      * graphics proxy doesn't handle size hint changes at all. */
 
     const auto container = new QWidget();
+    container->setAttribute(Qt::WA_TranslucentBackground);
     container->setObjectName(lit("extrasContainer"));
 
     const auto layout = new QHBoxLayout(container);
@@ -370,8 +368,8 @@ void QnStatusOverlayWidget::updateAreasSizes()
     QTransform sceneToViewport = view->viewportTransform();
     qreal scale = 1.0 / std::sqrt(sceneToViewport.m11() * sceneToViewport.m11() + sceneToViewport.m12() * sceneToViewport.m12());
 
-    bool showExtras = (m_visibleControls.testFlag(Control::kButton)
-        || m_visibleControls.testFlag(Control::kDescription));
+    //TODO: #vkutin #ynikitenkov Localize visibility matters in ONE place!
+    bool showExtras = m_visibleControls.testFlag(Control::kButton);
 
     const qreal minHeight = 95 * scale; // TODO: #ynikitenkov Change for description
     showExtras = showExtras && (rect.height() > minHeight); // Do not show extras on too small items

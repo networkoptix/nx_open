@@ -6,16 +6,6 @@
 namespace nx {
 namespace utils {
 
-QString AppInfo::applicationName()
-{
-    return QStringLiteral("${product.title}");
-}
-
-QString AppInfo::applicationDisplayName()
-{
-    return QStringLiteral("${product.display.title}");
-}
-
 bool AppInfo::beta()
 {
     static const auto betaString = QStringLiteral("${beta}").toLower();

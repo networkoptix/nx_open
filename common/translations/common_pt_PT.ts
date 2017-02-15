@@ -46,11 +46,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The discovered system %1 is in safe mode.</source>
         <comment>%1 is name of the system</comment>
         <translation type="unfinished"></translation>
@@ -58,21 +53,6 @@
     <message>
         <source>Could not configure the remote system %1.</source>
         <comment>%1 is name of the system</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In this version you can only merge systems which are not connected to %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Both systems are connected to %1. Merge is not allowed.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -85,6 +65,26 @@
     </message>
     <message>
         <source>Merge anyway?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In this version you can only merge systems which are not connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Both systems are connected to %1. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -600,10 +600,6 @@
         <translation>Verifique que a câmara está ligada à rede. Tente reiniciar a câmara.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
-        <translation>Verifique que a porta %2 está acessível (ex: reencaminhada).</translation>
-    </message>
-    <message>
         <source>Could not parse device response. Url %1, request name %2.</source>
         <translation>Não foi possível analisar a resposta do dispositivo. Url %1, nome pedido %2.</translation>
     </message>
@@ -714,6 +710,10 @@
     <message>
         <source>I/O Module initialization process is in progress.</source>
         <translation>Inicialização do módulo I/O em progresso.</translation>
+    </message>
+    <message>
+        <source>Make sure port %1 is accessible (e.g. forwarded).</source>
+        <translation type="unfinished">Verifique que a porta %1 está acessível (ex: reencaminhada).</translation>
     </message>
 </context>
 <context>
@@ -936,20 +936,6 @@
             <numerusform>Serão usadas %n %2 de um total de %1.</numerusform>
         </translation>
     </message>
-    <message numerus="yes">
-        <source>Activate %n more %2. </source>
-        <translation>
-            <numerusform>Activar %n %2 adicional.</numerusform>
-            <numerusform>Activar %n %2 adicionais.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n more %2 will be used. </source>
-        <translation>
-            <numerusform>Mais %n %2 será usada.</numerusform>
-            <numerusform>Mais %n %2 serão usadas.</numerusform>
-        </translation>
-    </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>A chave da licença que introduziu é inválida. Por favor verifique se a chave da licença está introduzida correctamente. Se o problema continuar, deve contactar a equipa de suporte para confirmar se a chave é válida ou para obter uma chave válida.</translation>
@@ -969,6 +955,20 @@
     <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
         <translation>Houve um problema ao activar a sua chave da licença. Dados inválidos recebidos. Deve contactar a equipa de suporte para obter uma chave válida.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Activate %n more %1. </source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more %1 will be used. </source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>

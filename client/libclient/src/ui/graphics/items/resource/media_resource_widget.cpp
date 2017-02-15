@@ -81,6 +81,7 @@
 #include <api/common_message_processor.h>
 #include <business/actions/abstract_business_action.h>
 #include <utils/media/sse_helper.h>
+#include <plugins/resource/avi/avi_resource.h>
 
 namespace {
 
@@ -593,6 +594,14 @@ void QnMediaResourceWidget::createPtzController()
 
 qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
 {
+    const auto aviResource = m_resource.dynamicCast<QnAviResource>();
+    if (aviResource && aviResource->flags().testFlag(Qn::still_image))
+    {
+        const auto aspect = aviResource->imageAspectRatio();
+        if (aspect.isValid())
+            return aspect.toFloat();
+    }
+
     /* Here we get 0.0 if no custom aspect ratio set. */
     qreal result = resource()->customAspectRatio();
     if (!qFuzzyIsNull(result))
@@ -1624,6 +1633,17 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
     const ResourceStates states = getResourceStates();
+
+    //TODO: #GDM #3.1 This really requires hell a lot of refactoring
+    // for live video make a quick check: status has higher priority than EOF
+    if (states.isRealTimeSource)
+    {
+        if (states.isOffline)
+            return Qn::OfflineOverlay;
+
+        if (states.isUnauthorized)
+            return Qn::UnauthorizedOverlay;
+    }
 
     if (m_camera && m_camera->hasFlags(Qn::io_module))
     {
