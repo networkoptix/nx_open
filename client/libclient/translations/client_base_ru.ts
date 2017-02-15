@@ -1447,9 +1447,37 @@ to view more bookmarks</source>
         <source>No archive for this position</source>
         <translation>Нет архивных записей для этой позиции</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These devices are removed from the System</source>
-        <translation>Эти устройства были удалены из системы</translation>
+        <translation type="unfinished">
+            <numerusform>Эти устройства были удалены из системы</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These servers are removed from the System</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These users are removed from the System</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These resources are removed from the System</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
