@@ -32,7 +32,7 @@ void QnSoftwareTriggerBusinessEventWidget::updateTabOrder(QWidget* before, QWidg
 
 void QnSoftwareTriggerBusinessEventWidget::at_model_dataChanged(QnBusiness::Fields fields)
 {
-    if (!model())
+    if (!model() || m_updating)
         return;
 
     QScopedValueRollback<bool> updatingRollback(m_updating, true);
@@ -48,6 +48,8 @@ void QnSoftwareTriggerBusinessEventWidget::paramsChanged()
 {
     if (!model() || m_updating)
         return;
+
+    QScopedValueRollback<bool> updatingRollback(m_updating, true);
 
     auto eventParams = model()->eventParams();
     eventParams.inputPortId = ui->triggerIdLineEdit->text().trimmed();
