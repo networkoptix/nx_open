@@ -245,8 +245,8 @@ QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList&
     result.setPath(path);
     QUrlQuery q;
     for (const auto& param: params)
-        q.addQueryItem(param.first, param.second);
-    result.setQuery(q.toString());
+        q.addQueryItem(param.first, QString::fromUtf8(QUrl::toPercentEncoding(param.second)));
+    result.setQuery(q);
     return result;
 }
 
