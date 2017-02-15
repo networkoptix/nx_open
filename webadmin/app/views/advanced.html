@@ -34,7 +34,7 @@
                     <td><span class="read-container storage-URL" title="{{storage.URL}}" class="storage-URL">{{storage.URL}}</span></td>
                     <td>
                         <div class="progress" style="margin-top:5px;"  ng-if="storage.accessible"
-                             title="Reserved: {{formatSpace(storage.reservedSpace)}}, &#013;Free: {{formatSpace(storage.freeSpace)}}, &#013;Occupied: {{formatSpace(storage.totalSpace-storage.freeSpace)}}, &#013;Total: {{formatSpace(storage.totalSpace)}}">
+                             title="{{formatTotalSpace(storage)}}">
 
                             <div class="progress-overlay progress-bar progress-bar-warning progress-bar-striped" role="progressbar"
                                  ng-style="{width: storage.reservedSpace*100/storage.totalSpace+ '%'}">
