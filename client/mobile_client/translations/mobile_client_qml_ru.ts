@@ -86,6 +86,10 @@
         <source>Email and password cannot be empty</source>
         <translation>Адрес электронной почты и пароль не могут быть пустыми</translation>
     </message>
+    <message>
+        <source>Log in</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>CustomConnectionScreen</name>
