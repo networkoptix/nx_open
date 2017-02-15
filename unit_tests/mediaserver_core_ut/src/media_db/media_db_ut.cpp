@@ -856,11 +856,7 @@ TEST(MediaDbTest, StorageDB)
 
     auto writerFunc = [&mutex, &sdb, &tcm]
     {
-        #ifndef __arm__
-            for (int i = 0; i < 100; ++i)
-        #else
-            for (int i = 0; i < 100; ++i)
-        #endif
+        for (int i = 0; i < 100; ++i)
         {
             int diceRoll = genRandomNumber<0, 10>();
             switch (diceRoll)
