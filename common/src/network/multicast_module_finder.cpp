@@ -318,7 +318,8 @@ void QnMulticastModuleFinder::run()
 
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis)
         {
-            if (!qnGlobalSettings->isNewSystem() && qnGlobalSettings->isAutoDiscoveryEnabled())
+            if (m_clientMode ||
+                (!qnGlobalSettings->isNewSystem() && qnGlobalSettings->isAutoDiscoveryEnabled()))
             {
                 QnMutexLocker lk(&m_mutex);
                 for (UDPSocket *socket : m_clientSockets)
