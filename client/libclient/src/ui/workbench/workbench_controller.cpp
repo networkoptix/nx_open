@@ -403,6 +403,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(ptzInstrument, &PtzInstrument::ptzProcessFinished, m_motionSelectionInstrument, &Instrument::recursiveEnable);
     connect(ptzInstrument, &PtzInstrument::ptzProcessStarted, m_itemLeftClickInstrument, &Instrument::recursiveDisable);
     connect(ptzInstrument, &PtzInstrument::ptzProcessFinished, m_itemLeftClickInstrument, &Instrument::recursiveEnable);
+    connect(ptzInstrument, &PtzInstrument::ptzProcessStarted, m_resizingInstrument, &Instrument::recursiveDisable);
+    connect(ptzInstrument, &PtzInstrument::ptzProcessFinished, m_resizingInstrument, &Instrument::recursiveEnable);
     connect(ptzInstrument, &PtzInstrument::ptzProcessStarted, this, &QnWorkbenchController::at_ptzProcessStarted);
 
     connect(m_zoomWindowInstrument,       SIGNAL(zoomWindowProcessStarted(QnMediaResourceWidget *)),                                  m_handScrollInstrument,         SLOT(recursiveDisable()));
