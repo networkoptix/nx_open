@@ -702,26 +702,36 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 
 }
 
-void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDType ActionId,
+void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDType actionId,
     int selectedPage)
 {
-    QnResourceList resList;
-    for (const auto& id: record->resources)
-    {
-        if (QnResourcePtr res = qnResPool->getResourceById(id))
-            resList << res;
-    }
-
-    QnActionParameters params(resList);
+    const QnResourceList resList = qnResPool->getResources(record->resources);
     if (resList.isEmpty())
     {
-        QnMessageBox::warning(this, tr("These devices are removed from the System"));
+        const auto n = static_cast<int>(record->resources.size());
+        switch (actionId)
+        {
+            case QnActions::CameraSettingsAction:
+                QnMessageBox::warning(this, tr("These devices are removed from the System", "", n));
+                break;
+            case QnActions::ServerSettingsAction:
+                QnMessageBox::warning(this, tr("These servers are removed from the System", "", n));
+                break;
+            case QnActions::UserSettingsAction:
+                QnMessageBox::warning(this, tr("These users are removed from the System", "", n));
+                break;
+            default:
+                QnMessageBox::warning(this, tr("These resources are removed from the System", "", n));
+                break;
+        }
+
         return;
     }
 
+    QnActionParameters params(resList);
     params.setArgument(Qn::ItemTimeRole, record->rangeStartSec * 1000ll);
     params.setArgument(Qn::FocusTabRole, selectedPage);
-    context()->menu()->trigger(ActionId, params);
+    context()->menu()->trigger(actionId, params);
 }
 
 void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
