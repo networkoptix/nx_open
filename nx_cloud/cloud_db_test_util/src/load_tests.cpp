@@ -12,17 +12,23 @@ namespace client {
 int establishManyConnections(
     const std::string& cdbUrl,
     const std::string& login,
-    const std::string& password)
+    const std::string& password,
+    int connectionCount)
 {
     auto loadEmulator = std::make_unique<test::LoadEmulator>(
         cdbUrl, //"https://cloud-dev.hdw.mx",
         login,
         password);
 
-    loadEmulator->setTransactionConnectionCount(1000);
+    loadEmulator->setTransactionConnectionCount(connectionCount);
     loadEmulator->start();
 
-    std::this_thread::sleep_for(std::chrono::hours(1));
+    for (;;)
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        std::cout << "Active connection count " << 
+            loadEmulator->activeConnectionCount() << std::endl;
+    }
 
     return 0;
 }

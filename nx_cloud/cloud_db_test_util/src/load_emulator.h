@@ -25,6 +25,8 @@ public:
 
     void start();
 
+    std::size_t activeConnectionCount() const;
+
 private:
     const std::string m_cdbUrl;
     api::CdbClient m_cdbClient;
