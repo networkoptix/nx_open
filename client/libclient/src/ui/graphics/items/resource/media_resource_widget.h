@@ -7,8 +7,6 @@
 
 #include <QtGui/QStaticText>
 
-#include <business/business_fwd.h>
-
 #include <camera/camera_bookmarks_manager_fwd.h>
 
 #include <core/resource/resource_fwd.h>
