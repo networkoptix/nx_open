@@ -1,6 +1,40 @@
+#include <string>
 #include <cstring>
 #include <memory>
 #include "test_storage_factory.h"
+
+namespace detail {
+
+struct UrlWithParam
+{
+
+};
+
+class UrlParser
+{
+    enum class ParseState
+    {
+        scheme,
+        url,
+        param
+    }
+
+public:
+    UrlParser(const std::string& url)
+        : m_url(url),
+          m_index(0),
+          m_state(scheme)
+    {
+        tryParse();
+    }
+
+private:
+    std::string m_url;
+    size_t m_index;
+    ParseState m_state;
+};
+
+}
 
 const char** STORAGE_METHOD_CALL TestStorageFactory::findAvailable() const
 {
@@ -12,6 +46,7 @@ nx_spl::Storage* STORAGE_METHOD_CALL TestStorageFactory::createStorage(
     int*        ecode
 )
 {
+
     // auto testStorage = std::unique_ptr<TestStorage>(new TestStorage);
     // auto errorCode = testStorage->parseUrl(url);
     // if (errorCode != ok)
@@ -37,14 +72,14 @@ const char* TestStorageFactory::lastErrorMessage(int ecode) const
 
 void* TestStorageFactory::queryInterface(const nxpl::NX_GUID& interfaceID)
 {
-if (std::memcmp(&interfaceID,
-                &nx_spl::IID_StorageFactory,
-                sizeof(nxpl::NX_GUID)) == 0)
-{
-    addRef();
-    return static_cast<nx_spl::StorageFactory*>(this);
-}
-else if (std::memcmp(&interfaceID,
+    if (std::memcmp(&interfaceID,
+                    &nx_spl::IID_StorageFactory,
+                    sizeof(nxpl::NX_GUID)) == 0)
+    {
+        addRef();
+        return static_cast<nx_spl::StorageFactory*>(this);
+    }
+    else if (std::memcmp(&interfaceID,
                          &nxpl::IID_PluginInterface,
                          sizeof(nxpl::IID_PluginInterface)) == 0)
     {

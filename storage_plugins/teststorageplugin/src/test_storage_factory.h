@@ -1,4 +1,7 @@
 #pragma once
+
+#include <unordered_set>
+#include <string>
 #include "third_party_storage.h"
 #include "common.h"
 
@@ -27,4 +30,7 @@ public: // plugin interface implementation
 
     virtual unsigned int addRef() override;
     virtual unsigned int releaseRef() override;
+
+private:
+    std::unordered_set<std::string> m_storageUrls;
 };
