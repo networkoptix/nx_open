@@ -35,8 +35,8 @@ Column
 
         anchors.left: parent.left;
 
-        width: 24;
-        height: 24;
+        width: 20;
+        height: 20;
         source:
         {
            if (!context.isCloudEnabled)
