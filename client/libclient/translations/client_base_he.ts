@@ -1477,6 +1477,13 @@ to view more bookmarks</source>
             <numerusform></numerusform>
         </translation>
     </message>
+    <message numerus="yes">
+        <source>These cameras are removed from the System</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>QnAuditLogModel</name>
