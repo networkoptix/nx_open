@@ -119,6 +119,8 @@ function(_add_msvc_precompiled_header target input)
 endfunction()
 
 function(_add_xcode_precompiled_header target input)
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${input}")
 endfunction()
 
 function(_add_gcc_clang_precompiled_header target input)
