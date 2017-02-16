@@ -8,15 +8,11 @@
 
 #include <ui/dialogs/private/setup_wizard_dialog_p.h>
 
-#include <utils/common/app_info.h>
-
 #include <nx/utils/log/log.h>
 
 namespace
 {
     static const QSize kSetupWizardSize(496, 392);
-
-    static const QString kTranslationExtension = lit(".ts");
 
     QUrl constructUrl(const QUrl &baseUrl)
     {
