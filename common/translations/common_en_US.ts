@@ -932,7 +932,10 @@
     <message numerus="yes">
         <source>%n %2 will be used out of %1.</source>
         <translation>
-            <numerusform></numerusform>
+            <numerusform>%n %2 will be used out of %1.</numerusform>
+            <numerusform>%n %2 will be used out of %1.</numerusform>
+        </translation>
+    </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation type="unfinished"></translation>
