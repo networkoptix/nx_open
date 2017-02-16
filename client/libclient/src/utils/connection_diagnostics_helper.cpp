@@ -55,9 +55,14 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
     Qn::ConnectionResult result,
     const QnConnectionInfo& connectionInfo)
 {
+    static const QString kRowMarker = lit(" - ");
     QString versionDetails =
-        tr(" - Client version: %1.").arg(qnCommon->engineVersion().toString()) + L'\n'
-        + tr(" - Server version: %1.").arg(connectionInfo.version.toString()) + L'\n';
+        kRowMarker
+        + tr("Client version: %1.").arg(qnCommon->engineVersion().toString())
+        + L'\n'
+        + kRowMarker
+        + tr("Server version: %1.").arg(connectionInfo.version.toString())
+        + L'\n';
 
     switch (result)
     {

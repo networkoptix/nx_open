@@ -18,6 +18,8 @@
 
 #include <licensing/license.h>
 
+#include <text/time_strings.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
@@ -183,6 +185,8 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     m_updating(false)
 {
     ui->setupUi(this);
+    ui->recordBeforeSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
+    ui->recordAfterSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
 
     NX_ASSERT(parent);
     QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());

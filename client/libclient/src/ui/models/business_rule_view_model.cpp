@@ -1093,11 +1093,11 @@ QString QnBusinessRuleViewModel::getAggregationText() const
 
     const qint64 kMsecPerSec = 1000;
     static const Qt::TimeSpanFormat kFormat = Qt::Seconds | Qt::Minutes | Qt::Hours | Qt::Days;
-    static const int kDoNotSuppress = -1;
     static const QString kSeparator(L' ');
 
     const qint64 aggregationPeriodMs = m_aggregationPeriodSec * kMsecPerSec;
-    const QString timespan = QTimeSpan(aggregationPeriodMs).toApproximateString(kDoNotSuppress,
+    const QString timespan = QTimeSpan(aggregationPeriodMs).toApproximateString(
+        QTimeSpan::kDoNotSuppressSecondUnit,
         kFormat,
         QTimeSpan::SuffixFormat::Full,
         kSeparator);

@@ -148,6 +148,9 @@ QnLayoutSettingsDialog::QnLayoutSettingsDialog(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    ui->widthSpinBox->setSuffix(L' ' + tr("cells"));
+    ui->heightSpinBox->setSuffix(L' ' + tr("cells"));
+
     setHelpTopic(ui->lockedCheckBox,        Qn::LayoutSettings_Locking_Help);
     setHelpTopic(ui->backgroundGroupBox,    Qn::LayoutSettings_EMapping_Help);
 

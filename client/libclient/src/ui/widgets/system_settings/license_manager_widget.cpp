@@ -723,7 +723,7 @@ void QnLicenseManagerWidget::showActivationMessageLater(const QJsonObject& error
     {
         showMessageLater(QnMessageBoxIcon::Warning,
             tr("Invalid license key"),
-            tr("Please make sure it is entered correctly. ")
+            tr("Please make sure it is entered correctly.")
             + L'\n' + getProblemPersistMessage(),
             CopyToClipboardButton::Hide);
     }
