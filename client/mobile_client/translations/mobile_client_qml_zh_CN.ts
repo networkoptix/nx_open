@@ -405,7 +405,7 @@
 <context>
     <name>SessionItem</name>
     <message>
-        <source>This server has too old version. </source>
+        <source>This server has too old version. Please update it to the latest version.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
