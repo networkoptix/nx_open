@@ -54,8 +54,7 @@ public:
 
     virtual ~AvFrameMemoryBufferPrivate()
     {
-        if (frame)
-            av_frame_free(&frame);
+        av_frame_free(&frame);
     }
 
     virtual int map(
