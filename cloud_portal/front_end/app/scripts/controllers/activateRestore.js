@@ -93,8 +93,14 @@ angular.module('cloudApp')
                 return cloudApi.activate($scope.data.activateCode);
             },{
                 errorCodes:{
-                    notFound: L.errorCodes.wrongCode,
-                    notAuthorized: L.errorCodes.wrongCode
+                    notFound: function(){
+                        $scope.activationSuccess = false;
+                        return false;
+                    },
+                    notAuthorized: function(){
+                        $scope.activationSuccess = false;
+                        return false;
+                    },
                 },
                 errorPrefix:L.errorCodes.cantActivatePrefix + ':'
             }).then(function(){
