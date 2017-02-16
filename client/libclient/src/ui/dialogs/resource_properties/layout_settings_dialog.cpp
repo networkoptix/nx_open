@@ -555,7 +555,7 @@ void QnLayoutSettingsDialog::selectFile() {
 
     if (fileInfo.size() > QnAppServerFileCache::maximumFileSize()) {
         d->state = Error;
-        d->errorText = braced(tr("Picture is too big. Maximum size is %1 Mb")
+        d->errorText = braced(tr("Picture is too big. Maximum size is %1 MB")
             .arg(QnAppServerFileCache::maximumFileSize() / (1024*1024)));
         updateControls();
         return;
