@@ -68,11 +68,6 @@
         <translation>Объединить?</translation>
     </message>
     <message>
-        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Не удается подключиться к другой системе, поскольку нынешняя система уже подключена к %1.</translation>
-    </message>
-    <message>
         <source>In this version you can only merge systems which are not connected to %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished">В этой версии можно объединять только системы, которые не связаны с %1.</translation>
@@ -86,6 +81,11 @@
         <source>These systems are built with different %1 URL. Merge is not allowed.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished">Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
+    </message>
+    <message>
+        <source>Cannot connect to the other system because current system is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -266,10 +266,6 @@
         <translation type="unfinished">%1 --&gt; %2</translation>
     </message>
     <message>
-        <source>Server &apos;%1&apos; has a license problem</source>
-        <translation>Проблема с лицензией на сервере &apos;%1&apos;</translation>
-    </message>
-    <message>
         <source>An unknown event has occurred</source>
         <translation>Произошло неизвестное событие</translation>
     </message>
@@ -369,10 +365,6 @@
         <translation>Резервное копирование архива завершено</translation>
     </message>
     <message>
-        <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation>Сервер &apos;%1&apos; завершил резервное копирование архива</translation>
-    </message>
-    <message>
         <source>Generic Event at %1</source>
         <translation>Генерируемое событие на %1</translation>
     </message>
@@ -411,10 +403,6 @@
     <message>
         <source>Archive backup failed: File catalog error</source>
         <translation>Ошибка резервного копирования архива: Ошибка файлового каталога</translation>
-    </message>
-    <message>
-        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation>Резервное копирование архива завершено не полностью, так как время, отведенное на резевное копирование, истекло. Резервоное копирование выполнено до %1</translation>
     </message>
     <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
@@ -513,6 +501,18 @@
             <numerusform>Конфликт IP адреса камер</numerusform>
             <numerusform>Конфликт IP адреса камер</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -622,22 +622,6 @@
         <translation>Не авторизован. URL %1.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
-        <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках устройства.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках камеры.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
-        <translation>Если это не помогает, восстановите заводские настройки на web-странице устройства.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation>Если это не помогает, восстановите заводские настройки на web-странице камеры.</translation>
-    </message>
-    <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>Запрос устройства &quot;%1&quot; вернул ошибку &quot;%2&quot;.</translation>
     </message>
@@ -686,14 +670,6 @@
         <translation>Невозможно разобрать ответ модуля ввода/вывода. URL %1, имя запроса %2.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation>Попробуйте включить запись (если она отключена).</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation>Если это не помогает, восстановите заводские настройки на web-странице модуля ввода/вывода.</translation>
-    </message>
-    <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>Запрос модуля ввода/вывода &quot;%1&quot; вернул ошибку &quot;%2&quot;.</translation>
     </message>
@@ -725,6 +701,30 @@
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
         <translation>Убедитесь, что порт %1 доступен (например, проброшен).</translation>
     </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the device web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the camera web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -749,24 +749,24 @@
         <translation>Не найден кодировщик для кодек %1.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t initialize resampling context, error code: %1</source>
-        <translation>Не удалось инициализировать контекст, код ошибки: %1</translation>
+        <source>Could not initialize resampling context, error code: %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
-        <translation>Не удалось выделить буферы, код ошибки: %1</translation>
+        <source>Could not allocate sample buffers, error code: %1</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
-        <translation>Не удалось отправить аудиоданные кодировщику, код ошибки: %1.</translation>
+        <source>Could not send audio frame to encoder, Error code: %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
-        <translation>Не удалось получить аудио пакет от кодировщика, код ошибки: %1.</translation>
+        <source>Could not receive audio packet from encoder, Error code: %1.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
-        <translation>Не удалось получить аудиоданные от декодера, код ошибки: %1.</translation>
+        <source>Could not receive audio frame from decoder, Error code: %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -993,13 +993,6 @@
     </message>
 </context>
 <context>
-    <name>QnPropertyStorage</name>
-    <message>
-        <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>Неверное значение параметра %1. Ожидается %2, введено %3.</translation>
-    </message>
-</context>
-<context>
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
         <source>%n Camera(s)</source>
@@ -1216,10 +1209,6 @@
     <message>
         <source>Video or audio codec is incompatible with the selected format.</source>
         <translation>Видео или аудио кодек несовместим с выбранным форматом.</translation>
-    </message>
-    <message>
-        <source>Error during watermark generation for file &apos;%1&apos;.</source>
-        <translation>Ошибка при генерации водяного знака для файла %1.</translation>
     </message>
     <message>
         <source>File write error. Not enough free space.</source>

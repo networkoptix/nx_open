@@ -731,17 +731,17 @@
     </message>
     <message>
         <location/>
-        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Motion detection control</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Force motion detection for stream:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1703,7 +1703,7 @@
     <name>MessageBox</name>
     <message>
         <location filename="../src/ui/dialogs/common/message_box.ui"/>
-        <source>Don&apos;t show this message again</source>
+        <source>Do not show this message again</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

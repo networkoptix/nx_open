@@ -68,11 +68,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>In this version you can only merge systems which are not connected to %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
@@ -84,6 +79,11 @@
     </message>
     <message>
         <source>These systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to the other system because current system is already connected to %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
@@ -264,10 +264,6 @@
         <translation>%1 --&gt; %2</translation>
     </message>
     <message>
-        <source>Server &apos;%1&apos; has a license problem</source>
-        <translation>伺服器 %1 發生授權問題</translation>
-    </message>
-    <message>
         <source>An unknown event has occurred</source>
         <translation>發生未知事件</translation>
     </message>
@@ -365,10 +361,6 @@
         <translation>影像備份完成</translation>
     </message>
     <message>
-        <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation>伺服器 %1 已完成影像備份</translation>
-    </message>
-    <message>
         <source>Generic Event at %1</source>
         <translation>通用事件 %1</translation>
     </message>
@@ -407,10 +399,6 @@
     <message>
         <source>Archive backup failed: File catalog error</source>
         <translation>影像備份失敗: 檔案目錄錯誤</translation>
-    </message>
-    <message>
-        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation>影像備份結束但未完全成功, 因為已超過設定時間. 檔案已備份至 %1</translation>
     </message>
     <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
@@ -493,6 +481,18 @@
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -602,22 +602,6 @@
         <translation>未授權. Url %1.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
-        <translation>首先, 請試著啟動錄影 (若目前為關閉) 接著在裝置設定中降低FPS.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation>首先, 請試著啟動錄影 (若目前為關閉) 接著在攝影機設定中降低FPS.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
-        <translation>若仍無效, 請在裝置網頁中還原預設值.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation>若仍無效, 請在攝影機網頁中還原預設值.</translation>
-    </message>
-    <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>裝置要求 &quot;%1&quot; 失敗 錯誤 &quot;%2&quot;.</translation>
     </message>
@@ -666,14 +650,6 @@
         <translation>無法解析 I/O 模組的回應. Url %1, 要求名稱 %2.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation>首先, 請試著開啟錄影(若目前為關閉)接著在 I/O 模組設定中降低 fps.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation>若仍無效, 請至網頁界面上還原 I/O 模組預設參數.</translation>
-    </message>
-    <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>I/O 模組要求 &quot;%1&quot; 失敗, 錯誤訊息為 &quot;%2&quot;.</translation>
     </message>
@@ -705,6 +681,30 @@
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
         <translation type="unfinished">請確認 %1 埠可被連結 (譬如已開啟轉發埠).</translation>
     </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the device web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the camera web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -729,23 +729,23 @@
         <translation type="unfinished">找不到 %1 編碼的編碼器.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t initialize resampling context, error code: %1</source>
+        <source>Could not initialize resampling context, error code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
+        <source>Could not allocate sample buffers, error code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
+        <source>Could not send audio frame to encoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
+        <source>Could not receive audio packet from encoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
+        <source>Could not receive audio frame from decoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -965,13 +965,6 @@
     </message>
 </context>
 <context>
-    <name>QnPropertyStorage</name>
-    <message>
-        <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>&apos;%1&apos; 參數值無效 - 預計 %2，提供&apos;%3&apos;。</translation>
-    </message>
-</context>
-<context>
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
         <source>%n Camera(s)</source>
@@ -1176,10 +1169,6 @@
     <message>
         <source>Video or audio codec is incompatible with the selected format.</source>
         <translation>影像或聲音編碼無法相容於選擇的格式。</translation>
-    </message>
-    <message>
-        <source>Error during watermark generation for file &apos;%1&apos;.</source>
-        <translation>生成檔案 %1 的浮水印時發生錯誤。</translation>
     </message>
     <message>
         <source>File write error. Not enough free space.</source>

@@ -716,11 +716,6 @@
     </message>
     <message>
         <location/>
-        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation>計算GOP流量而非每秒流量(這會增加攝影機的流量)</translation>
-    </message>
-    <message>
-        <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation>警告! 這將導致錄影排程中的畫質與FPS設定失去關聯.</translation>
     </message>
@@ -747,6 +742,11 @@
     <message>
         <location/>
         <source>Force motion detection for stream:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1709,7 +1709,7 @@
     <name>MessageBox</name>
     <message>
         <location filename="../src/ui/dialogs/common/message_box.ui"/>
-        <source>Don&apos;t show this message again</source>
+        <source>Do not show this message again</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

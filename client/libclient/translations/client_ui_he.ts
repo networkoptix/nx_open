@@ -722,11 +722,6 @@
     </message>
     <message>
         <location/>
-        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation>חשב קצב נתונים לכל GOP (קבוצת תמונות) במקום קצב נתונים לשניה (קצב הנתונים של המצלמה יגדל)</translation>
-    </message>
-    <message>
-        <location/>
         <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
         <translation>אזהרה! אל תשנה הגדרות אלו במידה ואינך מבין לחלוטין את ההשפעה האפשרית שלהם על ביצועי המערכת שלך.</translation>
     </message>
@@ -743,6 +738,11 @@
     <message>
         <location/>
         <source>Force motion detection for stream:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1704,7 +1704,7 @@
     <name>MessageBox</name>
     <message>
         <location filename="../src/ui/dialogs/common/message_box.ui"/>
-        <source>Don&apos;t show this message again</source>
+        <source>Do not show this message again</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

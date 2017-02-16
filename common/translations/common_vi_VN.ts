@@ -68,11 +68,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>In this version you can only merge systems which are not connected to %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
@@ -84,6 +79,11 @@
     </message>
     <message>
         <source>These systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to the other system because current system is already connected to %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
@@ -264,10 +264,6 @@
         <translation>%1 --&gt; %2</translation>
     </message>
     <message>
-        <source>Server &apos;%1&apos; has a license problem</source>
-        <translation>máy chủ &apos;%1&apos; có một vấn đề giấy phép</translation>
-    </message>
-    <message>
         <source>An unknown event has occurred</source>
         <translation>Một sự kiện chưa biết</translation>
     </message>
@@ -365,10 +361,6 @@
         <translation>Lưu trữ bản sao lưu đã hoàn thành</translation>
     </message>
     <message>
-        <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation>Server &apos;%1&apos; đã hoàn thành một bản sao lưu kho lưu trữ</translation>
-    </message>
-    <message>
         <source>Generic Event at %1</source>
         <translation>Sự kiện Generic %1</translation>
     </message>
@@ -407,10 +399,6 @@
     <message>
         <source>Archive backup failed: File catalog error</source>
         <translation>Lưu trữ bản sao lưu không: Danh mục tập tin lỗi</translation>
-    </message>
-    <message>
-        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation>Lưu trữ bản sao lưu hoàn tất, nhưng không hoàn thành đầy đủ vì thời gian dự phòng là hơn. Dữ liệu được sao lưu vào %1</translation>
     </message>
     <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
@@ -493,6 +481,18 @@
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -602,22 +602,6 @@
         <translation>Không được cho phép. Url %1.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
-        <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt thiết bị.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt camera.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
-        <translation>Nếu nó không giúp, phục hồi mặc định nhà máy trên thiết bị web-page.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation>Nếu nó không giúp, phục hồi mặc định nhà máy trên máy ảnh web-page.</translation>
-    </message>
-    <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>Yêu cầu thiết bị &quot;%1&quot; thất bại với lỗi &quot;%2&quot;.</translation>
     </message>
@@ -666,14 +650,6 @@
         <translation>Không thể phân tích tôi phản ứng I / Omodule. Url %1, yêu cầu tên %2.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation>Đầu tiên, hãy thử bật ghi âm (nếu mình off) và giảm fps trong cài đặt I / O module tôi.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt I / O module tôi.</translation>
-    </message>
-    <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>I / O Module yêu cầu &quot;%1&quot; thất bại với lỗi &quot;%2&quot;.</translation>
     </message>
@@ -705,6 +681,30 @@
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
         <translation type="unfinished">Hãy chắc chắn rằng cổng %1 có thể truy cập (ví dụ chuyển tiếp).</translation>
     </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the device web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the camera web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -729,23 +729,23 @@
         <translation type="unfinished">không thể tìm thấy %1 Một bộ mã hóa để mã hóa.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t initialize resampling context, error code: %1</source>
+        <source>Could not initialize resampling context, error code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
+        <source>Could not allocate sample buffers, error code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
+        <source>Could not send audio frame to encoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
+        <source>Could not receive audio packet from encoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
+        <source>Could not receive audio frame from decoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -965,13 +965,6 @@
     </message>
 </context>
 <context>
-    <name>QnPropertyStorage</name>
-    <message>
-        <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>&apos;%1&apos; Giá trị tham số không hợp lệ - dự báo %2, cung cấp&apos;%3&apos;.</translation>
-    </message>
-</context>
-<context>
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
         <source>%n Camera(s)</source>
@@ -1176,10 +1169,6 @@
     <message>
         <source>Video or audio codec is incompatible with the selected format.</source>
         <translation>Video hay mã hóa âm thanh không thể tương thích với các định dạng đã chọn.</translation>
-    </message>
-    <message>
-        <source>Error during watermark generation for file &apos;%1&apos;.</source>
-        <translation>Lỗi trong hệ watermark cho tập tin %1.</translation>
     </message>
     <message>
         <source>File write error. Not enough free space.</source>

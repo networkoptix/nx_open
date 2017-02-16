@@ -241,19 +241,11 @@ Para ver mais Bookmarks</translation>
 <context>
     <name>Ptz</name>
     <message>
-        <source>Can&apos;t get the current position from camera &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation type="unfinished">Aguarde que a câmara fique online.</translation>
     </message>
     <message>
         <source>Failed to get current position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Can&apos;t set the current position for camera &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -266,6 +258,14 @@ Para ver mais Bookmarks</translation>
     </message>
     <message>
         <source>These tours will become invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot get the current position from camera &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot set the current position for camera &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1983,10 +1983,6 @@ Para ver mais Bookmarks</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This action can&apos;t be undone.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to retrieve rules</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2000,6 +1996,10 @@ Para ver mais Bookmarks</translation>
     </message>
     <message>
         <source>Apply changes before exit?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This action cannot be undone.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2227,17 +2227,16 @@ Para ver mais Bookmarks</translation>
         <source>Select device</source>
         <translation>Seleccionar Dispositivo</translation>
     </message>
-    <message numerus="yes">
-        <source>%1 doesn&apos;t support two-way audio</source>
-        <translatorcomment>There is a warning about not including %n, but the source text does not have it...</translatorcomment>
-        <translation>
-            <numerusform>%1 não suporta audio bi-direccional</numerusform>
-            <numerusform>%1 não suportam audio bi-direccional</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Select camera</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 does not support two-way audio</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3114,28 +3113,24 @@ to %1</source>
 <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>Não foi possível encontrar o encoder de áudio %1.</translation>
-    </message>
-    <message>
         <source>Could not initialize audio encoder.</source>
         <translation>Não foi possível iniciar o encoder de áudio.</translation>
-    </message>
-    <message>
-        <source>Primary audio device isn&apos;t selected.</source>
-        <translation>O dispositivo primário de audio não esta seleccionado.</translation>
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
         <translation>O formato sample do dispositivo de entrada %1 não é suportado.</translation>
     </message>
+    <message>
+        <source>Could not find audio encoder &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Primary audio device is not selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnDesktopDataProvider</name>
-    <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation>Os formatos de áudio 44.1Khz e 48Khz não são suportados pelo dispositivo de captura! Por favor seleccione outro dispositivo de áudio ou nenhum&apos; nas definições de gravação de ecrã</translation>
-    </message>
     <message>
         <source>Could not find video encoder %1.</source>
         <translation>Não foi possível encontrar o encoder de vídeo %1.</translation>
@@ -3145,16 +3140,8 @@ to %1</source>
         <translation>Não foi possível inicializar o encoder de vídeo.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>Não foi possível encontrar o encoder de áudio %1.</translation>
-    </message>
-    <message>
         <source>Could not initialize audio encoder.</source>
         <translation>Não foi possível inicializar o encoder de áudio.</translation>
-    </message>
-    <message>
-        <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation>Não foi possível inicializar o dispositivo de áudio %1.</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
@@ -3163,6 +3150,18 @@ to %1</source>
     <message>
         <source>Screen width must be a multiple of 8.</source>
         <translation>Tamanho da tela deve ser um múltiplo de 8.</translation>
+    </message>
+    <message>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &quot;none&quot; value in screen recording settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not find audio encoder &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not initialize audio device &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3230,7 +3229,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You won&apos;t be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
+        <source>You will not be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
@@ -3675,10 +3674,6 @@ to %1</source>
 <context>
     <name>QnLayoutExportTool</name>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>Ficheiro &apos;%1&apos; usado em outro processo. Tente outro nome.</translation>
-    </message>
-    <message>
         <source>Exporting to &quot;%1&quot;...</source>
         <translation>A exportar  para &quot;%1&quot;...</translation>
     </message>
@@ -3702,6 +3697,10 @@ to %1</source>
     <message>
         <source>Could not create output file %1...</source>
         <translation>Não foi possível criar o ficheiro %1...</translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4442,10 +4441,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&quot;Motion + Low - Res&quot; recording option can&apos;t be set.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Set Recording to &quot;Always&quot;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4455,6 +4450,10 @@ to %1</source>
     </message>
     <message>
         <source>multiple values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5569,14 +5568,6 @@ to %1</source>
         <source>Continue in Background</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Update can&apos;t be canceled at this stage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please wait until it&apos;s finished.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Not enough free space at %n Servers:</source>
         <translation type="unfinished">
@@ -5618,6 +5609,14 @@ to %1</source>
     </message>
     <message>
         <source>%1 will be restarted to the updated version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cannot be canceled at this stage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please wait until it is finished.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5723,10 +5722,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&quot;Motion + Low - Res&quot; recording option can&apos;t be set.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Set Recording to &quot;Always&quot;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5739,7 +5734,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This action can&apos;t be undone.</source>
+        <source>This action cannot be undone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5785,10 +5784,6 @@ to %1</source>
 <context>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
-        <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation>Nenhum Preset encontrado. Use a opção &apos;avançado&apos;.</translation>
-    </message>
-    <message>
         <source>Email</source>
         <translation type="unfinished">Email</translation>
     </message>
@@ -5814,6 +5809,10 @@ to %1</source>
     </message>
     <message>
         <source>Support Signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No preset found. Use &quot;Advanced&quot; option.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5864,11 +5863,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t perform the test.</source>
+        <source>No Servers connected to internet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No Servers connected to internet</source>
+        <source>Cannot perform the test.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6169,10 +6168,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>It&apos;s not recommended to use one recording location for different servers.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Add this storage anyway?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6182,6 +6177,10 @@ to %1</source>
     </message>
     <message>
         <source>Add Storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not recommended to use one recording location for different servers.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6970,37 +6969,12 @@ to %1</source>
         <source>Server &quot;%1&quot; is not responding.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <source>Server &quot;%1&quot; can&apos;t access %n devices. Move them anyway?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Server &quot;%1&quot; can&apos;t access %n cameras. Move them anyway?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Server &quot;%1&quot; can&apos;t access %n I/O modules. Move them anyway?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>Move</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Too short period selected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Can&apos;t perform Preview Search. Please select a period of 15 seconds or longer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7054,6 +7028,31 @@ to %1</source>
     <message>
         <source>Skip</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -7244,10 +7243,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>EXE files over 4 GB can&apos;t be opened by double click due to a Windows limitation.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export to EXE anyway?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7293,6 +7288,10 @@ to %1</source>
     </message>
     <message>
         <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7364,10 +7363,6 @@ to %1</source>
 </context>
 <context>
     <name>QnWorkbenchResourcesChangesWatcher</name>
-    <message>
-        <source>The System is in the Safe Mode. It&apos;s not allowed to make any changes except license activation.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>The following %n items are not saved:</source>
         <translation type="unfinished">
@@ -7400,6 +7395,10 @@ to %1</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>The System is in the Safe Mode. It is not allowed to make any changes except license activation.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7510,7 +7509,7 @@ to %1</source>
         <translation type="unfinished">Actualizar...</translation>
     </message>
     <message>
-        <source>Don&apos;t notify again about this update</source>
+        <source>Do not notify again about this update</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7557,10 +7556,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Control session can&apos;t be started.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>To enable Video Wall, please activate a Video Wall license.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7587,10 +7582,6 @@ to %1</source>
         <source>Stop</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Can&apos;t save empty matrix</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Delete %n matrices?</source>
         <translation type="unfinished">
@@ -7600,6 +7591,14 @@ to %1</source>
     </message>
     <message>
         <source>More Video Wall licenses required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Control session cannot be started.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot save empty matrix</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7622,10 +7621,6 @@ to %1</source>
     <name>Resources</name>
     <message>
         <source>There is another layout with the same name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You don&apos;t have permission to overwrite it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7713,10 +7708,6 @@ to %1</source>
         <translation type="unfinished">Remover</translation>
     </message>
     <message>
-        <source>You are going to delete some resources to which you have access from Video Wall only. You won&apos;t see them in your resource list after it and won&apos;t be able to add them to Video Wall again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You will lose access to following resources:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7780,6 +7771,14 @@ to %1</source>
         <source>They may be auto-discovered again after removing.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>You do not have permission to overwrite it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StatisticsOverlayWidget</name>
@@ -7807,11 +7806,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Local files can&apos;t be placed on Video Wall Screen attached to another computer</source>
+        <source>To display local files on the Video Wall, please attach them using computer where Video Wall is hosted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To display local files on the Video Wall, please attach them using computer where Video Wall is hosted.</source>
+        <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

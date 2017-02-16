@@ -118,12 +118,12 @@
         <translation>Удалить подключение?</translation>
     </message>
     <message>
-        <source>Login can&apos;t be empty</source>
-        <translation>Логин должен быть задан.</translation>
+        <source>Login cannot be empty</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Password can&apos;t be empty</source>
-        <translation>Пароль не может быть пустым</translation>
+        <source>Password cannot be empty</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -559,8 +559,8 @@
         <translation>Камера не в сети</translation>
     </message>
     <message>
-        <source>Can&apos;t load video</source>
-        <translation>Ошибка при получении видео</translation>
+        <source>Cannot load video</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

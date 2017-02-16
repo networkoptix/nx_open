@@ -73,14 +73,14 @@
         <translation type="unfinished">Внутренняя ошибка %1. Обратитесь в службу поддержки.</translation>
     </message>
     <message>
-        <source>Sorry, %1 Service is temporary unavailable. We&apos;re doing our best to restore it. Please try again later.</source>
+        <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Извините, %1 служба временно недоступна. Мы делаем все возможное для ее восстановления. Пожалуйста, повторите попытку позже.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Sorry, %1 Service couldn&apos;t process your request. Please try again in a few moments.</source>
+        <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">К сожалению, %1 службе не удалось обработать ваш запрос. Повторите попытку через несколько минут.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

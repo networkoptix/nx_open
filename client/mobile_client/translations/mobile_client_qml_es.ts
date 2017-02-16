@@ -118,11 +118,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Login can&apos;t be empty</source>
+        <source>Login cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Password can&apos;t be empty</source>
+        <source>Password cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -559,8 +559,8 @@
         <translation type="unfinished">Cámara fuera de línea</translation>
     </message>
     <message>
-        <source>Can&apos;t load video</source>
-        <translation type="unfinished">No puede cargar el vídeo</translation>
+        <source>Cannot load video</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

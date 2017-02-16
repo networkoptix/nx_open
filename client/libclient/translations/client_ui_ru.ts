@@ -731,11 +731,6 @@
     </message>
     <message>
         <location/>
-        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation>Считать битрейт по блокам, а не по секундам (увеличит битрейт для камеры)</translation>
-    </message>
-    <message>
-        <location/>
         <source>Motion detection control</source>
         <translation>Настройки обнаружения движения</translation>
     </message>
@@ -743,6 +738,11 @@
         <location/>
         <source>Force motion detection for stream:</source>
         <translation>Жестко задать обнаружение движения по потоку:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1703,8 +1703,8 @@
     <name>MessageBox</name>
     <message>
         <location filename="../src/ui/dialogs/common/message_box.ui"/>
-        <source>Don&apos;t show this message again</source>
-        <translation>Больше не показывать это сообщение</translation>
+        <source>Do not show this message again</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

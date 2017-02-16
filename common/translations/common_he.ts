@@ -68,11 +68,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>In this version you can only merge systems which are not connected to %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
@@ -84,6 +79,11 @@
     </message>
     <message>
         <source>These systems are built with different %1 URL. Merge is not allowed.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to the other system because current system is already connected to %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
@@ -185,10 +185,6 @@
     <message>
         <source>Server &quot;%1&quot; Started</source>
         <translation>שרת &quot;%1&quot; הופעל</translation>
-    </message>
-    <message>
-        <source>Server &apos;%1&apos; has a license problem</source>
-        <translation>בשרת &quot;%1&quot; קיימת בעיית רשיון</translation>
     </message>
     <message>
         <source>An unknown event has occurred</source>
@@ -367,10 +363,6 @@
         <translation>גיבוי ארכיון הסתיים</translation>
     </message>
     <message>
-        <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation>שרת  &apos;%1סיים את גיבוי הארכיון</translation>
-    </message>
-    <message>
         <source>Generic Event at %1</source>
         <translation>אירוע כללי ב %1</translation>
     </message>
@@ -409,10 +401,6 @@
     <message>
         <source>Archive backup failed: File catalog error</source>
         <translation>גיבוי ארכיון נכשל: שגיאה בקטלוג הקבצים</translation>
-    </message>
-    <message>
-        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation>גיבוי הארכיון הסתיים, אבל לא באופן מלא מאחר וזמן סיום הגיבוי הגיע. המידע גובה ל %1</translation>
     </message>
     <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
@@ -503,6 +491,18 @@
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -612,22 +612,6 @@
         <translation>לא מאושר. URL %1.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
-        <translation>קודם כל נסה להפעיל הקלטה (במידה והיא כבויה) ולהוריד את מספר הפריימים לשניה בהגדרות ההתקן.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation>קודם כל נסה להפעיל הקלטה (במידה והיא כבויה) ולהוריד את מספר הפריימים לשניה בהגדרות המצלמה.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
-        <translation>במידה וזה לא עוזר, שחזר הגדרות ברירת מחדל בדף האינטרנט של ההתקן.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation>במידה וזה לא עוזר, שחזר הגדרות ברירת מחדל בדף האינטרנט של המצלמה.</translation>
-    </message>
-    <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>הבקשה של התקן &quot;%1&quot; נכשלה עם שגיאה &quot;%2&quot;.</translation>
     </message>
@@ -676,14 +660,6 @@
         <translation>לא ניתן לנתח את תגובת מודול הקלט/פלט. Url %1 שם בקשה %2.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation>נסה תחילה, להפעיל הקלטה (אם היא כבויה) ולהוריד את קצב התמונות בהגדרות מודול הקלט/פלט.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation>במידה וזה אינו עוזר, החזר הגדרות יצרן בדף האינטרנט של מודול הקלט/פלט.</translation>
-    </message>
-    <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>בקשת מודול קלט/פלט &quot;%1&quot; נכשלה עם שגיאה &quot;%2&quot;.</translation>
     </message>
@@ -715,6 +691,30 @@
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
         <translation type="unfinished">וודא שפורט %1 נגישץ (כלומר שהוא מופנה).</translation>
     </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the device web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the camera web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -739,23 +739,23 @@
         <translation type="unfinished">לא נמצא מקודד לקודק %1.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t initialize resampling context, error code: %1</source>
+        <source>Could not initialize resampling context, error code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
+        <source>Could not allocate sample buffers, error code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
+        <source>Could not send audio frame to encoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
+        <source>Could not receive audio packet from encoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
+        <source>Could not receive audio frame from decoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -979,13 +979,6 @@
     </message>
 </context>
 <context>
-    <name>QnPropertyStorage</name>
-    <message>
-        <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>ערך שגוי בארגומנט &apos;%1&apos;. נדרש %2, סופק &apos;%3&apos;.</translation>
-    </message>
-</context>
-<context>
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
         <source>%n Camera(s)</source>
@@ -1196,10 +1189,6 @@
     <message>
         <source>Video or audio codec is incompatible with the selected format.</source>
         <translation>קודק הוידאו/אודיו אינו תואם לפורמט שנבחר.</translation>
-    </message>
-    <message>
-        <source>Error during watermark generation for file &apos;%1&apos;.</source>
-        <translation>אירעה שגיאה במהלך יצירת סימן מים לקובץ &apos;%1&apos;.</translation>
     </message>
     <message>
         <source>File write error. Not enough free space.</source>

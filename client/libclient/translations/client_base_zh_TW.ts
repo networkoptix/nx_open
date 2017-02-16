@@ -239,19 +239,11 @@ to view more bookmarks</source>
 <context>
     <name>Ptz</name>
     <message>
-        <source>Can&apos;t get the current position from camera &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Failed to get current position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Can&apos;t set the current position for camera &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -264,6 +256,14 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>These tours will become invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot get the current position from camera &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot set the current position for camera &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1964,10 +1964,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This action can&apos;t be undone.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to retrieve rules</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1981,6 +1977,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Apply changes before exit?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This action cannot be undone.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2205,15 +2205,15 @@ to view more bookmarks</source>
         <source>Select device</source>
         <translation>選擇裝置</translation>
     </message>
-    <message numerus="yes">
-        <source>%1 doesn&apos;t support two-way audio</source>
-        <translation>
-            <numerusform>%1 不支援雙向語音%n</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Select camera</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 does not support two-way audio</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3076,28 +3076,24 @@ to %1</source>
 <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>找不到聲音編碼器 &apos;%1&apos;.</translation>
-    </message>
-    <message>
         <source>Could not initialize audio encoder.</source>
         <translation>無法初始化聲音編碼器.</translation>
-    </message>
-    <message>
-        <source>Primary audio device isn&apos;t selected.</source>
-        <translation>未選擇主要聲音裝置.</translation>
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
         <translation>輸入裝置的格式 %1 未支援.</translation>
     </message>
+    <message>
+        <source>Could not find audio encoder &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Primary audio device is not selected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnDesktopDataProvider</name>
-    <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation>音效擷取裝置不支援 44.1Khz 及 48Khz 音效格式！請選擇其他音效裝置來源或於錄影設定處留白</translation>
-    </message>
     <message>
         <source>Could not find video encoder %1.</source>
         <translation>找不到影像編碼器 &apos;%1&apos;。</translation>
@@ -3107,16 +3103,8 @@ to %1</source>
         <translation>無法初始化影像編碼器。</translation>
     </message>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>找不到聲音編碼器 &apos;%1&apos;。</translation>
-    </message>
-    <message>
         <source>Could not initialize audio encoder.</source>
         <translation>無法初始化聲音編碼器。</translation>
-    </message>
-    <message>
-        <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation>無法初始化音效設備 &apos;%1&apos;。</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
@@ -3125,6 +3113,18 @@ to %1</source>
     <message>
         <source>Screen width must be a multiple of 8.</source>
         <translation>螢幕寬度必須是 8 的倍數.</translation>
+    </message>
+    <message>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &quot;none&quot; value in screen recording settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not find audio encoder &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not initialize audio device &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3192,7 +3192,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You won&apos;t be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
+        <source>You will not be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
@@ -3630,10 +3630,6 @@ to %1</source>
 <context>
     <name>QnLayoutExportTool</name>
     <message>
-        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>檔案 &apos;%1&apos; 已被其他程式使用。請重試其他名稱。</translation>
-    </message>
-    <message>
         <source>Exporting to &quot;%1&quot;...</source>
         <translation>匯出到 &quot;%1&quot;…</translation>
     </message>
@@ -3657,6 +3653,10 @@ to %1</source>
     <message>
         <source>Could not create output file %1...</source>
         <translation>無法建立輸出檔 %1...</translation>
+    </message>
+    <message>
+        <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4387,10 +4387,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&quot;Motion + Low - Res&quot; recording option can&apos;t be set.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Set Recording to &quot;Always&quot;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4400,6 +4396,10 @@ to %1</source>
     </message>
     <message>
         <source>multiple values</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5497,14 +5497,6 @@ to %1</source>
         <source>Continue in Background</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Update can&apos;t be canceled at this stage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please wait until it&apos;s finished.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Not enough free space at %n Servers:</source>
         <translation type="unfinished">
@@ -5545,6 +5537,14 @@ to %1</source>
     </message>
     <message>
         <source>%1 will be restarted to the updated version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cannot be canceled at this stage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please wait until it is finished.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5647,10 +5647,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&quot;Motion + Low - Res&quot; recording option can&apos;t be set.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Set Recording to &quot;Always&quot;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5663,7 +5659,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This action can&apos;t be undone.</source>
+        <source>This action cannot be undone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5709,10 +5709,6 @@ to %1</source>
 <context>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
-        <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation>找不到預設點. 請使用&quot;進階&quot;選項.</translation>
-    </message>
-    <message>
         <source>Email</source>
         <translation type="unfinished">Email</translation>
     </message>
@@ -5738,6 +5734,10 @@ to %1</source>
     </message>
     <message>
         <source>Support Signature</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No preset found. Use &quot;Advanced&quot; option.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5788,11 +5788,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t perform the test.</source>
+        <source>No Servers connected to internet</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No Servers connected to internet</source>
+        <source>Cannot perform the test.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6091,10 +6091,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>It&apos;s not recommended to use one recording location for different servers.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Add this storage anyway?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6104,6 +6100,10 @@ to %1</source>
     </message>
     <message>
         <source>Add Storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It is not recommended to use one recording location for different servers.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6881,34 +6881,12 @@ to %1</source>
         <source>Server &quot;%1&quot; is not responding.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <source>Server &quot;%1&quot; can&apos;t access %n devices. Move them anyway?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Server &quot;%1&quot; can&apos;t access %n cameras. Move them anyway?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Server &quot;%1&quot; can&apos;t access %n I/O modules. Move them anyway?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
     <message>
         <source>Move</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Too short period selected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Can&apos;t perform Preview Search. Please select a period of 15 seconds or longer.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6962,6 +6940,28 @@ to %1</source>
     <message>
         <source>Skip</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -7151,10 +7151,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>EXE files over 4 GB can&apos;t be opened by double click due to a Windows limitation.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Export to EXE anyway?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7200,6 +7196,10 @@ to %1</source>
     </message>
     <message>
         <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7271,10 +7271,6 @@ to %1</source>
 </context>
 <context>
     <name>QnWorkbenchResourcesChangesWatcher</name>
-    <message>
-        <source>The System is in the Safe Mode. It&apos;s not allowed to make any changes except license activation.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>The following %n items are not saved:</source>
         <translation type="unfinished">
@@ -7304,6 +7300,10 @@ to %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>The System is in the Safe Mode. It is not allowed to make any changes except license activation.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7414,7 +7414,7 @@ to %1</source>
         <translation type="unfinished">更新...</translation>
     </message>
     <message>
-        <source>Don&apos;t notify again about this update</source>
+        <source>Do not notify again about this update</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7461,10 +7461,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Control session can&apos;t be started.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>To enable Video Wall, please activate a Video Wall license.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7490,10 +7486,6 @@ to %1</source>
         <source>Stop</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Can&apos;t save empty matrix</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Delete %n matrices?</source>
         <translation type="unfinished">
@@ -7502,6 +7494,14 @@ to %1</source>
     </message>
     <message>
         <source>More Video Wall licenses required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Control session cannot be started.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot save empty matrix</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7524,10 +7524,6 @@ to %1</source>
     <name>Resources</name>
     <message>
         <source>There is another layout with the same name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You don&apos;t have permission to overwrite it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7607,10 +7603,6 @@ to %1</source>
         <translation type="unfinished">移除</translation>
     </message>
     <message>
-        <source>You are going to delete some resources to which you have access from Video Wall only. You won&apos;t see them in your resource list after it and won&apos;t be able to add them to Video Wall again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You will lose access to following resources:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7666,6 +7658,14 @@ to %1</source>
         <source>They may be auto-discovered again after removing.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>You do not have permission to overwrite it.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>StatisticsOverlayWidget</name>
@@ -7693,11 +7693,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Local files can&apos;t be placed on Video Wall Screen attached to another computer</source>
+        <source>To display local files on the Video Wall, please attach them using computer where Video Wall is hosted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To display local files on the Video Wall, please attach them using computer where Video Wall is hosted.</source>
+        <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
