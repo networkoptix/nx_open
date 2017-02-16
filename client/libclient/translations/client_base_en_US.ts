@@ -1448,37 +1448,37 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>These devices are removed from the System</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>This device is removed from System</numerusform>
+            <numerusform>These devices are removed from System</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These servers are removed from the System</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>This server is removed from System</numerusform>
+            <numerusform>These servers are removed from System</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These users are removed from the System</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>This user is removed from System</numerusform>
+            <numerusform>These users are removed from System</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These resources are removed from the System</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>These resource is removed from System</numerusform>
+            <numerusform>These resources are removed from System</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These cameras are removed from the System</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>This camera is removed from the System</numerusform>
+            <numerusform>These cameras are removed from System</numerusform>
         </translation>
     </message>
 </context>
@@ -1546,7 +1546,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Server removed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Business rule removed</source>
@@ -2469,8 +2469,8 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>Recording or motion detection is disabled for %1</source>
         <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>Recording or motion detection is disabled on %1</numerusform>
+            <numerusform>Recording or motion detection is disabled on %1</numerusform>
         </translation>
     </message>
 </context>
@@ -3333,23 +3333,23 @@ to %1</source>
     </message>
     <message numerus="yes">
         <source>%n users</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n user</numerusform>
+            <numerusform>%n users</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>and %n users more...</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>and %n  more user...</numerusform>
+            <numerusform>and %n  more users...</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>and %n more...</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>and %n more...</numerusform>
+            <numerusform>and %n more...</numerusform>
         </translation>
     </message>
 </context>
@@ -5299,8 +5299,8 @@ to %1</source>
     <message numerus="yes">
         <source>%n additional</source>
         <translation>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+            <numerusform>%n additional</numerusform>
+            <numerusform>%n additional</numerusform>
         </translation>
     </message>
 </context>
@@ -5954,9 +5954,9 @@ to %1</source>
     <message numerus="yes">
         <source>%n TB</source>
         <comment>TB - terabytes</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n TB</numerusform>
+            <numerusform>%n TB</numerusform>
         </translation>
     </message>
 </context>
