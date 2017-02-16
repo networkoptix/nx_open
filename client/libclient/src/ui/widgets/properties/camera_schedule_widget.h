@@ -148,5 +148,7 @@ private:
     QString m_scheduleAlert;
     QString m_archiveLengthAlert;
 
+    QTimer* const m_batchUpdateTimer;
+    bool m_alertUpdateCheckNeeded;
     bool m_updating;
 };

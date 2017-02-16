@@ -182,11 +182,16 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     m_maxFps(0),
     m_maxDualStreamingFps(0),
     m_motionTypeOverride(Qn::MT_Default),
+    m_batchUpdateTimer(new QTimer(this)),
+    m_alertUpdateCheckNeeded(false),
     m_updating(false)
 {
     ui->setupUi(this);
     ui->recordBeforeSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
     ui->recordAfterSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
+
+    m_batchUpdateTimer->setSingleShot(true);
+    m_batchUpdateTimer->setInterval(0);
 
     NX_ASSERT(parent);
     QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
@@ -255,17 +260,30 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
                 emit archiveRangeChanged();
         };
 
+    auto handleCellValuesChanged =
+        [this]()
+        {
+            if (m_alertUpdateCheckNeeded)
+                checkRecordingEnabled();
+
+            m_alertUpdateCheckNeeded = false;
+            emit scheduleTasksChanged();
+        };
+
     auto handleCellValueChanged =
         [this](const QPoint& cell)
         {
             if (m_updating)
                 return;
 
-            if (ui->gridWidget->cellValue(cell).recordingType != Qn::RT_Never)
-                checkRecordingEnabled();
-
-            emit scheduleTasksChanged();
+            m_alertUpdateCheckNeeded |= (ui->gridWidget->cellValue(cell).recordingType != Qn::RT_Never);
+            m_batchUpdateTimer->start();
         };
+
+    connect(m_batchUpdateTimer, &QTimer::timeout, this, handleCellValuesChanged);
+
+    connect(ui->gridWidget, &QnScheduleGridWidget::cellValueChanged,
+        this, handleCellValueChanged);
 
     connect(ui->recordAlwaysButton, &QToolButton::toggled, this,
         &QnCameraScheduleWidget::updateGridParams);
@@ -305,9 +323,6 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
 
     connect(ui->gridWidget, &QnScheduleGridWidget::cellActivated, this,
         &QnCameraScheduleWidget::at_gridWidget_cellActivated);
-
-    connect(ui->gridWidget, &QnScheduleGridWidget::cellValueChanged,
-        this, handleCellValueChanged);
 
     connect(ui->checkBoxMinArchive, &QCheckBox::stateChanged, this,
         &QnCameraScheduleWidget::updateArchiveRangeEnabledState);
@@ -1063,6 +1078,8 @@ void QnCameraScheduleWidget::updateColors()
 // -------------------------------------------------------------------------- //
 void QnCameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
 {
+    /* Called when a cell is Alt-clicked this handler fetches cell settings as current. */
+
     m_disableUpdateGridParams = true;
     const auto params = ui->gridWidget->cellValue(cell);
     switch (params.recordingType)
@@ -1085,7 +1102,6 @@ void QnCameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
     {
         ui->fpsSpinBox->setValue(params.fps);
         ui->qualityComboBox->setCurrentIndex(qualityToComboIndex(params.quality));
-        checkRecordingEnabled();
     }
 
     m_disableUpdateGridParams = false;
@@ -1313,7 +1329,6 @@ void QnCameraScheduleWidget::setArchiveLengthAlert(const QString& archiveLengthA
 
 bool QnCameraScheduleWidget::checkCanEnableRecording()
 {
-    setScheduleAlert(QString());
     if (canEnableRecording())
         return true;
 
