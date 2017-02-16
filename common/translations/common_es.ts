@@ -139,10 +139,6 @@
         <translation>Repetir sonido</translation>
     </message>
     <message>
-        <source>Send email</source>
-        <translation>Enviar correo electrónico</translation>
-    </message>
-    <message>
         <source>Speak</source>
         <translation>Habla</translation>
     </message>
@@ -503,6 +499,10 @@
         <source>MAC #%1: %2</source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
         <translation type="unfinished">MAC #%1: %2 {1:?} {2?}</translation>
+    </message>
+    <message>
+        <source>Send Email</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -945,10 +945,6 @@
         <translation>Intentas activar una licencia incompatible con su software. Póngase en contacto con el equipo de asistencia para obtener una clave de licencia válida.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation>Esta clave de licencia se ha activado anteriormente en el hardware id { {hwid}} { {tiempo} }. Póngase en contacto con el equipo de asistencia para obtener una clave de licencia válida.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
         <translation>Hubo un problema al activar su clave de licencia. Se produjo un error de base de datos.</translation>
     </message>
@@ -969,6 +965,11 @@
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
+        <comment>%1 is a hardware ID, %2 is an activation time</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

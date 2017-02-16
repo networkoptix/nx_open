@@ -99,10 +99,6 @@
         <translation>Запись по тревоге</translation>
     </message>
     <message>
-        <source>Send email</source>
-        <translation>Отправить email</translation>
-    </message>
-    <message>
         <source>Write to log</source>
         <translation>Записать в журнал</translation>
     </message>
@@ -513,6 +509,10 @@
         <source>MAC #%1: %2</source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
         <translation type="unfinished">MAC #%1: %2  {1:?} {2?}</translation>
+    </message>
+    <message>
+        <source>Send Email</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -957,10 +957,6 @@
         <translation>Вы пытаетесь активировать несовместимую с вашим программным обеспечением лицензию. Обратитесь в службу поддержки для получения правильного лицензионного ключа.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation>Этот лицензионный ключ был активирован {{time}} для аппаратного ID {{hwid}}. Пожалуйста, обратитесь в службу поддержки для получения правильного лицензионного ключа.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
         <translation>При активации лицензионного ключа произошла ошибка базы данных.</translation>
     </message>
@@ -983,6 +979,11 @@
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
+        <comment>%1 is a hardware ID, %2 is an activation time</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

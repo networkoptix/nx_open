@@ -100,10 +100,6 @@
         <translation>Panik Aufnahme</translation>
     </message>
     <message>
-        <source>Send email</source>
-        <translation>Sende Email</translation>
-    </message>
-    <message>
         <source>Write to log</source>
         <translation>In Log schreiben</translation>
     </message>
@@ -504,6 +500,10 @@
         <source>MAC #%1: %2</source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
         <translation type="unfinished">MAC #%1: %2  {1:?} {2?}</translation>
+    </message>
+    <message>
+        <source>Send Email</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -947,10 +947,6 @@
         <translation>Sie versuchen einen mit der Software inkompatiblen Lizenzschlüssel zu aktivieren.  Bitte kontaktieren Sie das Support Team um einen gültigen Lizenzschlüssel zu erhalten.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation>Dieser Lizenzschlüssel wurde bereits am {{time}} für Hardware-ID {{hwid}} aktiviert.  Bitte kontaktieren Sie das Support Team, um einen gültigen Lizenzschlüssel zu erhalten.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
         <translation>Es gab ein Problem bei der Aktivierung Ihrer Lizenz. Ein Datenbankfehler ist aufgetreten.</translation>
     </message>
@@ -971,6 +967,11 @@
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
+        <comment>%1 is a hardware ID, %2 is an activation time</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

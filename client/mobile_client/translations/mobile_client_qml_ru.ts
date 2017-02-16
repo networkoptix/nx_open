@@ -75,10 +75,6 @@
         <translation>Забыли пароль?</translation>
     </message>
     <message>
-        <source>Invalid email or password</source>
-        <translation>Недопустимый Email или пароль</translation>
-    </message>
-    <message>
         <source>Cannot connect to %1</source>
         <translation>Не удается подключиться к %1</translation>
     </message>
@@ -88,6 +84,10 @@
     </message>
     <message>
         <source>Log in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect Email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

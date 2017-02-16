@@ -139,10 +139,6 @@
         <translation>Lặp lại âm thanh</translation>
     </message>
     <message>
-        <source>Send email</source>
-        <translation>Gửi emai</translation>
-    </message>
-    <message>
         <source>Speak</source>
         <translation>nói</translation>
     </message>
@@ -493,6 +489,10 @@
         <source>MAC #%1: %2</source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
         <translation type="unfinished">MAC #%1: %2  {1:?} {2?}</translation>
+    </message>
+    <message>
+        <source>Send Email</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -933,10 +933,6 @@
         <translation>Bạn đang cố gắng để kích hoạt một giấy phép tương thích với phần mềm của bạn. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation>Key bản quyền này trước đó đã được kích hoạt cho phần cứng id {{}} HWID vào {{}} thời gian. Hãy liên hệ với nhóm hỗ trợ để có được một chìa khóa giấy phép hợp lệ.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
         <translation>Có một vấn đề kích hoạt key bản quyền của bạn. xảy ra một lỗi cơ sở dữ liệu.</translation>
     </message>
@@ -955,6 +951,11 @@
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
+        <comment>%1 is a hardware ID, %2 is an activation time</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

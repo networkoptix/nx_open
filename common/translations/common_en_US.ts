@@ -99,10 +99,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Send email</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Write to log</source>
         <translation></translation>
     </message>
@@ -502,6 +498,10 @@
     <message>
         <source>MAC #%1: %2</source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send Email</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -945,10 +945,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -969,6 +965,11 @@
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
+        <comment>%1 is a hardware ID, %2 is an activation time</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

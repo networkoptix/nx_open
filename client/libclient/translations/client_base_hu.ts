@@ -3320,8 +3320,8 @@ to %1</source>
         <translation>Válasszon ki egy kamerát</translation>
     </message>
     <message>
-        <source>%1 has no ptz presets</source>
-        <translation>%1 nem rednelkezik ptz presettel</translation>
+        <source>%1 has no PTZ presets</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3973,14 +3973,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This license is already activated and linked to hardware id %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This license is already activated and linked to hardware id %1 on %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>License already activated on another server</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3998,6 +3990,14 @@ to %1</source>
     </message>
     <message>
         <source>Please make sure it is entered correctly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license is already activated and linked to hardware ID %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license is already activated and linked to hardware ID %1 on %2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4020,15 +4020,19 @@ to %1</source>
         <translation>Minden fájl (*.*)</translation>
     </message>
     <message>
-        <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished">Kérjük küldje el e-mailen a sorzatszámot és a %1 által megadott hardverazonosítót, az aktiváló fájl megküldéséhez.</translation>
-    </message>
-    <message>
-        <source>Hardware id copied to clipboard</source>
+        <source>Failed to open file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to open file</source>
+        <source>Please send Email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please send the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardware ID copied to clipboard</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5190,30 +5194,6 @@ to %1</source>
         <source>Select at least one user</source>
         <translation type="unfinished">Válasszon legalább egy felhasználót</translation>
     </message>
-    <message>
-        <source>User %1 has invalid email address</source>
-        <translation type="unfinished">%1 felhasználónak érvénytelen az email címe</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 users have invalid email address</source>
-        <translation type="unfinished">
-            <numerusform>%n a(z) %1 felhasználónak érvénytelen az email címe</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Invalid email address %1</source>
-        <translation type="unfinished">Érvénytelen email cím %1</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 additional email addresses are invalid</source>
-        <translation type="unfinished">
-            <numerusform>%n a(z) %1 további email címből érvénytelen</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Send email to %1</source>
-        <translation type="unfinished">Email küldése a %1 címre</translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
         <translation type="unfinished">
@@ -5231,6 +5211,30 @@ to %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>User %1 has invalid Email address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 users have invalid Email address</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Invalid Email address %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 additional Email addresses are invalid</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Send Email to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6148,10 +6152,6 @@ to %1</source>
         <translation>Nincs email szerver beállítva</translation>
     </message>
     <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>Néhány felhasználó nem állított be email címet</translation>
-    </message>
-    <message>
         <source>Connection to server lost</source>
         <translation>Megszakadt a kapcsolat a szerverrel</translation>
     </message>
@@ -6162,10 +6162,6 @@ to %1</source>
     <message>
         <source>System is in safe mode</source>
         <translation>A rendszer biztonsági módban van</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>Hiba történt az email küldés során</translation>
     </message>
     <message>
         <source>Storage is full</source>
@@ -6192,20 +6188,8 @@ to %1</source>
         <translation>Nincs email cím beállítva.</translation>
     </message>
     <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>Nem fog rendszer figyelmeztetésket kapni emailen.</translation>
-    </message>
-    <message>
         <source>Email server is not set.</source>
         <translation>Nincs email szerver beállítva.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>Néhány felhasználó nem állított be email címet.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>Nem fognak rendszer figyelmeztetésket kapni emailen.</translation>
     </message>
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
@@ -6250,6 +6234,26 @@ to %1</source>
     <message>
         <source>Check out &lt;b&gt;%1&lt;/b&gt; Beta &amp;mdash; connect to your servers from anywhere</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some users have not set their Email addresses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while sending Email</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You cannot receive system notifications via Email.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some users have not set their Email addresses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>They cannot receive system notifications via Email.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6684,10 +6688,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cloud user with specified email already exists.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Password</source>
         <translation type="unfinished">Jelszó</translation>
     </message>
@@ -6698,6 +6698,10 @@ to %1</source>
     <message>
         <source>Passwords do not match.</source>
         <translation type="unfinished">A jelszavak nem egyeznek.</translation>
+    </message>
+    <message>
+        <source>Cloud user with specified Email already exists.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

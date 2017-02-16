@@ -139,10 +139,6 @@
         <translation>음원 반복</translation>
     </message>
     <message>
-        <source>Send email</source>
-        <translation>보내는 이메일</translation>
-    </message>
-    <message>
         <source>Speak</source>
         <translation>음성출력</translation>
     </message>
@@ -492,6 +488,10 @@
     <message>
         <source>MAC #%1: %2</source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send Email</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -933,10 +933,6 @@
         <translation>부정확한 인증키의 등록을 시도 중입니다. 관리자를 통해 유효한 인증키를 발급 받으십시오.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation>{{hwid}} on {{time}}에서 이미 사용된 인증 키입니다. 관리자를 통해 유효한 인증키를 발급 받으세요.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -955,6 +951,11 @@
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
+        <comment>%1 is a hardware ID, %2 is an activation time</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

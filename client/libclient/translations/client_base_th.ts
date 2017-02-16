@@ -3319,8 +3319,8 @@ to %1</source>
         <translation>เลือกอีกหนึ่งกล้อง</translation>
     </message>
     <message>
-        <source>%1 has no ptz presets</source>
-        <translation>%1 ไม่มีที่ตั้งไว้ล่วงหน้า PTZ</translation>
+        <source>%1 has no PTZ presets</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3972,14 +3972,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This license is already activated and linked to hardware id %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This license is already activated and linked to hardware id %1 on %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>License already activated on another server</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3997,6 +3989,14 @@ to %1</source>
     </message>
     <message>
         <source>Please make sure it is entered correctly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license is already activated and linked to hardware ID %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license is already activated and linked to hardware ID %1 on %2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4019,15 +4019,19 @@ to %1</source>
         <translation>ทุกไฟล์ (*.*)</translation>
     </message>
     <message>
-        <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished">กรุณาส่งอีเมลที่มีซีรี่คีย์และหมายเลขของฮาร์ดแวร์ให้กับ %1 ที่จะได้รับแฟ้มคีย์การเปิดใช้งาน.</translation>
-    </message>
-    <message>
-        <source>Hardware id copied to clipboard</source>
+        <source>Failed to open file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to open file</source>
+        <source>Please send Email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please send the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardware ID copied to clipboard</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5189,30 +5193,6 @@ to %1</source>
         <source>Select at least one user</source>
         <translation type="unfinished">เลือกผู้ใช้งานอย่างน้อยหนึ่งคน</translation>
     </message>
-    <message>
-        <source>User %1 has invalid email address</source>
-        <translation type="unfinished">ผู้ใช้งาน %1 มีที่อยู่อีเมลไม่ถูกต้อง</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 users have invalid email address</source>
-        <translation type="unfinished">
-            <numerusform>%n ของ %1 ผู้ใช้งาน ที่อยู่อีเมลที่ไม่ถูกต้อง</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Invalid email address %1</source>
-        <translation type="unfinished">ที่อยู่อีเมลไม่ถูกต้อง %1</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 additional email addresses are invalid</source>
-        <translation type="unfinished">
-            <numerusform>%n ของ %1 ที่อยู่อีเมลเพิ่มเติมไม่ถูกต้อง</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Send email to %1</source>
-        <translation type="unfinished">ส่งอีเมลไปยัง %1</translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
         <translation type="unfinished">
@@ -5230,6 +5210,30 @@ to %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>User %1 has invalid Email address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 users have invalid Email address</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Invalid Email address %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 additional Email addresses are invalid</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Send Email to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6146,10 +6150,6 @@ to %1</source>
         <translation>เซิร์ฟเวอร์อีเมลที่ไม่ได้ตั้งค่า</translation>
     </message>
     <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>ผู้ใช้บางคนยังไม่ได้ตั้งที่อยู่อีเมลของพวกเขา</translation>
-    </message>
-    <message>
         <source>Connection to server lost</source>
         <translation>การเชื่อมต่อกับเซิร์ฟเวอร์หายไป</translation>
     </message>
@@ -6160,10 +6160,6 @@ to %1</source>
     <message>
         <source>System is in safe mode</source>
         <translation>ระบบในเซฟโหมด</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>ข้อผิดพลาดขณะที่การส่งอีเมล</translation>
     </message>
     <message>
         <source>Storage is full</source>
@@ -6190,20 +6186,8 @@ to %1</source>
         <translation>ที่อยู่อีเมลไม่ได้ตั้งค่า.</translation>
     </message>
     <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>คุณไม่สามารถได้รับการแจ้งเตือนของระบบผ่านทางอีเมล์.</translation>
-    </message>
-    <message>
         <source>Email server is not set.</source>
         <translation>เซิร์ฟเวอร์อีเมลที่ไม่ได้ตั้งค่า.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>ผู้ใช้บางคนยังไม่ได้ตั้งที่อยู่อีเมลของพวกเขา.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>พวกเขาไม่สามารถรับการแจ้งเตือนระบบผ่านทางอีเมล์.</translation>
     </message>
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
@@ -6248,6 +6232,26 @@ to %1</source>
     <message>
         <source>Check out &lt;b&gt;%1&lt;/b&gt; Beta &amp;mdash; connect to your servers from anywhere</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some users have not set their Email addresses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while sending Email</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You cannot receive system notifications via Email.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some users have not set their Email addresses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>They cannot receive system notifications via Email.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6682,10 +6686,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cloud user with specified email already exists.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Password</source>
         <translation type="unfinished">รหัสผ่าน</translation>
     </message>
@@ -6696,6 +6696,10 @@ to %1</source>
     <message>
         <source>Passwords do not match.</source>
         <translation type="unfinished">รหัสผ่านไม่ตรงกัน.</translation>
+    </message>
+    <message>
+        <source>Cloud user with specified Email already exists.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

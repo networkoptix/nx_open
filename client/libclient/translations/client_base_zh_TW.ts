@@ -3318,8 +3318,8 @@ to %1</source>
         <translation>選擇一支攝影機</translation>
     </message>
     <message>
-        <source>%1 has no ptz presets</source>
-        <translation>%1 沒有PTZ預設點</translation>
+        <source>%1 has no PTZ presets</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3971,14 +3971,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This license is already activated and linked to hardware id %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This license is already activated and linked to hardware id %1 on %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>License already activated on another server</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3996,6 +3988,14 @@ to %1</source>
     </message>
     <message>
         <source>Please make sure it is entered correctly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license is already activated and linked to hardware ID %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license is already activated and linked to hardware ID %1 on %2</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4018,15 +4018,19 @@ to %1</source>
         <translation>全部檔案(*.*)</translation>
     </message>
     <message>
-        <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished">請將序號以及硬體ID email給 %1 以取得啟動檔案.</translation>
-    </message>
-    <message>
-        <source>Hardware id copied to clipboard</source>
+        <source>Failed to open file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to open file</source>
+        <source>Please send Email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please send the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardware ID copied to clipboard</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5188,30 +5192,6 @@ to %1</source>
         <source>Select at least one user</source>
         <translation type="unfinished">至少選擇一個使用者</translation>
     </message>
-    <message>
-        <source>User %1 has invalid email address</source>
-        <translation type="unfinished">使用者 %1 E-Mail 位址無效</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 users have invalid email address</source>
-        <translation type="unfinished">
-            <numerusform>%1 個使用者中有 %n 個E-mail 地址無效</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Invalid email address %1</source>
-        <translation type="unfinished">無效的 Email 地址 %1</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 additional email addresses are invalid</source>
-        <translation type="unfinished">
-            <numerusform>%1 個額外的 Email 地址中有 %n 個無效</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Send email to %1</source>
-        <translation type="unfinished">寄送 Email 給%1</translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
         <translation type="unfinished">
@@ -5229,6 +5209,30 @@ to %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>User %1 has invalid Email address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 users have invalid Email address</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Invalid Email address %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 additional Email addresses are invalid</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Send Email to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6146,10 +6150,6 @@ to %1</source>
         <translation>Email伺服器尚未設定</translation>
     </message>
     <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>有些使用者尚未設定Email地址</translation>
-    </message>
-    <message>
         <source>Connection to server lost</source>
         <translation>與伺服器的連線中斷</translation>
     </message>
@@ -6160,10 +6160,6 @@ to %1</source>
     <message>
         <source>System is in safe mode</source>
         <translation>系統正處於安全模式</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>寄Email時發生錯誤</translation>
     </message>
     <message>
         <source>Storage is full</source>
@@ -6190,20 +6186,8 @@ to %1</source>
         <translation>Email地址尚未設定.</translation>
     </message>
     <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>您無法透過Email接收到系統通知.</translation>
-    </message>
-    <message>
         <source>Email server is not set.</source>
         <translation>Email伺服器尚未設定.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>有些使用者尚未設定Email地址.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>他們無法透過Email接收到系統通知.</translation>
     </message>
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
@@ -6248,6 +6232,26 @@ to %1</source>
     <message>
         <source>Check out &lt;b&gt;%1&lt;/b&gt; Beta &amp;mdash; connect to your servers from anywhere</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some users have not set their Email addresses</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while sending Email</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You cannot receive system notifications via Email.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some users have not set their Email addresses.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>They cannot receive system notifications via Email.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6682,10 +6686,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cloud user with specified email already exists.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Password</source>
         <translation type="unfinished">密碼</translation>
     </message>
@@ -6696,6 +6696,10 @@ to %1</source>
     <message>
         <source>Passwords do not match.</source>
         <translation type="unfinished">密碼不匹配.</translation>
+    </message>
+    <message>
+        <source>Cloud user with specified Email already exists.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

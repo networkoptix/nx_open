@@ -99,10 +99,6 @@
         <translation>הקלטת מצוקה</translation>
     </message>
     <message>
-        <source>Send email</source>
-        <translation>שלח אימייל</translation>
-    </message>
-    <message>
         <source>Write to log</source>
         <translation>כתוב לתיעוד</translation>
     </message>
@@ -503,6 +499,10 @@
         <source>MAC #%1: %2</source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
         <translation type="unfinished">MAC #%1: %2  {1:?} {2?}</translation>
+    </message>
+    <message>
+        <source>Send Email</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -945,10 +945,6 @@
         <translation>אתה מנסה להפעיל רשיון שאיננו תואם לתוכנה. אנא צור קשר עם קבוצת התמיכה על מנת להשיג מפתח רשיון תקין.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation>מפתח הרשיון הופעל בעבר למזהה החומרה {{hwid}} ב{{time}}. אנא צור קשר עם קבוצת התמיכה על מנת להשיג מפתח רשיון תקין.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
         <translation>התרחשה שגיאה בזמן הפעלת מפתח הרשיון. שגיאת בסיס נתונים.</translation>
     </message>
@@ -969,6 +965,11 @@
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
+        <comment>%1 is a hardware ID, %2 is an activation time</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
