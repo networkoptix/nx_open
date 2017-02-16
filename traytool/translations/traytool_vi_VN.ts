@@ -50,34 +50,6 @@
         <translation>không %1 Dịch vụ cài đặt</translation>
     </message>
     <message>
-        <source> (stopped)</source>
-        <translation>(ngưng)</translation>
-    </message>
-    <message>
-        <source> (starting)</source>
-        <translation>(Bắt đầu)</translation>
-    </message>
-    <message>
-        <source> (stopping)</source>
-        <translation>(dừng lại)</translation>
-    </message>
-    <message>
-        <source> (started)</source>
-        <translation>(bắt đầu)</translation>
-    </message>
-    <message>
-        <source> (resuming)</source>
-        <translation>(Khởi động lại)</translation>
-    </message>
-    <message>
-        <source> (paused)</source>
-        <translation>(giờ nghĩ giảo lao)</translation>
-    </message>
-    <message>
-        <source> (pausing)</source>
-        <translation>(tạm ngừng)</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;đi đi</translation>
     </message>
@@ -111,6 +83,34 @@
     </message>
     <message>
         <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>starting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>resuming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pausing</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

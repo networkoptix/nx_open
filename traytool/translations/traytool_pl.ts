@@ -54,34 +54,6 @@
         <translation>%1 zainstalowanych usług</translation>
     </message>
     <message>
-        <source> (stopped)</source>
-        <translation>(zatrzymany)</translation>
-    </message>
-    <message>
-        <source> (starting)</source>
-        <translation>(uruchamianie)</translation>
-    </message>
-    <message>
-        <source> (stopping)</source>
-        <translation>(zatrzymywanie)</translation>
-    </message>
-    <message>
-        <source> (started)</source>
-        <translation>(uruchomiony)</translation>
-    </message>
-    <message>
-        <source> (resuming)</source>
-        <translation>(wznawianie)</translation>
-    </message>
-    <message>
-        <source> (paused)</source>
-        <translation>(wstrzymany)</translation>
-    </message>
-    <message>
-        <source> (pausing)</source>
-        <translation>(wstrzymywanie)</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;Wyjście</translation>
     </message>
@@ -111,6 +83,34 @@
     </message>
     <message>
         <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>starting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>resuming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pausing</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

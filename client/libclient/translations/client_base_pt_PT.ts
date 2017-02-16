@@ -1489,18 +1489,6 @@ Para ver mais Bookmarks</translation>
 <context>
     <name>QnAuditLogModel</name>
     <message>
-        <source>%1d </source>
-        <translation>%1d </translation>
-    </message>
-    <message>
-        <source>%1h </source>
-        <translation>%1h </translation>
-    </message>
-    <message>
-        <source>%1m </source>
-        <translation>%1m </translation>
-    </message>
-    <message>
         <source>Unknown</source>
         <translation>Desconhecido</translation>
     </message>
@@ -1568,10 +1556,6 @@ Para ver mais Bookmarks</translation>
     <message>
         <source>Database restored</source>
         <translation>Base da Dados restaurada</translation>
-    </message>
-    <message>
-        <source>%1 - %2, </source>
-        <translation>%1 - %2, </translation>
     </message>
     <message numerus="yes">
         <source>%n action(s)</source>
@@ -2869,14 +2853,6 @@ to %1</source>
         <translation>Se este erro persistir, contacte o seu administrador do VMS.</translation>
     </message>
     <message>
-        <source> - Client version: %1.</source>
-        <translation>- Versão do Cliente: %1.</translation>
-    </message>
-    <message>
-        <source> - Server version: %1.</source>
-        <translation> - Versão do Servidor: %1.</translation>
-    </message>
-    <message>
         <source>Compatibility mode for versions lower than %1 is not supported.</source>
         <translation>Modo de compatibilidade para versões inferiores a %1 não são suportadas.</translation>
     </message>
@@ -3002,6 +2978,14 @@ to %1</source>
     <message>
         <source>Connection to %1 is not established.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client version: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server version: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3737,6 +3721,10 @@ to %1</source>
         <source>Picture cannot be loaded</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>cells</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLdapSettingsDialog</name>
@@ -4010,10 +3998,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please make sure it is entered correctly. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to activate license</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4058,6 +4042,10 @@ to %1</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Please make sure it is entered correctly.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5970,6 +5958,11 @@ to %1</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>TB</source>
+        <comment>TB - terabytes</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

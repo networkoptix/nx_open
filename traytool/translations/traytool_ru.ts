@@ -50,34 +50,6 @@
         <translation>Сервисы %1 не установлены</translation>
     </message>
     <message>
-        <source> (stopped)</source>
-        <translation> (остановлен)</translation>
-    </message>
-    <message>
-        <source> (starting)</source>
-        <translation> (запускается)</translation>
-    </message>
-    <message>
-        <source> (stopping)</source>
-        <translation> (заканчивает работу)</translation>
-    </message>
-    <message>
-        <source> (started)</source>
-        <translation> (запущен)</translation>
-    </message>
-    <message>
-        <source> (resuming)</source>
-        <translation> (возобновляется)</translation>
-    </message>
-    <message>
-        <source> (paused)</source>
-        <translation> (пауза)</translation>
-    </message>
-    <message>
-        <source> (pausing)</source>
-        <translation> (приостанавливается)</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;Выход</translation>
     </message>
@@ -112,6 +84,34 @@
     <message>
         <source>Server Web Page</source>
         <translation>Открыть web-страницу сервера</translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>starting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>resuming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pausing</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

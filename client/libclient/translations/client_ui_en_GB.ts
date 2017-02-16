@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source> ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse Logs</source>
         <translation type="unfinished">Browse Logs</translation>
     </message>
@@ -783,11 +778,6 @@
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source>Panic Mode: </source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule Settings</source>
         <translation></translation>
     </message>
@@ -833,12 +823,6 @@
     </message>
     <message>
         <location/>
-        <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Post-Recording</source>
         <translation></translation>
     </message>
@@ -846,11 +830,6 @@
         <location/>
         <source>Copy Schedule...</source>
         <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion + Low-Res </source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -895,6 +874,16 @@
     <message>
         <location/>
         <source>Apply changes before copying schedule.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Low-Res</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1300,11 +1289,6 @@
     </message>
     <message>
         <location/>
-        <source> cells</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>%</source>
         <translation></translation>
     </message>
@@ -1645,11 +1629,6 @@
     </message>
     <message>
         <location/>
-        <source> seconds</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>%</source>
         <translation></translation>
     </message>
@@ -1696,6 +1675,11 @@
     <message>
         <location/>
         <source>Tour cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>seconds</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2721,11 +2705,6 @@
     <message>
         <location/>
         <source>Forecast for Full Storage Usage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source> TB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

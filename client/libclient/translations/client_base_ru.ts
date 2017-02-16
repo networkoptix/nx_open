@@ -1492,18 +1492,6 @@ to view more bookmarks</source>
 <context>
     <name>QnAuditLogModel</name>
     <message>
-        <source>%1d </source>
-        <translation>%1д </translation>
-    </message>
-    <message>
-        <source>%1h </source>
-        <translation>%1ч </translation>
-    </message>
-    <message>
-        <source>%1m </source>
-        <translation>%1м </translation>
-    </message>
-    <message>
         <source>Unknown</source>
         <translation>Неизвестно</translation>
     </message>
@@ -1570,10 +1558,6 @@ to view more bookmarks</source>
     <message>
         <source>Database restored</source>
         <translation>Восстановлена база данных</translation>
-    </message>
-    <message>
-        <source>%1 - %2, </source>
-        <translation>%1 - %2, </translation>
     </message>
     <message numerus="yes">
         <source>%n action(s)</source>
@@ -2891,14 +2875,6 @@ to %1</source>
         <translation>Если ошибка остаётся, обратитесь к администратору системы.</translation>
     </message>
     <message>
-        <source> - Client version: %1.</source>
-        <translation> - Версия клиента: %1.</translation>
-    </message>
-    <message>
-        <source> - Server version: %1.</source>
-        <translation> - Версия сервера: %1.</translation>
-    </message>
-    <message>
         <source>Compatibility mode for versions lower than %1 is not supported.</source>
         <translation>Режим совместимости для версий ниже %1 не поддерживается.</translation>
     </message>
@@ -3025,6 +3001,14 @@ to %1</source>
         <source>Connection to %1 is not established.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished">Подключение к %1 не установлено.</translation>
+    </message>
+    <message>
+        <source>Client version: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server version: %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3764,6 +3748,10 @@ to %1</source>
         <source>Picture cannot be loaded</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>cells</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLdapSettingsDialog</name>
@@ -4038,10 +4026,6 @@ to %1</source>
         <translation>Недопустимый лицензионный ключ</translation>
     </message>
     <message>
-        <source>Please make sure it is entered correctly. </source>
-        <translation>Пожалуйста, убедитесь, что он введен правильно. </translation>
-    </message>
-    <message>
         <source>Failed to activate license</source>
         <translation>Не удалось активировать лицензию</translation>
     </message>
@@ -4088,6 +4072,10 @@ to %1</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Please make sure it is entered correctly.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6017,6 +6005,11 @@ to %1</source>
             <numerusform>%n ТБ</numerusform>
             <numerusform>%n ТБ</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>TB</source>
+        <comment>TB - terabytes</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

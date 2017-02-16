@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source> ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse Logs</source>
         <translation type="unfinished">ค้นหา logs</translation>
     </message>
@@ -783,11 +778,6 @@
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source>Panic Mode: </source>
-        <translation>โหมด Panic:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule Settings</source>
         <translation>กำหนดการตั้งค่า</translation>
     </message>
@@ -833,12 +823,6 @@
     </message>
     <message>
         <location/>
-        <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation>วินาที</translation>
-    </message>
-    <message>
-        <location/>
         <source>Post-Recording</source>
         <translation>โพสต์บันทึก</translation>
     </message>
@@ -846,11 +830,6 @@
         <location/>
         <source>Copy Schedule...</source>
         <translation>คัดคอกกำหนดการ...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion + Low-Res </source>
-        <translation>การเคลื่อนไหว + ความละเอียดต่ำ</translation>
     </message>
     <message>
         <location/>
@@ -896,6 +875,16 @@
         <location/>
         <source>Apply changes before copying schedule.</source>
         <translation type="unfinished">เปลี่ยนแปลงตารางการคัดลอก</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Low-Res</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1300,11 +1289,6 @@
     </message>
     <message>
         <location/>
-        <source> cells</source>
-        <translation>ตาราง</translation>
-    </message>
-    <message>
-        <location/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -1645,11 +1629,6 @@
     </message>
     <message>
         <location/>
-        <source> seconds</source>
-        <translation>วินาที</translation>
-    </message>
-    <message>
-        <location/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -1697,6 +1676,11 @@
         <location/>
         <source>Tour cycle</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation type="unfinished">วินาที</translation>
     </message>
 </context>
 <context>
@@ -2721,11 +2705,6 @@
     <message>
         <location/>
         <source>Forecast for Full Storage Usage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source> TB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

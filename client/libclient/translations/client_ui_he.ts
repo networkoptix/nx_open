@@ -100,11 +100,6 @@
     </message>
     <message>
         <location/>
-        <source> ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse Logs</source>
         <translation type="unfinished">סייר בתיעוד(log)</translation>
     </message>
@@ -784,11 +779,6 @@
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source>Panic Mode: </source>
-        <translation>מצב מצוקה:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule Settings</source>
         <translation>הגדרות לוח זמנים</translation>
     </message>
@@ -811,11 +801,6 @@
         <location/>
         <source>Motion Only</source>
         <translation>תנועה בלבד</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion + Low-Res </source>
-        <translation>תנועה + רזולוציה נמוכה</translation>
     </message>
     <message>
         <location/>
@@ -851,12 +836,6 @@
         <location/>
         <source>Pre-Recording</source>
         <translation>משך הקלטה לפני </translation>
-    </message>
-    <message>
-        <location/>
-        <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation>ש</translation>
     </message>
     <message>
         <location/>
@@ -897,6 +876,16 @@
         <location/>
         <source>Apply changes before copying schedule.</source>
         <translation type="unfinished">החלת השינויים לפני העתקת לוח הזמנים</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Low-Res</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1311,11 +1300,6 @@
     </message>
     <message>
         <location/>
-        <source> cells</source>
-        <translation>תאים</translation>
-    </message>
-    <message>
-        <location/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -1646,11 +1630,6 @@
     </message>
     <message>
         <location/>
-        <source> seconds</source>
-        <translation>שניות</translation>
-    </message>
-    <message>
-        <location/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -1698,6 +1677,11 @@
         <location/>
         <source>Tour cycle</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation type="unfinished">שניות</translation>
     </message>
 </context>
 <context>
@@ -2722,11 +2706,6 @@
     <message>
         <location/>
         <source>Forecast for Full Storage Usage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source> TB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

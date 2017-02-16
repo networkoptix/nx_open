@@ -286,11 +286,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>MAC #%1: %2 </source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
         <translation>카메라 메인스트림 연결이 예상치 못하게 끊겼습니다.</translation>
     </message>
@@ -492,6 +487,11 @@
     </message>
     <message>
         <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2</source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -945,15 +945,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>Activate %n more %1. </source>
+        <source>Activate %n more %1.</source>
         <translation type="unfinished">
-            <numerusform>%n은 %1의 등록을 추가합니다.</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <source>%n more %1 will be used. </source>
+        <source>%n more %1 will be used.</source>
         <translation type="unfinished">
-            <numerusform>%n 와(과) %1 가 사용됩니다.</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -1058,24 +1058,24 @@
         <translation>알수 없음</translation>
     </message>
     <message>
-        <source>Hardware ID: </source>
-        <translation>하드웨어 ID:</translation>
-    </message>
-    <message>
-        <source>Watermark: </source>
-        <translation>파일변조:</translation>
-    </message>
-    <message>
         <source>Trial License</source>
         <translation>기간한정 인증키</translation>
     </message>
     <message>
-        <source>Licensed To: </source>
-        <translation>인증키:</translation>
-    </message>
-    <message>
         <source>FREE License</source>
         <translation>무료 인증키</translation>
+    </message>
+    <message>
+        <source>Hardware ID: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licensed To: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watermark: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

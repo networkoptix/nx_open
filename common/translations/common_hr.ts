@@ -265,11 +265,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>MAC #%1: %2 </source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Conflicting Server #%1: %2</source>
         <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
         <translation type="unfinished"></translation>
@@ -512,6 +507,11 @@
     </message>
     <message>
         <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2</source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -969,7 +969,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>Activate %n more %1. </source>
+        <source>Activate %n more %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -977,7 +977,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <source>%n more %1 will be used. </source>
+        <source>%n more %1 will be used.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -1102,19 +1102,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hardware ID: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Licensed To: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Watermark: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>FREE License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardware ID: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licensed To: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watermark: %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

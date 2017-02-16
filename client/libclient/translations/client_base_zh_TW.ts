@@ -1479,18 +1479,6 @@ to view more bookmarks</source>
 <context>
     <name>QnAuditLogModel</name>
     <message>
-        <source>%1d </source>
-        <translation>%1日</translation>
-    </message>
-    <message>
-        <source>%1h </source>
-        <translation>%1時</translation>
-    </message>
-    <message>
-        <source>%1m </source>
-        <translation>%1分</translation>
-    </message>
-    <message>
         <source>Unknown</source>
         <translation>未知</translation>
     </message>
@@ -1557,10 +1545,6 @@ to view more bookmarks</source>
     <message>
         <source>Database restored</source>
         <translation>資料庫重置</translation>
-    </message>
-    <message>
-        <source>%1 - %2, </source>
-        <translation>%1 - %2, </translation>
     </message>
     <message numerus="yes">
         <source>%n action(s)</source>
@@ -2832,14 +2816,6 @@ to %1</source>
         <translation>若錯誤持續發生, 請連繫您的管理員.</translation>
     </message>
     <message>
-        <source> - Client version: %1.</source>
-        <translation>- 客戶端版本: %1.</translation>
-    </message>
-    <message>
-        <source> - Server version: %1.</source>
-        <translation>- 伺服器版本: %1.</translation>
-    </message>
-    <message>
         <source>Compatibility mode for versions lower than %1 is not supported.</source>
         <translation>相容模式不支援比 %1 更低的版本.</translation>
     </message>
@@ -2965,6 +2941,14 @@ to %1</source>
     <message>
         <source>Connection to %1 is not established.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client version: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server version: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3693,6 +3677,10 @@ to %1</source>
         <source>Picture cannot be loaded</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>cells</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLdapSettingsDialog</name>
@@ -3963,10 +3951,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please make sure it is entered correctly. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to activate license</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4009,6 +3993,10 @@ to %1</source>
         <translation type="unfinished">
             <numerusform>已使用 %n %1</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Please make sure it is entered correctly.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5894,6 +5882,11 @@ to %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>TB</source>
+        <comment>TB - terabytes</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

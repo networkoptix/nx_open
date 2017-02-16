@@ -286,11 +286,6 @@
         <translation>キャプション: %1</translation>
     </message>
     <message>
-        <source>MAC #%1: %2 </source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation>MAC #%1: %2 </translation>
-    </message>
-    <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
         <translation>カメラ(プライマリーストリーム)との接続は閉じられました.</translation>
     </message>
@@ -493,6 +488,11 @@
     <message>
         <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2</source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation type="unfinished">MAC #%1: %2  {1:?} {2?}</translation>
     </message>
 </context>
 <context>
@@ -945,15 +945,15 @@
         <translation>ライセンスキーのアクティベートエラー　サポート窓口にお問い合わせください.</translation>
     </message>
     <message numerus="yes">
-        <source>Activate %n more %1. </source>
+        <source>Activate %n more %1.</source>
         <translation type="unfinished">
-            <numerusform>アクティベートには追加で %n 以上の %1 が必要.</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <source>%n more %1 will be used. </source>
+        <source>%n more %1 will be used.</source>
         <translation type="unfinished">
-            <numerusform> %n 以上の %1 を使用.</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -1058,24 +1058,24 @@
         <translation>未知の値</translation>
     </message>
     <message>
-        <source>Hardware ID: </source>
-        <translation>ハードウェアID:</translation>
-    </message>
-    <message>
-        <source>Watermark: </source>
-        <translation>電子透かし:</translation>
-    </message>
-    <message>
         <source>Trial License</source>
         <translation>トライアルライセンストライアルライセンス</translation>
     </message>
     <message>
-        <source>Licensed To: </source>
-        <translation>以下にライセンス:</translation>
-    </message>
-    <message>
         <source>FREE License</source>
         <translation>無償ライセンス</translation>
+    </message>
+    <message>
+        <source>Hardware ID: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licensed To: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watermark: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

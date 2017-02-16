@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source> ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse Logs</source>
         <translation type="unfinished">瀏覽記錄</translation>
     </message>
@@ -789,11 +784,6 @@
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source>Panic Mode: </source>
-        <translation>緊急模式:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule Settings</source>
         <translation>排程設定</translation>
     </message>
@@ -839,12 +829,6 @@
     </message>
     <message>
         <location/>
-        <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation>秒</translation>
-    </message>
-    <message>
-        <location/>
         <source>Post-Recording</source>
         <translation>事後錄影</translation>
     </message>
@@ -852,11 +836,6 @@
         <location/>
         <source>Copy Schedule...</source>
         <translation>複製排程…</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion + Low-Res </source>
-        <translation>位移高解析錄影+全時低解析錄影</translation>
     </message>
     <message>
         <location/>
@@ -902,6 +881,16 @@
         <location/>
         <source>Apply changes before copying schedule.</source>
         <translation type="unfinished">複製排程前先套用變更</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Low-Res</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1306,11 +1295,6 @@
     </message>
     <message>
         <location/>
-        <source> cells</source>
-        <translation>格</translation>
-    </message>
-    <message>
-        <location/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -1651,11 +1635,6 @@
     </message>
     <message>
         <location/>
-        <source> seconds</source>
-        <translation>秒</translation>
-    </message>
-    <message>
-        <location/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -1703,6 +1682,11 @@
         <location/>
         <source>Tour cycle</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation type="unfinished">秒</translation>
     </message>
 </context>
 <context>
@@ -2727,11 +2711,6 @@
     <message>
         <location/>
         <source>Forecast for Full Storage Usage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source> TB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

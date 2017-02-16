@@ -1492,18 +1492,6 @@ to view more bookmarks</source>
 <context>
     <name>QnAuditLogModel</name>
     <message>
-        <source>%1d </source>
-        <translation>%1d</translation>
-    </message>
-    <message>
-        <source>%1h </source>
-        <translation>%1h</translation>
-    </message>
-    <message>
-        <source>%1m </source>
-        <translation>%1m</translation>
-    </message>
-    <message>
         <source>Unknown</source>
         <translation>Nieznany</translation>
     </message>
@@ -1570,10 +1558,6 @@ to view more bookmarks</source>
     <message>
         <source>Database restored</source>
         <translation>Baza danych przywrócona</translation>
-    </message>
-    <message>
-        <source>%1 - %2, </source>
-        <translation>%1 - %2,</translation>
     </message>
     <message numerus="yes">
         <source>%n action(s)</source>
@@ -2887,14 +2871,6 @@ to %1</source>
         <translation>Próbujesz się połączyć z niekompatybilnym serwerem.</translation>
     </message>
     <message>
-        <source> - Client version: %1.</source>
-        <translation>- Wersja klienta: %1.</translation>
-    </message>
-    <message>
-        <source> - Server version: %1.</source>
-        <translation>- Wersja serwera: %1.</translation>
-    </message>
-    <message>
         <source>Compatibility mode for versions lower than %1 is not supported.</source>
         <translation>Tryb zgodności w wersjach niższych niż %1 nie jest obsługiwany.</translation>
     </message>
@@ -3020,6 +2996,14 @@ to %1</source>
     <message>
         <source>Connection to %1 is not established.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client version: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server version: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3760,6 +3744,10 @@ to %1</source>
         <source>Picture cannot be loaded</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>cells</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLdapSettingsDialog</name>
@@ -4034,10 +4022,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please make sure it is entered correctly. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to activate license</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4084,6 +4068,10 @@ to %1</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Please make sure it is entered correctly.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6012,6 +6000,11 @@ to %1</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>TB</source>
+        <comment>TB - terabytes</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

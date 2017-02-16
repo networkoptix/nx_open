@@ -1481,18 +1481,6 @@ több könyvjelző megjelenítéséhez</translation>
 <context>
     <name>QnAuditLogModel</name>
     <message>
-        <source>%1d </source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1h </source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1m </source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Unknown</source>
         <translation>Ismeretlen</translation>
     </message>
@@ -1559,10 +1547,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Database restored</source>
         <translation>Adatbázis visszaállítva</translation>
-    </message>
-    <message>
-        <source>%1 - %2, </source>
-        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n action(s)</source>
@@ -2834,14 +2818,6 @@ to %1</source>
         <translation>Nem kompatibilis szerverhez próbál csatlakozni.</translation>
     </message>
     <message>
-        <source> - Client version: %1.</source>
-        <translation> - Kliens verzió: %1.</translation>
-    </message>
-    <message>
-        <source> - Server version: %1.</source>
-        <translation> - Szerver verzió: %1.</translation>
-    </message>
-    <message>
         <source>Compatibility mode for versions lower than %1 is not supported.</source>
         <translation>Kompatibilitási mód %1 verzió alatt nem támogatott.</translation>
     </message>
@@ -2967,6 +2943,14 @@ to %1</source>
     <message>
         <source>Connection to %1 is not established.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client version: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server version: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3695,6 +3679,10 @@ to %1</source>
         <source>Picture cannot be loaded</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>cells</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLdapSettingsDialog</name>
@@ -3965,10 +3953,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please make sure it is entered correctly. </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to activate license</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4011,6 +3995,10 @@ to %1</source>
         <translation type="unfinished">
             <numerusform>%n %1 használatban</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Please make sure it is entered correctly.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5896,6 +5884,11 @@ to %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>TB</source>
+        <comment>TB - terabytes</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

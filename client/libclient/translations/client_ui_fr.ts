@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source> ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse Logs</source>
         <translation type="unfinished">Parcourir les journaux</translation>
     </message>
@@ -783,18 +778,6 @@
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translatorcomment>&quot;s&quot; Refering to what ?</translatorcomment>
-        <translation> s</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Panic Mode: </source>
-        <translation>Mode Panic: </translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule Settings</source>
         <translation>Configuration de l&apos;horaire</translation>
     </message>
@@ -850,11 +833,6 @@
     </message>
     <message>
         <location/>
-        <source>Motion + Low-Res </source>
-        <translation>Mouv. et Basse réso</translation>
-    </message>
-    <message>
-        <location/>
         <source>Do Not Record</source>
         <translation>Aucun Enreg</translation>
     </message>
@@ -897,6 +875,16 @@
         <location/>
         <source>Apply changes before copying schedule.</source>
         <translation type="unfinished">Appliquer les modifications avant de copier l&apos;horaire</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Low-Res</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1301,11 +1289,6 @@
     </message>
     <message>
         <location/>
-        <source> cells</source>
-        <translation>cellules</translation>
-    </message>
-    <message>
-        <location/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -1646,11 +1629,6 @@
     </message>
     <message>
         <location/>
-        <source> seconds</source>
-        <translation>Secondes</translation>
-    </message>
-    <message>
-        <location/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -1697,6 +1675,11 @@
     <message>
         <location/>
         <source>Tour cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>seconds</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2722,11 +2705,6 @@
     <message>
         <location/>
         <source>Forecast for Full Storage Usage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source> TB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

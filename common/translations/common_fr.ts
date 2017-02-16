@@ -288,11 +288,6 @@
         <translation>Légende: %1</translation>
     </message>
     <message>
-        <source>MAC #%1: %2 </source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation>MAC #%1: %2 </translation>
-    </message>
-    <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
         <translation>Connexion à la caméra (flux primaire) a été fermée de façon inattendue.</translation>
     </message>
@@ -503,6 +498,11 @@
     <message>
         <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2</source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation type="unfinished">MAC #%1: %2  {1:?} {2?}</translation>
     </message>
 </context>
 <context>
@@ -957,14 +957,14 @@
         <translation>Il a eu un problème d&apos;activation de votre licence. Données invalides reçues. S.V.P., contactez l’assistance technique pour signaler cette erreur.</translation>
     </message>
     <message numerus="yes">
-        <source>Activate %n more %1. </source>
+        <source>Activate %n more %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <source>%n more %1 will be used. </source>
+        <source>%n more %1 will be used.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -1078,24 +1078,24 @@
         <translation>Inconnue</translation>
     </message>
     <message>
-        <source>Hardware ID: </source>
-        <translation>ID du matériel: </translation>
-    </message>
-    <message>
-        <source>Watermark: </source>
-        <translation>Filigrane: </translation>
-    </message>
-    <message>
         <source>Trial License</source>
         <translation>Licence d&apos;essaie</translation>
     </message>
     <message>
-        <source>Licensed To: </source>
-        <translation>Licence accordée à:</translation>
-    </message>
-    <message>
         <source>FREE License</source>
         <translation>Licence gratuite</translation>
+    </message>
+    <message>
+        <source>Hardware ID: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licensed To: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watermark: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -288,11 +288,6 @@
         <translation>Título: %1</translation>
     </message>
     <message>
-        <source>MAC #%1: %2 </source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation>MAC #%1: %2 </translation>
-    </message>
-    <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
         <translation>A ligação à câmara (Stream principal) foi terminada inesperadamente.</translation>
     </message>
@@ -503,6 +498,11 @@
     <message>
         <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2</source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation type="unfinished">MAC #%1: %2  {1:?} {2?}</translation>
     </message>
 </context>
 <context>
@@ -957,14 +957,14 @@
         <translation>Houve um problema ao activar a sua chave da licença. Dados inválidos recebidos. Deve contactar a equipa de suporte para obter uma chave válida.</translation>
     </message>
     <message numerus="yes">
-        <source>Activate %n more %1. </source>
+        <source>Activate %n more %1.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <source>%n more %1 will be used. </source>
+        <source>%n more %1 will be used.</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -1074,14 +1074,6 @@
 <context>
     <name>QnSignHelper</name>
     <message>
-        <source>Hardware ID: </source>
-        <translation>ID do hardware: </translation>
-    </message>
-    <message>
-        <source>Watermark: </source>
-        <translation>Marca dágua: </translation>
-    </message>
-    <message>
         <source>Unknown</source>
         <translation>Desconhecido</translation>
     </message>
@@ -1090,12 +1082,20 @@
         <translation>Licença Trial</translation>
     </message>
     <message>
-        <source>Licensed To: </source>
-        <translation>Licenciado para : </translation>
-    </message>
-    <message>
         <source>FREE License</source>
         <translation>Licença Gratuita</translation>
+    </message>
+    <message>
+        <source>Hardware ID: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licensed To: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watermark: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

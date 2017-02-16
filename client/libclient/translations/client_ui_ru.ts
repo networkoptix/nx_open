@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source> ms</source>
-        <translation> мс</translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse Logs</source>
         <translation>Просмотр журнала событий</translation>
     </message>
@@ -783,11 +778,6 @@
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source>Panic Mode: </source>
-        <translation>Запись по тревоге: </translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule Settings</source>
         <translation>Настройки расписания</translation>
     </message>
@@ -810,11 +800,6 @@
         <location/>
         <source>Motion Only</source>
         <translation>Только движение (ДД)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion + Low-Res </source>
-        <translation>Дд + низ </translation>
     </message>
     <message>
         <location/>
@@ -850,12 +835,6 @@
         <location/>
         <source>Pre-Recording</source>
         <translation>Пре-запись</translation>
-    </message>
-    <message>
-        <location/>
-        <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation> с</translation>
     </message>
     <message>
         <location/>
@@ -896,6 +875,16 @@
         <location/>
         <source>Apply changes before copying schedule.</source>
         <translation>Сохраните изменения перед копированием.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Low-Res</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1310,11 +1299,6 @@
     </message>
     <message>
         <location/>
-        <source> cells</source>
-        <translation> ячеек</translation>
-    </message>
-    <message>
-        <location/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -1645,11 +1629,6 @@
     </message>
     <message>
         <location/>
-        <source> seconds</source>
-        <translation>с</translation>
-    </message>
-    <message>
-        <location/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -1697,6 +1676,11 @@
         <location/>
         <source>Tour cycle</source>
         <translation>Цикличность тура</translation>
+    </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2722,11 +2706,6 @@
         <location/>
         <source>Forecast for Full Storage Usage</source>
         <translation>Прогноз полного использования хранилища</translation>
-    </message>
-    <message>
-        <location/>
-        <source> TB</source>
-        <translation> ТБ</translation>
     </message>
     <message>
         <location/>

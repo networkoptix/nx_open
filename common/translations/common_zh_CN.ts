@@ -288,11 +288,6 @@
         <translation>容量: (%1)</translation>
     </message>
     <message>
-        <source>MAC #%1: %2 </source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation>MAC #%1: %2 </translation>
-    </message>
-    <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
         <translation>连接摄像机(主码流)意外关闭.</translation>
     </message>
@@ -495,6 +490,11 @@
     <message>
         <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2</source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation type="unfinished">MAC #%1: %2  {1:?} {2?}</translation>
     </message>
 </context>
 <context>
@@ -947,15 +947,15 @@
         <translation>激活授权许可时发生错误,收到无效数据,请联系技术支持团队解决此问题.</translation>
     </message>
     <message numerus="yes">
-        <source>Activate %n more %1. </source>
+        <source>Activate %n more %1.</source>
         <translation type="unfinished">
-            <numerusform>Activate %n more %1.</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <source>%n more %1 will be used. </source>
+        <source>%n more %1 will be used.</source>
         <translation type="unfinished">
-            <numerusform>%n 多于 %1 将被使用</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
 </context>
@@ -1060,24 +1060,24 @@
         <translation>未知</translation>
     </message>
     <message>
-        <source>Hardware ID: </source>
-        <translation>硬件ID:</translation>
-    </message>
-    <message>
-        <source>Watermark: </source>
-        <translation>水印:</translation>
-    </message>
-    <message>
         <source>Trial License</source>
         <translation>试用授权</translation>
     </message>
     <message>
-        <source>Licensed To: </source>
-        <translation>授权给:</translation>
-    </message>
-    <message>
         <source>FREE License</source>
         <translation>免费许可</translation>
+    </message>
+    <message>
+        <source>Hardware ID: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licensed To: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watermark: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

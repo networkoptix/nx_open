@@ -103,11 +103,6 @@
     </message>
     <message>
         <location/>
-        <source> ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse Logs</source>
         <translation type="unfinished">Logs ansehen</translation>
     </message>
@@ -788,11 +783,6 @@
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source>Panic Mode: </source>
-        <translation>Panik Modus:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule Settings</source>
         <translation>Zeitplan-Einstellungen</translation>
     </message>
@@ -840,12 +830,6 @@
     </message>
     <message>
         <location/>
-        <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation> s</translation>
-    </message>
-    <message>
-        <location/>
         <source>Post-Recording</source>
         <translation>Nachlauf</translation>
     </message>
@@ -854,11 +838,6 @@
         <source>Copy Schedule...</source>
         <translatorcomment>Additional spaces are required to make place for the long &quot;Motion Recording&quot; caption</translatorcomment>
         <translation>Zeitplan kopieren...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion + Low-Res </source>
-        <translation>Bewegung + Low Res</translation>
     </message>
     <message>
         <location/>
@@ -904,6 +883,16 @@
         <location/>
         <source>Apply changes before copying schedule.</source>
         <translation type="unfinished">Änderungen vor dem Kopieren anwenden</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Low-Res</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1308,11 +1297,6 @@
     </message>
     <message>
         <location/>
-        <source> cells</source>
-        <translation>Zellen</translation>
-    </message>
-    <message>
-        <location/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -1654,11 +1638,6 @@
     </message>
     <message>
         <location/>
-        <source> seconds</source>
-        <translation>Sekunden</translation>
-    </message>
-    <message>
-        <location/>
         <source>%</source>
         <translation>%</translation>
     </message>
@@ -1706,6 +1685,11 @@
         <location/>
         <source>Tour cycle</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation type="unfinished">Sekunden</translation>
     </message>
 </context>
 <context>
@@ -2730,11 +2714,6 @@
     <message>
         <location/>
         <source>Forecast for Full Storage Usage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source> TB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
