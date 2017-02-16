@@ -1445,9 +1445,40 @@ to view more bookmarks</source>
         <source>No archive for this position</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These devices are removed from the System</source>
-        <translation type="unfinished"></translation>
+        <translation>
+            <numerusform>This device is removed from System</numerusform>
+            <numerusform>These devices are removed from System</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These servers are removed from the System</source>
+        <translation>
+            <numerusform>This server is removed from System</numerusform>
+            <numerusform>These servers are removed from System</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These users are removed from the System</source>
+        <translation>
+            <numerusform>This user is removed from System</numerusform>
+            <numerusform>These users are removed from System</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These resources are removed from the System</source>
+        <translation>
+            <numerusform>These resource is removed from System</numerusform>
+            <numerusform>These resources are removed from System</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These cameras are removed from the System</source>
+        <translation>
+            <numerusform>This camera is removed from the System</numerusform>
+            <numerusform>These cameras are removed from System</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1514,7 +1545,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Server removed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Business rule removed</source>
@@ -1645,10 +1676,6 @@ to view more bookmarks</source>
 <context>
     <name>QnBackupSettingsDialog</name>
     <message>
-        <source>Global Settings	(affect all servers in the system)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>By Schedule</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1673,6 +1700,15 @@ to view more bookmarks</source>
     <message>
         <source>All Streams</source>
         <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Global Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>affect all servers in the system</source>
+        <comment>Relates to &apos;Global Settings&apos; subject</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2431,7 +2467,8 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>Recording or motion detection is disabled for %1</source>
         <translation>
-            <numerusform></numerusform>
+            <numerusform>Recording or motion detection is disabled on %1</numerusform>
+            <numerusform>Recording or motion detection is disabled on %1</numerusform>
         </translation>
     </message>
 </context>
@@ -2669,46 +2706,9 @@ to view more bookmarks</source>
 <context>
     <name>QnCloudManagementWidget</name>
     <message>
-        <source>Disconnect System from %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open %1 Portal</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create %1 Account</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connect System to %1...</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create %1
-account</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connect System
-to %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Connect to your Systems
 from anywhere with any
 devices</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Learn more about %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2716,8 +2716,45 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Disconnect System from %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open %1 Portal</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create %1 Account</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect System to %1...</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create %1
+account</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect System
+to %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>%1 is in Beta.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Learn more about %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2733,12 +2770,7 @@ devices</source>
     </message>
     <message>
         <source>Cannot connect to %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Log in to %1...</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2769,12 +2801,12 @@ devices</source>
     </message>
     <message>
         <source>Connect to %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Enter %1 Account</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2786,12 +2818,12 @@ devices</source>
     </message>
     <message>
         <source>The System connected to %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Failed to connect the System to %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2865,21 +2897,11 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection to the %1 is not ready yet. Check media server internet connection or try again later.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to connect to Server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Incorrect username or password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connection to %1 is not established.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2958,6 +2980,16 @@ devices</source>
     </message>
     <message>
         <source>Failed to restart %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to the %1 is not ready yet. Check media server internet connection or try again later.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 is not established.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3167,27 +3199,27 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to disconnect the System from %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Disconnect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>All cloud users will be deleted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to disconnect the System from %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Disconnect the System from %1?</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All cloud features will be disabled, cloud users will be deleted from the System.</source>
+        <source>You won&apos;t be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You wont be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">You won&apos;t be able to connect to this system with your %1 account after you disconnect this system from %1.</translation>
     </message>
 </context>
 <context>
@@ -3299,20 +3331,23 @@ devices</source>
     </message>
     <message numerus="yes">
         <source>%n users</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n user</numerusform>
+            <numerusform>%n users</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>and %n users more...</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>and %n  more user...</numerusform>
+            <numerusform>and %n  more users...</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>and %n more...</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>and %n more...</numerusform>
+            <numerusform>and %n more...</numerusform>
         </translation>
     </message>
 </context>
@@ -4077,7 +4112,7 @@ devices</source>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
         <source>Failed to login to %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4195,12 +4230,12 @@ devices</source>
     </message>
     <message>
         <source>Log in to %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Welcome to %1!</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5262,7 +5297,8 @@ devices</source>
     <message numerus="yes">
         <source>%n additional</source>
         <translation>
-            <numerusform></numerusform>
+            <numerusform>%n additional</numerusform>
+            <numerusform>%n additional</numerusform>
         </translation>
     </message>
 </context>
@@ -5916,8 +5952,9 @@ devices</source>
     <message numerus="yes">
         <source>%n TB</source>
         <comment>TB - terabytes</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n TB</numerusform>
+            <numerusform>%n TB</numerusform>
         </translation>
     </message>
 </context>
@@ -6074,23 +6111,19 @@ devices</source>
 <context>
     <name>QnStorageRebuildWidget</name>
     <message>
-        <source>Fast Backup Scan... 	%p%</source>
-        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <source>Fast Backup Scan...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Fast Archive Scan... 	%p%</source>
-        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <source>Fast Archive Scan...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reindexing Backup... 	%p%</source>
-        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <source>Reindexing Backup...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reindexing Archive... 	%p%</source>
-        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <source>Reindexing Archive...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6283,7 +6316,7 @@ devices</source>
     </message>
     <message>
         <source>Check out &lt;b&gt;%1&lt;/b&gt; Beta &amp;mdash; connect to your servers from anywhere</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6604,7 +6637,7 @@ devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>What to do with %n users with this role?</source>
+        <source>Please select the action to perform to %n users with this role</source>
         <translation>
             <numerusform>Please select the action to perform to %n user with this role</numerusform>
             <numerusform>Please select the action to perform to %n users with this role</numerusform>
@@ -7504,7 +7537,7 @@ devices</source>
     </message>
     <message>
         <source>Screen controlled by another user</source>
-        <translation type="unfinished"></translation>
+        <translation>Screen is being controlled by another user</translation>
     </message>
     <message>
         <source>Control session can&apos;t be started.</source>
@@ -7664,7 +7697,7 @@ devices</source>
     </message>
     <message>
         <source>You are going to delete some resources to which you have access from Video Wall only. You won&apos;t see them in your resource list after it and won&apos;t be able to add them to Video Wall again.</source>
-        <translation type="unfinished"></translation>
+        <translation>You are going to delete some resources that can be accessed from Video Wall only. You won&apos;t see them in your resource list afterwards and won&apos;t be able to add them to Video Wall again.</translation>
     </message>
     <message>
         <source>You will lose access to following resources:</source>
