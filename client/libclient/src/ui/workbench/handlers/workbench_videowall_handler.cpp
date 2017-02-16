@@ -1124,7 +1124,7 @@ void QnWorkbenchVideoWallHandler::showFailedToApplyChanges() const
 void QnWorkbenchVideoWallHandler::showControlledByAnotherUserMessage() const
 {
     QnMessageBox::warning(mainWindow(),
-        tr("Screen controlled by another user"),
+        tr("Screen is being controlled by another user"),
         tr("Control session cannot be started."));
 }
 
