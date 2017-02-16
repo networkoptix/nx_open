@@ -598,11 +598,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Minimize</source>
-        <translation></translation>
+        <translation>Minimise</translation>
     </message>
     <message>
         <source>Maximize</source>
-        <translation></translation>
+        <translation>Maximise</translation>
     </message>
     <message>
         <source>Restore Down</source>
@@ -722,7 +722,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Maximize Item</source>
-        <translation></translation>
+        <translation>Maximise Item</translation>
     </message>
     <message>
         <source>Restore Item</source>
@@ -1002,7 +1002,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Synchronize Streams</source>
-        <translation></translation>
+        <translation>Synchronise Streams</translation>
     </message>
     <message>
         <source>Disable Stream Synchronization</source>
@@ -3088,7 +3088,7 @@ to %1</source>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Could not initialise audio encoder.</translation>
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
@@ -3111,11 +3111,11 @@ to %1</source>
     </message>
     <message>
         <source>Could not initialize video encoder.</source>
-        <translation></translation>
+        <translation>Could not initialise video encoder.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
-        <translation></translation>
+        <translation>Could not initialise audio encoder.</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
@@ -3135,7 +3135,7 @@ to %1</source>
     </message>
     <message>
         <source>Could not initialize audio device &quot;%1&quot;.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Could not initialise audio device &quot;%1&quot;.</translation>
     </message>
 </context>
 <context>
@@ -5868,7 +5868,7 @@ to %1</source>
     </message>
     <message>
         <source>UNAUTHORIZED</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">UNAUTHORISED</translation>
     </message>
     <message>
         <source>NO SIGNAL</source>
@@ -6213,7 +6213,7 @@ to %1</source>
     </message>
     <message>
         <source>Select server for others to synchronize time with</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Select server for others to synchronise time with</translation>
     </message>
     <message>
         <source>System is in safe mode</source>
@@ -6249,7 +6249,7 @@ to %1</source>
     </message>
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Server times are not synchronised and a common time could not be detected automatically.</translation>
     </message>
     <message>
         <source>The system is running in safe mode.</source>
@@ -6325,11 +6325,11 @@ to %1</source>
     </message>
     <message>
         <source>Allow system to optimize device settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Allow system to optimise device settings</translation>
     </message>
     <message>
         <source>Allow system to optimize camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Allow system to optimise camera settings</translation>
     </message>
 </context>
 <context>
@@ -7390,7 +7390,7 @@ to %1</source>
     <name>QnWorkbenchScreenRecordingHandler</name>
     <message>
         <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Screen capturing subsystem is not initialised yet. Please try again later.</translation>
     </message>
     <message>
         <source>Recording in %1...</source>
