@@ -23,7 +23,11 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent) :
 {
     ui->setupUi(this);
 
-    ui->globalSettingsGroupBox->setTitle(tr("Global Settings\t(affect all servers in the system)"));
+    QString title = lit("%1\t(%2)")
+        .arg(tr("Global Settings"))
+        .arg(tr("affect all servers in the system", "Relates to 'Global Settings' subject"));
+
+    ui->globalSettingsGroupBox->setTitle(title);
 
     ui->comboBoxBackupType->addItem(tr("By Schedule"), Qn::Backup_Schedule);
     ui->comboBoxBackupType->addItem(tr("Realtime"), Qn::Backup_RealTime);

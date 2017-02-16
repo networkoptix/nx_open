@@ -2,5 +2,5 @@
 # if somebody also updates the protocol version.
 # Prefer to use issue number and title as a comment.
 
-#vms-4742. ecs sqlite database was significally increased (twice) on servers update
-set(nxec.ec2ProtoVersion "3024")
+#VMS-5388: Some data is not shown if log in to Server with Cloud account
+set(nxec.ec2ProtoVersion "3025")
