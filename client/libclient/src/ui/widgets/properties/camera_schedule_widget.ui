@@ -442,7 +442,7 @@
                     </sizepolicy>
                    </property>
                    <property name="text">
-                    <string>Motion + Low-Res</string>
+                    <string>Motion + Lo-Res</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>

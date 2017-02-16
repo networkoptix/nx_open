@@ -87,7 +87,7 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent) :
                 .filtered<QnVirtualCameraResource>());
         });
 
-    ui->qualityComboBox->addItem(tr("Low-Res Streams", "Cameras Backup"),
+    ui->qualityComboBox->addItem(tr("Lo-Res Streams", "Cameras Backup"),
         QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackup_LowQuality));
     ui->qualityComboBox->addItem(tr("Hi-Res Streams", "Cameras Backup"),
         QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackup_HighQuality));

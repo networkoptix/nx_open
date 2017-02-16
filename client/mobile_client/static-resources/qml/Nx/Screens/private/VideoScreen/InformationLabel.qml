@@ -61,13 +61,13 @@ Pane
 
             var quality = player.actualVideoQuality()
             if (quality === QnPlayer.HighVideoQuality)
-                d.quality = qsTr("Hi-res")
+                d.quality = qsTr("Hi-Res")
             else if (quality === QnPlayer.LowVideoQuality)
-                d.quality = qsTr("Low-res")
+                d.quality = qsTr("Lo-Res")
             else if (quality === QnPlayer.LowIframesOnlyVideoQuality)
-                d.quality = qsTr("Low-res key-frames")
+                d.quality = qsTr("Keyfr + Lo-Res")
             else if (quality === QnPlayer.CustomVideoQuality)
-                d.quality = qsTr("Custom-res")
+                d.quality = qsTr("Custom-Res")
             else
                 d.quality = ""
         }
