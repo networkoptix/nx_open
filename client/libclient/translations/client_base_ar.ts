@@ -7838,10 +7838,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Screen controlled by another user</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>To enable Video Wall, please activate a Video Wall license.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7893,6 +7889,10 @@ to %1</source>
     </message>
     <message>
         <source>Cannot save empty matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Screen is being controlled by another user</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
