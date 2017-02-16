@@ -14,23 +14,33 @@ class AbstractJoystick;
 
 namespace controls {
 
-struct Limits
+
+struct Range
 {
-    Limits(): min(0), max(0) {};
-    Limits(nx::joystick::StateAtom minimum, nx::joystick::StateAtom maximum):
+    static const int kDefaultMinRangeValue = 100;
+    static const int kDefaultMaxRangeValue = -100;
+
+    Range(): 
+        min(kDefaultMinRangeValue),
+        max(kDefaultMaxRangeValue) 
+    {};
+
+    Range(nx::joystick::StateElement minimum, nx::joystick::StateElement maximum):
         min(minimum),
         max(maximum)
     {};
 
-    nx::joystick::StateAtom min;
-    nx::joystick::StateAtom max;
+    nx::joystick::StateElement min;
+    nx::joystick::StateElement max;
 };
 
-typedef std::vector<Limits> LimitsVector;
+typedef std::vector<Range> Ranges;
 
 class BaseControl: public AbstractControl
 {
 public:
+    BaseControl(nx::joystick::State::size_type stateSize);
+
     virtual QString getId() const override;
     virtual void setId(const QString& id) override;
 
@@ -46,8 +56,14 @@ public:
     virtual nx::joystick::State getState() const override;
     virtual void setState(const nx::joystick::State& state) override;
 
-    virtual void updateStateWithRawValue(const nx::joystick::State& state) override;
-    virtual bool addEventHandler(nx::joystick::EventType eventType, nx::joystick::EventHandler handler) override;
+    virtual void notifyControlStateChanged(const nx::joystick::State& state) override;
+    virtual bool addEventHandler(
+        nx::joystick::EventType eventType,
+        nx::joystick::EventHandler handler) override;
+
+    virtual void applyOverride(
+        const QString overrideName,
+        const QString& overrideValue) override;
 
 protected:
     typedef std::map<nx::joystick::EventType, std::vector<EventHandler>> EventHandlerMap;
@@ -55,15 +71,12 @@ protected:
 
     virtual bool isEventTypeSupported(EventType eventType) const;
     virtual EventSet checkForEventsUnsafe() const;
-    virtual void fireEventsUnsafe(const EventSet& eventSet);
+    virtual void setStateUnsafe(const nx::joystick::State& state);
     virtual nx::joystick::EventParameters makeParametersForEvent(
         nx::joystick::EventType eventType) const;
 
     virtual nx::joystick::State fromRawToNormalized(const nx::joystick::State& raw) const;
     virtual nx::joystick::State fromNormalizedToRaw(const nx::joystick::State& normalized) const;
-
-private:
-    void setStateAndFireEventsUnsafe(const nx::joystick::State& state);
 
 protected:
     QString m_id;

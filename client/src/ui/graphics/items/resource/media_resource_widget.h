@@ -196,7 +196,6 @@ private slots:
     void at_renderWatcher_widgetChanged(QnResourceWidget *widget);
     void at_zoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
-    void at_joystickMove(const nx::joystick::State& stickState);
 
     void at_item_imageEnhancementChanged();
     void at_videoLayoutChanged();

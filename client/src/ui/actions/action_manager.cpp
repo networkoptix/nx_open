@@ -1900,6 +1900,22 @@ QnActionManager::QnActionManager(QObject *parent):
         toggledText(tr("Enable Background Animation")).
         checked(true).
         autoRepeat(false);
+
+    factory(QnActions::GoToNextItemAction)
+        .flags(Qn::NoTarget);
+
+    factory(QnActions::GoToPreviousItemAction)
+        .flags(Qn::NoTarget);
+
+    factory(QnActions::ToggleCurrentItemMaximizationStateAction)
+        .flags(Qn::NoTarget);
+
+    factory(QnActions::PtzContinuousMoveAction)
+        .flags(Qn::NoTarget);
+
+    factory(QnActions::PtzActivatePresetByIndexAction)
+        .flags(Qn::NoTarget);
+
 }
 
 QnActionManager::~QnActionManager() {

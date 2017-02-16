@@ -760,24 +760,15 @@ public:
         PtzCalibrateFisheyeAction,
 
         /**
-         * Starts continuous move with given speed
+         * Performs continuous move with given speed.
          */
-        PtzStartContinuousMoveAction,
+        PtzContinuousMoveAction,
 
         /**
-         * Ends continuous move with given speed
+         * Activates preset by index
          */
-        PtzEndContinuousMoveAction,
+        PtzActivatePresetByIndexAction, 
 
-        /**
-         * Starts continuous zoom with given speed
-         */
-        PtzStartContinuousMove,
-
-        /**
-         * Ends continuous zoom with given speed
-         */
-        PtzEndContinuousZoom,
         /* Layout actions. */
 
         /**
@@ -1085,6 +1076,21 @@ public:
          * Opens the Audit Log dialog.
          */
         OpenAuditLogAction,
+
+        /**
+         * Go to the next item on layout.
+         */
+        GoToNextItemAction,
+
+        /**
+         * Go to the previous item on layout
+         */
+        GoToPreviousItemAction,
+
+        /**
+         * Maximizes/Unmaximizes current item
+         **/
+        ToggleCurrentItemMaximizationStateAction,
 
         ActionCount,
 

@@ -1,12 +1,12 @@
 #pragma once
 
 #include "abstract_joystick.h"
-#include "abstract_joystick_driver.h"
+
+#include <plugins/io_device/joystick/drivers/abstract_joystick_driver.h>
 #include <plugins/io_device/joystick/controls/joystick_button_control.h>
 #include <plugins/io_device/joystick/controls/joystick_stick_control.h>
-#include <plugins/io_device/joystick/controls/joystick_wheel_control.h>
 #include <plugins/io_device/joystick/controls/joystick_led_control.h>
-#include <plugins/io_device/joystick/controls/joystick_slider_control.h>
+
 
 namespace nx {
 namespace joystick {
@@ -40,14 +40,8 @@ public:
     virtual std::vector<controls::LedPtr> getLeds();
     virtual void setLeds(std::vector<controls::LedPtr> joystickLeds);
 
-    virtual std::vector<controls::WheelPtr> getWheels();
-    virtual void setWheels(std::vector<controls::WheelPtr> joystickWheels);
-
-    virtual std::vector<controls::SliderPtr> getSliders();
-    virtual void setSliders(std::vector<controls::SliderPtr> joystickSliders);
-
     virtual bool setControlState(const QString& controlId, const State& state) override;
-    virtual void updateControlStateWithRawValue(const QString& controlId, const State& state) override;
+    virtual void notifyControlStateChanged(const QString& controlId, const State& state) override;
 
     virtual driver::AbstractJoystickDriver* getDriver() const override;
     virtual void setDriver(driver::AbstractJoystickDriver* driver) override;

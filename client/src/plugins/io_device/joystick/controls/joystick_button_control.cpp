@@ -2,8 +2,10 @@
 
 namespace {
 
-const nx::joystick::StateAtom kReleasedButtonState = 0;
-const nx::joystick::StateAtom kPressedButtonState = 1;
+const nx::joystick::State::size_type kButtonStateSize = 1;
+
+const nx::joystick::StateElement kReleasedButtonState = 0;
+const nx::joystick::StateElement kPressedButtonState = 1;
 
 const QString kWrongStateSizeMessage = lit("Wrong button state size.");
 
@@ -15,9 +17,9 @@ namespace joystick {
 namespace controls {
 
 Button::Button():
+    base_type(kButtonStateSize),
     m_previousState(ButtonState::released)
 {
-    m_state.resize(1);
 }
 
 ButtonState Button::getButtonState() const
@@ -26,30 +28,27 @@ ButtonState Button::getButtonState() const
     return getButtonStateUnsafe();
 }
 
-void Button::updateButtonState(ButtonState buttonState)
+void Button::notifyButtonStateChanged(ButtonState buttonState)
 {
-    State newState;
-
     {
         QnMutexLocker lock(&m_mutex);
-        Q_ASSERT(m_state.size() == 1, kWrongStateSizeMessage);
-
-        // TODO: #dmishin normalization is needed here
-        m_previousState = fromStateAtomToButtonState(m_state[0]);
-        newState.push_back(fromButtonStateToStateAtom(buttonState));
+        Q_ASSERT(m_state.size() == 1, kWrongStateSizeMessage);        
     }
 
-    updateStateWithRawValue(newState);
+    State newState;
+    newState.push_back(fromButtonStateToStateElement(buttonState));
+
+    notifyControlStateChanged(newState);
 }
 
-void Button::updateButtonState(nx::joystick::State state)
+void Button::notifyButtonStateChanged(const nx::joystick::State& state)
 {
     {
         QnMutexLocker lock(&m_mutex);
         Q_ASSERT(m_state.size() == 1, kWrongStateSizeMessage);
     }
 
-    updateStateWithRawValue(state);
+    notifyControlStateChanged(state);
 }
 
 bool Button::isEventTypeSupported(EventType eventType) const
@@ -80,7 +79,13 @@ BaseControl::EventSet Button::checkForEventsUnsafe() const
     return eventSet;
 }
 
-nx::joystick::StateAtom Button::fromButtonStateToStateAtom(ButtonState buttonState) const
+void Button::setStateUnsafe(const nx::joystick::State& state)
+{
+    m_previousState = fromStateElementToButtonState(m_state[0]);
+    m_state = state;
+}
+
+nx::joystick::StateElement Button::fromButtonStateToStateElement(ButtonState buttonState) const
 {
     if (buttonState == ButtonState::released)
         return kReleasedButtonState;
@@ -88,9 +93,9 @@ nx::joystick::StateAtom Button::fromButtonStateToStateAtom(ButtonState buttonSta
     return kPressedButtonState;
 }
 
-ButtonState Button::fromStateAtomToButtonState(nx::joystick::StateAtom stateAtom) const
+ButtonState Button::fromStateElementToButtonState(nx::joystick::StateElement StateElement) const
 {
-    if (stateAtom == kReleasedButtonState)
+    if (StateElement == kReleasedButtonState)
         return ButtonState::released;
 
     return ButtonState::pressed;
@@ -103,7 +108,7 @@ ButtonState Button::getButtonStateUnsafe() const
         m_state[0] == kReleasedButtonState || m_state[0] == kPressedButtonState,
         lit("Wrong button state"));
 
-    return fromStateAtomToButtonState(m_state[0]);
+    return fromStateElementToButtonState(m_state[0]);
 }
 
 bool Button::didButtonUpEventOccurUnsafe() const

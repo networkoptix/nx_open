@@ -97,6 +97,8 @@
 #include "workbench_display.h"
 #include "workbench_access_controller.h"
 
+#include <plugins/io_device/joystick/joystick_manager.h>
+
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 #ifdef QN_WORKBENCH_CONTROLLER_DEBUG
 #   define TRACE(...) qDebug() << __VA_ARGS__;
@@ -460,6 +462,19 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(action(QnActions::FitInViewAction), SIGNAL(triggered()),                                                                       this,                           SLOT(at_fitInViewAction_triggered()));
     connect(action(QnActions::ToggleTourModeAction), SIGNAL(triggered(bool)),                                                              this,                           SLOT(at_toggleTourModeAction_triggered(bool)));
 
+
+    connect(
+        action(QnActions::GoToNextItemAction), &QAction::triggered,
+        this, &QnWorkbenchController::at_nextItemAction_triggered);
+
+    connect(
+        action(QnActions::GoToPreviousItemAction), &QAction::triggered,
+        this, &QnWorkbenchController::at_previousItemAction_triggered);
+
+    connect(
+        action(QnActions::ToggleCurrentItemMaximizationStateAction), &QnAction::triggered,
+        this, &QnWorkbenchController::at_toggleCurrentItemMaximizationState_triggered);
+
     /* Init screen recorder. */
     if (QnScreenRecorder::isSupported()){
         m_screenRecorder = new QnScreenRecorder(this);
@@ -705,12 +720,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     switch(e->key()) {
     case Qt::Key_Enter:
     case Qt::Key_Return: {
-        QnResourceWidget *widget = display()->widget(Qn::CentralRole);
-        if(widget && widget == display()->widget(Qn::ZoomedRole)) {
-            menu()->trigger(QnActions::UnmaximizeItemAction, widget);
-        } else {
-            menu()->trigger(QnActions::MaximizeItemAction, widget);
-        }
+        toggleCurrentItemMaximizationState();
         break;
     }
     case Qt::Key_Up:
@@ -1412,6 +1422,21 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
     dialog->exec();
 }
 
+void QnWorkbenchController::at_nextItemAction_triggered()
+{
+    moveCursor(QPoint(1, 0), QPoint(0, 1));
+}
+
+void QnWorkbenchController::at_previousItemAction_triggered()
+{
+    moveCursor(QPoint(-1, 0), QPoint(0, -1));
+}
+
+void QnWorkbenchController::at_toggleCurrentItemMaximizationState_triggered()
+{
+    toggleCurrentItemMaximizationState();
+}
+
 void QnWorkbenchController::at_toggleSmartSearchAction_triggered() {
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
 
@@ -1568,4 +1593,14 @@ void QnWorkbenchController::at_ptzProcessStarted(QnMediaResourceWidget *widget) 
     display()->scene()->clearSelection();
     widget->setSelected(true);
     display()->bringToFront(widget);
+}
+
+void QnWorkbenchController::toggleCurrentItemMaximizationState()
+{
+    QnResourceWidget *widget = display()->widget(Qn::CentralRole);
+    if(widget && widget == display()->widget(Qn::ZoomedRole)) {
+        menu()->trigger(QnActions::UnmaximizeItemAction, widget);
+    } else {
+        menu()->trigger(QnActions::MaximizeItemAction, widget);
+    }
 }

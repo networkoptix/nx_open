@@ -130,10 +130,6 @@ extern "C"
 #include "api/runtime_info_manager.h"
 #include <utils/common/timermanager.h>
 
-#if defined(Q_OS_WIN)
-#include <plugins/io_device/joystick/joystick_event_filter_win.h>
-#endif
-
 #include <plugins/io_device/joystick/joystick_manager.h>
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
@@ -498,6 +494,9 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     Qt::WindowFlags flags = qnRuntime->isVideoWallMode()
             ? Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint
             : static_cast<Qt::WindowFlags>(0);
+
+    std::unique_ptr<nx::joystick::Manager> joystickManager(new nx::joystick::Manager(context.data()));
+
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data(), NULL, flags));
     context->setMainWindow(mainWindow.data());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
@@ -513,12 +512,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     mainWindow->show();
     
-    std::unique_ptr<nx::joystick::Manager> joystickManager(
-        new nx::joystick::Manager(
-            application,
-            mainWindow.data(),
-            context.data()));
-
     joystickManager->start();
 
     if (!startupParams.fullScreenDisabled)

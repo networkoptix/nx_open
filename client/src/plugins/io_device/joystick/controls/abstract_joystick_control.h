@@ -31,14 +31,17 @@ public:
     virtual nx::joystick::State getState() const = 0;
     virtual void setState(const nx::joystick::State& state) = 0;
 
-    virtual void updateStateWithRawValue(const nx::joystick::State& state) = 0;
+    virtual nx::joystick::State fromRawToNormalized(const nx::joystick::State& raw) const = 0;
+    virtual nx::joystick::State fromNormalizedToRaw(const nx::joystick::State& raw) const = 0;
+
+    virtual void notifyControlStateChanged(const nx::joystick::State& state) = 0;
+
+    virtual void applyOverride(const QString overrideName, const QString& overrideValue) = 0;
 
     virtual bool addEventHandler(
         nx::joystick::EventType eventType,
         nx::joystick::EventHandler handler) = 0;
 };
-
-typedef std::shared_ptr<AbstractControl> ControlPtr;
 
 } // namespace controls
 } // namespace joystick

@@ -14,20 +14,22 @@ enum class ButtonState
 
 class Button: public BaseControl
 {
+    typedef BaseControl base_type;
 
 public:
     Button();
     virtual ButtonState getButtonState() const;
-    virtual void updateButtonState(ButtonState buttonState);
-    virtual void updateButtonState(nx::joystick::State state);
+    virtual void notifyButtonStateChanged(ButtonState buttonState);
+    virtual void notifyButtonStateChanged(const nx::joystick::State& state);
 
 protected:
     virtual bool isEventTypeSupported(nx::joystick::EventType eventType) const override;
     virtual EventSet checkForEventsUnsafe() const override;
+    virtual void setStateUnsafe(const nx::joystick::State& state);
 
 private:
-    nx::joystick::StateAtom fromButtonStateToStateAtom(ButtonState buttonState) const;
-    ButtonState fromStateAtomToButtonState(nx::joystick::StateAtom stateAtom) const;
+    nx::joystick::StateElement fromButtonStateToStateElement(ButtonState buttonState) const;
+    ButtonState fromStateElementToButtonState(nx::joystick::StateElement StateElement) const;
 
     ButtonState getButtonStateUnsafe() const;
 

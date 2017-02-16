@@ -1,9 +1,12 @@
 #if defined(Q_OS_WIN)
 
 #include "mm_joystick_driver_win.h"
-#include "generic_joystick.h"
+#include <plugins/io_device/joystick/joystick_manager.h>
+
+#include <plugins/io_device/joystick/generic_joystick.h>
 #include <plugins/io_device/joystick/controls/joystick_button_control.h>
 #include <plugins/io_device/joystick/controls/joystick_stick_control.h>
+#include <utils/common/timermanager.h>
 
 namespace {
 
@@ -13,6 +16,8 @@ const uint kMaxStickNumber = 2;
 const QString kJoystickObjectType = lit("joystick");
 const QString kButtonObjectType = lit("button");
 const QString kStickObjectType = lit("stick");
+const int kDefaultStickLogicalRangeMin = -100;
+const int kDefaultStickLogicalRangeMax = 100; 
 
 } // namespace 
 
@@ -28,17 +33,20 @@ MmWinDriver::MmWinDriver(HWND windowId):
 
 MmWinDriver::~MmWinDriver()
 {
+    QnMutexLocker lock(&m_mutex);
     for (auto capturedJoystickIndex: m_capturedJoysticks)
         joyReleaseCapture(capturedJoystickIndex);
 }
 
 std::vector<JoystickPtr> MmWinDriver::enumerateJoysticks()
 {
+    QnMutexLocker lock(&m_mutex);
+
     auto maxJoysticks = joyGetNumDevs();
     auto result = JOYERR_NOERROR;
 
     if (maxJoysticks <= 0)
-        return m_joysticks;
+        return std::vector<JoystickPtr>();
 
     for (auto i = 0; i < maxJoysticks; ++i)
     {
@@ -56,22 +64,31 @@ std::vector<JoystickPtr> MmWinDriver::enumerateJoysticks()
 
         m_joysticks.push_back(joy);
     }
-
+    
     return m_joysticks;
 }
 
 bool MmWinDriver::captureJoystick(JoystickPtr& joystickToCapture)
 {
+    QnMutexLocker lock(&m_mutex);
     auto joystickIndex = getJoystickIndex(joystickToCapture);
     if (!joystickIndex)
         return false;
 
-    const uint kDefaultPeriodMs = 100;
+    const uint kDefaultPeriodMs = 50;
+    if (m_capturedJoysticks.find(joystickIndex.get()) != m_capturedJoysticks.end())
+        return true;
+
     auto result = joySetCapture(m_windowId, joystickIndex.get(), kDefaultPeriodMs, false);
 
-    if (result != JOYERR_NOERROR)
-        return false;
+    auto hwnd = m_windowId;
+    auto jIndex = joystickIndex.get();
 
+    if (result != JOYERR_NOERROR)
+    {
+        return false;
+    }
+    
     m_capturedJoysticks.insert(joystickIndex.get());
 
     return true;
@@ -79,6 +96,7 @@ bool MmWinDriver::captureJoystick(JoystickPtr& joystickToCapture)
 
 bool MmWinDriver::releaseJoystick(JoystickPtr& joystickToRelease)
 {
+    QnMutexLocker lock(&m_mutex);
     auto joystickIndex = getJoystickIndex(joystickToRelease);
     if (!joystickIndex)
         return false;
@@ -93,23 +111,39 @@ bool MmWinDriver::releaseJoystick(JoystickPtr& joystickToRelease)
     return true;
 }
 
-bool MmWinDriver::setControlState(const QString& controlId, const nx::joystick::State& state)
+bool MmWinDriver::setControlState(
+    const QString& joystickId,
+    const QString& controlId,
+    const nx::joystick::State& state)
 {
+    // No way to set control state via Windows Joystick API, so just ignore these calls.
     return true;
 }
 
-void MmWinDriver::updateJoystickState(const JOYINFOEX& info, uint joystickIndex)
+void MmWinDriver::notifyJoystickStateChanged(const JOYINFOEX& info, uint joystickIndex)
 {
-    auto joy = getJoystickByIndex(joystickIndex);
+    QnMutexLocker lock(&m_mutex);
+    auto joy = getJoystickByIndexUnsafe(joystickIndex);
 
     if (!joy)
         return;
     
-    updateJoystickButtons(joy, info.dwButtons);
-    updateJoystickSticks(joy, info);
+    notifyJoystickButtonsStateChanged(joy, info.dwButtons);
+    notifyJoystickSticksStateChanged(joy, info);
 }
 
-nx::joystick::JoystickPtr MmWinDriver::getJoystickByIndex(uint joystickIndex) const
+void MmWinDriver::notifyHardwareConfigurationChanged()
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_joysticks.clear();
+    }
+
+    auto manager = nx::joystick::Manager::instance();
+    manager->notifyHardwareConfigurationChanged();
+}
+
+nx::joystick::JoystickPtr MmWinDriver::getJoystickByIndexUnsafe(uint joystickIndex) const
 {
     if (joystickIndex > kMaxJoystickIndex)
         return nullptr;
@@ -162,18 +196,24 @@ JoystickPtr MmWinDriver::createJoystick(
     auto stick = std::make_shared<controls::Stick>();
     stick->setId(makeId(kStickObjectType, 0));
     stick->setDescription(lit("Generic stick"));
-    stick->setStickXLimits(joystickCapabitlities.wXmin, joystickCapabitlities.wXmax);
-    stick->setStickYLimits(joystickCapabitlities.wYmin, joystickCapabitlities.wYmax);
-    stick->setStickZLimits(joystickCapabitlities.wZmin, joystickCapabitlities.wZmax);
-    stick->setStickRxLimits(joystickCapabitlities.wRmin, joystickCapabitlities.wRmax);
-    stick->setStickRyLimits(joystickCapabitlities.wUmin, joystickCapabitlities.wUmax);
-    stick->setStickRzLimits(joystickCapabitlities.wVmin, joystickCapabitlities.wVmax);
+    stick->setStickXRange(joystickCapabitlities.wXmin, joystickCapabitlities.wXmax);
+    stick->setStickYRange(joystickCapabitlities.wYmin, joystickCapabitlities.wYmax);
+    stick->setStickZRange(joystickCapabitlities.wZmin, joystickCapabitlities.wZmax);
+    stick->setStickRxRange(joystickCapabitlities.wRmin, joystickCapabitlities.wRmax);
+    stick->setStickRyRange(joystickCapabitlities.wUmin, joystickCapabitlities.wUmax);
+    stick->setStickRzRange(joystickCapabitlities.wVmin, joystickCapabitlities.wVmax);
 
-    nx::joystick::controls::LimitsVector outputLimits;
-    for (auto i = 0; i < 6; ++i)
-        outputLimits.emplace_back(-100, 100);
+    const int kMaxDegreesOfFreedom = 6;
+    nx::joystick::controls::Ranges outputLimits;
 
-    stick->setOutputLimits(outputLimits);
+    for (auto i = 0; i < kMaxDegreesOfFreedom; ++i)
+    {
+        outputLimits.emplace_back(
+            kDefaultStickLogicalRangeMin,
+            kDefaultStickLogicalRangeMax);
+    }
+
+    stick->setOutputRanges(outputLimits);
     sticks.push_back(stick);
 
     joy->setSticks(sticks);
@@ -182,7 +222,7 @@ JoystickPtr MmWinDriver::createJoystick(
     return joy; 
 }
 
-void MmWinDriver::updateJoystickButtons(JoystickPtr& joy, DWORD buttonStates)
+void MmWinDriver::notifyJoystickButtonsStateChanged(JoystickPtr& joy, DWORD buttonStates)
 {
     DWORD currentButtonMask = 1;
     int currentButtonIndex = 0;
@@ -196,16 +236,16 @@ void MmWinDriver::updateJoystickButtons(JoystickPtr& joy, DWORD buttonStates)
         if (!joy->getControlById(controlId))
             return;
 
-        nx::joystick::StateAtom pressedState = (currentButtonMask & buttonStates) ? 1 : 0;
+        nx::joystick::StateElement pressedState = (currentButtonMask & buttonStates) ? 1 : 0;
         nx::joystick::State state;
         state.push_back(pressedState);
-        joy->updateControlStateWithRawValue(controlId, state);
+        joy->notifyControlStateChanged(controlId, state);
         ++currentButtonIndex;
         currentButtonMask *= 2;
     }
 }
 
-void MmWinDriver::updateJoystickSticks(JoystickPtr& joy, const JOYINFOEX& info)
+void MmWinDriver::notifyJoystickSticksStateChanged(JoystickPtr& joy, const JOYINFOEX& info)
 {
     auto controlId = makeId(kStickObjectType, 0);
     if (!joy->getControlById(controlId))
@@ -219,7 +259,7 @@ void MmWinDriver::updateJoystickSticks(JoystickPtr& joy, const JOYINFOEX& info)
     state.push_back(info.dwUpos);
     state.push_back(info.dwVpos);
 
-    joy->updateControlStateWithRawValue(controlId, state);
+    joy->notifyControlStateChanged(controlId, state);
 }
 
 QString MmWinDriver::makeId(const QString& objectType, uint objectIndex)

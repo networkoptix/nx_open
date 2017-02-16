@@ -28,6 +28,7 @@
 
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
 
 class QnSingleCameraPtzHotkeysDelegate: public QnAbstractPtzHotkeyDelegate, public QnWorkbenchContextAware {
 public:
@@ -89,6 +90,14 @@ QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent):
     connect(action(QnActions::PtzManageAction),                        &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_ptzManageAction_triggered);
     connect(action(QnActions::DebugCalibratePtzAction),                &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_debugCalibratePtzAction_triggered);
     connect(action(QnActions::DebugGetPtzPositionAction),              &QAction::triggered,    this,   &QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered);
+
+    connect(
+        action(QnActions::PtzContinuousMoveAction), &QAction::triggered, 
+        this, &QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered);
+
+    connect(
+        action(QnActions::PtzActivatePresetByIndexAction), &QAction::triggered, 
+        this, &QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered);
 }
 
 QnWorkbenchPtzHandler::~QnWorkbenchPtzHandler() {
@@ -297,5 +306,46 @@ void QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered() {
         qDebug() << "COULD NOT GET POSITION";
     } else {
         qDebug() << "GOT POSITION" << position;
+    }
+}
+
+void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
+{
+    auto widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
+
+    if (!widget)
+        return;
+
+    auto speed = menu()->currentParameters(sender())
+        .argument<QVector3D>(Qn::ItemDataRole::PtzSpeedRole);
+
+    widget->ptzController()->continuousMove(speed);
+}
+
+void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()
+{
+    auto widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
+
+    if (!widget)
+        return;
+    auto controller = widget->ptzController();
+    auto presetIndex = menu()->currentParameters(sender())
+        .argument<uint>(Qn::ItemDataRole::PtzPresetIndexRole);
+
+    QnPtzPresetList presetList;
+    controller->getPresets(&presetList);
+    std::sort(
+        presetList.begin(),
+        presetList.end(), 
+        [](QnPtzPreset f, QnPtzPreset s){ return f.name < s.name; });
+
+    if (presetIndex < presetList.size() && presetIndex >= 0)
+    {
+        menu()->trigger(
+            QnActions::PtzActivateObjectAction, 
+            QnActionParameters(widget)
+                .withArgument(
+                    Qn::PtzObjectIdRole,
+                    presetList[presetIndex].id));
     }
 }

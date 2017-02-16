@@ -1,13 +1,23 @@
 #include "joystick_stick_control.h"
-#include <utils/math/fuzzy.h>
 
 namespace {
 
 const int kMaxDegreesOfFreedom = 6;
-const nx::joystick::StateAtom kZeroPositionArray[] = {0, 0, 0, 0, 0, 0};
-const std::vector<nx::joystick::StateAtom> kZeroPositionState(
+const nx::joystick::StateElement kDefaultThreshold = 2;
+const nx::joystick::StateElement kZeroPositionArray[] = {0, 0, 0, 0, 0, 0};
+const nx::joystick::State kZeroPositionState(
     kZeroPositionArray,
-    kZeroPositionArray + sizeof(kZeroPositionArray) / sizeof(nx::joystick::StateAtom));
+    kZeroPositionArray + sizeof(kZeroPositionArray) / sizeof(nx::joystick::StateElement));
+
+const QString kInvertXaxisOverrideName = lit("invertX");
+const QString kInvertYaxisOverrideName = lit("invertY");
+const QString kInvertZaxisOverrideName = lit("invertZ");
+const QString kInvertRxAxisOverrideName = lit("invertRx");
+const QString kInvertRyAxisOverrideName = lit("invertRy");
+const QString kInvertRzAxisOverrideName = lit("invertRz");
+
+const QString kStringTrueValue = lit("true");
+const QString kStringFalseValue = lit("false");
 
 } // namespace
 
@@ -15,253 +25,495 @@ namespace nx {
 namespace joystick {
 namespace controls {
 
-Stick::Stick()
+Stick::Stick():
+    base_type(kMaxDegreesOfFreedom),
+    m_threshold(kDefaultThreshold),
+    m_previousPosition(kMaxDegreesOfFreedom, 0),
+    m_ranges(kMaxDegreesOfFreedom, Range()),
+    m_outputRanges(kMaxDegreesOfFreedom, Range()),
+    m_inversions(kMaxDegreesOfFreedom, false)
 {
-    m_state.resize(kMaxDegreesOfFreedom);
-    m_previousPosition.resize(kMaxDegreesOfFreedom);
-    m_limits.resize(kMaxDegreesOfFreedom);
-    m_outputLimits.resize(kMaxDegreesOfFreedom);
 }
 
-LimitsVector Stick::getOutputLimits() const
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_outputLimits;
-}
-
-void Stick::setOutputLimits(LimitsVector outputLimits)
-{
-    QnMutexLocker lock(&m_mutex);
-    m_outputLimits = outputLimits;
-}
-
-nx::joystick::StateAtom Stick::getStickX() const
+nx::joystick::StateElement Stick::getStickX() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_state[kXindex];
 }
 
-nx::joystick::StateAtom Stick::getStickY() const
+nx::joystick::StateElement Stick::getStickY() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_state[kYindex];
 }
 
-nx::joystick::StateAtom Stick::getStickZ() const
+nx::joystick::StateElement Stick::getStickZ() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_state[kZindex];
 }
 
-nx::joystick::StateAtom Stick::getStickRx() const
+nx::joystick::StateElement Stick::getStickRx() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_state[kRxIndex];
 }
 
-nx::joystick::StateAtom Stick::getStickRy() const
+nx::joystick::StateElement Stick::getStickRy() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_state[kRyIndex];
 }
 
-nx::joystick::StateAtom Stick::getStickRz() const
+nx::joystick::StateElement Stick::getStickRz() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_state[kRzIndex];
 }
 
-Limits Stick::getStickXLimits() const
+std::vector<Range> Stick::getRanges() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_limits[kXindex];
+    return m_ranges;
 }
 
-void Stick::setStickXLimits(nx::joystick::StateAtom min, nx::joystick::StateAtom max)
+void Stick::setRanges(Ranges ranges)
 {
+    Q_ASSERT(ranges.size() == kMaxDegreesOfFreedom);
     QnMutexLocker lock(&m_mutex);
-    m_limits[kXindex] = Limits(min, max);
+    m_ranges = ranges;
 }
 
-void Stick::setStickXLimits(Limits limits)
+Ranges Stick::getOutputRanges() const
 {
     QnMutexLocker lock(&m_mutex);
-    m_limits[kXindex] = limits;
+    return m_outputRanges;
 }
 
-Limits Stick::getStickYLimits() const
+void Stick::setOutputRanges(Ranges outputRanges)
 {
+    Q_ASSERT(outputRanges.size() == kMaxDegreesOfFreedom);
     QnMutexLocker lock(&m_mutex);
-    return m_limits[kYindex];
+    m_outputRanges = outputRanges;
 }
 
-void Stick::setStickYLimits(nx::joystick::StateAtom min, nx::joystick::StateAtom max)
+std::vector<bool> Stick::getInversions() const
 {
     QnMutexLocker lock(&m_mutex);
-    m_limits[kYindex] = Limits(min, max);
+    return m_inversions;
 }
 
-void Stick::setStickYLimits(Limits limits)
+void Stick::setInversions(const std::vector<bool>& inverions)
 {
     QnMutexLocker lock(&m_mutex);
-    m_limits[kYindex] = limits;
+    m_inversions = inverions;
 }
 
-Limits Stick::getStickZLimits() const
+void Stick::invertX(bool invert)
 {
     QnMutexLocker lock(&m_mutex);
-    return m_limits[kZindex];
+    m_inversions[kXindex] = invert;
 }
 
-void Stick::setStickZLimits(nx::joystick::StateAtom min, nx::joystick::StateAtom max)
+bool Stick::isXInverted() const
 {
     QnMutexLocker lock(&m_mutex);
-    m_limits[kZindex] = Limits(min, max);
+    return m_inversions[kXindex];
 }
 
-void Stick::setStickZLimits(Limits limits)
+void Stick::invertY(bool invert)
 {
     QnMutexLocker lock(&m_mutex);
-    m_limits[kZindex] = limits;
+    m_inversions[kYindex] = invert;
 }
 
-Limits Stick::getStickRxLimits() const
+bool Stick::isYInverted() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_limits[kRxIndex];
+    return m_inversions[kYindex];
 }
 
-void Stick::setStickRxLimits(nx::joystick::StateAtom min, nx::joystick::StateAtom max)
+void Stick::invertZ(bool invert)
 {
     QnMutexLocker lock(&m_mutex);
-    m_limits[kRxIndex] = Limits(min, max);
+    m_inversions[kZindex] = invert;
 }
 
-void Stick::setStickRxLimits(Limits limits)
+bool Stick::isZInverted() const
 {
     QnMutexLocker lock(&m_mutex);
-    m_limits[kRxIndex] = limits;
+    return m_inversions[kZindex];
 }
 
-Limits Stick::getStickRyLimits() const
+void Stick::invertRx(bool invert)
 {
     QnMutexLocker lock(&m_mutex);
-    return m_limits[kRyIndex];
+    m_inversions[kRxIndex] = invert;
 }
 
-void Stick::setStickRyLimits(nx::joystick::StateAtom min, nx::joystick::StateAtom max)
+bool Stick::isRxInverted() const
 {
     QnMutexLocker lock(&m_mutex);
-    m_limits[kRyIndex] = Limits(min, max);
+    return m_inversions[kRxIndex];
 }
 
-void Stick::setStickRyLimits(Limits limits)
+void Stick::invertRy(bool invert)
 {
     QnMutexLocker lock(&m_mutex);
-    m_limits[kRyIndex] = limits;
+    m_inversions[kRyIndex] = invert;
 }
 
-Limits Stick::getStickRzLimits() const
+bool Stick::isRyInverted() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_limits[kRzIndex];
+    return m_inversions[kRyIndex];
 }
 
-void Stick::setStickRzLimits(nx::joystick::StateAtom min, nx::joystick::StateAtom max)
+void Stick::invertRz(bool invert)
 {
     QnMutexLocker lock(&m_mutex);
-    m_limits[kRzIndex] = Limits(min, max);
+    m_inversions[kRzIndex] = invert;
 }
 
-void Stick::setStickRzLimits(Limits limits)
+bool Stick::isRzInverted() const
 {
     QnMutexLocker lock(&m_mutex);
-    m_limits[kRzIndex] = limits;
+    return m_inversions[kRzIndex];
 }
 
-std::vector<Limits> Stick::getLimits() const
+Range Stick::getStickXRange() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_limits;
+    return m_ranges[kXindex];
 }
 
-void Stick::setLimits(std::vector<Limits> limits)
+void Stick::setStickXRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+{
+    Q_ASSERT(max > min);
+    QnMutexLocker lock(&m_mutex);
+    m_ranges[kXindex] = Range(min, max);
+}
+
+void Stick::setStickXRange(const Range& range)
+{
+    Q_ASSERT(range.max > range.min);
+    QnMutexLocker lock(&m_mutex);
+    m_ranges[kXindex] = range;
+}
+
+Range Stick::getStickYRange() const
 {
     QnMutexLocker lock(&m_mutex);
-    m_limits = limits;
+    return m_ranges[kYindex];
+}
+
+void Stick::setStickYRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+{
+    Q_ASSERT(max > min);
+    QnMutexLocker lock(&m_mutex);
+    m_ranges[kYindex] = Range(min, max);
+}
+
+void Stick::setStickYRange(const Range& range)
+{
+    Q_ASSERT(range.max > range.min);
+    QnMutexLocker lock(&m_mutex);
+    m_ranges[kYindex] = range;
+}
+
+Range Stick::getStickZRange() const
+{    
+    QnMutexLocker lock(&m_mutex);
+    return m_ranges[kZindex];
+}
+
+void Stick::setStickZRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+{
+    Q_ASSERT(max > min);
+    QnMutexLocker lock(&m_mutex);
+    m_ranges[kZindex] = Range(min, max);
+}
+
+void Stick::setStickZRange(const Range& range)
+{
+    Q_ASSERT(range.max > range.min);
+    QnMutexLocker lock(&m_mutex);
+    m_ranges[kZindex] = range;
+}
+
+Range Stick::getStickRxRange() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_ranges[kRxIndex];
+}
+
+void Stick::setStickRxRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+{
+    Q_ASSERT(max > min);
+    QnMutexLocker lock(&m_mutex);
+    m_ranges[kRxIndex] = Range(min, max);
+}
+
+void Stick::setStickRxRange(const Range& range)
+{
+    Q_ASSERT(range.max > range.min);
+    QnMutexLocker lock(&m_mutex);
+    m_ranges[kRxIndex] = range;
+}
+
+Range Stick::getStickRyRange() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_ranges[kRyIndex];
+}
+
+void Stick::setStickRyRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+{
+    Q_ASSERT(max > min);
+    QnMutexLocker lock(&m_mutex);
+    m_ranges[kRyIndex] = Range(min, max);
+}
+
+void Stick::setStickRyRange(const Range& range)
+{
+    Q_ASSERT(range.max > range.min);
+    QnMutexLocker lock(&m_mutex);
+    m_ranges[kRyIndex] = range;
+}
+
+Range Stick::getStickRzRange() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_ranges[kRzIndex];
+}
+
+void Stick::setStickRzRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+{
+    Q_ASSERT(max > min);
+    QnMutexLocker lock(&m_mutex);
+    m_ranges[kRzIndex] = Range(min, max);
+}
+
+void Stick::setStickRzRange(const Range& range)
+{
+    Q_ASSERT(range.max > range.min);
+    QnMutexLocker lock(&m_mutex);
+    m_ranges[kRzIndex] = range;
+}
+
+Range Stick::getStickOutputXRange() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_outputRanges[kXindex];
+}
+
+void Stick::setStickOutputXRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+{
+    Q_ASSERT(max > min);
+    QnMutexLocker lock(&m_mutex);
+    m_outputRanges[kXindex] = Range(min, max);
+}
+
+void Stick::setStickOutputXRange(const Range& range)
+{
+    Q_ASSERT(range.max > range.min);
+    QnMutexLocker lock(&m_mutex);
+    m_outputRanges[kXindex] = range;
+}
+
+Range Stick::getStickOutputYRange() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_outputRanges[kYindex];
+}
+
+void Stick::setStickOutputYRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+{
+    Q_ASSERT(max > min);
+    QnMutexLocker lock(&m_mutex);
+    m_outputRanges[kYindex] = Range(min, max);
+}
+
+void Stick::setStickOutputYRange(const Range& range)
+{
+    Q_ASSERT(range.max > range.min);
+    QnMutexLocker lock(&m_mutex);
+    m_outputRanges[kYindex] = range;
+}
+
+Range Stick::getStickOutputZRange() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_outputRanges[kZindex];
+}
+
+void Stick::setStickOutputZRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+{
+    Q_ASSERT(max > min);
+    QnMutexLocker lock(&m_mutex);
+    m_outputRanges[kZindex] = Range(min, max);
+}
+
+void Stick::setStickOutputZRange(const Range& range)
+{
+    Q_ASSERT(range.max > range.min);
+    QnMutexLocker lock(&m_mutex);
+    m_outputRanges[kZindex] = range;
+}
+
+Range Stick::getStickOutputRxRange() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_outputRanges[kRxIndex];
+}
+
+void Stick::setStickOutputRxRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+{
+    Q_ASSERT(max > min);
+    QnMutexLocker lock(&m_mutex);
+    m_outputRanges[kRxIndex] = Range(min, max);
+}
+
+void Stick::setStickOutputRxRange(const Range& range)
+{
+    Q_ASSERT(range.max > range.min);
+    QnMutexLocker lock(&m_mutex);
+    m_outputRanges[kRxIndex] = range;
+}
+
+Range Stick::getStickOutputRyRange() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_outputRanges[kRyIndex];
+}
+
+void Stick::setStickOutputRyRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+{
+    Q_ASSERT(max > min);
+    QnMutexLocker lock(&m_mutex);
+    m_outputRanges[kRyIndex] = Range(min, max);
+}
+
+void Stick::setStickOutputRyRange(const Range& range)
+{
+    Q_ASSERT(range.max > range.min);
+    QnMutexLocker lock(&m_mutex);
+    m_outputRanges[kRyIndex] = range;
+}
+
+Range Stick::getStickOutputRzRange() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_outputRanges[kRzIndex];
+}
+
+void Stick::setStickOutputRzRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+{
+    Q_ASSERT(max > min);
+    QnMutexLocker lock(&m_mutex);
+    m_outputRanges[kRzIndex] = Range(min, max);
+}
+
+void Stick::setStickOutputRzRange(const Range& range)
+{
+    Q_ASSERT(range.max > range.min);
+    QnMutexLocker lock(&m_mutex);
+    m_outputRanges[kRzIndex] = range;
+}
+
+void Stick::applyOverride(const QString overrideName, const QString& overrideValue)
+{
+    bool isTrueValue = overrideValue.toLower() == kStringTrueValue;
+
+    if (overrideName == kInvertXaxisOverrideName)
+        invertX(isTrueValue);
+    else if (overrideName == kInvertYaxisOverrideName)
+        invertY(isTrueValue);
+    else if(overrideName == kInvertZaxisOverrideName)
+        invertZ(isTrueValue);
+    else if(overrideName == kInvertRxAxisOverrideName)
+        invertRx(isTrueValue);
+    else if(overrideName == kInvertRyAxisOverrideName)
+        invertRy(isTrueValue);
+    else if(overrideName == kInvertRzAxisOverrideName)
+        invertRz(isTrueValue);
 }
 
 bool Stick::isEventTypeSupported(nx::joystick::EventType eventType) const
 {
-    return eventType == EventType::stickNonZero
-        || eventType == EventType::stickZero
-        || eventType == EventType::stickPushUp
-        || eventType == EventType::stickPushDown
-        || eventType == EventType::stickPushLeft
-        || eventType == EventType::stickPushRight;
+    return eventType == EventType::stickMove;
 }
-
 
 BaseControl::EventSet Stick::checkForEventsUnsafe() const 
 {
-    // TODO: #dmishin something is wrong with this method and zero/nonZero events
-
     Q_ASSERT(m_state.size() == kMaxDegreesOfFreedom);
     EventSet eventsToBeFired;
-    if (isZeroPosition(m_state) && !isZeroPosition(m_previousPosition))
-    {
-        eventsToBeFired.insert(nx::joystick::EventType::stickZero);
-        return eventsToBeFired;
-    }
 
     if (distance(m_previousPosition, m_state) > m_threshold)
-        eventsToBeFired.insert(nx::joystick::EventType::stickNonZero);
+        eventsToBeFired.insert(nx::joystick::EventType::stickMove);
     
     return eventsToBeFired;
 }
 
+void Stick::setStateUnsafe(const nx::joystick::State& state)
+{
+    m_previousPosition = m_state;
+    m_state = state;
+}
+
 nx::joystick::State Stick::fromRawToNormalized(const nx::joystick::State& raw) const 
 {
+    Q_ASSERT(raw.size() == kMaxDegreesOfFreedom);
+
+    QnMutexLocker lock(&m_mutex);
     nx::joystick::State normalizedState;
+    std::vector<bool> inversions;
 
     for (auto i = 0; i < raw.size(); ++i)
     {
-        auto normalizedAxisState = translatePoint(raw[i], m_limits[i], m_outputLimits[i]);
+        auto normalizedAxisState = translatePoint(raw[i], m_ranges[i], m_outputRanges[i]);
+        if (m_inversions[i])
+            normalizedAxisState *= -1;
+
         normalizedState.push_back(normalizedAxisState);
     }
+
+    if (distance(normalizedState, kZeroPositionState) < m_threshold)
+        return kZeroPositionState;
 
     return normalizedState;
 }
 
 nx::joystick::State Stick::fromNormalizedToRaw(const nx::joystick::State& normalized) const 
 {
+    Q_ASSERT(normalized.size() == kMaxDegreesOfFreedom);
     nx::joystick::State rawState;
-
     for (auto i = 0; i < normalized.size(); ++i)
     {
-        auto rawAxisState = translatePoint(normalized[i], m_outputLimits[i], m_limits[i]);
+        auto rawAxisState = translatePoint(normalized[i], m_outputRanges[i], m_ranges[i]);
         rawState.push_back(rawAxisState);
     }
 
     return rawState;
 }
 
-
-nx::joystick::StateAtom Stick::distance(const State& position1, const State& position2) const
+nx::joystick::StateElement Stick::distance(const State& position1, const State& position2) const
 {
+    Q_ASSERT(position1.size() >= 3 && position2.size() >= 3);
     auto xDiff = position1[kXindex] - position2[kXindex];
     auto yDiff = position1[kYindex] - position2[kYindex];
     auto zDiff = position1[kZindex] - position2[kZindex];
 
-    return static_cast<StateAtom>(std::sqrt(xDiff * xDiff + yDiff * yDiff + zDiff * zDiff) + 0.5);
+    return static_cast<StateElement>(std::sqrt(xDiff * xDiff + yDiff * yDiff + zDiff * zDiff) + 0.5);
 }
 
-nx::joystick::StateAtom Stick::translatePoint(
-    nx::joystick::StateAtom point,
-    const Limits& originalBounds,
-    const Limits& targetBounds) const
+nx::joystick::StateElement Stick::translatePoint(
+    nx::joystick::StateElement point,
+    const Range& originalBounds,
+    const Range& targetBounds) const
 {
-    auto translated = static_cast<nx::joystick::StateAtom>(
+    Q_ASSERT(originalBounds.max > originalBounds.min && targetBounds.max > targetBounds.min);
+    auto translated = static_cast<nx::joystick::StateElement>(
         targetBounds.min 
         + static_cast<double>((point - originalBounds.min)) / (originalBounds.max - originalBounds.min) 
         * (targetBounds.max - targetBounds.min) + 0.5);
@@ -277,14 +529,9 @@ nx::joystick::StateAtom Stick::translatePoint(
 
 bool Stick::isZeroPosition(const State& position) const
 {
-    Q_ASSERT(position.size() == 6, lit("Wrong state size"));
+    Q_ASSERT(position.size() == kMaxDegreesOfFreedom, lit("Wrong state size"));
 
     return distance(position, kZeroPositionState) < m_threshold;
-}
-
-bool Stick::hasStickBeenPushedToArea(StickArea area) const
-{
-    return false; //< TODO: #dmishin implement push events.
 }
 
 } // namespace controls

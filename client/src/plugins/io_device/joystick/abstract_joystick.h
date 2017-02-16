@@ -27,7 +27,7 @@ public:
     virtual void setControls(std::vector<controls::ControlPtr> joystickControls) = 0;
 
     virtual bool setControlState(const QString& controlId, const State& state) = 0;
-    virtual void updateControlStateWithRawValue(const QString& controlId, const State& state) = 0;
+    virtual void notifyControlStateChanged(const QString& controlId, const State& state) = 0;
 
     virtual nx::joystick::driver::AbstractJoystickDriver* getDriver() const = 0;
     virtual void setDriver(nx::joystick::driver::AbstractJoystickDriver* driver) = 0;

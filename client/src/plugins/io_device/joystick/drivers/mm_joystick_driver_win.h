@@ -28,12 +28,16 @@ public:
     virtual std::vector<JoystickPtr> enumerateJoysticks() override;
     virtual bool captureJoystick(JoystickPtr& joystickToCapture) override;
     virtual bool releaseJoystick(JoystickPtr& joystickToRelease) override;
-    virtual bool setControlState(const QString& controlId, const nx::joystick::State& state) override;
+    virtual bool setControlState(
+        const QString& joystickId, 
+        const QString& controlId, 
+        const nx::joystick::State& state) override;
 
-    void updateJoystickState(const JOYINFOEX& info, uint joystickIndex);
+    void notifyJoystickStateChanged(const JOYINFOEX& info, uint joystickIndex);
+    void notifyHardwareConfigurationChanged();
 
 private:
-    JoystickPtr getJoystickByIndex(uint joystickIndex) const;
+    JoystickPtr getJoystickByIndexUnsafe(uint joystickIndex) const;
     boost::optional<uint> getJoystickIndex(const JoystickPtr& joy) const;
 
     JoystickPtr createJoystick(
@@ -41,8 +45,8 @@ private:
         JOYCAPS joystickCapabitlities,
         int joystickIndex);
 
-    void updateJoystickButtons(JoystickPtr& joy, DWORD buttonStates);
-    void updateJoystickSticks(JoystickPtr& joy, const JOYINFOEX& info);
+    void notifyJoystickButtonsStateChanged(JoystickPtr& joy, DWORD buttonStates);
+    void notifyJoystickSticksStateChanged(JoystickPtr& joy, const JOYINFOEX& info);
 
     QString makeId(const QString& objectType, uint objectIndex);
 
@@ -50,6 +54,7 @@ private:
     HWND m_windowId;
     std::set<uint> m_capturedJoysticks;
     std::vector<JoystickPtr> m_joysticks;
+    mutable QnMutex m_mutex;
 };
 
 } // namespace driver

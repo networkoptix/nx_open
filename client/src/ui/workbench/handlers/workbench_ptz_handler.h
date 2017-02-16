@@ -23,6 +23,9 @@ private slots:
 
     void at_debugCalibratePtzAction_triggered();
     void at_debugGetPtzPositionAction_triggered();
+
+    void at_ptzContinuousMoveAction_triggered();
+    void at_ptzActivatePresetByIndexAction_triggered();
 };
 
 #endif // WORKBENCH_PTZ_HANDLER_H

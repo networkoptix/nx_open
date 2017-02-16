@@ -1,18 +1,20 @@
 #pragma once
 
+#include <utils/common/model_functions_fwd.h>
+
 namespace nx {
 namespace joystick {
 
 enum class ControlCapability 
 {
-    xAxisCapability = 0x0001,
-    yAxisCapability = 0x0002,
-    zAxisCapability = 0x0004,
-    rxAxisCapability = 0x0008,
-    ryAxisCapability = 0x0010,
-    rzAxisCapability = 0x0020,
+    xAxis = 0x0001,
+    yAxis = 0x0002,
+    zAxis = 0x0004,
+    rxAxis = 0x0008,
+    ryAxis = 0x0010,
+    rzAxis = 0x0020,
 
-    colorChangeCapabilty = 0x0040,
+    colorChange = 0x0040,
 };
 
 enum class EventType 
@@ -21,26 +23,28 @@ enum class EventType
     buttonUp,
     buttonPressed,
     buttonDoublePressed,
-    stickNonZero,
-    stickZero,
-    stickPushUp,
-    stickPushDown,
-    stickPushRight,
-    stickPushLeft
+    stickMove
 };
 
 
-typedef int64_t StateAtom;
-typedef std::vector<StateAtom> State;
+QN_FUSION_DECLARE_FUNCTIONS(EventType, (lexical)(metatype))
+
+
+typedef int64_t StateElement;
+typedef std::vector<StateElement> State;
 typedef QFlags<ControlCapability> ControlCapabilities;
 
 struct EventParameters
 {
+    QString controlId;
     State state;
 };
 
-typedef std::function<void(State)> StateChangeHandler;
 typedef std::function<void(EventType, EventParameters)> EventHandler;
 
 } // namespace joystick
 } // namespace nx
+
+
+
+

@@ -6,6 +6,11 @@ namespace nx {
 namespace joystick {
 namespace controls {
 
+BaseControl::BaseControl(nx::joystick::State::size_type stateSize)
+{
+    m_state.resize(stateSize);
+}
+
 QString BaseControl::getId() const
 {
     QnMutexLocker lock(&m_mutex);
@@ -62,26 +67,68 @@ nx::joystick::State BaseControl::getState() const
 
 void BaseControl::setState(const nx::joystick::State& state)
 {
-    QnMutexLocker lock(&m_mutex);
-    if (!m_parentDevice)
-        return;
+    decltype(m_eventHandlers) handlers;
+    EventSet eventsToBeFired;
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (!m_parentDevice)
+            return;
 
-    if (state == m_state)
-        return;
+        if (state == m_state)
+            return;
 
-    if (m_parentDevice->setControlState(m_id, state))
-        setStateAndFireEventsUnsafe(state);
+        if (!m_parentDevice->setControlState(m_id, state))
+            return;
+
+        setStateUnsafe(state);
+
+        eventsToBeFired = checkForEventsUnsafe();
+        if (eventsToBeFired.empty())
+            return;
+
+        handlers = m_eventHandlers;
+    }
+
+    for (const auto& eventType: eventsToBeFired) 
+    {
+        if (handlers[eventType].empty())
+            continue;
+
+        auto parameters = makeParametersForEvent(eventType);
+
+        for (auto& handler: handlers[eventType])
+            handler(eventType, parameters);
+    }  
 }
 
-void BaseControl::updateStateWithRawValue(const nx::joystick::State& state)
+void BaseControl::notifyControlStateChanged(const nx::joystick::State& state)
 {
-    QnMutexLocker lock(&m_mutex);
+    decltype(m_eventHandlers) handlers;
+    EventSet eventsToBeFired;
 
-    auto normalizedState = fromRawToNormalized(state);
-    if (m_state == normalizedState)
-        return;
-    qDebug() << "SETTING STATE AND FIRING EVENTS";
-    setStateAndFireEventsUnsafe(normalizedState);
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_state == state)
+            return;
+
+        setStateUnsafe(state);
+        eventsToBeFired = checkForEventsUnsafe();
+        if (eventsToBeFired.empty())
+            return;
+
+        handlers = m_eventHandlers;
+    }
+
+    for (const auto& eventType: eventsToBeFired) 
+    {
+        if (handlers[eventType].empty())
+            continue;
+
+        auto parameters = makeParametersForEvent(eventType);
+
+        for (auto& handler: handlers[eventType])
+            handler(eventType, parameters);
+    }
 }
 
 bool BaseControl::addEventHandler(
@@ -97,6 +144,11 @@ bool BaseControl::addEventHandler(
     return true;
 }
 
+void BaseControl::applyOverride(const QString overrideName, const QString& overrideValue)
+{
+    // Do nothing.
+}
+
 bool BaseControl::isEventTypeSupported(nx::joystick::EventType eventType) const
 {
     return false;
@@ -107,23 +159,16 @@ BaseControl::EventSet BaseControl::checkForEventsUnsafe() const
     return EventSet();
 }
 
-void BaseControl::fireEventsUnsafe(const EventSet& eventsToBeFired)
+void BaseControl::setStateUnsafe(const nx::joystick::State& state)
 {
-    for (const auto& eventType: eventsToBeFired) 
-    {
-        if (m_eventHandlers[eventType].empty())
-            continue;
-
-        auto parameters = makeParametersForEvent(eventType);
-        for (auto& handler: m_eventHandlers[eventType])
-            handler(eventType, parameters);
-    }
+    m_state = state;
 }
 
 nx::joystick::EventParameters BaseControl::makeParametersForEvent(
     nx::joystick::EventType eventType) const
 {
     nx::joystick::EventParameters eventParameters;
+    eventParameters.controlId = m_id;
     eventParameters.state = m_state;
 
     return eventParameters;
@@ -139,14 +184,6 @@ nx::joystick::State BaseControl::fromNormalizedToRaw(const nx::joystick::State& 
 {
     // No translation by default.
     return normalized;
-}
-
-void BaseControl::setStateAndFireEventsUnsafe(const nx::joystick::State& state)
-{
-    m_state = state;
-    auto eventsToBeFired = checkForEventsUnsafe();
-    if (!eventsToBeFired.empty())
-        fireEventsUnsafe(eventsToBeFired);
 }
 
 } // namespace controls

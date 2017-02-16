@@ -52,10 +52,12 @@ void GenericJoystick::setVendor(const QString& vendor)
 controls::ControlPtr GenericJoystick::getControlById(const QString& controlId) const 
 {
     QnMutexLocker lock(&m_mutex);
-    if (m_controls.find(controlId) == m_controls.end())
+
+    auto controlItr = m_controls.find(controlId);
+    if (controlItr == m_controls.end())
         return nullptr;
 
-    return m_controls.at(controlId);
+    return controlItr->second;
 }
 
 std::vector<controls::ControlPtr> GenericJoystick::getControls() const
@@ -116,47 +118,22 @@ void GenericJoystick::setLeds(std::vector<controls::LedPtr> joystickLeds)
     addControls(joystickLeds, m_controls);
 }
 
-std::vector<controls::WheelPtr> GenericJoystick::getWheels()
-{
-    QnMutexLocker lock(&m_mutex);
-    return filterControls<controls::Wheel>(m_controls);
-}
-
-void GenericJoystick::setWheels(std::vector<controls::WheelPtr> joystickWheels)
-{
-    QnMutexLocker lock(&m_mutex);
-    removeControls<controls::Wheel>(m_controls);
-    addControls<controls::Wheel>(joystickWheels, m_controls);
-}
-
-std::vector<controls::SliderPtr> GenericJoystick::getSliders()
-{
-    QnMutexLocker lock(&m_mutex);
-    return filterControls<controls::Slider>(m_controls);
-}
-
-void GenericJoystick::setSliders(std::vector<controls::SliderPtr> joystickSliders)
-{
-    QnMutexLocker lock(&m_mutex);
-    removeControls<controls::Slider>(m_controls);
-    addControls(joystickSliders, m_controls);
-}
-
 bool GenericJoystick::setControlState(const QString& controlId, const State& state)
 {
     QnMutexLocker lock(&m_mutex);
     if (!m_driver)
         return false;
 
-    return m_driver->setControlState(controlId, state);
+    return m_driver->setControlState(m_id, controlId, state);
 }
 
-void GenericJoystick::updateControlStateWithRawValue(
+void GenericJoystick::notifyControlStateChanged(
     const QString& controlId,
     const State& state)
 {
     auto control = getControlById(controlId);
-    control->updateStateWithRawValue(state);
+    auto normalizedState = control->fromRawToNormalized(state);
+    control->notifyControlStateChanged(normalizedState);
 }
 
 driver::AbstractJoystickDriver* GenericJoystick::getDriver() const
