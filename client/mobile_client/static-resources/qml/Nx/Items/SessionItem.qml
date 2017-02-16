@@ -101,8 +101,8 @@ Pane
                 || applicationInfo.oldMobileClientUrl() == "")
             {
                 Workflow.openStandardDialog("",
-                    qsTr("This server has too old version. ")
-                        + "Please update it to the latest version.")
+                    qsTr("This server has too old version. "
+                        + "Please update it to the latest version."))
                 return
             }
 
