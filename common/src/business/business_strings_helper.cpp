@@ -46,7 +46,7 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
                                     );
     case BookmarkAction:            return tr("Bookmark");
     case PanicRecordingAction:      return tr("Panic recording");
-    case SendMailAction:            return tr("Send email");
+    case SendMailAction:            return tr("Send Email");
     case DiagnosticsAction:         return tr("Write to log");
     case ShowPopupAction:           return tr("Show notification");
     case PlaySoundAction:           return tr("Repeat sound");

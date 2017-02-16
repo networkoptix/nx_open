@@ -119,7 +119,7 @@ QString QnExecPtzPresetPolicy::getText(const QnResourceList &resources, const bo
 
     QnVirtualCameraResourcePtr camera = cameras.first();
     if (!isResourceValid(camera))
-        return tr("%1 has no ptz presets").arg(getShortResourceName(camera));
+        return tr("%1 has no PTZ presets").arg(getShortResourceName(camera));
 
     return getShortResourceName(camera);
 }
@@ -249,8 +249,8 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     if (detailed && invalid > 0)
     {
         if (users.size() == 1)
-            return tr("User %1 has invalid email address").arg(users.first()->getName());
-        return tr("%n of %1 users have invalid email address", "", invalid).arg(users.size());
+            return tr("User %1 has invalid Email address").arg(users.first()->getName());
+        return tr("%n of %1 users have invalid Email address", "", invalid).arg(users.size());
     }
 
     invalid = 0;
@@ -265,11 +265,11 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     //
     if (detailed && invalid > 0)
         return (additional.size() == 1)
-        ? tr("Invalid email address %1").arg(additional.first())
-        : tr("%n of %1 additional email addresses are invalid", "", invalid).arg(additional.size());
+        ? tr("Invalid Email address %1").arg(additional.first())
+        : tr("%n of %1 additional Email addresses are invalid", "", invalid).arg(additional.size());
 
     if (detailed)
-        return tr("Send email to %1").arg(receivers.join(QLatin1String("; ")));
+        return tr("Send Email to %1").arg(receivers.join(QLatin1String("; ")));
 
 
     QStringList recipients;
