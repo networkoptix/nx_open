@@ -4,8 +4,9 @@
 #include <QtCore/QDebug>
 #include <QtCore/QElapsedTimer>
 
-#include <recording/time_period_list.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/test_support/test_options.h>
+#include <recording/time_period_list.h>
 
 namespace {
 #ifdef _DEBUG
@@ -37,12 +38,8 @@ void PrintTo(const QnTimePeriodList& periodList, ::std::ostream* os) {
     }
 }
 
-#ifndef __arm__
-    static const qint64 kTotalLengthMs = 1000ll * 60 * 60 * 24 * 365 * 2; //<  Two years of chunks.
-#else
-    static const qint64 kTotalLengthMs = 1000ll * 60 * 60 * 24 * 60; //< Two month of chunks.
-#endif
-
+static const qint64 kTwoYearsMs = 1000ll * 60 * 60 * 24 * 365 * 2;
+static const qint64 kTwoMonthMs = 1000ll * 60 * 60 * 24 * 60;
 static const qint64 kChunkLengthMs = 1000ll * 60; //< One minute each.
 static const qint64 kChunkSpaceMs = 1000ll * 5; //< 5 seconds spacing.
 static const  int kMergingListsCount = 10;
@@ -55,8 +52,10 @@ TEST( QnTimePeriodsListTest, mergeBigData )
 
     QnTimePeriodList resultPeriods;
 
+    const auto totalLengthMs = nx::utils::AppInfo::isArm() ? kTwoMonthMs : kTwoMonthMs;
     qint64 start = 0;
-    while (start < kTotalLengthMs) {
+    while (start < totalLengthMs)
+    {
         for (int i = 0; i < kMergingListsCount; ++i)
             lists[i].push_back(QnTimePeriod(start + i, kChunkLengthMs));
 
@@ -70,10 +69,8 @@ TEST( QnTimePeriodsListTest, mergeBigData )
     qint64 elapsed =  t.elapsed();
 
     ASSERT_EQ(resultPeriods, merged);
-    #ifndef __arm__
-        if (!nx::utils::TestOptions::areTimeAssertsDisabled())
-            ASSERT_LE(elapsed, bigDataTestsLimitMs);
-    #endif
+    if (!nx::utils::AppInfo::isArm() && !nx::utils::TestOptions::areTimeAssertsDisabled())
+        ASSERT_LE(elapsed, bigDataTestsLimitMs);
 }
 
 TEST( QnTimePeriodsListTest, unionBigData )
@@ -84,8 +81,10 @@ TEST( QnTimePeriodsListTest, unionBigData )
 
     QnTimePeriodList resultPeriods;
 
+    const auto totalLengthMs = nx::utils::AppInfo::isArm() ? kTwoMonthMs : kTwoMonthMs;
     qint64 start = 0;
-    while (start < kTotalLengthMs) {
+    while (start < totalLengthMs)
+    {
         for (int i = 0; i < kMergingListsCount; ++i)
             lists[i].push_back(QnTimePeriod(start + i, kChunkLengthMs));
 
@@ -100,10 +99,8 @@ TEST( QnTimePeriodsListTest, unionBigData )
     qint64 elapsed =  t.elapsed();
 
     ASSERT_EQ(resultPeriods, lists[0]);
-    #ifndef __arm__
-        if (!nx::utils::TestOptions::areTimeAssertsDisabled())
-            ASSERT_LE(elapsed, bigDataTestsLimitMs);
-    #endif
+    if (!nx::utils::AppInfo::isArm() && !nx::utils::TestOptions::areTimeAssertsDisabled())
+        ASSERT_LE(elapsed, bigDataTestsLimitMs);
 }
 
 TEST( QnTimePeriodsListTest, unionBySameChunk )

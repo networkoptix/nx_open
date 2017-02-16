@@ -145,6 +145,7 @@
 #include <rest/handlers/test_email_rest_handler.h>
 #include <rest/handlers/test_ldap_rest_handler.h>
 #include <rest/handlers/update_rest_handler.h>
+#include <rest/handlers/update_unauthenticated_rest_handler.h>
 #include <rest/handlers/update_information_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
@@ -1762,6 +1763,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getSystemId", new QnGetSystemIdRestHandler());
     reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
     reg("api/installUpdate", new QnUpdateRestHandler());
+    reg("api/installUpdateUnauthenticated", new QnUpdateUnauthenticatedRestHandler());
     reg("api/restart", new QnRestartRestHandler(), kAdmin);
     reg("api/connect", new QnOldClientConnectRestHandler());
     reg("api/moduleInformation", new QnModuleInformationRestHandler());
@@ -1888,31 +1890,17 @@ bool MediaServerProcess::initTcpListener(
 
 std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
 {
-    auto mapper = std::make_unique<nx_upnp::PortMapper>();
-    const auto configValue = MSSettings::roSettings()->value(
-        nx::settings_names::kNameUpnpPortMappingEnabled);
+    auto mapper = std::make_unique<nx_upnp::PortMapper>(/*isEnabled*/ false);
+    auto updateEnabled =
+        [mapper = mapper.get()]()
+        {
+            const auto isCloudSystem = !qnGlobalSettings->cloudSystemId().isEmpty();
+            mapper->setIsEnabled(isCloudSystem && qnGlobalSettings->isUpnpPortMappingEnabled());
+        };
 
-    if (!configValue.isNull())
-    {
-        // Config can not be changed by global system settings.
-        if (!configValue.toBool())
-            return nullptr; //< Just to be sure, no mappings are going to be made ever.
-
-        mapper->setIsEnabled(true);
-    }
-    else
-    {
-        auto updateEnabled =
-            [mapper = mapper.get()]()
-            {
-                const auto isCloudSystem = !qnGlobalSettings->cloudSystemId().isEmpty();
-                mapper->setIsEnabled(isCloudSystem && qnGlobalSettings->isUpnpPortMappingEnabled());
-            };
-
-        connect(qnGlobalSettings, &QnGlobalSettings::upnpPortMappingEnabledChanged, updateEnabled);
-        connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, updateEnabled);
-        updateEnabled();
-    }
+    connect(qnGlobalSettings, &QnGlobalSettings::upnpPortMappingEnabledChanged, updateEnabled);
+    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, updateEnabled);
+    updateEnabled();
 
     mapper->enableMapping(
         m_mediaServer->getPort(), nx_upnp::PortMapper::Protocol::TCP,
@@ -2172,8 +2160,9 @@ void MediaServerProcess::run()
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/static/*"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("/crossdomain.xml"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/startLiteClient"), AuthMethod::noAuth);
-    // TODO: #3.1 Enable authentication for /api/installUpdates when offline cloud authentication is implemented.
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdate"), AuthMethod::noAuth);
+    // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud authentication is implemented.
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdateUnauthenticated"), AuthMethod::noAuth);
 
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), AuthMethod::noAuth );
@@ -2626,7 +2615,7 @@ void MediaServerProcess::run()
     QThreadPool::globalInstance()->setExpiryTimeout(-1);
 
     // ============================
-    std::unique_ptr<nx_upnp::DeviceSearcher> upnpDeviceSearcher(new nx_upnp::DeviceSearcher());
+    std::unique_ptr<nx_upnp::DeviceSearcher> upnpDeviceSearcher(new nx_upnp::DeviceSearcher(qnGlobalSettings));
     std::unique_ptr<QnMdnsListener> mdnsListener(new QnMdnsListener());
 
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );

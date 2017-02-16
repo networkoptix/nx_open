@@ -150,8 +150,11 @@ public:
     {
         using namespace std::placeholders;
 
-        if (!m_socket->listen())
+        if (!m_socket->setNonBlockingMode(true) ||
+            !m_socket->listen())
+        {
             return false;
+        }
         m_socket->acceptAsync(std::bind(&SelfType::newConnectionAccepted, this, _1, _2));
         return true;
     }

@@ -1,10 +1,4 @@
-/**********************************************************
-* Aug 12, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_CLOUD_DB_EMAIL_MANAGER_H
-#define NX_CLOUD_DB_EMAIL_MANAGER_H
+#pragma once
 
 #include <functional>
 #include <memory>
@@ -26,13 +20,12 @@
 #include "notification.h"
 #include "settings.h"
 
-
 namespace nx {
 namespace cdb {
 
 namespace conf {
 class Settings;
-}   // namespace conf
+} // namespace conf
 
 class AbstractEmailManager
 {
@@ -45,8 +38,7 @@ public:
 };
 
 //!Responsible for sending emails
-class EMailManager
-:
+class EMailManager:
     public AbstractEmailManager
 {
 public:
@@ -78,19 +70,22 @@ private:
         std::function<void(bool)> completionHandler);
 };
 
-/*!
-    \note Access to internal factory func is not synchronized
-*/
+/**
+ * @note Access to internal factory func is not synchronized.
+ */
 class EMailManagerFactory
 {
 public:
+    using FactoryFunc =
+        std::function<std::unique_ptr<AbstractEmailManager>(const conf::Settings& settings)>;
+
     static std::unique_ptr<AbstractEmailManager> create(const conf::Settings& settings);
-    static void setFactory(
-        std::function<std::unique_ptr<AbstractEmailManager>(
-            const conf::Settings& settings)> factoryFunc);
+    /**
+     * Default is nullptr.
+     * @return Previous factory func.
+     */
+    static FactoryFunc setFactory(FactoryFunc factoryFunc);
 };
 
-}   //cdb
-}   //nx
-
-#endif  //NX_CLOUD_DB_EMAIL_MANAGER_H
+} // namespace cdb
+} // namespace nx

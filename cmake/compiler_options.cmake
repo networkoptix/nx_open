@@ -2,6 +2,8 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 add_definitions(
     -DUSE_NX_HTTP
     -D__STDC_CONSTANT_MACROS
@@ -10,14 +12,12 @@ add_definitions(
     -DENABLE_DATA_PROVIDERS
     -DENABLE_SOFTWARE_MOTION_DETECTION
     -DENABLE_THIRD_PARTY
-    -DENABLE_MDNS
-)
+    -DENABLE_MDNS)
 
 if(WIN32)
     add_definitions(
         -DENABLE_VMAX
-        -DENABLE_DESKTOP_CAMERA
-    )
+        -DENABLE_DESKTOP_CAMERA    )
 endif()
 
 if(UNIX)
@@ -33,8 +33,7 @@ if(ANDROID OR IOS)
         -DENABLE_DATA_PROVIDERS
         -DENABLE_SOFTWARE_MOTION_DETECTION
         -DENABLE_THIRD_PARTY
-        -DENABLE_MDNS
-    )
+        -DENABLE_MDNS)
 
     set(enableAllVendors OFF)
 endif()
@@ -55,8 +54,7 @@ if(enableAllVendors)
         -DENABLE_STARDOT
         -DENABLE_IQE
         -DENABLE_ISD
-        -DENABLE_PULSE_CAMERA
-    )
+        -DENABLE_PULSE_CAMERA)
 endif()
 
 if(WIN32)
@@ -78,31 +76,35 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 if(UNIX)
-    add_definitions(
+    add_compile_options(
         -Werror=enum-compare
         -Werror=reorder
         -Werror=delete-non-virtual-dtor
         -Werror=return-type
         -Werror=conversion-null
-        -Wuninitialized
-    )
+        -Wuninitialized)
 
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-        add_definitions(
+        add_compile_options(
             -Wno-c++14-extensions
-            -Wno-inconsistent-missing-override
-        )
+            -Wno-inconsistent-missing-override)
     endif()
 endif()
 
 if(LINUX)
     if(NOT "${arch}" STREQUAL "arm")
-        add_definitions(-msse2)
+        add_compile_options(-msse2)
     endif()
-    add_definitions(
+    add_compile_options(
         -Wno-unknown-pragmas
-        -Wno-ignored-qualifiers
-    )
+        -Wno-ignored-qualifiers)
+endif()
+
+if(MACOSX)
+    add_compile_options(
+        -msse4.1
+        -Wno-unused-local-typedef)
+    set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
 endif()
 
 # set(CMAKE_AUTOMOC_MOC_OPTIONS "-bstdafx.h")

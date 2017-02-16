@@ -99,7 +99,6 @@ private:
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_resourceParentIdChanged(const QnResourcePtr& resource);
-    void at_serverFlagsChanged(const QnResourcePtr& resource);
 
     int itemRow(const QnUuid& id) const;
     void updateItem(const QnUuid& id);
@@ -107,9 +106,9 @@ private:
     void removeLayout(const QnLayoutResourcePtr& layout);
 
     QList<ModelItem> m_itemsList;
+    QHash<QnUuid, QSharedPointer<LayoutCamerasWatcher>> m_layoutCameraWatcherById;
     QnUserResourcePtr m_user;
     int m_allCamerasCount;
-    QHash<QnUuid, QSharedPointer<LayoutCamerasWatcher>> m_layoutCameraWatcherById;
 };
 
 QnLayoutsModelUnsorted::QnLayoutsModelUnsorted(QObject* parent):
@@ -245,9 +244,6 @@ void QnLayoutsModelUnsorted::resetModel()
         const auto servers = qnResPool->getResources<QnMediaServerResource>();
         for (const auto& server : servers)
         {
-            connect(server, &QnMediaServerResource::serverFlagsChanged,
-                    this, &QnLayoutsModelUnsorted::at_serverFlagsChanged);
-
             if (!isServerSuitable(server))
                 continue;
 
@@ -323,11 +319,6 @@ void QnLayoutsModelUnsorted::at_resourceParentIdChanged(const QnResourcePtr& res
         addLayout(layout);
     else
         removeLayout(layout);
-}
-
-void QnLayoutsModelUnsorted::at_serverFlagsChanged(const QnResourcePtr& resource)
-{
-    QN_UNUSED(resource);
 }
 
 int QnLayoutsModelUnsorted::itemRow(const QnUuid& id) const

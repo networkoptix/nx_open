@@ -8,6 +8,8 @@ namespace utils {
 
 namespace {
 
+static const std::chrono::seconds kDetachedThreadsCleanupPeriod(10);
+
 class DetachedThreads
 {
     DetachedThreads();
@@ -18,8 +20,8 @@ public:
     static DetachedThreads* instance();
 
 private:
+    utils::promise<void> m_stopPromise;
     std::mutex m_mutex;
-    bool m_isTerminated = false;
     std::list<std::unique_ptr<detail::thread>> m_garbage;
     thread m_collector;
 };
@@ -28,15 +30,10 @@ DetachedThreads::DetachedThreads():
     m_collector(
         [this]()
         {
-            std::unique_lock<std::mutex> lock(m_mutex);
-            while (!m_isTerminated)
+            auto future = m_stopPromise.get_future();
+            while (future.wait_for(kDetachedThreadsCleanupPeriod) != std::future_status::ready)
             {
-                {
-                    lock.unlock();
-                    std::this_thread::sleep_for(std::chrono::seconds(1));
-                    lock.lock();
-                }
-
+                std::unique_lock<std::mutex> lock(m_mutex);
                 for (auto it = m_garbage.begin(); it != m_garbage.end(); )
                 {
                     if ((*it)->isFinished())
@@ -51,14 +48,9 @@ DetachedThreads::DetachedThreads():
 
 DetachedThreads::~DetachedThreads()
 {
-    {
-        std::unique_lock<std::mutex> lk(m_mutex);
-        m_isTerminated = true;
-    }
-
+    m_stopPromise.set_value();
     m_collector.join();
-    for (auto& thread: m_garbage)
-        thread->join();
+    m_garbage.clear(); //< Will end up with QT warnings and running threads termination.
 }
 
 void DetachedThreads::addThread(std::unique_ptr<detail::thread> thread)

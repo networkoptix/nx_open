@@ -37,7 +37,8 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
     const auto onHttpDone =
         [this](nx_http::AsyncHttpClientPtr)
         {
-            const auto handler = std::move(m_handler);
+            decltype(m_handler) handler;
+            handler.swap(m_handler);
             if (!handler)
                 return;
 

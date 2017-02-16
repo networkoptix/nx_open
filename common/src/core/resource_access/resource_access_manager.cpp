@@ -445,7 +445,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         return result;
 
     if (hasGlobalPermission(subject, Qn::GlobalEditCamerasPermission))
-        result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+        result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission;
 
     return result;
 }

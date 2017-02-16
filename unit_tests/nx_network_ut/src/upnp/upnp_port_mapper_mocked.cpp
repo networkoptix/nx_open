@@ -131,7 +131,7 @@ bool AsyncClientMock::rmMapping( quint16 port, Protocol protocol )
 PortMapperMocked::PortMapperMocked( const HostAddress& internalIp,
                                     const HostAddress& externalIp,
                                     quint64 checkMappingsInterval )
-    : PortMapper( checkMappingsInterval, lit( "UpnpPortMapperMocked" ), QString() )
+    : PortMapper( true, checkMappingsInterval, lit( "UpnpPortMapperMocked" ), QString() )
 {
     m_upnpClient.reset( new AsyncClientMock( externalIp ) );
 

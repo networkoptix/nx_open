@@ -296,9 +296,9 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
     QString mkvFileFilter = tr("Matroska (*.mkv)");
 
     QString allowedFormatFilter =
-        aviFileFilter
+        mkvFileFilter
         + filterSeparator
-        + mkvFileFilter;
+        + aviFileFilter;
 
     bool canUseBinaryExport = isBinaryExportSupported() && timelapseFrameStepMs == 0;
     if (canUseBinaryExport)

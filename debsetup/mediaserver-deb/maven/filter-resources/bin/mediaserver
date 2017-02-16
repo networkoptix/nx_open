@@ -2,6 +2,9 @@
 
 VMS_DIR=$(dirname $(dirname "${BASH_SOURCE[0]}"))
 
+EXE=$VMS_DIR/bin/mediaserver-bin
+ARGS="-e"
+
 export LD_LIBRARY_PATH="$VMS_DIR/lib"
 #export VMS_PLUGIN_DIR="$VMS_DIR/lib"
 
@@ -15,8 +18,11 @@ done
 $VMS_DIR/bin/shell_utils.sh crash_gdb_bt $VMS_DIR/bin/mediaserver-bin
 
 lsblk -o MODEL -n | grep -v '^$' > /tmp/hddlist
-ulimit -n 8192
-ulimit -c unlimited
 
-ARGS="-e"
-exec start-stop-daemon --start -d $VMS_DIR/bin --exec $VMS_DIR/bin/mediaserver-bin -- $ARGS
+echo --- Set ulimits:
+ulimit -n $(cat /proc/sys/fs/file-max 2>/dev/null || echo 8192)
+ulimit -c unlimited
+ulimit -a
+
+echo --- Starting: $EXE $ARGS
+exec start-stop-daemon --start -d $VMS_DIR/bin --exec $EXE -- $ARGS
