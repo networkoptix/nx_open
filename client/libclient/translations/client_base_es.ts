@@ -3705,15 +3705,15 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Picture is too big. Maximum size is %1 Mb</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Picture cannot be loaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>cells</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is too big. Maximum size is %1 MB</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6068,10 +6068,6 @@ to %1</source>
         <translation>Almacenamiento no válido</translation>
     </message>
     <message>
-        <source>%1 Gb</source>
-        <translation>%1 Gb</translation>
-    </message>
-    <message>
         <source>Remove</source>
         <translation>Quitar</translation>
     </message>
@@ -6102,6 +6098,10 @@ to %1</source>
     <message>
         <source>Main</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation type="unfinished">%1 Gb</translation>
     </message>
 </context>
 <context>

@@ -3706,15 +3706,15 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Picture is too big. Maximum size is %1 Mb</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Picture cannot be loaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>cells</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is too big. Maximum size is %1 MB</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6069,10 +6069,6 @@ to %1</source>
         <translation>Ungültiger Speicher</translation>
     </message>
     <message>
-        <source>%1 Gb</source>
-        <translation>%1 GB</translation>
-    </message>
-    <message>
         <source>Remove</source>
         <translation>Entfernen</translation>
     </message>
@@ -6103,6 +6099,10 @@ to %1</source>
     <message>
         <source>Main</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation type="unfinished">%1 GB</translation>
     </message>
 </context>
 <context>
