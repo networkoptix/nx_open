@@ -47,15 +47,15 @@ public:
 public:
     AvFrameMemoryBufferPrivate(AVFrame* _frame):
         QAbstractVideoBufferPrivate(),
-        frame(av_frame_alloc()),
+        frame(_frame),
         mapMode(QAbstractVideoBuffer::NotMapped)
     {
-        av_frame_move_ref(frame, _frame);
     }
 
     virtual ~AvFrameMemoryBufferPrivate()
     {
-        av_frame_free(&frame); //< It includes av_frame_unref
+        if (frame)
+            av_frame_free(&frame);
     }
 
     virtual int map(
@@ -138,7 +138,7 @@ public:
     ~FfmpegVideoDecoderPrivate()
     {
         closeCodecContext();
-        av_free(frame);
+        av_frame_free(&frame);
         sws_freeContext(scaleContext);
     }
 
