@@ -178,6 +178,9 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
             if (m_removeConnectionAfterClosure)
                 removeConnection(connection);
             break;
+
+        default:
+            break;
     }
 
     m_condition.wakeAll();
