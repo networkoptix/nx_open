@@ -45,7 +45,7 @@ QString QnCloudResultInfo::toString(ResultCode code)
             return tr("Invalid login.");
 
         case ResultCode::serviceUnavailable:
-            return tr("Sorry, %1 Service is temporary unavailable. We're doing our best to restore it. Please try again later.",
+            return tr("Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.",
                 "%1 is the cloud name (like 'Nx Cloud')")
                 .arg(QnAppInfo::cloudName());
 
@@ -53,7 +53,7 @@ QString QnCloudResultInfo::toString(ResultCode code)
             return tr("Credentials are no longer valid.");
 
         case ResultCode::retryLater:
-            return tr("Sorry, %1 Service couldn't process your request. Please try again in a few moments.",
+            return tr("Sorry, %1 Service could not process your request. Please try again in a few moments.",
                 "%1 is the cloud name (like 'Nx Cloud')")
                 .arg(QnAppInfo::cloudName());
 

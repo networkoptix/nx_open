@@ -47,7 +47,7 @@ public:
             case forbidden:
                 return tr("This user does not have permissions for the requested operation.");
             case notLocalOwner:
-                return tr("Can't connect to the other system "
+                return tr("Cannot connect to the other system "
                     "because current system is already connected to %1.",
                     "%1 is the cloud name (like 'Nx Cloud')")
                         .arg(QnAppInfo::cloudName());

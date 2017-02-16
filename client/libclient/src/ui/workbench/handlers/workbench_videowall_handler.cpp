@@ -1125,7 +1125,7 @@ void QnWorkbenchVideoWallHandler::showControlledByAnotherUserMessage() const
 {
     QnMessageBox::warning(mainWindow(),
         tr("Screen controlled by another user"),
-        tr("Control session can't be started."));
+        tr("Control session cannot be started."));
 }
 
 void QnWorkbenchVideoWallHandler::setControlMode(bool active)
@@ -2005,7 +2005,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered()
 
     if (matrix.layoutByItem.isEmpty())
     {
-        QnMessageBox::warning(mainWindow(), tr("Can't save empty matrix"));
+        QnMessageBox::warning(mainWindow(), tr("Cannot save empty matrix"));
         return;
     }
 

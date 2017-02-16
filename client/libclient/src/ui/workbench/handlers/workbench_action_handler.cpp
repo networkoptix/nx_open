@@ -843,11 +843,11 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     {
         const auto text = QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
-                tr("Server \"%1\" can't access %n devices. Move them anyway?",
+                tr("Server \"%1\" cannot access %n devices. Move them anyway?",
                     "", errorResources.size()),
-                tr("Server \"%1\" can't access %n cameras. Move them anyway?",
+                tr("Server \"%1\" cannot access %n cameras. Move them anyway?",
                     "", errorResources.size()),
-                tr("Server \"%1\" can't access %n I/O modules. Move them anyway?",
+                tr("Server \"%1\" cannot access %n I/O modules. Move them anyway?",
                     "", errorResources.size())),
             errorResources).arg(server->getName());
 
@@ -1264,7 +1264,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered()
     {
         QnMessageBox::warning(mainWindow(),
             tr("Too short period selected"),
-            tr("Can't perform Preview Search. Please select a period of 15 seconds or longer."));
+            tr("Cannot perform Preview Search. Please select a period of 15 seconds or longer."));
         return;
     }
 

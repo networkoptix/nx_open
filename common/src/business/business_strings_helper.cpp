@@ -161,9 +161,9 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
     case ServerStartEvent:
         return tr("Server \"%1\" Started").arg(resourceName);
     case LicenseIssueEvent:
-        return tr("Server \'%1\' has a license problem").arg(resourceName);
+        return tr("Server \"%1\" has a license problem").arg(resourceName);
     case BackupFinishedEvent:
-        return tr("Server \'%1\' has finished an archive backup").arg(resourceName);
+        return tr("Server \"%1\" has finished an archive backup").arg(resourceName);
     case UserDefinedEvent:
         return (!params.caption.isEmpty() ? params.caption
             : (params.resourceName.isEmpty() ? tr("Generic Event")
@@ -453,7 +453,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         qint64 timeStampMs = params.description.toLongLong();
         QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
         // todo: #gdm add server/client timezone conversion
-        result = tr("Archive backup finished, but isn't fully completed because backup time is over. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+        result = tr("Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
     }
     case BackupDone:
     {

@@ -135,14 +135,14 @@ public:
             case cannotConfigureMediaStream:
             {
                 QnCameraDeviceStringSet detailsBase(
-                    tr("First, try to turn on recording (if it's off) and decrease fps in device settings.").arg(p1),
-                    tr("First, try to turn on recording (if it's off) and decrease fps in camera settings.").arg(p1),
-                    tr("First, try to turn on recording (if it's off) and decrease fps in I/O module settings.").arg(p1)
+                    tr("First, try to turn on recording (if it is off) and decrease fps in device settings.").arg(p1),
+                    tr("First, try to turn on recording (if it is off) and decrease fps in camera settings.").arg(p1),
+                    tr("First, try to turn on recording (if it is off) and decrease fps in I/O module settings.").arg(p1)
                 );
                 QnCameraDeviceStringSet detailsAdvanced(
-                    tr("If it doesn't help, restore factory defaults on the device web-page."),
-                    tr("If it doesn't help, restore factory defaults on the camera web-page."),
-                    tr("If it doesn't help, restore factory defaults on the I/O module web-page.")
+                    tr("If it does not help, restore factory defaults on the device web-page."),
+                    tr("If it does not help, restore factory defaults on the camera web-page."),
+                    tr("If it does not help, restore factory defaults on the I/O module web-page.")
                 );
 
                 errorMessageParts

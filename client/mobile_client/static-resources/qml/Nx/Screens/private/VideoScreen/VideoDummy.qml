@@ -55,7 +55,7 @@ DummyMessage
             PropertyChanges
             {
                 target: dummyMessage
-                title: qsTr("Can't load video")
+                title: qsTr("Cannot load video")
                 image: lp("/images/alert_alert.png")
             }
         }

@@ -227,7 +227,7 @@ bool QnMultipleCameraSettingsWidget::isValidSecondStream()
 
     QnMessageBox dialog(QnMessageBoxIcon::Warning,
         tr("Secondary stream disabled for these cameras"),
-        tr("\"Motion + Low - Res\" recording option can't be set."),
+        tr("\"Motion + Low - Res\" recording option cannot be set."),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton);
 
     const auto recordAlways = dialog.addButton(
