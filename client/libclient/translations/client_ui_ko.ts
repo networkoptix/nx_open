@@ -883,7 +883,7 @@
     </message>
     <message>
         <location/>
-        <source>Motion + Low-Res</source>
+        <source>Motion + Lo-Res</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1020,11 +1020,6 @@
     </message>
     <message>
         <location/>
-        <source>HTTP url</source>
-        <translation>HTTP url</translation>
-    </message>
-    <message>
-        <location/>
         <source>Login to authenticate (optional)</source>
         <translation>사용자 로그인(옵션)</translation>
     </message>
@@ -1046,6 +1041,11 @@
     <message>
         <location/>
         <source>Content type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP URL</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1202,7 +1202,7 @@
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots</source>
+        <source>Run application when PC Boots up</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1435,11 +1435,6 @@
         <location/>
         <source>Features</source>
         <translation>기능</translation>
-    </message>
-    <message>
-        <location/>
-        <source>This license type requires a higher software version.</source>
-        <translation>현재 라이센스는 상위 버젼 SW가 필요합니다.</translation>
     </message>
 </context>
 <context>

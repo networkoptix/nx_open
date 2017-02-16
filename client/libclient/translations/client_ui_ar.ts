@@ -883,7 +883,7 @@
     </message>
     <message>
         <location/>
-        <source>Motion + Low-Res</source>
+        <source>Motion + Lo-Res</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1020,11 +1020,6 @@
     </message>
     <message>
         <location/>
-        <source>HTTP url</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Login to authenticate (optional)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1046,6 +1041,11 @@
     <message>
         <location/>
         <source>Content type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP URL</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1202,7 +1202,7 @@
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots</source>
+        <source>Run application when PC Boots up</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1434,11 +1434,6 @@
     <message>
         <location/>
         <source>Features</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>This license type requires a higher software version.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

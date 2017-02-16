@@ -1666,11 +1666,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Low-Res Streams</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Hi-Res Streams</source>
         <comment>Cameras Backup</comment>
         <translation type="unfinished"></translation>
@@ -1687,6 +1682,11 @@ to view more bookmarks</source>
     <message>
         <source>affect all servers in the system</source>
         <comment>Relates to &apos;Global Settings&apos; subject</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lo-Res Streams</source>
+        <comment>Cameras Backup</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4270,10 +4270,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Low-Res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Hi-Res</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4283,6 +4279,10 @@ to %1</source>
     </message>
     <message>
         <source>%1 (Tour &quot;%2&quot; is active)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lo-Res</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7504,11 +7504,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter the url of the Web Page to add:</source>
+        <source>This Web Page already exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This Web Page already exists</source>
+        <source>Enter the URL of the Web Page to add:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

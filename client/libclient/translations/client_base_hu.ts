@@ -1668,11 +1668,6 @@ több könyvjelző megjelenítéséhez</translation>
         <translation type="unfinished">Kérésre</translation>
     </message>
     <message>
-        <source>Low-Res Streams</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished">Alacsony felbontású streamek</translation>
-    </message>
-    <message>
         <source>Hi-Res Streams</source>
         <comment>Cameras Backup</comment>
         <translation type="unfinished">Nagy felbontású streamek</translation>
@@ -1689,6 +1684,11 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>affect all servers in the system</source>
         <comment>Relates to &apos;Global Settings&apos; subject</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lo-Res Streams</source>
+        <comment>Cameras Backup</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4280,12 +4280,12 @@ to %1</source>
         <translation>Zoom ablak</translation>
     </message>
     <message>
-        <source>Low-Res</source>
-        <translation>Alacsony felbontás</translation>
-    </message>
-    <message>
         <source>I/O Module</source>
         <translation>I/O modul</translation>
+    </message>
+    <message>
+        <source>Lo-Res</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7507,11 +7507,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter the url of the Web Page to add:</source>
+        <source>This Web Page already exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This Web Page already exists</source>
+        <source>Enter the URL of the Web Page to add:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -532,24 +532,8 @@
         <translation>לא ניתן להתחבר ליציאת http %1.</translation>
     </message>
     <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation>לא ניתן לפתוח את כתובת המדיה %1. ההתחברות ליציאת המדיה %2 נכשלה.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation>לא ניתן לפתוח את כתובת המדיה %1. ההתחברות ליציאה %2 נסגרה באופן לא צפוי.</translation>
-    </message>
-    <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>לבסוף, נסה לעדכן את הקושחה. במידה והבעיה נמשכת, אנא צור קשר עם התמיכה.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.</source>
-        <translation>לא נמצאו קבצי מדיה נתמכים בכתובת %1.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation>לא ניתן לפתוח את כתובת המדיה %1. פרוטוקול מדיה שאיננו נתמך %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
@@ -600,18 +584,6 @@
         <translation>וודא שהמצלמה מחוברת לרשת. נסה לאתחלה.</translation>
     </message>
     <message>
-        <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation>לא ניתן לפענח את תגובתו של ההתקן.URL %1, שם מבוקש %2.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>לא ניתן לפענח את תגובתה של המצלמה.URL %1, שם מבוקש %2.</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>לא מאושר. URL %1.</translation>
-    </message>
-    <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>הבקשה של התקן &quot;%1&quot; נכשלה עם שגיאה &quot;%2&quot;.</translation>
     </message>
@@ -654,10 +626,6 @@
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
         <translation>יש לוודא שמודול הקלט/פלט מחובר לרשת. נסה לאתחל את המודול.</translation>
-    </message>
-    <message>
-        <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation>לא ניתן לנתח את תגובת מודול הקלט/פלט. Url %1 שם בקשה %2.</translation>
     </message>
     <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -713,6 +681,38 @@
     </message>
     <message>
         <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse device response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No supported media tracks at URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not authorized. URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -892,10 +892,6 @@
         <translation>רשיונות שאינם תקינים</translation>
     </message>
     <message>
-        <source>This license type requires higher software version.</source>
-        <translation>סוג רשיון זה דורש גירסת תוכנה גבוהה יותר.</translation>
-    </message>
-    <message>
         <source>Invalid signature</source>
         <translation type="unfinished">החתימה איננה תקינה</translation>
     </message>
@@ -917,6 +913,10 @@
     </message>
     <message>
         <source>Free license</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -226,27 +226,27 @@
         <translation type="unfinished">desconocido</translation>
     </message>
     <message>
-        <source>Hi-res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low-res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low-res key-frames</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Custom-res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1 fps</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hi-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyfr + Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom-Res</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

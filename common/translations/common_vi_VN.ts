@@ -538,24 +538,8 @@
         <translation>Không thể kết nối với http cổng %1.</translation>
     </message>
     <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation>Không thể mở phương tiện truyền thông url %1. Không thể kết nối với cổng truyền thông %2.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation>Không thể mở phương tiện truyền thông url %1. Kết nối đến cổng %2 đã được đóng cửa đột xuất.</translation>
-    </message>
-    <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>Cuối cùng, cố gắng cập nhật firmware. Nếu vấn đề vẫn còn tồn tại, xin vui lòng liên hệ với hỗ trợ.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.</source>
-        <translation>Không hỗ trợ các bài hát truyền thông tại url %1.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation>Không thể mở phương tiện truyền thông url %1. Phương tiện truyền thông không được hỗ trợ giao thức %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
@@ -588,18 +572,6 @@
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>Hãy chắc chắn rằng các camera được cắm vào mạng. Hãy thử khởi động lại máy ảnh.</translation>
-    </message>
-    <message>
-        <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation>Không thể phân tích phản ứng thiết bị. Url %1, yêu cầu tên %2.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>Không thể phân tích ứng của máy ảnh. Url %1, yêu cầu tên %2.</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>Không được cho phép. Url %1.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -644,10 +616,6 @@
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
         <translation>Hãy chắc chắn rằng các I / O module được cắm vào mạng. Hãy thử khởi động lại các I / O module.</translation>
-    </message>
-    <message>
-        <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation>Không thể phân tích tôi phản ứng I / Omodule. Url %1, yêu cầu tên %2.</translation>
     </message>
     <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -703,6 +671,38 @@
     </message>
     <message>
         <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse device response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No supported media tracks at URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not authorized. URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -882,10 +882,6 @@
         <translation>Giấy phép không hợp lệ</translation>
     </message>
     <message>
-        <source>This license type requires higher software version.</source>
-        <translation>Loại giấy phép này đòi hỏi phiên bản phần mềm cao hơn.</translation>
-    </message>
-    <message>
         <source>Invalid signature</source>
         <translation type="unfinished">chữ ký không hợp lệ</translation>
     </message>
@@ -907,6 +903,10 @@
     </message>
     <message>
         <source>Free license</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

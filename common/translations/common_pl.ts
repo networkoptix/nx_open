@@ -542,24 +542,8 @@
         <translation>Nie można połączyć z %1 portem http.</translation>
     </message>
     <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation>Nie można otworzyć adresu url strumienia %1. Błąd połączenia do portu strumienia%2.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation>Nie można otworzyć adresu url strumienia %1.Połączenie do portu strumienia%2 zostało niespodziewanie zamknięte.</translation>
-    </message>
-    <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>Ostatecznie, spróbuj zaktualizować firmware. Jeśli problem będzie się powtarzał, skontaktuj się z pomocą techniczną.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.</source>
-        <translation>Nieobsługiwane strumienie mediów pod adresem url %1.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation>Nie można otworzyć adresu url strumienia %1. Nieobsługiwany protokół %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
@@ -610,18 +594,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -663,10 +635,6 @@
     </message>
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not parse I/O module response. Url %1, request name %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -723,6 +691,38 @@
     </message>
     <message>
         <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse device response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No supported media tracks at URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not authorized. URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -903,10 +903,6 @@
         <translation>Nieprawidłowe licencje</translation>
     </message>
     <message>
-        <source>This license type requires higher software version.</source>
-        <translation>Ten rodzaj licencji wymaga wyższej wersji oprogramowania.</translation>
-    </message>
-    <message>
         <source>Invalid signature</source>
         <translation type="unfinished">Nieprawidłowa sygnatura</translation>
     </message>
@@ -928,6 +924,10 @@
     </message>
     <message>
         <source>Free license</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

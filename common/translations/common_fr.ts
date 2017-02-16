@@ -548,24 +548,8 @@
         <translation>Ne peut pas se connecter au port HTTP %1.</translation>
     </message>
     <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation>Ne peut pas ouvrir l&apos;URL média %1. Échec de connexion sur le port Média %2.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation>Ne peut pas ouvrir l&apos;URL média %1. La connexion au port %2 s&apos;est fermé de façon inattendue.</translation>
-    </message>
-    <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>Finalement, essayez de faire la MàJ micrologiciel. Si le problème persiste, contactez le support.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.</source>
-        <translation>Aucune piste média supporté au URL %1.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation>Ne peut pas ouvrir l&apos;URL média %1. Protocole Média non supporté %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
@@ -598,18 +582,6 @@
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>Assurez-vous que la caméra est branché sur le réseau. Essayez de la redémarrer.</translation>
-    </message>
-    <message>
-        <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation>Impossible d&apos;analyser la réponse du périphérique. URL %1, demande nom %2.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>Impossible d&apos;analyser la réponse de caméra. URL %1, demande nom %2.</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>Non autorisé. URL %1.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -654,10 +626,6 @@
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
         <translation>Assurez-vous que le module I/O est branché sur le réseau. Essayez de le redémarrer.</translation>
-    </message>
-    <message>
-        <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation>Ne peut pas analyser la réponse du module IO. URL %1, demande nom %2.</translation>
     </message>
     <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -713,6 +681,38 @@
     </message>
     <message>
         <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse device response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No supported media tracks at URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not authorized. URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -892,10 +892,6 @@
         <translation>Licences Invalide</translation>
     </message>
     <message>
-        <source>This license type requires higher software version.</source>
-        <translation>Ce type de licence requiert une version logiciel récente.</translation>
-    </message>
-    <message>
         <source>Invalid signature</source>
         <translation type="unfinished">Signature Invalide</translation>
     </message>
@@ -917,6 +913,10 @@
     </message>
     <message>
         <source>Free license</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

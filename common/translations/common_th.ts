@@ -538,24 +538,8 @@
         <translation>ไม่สามารถเชื่อมต่อพอร์ต http. %1.</translation>
     </message>
     <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation>ไม่สามารถเปิดสื่อ url%1 ไม่สามารถเชื่อมต่อไปยังสื่อพอร์ต %2.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation>ไม่สามารถเปิดสื่อ url %1 การเชื่อมต่อกับพอร์ต %2 ถูกปิดโดยไม่ได้ตั้งใจ.</translation>
-    </message>
-    <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>สุดท้าย พยายามที่จะปรับปรุง เฟิร์มแวร์ หากยังพบปัญหากรุณาติดต่อฝ่ายสนับสนุน.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.</source>
-        <translation>ไม่มีการสนับสนุนสื่อที่แทร็ค url%1.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation>ไม่สามารถเปิดสื่อ url%1. ไม่สนับสนุนสื่อโพรโทคอล %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
@@ -588,18 +572,6 @@
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>ตรวจสอบให้แน่ใจว่ามีการเสียบกล้องเข้าสู่เครือข่าย ลองที่จะรีบูตกล้อง.</translation>
-    </message>
-    <message>
-        <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation>ไม่สามารถแยกการตอบสนองอุปกรณ์ Url %1 ต้องการชื่อ %2.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>ไม่สามารถแยกการตอบสนองของกล้อง Url %1 ต้องการชื่อ %2.</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>ไม่ได้รับอนุญาต Url %1.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -644,10 +616,6 @@
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
         <translation>ตรวจสอบให้แน่ใจว่าโมดูล I/O ต่อเข้ากับครือข่าย ลองที่จะรีบูตโมดูล I/O อีกครั้ง.</translation>
-    </message>
-    <message>
-        <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation>ไม่สามารถแยกวิเคราะห์ I/O โมดูลการตอบสนอง. Url %1, ขอชื่อ %2.</translation>
     </message>
     <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -703,6 +671,38 @@
     </message>
     <message>
         <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse device response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No supported media tracks at URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not authorized. URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -882,10 +882,6 @@
         <translation>ใบอนุญาตไม่ถูกต้อง</translation>
     </message>
     <message>
-        <source>This license type requires higher software version.</source>
-        <translation>ประเภทใบอนุญาตนี้ต้องใช้ซอฟต์แวร์รุ่นที่สูงขึ้น.</translation>
-    </message>
-    <message>
         <source>Invalid signature</source>
         <translation type="unfinished">ลายเซ็นไม่ถูกต้อง</translation>
     </message>
@@ -907,6 +903,10 @@
     </message>
     <message>
         <source>Free license</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

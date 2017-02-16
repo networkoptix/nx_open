@@ -889,7 +889,7 @@
     </message>
     <message>
         <location/>
-        <source>Motion + Low-Res</source>
+        <source>Motion + Lo-Res</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1026,11 +1026,6 @@
     </message>
     <message>
         <location/>
-        <source>HTTP url</source>
-        <translation>HTTP url</translation>
-    </message>
-    <message>
-        <location/>
         <source>Login to authenticate (optional)</source>
         <translation>認証帳號 (非必要)</translation>
     </message>
@@ -1052,6 +1047,11 @@
     <message>
         <location/>
         <source>Content type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP URL</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1208,7 +1208,7 @@
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots</source>
+        <source>Run application when PC Boots up</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1441,11 +1441,6 @@
         <location/>
         <source>Features</source>
         <translation>功能</translation>
-    </message>
-    <message>
-        <location/>
-        <source>This license type requires a higher software version.</source>
-        <translation>此授權類型適用於更高階版本.</translation>
     </message>
 </context>
 <context>

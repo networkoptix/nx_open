@@ -538,24 +538,8 @@
         <translation>httpポート%1.に接続できません.</translation>
     </message>
     <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation>メディアurl%1.を開けません　メディアポート%2.への接続失敗.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation>メディアurl %1を開けません　ポート%2が閉じられました.</translation>
-    </message>
-    <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>ファームウェアの更新を行ってください　問題が継続する場合はサポートにお問合せください.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.</source>
-        <translation>サポートされないメディアトラック　url%1.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation>メディアurl%1が開けません　サポートされないメディアプロトコル %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
@@ -588,18 +572,6 @@
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>カメラがネットワークに接続されている事を確認して再起動を行ってください.</translation>
-    </message>
-    <message>
-        <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation>デバイス応答がありません Url %1 リクエスト名 %2.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>カメラ応答がありません Url %1 リクエスト名 %2.</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>許可されないUrl %1.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -644,10 +616,6 @@
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
         <translation>IOモジュールがネットワークに接続されているか確認し　IOモジュールの再起動を行ってください.</translation>
-    </message>
-    <message>
-        <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation>IOモジュールの応答を解析できませんでした　Url %1,　リクエスト名 %2.</translation>
     </message>
     <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -703,6 +671,38 @@
     </message>
     <message>
         <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse device response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No supported media tracks at URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not authorized. URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -882,10 +882,6 @@
         <translation>無効なライセンス</translation>
     </message>
     <message>
-        <source>This license type requires higher software version.</source>
-        <translation>このライセンスタイプには新しいバージョンが必要です.</translation>
-    </message>
-    <message>
         <source>Invalid signature</source>
         <translation type="unfinished">無効な署名</translation>
     </message>
@@ -907,6 +903,10 @@
     </message>
     <message>
         <source>Free license</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

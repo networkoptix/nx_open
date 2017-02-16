@@ -883,7 +883,7 @@
     </message>
     <message>
         <location/>
-        <source>Motion + Low-Res</source>
+        <source>Motion + Lo-Res</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1020,11 +1020,6 @@
     </message>
     <message>
         <location/>
-        <source>HTTP url</source>
-        <translation>HTTP URL</translation>
-    </message>
-    <message>
-        <location/>
         <source>Login to authenticate (optional)</source>
         <translation>Имя пользователя для аутентификации (необязательно)</translation>
     </message>
@@ -1047,6 +1042,11 @@
         <location/>
         <source>Content type</source>
         <translation>Тип содержимого</translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP URL</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1202,8 +1202,8 @@
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots</source>
-        <translation>Запустить приложение при загрузке компьютера</translation>
+        <source>Run application when PC Boots up</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1435,11 +1435,6 @@
         <location/>
         <source>Features</source>
         <translation>Особенности</translation>
-    </message>
-    <message>
-        <location/>
-        <source>This license type requires a higher software version.</source>
-        <translation>Данный тип лицензии требует более поздней версии ПО.</translation>
     </message>
 </context>
 <context>

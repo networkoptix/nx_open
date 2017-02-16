@@ -884,7 +884,7 @@
     </message>
     <message>
         <location/>
-        <source>Motion + Low-Res</source>
+        <source>Motion + Lo-Res</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1021,11 +1021,6 @@
     </message>
     <message>
         <location/>
-        <source>HTTP url</source>
-        <translation>כתובת HTTP</translation>
-    </message>
-    <message>
-        <location/>
         <source>Login to authenticate (optional)</source>
         <translation>היכנס לארכיטקטורה (אופציונאלי)</translation>
     </message>
@@ -1047,6 +1042,11 @@
     <message>
         <location/>
         <source>Content type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP URL</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1203,7 +1203,7 @@
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots</source>
+        <source>Run application when PC Boots up</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1436,11 +1436,6 @@
         <location/>
         <source>Features</source>
         <translation>תכונות</translation>
-    </message>
-    <message>
-        <location/>
-        <source>This license type requires a higher software version.</source>
-        <translation>רשיון זה דורש גרסת תוכנה גבוהה יותר</translation>
     </message>
 </context>
 <context>

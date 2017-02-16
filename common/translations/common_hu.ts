@@ -522,24 +522,8 @@
         <translation>Nem lehet csatlakozni a %1 http porthoz.</translation>
     </message>
     <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation>Nem lehet megnyitni a %1 media url-t. Csatlakozás a %2 media porthoz meghiúsult.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation>Nem lehet megnyitni a %1 media url-t. Kapcsolat a %2 media porthoz váratlanul bezárult.</translation>
-    </message>
-    <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>Végül, próbálja meg frissíteni a firmware-t. Ha a probléma továbbra is fennáll, lépjen kapcsolatba a technikai segítségnyújtóval.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.</source>
-        <translation>Nincs támogatott media track a(z) %1 url-en.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation>Nem lehet megnyitni a %1 media url-t.Nem támogatott %2 media protokoll.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
@@ -590,18 +574,6 @@
         <translation>Győződjön meg róla, hogy akamera csatlakoztatva van a hálózathoz. Próbálja meg újraindítani a kamerát.</translation>
     </message>
     <message>
-        <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation>Nem lehet értelmezni az eszköz válaszát. %1 Url, %2 kérés név.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>Nem lehet értelmezni a kamera válaszát. %1 Url, %2 kérés név.</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>Nem engedélyezett. %1 Url.</translation>
-    </message>
-    <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>%1 eszköz kérés %2 hibával meghiúsult.</translation>
     </message>
@@ -644,10 +616,6 @@
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
         <translation>Ellenőrizze, hogy az I/O modul csatlakoztatva van a rendszerre. Próbálja újraindítani az I/O modult.</translation>
-    </message>
-    <message>
-        <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation>Az I/O modul  nem válaszol. URL: %1, név: %2.</translation>
     </message>
     <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -703,6 +671,38 @@
     </message>
     <message>
         <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse device response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No supported media tracks at URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not authorized. URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -882,10 +882,6 @@
         <translation>Érvénytelen licencek</translation>
     </message>
     <message>
-        <source>This license type requires higher software version.</source>
-        <translation>A licence típus magasabb szoftver verziót igényel.</translation>
-    </message>
-    <message>
         <source>Invalid signature</source>
         <translation type="unfinished">Érvénytelen aláírás</translation>
     </message>
@@ -907,6 +903,10 @@
     </message>
     <message>
         <source>Free license</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

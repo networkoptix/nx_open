@@ -1667,11 +1667,6 @@ to view more bookmarks</source>
         <translation type="unfinished">On Demand</translation>
     </message>
     <message>
-        <source>Low-Res Streams</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished">Low-Res suối</translation>
-    </message>
-    <message>
         <source>Hi-Res Streams</source>
         <comment>Cameras Backup</comment>
         <translation type="unfinished">Hi-Res suối</translation>
@@ -1688,6 +1683,11 @@ to view more bookmarks</source>
     <message>
         <source>affect all servers in the system</source>
         <comment>Relates to &apos;Global Settings&apos; subject</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lo-Res Streams</source>
+        <comment>Cameras Backup</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4279,12 +4279,12 @@ to %1</source>
         <translation>phóng to cửa sổ</translation>
     </message>
     <message>
-        <source>Low-Res</source>
-        <translation>Độ phân giải thấp</translation>
-    </message>
-    <message>
         <source>I/O Module</source>
         <translation>I/O Module</translation>
+    </message>
+    <message>
+        <source>Lo-Res</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7506,11 +7506,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter the url of the Web Page to add:</source>
+        <source>This Web Page already exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This Web Page already exists</source>
+        <source>Enter the URL of the Web Page to add:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

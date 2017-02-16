@@ -538,24 +538,8 @@
         <translation>http 포트 %1에 연결할 수 없습니다.</translation>
     </message>
     <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation>%1 미디어 URL을 열수 없습니다. %2 미디어 포트의 연결에 실패하였습니다.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation>미디어 URL %1 을 열수 없습니다. %2 포트의 연결이 예기치 못한 문제로 종료되었습니다.</translation>
-    </message>
-    <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>마지막으로, 카메라 업데잍를 시도합니다. 만약 문제가 지속될 경우 고객지원으로 연락해 주세요.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.</source>
-        <translation>URL %1의 미디어트랙을 지원하지 않습니다.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation>%1 미디어 URL을 열수 없습니다. %2 미디어 프로토콜을 지원하지 않습니다.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
@@ -588,18 +572,6 @@
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>카메라가 네트워크에 연결되었는지 확인후, 카메라 재시작 하세요.</translation>
-    </message>
-    <message>
-        <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation>장치로 부터 반응 없음 :URL%1, 요청이름 %2.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>장치로 부터 반응 없음 :URL%1, 요청이름 %2.</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>로그인 정보 오류. URL %1.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -643,10 +615,6 @@
     </message>
     <message>
         <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not parse I/O module response. Url %1, request name %2.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -703,6 +671,38 @@
     </message>
     <message>
         <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse device response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No supported media tracks at URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not authorized. URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -882,10 +882,6 @@
         <translation>유효하지 않은 라이센스</translation>
     </message>
     <message>
-        <source>This license type requires higher software version.</source>
-        <translation>이 라이센스는 상위 버젼의 SW가 필요합니다.</translation>
-    </message>
-    <message>
         <source>Invalid signature</source>
         <translation type="unfinished">유효하지 않은 서명</translation>
     </message>
@@ -907,6 +903,10 @@
     </message>
     <message>
         <source>Free license</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
