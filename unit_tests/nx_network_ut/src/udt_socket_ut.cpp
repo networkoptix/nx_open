@@ -350,37 +350,37 @@ TEST_F(SocketUdt, rendezvousConnectWithDelay)
     ASSERT_GT(generator->totalBytesReceived(), 0);
 }
 
-TEST_F(SocketUdt, DISABLED_acceptingFirstConnection)
+TEST_F(SocketUdt, acceptingFirstConnection)
 {
-    const std::chrono::seconds timeToWaitForSocketAccepted(1);
     const int loopLength = 71;
 
     for (int i = 0; i < loopLength; ++i)
     {
         UdtStreamServerSocket serverSocket(AF_INET);
         ASSERT_TRUE(serverSocket.bind(SocketAddress(HostAddress::localhost, 0)));
+        const auto serverAddress = serverSocket.getLocalAddress();
         ASSERT_TRUE(serverSocket.listen());
         ASSERT_TRUE(serverSocket.setNonBlockingMode(true));
 
-        nx::utils::promise<SystemError::ErrorCode> socketAcceptedPromise;
+        nx::utils::promise<
+            std::pair<SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>>
+        > socketAcceptedPromise;
         serverSocket.acceptAsync(
             [&socketAcceptedPromise](
                 SystemError::ErrorCode errorCode,
                 AbstractStreamSocket* socket)
             {
-                delete socket;
-                socketAcceptedPromise.set_value(errorCode);
+               socketAcceptedPromise.set_value(
+                   std::make_pair(errorCode, std::unique_ptr<AbstractStreamSocket>(socket)));
             });
 
         UdtStreamSocket clientSock(AF_INET);
-        ASSERT_TRUE(clientSock.connect(serverSocket.getLocalAddress()))
+        ASSERT_TRUE(clientSock.connect(serverAddress))
+            << serverAddress.toStdString() <<", "
             << SystemError::getLastOSErrorText().toStdString();
 
-        auto future = socketAcceptedPromise.get_future();
-        ASSERT_EQ(
-            std::future_status::ready,
-            future.wait_for(timeToWaitForSocketAccepted));
-        ASSERT_EQ(SystemError::noError, future.get());
+        const auto result = socketAcceptedPromise.get_future().get();
+        ASSERT_EQ(SystemError::noError, result.first);
 
         serverSocket.pleaseStopSync();
     }
