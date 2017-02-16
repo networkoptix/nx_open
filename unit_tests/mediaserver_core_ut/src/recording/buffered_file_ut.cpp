@@ -270,6 +270,8 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
 
 TEST(BufferedFileWriter, VariousSizes)
 {
+    QnWriterPool writerPool;
+
     const QByteArray kTestFileName("test_data1.bin");
     const QByteArray kTestPattern("1234567890");
     for (int fileBlockSize = 32768; fileBlockSize < 327680; fileBlockSize += 15000)
