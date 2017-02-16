@@ -497,18 +497,19 @@ protected:
         return "/validateUrl";
     }
 
-    void whenIssuedRequestWithEncodedSequenceInQuery()
+    void whenIssuedRequestWithEncodedSequenceInQueryAndFragment()
     {
         const auto query = QUrl::toPercentEncoding("test#%20#");
+        const auto fragment = QUrl::toPercentEncoding("#frag%20ment");
 
-        m_testUrl = QUrl(lit("http://%1%2?%3")
+        m_testUrl = QUrl(lit("http://%1%2?%3#%4")
             .arg(testHttpServer()->serverAddress().toString())
-            .arg(testPath()).arg(QLatin1String(query)));
+            .arg(testPath()).arg(QLatin1String(query)).arg(QLatin1String(fragment)));
 
         ASSERT_TRUE(m_httpClient.doGet(m_testUrl));
     }
 
-    void assertServerHasReceivedStillEncodedUrl()
+    void assertServerHasReceivedCorrectUrl()
     {
         auto url = m_urlsFromReceivedRequests.pop();
         url.setHost(m_testUrl.host());
@@ -551,8 +552,8 @@ TEST_F(
     AsyncHttpClientCorrectUrlTransferring,
     encoded_sequence_in_query_param_is_not_decoded)
 {
-    whenIssuedRequestWithEncodedSequenceInQuery();
-    assertServerHasReceivedStillEncodedUrl();
+    whenIssuedRequestWithEncodedSequenceInQueryAndFragment();
+    assertServerHasReceivedCorrectUrl();
 }
 
 //-------------------------------------------------------------------------------------------------

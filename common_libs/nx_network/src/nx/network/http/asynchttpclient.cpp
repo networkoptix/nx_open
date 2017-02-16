@@ -1061,6 +1061,7 @@ namespace nx_http
         {
             m_request.requestLine.url = m_contentLocationUrl.path();
             m_request.requestLine.url.setQuery(m_contentLocationUrl.query());
+            m_request.requestLine.url.setFragment(m_contentLocationUrl.fragment());
         }
         m_request.requestLine.version = useHttp11 ? nx_http::http_1_1 : nx_http::http_1_0;
 
