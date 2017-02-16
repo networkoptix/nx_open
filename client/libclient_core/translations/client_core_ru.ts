@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>This account is not activated. Please check your email.</source>
-        <translation>Эта учетная запись неактивна. Пожалуйста, проверьте электронную почту.</translation>
+        <translation>Учетная запись неактивна. Пожалуйста, проверьте почту.</translation>
     </message>
     <message>
         <source>This account is blocked.</source>

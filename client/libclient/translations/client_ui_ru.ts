@@ -166,7 +166,7 @@
     <message>
         <location/>
         <source>Get Installed Versions</source>
-        <translation>Получить версию установленного ПО</translation>
+        <translation>Получить версии установленных компонентов</translation>
     </message>
 </context>
 <context>
@@ -244,7 +244,7 @@
     <message>
         <location/>
         <source>Email settings</source>
-        <translation>Настройки e-mail</translation>
+        <translation>Настройки Email</translation>
     </message>
     <message>
         <location/>
@@ -523,7 +523,7 @@
     <message>
         <location/>
         <source>Add device(s)...</source>
-        <translation>Добавить устройства...</translation>
+        <translation>Добавить устройств(а)...</translation>
     </message>
     <message>
         <location/>
@@ -533,7 +533,7 @@
     <message>
         <location/>
         <source>Device Address</source>
-        <translation>Адрес устройства:</translation>
+        <translation>Адрес устройства</translation>
     </message>
     <message>
         <location/>
@@ -563,7 +563,7 @@
     <message>
         <location/>
         <source>Discovery Port</source>
-        <translation>П&amp;орт:</translation>
+        <translation>Порт</translation>
     </message>
     <message>
         <location/>
@@ -727,7 +727,7 @@
     <message>
         <location/>
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation>Настройка &quot;Разрешить системе оптимизировать настройки камер&quot; отключена в диалоге &quot;Администрирование системы&quot;</translation>
+        <translation>Настройка &quot;Разрешить системе оптимизировать настройки камер&quot; отключена в диалоге &quot;Администрирование системы&quot;.</translation>
     </message>
     <message>
         <location/>
@@ -784,7 +784,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
         <source>Panic Mode: </source>
-        <translation>Запись по тревоге:</translation>
+        <translation>Запись по тревоге: </translation>
     </message>
     <message>
         <location/>
@@ -814,7 +814,7 @@
     <message>
         <location/>
         <source>Motion + Low-Res </source>
-        <translation>Движение + Низкое разрешение</translation>
+        <translation>Дд + низ </translation>
     </message>
     <message>
         <location/>
@@ -855,7 +855,7 @@
         <location/>
         <source> s</source>
         <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation>с</translation>
+        <translation> с</translation>
     </message>
     <message>
         <location/>
@@ -895,7 +895,7 @@
     <message>
         <location/>
         <source>Apply changes before copying schedule.</source>
-        <translation>Сохраните изменения перед копированием</translation>
+        <translation>Сохраните изменения перед копированием.</translation>
     </message>
 </context>
 <context>
@@ -1291,7 +1291,7 @@
     <message>
         <location/>
         <source>Browse...</source>
-        <translation>Выбрать...</translation>
+        <translation>Обзор...</translation>
     </message>
     <message>
         <location/>
@@ -1455,7 +1455,7 @@
     <message>
         <location/>
         <source>This license type requires a higher software version.</source>
-        <translation>Для использования такого типа лицензии требуется более новая версия ПО.</translation>
+        <translation>Данный тип лицензии требует более поздней версии ПО.</translation>
     </message>
 </context>
 <context>
@@ -1524,7 +1524,7 @@
     <message>
         <location/>
         <source>Browse...</source>
-        <translation>Выбрать...</translation>
+        <translation>Обзор...</translation>
     </message>
     <message>
         <location/>
@@ -1549,7 +1549,7 @@
     <message>
         <location/>
         <source>License Key</source>
-        <translation>Лицензионный ключ:</translation>
+        <translation>Лицензионный ключ</translation>
     </message>
     <message>
         <location/>
@@ -1559,12 +1559,12 @@
     <message>
         <location/>
         <source>Hardware ID</source>
-        <translation>Аппаратный идентификатор:</translation>
+        <translation>Аппаратный идентификатор</translation>
     </message>
     <message>
         <location/>
         <source>Activation Key File</source>
-        <translation>Файл с ключом активации:</translation>
+        <translation>Файл с ключом активации</translation>
     </message>
 </context>
 <context>
@@ -1661,22 +1661,22 @@
     <message>
         <location/>
         <source>Browse...</source>
-        <translation>Выбрать...</translation>
+        <translation>Обзор...</translation>
     </message>
     <message>
         <location/>
         <source>Language</source>
-        <translation>Язык:</translation>
+        <translation>Язык</translation>
     </message>
     <message>
         <location/>
         <source>Time Mode</source>
-        <translation>Шкала времени:</translation>
+        <translation>Шкала времени</translation>
     </message>
     <message>
         <location/>
         <source>Image</source>
-        <translation>Изображение:</translation>
+        <translation>Изображение</translation>
     </message>
     <message>
         <location/>
@@ -1686,7 +1686,7 @@
     <message>
         <location/>
         <source>Intensity</source>
-        <translation>Непрозрачность:</translation>
+        <translation>Интенсивность</translation>
     </message>
     <message>
         <location/>
@@ -2127,7 +2127,7 @@
     <message>
         <location/>
         <source>Browse...</source>
-        <translation>Выбрать...</translation>
+        <translation>Обзор...</translation>
     </message>
     <message>
         <location/>
@@ -2320,17 +2320,17 @@
     <message>
         <location/>
         <source>Browse...</source>
-        <translation>Выбрать...</translation>
+        <translation>Обзор...</translation>
     </message>
     <message>
         <location/>
         <source>Resolution</source>
-        <translation>Разрешение:</translation>
+        <translation>Разрешение</translation>
     </message>
     <message>
         <location/>
         <source>Recording Quality</source>
-        <translation>Качество записи:</translation>
+        <translation>Качество записи</translation>
     </message>
 </context>
 <context>
@@ -2384,7 +2384,7 @@
     <message>
         <location/>
         <source>Global Email Settings...</source>
-        <translation>&amp;Настройки e-mail...</translation>
+        <translation>Настройки почты...</translation>
     </message>
 </context>
 <context>
@@ -2417,7 +2417,7 @@
     <message>
         <location/>
         <source>IP Address</source>
-        <translation>IP адрес:</translation>
+        <translation>IP адрес</translation>
     </message>
     <message>
         <location/>
@@ -2569,12 +2569,12 @@
     <message>
         <location/>
         <source>Firmware</source>
-        <translation>Версия прошивки:</translation>
+        <translation>Версия прошивки</translation>
     </message>
     <message>
         <location/>
         <source>Vendor</source>
-        <translation>Производитель:</translation>
+        <translation>Производитель</translation>
     </message>
     <message>
         <location/>
@@ -2594,7 +2594,7 @@
     <message>
         <location/>
         <source>IP Address</source>
-        <translation>IP адрес:</translation>
+        <translation>IP адрес</translation>
     </message>
     <message>
         <location/>
@@ -2604,12 +2604,12 @@
     <message>
         <location/>
         <source>MAC Address</source>
-        <translation>MAC адрес:</translation>
+        <translation>MAC адрес</translation>
     </message>
     <message>
         <location/>
         <source>Sensitivity</source>
-        <translation>Чувствительность:</translation>
+        <translation>Чувствительность</translation>
     </message>
     <message>
         <location/>
@@ -2857,7 +2857,8 @@
         <location/>
         <source>System time is synchronized with the Internet and is independent from server&apos;s local time.
 Selected server will be used as a time server if the system has no Internet access.</source>
-        <translation>Системное время синхронизируется с Интернетом и не зависит от местного времени сервера. Выбранный сервер будет использоваться как сервер времени, если у системе нет доступа в сеть Интернет.</translation>
+        <translation>Системное время синхронизируется с Интернетом и не зависит от местного времени сервера. 
+Выбранный сервер будет использоваться как сервер времени, если у системе нет доступа в сеть Интернет.</translation>
     </message>
 </context>
 <context>
@@ -2897,7 +2898,8 @@ Selected server will be used as a time server if the system has no Internet acce
         <location/>
         <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-        <translation>В системе еще не настроены пользовательские роли. Для создания используется кнопка «Новая роль».</translation>
+        <translation>В системе еще не настроены пользовательские роли. 
+Для создания используется кнопка «Новая роль».</translation>
     </message>
     <message>
         <location/>

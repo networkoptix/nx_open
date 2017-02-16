@@ -56,7 +56,7 @@
     <name>CredentialsEditor</name>
     <message>
         <source>Email</source>
-        <translation>Адрес электронной почты</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Password</source>
@@ -76,7 +76,7 @@
     </message>
     <message>
         <source>Invalid email or password</source>
-        <translation>Недопустимый адрес электронной почты или пароль</translation>
+        <translation>Недопустимый Email или пароль</translation>
     </message>
     <message>
         <source>Cannot connect to %1</source>
@@ -84,7 +84,7 @@
     </message>
     <message>
         <source>Email and password cannot be empty</source>
-        <translation>Адрес электронной почты и пароль не могут быть пустыми</translation>
+        <translation>Email и пароль не могут быть пустыми</translation>
     </message>
     <message>
         <source>Log in</source>
@@ -227,19 +227,19 @@
     </message>
     <message>
         <source>Hi-res</source>
-        <translation>Выс. Разр.</translation>
+        <translation>Выс</translation>
     </message>
     <message>
         <source>Low-res</source>
-        <translation>Низ. Разр.</translation>
+        <translation>Низ</translation>
     </message>
     <message>
         <source>Low-res key-frames</source>
-        <translation>Ключ. кадры с низ. разр.</translation>
+        <translation>Низ + ключ</translation>
     </message>
     <message>
         <source>Custom-res</source>
-        <translation>Польз. разр.</translation>
+        <translation>Др</translation>
     </message>
     <message>
         <source>%1 fps</source>

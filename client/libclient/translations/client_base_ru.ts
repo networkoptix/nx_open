@@ -35,7 +35,8 @@
 to view more bookmarks</source>
         <comment>Use &apos;
 &apos; to split message in two lines (required)</comment>
-        <translation>Увеличьте масштаб шкалы времени чтобы увидеть больше закладок</translation>
+        <translation>Увеличьте масштаб шкалы времени
+чтобы увидеть больше закладок</translation>
     </message>
 </context>
 <context>
@@ -252,7 +253,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Preset used by some tours. Delete it anyway?</source>
-        <translation>Позиция используется в лескольких PTZ турах. Удалить ее?</translation>
+        <translation>Позиция используется в нескольких турах. Удалить ее?</translation>
     </message>
     <message>
         <source>These tours will become invalid.</source>
@@ -543,7 +544,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Video Wall...</source>
-        <translation>Видеостена...</translation>
+        <translation>Видеостену...</translation>
     </message>
     <message>
         <source>New Video Wall...</source>
@@ -1290,7 +1291,7 @@ to view more bookmarks</source>
     <message>
         <source>Open %1 Portal...</source>
         <comment>Open Nx Cloud Portal</comment>
-        <translation>Орктыть потрал %1...</translation>
+        <translation>Открыть потрал %1...</translation>
     </message>
     <message>
         <source>Stop Sharing Layout</source>
@@ -1456,6 +1457,14 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
+        <source>These cameras are removed from the System</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
         <source>These servers are removed from the System</source>
         <translation type="unfinished">
             <numerusform></numerusform>
@@ -1473,14 +1482,6 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
         <source>These resources are removed from the System</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>These cameras are removed from the System</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -1656,7 +1657,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation>Настройки e-mail изменены</translation>
+        <translation>Настройки Email изменены</translation>
     </message>
     <message>
         <source>Filled circle mark means the archive is still available</source>
@@ -1703,7 +1704,7 @@ to view more bookmarks</source>
     <message>
         <source>Hi-Res Streams</source>
         <comment>Cameras Backup</comment>
-        <translation>Потоки с высоким качеством</translation>
+        <translation>Высокое качество</translation>
     </message>
     <message>
         <source>All Streams</source>
@@ -1712,12 +1713,12 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Global Settings</source>
-        <translation>Глобальные параметры</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>affect all servers in the system</source>
         <comment>Relates to &apos;Global Settings&apos; subject</comment>
-        <translation>влияют на все серверы в системе</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2657,7 +2658,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>Changes to the following %n devices are not saved:</source>
         <translation>
-            <numerusform>Изменения для следующего %n устройства не сохранены:</numerusform>
+            <numerusform>Изменения для %n устройства не сохранены:</numerusform>
             <numerusform>Изменения для следующих %n устройств не сохранены:</numerusform>
             <numerusform>Изменения для следующих %n устройств не сохранены:</numerusform>
         </translation>
@@ -2665,7 +2666,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>Changes to the following %n cameras are not saved:</source>
         <translation>
-            <numerusform>Изменения для следующей камеры не сохранены:</numerusform>
+            <numerusform>Изменения для %n камеры не сохранены:</numerusform>
             <numerusform>Изменения для следующих %n камер не сохранены:</numerusform>
             <numerusform>Изменения для следующих %n камер не сохранены:</numerusform>
         </translation>
@@ -2673,7 +2674,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>Changes to the following %n I/O Modules are not saved:</source>
         <translation>
-            <numerusform>Изменения для следующего модуля ввода-вывода не сохранены:</numerusform>
+            <numerusform>Изменения для %n модуля ввода-вывода не сохранены:</numerusform>
             <numerusform>Изменения для следующих %n модулей ввода-вывода не сохранены:</numerusform>
             <numerusform>Изменения для следующих %n модулей ввода-вывода не сохранены:</numerusform>
         </translation>
@@ -2738,7 +2739,9 @@ to view more bookmarks</source>
         <source>Connect to your Systems
 from anywhere with any
 devices</source>
-        <translation>Подключайтесь к системам из любого места с любых устройств</translation>
+        <translation>Подключайтесь к системам 
+из любого места 
+с любых устройств</translation>
     </message>
     <message>
         <source>Known limitations</source>
@@ -2752,12 +2755,12 @@ devices</source>
     <message>
         <source>Open %1 Portal</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Орктыть потрал %1</translation>
+        <translation type="unfinished">Открыть потрал %1</translation>
     </message>
     <message>
         <source>Create %1 Account</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Создание учетную запись %1</translation>
+        <translation type="unfinished">Создать учетную запись %1</translation>
     </message>
     <message>
         <source>Connect System to %1...</source>
@@ -2768,13 +2771,15 @@ devices</source>
         <source>Create %1
 account</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Создать учетную запись %1</translation>
+        <translation type="unfinished">Создать учетную 
+запись %1</translation>
     </message>
     <message>
         <source>Connect System
 to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Подключить систему к %1</translation>
+        <translation type="unfinished">Подключить 
+систему к %1</translation>
     </message>
     <message>
         <source>%1 is in Beta.</source>
@@ -2814,7 +2819,7 @@ to %1</source>
     <name>QnConnectToCloudDialog</name>
     <message>
         <source>Email</source>
-        <translation>Почта</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Password</source>
@@ -2860,11 +2865,11 @@ to %1</source>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server</source>
-        <translation>Настройка сервера(ов)</translation>
+        <translation>Настройка сервера</translation>
     </message>
     <message>
         <source>Updating Server</source>
-        <translation>Обновление сервера(ов)</translation>
+        <translation>Обновление сервера</translation>
     </message>
 </context>
 <context>
@@ -3357,6 +3362,10 @@ to %1</source>
         <source>Open camera</source>
         <translation>Открыть камеру</translation>
     </message>
+    <message>
+        <source>User removed</source>
+        <translation type="unfinished">Пользователь удалён</translation>
+    </message>
     <message numerus="yes">
         <source>%n users</source>
         <translation type="unfinished">
@@ -3380,10 +3389,6 @@ to %1</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
-    </message>
-    <message>
-        <source>User removed</source>
-        <translation type="unfinished">Пользователь удалён</translation>
     </message>
 </context>
 <context>
@@ -3806,7 +3811,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>Почта</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>DN</source>
@@ -4046,7 +4051,7 @@ to %1</source>
     </message>
     <message>
         <source>Network error</source>
-        <translation>Сетевая ошибка.</translation>
+        <translation>Сетевая ошибка</translation>
     </message>
     <message>
         <source>Please contact Customer Support to activate license key manually.</source>
@@ -4105,7 +4110,7 @@ to %1</source>
     </message>
     <message>
         <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation>Для получения лицензионного ключа необходимо отослать сообщение, содержащее серийный номер и Hardware ID, %1.</translation>
+        <translation>Для получения лицензионного ключа необходимо отослать Email, содержащий серийный номер и Hardware ID, %1.</translation>
     </message>
     <message>
         <source>Hardware id copied to clipboard</source>
@@ -4238,7 +4243,7 @@ to %1</source>
     </message>
     <message>
         <source>Delete connection?</source>
-        <translation>Удалить соединения</translation>
+        <translation>Удалить подключение?</translation>
     </message>
     <message>
         <source>There is another connection with the same name.</source>
@@ -4253,7 +4258,7 @@ to %1</source>
     <name>QnLoginToCloudDialog</name>
     <message>
         <source>Email</source>
-        <translation>Почта</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Password</source>
@@ -4357,7 +4362,7 @@ to %1</source>
     </message>
     <message>
         <source>Hi-Res</source>
-        <translation>Hi-Res</translation>
+        <translation>Выс</translation>
     </message>
     <message>
         <source>LIVE</source>
@@ -4373,7 +4378,7 @@ to %1</source>
     </message>
     <message>
         <source>Low-Res</source>
-        <translation>Lo-Res</translation>
+        <translation>Низ</translation>
     </message>
     <message>
         <source>I/O Module</source>
@@ -4477,11 +4482,11 @@ to %1</source>
         <translation>Включить вторичный поток</translation>
     </message>
     <message>
-        <source>multiple values</source>
+        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
+        <source>multiple values</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4634,7 +4639,7 @@ to %1</source>
     </message>
     <message>
         <source>This is also required to create/edit PTZ presets and tours.</source>
-        <translation>Это также необходимо для создания/редактирования PTZ позиций и туров.</translation>
+        <translation>А также настройка PTZ позиций и туров.</translation>
     </message>
     <message>
         <source>Control video walls</source>
@@ -4662,11 +4667,11 @@ to %1</source>
     </message>
     <message>
         <source>User Input</source>
-        <translation>Действия пользователя</translation>
+        <translation>Другие действия</translation>
     </message>
     <message>
         <source>PTZ, Device Output, 2-way Audio</source>
-        <translation>Управление PTZ, устройствами вывода, двухсторонний звук</translation>
+        <translation>PTZ, выводы устройств, 2x-сторонний звук</translation>
     </message>
 </context>
 <context>
@@ -5302,19 +5307,19 @@ to %1</source>
     </message>
     <message>
         <source>User %1 has invalid email address</source>
-        <translation>У пользователя %1 неправильный E-Mail</translation>
+        <translation>У пользователя %1 неправильный Email</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 users have invalid email address</source>
         <translation>
-            <numerusform>У %n из %1 пользователя некорректный email адрес</numerusform>
+            <numerusform>У %n из %1 пользователя некорректный Email</numerusform>
             <numerusform>У %n из %1 пользователей некорректные email адреса</numerusform>
             <numerusform>У %n мз %1 пользователей некорректные email адреса</numerusform>
         </translation>
     </message>
     <message>
         <source>Invalid email address %1</source>
-        <translation>Некорректный адрес %1</translation>
+        <translation>Некорректный Email %1</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 additional email addresses are invalid</source>
@@ -5775,11 +5780,11 @@ to %1</source>
         <translation>Сбросить области обнаружения движения на настройки по умолчанию?</translation>
     </message>
     <message>
-        <source>This action cannot be undone.</source>
+        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
+        <source>This action cannot be undone.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5791,7 +5796,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>Почта</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>SMTP Server</source>
@@ -5826,11 +5831,11 @@ to %1</source>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
         <source>Email</source>
-        <translation>Почта</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation>Некорректный E-Mail</translation>
+        <translation>Некорректный Email.</translation>
     </message>
     <message>
         <source>Password</source>
@@ -5897,7 +5902,7 @@ to %1</source>
     </message>
     <message>
         <source>Network error</source>
-        <translation>Сетевая ошибка.</translation>
+        <translation>Сетевая ошибка</translation>
     </message>
     <message>
         <source>Invalid parameters</source>
@@ -6237,7 +6242,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>Почта</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Updates</source>
@@ -6245,7 +6250,7 @@ to %1</source>
     </message>
     <message>
         <source>Routing Management</source>
-        <translation>Управление маршрутизацией</translation>
+        <translation>Маршрутизация</translation>
     </message>
     <message>
         <source>Time Synchronization</source>
@@ -6260,7 +6265,7 @@ to %1</source>
     <name>QnSystemHealthStringsHelper</name>
     <message>
         <source>Email address is not set</source>
-        <translation>Адрес E-Mail не настроен</translation>
+        <translation>Не настроен адрес Email</translation>
     </message>
     <message>
         <source>No licenses</source>
@@ -6268,11 +6273,11 @@ to %1</source>
     </message>
     <message>
         <source>Email server is not set</source>
-        <translation>Сервер E-Mail не настроен</translation>
+        <translation>Не настроен сервер Email</translation>
     </message>
     <message>
         <source>Some users have not set their email addresses</source>
-        <translation>У некоторых пользователей не настроен адрес E-Mail</translation>
+        <translation>У некоторых пользователей не настроен адрес Email</translation>
     </message>
     <message>
         <source>Connection to server lost</source>
@@ -6288,7 +6293,7 @@ to %1</source>
     </message>
     <message>
         <source>Error while sending email</source>
-        <translation>Ошибка отправки сообщения</translation>
+        <translation>Ошибка отправки Email</translation>
     </message>
     <message>
         <source>Storage is full</source>
@@ -6308,7 +6313,7 @@ to %1</source>
     </message>
     <message>
         <source>Email address is not set for user %1</source>
-        <translation>У пользователя %1 не настроен адрес E-Mail </translation>
+        <translation>У пользователя %1 не настроен адрес Email</translation>
     </message>
     <message>
         <source>Email address is not set.</source>
@@ -6316,19 +6321,19 @@ to %1</source>
     </message>
     <message>
         <source>You cannot receive system notifications via email.</source>
-        <translation>Вы не можете получать оповещения по E-Mail.</translation>
+        <translation>Вы не можете получать оповещения по Email.</translation>
     </message>
     <message>
         <source>Email server is not set.</source>
-        <translation>Сервер E-Mail не настроен.</translation>
+        <translation>Сервер Email не настроен.</translation>
     </message>
     <message>
         <source>Some users have not set their email addresses.</source>
-        <translation>У некоторых пользователей не настроен адрес E-Mail.</translation>
+        <translation>У некоторых пользователей не настроен адрес Email.</translation>
     </message>
     <message>
         <source>They cannot receive system notifications via email.</source>
-        <translation>Они не могут получать оповещения по E-Mail.</translation>
+        <translation>Они не могут получать оповещения по Email.</translation>
     </message>
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
@@ -6482,7 +6487,7 @@ to %1</source>
     </message>
     <message>
         <source>Network error</source>
-        <translation>Сетевая ошибка.</translation>
+        <translation>Сетевая ошибка</translation>
     </message>
 </context>
 <context>
@@ -6661,7 +6666,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>Почта</translation>
+        <translation>Email</translation>
     </message>
 </context>
 <context>
@@ -6812,15 +6817,15 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>Почта</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Email cannot be empty.</source>
-        <translation>Электронный адрес не может быть пустым.</translation>
+        <translation>Email не может быть пустым.</translation>
     </message>
     <message>
         <source>Cloud user with specified email already exists.</source>
-        <translation>Облачный пользователь с таким адресом электронной почты уже существует.</translation>
+        <translation>Облачный пользователь с таким Email уже существует.</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6839,11 +6844,11 @@ to %1</source>
     <name>QnValidatorStrings</name>
     <message>
         <source>Email cannot be empty.</source>
-        <translation>Электронный адрес не может быть пустым.</translation>
+        <translation>Email не может быть пустым.</translation>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation>Некорректный E-Mail</translation>
+        <translation>Некорректный Email.</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
@@ -7081,10 +7086,6 @@ to %1</source>
         <source>Skip</source>
         <translation>Пропустить</translation>
     </message>
-    <message>
-        <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
         <translation type="unfinished">
@@ -7108,6 +7109,10 @@ to %1</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7139,7 +7144,7 @@ to %1</source>
     <message numerus="yes">
         <source>Delete %n bookmarks?</source>
         <translation>
-            <numerusform>Удалить закладку?</numerusform>
+            <numerusform>Удалить %n закладку?</numerusform>
             <numerusform>Удалить %n закладки?</numerusform>
             <numerusform>Удалить %n закладок?</numerusform>
         </translation>
@@ -7438,7 +7443,7 @@ to %1</source>
     <message numerus="yes">
         <source>The following %n items are not deleted:</source>
         <translation>
-            <numerusform>Следующий элемент не удален:</numerusform>
+            <numerusform>%n элемент не удален:</numerusform>
             <numerusform>%n элемента не удалено:</numerusform>
             <numerusform>%n элементов не удалено:</numerusform>
         </translation>
@@ -7450,7 +7455,7 @@ to %1</source>
     <message numerus="yes">
         <source>Failed to delete %n items:</source>
         <translation>
-            <numerusform>Не удалось удалить элемент:</numerusform>
+            <numerusform>Не удалось удалить %n элемент:</numerusform>
             <numerusform>Не удалось удалить %n элемента:</numerusform>
             <numerusform>Не удалось удалить %n элементов:</numerusform>
         </translation>
@@ -7621,7 +7626,7 @@ to %1</source>
     <message numerus="yes">
         <source>Delete %n items?</source>
         <translation>
-            <numerusform>Удалить элемент?</numerusform>
+            <numerusform>Удалить %n элемент?</numerusform>
             <numerusform>Удалить %n элемента?</numerusform>
             <numerusform>Удалить %n элементов?</numerusform>
         </translation>
@@ -7645,7 +7650,7 @@ to %1</source>
     <message numerus="yes">
         <source>Delete %n matrices?</source>
         <translation>
-            <numerusform>Удалить матрицу?</numerusform>
+            <numerusform>Удалить %n матрицу?</numerusform>
             <numerusform>Удалить %n матрицы?</numerusform>
             <numerusform>Удалить %n матриц?</numerusform>
         </translation>
@@ -7759,7 +7764,7 @@ to %1</source>
     <message numerus="yes">
         <source>These %n layouts are shared with other users, so you delete it for them too.</source>
         <translation>
-            <numerusform>Эта раскладка используется совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
+            <numerusform>%n раскладка используется совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
             <numerusform>Эти %n раскладки используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
             <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
         </translation>
@@ -7767,7 +7772,7 @@ to %1</source>
     <message numerus="yes">
         <source>Remove %n items from layout?</source>
         <translation>
-            <numerusform>Удалить элемент из раскладки?</numerusform>
+            <numerusform>Удалить %n элемент из раскладки?</numerusform>
             <numerusform>Удалить %n элемента из раскладки?</numerusform>
             <numerusform>Удалить %n элементов из раскладки?</numerusform>
         </translation>

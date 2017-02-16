@@ -68,6 +68,11 @@
         <translation>Объединить?</translation>
     </message>
     <message>
+        <source>Cannot connect to the other system because current system is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>In this version you can only merge systems which are not connected to %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished">В этой версии можно объединять только системы, которые не связаны с %1.</translation>
@@ -81,11 +86,6 @@
         <source>These systems are built with different %1 URL. Merge is not allowed.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished">Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
-    </message>
-    <message>
-        <source>Cannot connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -378,7 +378,7 @@
     </message>
     <message>
         <source>I/O Module %1 was disconnected</source>
-        <translation>Модуль ввода/вывода %1  отсоединен</translation>
+        <translation>Модуль ввода/вывода %1 отсоединен</translation>
     </message>
     <message>
         <source>Conflicting Address: %1</source>
@@ -699,7 +699,7 @@
     </message>
     <message>
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-        <translation>Убедитесь, что порт %1 доступен (например, проброшен).</translation>
+        <translation type="unfinished">Убедитесь, что порт %2 доступен (например, проброшен). {1 ?}</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
@@ -835,7 +835,7 @@
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
-        <translation>Для этого устройства доступны только одиночные лицензии</translation>
+        <translation>Для этого устройства доступна только одиночная лицензия</translation>
     </message>
     <message>
         <source>Unknown error</source>
@@ -851,31 +851,31 @@
     </message>
     <message>
         <source>Analog Encoder</source>
-        <translation>Аналоговый энкодер</translation>
+        <translation>Аналоговый кодировщик</translation>
     </message>
     <message>
         <source>Trial Licenses</source>
-        <translation>Временная лицензия</translation>
+        <translation>Временные лицензии</translation>
     </message>
     <message>
         <source>Analog Licenses</source>
-        <translation>Лицензия на аналоговую камеру</translation>
+        <translation>Лицензии на аналоговую камеру</translation>
     </message>
     <message>
         <source>Professional Licenses</source>
-        <translation>Профессиональная лицензия</translation>
+        <translation>Профессиональные лицензии</translation>
     </message>
     <message>
         <source>Edge Licenses</source>
-        <translation>Лицензия Edge</translation>
+        <translation>Лицензии Edge</translation>
     </message>
     <message>
         <source>Vmax Licenses</source>
-        <translation>Лицензия Vmax</translation>
+        <translation>Vmax лицензии</translation>
     </message>
     <message>
         <source>Analog Encoder Licenses</source>
-        <translation>Лицензии на аналоговые энкодеры</translation>
+        <translation>Лицензии на аналоговые кодировщики</translation>
     </message>
     <message>
         <source>Video Wall Licenses</source>
@@ -903,7 +903,7 @@
     </message>
     <message>
         <source>This license type requires higher software version.</source>
-        <translation>Данный тип лицензии требует более старшей версии ПО.</translation>
+        <translation>Данный тип лицензии требует более поздней версии ПО.</translation>
     </message>
     <message>
         <source>Invalid signature</source>
@@ -1188,7 +1188,7 @@
     <name>QnStreamRecorder</name>
     <message>
         <source>Corresponding container in FFMPEG library was not found.</source>
-        <translation>Контейнер  не был найден в библиотеке FFMPEG.</translation>
+        <translation>Не найден соответствующий контейнер в библиотекe FFMPEG.</translation>
     </message>
     <message>
         <source>Could not create output file for video recording.</source>
@@ -1200,7 +1200,7 @@
     </message>
     <message>
         <source>Could not allocate output audio stream.</source>
-        <translation>Невозможно создать буфер для звукового  потока.</translation>
+        <translation>Невозможно создать буфер для звукового потока.</translation>
     </message>
     <message>
         <source>Invalid audio codec information.</source>
