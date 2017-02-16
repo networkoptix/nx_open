@@ -14,7 +14,7 @@ angular.module('cloudApp')
                     var activeLanguage = _.find(languages, function(lang){
                         return lang.language == L.language;
                     })
-                    scope.activeLanguage = activeLanguage? activeLanguage.name: "LANGUAGE";
+                    scope.activeLanguage = activeLanguage? activeLanguage.lang: "en";
                     scope.languages = languages;
                 });
                 scope.changeLanguage = function(language){

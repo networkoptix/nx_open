@@ -1,2 +1,14 @@
-[{"language": "en", "name": "English (USA)"},
-  {"language": "ru", "name": "Русский (Russia)"}]
+[{"name": "English (USA)", "language": "en"},
+  {"name": "Русский (Russia)", "language": "ru"},
+  {"name": "Français", "language": "fr"},
+  {"name": "Deutsche", "language": "de"},
+  {"name": "Español", "language": "es"},
+  {"name": "日本語", "language": "ja"},
+  {"name": "한국어", "language": "ko"},
+  {"name": "ภาษาไทย", "language": "th"},
+  {"name": "简体中文", "language": "zh_CN"},
+  {"name": "繁体中文", "language": "zh_TW"},
+  {"name": "tiếng Việt", "language": "vi_VN"},
+  {"name": "Magyar", "language": "hu"},
+  {"name": "עברית", "language": "he"},
+  {"name": "Português (Portugal)", "language": "pt_PT"}]
