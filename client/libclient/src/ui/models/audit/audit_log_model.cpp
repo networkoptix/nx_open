@@ -278,7 +278,7 @@ QString QnAuditLogModel::formatDuration(int durationSecs)
 {
     qint64 durationMs = durationSecs * 1000;
 
-    static const QString kSeparator = L' ';
+    static const QString kSeparator(L' ');
     return QTimeSpan(durationMs).toApproximateString(
         QTimeSpan::kDoNotSuppressSecondUnit,
         Qt::Days | Qt::Hours | Qt::Minutes,
