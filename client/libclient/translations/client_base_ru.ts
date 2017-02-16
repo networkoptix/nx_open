@@ -1451,7 +1451,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>These devices are removed from the System</source>
         <translation type="unfinished">
-            <numerusform>Эти устройства были удалены из системы</numerusform>
+            <numerusform></numerusform>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>

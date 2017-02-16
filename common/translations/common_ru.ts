@@ -699,7 +699,7 @@
     </message>
     <message>
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished">Убедитесь, что порт %2 доступен (например, проброшен). {1 ?}</translation>
+        <translation type="unfinished">Убедитесь, что порт %1 доступен (например, проброшен).</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
