@@ -12,6 +12,7 @@ import calendar
 import pytz
 import tzlocal
 import requests.exceptions
+import pytest
 from server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_SEC, HttpError, ServerRestApi
 from camera import Camera, SampleMediaFile
 
@@ -32,6 +33,7 @@ MEDIASERVER_CLOUDHOST_FPATH = '/opt/networkoptix/mediaserver/lib/libcommon.so'
 
 CLOUD_HOST_TIMEOUT_SEC = 10
 MEDIASERVER_CREDENTIALS_TIMEOUT_SEC = 60 *5
+MEDIASERVER_MERGE_TIMEOUT_SEC = MEDIASERVER_CREDENTIALS_TIMEOUT_SEC
 DEFAULT_CUSTOMIZATION = 'default'
 
 log = logging.getLogger(__name__)
@@ -146,10 +148,10 @@ class ServerPersistentInfo(object):
         
 class Server(object):
 
-    def __init__(self, name, box, ip_address, cloud_host_rest_api):
+    def __init__(self, name, box, url, cloud_host_rest_api):
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
         self.box = box
-        self.url = 'http://%s:%d/' % (ip_address, MEDIASERVER_LISTEN_PORT)
+        self.url = url
         self.cloud_host_rest_api = cloud_host_rest_api
         self.service = Service(box, MEDIASERVER_SERVICE_NAME)
         self.user = REST_API_USER
@@ -170,6 +172,7 @@ class Server(object):
         if reset:
             if was_started:
                 self.stop_service()
+            self.storage.cleanup()
             self.patch_binary_set_cloud_host(MEDIASERVER_DEFAULT_CLOUDHOST)  # may be changed by previous tests...
             self.reset_config()
             if must_start:
@@ -343,6 +346,12 @@ class Server(object):
         return settings
 
     def merge_systems(self, other_server, take_remote_settings=False):
+        log.info('Merging servers: %s with local_system_id=%r and %s with local_system_id=%r',
+                 self, self.local_system_id, other_server, other_server.local_system_id)
+        assert self._is_started and other_server._is_started
+        assert self.local_system_id is not None and other_server is not None  # expected to be loaded already
+        assert self.local_system_id != other_server.local_system_id  # Must not be merged yet
+
         realm, nonce = other_server.get_nonce()
         def make_key(method):
             digest = generate_auth_key(method, other_server.user.lower(), other_server.password, nonce, realm)
@@ -357,8 +366,20 @@ class Server(object):
             self._set_user_password(other_server.user, other_server.password)
         else:
             other_server._set_user_password(self.user, self.password)
-        self._load_system_settings()
-        other_server._load_system_settings()
+        self._wait_for_servers_to_merge(other_server)
+
+    def _wait_for_servers_to_merge(self, other_server):
+        t = time.time()
+        while time.time() - t < MEDIASERVER_MERGE_TIMEOUT_SEC:
+            self._load_system_settings()
+            other_server._load_system_settings()
+            if self.local_system_id == other_server.local_system_id:
+                log.info('Servers are merged now, have common local_system_id=%r', self.local_system_id)
+                return
+            log.debug('Servers are not merged yet, waiting...')
+            time.sleep(0.5)
+        pytest.fail('Timed out in %s seconds waiting for servers %s and %s to be merged'
+                    % (MEDIASERVER_MERGE_TIMEOUT_SEC, self, other_server))
 
     def _set_user_password(self, user, password):
         log.debug('%s got user/password: %r/%r', self, user, password)
@@ -380,7 +401,8 @@ class Server(object):
                 if x.status_code != 401:
                     raise
             time.sleep(1)
-        assert False, 'Timed out waiting for server %s to accept credentials: user=%r, password=%r' % (self, self.user, self.password)
+        pytest.fail('Timed out in %s seconds waiting for server %s to accept credentials: user=%r, password=%r'
+                    % (MEDIASERVER_CREDENTIALS_TIMEOUT_SEC, self, self.user, self.password))
 
     def get_nonce(self):
         response = self.rest_api.api.getNonce.get()

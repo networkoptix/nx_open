@@ -29,7 +29,6 @@ CdbNonceFetcher::CdbNonceFetcher(
 :
     m_cloudConnectionManager(cloudConnectionManager),
     m_defaultGenerator(defaultGenerator),
-    m_boundToCloud(false),
     m_randomEngine(m_rd()),
     m_nonceTrailerRandomGenerator('a', 'z'),
     m_timerManager(nx::utils::TimerManager::instance())
@@ -42,9 +41,7 @@ CdbNonceFetcher::CdbNonceFetcher(
         m_cloudConnectionManager, &CloudConnectionManager::cloudBindingStatusChanged,
         this, &CdbNonceFetcher::cloudBindingStatusChanged);
 
-    m_boundToCloud = m_cloudConnectionManager->boundToCloud();
-
-    if (m_boundToCloud)
+    if (m_cloudConnectionManager->boundToCloud())
     {
         m_timerID = nx::utils::TimerManager::TimerGuard(
             m_timerManager,
@@ -69,10 +66,12 @@ CdbNonceFetcher::~CdbNonceFetcher()
 
 QByteArray CdbNonceFetcher::generateNonce()
 {
-    QnMutexLocker lock(&m_mutex);
+    if (!m_cloudConnectionManager->boundToCloud())
+        return m_defaultGenerator->generateNonce();
 
-    if (m_boundToCloud)
     {
+        QnMutexLocker lock(&m_mutex);
+
         const qint64 curClock = m_monotonicClock.elapsed();
         removeExpiredNonce(lock, curClock);
 
@@ -100,8 +99,6 @@ QByteArray CdbNonceFetcher::generateNonce()
             NX_LOGX(lit("No valid cloud nonce available..."), cl_logDEBUG2);
         }
     }
-
-    lock.unlock();
 
     return m_defaultGenerator->generateNonce();
 }
@@ -186,9 +183,6 @@ void CdbNonceFetcher::fetchCdbNonceAsync()
     QnMutexLocker lock(&m_mutex);
     m_timerID.release();
 
-    if (!m_boundToCloud)
-        return;
-
     newConnection = m_cloudConnectionManager->getCloudConnection();
     std::swap(m_connection, newConnection);
     if (!m_connection)
@@ -222,10 +216,10 @@ void CdbNonceFetcher::gotNonce(
     nx::cdb::api::ResultCode resCode,
     nx::cdb::api::NonceData nonce)
 {
-    QnMutexLocker lock(&m_mutex);
-
-    if (!m_boundToCloud)
+    if (!m_cloudConnectionManager->boundToCloud())
         return;
+
+    QnMutexLocker lock(&m_mutex);
 
     if (resCode != nx::cdb::api::ResultCode::ok)
     {
@@ -276,7 +270,6 @@ void CdbNonceFetcher::cloudBindingStatusChangedUnsafe(
 {
     NX_LOGX(lm("Cloud binding status changed: %1").arg(boundToCloud), cl_logDEBUG1);
 
-    m_boundToCloud = boundToCloud;
     if (!boundToCloud)
     {
         m_cdbNonceQueue.clear();

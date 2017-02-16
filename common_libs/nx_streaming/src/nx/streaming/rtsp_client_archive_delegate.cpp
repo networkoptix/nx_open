@@ -870,6 +870,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnSecurityCamResourcePt
         session->setAdditionAttribute(Qn::VIDEOWALL_GUID_HEADER_NAME, m_auth.videowall.toString().toUtf8());
     session->setAdditionAttribute(Qn::EC2_RUNTIME_GUID_HEADER_NAME, m_runtimeId.toByteArray());
     session->setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1" );
+    session->setAdditionAttribute(Qn::CUSTOM_USERNAME_HEADER_NAME, m_auth.username.toUtf8());
 
     /* We can get here while client is already closing. */
     if (server && QnNetworkProxyFactory::instance())

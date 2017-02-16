@@ -210,7 +210,7 @@ std::unique_ptr<SyncSocketServer<Socket>> syncSocketServer(Socket socket, Args .
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
-void socketSimpleSync(
+void socketTransferSync(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
     boost::optional<SocketAddress> endpointToConnectTo = boost::none,
@@ -258,7 +258,7 @@ static void testWouldBlockLastError()
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
-void socketSimpleSyncFlags(
+void socketTransferSyncFlags(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
     boost::optional<SocketAddress> endpointToConnectTo = boost::none,
@@ -334,7 +334,7 @@ void socketSimpleSyncFlags(
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
-void socketSimpleAsync(
+void socketTransferAsync(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
     boost::optional<SocketAddress> endpointToConnectTo,
@@ -782,9 +782,8 @@ void socketShutdown(
 {
     SocketAddress endpointToBindTo = SocketAddress::anyPrivateAddress;
 
-    // Takes amazingly long with UdtSocket.
-    const auto repeatCount = useAsyncPriorSync ? 5 : 14;
-    for (int i = 0; i < repeatCount; ++i)
+    const auto repeatCount = utils::TestOptions::applyLoadMode<size_t>(5);
+    for (size_t i = 0; i < repeatCount; ++i)
     {
         const auto syncServer = syncSocketServer(serverMaker());
         syncServer->setEndpointToBindTo(endpointToBindTo);
@@ -873,7 +872,7 @@ void socketShutdown(
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
-void socketSimpleAcceptMixed(
+void socketAcceptMixed(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
     boost::optional<SocketAddress> endpointToConnectTo = boost::none)
@@ -1320,8 +1319,8 @@ typedef nx::network::test::StopType StopType;
         { nx::network::test::socketIsUsefulAfterCancelIo(mkServer, mkClient, endpointToConnectTo); } \
 
 #define NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
-    Type(Name, SimpleAcceptMixed) \
-        { nx::network::test::socketSimpleAcceptMixed(mkServer, mkClient, endpointToConnectTo); } \
+    Type(Name, AcceptMixed) \
+        { nx::network::test::socketAcceptMixed(mkServer, mkClient, endpointToConnectTo); } \
     Type(Name, AcceptedSocketOptionsInheritance) \
         { nx::network::test::acceptedSocketOptionsInheritance(mkServer, mkClient); } \
     Type(Name, AcceptTimeoutSync) \
@@ -1341,42 +1340,42 @@ typedef nx::network::test::StopType StopType;
     Type(Name, PleaseStopCancelsPostedCall) \
         { nx::network::test::serverSocketPleaseStopCancelsPostedCall(mkServer); } \
 
-#define NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
-    Type(Name, SimpleSync) \
-        { nx::network::test::socketSimpleSync(mkServer, mkClient, endpointToConnectTo); } \
-    Type(Name, SimpleSyncFlags) \
-        { nx::network::test::socketSimpleSyncFlags(mkServer, mkClient, endpointToConnectTo); } \
-    Type(Name, SimpleAsync) \
-        { nx::network::test::socketSimpleAsync(mkServer, mkClient, endpointToConnectTo); } \
-    Type(Name, SimpleSyncAsyncSwitch) \
-        { nx::network::test::socketSyncAsyncSwitch(mkServer, mkClient, false, endpointToConnectTo); } \
-    Type(Name, Simple) \
+#define NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
+    Type(Name, TransferSync) \
+        { nx::network::test::socketTransferSync(mkServer, mkClient, endpointToConnectTo); } \
+    Type(Name, TransferSyncFlags) \
+        { nx::network::test::socketTransferSyncFlags(mkServer, mkClient, endpointToConnectTo); } \
+    Type(Name, TransferAsync) \
+        { nx::network::test::socketTransferAsync(mkServer, mkClient, endpointToConnectTo); } \
+    Type(Name, TransferSyncAsyncSwitch) \
+        { nx::network::test::socketSyncAsyncSwitch(mkServer, mkClient, true, endpointToConnectTo); } \
+    Type(Name, TransferAsyncSyncSwitch) \
         { nx::network::test::socketSyncAsyncSwitch(mkServer, mkClient, false, endpointToConnectTo); } \
     Type(Name, TransferFragmentation) \
         { nx::network::test::socketTransferFragmentation(mkServer, mkClient, endpointToConnectTo); } \
-    Type(Name, SimpleMultiConnect) \
+    Type(Name, MultiConnect) \
         { nx::network::test::socketMultiConnect(mkServer, mkClient, endpointToConnectTo); } \
 
-#define NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE(Type, Name, mkServer, mkClient) \
-    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, boost::none)
+#define NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE(Type, Name, mkServer, mkClient) \
+    NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, boost::none)
 
-#define NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE_EX(Type, Name, mkServer, mkClient, endpointToConnectTo) \
-    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo)
+#define NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE_EX(Type, Name, mkServer, mkClient, endpointToConnectTo) \
+    NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo)
 
 #define NX_NETWORK_CLIENT_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient) \
     NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, boost::none) \
-    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, boost::none) \
+    NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, boost::none) \
 
 #define NX_NETWORK_CLIENT_SOCKET_TEST_CASE_EX(Type, Name, mkServer, mkClient, endpointToConnectTo) \
     NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
-    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
+    NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, endpointToConnectTo) \
 
 #define NX_NETWORK_SERVER_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient) \
     NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, boost::none) \
-    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, boost::none) \
+    NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, boost::none) \
 
 #define NX_NETWORK_BOTH_SOCKET_TEST_CASE(Type, Name, mkServer, mkClient) \
     NX_NETWORK_SERVER_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, boost::none) \
     NX_NETWORK_CLIENT_SOCKET_TEST_GROUP(Type, Name, mkServer, mkClient, boost::none) \
-    NX_NETWORK_TRANSMIT_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, boost::none) \
+    NX_NETWORK_TRANSFER_SOCKET_TESTS_GROUP(Type, Name, mkServer, mkClient, boost::none) \
 
