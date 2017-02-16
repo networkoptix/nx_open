@@ -8,12 +8,16 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_access/resource_access_manager.h>
-#include <core/resource/device_dependent_strings.h>
 
 #include <utils/email/email.h>
 
 namespace
 {
+
+QString braced(const QString& source)
+{
+    return L'<' + source + L'>';
+}
 
     QString getShortResourceName(const QnResourcePtr& resource)
     {
@@ -34,11 +38,12 @@ namespace
             ).arg(count);
         }
 
-        static QString anyCamera() {
-            return QnDeviceDependentStrings::getDefaultNameFromSet(
-                tr("<Any Device>"),
-                tr("<Any Camera>")
-                );
+        static QString anyCamera()
+        {
+            return braced(QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Any Device"),
+                tr("Any Camera")
+                ));
         }
 
         static QString selectCamera() {

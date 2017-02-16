@@ -139,7 +139,7 @@
            <bool>true</bool>
           </property>
           <property name="placeholderText">
-           <string>&lt;No image&gt;</string>
+           <string notr="true">&lt;No image&gt;</string>
           </property>
          </widget>
         </item>

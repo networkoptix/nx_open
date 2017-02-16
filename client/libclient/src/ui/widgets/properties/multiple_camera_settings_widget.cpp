@@ -315,7 +315,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources()
             else
             {
                 ui->loginEdit->setText(QString());
-                ui->loginEdit->setPlaceholderText(tr("<multiple values>", "LoginEdit"));
+                ui->loginEdit->setPlaceholderText(L'<' + tr("multiple values") + L'>');
             }
             m_loginWasEmpty = ui->loginEdit->text().isEmpty();
 
@@ -327,7 +327,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources()
             else
             {
                 ui->passwordEdit->setText(QString());
-                ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
+                ui->passwordEdit->setPlaceholderText(L'<' + tr("multiple values") + L'>');
             }
             m_passwordWasEmpty = ui->passwordEdit->text().isEmpty();
         }
