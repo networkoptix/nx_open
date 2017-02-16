@@ -54,6 +54,22 @@ written by
 
 class CChannel;
 
+enum class PacketType
+{
+    Handshake = 0,
+    KeepAlive = 1,
+    Acknowledgement = 2,
+    LossReport = 3,
+    DelayWarning = 4,
+    Shutdown = 5,
+    AcknowledgementOfAcknowledgement = 6,
+    MsgDropRequest = 7,
+    /** An error has happened to the peer side. */
+    RemotePeerFailure = 8,
+    /** 0x7FFF - reserved and user defined messages. */
+    Reserved = 32767,
+};
+
 class CPacket
 {
 friend class CChannel;
@@ -128,7 +144,7 @@ public:
       // Returned value:
       //    packet type filed (000 ~ 111).
 
-   int getType() const;
+   PacketType getType() const;
 
       // Functionality:
       //    Read the extended packet type.

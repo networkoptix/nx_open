@@ -115,6 +115,9 @@ public: //API
 public: // internal API
    static CUDT* getUDTHandle(UDTSOCKET u);
 
+   void setConnecting(bool val);
+   bool isConnecting() const;
+
 private:
       // Functionality:
       //    initialize a UDT entity and bind to a local address.

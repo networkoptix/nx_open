@@ -307,10 +307,10 @@ int CPacket::getFlag() const
    return m_nHeader[0] >> 31;
 }
 
-int CPacket::getType() const
+PacketType CPacket::getType() const
 {
    // read bit 1~15
-   return (m_nHeader[0] >> 16) & 0x00007FFF;
+   return static_cast<PacketType>((m_nHeader[0] >> 16) & 0x00007FFF);
 }
 
 int CPacket::getExtendedType() const

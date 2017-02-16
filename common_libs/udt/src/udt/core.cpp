@@ -292,7 +292,7 @@ void CUDT::setOpt(UDTOpt optName, const void* optval, int)
       break;
 
    case UDT_CC:
-      if (m_bConnecting || m_bConnected)
+      if (isConnecting() || m_bConnected)
          throw CUDTException(5, 1, 0);
       if (NULL != m_pCCFactory)
          delete m_pCCFactory;
@@ -301,7 +301,7 @@ void CUDT::setOpt(UDTOpt optName, const void* optval, int)
       break;
 
    case UDT_FC:
-      if (m_bConnecting || m_bConnected)
+      if (isConnecting() || m_bConnected)
          throw CUDTException(5, 2, 0);
 
       if (*(int*)optval < 1)
@@ -365,7 +365,7 @@ void CUDT::setOpt(UDTOpt optName, const void* optval, int)
       break;
 
    case UDT_RENDEZVOUS:
-      if (m_bConnecting || m_bConnected)
+      if (isConnecting() || m_bConnected)
          throw CUDTException(5, 1, 0);
       m_bRendezvous = *(bool *)optval;
       break;
@@ -523,6 +523,16 @@ void CUDT::getOpt(UDTOpt optName, void* optval, int& optlen)
    }
 }
 
+void CUDT::setConnecting(bool val)
+{
+    m_bConnecting = val;
+}
+
+bool CUDT::isConnecting() const
+{
+    return m_bConnecting;
+}
+
 void CUDT::open()
 {
    CGuard cg(m_ConnectionLock);
@@ -595,7 +605,7 @@ void CUDT::listen()
    if (!m_bOpened)
       throw CUDTException(5, 0, 0);
 
-   if (m_bConnecting || m_bConnected)
+   if (isConnecting() || m_bConnected)
       throw CUDTException(5, 2, 0);
 
    // listen can be called more than once
@@ -619,7 +629,7 @@ void CUDT::connect(const sockaddr* serv_addr)
    if (m_bListening)
       throw CUDTException(5, 2, 0);
 
-   if (m_bConnecting || m_bConnected)
+   if (isConnecting() || m_bConnected)
       throw CUDTException(5, 2, 0);
 
    // record peer/server address
@@ -668,7 +678,7 @@ void CUDT::connect(const sockaddr* serv_addr)
    m_pSndQueue->sendto(serv_addr, request);
    m_llLastReqTime = CTimer::getTime();
 
-   m_bConnecting = true;
+   setConnecting(true);
 
    // asynchronous connect, return immediately
    if (!m_bSynRecving)
@@ -742,17 +752,17 @@ int CUDT::connect(const CPacket& response)
    // returning -1 means there is an error.
    // returning 1 or 2 means the connection is in process and needs more handshake
 
-   if (!m_bConnecting)
+   if (!isConnecting())
       return -1;
 
-   if (m_bRendezvous && ((0 == response.getFlag()) || (1 == response.getType())) && (0 != m_ConnRes.m_iType))
+   if (m_bRendezvous && ((0 == response.getFlag()) || (PacketType::KeepAlive == response.getType())) && (0 != m_ConnRes.m_iType))
    {
       //a data packet or a keep-alive packet comes, which means the peer side is already connected
       // in this situation, the previously recorded response will be used
       goto POST_CONNECT;
    }
 
-   if ((1 != response.getFlag()) || (0 != response.getType()))
+   if ((1 != response.getFlag()) || (PacketType::Handshake != response.getType()))
       return -1;
 
    m_ConnRes.deserialize(response.m_pcData, response.getLength());
@@ -840,7 +850,7 @@ POST_CONNECT:
    m_dCongestionWindow = m_pCC->m_dCWndSize;
 
    // And, I am connected too.
-   m_bConnecting = false;
+   setConnecting(false);
    m_bConnected = true;
 
    // register this socket for receiving data packets
@@ -1988,7 +1998,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
 
    switch (ctrlpkt.getType())
    {
-   case 2: //010 - Acknowledgement
+   case PacketType::Acknowledgement: //010 - Acknowledgement
       {
       int32_t ack;
 
@@ -2108,7 +2118,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
       break;
       }
 
-   case 6: //110 - Acknowledgement of Acknowledgement
+   case PacketType::AcknowledgementOfAcknowledgement: //110 - Acknowledgement of Acknowledgement
       {
       int32_t ack;
       int rtt = -1;
@@ -2134,7 +2144,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
       break;
       }
 
-   case 3: //011 - Loss Report
+   case PacketType::LossReport: //011 - Loss Report
       {
       int32_t* losslist = (int32_t *)(ctrlpkt.m_pcData);
 
@@ -2199,20 +2209,20 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
       break;
       }
 
-   case 4: //100 - Delay Warning
+   case PacketType::DelayWarning:
       // One way packet delay is increasing, so decrease the sending rate
       m_ullInterval = (uint64_t)ceil(m_ullInterval * 1.125);
       m_iLastDecSeq = m_iSndCurrSeqNo;
 
       break;
 
-   case 1: //001 - Keep-alive
+   case PacketType::KeepAlive:
       // The only purpose of keep-alive packet is to tell that the peer is still alive
       // nothing needs to be done.
 
       break;
 
-   case 0: //000 - Handshake
+   case PacketType::Handshake:
       {
       CHandShake req;
       req.deserialize(ctrlpkt.m_pcData, ctrlpkt.getLength());
@@ -2238,7 +2248,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
       break;
       }
 
-   case 5: //101 - Shutdown
+   case PacketType::Shutdown:
       m_bShutdown = true;
       m_bClosing = true;
       m_bBroken = true;
@@ -2260,7 +2270,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
 
       break;
 
-   case 7: //111 - Msg drop request
+   case PacketType::MsgDropRequest:
       m_pRcvBuffer->dropMsg(ctrlpkt.getMsgSeq());
       m_pRcvLossList->remove(*(int32_t*)ctrlpkt.m_pcData, *(int32_t*)(ctrlpkt.m_pcData + 4));
 
@@ -2273,7 +2283,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
 
       break;
 
-   case 8: // 1000 - An error has happened to the peer side
+   case PacketType::RemotePeerFailure:
       //int err_type = packet.getAddInfo();
 
       // currently only this error is signalled from the peer side
@@ -2284,7 +2294,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
 
       break;
 
-   case 32767: //0x7FFF - reserved and user defined messages
+   case PacketType::Reserved: 
       m_pCC->processCustomMsg(&ctrlpkt);
       CCUpdate();
 
@@ -2528,7 +2538,7 @@ int CUDT::listen(sockaddr* addr, CPacket& packet)
    int32_t id = hs.m_iID;
 
    // When a peer side connects in...
-   if ((1 == packet.getFlag()) && (0 == packet.getType()))
+   if ((1 == packet.getFlag()) && (PacketType::Handshake == packet.getType()))
    {
       if ((hs.m_iVersion != m_iVersion) || (hs.m_iType != m_iSockType))
       {
