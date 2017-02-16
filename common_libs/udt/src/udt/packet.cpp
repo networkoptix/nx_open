@@ -188,9 +188,9 @@ void CPacket::pack(int pkttype, void* lparam, void* rparam, int size)
    m_nHeader[0] = 0x80000000 | (pkttype << 16);
 
    // Set additional information and control information field
-   switch (pkttype)
+   switch (static_cast<PacketType>(pkttype))
    {
-   case 2: //0010 - Acknowledgement (ACK)
+   case PacketType::Acknowledgement: //0010 - Acknowledgement (ACK)
       // ACK packet seq. no.
       if (NULL != lparam)
          m_nHeader[1] = *(int32_t *)lparam;
@@ -202,7 +202,7 @@ void CPacket::pack(int pkttype, void* lparam, void* rparam, int size)
 
       break;
 
-   case 6: //0110 - Acknowledgement of Acknowledgement (ACK-2)
+   case PacketType::AcknowledgementOfAcknowledgement: //0110 - Acknowledgement of Acknowledgement (ACK-2)
       // ACK packet seq. no.
       m_nHeader[1] = *(int32_t *)lparam;
 
@@ -213,14 +213,14 @@ void CPacket::pack(int pkttype, void* lparam, void* rparam, int size)
 
       break;
 
-   case 3: //0011 - Loss Report (NAK)
+   case PacketType::LossReport: //0011 - Loss Report (NAK)
       // loss list
       m_PacketVector[1].iov_base = (char *)rparam;
       m_PacketVector[1].iov_len = size;
 
       break;
 
-   case 4: //0100 - Congestion Warning
+   case PacketType::DelayWarning: //0100 - Congestion Warning
       // control info field should be none
       // but "writev" does not allow this
       m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
@@ -228,7 +228,7 @@ void CPacket::pack(int pkttype, void* lparam, void* rparam, int size)
   
       break;
 
-   case 1: //0001 - Keep-alive
+   case PacketType::KeepAlive: //0001 - Keep-alive
       // control info field should be none
       // but "writev" does not allow this
       m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
@@ -236,14 +236,14 @@ void CPacket::pack(int pkttype, void* lparam, void* rparam, int size)
 
       break;
 
-   case 0: //0000 - Handshake
+   case PacketType::Handshake: //0000 - Handshake
       // control info filed is handshake info
       m_PacketVector[1].iov_base = (char *)rparam;
       m_PacketVector[1].iov_len = size; //sizeof(CHandShake);
 
       break;
 
-   case 5: //0101 - Shutdown
+   case PacketType::Shutdown: //0101 - Shutdown
       // control info field should be none
       // but "writev" does not allow this
       m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
@@ -251,7 +251,7 @@ void CPacket::pack(int pkttype, void* lparam, void* rparam, int size)
 
       break;
 
-   case 7: //0111 - Message Drop Request
+   case PacketType::MsgDropRequest: //0111 - Message Drop Request
       // msg id 
       m_nHeader[1] = *(int32_t *)lparam;
 
@@ -261,7 +261,7 @@ void CPacket::pack(int pkttype, void* lparam, void* rparam, int size)
 
       break;
 
-   case 8: //1000 - Error Signal from the Peer Side
+   case PacketType::RemotePeerFailure: //1000 - Error Signal from the Peer Side
       // Error type
       m_nHeader[1] = *(int32_t *)lparam;
 
@@ -272,7 +272,7 @@ void CPacket::pack(int pkttype, void* lparam, void* rparam, int size)
 
       break;
 
-   case 32767: //0x7FFF - Reserved for user defined control packets
+   case PacketType::Reserved: //0x7FFF - Reserved for user defined control packets
       // for extended control packet
       // "lparam" contains the extended type information for bit 16 - 31
       // "rparam" is the control information
