@@ -324,11 +324,6 @@
     </message>
     <message>
         <location/>
-        <source>&lt;Cameras...&gt; </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Backup Quality</source>
         <translation type="unfinished"></translation>
     </message>
@@ -399,11 +394,6 @@
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt; Any camera &gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -917,15 +907,6 @@
     </message>
 </context>
 <context>
-    <name>CloudManagementWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
-        <source>&lt;2. Connect system
-to the cloud&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ConnectToCloudDialog</name>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
@@ -1034,11 +1015,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Clear Filter</source>
         <translation type="unfinished">Clear Filter</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -1281,13 +1257,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt;No image&gt;</source>
-        <translation type="unfinished"></translation>
+        <source>Loading Image...Please Wait.</source>
+        <translation type="unfinished">Loading Image...Please Wait.</translation>
     </message>
     <message>
         <location/>
-        <source>Loading Image...Please Wait.</source>
-        <translation type="unfinished">Loading Image...Please Wait.</translation>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1680,11 +1656,6 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Background Image</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;No image&gt;</source>
         <translation></translation>
     </message>
     <message>

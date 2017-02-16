@@ -1780,14 +1780,6 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>모든 장치</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>모든카메라</translation>
-    </message>
-    <message>
         <source>Select at least one device</source>
         <translation>최소 한개 선택</translation>
     </message>
@@ -1800,6 +1792,14 @@ to view more bookmarks</source>
         <translation>
             <numerusform>%n I/O모듈의 %1</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1816,16 +1816,8 @@ to view more bookmarks</source>
 <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
-        <source>&lt;System&gt;</source>
-        <translation>&lt;시스템&gt;</translation>
-    </message>
-    <message>
         <source>Error: %1</source>
         <translation>오류:%1</translation>
-    </message>
-    <message>
-        <source>&lt;Any Server&gt;</source>
-        <translation>&lt;모든 서버&gt;</translation>
     </message>
     <message numerus="yes">
         <source>%n Server(s)</source>
@@ -1848,14 +1840,6 @@ to view more bookmarks</source>
     <message>
         <source>Administrators Only</source>
         <translation>관리자만</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>모든 장치</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>모든카메라</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1891,6 +1875,22 @@ to view more bookmarks</source>
         <source>Every %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
@@ -1903,14 +1903,6 @@ to view more bookmarks</source>
         <source>to</source>
         <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
         <translation>로</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>모든 장치</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>모든카메라</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1927,6 +1919,14 @@ to view more bookmarks</source>
     <message>
         <source>Cameras</source>
         <translation>카메라</translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2305,8 +2305,8 @@ to view more bookmarks</source>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translation>&lt;자동&gt;</translation>
+        <source>automatic</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2455,8 +2455,8 @@ to view more bookmarks</source>
 <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translation>&lt;자동&gt;</translation>
+        <source>automatic</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3279,10 +3279,6 @@ to %1</source>
         <translation>관리자만</translation>
     </message>
     <message>
-        <source>&lt;User removed&gt;</source>
-        <translation>&lt;사용자:삭제됨&gt;</translation>
-    </message>
-    <message>
         <source>All users</source>
         <translation>전체사용자</translation>
     </message>
@@ -3318,6 +3314,10 @@ to %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>User removed</source>
+        <translation type="unfinished">유저삭제</translation>
     </message>
 </context>
 <context>
@@ -3612,7 +3612,7 @@ to %1</source>
         <translation type="unfinished">자동</translation>
     </message>
     <message>
-        <source>&lt;multiple values&gt;</source>
+        <source>multiple values</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3670,28 +3670,28 @@ to %1</source>
         <translation>사진 %1</translation>
     </message>
     <message>
-        <source>&lt;No picture&gt;</source>
-        <translation>&lt;사진 없음&gt;</translation>
+        <source>No picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Error while loading picture&gt;</source>
-        <translation>&lt;사진 로딩 중 오류&gt;</translation>
+        <source>Error while loading picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Error while uploading picture&gt;</source>
-        <translation>&lt;사진 업데이트 중 오류&gt;</translation>
+        <source>Error while uploading picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be read&gt;</source>
-        <translation>&lt;사진파일을 읽을 수 없음&gt;</translation>
+        <source>Picture cannot be read</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
-        <translation>&lt;사진의 사이즈가 너무 큽니다. 최대 크기는 %1 Mb 입니다.&gt;</translation>
+        <source>Picture is too big. Maximum size is %1 Mb</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be loaded&gt;</source>
-        <translation>&lt;사진을 읽어오지 못합니다.&gt;</translation>
+        <source>Picture cannot be loaded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4135,10 +4135,6 @@ to %1</source>
         <translation>*마지막 사용 서버 연결*</translation>
     </message>
     <message>
-        <source>&lt;none&gt;</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>서버 연결...</translation>
     </message>
@@ -4164,6 +4160,10 @@ to %1</source>
     </message>
     <message>
         <source>There is another connection with the same name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>none</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4241,6 +4241,10 @@ to %1</source>
     <message>
         <source>Select File...</source>
         <translation>파일선택...</translation>
+    </message>
+    <message>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4379,16 +4383,6 @@ to %1</source>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>LoginEdit</comment>
-        <translation>&lt;중복 결과&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>PasswordEdit</comment>
-        <translation>multiple values&gt;</translation>
-    </message>
-    <message>
         <source>Secondary stream disabled for these cameras</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4402,6 +4396,10 @@ to %1</source>
     </message>
     <message>
         <source>Enable Secondary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>multiple values</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4506,20 +4504,20 @@ to %1</source>
 <context>
     <name>QnNotificationSoundModel</name>
     <message>
-        <source>&lt;Downloading sound list...&gt;</source>
-        <translation>&lt;다운로드 음원 목록...&gt;</translation>
+        <source>Downloading sound list...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;No Sound&gt;</source>
-        <translation>&lt;음원 없음&gt;</translation>
+        <source>No Sound</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Downloading sound...&gt;</source>
-        <translation>&lt;음원 다운로드...&gt;</translation>
+        <source>Downloading sound...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Uploading sound...&gt;</source>
-        <translation>&lt;음원 업로드...&gt;</translation>
+        <source>Uploading sound...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4752,10 +4750,6 @@ to %1</source>
         <translation>긴급</translation>
     </message>
     <message>
-        <source>&lt;Invalid&gt;</source>
-        <translation>&lt;유효하지 않는&gt;</translation>
-    </message>
-    <message>
         <source>Position</source>
         <translation>위치</translation>
     </message>
@@ -4766,6 +4760,10 @@ to %1</source>
     <message>
         <source>Speed</source>
         <translation>속도</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished">유효하지 않음</translation>
     </message>
 </context>
 <context>
@@ -5026,10 +5024,6 @@ to %1</source>
     </message>
     <message>
         <source>All Shared Layouts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Unnamed system&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5567,10 +5561,6 @@ to %1</source>
 </context>
 <context>
     <name>QnShowOnAlarmLayoutActionWidget</name>
-    <message>
-        <source>&lt;All Users&gt;</source>
-        <translation>모든 사용자들</translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
         <translation type="unfinished">
@@ -5582,6 +5572,10 @@ to %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>All Users</source>
+        <translation type="unfinished">모든 사용자</translation>
     </message>
 </context>
 <context>

@@ -1782,14 +1782,6 @@ több könyvjelző megjelenítéséhez</translation>
         </translation>
     </message>
     <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Minden eszköz&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Minden kamera&gt;</translation>
-    </message>
-    <message>
         <source>Select at least one device</source>
         <translation>Válasszon legalább egy eszközt</translation>
     </message>
@@ -1802,6 +1794,14 @@ több könyvjelző megjelenítéséhez</translation>
         <translation>
             <numerusform>%1 a %n I/O modulból</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1820,14 +1820,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Error: %1</source>
         <translation>Hiba: %1</translation>
-    </message>
-    <message>
-        <source>&lt;System&gt;</source>
-        <translation>&lt;Rendszer&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Server&gt;</source>
-        <translation>&lt;Bármely szerver&gt;</translation>
     </message>
     <message numerus="yes">
         <source>%n Server(s)</source>
@@ -1850,14 +1842,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Administrators Only</source>
         <translation>Csak adminisztrátorok</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Minden eszköz&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Minden kamera&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1893,6 +1877,22 @@ több könyvjelző megjelenítéséhez</translation>
         <source>Every %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
@@ -1905,14 +1905,6 @@ több könyvjelző megjelenítéséhez</translation>
         <source>at</source>
         <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
         <translation>at</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Minden eszköz&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Minden kamera&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1929,6 +1921,14 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
         <source>Cameras</source>
         <translation>Kamerák</translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2307,8 +2307,8 @@ több könyvjelző megjelenítéséhez</translation>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translation>&lt;automatikus&gt;</translation>
+        <source>automatic</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2457,8 +2457,8 @@ több könyvjelző megjelenítéséhez</translation>
 <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translation>&lt;automatikus&gt;</translation>
+        <source>automatic</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3281,10 +3281,6 @@ to %1</source>
         <translation>Leírás</translation>
     </message>
     <message>
-        <source>&lt;User removed&gt;</source>
-        <translation>&lt;User eltávolítva&gt;</translation>
-    </message>
-    <message>
         <source>All users</source>
         <translation>Minden felhasználó</translation>
     </message>
@@ -3320,6 +3316,10 @@ to %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>User removed</source>
+        <translation type="unfinished">Felhasználó eltávolítva</translation>
     </message>
 </context>
 <context>
@@ -3614,7 +3614,7 @@ to %1</source>
         <translation type="unfinished">Auto</translation>
     </message>
     <message>
-        <source>&lt;multiple values&gt;</source>
+        <source>multiple values</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3664,18 +3664,6 @@ to %1</source>
 <context>
     <name>QnLayoutSettingsDialog</name>
     <message>
-        <source>&lt;No picture&gt;</source>
-        <translation>&lt;Nincs kép&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Error while loading picture&gt;</source>
-        <translation>&lt;Hiba a kép betöltésekor&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Error while uploading picture&gt;</source>
-        <translation>&lt;Hiba a kép feltöltésekor&gt;</translation>
-    </message>
-    <message>
         <source>Select file...</source>
         <translation>Fájl kiválasztása...</translation>
     </message>
@@ -3684,16 +3672,28 @@ to %1</source>
         <translation>%1 kép</translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be read&gt;</source>
-        <translation>&lt;A kép nem olvasható&gt;</translation>
+        <source>No picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
-        <translation>&lt; A kép túl nagy. Maximális képméret %1 Mb&gt;</translation>
+        <source>Error while loading picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be loaded&gt;</source>
-        <translation>&lt;A kép nem tölthető be&gt;</translation>
+        <source>Error while uploading picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture cannot be read</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is too big. Maximum size is %1 Mb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture cannot be loaded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4149,10 +4149,6 @@ to %1</source>
         <translation>* Utoljára használt kapcsolat *</translation>
     </message>
     <message>
-        <source>&lt;none&gt;</source>
-        <translation>&lt;semmi&gt;</translation>
-    </message>
-    <message>
         <source>%1 at %2</source>
         <translation>%1 at %2</translation>
     </message>
@@ -4166,6 +4162,10 @@ to %1</source>
     </message>
     <message>
         <source>There is another connection with the same name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>none</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4243,6 +4243,10 @@ to %1</source>
     <message>
         <source>Select File...</source>
         <translation>Fájl kiválasztása...</translation>
+    </message>
+    <message>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4381,16 +4385,6 @@ to %1</source>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>LoginEdit</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>PasswordEdit</comment>
-        <translation></translation>
-    </message>
-    <message>
         <source>Secondary stream disabled for these cameras</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4404,6 +4398,10 @@ to %1</source>
     </message>
     <message>
         <source>Enable Secondary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>multiple values</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4508,20 +4506,20 @@ to %1</source>
 <context>
     <name>QnNotificationSoundModel</name>
     <message>
-        <source>&lt;Downloading sound list...&gt;</source>
-        <translation>&lt;Hangok listájának letöltése...&gt;</translation>
+        <source>Downloading sound list...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;No Sound&gt;</source>
-        <translation>&lt;Nincs Hang&gt;</translation>
+        <source>No Sound</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Downloading sound...&gt;</source>
-        <translation>&lt;Hang letöltése...&gt;</translation>
+        <source>Downloading sound...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Uploading sound...&gt;</source>
-        <translation>&lt;Hang feltöltése...&gt;</translation>
+        <source>Uploading sound...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4754,10 +4752,6 @@ to %1</source>
         <translation>Azonnali</translation>
     </message>
     <message>
-        <source>&lt;Invalid&gt;</source>
-        <translation>&lt;Érvénytelen&gt;</translation>
-    </message>
-    <message>
         <source>Position</source>
         <translation>Pozíció</translation>
     </message>
@@ -4768,6 +4762,10 @@ to %1</source>
     <message>
         <source>Speed</source>
         <translation>Sebesség</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished">Érvénytelen</translation>
     </message>
 </context>
 <context>
@@ -5028,10 +5026,6 @@ to %1</source>
     </message>
     <message>
         <source>All Shared Layouts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Unnamed system&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5569,10 +5563,6 @@ to %1</source>
 </context>
 <context>
     <name>QnShowOnAlarmLayoutActionWidget</name>
-    <message>
-        <source>&lt;All Users&gt;</source>
-        <translation>&lt;Minden felhasználó&gt;</translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
         <translation type="unfinished">
@@ -5584,6 +5574,10 @@ to %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>All Users</source>
+        <translation type="unfinished">Minden felhasználó</translation>
     </message>
 </context>
 <context>

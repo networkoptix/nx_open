@@ -1781,14 +1781,6 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;任何设备&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;任何摄像机&gt;</translation>
-    </message>
-    <message>
         <source>Select at least one device</source>
         <translation>请至少选择一台设备</translation>
     </message>
@@ -1801,6 +1793,14 @@ to view more bookmarks</source>
         <translation>
             <numerusform> %n 的 %1 I/O模块</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1816,14 +1816,6 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessRuleViewModel</name>
-    <message>
-        <source>&lt;System&gt;</source>
-        <translation>&lt;系统&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Server&gt;</source>
-        <translation>&lt;任何服务器&gt;</translation>
-    </message>
     <message numerus="yes">
         <source>%n Server(s)</source>
         <translation>
@@ -1849,14 +1841,6 @@ to view more bookmarks</source>
     <message>
         <source>Administrators Only</source>
         <translation>仅管理员</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;任何设备&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;任何摄像机&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1892,6 +1876,22 @@ to view more bookmarks</source>
         <source>Every %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
@@ -1904,14 +1904,6 @@ to view more bookmarks</source>
         <source>to</source>
         <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
         <translation>到</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;任何设备&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;任何摄像机&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1928,6 +1920,14 @@ to view more bookmarks</source>
     <message>
         <source>Cameras</source>
         <translation>摄像机</translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2306,8 +2306,8 @@ to view more bookmarks</source>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translation>&lt;自动&gt;</translation>
+        <source>automatic</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2456,8 +2456,8 @@ to view more bookmarks</source>
 <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translation>&lt;自动&gt;</translation>
+        <source>automatic</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3280,10 +3280,6 @@ to %1</source>
         <translation>仅管理员</translation>
     </message>
     <message>
-        <source>&lt;User removed&gt;</source>
-        <translation>&lt;User 移除&gt;</translation>
-    </message>
-    <message>
         <source>All users</source>
         <translation>所有用户</translation>
     </message>
@@ -3319,6 +3315,10 @@ to %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>User removed</source>
+        <translation type="unfinished">移除用户</translation>
     </message>
 </context>
 <context>
@@ -3613,8 +3613,8 @@ to %1</source>
         <translation type="unfinished">自动</translation>
     </message>
     <message>
-        <source>&lt;multiple values&gt;</source>
-        <translation type="unfinished">&lt;multiple values&gt;</translation>
+        <source>multiple values</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3671,28 +3671,28 @@ to %1</source>
         <translation>图片 %1</translation>
     </message>
     <message>
-        <source>&lt;No picture&gt;</source>
-        <translation>&lt;无 图片&gt;</translation>
+        <source>No picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Error while loading picture&gt;</source>
-        <translation>&lt;错误 加载图片&gt;</translation>
+        <source>Error while loading picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Error while uploading picture&gt;</source>
-        <translation>&lt;错误 图片更新&gt;</translation>
+        <source>Error while uploading picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be read&gt;</source>
-        <translation>&lt;图片 无法读取&gt;</translation>
+        <source>Picture cannot be read</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
-        <translation>&lt;图片 过大，最大尺寸为 %1 Mb&gt;</translation>
+        <source>Picture is too big. Maximum size is %1 Mb</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be loaded&gt;</source>
-        <translation>&lt;图片 无法加载&gt;</translation>
+        <source>Picture cannot be loaded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4132,10 +4132,6 @@ to %1</source>
         <translation>保存的会话</translation>
     </message>
     <message>
-        <source>&lt;none&gt;</source>
-        <translation>&lt;无&gt;</translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>连接到服务器...</translation>
     </message>
@@ -4165,6 +4161,10 @@ to %1</source>
     </message>
     <message>
         <source>There is another connection with the same name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>none</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4242,6 +4242,10 @@ to %1</source>
     <message>
         <source>Select File...</source>
         <translation>选择文件...</translation>
+    </message>
+    <message>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4380,16 +4384,6 @@ to %1</source>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>LoginEdit</comment>
-        <translation>&lt;multiple values&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>PasswordEdit</comment>
-        <translation>&lt;multiple values&gt;</translation>
-    </message>
-    <message>
         <source>Secondary stream disabled for these cameras</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4403,6 +4397,10 @@ to %1</source>
     </message>
     <message>
         <source>Enable Secondary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>multiple values</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4507,20 +4505,20 @@ to %1</source>
 <context>
     <name>QnNotificationSoundModel</name>
     <message>
-        <source>&lt;Downloading sound list...&gt;</source>
-        <translation>&lt;正在下载音效列表...&gt;</translation>
+        <source>Downloading sound list...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;No Sound&gt;</source>
-        <translation>&lt;沒有音效&gt;</translation>
+        <source>No Sound</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Downloading sound...&gt;</source>
-        <translation>&lt;正在下载音效...&gt;</translation>
+        <source>Downloading sound...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Uploading sound...&gt;</source>
-        <translation>&lt;正在上传音效...&gt;</translation>
+        <source>Uploading sound...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4753,10 +4751,6 @@ to %1</source>
         <translation>立即作用</translation>
     </message>
     <message>
-        <source>&lt;Invalid&gt;</source>
-        <translation>无效</translation>
-    </message>
-    <message>
         <source>Position</source>
         <translation>位置</translation>
     </message>
@@ -4767,6 +4761,10 @@ to %1</source>
     <message>
         <source>Speed</source>
         <translation>速度</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished">无效</translation>
     </message>
 </context>
 <context>
@@ -5027,10 +5025,6 @@ to %1</source>
     </message>
     <message>
         <source>All Shared Layouts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Unnamed system&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5568,10 +5562,6 @@ to %1</source>
 </context>
 <context>
     <name>QnShowOnAlarmLayoutActionWidget</name>
-    <message>
-        <source>&lt;All Users&gt;</source>
-        <translation>&lt;All 用户&gt;</translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
         <translation type="unfinished">
@@ -5583,6 +5573,10 @@ to %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>All Users</source>
+        <translation type="unfinished">所有用户</translation>
     </message>
 </context>
 <context>

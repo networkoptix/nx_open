@@ -1781,14 +1781,6 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Bất kỳ thiết bị&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Bất kỳ máy ảnh&gt;</translation>
-    </message>
-    <message>
         <source>Select at least one device</source>
         <translation>Chọn ít nhất một thiết bị</translation>
     </message>
@@ -1801,6 +1793,14 @@ to view more bookmarks</source>
         <translation>
             <numerusform>%1 of %n I/O modules</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1817,16 +1817,8 @@ to view more bookmarks</source>
 <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
-        <source>&lt;System&gt;</source>
-        <translation>&lt;hệ thống&gt;</translation>
-    </message>
-    <message>
         <source>Error: %1</source>
         <translation>lỗi: %1</translation>
-    </message>
-    <message>
-        <source>&lt;Any Server&gt;</source>
-        <translation>&lt;bất kỳ máy chủ&gt;</translation>
     </message>
     <message numerus="yes">
         <source>%n Server(s)</source>
@@ -1849,14 +1841,6 @@ to view more bookmarks</source>
     <message>
         <source>Administrators Only</source>
         <translation>chỉ có các nhà quản lý</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Bất kỳ thiết bị&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Bất kỳ máy ảnh&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1892,6 +1876,22 @@ to view more bookmarks</source>
         <source>Every %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
@@ -1904,14 +1904,6 @@ to view more bookmarks</source>
         <source>to</source>
         <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
         <translation>đến</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Bất kỳ thiết bị&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Bất kỳ máy ảnh&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1928,6 +1920,14 @@ to view more bookmarks</source>
     <message>
         <source>Cameras</source>
         <translation>Máy ảnh</translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2306,8 +2306,8 @@ to view more bookmarks</source>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translation>&lt;tự động&gt;</translation>
+        <source>automatic</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2456,8 +2456,8 @@ to view more bookmarks</source>
 <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translation>&lt;tự động&gt;</translation>
+        <source>automatic</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3280,10 +3280,6 @@ to %1</source>
         <translation>chỉ có các nhà quản lý</translation>
     </message>
     <message>
-        <source>&lt;User removed&gt;</source>
-        <translation>&lt;Xóa người dùng&gt;</translation>
-    </message>
-    <message>
         <source>All users</source>
         <translation>Tất cả người dùng</translation>
     </message>
@@ -3319,6 +3315,10 @@ to %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>User removed</source>
+        <translation type="unfinished">người dùng xóa</translation>
     </message>
 </context>
 <context>
@@ -3613,8 +3613,8 @@ to %1</source>
         <translation type="unfinished">tự động</translation>
     </message>
     <message>
-        <source>&lt;multiple values&gt;</source>
-        <translation type="unfinished">&lt;nhiều lựa chọn&gt;</translation>
+        <source>multiple values</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3671,28 +3671,28 @@ to %1</source>
         <translation>màn%1</translation>
     </message>
     <message>
-        <source>&lt;No picture&gt;</source>
-        <translation>&lt;Không có hình ảnh&gt;</translation>
+        <source>No picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Error while loading picture&gt;</source>
-        <translation>&lt;Lỗi trong khi tải các hình ảnh&gt;</translation>
+        <source>Error while loading picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Error while uploading picture&gt;</source>
-        <translation>&lt;Lỗi trong khi tải lên hình ảnh&gt;</translation>
+        <source>Error while uploading picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be read&gt;</source>
-        <translation>&lt;Hình ảnh không thể được đọc&gt;</translation>
+        <source>Picture cannot be read</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
-        <translation>&lt;Hình ảnh quá lớn. Kích thước tối đa là %1 Mb&gt;</translation>
+        <source>Picture is too big. Maximum size is %1 Mb</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be loaded&gt;</source>
-        <translation>&lt;Hình ảnh không thể được nạp&gt;</translation>
+        <source>Picture cannot be loaded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4136,10 +4136,6 @@ to %1</source>
         <translation>*Kết nối sử dụng cuối cùng*</translation>
     </message>
     <message>
-        <source>&lt;none&gt;</source>
-        <translation>&lt;không&gt;</translation>
-    </message>
-    <message>
         <source>Connect to Server...</source>
         <translation>Kết nối đến máy chủ...</translation>
     </message>
@@ -4165,6 +4161,10 @@ to %1</source>
     </message>
     <message>
         <source>There is another connection with the same name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>none</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4242,6 +4242,10 @@ to %1</source>
     <message>
         <source>Select File...</source>
         <translation>Chọn File...</translation>
+    </message>
+    <message>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4380,16 +4384,6 @@ to %1</source>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>LoginEdit</comment>
-        <translation>&lt;nhiều lựa chọn&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>PasswordEdit</comment>
-        <translation>&lt;nhiều lựa chọn&gt;</translation>
-    </message>
-    <message>
         <source>Secondary stream disabled for these cameras</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4403,6 +4397,10 @@ to %1</source>
     </message>
     <message>
         <source>Enable Secondary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>multiple values</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4507,20 +4505,20 @@ to %1</source>
 <context>
     <name>QnNotificationSoundModel</name>
     <message>
-        <source>&lt;Downloading sound list...&gt;</source>
-        <translation>&lt;Tải về Âm thanh danh...&gt;</translation>
+        <source>Downloading sound list...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;No Sound&gt;</source>
-        <translation>&lt;không có âm thanh&gt;</translation>
+        <source>No Sound</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Downloading sound...&gt;</source>
-        <translation>&lt;Tải về Âm thanh...&gt;</translation>
+        <source>Downloading sound...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Uploading sound...&gt;</source>
-        <translation>&lt;tải lên tiếng&gt;</translation>
+        <source>Uploading sound...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4753,10 +4751,6 @@ to %1</source>
         <translation>ngay</translation>
     </message>
     <message>
-        <source>&lt;Invalid&gt;</source>
-        <translation>&lt;vô hiệu&gt;</translation>
-    </message>
-    <message>
         <source>Position</source>
         <translation>vị trí</translation>
     </message>
@@ -4767,6 +4761,10 @@ to %1</source>
     <message>
         <source>Speed</source>
         <translation>tốc độ</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished">vô hiệu</translation>
     </message>
 </context>
 <context>
@@ -5027,10 +5025,6 @@ to %1</source>
     </message>
     <message>
         <source>All Shared Layouts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Unnamed system&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5568,10 +5562,6 @@ to %1</source>
 </context>
 <context>
     <name>QnShowOnAlarmLayoutActionWidget</name>
-    <message>
-        <source>&lt;All Users&gt;</source>
-        <translation>&lt;Tất cả người dùng&gt;</translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
         <translation type="unfinished">
@@ -5583,6 +5573,10 @@ to %1</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>All Users</source>
+        <translation type="unfinished">Tất cả người dùng</translation>
     </message>
 </context>
 <context>

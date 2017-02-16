@@ -1792,14 +1792,6 @@ um mehr Lesezeichen zu sehen</translation>
         </translation>
     </message>
     <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Jedes Gerät&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Jede Kamera&gt;</translation>
-    </message>
-    <message>
         <source>Select at least one device</source>
         <translation>Wählen Sie mindestens ein Gerät</translation>
     </message>
@@ -1813,6 +1805,14 @@ um mehr Lesezeichen zu sehen</translation>
             <numerusform>%1 von %n I/O Module</numerusform>
             <numerusform>%1 von %n I/O Module</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1831,14 +1831,6 @@ um mehr Lesezeichen zu sehen</translation>
     <message>
         <source>Error: %1</source>
         <translation>Fehler: %1</translation>
-    </message>
-    <message>
-        <source>&lt;System&gt;</source>
-        <translation>&lt;System&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Server&gt;</source>
-        <translation>&lt;jeder Server&gt;</translation>
     </message>
     <message numerus="yes">
         <source>%n Server(s)</source>
@@ -1862,14 +1854,6 @@ um mehr Lesezeichen zu sehen</translation>
     <message>
         <source>Administrators Only</source>
         <translation>Nur Administratoren</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Jedes Gerät&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Jede Kamera&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1906,6 +1890,22 @@ um mehr Lesezeichen zu sehen</translation>
         <source>Every %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
@@ -1919,14 +1919,6 @@ um mehr Lesezeichen zu sehen</translation>
         <source>at</source>
         <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
         <translation>an</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Jedes Gerät&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Jede Kamera&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1943,6 +1935,14 @@ um mehr Lesezeichen zu sehen</translation>
     <message>
         <source>Cameras</source>
         <translation>Kameras</translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2325,8 +2325,8 @@ um mehr Lesezeichen zu sehen</translation>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translation>&lt;automatisch&gt;</translation>
+        <source>automatic</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2480,8 +2480,8 @@ um mehr Lesezeichen zu sehen</translation>
 <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translation>&lt;automatisch&gt;</translation>
+        <source>automatic</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3311,10 +3311,6 @@ to %1</source>
         <translation>Beschreibung</translation>
     </message>
     <message>
-        <source>&lt;User removed&gt;</source>
-        <translation>&lt; Benutzer entfernt&gt;</translation>
-    </message>
-    <message>
         <source>All users</source>
         <translation>Alle Benutzer</translation>
     </message>
@@ -3354,6 +3350,10 @@ to %1</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>User removed</source>
+        <translation type="unfinished">Benutzer wurde entfernt</translation>
     </message>
 </context>
 <context>
@@ -3648,8 +3648,8 @@ to %1</source>
         <translation type="unfinished">Auto</translation>
     </message>
     <message>
-        <source>&lt;multiple values&gt;</source>
-        <translation type="unfinished">&lt;unterschiedliche Werte&gt;</translation>
+        <source>multiple values</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3706,29 +3706,28 @@ to %1</source>
         <translation>Bilder %1</translation>
     </message>
     <message>
-        <source>&lt;No picture&gt;</source>
-        <translatorcomment>Image vs. Picture? I assume picture is static, while image might be a video stream!? Problem: Same word in German. </translatorcomment>
-        <translation>&lt;Kein Bild&gt;</translation>
+        <source>No picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Error while loading picture&gt;</source>
-        <translation>&lt;Fehler beim Versuch das Bild zu laden&gt;</translation>
+        <source>Error while loading picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Error while uploading picture&gt;</source>
-        <translation>&lt;Fehler beim Bild hochladen&gt;</translation>
+        <source>Error while uploading picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be read&gt;</source>
-        <translation>&lt;Bild kann nicht gelesen werden&gt;</translation>
+        <source>Picture cannot be read</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
-        <translation>&lt;Bild ist zu groß. Maximal %1 Mb&gt;</translation>
+        <source>Picture is too big. Maximum size is %1 Mb</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be loaded&gt;</source>
-        <translation>&lt;Bild kann nicht geladen werden&gt;</translation>
+        <source>Picture cannot be loaded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4192,10 +4191,6 @@ to %1</source>
         <translation>* Zuletzt verwendete Verbindung *</translation>
     </message>
     <message>
-        <source>&lt;none&gt;</source>
-        <translation>&lt;keine&gt;</translation>
-    </message>
-    <message>
         <source>%1 at %2</source>
         <translation>%1 bei %2</translation>
     </message>
@@ -4209,6 +4204,10 @@ to %1</source>
     </message>
     <message>
         <source>There is another connection with the same name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>none</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4286,6 +4285,10 @@ to %1</source>
     <message>
         <source>Select File...</source>
         <translation>Datei wählen...</translation>
+    </message>
+    <message>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4424,16 +4427,6 @@ to %1</source>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>LoginEdit</comment>
-        <translation>&lt;unterschiedliche Werte&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>PasswordEdit</comment>
-        <translation>&lt;unterschiedliche Werte&gt;</translation>
-    </message>
-    <message>
         <source>Secondary stream disabled for these cameras</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4447,6 +4440,10 @@ to %1</source>
     </message>
     <message>
         <source>Enable Secondary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>multiple values</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4552,20 +4549,20 @@ to %1</source>
 <context>
     <name>QnNotificationSoundModel</name>
     <message>
-        <source>&lt;Downloading sound list...&gt;</source>
-        <translation>&lt;Lade Tonliste herunter...&gt;</translation>
+        <source>Downloading sound list...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;No Sound&gt;</source>
-        <translation>&lt;Kein Ton&gt;</translation>
+        <source>No Sound</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Downloading sound...&gt;</source>
-        <translation>&lt;Lade Ton herunter...&gt;</translation>
+        <source>Downloading sound...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Uploading sound...&gt;</source>
-        <translation>&lt;Lade Ton hoch...&gt;</translation>
+        <source>Uploading sound...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4801,10 +4798,6 @@ to %1</source>
         <translation>Sofort</translation>
     </message>
     <message>
-        <source>&lt;Invalid&gt;</source>
-        <translation>&lt;Ungültig&gt;</translation>
-    </message>
-    <message>
         <source>Position</source>
         <translation>Position</translation>
     </message>
@@ -4815,6 +4808,10 @@ to %1</source>
     <message>
         <source>Speed</source>
         <translation>Geschwindigkeit</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished">Ungültig</translation>
     </message>
 </context>
 <context>
@@ -5078,10 +5075,6 @@ to %1</source>
     </message>
     <message>
         <source>All Shared Layouts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Unnamed system&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5627,10 +5620,6 @@ to %1</source>
 </context>
 <context>
     <name>QnShowOnAlarmLayoutActionWidget</name>
-    <message>
-        <source>&lt;All Users&gt;</source>
-        <translation>&lt;Alle Benutzer&gt;</translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
         <translation type="unfinished">
@@ -5644,6 +5633,10 @@ to %1</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>All Users</source>
+        <translation type="unfinished">Alle Benutzer</translation>
     </message>
 </context>
 <context>

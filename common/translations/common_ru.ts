@@ -1233,8 +1233,8 @@
 <context>
     <name>QnSystemDescription</name>
     <message>
-        <source>&lt;Unnamed system&gt;</source>
-        <translation>&lt;Система без имени&gt;</translation>
+        <source>Unnamed system</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -324,11 +324,6 @@
     </message>
     <message>
         <location/>
-        <source>&lt;Cameras...&gt; </source>
-        <translation>&lt;Камеры...&gt; </translation>
-    </message>
-    <message>
-        <location/>
         <source>Backup Quality</source>
         <translation>Качество резервного копирования</translation>
     </message>
@@ -400,11 +395,6 @@
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
         <source>Refresh</source>
         <translation>Обновить</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation>&lt; Любая камера &gt;</translation>
     </message>
     <message>
         <location/>
@@ -917,15 +907,6 @@
     </message>
 </context>
 <context>
-    <name>CloudManagementWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
-        <source>&lt;2. Connect system
-to the cloud&gt;</source>
-        <translation>&lt; 2. Подключить систему к облаку &gt;</translation>
-    </message>
-</context>
-<context>
     <name>ConnectToCloudDialog</name>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
@@ -1034,11 +1015,6 @@ to the cloud&gt;</source>
         <location/>
         <source>All Servers are offline. Logs are not available.</source>
         <translation>Все серверы отключены. Журналы недоступны.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation>&lt; Любая камера &gt;</translation>
     </message>
     <message>
         <location/>
@@ -1286,8 +1262,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;Нет изображения&gt;</translation>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1681,11 +1657,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Background Image</source>
         <translation>Фоновое изображение</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;Нет изображения&gt;</translation>
     </message>
     <message>
         <location/>

@@ -63,7 +63,9 @@ QnSystemDescription::~QnSystemDescription()
 
 QString QnSystemDescription::extractSystemName(const QString& systemName)
 {
-    return (systemName.isEmpty() ? tr("<Unnamed system>") : systemName);
+    return systemName.isEmpty()
+        ? L'<' + tr("Unnamed system") + L'>'
+        : systemName;
 }
 
 QString QnSystemDescription::id() const

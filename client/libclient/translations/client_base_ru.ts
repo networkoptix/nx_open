@@ -1800,14 +1800,6 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Любое устройство&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Любая камера&gt;</translation>
-    </message>
-    <message>
         <source>Select at least one device</source>
         <translation>Выберите хотя бы одно устройство</translation>
     </message>
@@ -1822,6 +1814,14 @@ to view more bookmarks</source>
             <numerusform>%1 из %n модулей ввода/вывода</numerusform>
             <numerusform>%1 из %n модулей ввода/вывода</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished">Любое устройство</translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished">Любая Камера</translation>
     </message>
 </context>
 <context>
@@ -1850,14 +1850,6 @@ to view more bookmarks</source>
         <translation>Ошибка: %1</translation>
     </message>
     <message>
-        <source>&lt;System&gt;</source>
-        <translation>&lt;Система&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Server&gt;</source>
-        <translation>&lt;Любой Сервер&gt;</translation>
-    </message>
-    <message>
         <source>Instant</source>
         <translation>Мгновенно</translation>
     </message>
@@ -1872,14 +1864,6 @@ to view more bookmarks</source>
     <message>
         <source>Administrators Only</source>
         <translation>Только администраторам</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Любое устройство&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Любая камера&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1917,6 +1901,22 @@ to view more bookmarks</source>
         <source>Every %1</source>
         <translation>Каждый %1</translation>
     </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Server</source>
+        <translation type="unfinished">Любой сервер</translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished">Любое устройство</translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished">Любая Камера</translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
@@ -1929,14 +1929,6 @@ to view more bookmarks</source>
         <source>at</source>
         <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
         <translation>на</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Любое устройство&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Любая камера&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1953,6 +1945,14 @@ to view more bookmarks</source>
     <message>
         <source>Cameras</source>
         <translation>Камеры</translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished">Любое устройство</translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished">Любая Камера</translation>
     </message>
 </context>
 <context>
@@ -2339,8 +2339,8 @@ to view more bookmarks</source>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translation>&lt;Авто&gt;</translation>
+        <source>automatic</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2499,8 +2499,8 @@ to view more bookmarks</source>
 <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translation>&lt;авто&gt;</translation>
+        <source>automatic</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3337,10 +3337,6 @@ to %1</source>
         <translation>Описание</translation>
     </message>
     <message>
-        <source>&lt;User removed&gt;</source>
-        <translation>&lt;Пользователь удален&gt;</translation>
-    </message>
-    <message>
         <source>All users</source>
         <translation>Все пользователи</translation>
     </message>
@@ -3384,6 +3380,10 @@ to %1</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>User removed</source>
+        <translation type="unfinished">Пользователь удалён</translation>
     </message>
 </context>
 <context>
@@ -3678,8 +3678,8 @@ to %1</source>
         <translation>Авто</translation>
     </message>
     <message>
-        <source>&lt;multiple values&gt;</source>
-        <translation>&lt;несколько значений&gt;</translation>
+        <source>multiple values</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3736,28 +3736,28 @@ to %1</source>
         <translation>Изображения %1</translation>
     </message>
     <message>
-        <source>&lt;No picture&gt;</source>
-        <translation>&lt;Без изображения&gt;</translation>
+        <source>No picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Error while loading picture&gt;</source>
-        <translation>&lt;Ошибка при загрузке изображения&gt;</translation>
+        <source>Error while loading picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Error while uploading picture&gt;</source>
-        <translation>&lt;Ошибка загрузки изображения на сервер&gt;</translation>
+        <source>Error while uploading picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be read&gt;</source>
-        <translation>&lt;Изображение не читается&gt;</translation>
+        <source>Picture cannot be read</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
-        <translation>&lt;Слишком большое изображение. Максимальный размер %1 МБ&gt;</translation>
+        <source>Picture is too big. Maximum size is %1 Mb</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be loaded&gt;</source>
-        <translation>&lt;Невозможно загрузить изображение&gt;</translation>
+        <source>Picture cannot be loaded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4229,10 +4229,6 @@ to %1</source>
         <translation>* Последнее подключение *</translation>
     </message>
     <message>
-        <source>&lt;none&gt;</source>
-        <translation>&lt;нет&gt;</translation>
-    </message>
-    <message>
         <source>%1 at %2</source>
         <translation>%1 на %2</translation>
     </message>
@@ -4247,6 +4243,10 @@ to %1</source>
     <message>
         <source>There is another connection with the same name.</source>
         <translation>Существует другое соединение с тем же именем.</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4323,6 +4323,10 @@ to %1</source>
     <message>
         <source>Select File...</source>
         <translation>Выбрать файл...</translation>
+    </message>
+    <message>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4461,16 +4465,6 @@ to %1</source>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>LoginEdit</comment>
-        <translation>&lt;несколько значений&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>PasswordEdit</comment>
-        <translation>&lt;несколько значений&gt;</translation>
-    </message>
-    <message>
         <source>Secondary stream disabled for these cameras</source>
         <translation>Вторичный поток отключен для этих камер</translation>
     </message>
@@ -4485,6 +4479,10 @@ to %1</source>
     <message>
         <source>Enable Secondary Stream</source>
         <translation>Включить вторичный поток</translation>
+    </message>
+    <message>
+        <source>multiple values</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4590,20 +4588,20 @@ to %1</source>
 <context>
     <name>QnNotificationSoundModel</name>
     <message>
-        <source>&lt;Downloading sound list...&gt;</source>
-        <translation>&lt;Загружается список звуков...&gt;</translation>
+        <source>Downloading sound list...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;No Sound&gt;</source>
-        <translation>&lt;Нет звука&gt;</translation>
+        <source>No Sound</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Downloading sound...&gt;</source>
-        <translation>&lt;Загружается звук...&gt;</translation>
+        <source>Downloading sound...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Uploading sound...&gt;</source>
-        <translation>&lt;Звук... Загружается на сервер&gt;</translation>
+        <source>Uploading sound...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4842,10 +4840,6 @@ to %1</source>
         <translation>Немедленно</translation>
     </message>
     <message>
-        <source>&lt;Invalid&gt;</source>
-        <translation>&lt;Неверное знач&gt;</translation>
-    </message>
-    <message>
         <source>Position</source>
         <translation>Позиция</translation>
     </message>
@@ -4856,6 +4850,10 @@ to %1</source>
     <message>
         <source>Speed</source>
         <translation>Скорость</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished">Некорректный</translation>
     </message>
 </context>
 <context>
@@ -5123,10 +5121,6 @@ to %1</source>
     <message>
         <source>All Shared Layouts</source>
         <translation>Все Раскладки с общим доступом</translation>
-    </message>
-    <message>
-        <source>&lt;Unnamed system&gt;</source>
-        <translation>&lt;Система без имени&gt;</translation>
     </message>
     <message>
         <source>Shared Layouts</source>
@@ -5679,10 +5673,6 @@ to %1</source>
 </context>
 <context>
     <name>QnShowOnAlarmLayoutActionWidget</name>
-    <message>
-        <source>&lt;All Users&gt;</source>
-        <translation>&lt;Все пользователи&gt;</translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
         <translation>
@@ -5698,6 +5688,10 @@ to %1</source>
             <numerusform>%n роли</numerusform>
             <numerusform>%n ролей</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>All Users</source>
+        <translation type="unfinished">Все пользователи</translation>
     </message>
 </context>
 <context>

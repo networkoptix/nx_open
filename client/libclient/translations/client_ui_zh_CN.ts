@@ -324,11 +324,6 @@
     </message>
     <message>
         <location/>
-        <source>&lt;Cameras...&gt; </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Backup Quality</source>
         <translation type="unfinished"></translation>
     </message>
@@ -400,11 +395,6 @@
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
         <source>Refresh</source>
         <translation>刷新</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation>&lt;任何摄像机&gt;</translation>
     </message>
     <message>
         <location/>
@@ -917,15 +907,6 @@
     </message>
 </context>
 <context>
-    <name>CloudManagementWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
-        <source>&lt;2. Connect system
-to the cloud&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ConnectToCloudDialog</name>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
@@ -1034,11 +1015,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Clear Filter</source>
         <translation>清除过滤器</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished">&lt;任何摄像机&gt;</translation>
     </message>
     <message>
         <location/>
@@ -1281,13 +1257,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;无 图像&gt;</translation>
+        <source>Loading Image...Please Wait.</source>
+        <translation>加载图像...请稍候.</translation>
     </message>
     <message>
         <location/>
-        <source>Loading Image...Please Wait.</source>
-        <translation>加载图像...请稍候.</translation>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1681,11 +1657,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Background Image</source>
         <translation>背景图片</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;沒有图像&gt;</translation>
     </message>
     <message>
         <location/>

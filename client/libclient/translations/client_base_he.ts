@@ -1793,14 +1793,6 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;כל התקן&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;כל מצלמה&gt;</translation>
-    </message>
-    <message>
         <source>Select at least one device</source>
         <translation>בחר לפחות התקן אחד</translation>
     </message>
@@ -1814,6 +1806,14 @@ to view more bookmarks</source>
             <numerusform>מודול קלט/פלט %1 מ %n</numerusform>
             <numerusform>מודולי קלט/פלט %1 מ %n</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1832,14 +1832,6 @@ to view more bookmarks</source>
     <message>
         <source>Error: %1</source>
         <translation>שגיאה: %1</translation>
-    </message>
-    <message>
-        <source>&lt;System&gt;</source>
-        <translation>&lt;מערכת&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Server&gt;</source>
-        <translation>&lt;כל שרת&gt;</translation>
     </message>
     <message numerus="yes">
         <source>%n Server(s)</source>
@@ -1863,14 +1855,6 @@ to view more bookmarks</source>
     <message>
         <source>Starts</source>
         <translation>התחלות</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;כל התקן&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;כל מצלמה&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1907,6 +1891,22 @@ to view more bookmarks</source>
         <source>Every %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
@@ -1919,14 +1919,6 @@ to view more bookmarks</source>
         <source>at</source>
         <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
         <translation>ב</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;כל התקן&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;כל מצלמה&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1943,6 +1935,14 @@ to view more bookmarks</source>
     <message>
         <source>Cameras</source>
         <translation>מצלמות</translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2325,8 +2325,8 @@ to view more bookmarks</source>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translation>&lt;אוטומטי&gt;</translation>
+        <source>automatic</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2480,8 +2480,8 @@ to view more bookmarks</source>
 <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translation>&lt;אוטומטי&gt;</translation>
+        <source>automatic</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3311,10 +3311,6 @@ to %1</source>
         <translation>תיאור</translation>
     </message>
     <message>
-        <source>&lt;User removed&gt;</source>
-        <translation>&lt;המשתמש הוסר&gt;</translation>
-    </message>
-    <message>
         <source>All users</source>
         <translation>כל המשתמשים</translation>
     </message>
@@ -3354,6 +3350,10 @@ to %1</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>User removed</source>
+        <translation type="unfinished">המשתמש הוסר</translation>
     </message>
 </context>
 <context>
@@ -3648,8 +3648,8 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;multiple values&gt;</source>
-        <translation type="unfinished">&lt;ערכים מרובים&gt;</translation>
+        <source>multiple values</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3698,18 +3698,6 @@ to %1</source>
 <context>
     <name>QnLayoutSettingsDialog</name>
     <message>
-        <source>&lt;No picture&gt;</source>
-        <translation>&lt;ללא תמונה&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Error while loading picture&gt;</source>
-        <translation>&lt;אירעה שגיאה במהלך טעינת התמונה&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Error while uploading picture&gt;</source>
-        <translation>&lt;אירעה שגיאה במהלך העלאת התמונה&gt;</translation>
-    </message>
-    <message>
         <source>Select file...</source>
         <translation>בחר קובץ...</translation>
     </message>
@@ -3718,16 +3706,28 @@ to %1</source>
         <translation>תמונות %1</translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be read&gt;</source>
-        <translation>&lt;לא ניתן לפתוח את התמונה&gt;</translation>
+        <source>No picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
-        <translation>&lt;התמונה גדולה מדי. הגודל המקסימלי הוא %1 Mb&gt;</translation>
+        <source>Error while loading picture</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be loaded&gt;</source>
-        <translation>&lt;לא ניתן לטעון את התמונה&gt;</translation>
+        <source>Error while uploading picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture cannot be read</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture is too big. Maximum size is %1 Mb</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Picture cannot be loaded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4191,10 +4191,6 @@ to %1</source>
         <translation>* החיבור האחרון בו בוצע שימוש *</translation>
     </message>
     <message>
-        <source>&lt;none&gt;</source>
-        <translation>&lt;ללא&gt;</translation>
-    </message>
-    <message>
         <source>%1 at %2</source>
         <translation>%1 ב%2</translation>
     </message>
@@ -4208,6 +4204,10 @@ to %1</source>
     </message>
     <message>
         <source>There is another connection with the same name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>none</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4285,6 +4285,10 @@ to %1</source>
     <message>
         <source>Crop</source>
         <translation>חתוך</translation>
+    </message>
+    <message>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4423,16 +4427,6 @@ to %1</source>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>LoginEdit</comment>
-        <translation>&lt;ערכים מרובים&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>PasswordEdit</comment>
-        <translation>&lt;ערכים מרובים&gt;</translation>
-    </message>
-    <message>
         <source>Secondary stream disabled for these cameras</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4446,6 +4440,10 @@ to %1</source>
     </message>
     <message>
         <source>Enable Secondary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>multiple values</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4551,20 +4549,20 @@ to %1</source>
 <context>
     <name>QnNotificationSoundModel</name>
     <message>
-        <source>&lt;Downloading sound list...&gt;</source>
-        <translation>&lt;מוריד רשימת קבצי שמע...&gt;</translation>
+        <source>Downloading sound list...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;No Sound&gt;</source>
-        <translation>&lt;ללא קובץ שמע&gt;</translation>
+        <source>No Sound</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Downloading sound...&gt;</source>
-        <translation>&lt;מוריד קובץ שמע...&gt;</translation>
+        <source>Downloading sound...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Uploading sound...&gt;</source>
-        <translation>&lt;מעלה קובץ שמע...&gt;</translation>
+        <source>Uploading sound...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4800,10 +4798,6 @@ to %1</source>
         <translation>מיידי</translation>
     </message>
     <message>
-        <source>&lt;Invalid&gt;</source>
-        <translation>&lt;לא תקין&gt;</translation>
-    </message>
-    <message>
         <source>Position</source>
         <translation>מיקום</translation>
     </message>
@@ -4814,6 +4808,10 @@ to %1</source>
     <message>
         <source>Speed</source>
         <translation>מהירות</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation type="unfinished">לא תקין</translation>
     </message>
 </context>
 <context>
@@ -5077,10 +5075,6 @@ to %1</source>
     </message>
     <message>
         <source>All Shared Layouts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Unnamed system&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5626,10 +5620,6 @@ to %1</source>
 </context>
 <context>
     <name>QnShowOnAlarmLayoutActionWidget</name>
-    <message>
-        <source>&lt;All Users&gt;</source>
-        <translation>&lt;כל המשתמשים&gt;</translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
         <translation type="unfinished">
@@ -5643,6 +5633,10 @@ to %1</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>All Users</source>
+        <translation type="unfinished">כל המשתמשים</translation>
     </message>
 </context>
 <context>
