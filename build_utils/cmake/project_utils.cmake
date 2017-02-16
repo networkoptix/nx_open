@@ -46,6 +46,7 @@ function(nx_add_target name type)
 
     if("${type}" STREQUAL "EXECUTABLE")
         add_executable(${name} ${sources})
+        set_target_properties(${name} PROPERTIES SKIP_BUILD_RPATH OFF)
     elseif("${type}" STREQUAL "LIBRARY")
         add_library(${name} ${NX_LIBRARY_TYPE} ${sources})
     endif()
