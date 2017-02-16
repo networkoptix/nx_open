@@ -1414,7 +1414,7 @@ content type "application/json". Example of such object:
                     <params/>
                     <result>
                       <caption>
-                        JSON with error code
+                        JSON with error code.
                         When all is OK errorString will be empty. In case of error errorString will contain:
                         UP_TO_DATE if the provided version is already installed;
                         INVALID_FILE if the provided file cannot be opened as a ZIP archive;
@@ -1488,11 +1488,7 @@ content type "application/json". Example of such object:
                   </function>
                   <function>
                     <name>configure</name>
-                    <description>
-                      Configure various server parameters. Some of them are used for the needs of the function 'mergeSystem'.
-                      They are for proprietary use only. If you need to merge servers to each other please use API method
-                      'mergeSystem' instead.
-                    </description>
+                    <description>Configure various server parameters.</description>
                     <permissions>Administrator.</permissions>
                     <method>POST</method>
                     <params>
@@ -1503,14 +1499,15 @@ content type "application/json". Example of such object:
                         </param>
                         <param>
                             <name>port</name>
-                            <description>Change server API port. It affects current server only.</description>
+                            <description>Server API port. It affects the current server only.</description>
                             <optional>true</optional>
                         </param>
                     </params>
                     <result>
                         <caption>
-                          JSON with error code and flag "restartNeeded" that shows if the server must be restarted to apply settings.
-                          Error string contains a hint to identify a problem: SYSTEM_NAME or PORT.
+                            JSON with error code, error string, and flag "restartNeeded" that shows
+                            whether the server must be restarted to apply settings. Error string
+                            contains a hint to identify the problem: "SYSTEM_NAME" or "PORT".
                         </caption>
                     </result>
                 </function>
@@ -1678,7 +1675,7 @@ content type "application/json". Example of such object:
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>JSON with error code</caption>
+                        <caption>JSON with error code.</caption>
                     </result>
                 </function>
                 <function proprietary="true">
