@@ -36,16 +36,20 @@ def visited_key(request):
 
 
 def detect_language_by_request(request):
-    lang = request.session.get('language', False)
+    lang = None
 
-    # 2. Try cookie value
+    # 1. Try account value - top priority
+    if request.user.is_authenticated():
+        lang = request.user.language
+
+    # 2. try session valie
+    if not lang:
+        lang = request.session.get('language', False)
+
+    # 3. Try cookie value (saved in browser some time ago)
     if not lang:
         if 'language' in request.COOKIES:
             lang = request.COOKIES['language']
-
-    # 3. Try account value
-    if not lang and request.user.is_authenticated():
-        lang = request.user.language
 
     # 4. Try ACCEPT_LANGUAGE header
     if not lang and 'HTTP_ACCEPT_LANGUAGE' in request.META:
