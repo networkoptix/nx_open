@@ -1953,11 +1953,6 @@
         <source>Login:</source>
         <translation type="unfinished">登入:</translation>
     </message>
-    <message>
-        <location/>
-        <source>admin</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>

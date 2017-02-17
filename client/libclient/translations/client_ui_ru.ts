@@ -1947,11 +1947,6 @@
         <source>Login:</source>
         <translation>Логин:</translation>
     </message>
-    <message>
-        <location/>
-        <source>admin</source>
-        <translation type="unfinished">admin</translation>
-    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
