@@ -17,10 +17,6 @@
 <context>
     <name>MergeSystemsStatusStrings</name>
     <message>
-        <source>The system was not found.</source>
-        <translation>Система не найдена.</translation>
-    </message>
-    <message>
         <source>The password or user name is invalid.</source>
         <translation>Недопустимое имя пользователя или пароль.</translation>
     </message>
@@ -39,21 +35,6 @@
     <message>
         <source>Unknown error.</source>
         <translation>Неизвестная ошибка.</translation>
-    </message>
-    <message>
-        <source>The discovered system %1 has an incompatible version %2.</source>
-        <comment>%1 is name of the system, %2 is version information</comment>
-        <translation>Найденная система %1 несовместима с версией %2.</translation>
-    </message>
-    <message>
-        <source>The discovered system %1 is in safe mode.</source>
-        <comment>%1 is name of the system</comment>
-        <translation>Найденная система %1 находится в безопасном режиме.</translation>
-    </message>
-    <message>
-        <source>Could not configure the remote system %1.</source>
-        <comment>%1 is name of the system</comment>
-        <translation>Не удалось настроить удаленную систему %1.</translation>
     </message>
     <message>
         <source>You are about to merge Systems with Starter licenses.</source>
@@ -86,6 +67,25 @@
         <source>These systems are built with different %1 URL. Merge is not allowed.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished">Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
+    </message>
+    <message>
+        <source>System was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered system %1 has an incompatible version %2.</source>
+        <comment>%1 is name of System, %2 is version information</comment>
+        <translation type="unfinished">Найденная система %1 несовместима с версией %2.</translation>
+    </message>
+    <message>
+        <source>The discovered system %1 is in safe mode.</source>
+        <comment>%1 is name of System</comment>
+        <translation type="unfinished">Найденная система %1 находится в безопасном режиме.</translation>
+    </message>
+    <message>
+        <source>Could not configure the remote system %1.</source>
+        <comment>%1 is name of System</comment>
+        <translation type="unfinished">Не удалось настроить удаленную систему %1.</translation>
     </message>
 </context>
 <context>

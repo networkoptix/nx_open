@@ -1451,7 +1451,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <source>These devices are removed from the System</source>
+        <source>These devices are removed from System</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -1462,7 +1462,7 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>These servers are removed from the System</source>
+        <source>These cameras are removed from System</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -1473,7 +1473,7 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>These users are removed from the System</source>
+        <source>These servers are removed from System</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -1484,7 +1484,7 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>These resources are removed from the System</source>
+        <source>These users are removed from System</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -1495,7 +1495,7 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>These cameras are removed from the System</source>
+        <source>These resources are removed from System</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -2903,12 +2903,12 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The System connected to %1</source>
+        <source>System connected to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to connect the System to %1</source>
+        <source>Failed to connect System to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
@@ -3168,10 +3168,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The System configuration will be restored from backup, Server application will be restarted.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Database successfully restored</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3181,6 +3177,10 @@ to %1</source>
     </message>
     <message>
         <source>Failed to restore database</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System configuration will be restored from backup, Server application will be restarted.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4494,10 +4494,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The system was configured successfully.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The servers from the remote system should appear in your system soon.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4547,6 +4543,10 @@ to %1</source>
     </message>
     <message>
         <source>Failed to merge Systems</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System was configured successfully.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6469,10 +6469,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The system is running in safe mode.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Any configuration changes except license activation are impossible.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6527,6 +6523,10 @@ to %1</source>
     </message>
     <message>
         <source>They cannot receive system notifications via Email.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System is running in safe mode.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7237,23 +7237,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Components of the System have different versions:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Some functionality may be unavailable or not working properly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The System sends anonymous usage statistics</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>It will be used by software development team to improve your user experience.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>To disable it, go to the System Administration dialog.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7300,6 +7288,18 @@ to %1</source>
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Components of System have different versions:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System sends anonymous usage statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To disable it, go to System Administration dialog.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7577,15 +7577,15 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server connected to the System</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to update Server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Total amount of licenses will decrease</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server connected to System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7660,7 +7660,7 @@ to %1</source>
         </translation>
     </message>
     <message>
-        <source>The System is in the Safe Mode. It is not allowed to make any changes except license activation.</source>
+        <source>System is in the Safe Mode. It is not allowed to make any changes except license activation.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

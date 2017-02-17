@@ -1449,7 +1449,7 @@ to view more bookmarks</source>
         <translation>Нет архивных записей для этой позиции</translation>
     </message>
     <message numerus="yes">
-        <source>These devices are removed from the System</source>
+        <source>These devices are removed from System</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -1457,7 +1457,7 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>These cameras are removed from the System</source>
+        <source>These cameras are removed from System</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -1465,7 +1465,7 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>These servers are removed from the System</source>
+        <source>These servers are removed from System</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -1473,7 +1473,7 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>These users are removed from the System</source>
+        <source>These users are removed from System</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -1481,7 +1481,7 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message numerus="yes">
-        <source>These resources are removed from the System</source>
+        <source>These resources are removed from System</source>
         <translation type="unfinished">
             <numerusform></numerusform>
             <numerusform></numerusform>
@@ -2827,14 +2827,14 @@ to %1</source>
         <translation>Ни один из ваших серверов не подключен к Интернету.</translation>
     </message>
     <message>
-        <source>The System connected to %1</source>
+        <source>System connected to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Система подключена к %1</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to connect the System to %1</source>
+        <source>Failed to connect System to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Не удалось подключить систему к %1</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3092,10 +3092,6 @@ to %1</source>
         <translation>Восстановить базу данных?</translation>
     </message>
     <message>
-        <source>The System configuration will be restored from backup, Server application will be restarted.</source>
-        <translation>Конфигурация системы будет восстановлена из резервной копии, сервер будет перезапущено.</translation>
-    </message>
-    <message>
         <source>Database successfully restored</source>
         <translation>База данных успешно восстановлена</translation>
     </message>
@@ -3106,6 +3102,10 @@ to %1</source>
     <message>
         <source>Failed to restore database</source>
         <translation>Не удалось восстановить базу данных</translation>
+    </message>
+    <message>
+        <source>System configuration will be restored from backup, Server application will be restarted.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4404,10 +4404,6 @@ to %1</source>
         <translation>Успешно!</translation>
     </message>
     <message>
-        <source>The system was configured successfully.</source>
-        <translation>Система успешно сконфигурирована.</translation>
-    </message>
-    <message>
         <source>The servers from the remote system should appear in your system soon.</source>
         <translation>Серверы удалённой системы должны появиться в вашей системе в ближайшее время.</translation>
     </message>
@@ -4430,6 +4426,10 @@ to %1</source>
     <message>
         <source>Failed to merge Systems</source>
         <translation>Не удалось объединить системы</translation>
+    </message>
+    <message>
+        <source>System was configured successfully.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6298,10 +6298,6 @@ to %1</source>
         <translation>Время на серверах не может быть синхронизировано, так как точное время не может быть определено.</translation>
     </message>
     <message>
-        <source>The system is running in safe mode.</source>
-        <translation>Система запущена в безопасном режиме.</translation>
-    </message>
-    <message>
         <source>Any configuration changes except license activation are impossible.</source>
         <translation>Конфигурирование системы невозможно (за исключением активации лицензий).</translation>
     </message>
@@ -6356,6 +6352,10 @@ to %1</source>
     </message>
     <message>
         <source>They cannot receive system notifications via Email.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System is running in safe mode.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7033,24 +7033,12 @@ to %1</source>
         <translation>Пожалуйста, обновите все компоненты системы на версию %1</translation>
     </message>
     <message>
-        <source>Components of the System have different versions:</source>
-        <translation>Компоненты системы имеют разные версии:</translation>
-    </message>
-    <message>
         <source>Some functionality may be unavailable or not working properly.</source>
         <translation>Некоторые функции могут быть недоступны или не работать должным образом.</translation>
     </message>
     <message>
-        <source>The System sends anonymous usage statistics</source>
-        <translation>Система отправляет анонимную статистику использования</translation>
-    </message>
-    <message>
         <source>It will be used by software development team to improve your user experience.</source>
         <translation>Она будет использоваться командой разработки для того чтобы сделать систему проще и понятнее для пользователей.</translation>
-    </message>
-    <message>
-        <source>To disable it, go to the System Administration dialog.</source>
-        <translation>Чтобы отключить ее перейдите на диалоговое окно Системное администрирование.</translation>
     </message>
     <message>
         <source>Failed to open server web page</source>
@@ -7086,6 +7074,18 @@ to %1</source>
     </message>
     <message>
         <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Components of System have different versions:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System sends anonymous usage statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To disable it, go to System Administration dialog.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7361,16 +7361,16 @@ to %1</source>
         <translation>Не удалось объединить системы</translation>
     </message>
     <message>
-        <source>Server connected to the System</source>
-        <translation>Сервер, подключен к системе</translation>
-    </message>
-    <message>
         <source>Failed to update Server</source>
         <translation>Не удалось обновить сервер</translation>
     </message>
     <message>
         <source>Total amount of licenses will decrease</source>
         <translation>Общее количество лицензий уменьшится</translation>
+    </message>
+    <message>
+        <source>Server connected to System</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7435,7 +7435,7 @@ to %1</source>
         </translation>
     </message>
     <message>
-        <source>The System is in the Safe Mode. It is not allowed to make any changes except license activation.</source>
+        <source>System is in the Safe Mode. It is not allowed to make any changes except license activation.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

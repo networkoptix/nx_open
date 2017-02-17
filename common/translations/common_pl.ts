@@ -17,10 +17,6 @@
 <context>
     <name>MergeSystemsStatusStrings</name>
     <message>
-        <source>The system was not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The password or user name is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -38,21 +34,6 @@
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The discovered system %1 has an incompatible version %2.</source>
-        <comment>%1 is name of the system, %2 is version information</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The discovered system %1 is in safe mode.</source>
-        <comment>%1 is name of the system</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not configure the remote system %1.</source>
-        <comment>%1 is name of the system</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -85,6 +66,25 @@
     <message>
         <source>Cannot connect to the other system because current system is already connected to %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered system %1 has an incompatible version %2.</source>
+        <comment>%1 is name of System, %2 is version information</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered system %1 is in safe mode.</source>
+        <comment>%1 is name of System</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not configure the remote system %1.</source>
+        <comment>%1 is name of System</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
