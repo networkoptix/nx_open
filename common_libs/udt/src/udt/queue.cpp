@@ -46,12 +46,70 @@ written by
    #endif
 #endif
 #include <cstring>
+#include <iostream>
+#include <sstream>
 
 #include "common.h"
 #include "core.h"
 #include "queue.h"
 
 using namespace std;
+
+//#define DEBUG_RECORD_PACKET_HISTORY
+
+#ifdef DEBUG_RECORD_PACKET_HISTORY
+namespace {
+
+static std::string dumpPacket(const CPacket& packet)
+{
+    std::ostringstream ss;
+    ss <<
+        "id " << packet.m_iID << ", "
+        "type " << (int)packet.getType();
+    return ss.str();
+}
+
+class SendedPacketVerifier
+{
+public:
+    void beforeSendingPacket(const CPacket& packet)
+    {
+        std::unique_lock<std::mutex> lock(m_mutex);
+
+        auto p = m_idToPrevSendedPacketType.emplace(packet.m_iID, std::vector<PacketType>());
+        p.first->second.push_back(packet.getType());
+
+        //if (packet.getType() == PacketType::KeepAlive)
+        //{
+        //    std::cout<<"Sending "<<dumpPacket(packet)<<"\n";
+        //}
+    }
+
+    void packetReceived(const CPacket& packet)
+    {
+        std::unique_lock<std::mutex> lock(m_mutex);
+
+        auto p = m_idToPrevReceivedPacketType.emplace(packet.m_iID, std::vector<PacketType>());
+        p.first->second.push_back(packet.getType());
+
+        //if (packet.getType() == PacketType::KeepAlive)
+        //{
+        //    std::cout << "Received " << dumpPacket(packet) << "\n";
+        //}
+    }
+
+private:
+    std::map<int, std::vector<PacketType>> m_idToPrevSendedPacketType;
+    std::map<int, std::vector<PacketType>> m_idToPrevReceivedPacketType;
+    std::mutex m_mutex;
+};
+
+static SendedPacketVerifier packetVerifier;
+
+} // namespace
+
+#endif DEBUG_RECORD_PACKET_HISTORY
+
 
 CUnitQueue::CUnitQueue():
 m_pQEntry(NULL),
@@ -537,6 +595,10 @@ void CSndQueue::init(CChannel* c, CTimer* t)
          if (self->m_pSndUList->pop(addr, pkt) < 0)
             continue;
 
+#ifdef DEBUG_RECORD_PACKET_HISTORY
+         packetVerifier.beforeSendingPacket(pkt);
+#endif // DEBUG_RECORD_PACKET_HISTORY
+
          self->m_pChannel->sendto(addr, pkt);
       }
       else
@@ -563,7 +625,11 @@ void CSndQueue::init(CChannel* c, CTimer* t)
 
 int CSndQueue::sendto(const sockaddr* addr, CPacket& packet)
 {
-   // send out the packet immediately (high priority), this is a control packet
+#ifdef DEBUG_RECORD_PACKET_HISTORY
+    packetVerifier.beforeSendingPacket(packet);
+#endif // DEBUG_RECORD_PACKET_HISTORY
+    
+    // send out the packet immediately (high priority), this is a control packet
    m_pChannel->sendto(addr, packet);
    return packet.getLength();
 }
@@ -1036,6 +1102,10 @@ void CRcvQueue::init(int qsize, int payload, int version, int hsize, CChannel* c
           }
           else if (id > 0)
           {
+#ifdef DEBUG_RECORD_PACKET_HISTORY
+              packetVerifier.packetReceived(unit->m_Packet);
+#endif // DEBUG_RECORD_PACKET_HISTORY
+
              if (NULL != (u = self->m_pHash->lookup(id)))
              {
                 if (CIPAddress::ipcmp(addr, u->m_pPeerAddr, u->m_iIPversion))
