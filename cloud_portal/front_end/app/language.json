@@ -101,7 +101,7 @@
     "unknownError": "Unexpected error occured.",
     "accountAlreadyActivated": "This account has been already activated.",
     "emailNotFound": "This email has not been registered in portal.",
-    "emailAlreadyExists": "This email address has been already registered.",
+    "emailAlreadyExists": "This Email has been already registered.",
     "oldPasswordMistmatch": "Current password is incorrect.",
     "passwordMismatch": "Wrong password",
     "cantEditYourself": "Changing own permissions is not allowed.",

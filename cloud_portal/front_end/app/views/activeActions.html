@@ -2,7 +2,7 @@
     <div ng-if="data.activateCode" process-loading="activate">
         <h1 class="process-success" ng-if="activate.success">
             Your account has been successfully activated.<br>
-            <a ng-if="!session.fromClient" href="/login">Log in</a>
+            <a ng-if="!session.fromClient" href="/login">Log In</a>
             <button ng-if="session.fromClient" ng-click="openClient()" class="btn btn-default">Open VMS_NAME</button>
         </h1>
 
@@ -14,7 +14,7 @@
     <div ng-if="!data.activateCode && activationSuccess">
         <h1 class="process-success">
             Your account has been successfully activated.<br>
-            <a href="/login">Log in</a>
+            <a href="/login">Log In</a>
             <!-- <button ng-if="session.fromClient" ng-click="openClient()" class="btn btn-default">Open VMS_NAME</button> -->
         </h1>
     </div>
@@ -27,7 +27,7 @@
 
     <div ng-if="reactivatingSuccess">
         <h1 class="process-success">
-            We've sent a password reset message to your email address.  Open it up to reset the password.
+            We've sent a password reset message to your Email.  Open it up to reset the password.
         </h1>
     </div>
     
@@ -35,7 +35,7 @@
         <h1>Confirm your account</h1>
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" validate-field>
-                <label for="emailReactivate"  class="col-sm-4 control-label">Email address</label>
+                <label for="emailReactivate"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
                            ng-model="data.email"
@@ -44,8 +44,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email address is required.</span>
-                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid email address.</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required.</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email">Please enter a valid Email.</span>
                 </div>
             </div>
             <div class="form-group">
@@ -60,7 +60,7 @@
 
     <div ng-if="restoringSuccess">
         <h1 class="process-success">
-            We've sent a password reset message to your email address.  Open it up to reset the password.
+            We've sent a password reset message to your Email.  Open it up to reset the password.
         </h1>
     </div>
 
@@ -68,7 +68,7 @@
         <h1>Reset Password</h1>
         <form name="restorePassword" class="form-horizontal" novalidate>
             <div class="form-group" validate-field>
-                <label for="email"  class="col-sm-4 control-label">Email address</label>
+                <label for="email"  class="col-sm-4 control-label">Email</label>
                 <div class="col-sm-4">
                     <input type="email" class="form-control"  validate-email
                            ng-model="data.email"
@@ -77,8 +77,8 @@
                            required autofocus>
                 </div>
                 <div class="col-sm-4">
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email address is required.</span>
-                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid email address.</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required.</span>
+                    <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email">Please enter a valid Email.</span>
                 </div>
             </div>
             <div class="form-group">
@@ -93,7 +93,7 @@
     <div ng-if="data.restoreCode">
         <h1 class="process-success" ng-if="change.success || changeSuccess ">
             Password successfully saved.<br>
-            <a href="/login">Log in</a>
+            <a href="/login">Log In</a>
         </h1>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>
