@@ -41,6 +41,10 @@ footer {
     &:hover{
       color:$light16;
     }
+
+    &.dropdown{
+      padding:6px;
+    }
   }
   .navbar-right > li > a, .navbar-right > li > span > a{
     color:$light8;
