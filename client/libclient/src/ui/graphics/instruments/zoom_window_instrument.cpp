@@ -34,7 +34,7 @@ namespace {
     constexpr qreal kZoomWindowMaxSize = 0.9;
     constexpr qreal kZoomWindowMinAspectRatio = kZoomWindowMinSize / kZoomWindowMaxSize;
     constexpr qreal kZoomWindowMaxAspectRatio = kZoomWindowMaxSize / kZoomWindowMinSize;
-
+    static const qreal kMaxZoomWindowAr = 21.0 / 9.0;
     const int kZoomLineWidth = 2;
 
     const auto isZoomAllowed = [](QGraphicsItem* item)
@@ -766,8 +766,19 @@ void ZoomWindowInstrument::dragMove(DragInfo *info) {
         return;
     }
 
+    qreal originalAr = aspectRatio(target()->size()) / aspectRatio(target()->channelLayout()->size());
+
+    // Here are the special algorithm by #rvasilenko
+    int resizeCoef = 1;
+    qreal targetAr = originalAr;
+    while (targetAr > kMaxZoomWindowAr)
+    {
+        ++resizeCoef;
+        targetAr = originalAr / resizeCoef;
+    }
+
     ensureSelectionItem();
-    selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), aspectRatio(target()->size()) / aspectRatio(target()->channelLayout()->size()), target()->rect());
+    selectionItem()->setGeometry(info->mousePressItemPos(), info->mouseItemPos(), targetAr, target()->rect());
 }
 
 void ZoomWindowInstrument::finishDrag(DragInfo *) {

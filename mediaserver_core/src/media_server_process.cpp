@@ -514,14 +514,14 @@ static QStringList listRecordFolders()
     QStringList folderPaths;
 
 #ifdef Q_OS_WIN
-    for (const WinDriveInfo& drive: getWinDrivesInfo()) 
+    for (const WinDriveInfo& drive: getWinDrivesInfo())
     {
         if (!(drive.access | WinDriveInfo::Writable) || drive.type != DRIVE_FIXED)
             continue;
-        
+
         folderPaths.append(QDir::toNativeSeparators(drive.path) + QnAppInfo::mediaFolderName());
      }
- 
+
 #endif
 
 #ifdef Q_OS_LINUX
@@ -1007,7 +1007,6 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[])
     m_dumpSystemResourceUsageTaskID(0),
     m_stopping(false)
 {
-    m_platform.reset(new QnPlatformAbstraction());
     serviceMainInstance = this;
 
     parseCommandLineParameters(argc, argv);
@@ -1023,6 +1022,12 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[])
         MSSettings::initializeRunTimeSettings();
 
     addCommandLineParametersFromConfig();
+
+    const bool isStatisticsDisabled =
+        MSSettings::roSettings()->value(QnServer::kNoMonitorStatistics, false).toBool();
+
+    m_platform.reset(new QnPlatformAbstraction(
+        isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs));
 }
 
 void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
@@ -1885,31 +1890,17 @@ bool MediaServerProcess::initTcpListener(
 
 std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
 {
-    auto mapper = std::make_unique<nx_upnp::PortMapper>();
-    const auto configValue = MSSettings::roSettings()->value(
-        nx::settings_names::kNameUpnpPortMappingEnabled);
+    auto mapper = std::make_unique<nx_upnp::PortMapper>(/*isEnabled*/ false);
+    auto updateEnabled =
+        [mapper = mapper.get()]()
+        {
+            const auto isCloudSystem = !qnGlobalSettings->cloudSystemId().isEmpty();
+            mapper->setIsEnabled(isCloudSystem && qnGlobalSettings->isUpnpPortMappingEnabled());
+        };
 
-    if (!configValue.isNull())
-    {
-        // Config can not be changed by global system settings.
-        if (!configValue.toBool())
-            return nullptr; //< Just to be sure, no mappings are going to be made ever.
-
-        mapper->setIsEnabled(true);
-    }
-    else
-    {
-        auto updateEnabled =
-            [mapper = mapper.get()]()
-            {
-                const auto isCloudSystem = !qnGlobalSettings->cloudSystemId().isEmpty();
-                mapper->setIsEnabled(isCloudSystem && qnGlobalSettings->isUpnpPortMappingEnabled());
-            };
-
-        connect(qnGlobalSettings, &QnGlobalSettings::upnpPortMappingEnabledChanged, updateEnabled);
-        connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, updateEnabled);
-        updateEnabled();
-    }
+    connect(qnGlobalSettings, &QnGlobalSettings::upnpPortMappingEnabledChanged, updateEnabled);
+    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, updateEnabled);
+    updateEnabled();
 
     mapper->enableMapping(
         m_mediaServer->getPort(), nx_upnp::PortMapper::Protocol::TCP,
@@ -2624,7 +2615,7 @@ void MediaServerProcess::run()
     QThreadPool::globalInstance()->setExpiryTimeout(-1);
 
     // ============================
-    std::unique_ptr<nx_upnp::DeviceSearcher> upnpDeviceSearcher(new nx_upnp::DeviceSearcher());
+    std::unique_ptr<nx_upnp::DeviceSearcher> upnpDeviceSearcher(new nx_upnp::DeviceSearcher(qnGlobalSettings));
     std::unique_ptr<QnMdnsListener> mdnsListener(new QnMdnsListener());
 
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
@@ -2733,7 +2724,9 @@ void MediaServerProcess::run()
 
 
     QnResourceDiscoveryManager::instance()->setReady(true);
-    if( !ec2Connection->connectionInfo().ecDbReadOnly )
+    const bool isDiscoveryDisabled =
+        MSSettings::roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
+    if( !ec2Connection->connectionInfo().ecDbReadOnly && !isDiscoveryDisabled)
         QnResourceDiscoveryManager::instance()->start();
     //else
     //    we are not able to add cameras to DB anyway, so no sense to do discover
@@ -2769,14 +2762,16 @@ void MediaServerProcess::run()
         std::chrono::milliseconds(SYSTEM_USAGE_DUMP_TIMEOUT));
 
     QnRecordingManager::instance()->start();
-    QnMServerResourceSearcher::instance()->start();
+    if (!isDiscoveryDisabled)
+        QnMServerResourceSearcher::instance()->start();
     m_universalTcpListener->start();
     serverConnector->start();
 #if 1
     if (ec2Connection->connectionInfo().ecUrl.scheme() == "file") {
         // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
         qnCommon->setCloudMode(true);
-        m_moduleFinder->start();
+        if (!isDiscoveryDisabled)
+            m_moduleFinder->start();
     }
 #endif
     qnBackupStorageMan->scheduleSync()->start();

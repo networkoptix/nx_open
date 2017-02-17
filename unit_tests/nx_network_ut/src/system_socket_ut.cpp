@@ -140,14 +140,14 @@ NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     [](){ return std::make_unique<TCPServerSocket>(AF_INET6); },
     [](){ return std::make_unique<TCPSocket>(AF_INET6); })
 
-// TODO: Figure out why it does not work for any local address:
-NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE(
+// NOTE: Currenly IP v4 address 127.0.0.1 is represented as ::1 IP v6 address, which is not true.
+// TODO: Enable these tests when IP v6 is properly supported.
+NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE(
     TEST, DISABLED_TcpSocketV4to6,
     [](){ return std::make_unique<TCPServerSocket>(AF_INET6); },
     [](){ return std::make_unique<TCPSocket>(AF_INET); })
 
-// TODO: Figure out why it does not work for any local address:
-NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE(
+NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE(
     TEST, DISABLED_TcpSocketV6to4,
     [](){ return std::make_unique<TCPServerSocket>(AF_INET); },
     [](){ return std::make_unique<TCPSocket>(AF_INET6); })

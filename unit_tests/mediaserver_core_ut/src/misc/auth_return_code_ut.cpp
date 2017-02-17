@@ -32,19 +32,35 @@ public:
 
     virtual void SetUp() override
     {
+        auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
+
         userData.id = QnUuid::createUuid();
         userData.name = "Vasja pupkin@gmail.com";
         userData.email = userData.name;
         userData.isEnabled = true;
         userData.isCloud = true;
-        {
-            auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
-            ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
-            ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(userData));
-        }
+        ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(userData));
+
+        ldapUserWithEmptyDigest.id = QnUuid::createUuid();
+        ldapUserWithEmptyDigest.name = "ldap user 1";
+        ldapUserWithEmptyDigest.isEnabled = true;
+        ldapUserWithEmptyDigest.isLdap = true;
+        ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(ldapUserWithEmptyDigest));
+
+        ldapUserWithFilledDigest.id = QnUuid::createUuid();
+        ldapUserWithFilledDigest.name = "ldap user 2";
+        ldapUserWithFilledDigest.isEnabled = true;
+        ldapUserWithFilledDigest.isLdap = true;
+        ldapUserWithFilledDigest.digest = "some digest";
+        ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(ldapUserWithFilledDigest));
     }
 
     ec2::ApiUserData userData;
+    ec2::ApiUserData ldapUserWithEmptyDigest;
+    ec2::ApiUserData ldapUserWithFilledDigest;
+
+
     static std::unique_ptr<MediaServerLauncher> mediaServerLauncher;
 };
 std::unique_ptr<MediaServerLauncher> AuthReturnCodeTest::mediaServerLauncher;
@@ -167,4 +183,23 @@ TEST_F(AuthReturnCodeTest, cookieCorrectPassword)
         "admin", "admin",
         mediaServerLauncher.get(),
         QnRestResult::NoError);
+}
+
+TEST_F(AuthReturnCodeTest, noLdapConnect)
+{
+    // We have cloud user but not connected to cloud yet.
+    testServerReturnCode(
+        ldapUserWithEmptyDigest,
+        mediaServerLauncher.get(),
+        nx_http::AsyncHttpClient::authBasicAndDigest,
+        nx_http::StatusCode::unauthorized,
+        Qn::Auth_LDAPConnectError);
+
+    // We have cloud user but not connected to cloud yet.
+    testServerReturnCode(
+        ldapUserWithFilledDigest,
+        mediaServerLauncher.get(),
+        nx_http::AsyncHttpClient::authDigest,
+        nx_http::StatusCode::unauthorized,
+        Qn::Auth_LDAPConnectError);
 }

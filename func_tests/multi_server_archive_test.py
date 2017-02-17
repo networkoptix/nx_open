@@ -10,7 +10,7 @@ from server import TimePeriod
 def env(env_builder, server):
     one = server()
     two = server()
-    return env_builder(merge_servers=['one', 'two'], one=one, two=two)
+    return env_builder(merge_servers=[one, two], one=one, two=two)
 
 
 def test_merged_archive(env, camera, sample_media_file):

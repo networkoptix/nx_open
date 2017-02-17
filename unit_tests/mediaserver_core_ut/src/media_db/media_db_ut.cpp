@@ -824,7 +824,7 @@ TEST(MediaDbTest, StorageDB)
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
     }
     commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction);
+    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
 
     std::unique_ptr<QnResourceStatusDictionary> statusDictionary;
     if (!qnStatusDictionary) {
@@ -856,7 +856,7 @@ TEST(MediaDbTest, StorageDB)
 
     auto writerFunc = [&mutex, &sdb, &tcm]
     {
-        for (int i = 0; i < 1000; ++i)
+        for (int i = 0; i < 100; ++i)
         {
             int diceRoll = genRandomNumber<0, 10>();
             switch (diceRoll)
@@ -975,7 +975,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
                 new QnResourceStatusDictionary);
     }
 
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction);
+    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
     std::unique_ptr<QnResourcePropertyDictionary> propDictionary;
     if (!propertyDictionary) {
         propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(

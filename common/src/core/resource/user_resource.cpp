@@ -116,7 +116,6 @@ void QnUserResource::setPassword(const QString& password)
 void QnUserResource::generateHash()
 {
     QString password = getPassword();
-    NX_ASSERT(!password.isEmpty(), Q_FUNC_INFO, "Invalid password");
     if (password.isEmpty())
         return;
 

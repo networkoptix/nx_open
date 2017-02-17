@@ -48,10 +48,10 @@ public:
 // -------------------------------------------------------------------------- //
 class QnGlobalMonitorPrivate {
 public:
-    QnGlobalMonitorPrivate()
+    QnGlobalMonitorPrivate(int updatePeriod)
     :
         base(NULL),
-        updatePeriod(2500),
+        updatePeriod(updatePeriod),
         stopped(true),
         requestCount(0),
         totalCpuUsage(0.0),
@@ -109,15 +109,20 @@ private:
 // -------------------------------------------------------------------------- //
 // QnGlobalMonitor
 // -------------------------------------------------------------------------- //
-QnGlobalMonitor::QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent):
+QnGlobalMonitor::QnGlobalMonitor(
+    QnPlatformMonitor *base,
+    QObject *parent,
+    int updatePeriod)
+    :
     base_type(parent),
-    d_ptr(new QnGlobalMonitorPrivate())
+    d_ptr(new QnGlobalMonitorPrivate(updatePeriod))
 {
     Q_D(QnGlobalMonitor);
 
     d_ptr->q_ptr = this;
 
-    if(!base) {
+    if(!base)
+    {
         qnNullWarning(base);
         base = new QnStubMonitor();
     }
@@ -130,9 +135,11 @@ QnGlobalMonitor::QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent):
 
     base->setParent(this); /* Claim ownership. */
     d->base = base;
-
-    d->updateCacheLocked();
-    d->restartTimersLocked();
+    if (d->updatePeriod > 0)
+    {
+        d->updateCacheLocked();
+        d->restartTimersLocked();
+    }
 }
 
 QnGlobalMonitor::~QnGlobalMonitor() {
