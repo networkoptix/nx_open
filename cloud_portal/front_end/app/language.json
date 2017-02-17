@@ -106,7 +106,8 @@
     "passwordMismatch": "Wrong password",
     "cantEditYourself": "Changing own permissions is not allowed.",
     "cantEditAdmin": "This user already has administrator permissions.",
-    "cantOpenClient": "VMS_NAME application was not detected. <a href=\"/download\">Download</a>"
+    "cantOpenClient": "VMS_NAME application was not detected. <a href=\"/download\">Download</a>",
+    "lostConnection": "Connection to {{systemName}} was lost"
   },
   "passwordRequirements": {
     "minLengthMessage": "Password must contain at least 8 characters",
