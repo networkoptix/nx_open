@@ -117,7 +117,7 @@
               <item row="1" column="1">
                <widget class="QLineEdit" name="loginEdit">
                 <property name="text">
-                 <string>admin</string>
+                 <string notr="true">admin</string>
                 </property>
                </widget>
               </item>
