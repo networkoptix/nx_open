@@ -704,6 +704,7 @@ h2.version-number{
   background-size: 112px 32px;
   width: 16px;
   height: 16px;
+  display: inline-block;
   background-image: url('/static/images/portal_icons.png');
   @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
     background-image: url('/static/images/portal_icons@2x.png');
@@ -731,10 +732,14 @@ h2.version-number{
 }
 .icon-caret{
   @include icon;
-  display: inline-block;
   background-position: 2px 0px;
 
   margin-left:$padding-input-horizontal/2;
   margin-top: 2px;
   float:right;
 }
+.close-icon{
+  @include icon;
+  background-position: -32px 0;
+}
+
