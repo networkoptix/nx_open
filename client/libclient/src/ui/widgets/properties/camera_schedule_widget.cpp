@@ -182,15 +182,11 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     m_maxFps(0),
     m_maxDualStreamingFps(0),
     m_motionTypeOverride(Qn::MT_Default),
-    m_batchUpdateTimer(new QTimer(this)),
     m_updating(false)
 {
     ui->setupUi(this);
     ui->recordBeforeSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
     ui->recordAfterSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
-
-    m_batchUpdateTimer->setSingleShot(true);
-    m_batchUpdateTimer->setInterval(0);
 
     NX_ASSERT(parent);
     QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
@@ -258,15 +254,8 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
             emit scheduleTasksChanged();
         };
 
-    connect(m_batchUpdateTimer, &QTimer::timeout, this, handleCellValuesChanged);
-
-    connect(ui->gridWidget, &QnScheduleGridWidget::cellValueChanged, this,
-        [this]()
-        {
-            if (!m_updating)
-                m_batchUpdateTimer->start();
-        });
-
+    connect(ui->gridWidget, &QnScheduleGridWidget::cellValuesChanged,
+        this, handleCellValuesChanged);
     connect(ui->recordAlwaysButton, &QToolButton::toggled, this,
         &QnCameraScheduleWidget::updateGridParams);
     connect(ui->recordMotionButton, &QToolButton::toggled, this,
