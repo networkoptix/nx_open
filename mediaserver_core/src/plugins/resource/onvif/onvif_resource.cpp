@@ -1371,19 +1371,21 @@ void QnPlOnvifResource::setTimeDrift(int value)
     m_timeDriftTimer.restart();
 }
 
-void QnPlOnvifResource::calcTimeDrift() const
+void QnPlOnvifResource::calcTimeDrift(int* outSoapRes) const
 {
-    m_timeDrift = calcTimeDrift(getDeviceOnvifUrl());
+    m_timeDrift = calcTimeDrift(getDeviceOnvifUrl(), outSoapRes);
     m_timeDriftTimer.restart();
 }
 
-int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl)
+int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl, int* outSoapRes)
 {
     DeviceSoapWrapper soapWrapper(deviceUrl.toStdString(), QString(), QString(), 0);
 
     _onvifDevice__GetSystemDateAndTime request;
     _onvifDevice__GetSystemDateAndTimeResponse response;
     int soapRes = soapWrapper.GetSystemDateAndTime(request, response);
+    if (outSoapRes)
+        *outSoapRes = soapRes;
 
     if (soapRes == SOAP_OK && response.SystemDateAndTime && response.SystemDateAndTime->UTCDateTime)
     {
@@ -2838,7 +2840,7 @@ bool QnPlOnvifResource::loadXmlParametersInternal(QnCameraAdvancedParams &params
     {
         NX_LOG(lit("Error while parsing xml (onvif) %1").arg(paramsTemplateFileName), cl_logWARNING);
     }
-    
+
 
     return result;
 }
@@ -3480,7 +3482,7 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
 
     auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
     const bool useHttpReader = resData.value<bool>(
-        Qn::PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER, 
+        Qn::PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER,
         false);
 
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> asyncPullMessagesCallWrapper(
