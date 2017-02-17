@@ -611,11 +611,6 @@
     </message>
     <message>
         <location/>
-        <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation>Не менять настройки потоков и профилей камеры</translation>
-    </message>
-    <message>
-        <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation>Внимание! Это сделает настройки Качество и Частота кадров (FPS) неактуальными.</translation>
     </message>
@@ -727,6 +722,11 @@
     <message>
         <location/>
         <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Keep camera streams and profiles settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2781,10 +2781,9 @@
     </message>
     <message>
         <location/>
-        <source>System time is synchronized with the Internet and is independent from server&apos;s local time.
+        <source>System time is synchronized with the Internet and is independent from server local time.
 Selected server will be used as a time server if the system has no Internet access.</source>
-        <translation>Системное время синхронизируется с Интернетом и не зависит от местного времени сервера. 
-Выбранный сервер будет использоваться как сервер времени, если у системе нет доступа в сеть Интернет.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -611,11 +611,6 @@
     </message>
     <message>
         <location/>
-        <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation>카메라 스트림과 프로파일 설정 유지</translation>
-    </message>
-    <message>
-        <location/>
         <source>Secondary Stream Control</source>
         <translation>보조 스트림 제어</translation>
     </message>
@@ -727,6 +722,11 @@
     <message>
         <location/>
         <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Keep camera streams and profiles settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2781,7 +2781,7 @@
     </message>
     <message>
         <location/>
-        <source>System time is synchronized with the Internet and is independent from server&apos;s local time.
+        <source>System time is synchronized with the Internet and is independent from server local time.
 Selected server will be used as a time server if the system has no Internet access.</source>
         <translation type="unfinished"></translation>
     </message>
