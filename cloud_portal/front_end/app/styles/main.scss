@@ -721,7 +721,14 @@ h2.version-number{
     @include kill-glyphicon;
     background-position: -16px 0;
 }
-
+.glyphicon-eye-open{
+    @include kill-glyphicon;
+    background-position: -80px 0;
+}
+.glyphicon-eye-close{
+    @include kill-glyphicon;
+    background-position: -80px -16px;
+}
 .icon-caret{
   @include icon;
   display: inline-block;
