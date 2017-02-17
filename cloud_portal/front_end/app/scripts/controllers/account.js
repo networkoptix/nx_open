@@ -17,7 +17,8 @@ angular.module('cloudApp')
         };
 
         $scope.save = process.init(function() {
-            return cloudApi.accountPost($scope.account.first_name,$scope.account.last_name,$scope.account.subscribe).then(function(result){
+        console.log($scope.account);
+            return cloudApi.accountPost($scope.account).then(function(result){
                 if(L.language != account.language){
                     //Need to reload page
                     $timeout(function(){
