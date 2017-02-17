@@ -609,6 +609,8 @@ void QnScheduleGridWidget::resetCellValues()
     for (int col = 0; col < columnCount(); ++col)
         for (int row = 0; row < rowCount(); ++row)
             setCellValue(QPoint(col, row), emptyParams);
+
+    emit cellValuesChanged();
 }
 
 bool QnScheduleGridWidget::isReadOnly() const
