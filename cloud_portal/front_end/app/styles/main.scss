@@ -689,7 +689,7 @@ h2.version-number{
     width:100%;
 }
 .dropdown .lang-sm{
-    margin-right: $padding-input-horizontal;
+    margin-right: $padding-input-horizontal/2;
 }
 .two-columns{
     -moz-column-count: 2;
@@ -699,11 +699,11 @@ h2.version-number{
     column-count: 2;
 }
 
-
-
 @mixin icon{
   display: inline-block;
   background-size: 112px 32px;
+  width: 16px;
+  height: 16px;
   background-image: url('/static/images/portal_icons.png');
   @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
     background-image: url('/static/images/portal_icons@2x.png');
@@ -712,8 +712,6 @@ h2.version-number{
 
 @mixin kill-glyphicon{
   @include icon;
-  width: 16px;
-  height: 16px;
   &:before{
     content:none;
   }
@@ -722,4 +720,14 @@ h2.version-number{
 .glyphicon-share{
     @include kill-glyphicon;
     background-position: -16px 0;
+}
+
+.icon-caret{
+  @include icon;
+  display: inline-block;
+  background-position: 2px 0px;
+
+  margin-left:$padding-input-horizontal/2;
+  margin-top: 2px;
+  float:right;
 }
