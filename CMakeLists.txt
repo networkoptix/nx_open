@@ -34,10 +34,11 @@ include(utils)
 include(find_sources)
 include(qrc_utils)
 include(precompiled_header)
-include(python_exec)
 include(rdep)
 include(mercurial)
 include(project_utils)
+
+find_package(PythonInterp 2 REQUIRED)
 
 detect_platform()
 rdep_configure()
