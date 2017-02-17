@@ -57,7 +57,9 @@ private:
     nx_spl::FileInfo m_fInfo;
 };
 
-//!Storage abstraction
+
+*/
+
 class TestStorage : public nx_spl::Storage
 {
 public:
@@ -121,5 +123,3 @@ public:
     ErrorCode parseUrl(const char* url);
 
 };
-
-*/

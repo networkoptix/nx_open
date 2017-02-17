@@ -1,14 +1,11 @@
 #include <stdio.h>
+#include <gtest/gtest.h>
+#include <plugin_api.h>
 
-#include "../../src/plugin_api.h"
 #include "library_loader.h"
-
-using CreateNXPluginInstanceType = nxpl::PluginInterface* (*)();
 
 int main(int argc, const char* argv[])
 {
-    Library lib("plugins/libteststorageplugin.so");
-    printf("Lib is opened: %d\n", lib.isOpened());
-
-    auto instanceFunc = lib.symbol<CreateNXPluginInstanceType>("createNXPluginInstance");
+    ::testing::InitGoogleTest(&argc, (char**)argv);
+    return RUN_ALL_TESTS();
 }

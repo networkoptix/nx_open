@@ -1,40 +1,9 @@
 #include <string>
 #include <cstring>
 #include <memory>
+#include <unordered_map>
+#include <algorithm>
 #include "test_storage_factory.h"
-
-namespace detail {
-
-struct UrlWithParam
-{
-
-};
-
-class UrlParser
-{
-    enum class ParseState
-    {
-        scheme,
-        url,
-        param
-    }
-
-public:
-    UrlParser(const std::string& url)
-        : m_url(url),
-          m_index(0),
-          m_state(scheme)
-    {
-        tryParse();
-    }
-
-private:
-    std::string m_url;
-    size_t m_index;
-    ParseState m_state;
-};
-
-}
 
 const char** STORAGE_METHOD_CALL TestStorageFactory::findAvailable() const
 {
