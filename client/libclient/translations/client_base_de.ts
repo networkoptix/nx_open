@@ -2866,10 +2866,6 @@ to %1</source>
         <translation>Zeitüberschreitung bei LDAP Server.</translation>
     </message>
     <message>
-        <source>Operation is not permitted now. It could happen due to media server is restarting now. Please try again later.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to connect to Server</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2956,11 +2952,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection to the %1 is not ready yet. Check media server internet connection or try again later.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Connection to %1 is not established.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
@@ -2971,6 +2962,15 @@ to %1</source>
     </message>
     <message>
         <source>Server version: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to the %1 is not ready yet. Check server internet connection or try again later.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Operation is not permitted now. It could happen due to server is restarting now. Please try again later.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
