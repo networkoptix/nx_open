@@ -26,9 +26,7 @@ enum class EventType
     stickMove
 };
 
-
-QN_FUSION_DECLARE_FUNCTIONS(EventType, (lexical)(metatype))
-
+QN_FUSION_DECLARE_FUNCTIONS(EventType, (lexical))
 
 typedef int64_t StateElement;
 typedef std::vector<StateElement> State;

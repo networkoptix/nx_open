@@ -109,7 +109,6 @@ bool ConfigHolder::checkIfConfigurationExistsUnsafe(const QString& configuration
 
 bool ConfigHolder::load(const QString& configPath)
 {
-    bool opened = false;
     QFile configFile(configPath);
     if (!configFile.open(QIODevice::ReadOnly | QIODevice::Text))
         return false;

@@ -6,10 +6,10 @@ namespace nx {
 namespace joystick {
 namespace mapping {
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Rule, (json), (ruleId)(eventType)(actionType)(actionParameters));
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(JoystickConfiguration, (json), (configurationId)(configurationName)(controlOverrides)(eventMapping));
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Config, (json), (enabledConfigurations)(configurations));
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((Rule), (json), _Fields);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((JoystickConfiguration), (json), _Fields);
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((Config), (json), _Fields);
 
-} // namespace mapping
+} // namespace mappings
 } // namespace joystick
 } // namespace nx

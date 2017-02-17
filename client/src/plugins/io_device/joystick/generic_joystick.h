@@ -52,14 +52,14 @@ private:
 private:
     // All the functions below use std::dynamic_pointer_cast which doesn't seem to be very efficient.
     template<typename ControlType>
-    std::vector<std::shared_ptr<typename ControlType>> filterControls(const ControlMap& controlMap) const;
+    std::vector<std::shared_ptr<ControlType>> filterControls(const ControlMap& controlMap) const;
 
     template<typename ControlType>
     void removeControls(ControlMap& controlMap) const;
 
     template<typename ControlType>
     void addControls(
-        const std::vector<std::shared_ptr<typename ControlType>>& controlsToAdd,
+        const std::vector<std::shared_ptr<ControlType>>& controlsToAdd,
         ControlMap& controlMap) const;
 
 private:
@@ -74,7 +74,7 @@ private:
 };
 
 template<typename ControlType>
-std::vector<std::shared_ptr<typename ControlType>> GenericJoystick::filterControls(const ControlMap& controlMap) const
+std::vector<std::shared_ptr<ControlType>> GenericJoystick::filterControls(const ControlMap& controlMap) const
 {
     std::vector<std::shared_ptr<ControlType>> filtered;
 
@@ -102,7 +102,7 @@ void GenericJoystick::removeControls(ControlMap& controlMap) const
 
 template<typename ControlType>
 void GenericJoystick::addControls(
-    const std::vector<std::shared_ptr<typename ControlType>>& controlsToAdd,
+    const std::vector<std::shared_ptr<ControlType>>& controlsToAdd,
     ControlMap& controlMap) const
 {
     for (const auto& control: controlsToAdd)

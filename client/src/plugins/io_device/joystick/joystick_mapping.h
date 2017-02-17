@@ -31,9 +31,6 @@ struct Rule
     std::map<QString, QString> actionParameters;
 };
 
-QN_FUSION_DECLARE_FUNCTIONS(Rule, (metatype)(json))
-
-
 struct JoystickConfiguration 
 {
     typedef QString ControlIdType;
@@ -45,7 +42,6 @@ struct JoystickConfiguration
     std::map<ControlIdType, std::vector<Rule>> eventMapping;
 };
 
-QN_FUSION_DECLARE_FUNCTIONS(JoystickConfiguration, (metatype)(json))
 
 struct Config
 {
@@ -56,9 +52,15 @@ struct Config
     std::map<ConfigurationIdType, JoystickConfiguration> configurations;
 };
 
-QN_FUSION_DECLARE_FUNCTIONS(Config, (metatype)(json))
-
 const QString kPresetIndexParameterName = lit("presetIndex");
+
+#define Rule_Fields (ruleId)(eventType)(actionType)(actionParameters)
+#define JoystickConfiguration_Fields (configurationId)(configurationName)(controlOverrides)(eventMapping)
+#define Config_Fields (enabledConfigurations)(configurations)
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::joystick::mapping::Rule, (json));
+QN_FUSION_DECLARE_FUNCTIONS(nx::joystick::mapping::JoystickConfiguration, (json));
+QN_FUSION_DECLARE_FUNCTIONS(nx::joystick::mapping::Config, (json));
 
 } // namespace mapping
 } // namespace joystick

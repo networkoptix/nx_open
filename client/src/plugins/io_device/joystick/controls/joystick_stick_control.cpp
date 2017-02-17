@@ -532,7 +532,7 @@ nx::joystick::StateElement Stick::translatePoint(
 
 bool Stick::isZeroPosition(const State& position) const
 {
-    Q_ASSERT(position.size() == kMaxDegreesOfFreedom, lit("Wrong state size"));
+    Q_ASSERT(position.size() == kMaxDegreesOfFreedom);
 
     return distance(position, kZeroPositionState) < m_threshold;
 }

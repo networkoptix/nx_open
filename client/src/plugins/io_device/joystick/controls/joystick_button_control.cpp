@@ -32,7 +32,7 @@ void Button::notifyButtonStateChanged(ButtonState buttonState)
 {
     {
         QnMutexLocker lock(&m_mutex);
-        Q_ASSERT(m_state.size() == 1, kWrongStateSizeMessage);        
+        Q_ASSERT(m_state.size() == 1);
     }
 
     State newState;
@@ -45,7 +45,7 @@ void Button::notifyButtonStateChanged(const nx::joystick::State& state)
 {
     {
         QnMutexLocker lock(&m_mutex);
-        Q_ASSERT(m_state.size() == 1, kWrongStateSizeMessage);
+        Q_ASSERT(m_state.size() == 1);
     }
 
     notifyControlStateChanged(state);
@@ -103,10 +103,8 @@ ButtonState Button::fromStateElementToButtonState(nx::joystick::StateElement Sta
 
 ButtonState Button::getButtonStateUnsafe() const
 {
-    Q_ASSERT(m_state.size() == 1, kWrongStateSizeMessage);
-    Q_ASSERT(
-        m_state[0] == kReleasedButtonState || m_state[0] == kPressedButtonState,
-        lit("Wrong button state"));
+    Q_ASSERT(m_state.size() == 1);
+    Q_ASSERT(m_state[0] == kReleasedButtonState || m_state[0] == kPressedButtonState);
 
     return fromStateElementToButtonState(m_state[0]);
 }
