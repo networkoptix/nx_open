@@ -100,7 +100,8 @@ if(LINUX)
         -Wno-ignored-qualifiers)
 
     set(CMAKE_SKIP_BUILD_RPATH ON)
-    list(APPEND CMAKE_EXE_LINKER_FLAGS "-Wl,--disable-new-dtags")
+    set(CMAKE_EXE_LINKER_FLAGS "-Wl,--disable-new-dtags")
+    set(CMAKE_SHARED_LINKER_FLAGS "-rdynamic -Wl,--allow-shlib-undefined")
 endif()
 
 if(MACOSX)
