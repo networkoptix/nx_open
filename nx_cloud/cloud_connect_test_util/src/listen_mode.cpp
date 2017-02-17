@@ -161,6 +161,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
     auto transmissionMode = test::TestTransmissionMode::spam;
     if (args.get("ping"))
         transmissionMode = test::TestTransmissionMode::pong;
+    std::cout << lm("Server mode: %1").strs(transmissionMode).toStdString() << std::endl;
 
     auto multiServerSocket = new network::MultipleServerSocket();
     std::unique_ptr<AbstractStreamServerSocket> serverSocket(multiServerSocket);
@@ -170,7 +171,17 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
             serverSocket->pleaseStopSync();
     });
 
-    std::cout << lm("Server mode: %1").strs(transmissionMode).toStdString() << std::endl;
+    std::chrono::milliseconds rwTimeout = nx::network::test::TestConnection::kDefaultRwTimeout;
+    {
+        QString value;
+        if (args.read("rw-timeout", &value))
+            rwTimeout = nx::utils::parseTimerDuration(value, rwTimeout);
+
+        stun::AbstractAsyncClient::Settings settings;
+        settings.sendTimeout = rwTimeout;
+        settings.recvTimeout = rwTimeout;
+        hpm::api::MediatorConnector::setStunClientSettings(settings);
+    }
 
     CloudServerSocketGenerator cloudServerSocketGenerator;
     test::RandomDataTcpServer server(
@@ -188,7 +199,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
 
         if (!localServer->bind(localAddress))
         {
-            std::cout << "Error: can bot bind to " << localAddress.toString().toStdString() << std::endl;
+            std::cout << "Error: Unable to bind to " << localAddress.toString().toStdString() << std::endl;
             return 1;
         }
 
@@ -270,13 +281,6 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
 
         NX_CRITICAL(network::SslEngine::useCertificateAndPkey(certificate));
         serverSocket.reset(new SslServerSocket(serverSocket.release(), false));
-    }
-
-    std::chrono::milliseconds rwTimeout = nx::network::test::TestConnection::kDefaultRwTimeout;
-    {
-        QString value;
-        if (args.read("rw-timeout", &value))
-            rwTimeout = nx::utils::parseTimerDuration(value, rwTimeout);
     }
 
     server.setServerSocket(std::move(serverSocket));
