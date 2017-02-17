@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 namespace nx {
 namespace joystick {
 
