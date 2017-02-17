@@ -5,5 +5,14 @@
 
 namespace utils {
 
-FsStubNode* buildVfsFromJson(const char* jsonString);
+struct VfsPair
+{
+    std::string sampleFilePath;
+    FsStubNode* root;
+};
+
+bool buildVfsFromJson(
+    const char* jsonString, 
+    const char* rootPath, 
+    VfsPair* outVfsPair);
 }

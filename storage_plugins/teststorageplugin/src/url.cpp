@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "url.h"
 
 namespace utils {
 
@@ -61,7 +61,7 @@ Url::ParseState Url::parseHostPath()
 {
     if (m_url[m_index] == '/')
         return ParseState::error;
-    
+
     auto questionMarkIndex = m_url.find('?', m_index);
     if (questionMarkIndex == m_index)
         return ParseState::error;

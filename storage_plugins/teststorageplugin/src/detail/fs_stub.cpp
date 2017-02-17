@@ -9,7 +9,7 @@ static int createStringCopy(const char *source, int sourceLen, char **target)
     if (sourceLen == -1)
         sourceLen = strlen(source);
 
-    stringCopy = malloc(sourceLen + 1);
+    stringCopy = (char *)malloc(sourceLen + 1);
     if (stringCopy == NULL)
         return -1;
 
@@ -44,7 +44,7 @@ void StringVector_destroy(struct StringVector *stringVector)
 
 char *StringVector_add(struct StringVector *stringVector, const char* source, int sourceLen)
 {
-    stringVector->data = realloc(stringVector->data, sizeof(*stringVector->data)*(stringVector->len + 1));
+    stringVector->data = (char **)realloc(stringVector->data, sizeof(*stringVector->data)*(stringVector->len + 1));
     if (stringVector->data == NULL)
         return NULL;
 
@@ -100,7 +100,7 @@ static struct FsStubNode *createNode(
     struct FsStubNode *iteratorNode;
     struct FsStubNode *prevIteratorNode;
 
-    fsNode = malloc(sizeof(*fsNode));
+    fsNode = (struct FsStubNode *)malloc(sizeof(*fsNode));
     memset(fsNode, 0, sizeof(*fsNode));
 
     if (fsNode == NULL)
@@ -137,7 +137,7 @@ static struct FsStubNode *createNode(
         fsNode->prev = NULL;
 
     fsNode->size = size;
-    fsNode->type = type;
+    fsNode->type = (FsStubEntryType)type;
 
     return fsNode;
 }

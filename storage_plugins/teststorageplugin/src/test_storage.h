@@ -58,7 +58,7 @@ private:
 };
 
 
-*/
+
 
 class TestStorage : public nx_spl::Storage
 {
@@ -123,3 +123,5 @@ public:
     ErrorCode parseUrl(const char* url);
 
 };
+
+*/
