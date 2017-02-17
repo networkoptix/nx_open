@@ -47,39 +47,39 @@
   "accessRoles": {
     "disabled": {
       "label": "Disabled",
-      "description": "User is disabled and cannot log in to the system."
+      "description": "User is disabled and cannot log in to the system"
     },
     "Owner": {
       "label": "Owner",
-      "description": "Unrestricted access including the ability to share and connect/disconnect system from cloud."
+      "description": "Unrestricted access including the ability to share and connect/disconnect system from cloud"
     },
     "Viewer": {
       "label": "Viewer",
-      "description": "Can view live video and browse the archive."
+      "description": "Can view live video and browse the archive"
     },
     "Live Viewer": {
       "label": "Live Viewer",
-      "description": "Can only view live video."
+      "description": "Can only view live video"
     },
     "Advanced Viewer": {
       "label": "Advanced Viewer",
-      "description": "Can view live video, browse the archive, configure cameras, control PTZ etc."
+      "description": "Can view live video, browse the archive, configure cameras, control PTZ etc"
     },
     "Administrator": {
       "label": "Administrator",
-      "description": "Unrestricted access including the ability to share."
+      "description": "Unrestricted access including the ability to share"
     },
     "Custom": {
       "label": "Custom",
-      "description": "Use the desktop client application to set up custom permissions."
+      "description": "Use the desktop client application to set up custom permissions"
     },
     "cloudAdmin": {
       "label": "Administrator",
-      "description": "Can configure system and share it."
+      "description": "Can configure system and share it"
     },
     "customRole": {
       "label": "Custom role",
-      "description": "Custom user role specified in the system."
+      "description": "Custom user role specified in the system"
     }
   },
   "errorCodes": {
@@ -88,30 +88,30 @@
     "cantSendActivationPrefix": "Cannot send confirmation email",
     "cantActivatePrefix": "Cannot activate your account",
     "cantSendConfirmationPrefix": "Cannot send confirmation email",
-    "cloudInvalidResponse": "Cloud DB returned an unexpected response.",
-    "notAuthorized": "Login or password are incorrect.",
-    "wrongParameters": "Some parameters on the form are incorrect.",
-    "wrongCode": "Account was already activated or confirmation code is incorrect.",
+    "cloudInvalidResponse": "Cloud DB returned an unexpected response",
+    "notAuthorized": "Login or password are incorrect",
+    "wrongParameters": "Some parameters on the form are incorrect",
+    "wrongCode": "Account was already activated or confirmation code is incorrect",
     "wrongCodeRestore": "Confirmation code was already used or incorrect",
-    "forbidden": "You do not have permissions to perform this action.",
+    "forbidden": "You do not have permissions to perform this action",
     "accountNotActivated": "This account hasn't been activated yet. <a href=\"/activate\">Send activation link again</a>",
-    "accountBlocked": "This account has been blocked.",
+    "accountBlocked": "This account has been blocked",
     "notFound": "Not found",
     "alreadyExists": "Already exists",
-    "unknownError": "Unexpected error occured.",
-    "accountAlreadyActivated": "This account has been already activated.",
-    "emailNotFound": "This email has not been registered in portal.",
-    "emailAlreadyExists": "This Email has been already registered.",
-    "oldPasswordMistmatch": "Current password is incorrect.",
+    "unknownError": "Unexpected error occured",
+    "accountAlreadyActivated": "This account has been already activated",
+    "emailNotFound": "This email has not been registered in portal",
+    "emailAlreadyExists": "This Email has been already registered",
+    "oldPasswordMistmatch": "Current password is incorrect",
     "passwordMismatch": "Wrong password",
-    "cantEditYourself": "Changing own permissions is not allowed.",
-    "cantEditAdmin": "This user already has administrator permissions.",
+    "cantEditYourself": "Changing own permissions is not allowed",
+    "cantEditAdmin": "This user already has administrator permissions",
     "cantOpenClient": "VMS_NAME application was not detected. <a href=\"/download\">Download</a>"
   },
   "passwordRequirements": {
     "minLengthMessage": "Password must contain at least 8 characters",
-    "requiredMessage": "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces.",
-    "weakMessage": "Use numbers, upper and lower case letters and special characters to make your password stronger.",
+    "requiredMessage": "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
+    "weakMessage": "Use numbers, upper and lower case letters and special characters to make your password stronger",
     "strongMessage": "Strong password!",
     "commonMessage": "This password is in top most popular passwords in the world"
   },
@@ -158,11 +158,11 @@
     "groups": {
       "windows": {
         "label": "Windows",
-        "supported": "Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012."
+        "supported": "Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion."
+        "supported": "OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion"
       },
       "linux": {
         "label": "Ubuntu Linux",
