@@ -109,9 +109,6 @@ int OnvifResourceSearcher::autoDetectDevicePort(const QUrl& url)
     while (workers > 0)
         waitCond.wait(&mutex);
 
-    for (const auto& socket: socketList)
-        socket->pleaseStopSync();
-
     return result > 0 ? result : kDefaultOnvifPort;
 }
 
