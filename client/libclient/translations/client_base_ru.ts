@@ -3904,11 +3904,7 @@ to %1</source>
     </message>
     <message>
         <source>Server not found</source>
-        <translation>&lt;Сервер не найден&gt;</translation>
-    </message>
-    <message>
-        <source>Qnt.</source>
-        <translation>Кол-во</translation>
+        <translation>Сервер не найден</translation>
     </message>
     <message>
         <source>Expires</source>
@@ -3941,6 +3937,10 @@ to %1</source>
             <numerusform>Срок действия истекает через %n дня</numerusform>
             <numerusform>Срок действия истекает через %n дней</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Qty</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
