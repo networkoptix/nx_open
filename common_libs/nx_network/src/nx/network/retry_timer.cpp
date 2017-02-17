@@ -66,6 +66,13 @@ RetryTimer::~RetryTimer()
     stopWhileInAioThread();
 }
 
+aio::AbstractAioThread* RetryTimer::getAioThread() const
+{
+    const auto aioThread = aio::BasicPollable::getAioThread();
+    m_timer->bindToAioThread(aioThread);
+    return aioThread;
+}
+
 void RetryTimer::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
     aio::BasicPollable::bindToAioThread(aioThread);
