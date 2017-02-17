@@ -74,7 +74,7 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
         return tr("LDAP Server connection timed out.") + L'\n'
             + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::CloudTemporaryUnauthorizedConnectionResult:
-        return tr("Connection to the %1 is not ready yet. "
+        return tr("Connection to %1 is not ready yet. "
             "Check server internet connection or try again later.",
             "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName())
             + L'\n' + getErrorString(ErrorStrings::ContactAdministrator);

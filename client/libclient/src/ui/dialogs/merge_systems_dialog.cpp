@@ -204,7 +204,7 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked()
     QString password = ui->passwordEdit->text();
 
     if ((url.scheme() != lit("http") && url.scheme() != lit("https")) || url.host().isEmpty()) {
-        updateErrorLabel(tr("The URL is invalid."));
+        updateErrorLabel(tr("URL is invalid."));
         updateConfigurationBlock();
         return;
     }
