@@ -425,8 +425,11 @@ template<typename InterfaceToImplement>
 AbstractSocket::SOCKET_HANDLE UdtSocket<InterfaceToImplement>::handle() const
 {
     NX_ASSERT(!isClosed());
-    NX_ASSERT(sizeof(UDTSOCKET) == sizeof(AbstractSocket::SOCKET_HANDLE));
-    return *reinterpret_cast<const AbstractSocket::SOCKET_HANDLE*>(&m_impl->udtHandle);
+    static_assert(
+        sizeof(UDTSOCKET) <= sizeof(AbstractSocket::SOCKET_HANDLE),
+        "One have to fix UdtSocket<InterfaceToImplement>::handle() implementation");
+    //return *reinterpret_cast<const AbstractSocket::SOCKET_HANDLE*>(&m_impl->udtHandle);
+    return static_cast<AbstractSocket::SOCKET_HANDLE>(m_impl->udtHandle);
 }
 
 template<typename InterfaceToImplement>
