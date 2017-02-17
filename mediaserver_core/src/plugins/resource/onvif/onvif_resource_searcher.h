@@ -28,6 +28,7 @@ public:
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 private:
     OnvifResourceSearcherWsdd m_wsddSearcher;
+    int autoDetectDevicePort(const QUrl& url);
     //OnvifResourceSearcherMdns m_mdnsSearcher;
 
     QList<QnResourcePtr> checkHostAddrInternal( const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck );
