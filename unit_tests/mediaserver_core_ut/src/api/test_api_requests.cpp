@@ -38,7 +38,8 @@ static QByteArray jsonMapToStr(const QMap<QString, QVariant>& jsonMap)
     return QJsonDocument::fromVariant(QVariant(jsonMap)).toJson();
 }
 
-nx_http::BufferType readResponse(nx_http::HttpClient* httpClient)
+// TODO: Consider moving to nx_http::HttpClient.
+nx_http::BufferType readResponseBody(nx_http::HttpClient* httpClient)
 {
     nx_http::BufferType response;
     while (!httpClient->eof())
@@ -78,7 +79,7 @@ void doExecutePost(
 
     httpClient->doPost(url, "application/json", actualRequest);
 
-    const auto response = readResponse(httpClient.get());
+    const auto response = readResponseBody(httpClient.get());
     NX_LOG(lm("[TEST] POST_RESPONSE: %1").arg(response), cl_logINFO);
     NX_LOG(lm("[TEST] POST_STATUS: %1").arg(httpClient->response()->statusLine.statusCode),
         cl_logINFO);
@@ -100,7 +101,7 @@ void doExecuteGet(
     ASSERT_TRUE(httpClient->doGet(url));
 
     NX_CRITICAL(outResponse);
-    *outResponse = readResponse(httpClient.get());
+    *outResponse = readResponseBody(httpClient.get());
     NX_LOG(lm("[TEST] GET_RESPONSE: %1").arg(*outResponse), cl_logINFO);
     NX_LOG(lm("[TEST] GET_STATUS: %1").arg(httpClient->response()->statusLine.statusCode),
         cl_logINFO);

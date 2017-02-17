@@ -2611,8 +2611,7 @@ void MediaServerProcess::run()
     QnResource::initAsyncPoolInstance()->setMaxThreadCount( MSSettings::roSettings()->value(
         nx_ms_conf::RESOURCE_INIT_THREADS_COUNT,
         nx_ms_conf::DEFAULT_RESOURCE_INIT_THREADS_COUNT ).toInt() );
-    QnResource::initAsyncPoolInstance()->setExpiryTimeout(-1); // default expiration timeout is 30 second. But it has a bug in QT < v.5.3
-    QThreadPool::globalInstance()->setExpiryTimeout(-1);
+    QnResource::initAsyncPoolInstance();
 
     // ============================
     std::unique_ptr<nx_upnp::DeviceSearcher> upnpDeviceSearcher(new nx_upnp::DeviceSearcher(qnGlobalSettings));
