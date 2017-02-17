@@ -2053,7 +2053,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     QScopedPointer<QnSessionAwareMessageBox> messageBox(
         new QnSessionAwareMessageBox(mainWindow()));
     messageBox->setIcon(QnMessageBoxIcon::Warning);
-    messageBox->setText(tr("Components of the System have different versions:"));
+    messageBox->setText(tr("Components of System have different versions:"));
     messageBox->setInformativeText(extras);
     messageBox->setCheckBoxEnabled();
 
@@ -2115,9 +2115,9 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
         return;
 
     QnMessageBox::information(mainWindow(),
-        tr("The System sends anonymous usage statistics"),
+        tr("System sends anonymous usage statistics"),
         tr("It will be used by software development team to improve your user experience.")
-            + L'\n' + tr("To disable it, go to the System Administration dialog."));
+            + L'\n' + tr("To disable it, go to System Administration dialog."));
 
     qnGlobalSettings->setStatisticsAllowed(true);
     qnGlobalSettings->synchronizeNow();

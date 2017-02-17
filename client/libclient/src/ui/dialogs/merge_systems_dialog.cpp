@@ -49,7 +49,7 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
         << tr("Success!")
         << QString()
         << QString()
-        << tr("The system was configured successfully.")
+        << tr("System was configured successfully.")
         << tr("The servers from the remote system should appear in your system soon.");
     ui->successLabel->setText(successMessage.join(L'\n'));
 

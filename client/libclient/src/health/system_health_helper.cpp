@@ -86,7 +86,7 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             messageParts << tr("Server times are not synchronized and a common time could not be detected automatically.");
             break;
         case QnSystemHealth::SystemIsReadOnly:
-            messageParts << tr("The system is running in safe mode.") << tr("Any configuration changes except license activation are impossible.");
+            messageParts << tr("System is running in safe mode.") << tr("Any configuration changes except license activation are impossible.");
             break;
         case QnSystemHealth::StoragesAreFull:
             messageParts << tr("Storage is full on the following Server:") << resourceName;
