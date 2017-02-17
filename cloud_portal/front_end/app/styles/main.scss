@@ -6,6 +6,7 @@
 @import '_theme_override';
 
 @import '_big_brother';
+@import '_languages';
 
 html {
   position: relative;
@@ -677,4 +678,19 @@ h2.version-number{
 
 .help-topic{
     margin-top:10px;
+}
+
+.dropdown-wide{
+    display:inline-block;
+    width:100%;
+}
+.dropdown .lang-sm{
+    margin-right: $padding-input-horizontal;
+}
+.two-columns{
+    -moz-column-count: 2;
+    /* Firefox */
+    -webkit-column-count: 2;
+    /* Safari and Chrome */
+    column-count: 2;
 }

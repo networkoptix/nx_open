@@ -28,6 +28,14 @@
                 <span class="help-block" ng-if="accountForm.lastName.$touched && accountForm.lastName.$error.required">Last name is required.</span>
             </div>
         </div>
+        <div class="form-group"  validate-field>
+            <label for="lastName"  class="col-sm-4 control-label">Language</label>
+            <div class="col-sm-4">
+                <language-select account-mode="true" ng-model="account.language"></language-select>
+            </div>
+            <div class="col-sm-4">
+            </div>
+        </div>
 
         <div class="form-group">
             <div class="col-sm-offset-4 col-sm-4">

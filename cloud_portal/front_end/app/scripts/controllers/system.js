@@ -42,7 +42,15 @@ angular.module('cloudApp')
 
         function delayedUpdateSystemInfo(){
             var pollingSystemUpdate = $poll(function(){
-                return $scope.system.update();
+                return $scope.system.update().catch(function(error){
+                    if(error.data.resultCode == "forbidden"){
+                        // Either we lost access to the system
+                        // Or it was disconnected from the cloud
+                        // Send user to /systems/ and show him the message
+                        dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}", $scope.system.info.name), 'warning');
+                        $location.path("/systems/");
+                    }
+                });
             },Config.updateInterval);
 
             $scope.$on('$destroy', function( event ) {

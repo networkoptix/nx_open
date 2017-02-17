@@ -399,3 +399,11 @@ select {
 .btn:disabled *{
     pointer-events: none;
 }
+
+.btn.form-control{
+    text-align:left;
+    .caret{
+        float:right;
+        margin-top: 8px;
+    }
+}
