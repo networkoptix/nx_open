@@ -121,7 +121,8 @@
     "shareTitle": "Share",
     "shareConfirmButton": "Share",
     "editShareTitle": "Edit users' permissions",
-    "editShareConfirmButton": "Save"
+    "editShareConfirmButton": "Save",
+    "permissionsSaved": "New permissions saved"
   },
   "system": {
     "yourSystem": "Your system",
