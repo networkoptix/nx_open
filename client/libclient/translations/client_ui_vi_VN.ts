@@ -1696,11 +1696,6 @@
         <source>Enable Audio</source>
         <translation>cho phép âm thanh</translation>
     </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>PlaySoundBusinessActionWidget</name>

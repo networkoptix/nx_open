@@ -1690,11 +1690,6 @@
         <source>Expert</source>
         <translation></translation>
     </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>PlaySoundBusinessActionWidget</name>

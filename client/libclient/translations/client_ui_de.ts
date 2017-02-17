@@ -1699,11 +1699,6 @@
         <source>Enable Audio</source>
         <translation>Audio aktivieren</translation>
     </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>PlaySoundBusinessActionWidget</name>

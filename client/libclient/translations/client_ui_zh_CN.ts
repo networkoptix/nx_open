@@ -1690,11 +1690,6 @@
         <source>Enable Audio</source>
         <translation>启用音频</translation>
     </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>PlaySoundBusinessActionWidget</name>

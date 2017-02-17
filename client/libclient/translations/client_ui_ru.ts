@@ -1690,11 +1690,6 @@
         <source>Expert</source>
         <translation>Экспертные</translation>
     </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation>TextLabel</translation>
-    </message>
 </context>
 <context>
     <name>PlaySoundBusinessActionWidget</name>
