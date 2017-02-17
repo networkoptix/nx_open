@@ -755,7 +755,7 @@ int CUDT::connect(const CPacket& response)
    if (!isConnecting())
       return -1;
 
-   if (m_bRendezvous && ((0 == response.getFlag()) || (PacketType::KeepAlive == response.getType())) && (0 != m_ConnRes.m_iType))
+   if (/*m_bRendezvous &&*/ ((0 == response.getFlag()) || (PacketType::KeepAlive == response.getType())) && (0 != m_ConnRes.m_iType))
    {
       //a data packet or a keep-alive packet comes, which means the peer side is already connected
       // in this situation, the previously recorded response will be used
