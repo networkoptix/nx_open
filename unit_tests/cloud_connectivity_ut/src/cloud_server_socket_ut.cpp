@@ -238,9 +238,9 @@ NX_NETWORK_SERVER_SOCKET_TEST_CASE(
     [this](){ return makeServerTester(); },
     [this](){ return makeClientTester(); });
 
-TEST_F(CloudServerSocketTcpTest, SimpleSyncSsl)
+TEST_F(CloudServerSocketTcpTest, TransferSyncSsl)
 {
-    network::test::socketSimpleSync(
+    network::test::socketTransferSync(
         [&]() { return std::make_unique<SslServerSocket>(makeServerTester().release(), false); },
         [&]() { return std::make_unique<SslSocket>(makeClientTester().release(), false); });
 }

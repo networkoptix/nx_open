@@ -94,7 +94,7 @@ Item
         LoginButton
         {
             id: loginButton
-            text: "Log in"
+            text: qsTr("Log in")
             width: parent.width
             showProgress: d.connecting
             onClicked: login()

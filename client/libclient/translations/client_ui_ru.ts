@@ -31,7 +31,7 @@
     <message>
         <location/>
         <source>System Servers</source>
-        <translation type="unfinished"></translation>
+        <translation>Cерверы в системе</translation>
     </message>
 </context>
 <context>
@@ -39,7 +39,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/accessible_resources_widget.ui"/>
         <source>Filter</source>
-        <translation type="unfinished">Поиск</translation>
+        <translation>Поиск</translation>
     </message>
 </context>
 <context>
@@ -80,42 +80,42 @@
     <message>
         <location filename="../src/ui/widgets/local_settings/advanced_settings_widget.ui"/>
         <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation type="unfinished">Микшировать звук 5.1 в 2.1</translation>
+        <translation>Микшировать звук 5.1 в 2.1</translation>
     </message>
     <message>
         <location/>
         <source>Double Buffering</source>
-        <translation type="unfinished"></translation>
+        <translation>Двойная буферизация</translation>
     </message>
     <message>
         <location/>
         <source>Disable only if the client takes too much CPU</source>
-        <translation type="unfinished"></translation>
+        <translation>Отключайте только в случае слишком большой загрузки процессора</translation>
     </message>
     <message>
         <location/>
         <source>Maximum Live Buffer Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Максимальная длина живая буфера живого видео</translation>
     </message>
     <message>
         <location/>
         <source> ms</source>
-        <translation type="unfinished"></translation>
+        <translation> мс</translation>
     </message>
     <message>
         <location/>
         <source>Browse Logs</source>
-        <translation type="unfinished">Просмотр журнала событий</translation>
+        <translation>Просмотр журнала событий</translation>
     </message>
     <message>
         <location/>
         <source>Clear Local Cache</source>
-        <translation type="unfinished">Очистить локальный кэш</translation>
+        <translation>Очистить локальный кэш</translation>
     </message>
     <message>
         <location/>
         <source>Reset All Warnings</source>
-        <translation type="unfinished"></translation>
+        <translation>Сбросить все предупреждения</translation>
     </message>
 </context>
 <context>
@@ -146,27 +146,27 @@
     <message>
         <location filename="../src/nx/client/ui/dialogs/debug/applauncher_control_dialog.ui"/>
         <source>Add External Storage...</source>
-        <translation type="unfinished">Добавить внешнее хранилище...</translation>
+        <translation>Добавить внешнее хранилище...</translation>
     </message>
     <message>
         <location/>
         <source>Version:</source>
-        <translation type="unfinished"></translation>
+        <translation>Версия:</translation>
     </message>
     <message>
         <location/>
         <source>Check</source>
-        <translation type="unfinished">Проверить</translation>
+        <translation>Проверить</translation>
     </message>
     <message>
         <location/>
         <source>Not Checked</source>
-        <translation type="unfinished"></translation>
+        <translation>Не проверен</translation>
     </message>
     <message>
         <location/>
         <source>Get Installed Versions</source>
-        <translation type="unfinished"></translation>
+        <translation>Получить версию установленного ПО</translation>
     </message>
 </context>
 <context>
@@ -239,17 +239,17 @@
     <message>
         <location/>
         <source>Clear Filter</source>
-        <translation type="unfinished">Очистить фильтр</translation>
+        <translation>Очистить фильтр</translation>
     </message>
     <message>
         <location/>
         <source>Email settings</source>
-        <translation type="unfinished">Настройки e-mail</translation>
+        <translation>Настройки e-mail</translation>
     </message>
     <message>
         <location/>
         <source>All servers are offline. Audit data is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Все серверы отключены. Журналы недоступны.</translation>
     </message>
 </context>
 <context>
@@ -277,17 +277,17 @@
     <message>
         <location/>
         <source>Bitrate limitation could lead to backup failure.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ограничение битрейта может привести к сбоям при резервном копирования.</translation>
     </message>
     <message>
         <location/>
         <source>Finish</source>
-        <translation type="unfinished"></translation>
+        <translation>Завершить</translation>
     </message>
     <message>
         <location/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Начать</translation>
     </message>
 </context>
 <context>
@@ -295,42 +295,42 @@
     <message>
         <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
         <source>Backup Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Параметры резервного копирования</translation>
     </message>
     <message>
         <location/>
         <source>Server Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки сервера</translation>
     </message>
     <message>
         <location/>
         <source>Set Schedule...</source>
-        <translation type="unfinished">Настроить расписание...</translation>
+        <translation>Настроить расписание...</translation>
     </message>
     <message>
         <location/>
         <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
-        <translation type="unfinished"></translation>
+        <translation>Внимание! Резервироваться будут только последующие данные! Существующий архив резервироваться не будет.</translation>
     </message>
     <message>
         <location/>
         <source>Execute Backup</source>
-        <translation type="unfinished">Запустить резервное копирование</translation>
+        <translation>Запустить резервное копирование</translation>
     </message>
     <message>
         <location/>
         <source>Backup Archive From</source>
-        <translation type="unfinished"></translation>
+        <translation>Резервировать архив с</translation>
     </message>
     <message>
         <location/>
         <source>&lt;Cameras...&gt; </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Камеры...&gt; </translation>
     </message>
     <message>
         <location/>
         <source>Backup Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Качество резервного копирования</translation>
     </message>
 </context>
 <context>
@@ -371,27 +371,27 @@
     <message>
         <location/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <location/>
         <source>Description</source>
-        <translation type="unfinished">&amp;Описание</translation>
+        <translation>&amp;Описание</translation>
     </message>
     <message>
         <location/>
         <source>Timeout</source>
-        <translation type="unfinished">&amp;Таймаут</translation>
+        <translation>&amp;Таймаут</translation>
     </message>
     <message>
         <location/>
         <source>Tags</source>
-        <translation type="unfinished"></translation>
+        <translation>Теги</translation>
     </message>
     <message>
         <location/>
         <source>List of tags divided by commas</source>
-        <translation type="unfinished"></translation>
+        <translation>Список тегов, разделенных запятыми</translation>
     </message>
 </context>
 <context>
@@ -419,7 +419,7 @@
     <message>
         <location/>
         <source>Clear Filter</source>
-        <translation type="unfinished">Очистить фильтр</translation>
+        <translation>Очистить фильтр</translation>
     </message>
 </context>
 <context>
@@ -475,18 +475,23 @@
     <message>
         <location/>
         <source>Event Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Правила событий</translation>
     </message>
     <message>
         <location/>
         <source>Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>Журнал событий...</translation>
     </message>
 </context>
 <context>
     <name>CameraAdditionDialog</name>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
+        <source>Server is offline</source>
+        <translation>Сервер не в сети</translation>
+    </message>
+    <message>
+        <location/>
         <source>IP, hostname, RTSP link...</source>
         <translation>IP, доменное имя, RTSP ссылка...</translation>
     </message>
@@ -497,8 +502,8 @@
     </message>
     <message>
         <location/>
-        <source>Stop</source>
-        <translation>Остановить</translation>
+        <source>Address</source>
+        <translation>Адрес</translation>
     </message>
     <message>
         <location/>
@@ -507,13 +512,8 @@
     </message>
     <message>
         <location/>
-        <source>Address</source>
-        <translation>Адрес</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Server is offline</source>
-        <translation>Сервер не в сети</translation>
+        <source>Stop</source>
+        <translation>Остановить</translation>
     </message>
     <message>
         <location/>
@@ -543,57 +543,57 @@
     <message>
         <location/>
         <source>Device Address</source>
-        <translation type="unfinished">Адрес устройства:</translation>
+        <translation>Адрес устройства:</translation>
     </message>
     <message>
         <location/>
         <source>Start IP</source>
-        <translation type="unfinished"></translation>
+        <translation>Начальный IP адрес</translation>
     </message>
     <message>
         <location/>
         <source>0.0.0.0</source>
-        <translation type="unfinished">0.0.0.0</translation>
+        <translation>0.0.0.0</translation>
     </message>
     <message>
         <location/>
         <source>End IP</source>
-        <translation type="unfinished"></translation>
+        <translation>Конечный IP адрес</translation>
     </message>
     <message>
         <location/>
         <source>0.0.0.255</source>
-        <translation type="unfinished">0.0.0.255</translation>
+        <translation>0.0.0.255</translation>
     </message>
     <message>
         <location/>
         <source>Subnet Scan</source>
-        <translation type="unfinished">&amp;Сканировать Сеть</translation>
+        <translation>&amp;Сканировать Сеть</translation>
     </message>
     <message>
         <location/>
         <source>Discovery Port</source>
-        <translation type="unfinished">П&amp;орт:</translation>
+        <translation>П&amp;орт:</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished">Пароль</translation>
+        <translation>Пароль</translation>
     </message>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished">Имя пользователя</translation>
+        <translation>Имя пользователя</translation>
     </message>
     <message>
         <location/>
         <source>Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>Сканировать</translation>
     </message>
     <message>
         <location/>
         <source>Add selected</source>
-        <translation type="unfinished">&amp;Добавить выбранные</translation>
+        <translation>&amp;Добавить выбранные</translation>
     </message>
 </context>
 <context>
@@ -619,7 +619,7 @@
     <message>
         <location/>
         <source>Advanced settings are unavailable</source>
-        <translation type="unfinished"></translation>
+        <translation>Расширенные параметры недоступны</translation>
     </message>
 </context>
 <context>
@@ -641,6 +641,11 @@
     </message>
     <message>
         <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation>Внимание! Это сделает настройки Качество и Частота кадров (FPS) неактуальными.</translation>
+    </message>
+    <message>
+        <location/>
         <source>Secondary Stream Control</source>
         <translation>Настройки второго потока</translation>
     </message>
@@ -648,6 +653,11 @@
         <location/>
         <source>Override secondary stream quality</source>
         <translation>Перезаписывать настройки качества второго потока</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Do not use</source>
+        <translation>Не перезаписывать</translation>
     </message>
     <message>
         <location/>
@@ -663,6 +673,11 @@
         <location/>
         <source>High quality</source>
         <translation>Высокое качество</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
+        <translation>Внимание! Выбор Высокого качества можетотразиться на загрузке ЦП и сети, что может привести к дополнительным проблемам.</translation>
     </message>
     <message>
         <location/>
@@ -706,6 +721,11 @@
     </message>
     <message>
         <location/>
+        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
+        <translation>Внимание! Не изменяйте эти настройки, если вы не уверены, что это не отразится на производительности вашей системы.</translation>
+    </message>
+    <message>
+        <location/>
         <source>Restore Defaults</source>
         <translation>По умолчанию</translation>
     </message>
@@ -726,33 +746,13 @@
     </message>
     <message>
         <location/>
-        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation>Внимание! Это сделает настройки Качество и Частота кадров (FPS) неактуальными.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Do not use</source>
-        <translation>Не перезаписывать</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-        <translation>Внимание! Выбор Высокого качества можетотразиться на загрузке ЦП и сети, что может привести к дополнительным проблемам.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation>Внимание! Не изменяйте эти настройки, если вы не уверены, что это не отразится на производительности вашей системы.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Motion detection control</source>
-        <translation type="unfinished"></translation>
+        <translation>Настройки обнаружения движения</translation>
     </message>
     <message>
         <location/>
         <source>Force motion detection for stream:</source>
-        <translation type="unfinished"></translation>
+        <translation>Жестко задать обнаружение движения по потоку:</translation>
     </message>
 </context>
 <context>
@@ -768,7 +768,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
         <source>Add Device...</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить устройство...</translation>
     </message>
 </context>
 <context>
@@ -776,17 +776,17 @@
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
         <source>Output ID:</source>
-        <translation type="unfinished">ID тревожного в&amp;ыхода:</translation>
+        <translation>ID тревожного в&amp;ыхода:</translation>
     </message>
     <message>
         <location/>
         <source>Fixed duration:</source>
-        <translation type="unfinished">Длительность по умолчанию:</translation>
+        <translation>Длительность по умолчанию:</translation>
     </message>
     <message>
         <location/>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>секунд</translation>
     </message>
 </context>
 <context>
@@ -823,42 +823,6 @@
     </message>
     <message>
         <location/>
-        <source>Fixed Archive Length</source>
-        <translation>Фиксированная длина архива</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Auto</source>
-        <translation>Авто</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion Recording</source>
-        <translation>Запись по движению</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Pre-Recording</source>
-        <translation>Пре-запись</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Post-Recording</source>
-        <translation>Пост-запись</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Copy Schedule...</source>
-        <translation>Скопировать расписание...</translation>
-    </message>
-    <message>
-        <location/>
-        <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation>с</translation>
-    </message>
-    <message>
-        <location/>
         <source>Motion + Low-Res </source>
         <translation>Движение + Низкое разрешение</translation>
     </message>
@@ -866,6 +830,16 @@
         <location/>
         <source>Do Not Record</source>
         <translation>Не писать</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Fixed Archive Length</source>
+        <translation>Фиксированная длина архива</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Auto</source>
+        <translation>Авто</translation>
     </message>
     <message>
         <location/>
@@ -879,33 +853,59 @@
     </message>
     <message>
         <location/>
+        <source>Motion Recording</source>
+        <translation>Запись по движению</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pre-Recording</source>
+        <translation>Пре-запись</translation>
+    </message>
+    <message>
+        <location/>
+        <source> s</source>
+        <extracomment>Short for &quot;seconds&quot;</extracomment>
+        <translation>с</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Post-Recording</source>
+        <translation>Пост-запись</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Copy Schedule...</source>
+        <translation>Скопировать расписание...</translation>
+    </message>
+    <message>
+        <location/>
         <source>Recording</source>
-        <translation type="unfinished">Запись</translation>
+        <translation>Запись</translation>
     </message>
     <message>
         <location/>
         <source>Activate License...</source>
-        <translation type="unfinished"></translation>
+        <translation>Активировать лицензию...</translation>
     </message>
     <message>
         <location/>
         <source>Show Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать качество</translation>
     </message>
     <message>
         <location/>
         <source>Show FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать FPS</translation>
     </message>
     <message>
         <location/>
         <source>Copying Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Копировать расписание</translation>
     </message>
     <message>
         <location/>
         <source>Apply changes before copying schedule.</source>
-        <translation type="unfinished">Сохраните изменения перед копированием</translation>
+        <translation>Сохраните изменения перед копированием</translation>
     </message>
 </context>
 <context>
@@ -913,7 +913,7 @@
     <message>
         <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
         <source>Change password</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменить пароль</translation>
     </message>
 </context>
 <context>
@@ -922,19 +922,19 @@
         <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
         <source>&lt;2. Connect system
 to the cloud&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt; 2. Подключить систему к облаку &gt;</translation>
     </message>
 </context>
 <context>
     <name>ConnectToCloudDialog</name>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
-        <source>Email or password is not recognized.</source>
-        <translation type="unfinished"></translation>
+        <source>Stay logged in</source>
+        <translation>Запомнить</translation>
     </message>
     <message>
         <location/>
-        <source>Stay logged in</source>
+        <source>Incorrect email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1010,23 +1010,13 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/widgets/common/date_range_widget.ui"/>
         <source>-</source>
-        <translation type="unfinished">-</translation>
+        <translation>-</translation>
     </message>
 </context>
 <context>
     <name>EventLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
-        <source>All Servers are offline. Logs are not available.</source>
-        <translation>Все серверы отключены. Журналы недоступны.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Refresh</source>
-        <translation>Обновить</translation>
-    </message>
-    <message>
-        <location/>
         <source>Event Log</source>
         <translation>Журнал событий</translation>
     </message>
@@ -1037,13 +1027,23 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
+        <source>Refresh</source>
+        <translation>Обновить</translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Logs are not available.</source>
+        <translation>Все серверы отключены. Журналы недоступны.</translation>
+    </message>
+    <message>
+        <location/>
         <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished">&lt; Любая камера &gt;</translation>
+        <translation>&lt; Любая камера &gt;</translation>
     </message>
     <message>
         <location/>
         <source>Event Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Правила событий...</translation>
     </message>
 </context>
 <context>
@@ -1081,7 +1081,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Content type</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип содержимого</translation>
     </message>
 </context>
 <context>
@@ -1089,7 +1089,7 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>PTZ preset:</source>
-        <translation type="unfinished">&amp;PTZ позиция:</translation>
+        <translation>&amp;PTZ позиция:</translation>
     </message>
 </context>
 <context>
@@ -1140,42 +1140,42 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Fisheye Dewarping</source>
-        <translation type="unfinished"></translation>
+        <translation>Развертка камер &quot;рыбий глаз&quot;</translation>
     </message>
     <message>
         <location/>
         <source>Auto Calibration</source>
-        <translation type="unfinished">Автокалибровка</translation>
+        <translation>Автокалибровка</translation>
     </message>
     <message>
         <location/>
         <source>Mount Angle Correction:</source>
-        <translation type="unfinished"></translation>
+        <translation>Коррекция угла наклона:</translation>
     </message>
     <message>
         <location/>
         <source>°</source>
-        <translation type="unfinished"></translation>
+        <translation>°</translation>
     </message>
     <message>
         <location/>
         <source>Y Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Смещение по оси Y</translation>
     </message>
     <message>
         <location/>
         <source>X Offset</source>
-        <translation type="unfinished"></translation>
+        <translation>Смещение по x</translation>
     </message>
     <message>
         <location/>
         <source>Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Размер</translation>
     </message>
     <message>
         <location/>
         <source>Ellipticity</source>
-        <translation type="unfinished"></translation>
+        <translation>Эллиптичность</translation>
     </message>
 </context>
 <context>
@@ -1187,13 +1187,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>after</source>
-        <translation>после</translation>
+        <source>Auto Pause Video</source>
+        <translation>Приостанавливать воспроизведение</translation>
     </message>
     <message>
         <location/>
-        <source>Auto Pause Video</source>
-        <translation>Приостанавливать воспроизведение</translation>
+        <source>after</source>
+        <translation>после</translation>
     </message>
     <message>
         <location/>
@@ -1203,42 +1203,42 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Add...</source>
-        <translation type="unfinished">&amp;Добавить...</translation>
+        <translation>&amp;Добавить...</translation>
     </message>
     <message>
         <location/>
         <source>Remove</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location/>
         <source>Local Media Folders</source>
-        <translation type="unfinished"></translation>
+        <translation>Локальные медиа папки</translation>
     </message>
     <message>
         <location/>
         <source>Audio Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Аудио вход</translation>
     </message>
     <message>
         <location/>
         <source>First Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Первый источник</translation>
     </message>
     <message>
         <location/>
         <source>None</source>
-        <translation type="unfinished">Нет</translation>
+        <translation>Нет</translation>
     </message>
     <message>
         <location/>
         <source>Second Source</source>
-        <translation type="unfinished"></translation>
+        <translation>Второй источник</translation>
     </message>
     <message>
         <location/>
         <source>Run application when PC Boots</source>
-        <translation type="unfinished"></translation>
+        <translation>Запустить приложение при загрузке компьютера</translation>
     </message>
 </context>
 <context>
@@ -1251,7 +1251,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Backup and Restore</source>
-        <translation type="unfinished"></translation>
+        <translation>Резервное копирование и восстановление</translation>
     </message>
 </context>
 <context>
@@ -1264,12 +1264,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Соотношение сторон</translation>
     </message>
     <message>
         <location/>
         <source>Rotation</source>
-        <translation type="unfinished"></translation>
+        <translation>Вращение</translation>
     </message>
 </context>
 <context>
@@ -1281,13 +1281,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;Нет изображения&gt;</translation>
+        <source>Loading Image...Please Wait.</source>
+        <translation>Загрузка изображения... Пожалуйста, подождите.</translation>
     </message>
     <message>
         <location/>
-        <source>Loading Image...Please Wait.</source>
-        <translation>Загрузка изображения... Пожалуйста, подождите.</translation>
+        <source>&lt;No image&gt;</source>
+        <translation>&lt;Нет изображения&gt;</translation>
     </message>
 </context>
 <context>
@@ -1301,6 +1301,11 @@ to the cloud&gt;</source>
         <location/>
         <source>General Settings</source>
         <translation> Общие настройки</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Layout is Locked</source>
+        <translation>Изменение раскладки запрещено</translation>
     </message>
     <message>
         <location/>
@@ -1324,6 +1329,11 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
+        <source>Processing Image...Please Wait.</source>
+        <translation>Обработка изображения... Пожалуйста, подождите.</translation>
+    </message>
+    <message>
+        <location/>
         <source> cells</source>
         <translation> ячеек</translation>
     </message>
@@ -1334,38 +1344,28 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Layout is Locked</source>
-        <translation>Изменение раскладки запрещено</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Processing Image...Please Wait.</source>
-        <translation>Обработка изображения... Пожалуйста, подождите.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Keep Aspect Ratio</source>
         <translation>Сохранять соотношение сторон</translation>
     </message>
     <message>
         <location/>
         <source>Crop to monitor aspect ratio</source>
-        <translation type="unfinished">&amp;Обрезать по соотношению сторон монитора</translation>
+        <translation>&amp;Обрезать по соотношению сторон монитора</translation>
     </message>
     <message>
         <location/>
         <source>Width:</source>
-        <translation type="unfinished">&amp;Ширина:</translation>
+        <translation>&amp;Ширина:</translation>
     </message>
     <message>
         <location/>
         <source>Height:</source>
-        <translation type="unfinished">&amp;Высота:</translation>
+        <translation>&amp;Высота:</translation>
     </message>
     <message>
         <location/>
         <source>Opacity:</source>
-        <translation type="unfinished">&amp;Прозрачность:</translation>
+        <translation>&amp;Прозрачность:</translation>
     </message>
 </context>
 <context>
@@ -1393,27 +1393,27 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Server URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL-адрес сервера</translation>
     </message>
     <message>
         <location/>
         <source>Admin DN</source>
-        <translation type="unfinished"></translation>
+        <translation>Администратор DN</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished">Пароль</translation>
+        <translation>Пароль</translation>
     </message>
     <message>
         <location/>
         <source>Search Base</source>
-        <translation type="unfinished"></translation>
+        <translation>База поиска</translation>
     </message>
     <message>
         <location/>
         <source>Search Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Фильтр поиска</translation>
     </message>
 </context>
 <context>
@@ -1502,12 +1502,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Details...</source>
-        <translation type="unfinished"></translation>
+        <translation>Подробнее...</translation>
     </message>
     <message>
         <location/>
         <source>The software is licensed to</source>
-        <translation type="unfinished"></translation>
+        <translation>ПO лицензировано для</translation>
     </message>
 </context>
 <context>
@@ -1520,7 +1520,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>License issues:</source>
-        <translation type="unfinished"></translation>
+        <translation>Проблемы с лицензиями:</translation>
     </message>
 </context>
 <context>
@@ -1532,11 +1532,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Browse...</source>
-        <translation>Выбрать...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Paste from Clipboard</source>
         <translation>Вставить из буфера обмена</translation>
     </message>
@@ -1544,6 +1539,16 @@ to the cloud&gt;</source>
         <location/>
         <source>Copy to Clipboard</source>
         <translation>Скопировать в буфер обмена</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select License File...</source>
+        <translation>Выбрать файл лицензии...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Browse...</source>
+        <translation>Выбрать...</translation>
     </message>
     <message>
         <location/>
@@ -1562,33 +1567,28 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Select License File...</source>
-        <translation>Выбрать файл лицензии...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Internet Activation</source>
-        <translation type="unfinished"></translation>
+        <translation>Активация по сети Интернет</translation>
     </message>
     <message>
         <location/>
         <source>License Key</source>
-        <translation type="unfinished">Лицензионный ключ:</translation>
+        <translation>Лицензионный ключ:</translation>
     </message>
     <message>
         <location/>
         <source>Invalid License Key</source>
-        <translation type="unfinished"></translation>
+        <translation>Недопустимый лицензионный ключ</translation>
     </message>
     <message>
         <location/>
         <source>Hardware ID</source>
-        <translation type="unfinished">Аппаратный идентификатор:</translation>
+        <translation>Аппаратный идентификатор:</translation>
     </message>
     <message>
         <location/>
         <source>Activation Key File</source>
-        <translation type="unfinished">Файл с ключом активации:</translation>
+        <translation>Файл с ключом активации:</translation>
     </message>
 </context>
 <context>
@@ -1601,7 +1601,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Activate License...</source>
-        <translation type="unfinished"></translation>
+        <translation>Активировать лицензию...</translation>
     </message>
 </context>
 <context>
@@ -1609,7 +1609,7 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/dialogs/local_settings_dialog.ui"/>
         <source>Local Settings</source>
-        <translation type="unfinished">Локальные настройки</translation>
+        <translation>Локальные настройки</translation>
     </message>
 </context>
 <context>
@@ -1627,37 +1627,37 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Connection Options:</source>
-        <translation type="unfinished">П&amp;араметры подключения:</translation>
+        <translation>П&amp;араметры подключения:</translation>
     </message>
     <message>
         <location/>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation>Узел</translation>
     </message>
     <message>
         <location/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Порт</translation>
     </message>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished">Имя пользователя</translation>
+        <translation>Имя пользователя</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished">Пароль</translation>
+        <translation>Пароль</translation>
     </message>
     <message>
         <location/>
         <source>Test</source>
-        <translation type="unfinished">Проверка</translation>
+        <translation>Проверка</translation>
     </message>
     <message>
         <location/>
         <source>Auto-Login</source>
-        <translation type="unfinished">&amp;Запомнить пароль</translation>
+        <translation>&amp;Запомнить пароль</translation>
     </message>
 </context>
 <context>
@@ -1695,37 +1695,37 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Language</source>
-        <translation type="unfinished">Язык:</translation>
+        <translation>Язык:</translation>
     </message>
     <message>
         <location/>
         <source>Time Mode</source>
-        <translation type="unfinished">Шкала времени:</translation>
+        <translation>Шкала времени:</translation>
     </message>
     <message>
         <location/>
         <source>Image</source>
-        <translation type="unfinished">Изображение:</translation>
+        <translation>Изображение:</translation>
     </message>
     <message>
         <location/>
         <source>Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Режим</translation>
     </message>
     <message>
         <location/>
         <source>Intensity</source>
-        <translation type="unfinished">Непрозрачность:</translation>
+        <translation>Непрозрачность:</translation>
     </message>
     <message>
         <location/>
         <source>Show additional info in tree</source>
-        <translation type="unfinished"></translation>
+        <translation>Показать дополнительную информацию в дереве</translation>
     </message>
     <message>
         <location/>
         <source>Tour cycle</source>
-        <translation type="unfinished"></translation>
+        <translation>Цикличность тура</translation>
     </message>
 </context>
 <context>
@@ -1733,7 +1733,7 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/dialogs/common/message_box.ui"/>
         <source>Don&apos;t show this message again</source>
-        <translation type="unfinished"></translation>
+        <translation>Больше не показывать это сообщение</translation>
     </message>
 </context>
 <context>
@@ -1750,13 +1750,18 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
+        <source>Password:</source>
+        <translation>Пароль:</translation>
+    </message>
+    <message>
+        <location/>
         <source>Login:</source>
         <translation>Логин:</translation>
     </message>
     <message>
         <location/>
-        <source>Password:</source>
-        <translation>Пароль:</translation>
+        <source>Enable Audio</source>
+        <translation>Включить звук</translation>
     </message>
     <message>
         <location/>
@@ -1770,13 +1775,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Enable Audio</source>
-        <translation>Включить звук</translation>
-    </message>
-    <message>
-        <location/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation>TextLabel</translation>
     </message>
 </context>
 <context>
@@ -1806,13 +1806,13 @@ to the cloud&gt;</source>
     <name>PopupBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
-        <source>Global Notification Settings...</source>
-        <translation>Настройки уведомлений...</translation>
+        <source>Show to administrators only</source>
+        <translation>Только Администраторам</translation>
     </message>
     <message>
         <location/>
-        <source>Show to administrators only</source>
-        <translation>Только Администраторам</translation>
+        <source>Global Notification Settings...</source>
+        <translation>Настройки уведомлений...</translation>
     </message>
 </context>
 <context>
@@ -1830,7 +1830,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Events</source>
-        <translation type="unfinished"></translation>
+        <translation>События</translation>
     </message>
 </context>
 <context>
@@ -1867,6 +1867,11 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
+        <source>No Tour Selected</source>
+        <translation>Маршрут обхода не выбран</translation>
+    </message>
+    <message>
+        <location/>
         <source>Preview</source>
         <translation>Предпросмотр</translation>
     </message>
@@ -1880,16 +1885,16 @@ to the cloud&gt;</source>
         <source>Get Preview</source>
         <translation>Предпросмотр</translation>
     </message>
-    <message>
-        <location/>
-        <source>No Tour Selected</source>
-        <translation>Маршрут обхода не выбран</translation>
-    </message>
 </context>
 <context>
     <name>PtzPresetDialog</name>
     <message>
         <location filename="../src/ui/dialogs/ptz_preset_dialog.ui"/>
+        <source>Save Position</source>
+        <translation>Запомнить позицию</translation>
+    </message>
+    <message>
+        <location/>
         <source>Name:</source>
         <translation>Имя:</translation>
     </message>
@@ -1897,11 +1902,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Hotkey:</source>
         <translation>Горячая клавиша:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save Position</source>
-        <translation>Запомнить позицию</translation>
     </message>
 </context>
 <context>
@@ -1922,7 +1922,7 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
         <source>Choose a specific build</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбрать другую сборку</translation>
     </message>
 </context>
 <context>
@@ -1938,7 +1938,7 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.ui"/>
         <source>Installing Compatibility Version...</source>
-        <translation type="unfinished"></translation>
+        <translation>Установка версии для совместимости...</translation>
     </message>
 </context>
 <context>
@@ -1969,7 +1969,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Enable tile interface</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить интерфейс</translation>
     </message>
 </context>
 <context>
@@ -1977,16 +1977,16 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
         <source>Log in</source>
-        <translation type="unfinished"></translation>
+        <translation>Войти</translation>
     </message>
     <message>
         <location/>
         <source>Stay logged in</source>
-        <translation type="unfinished"></translation>
+        <translation>Запомнить</translation>
     </message>
     <message>
         <location/>
-        <source>Email or password is not recognized.</source>
+        <source>Incorrect email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2033,12 +2033,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Login:</source>
-        <translation type="unfinished">Логин:</translation>
+        <translation>Логин:</translation>
     </message>
     <message>
         <location/>
         <source>admin</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">admin</translation>
     </message>
 </context>
 <context>
@@ -2051,22 +2051,22 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Play</source>
-        <translation type="unfinished"></translation>
+        <translation>Воспроизвести</translation>
     </message>
     <message>
         <location/>
         <source>Add...</source>
-        <translation type="unfinished">&amp;Добавить...</translation>
+        <translation>&amp;Добавить...</translation>
     </message>
     <message>
         <location/>
         <source>Rename...</source>
-        <translation type="unfinished">&amp;Переименовать...</translation>
+        <translation>&amp;Переименовать...</translation>
     </message>
     <message>
         <location/>
         <source>Delete...</source>
-        <translation type="unfinished">&amp;Удалить...</translation>
+        <translation>&amp;Удалить...</translation>
     </message>
 </context>
 <context>
@@ -2097,7 +2097,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Add</source>
-        <translation type="unfinished">Добавить</translation>
+        <translation>Добавить</translation>
     </message>
 </context>
 <context>
@@ -2120,22 +2120,22 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Applying system updates at the end of the week is not recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не рекомендуется обновлять систему в конце недели.</translation>
     </message>
     <message>
         <location/>
         <source>Updating to...</source>
-        <translation type="unfinished"></translation>
+        <translation>Обновляется на...</translation>
     </message>
     <message>
         <location/>
         <source>Link copied</source>
-        <translation type="unfinished"></translation>
+        <translation>Ссылка скопирована</translation>
     </message>
     <message>
         <location/>
         <source>You have the latest version installed</source>
-        <translation type="unfinished"></translation>
+        <translation>Установлена последняя версия</translation>
     </message>
 </context>
 <context>
@@ -2212,27 +2212,27 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Search users</source>
-        <translation type="unfinished"></translation>
+        <translation>Поиск пользователей</translation>
     </message>
     <message>
         <location/>
         <source>Enable</source>
-        <translation type="unfinished"></translation>
+        <translation>Включить</translation>
     </message>
     <message>
         <location/>
         <source>Disable</source>
-        <translation type="unfinished"></translation>
+        <translation>Отключить</translation>
     </message>
     <message>
         <location/>
         <source>Delete...</source>
-        <translation type="unfinished">&amp;Удалить...</translation>
+        <translation>&amp;Удалить...</translation>
     </message>
     <message>
         <location/>
         <source>Edit Roles...</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменить роли...</translation>
     </message>
 </context>
 <context>
@@ -2303,6 +2303,11 @@ to the cloud&gt;</source>
     <name>RecordingSettings</name>
     <message>
         <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
+        <source>Temporary Folder</source>
+        <translation>Временная папка</translation>
+    </message>
+    <message>
+        <location/>
         <source>Capture Mode</source>
         <translation>Область записи</translation>
     </message>
@@ -2315,6 +2320,11 @@ to the cloud&gt;</source>
         <location/>
         <source>Application Window</source>
         <translation>Окно приложения</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Additional Options</source>
+        <translation>Дополнительные настройки</translation>
     </message>
     <message>
         <location/>
@@ -2333,33 +2343,23 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Temporary Folder</source>
-        <translation>Временная папка</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Additional Options</source>
-        <translation>Дополнительные настройки</translation>
-    </message>
-    <message>
-        <location/>
         <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
         <translation>Рекомендуется использовать мощный компьютер для &apos;Лучшего&apos; качества и разрешения.</translation>
     </message>
     <message>
         <location/>
         <source>Browse...</source>
-        <translation type="unfinished">Выбрать...</translation>
+        <translation>Выбрать...</translation>
     </message>
     <message>
         <location/>
         <source>Resolution</source>
-        <translation type="unfinished">Разрешение:</translation>
+        <translation>Разрешение:</translation>
     </message>
     <message>
         <location/>
         <source>Recording Quality</source>
-        <translation type="unfinished">Качество записи:</translation>
+        <translation>Качество записи:</translation>
     </message>
 </context>
 <context>
@@ -2408,12 +2408,12 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
         <source>Additional Recipients:</source>
-        <translation type="unfinished">&amp;Дополнительные получатели:</translation>
+        <translation>&amp;Дополнительные получатели:</translation>
     </message>
     <message>
         <location/>
         <source>Global Email Settings...</source>
-        <translation type="unfinished">&amp;Настройки e-mail...</translation>
+        <translation>&amp;Настройки e-mail...</translation>
     </message>
 </context>
 <context>
@@ -2426,7 +2426,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>9000</source>
-        <translation>9000</translation>
+        <translation type="unfinished">9000</translation>
     </message>
     <message>
         <location/>
@@ -2441,17 +2441,17 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <location/>
         <source>IP Address</source>
-        <translation type="unfinished">IP адрес:</translation>
+        <translation>IP адрес:</translation>
     </message>
     <message>
         <location/>
         <source>Port</source>
-        <translation type="unfinished"></translation>
+        <translation>Порт</translation>
     </message>
 </context>
 <context>
@@ -2588,67 +2588,67 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <location/>
         <source>Model</source>
-        <translation type="unfinished">Модель</translation>
+        <translation>Модель</translation>
     </message>
     <message>
         <location/>
         <source>Firmware</source>
-        <translation type="unfinished">Версия прошивки:</translation>
+        <translation>Версия прошивки:</translation>
     </message>
     <message>
         <location/>
         <source>Vendor</source>
-        <translation type="unfinished">Производитель:</translation>
+        <translation>Производитель:</translation>
     </message>
     <message>
         <location/>
         <source>Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Аудио</translation>
     </message>
     <message>
         <location/>
         <source>Login</source>
-        <translation type="unfinished">Имя пользователя</translation>
+        <translation>Имя пользователя</translation>
     </message>
     <message>
         <location/>
         <source>Password</source>
-        <translation type="unfinished">Пароль</translation>
+        <translation>Пароль</translation>
     </message>
     <message>
         <location/>
         <source>IP Address</source>
-        <translation type="unfinished">IP адрес:</translation>
+        <translation>IP адрес:</translation>
     </message>
     <message>
         <location/>
         <source>Web Page</source>
-        <translation type="unfinished">Веб-интерфейс:</translation>
+        <translation>Web-интерфейс</translation>
     </message>
     <message>
         <location/>
         <source>MAC Address</source>
-        <translation type="unfinished">MAC адрес:</translation>
+        <translation>MAC адрес:</translation>
     </message>
     <message>
         <location/>
         <source>Sensitivity</source>
-        <translation type="unfinished">Чувствительность:</translation>
+        <translation>Чувствительность:</translation>
     </message>
     <message>
         <location/>
         <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Сброс</translation>
     </message>
     <message>
         <location/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">TextLabel</translation>
     </message>
 </context>
 <context>
@@ -2676,13 +2676,18 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Port:</source>
-        <translation type="unfinished">Порт:</translation>
+        <translation>Порт:</translation>
     </message>
 </context>
 <context>
     <name>SmtpSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp/smtp_settings_widget.ui"/>
+        <source>Outgoing Email Settings</source>
+        <translation>Насторйки исходящей почты</translation>
+    </message>
+    <message>
+        <location/>
         <source>Advanced settings...</source>
         <translation>Дополнительные настройки...</translation>
     </message>
@@ -2690,11 +2695,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Test</source>
         <translation>Проверка</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Outgoing Email Settings</source>
-        <translation>Насторйки исходящей почты</translation>
     </message>
 </context>
 <context>
@@ -2745,27 +2745,27 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
         <source>Current Statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>Текущая статистика</translation>
     </message>
     <message>
         <location/>
         <source>Forecast for Full Storage Usage</source>
-        <translation type="unfinished"></translation>
+        <translation>Прогноз полного использования хранилища</translation>
     </message>
     <message>
         <location/>
         <source> TB</source>
-        <translation type="unfinished"></translation>
+        <translation> ТБ</translation>
     </message>
     <message>
         <location/>
         <source>Additional storage:</source>
-        <translation type="unfinished">Дополнительное хранилище:</translation>
+        <translation>Дополнительное хранилище:</translation>
     </message>
     <message>
         <location/>
         <source>Server is offline. Statistics are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер не в сети. Данные по статистическе не доступны.</translation>
     </message>
 </context>
 <context>
@@ -2788,32 +2788,32 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Storage Locations</source>
-        <translation type="unfinished"></translation>
+        <translation>Места хранения</translation>
     </message>
     <message>
         <location/>
         <source>Reindex Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Переиндексировать Архив</translation>
     </message>
     <message>
         <location/>
         <source>Reindex Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Переиндексировать резервную копию</translation>
     </message>
     <message>
         <location/>
         <source>Backup Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Резервировать архив</translation>
     </message>
     <message>
         <location/>
         <source>Backup Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Параметры резервного копирования...</translation>
     </message>
     <message>
         <location/>
         <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись на отключенное хранилище прекратится. Однако, удаление устаревших записей будет продолжаться.</translation>
     </message>
 </context>
 <context>
@@ -2880,13 +2880,13 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
         <source>System Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Системное время</translation>
     </message>
     <message>
         <location/>
         <source>System time is synchronized with the Internet and is independent from server&apos;s local time.
 Selected server will be used as a time server if the system has no Internet access.</source>
-        <translation type="unfinished"></translation>
+        <translation>Системное время синхронизируется с Интернетом и не зависит от местного времени сервера. Выбранный сервер будет использоваться как сервер времени, если у системе нет доступа в сеть Интернет.</translation>
     </message>
 </context>
 <context>
@@ -2894,7 +2894,7 @@ Selected server will be used as a time server if the system has no Internet acce
     <message>
         <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
         <source>Change Password...</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменить пароль...</translation>
     </message>
 </context>
 <context>
@@ -2902,17 +2902,17 @@ Selected server will be used as a time server if the system has no Internet acce
     <message>
         <location filename="../src/ui/widgets/properties/user_role_settings_widget.ui"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Имя</translation>
     </message>
     <message>
         <location/>
         <source>Users</source>
-        <translation type="unfinished"></translation>
+        <translation>Пользователи</translation>
     </message>
     <message>
         <location/>
         <source>Delete Role</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить роль</translation>
     </message>
 </context>
 <context>
@@ -2920,18 +2920,18 @@ Selected server will be used as a time server if the system has no Internet acce
     <message>
         <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
         <source>User Roles</source>
-        <translation type="unfinished"></translation>
+        <translation>Роли пользователей</translation>
     </message>
     <message>
         <location/>
         <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-        <translation type="unfinished"></translation>
+        <translation>В системе еще не настроены пользовательские роли. Для создания используется кнопка «Новая роль».</translation>
     </message>
     <message>
         <location/>
         <source>New role</source>
-        <translation type="unfinished"></translation>
+        <translation>Новая роль</translation>
     </message>
 </context>
 <context>
@@ -2939,17 +2939,17 @@ Click &quot;New role&quot; button to create one.</source>
     <message>
         <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
         <source>User Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Тип пользователя</translation>
     </message>
     <message>
         <location/>
         <source>Role</source>
-        <translation type="unfinished"></translation>
+        <translation>Роль</translation>
     </message>
     <message>
         <location/>
         <source>Edit Roles...</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменить роли...</translation>
     </message>
 </context>
 <context>

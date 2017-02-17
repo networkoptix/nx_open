@@ -1,5 +1,5 @@
 function(pick_file file_name result_name)
-  if(file_name MATCHES "StdAfx.cpp")
+  if(file_name MATCHES "StdAfx.cpp" OR file_name MATCHES "StdAfx.h")
     set(${result_name} FALSE PARENT_SCOPE)
     return()
   elseif(file_name MATCHES "_win[./]")

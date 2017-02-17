@@ -17,20 +17,20 @@
 
 GenericUserDataProvider::GenericUserDataProvider()
 {
-    connect(
+    Qn::directConnect(
         qnResPool, &QnResourcePool::resourceAdded,
         this, &GenericUserDataProvider::at_resourcePool_resourceAdded);
-    connect(
+    Qn::directConnect(
         qnResPool, &QnResourcePool::resourceChanged,
         this, &GenericUserDataProvider::at_resourcePool_resourceAdded);
-    connect(
+    Qn::directConnect(
         qnResPool, &QnResourcePool::resourceRemoved,
         this, &GenericUserDataProvider::at_resourcePool_resourceRemoved);
 }
 
 GenericUserDataProvider::~GenericUserDataProvider()
 {
-    disconnect(qnResPool, NULL, this, NULL);
+    directDisconnectAll();
 }
 
 QnResourcePtr GenericUserDataProvider::findResByName(const QByteArray& nxUserName) const

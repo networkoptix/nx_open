@@ -9,24 +9,30 @@
 namespace nx_upnp {
 namespace test {
 
-std::pair< quint16, PortMapper::Protocol > tcpPort( quint16 port )
+class UpnpPortMapper: public ::testing::Test
 {
-    return std::make_pair( port, PortMapper::Protocol::TCP );
-}
-
-static SocketAddress popAddress( nx::utils::TestSyncQueue< SocketAddress >* queue7001 )
-{
-    auto address = queue7001->pop();
-    if( address.address == HostAddress() ) // external IP is not resolved yet
-        address = queue7001->pop(); // wait for the next notification
-
-    return address;
-}
-
-TEST( UpnpPortMapper, NormalUsage )
-{
+public:
+    UpnpPortMapper() : deviceSearcher( nullptr ) {}
     nx::utils::TimerManager timerManager;
     DeviceSearcher deviceSearcher;
+
+    static std::pair< quint16, PortMapper::Protocol > tcpPort( quint16 port )
+    {
+        return std::make_pair( port, PortMapper::Protocol::TCP );
+    }
+
+    static SocketAddress popAddress( nx::utils::TestSyncQueue< SocketAddress >* queue7001 )
+    {
+        auto address = queue7001->pop();
+        if( address.address == HostAddress() ) // external IP is not resolved yet
+            address = queue7001->pop(); // wait for the next notification
+
+        return address;
+    }
+};
+
+TEST_F( UpnpPortMapper, NormalUsage )
+{
     PortMapperMocked portMapper( lit( "192.168.0.10" ), lit( "12.34.56.78" ) );
     AsyncClientMock& clientMock = portMapper.clientMock();
 
@@ -65,10 +71,8 @@ TEST( UpnpPortMapper, NormalUsage )
     EXPECT_EQ( clientMock.mappingsCount(), 0 );
 }
 
-TEST( UpnpPortMapper, ReuseExisting )
+TEST_F( UpnpPortMapper, ReuseExisting )
 {
-    nx::utils::TimerManager timerManager;
-    DeviceSearcher deviceSearcher;
     PortMapperMocked portMapper( lit( "192.168.0.10" ), lit( "12.34.56.78" ) );
     AsyncClientMock& clientMock = portMapper.clientMock();
 
@@ -92,10 +96,8 @@ TEST( UpnpPortMapper, ReuseExisting )
     EXPECT_EQ( clientMock.mappingsCount(), 0 );
 }
 
-TEST( UpnpPortMapper, CheckMappings )
+TEST_F( UpnpPortMapper, CheckMappings )
 {
-    nx::utils::TimerManager timerManager;
-    DeviceSearcher deviceSearcher;
     PortMapperMocked portMapper( lit( "192.168.0.10" ), lit( "12.34.56.78" ), 500 );
     AsyncClientMock& clientMock = portMapper.clientMock();
 
@@ -122,10 +124,8 @@ TEST( UpnpPortMapper, CheckMappings )
     EXPECT_EQ( clientMock.mappings().size(), 0 );
 }
 
-TEST( UpnpPortMapper, DISABLED_RealRouter )
+TEST_F( UpnpPortMapper, DISABLED_RealRouter )
 {
-    nx::utils::TimerManager timerManager;
-    DeviceSearcher deviceSearcher;
     PortMapper portMapper( 10000 );
 
     EXPECT_TRUE( portMapper.enableMapping( 7001, PortMapper::Protocol::TCP,

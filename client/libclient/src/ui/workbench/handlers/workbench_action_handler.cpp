@@ -1056,18 +1056,20 @@ void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
     menu()->trigger(QnActions::OpenBusinessRulesAction);
 }
 
-void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
+void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered()
+{
     QnNonModalDialogConstructor<QnBusinessRulesDialog> dialogConstructor(m_businessRulesDialog, mainWindow());
 
-    QString filter;
+    QStringList filter;
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourceList cameras = parameters.resources().filtered<QnVirtualCameraResource>();
-    if (!cameras.isEmpty()) {
-        foreach(const QnVirtualCameraResourcePtr &camera, cameras) {
-            filter += camera->getPhysicalId(); //getUniqueId() cannot be used here --gdm
-        }
+    if (!cameras.isEmpty())
+    {
+        NX_ASSERT(cameras.size() == 1); // currently filter is not implemented for several cameras
+        for (const auto& camera: cameras)
+            filter.append(camera->getId().toSimpleString());
     }
-    businessRulesDialog()->setFilter(filter);
+    businessRulesDialog()->setFilter(filter.join(L' '));
 }
 
 void QnWorkbenchActionHandler::at_webClientAction_triggered()

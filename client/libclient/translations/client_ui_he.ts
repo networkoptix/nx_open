@@ -930,12 +930,12 @@ to the cloud&gt;</source>
     <name>ConnectToCloudDialog</name>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
-        <source>Email or password is not recognized.</source>
+        <source>Stay logged in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Stay logged in</source>
+        <source>Incorrect email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1987,7 +1987,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Email or password is not recognized.</source>
+        <source>Incorrect email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

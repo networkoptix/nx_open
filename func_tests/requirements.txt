@@ -1,4 +1,5 @@
 pytest
+pytest-timeout
 pytz
 tzlocal
 requests>=2.12.5

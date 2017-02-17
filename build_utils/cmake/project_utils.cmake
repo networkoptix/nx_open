@@ -39,9 +39,7 @@ function(nx_add_target name type)
 
     set(sources ${cpp_files} ${moc_files} ${rcc_files} ${qm_files})
     if(NOT NX_NO_PCH)
-        set(sources ${sources}
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.cpp"
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h")
+        set(sources ${sources} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h")
     endif()
 
     set(sources ${sources} ${NX_ADDITIONAL_SOURCES} ${NX_OTHER_RESOURCES} ${NX_OTHER_SOURCES})
