@@ -1,5 +1,7 @@
 #include "joystick_stick_control.h"
 
+#include <cmath>
+
 namespace {
 
 const int kMaxDegreesOfFreedom = 6;
