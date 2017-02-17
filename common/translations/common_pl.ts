@@ -258,10 +258,6 @@
         <translation>Na %1 %2</translation>
     </message>
     <message>
-        <source>%1 --&gt; %2</source>
-        <translation>%1 --&gt; %2</translation>
-    </message>
-    <message>
         <source>An unknown event has occurred</source>
         <translation>Wystąpiło nienznane zdarzenie</translation>
     </message>
@@ -1179,11 +1175,6 @@
         <source>Ps</source>
         <extracomment>Short for &apos;Preset&apos;</extracomment>
         <translation>Pr</translation>
-    </message>
-    <message>
-        <source>-</source>
-        <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation>-</translation>
     </message>
 </context>
 <context>

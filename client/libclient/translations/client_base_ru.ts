@@ -1998,10 +1998,6 @@ to view more bookmarks</source>
 <context>
     <name>QnBusinessRulesViewModel</name>
     <message>
-        <source>#</source>
-        <translation>#</translation>
-    </message>
-    <message>
         <source>On</source>
         <translation>Вкл</translation>
     </message>
@@ -2012,10 +2008,6 @@ to view more bookmarks</source>
     <message>
         <source>Source</source>
         <translation>Источник</translation>
-    </message>
-    <message>
-        <source>-&gt;</source>
-        <translation>-&gt;</translation>
     </message>
     <message>
         <source>Action</source>
@@ -4687,10 +4679,6 @@ to %1</source>
 <context>
     <name>QnPtzManageModel</name>
     <message>
-        <source>#</source>
-        <translation>#</translation>
-    </message>
-    <message>
         <source>Name</source>
         <translation>Имя</translation>
     </message>
@@ -6186,13 +6174,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>QnStorageSpaceSlider</name>
-    <message>
-        <source>%1%</source>
-        <translation>%1%</translation>
-    </message>
-</context>
-<context>
     <name>QnStorageUrlDialog</name>
     <message>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
@@ -6904,10 +6885,6 @@ to %1</source>
     <message>
         <source>Muted</source>
         <translation>Беззвучный</translation>
-    </message>
-    <message>
-        <source>%1%</source>
-        <translation>%1%</translation>
     </message>
 </context>
 <context>
@@ -7857,13 +7834,6 @@ to %1</source>
     <message>
         <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>StatisticsOverlayWidget</name>
-    <message>
-        <source>%1%</source>
-        <translation>%1%</translation>
     </message>
 </context>
 <context>

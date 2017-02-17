@@ -256,10 +256,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 --&gt; %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>An unknown event has occurred</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1137,11 +1133,6 @@
     <message>
         <source>Ps</source>
         <extracomment>Short for &apos;Preset&apos;</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>-</source>
-        <extracomment>Short for &apos;Undefined&apos;</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>

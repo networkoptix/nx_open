@@ -257,10 +257,6 @@
         <translation>Em %1 %2</translation>
     </message>
     <message>
-        <source>%1 --&gt; %2</source>
-        <translation>%1 --&gt; %2</translation>
-    </message>
-    <message>
         <source>An unknown event has occurred</source>
         <translation>Ocorreu um evento desconhecido</translation>
     </message>
@@ -1101,11 +1097,6 @@
 </context>
 <context>
     <name>QnStreamQualityStrings</name>
-    <message>
-        <source>-</source>
-        <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation>-</translation>
-    </message>
     <message>
         <source>Hi</source>
         <extracomment>Short for &apos;High&apos;</extracomment>

@@ -263,10 +263,6 @@
         <source>On %1 %2</source>
         <translation>Itt: %1 %2</translation>
     </message>
-    <message>
-        <source>%1 --&gt; %2</source>
-        <translation></translation>
-    </message>
     <message numerus="yes">
         <source>No data received during last %n seconds.</source>
         <translation>
@@ -1137,11 +1133,6 @@
     <message>
         <source>Ps</source>
         <extracomment>Short for &apos;Preset&apos;</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>-</source>
-        <extracomment>Short for &apos;Undefined&apos;</extracomment>
         <translation></translation>
     </message>
 </context>

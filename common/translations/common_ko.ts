@@ -256,10 +256,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>%1 --&gt; %2</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>An unknown event has occurred</source>
         <translation>알지 못하는 이벤트 발생</translation>
     </message>
@@ -1138,11 +1134,6 @@
         <source>Ps</source>
         <extracomment>Short for &apos;Preset&apos;</extracomment>
         <translation>프리셋</translation>
-    </message>
-    <message>
-        <source>-</source>
-        <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation></translation>
     </message>
 </context>
 <context>

@@ -1971,10 +1971,6 @@ to view more bookmarks</source>
 <context>
     <name>QnBusinessRulesViewModel</name>
     <message>
-        <source>#</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>On</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1984,10 +1980,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Source</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>-&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4606,10 +4598,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>#</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6062,13 +6050,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>QnStorageSpaceSlider</name>
-    <message>
-        <source>%1%</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnStorageUrlDialog</name>
     <message>
         <source>Network Shared Resource</source>
@@ -6765,10 +6746,6 @@ to %1</source>
     <name>QnVolumeSlider</name>
     <message>
         <source>Muted</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1%</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7660,13 +7637,6 @@ to %1</source>
     </message>
     <message>
         <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>StatisticsOverlayWidget</name>
-    <message>
-        <source>%1%</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

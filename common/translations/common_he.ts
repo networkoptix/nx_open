@@ -264,10 +264,6 @@
         <source>On %1 %2</source>
         <translation>ב%1 %2</translation>
     </message>
-    <message>
-        <source>%1 --&gt; %2</source>
-        <translation>%1 --&gt; %2</translation>
-    </message>
     <message numerus="yes">
         <source>No data received during last %n seconds.</source>
         <translation>
@@ -1158,11 +1154,6 @@
         <source>Ps</source>
         <extracomment>Short for &apos;Preset&apos;</extracomment>
         <translation>פריסט</translation>
-    </message>
-    <message>
-        <source>-</source>
-        <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation>-</translation>
     </message>
 </context>
 <context>

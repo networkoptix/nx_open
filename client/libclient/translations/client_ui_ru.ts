@@ -537,18 +537,8 @@
     </message>
     <message>
         <location/>
-        <source>0.0.0.0</source>
-        <translation>0.0.0.0</translation>
-    </message>
-    <message>
-        <location/>
         <source>End IP</source>
         <translation>Конечный IP адрес</translation>
-    </message>
-    <message>
-        <location/>
-        <source>0.0.0.255</source>
-        <translation>0.0.0.255</translation>
     </message>
     <message>
         <location/>
@@ -976,14 +966,6 @@
     </message>
 </context>
 <context>
-    <name>DateRangeWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/common/date_range_widget.ui"/>
-        <source>-</source>
-        <translation>-</translation>
-    </message>
-</context>
-<context>
     <name>EventLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
@@ -1116,11 +1098,6 @@
         <location/>
         <source>Mount Angle Correction:</source>
         <translation>Коррекция угла наклона:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>°</source>
-        <translation>°</translation>
     </message>
     <message>
         <location/>
@@ -1296,11 +1273,6 @@
         <location/>
         <source>Processing Image...Please Wait.</source>
         <translation>Обработка изображения... Пожалуйста, подождите.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation>%</translation>
     </message>
     <message>
         <location/>
@@ -1621,11 +1593,6 @@
         <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
         <source>Look and Feel</source>
         <translation>Интерфейс</translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation>%</translation>
     </message>
     <message>
         <location/>
@@ -2372,11 +2339,6 @@
         <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
         <source>Ping</source>
         <translation>Проверить подключение</translation>
-    </message>
-    <message>
-        <location/>
-        <source>9000</source>
-        <translation type="unfinished">9000</translation>
     </message>
     <message>
         <location/>

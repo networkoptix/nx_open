@@ -256,10 +256,6 @@
         <translation>%1 %2</translation>
     </message>
     <message>
-        <source>%1 --&gt; %2</source>
-        <translation>%1 --&gt; %2</translation>
-    </message>
-    <message>
         <source>An unknown event has occurred</source>
         <translation>不明なイベント</translation>
     </message>
@@ -1138,11 +1134,6 @@
         <source>Ps</source>
         <extracomment>Short for &apos;Preset&apos;</extracomment>
         <translation>PS</translation>
-    </message>
-    <message>
-        <source>-</source>
-        <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation>未</translation>
     </message>
 </context>
 <context>
