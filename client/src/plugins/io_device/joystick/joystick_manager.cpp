@@ -12,6 +12,12 @@
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench_display.h>
 
+namespace {
+
+const QString kDefaultConfigFileName = lit("joystick_config.json");
+
+} // namespace 
+
 namespace nx {
 namespace joystick {
 
@@ -28,7 +34,10 @@ void Manager::start()
 {
     QnMutexLocker lock(&m_mutex);
     loadDrivers();
-    loadMappings();
+
+    if (!loadMappings())
+        return;
+
     applyMappingsAndCaptureJoysticks();
 }
 
@@ -48,10 +57,16 @@ void Manager::loadDrivers()
 #endif
 }
 
-void Manager::loadMappings()
+bool Manager::loadMappings()
 {
-    m_configHolder.load();
-}
+    bool loaded = m_configHolder.load(
+        QCoreApplication::applicationDirPath() + lit("/%1").arg(kDefaultConfigFileName));
+
+    if (!loaded)
+        loaded = m_configHolder.load(lit(":/%1").arg(kDefaultConfigFileName));
+
+    return loaded;
+}   
 
 void Manager::applyMappings(std::vector<JoystickPtr>& joysticks)
 {

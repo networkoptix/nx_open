@@ -28,7 +28,7 @@ public:
         const QString& configurationId,
         const QString& controlId) const;
 
-    bool load();
+    bool load(const QString& configName);
 
 private:
     bool checkIfConfigurationExistsUnsafe(const QString& configurationId) const;

@@ -29,7 +29,7 @@ public:
 
 private:
     void loadDrivers();
-    void loadMappings();
+    bool loadMappings();
     void applyMappings(std::vector<JoystickPtr>& joysticks);
     void applyMappingsAndCaptureJoysticks();
 

@@ -2,12 +2,6 @@
 
 #include <utils/serialization/json.h>
 
-namespace {
-
-const QString kDefaultJoystickConfigFileName = lit("joystick_config.json");
-
-} // namespace 
-
 namespace nx {
 namespace joystick {
 namespace mapping {
@@ -113,15 +107,17 @@ bool ConfigHolder::checkIfConfigurationExistsUnsafe(const QString& configuration
     return m_config.configurations.find(configurationId) != m_config.configurations.end();
 }
 
-bool ConfigHolder::load()
+bool ConfigHolder::load(const QString& configPath)
 {
-    QFile file(lit("C:\\develop\\nx_vms3\\client\\maven\\filter-resources\\resources\\joystick_config.json"));
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    bool opened = false;
+    QFile configFile(configPath);
+    if (!configFile.open(QIODevice::ReadOnly | QIODevice::Text))
         return false;
 
-    QByteArray data = file.readAll();
+    QByteArray data = configFile.readAll();
 
     QnMutexLocker lock(&m_mutex);
+    m_config = nx::joystick::mapping::Config();
     QJson::deserialize(data, &m_config);
     return true;
 }
