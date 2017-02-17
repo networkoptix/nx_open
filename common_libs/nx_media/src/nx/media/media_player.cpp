@@ -152,8 +152,6 @@ public:
     // Last seek position. UTC time in msec.
     qint64 lastSeekTimeMs;
 
-    bool waitWhileJumpFinished;
-
     // Current duration of live buffer in range [kInitialLiveBufferMs.. kMaxLiveBufferMs].
     int liveBufferMs;
 
@@ -225,7 +223,6 @@ private:
 
     void log(const QString& message) const;
 
-    bool isCoarseFrame(const QVideoFramePtr& frame) const;
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
@@ -242,7 +239,6 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     execTimer(new QTimer(this)),
     miscTimer(new QTimer(this)),
     lastSeekTimeMs(AV_NOPTS_VALUE),
-    waitWhileJumpFinished(false),
     liveBufferMs(kInitialBufferMs),
     liveBufferState(BufferState::NoIssue),
     underflowCounter(0),
@@ -352,11 +348,14 @@ void PlayerPrivate::at_hurryUp()
         execTimer->stop();
         presentNextFrame();
     }
+    else
+    {
+        QTimer::singleShot(0, this, &PlayerPrivate::at_gotVideoFrame);
+    }
 }
 
 void PlayerPrivate::at_jumpOccurred(int sequence)
 {
-    waitWhileJumpFinished = false;
     if (!videoFrameToRender)
         return;
     FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
@@ -391,10 +390,10 @@ void PlayerPrivate::at_gotVideoFrame()
         return;
     }
 
-    if (state == Player::State::Paused)
+    if (state == Player::State::Paused || state == Player::State::Previewing)
     {
-        if (!metadata.noDelay && !isCoarseFrame(videoFrameToRender))
-            return; //< Display regular frames only if the player is playing.
+        if (metadata.displayHint == DisplayHint::regular)
+            return; //< Display regular frames if and only if the player is playing.
     }
 
     presentNextFrameDelayed();
@@ -501,9 +500,11 @@ void PlayerPrivate::presentNextFrame()
     }
 
     bool isLivePacket = metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE);
-    bool isPacketOK = (isLivePacket == liveMode);
+    bool skipFrame = isLivePacket != liveMode
+        || (state != Player::State::Previewing
+            && metadata.displayHint == DisplayHint::noDelay);
 
-    if (videoSurface && videoSurface->isActive() && isPacketOK)
+    if (videoSurface && videoSurface->isActive() && !skipFrame)
     {
         videoSurface->present(*scaleFrame(videoFrameToRender));
         if (dataConsumer)
@@ -511,8 +512,7 @@ void PlayerPrivate::presentNextFrame()
             qint64 timeUs = liveMode ? DATETIME_NOW : videoFrameToRender->startTime() * 1000;
             dataConsumer->setDisplayedTimeUs(timeUs);
         }
-        bool ignoreFrameTime = metadata.noDelay || waitWhileJumpFinished;
-        if (!ignoreFrameTime)
+        if (metadata.displayHint != DisplayHint::noDelay)
             setPosition(videoFrameToRender->startTime());
         setAspectRatio(videoFrameToRender->width() * metadata.sar / videoFrameToRender->height());
     }
@@ -586,7 +586,7 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& f
 
     if (liveMode)
     {
-        if (metadata.noDelay)
+        if (metadata.displayHint != DisplayHint::regular)
         {
             resetLiveBufferState(); //< Reset live statistics because of seek or FCZ frames.
         }
@@ -602,8 +602,7 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& f
 
     if (!lastVideoPtsMs.is_initialized() || //< first time
         !qBetween(*lastVideoPtsMs, ptsMs, *lastVideoPtsMs + kMaxFrameDurationMs) || //< pts discontinuity
-        metadata.noDelay || //< jump occurred
-        isCoarseFrame(frame) || //< 'coarse' frame. Frame time is less than required jump pos.
+        metadata.displayHint != DisplayHint::regular || //< jump occurred
         frameDelayMs < -kMaxDelayForResyncMs || //< Resync because the video frame is late for more than threshold.
         liveBufferUnderflow ||
         liveBufferOverflow //< live buffer overflow
@@ -737,11 +736,6 @@ void PlayerPrivate::log(const QString& message) const
         .arg(message), cl_logDEBUG1);
 }
 
-bool PlayerPrivate::isCoarseFrame(const QVideoFramePtr& frame) const
-{
-    return frame->startTime() < lastSeekTimeMs;
-}
-
 //-------------------------------------------------------------------------------------------------
 // Player
 
@@ -802,12 +796,12 @@ void Player::setPosition(qint64 value)
     d->positionMs = d->lastSeekTimeMs = value;
     if (d->archiveReader)
     {
-        d->archiveReader->jumpTo(msecToUsec(value), 0);
-        d->waitWhileJumpFinished = true;
+        d->archiveReader->jumpTo(msecToUsec(value), msecToUsec(value));
     }
 
     d->setLiveMode(value == kLivePosition);
-
+    if (d->state != State::Previewing)
+        d->videoFrameToRender.reset();
     d->at_hurryUp(); //< renew receiving frames
 
     emit positionChanged();
@@ -856,6 +850,13 @@ void Player::pause()
     Q_D(Player);
     d->log(lit("pause()"));
     d->setState(State::Paused);
+}
+
+void Player::preview()
+{
+    Q_D(Player);
+    d->log(lit("preview()"));
+    d->setState(State::Previewing);
 }
 
 void Player::stop()

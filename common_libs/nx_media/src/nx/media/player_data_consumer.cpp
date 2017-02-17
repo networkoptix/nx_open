@@ -43,8 +43,6 @@ PlayerDataConsumer::PlayerDataConsumer(
     :
     QnAbstractDataConsumer(kMaxMediaQueueLen),
     m_awaitJumpCounter(0),
-    m_buffering(0),
-    m_noDelayState(NoDelayState::Disabled),
     m_sequence(0),
     m_lastFrameTimeUs(AV_NOPTS_VALUE),
     m_lastDisplayedTimeUs(AV_NOPTS_VALUE),
@@ -233,28 +231,6 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& video
         return true; //< The frame is processed.
     }
 
-    // First packet after a jump.
-    const bool isBofData = (data->flags & QnAbstractMediaData::MediaFlags_BOF);
-
-    bool displayImmediately = isBofData; //< display data immediately with no delay
-    {
-        QnMutexLocker lock(&m_dataProviderMutex);
-        if (m_noDelayState != NoDelayState::Disabled)
-        {
-            // Display any data immediately (include intermediate frames between BOF frames) if the
-            // jumps are not processed yet.
-            displayImmediately = true;
-        }
-        if (m_noDelayState == NoDelayState::WaitForNextBOF && isBofData)
-            m_noDelayState = NoDelayState::Disabled;
-    }
-    if (displayImmediately)
-    {
-        m_hurryUpToFrame.videoChannel = videoChannel;
-        m_hurryUpToFrame.frameNumber = videoDecoder->currentFrameNumber();
-        emit hurryUp(); //< Hint to a player to avoid waiting for the currently displaying frame.
-    }
-
     QVideoFramePtr decodedFrame;
     if (!videoDecoder->decode(data, &decodedFrame))
     {
@@ -323,25 +299,25 @@ QVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
 
     FrameMetadata metadata = FrameMetadata::deserialize(result);
 
-    /**
-     * m_hurryUpToFrame hold frame number from which player should display data without delay.
-     * Additionally, for panoramic cameras frames should be processed without delay unless
-     * it got at least 1 frame for each channel
-     */
-    if ((metadata.videoChannel != m_hurryUpToFrame.videoChannel &&
-        m_awaitingFramesMask.hasChannel(m_hurryUpToFrame.videoChannel)) ||
-        metadata.frameNum < m_hurryUpToFrame.frameNumber)
+    if (!checkSequence(metadata.sequence) || m_awaitJumpCounter > 0)
     {
-        metadata.noDelay = true;
+        // Frame became deprecated because of new jump was queued. Mark it as noDelay
+        metadata.displayHint = DisplayHint::noDelay;
     }
-    else
+    else if (metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_Ignore))
     {
-        if (!m_awaitingFramesMask.isEmpty())
-            metadata.noDelay = true; //< include noDelay to the first displayed frame
+        metadata.displayHint = DisplayHint::noDelay; //< coarse time frame
+    }
+     else if (!m_awaitingFramesMask.isEmpty())
+    {
         m_awaitingFramesMask.removeChannel(metadata.videoChannel);
+        if (m_awaitingFramesMask.isEmpty())
+            metadata.displayHint = DisplayHint::firstRegular;
+        else
+            metadata.displayHint = DisplayHint::noDelay;
     }
-    if (metadata.noDelay)
-        metadata.serialize(result);
+
+    metadata.serialize(result);
 
     m_queueWaitCond.wakeAll();
 
@@ -383,13 +359,10 @@ void PlayerDataConsumer::onBeforeJump(qint64 timeUsec)
     QnMutexLocker lock(&m_dataProviderMutex);
     ++m_awaitJumpCounter;
     m_emptyPacketCounter = 0; //< ignore EOF due to we are going to set new position
-    m_buffering = getBufferingMask();
 
     // The purpose of this variable is prevent doing delay between frames while they are displayed.
     // We supposed to decode/display them at maximum speed unless the last jump command is
     // processed.
-    m_noDelayState = NoDelayState::Activated;
-    m_awaitingFramesMask.setMask();
     m_lastDisplayedTimeUs = m_lastFrameTimeUs = timeUsec; //< force position to the new place
 }
 
@@ -413,8 +386,8 @@ void PlayerDataConsumer::onJumpOccurred(qint64 /*timeUsec*/, int sequence)
             // This function is called from dataProvider thread. PlayerConsumer may still process the
             // previous frame. So, leave noDelay state a bit later, when the next BOF frame will be
             // received.
-            m_noDelayState = NoDelayState::WaitForNextBOF;
             m_sequence = sequence;
+            m_awaitingFramesMask.setMask();
         }
     }
 

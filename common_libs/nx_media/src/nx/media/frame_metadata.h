@@ -10,6 +10,13 @@
 namespace nx {
 namespace media {
 
+enum class DisplayHint
+{
+    regular, //< Regular frame.
+    noDelay, //< Frame is deprecated because of seek or it's coarse frame.
+    firstRegular //< First regular frame. No need to sleep before display it.
+};
+
 /**
  * Contains addition information associated with every decoded frame.
  */
@@ -23,7 +30,7 @@ struct FrameMetadata
     static FrameMetadata deserialize(const QnConstVideoFramePtr& frame);
 
     QnAbstractMediaData::MediaFlags flags; /**< Various flags passed from compressed video data. */
-    bool noDelay; /**< Display frame immediately with no delay. */
+    DisplayHint displayHint; /**< Display frame immediately with no delay. */
     int frameNum; /**< Frame number in range [0..INT_MAX]. */
     double sar; /**< square(pixel) aspect ratio. */
     int videoChannel; /**< For multi-sensor cameras. */

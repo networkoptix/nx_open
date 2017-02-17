@@ -201,15 +201,12 @@ bool SeamlessVideoDecoder::decode(
         {
             FrameMetadata metadata = d->findMetadata(
                 d->decoderFrameNumToLocalNum(decodedFrameNum));
-            if (!metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_Ignore))
-            {
-                double sar = d->videoDecoder->getSampleAspectRatio();
-                metadata.sar = qFuzzyCompare(sar, 1.0)
-                    ? nx::media::getDefaultSampleAspectRatio(decodedFrame->size())
-                    : sar;
-                metadata.serialize(decodedFrame);
-                d->queue.push_back(std::move(decodedFrame));
-            }
+            double sar = d->videoDecoder->getSampleAspectRatio();
+            metadata.sar = qFuzzyCompare(sar, 1.0)
+                ? nx::media::getDefaultSampleAspectRatio(decodedFrame->size())
+                : sar;
+            metadata.serialize(decodedFrame);
+            d->queue.push_back(std::move(decodedFrame));
         }
     }
 

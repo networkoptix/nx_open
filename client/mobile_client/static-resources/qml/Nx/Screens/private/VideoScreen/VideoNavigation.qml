@@ -36,7 +36,6 @@ Item
             videoScreenController
                 && videoScreenController.mediaPlayer.liveMode
                 && !playbackController.paused
-        property real resumePosition: -1
 
         function updateNavigatorPosition()
         {
@@ -176,9 +175,10 @@ Item
             {
                 if (!moving)
                 {
-                    videoScreenController.setPosition(position)
                     if (resumeWhenDragFinished)
                         videoScreenController.play()
+                    else
+                        videoScreenController.pause()
                 }
             }
             onPositionTapped: videoScreenController.setPosition(position)
@@ -195,7 +195,7 @@ Item
                 if (dragging)
                 {
                     resumeWhenDragFinished = !videoNavigation.paused
-                    videoScreenController.pause()
+                    videoScreenController.preview()
                 }
             }
 
@@ -428,17 +428,11 @@ Item
             {
                 if (paused)
                 {
-                    if (d.resumePosition > 0)
-                    {
-                        videoScreenController.setPosition(d.resumePosition)
-                        d.resumePosition = -1
-                    }
                     videoScreenController.play()
                 }
                 else
                 {
                     videoScreenController.pause()
-                    d.resumePosition = videoScreenController.mediaPlayer.position
                 }
             }
         }
