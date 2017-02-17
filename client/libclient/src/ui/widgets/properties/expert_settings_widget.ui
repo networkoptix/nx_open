@@ -36,7 +36,7 @@
          <item>
           <widget class="QCheckBox" name="settingsDisableControlCheckBox">
            <property name="text">
-            <string>Keep camera streams' and profiles' settings</string>
+            <string>Keep camera streams and profiles settings</string>
            </property>
           </widget>
          </item>
