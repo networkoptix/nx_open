@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include <nx/utils/std/cpp14.h>
+#include <cdb/ec2_request_paths.h>
 
 namespace nx {
 namespace cdb {
@@ -21,7 +22,7 @@ TransactionConnectionHelper::~TransactionConnectionHelper()
     m_aioTimer.pleaseStopSync();
 }
 
-TransactionConnectionHelper::ConnectionId 
+TransactionConnectionHelper::ConnectionId
     TransactionConnectionHelper::establishTransactionConnection(
         const QUrl& appserver2BaseUrl,
         const std::string& login,
@@ -32,7 +33,7 @@ TransactionConnectionHelper::ConnectionId
     localPeerInfo.id = QnUuid::createUuid();
 
     ConnectionContext connectionContext;
-    connectionContext.connectionGuardSharedState = 
+    connectionContext.connectionGuardSharedState =
         std::make_unique<::ec2::ConnectionGuardSharedState>();
     connectionContext.connection =
         std::make_unique<test::TransactionTransport>(
@@ -59,7 +60,7 @@ TransactionConnectionHelper::ConnectionId
         connectionId,
         std::move(connectionContext));
     QUrl url = appserver2BaseUrl;
-    url.setPath("/cdb/ec2/events");
+    url.setPath(api::kEc2EventsPath);
     transactionConnectionPtr->doOutgoingConnect(url);
 
     return connectionId;
@@ -70,7 +71,7 @@ bool TransactionConnectionHelper::waitForState(
     ConnectionId connectionId,
     std::chrono::milliseconds durationToWait)
 {
-    // TODO: #ak This method can skip Connected state due Connected -> ReadyForStreaming 
+    // TODO: #ak This method can skip Connected state due Connected -> ReadyForStreaming
     //    transition in onTransactionConnectionStateChanged.
 
     using namespace std::chrono;
@@ -110,7 +111,7 @@ bool TransactionConnectionHelper::waitForState(
     }
 }
 
-::ec2::QnTransactionTransportBase::State 
+::ec2::QnTransactionTransportBase::State
     TransactionConnectionHelper::getConnectionStateById(
         ConnectionId connectionId) const
 {
