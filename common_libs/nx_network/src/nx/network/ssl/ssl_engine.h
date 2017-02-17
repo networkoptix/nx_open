@@ -26,6 +26,8 @@ public:
         const String& name, const String& country, const String& company);
 
     static void useRandomCertificate(const String& module);
+
+    static void setAllowedServerVersions(const String& versions);
 };
 
 } // namespace network

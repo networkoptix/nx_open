@@ -219,5 +219,10 @@ void SslEngine::useRandomCertificate(const String& module)
     NX_CRITICAL(useCertificateAndPkey(sslCert));
 }
 
+void SslEngine::setAllowedServerVersions(const String& versions)
+{
+    ssl::SslStaticData::setAllowedServerVersions(versions);
+}
+
 } // namespace network
 } // namespace nx

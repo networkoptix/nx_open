@@ -29,10 +29,14 @@ public:
     const nx::String& sslSessionId();
 
     static SslStaticData* instance();
+    static void setAllowedServerVersions(const String& versions);
 
 private:
     std::unique_ptr<SSL_CTX, decltype(&SSL_CTX_free)> m_serverContext;
     std::unique_ptr<SSL_CTX, decltype(&SSL_CTX_free)> m_clientContext;
+
+    static std::atomic<bool> s_isInitialized;
+    static int s_disabledServerVersions;
 };
 
 } // namespace ssl
