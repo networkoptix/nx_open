@@ -36,6 +36,8 @@ def visited_key(request):
 
 
 def detect_language_by_request(request):
+    lang = None
+
     # 1. Try account value - top priority
     if request.user.is_authenticated():
         lang = request.user.language
