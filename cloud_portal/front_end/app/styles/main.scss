@@ -698,3 +698,28 @@ h2.version-number{
     /* Safari and Chrome */
     column-count: 2;
 }
+
+
+
+@mixin icon{
+  display: inline-block;
+  background-size: 112px 32px;
+  background-image: url('/static/images/portal_icons.png');
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+    background-image: url('/static/images/portal_icons@2x.png');
+  }
+}
+
+@mixin kill-glyphicon{
+  @include icon;
+  width: 16px;
+  height: 16px;
+  &:before{
+    content:none;
+  }
+}
+
+.glyphicon-share{
+    @include kill-glyphicon;
+    background-position: -16px 0;
+}
