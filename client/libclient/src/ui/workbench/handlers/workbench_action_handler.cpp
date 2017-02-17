@@ -281,11 +281,32 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(action(QnActions::AdjustVideoAction), SIGNAL(triggered()), this, SLOT(at_adjustVideoAction_triggered()));
     connect(action(QnActions::ExitAction), &QAction::triggered, this, &QnWorkbenchActionHandler::closeApplication);
     connect(action(QnActions::ThumbnailsSearchAction), SIGNAL(triggered()), this, SLOT(at_thumbnailsSearchAction_triggered()));
-    connect(action(QnActions::SetCurrentLayoutItemSpacing0Action), SIGNAL(triggered()), this, SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
-    connect(action(QnActions::SetCurrentLayoutItemSpacing10Action), SIGNAL(triggered()), this, SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
-    connect(action(QnActions::SetCurrentLayoutItemSpacing20Action), SIGNAL(triggered()), this, SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
-    connect(action(QnActions::SetCurrentLayoutItemSpacing30Action), SIGNAL(triggered()), this, SLOT(at_setCurrentLayoutItemSpacing30Action_triggered()));
     connect(action(QnActions::CreateZoomWindowAction), SIGNAL(triggered()), this, SLOT(at_createZoomWindowAction_triggered()));
+
+    connect(action(QnActions::SetCurrentLayoutItemSpacingNoneAction), &QAction::triggered, this,
+        [this]
+        {
+            setCurrentLayoutCellSpacing(Qn::CellSpacing::None);
+        });
+
+    connect(action(QnActions::SetCurrentLayoutItemSpacingSmallAction), &QAction::triggered, this,
+        [this]
+        {
+            setCurrentLayoutCellSpacing(Qn::CellSpacing::Small);
+        });
+
+    connect(action(QnActions::SetCurrentLayoutItemSpacingMediumAction), &QAction::triggered, this,
+        [this]
+        {
+            setCurrentLayoutCellSpacing(Qn::CellSpacing::Medium);
+        });
+
+    connect(action(QnActions::SetCurrentLayoutItemSpacingLargeAction), &QAction::triggered, this,
+        [this]
+        {
+            setCurrentLayoutCellSpacing(Qn::CellSpacing::Large);
+        });
+
     connect(action(QnActions::Rotate0Action), &QAction::triggered, this, [this] { rotateItems(0); });
     connect(action(QnActions::Rotate90Action), &QAction::triggered, this, [this] { rotateItems(90); });
     connect(action(QnActions::Rotate180Action), &QAction::triggered, this, [this] { rotateItems(180); });
@@ -459,7 +480,36 @@ void QnWorkbenchActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMo
         qnRedAssController->setMode(resolutionMode);
 }
 
-QnBusinessRulesDialog *QnWorkbenchActionHandler::businessRulesDialog() const {
+void QnWorkbenchActionHandler::setCurrentLayoutCellSpacing(Qn::CellSpacing spacing)
+{
+    //TODO: #GDM #3.1 move out these actions to separate CurrentLayoutHandler
+    // There at_workbench_cellSpacingChanged will also use this method
+    auto actionId = [spacing]
+        {
+            switch (spacing)
+            {
+                case Qn::CellSpacing::None:
+                    return QnActions::SetCurrentLayoutItemSpacingNoneAction;
+                case Qn::CellSpacing::Small:
+                    return QnActions::SetCurrentLayoutItemSpacingSmallAction;
+                case Qn::CellSpacing::Medium:
+                    return QnActions::SetCurrentLayoutItemSpacingMediumAction;
+                case Qn::CellSpacing::Large:
+                    return QnActions::SetCurrentLayoutItemSpacingLargeAction;
+            }
+            NX_ASSERT(false);
+            return QnActions::SetCurrentLayoutItemSpacingSmallAction;
+        };
+
+    if (auto layout = workbench()->currentLayout()->resource())
+    {
+        layout->setCellSpacing(QnWorkbenchLayout::cellSpacingValue(spacing));
+        action(actionId())->setChecked(true);
+    }
+}
+
+QnBusinessRulesDialog *QnWorkbenchActionHandler::businessRulesDialog() const
+{
     return m_businessRulesDialog.data();
 }
 
@@ -584,13 +634,13 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged()
     qreal value = workbench()->currentLayout()->cellSpacing();
 
     if (qFuzzyIsNull(value))
-        action(QnActions::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
-    else if (qFuzzyCompare(0.1, value))
-        action(QnActions::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
-    else if (qFuzzyCompare(0.15, value))
-        action(QnActions::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
+        action(QnActions::SetCurrentLayoutItemSpacingNoneAction)->setChecked(true);
+    else if (qFuzzyCompare(QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Medium), value))
+        action(QnActions::SetCurrentLayoutItemSpacingMediumAction)->setChecked(true);
+    else if (qFuzzyCompare(QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Large), value))
+        action(QnActions::SetCurrentLayoutItemSpacingLargeAction)->setChecked(true);
     else
-        action(QnActions::SetCurrentLayoutItemSpacing10Action)->setChecked(true); //default value
+        action(QnActions::SetCurrentLayoutItemSpacingSmallAction)->setChecked(true); //default value
 }
 
 void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
@@ -1701,43 +1751,6 @@ void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
 
     QnNonModalDialogConstructor<QnAdjustVideoDialog> dialogConstructor(m_adjustVideoDialog, mainWindow());
     adjustVideoDialog()->setWidget(widget);
-}
-
-
-void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered()
-{
-    if (auto layout = workbench()->currentLayout()->resource())
-    {
-        layout->setCellSpacing(0.0);
-        action(QnActions::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
-    }
-}
-
-void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing10Action_triggered()
-{
-    if (auto layout = workbench()->currentLayout()->resource())
-    {
-        layout->setCellSpacing(0.05);
-        action(QnActions::SetCurrentLayoutItemSpacing10Action)->setChecked(true);
-    }
-}
-
-void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing20Action_triggered()
-{
-    if (auto layout = workbench()->currentLayout()->resource())
-    {
-        layout->setCellSpacing(0.1);
-        action(QnActions::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
-    }
-}
-
-void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered()
-{
-    if (auto layout = workbench()->currentLayout()->resource())
-    {
-        layout->setCellSpacing(0.15);
-        action(QnActions::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
-    }
 }
 
 void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
