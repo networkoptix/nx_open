@@ -449,8 +449,11 @@ BaseControl::EventSet Stick::checkForEventsUnsafe() const
     Q_ASSERT(m_state.size() == kMaxDegreesOfFreedom);
     EventSet eventsToBeFired;
 
-    if (distance(m_previousPosition, m_state) > m_threshold)
+    if (distance(m_previousPosition, m_state) > m_threshold || 
+        (isZeroPosition(m_state) && !isZeroPosition(m_previousPosition)))
+    {
         eventsToBeFired.insert(nx::joystick::EventType::stickMove);
+    }
     
     return eventsToBeFired;
 }
