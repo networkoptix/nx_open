@@ -582,5 +582,5 @@ QString QnBusinessStringsHelper::eventTypeString(
 QString QnBusinessStringsHelper::bruleDescriptionText(const QnBusinessEventRulePtr& bRule)
 {
     QString eventString = eventTypeString(bRule->eventType(), bRule->eventState(), bRule->actionType(), bRule->actionParams());
-    return tr("%1 --> %2").arg(eventString).arg(actionName(bRule->actionType()));
+    return lit("%1 --> %2").arg(eventString).arg(actionName(bRule->actionType()));
 }

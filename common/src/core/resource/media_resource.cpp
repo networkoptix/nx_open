@@ -69,8 +69,7 @@ public:
             //: Short for 'Preset'
             return tr("Ps");
         case Qn::QualityNotDefined:
-            //: Short for 'Undefined'
-            return tr("-");
+            return lit("-");
         default:
             qnWarning("Invalid stream quality value '%1'.", static_cast<int>(value));
             return QString();

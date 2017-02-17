@@ -255,7 +255,7 @@
               <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
              </property>
              <property name="suffix">
-              <string>%</string>
+              <string notr="true">%</string>
              </property>
              <property name="minimum">
               <number>5</number>
