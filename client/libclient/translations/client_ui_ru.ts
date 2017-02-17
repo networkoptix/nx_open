@@ -1242,7 +1242,7 @@
     <message>
         <location/>
         <source>General Settings</source>
-        <translation> Общие настройки</translation>
+        <translation>Общие настройки</translation>
     </message>
     <message>
         <location/>

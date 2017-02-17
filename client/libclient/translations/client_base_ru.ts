@@ -4948,7 +4948,7 @@ to %1</source>
     </message>
     <message>
         <source>Cameras from other servers and removed cameras</source>
-        <translation>&lt;Камеры с других серверов, а также удаленные камеры&gt;</translation>
+        <translation>Камеры с других серверов, а также удаленные камеры</translation>
     </message>
     <message>
         <source>%1 TB</source>
@@ -6287,7 +6287,7 @@ to %1</source>
     </message>
     <message>
         <source>Email address is not set.</source>
-        <translation>Адрес E-Mail не настроен.</translation>
+        <translation>Адрес Email не настроен.</translation>
     </message>
     <message>
         <source>Email server is not set.</source>
