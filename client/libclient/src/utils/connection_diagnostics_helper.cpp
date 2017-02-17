@@ -75,11 +75,11 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
             + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::CloudTemporaryUnauthorizedConnectionResult:
         return tr("Connection to the %1 is not ready yet. "
-            "Check media server internet connection or try again later.",
+            "Check server internet connection or try again later.",
             "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName())
             + L'\n' + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::ForbiddenConnectionResult:
-        return tr("Operation is not permitted now. It could happen due to media server is restarting now. Please try again later.")
+        return tr("Operation is not permitted now. It could happen due to server is restarting now. Please try again later.")
             + L'\n' + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::NetworkErrorConnectionResult:
         return tr("Connection to the Server could not be established.") + L'\n'
