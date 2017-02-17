@@ -2972,12 +2972,12 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection to the %1 is not ready yet. Check server internet connection or try again later.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <source>Operation is not permitted now. It could happen due to server is restarting now. Please try again later.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Operation is not permitted now. It could happen due to server is restarting now. Please try again later.</source>
+        <source>Connection to %1 is not ready yet. Check server internet connection or try again later.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3195,17 +3195,17 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to disconnect the System from %1</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Disconnect the System from %1?</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You will not be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to disconnect System from %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect System from %1?</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
@@ -4351,10 +4351,6 @@ to %1</source>
         <translation>%1 (actual)</translation>
     </message>
     <message>
-        <source>The URL is invalid.</source>
-        <translation>O URL é inválido.</translation>
-    </message>
-    <message>
         <source>Use a specific hostname or IP address rather than %1.</source>
         <translation>Utilize um hostname ou Endereço IP especifico em vez de %1.</translation>
     </message>
@@ -4396,6 +4392,10 @@ to %1</source>
     </message>
     <message>
         <source>System was configured successfully.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>URL is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7587,7 +7587,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter the URL of the Web Page to add:</source>
+        <source>Enter URL of the Web Page to add:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
