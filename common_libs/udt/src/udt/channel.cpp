@@ -223,9 +223,11 @@ int CChannel::sendto(const sockaddr* addr, CPacket& packet) const
     assert(m_iSocket != INVALID_SOCKET);
 
     // convert control information into network order
-    if (packet.getFlag())
+    if (packet.getFlag() == PacketFlag::Control)
+    {
         for (int i = 0, n = packet.getLength() / 4; i < n; ++i)
             *((uint32_t *)packet.m_pcData + i) = htonl(*((uint32_t *)packet.m_pcData + i));
+    }
 
     // convert packet header into network order
     //for (int j = 0; j < 4; ++ j)
@@ -265,7 +267,7 @@ int CChannel::sendto(const sockaddr* addr, CPacket& packet) const
         ++p;
     }
 
-    if (packet.getFlag())
+    if (packet.getFlag() == PacketFlag::Control)
     {
         for (int l = 0, n = packet.getLength() / 4; l < n; ++l)
             *((uint32_t *)packet.m_pcData + l) = ntohl(*((uint32_t *)packet.m_pcData + l));
@@ -326,7 +328,7 @@ int CChannel::recvfrom(sockaddr* addr, CPacket& packet) const
         ++p;
     }
 
-    if (packet.getFlag())
+    if (packet.getFlag() == PacketFlag::Control)
     {
         for (int j = 0, n = packet.getLength() / 4; j < n; ++j)
             *((uint32_t *)packet.m_pcData + j) = ntohl(*((uint32_t *)packet.m_pcData + j));

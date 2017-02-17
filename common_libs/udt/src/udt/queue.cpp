@@ -76,10 +76,10 @@ public:
     {
         std::unique_lock<std::mutex> lock(m_mutex);
 
-        auto p = m_idToPrevSendedPacketType.emplace(packet.m_iID, std::vector<PacketType>());
-        p.first->second.push_back(packet.getType());
+        auto p = m_idToPrevSendedPacketType.emplace(packet.m_iID, SocketContext());
+        p.first->second.packets.emplace_back(packet.getFlag(), packet.getType());
 
-        //if (packet.getType() == PacketType::KeepAlive)
+        //if (packet.getType() == ControlPacketType::KeepAlive)
         //{
         //    std::cout<<"Sending "<<dumpPacket(packet)<<"\n";
         //}
@@ -89,18 +89,23 @@ public:
     {
         std::unique_lock<std::mutex> lock(m_mutex);
 
-        auto p = m_idToPrevReceivedPacketType.emplace(packet.m_iID, std::vector<PacketType>());
-        p.first->second.push_back(packet.getType());
+        auto p = m_idToPrevReceivedPacketType.emplace(packet.m_iID, SocketContext());
+        p.first->second.packets.emplace_back(packet.getFlag(), packet.getType());
 
-        //if (packet.getType() == PacketType::KeepAlive)
+        //if (packet.getType() == ControlPacketType::KeepAlive)
         //{
         //    std::cout << "Received " << dumpPacket(packet) << "\n";
         //}
     }
 
 private:
-    std::map<int, std::vector<PacketType>> m_idToPrevSendedPacketType;
-    std::map<int, std::vector<PacketType>> m_idToPrevReceivedPacketType;
+    struct SocketContext
+    {
+        std::vector<std::pair<PacketFlag, ControlPacketType>> packets;
+    };
+
+    std::map<int, SocketContext> m_idToPrevSendedPacketType;
+    std::map<int, SocketContext> m_idToPrevReceivedPacketType;
     std::mutex m_mutex;
 };
 
@@ -918,7 +923,7 @@ void CRendezvousQueue::updateConnStatus()
 
             CPacket request;
             char* reqdata = new char[i->m_pUDT->m_iPayloadSize];
-            request.pack(0, NULL, reqdata, i->m_pUDT->m_iPayloadSize);
+            request.pack(ControlPacketType::Handshake, NULL, reqdata, i->m_pUDT->m_iPayloadSize);
             // ID = 0, connection request
             request.m_iID = !i->m_pUDT->m_bRendezvous ? 0 : i->m_pUDT->m_ConnRes.m_iID;
             int hs_size = i->m_pUDT->m_iPayloadSize;
@@ -1110,9 +1115,9 @@ DWORD WINAPI CRcvQueue::worker(LPVOID param)
                 {
                     if (CIPAddress::ipcmp(addr, u->m_pPeerAddr, u->m_iIPversion))
                     {
-                        if (u->m_bConnected && !u->m_bBroken && !u->m_bClosing)
+                        if (u->m_bConnected && !u->m_bBroken && !u->isClosing())
                         {
-                            if (0 == unit->m_Packet.getFlag())
+                            if (unit->m_Packet.getFlag() == PacketFlag::Data)
                                 u->processData(unit);
                             else
                                 u->processCtrl(unit->m_Packet);
@@ -1148,7 +1153,7 @@ DWORD WINAPI CRcvQueue::worker(LPVOID param)
         {
             CUDT* u = ul->m_pUDT;
 
-            if (u->m_bConnected && !u->m_bBroken && !u->m_bClosing)
+            if (u->m_bConnected && !u->m_bBroken && !u->isClosing())
             {
                 u->checkTimers(false);
                 self->m_pRcvUList->update(u);

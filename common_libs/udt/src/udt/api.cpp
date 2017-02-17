@@ -1209,7 +1209,7 @@ void CUDTUnited::checkBrokenSockets()
             if ((NULL == j->second->m_pUDT->m_pSndBuffer) || (0 == j->second->m_pUDT->m_pSndBuffer->getCurrBufSize()) || (j->second->m_pUDT->m_ullLingerExpiration <= CTimer::getTime()))
             {
                 j->second->m_pUDT->m_ullLingerExpiration = 0;
-                j->second->m_pUDT->m_bClosing = true;
+                j->second->m_pUDT->setIsClosing(true);
                 j->second->m_TimeStamp = CTimer::getTime();
             }
         }

@@ -54,7 +54,7 @@ struct iovec
 
 class CChannel;
 
-enum class PacketType
+enum class ControlPacketType
 {
     Handshake = 0,
     KeepAlive = 1,
@@ -68,6 +68,12 @@ enum class PacketType
     RemotePeerFailure = 8,
     /** 0x7FFF - reserved and user defined messages. */
     Reserved = 32767,
+};
+
+enum class PacketFlag
+{
+    Data = 0,
+    Control = 1,
 };
 
 class CPacket
@@ -117,7 +123,7 @@ public:
     // Returned value:
     //    None.
 
-    void pack(int pkttype, void* lparam = NULL, void* rparam = NULL, int size = 0);
+    void pack(ControlPacketType pkttype, void* lparam = NULL, void* rparam = NULL, int size = 0);
 
     // Functionality:
     //    Read the packet vector.
@@ -135,7 +141,7 @@ public:
     // Returned value:
     //    packet flag (0 or 1).
 
-    int getFlag() const;
+    PacketFlag getFlag() const;
 
     // Functionality:
     //    Read the packet type.
@@ -144,7 +150,7 @@ public:
     // Returned value:
     //    packet type filed (000 ~ 111).
 
-    PacketType getType() const;
+    ControlPacketType getType() const;
 
     // Functionality:
     //    Read the extended packet type.

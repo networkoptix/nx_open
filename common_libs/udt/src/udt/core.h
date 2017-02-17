@@ -118,6 +118,9 @@ public: // internal API
     void setConnecting(bool val);
     bool isConnecting() const;
 
+    void setIsClosing(bool val);
+    bool isClosing() const;
+
 private:
     // Functionality:
     //    initialize a UDT entity and bind to a local address.
@@ -391,7 +394,7 @@ private: // synchronization: mutexes and conditions
     void releaseSynch();
 
 private: // Generation and processing of packets
-    void sendCtrl(int pkttype, void* lparam = NULL, void* rparam = NULL, int size = 0);
+    void sendCtrl(ControlPacketType pkttype, void* lparam = NULL, void* rparam = NULL, int size = 0);
     void processCtrl(CPacket& ctrlpkt);
     int packData(CPacket& packet, uint64_t& ts);
     int processData(CUnit* unit);
