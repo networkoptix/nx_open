@@ -10,7 +10,7 @@ function(nx_add_target name type)
 
     find_sources("${CMAKE_CURRENT_SOURCE_DIR}/src" cpp_files hpp_files)
     if(NOT NX_NO_MOC)
-        qt5_wrap_cpp(moc_files ${hpp_files})
+        qt5_wrap_cpp(moc_files ${hpp_files} OPTIONS --no-notes)
     endif()
 
     set(resources ${NX_ADDITIONAL_RESOURCES})
