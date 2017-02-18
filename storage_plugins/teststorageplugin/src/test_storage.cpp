@@ -87,3 +87,58 @@ nx_spl::FileInfo* STORAGE_METHOD_CALL TestFileInfoIterator::next(int* ecode) con
 }
 
 */
+
+int STORAGE_METHOD_CALL TestStorage::isAvailable() const 
+
+nx_spl::IODevice* STORAGE_METHOD_CALL open(
+    const char*     url,
+    int             flags,
+    int*            ecode
+) const 
+
+uint64_t STORAGE_METHOD_CALL TestStorage::getFreeSpace(int* ecode) const 
+
+uint64_t STORAGE_METHOD_CALL TestStorage::getTotalSpace(int* ecode) const 
+
+int STORAGE_METHOD_CALL TestStorage::getCapabilities() const 
+
+void STORAGE_METHOD_CALL TestStorage::removeFile(
+    const char* url,
+    int*        ecode
+) 
+
+void STORAGE_METHOD_CALL TestStorage::removeDir(
+    const char* url,
+    int*        ecode
+) 
+
+void STORAGE_METHOD_CALL TestStorage::renameFile(
+    const char*     oldUrl,
+    const char*     newUrl,
+    int*            ecode
+) 
+
+nx_spl::FileInfoIterator* STORAGE_METHOD_CALL TestStorage::getFileIterator(
+    const char*     dirUrl,
+    int*            ecode
+) const 
+
+int STORAGE_METHOD_CALL TestStorage::fileExists(
+    const char*     url,
+    int*            ecode
+) const 
+
+int STORAGE_METHOD_CALL TestStorage::dirExists(
+    const char*     url,
+    int*            ecode
+) const 
+
+uint64_t STORAGE_METHOD_CALL TestStorage::fileSize(
+    const char*     url,
+    int*            ecode
+) const 
+
+void* TestStorage::queryInterface(const nxpl::NX_GUID& interfaceID) 
+
+unsigned int TestStorage::addRef() 
+unsigned int TestStorage::releaseRef() 

@@ -79,7 +79,7 @@ void processChunk(void* ctx, const struct JsonVal* value)
     JsonVal_forEachObjectElement(value, &chunkSuccess, &parseChunkObj);
     if (!chunkSuccess.durationFound || !chunkSuccess.startTimeFound)
     {
-        LOG("%s: 'chunk' object should have int 'durationMs' field and 'startTimeMs' field, ignoring: %s\n", 
+        LOG("%s: 'chunk' object should have number 'durationMs' field and 'startTimeMs' field, ignoring: %s\n", 
             __FUNCTION__);
         return;
     }
@@ -117,11 +117,18 @@ void processRootObj(void* ctx, const char* key, const struct JsonVal* value)
     }
 }
 
+void setNodeSize(void* ctx, struct FsStubNode* fsNode)
+{
+    int64_t* fileSize = (int64_t*)ctx;
+    fsNode->size = *fileSize;
+}
+
 }
 
 bool buildVfsFromJson(
     const char* jsonString, 
     const char* rootPath, 
+    GetFileSizeFunc getFileSizeFunc, 
     VfsPair* outVfsPair)
 {
     char errorBuf[512];
@@ -142,12 +149,23 @@ bool buildVfsFromJson(
     JsonVal_forEachObjectElement(&rootObj, &result, &processRootObj);
     if (!result.success || !result.chunksFound || result.vfsPair->sampleFilePath.empty())
     {
-        LOG("%s: root json object has invalid structure, json string is: %s\n", 
+        LOG("%s: root json object is invalid, json string is: %s\n", 
             __FUNCTION__, jsonString);
         JsonVal_destroy(&rootObj);
         FsStubNode_remove(result.vfsPair->root);
         return false;
     }
+
+    int64_t fileSize = getFileSizeFunc(result.vfsPair->sampleFilePath.c_str());   
+    if (fileSize < 0)
+    {
+        LOG("%s: failed to get file size for sample file: %s\n",
+            __FUNCTION__, result.vfsPair->sampleFilePath.c_str());
+        JsonVal_destroy(&rootObj);
+        return false;
+    }
+
+    FsStubNode_forEach(result.vfsPair->root, &fileSize, &setNodeSize);
 
     JsonVal_destroy(&rootObj);
     return true;

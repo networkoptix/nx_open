@@ -137,7 +137,7 @@ static struct FsStubNode *createNode(
         fsNode->prev = NULL;
 
     fsNode->size = size;
-    fsNode->type = (FsStubEntryType)type;
+    fsNode->type = (enum FsStubEntryType)type;
 
     return fsNode;
 }
@@ -256,4 +256,18 @@ void FsStubNode_remove(struct FsStubNode *fsNode)
 
     free(fsNode->name);
     free(fsNode);
+}
+
+void FsStubNode_forEach(
+    struct FsStubNode *root, 
+    void *ctx, 
+    void (*action)(void *ctx, struct FsStubNode *node))
+{
+    struct FsStubNode *curNode;
+
+    curNode = root->child;
+    for (; curNode; curNode = curNode->next)
+        FsStubNode_forEach(curNode, ctx, action);
+
+    action(ctx, root);
 }

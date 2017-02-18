@@ -23,11 +23,16 @@ struct FsStubNode
 
 struct FsStubNode *fsStubCreateTopLevel();
 struct FsStubNode *FsStubNode_add(
-        struct FsStubNode *parent,
-        const char *path,
-        int type,
-        int mask,
-        int64_t size);
+    struct FsStubNode *parent,
+    const char *path,
+    int type,
+    int mask,
+    int64_t size);
+
+void FsStubNode_forEach(
+    struct FsStubNode *root, 
+    void *ctx, 
+    void (*action)(void *ctx, struct FsStubNode *node));
 
 struct FsStubNode *FsStubNode_find(struct FsStubNode *topLevelNode, const char *path);
 int FsStubNode_rename(struct FsStubNode *fsNode, const char *newName);

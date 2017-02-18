@@ -57,8 +57,9 @@ private:
     nx_spl::FileInfo m_fInfo;
 };
 
+*/
 
-
+struct FsStubNode;
 
 class TestStorage : public nx_spl::Storage
 {
@@ -119,9 +120,7 @@ public: // plugin interface implementation
     virtual unsigned int addRef() override;
     virtual unsigned int releaseRef() override;
 
-public:
-    ErrorCode parseUrl(const char* url);
-
+private:
+    FsStubNode* m_root;
+    std::string m_sampleFilePath;
 };
-
-*/
