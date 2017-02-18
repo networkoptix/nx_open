@@ -222,7 +222,7 @@ private:
     void doPeriodicTasks();
 
     void log(const QString& message) const;
-
+    void clearCurrentFrame();
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
@@ -362,8 +362,7 @@ void PlayerPrivate::at_jumpOccurred(int sequence)
     if (sequence && sequence != metadata.sequence)
     {
         // Drop deprecate frame
-        execTimer->stop();
-        videoFrameToRender.reset();
+        clearCurrentFrame();
         at_gotVideoFrame();
     }
 }
@@ -736,6 +735,12 @@ void PlayerPrivate::log(const QString& message) const
         .arg(message), cl_logDEBUG1);
 }
 
+void PlayerPrivate::clearCurrentFrame()
+{
+    execTimer->stop();
+    videoFrameToRender.reset();
+}
+
 //-------------------------------------------------------------------------------------------------
 // Player
 
@@ -800,8 +805,7 @@ void Player::setPosition(qint64 value)
     }
 
     d->setLiveMode(value == kLivePosition);
-    if (d->state != State::Previewing)
-        d->videoFrameToRender.reset();
+    d->clearCurrentFrame();
     d->at_hurryUp(); //< renew receiving frames
 
     emit positionChanged();
@@ -850,6 +854,7 @@ void Player::pause()
     Q_D(Player);
     d->log(lit("pause()"));
     d->setState(State::Paused);
+    d->execTimer->stop(); //< stop next frame displaying
 }
 
 void Player::preview()
@@ -877,7 +882,7 @@ void Player::stop()
         else
             d->archiveReader.reset();
     }
-    d->videoFrameToRender.reset();
+    d->clearCurrentFrame();
     d->updateCurrentResolution(QSize());
 
     d->setState(State::Stopped);
