@@ -1,6 +1,7 @@
 #pragma once
 
 #include "third_party_storage.h"
+#include "common.h"
 
 /*
 
@@ -61,7 +62,9 @@ private:
 
 struct FsStubNode;
 
-class TestStorage : public nx_spl::Storage
+class TestStorage : 
+    public nx_spl::Storage, 
+    public PluginRefCounter<TestStorage>
 {
 public:
     virtual int STORAGE_METHOD_CALL isAvailable() const override;
