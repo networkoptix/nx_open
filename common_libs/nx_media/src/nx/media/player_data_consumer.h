@@ -149,10 +149,10 @@ private:
     std::deque<QVideoFramePtr> m_decodedVideo;
     QnWaitCondition m_queueWaitCond;
     mutable QnMutex m_queueMutex; //< sync with player thread
-    mutable QnMutex m_dataProviderMutex; //< sync with dataProvider thread
+    mutable QnMutex m_jumpMutex; //< sync jump related logic
     mutable QnMutex m_decoderMutex; //< sync with create/destroy decoder
 
-    int m_awaitJumpCounter; //< how many jump requests are queued
+    int m_awaitingJumpCounter; //< how many jump requests are queued
 
     struct BofFrameInfo
     {
