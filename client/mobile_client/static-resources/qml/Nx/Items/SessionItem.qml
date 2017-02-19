@@ -114,10 +114,15 @@ Pane
         {
             if (!hostsModel.isEmpty)
             {
-                connectionManager.connectToServer(
+                if (!connectionManager.connectToServer(
                     hostsModel.firstHost,
                     cloudStatusWatcher.credentials.user,
-                    cloudStatusWatcher.credentials.password)
+                    cloudStatusWatcher.credentials.password))
+                {
+                    sessionsScreen.openConnectionWarningDialog(systemName)
+                    return
+                }
+
                 Workflow.openResourcesScreen(systemName)
             }
         }
@@ -125,10 +130,15 @@ Pane
         {
             if (authenticationDataModel.hasStoredPassword)
             {
-                connectionManager.connectToServer(
+                if (!connectionManager.connectToServer(
                     hostsModel.firstHost,
                     authenticationDataModel.defaultCredentials.user,
-                    authenticationDataModel.defaultCredentials.password)
+                    authenticationDataModel.defaultCredentials.password))
+                {
+                    sessionsScreen.openConnectionWarningDialog(systemName)
+                    return
+                }
+
                 Workflow.openResourcesScreen(systemName)
             }
             else
