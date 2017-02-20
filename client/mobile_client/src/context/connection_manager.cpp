@@ -393,14 +393,14 @@ bool QnConnectionManagerPrivate::doConnect()
 
             using namespace nx::client::core::helpers;
             storeConnection(localId, connectionInfo.systemName, url);
-            storeCredentials(localId, QnCredentials(url));
+            storeCredentials(localId, QnEncodedCredentials(url));
             updateWeightData(localId);
             qnClientCoreSettings->save();
 
             LastConnectionData connectionData{
                 connectionInfo.systemName,
                 QnUrlHelper(url).cleanUrl(),
-                QnCredentials(url)};
+                QnEncodedCredentials(url)};
             qnSettings->setLastUsedConnection(connectionData);
             qnSettings->save();
 

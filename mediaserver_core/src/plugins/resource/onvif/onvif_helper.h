@@ -1,20 +1,17 @@
-#ifndef onvif_helper_h
-#define onvif_helper_h
+#pragma once
 
 #ifdef ENABLE_ONVIF
 
-#include <list>
-
-#include <QHash>
+#include <QtCore/QHash>
 #include <QtCore/QString>
 #include <QtCore/QSet>
-#include <QtCore/QPair>
-#include <nx/utils/singleton.h>
 
-//first - login, second - password
-typedef std::list<std::pair<const char*, const char*> > PasswordList;
+#include <nx/utils/singleton.h>
+#include <utils/common/credentials.h>
 
 struct SOAP_ENV__Fault;
+
+using CredentialsList = QList<nx::common::utils::Credentials>;
 
 class PasswordHelper:
     public QObject,
@@ -22,22 +19,20 @@ class PasswordHelper:
 {
     Q_OBJECT
 
-    //QHash<Manufacturer, Passwords>
-    typedef QHash<QString, PasswordList> ManufacturerPasswords;
+    using ManufacturerCredentials = QHash<QString, CredentialsList>;
 
-    ManufacturerPasswords manufacturerPasswords;
+    ManufacturerCredentials manufacturerPasswords;
 
 public:
     PasswordHelper();
-    ~PasswordHelper() {};
+    ~PasswordHelper() = default;
 
     static bool isNotAuthenticated(const SOAP_ENV__Fault* faultInfo);
     static bool isConflictError(const SOAP_ENV__Fault* faultInfo);
 
-    const PasswordList getPasswordsByManufacturer(const QString& mdnsPacketData) const;
+    const CredentialsList getCredentialsByManufacturer(const QString& mdnsPacketData) const;
 
 private:
-
     void setPasswordInfo(const char* manufacturer, const char* login, const char* passwd);
     void setPasswordInfo(const char* manufacturer);
     void printPasswords() const;
@@ -55,9 +50,9 @@ class NameHelper
 {
     QSet<QString> camerasNames;
 
-    NameHelper(const NameHelper&) {}
     NameHelper();
-    ~NameHelper() {};
+    NameHelper(const NameHelper&) = default;
+    ~NameHelper() = default;
 
 public:
 
@@ -68,5 +63,3 @@ public:
 };
 
 #endif //ENABLE_ONVIF
-
-#endif // onvif_helper_h

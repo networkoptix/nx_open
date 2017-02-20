@@ -11,10 +11,11 @@
 #include <utils/common/credentials.h>
 #include <plugins/resource/mdns/mdns_packet.h>
 
+using nx::common::utils::Credentials;
 
 extern QString getValueFromString(const QString& line);
 
-typedef QList<QnCredentials> DefaultCredentialsList;
+using DefaultCredentialsList = QList<Credentials>;
 
 namespace
 {
@@ -95,7 +96,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
         auto possibleCreds = resData.value<DefaultCredentialsList>(
             Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
-        possibleCreds << QnCredentials(kDefaultIsdUsername, kDefaultIsdPassword);
+        possibleCreds << Credentials(kDefaultIsdUsername, kDefaultIsdPassword);
 
         for (const auto& creds: possibleCreds)
         {

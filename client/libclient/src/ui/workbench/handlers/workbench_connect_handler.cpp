@@ -587,8 +587,8 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     if (helpers::isLocalUser(url.userName()))
     {
         const auto credentials = (storePassword || autoLogin
-            ? QnCredentials(url)
-            : QnCredentials(url.userName(), QString()));
+            ? QnEncodedCredentials(url)
+            : QnEncodedCredentials(url.userName(), QString()));
 
         nx::client::core::helpers::storeCredentials(localId, credentials);
         qnClientCoreSettings->save();

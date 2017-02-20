@@ -287,7 +287,8 @@ bool QnPlAxisResourceSearcher::testCredentials(
     return true;
 }
 
-QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(const QnSecurityCamResourcePtr& resource) const
+QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(
+    const QnSecurityCamResourcePtr& resource) const
 {
     if (!resource)
         return QAuthenticator();
@@ -297,12 +298,12 @@ QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(const QnSe
         return existingResource->getAuth();
 
     auto resData = qnCommon->dataPool()->data(resource->getVendor(), resource->getModel());
-    auto possibleCredentials = resData.value<QList<QnCredentials>>(
+    auto possibleCredentials = resData.value<QList<nx::common::utils::Credentials>>(
         Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
-    for (const auto& creds: possibleCredentials)
+    for (const auto& credentials: possibleCredentials)
     {
-        auto auth = creds.toAuthenticator();
+        const auto& auth = credentials.toAuthenticator();
         if (testCredentials(resource->getUrl(), auth))
             return auth;
     }
@@ -315,7 +316,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
 {
     QnPlAxisResourcePtr firstResource = result.first().template dynamicCast<QnPlAxisResource>();
 
-    int channels = 1;
+    uint channels = 1;
     if (firstResource->hasParam(QLatin1String("channelsAmount")))
     {
         QString val = firstResource->getProperty(QLatin1String("channelsAmount"));
@@ -329,7 +330,7 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
 
         firstResource->setPhysicalId(physicalId + QLatin1String("_channel_") + QString::number(1));
 
-        for (int i = 2; i <= channels; ++i)
+        for (uint i = 2; i <= channels; ++i)
         {
             QnPlAxisResourcePtr resource ( new QnPlAxisResource() );
 
@@ -353,7 +354,6 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
             resource->setPhysicalId(resource->getPhysicalId() + QLatin1String("_channel_") + QString::number(i));
 
             result.push_back(resource);
-
         }
     }
 }

@@ -102,6 +102,7 @@
 #include "api/model/audit/audit_record.h"
 #include "health/system_health.h"
 #include <utils/common/credentials.h>
+#include <utils/common/encoded_credentials.h>
 #include <core/dataprovider/stream_mixer.h>
 #include <core/resource/resource_data_structures.h>
 
@@ -343,7 +344,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnIOPortDataList>();
     qRegisterMetaType<QList<QMap<QString, QString>>>();
 
-    qRegisterMetaType<QList<QnCredentials>>();
+    qRegisterMetaType<QList<nx::common::utils::Credentials>>();
     qRegisterMetaType<QnHttpConfigureRequestList>();
     qRegisterMetaType<QnBitrateList>();
     qRegisterMetaType<QnBounds>();
@@ -363,8 +364,9 @@ void QnCommonMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnOnvifConfigDataPtr>();
     QnJsonSerializer::registerSerializer<QnIOPortData>();
     QnJsonSerializer::registerSerializer<QnIOPortDataList>();
-    QnJsonSerializer::registerSerializer<QnCredentials>();
-    QnJsonSerializer::registerSerializer<QList<QnCredentials>>();
+    QnJsonSerializer::registerSerializer<nx::common::utils::Credentials>();
+    QnJsonSerializer::registerSerializer<QList<nx::common::utils::Credentials>>();
+    QnJsonSerializer::registerSerializer<QnEncodedCredentials>();
     QnJsonSerializer::registerSerializer<QList<QnChannelMapping>>();
     QnJsonSerializer::registerSerializer<QList<QnResourceChannelMapping>>();
     QnJsonSerializer::registerSerializer<QnHttpConfigureRequestList>();

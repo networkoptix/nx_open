@@ -327,8 +327,10 @@ private:
     DeviceSoapWrapper();
     DeviceSoapWrapper(const DeviceSoapWrapper&);
     QAuthenticator getDefaultPassword(const QString& manufacturer, const QString& model) const;
-    std::list<QnCredentials> getPossibleCredentials(const QString& manufacturer, const QString& model) const;
-    QnCredentials getForcedCredentials(const QString& manufacturer, const QString& model);
+    std::list<nx::common::utils::Credentials> getPossibleCredentials(
+        const QString& manufacturer, const QString& model) const;
+    nx::common::utils::Credentials getForcedCredentials(
+        const QString& manufacturer, const QString& model);
     void calcTimeDrift();
 
 };

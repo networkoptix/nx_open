@@ -216,7 +216,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
     using namespace nx::vms::utils;
 
     SystemUri::Auth auth = uri.authenticator();
-    QnCredentials credentials(auth.user, auth.password);
+    QnEncodedCredentials credentials(auth.user, auth.password);
 
     switch (uri.clientCommand())
     {

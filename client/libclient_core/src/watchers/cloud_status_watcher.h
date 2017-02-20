@@ -7,7 +7,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
 
-#include <utils/common/credentials.h>
+#include <utils/common/encoded_credentials.h>
 #include <network/cloud_system_data.h>
 
 class QSettings;
@@ -17,7 +17,7 @@ class QnCloudStatusWatcherPrivate;
 class QnCloudStatusWatcher : public QObject, public Singleton<QnCloudStatusWatcher>
 {
     Q_OBJECT
-    Q_PROPERTY(QnCredentials credentials READ credentials NOTIFY credentialsChanged)
+    Q_PROPERTY(QnEncodedCredentials credentials READ credentials NOTIFY credentialsChanged)
     Q_PROPERTY(QString effectiveUserName READ effectiveUserName NOTIFY effectiveUserNameChanged)
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(ErrorCode error READ error NOTIFY errorChanged)
@@ -48,9 +48,9 @@ public:
     explicit QnCloudStatusWatcher(QObject *parent = nullptr);
     ~QnCloudStatusWatcher();
 
-    QnCredentials credentials() const;
+    QnEncodedCredentials credentials() const;
     void resetCredentials();
-    void setCredentials(const QnCredentials& credentials, bool initial = false);
+    void setCredentials(const QnEncodedCredentials& credentials, bool initial = false);
 
     // These getters are for qml
     Q_INVOKABLE QString cloudLogin() const;
@@ -64,7 +64,7 @@ public:
 
     void logSession(const QString& cloudSystemId);
 
-    QnCredentials createTemporaryCredentials() const;
+    QnEncodedCredentials createTemporaryCredentials() const;
 
     Status status() const;
 

@@ -84,7 +84,7 @@ public:
 
     std::string cloudHost;
     int cloudPort;
-    QnCredentials credentials;
+    QnEncodedCredentials credentials;
     QString effectiveUserName;
     bool stayConnected;
     QnCloudStatusWatcher::ErrorCode errorCode;
@@ -160,7 +160,7 @@ QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
         });
 
     //TODO: #GDM store temporary credentials
-    setCredentials(QnCredentials(
+    setCredentials(QnEncodedCredentials(
         qnClientCoreSettings->cloudLogin(), qnClientCoreSettings->cloudPassword()), true);
 
     connect(qnClientCoreSettings, &QnClientCoreSettings::valueChanged, this,
@@ -177,7 +177,7 @@ QnCloudStatusWatcher::~QnCloudStatusWatcher()
 {
 }
 
-QnCredentials QnCloudStatusWatcher::credentials() const
+QnEncodedCredentials QnCloudStatusWatcher::credentials() const
 {
     Q_D(const QnCloudStatusWatcher);
     return d->credentials;
@@ -247,15 +247,15 @@ void QnCloudStatusWatcher::logSession(const QString& cloudSystemId)
 
 void QnCloudStatusWatcher::resetCredentials()
 {
-    setCredentials(QnCredentials());
+    setCredentials(QnEncodedCredentials());
 }
 
-void QnCloudStatusWatcher::setCredentials(const QnCredentials& credentials, bool initial)
+void QnCloudStatusWatcher::setCredentials(const QnEncodedCredentials& credentials, bool initial)
 {
     Q_D(QnCloudStatusWatcher);
 
     const auto loweredCredentials =
-        QnCredentials(credentials.user.toLower(), credentials.password.value());
+        QnEncodedCredentials(credentials.user.toLower(), credentials.password.value());
 
     if (d->credentials == loweredCredentials)
         return;
@@ -275,10 +275,10 @@ void QnCloudStatusWatcher::setCredentials(const QnCredentials& credentials, bool
         emit this->passwordChanged();
 }
 
-QnCredentials QnCloudStatusWatcher::createTemporaryCredentials() const
+QnEncodedCredentials QnCloudStatusWatcher::createTemporaryCredentials() const
 {
     Q_D(const QnCloudStatusWatcher);
-    return QnCredentials(
+    return QnEncodedCredentials(
         QString::fromStdString(d->temporaryCredentials.login),
         QString::fromStdString(d->temporaryCredentials.password));
 }

@@ -14,7 +14,7 @@ namespace controllers {
 WebAdminController::WebAdminController(QObject* parent):
     QObject(parent)
 {
-    m_credentials = QnCredentials(qnSettings->startupParameters().url);
+    m_credentials = QnEncodedCredentials(qnSettings->startupParameters().url);
 }
 
 void WebAdminController::setUiController(QnMobileClientUiController* controller)
@@ -38,7 +38,7 @@ QString WebAdminController::getCredentials() const
 void WebAdminController::updateCredentials(
     const QString& login, const QString& password, bool /*isCloud*/)
 {
-    m_credentials = QnCredentials(login, password);
+    m_credentials = QnEncodedCredentials(login, password);
 }
 
 void WebAdminController::cancel()

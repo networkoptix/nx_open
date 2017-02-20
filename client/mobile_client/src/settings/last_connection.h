@@ -4,7 +4,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
-#include <utils/common/credentials.h>
+#include <utils/common/encoded_credentials.h>
 
 namespace nx {
 namespace client {
@@ -15,7 +15,7 @@ struct LastConnectionData
 {
     QString systemName;
     QUrl url;
-    QnCredentials credentials;
+    QnEncodedCredentials credentials;
 
     QUrl urlWithCredentials() const;
 };
