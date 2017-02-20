@@ -7,7 +7,7 @@
       </button>
 
     <ul class="dropdown-menu dropup" ng-class="{'two-columns':languages.length>12}" uib-dropdown-menu aria-labelledby="language-dropdown">
-        <li ng-repeat="lang in languages" ng-class="{active:lang.language == $root.L.language}">
+        <li ng-repeat="lang in languages" ng-class="{active:lang.language == activeLanguage.language}">
             <a href="" ng-click="changeLanguage(lang.language)">
                 <span class="lang-sm" lang="{{lang.language}}"></span> {{lang.name}}
             </a>
