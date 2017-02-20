@@ -376,7 +376,10 @@ void QnServerUpdatesWidget::updateDownloadButton()
 
 void QnServerUpdatesWidget::updateVersionPage()
 {
-    bool hasLatestVersion = m_mode == Mode::LatestVersion
+    if (isUpdating())
+        return;
+
+    const bool hasLatestVersion = m_mode == Mode::LatestVersion
         && !m_latestVersion.isNull()
         && m_updatesModel->lowestInstalledVersion() >= m_latestVersion;
 
@@ -823,6 +826,8 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
 {
     ui->updateProgess->setValue(100);
     ui->updateProgess->setFormat(tr("Update Finished...") + lit("\t100%"));
+
+    updateVersionPage();
 
     if (isVisible())
     {
