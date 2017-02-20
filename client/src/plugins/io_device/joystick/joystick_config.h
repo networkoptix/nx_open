@@ -13,14 +13,12 @@ namespace io_device {
 namespace joystick {
 namespace config {
 
-using namespace nx::client::plugins::io_device;
-
 struct Rule 
 {
     Rule() {};
     Rule(
         QString id,
-        joystick::EventType evtType,
+        EventType evtType,
         QnActions::IDType actType,
         std::map<QString, QString> actParameters):
         
@@ -31,7 +29,7 @@ struct Rule
     {};
 
     QString ruleId;
-    joystick::EventType eventType;
+    EventType eventType;
     QnActions::IDType actionType;
     std::map<QString, QString> actionParameters;
 };

@@ -1,6 +1,9 @@
 #pragma once
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace hid {
 namespace usage {
 namespace generic_desktop {
@@ -79,4 +82,7 @@ const uint16_t kSystemLcdAutoscale = 0xb7;
 } // namespace generic_desktop
 } // namespace usage
 } // namespace hid
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx

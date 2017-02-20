@@ -9,13 +9,15 @@ namespace io_device {
 namespace joystick {
 namespace controls {
 
-typedef State::size_type FreedomDegree;
-const FreedomDegree kXindex = 0;
-const FreedomDegree kYindex = 1;
-const FreedomDegree kZindex = 2;
-const FreedomDegree kRxIndex = 3;
-const FreedomDegree kRyIndex = 4;
-const FreedomDegree kRzIndex = 5;
+enum DegreeOfFreedom
+{
+    x = 0,
+    y,
+    z,
+    rX,
+    rY,
+    rZ
+};
 
 class Stick: public BaseControl
 {
@@ -23,20 +25,20 @@ class Stick: public BaseControl
 public:
     Stick();
 
-    virtual StateElement getStickX() const;
-    virtual StateElement getStickY() const;
-    virtual StateElement getStickZ() const;
-    virtual StateElement getStickRx() const;
-    virtual StateElement getStickRy() const;
-    virtual StateElement getStickRz() const;
+    virtual StateElement x() const;
+    virtual StateElement y() const;
+    virtual StateElement z() const;
+    virtual StateElement rX() const;
+    virtual StateElement rY() const;
+    virtual StateElement rZ() const;
 
-    virtual Ranges getRanges() const;
+    virtual Ranges ranges() const;
     virtual void setRanges(Ranges range);
 
-    virtual Ranges getOutputRanges() const;
+    virtual Ranges outputRanges() const;
     virtual void setOutputRanges(Ranges outputLimits);
 
-    virtual std::vector<bool> getInversions() const;
+    virtual std::vector<bool> inversions() const;
     virtual void setInversions(const std::vector<bool>& inverions);
 
     virtual void invertX(bool invert);
@@ -57,73 +59,73 @@ public:
     virtual void invertRz(bool invert);
     virtual bool isRzInverted() const;
 
-    virtual Range getStickXRange() const;
+    virtual Range xRange() const;
     virtual void setStickXRange(
         StateElement min,
         StateElement max);
     virtual void setStickXRange(const Range& range);
 
-    virtual Range getStickYRange() const;
+    virtual Range yRange() const;
     virtual void setStickYRange(
         StateElement min,
         StateElement max);
     virtual void setStickYRange(const Range& range);
 
-    virtual Range getStickZRange() const;
+    virtual Range zRange() const;
     virtual void setStickZRange(
         StateElement min,
         StateElement max);
     virtual void setStickZRange(const Range& range);
 
-    virtual Range getStickRxRange() const;
+    virtual Range rXRange() const;
     virtual void setStickRxRange(
         StateElement min,
         StateElement max);
     virtual void setStickRxRange(const Range& range);
 
-    virtual Range getStickRyRange() const;
+    virtual Range rYRange() const;
     virtual void setStickRyRange(
         StateElement min,
         StateElement max);
     virtual void setStickRyRange(const Range& range);
 
-    virtual Range getStickRzRange() const;
+    virtual Range rZRange() const;
     virtual void setStickRzRange(
         StateElement min,
         StateElement max);
     virtual void setStickRzRange(const Range& range);
 
-    virtual Range getStickOutputXRange() const;
+    virtual Range outputXRange() const;
     virtual void setStickOutputXRange(
         StateElement min,
         StateElement max);
     virtual void setStickOutputXRange(const Range& range);
 
-    virtual Range getStickOutputYRange() const;
+    virtual Range outputYRange() const;
     virtual void setStickOutputYRange(
         StateElement min,
         StateElement max);
     virtual void setStickOutputYRange(const Range& range);
 
-    virtual Range getStickOutputZRange() const;
+    virtual Range outputZRange() const;
     virtual void setStickOutputZRange(
         StateElement min,
         StateElement max);
     virtual void setStickOutputZRange(const Range& range);
 
-    virtual Range getStickOutputRxRange() const;
+    virtual Range outputRxRange() const;
     virtual void setStickOutputRxRange(
         StateElement min,
         StateElement max);
     virtual void setStickOutputRxRange(const Range& range);
 
-    virtual Range getStickOutputRyRange() const;
+    virtual Range outputRyRange() const;
     virtual void setStickOutputRyRange(
         StateElement min,
         StateElement max);
     virtual void setStickOutputRyRange(const Range& range);
 
-    virtual Range getStickOutputRzRange() const;
+    virtual Range outputRzRange() const;
     virtual void setStickOutputRzRange(
         StateElement min,
         StateElement max);

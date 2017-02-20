@@ -26,13 +26,13 @@ bool Led::getLedState() const
     return m_state[0];
 }
 
-boost::optional<Led::Color> Led::getLedColor() const
+boost::optional<Led::Color> Led::color() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_color;
 }
 
-void Led::setLedColor(Color color)
+void Led::setColor(Color color)
 {
     auto colorChangeAllowed = canChangeColor();
     if (!colorChangeAllowed)

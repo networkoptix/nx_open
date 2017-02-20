@@ -3,6 +3,9 @@
 #include "hid_usage.h"
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace hid {
 
 enum class UsagePage
@@ -33,13 +36,16 @@ enum class UsagePage
     arcade = 0x91
 };
 
-bool isReservedUsagePage(uint16_t pageCode);
+bool isReservedUsagePage(quint16 pageCode);
 
-bool isVendorDefinedUsagePage(uint16_t pageCode);
+bool isVendorDefinedUsagePage(quint16 pageCode);
 
-bool isPowerUsagePage(uint16_t pageCode);
+bool isPowerUsagePage(quint16 pageCode);
 
-bool isMonitorUsagePage(uint16_t pageCode);
+bool isMonitorUsagePage(quint16 pageCode);
 
 } // namespace hid
+} // namespace io_device
+} // namespace plugins
+} // namespace client 
 } // namespace nx

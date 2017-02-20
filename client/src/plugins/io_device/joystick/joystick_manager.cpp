@@ -160,9 +160,9 @@ QnActionParameters Manager::createActionParameters(
         if (!stick)
             return QnActionParameters();
 
-        auto xRange = stick->getStickOutputXRange();
-        auto yRange = stick->getStickOutputYRange();
-        auto zRange = stick->getStickOutputZRange();
+        auto xRange = stick->outputXRange();
+        auto yRange = stick->outputYRange();
+        auto zRange = stick->outputZRange();
 
         auto speed = QVector3D(
             (double)eventParameters.state[0] * 2 / (xRange.max - xRange.min),

@@ -42,43 +42,43 @@ Stick::Stick():
 {
 }
 
-StateElement Stick::getStickX() const
+StateElement Stick::x() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_state[kXindex];
+    return m_state[DegreeOfFreedom::x];
 }
 
-StateElement Stick::getStickY() const
+StateElement Stick::y() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_state[kYindex];
+    return m_state[DegreeOfFreedom::y];
 }
 
-StateElement Stick::getStickZ() const
+StateElement Stick::z() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_state[kZindex];
+    return m_state[DegreeOfFreedom::z];
 }
 
-StateElement Stick::getStickRx() const
+StateElement Stick::rX() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_state[kRxIndex];
+    return m_state[DegreeOfFreedom::rX];
 }
 
-StateElement Stick::getStickRy() const
+StateElement Stick::rY() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_state[kRyIndex];
+    return m_state[DegreeOfFreedom::rY];
 }
 
-StateElement Stick::getStickRz() const
+StateElement Stick::rZ() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_state[kRzIndex];
+    return m_state[DegreeOfFreedom::rZ];
 }
 
-std::vector<Range> Stick::getRanges() const
+std::vector<Range> Stick::ranges() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_ranges;
@@ -91,7 +91,7 @@ void Stick::setRanges(Ranges ranges)
     m_ranges = ranges;
 }
 
-Ranges Stick::getOutputRanges() const
+Ranges Stick::outputRanges() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_outputRanges;
@@ -104,7 +104,7 @@ void Stick::setOutputRanges(Ranges outputRanges)
     m_outputRanges = outputRanges;
 }
 
-std::vector<bool> Stick::getInversions() const
+std::vector<bool> Stick::inversions() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_inversions;
@@ -119,313 +119,313 @@ void Stick::setInversions(const std::vector<bool>& inverions)
 void Stick::invertX(bool invert)
 {
     QnMutexLocker lock(&m_mutex);
-    m_inversions[kXindex] = invert;
+    m_inversions[DegreeOfFreedom::x] = invert;
 }
 
 bool Stick::isXInverted() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_inversions[kXindex];
+    return m_inversions[DegreeOfFreedom::x];
 }
 
 void Stick::invertY(bool invert)
 {
     QnMutexLocker lock(&m_mutex);
-    m_inversions[kYindex] = invert;
+    m_inversions[DegreeOfFreedom::y] = invert;
 }
 
 bool Stick::isYInverted() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_inversions[kYindex];
+    return m_inversions[DegreeOfFreedom::y];
 }
 
 void Stick::invertZ(bool invert)
 {
     QnMutexLocker lock(&m_mutex);
-    m_inversions[kZindex] = invert;
+    m_inversions[DegreeOfFreedom::z] = invert;
 }
 
 bool Stick::isZInverted() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_inversions[kZindex];
+    return m_inversions[DegreeOfFreedom::z];
 }
 
 void Stick::invertRx(bool invert)
 {
     QnMutexLocker lock(&m_mutex);
-    m_inversions[kRxIndex] = invert;
+    m_inversions[DegreeOfFreedom::rX] = invert;
 }
 
 bool Stick::isRxInverted() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_inversions[kRxIndex];
+    return m_inversions[DegreeOfFreedom::rX];
 }
 
 void Stick::invertRy(bool invert)
 {
     QnMutexLocker lock(&m_mutex);
-    m_inversions[kRyIndex] = invert;
+    m_inversions[DegreeOfFreedom::rY] = invert;
 }
 
 bool Stick::isRyInverted() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_inversions[kRyIndex];
+    return m_inversions[DegreeOfFreedom::rY];
 }
 
 void Stick::invertRz(bool invert)
 {
     QnMutexLocker lock(&m_mutex);
-    m_inversions[kRzIndex] = invert;
+    m_inversions[DegreeOfFreedom::rZ] = invert;
 }
 
 bool Stick::isRzInverted() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_inversions[kRzIndex];
+    return m_inversions[DegreeOfFreedom::rZ];
 }
 
-Range Stick::getStickXRange() const
+Range Stick::xRange() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_ranges[kXindex];
+    return m_ranges[DegreeOfFreedom::x];
 }
 
 void Stick::setStickXRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
-    m_ranges[kXindex] = Range(min, max);
+    m_ranges[DegreeOfFreedom::x] = Range(min, max);
 }
 
 void Stick::setStickXRange(const Range& range)
 {
     Q_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
-    m_ranges[kXindex] = range;
+    m_ranges[DegreeOfFreedom::x] = range;
 }
 
-Range Stick::getStickYRange() const
+Range Stick::yRange() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_ranges[kYindex];
+    return m_ranges[DegreeOfFreedom::y];
 }
 
 void Stick::setStickYRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
-    m_ranges[kYindex] = Range(min, max);
+    m_ranges[DegreeOfFreedom::y] = Range(min, max);
 }
 
 void Stick::setStickYRange(const Range& range)
 {
     Q_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
-    m_ranges[kYindex] = range;
+    m_ranges[DegreeOfFreedom::y] = range;
 }
 
-Range Stick::getStickZRange() const
+Range Stick::zRange() const
 {    
     QnMutexLocker lock(&m_mutex);
-    return m_ranges[kZindex];
+    return m_ranges[DegreeOfFreedom::z];
 }
 
 void Stick::setStickZRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
-    m_ranges[kZindex] = Range(min, max);
+    m_ranges[DegreeOfFreedom::z] = Range(min, max);
 }
 
 void Stick::setStickZRange(const Range& range)
 {
     Q_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
-    m_ranges[kZindex] = range;
+    m_ranges[DegreeOfFreedom::z] = range;
 }
 
-Range Stick::getStickRxRange() const
+Range Stick::rXRange() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_ranges[kRxIndex];
+    return m_ranges[DegreeOfFreedom::rX];
 }
 
 void Stick::setStickRxRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
-    m_ranges[kRxIndex] = Range(min, max);
+    m_ranges[DegreeOfFreedom::rX] = Range(min, max);
 }
 
 void Stick::setStickRxRange(const Range& range)
 {
     Q_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
-    m_ranges[kRxIndex] = range;
+    m_ranges[DegreeOfFreedom::rX] = range;
 }
 
-Range Stick::getStickRyRange() const
+Range Stick::rYRange() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_ranges[kRyIndex];
+    return m_ranges[DegreeOfFreedom::rY];
 }
 
 void Stick::setStickRyRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
-    m_ranges[kRyIndex] = Range(min, max);
+    m_ranges[DegreeOfFreedom::rY] = Range(min, max);
 }
 
 void Stick::setStickRyRange(const Range& range)
 {
     Q_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
-    m_ranges[kRyIndex] = range;
+    m_ranges[DegreeOfFreedom::rY] = range;
 }
 
-Range Stick::getStickRzRange() const
+Range Stick::rZRange() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_ranges[kRzIndex];
+    return m_ranges[DegreeOfFreedom::rZ];
 }
 
 void Stick::setStickRzRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
-    m_ranges[kRzIndex] = Range(min, max);
+    m_ranges[DegreeOfFreedom::rZ] = Range(min, max);
 }
 
 void Stick::setStickRzRange(const Range& range)
 {
     Q_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
-    m_ranges[kRzIndex] = range;
+    m_ranges[DegreeOfFreedom::rZ] = range;
 }
 
-Range Stick::getStickOutputXRange() const
+Range Stick::outputXRange() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_outputRanges[kXindex];
+    return m_outputRanges[DegreeOfFreedom::x];
 }
 
 void Stick::setStickOutputXRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
-    m_outputRanges[kXindex] = Range(min, max);
+    m_outputRanges[DegreeOfFreedom::x] = Range(min, max);
 }
 
 void Stick::setStickOutputXRange(const Range& range)
 {
     Q_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
-    m_outputRanges[kXindex] = range;
+    m_outputRanges[DegreeOfFreedom::x] = range;
 }
 
-Range Stick::getStickOutputYRange() const
+Range Stick::outputYRange() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_outputRanges[kYindex];
+    return m_outputRanges[DegreeOfFreedom::y];
 }
 
 void Stick::setStickOutputYRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
-    m_outputRanges[kYindex] = Range(min, max);
+    m_outputRanges[DegreeOfFreedom::y] = Range(min, max);
 }
 
 void Stick::setStickOutputYRange(const Range& range)
 {
     Q_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
-    m_outputRanges[kYindex] = range;
+    m_outputRanges[DegreeOfFreedom::y] = range;
 }
 
-Range Stick::getStickOutputZRange() const
+Range Stick::outputZRange() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_outputRanges[kZindex];
+    return m_outputRanges[DegreeOfFreedom::z];
 }
 
 void Stick::setStickOutputZRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
-    m_outputRanges[kZindex] = Range(min, max);
+    m_outputRanges[DegreeOfFreedom::z] = Range(min, max);
 }
 
 void Stick::setStickOutputZRange(const Range& range)
 {
     Q_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
-    m_outputRanges[kZindex] = range;
+    m_outputRanges[DegreeOfFreedom::z] = range;
 }
 
-Range Stick::getStickOutputRxRange() const
+Range Stick::outputRxRange() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_outputRanges[kRxIndex];
+    return m_outputRanges[DegreeOfFreedom::rX];
 }
 
 void Stick::setStickOutputRxRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
-    m_outputRanges[kRxIndex] = Range(min, max);
+    m_outputRanges[DegreeOfFreedom::rX] = Range(min, max);
 }
 
 void Stick::setStickOutputRxRange(const Range& range)
 {
     Q_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
-    m_outputRanges[kRxIndex] = range;
+    m_outputRanges[DegreeOfFreedom::rX] = range;
 }
 
-Range Stick::getStickOutputRyRange() const
+Range Stick::outputRyRange() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_outputRanges[kRyIndex];
+    return m_outputRanges[DegreeOfFreedom::rY];
 }
 
 void Stick::setStickOutputRyRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
-    m_outputRanges[kRyIndex] = Range(min, max);
+    m_outputRanges[DegreeOfFreedom::rY] = Range(min, max);
 }
 
 void Stick::setStickOutputRyRange(const Range& range)
 {
     Q_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
-    m_outputRanges[kRyIndex] = range;
+    m_outputRanges[DegreeOfFreedom::rY] = range;
 }
 
-Range Stick::getStickOutputRzRange() const
+Range Stick::outputRzRange() const
 {
     QnMutexLocker lock(&m_mutex);
-    return m_outputRanges[kRzIndex];
+    return m_outputRanges[DegreeOfFreedom::rZ];
 }
 
 void Stick::setStickOutputRzRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
-    m_outputRanges[kRzIndex] = Range(min, max);
+    m_outputRanges[DegreeOfFreedom::rZ] = Range(min, max);
 }
 
 void Stick::setStickOutputRzRange(const Range& range)
 {
     Q_ASSERT(range.max > range.min);
     QnMutexLocker lock(&m_mutex);
-    m_outputRanges[kRzIndex] = range;
+    m_outputRanges[DegreeOfFreedom::rZ] = range;
 }
 
 void Stick::applyOverride(const QString overrideName, const QString& overrideValue)
@@ -510,9 +510,9 @@ State Stick::fromNormalizedToRaw(const State& normalized) const
 StateElement Stick::distance(const State& position1, const State& position2) const
 {
     Q_ASSERT(position1.size() >= 3 && position2.size() >= 3);
-    auto xDiff = position1[kXindex] - position2[kXindex];
-    auto yDiff = position1[kYindex] - position2[kYindex];
-    auto zDiff = position1[kZindex] - position2[kZindex];
+    auto xDiff = position1[DegreeOfFreedom::x] - position2[DegreeOfFreedom::x];
+    auto yDiff = position1[DegreeOfFreedom::y] - position2[DegreeOfFreedom::y];
+    auto zDiff = position1[DegreeOfFreedom::z] - position2[DegreeOfFreedom::z];
 
     return static_cast<StateElement>(std::sqrt(xDiff * xDiff + yDiff * yDiff + zDiff * zDiff) + 0.5);
 }

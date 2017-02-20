@@ -1,9 +1,12 @@
 #include "hid_common.h"
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace hid {
 
-bool isReservedUsagePage(uint16_t pageCode)
+bool isReservedUsagePage(quint16 pageCode)
 {
     return pageCode == 0x0e 
         || (pageCode >= 0x11 && pageCode <= 0x13)
@@ -13,20 +16,23 @@ bool isReservedUsagePage(uint16_t pageCode)
         || (pageCode >= 0x92 && pageCode <= 0xfeff);
 }
 
-bool isVendorDefinedUsagePage(uint16_t pageCode)
+bool isVendorDefinedUsagePage(quint16 pageCode)
 {
     return pageCode >= 0xff00 && pageCode <= 0xffff;
 }
 
-bool isPowerUsagePage(uint16_t pageCode)
+bool isPowerUsagePage(quint16 pageCode)
 {
     return pageCode >= 0x84 && pageCode <= 0x87;
 }
 
-bool isMonitorUsagePage(uint16_t pageCode)
+bool isMonitorUsagePage(quint16 pageCode)
 {
     return pageCode >= 0x80 && pageCode <=0x83;
 }
 
 } // namespace hid
+} // namespace io_device
+} // namespace plugins
+} // namespace client 
 } // namespace nx

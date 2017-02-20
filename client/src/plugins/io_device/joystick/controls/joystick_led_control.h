@@ -19,8 +19,8 @@ public:
     typedef uint32_t Color;
 
     virtual bool getLedState() const;
-    virtual boost::optional<Color> getLedColor() const;
-    virtual void setLedColor(Color color);
+    virtual boost::optional<Color> color() const;
+    virtual void setColor(Color color);
     virtual bool canChangeColor() const;
 
 private:
