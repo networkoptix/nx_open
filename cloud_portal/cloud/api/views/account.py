@@ -70,6 +70,9 @@ def logout(request):
 @handle_exceptions
 def index(request):
     if request.method == 'GET':
+        # validate credentials in cloud_db
+        # password could be changed, ot temporary link expired
+        Account.get(request.session['login'], request.session['password'])
         # get authorized user here
         serializer = AccountSerializer(request.user, many=False)
         return Response(serializer.data)

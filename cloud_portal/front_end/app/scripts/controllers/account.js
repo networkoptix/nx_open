@@ -17,7 +17,6 @@ angular.module('cloudApp')
         };
 
         $scope.save = process.init(function() {
-        console.log($scope.account);
             return cloudApi.accountPost($scope.account).then(function(result){
                 if(L.language != account.language){
                     //Need to reload page
@@ -29,7 +28,8 @@ angular.module('cloudApp')
             });
         },{
             successMessage:'Your account was successfully saved.',
-            errorPrefix:'Couldn\'t save your data:'
+            errorPrefix:'Couldn\'t save your data:',
+            logoutForbidden: true
         });
 
         $scope.changePassword = process.init(function() {
@@ -39,6 +39,7 @@ angular.module('cloudApp')
                 notAuthorized: L.errorCodes.oldPasswordMistmatch
             },
             successMessage:'Your password was successfully changed.',
-            errorPrefix:'Couldn\'t change your password:'
+            errorPrefix:'Couldn\'t change your password:',
+            ignoreUnauthorized: true
         });
     }]);
