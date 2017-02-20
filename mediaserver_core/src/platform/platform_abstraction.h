@@ -11,7 +11,7 @@ class QnPlatformAbstraction: public QnCorePlatformAbstraction {
     typedef QnCorePlatformAbstraction base_type;
 
 public:
-    QnPlatformAbstraction(QObject *parent = 0);
+    QnPlatformAbstraction(int statsUpdatePeriodMs, QObject *parent = nullptr);
     virtual ~QnPlatformAbstraction();
 
     QnGlobalMonitor *monitor() const {

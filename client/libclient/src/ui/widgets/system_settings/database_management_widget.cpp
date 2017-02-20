@@ -138,7 +138,7 @@ void QnDatabaseManagementWidget::restoreDb()
 
     const auto button = QnMessageBox::question(this,
         tr("Restore database?"),
-        tr("The System configuration will be restored from backup,"
+        tr("System configuration will be restored from backup,"
            " Server application will be restarted."),
         QDialogButtonBox::Ok | QDialogButtonBox::Cancel, QDialogButtonBox::Ok);
 

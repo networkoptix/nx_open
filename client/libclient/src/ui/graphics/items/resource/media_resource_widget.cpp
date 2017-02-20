@@ -1478,7 +1478,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const
 
     QString hqLqString;
     if (hasVideo() && !m_resource->toResource()->hasFlags(Qn::local))
-        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Low-Res") : tr("Hi-Res");
+        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Lo-Res") : tr("Hi-Res");
 
     static const int kDetailsTextPixelSize = 11;
 

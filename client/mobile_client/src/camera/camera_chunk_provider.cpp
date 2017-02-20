@@ -148,4 +148,8 @@ void QnCameraChunkProvider::update()
         return;
 
     m_loader->load(QString(), 1);
+
+    auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(
+        m_loader->resource()->getId());
+    qnCameraHistoryPool->updateCameraHistoryAsync(camera, nullptr);
 }

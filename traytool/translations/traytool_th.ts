@@ -51,34 +51,6 @@
         <translation>ไม่มี %1บริการติดตั้ง</translation>
     </message>
     <message>
-        <source> (stopped)</source>
-        <translation> (หยุด)</translation>
-    </message>
-    <message>
-        <source> (starting)</source>
-        <translation> (เริ่ม)</translation>
-    </message>
-    <message>
-        <source> (stopping)</source>
-        <translation> (กำลังหยุด)</translation>
-    </message>
-    <message>
-        <source> (started)</source>
-        <translation> (เริ่ม)</translation>
-    </message>
-    <message>
-        <source> (resuming)</source>
-        <translation>(กลับมาทำงานใหม่)</translation>
-    </message>
-    <message>
-        <source> (paused)</source>
-        <translation>(หยุดชั่วคราว)</translation>
-    </message>
-    <message>
-        <source> (pausing)</source>
-        <translation>(หยุดชั่วคราว)</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;ออก</translation>
     </message>
@@ -112,6 +84,34 @@
     </message>
     <message>
         <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>starting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>resuming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pausing</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

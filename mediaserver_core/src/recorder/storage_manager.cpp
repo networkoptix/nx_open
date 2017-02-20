@@ -452,8 +452,7 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_gen(m_rd()),
     m_isRenameDisabled(MSSettings::roSettings()->value("disableRename").toInt()),
     m_camInfoWriterHandler(this),
-    m_camInfoWriter(&m_camInfoWriterHandler),
-    m_camInfoReader(&m_camInfoReadHandler)
+    m_camInfoWriter(&m_camInfoWriterHandler)
 {
     m_storageDbPoolRef = qnStorageDbPool->create();
 
@@ -506,6 +505,18 @@ void QnStorageManager::createArchiveCameras(const nx::caminfo::ArchiveCameraData
         bool doAdd = (cameraLowCatalog && !cameraLowCatalog->isEmpty()) || (cameraHiCatalog && !cameraHiCatalog->isEmpty());
         if (doAdd)
             camerasToAdd.push_back(camera);
+
+        if (QnLog::logs() && QnLog::logs()->get()->logLevel() >= cl_logDEBUG2)
+        {
+            QString logMessage;
+            QTextStream logStream(&logMessage);
+
+            logStream << lit("camera info: Camera found %1").arg(camera.coreData.physicalId) << endl;
+            for (const auto& prop: camera.properties)
+                logStream << "\t" << prop.name << " : " << prop.value << endl << endl;
+
+            NX_LOG(logMessage, cl_logDEBUG2);
+        }
     }
 
     for (const auto &camera : camerasToAdd)
@@ -997,16 +1008,16 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
         if (m_rebuildCancelled)
             return; // cancel rebuild
 
-        m_camInfoReader.loadCameraInfo(
-            fi,
-            archiveCameraList,
-            [&storage](const QString& filePath)
+        auto getFileDataFunc= [&storage](const QString& filePath)
             {
                 auto file = std::unique_ptr<QIODevice>(storage->open(filePath, QIODevice::ReadOnly));
                 if (!file)
                    return QByteArray();
                 return file->readAll();
-            });
+            };
+
+        nx::caminfo::ServerReaderHandler readerHandler;
+        nx::caminfo::Reader(&readerHandler, fi, getFileDataFunc)(&archiveCameraList);
 
         QString cameraUniqueId = fi.fileName();
         ArchiveScanPosition currentPos(m_role, storage, catalog, cameraUniqueId);

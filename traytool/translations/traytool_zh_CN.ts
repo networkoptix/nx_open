@@ -34,34 +34,6 @@
         <translation>没有安装 %1 服务</translation>
     </message>
     <message>
-        <source> (stopped)</source>
-        <translation>(已停止)</translation>
-    </message>
-    <message>
-        <source> (starting)</source>
-        <translation>(开启中)</translation>
-    </message>
-    <message>
-        <source> (stopping)</source>
-        <translation>(停止中)</translation>
-    </message>
-    <message>
-        <source> (started)</source>
-        <translation>(已开启)</translation>
-    </message>
-    <message>
-        <source> (resuming)</source>
-        <translation>(重新开启中)</translation>
-    </message>
-    <message>
-        <source> (paused)</source>
-        <translation>(已暂停)</translation>
-    </message>
-    <message>
-        <source> (pausing)</source>
-        <translation>(暂停中)</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;退出</translation>
     </message>
@@ -111,6 +83,34 @@
     </message>
     <message>
         <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>starting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>resuming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pausing</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

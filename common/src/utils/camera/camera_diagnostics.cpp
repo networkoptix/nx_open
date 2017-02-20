@@ -86,7 +86,7 @@ public:
             case cannotOpenCameraMediaPort:
             {
                 errorMessageParts
-                    << tr("Cannot open media url %1. Failed to connect to media port %2.").arg(p1).arg(p2)
+                    << tr("Cannot open media URL %1. Failed to connect to media port %2.").arg(p1).arg(p2)
                     << tr("Make sure port %1 is accessible (e.g. forwarded).").arg(p2)
                     << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device);
                 break;
@@ -94,16 +94,16 @@ public:
             case connectionClosedUnexpectedly:
             {
                 errorMessageParts
-                    << tr("Cannot open media url %1. Connection to port %2 was closed unexpectedly.").arg(p1).arg(p2)
+                    << tr("Cannot open media URL %1. Connection to port %2 was closed unexpectedly.").arg(p1).arg(p2)
                     << QnDeviceDependentStrings::getNameFromSet(detailsPluggedReboot, device);
                 break;
             }
             case responseParseError:
             {
                 QnCameraDeviceStringSet detailsBase(
-                    tr("Could not parse device response. Url %1, request name %2.").arg(p1).arg(p2),
-                    tr("Could not parse camera response. Url %1, request name %2.").arg(p1).arg(p2),
-                    tr("Could not parse I/O module response. Url %1, request name %2.").arg(p1).arg(p2)
+                    tr("Could not parse device response. URL %1, request name %2.").arg(p1).arg(p2),
+                    tr("Could not parse camera response. URL %1, request name %2.").arg(p1).arg(p2),
+                    tr("Could not parse I/O module response. URL %1, request name %2.").arg(p1).arg(p2)
                 );
 
                 errorMessageParts
@@ -114,20 +114,20 @@ public:
             }
             case noMediaTrack:
             {
-                errorMessageParts << tr("No supported media tracks at url %1.").arg(p1)
+                errorMessageParts << tr("No supported media tracks at URL %1.").arg(p1)
                     << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device)
                     << firmwareSupport;
                 break;
             }
             case notAuthorised:
             {
-                errorMessageParts << tr("Not authorized. Url %1.").arg(p1);
+                errorMessageParts << tr("Not authorized. URL %1.").arg(p1);
                 break;
             }
             case unsupportedProtocol:
             {
                 errorMessageParts
-                    << tr("Cannot open media url %1. Unsupported media protocol %2.").arg(p1).arg(p2)
+                    << tr("Cannot open media URL %1. Unsupported media protocol %2.").arg(p1).arg(p2)
                     << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device)
                     << firmwareSupport;
                 break;
@@ -135,14 +135,14 @@ public:
             case cannotConfigureMediaStream:
             {
                 QnCameraDeviceStringSet detailsBase(
-                    tr("First, try to turn on recording (if it's off) and decrease fps in device settings.").arg(p1),
-                    tr("First, try to turn on recording (if it's off) and decrease fps in camera settings.").arg(p1),
-                    tr("First, try to turn on recording (if it's off) and decrease fps in I/O module settings.").arg(p1)
+                    tr("First, try to turn on recording (if it is off) and decrease fps in device settings.").arg(p1),
+                    tr("First, try to turn on recording (if it is off) and decrease fps in camera settings.").arg(p1),
+                    tr("First, try to turn on recording (if it is off) and decrease fps in I/O module settings.").arg(p1)
                 );
                 QnCameraDeviceStringSet detailsAdvanced(
-                    tr("If it doesn't help, restore factory defaults on the device web-page."),
-                    tr("If it doesn't help, restore factory defaults on the camera web-page."),
-                    tr("If it doesn't help, restore factory defaults on the I/O module web-page.")
+                    tr("If it does not help, restore factory defaults on the device web-page."),
+                    tr("If it does not help, restore factory defaults on the camera web-page."),
+                    tr("If it does not help, restore factory defaults on the I/O module web-page.")
                 );
 
                 errorMessageParts

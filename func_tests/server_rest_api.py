@@ -1,7 +1,9 @@
 import json
 import logging
+import warnings
 import requests
 import requests.exceptions
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from requests.auth import HTTPDigestAuth
 
 
@@ -38,14 +40,14 @@ class ServerRestApiProxy(object):
     def __getattr__(self, name):
         return ServerRestApiProxy(self._url + '/' + name, self._user, self._password)
 
-    def get(self, raise_exception=True, timeout_sec=None, **kw):
+    def get(self, raise_exception=True, timeout_sec=None, headers=None, **kw):
         log.debug('GET %s %s', self._url, kw)
         params = {name: self._get_param_to_str(value) for name, value in kw.items()}
-        return self._make_request(raise_exception, timeout_sec, requests.get, self._url, params=params)
+        return self._make_request(raise_exception, timeout_sec, requests.get, self._url, headers=headers, params=params)
 
-    def post(self, raise_exception=True, timeout_sec=None, **kw):
+    def post(self, raise_exception=True, timeout_sec=None, headers=None, **kw):
         log.debug('POST %s %s', self._url, kw)
-        return self._make_request(raise_exception, timeout_sec, requests.post, self._url, json=kw)
+        return self._make_request(raise_exception, timeout_sec, requests.post, self._url, headers=headers, json=kw)
 
     def _get_param_to_str(self, value):
         if type(value) is bool:
@@ -56,7 +58,9 @@ class ServerRestApiProxy(object):
         if timeout_sec is None:
             timeout_sec = REST_API_TIMEOUT_SEC
         try:
-            response = fn(url, auth=HTTPDigestAuth(self._user, self._password), timeout=timeout_sec, *args, **kw)
+            with warnings.catch_warnings():
+                warnings.simplefilter('ignore', InsecureRequestWarning)
+                response = fn(url, auth=HTTPDigestAuth(self._user, self._password), timeout=timeout_sec, verify=False, *args, **kw)
         except requests.exceptions.RequestException as x:
             log.debug('\t--> %s: %s', x.__class__.__name__, x)
             raise

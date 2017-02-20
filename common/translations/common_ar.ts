@@ -17,10 +17,6 @@
 <context>
     <name>MergeSystemsStatusStrings</name>
     <message>
-        <source>The system was not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The password or user name is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -41,21 +37,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The discovered system %1 has an incompatible version %2.</source>
-        <comment>%1 is name of the system, %2 is version information</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The discovered system %1 is in safe mode.</source>
-        <comment>%1 is name of the system</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not configure the remote system %1.</source>
-        <comment>%1 is name of the system</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You are about to merge Systems with Starter licenses.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -65,11 +46,6 @@
     </message>
     <message>
         <source>Merge anyway?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -85,6 +61,30 @@
     <message>
         <source>These systems are built with different %1 URL. Merge is not allowed.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to the other system because current system is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered system %1 has an incompatible version %2.</source>
+        <comment>%1 is name of System, %2 is version information</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered system %1 is in safe mode.</source>
+        <comment>%1 is name of System</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not configure the remote system %1.</source>
+        <comment>%1 is name of System</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -112,10 +112,6 @@
     </message>
     <message>
         <source>Panic recording</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Send email</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -257,14 +253,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server &apos;%1&apos; has a license problem</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Generic Event at %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -298,11 +286,6 @@
     </message>
     <message>
         <source>Conflicting Address: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>MAC #%1: %2 </source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -399,10 +382,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Archive backup is successfully completed</source>
         <translation type="unfinished"></translation>
     </message>
@@ -424,10 +403,6 @@
     </message>
     <message>
         <source>On %1 %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 --&gt; %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -544,6 +519,27 @@
             <numerusform></numerusform>
         </translation>
     </message>
+    <message>
+        <source>Server &quot;%1&quot; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2</source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Send Email</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -597,62 +593,6 @@
     </message>
     <message>
         <source>Cannot connect to http port %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -755,6 +695,62 @@
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the device web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the camera web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse device response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No supported media tracks at URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not authorized. URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -779,23 +775,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t initialize resampling context, error code: %1</source>
+        <source>Could not initialize resampling context, error code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
+        <source>Could not allocate sample buffers, error code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
+        <source>Could not send audio frame to encoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
+        <source>Could not receive audio packet from encoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
+        <source>Could not receive audio frame from decoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -928,10 +924,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This license type requires higher software version.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -957,6 +949,10 @@
     </message>
     <message>
         <source>Free license</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1000,44 +996,38 @@
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <source>Activate %n more %1.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n more %1 will be used.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
+        <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
+        <comment>%1 is a hardware ID, %2 is an activation time</comment>
         <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Activate %n more %1. </source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n more %1 will be used. </source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
     </message>
 </context>
 <context>
     <name>QnLocalSystemDescription</name>
     <message>
         <source>New Server</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnPropertyStorage</name>
-    <message>
-        <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1169,19 +1159,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hardware ID: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Licensed To: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Watermark: </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>FREE License</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hardware ID: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licensed To: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watermark: %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1245,11 +1235,6 @@
         <extracomment>Short for &apos;Preset&apos;</extracomment>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>-</source>
-        <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnStreamRecorder</name>
@@ -1282,10 +1267,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error during watermark generation for file &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Invalid resource type for data export.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1293,7 +1274,7 @@
 <context>
     <name>QnSystemDescription</name>
     <message>
-        <source>&lt;Unnamed system&gt;</source>
+        <source>Unnamed system</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

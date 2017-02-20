@@ -490,10 +490,9 @@ bool QnTimeServerSelectionModel::isSelected(quint64 priority)
 QString QnTimeServerSelectionModel::formattedOffset(qint64 offsetMs)
 {
     static const Qt::TimeSpanFormat kFormat = Qt::Seconds | Qt::Minutes | Qt::Hours;
-    static const int kDoNotSuppress = -1;
     static const QString kSeparator(L' ');
 
-    return QTimeSpan(offsetMs).toApproximateString(kDoNotSuppress, kFormat,
+    return QTimeSpan(offsetMs).toApproximateString(QTimeSpan::kDoNotSuppressSecondUnit, kFormat,
         QTimeSpan::SuffixFormat::Short, kSeparator);
 }
 

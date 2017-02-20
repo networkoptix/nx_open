@@ -147,6 +147,7 @@ bool QnDbHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database, c
 
 bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details)
 {
+    NX_EXPECT(validateParams(*query));
     if (!query->exec())
     {
         auto error = query->lastError();
@@ -299,12 +300,24 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
     return true;
 }
 
-bool QnDbHelper::beforeInstallUpdate(const QString& updateName) {
+bool QnDbHelper::beforeInstallUpdate(const QString& updateName)
+{
     Q_UNUSED(updateName);
     return true;
 }
 
-bool QnDbHelper::afterInstallUpdate(const QString& updateName) {
+bool QnDbHelper::afterInstallUpdate(const QString& updateName)
+{
     Q_UNUSED(updateName);
+    return true;
+}
+
+bool QnDbHelper::validateParams(const QSqlQuery& query)
+{
+    for (const auto& value: query.boundValues().values())
+    {
+        if (!value.isValid())
+            return false;
+    }
     return true;
 }

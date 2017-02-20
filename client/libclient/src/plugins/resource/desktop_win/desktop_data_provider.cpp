@@ -206,7 +206,8 @@ bool QnDesktopDataProvider::EncodedAudioInfo::setupFormat(QString& errMessage)
         {
             m_audioFormat.setSampleRate(AUDIO_CAUPTURE_ALT_FREQUENCY);
             if (!m_audioDevice.isFormatSupported(m_audioFormat)) {
-                errMessage = tr("44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or 'none' value in screen recording settings");
+                errMessage = tr("44.1Khz and 48Khz audio formats are not supported by audio capturing device. "
+                    "Please select other audio device or \"none\" in the Screen Recording settings");
                 return false;
             }
         }
@@ -458,7 +459,7 @@ bool QnDesktopDataProvider::init()
         AVCodec* audioCodec = avcodec_find_encoder_by_name(audioCodecName.toLatin1().constData());
         if(audioCodec == 0)
         {
-            m_lastErrorStr = tr("Could not find audio encoder '%1'.").arg(audioCodecName);
+            m_lastErrorStr = tr("Could not find audio encoder \"%1\".").arg(audioCodecName);
             return false;
         }
 
@@ -486,7 +487,7 @@ bool QnDesktopDataProvider::init()
         {
             if (!audioChannel->setupPostProcess())
             {
-                m_lastErrorStr = tr("Could not initialize audio device '%1'.").arg(audioChannel->m_audioDevice.fullName());
+                m_lastErrorStr = tr("Could not initialize audio device \"%1\".").arg(audioChannel->m_audioDevice.fullName());
                 return false;
             }
         }

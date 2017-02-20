@@ -36,7 +36,7 @@
        <item>
         <widget class="QTabWidget" name="tabWidget">
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <property name="documentMode">
           <bool>false</bool>
@@ -191,7 +191,7 @@
                 <item row="0" column="1" rowspan="4">
                  <widget class="QDoubleSpinBox" name="extraSizeSpinBox">
                   <property name="suffix">
-                   <string> TB</string>
+                   <string notr="true">&lt; TB&gt;</string>
                   </property>
                   <property name="maximum">
                    <double>1000.000000000000000</double>

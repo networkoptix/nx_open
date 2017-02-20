@@ -28,7 +28,7 @@ public:
         setMouseTracking(true);
         setProperty(style::Properties::kSliderLength, 0);
 
-        setTextFormat(QLatin1String("%1"));
+        setTextFormat(lit("%1"));
 
         connect(this, SIGNAL(sliderPressed()), this, SLOT(update()));
         connect(this, SIGNAL(sliderReleased()), this, SLOT(update()));
@@ -51,7 +51,7 @@ public:
             if(isSliderDown()) {
                 return formatSize(sliderPosition() * bytesInMiB);
             } else {
-                return tr("%1%").arg(static_cast<int>(relativePosition() * 100));
+                return lit("%1%").arg(static_cast<int>(relativePosition() * 100));
             }
         }
     }

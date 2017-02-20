@@ -35,6 +35,8 @@ QN_DECLARE_METAOBJECT_HEADER(QnServer, ChunksCatalog, )
     }
     static const QByteArray kRemoveDbParamName = "removeDbOnStartup";
     static const QByteArray kNoInitStoragesOnStartup = "noInitStoragesOnStartup";
+    static const QByteArray kNoResourceDiscovery = "noResourceDiscovery";
+    static const QByteArray kNoMonitorStatistics = "noMonitorStatistics"; //< disable CPU/network usage stats
 
     static const QString kIsConnectedToCloudKey = "isConnectedToCloud";
 

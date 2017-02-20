@@ -31,7 +31,7 @@ public:
     ~FfmpegAudioDecoderPrivate()
     {
         closeCodecContext();
-        av_free(frame);
+        av_frame_free(&frame);
     }
 
     void initContext(const QnConstCompressedAudioDataPtr& frame);

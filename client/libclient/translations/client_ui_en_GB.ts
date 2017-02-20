@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source> ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse Logs</source>
         <translation type="unfinished">Browse Logs</translation>
     </message>
@@ -324,11 +319,6 @@
     </message>
     <message>
         <location/>
-        <source>&lt;Cameras...&gt; </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Backup Quality</source>
         <translation type="unfinished"></translation>
     </message>
@@ -399,11 +389,6 @@
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt; Any camera &gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -552,17 +537,7 @@
     </message>
     <message>
         <location/>
-        <source>0.0.0.0</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>End IP</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>0.0.0.255</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -632,11 +607,6 @@
     <message>
         <location/>
         <source>Camera Settings Control</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Keep camera streams&apos; and profiles&apos; settings</source>
         <translation></translation>
     </message>
     <message>
@@ -721,11 +691,6 @@
     </message>
     <message>
         <location/>
-        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -752,6 +717,16 @@
     <message>
         <location/>
         <source>Force motion detection for stream:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Keep camera streams and profiles settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -793,11 +768,6 @@
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source>Panic Mode: </source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule Settings</source>
         <translation></translation>
     </message>
@@ -843,12 +813,6 @@
     </message>
     <message>
         <location/>
-        <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Post-Recording</source>
         <translation></translation>
     </message>
@@ -856,11 +820,6 @@
         <location/>
         <source>Copy Schedule...</source>
         <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion + Low-Res </source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
@@ -907,21 +866,22 @@
         <source>Apply changes before copying schedule.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChangeUserPasswordDialog</name>
     <message>
         <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
         <source>Change password</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>CloudManagementWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
-        <source>&lt;2. Connect system
-to the cloud&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -934,7 +894,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Incorrect email or password</source>
+        <source>Incorrect Email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1006,14 +966,6 @@ to the cloud&gt;</source>
     </message>
 </context>
 <context>
-    <name>DateRangeWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/common/date_range_widget.ui"/>
-        <source>-</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>EventLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
@@ -1037,11 +989,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Event Rules...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1051,11 +998,6 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
         <source>HTTP content</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>HTTP url</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1081,6 +1023,11 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Content type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP URL</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1150,11 +1097,6 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Mount Angle Correction:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1237,7 +1179,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots</source>
+        <source>Run application when PC Boots up</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1281,13 +1223,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt;No image&gt;</source>
-        <translation type="unfinished"></translation>
+        <source>Loading Image...Please Wait.</source>
+        <translation type="unfinished">Loading Image...Please Wait.</translation>
     </message>
     <message>
         <location/>
-        <source>Loading Image...Please Wait.</source>
-        <translation type="unfinished">Loading Image...Please Wait.</translation>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1320,16 +1262,6 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Clear</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source> cells</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
         <translation></translation>
     </message>
     <message>
@@ -1475,11 +1407,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Features</source>
         <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>This license type requires a higher software version.</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1669,22 +1596,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source> seconds</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Background Image</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;No image&gt;</source>
         <translation></translation>
     </message>
     <message>
@@ -1727,12 +1639,17 @@ to the cloud&gt;</source>
         <source>Tour cycle</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>MessageBox</name>
     <message>
         <location filename="../src/ui/dialogs/common/message_box.ui"/>
-        <source>Don&apos;t show this message again</source>
+        <source>Do not show this message again</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1772,11 +1689,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Enable Audio</source>
         <translation type="unfinished">Enable Audio</translation>
-    </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1986,7 +1898,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Incorrect email or password</source>
+        <source>Incorrect Email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2033,11 +1945,6 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Login:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>admin</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2425,11 +2332,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>9000</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Failover</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2754,11 +2656,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source> TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Additional storage:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2884,10 +2781,9 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>System time is synchronized with the Internet and is independent from server&apos;s local time.
+        <source>System time is synchronized with the Internet and is independent from server local time.
 Selected server will be used as a time server if the system has no Internet access.</source>
-        <translation>System time is synchronised with the Internet and is independent from server&apos;s local time.
-Selected server will be used as a time server if the system has no Internet access.</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

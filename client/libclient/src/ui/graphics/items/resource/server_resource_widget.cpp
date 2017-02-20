@@ -445,7 +445,7 @@ protected:
 
                     main_pen.setColor(toTransparent(data.color, data.opacity));
                     painter->setPen(main_pen);
-                    painter->drawText(xRight, y, tr("%1%").arg(qRound(interValue * 100.0)));
+                    painter->drawText(xRight, y, lit("%1%").arg(qRound(interValue * 100.0)));
                 }
 
                 painter->setOpacity(opacity);

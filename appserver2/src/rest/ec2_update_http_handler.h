@@ -40,7 +40,7 @@ void fixRequestDataIfNeeded<ApiUserData>(ApiUserData* const userData)
             userData->name = userData->email;
 
         if (userData->digest.isEmpty())
-            userData->digest = userData->kCloudPasswordStub();
+            userData->digest = ApiUserData::kCloudPasswordStub;
     }
 }
 

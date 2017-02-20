@@ -54,34 +54,6 @@
         <translation>Não foi possivel acessar os serviços instalados</translation>
     </message>
     <message>
-        <source> (stopping)</source>
-        <translation> (parando)</translation>
-    </message>
-    <message>
-        <source> (paused)</source>
-        <translation> (pausado)</translation>
-    </message>
-    <message>
-        <source> (starting)</source>
-        <translation> (iniciando)</translation>
-    </message>
-    <message>
-        <source> (pausing)</source>
-        <translation> (pausando)</translation>
-    </message>
-    <message>
-        <source> (started)</source>
-        <translation> (iniciado)</translation>
-    </message>
-    <message>
-        <source> (resuming)</source>
-        <translation> (resumindo)</translation>
-    </message>
-    <message>
-        <source> (stopped)</source>
-        <translation> (parado)</translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -111,6 +83,34 @@
     </message>
     <message>
         <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>starting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>resuming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pausing</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

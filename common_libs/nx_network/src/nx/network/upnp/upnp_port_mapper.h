@@ -16,7 +16,8 @@ class NX_NETWORK_API PortMapper
         , nx::utils::TimerEventHandler
 {
 public:
-    PortMapper( quint64 checkMappingsInterval = DEFAULT_CHECK_MAPPINGS_INTERVAL,
+    PortMapper( bool isEnabled = true,
+                quint64 checkMappingsInterval = DEFAULT_CHECK_MAPPINGS_INTERVAL,
                 const QString& description = QnAppInfo::organizationName(),
                 const QString& device = AsyncClient::INTERNAL_GATEWAY );
     ~PortMapper();

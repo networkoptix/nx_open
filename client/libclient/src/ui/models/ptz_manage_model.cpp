@@ -66,7 +66,7 @@ void QnPtzManageModel::removeTour(const QString &id) {
     int offset = m_presets.size();
     if (offset > 0)
         offset++;   //presets title
-    
+
     int firstRow = offset + idx;
     if (m_tours.size() > 1)
         firstRow++; // do not remove tour title
@@ -138,7 +138,7 @@ void QnPtzManageModel::removePreset(const QString &id) {
     m_removedPresets << m_presets.takeAt(idx).preset.id;
     cleanHotkeys();
     endRemoveRows();
-   
+
     updatePresetsCache();
 }
 
@@ -184,7 +184,7 @@ void QnPtzManageModel::setHomePositionInternal(const QString &homePosition, bool
         emit dataChanged(index(newPos, HomeColumn), index(newPos, HomeColumn));
 }
 
-bool QnPtzManageModel::setHotkeyInternal(int hotkey, const QString &id) { 
+bool QnPtzManageModel::setHotkeyInternal(int hotkey, const QString &id) {
     if (id.isEmpty() || m_hotkeys.value(hotkey) == id)
         return false;
 
@@ -193,7 +193,7 @@ bool QnPtzManageModel::setHotkeyInternal(int hotkey, const QString &id) {
         m_hotkeys.remove(key);
 
     /* Set new hotkey. */
-    if (hotkey != QnPtzHotkey::NoHotkey) 
+    if (hotkey != QnPtzHotkey::NoHotkey)
         m_hotkeys.insert(hotkey, id);
 
     { /* Mark preset as modified (if any). */
@@ -256,7 +256,7 @@ QVariant QnPtzManageModel::data(const QModelIndex &index, int role) const {
             return Qn::PtzPresets_Help;
         return QVariant();
     }
-    
+
     RowData data = rowData(index.row());
 
     switch (data.rowType) {
@@ -307,7 +307,7 @@ bool QnPtzManageModel::setData(const QModelIndex &index, const QVariant &value, 
             return false;
 
         switch (data.rowType) {
-        case QnPtzManageModel::PresetRow: 
+        case QnPtzManageModel::PresetRow:
             {
                 int idx = presetIndex(data.presetModel.preset.id);
                 if (idx < 0)
@@ -347,7 +347,7 @@ QVariant QnPtzManageModel::headerData(int section, Qt::Orientation orientation, 
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
         switch (section) {
         case ModifiedColumn:
-            return tr("#");
+            return lit("#");
         case NameColumn:
             return tr("Name");
         case HotkeyColumn:
@@ -366,15 +366,15 @@ QVariant QnPtzManageModel::headerData(int section, Qt::Orientation orientation, 
 Qt::ItemFlags QnPtzManageModel::flags(const QModelIndex &index) const {
     Qt::ItemFlags flags = Qt::ItemNeverHasChildren;
 
-    if (!index.isValid()) 
+    if (!index.isValid())
         return flags;
 
     flags |= Qt::ItemIsEnabled;
 
     RowData data = rowData(index.row());
 
-    if (data.rowType == InvalidRow 
-        || data.rowType == PresetTitleRow 
+    if (data.rowType == InvalidRow
+        || data.rowType == PresetTitleRow
         || data.rowType == TourTitleRow)
         return flags;
 
@@ -507,7 +507,7 @@ QVariant QnPtzManageModel::titleData(RowType rowType,  int column, int role) con
     case Qt::WhatsThisRole:
     case Qt::AccessibleTextRole:
     case Qt::AccessibleDescriptionRole:
-        if (column != NameColumn) 
+        if (column != NameColumn)
             return QVariant();
 
         if (rowType == TourTitleRow)
@@ -516,7 +516,7 @@ QVariant QnPtzManageModel::titleData(RowType rowType,  int column, int role) con
 
     case Qt::BackgroundRole:
         return m_colors.title;
-    case Qt::FontRole: 
+    case Qt::FontRole:
         {
             QFont f;
             f.setBold(true);
@@ -524,7 +524,7 @@ QVariant QnPtzManageModel::titleData(RowType rowType,  int column, int role) con
         }
     case Qn::HelpTopicIdRole:
         return rowType == PresetTitleRow ? Qn::PtzPresets_Help : Qn::PtzManagement_Tour_Help;
-        
+
     default:
         break;
     }
@@ -748,7 +748,7 @@ void QnPtzManageModel::cleanHotkeys() {
             ++iter;
         else
             iter = m_hotkeys.erase(iter);
-    } 
+    }
 }
 
 QString QnPtzManageModel::RowData::id() const {

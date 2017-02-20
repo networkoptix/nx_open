@@ -594,7 +594,7 @@ bool QnWorkbenchExportHandler::confirmExportTooBigExeFile() const
 {
     return confirmExport(QnMessageBoxIcon::Warning,
         tr("EXE format not recommended"),
-        tr("EXE files over 4 GB can't be opened by double click due to a Windows limitation.")
+        tr("EXE files over 4 GB cannot be opened by double click due to a Windows limitation.")
             + L'\n' + tr("Export to EXE anyway?"));
 }
 
