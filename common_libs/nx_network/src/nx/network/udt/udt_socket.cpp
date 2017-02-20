@@ -954,11 +954,14 @@ void UdtStreamServerSocket::acceptAsync(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> handler)
 {
-#ifdef _DEBUG
     bool nonBlockingMode = false;
     NX_ASSERT(getNonBlockingMode(&nonBlockingMode));
     NX_ASSERT(nonBlockingMode);
-#endif
+    if (!nonBlockingMode)
+    {
+        return post(
+            [handler = std::move(handler)]() { handler(SystemError::notSupported, nullptr); });
+    }
 
     return m_aioHelper->acceptAsync(
         [handler = std::move(handler)](
