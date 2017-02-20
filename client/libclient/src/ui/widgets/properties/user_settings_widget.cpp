@@ -428,7 +428,7 @@ void QnUserSettingsWidget::setupInputFields()
             {
                 bool passwordWasValid = ui->passwordInputField->lastValidationResult() != QValidator::Invalid;
                 if (ui->passwordInputField->isValid() != passwordWasValid)
-                    ui->passwordInputField->updateDisplayState();
+                    ui->passwordInputField->updateDisplayStateDelayed();
             }
         });
 
@@ -491,7 +491,7 @@ void QnUserSettingsWidget::setupInputFields()
         this, &QnUserSettingsWidget::updatePasswordPlaceholders);
 
     connect(ui->passwordInputField, &QnInputField::editingFinished,
-        ui->confirmPasswordInputField, &QnInputField::updateDisplayState);
+        ui->confirmPasswordInputField, &QnInputField::updateDisplayStateDelayed);
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
