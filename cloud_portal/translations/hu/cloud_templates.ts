@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TS language="en_US" sourcelanguage="en" version="2.1">
   <context>
+    <name>notifications-language.json</name>
+    <message>
+      <location filename="notifications-language.json"/>
+      <source>notification</source>
+      <translation> </translation>
+    </message>
+  </context>
+  <context>
     <name>activate_account.mustache</name>
     <message>
       <location filename="activate_account.mustache"/>

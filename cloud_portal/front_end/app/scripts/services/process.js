@@ -76,7 +76,10 @@ angular.module('cloudApp')
                             self.error = true;
                             self.errorData = data;
 
-                            if(!settings.ignoreUnauthorized && data.data && data.data.resultCode == 'notAuthorized'){
+                            if(!settings.ignoreUnauthorized &&
+                                    data.data &&
+                                    (data.data.resultCode == 'notAuthorized' ||
+                                        data.data.resultCode =='forbidden' && settings.logoutForbidden)){
                                 account.logout();
                                 deferred.reject(data);
                                 return;
