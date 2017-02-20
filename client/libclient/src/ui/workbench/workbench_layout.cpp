@@ -637,6 +637,23 @@ void QnWorkbenchLayout::setCellAspectRatio(float cellAspectRatio) {
     emit dataChanged(Qn::LayoutCellAspectRatioRole);
 }
 
+qreal QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing spacing)
+{
+    switch (spacing)
+    {
+        case Qn::CellSpacing::None:
+            return 0.0;
+        case Qn::CellSpacing::Small:
+            return 0.05;
+        case Qn::CellSpacing::Medium:
+            return 0.1;
+        case Qn::CellSpacing::Large:
+            return 0.15;
+    }
+    NX_ASSERT(false, "Unhandled enum value");
+    return 0.0;
+}
+
 const qreal QnWorkbenchLayout::cellSpacing() const
 {
     return m_cellSpacing;

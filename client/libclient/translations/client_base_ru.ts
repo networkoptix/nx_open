@@ -35,7 +35,8 @@
 to view more bookmarks</source>
         <comment>Use &apos;
 &apos; to split message in two lines (required)</comment>
-        <translation>Увеличьте масштаб шкалы времени чтобы увидеть больше закладок</translation>
+        <translation>Увеличьте масштаб шкалы времени
+чтобы увидеть больше закладок</translation>
     </message>
 </context>
 <context>
@@ -206,7 +207,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>This password is in list of the most popular passwords.</source>
-        <translation>Этот пароль включен в список самых популярных паролей.</translation>
+        <translation>Этот пароль включён в список самых популярных паролей.</translation>
     </message>
     <message>
         <source>Incorrect</source>
@@ -233,15 +234,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Permissions</source>
-        <translation>Разрешения</translation>
+        <translation>Полномочия</translation>
     </message>
 </context>
 <context>
     <name>Ptz</name>
-    <message>
-        <source>Can&apos;t get the current position from camera &quot;%1&quot;</source>
-        <translation>Не удается получить текущую позицию от камеры «%1»</translation>
-    </message>
     <message>
         <source>Please wait for the camera to go online.</source>
         <translation>Пожалуйста дождитесь включения камеры.</translation>
@@ -251,20 +248,24 @@ to view more bookmarks</source>
         <translation>Не удалось получить текущую позицию</translation>
     </message>
     <message>
-        <source>Can&apos;t set the current position for camera &quot;%1&quot;</source>
-        <translation>Не удается задать текущую позицию камеры «%1»</translation>
-    </message>
-    <message>
         <source>Failed to set current position</source>
         <translation>Не удалось задать текущую позицию</translation>
     </message>
     <message>
         <source>Preset used by some tours. Delete it anyway?</source>
-        <translation>Позиция используется в лескольких PTZ турах. Удалить ее?</translation>
+        <translation>Позиция используется в нескольких турах. Удалить ее?</translation>
     </message>
     <message>
         <source>These tours will become invalid.</source>
         <translation>Эти туры станут недействительными.</translation>
+    </message>
+    <message>
+        <source>Cannot get the current position from camera &quot;%1&quot;</source>
+        <translation>Не удаётся получить текущую позицию от камеры &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>Cannot set the current position for camera &quot;%1&quot;</source>
+        <translation>Не удаётся задать текущую позицию камеры «%1»</translation>
     </message>
 </context>
 <context>
@@ -348,7 +349,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Client is not connected to any system</source>
-        <translation>Клиент не подключен ни к одной системе</translation>
+        <translation>Клиент не подключён ни к одной системе</translation>
     </message>
     <message>
         <source>Customer Support</source>
@@ -382,8 +383,8 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>...and %n more</source>
         <translation>
-            <numerusform>...и еще %n</numerusform>
-            <numerusform>...и еще %n</numerusform>
+            <numerusform>...и ещё %n</numerusform>
+            <numerusform>...и ещё %n</numerusform>
             <numerusform>...и еще %n</numerusform>
         </translation>
     </message>
@@ -543,7 +544,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Video Wall...</source>
-        <translation>Видеостена...</translation>
+        <translation>Видеостену...</translation>
     </message>
     <message>
         <source>New Video Wall...</source>
@@ -1290,7 +1291,7 @@ to view more bookmarks</source>
     <message>
         <source>Open %1 Portal...</source>
         <comment>Open Nx Cloud Portal</comment>
-        <translation>Орктыть потрал %1...</translation>
+        <translation>Открыть потрал %1...</translation>
     </message>
     <message>
         <source>Stop Sharing Layout</source>
@@ -1302,7 +1303,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Role Settings...</source>
-        <translation>Параметры роли...</translation>
+        <translation>Настройки роли...</translation>
     </message>
     <message>
         <source>Show Notifications</source>
@@ -1318,11 +1319,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Account Settings...</source>
-        <translation>Настройки учетной записи...</translation>
+        <translation>Настройки учётной записи...</translation>
     </message>
     <message>
         <source>Create Account...</source>
-        <translation>Создать учетную запись...</translation>
+        <translation>Создать учётную запись...</translation>
     </message>
     <message>
         <source>Server Web Page...</source>
@@ -1370,7 +1371,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>User settings...</source>
-        <translation>Параметры пользователя...</translation>
+        <translation>Настройки пользователя...</translation>
     </message>
     <message>
         <source>Server settings...</source>
@@ -1447,25 +1448,49 @@ to view more bookmarks</source>
         <source>No archive for this position</source>
         <translation>Нет архивных записей для этой позиции</translation>
     </message>
-    <message>
-        <source>These devices are removed from the System</source>
-        <translation>Эти устройства были удалены из системы</translation>
+    <message numerus="yes">
+        <source>These devices are removed from System</source>
+        <translation>
+            <numerusform>Это устройство было удалено из системы</numerusform>
+            <numerusform>Эти устройства были удалены из системы</numerusform>
+            <numerusform>Эти устройства были удалены из системы</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These cameras are removed from System</source>
+        <translation>
+            <numerusform>Эта камера была удалена из системы</numerusform>
+            <numerusform>Эти камеры были удалены из системы</numerusform>
+            <numerusform>Эти камеры были удалены из системы</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These servers are removed from System</source>
+        <translation>
+            <numerusform>Этот сервер был удален из системы</numerusform>
+            <numerusform>Эти серверы были удалены из системы</numerusform>
+            <numerusform>Эти серверы были удалены из системы</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These users are removed from System</source>
+        <translation>
+            <numerusform>Этот сервер был удален из системы</numerusform>
+            <numerusform>Эти серверы были удалены из системы</numerusform>
+            <numerusform>Эти серверы были удалены из системы</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These resources are removed from System</source>
+        <translation>
+            <numerusform>Этот ресурс был удален из системы</numerusform>
+            <numerusform>Эти ресурсы были удалены из системы</numerusform>
+            <numerusform>Эти ресурсы были удалены из системы</numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>QnAuditLogModel</name>
-    <message>
-        <source>%1d </source>
-        <translation>%1д </translation>
-    </message>
-    <message>
-        <source>%1h </source>
-        <translation>%1ч </translation>
-    </message>
-    <message>
-        <source>%1m </source>
-        <translation>%1м </translation>
-    </message>
     <message>
         <source>Unknown</source>
         <translation>Неизвестно</translation>
@@ -1533,10 +1558,6 @@ to view more bookmarks</source>
     <message>
         <source>Database restored</source>
         <translation>Восстановлена база данных</translation>
-    </message>
-    <message>
-        <source>%1 - %2, </source>
-        <translation>%1 - %2, </translation>
     </message>
     <message numerus="yes">
         <source>%n action(s)</source>
@@ -1620,11 +1641,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation>Настройки e-mail изменены</translation>
+        <translation>Настройки Email изменены</translation>
     </message>
     <message>
         <source>Filled circle mark means the archive is still available</source>
-        <translation>Сплошной кружок означает, что архив все еще доступен</translation>
+        <translation>Сплошной кружок означает, что архив все ещё доступен</translation>
     </message>
 </context>
 <context>
@@ -1660,14 +1681,9 @@ to view more bookmarks</source>
         <translation>По запросу</translation>
     </message>
     <message>
-        <source>Low-Res Streams</source>
-        <comment>Cameras Backup</comment>
-        <translation>Потоки с низким качеством</translation>
-    </message>
-    <message>
         <source>Hi-Res Streams</source>
         <comment>Cameras Backup</comment>
-        <translation>Потоки с высоким качеством</translation>
+        <translation>Высокое качество</translation>
     </message>
     <message>
         <source>All Streams</source>
@@ -1676,12 +1692,17 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Global Settings</source>
-        <translation>Глобальные параметры</translation>
+        <translation>Глобальные настройки</translation>
     </message>
     <message>
         <source>affect all servers in the system</source>
         <comment>Relates to &apos;Global Settings&apos; subject</comment>
         <translation>влияют на все серверы в системе</translation>
+    </message>
+    <message>
+        <source>Lo-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation>Потоки с низким качеством</translation>
     </message>
 </context>
 <context>
@@ -1764,14 +1785,6 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Любое устройство&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Любая камера&gt;</translation>
-    </message>
-    <message>
         <source>Select at least one device</source>
         <translation>Выберите хотя бы одно устройство</translation>
     </message>
@@ -1787,12 +1800,20 @@ to view more bookmarks</source>
             <numerusform>%1 из %n модулей ввода/вывода</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Any Device</source>
+        <translation>Любое устройство</translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation>Любая Камера</translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
         <source>For Administrators Only</source>
-        <translation>Только Администраторам</translation>
+        <translation>Только администраторам</translation>
     </message>
     <message>
         <source>For Users</source>
@@ -1814,14 +1835,6 @@ to view more bookmarks</source>
         <translation>Ошибка: %1</translation>
     </message>
     <message>
-        <source>&lt;System&gt;</source>
-        <translation>&lt;Система&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Server&gt;</source>
-        <translation>&lt;Любой Сервер&gt;</translation>
-    </message>
-    <message>
         <source>Instant</source>
         <translation>Мгновенно</translation>
     </message>
@@ -1836,14 +1849,6 @@ to view more bookmarks</source>
     <message>
         <source>Administrators Only</source>
         <translation>Только администраторам</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Любое устройство&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Любая камера&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1864,9 +1869,9 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>Source and %n more cameras</source>
         <translation>
-            <numerusform>Исходная камера и еще %n камера</numerusform>
-            <numerusform>Исходная камера и еще %n камеры</numerusform>
-            <numerusform>Исходная камера и еще %n камер</numerusform>
+            <numerusform>Исходная камера и ещё %n камера</numerusform>
+            <numerusform>Исходная камера и ещё %n камеры</numerusform>
+            <numerusform>Исходная камера и ещё %n камер</numerusform>
         </translation>
     </message>
     <message>
@@ -1881,6 +1886,22 @@ to view more bookmarks</source>
         <source>Every %1</source>
         <translation>Каждый %1</translation>
     </message>
+    <message>
+        <source>System</source>
+        <translation>Система</translation>
+    </message>
+    <message>
+        <source>Any Server</source>
+        <translation>Любой сервер</translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation>Любое устройство</translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation>Любая Камера</translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
@@ -1893,14 +1914,6 @@ to view more bookmarks</source>
         <source>at</source>
         <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
         <translation>на</translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Любое устройство&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Любая камера&gt;</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1917,6 +1930,14 @@ to view more bookmarks</source>
     <message>
         <source>Cameras</source>
         <translation>Камеры</translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation>Любое устройство</translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation>Любая Камера</translation>
     </message>
 </context>
 <context>
@@ -1954,10 +1975,6 @@ to view more bookmarks</source>
         <translation>Сбросить все правила на настройки по умолчанию?</translation>
     </message>
     <message>
-        <source>This action can&apos;t be undone.</source>
-        <translation>Это действие нельзя отменить.</translation>
-    </message>
-    <message>
         <source>Failed to retrieve rules</source>
         <translation>Не удалось получить правила</translation>
     </message>
@@ -1973,13 +1990,13 @@ to view more bookmarks</source>
         <source>Apply changes before exit?</source>
         <translation>Применить изменения перед выходом?</translation>
     </message>
+    <message>
+        <source>This action cannot be undone.</source>
+        <translation>Это действие нельзя будет отменить.</translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRulesViewModel</name>
-    <message>
-        <source>#</source>
-        <translation>#</translation>
-    </message>
     <message>
         <source>On</source>
         <translation>Вкл</translation>
@@ -1991,10 +2008,6 @@ to view more bookmarks</source>
     <message>
         <source>Source</source>
         <translation>Источник</translation>
-    </message>
-    <message>
-        <source>-&gt;</source>
-        <translation>-&gt;</translation>
     </message>
     <message>
         <source>Action</source>
@@ -2172,11 +2185,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>This I/O module has no advanced settings</source>
-        <translation>У этого модуль ввода-вывода нет дополнительных параметров</translation>
+        <translation>У этого модуль ввода-вывода нет дополнительных настроек</translation>
     </message>
     <message>
         <source>This camera has no advanced settings</source>
-        <translation>У этой камеры нет дополнительных параметров</translation>
+        <translation>У этой камеры нет дополнительных настроек</translation>
     </message>
     <message>
         <source>Audio Stream</source>
@@ -2201,17 +2214,17 @@ to view more bookmarks</source>
         <source>Select device</source>
         <translation>Выбор устройства</translation>
     </message>
+    <message>
+        <source>Select camera</source>
+        <translation>Выберите камеру</translation>
+    </message>
     <message numerus="yes">
-        <source>%1 doesn&apos;t support two-way audio</source>
+        <source>%1 does not support two-way audio</source>
         <translation>
             <numerusform>%1 не поддерживает двусторонний звук</numerusform>
             <numerusform>%1 не поддерживают двусторонний звук</numerusform>
             <numerusform>%1 не поддерживают двусторонний звук</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Select camera</source>
-        <translation>Выберите камеру</translation>
     </message>
 </context>
 <context>
@@ -2238,7 +2251,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Diagnostics complete!</source>
-        <translation>Диагностика завершена!</translation>
+        <translation>Диагностика завершена</translation>
     </message>
     <message>
         <source>Diagnostics for device %1</source>
@@ -2282,7 +2295,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Confirming I/O module is accessible.</source>
-        <translation>Подтверждение доступности  модуля ввода/вывода.</translation>
+        <translation>Подтверждение доступности модуля ввода/вывода.</translation>
     </message>
     <message>
         <source>Confirming target I/O module provides media stream.</source>
@@ -2303,8 +2316,8 @@ to view more bookmarks</source>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translation>&lt;Авто&gt;</translation>
+        <source>automatic</source>
+        <translation>автоматическая</translation>
     </message>
 </context>
 <context>
@@ -2463,8 +2476,8 @@ to view more bookmarks</source>
 <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translation>&lt;авто&gt;</translation>
+        <source>automatic</source>
+        <translation>автоматическая</translation>
     </message>
 </context>
 <context>
@@ -2541,7 +2554,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-        <translation>Чтобы убедиться, что оно поддерживается, и включить его, перейдите на вкладку «Движение» в настройках камеры.</translation>
+        <translation>Чтобы убедиться, что оно поддерживается, и включить его, перейдите на вкладку &quot;Движение&quot; в настройках камеры.</translation>
     </message>
     <message>
         <source>Dual-Streaming not supported for this camera</source>
@@ -2557,7 +2570,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-        <translation>Чтобы включить или настроить его, перейдите на вкладку «Движение» в настройках камеры.</translation>
+        <translation>Чтобы включить или настроить его, перейдите на вкладку &quot;Движение&quot; в настройках камеры.</translation>
     </message>
 </context>
 <context>
@@ -2621,7 +2634,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>Changes to the following %n devices are not saved:</source>
         <translation>
-            <numerusform>Изменения для следующего %n устройства не сохранены:</numerusform>
+            <numerusform>Изменения для %n устройства не сохранены:</numerusform>
             <numerusform>Изменения для следующих %n устройств не сохранены:</numerusform>
             <numerusform>Изменения для следующих %n устройств не сохранены:</numerusform>
         </translation>
@@ -2629,7 +2642,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>Changes to the following %n cameras are not saved:</source>
         <translation>
-            <numerusform>Изменения для следующей камеры не сохранены:</numerusform>
+            <numerusform>Изменения для %n камеры не сохранены:</numerusform>
             <numerusform>Изменения для следующих %n камер не сохранены:</numerusform>
             <numerusform>Изменения для следующих %n камер не сохранены:</numerusform>
         </translation>
@@ -2637,7 +2650,7 @@ to view more bookmarks</source>
     <message numerus="yes">
         <source>Changes to the following %n I/O Modules are not saved:</source>
         <translation>
-            <numerusform>Изменения для следующего модуля ввода-вывода не сохранены:</numerusform>
+            <numerusform>Изменения для %n модуля ввода-вывода не сохранены:</numerusform>
             <numerusform>Изменения для следующих %n модулей ввода-вывода не сохранены:</numerusform>
             <numerusform>Изменения для следующих %n модулей ввода-вывода не сохранены:</numerusform>
         </translation>
@@ -2651,7 +2664,7 @@ to view more bookmarks</source>
     <name>QnCameraSettingsWidget</name>
     <message>
         <source>Cannot edit properties for items of different types.</source>
-        <translation>Невозможно редактировать параметры объектов разных типов.</translation>
+        <translation>Невозможно редактировать свойства объектов разных типов.</translation>
     </message>
     <message>
         <source>No device selected.</source>
@@ -2702,7 +2715,9 @@ to view more bookmarks</source>
         <source>Connect to your Systems
 from anywhere with any
 devices</source>
-        <translation>Подключайтесь к системам из любого места с любых устройств</translation>
+        <translation>Подключайтесь к системам 
+из любого места 
+с любых устройств</translation>
     </message>
     <message>
         <source>Known limitations</source>
@@ -2711,44 +2726,46 @@ devices</source>
     <message>
         <source>Disconnect System from %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Отключить систему от %1</translation>
+        <translation>Отключить систему от %1</translation>
     </message>
     <message>
         <source>Open %1 Portal</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Орктыть потрал %1</translation>
+        <translation>Открыть потрал %1</translation>
     </message>
     <message>
         <source>Create %1 Account</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Создание учетную запись %1</translation>
+        <translation>Создать учётную запись %1</translation>
     </message>
     <message>
         <source>Connect System to %1...</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Подключить систему к %1...</translation>
+        <translation>Подключить систему к %1...</translation>
     </message>
     <message>
         <source>Create %1
 account</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Создать учетную запись %1</translation>
+        <translation>Создать учётную 
+запись %1</translation>
     </message>
     <message>
         <source>Connect System
 to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Подключить систему к %1</translation>
+        <translation>Подключить 
+систему к %1</translation>
     </message>
     <message>
         <source>%1 is in Beta.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">%1 находится в бета-версии.</translation>
+        <translation>%1 находится в бета-версии.</translation>
     </message>
     <message>
         <source>Learn more about %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Подробнее о %1</translation>
+        <translation>Подробнее о %1</translation>
     </message>
 </context>
 <context>
@@ -2764,21 +2781,21 @@ to %1</source>
     <message>
         <source>Cannot connect to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Не удается подключиться к %1</translation>
+        <translation>Не удаётся подключиться к %1</translation>
     </message>
 </context>
 <context>
     <name>QnCloudUserPanelWidget</name>
     <message>
         <source>Account Settings</source>
-        <translation>Настройки учетной записи</translation>
+        <translation>Настройки учётной записи</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCloudDialog</name>
     <message>
         <source>Email</source>
-        <translation>Почта</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Password</source>
@@ -2786,7 +2803,7 @@ to %1</source>
     </message>
     <message>
         <source>Create account</source>
-        <translation>Создать учетную запись</translation>
+        <translation>Создать учётную запись</translation>
     </message>
     <message>
         <source>Forgot password?</source>
@@ -2795,12 +2812,12 @@ to %1</source>
     <message>
         <source>Connect to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Подключение к %1</translation>
+        <translation>Подключиться к %1</translation>
     </message>
     <message>
         <source>Enter %1 Account</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Введите учетную запись %1</translation>
+        <translation>Введите учётную запись %1</translation>
     </message>
 </context>
 <context>
@@ -2810,25 +2827,25 @@ to %1</source>
         <translation>Ни один из ваших серверов не подключен к Интернету.</translation>
     </message>
     <message>
-        <source>The System connected to %1</source>
+        <source>System connected to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Система подключена к %1</translation>
+        <translation>Система подключена к %1</translation>
     </message>
     <message>
-        <source>Failed to connect the System to %1</source>
+        <source>Failed to connect System to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Не удалось подключить систему к %1</translation>
+        <translation>Не удалось подключить систему к %1</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server</source>
-        <translation>Настройка сервера(ов)</translation>
+        <translation>Настройка сервера</translation>
     </message>
     <message>
         <source>Updating Server</source>
-        <translation>Обновление сервера(ов)</translation>
+        <translation>Обновление сервера</translation>
     </message>
 </context>
 <context>
@@ -2848,14 +2865,6 @@ to %1</source>
     <message>
         <source>If this error persists, please contact your VMS administrator.</source>
         <translation>Если ошибка остаётся, обратитесь к администратору системы.</translation>
-    </message>
-    <message>
-        <source> - Client version: %1.</source>
-        <translation> - Версия клиента: %1.</translation>
-    </message>
-    <message>
-        <source> - Server version: %1.</source>
-        <translation> - Версия сервера: %1.</translation>
     </message>
     <message>
         <source>Compatibility mode for versions lower than %1 is not supported.</source>
@@ -2884,10 +2893,6 @@ to %1</source>
     <message>
         <source>LDAP Server connection timed out.</source>
         <translation>Истекло время ожидания подключения к серверу LDAP.</translation>
-    </message>
-    <message>
-        <source>Operation is not permitted now. It could happen due to media server is restarting now. Please try again later.</source>
-        <translation>Операция не может быть выполнена. Это может произойти из-за того что сервер сейчас перезагружается. Пожалуйста, повторите попытку позже.</translation>
     </message>
     <message>
         <source>Failed to connect to Server</source>
@@ -2976,14 +2981,26 @@ to %1</source>
         <translation>Не удалось перезапустить %1</translation>
     </message>
     <message>
-        <source>Connection to the %1 is not ready yet. Check media server internet connection or try again later.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Подключение к %1 еще не установлено. Проверьте, что сервер подключен к Интернету, или повторите попытку позже.</translation>
-    </message>
-    <message>
         <source>Connection to %1 is not established.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Подключение к %1 не установлено.</translation>
+        <translation>Подключение к %1 не установлено.</translation>
+    </message>
+    <message>
+        <source>Client version: %1.</source>
+        <translation>Версия клиента: %1.</translation>
+    </message>
+    <message>
+        <source>Server version: %1.</source>
+        <translation>Версия сервера: %1.</translation>
+    </message>
+    <message>
+        <source>Operation is not permitted now. It could happen due to server is restarting now. Please try again later.</source>
+        <translation>Операция не может быть выполнена. Это может произойти из-за того что сервер сейчас перезагружается. Пожалуйста, повторите попытку позже.</translation>
+    </message>
+    <message>
+        <source>Connection to %1 is not ready yet. Check server internet connection or try again later.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Подключение к %1 ещё не установлено. Проверьте, что сервер подключен к сети Интернет или повторите попытку позже.</translation>
     </message>
 </context>
 <context>
@@ -3075,10 +3092,6 @@ to %1</source>
         <translation>Восстановить базу данных?</translation>
     </message>
     <message>
-        <source>The System configuration will be restored from backup, Server application will be restarted.</source>
-        <translation>Конфигурация системы будет восстановлена из резервной копии, сервер будет перезапущено.</translation>
-    </message>
-    <message>
         <source>Database successfully restored</source>
         <translation>База данных успешно восстановлена</translation>
     </message>
@@ -3090,32 +3103,32 @@ to %1</source>
         <source>Failed to restore database</source>
         <translation>Не удалось восстановить базу данных</translation>
     </message>
+    <message>
+        <source>System configuration will be restored from backup, Server application will be restarted.</source>
+        <translation>Конфигурация системы будет восстановлена из резервной копии, сервер будет перезапущен.</translation>
+    </message>
 </context>
 <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>Невозможно обнаружить звуковой кодек &apos;%1&apos;.</translation>
-    </message>
     <message>
         <source>Could not initialize audio encoder.</source>
         <translation>Невозможно инициализировать звуковой кодек.</translation>
     </message>
     <message>
-        <source>Primary audio device isn&apos;t selected.</source>
-        <translation>Первичное звуковое устройство не выбрано.</translation>
-    </message>
-    <message>
         <source>Sample format of input device %1 is not supported.</source>
         <translation>Формат устройства ввода %1 не поддерживается.</translation>
+    </message>
+    <message>
+        <source>Could not find audio encoder &quot;%1&quot;.</source>
+        <translation>Невозможно обнаружить звуковой кодек &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Primary audio device is not selected.</source>
+        <translation>Первичное звуковое устройство не выбрано.</translation>
     </message>
 </context>
 <context>
     <name>QnDesktopDataProvider</name>
-    <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation>Форматы 44100 и 48000 Гц не поддерживаются устройством захвата звука! Пожалуйста, выберите другое устройство или значение &apos;нет&apos;</translation>
-    </message>
     <message>
         <source>Could not find video encoder %1.</source>
         <translation>Невозможно обнаружить видео кодек %1.</translation>
@@ -3125,16 +3138,8 @@ to %1</source>
         <translation>Невозможно инициализировать видео кодек.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>Невозможно обнаружить звуковой кодек %1.</translation>
-    </message>
-    <message>
         <source>Could not initialize audio encoder.</source>
         <translation>Невозможно инициализировать звуковой кодек.</translation>
-    </message>
-    <message>
-        <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation>Невозможно инициализировать звуковое устройство %1.</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
@@ -3143,6 +3148,18 @@ to %1</source>
     <message>
         <source>Screen width must be a multiple of 8.</source>
         <translation>Ширина экрана должна быть кратна 8.</translation>
+    </message>
+    <message>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &quot;none&quot; value in screen recording settings</source>
+        <translation>Форматы 44 и 48 кГц не поддерживаются устройством захвата звука. Пожалуйста, выберите другое устройство или значение &apos;нет&apos;</translation>
+    </message>
+    <message>
+        <source>Could not find audio encoder &quot;%1&quot;.</source>
+        <translation>Невозможно обнаружить звуковой кодек &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Could not initialize audio device &quot;%1&quot;.</source>
+        <translation>Невозможно инициализировать звуковое устройство %1.</translation>
     </message>
 </context>
 <context>
@@ -3161,7 +3178,7 @@ to %1</source>
     </message>
     <message>
         <source>You will be disconnected from this system and able to login again through local network with local account</source>
-        <translation>Вы будете отключены от этой системы и сможете снова войти через локальную сеть с локальной учетной записью</translation>
+        <translation>Вы будете отключены от этой системы и сможете снова войти через локальную сеть с локальной учётной записью</translation>
     </message>
     <message>
         <source>Set local owner password</source>
@@ -3196,23 +3213,23 @@ to %1</source>
         <translation>Отключить</translation>
     </message>
     <message>
-        <source>Failed to disconnect the System from %1</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Не удалось отключить систему от %1</translation>
-    </message>
-    <message>
-        <source>Disconnect the System from %1?</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Отключить систему от %1?</translation>
-    </message>
-    <message>
         <source>All cloud users will be deleted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Все облачные пользователи будут удалены.</translation>
     </message>
     <message>
-        <source>You won&apos;t be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
+        <source>You will not be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <translation>Вы не сможете подключиться к этой системе с вашей учетной записью %1, после того, как вы отключите эту систему от %1.</translation>
+    </message>
+    <message>
+        <source>Failed to disconnect System from %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Не удалось отключить систему от %1</translation>
+    </message>
+    <message>
+        <source>Disconnect System from %1?</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Отключить систему от %1?</translation>
     </message>
 </context>
 <context>
@@ -3301,10 +3318,6 @@ to %1</source>
         <translation>Описание</translation>
     </message>
     <message>
-        <source>&lt;User removed&gt;</source>
-        <translation>&lt;Пользователь удален&gt;</translation>
-    </message>
-    <message>
         <source>All users</source>
         <translation>Все пользователи</translation>
     </message>
@@ -3327,27 +3340,31 @@ to %1</source>
     </message>
     <message numerus="yes">
         <source>%n users</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n пользователь</numerusform>
+            <numerusform>%n пользователя</numerusform>
+            <numerusform>%n пользователей</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>and %n users more...</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>и еще %n пользовалель...</numerusform>
+            <numerusform>и еще %n пользовалеля...</numerusform>
+            <numerusform>и еще %n пользовалелей...</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>and %n more...</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>и еще %n...</numerusform>
+            <numerusform>и еще %n...</numerusform>
+            <numerusform>и еще %n...</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>User removed</source>
+        <translation>Пользователь удалён</translation>
     </message>
 </context>
 <context>
@@ -3364,7 +3381,7 @@ to %1</source>
         <translation>Выберите ровно одну камеру</translation>
     </message>
     <message>
-        <source>%1 has no ptz presets</source>
+        <source>%1 has no PTZ presets</source>
         <translation>У %1 нет настроенных позиций PTZ</translation>
     </message>
 </context>
@@ -3642,8 +3659,8 @@ to %1</source>
         <translation>Авто</translation>
     </message>
     <message>
-        <source>&lt;multiple values&gt;</source>
-        <translation>&lt;несколько значений&gt;</translation>
+        <source>multiple values</source>
+        <translation>несколько значений</translation>
     </message>
 </context>
 <context>
@@ -3659,10 +3676,6 @@ to %1</source>
 </context>
 <context>
     <name>QnLayoutExportTool</name>
-    <message>
-        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>Файл %1 используется другим процессом. Пожалуйста, используйте другое имя.</translation>
-    </message>
     <message>
         <source>Exporting to &quot;%1&quot;...</source>
         <translation>Экспорт в &quot;%1&quot;...</translation>
@@ -3688,6 +3701,10 @@ to %1</source>
         <source>Could not create output file %1...</source>
         <translation>Невозможно открыть файл вывода %1...</translation>
     </message>
+    <message>
+        <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+        <translation>Файл %1 используется другим процессом. Пожалуйста, используйте другое имя.</translation>
+    </message>
 </context>
 <context>
     <name>QnLayoutSettingsDialog</name>
@@ -3700,28 +3717,32 @@ to %1</source>
         <translation>Изображения %1</translation>
     </message>
     <message>
-        <source>&lt;No picture&gt;</source>
-        <translation>&lt;Без изображения&gt;</translation>
+        <source>No picture</source>
+        <translation>Нет картинки</translation>
     </message>
     <message>
-        <source>&lt;Error while loading picture&gt;</source>
-        <translation>&lt;Ошибка при загрузке изображения&gt;</translation>
+        <source>Error while loading picture</source>
+        <translation>Ошибка загрузки изображения</translation>
     </message>
     <message>
-        <source>&lt;Error while uploading picture&gt;</source>
-        <translation>&lt;Ошибка загрузки изображения на сервер&gt;</translation>
+        <source>Error while uploading picture</source>
+        <translation>Ошибка загрузки изображения</translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be read&gt;</source>
-        <translation>&lt;Изображение не читается&gt;</translation>
+        <source>Picture cannot be read</source>
+        <translation>Изображение не читается</translation>
     </message>
     <message>
-        <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
-        <translation>&lt;Слишком большое изображение. Максимальный размер %1 МБ&gt;</translation>
+        <source>Picture cannot be loaded</source>
+        <translation>Невозможно загрузить изображение</translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be loaded&gt;</source>
-        <translation>&lt;Невозможно загрузить изображение&gt;</translation>
+        <source>cells</source>
+        <translation>ячеек</translation>
+    </message>
+    <message>
+        <source>Picture is too big. Maximum size is %1 MB</source>
+        <translation>Слишком большое изображение. Максимальный размер - %1 МБ</translation>
     </message>
 </context>
 <context>
@@ -3770,7 +3791,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>Почта</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>DN</source>
@@ -3883,11 +3904,7 @@ to %1</source>
     </message>
     <message>
         <source>Server not found</source>
-        <translation>&lt;Сервер не найден&gt;</translation>
-    </message>
-    <message>
-        <source>Qnt.</source>
-        <translation>Кол-во</translation>
+        <translation>Сервер не найден</translation>
     </message>
     <message>
         <source>Expires</source>
@@ -3899,7 +3916,7 @@ to %1</source>
     </message>
     <message>
         <source>License is expired</source>
-        <translation>Истек срок действия лицензии</translation>
+        <translation>Истёк срок действия лицензии</translation>
     </message>
     <message>
         <source>Expires soon</source>
@@ -3920,6 +3937,10 @@ to %1</source>
             <numerusform>Срок действия истекает через %n дня</numerusform>
             <numerusform>Срок действия истекает через %n дней</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Qty</source>
+        <translation>Кол-во</translation>
     </message>
 </context>
 <context>
@@ -3997,10 +4018,6 @@ to %1</source>
         <translation>Недопустимый лицензионный ключ</translation>
     </message>
     <message>
-        <source>Please make sure it is entered correctly. </source>
-        <translation>Пожалуйста, убедитесь, что он введен правильно. </translation>
-    </message>
-    <message>
         <source>Failed to activate license</source>
         <translation>Не удалось активировать лицензию</translation>
     </message>
@@ -4010,7 +4027,7 @@ to %1</source>
     </message>
     <message>
         <source>Network error</source>
-        <translation>Сетевая ошибка.</translation>
+        <translation>Сетевая ошибка</translation>
     </message>
     <message>
         <source>Please contact Customer Support to activate license key manually.</source>
@@ -4021,32 +4038,36 @@ to %1</source>
         <translation>Если проблема не устранена, обратитесь в службу поддержки.</translation>
     </message>
     <message>
-        <source>This license is already activated and linked to hardware id %1</source>
-        <translation>Эта лицензия уже активирована и связана с id оборудования %1</translation>
-    </message>
-    <message>
-        <source>This license is already activated and linked to hardware id %1 on %2</source>
-        <translation>Эта лицензия уже активирована и связана с id оборудования %1 на %2</translation>
-    </message>
-    <message>
         <source>License already activated on another server</source>
         <translation>Лицензия уже активирована на другом сервере</translation>
     </message>
     <message numerus="yes">
         <source>At least %n %1 are required</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Требуется по крайней мере %n %1</numerusform>
+            <numerusform>Требуется по крайней мере %n %1</numerusform>
+            <numerusform>Требуется по крайней мере %n %1</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n %1 are currently in use</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n %1 используется</numerusform>
+            <numerusform>%n %1 используется</numerusform>
+            <numerusform>%n %1 используются</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Please make sure it is entered correctly.</source>
+        <translation>Пожалуйста, убедитесь, что он введен правильно.</translation>
+    </message>
+    <message>
+        <source>This license is already activated and linked to hardware ID %1</source>
+        <translation>Эта лицензия уже активирована и связана с аппаратным ID %1</translation>
+    </message>
+    <message>
+        <source>This license is already activated and linked to hardware ID %1 on %2</source>
+        <translation>Эта лицензия уже активирована и связана с аппаратным ID %1 на %2</translation>
     </message>
 </context>
 <context>
@@ -4068,16 +4089,20 @@ to %1</source>
         <translation>Все файлы (*.*)</translation>
     </message>
     <message>
-        <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation>Для получения лицензионного ключа необходимо отослать сообщение, содержащее серийный номер и Hardware ID, %1.</translation>
-    </message>
-    <message>
-        <source>Hardware id copied to clipboard</source>
-        <translation>Код оборудования скопирован в буфер обмена</translation>
-    </message>
-    <message>
         <source>Failed to open file</source>
         <translation>Не удалось открыть файл</translation>
+    </message>
+    <message>
+        <source>Please send Email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
+        <translation>Для получения лицензионного ключа необходимо отослать Email, содержащий серийный номер и аппаратный ID, на %1.</translation>
+    </message>
+    <message>
+        <source>Please send the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
+        <translation>Для получения лицензионного ключа необходимо отослать Email, содержащий серийный номер и аппаратный ID, на %1.</translation>
+    </message>
+    <message>
+        <source>Hardware ID copied to clipboard</source>
+        <translation>Аппаратный ID скопирован в буфер обмена</translation>
     </message>
 </context>
 <context>
@@ -4120,7 +4145,7 @@ to %1</source>
     <message>
         <source>Failed to login to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Не удалось войти в %1</translation>
+        <translation>Не удалось войти в %1</translation>
     </message>
 </context>
 <context>
@@ -4151,7 +4176,7 @@ to %1</source>
     </message>
     <message>
         <source>Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</source>
-        <translation>Невозможно сохранить параметры. Пожалуйста, обратитесь к системному администратору. Все изменения будут потеряны после выхода из программы.</translation>
+        <translation>Невозможно сохранить настройки. Пожалуйста, обратитесь к системному администратору. Все изменения будут потеряны после выхода из программы.</translation>
     </message>
     <message>
         <source>Restart required</source>
@@ -4193,10 +4218,6 @@ to %1</source>
         <translation>* Последнее подключение *</translation>
     </message>
     <message>
-        <source>&lt;none&gt;</source>
-        <translation>&lt;нет&gt;</translation>
-    </message>
-    <message>
         <source>%1 at %2</source>
         <translation>%1 на %2</translation>
     </message>
@@ -4206,18 +4227,22 @@ to %1</source>
     </message>
     <message>
         <source>Delete connection?</source>
-        <translation>Удалить соединения</translation>
+        <translation>Удалить подключение?</translation>
     </message>
     <message>
         <source>There is another connection with the same name.</source>
         <translation>Существует другое соединение с тем же именем.</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>нет</translation>
     </message>
 </context>
 <context>
     <name>QnLoginToCloudDialog</name>
     <message>
         <source>Email</source>
-        <translation>Почта</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Password</source>
@@ -4225,7 +4250,7 @@ to %1</source>
     </message>
     <message>
         <source>Create account</source>
-        <translation>Создать учетную запись</translation>
+        <translation>Создать учётную запись</translation>
     </message>
     <message>
         <source>Forgot password?</source>
@@ -4238,12 +4263,12 @@ to %1</source>
     <message>
         <source>Log in to %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Войти в %1</translation>
+        <translation>Войти в %1</translation>
     </message>
     <message>
         <source>Welcome to %1!</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Добро пожаловать в %1!</translation>
+        <translation>Добро пожаловать в %1!</translation>
     </message>
 </context>
 <context>
@@ -4288,6 +4313,10 @@ to %1</source>
         <source>Select File...</source>
         <translation>Выбрать файл...</translation>
     </message>
+    <message>
+        <source>No image</source>
+        <translation>Нет изображения</translation>
+    </message>
 </context>
 <context>
     <name>QnMediaResourceWidget</name>
@@ -4317,7 +4346,7 @@ to %1</source>
     </message>
     <message>
         <source>Hi-Res</source>
-        <translation>Hi-Res</translation>
+        <translation>Выс</translation>
     </message>
     <message>
         <source>LIVE</source>
@@ -4332,12 +4361,12 @@ to %1</source>
         <translation>Окно увеличения</translation>
     </message>
     <message>
-        <source>Low-Res</source>
-        <translation>Lo-Res</translation>
-    </message>
-    <message>
         <source>I/O Module</source>
         <translation>Модуль ввода-вывода</translation>
+    </message>
+    <message>
+        <source>Lo-Res</source>
+        <translation>Низ</translation>
     </message>
 </context>
 <context>
@@ -4355,10 +4384,6 @@ to %1</source>
         <translation>%1 (текущая)</translation>
     </message>
     <message>
-        <source>The URL is invalid.</source>
-        <translation>Некорректный URL.</translation>
-    </message>
-    <message>
         <source>Use a specific hostname or IP address rather than %1.</source>
         <translation>Использовать особое имя хоста или ip адрес вместо %1.</translation>
     </message>
@@ -4373,10 +4398,6 @@ to %1</source>
     <message>
         <source>Success!</source>
         <translation>Успешно!</translation>
-    </message>
-    <message>
-        <source>The system was configured successfully.</source>
-        <translation>Система успешно сконфигурирована.</translation>
     </message>
     <message>
         <source>The servers from the remote system should appear in your system soon.</source>
@@ -4402,6 +4423,14 @@ to %1</source>
         <source>Failed to merge Systems</source>
         <translation>Не удалось объединить системы</translation>
     </message>
+    <message>
+        <source>System was configured successfully.</source>
+        <translation>Система успешно сконфигурирована.</translation>
+    </message>
+    <message>
+        <source>URL is invalid.</source>
+        <translation>Неверный URL-адрес.</translation>
+    </message>
 </context>
 <context>
     <name>QnMessageBox</name>
@@ -4425,30 +4454,24 @@ to %1</source>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>LoginEdit</comment>
-        <translation>&lt;несколько значений&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>PasswordEdit</comment>
-        <translation>&lt;несколько значений&gt;</translation>
-    </message>
-    <message>
         <source>Secondary stream disabled for these cameras</source>
         <translation>Вторичный поток отключен для этих камер</translation>
     </message>
     <message>
-        <source>&quot;Motion + Low - Res&quot; recording option can&apos;t be set.</source>
-        <translation>Режим записи «Движение + Низкое Разрешение» не может быть установлен.</translation>
-    </message>
-    <message>
         <source>Set Recording to &quot;Always&quot;</source>
-        <translation>Установить запись «Всегда»</translation>
+        <translation>Установить запись &quot;Всегда&quot;</translation>
     </message>
     <message>
         <source>Enable Secondary Stream</source>
         <translation>Включить вторичный поток</translation>
+    </message>
+    <message>
+        <source>multiple values</source>
+        <translation>несколько значений</translation>
+    </message>
+    <message>
+        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
+        <translation>Режим записи «Движение + Низкое Разрешение» не может быть установлен.</translation>
     </message>
 </context>
 <context>
@@ -4506,9 +4529,9 @@ to %1</source>
     <message numerus="yes">
         <source>%n more notifications</source>
         <translation>
-            <numerusform>Еще %n уведомление</numerusform>
-            <numerusform>Еще %n уведомления</numerusform>
-            <numerusform>Еще %n уведомлений</numerusform>
+            <numerusform>Ещё %n уведомление</numerusform>
+            <numerusform>Ещё %n уведомления</numerusform>
+            <numerusform>Ещё %n уведомлений</numerusform>
         </translation>
     </message>
 </context>
@@ -4554,20 +4577,20 @@ to %1</source>
 <context>
     <name>QnNotificationSoundModel</name>
     <message>
-        <source>&lt;Downloading sound list...&gt;</source>
-        <translation>&lt;Загружается список звуков...&gt;</translation>
+        <source>Downloading sound list...</source>
+        <translation>Загружается список звуков...</translation>
     </message>
     <message>
-        <source>&lt;No Sound&gt;</source>
-        <translation>&lt;Нет звука&gt;</translation>
+        <source>No Sound</source>
+        <translation>Нет звука</translation>
     </message>
     <message>
-        <source>&lt;Downloading sound...&gt;</source>
-        <translation>&lt;Загружается звук...&gt;</translation>
+        <source>Downloading sound...</source>
+        <translation>Загружается звук...</translation>
     </message>
     <message>
-        <source>&lt;Uploading sound...&gt;</source>
-        <translation>&lt;Звук... Загружается на сервер&gt;</translation>
+        <source>Uploading sound...</source>
+        <translation>Звук загружается на сервер...</translation>
     </message>
 </context>
 <context>
@@ -4596,11 +4619,11 @@ to %1</source>
     <name>QnPermissionsWidget</name>
     <message>
         <source>Edit camera settings</source>
-        <translation>Изменение параметров камеры</translation>
+        <translation>Изменение настроек камеры</translation>
     </message>
     <message>
         <source>This is also required to create/edit PTZ presets and tours.</source>
-        <translation>Это также необходимо для создания/редактирования PTZ позиций и туров.</translation>
+        <translation>А также настройка PTZ позиций и туров.</translation>
     </message>
     <message>
         <source>Control video walls</source>
@@ -4628,11 +4651,11 @@ to %1</source>
     </message>
     <message>
         <source>User Input</source>
-        <translation>Действия пользователя</translation>
+        <translation>Другие действия</translation>
     </message>
     <message>
         <source>PTZ, Device Output, 2-way Audio</source>
-        <translation>Управление PTZ, устройствами вывода, двухсторонний звук</translation>
+        <translation>PTZ, выводы устройств, 2x-сторонний звук</translation>
     </message>
 </context>
 <context>
@@ -4655,10 +4678,6 @@ to %1</source>
 </context>
 <context>
     <name>QnPtzManageModel</name>
-    <message>
-        <source>#</source>
-        <translation>#</translation>
-    </message>
     <message>
         <source>Name</source>
         <translation>Имя</translation>
@@ -4763,7 +4782,7 @@ to %1</source>
     </message>
     <message>
         <source>Hotkey used by tour &quot;%1&quot;</source>
-        <translation>Горячая клавиша уже используется туром «%1»</translation>
+        <translation>Горячая клавиша уже используется туром &quot;%1&quot;</translation>
     </message>
 </context>
 <context>
@@ -4806,10 +4825,6 @@ to %1</source>
         <translation>Немедленно</translation>
     </message>
     <message>
-        <source>&lt;Invalid&gt;</source>
-        <translation>&lt;Неверное знач&gt;</translation>
-    </message>
-    <message>
         <source>Position</source>
         <translation>Позиция</translation>
     </message>
@@ -4820,6 +4835,10 @@ to %1</source>
     <message>
         <source>Speed</source>
         <translation>Скорость</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation>Неверный</translation>
     </message>
 </context>
 <context>
@@ -4929,7 +4948,7 @@ to %1</source>
     </message>
     <message>
         <source>Cameras from other servers and removed cameras</source>
-        <translation>&lt;Камеры с других серверов, а также удаленные камеры&gt;</translation>
+        <translation>Камеры с других серверов, а также удаленные камеры</translation>
     </message>
     <message>
         <source>%1 TB</source>
@@ -5087,10 +5106,6 @@ to %1</source>
     <message>
         <source>All Shared Layouts</source>
         <translation>Все Раскладки с общим доступом</translation>
-    </message>
-    <message>
-        <source>&lt;Unnamed system&gt;</source>
-        <translation>&lt;Система без имени&gt;</translation>
     </message>
     <message>
         <source>Shared Layouts</source>
@@ -5270,34 +5285,6 @@ to %1</source>
         <source>Select at least one user</source>
         <translation>Выберите хотя бы одного пользователя</translation>
     </message>
-    <message>
-        <source>User %1 has invalid email address</source>
-        <translation>У пользователя %1 неправильный E-Mail</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 users have invalid email address</source>
-        <translation>
-            <numerusform>У %n из %1 пользователя некорректный email адрес</numerusform>
-            <numerusform>У %n из %1 пользователей некорректные email адреса</numerusform>
-            <numerusform>У %n мз %1 пользователей некорректные email адреса</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Invalid email address %1</source>
-        <translation>Некорректный адрес %1</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 additional email addresses are invalid</source>
-        <translation>
-            <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
-            <numerusform>%n из %1 дополнительных адресов некорректны</numerusform>
-            <numerusform>%n из %1 дополнительных адресов некорректны</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Send email to %1</source>
-        <translation>Отправить письмо %1</translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
         <translation>
@@ -5317,10 +5304,38 @@ to %1</source>
     <message numerus="yes">
         <source>%n additional</source>
         <translation>
-            <numerusform>еще %n</numerusform>
-            <numerusform>еще %n</numerusform>
-            <numerusform>еще %n</numerusform>
+            <numerusform>ещё %n</numerusform>
+            <numerusform>ещё %n</numerusform>
+            <numerusform>ещё %n</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>User %1 has invalid Email address</source>
+        <translation>У пользователя %1 неправильный Email</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 users have invalid Email address</source>
+        <translation>
+            <numerusform>У %n из %1 пользователей некорректный Email</numerusform>
+            <numerusform>У %n из %1 пользователей некорректный Email</numerusform>
+            <numerusform>У %n из %1 пользователей некорректный Email</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Invalid Email address %1</source>
+        <translation>Некорректный Email %1</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 additional Email addresses are invalid</source>
+        <translation>
+            <numerusform>%n из %1 дополнительных адресов некорректен</numerusform>
+            <numerusform>%n из %1 дополнительных адресов некорректны</numerusform>
+            <numerusform>%n из %1 дополнительных адресов некорректны</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Send Email to %1</source>
+        <translation>Отправить письмо на %1</translation>
     </message>
 </context>
 <context>
@@ -5498,7 +5513,7 @@ to %1</source>
     </message>
     <message>
         <source>Unable to check updates on the Internet.</source>
-        <translation>Не удается проверить обновления в Интернете.</translation>
+        <translation>Не удаётся проверить обновления в Интернете.</translation>
     </message>
     <message>
         <source>Unknown build number.</source>
@@ -5577,14 +5592,6 @@ to %1</source>
         <source>Continue in Background</source>
         <translation>Продолжить в фоновом режиме</translation>
     </message>
-    <message>
-        <source>Update can&apos;t be canceled at this stage</source>
-        <translation>Невозможно отменить обновление на этом этапе</translation>
-    </message>
-    <message>
-        <source>Please wait until it&apos;s finished.</source>
-        <translation>Пожалуйста, дождитесь завершения.</translation>
-    </message>
     <message numerus="yes">
         <source>Not enough free space at %n Servers:</source>
         <translation>
@@ -5629,6 +5636,14 @@ to %1</source>
         <source>%1 will be restarted to the updated version.</source>
         <translation>%1 будет перезапущен на обновленную версию.</translation>
     </message>
+    <message>
+        <source>Update cannot be canceled at this stage</source>
+        <translation>Невозможно отменить обновление на этом этапе</translation>
+    </message>
+    <message>
+        <source>Please wait until it is finished.</source>
+        <translation>Пожалуйста, дождитесь завершения.</translation>
+    </message>
 </context>
 <context>
     <name>QnSessionAwareTabbedDialog</name>
@@ -5643,10 +5658,6 @@ to %1</source>
 </context>
 <context>
     <name>QnShowOnAlarmLayoutActionWidget</name>
-    <message>
-        <source>&lt;All Users&gt;</source>
-        <translation>&lt;Все пользователи&gt;</translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
         <translation>
@@ -5662,6 +5673,10 @@ to %1</source>
             <numerusform>%n роли</numerusform>
             <numerusform>%n ролей</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>All Users</source>
+        <translation>Все пользователи</translation>
     </message>
 </context>
 <context>
@@ -5733,12 +5748,8 @@ to %1</source>
         <translation>Вторичный поток отключен для этой камеры</translation>
     </message>
     <message>
-        <source>&quot;Motion + Low - Res&quot; recording option can&apos;t be set.</source>
-        <translation>Режим записи «Движение + Низкое Разрешение» не может быть установлен.</translation>
-    </message>
-    <message>
         <source>Set Recording to &quot;Always&quot;</source>
-        <translation>Установить запись «Всегда»</translation>
+        <translation>Установить запись &quot;Всегда&quot;</translation>
     </message>
     <message>
         <source>Enable Secondary Stream</source>
@@ -5749,8 +5760,12 @@ to %1</source>
         <translation>Сбросить области обнаружения движения на настройки по умолчанию?</translation>
     </message>
     <message>
-        <source>This action can&apos;t be undone.</source>
-        <translation>Это действие нельзя отменить.</translation>
+        <source>This action cannot be undone.</source>
+        <translation>Это действие нельзя будет отменить.</translation>
+    </message>
+    <message>
+        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
+        <translation>Режим записи «Движение + Низкое Разрешение» не может быть установлен.</translation>
     </message>
 </context>
 <context>
@@ -5761,7 +5776,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>Почта</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>SMTP Server</source>
@@ -5795,16 +5810,12 @@ to %1</source>
 <context>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
-        <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation>Шаблон не найден. Воспользуйтесь дополнительными настройками.</translation>
-    </message>
-    <message>
         <source>Email</source>
-        <translation>Почта</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation>Некорректный E-Mail</translation>
+        <translation>Некорректный Email.</translation>
     </message>
     <message>
         <source>Password</source>
@@ -5825,6 +5836,10 @@ to %1</source>
     <message>
         <source>Support Signature</source>
         <translation>Информация о технической поддержке</translation>
+    </message>
+    <message>
+        <source>No preset found. Use &quot;Advanced&quot; option.</source>
+        <translation>Не найдена настроенная позиция. Воспользуйтесь дополнительными настройками.</translation>
     </message>
 </context>
 <context>
@@ -5867,19 +5882,19 @@ to %1</source>
     </message>
     <message>
         <source>Network error</source>
-        <translation>Сетевая ошибка.</translation>
+        <translation>Сетевая ошибка</translation>
     </message>
     <message>
         <source>Invalid parameters</source>
         <translation>Недопустимые параметры</translation>
     </message>
     <message>
-        <source>Can&apos;t perform the test.</source>
-        <translation>Не удается выполнить проверку.</translation>
-    </message>
-    <message>
         <source>No Servers connected to internet</source>
         <translation>Нет серверов, подключенных к Интернету</translation>
+    </message>
+    <message>
+        <source>Cannot perform the test.</source>
+        <translation>Не удаётся выполнить проверку.</translation>
     </message>
 </context>
 <context>
@@ -5983,6 +5998,11 @@ to %1</source>
             <numerusform>%n ТБ</numerusform>
         </translation>
     </message>
+    <message>
+        <source>TB</source>
+        <comment>TB - terabytes</comment>
+        <translation>ТБ</translation>
+    </message>
 </context>
 <context>
     <name>QnStorageConfigWidget</name>
@@ -6012,7 +6032,7 @@ to %1</source>
     </message>
     <message>
         <source>Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</source>
-        <translation>Измените «Основное» на «Резервное» для некоторых хранилищ, указанных выше, для включения резервного копирования.</translation>
+        <translation>Измените «Основное» на &quot;Резервное&quot; для некоторых хранилищ, указанных выше, для включения резервного копирования.</translation>
     </message>
     <message>
         <source>Apply changes to start backup.</source>
@@ -6024,7 +6044,7 @@ to %1</source>
     </message>
     <message>
         <source>%1 before now</source>
-        <translation>(%1 пред.)</translation>
+        <translation>%1 до сих пор</translation>
     </message>
     <message>
         <source>Realtime backup is active...</source>
@@ -6098,10 +6118,6 @@ to %1</source>
         <translation>Неверное хранилище</translation>
     </message>
     <message>
-        <source>%1 Gb</source>
-        <translation>%1 ГБ</translation>
-    </message>
-    <message>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
@@ -6133,31 +6149,28 @@ to %1</source>
         <source>Main</source>
         <translation>Главное</translation>
     </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 ГБ</translation>
+    </message>
 </context>
 <context>
     <name>QnStorageRebuildWidget</name>
     <message>
         <source>Fast Backup Scan...</source>
-        <translation type="unfinished"></translation>
+        <translation>Быстрое сканирование резервного архива...</translation>
     </message>
     <message>
         <source>Fast Archive Scan...</source>
-        <translation type="unfinished"></translation>
+        <translation>Быстрое сканирование архива...</translation>
     </message>
     <message>
         <source>Reindexing Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Переиндексация резервного архива...</translation>
     </message>
     <message>
         <source>Reindexing Archive...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnStorageSpaceSlider</name>
-    <message>
-        <source>%1%</source>
-        <translation>%1%</translation>
+        <translation>Переиндексация архива...</translation>
     </message>
 </context>
 <context>
@@ -6172,15 +6185,11 @@ to %1</source>
     </message>
     <message>
         <source>Invalid credentials for external storage</source>
-        <translation>Недопустимые учетные данные для внешнего хранилища</translation>
+        <translation>Недопустимые учётные данные для внешнего хранилища</translation>
     </message>
     <message>
         <source>Invalid storage path</source>
         <translation>Недопустимый путь к внешнему хранилищу</translation>
-    </message>
-    <message>
-        <source>It&apos;s not recommended to use one recording location for different servers.</source>
-        <translation>Не рекомендуется использовать один и тот же путь для записи на разных серверах.</translation>
     </message>
     <message>
         <source>Add this storage anyway?</source>
@@ -6193,6 +6202,10 @@ to %1</source>
     <message>
         <source>Add Storage</source>
         <translation>Добавить хранилище</translation>
+    </message>
+    <message>
+        <source>It is not recommended to use one recording location for different servers.</source>
+        <translation>Не рекомендуется использовать один и тот же путь для записи на разных серверах.</translation>
     </message>
 </context>
 <context>
@@ -6207,7 +6220,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>Почта</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Updates</source>
@@ -6215,7 +6228,7 @@ to %1</source>
     </message>
     <message>
         <source>Routing Management</source>
-        <translation>Управление маршрутизацией</translation>
+        <translation>Маршрутизация</translation>
     </message>
     <message>
         <source>Time Synchronization</source>
@@ -6230,7 +6243,7 @@ to %1</source>
     <name>QnSystemHealthStringsHelper</name>
     <message>
         <source>Email address is not set</source>
-        <translation>Адрес E-Mail не настроен</translation>
+        <translation>Не настроен адрес Email</translation>
     </message>
     <message>
         <source>No licenses</source>
@@ -6238,11 +6251,7 @@ to %1</source>
     </message>
     <message>
         <source>Email server is not set</source>
-        <translation>Сервер E-Mail не настроен</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>У некоторых пользователей не настроен адрес E-Mail</translation>
+        <translation>Не настроен сервер Email</translation>
     </message>
     <message>
         <source>Connection to server lost</source>
@@ -6255,10 +6264,6 @@ to %1</source>
     <message>
         <source>System is in safe mode</source>
         <translation>Система запущена в безопасном режиме</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>Ошибка отправки сообщения</translation>
     </message>
     <message>
         <source>Storage is full</source>
@@ -6278,35 +6283,19 @@ to %1</source>
     </message>
     <message>
         <source>Email address is not set for user %1</source>
-        <translation>У пользователя %1 не настроен адрес E-Mail </translation>
+        <translation>У пользователя %1 не настроен адрес Email</translation>
     </message>
     <message>
         <source>Email address is not set.</source>
         <translation>Адрес E-Mail не настроен.</translation>
     </message>
     <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>Вы не можете получать оповещения по E-Mail.</translation>
-    </message>
-    <message>
         <source>Email server is not set.</source>
-        <translation>Сервер E-Mail не настроен.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>У некоторых пользователей не настроен адрес E-Mail.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>Они не могут получать оповещения по E-Mail.</translation>
+        <translation>Сервер Email не настроен.</translation>
     </message>
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
         <translation>Время на серверах не может быть синхронизировано, так как точное время не может быть определено.</translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation>Система запущена в безопасном режиме.</translation>
     </message>
     <message>
         <source>Any configuration changes except license activation are impossible.</source>
@@ -6343,7 +6332,31 @@ to %1</source>
     <message>
         <source>Check out &lt;b&gt;%1&lt;/b&gt; Beta &amp;mdash; connect to your servers from anywhere</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Узнать больше о &lt;b&gt;%1&lt;/b&gt; Beta &amp;mdash; подключение к серверам из любого места</translation>
+        <translation>Узнать больше о &lt;b&gt;%1&lt;/b&gt; &amp;mdash; подключение к серверам из любого места</translation>
+    </message>
+    <message>
+        <source>Some users have not set their Email addresses</source>
+        <translation>У некоторых пользователей не настроен Email</translation>
+    </message>
+    <message>
+        <source>Error while sending Email</source>
+        <translation>Ошибка отправки Email</translation>
+    </message>
+    <message>
+        <source>You cannot receive system notifications via Email.</source>
+        <translation>Вы не можете получать оповещения по Email.</translation>
+    </message>
+    <message>
+        <source>Some users have not set their Email addresses.</source>
+        <translation>У некоторых пользователей не настроен Email.</translation>
+    </message>
+    <message>
+        <source>They cannot receive system notifications via Email.</source>
+        <translation>Они не могут получать оповещения по Email.</translation>
+    </message>
+    <message>
+        <source>System is running in safe mode.</source>
+        <translation>Система запущена в безопасном режиме.</translation>
     </message>
 </context>
 <context>
@@ -6444,15 +6457,15 @@ to %1</source>
     </message>
     <message>
         <source>Input device is not selected</source>
-        <translation>Устройство ввода не выбрано.</translation>
+        <translation>Устройство ввода не выбрано</translation>
     </message>
     <message>
         <source>Streaming is not ready yet</source>
-        <translation>Потоковая передача еще не готова</translation>
+        <translation>Потоковая передача ещё не готова</translation>
     </message>
     <message>
         <source>Network error</source>
-        <translation>Сетевая ошибка.</translation>
+        <translation>Сетевая ошибка</translation>
     </message>
 </context>
 <context>
@@ -6475,7 +6488,7 @@ to %1</source>
     </message>
     <message>
         <source>Could not download updates.</source>
-        <translation>Не удается скачать обновления.</translation>
+        <translation>Не удаётся скачать обновления.</translation>
     </message>
     <message>
         <source>No free space left on the disk.</source>
@@ -6631,7 +6644,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>Почта</translation>
+        <translation>Email</translation>
     </message>
 </context>
 <context>
@@ -6669,10 +6682,10 @@ to %1</source>
     </message>
     <message numerus="yes">
         <source>Please select the action to perform to %n users with this role</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователем с этой ролью</numerusform>
+            <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователями с этой ролью</numerusform>
+            <numerusform>Пожалуйста, выберите действие для выполнения с %n пользователями с этой ролью</numerusform>
         </translation>
     </message>
 </context>
@@ -6711,7 +6724,7 @@ to %1</source>
     </message>
     <message>
         <source>Permissions</source>
-        <translation>Разрешения</translation>
+        <translation>Полномочия</translation>
     </message>
     <message>
         <source>Cameras &amp;&amp; Resources</source>
@@ -6782,15 +6795,11 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>Почта</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Email cannot be empty.</source>
-        <translation>Электронный адрес не может быть пустым.</translation>
-    </message>
-    <message>
-        <source>Cloud user with specified email already exists.</source>
-        <translation>Облачный пользователь с таким адресом электронной почты уже существует.</translation>
+        <translation>Email не может быть пустым.</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6804,16 +6813,20 @@ to %1</source>
         <source>Passwords do not match.</source>
         <translation>Введённые пароли не совпадают.</translation>
     </message>
+    <message>
+        <source>Cloud user with specified Email already exists.</source>
+        <translation>Облачный пользователь с таким Email уже существует.</translation>
+    </message>
 </context>
 <context>
     <name>QnValidatorStrings</name>
     <message>
         <source>Email cannot be empty.</source>
-        <translation>Электронный адрес не может быть пустым.</translation>
+        <translation>Email не может быть пустым.</translation>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation>Некорректный E-Mail</translation>
+        <translation>Некорректный Email.</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
@@ -6844,7 +6857,7 @@ to %1</source>
     </message>
     <message>
         <source>Delete &quot;%1&quot;?</source>
-        <translation>Удалить «%1»?</translation>
+        <translation>Удалить &quot;%1&quot;?</translation>
     </message>
 </context>
 <context>
@@ -6872,10 +6885,6 @@ to %1</source>
     <message>
         <source>Muted</source>
         <translation>Беззвучный</translation>
-    </message>
-    <message>
-        <source>%1%</source>
-        <translation>%1%</translation>
     </message>
 </context>
 <context>
@@ -6989,31 +6998,7 @@ to %1</source>
     </message>
     <message>
         <source>Server &quot;%1&quot; is not responding.</source>
-        <translation>Сервер «%1» не отвечает.</translation>
-    </message>
-    <message numerus="yes">
-        <source>Server &quot;%1&quot; can&apos;t access %n devices. Move them anyway?</source>
-        <translation>
-            <numerusform>Сервер «%1» не может получить доступ к %n устройству. Переместить его в любом случае?</numerusform>
-            <numerusform>Сервер «%1» не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
-            <numerusform>Сервер «%1» не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Server &quot;%1&quot; can&apos;t access %n cameras. Move them anyway?</source>
-        <translation>
-            <numerusform>Сервер «%1» не может получить доступ к %n камере. Переместить ее в любом случае?</numerusform>
-            <numerusform>Сервер «%1» не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
-            <numerusform>Сервер «%1» не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Server &quot;%1&quot; can&apos;t access %n I/O modules. Move them anyway?</source>
-        <translation>
-            <numerusform>Сервер «%1» не может получить доступ к %n модулю ввода-вывода. Переместить его в любом случае?</numerusform>
-            <numerusform>Сервер «%1» не может получить доступ к %n модулям ввода-вывода. Переместить их в любом случае?</numerusform>
-            <numerusform>Сервер «%1» не может получить доступ к %n модулям ввода-вывода. Переместить их в любом случае?</numerusform>
-        </translation>
+        <translation>Сервер &quot;%1&quot; не отвечает.</translation>
     </message>
     <message>
         <source>Move</source>
@@ -7022,10 +7007,6 @@ to %1</source>
     <message>
         <source>Too short period selected</source>
         <translation>Выбран слишком короткий период</translation>
-    </message>
-    <message>
-        <source>Can&apos;t perform Preview Search. Please select a period of 15 seconds or longer.</source>
-        <translation>Не удается выполнить поиск по интервалам. Пожалуйста, выберите период 15 секунд или дольше.</translation>
     </message>
     <message>
         <source>Cancel device adding?</source>
@@ -7052,24 +7033,12 @@ to %1</source>
         <translation>Пожалуйста, обновите все компоненты системы на версию %1</translation>
     </message>
     <message>
-        <source>Components of the System have different versions:</source>
-        <translation>Компоненты системы имеют разные версии:</translation>
-    </message>
-    <message>
         <source>Some functionality may be unavailable or not working properly.</source>
         <translation>Некоторые функции могут быть недоступны или не работать должным образом.</translation>
     </message>
     <message>
-        <source>The System sends anonymous usage statistics</source>
-        <translation>Система отправляет анонимную статистику использования</translation>
-    </message>
-    <message>
         <source>It will be used by software development team to improve your user experience.</source>
         <translation>Она будет использоваться командой разработки для того чтобы сделать систему проще и понятнее для пользователей.</translation>
-    </message>
-    <message>
-        <source>To disable it, go to the System Administration dialog.</source>
-        <translation>Чтобы отключить ее перейдите на диалоговое окно Системное администрирование.</translation>
     </message>
     <message>
         <source>Failed to open server web page</source>
@@ -7078,6 +7047,46 @@ to %1</source>
     <message>
         <source>Skip</source>
         <translation>Пропустить</translation>
+    </message>
+    <message>
+        <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
+        <translation>Не удаётся выполнить поиск по интервалам. Пожалуйста, выберите период 15 секунд или дольше.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
+        <translation>
+            <numerusform>Сервер «%1» не может получить доступ к %n устройству. Переместить его в любом случае?</numerusform>
+            <numerusform>Сервер «%1» не может получить доступ к %n устройствам. Переместить его в любом случае?</numerusform>
+            <numerusform>Сервер «%1» не может получить доступ к %n устройствам. Переместить его в любом случае?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
+        <translation>
+            <numerusform>Сервер «%1» не может получить доступ к %n камере. Переместить ее в любом случае?</numerusform>
+            <numerusform>Сервер «%1» не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
+            <numerusform>Сервер «%1» не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
+        <translation>
+            <numerusform>Сервер «%1» не может получить доступ к %n устройству. Переместить его в любом случае?</numerusform>
+            <numerusform>Сервер «%1» не может получить доступ к %n устройствам. Переместить его в любом случае?</numerusform>
+            <numerusform>Сервер «%1» не может получить доступ к %n устройствам. Переместить его в любом случае?</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Components of System have different versions:</source>
+        <translation>Компоненты системы имеют разные версии:</translation>
+    </message>
+    <message>
+        <source>System sends anonymous usage statistics</source>
+        <translation>Система отправляет анонимную статистику использования</translation>
+    </message>
+    <message>
+        <source>To disable it, go to System Administration dialog.</source>
+        <translation>Чтобы отключить ее, перейдите на диалоговое окно Системное администрирование.</translation>
     </message>
 </context>
 <context>
@@ -7109,7 +7118,7 @@ to %1</source>
     <message numerus="yes">
         <source>Delete %n bookmarks?</source>
         <translation>
-            <numerusform>Удалить закладку?</numerusform>
+            <numerusform>Удалить %n закладку?</numerusform>
             <numerusform>Удалить %n закладки?</numerusform>
             <numerusform>Удалить %n закладок?</numerusform>
         </translation>
@@ -7269,10 +7278,6 @@ to %1</source>
         <translation>EXE формат не рекомендуется</translation>
     </message>
     <message>
-        <source>EXE files over 4 GB can&apos;t be opened by double click due to a Windows limitation.</source>
-        <translation>Из-за ограничений Windows EXE-файлы более 4 ГБ не могут быть открыты двойным щелчком мыши.</translation>
-    </message>
-    <message>
         <source>Export to EXE anyway?</source>
         <translation>Все равно экспортировать в EXE?</translation>
     </message>
@@ -7320,6 +7325,10 @@ to %1</source>
         <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
         <translation>Для экспорта записи c перерывами рекомендуется MKV или другой формат.</translation>
     </message>
+    <message>
+        <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
+        <translation>Из-за ограничений Windows EXE-файлы более 4 ГБ не могут быть открыты двойным щелчком мыши.</translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7352,16 +7361,16 @@ to %1</source>
         <translation>Не удалось объединить системы</translation>
     </message>
     <message>
-        <source>Server connected to the System</source>
-        <translation>Сервер, подключен к системе</translation>
-    </message>
-    <message>
         <source>Failed to update Server</source>
         <translation>Не удалось обновить сервер</translation>
     </message>
     <message>
         <source>Total amount of licenses will decrease</source>
         <translation>Общее количество лицензий уменьшится</translation>
+    </message>
+    <message>
+        <source>Server connected to System</source>
+        <translation>Сервер подключен к системе</translation>
     </message>
 </context>
 <context>
@@ -7389,10 +7398,6 @@ to %1</source>
 </context>
 <context>
     <name>QnWorkbenchResourcesChangesWatcher</name>
-    <message>
-        <source>The System is in the Safe Mode. It&apos;s not allowed to make any changes except license activation.</source>
-        <translation>Система находится в безопасном режиме. Не разрешается выполнять каких-либо измененения в системных настройках, за исключением активации лицензии.</translation>
-    </message>
     <message numerus="yes">
         <source>The following %n items are not saved:</source>
         <translation>
@@ -7412,7 +7417,7 @@ to %1</source>
     <message numerus="yes">
         <source>The following %n items are not deleted:</source>
         <translation>
-            <numerusform>Следующий элемент не удален:</numerusform>
+            <numerusform>%n элемент не удален:</numerusform>
             <numerusform>%n элемента не удалено:</numerusform>
             <numerusform>%n элементов не удалено:</numerusform>
         </translation>
@@ -7424,10 +7429,14 @@ to %1</source>
     <message numerus="yes">
         <source>Failed to delete %n items:</source>
         <translation>
-            <numerusform>Не удалось удалить элемент:</numerusform>
+            <numerusform>Не удалось удалить %n элемент:</numerusform>
             <numerusform>Не удалось удалить %n элемента:</numerusform>
             <numerusform>Не удалось удалить %n элементов:</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>System is in the Safe Mode. It is not allowed to make any changes except license activation.</source>
+        <translation>Система находится в безопасном режиме. Не разрешается выполнять какие-либо измененения в системных настройках, за исключением активации лицензии.</translation>
     </message>
 </context>
 <context>
@@ -7441,7 +7450,7 @@ to %1</source>
     <name>QnWorkbenchScreenRecordingHandler</name>
     <message>
         <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-        <translation>Подсистема захвата экрана еще не инициализирована. Пожалуйста, попытайтесь позже.</translation>
+        <translation>Подсистема захвата экрана ещё не инициализирована. Пожалуйста, попытайтесь позже.</translation>
     </message>
     <message>
         <source>Recording in %1...</source>
@@ -7538,7 +7547,7 @@ to %1</source>
         <translation>Обновление...</translation>
     </message>
     <message>
-        <source>Don&apos;t notify again about this update</source>
+        <source>Do not notify again about this update</source>
         <translation>Не уведомлять больше об этом обновлении</translation>
     </message>
 </context>
@@ -7581,21 +7590,13 @@ to %1</source>
         <translation>Не удалось применить изменения</translation>
     </message>
     <message>
-        <source>Screen controlled by another user</source>
-        <translation>Экран управляется другим пользователем</translation>
-    </message>
-    <message>
-        <source>Control session can&apos;t be started.</source>
-        <translation>Невозможно запустить сеанс управления.</translation>
-    </message>
-    <message>
         <source>To enable Video Wall, please activate a Video Wall license.</source>
         <translation>Для включения этой функции, пожалуйста, активируйте лицензию на видеостену.</translation>
     </message>
     <message numerus="yes">
         <source>Delete %n items?</source>
         <translation>
-            <numerusform>Удалить элемент?</numerusform>
+            <numerusform>Удалить %n элемент?</numerusform>
             <numerusform>Удалить %n элемента?</numerusform>
             <numerusform>Удалить %n элементов?</numerusform>
         </translation>
@@ -7616,14 +7617,10 @@ to %1</source>
         <source>Stop</source>
         <translation>Остановить</translation>
     </message>
-    <message>
-        <source>Can&apos;t save empty matrix</source>
-        <translation>Не удается сохранить пустую матрицу</translation>
-    </message>
     <message numerus="yes">
         <source>Delete %n matrices?</source>
         <translation>
-            <numerusform>Удалить матрицу?</numerusform>
+            <numerusform>Удалить %n матрицу?</numerusform>
             <numerusform>Удалить %n матрицы?</numerusform>
             <numerusform>Удалить %n матриц?</numerusform>
         </translation>
@@ -7631,6 +7628,18 @@ to %1</source>
     <message>
         <source>More Video Wall licenses required</source>
         <translation>Требуются дополнительные лицензии на видеостену</translation>
+    </message>
+    <message>
+        <source>Control session cannot be started.</source>
+        <translation>Невозможно запустить сеанс управления.</translation>
+    </message>
+    <message>
+        <source>Cannot save empty matrix</source>
+        <translation>Не удаётся сохранить пустую матрицу</translation>
+    </message>
+    <message>
+        <source>Screen is being controlled by another user</source>
+        <translation>Экран управляется другим пользователем</translation>
     </message>
 </context>
 <context>
@@ -7640,12 +7649,12 @@ to %1</source>
         <translation>Новая web-страница...</translation>
     </message>
     <message>
-        <source>Enter the url of the Web Page to add:</source>
-        <translation>Введите Url-адрес web-страницы для добавления:</translation>
-    </message>
-    <message>
         <source>This Web Page already exists</source>
         <translation>Эта web-страница уже существует</translation>
+    </message>
+    <message>
+        <source>Enter URL of the Web Page to add:</source>
+        <translation>Введите Url-адрес web-страницы для добавления:</translation>
     </message>
 </context>
 <context>
@@ -7653,10 +7662,6 @@ to %1</source>
     <message>
         <source>There is another layout with the same name</source>
         <translation>Существует другая раскладка с тем же именем</translation>
-    </message>
-    <message>
-        <source>You don&apos;t have permission to overwrite it.</source>
-        <translation>Отсутствует разрешение на перезапись.</translation>
     </message>
     <message>
         <source>Overwrite existing layout?</source>
@@ -7733,7 +7738,7 @@ to %1</source>
     <message numerus="yes">
         <source>These %n layouts are shared with other users, so you delete it for them too.</source>
         <translation>
-            <numerusform>Эта раскладка используется совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
+            <numerusform>%n раскладка используется совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
             <numerusform>Эти %n раскладки используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
             <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
         </translation>
@@ -7741,7 +7746,7 @@ to %1</source>
     <message numerus="yes">
         <source>Remove %n items from layout?</source>
         <translation>
-            <numerusform>Удалить элемент из раскладки?</numerusform>
+            <numerusform>Удалить %n элемент из раскладки?</numerusform>
             <numerusform>Удалить %n элемента из раскладки?</numerusform>
             <numerusform>Удалить %n элементов из раскладки?</numerusform>
         </translation>
@@ -7749,10 +7754,6 @@ to %1</source>
     <message>
         <source>Remove</source>
         <translation>Удалить</translation>
-    </message>
-    <message>
-        <source>You are going to delete some resources to which you have access from Video Wall only. You won&apos;t see them in your resource list after it and won&apos;t be able to add them to Video Wall again.</source>
-        <translation>Вы собираетесь удалить некоторые ресурсы, доступные только из режима видео стены. Вы не увидите их в списке ресурсов после этого и не сможет снова добавить их на видеостену.</translation>
     </message>
     <message>
         <source>You will lose access to following resources:</source>
@@ -7826,12 +7827,13 @@ to %1</source>
         <source>They may be auto-discovered again after removing.</source>
         <translation>Они могут быть снова автоматически обнаружены после удаления.</translation>
     </message>
-</context>
-<context>
-    <name>StatisticsOverlayWidget</name>
     <message>
-        <source>%1%</source>
-        <translation>%1%</translation>
+        <source>You do not have permission to overwrite it.</source>
+        <translation>Отсутствуют полномочия на перезапись.</translation>
+    </message>
+    <message>
+        <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
+        <translation>Вы собираетесь удалить некоторые ресурсы, доступные только из режима видео стены. Вы не увидите их в списке ресурсов после этого и не сможете снова добавить их на видеостену.</translation>
     </message>
 </context>
 <context>
@@ -7853,12 +7855,12 @@ to %1</source>
         <translation>Оставить</translation>
     </message>
     <message>
-        <source>Local files can&apos;t be placed on Video Wall Screen attached to another computer</source>
-        <translation>Локальные файлы не могут быть помещены на экран видеостены, подключенном к другому компьютеру</translation>
-    </message>
-    <message>
         <source>To display local files on the Video Wall, please attach them using computer where Video Wall is hosted.</source>
         <translation>Для отображения локальных файлов на видеостене, пожалуйста, поместите их на видеостену на компьютера, с которого она управляется.</translation>
+    </message>
+    <message>
+        <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
+        <translation>Локальные файлы не могут быть помещены на экран видеостены, подключенном к другому компьютеру</translation>
     </message>
 </context>
 </TS>

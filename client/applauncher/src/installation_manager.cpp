@@ -37,6 +37,15 @@ namespace {
             return version.toString();
     }
 
+    QString applicationRootPath()
+    {
+        const QDir dir(qApp->applicationDirPath());
+
+        if (QnAppInfo::applicationPlatform() == lit("linux"))
+            return dir.absoluteFilePath("..");
+
+        return dir.absolutePath();
+    }
 
 #if defined(Q_OS_MACX)
     QString extractVersion(const QString& fullPath)
@@ -94,7 +103,7 @@ void InstallationManager::updateInstalledVersionsInformation()
     // detect current installation
     NX_LOG(QString::fromLatin1("Checking current version (%1)").arg(QnAppInfo::applicationVersion()), cl_logDEBUG1);
 
-    QnClientInstallationPtr current = QnClientInstallation::installationForPath(QCoreApplication::applicationDirPath());
+    const auto current = QnClientInstallation::installationForPath(applicationRootPath());
     if (current)
     {
         current->setVersion(QnSoftwareVersion(QnAppInfo::applicationVersion()));

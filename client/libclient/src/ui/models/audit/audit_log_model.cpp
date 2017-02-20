@@ -17,6 +17,8 @@
 
 #include <client/client_settings.h>
 
+#include <text/time_strings.h>
+
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
@@ -24,6 +26,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
+#include <utils/common/qtimespan.h>
 #include <utils/math/math.h>
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
@@ -273,25 +276,14 @@ QString QnAuditLogModel::formatDateTime(const QDateTime& dateTime, bool showDate
 
 QString QnAuditLogModel::formatDuration(int durationSecs)
 {
-    int duration = durationSecs;
-    /* int seconds = duration % 60; */
-    duration /= 60;
-    int minutes = duration % 60;
-    duration /= 60;
-    int hours = duration % 24;
-    duration /= 24;
-    int days = duration;
+    qint64 durationMs = durationSecs * 1000;
 
-    QString result;
-    if (days > 0)
-        result += tr("%1d ").arg(days);
-    if (hours > 0)
-        result += tr("%1h ").arg(hours);
-    if ((minutes > 0 && days == 0) || result.isEmpty())
-        result += tr("%1m ").arg(minutes);
-    //if (seconds > 0 && days == 0 && hours == 0)
-    //    result += tr("%1s ").arg(seconds);
-    return result;
+    static const QString kSeparator(L' ');
+    return QTimeSpan(durationMs).toApproximateString(
+        QTimeSpan::kDoNotSuppressSecondUnit,
+        Qt::Days | Qt::Hours | Qt::Minutes,
+        QTimeSpan::SuffixFormat::Short,
+        kSeparator);
 }
 
 QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
@@ -401,7 +393,8 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data) const
     case Qn::AR_ViewArchive:
     case Qn::AR_ViewLive:
     case Qn::AR_ExportVideo:
-        result = tr("%1 - %2, ").arg(formatDateTime(data->rangeStartSec)).arg(formatDateTime(data->rangeEndSec));
+        result = lit("%1 - %2, ").arg(formatDateTime(data->rangeStartSec)).arg(formatDateTime(data->rangeEndSec));
+        //fall-through
     case Qn::AR_CameraUpdate:
     case Qn::AR_CameraInsert:
         result += QnDeviceDependentStrings::getNumericName(getCameras(data->resources));
@@ -429,16 +422,16 @@ QString QnAuditLogModel::htmlData(const Column& column, const QnAuditRecord* dat
         case Qn::AR_ViewArchive:
         case Qn::AR_ViewLive:
         case Qn::AR_ExportVideo:
-            result = tr("%1 - %2, ").arg(formatDateTime(data->rangeStartSec)).arg(formatDateTime(data->rangeEndSec));
+            result = lit("%1 - %2, ").arg(formatDateTime(data->rangeStartSec)).arg(formatDateTime(data->rangeEndSec));
         case Qn::AR_CameraInsert:
         case Qn::AR_CameraUpdate:
         {
             QString txt = QnDeviceDependentStrings::getNumericName(getCameras(data->resources));
             QString linkColor = lit("#%1").arg(QString::number(m_colors.httpLink.rgb(), 16));
             if (hovered)
-                result += QString(lit("<font color=%1><u><b>%2</b></u></font>")).arg(linkColor).arg(txt);
+                result += lit("<font color=%1><u><b>%2</b></u></font>").arg(linkColor).arg(txt);
             else
-                result += QString(lit("<font color=%1><b>%2</b></font>")).arg(linkColor).arg(txt);
+                result += lit("<font color=%1><b>%2</b></font>").arg(linkColor).arg(txt);
             if (hasDetail(data))
             {
                 auto archiveData = data->extractParam("archiveExist");

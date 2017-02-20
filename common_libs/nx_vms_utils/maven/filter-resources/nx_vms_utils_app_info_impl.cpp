@@ -19,3 +19,8 @@ QString AppInfo::iconFileName()
 {
     return QStringLiteral("${installer.name}.desktop");
 }
+
+QString AppInfo::productNameShort()
+{
+    return QStringLiteral("${product.name.short}");
+}

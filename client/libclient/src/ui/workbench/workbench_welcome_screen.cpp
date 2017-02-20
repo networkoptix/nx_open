@@ -375,7 +375,8 @@ void QnWorkbenchWelcomeScreen::makeDrop(const QList<QUrl>& urls)
     if (resources.isEmpty())
         return;
 
-    menu()->triggerIfPossible(QnActions::DropResourcesAction, QnActionParameters(resources));
+    if (menu()->triggerIfPossible(QnActions::DropResourcesAction, QnActionParameters(resources)))
+        action(QnActions::ResourcesModeAction)->setChecked(true);
 }
 
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(

@@ -98,6 +98,10 @@ if(LINUX)
     add_compile_options(
         -Wno-unknown-pragmas
         -Wno-ignored-qualifiers)
+
+    set(CMAKE_SKIP_BUILD_RPATH ON)
+    set(CMAKE_EXE_LINKER_FLAGS "-Wl,--disable-new-dtags")
+    set(CMAKE_SHARED_LINKER_FLAGS "-rdynamic -Wl,--allow-shlib-undefined")
 endif()
 
 if(MACOSX)

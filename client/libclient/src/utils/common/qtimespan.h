@@ -188,6 +188,8 @@ public:
         Long,
         Full
     };
+
+    static const int kDoNotSuppressSecondUnit = -1;
     QString toApproximateString(int suppresSecondUnitLimit = 3,
         Qt::TimeSpanFormat format = Qt::Seconds | Qt::Minutes | Qt::Hours | Qt::Days | Qt::Weeks,
         SuffixFormat suffixFormat = SuffixFormat::Full,

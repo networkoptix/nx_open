@@ -428,7 +428,7 @@ void QnUserSettingsWidget::setupInputFields()
             {
                 bool passwordWasValid = ui->passwordInputField->lastValidationResult() != QValidator::Invalid;
                 if (ui->passwordInputField->isValid() != passwordWasValid)
-                    ui->passwordInputField->validate();
+                    ui->passwordInputField->updateDisplayState();
             }
         });
 
@@ -457,7 +457,7 @@ void QnUserSettingsWidget::setupInputFields()
                 if (user->getEmail().toLower() != email)
                     continue;
 
-                return Qn::ValidationResult(tr("Cloud user with specified email already exists."));
+                return Qn::ValidationResult(tr("Cloud user with specified Email already exists."));
             }
 
             result = Qn::defaultEmailValidator()(text);
@@ -491,7 +491,7 @@ void QnUserSettingsWidget::setupInputFields()
         this, &QnUserSettingsWidget::updatePasswordPlaceholders);
 
     connect(ui->passwordInputField, &QnInputField::editingFinished,
-        ui->confirmPasswordInputField, &QnInputField::validate);
+        ui->confirmPasswordInputField, &QnInputField::updateDisplayState);
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);

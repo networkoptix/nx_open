@@ -16,6 +16,9 @@ struct NX_VMS_UTILS_API AppInfo
 
     /** Base file name of linux .desktop file. */
     static QString iconFileName();
+
+    /** Short name of the product like hdwitness. */
+    static QString productNameShort();
 };
 
 } // namespace utils

@@ -31,6 +31,7 @@ bool createDesktopFile(
     result += lit("Icon=vmsclient-%1.png\n").arg(customization);
     result += lit("Exec=\"%1\" %u\n").arg(applicationBinaryPath);
     result += lit("StartupNotify=%1\n").arg(lit("true"));
+    result += lit("StartupWMClass=%1\n").arg(AppInfo::productNameShort());
     result += lit("Terminal=%1\n").arg(lit("false"));
 
     if (!version.isNull())

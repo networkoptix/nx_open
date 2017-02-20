@@ -96,11 +96,6 @@ private:
     void setScheduleAlert(const QString& scheduleAlert);
     void setArchiveLengthAlert(const QString& archiveLengthAlert);
 
-    bool checkCanEnableRecording();
-    void checkRecordingEnabled();
-    void checkScheduleParamsSet();
-    void checkScheduleSet();
-
 private:
     /**
     * @brief getGridMaxFps         Get maximum fps value placed on a grid. If parameter motionPlusLqOnly set, then
@@ -121,6 +116,15 @@ private:
     int qualityToComboIndex(const Qn::StreamQuality& q);
 
     void retranslateUi();
+
+    enum AlertReason
+    {
+        CurrentParamsChange,
+        ScheduleChange,
+        EnabledChange
+    };
+
+    void updateAlert(AlertReason when);
 
 private:
     Q_DISABLE_COPY(QnCameraScheduleWidget)

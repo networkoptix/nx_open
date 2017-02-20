@@ -42,6 +42,11 @@ const int ProlongedActionRole = Qt::UserRole + 2;
 const int defaultActionDurationMs = 5000;
 const int defaultAggregationPeriodSec = 60;
 
+QString braced(const QString& source)
+{
+    return L'<' + source + L'>';
+};
+
 QVector<QnUuid> toIdList(const QSet<QnUuid>& src)
 {
     QVector<QnUuid> result;
@@ -972,35 +977,35 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const
     QnResourceList resources = qnResPool->getResources(eventResources());
     if (m_eventType == QnBusiness::CameraMotionEvent)
         return QnCameraMotionPolicy::getText(resources, detailed);
-    else if (m_eventType == QnBusiness::CameraInputEvent)
+
+    if (m_eventType == QnBusiness::CameraInputEvent)
         return QnCameraInputPolicy::getText(resources, detailed);
 
     if (!QnBusiness::isResourceRequired(m_eventType))
-    {
-        return tr("<System>");
-    }
-    else if (resources.size() == 1)
-    {
+        return braced(tr("System"));
+
+    if (resources.size() == 1)
         return QnResourceDisplayInfo(resources.first()).toString(qnSettings->extraInfoInTree());
-    }
-    else if (QnBusiness::requiresServerResource(m_eventType))
+
+    if (QnBusiness::requiresServerResource(m_eventType))
     {
         if (resources.isEmpty())
-            return tr("<Any Server>");
-        else
-            return tr("%n Server(s)", "", resources.size());
+            return braced(tr("Any Server"));
+
+        return tr("%n Server(s)", "", resources.size());
     }
-    else /*if (QnBusiness::requiresCameraResource(eventType))*/
+
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+    if (cameras.isEmpty())
     {
-        QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-        if (cameras.isEmpty())
-            return QnDeviceDependentStrings::getDefaultNameFromSet(
-                tr("<Any Device>"),
-                tr("<Any Camera>")
-            );
-        else
-            return QnDeviceDependentStrings::getNumericName(cameras);
+        return braced(QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("Any Device"),
+            tr("Any Camera")
+        ));
     }
+
+    return QnDeviceDependentStrings::getNumericName(cameras);
+
 }
 
 QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
@@ -1063,7 +1068,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
 
     //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
     if (!QnBusiness::requiresCameraResource(m_actionType))
-        return tr("<System>");
+        return braced(tr("System"));
 
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
     if (cameras.size() == 1)
@@ -1088,11 +1093,11 @@ QString QnBusinessRuleViewModel::getAggregationText() const
 
     const qint64 kMsecPerSec = 1000;
     static const Qt::TimeSpanFormat kFormat = Qt::Seconds | Qt::Minutes | Qt::Hours | Qt::Days;
-    static const int kDoNotSuppress = -1;
     static const QString kSeparator(L' ');
 
     const qint64 aggregationPeriodMs = m_aggregationPeriodSec * kMsecPerSec;
-    const QString timespan = QTimeSpan(aggregationPeriodMs).toApproximateString(kDoNotSuppress,
+    const QString timespan = QTimeSpan(aggregationPeriodMs).toApproximateString(
+        QTimeSpan::kDoNotSuppressSecondUnit,
         kFormat,
         QTimeSpan::SuffixFormat::Full,
         kSeparator);
