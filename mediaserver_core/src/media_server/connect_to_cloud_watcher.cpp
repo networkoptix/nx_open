@@ -5,6 +5,7 @@
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <transaction/transaction_message_bus.h>
+#include <cdb/ec2_request_paths.h>
 
 namespace {
     static const int kUpdateIfFailIntervalMs = 1000 * 60;
@@ -70,7 +71,7 @@ void QnConnectToCloudWatcher::at_updateConnection()
                 .str(url), cl_logDEBUG1);
 
             m_cloudUrl = url;
-            m_cloudUrl.setPath(lit("/ec2/events"));
+            m_cloudUrl.setPath(nx::cdb::api::kEc2EventsPath);
             m_cloudUrl.setUserName(qnGlobalSettings->cloudSystemId());
             m_cloudUrl.setPassword(qnGlobalSettings->cloudAuthKey());
             qnTransactionBus->addConnectionToPeer(m_cloudUrl);

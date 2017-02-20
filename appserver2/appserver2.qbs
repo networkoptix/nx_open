@@ -5,6 +5,7 @@ GenericProduct
     name: "appserver2"
 
     Depends { name: "nx_network" }
+    Depends { name: "cloud_db_client" }
 
     ResourcesGroup
     {
@@ -14,5 +15,6 @@ GenericProduct
     Export
     {
         Depends { name: "nx_network" }
+        Depends { name: "cloud_db_client" }
     }
 }
