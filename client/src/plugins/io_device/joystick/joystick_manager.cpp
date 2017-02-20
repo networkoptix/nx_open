@@ -19,6 +19,9 @@ const QString kDefaultConfigFileName = lit("joystick_config.json");
 } // namespace 
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
 
 Manager::Manager(QnWorkbenchContext* context):
@@ -53,7 +56,7 @@ void Manager::loadDrivers()
     auto hwndId = reinterpret_cast<HWND>(mainWindow()->winId());
     m_drivers.emplace_back(new driver::MmWinDriver(hwndId));
 
-    QApplication::instance()->installNativeEventFilter(new nx::joystick::JoystickEventFilter(hwndId));
+    QApplication::instance()->installNativeEventFilter(new driver::JoystickEventFilter(hwndId));
 #endif
 }
 
@@ -73,12 +76,12 @@ void Manager::applyMappings(std::vector<JoystickPtr>& joysticks)
     for (auto& joy: joysticks)
     { 
         auto activeConfiguration = m_configHolder.getActiveConfigurationForJoystick(
-            joy->getId());
+            joy->id());
 
         if (!activeConfiguration)
             return;
 
-        auto controls = joy->getControls();
+        auto controls = joy->controls();
 
         for (auto& control: controls)
         {
@@ -99,7 +102,7 @@ void Manager::applyMappings(std::vector<JoystickPtr>& joysticks)
                     qDebug() << "Can not add rule for control" << controlId;
             }
 
-            auto controlOverrides = m_configHolder.getControlOverrides(
+            auto controlOverrides = m_configHolder.controlOverrides(
                 activeConfiguration->configurationId,
                 controlId);
 
@@ -115,18 +118,18 @@ void Manager::applyMappings(std::vector<JoystickPtr>& joysticks)
 
 void Manager::applyMappingsAndCaptureJoysticks()
 {
-    std::vector<nx::joystick::JoystickPtr> joysticks;
+    std::vector<JoystickPtr> joysticks;
     for (const auto& drv: m_drivers)
     {
         auto joysticks = drv->enumerateJoysticks();
         applyMappings(joysticks);
-
-        for(auto& joy: joysticks)
+        
+        for (auto& joy: joysticks)
             drv->captureJoystick(joy);
     }
 }
 
-nx::joystick::EventHandler Manager::makeEventHandler(const mapping::Rule& rule, controls::ControlPtr control)
+EventHandler Manager::makeEventHandler(const config::Rule& rule, controls::ControlPtr control)
 {
     auto handler = 
         [rule, control, this](EventType eventType, EventParameters eventParameters)
@@ -145,7 +148,7 @@ nx::joystick::EventHandler Manager::makeEventHandler(const mapping::Rule& rule, 
 }
 
 QnActionParameters Manager::createActionParameters(
-    const mapping::Rule& rule,
+    const config::Rule& rule,
     const controls::ControlPtr& control,
     const EventParameters& eventParameters)
 {
@@ -190,7 +193,7 @@ QnActionParameters Manager::createActionParameters(
 boost::optional<Qn::ItemDataRole> Manager::fromActionParamterNameToItemDataRole(
     const QString& actionParamterName) const
 {
-    if (actionParamterName == mapping::kPresetIndexParameterName)
+    if (actionParamterName == config::kPresetIndexParameterName)
         return Qn::ItemDataRole::PtzPresetIndexRole;
 
     return boost::none;
@@ -213,4 +216,7 @@ QVariant Manager::fromActionParamtereValueToVariant(
 }
 
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx

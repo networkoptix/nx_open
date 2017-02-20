@@ -495,7 +495,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
             ? Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint
             : static_cast<Qt::WindowFlags>(0);
 
-    std::unique_ptr<nx::joystick::Manager> joystickManager(new nx::joystick::Manager(context.data()));
+    using namespace nx::client::plugins::io_device;
+    std::unique_ptr<joystick::Manager> joystickManager(new joystick::Manager(context.data()));
 
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data(), NULL, flags));
     context->setMainWindow(mainWindow.data());
@@ -511,7 +512,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 
     mainWindow->show();
-    
+
     joystickManager->start();
 
     if (!startupParams.fullScreenDisabled)

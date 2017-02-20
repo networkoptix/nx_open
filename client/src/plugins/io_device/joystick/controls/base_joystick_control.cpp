@@ -3,10 +3,13 @@
 #include <plugins/io_device/joystick/abstract_joystick.h>
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
 namespace controls {
 
-BaseControl::BaseControl(nx::joystick::State::size_type stateSize)
+BaseControl::BaseControl(State::size_type stateSize)
 {
     m_state.resize(stateSize);
 }
@@ -23,13 +26,13 @@ void BaseControl::setId(const QString& id)
     m_id = id;
 }
 
-nx::joystick::AbstractJoystick* BaseControl::getParentDevice() const 
+AbstractJoystick* BaseControl::getParentDevice() const 
 {
     QnMutexLocker lock(&m_mutex);
     return m_parentDevice;
 }
 
-void BaseControl::setParentDevice(nx::joystick::AbstractJoystick* parentJoystick)
+void BaseControl::setParentDevice(AbstractJoystick* parentJoystick)
 {
     QnMutexLocker lock(&m_mutex);
     m_parentDevice = parentJoystick;
@@ -47,25 +50,25 @@ void BaseControl::setDescription(const QString& description)
     m_description = description;
 }
 
-nx::joystick::ControlCapabilities BaseControl::getCapabilities() const 
+ControlCapabilities BaseControl::getCapabilities() const 
 {
     QnMutexLocker lock(&m_mutex);
     return m_capabilities;
 }
 
-void BaseControl::setCapabilities(nx::joystick::ControlCapabilities capabilities)
+void BaseControl::setCapabilities(ControlCapabilities capabilities)
 {
     QnMutexLocker lock(&m_mutex);
     m_capabilities = capabilities;
 }
 
-nx::joystick::State BaseControl::getState() const 
+State BaseControl::getState() const 
 {
     QnMutexLocker lock(&m_mutex);
     return m_state;
 }
 
-void BaseControl::setState(const nx::joystick::State& state)
+void BaseControl::setState(const State& state)
 {
     decltype(m_eventHandlers) handlers;
     EventSet eventsToBeFired;
@@ -101,7 +104,7 @@ void BaseControl::setState(const nx::joystick::State& state)
     }  
 }
 
-void BaseControl::notifyControlStateChanged(const nx::joystick::State& state)
+void BaseControl::notifyControlStateChanged(const State& state)
 {
     decltype(m_eventHandlers) handlers;
     EventSet eventsToBeFired;
@@ -132,8 +135,8 @@ void BaseControl::notifyControlStateChanged(const nx::joystick::State& state)
 }
 
 bool BaseControl::addEventHandler(
-    nx::joystick::EventType eventType,
-    nx::joystick::EventHandler handler)
+    EventType eventType,
+    EventHandler handler)
 {
     if (!isEventTypeSupported(eventType))
         return false;
@@ -149,7 +152,7 @@ void BaseControl::applyOverride(const QString overrideName, const QString& overr
     // Do nothing.
 }
 
-bool BaseControl::isEventTypeSupported(nx::joystick::EventType eventType) const
+bool BaseControl::isEventTypeSupported(EventType eventType) const
 {
     return false;
 }
@@ -159,28 +162,28 @@ BaseControl::EventSet BaseControl::checkForEventsUnsafe() const
     return EventSet();
 }
 
-void BaseControl::setStateUnsafe(const nx::joystick::State& state)
+void BaseControl::setStateUnsafe(const State& state)
 {
     m_state = state;
 }
 
-nx::joystick::EventParameters BaseControl::makeParametersForEvent(
-    nx::joystick::EventType eventType) const
+EventParameters BaseControl::makeParametersForEvent(
+    EventType eventType) const
 {
-    nx::joystick::EventParameters eventParameters;
+    EventParameters eventParameters;
     eventParameters.controlId = m_id;
     eventParameters.state = m_state;
 
     return eventParameters;
 }
 
-nx::joystick::State BaseControl::fromRawToNormalized(const nx::joystick::State& raw) const
+State BaseControl::fromRawToNormalized(const State& raw) const
 {
     // No translation by default.
     return raw;
 }
 
-nx::joystick::State BaseControl::fromNormalizedToRaw(const nx::joystick::State& normalized) const
+State BaseControl::fromNormalizedToRaw(const State& normalized) const
 {
     // No translation by default.
     return normalized;
@@ -188,4 +191,7 @@ nx::joystick::State BaseControl::fromNormalizedToRaw(const nx::joystick::State& 
 
 } // namespace controls
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx

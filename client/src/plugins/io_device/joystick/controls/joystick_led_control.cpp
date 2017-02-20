@@ -1,10 +1,15 @@
 #include "joystick_led_control.h"
 
 namespace {
-    const nx::joystick::State::size_type kLedStateSize = 1;
+
+const nx::client::plugins::io_device::joystick::State::size_type kLedStateSize = 1;
+
 } // namespace
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
 namespace controls {
 
@@ -40,9 +45,12 @@ void Led::setLedColor(Color color)
 bool Led::canChangeColor() const
 {
     auto caps = getCapabilities();
-    return caps & nx::joystick::ControlCapability::colorChange;
+    return caps & ControlCapability::colorChange;
 }
 
 } // namespace controls
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx

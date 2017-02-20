@@ -7,7 +7,11 @@
 #include <Dbt.h>
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
+namespace driver {
 
 JoystickEventFilter::JoystickEventFilter(HWND windowId):
     m_windowId(windowId)
@@ -26,7 +30,7 @@ bool JoystickEventFilter::nativeEventFilter(const QByteArray &eventType, void* m
     auto winMessageType = winMessage->message;
     int joystickIndex = -1;
 
-    auto mmDriver = nx::joystick::driver::MmWinDriver::instance();
+    auto mmDriver = MmWinDriver::instance();
 
     if (isJoystickInteractionMessage(winMessage, &joystickIndex))
     {
@@ -92,7 +96,11 @@ bool JoystickEventFilter::isJoystickConnectivityMessage(MSG* message)
     return hardwareConfigurationChanged;
 }
 
+} // namespace controls
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx
 
 #endif // defined(Q_OS_WIN)

@@ -3,10 +3,13 @@
 #include "base_joystick_control.h"
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
 namespace controls {
 
-typedef nx::joystick::State::size_type FreedomDegree;
+typedef State::size_type FreedomDegree;
 const FreedomDegree kXindex = 0;
 const FreedomDegree kYindex = 1;
 const FreedomDegree kZindex = 2;
@@ -20,12 +23,12 @@ class Stick: public BaseControl
 public:
     Stick();
 
-    virtual nx::joystick::StateElement getStickX() const;
-    virtual nx::joystick::StateElement getStickY() const;
-    virtual nx::joystick::StateElement getStickZ() const;
-    virtual nx::joystick::StateElement getStickRx() const;
-    virtual nx::joystick::StateElement getStickRy() const;
-    virtual nx::joystick::StateElement getStickRz() const;
+    virtual StateElement getStickX() const;
+    virtual StateElement getStickY() const;
+    virtual StateElement getStickZ() const;
+    virtual StateElement getStickRx() const;
+    virtual StateElement getStickRy() const;
+    virtual StateElement getStickRz() const;
 
     virtual Ranges getRanges() const;
     virtual void setRanges(Ranges range);
@@ -56,74 +59,74 @@ public:
 
     virtual Range getStickXRange() const;
     virtual void setStickXRange(
-        nx::joystick::StateElement min,
-        nx::joystick::StateElement max);
+        StateElement min,
+        StateElement max);
     virtual void setStickXRange(const Range& range);
 
     virtual Range getStickYRange() const;
     virtual void setStickYRange(
-        nx::joystick::StateElement min,
-        nx::joystick::StateElement max);
+        StateElement min,
+        StateElement max);
     virtual void setStickYRange(const Range& range);
 
     virtual Range getStickZRange() const;
     virtual void setStickZRange(
-        nx::joystick::StateElement min,
-        nx::joystick::StateElement max);
+        StateElement min,
+        StateElement max);
     virtual void setStickZRange(const Range& range);
 
     virtual Range getStickRxRange() const;
     virtual void setStickRxRange(
-        nx::joystick::StateElement min,
-        nx::joystick::StateElement max);
+        StateElement min,
+        StateElement max);
     virtual void setStickRxRange(const Range& range);
 
     virtual Range getStickRyRange() const;
     virtual void setStickRyRange(
-        nx::joystick::StateElement min,
-        nx::joystick::StateElement max);
+        StateElement min,
+        StateElement max);
     virtual void setStickRyRange(const Range& range);
 
     virtual Range getStickRzRange() const;
     virtual void setStickRzRange(
-        nx::joystick::StateElement min,
-        nx::joystick::StateElement max);
+        StateElement min,
+        StateElement max);
     virtual void setStickRzRange(const Range& range);
 
     virtual Range getStickOutputXRange() const;
     virtual void setStickOutputXRange(
-        nx::joystick::StateElement min,
-        nx::joystick::StateElement max);
+        StateElement min,
+        StateElement max);
     virtual void setStickOutputXRange(const Range& range);
 
     virtual Range getStickOutputYRange() const;
     virtual void setStickOutputYRange(
-        nx::joystick::StateElement min,
-        nx::joystick::StateElement max);
+        StateElement min,
+        StateElement max);
     virtual void setStickOutputYRange(const Range& range);
 
     virtual Range getStickOutputZRange() const;
     virtual void setStickOutputZRange(
-        nx::joystick::StateElement min,
-        nx::joystick::StateElement max);
+        StateElement min,
+        StateElement max);
     virtual void setStickOutputZRange(const Range& range);
 
     virtual Range getStickOutputRxRange() const;
     virtual void setStickOutputRxRange(
-        nx::joystick::StateElement min,
-        nx::joystick::StateElement max);
+        StateElement min,
+        StateElement max);
     virtual void setStickOutputRxRange(const Range& range);
 
     virtual Range getStickOutputRyRange() const;
     virtual void setStickOutputRyRange(
-        nx::joystick::StateElement min,
-        nx::joystick::StateElement max);
+        StateElement min,
+        StateElement max);
     virtual void setStickOutputRyRange(const Range& range);
 
     virtual Range getStickOutputRzRange() const;
     virtual void setStickOutputRzRange(
-        nx::joystick::StateElement min,
-        nx::joystick::StateElement max);
+        StateElement min,
+        StateElement max);
     virtual void setStickOutputRzRange(const Range& range);
 
     virtual void applyOverride(
@@ -131,26 +134,26 @@ public:
         const QString& overrideValue) override;
 
 protected:
-    virtual bool isEventTypeSupported(nx::joystick::EventType eventType) const override;
+    virtual bool isEventTypeSupported(EventType eventType) const override;
     virtual EventSet checkForEventsUnsafe() const override;
-    virtual void setStateUnsafe(const nx::joystick::State& state) override;
-    virtual nx::joystick::State fromRawToNormalized(
-        const nx::joystick::State& raw) const override;
+    virtual void setStateUnsafe(const State& state) override;
+    virtual State fromRawToNormalized(
+        const State& raw) const override;
 
-    virtual nx::joystick::State fromNormalizedToRaw(
-        const nx::joystick::State& normalized) const override;
+    virtual State fromNormalizedToRaw(
+        const State& normalized) const override;
 
 private:
-    nx::joystick::StateElement distance(
-        const nx::joystick::State& position1,
-        const nx::joystick::State& position2) const;
+    StateElement distance(
+    const State& position1,
+    const State& position2) const;
 
-    nx::joystick::StateElement translatePoint(
-        nx::joystick::StateElement point,
+    StateElement translatePoint(
+        StateElement point,
         const Range& originalBounds,
         const Range& targetBounds) const;
 
-    bool isZeroPosition(const nx::joystick::State& position) const;
+    bool isZeroPosition(const State& position) const;
 
 private:
     StateElement m_threshold;
@@ -164,5 +167,8 @@ typedef std::shared_ptr<Stick> StickPtr;
 
 } // namespace controls
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx
 

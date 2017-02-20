@@ -4,6 +4,9 @@
 #include <plugins/io_device/joystick/joystick_common.h>
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
 namespace driver {
 
@@ -12,16 +15,19 @@ class AbstractJoystickDriver
 public:
     virtual ~AbstractJoystickDriver() {};
 
-    virtual std::vector<nx::joystick::JoystickPtr> enumerateJoysticks() = 0;
+    virtual std::vector<JoystickPtr> enumerateJoysticks() = 0;
     virtual bool setControlState(
         const QString& joystickId,
         const QString& controlId,
-        const nx::joystick::State& state) = 0;
+        const State& state) = 0;
 
-    virtual bool captureJoystick(nx::joystick::JoystickPtr& joystickToCapture) = 0;
-    virtual bool releaseJoystick(nx::joystick::JoystickPtr& joystickToRelease) = 0;
+    virtual bool captureJoystick(JoystickPtr& joystickToCapture) = 0;
+    virtual bool releaseJoystick(JoystickPtr& joystickToRelease) = 0;
 };
 
 } // namespace driver
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx

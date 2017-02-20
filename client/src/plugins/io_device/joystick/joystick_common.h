@@ -3,6 +3,9 @@
 #include <utils/common/model_functions_fwd.h>
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
 
 enum class ControlCapability 
@@ -17,6 +20,8 @@ enum class ControlCapability
     colorChange = 0x0040,
 };
 
+Q_DECLARE_FLAGS(ControlCapabilities, ControlCapability);
+
 enum class EventType 
 {
     buttonDown = 1,
@@ -30,7 +35,6 @@ QN_FUSION_DECLARE_FUNCTIONS(EventType, (lexical))
 
 typedef int64_t StateElement;
 typedef std::vector<StateElement> State;
-typedef QFlags<ControlCapability> ControlCapabilities;
 
 struct EventParameters
 {
@@ -41,6 +45,9 @@ struct EventParameters
 typedef std::function<void(EventType, EventParameters)> EventHandler;
 
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx
 
 

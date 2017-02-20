@@ -5,11 +5,13 @@
 namespace {
 
 const int kMaxDegreesOfFreedom = 6;
-const nx::joystick::StateElement kDefaultThreshold = 2;
-const nx::joystick::StateElement kZeroPositionArray[] = {0, 0, 0, 0, 0, 0};
-const nx::joystick::State kZeroPositionState(
+const nx::client::plugins::io_device::joystick::StateElement kDefaultThreshold = 2;
+const nx::client::plugins::io_device::joystick::StateElement kZeroPositionArray[] = {0, 0, 0, 0, 0, 0};
+const nx::client::plugins::io_device::joystick::State kZeroPositionState(
     kZeroPositionArray,
-    kZeroPositionArray + sizeof(kZeroPositionArray) / sizeof(nx::joystick::StateElement));
+    kZeroPositionArray 
+    + sizeof(kZeroPositionArray) 
+        / sizeof(nx::client::plugins::io_device::joystick::StateElement));
 
 const QString kInvertXaxisOverrideName = lit("invertX");
 const QString kInvertYaxisOverrideName = lit("invertY");
@@ -24,6 +26,9 @@ const QString kStringFalseValue = lit("false");
 } // namespace
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
 namespace controls {
 
@@ -37,37 +42,37 @@ Stick::Stick():
 {
 }
 
-nx::joystick::StateElement Stick::getStickX() const
+StateElement Stick::getStickX() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_state[kXindex];
 }
 
-nx::joystick::StateElement Stick::getStickY() const
+StateElement Stick::getStickY() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_state[kYindex];
 }
 
-nx::joystick::StateElement Stick::getStickZ() const
+StateElement Stick::getStickZ() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_state[kZindex];
 }
 
-nx::joystick::StateElement Stick::getStickRx() const
+StateElement Stick::getStickRx() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_state[kRxIndex];
 }
 
-nx::joystick::StateElement Stick::getStickRy() const
+StateElement Stick::getStickRy() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_state[kRyIndex];
 }
 
-nx::joystick::StateElement Stick::getStickRz() const
+StateElement Stick::getStickRz() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_state[kRzIndex];
@@ -189,7 +194,7 @@ Range Stick::getStickXRange() const
     return m_ranges[kXindex];
 }
 
-void Stick::setStickXRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+void Stick::setStickXRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
@@ -209,7 +214,7 @@ Range Stick::getStickYRange() const
     return m_ranges[kYindex];
 }
 
-void Stick::setStickYRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+void Stick::setStickYRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
@@ -229,7 +234,7 @@ Range Stick::getStickZRange() const
     return m_ranges[kZindex];
 }
 
-void Stick::setStickZRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+void Stick::setStickZRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
@@ -249,7 +254,7 @@ Range Stick::getStickRxRange() const
     return m_ranges[kRxIndex];
 }
 
-void Stick::setStickRxRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+void Stick::setStickRxRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
@@ -269,7 +274,7 @@ Range Stick::getStickRyRange() const
     return m_ranges[kRyIndex];
 }
 
-void Stick::setStickRyRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+void Stick::setStickRyRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
@@ -289,7 +294,7 @@ Range Stick::getStickRzRange() const
     return m_ranges[kRzIndex];
 }
 
-void Stick::setStickRzRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+void Stick::setStickRzRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
@@ -309,7 +314,7 @@ Range Stick::getStickOutputXRange() const
     return m_outputRanges[kXindex];
 }
 
-void Stick::setStickOutputXRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+void Stick::setStickOutputXRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
@@ -329,7 +334,7 @@ Range Stick::getStickOutputYRange() const
     return m_outputRanges[kYindex];
 }
 
-void Stick::setStickOutputYRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+void Stick::setStickOutputYRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
@@ -349,7 +354,7 @@ Range Stick::getStickOutputZRange() const
     return m_outputRanges[kZindex];
 }
 
-void Stick::setStickOutputZRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+void Stick::setStickOutputZRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
@@ -369,7 +374,7 @@ Range Stick::getStickOutputRxRange() const
     return m_outputRanges[kRxIndex];
 }
 
-void Stick::setStickOutputRxRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+void Stick::setStickOutputRxRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
@@ -389,7 +394,7 @@ Range Stick::getStickOutputRyRange() const
     return m_outputRanges[kRyIndex];
 }
 
-void Stick::setStickOutputRyRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+void Stick::setStickOutputRyRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
@@ -409,7 +414,7 @@ Range Stick::getStickOutputRzRange() const
     return m_outputRanges[kRzIndex];
 }
 
-void Stick::setStickOutputRzRange(nx::joystick::StateElement min, nx::joystick::StateElement max)
+void Stick::setStickOutputRzRange(StateElement min, StateElement max)
 {
     Q_ASSERT(max > min);
     QnMutexLocker lock(&m_mutex);
@@ -441,7 +446,7 @@ void Stick::applyOverride(const QString overrideName, const QString& overrideVal
         invertRz(isTrueValue);
 }
 
-bool Stick::isEventTypeSupported(nx::joystick::EventType eventType) const
+bool Stick::isEventTypeSupported(EventType eventType) const
 {
     return eventType == EventType::stickMove;
 }
@@ -454,24 +459,24 @@ BaseControl::EventSet Stick::checkForEventsUnsafe() const
     if (distance(m_previousPosition, m_state) > m_threshold || 
         (isZeroPosition(m_state) && !isZeroPosition(m_previousPosition)))
     {
-        eventsToBeFired.insert(nx::joystick::EventType::stickMove);
+        eventsToBeFired.insert(EventType::stickMove);
     }
     
     return eventsToBeFired;
 }
 
-void Stick::setStateUnsafe(const nx::joystick::State& state)
+void Stick::setStateUnsafe(const State& state)
 {
     m_previousPosition = m_state;
     m_state = state;
 }
 
-nx::joystick::State Stick::fromRawToNormalized(const nx::joystick::State& raw) const 
+State Stick::fromRawToNormalized(const State& raw) const 
 {
     Q_ASSERT(raw.size() == kMaxDegreesOfFreedom);
 
     QnMutexLocker lock(&m_mutex);
-    nx::joystick::State normalizedState;
+    State normalizedState;
     std::vector<bool> inversions;
 
     for (auto i = 0; i < raw.size(); ++i)
@@ -489,10 +494,10 @@ nx::joystick::State Stick::fromRawToNormalized(const nx::joystick::State& raw) c
     return normalizedState;
 }
 
-nx::joystick::State Stick::fromNormalizedToRaw(const nx::joystick::State& normalized) const 
+State Stick::fromNormalizedToRaw(const State& normalized) const 
 {
     Q_ASSERT(normalized.size() == kMaxDegreesOfFreedom);
-    nx::joystick::State rawState;
+    State rawState;
     for (auto i = 0; i < normalized.size(); ++i)
     {
         auto rawAxisState = translatePoint(normalized[i], m_outputRanges[i], m_ranges[i]);
@@ -502,7 +507,7 @@ nx::joystick::State Stick::fromNormalizedToRaw(const nx::joystick::State& normal
     return rawState;
 }
 
-nx::joystick::StateElement Stick::distance(const State& position1, const State& position2) const
+StateElement Stick::distance(const State& position1, const State& position2) const
 {
     Q_ASSERT(position1.size() >= 3 && position2.size() >= 3);
     auto xDiff = position1[kXindex] - position2[kXindex];
@@ -512,13 +517,16 @@ nx::joystick::StateElement Stick::distance(const State& position1, const State& 
     return static_cast<StateElement>(std::sqrt(xDiff * xDiff + yDiff * yDiff + zDiff * zDiff) + 0.5);
 }
 
-nx::joystick::StateElement Stick::translatePoint(
-    nx::joystick::StateElement point,
+StateElement Stick::translatePoint(
+    StateElement point,
     const Range& originalBounds,
     const Range& targetBounds) const
 {
     Q_ASSERT(originalBounds.max > originalBounds.min && targetBounds.max > targetBounds.min);
-    auto translated = static_cast<nx::joystick::StateElement>(
+    if (originalBounds.max == originalBounds.min)
+        return targetBounds.min;
+
+    auto translated = static_cast<StateElement>(
         targetBounds.min 
         + static_cast<double>((point - originalBounds.min)) / (originalBounds.max - originalBounds.min) 
         * (targetBounds.max - targetBounds.min) + 0.5);
@@ -541,4 +549,7 @@ bool Stick::isZeroPosition(const State& position) const
 
 } // namespace controls
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx

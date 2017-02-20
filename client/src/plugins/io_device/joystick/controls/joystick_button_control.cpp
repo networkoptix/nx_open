@@ -2,17 +2,18 @@
 
 namespace {
 
-const nx::joystick::State::size_type kButtonStateSize = 1;
+const nx::client::plugins::io_device::joystick::State::size_type kButtonStateSize = 1;
 
-const nx::joystick::StateElement kReleasedButtonState = 0;
-const nx::joystick::StateElement kPressedButtonState = 1;
-
-const QString kWrongStateSizeMessage = lit("Wrong button state size.");
+const nx::client::plugins::io_device::joystick::StateElement kReleasedButtonState = 0;
+const nx::client::plugins::io_device::joystick::StateElement kPressedButtonState = 1;
 
 } // namespace 
 
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
 namespace controls {
 
@@ -41,7 +42,7 @@ void Button::notifyButtonStateChanged(ButtonState buttonState)
     notifyControlStateChanged(newState);
 }
 
-void Button::notifyButtonStateChanged(const nx::joystick::State& state)
+void Button::notifyButtonStateChanged(const State& state)
 {
     {
         QnMutexLocker lock(&m_mutex);
@@ -67,25 +68,25 @@ BaseControl::EventSet Button::checkForEventsUnsafe() const
     if (didButtonUpEventOccurUnsafe())
         eventSet.insert(EventType::buttonUp);
 
-    if(didButtonDownEventOccurUnsafe())
+    if (didButtonDownEventOccurUnsafe())
         eventSet.insert(EventType::buttonDown);
 
-    if(didButtonPressedEventOccurUnsafe())
+    if (didButtonPressedEventOccurUnsafe())
         eventSet.insert(EventType::buttonPressed);
 
-    if(didButtonDoublePressedEventOccurUnsafe())
+    if (didButtonDoublePressedEventOccurUnsafe())
         eventSet.insert(EventType::buttonDoublePressed);
 
     return eventSet;
 }
 
-void Button::setStateUnsafe(const nx::joystick::State& state)
+void Button::setStateUnsafe(const State& state)
 {
     m_previousState = fromStateElementToButtonState(m_state[0]);
     m_state = state;
 }
 
-nx::joystick::StateElement Button::fromButtonStateToStateElement(ButtonState buttonState) const
+StateElement Button::fromButtonStateToStateElement(ButtonState buttonState) const
 {
     if (buttonState == ButtonState::released)
         return kReleasedButtonState;
@@ -93,7 +94,7 @@ nx::joystick::StateElement Button::fromButtonStateToStateElement(ButtonState but
     return kPressedButtonState;
 }
 
-ButtonState Button::fromStateElementToButtonState(nx::joystick::StateElement StateElement) const
+ButtonState Button::fromStateElementToButtonState(StateElement StateElement) const
 {
     if (StateElement == kReleasedButtonState)
         return ButtonState::released;
@@ -140,4 +141,7 @@ bool Button::didButtonDoublePressedEventOccurUnsafe() const
 
 } // namespace controls
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx

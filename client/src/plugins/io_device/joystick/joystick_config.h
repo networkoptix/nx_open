@@ -1,43 +1,79 @@
 #pragma once
 
-#include "joystick_mapping.h"
+#include <set>
 
-#include <boost/optional/optional.hpp>
+#include <ui/actions/action.h>
+#include <plugins/io_device/joystick/joystick_common.h>
+#include <utils/common/model_functions_fwd.h>
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
-namespace mapping {
+namespace config {
 
+using namespace nx::client::plugins::io_device;
 
-class ConfigHolder
+struct Rule 
 {
-public:
-    std::vector<JoystickConfiguration> getConfigurations();
-    bool addConfiguration(const JoystickConfiguration& configuration);
-    bool removeConfiguration(const QString& configurationId);
-    bool updateConfiguration(const JoystickConfiguration& configuration);
+    Rule() {};
+    Rule(
+        QString id,
+        joystick::EventType evtType,
+        QnActions::IDType actType,
+        std::map<QString, QString> actParameters):
+        
+        ruleId(id),
+        eventType(evtType),
+        actionType(actType),
+        actionParameters(actParameters)
+    {};
 
-    boost::optional<JoystickConfiguration> getActiveConfigurationForJoystick(const QString& joystickId) const;
-    bool setActiveConfigurationForJoystick(const QString& joystickId, const QString& configurationId);
-
-    std::vector<Rule> getControlEventRules(
-        const QString& configurationId,
-        const QString& controlId) const;
-
-    std::map<QString, QString> getControlOverrides(
-        const QString& configurationId,
-        const QString& controlId) const;
-
-    bool load(const QString& configName);
-
-private:
-    bool checkIfConfigurationExistsUnsafe(const QString& configurationId) const;
-
-private:
-    Config m_config;
-    mutable QnMutex m_mutex;
+    QString ruleId;
+    joystick::EventType eventType;
+    QnActions::IDType actionType;
+    std::map<QString, QString> actionParameters;
 };
 
-} // namespace mapping
+#define Rule_Fields (ruleId)(eventType)(actionType)(actionParameters)
+QN_FUSION_DECLARE_FUNCTIONS(
+    nx::client::plugins::io_device::joystick::config::Rule, (json));
+
+struct Configuration 
+{
+    typedef QString ControlIdType;
+    typedef QString OverrideNameType;
+
+    QString configurationId;
+    QString configurationName;
+    std::map<ControlIdType, std::map<OverrideNameType, QString>> controlOverrides;
+    std::map<ControlIdType, std::vector<Rule>> eventMapping;
+};
+
+#define Configuration_Fields (configurationId)(configurationName)(controlOverrides)(eventMapping)
+QN_FUSION_DECLARE_FUNCTIONS(
+    nx::client::plugins::io_device::joystick::config::Configuration, (json));
+
+
+struct Config
+{
+    typedef QString JoystickIdType;
+    typedef QString ConfigurationIdType;
+
+    std::map<JoystickIdType, ConfigurationIdType> enabledConfigurations;
+    std::map<ConfigurationIdType, Configuration> configurations;
+};
+
+#define Config_Fields (enabledConfigurations)(configurations)
+QN_FUSION_DECLARE_FUNCTIONS(
+    nx::client::plugins::io_device::joystick::config::Config, (json));
+
+const QString kPresetIndexParameterName = lit("presetIndex");
+
+} // namespace config
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx

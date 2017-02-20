@@ -22,8 +22,6 @@
 #include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
 
-#include <plugins/io_device/joystick/joystick_manager.h>
-
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;

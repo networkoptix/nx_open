@@ -22,6 +22,9 @@ const int kDefaultStickLogicalRangeMax = 100;
 } // namespace 
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
 namespace driver {
 
@@ -114,7 +117,7 @@ bool MmWinDriver::releaseJoystick(JoystickPtr& joystickToRelease)
 bool MmWinDriver::setControlState(
     const QString& joystickId,
     const QString& controlId,
-    const nx::joystick::State& state)
+    const State& state)
 {
     // No way to set control state via Windows Joystick API, so just ignore these calls.
     return true;
@@ -139,11 +142,11 @@ void MmWinDriver::notifyHardwareConfigurationChanged()
         m_joysticks.clear();
     }
 
-    auto manager = nx::joystick::Manager::instance();
+    auto manager = Manager::instance();
     manager->notifyHardwareConfigurationChanged();
 }
 
-nx::joystick::JoystickPtr MmWinDriver::getJoystickByIndexUnsafe(uint joystickIndex) const
+JoystickPtr MmWinDriver::getJoystickByIndexUnsafe(uint joystickIndex) const
 {
     if (joystickIndex > kMaxJoystickIndex)
         return nullptr;
@@ -156,7 +159,7 @@ nx::joystick::JoystickPtr MmWinDriver::getJoystickByIndexUnsafe(uint joystickInd
 
 boost::optional<uint> MmWinDriver::getJoystickIndex(const JoystickPtr& joy) const
 {
-    auto id = joy->getId();
+    auto id = joy->id();
     auto split = id.split(L':');
 
     if (split.size() != 2)
@@ -204,7 +207,7 @@ JoystickPtr MmWinDriver::createJoystick(
     stick->setStickRzRange(joystickCapabitlities.wVmin, joystickCapabitlities.wVmax);
 
     const int kMaxDegreesOfFreedom = 6;
-    nx::joystick::controls::Ranges outputLimits;
+    controls::Ranges outputLimits;
 
     for (auto i = 0; i < kMaxDegreesOfFreedom; ++i)
     {
@@ -233,11 +236,11 @@ void MmWinDriver::notifyJoystickButtonsStateChanged(JoystickPtr& joy, DWORD butt
     while (currentButtonIndex < kMaxButtonNumber)
     {
         auto controlId = makeId(kButtonObjectType, currentButtonIndex);
-        if (!joy->getControlById(controlId))
+        if (!joy->controlById(controlId))
             return;
 
-        nx::joystick::StateElement pressedState = (currentButtonMask & buttonStates) ? 1 : 0;
-        nx::joystick::State state;
+        StateElement pressedState = (currentButtonMask & buttonStates) ? 1 : 0;
+        State state;
         state.push_back(pressedState);
         joy->notifyControlStateChanged(controlId, state);
         ++currentButtonIndex;
@@ -248,10 +251,10 @@ void MmWinDriver::notifyJoystickButtonsStateChanged(JoystickPtr& joy, DWORD butt
 void MmWinDriver::notifyJoystickSticksStateChanged(JoystickPtr& joy, const JOYINFOEX& info)
 {
     auto controlId = makeId(kStickObjectType, 0);
-    if (!joy->getControlById(controlId))
+    if (!joy->controlById(controlId))
         return;
 
-    nx::joystick::State state;
+    State state;
     state.push_back(info.dwXpos);
     state.push_back(info.dwYpos);
     state.push_back(info.dwZpos);
@@ -271,6 +274,9 @@ QString MmWinDriver::makeId(const QString& objectType, uint objectIndex)
 
 } // namespace driver
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx
 
 #endif

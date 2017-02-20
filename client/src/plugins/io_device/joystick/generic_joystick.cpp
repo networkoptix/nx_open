@@ -1,6 +1,9 @@
 #include "generic_joystick.h"
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
 
 GenericJoystick::GenericJoystick()
@@ -13,7 +16,7 @@ GenericJoystick::~GenericJoystick()
 
 }
 
-QString GenericJoystick::getId() const
+QString GenericJoystick::id() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_id;
@@ -25,7 +28,7 @@ void GenericJoystick::setId(const QString& id)
     m_id = id;
 }
 
-QString GenericJoystick::getModel() const
+QString GenericJoystick::model() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_model;
@@ -37,7 +40,7 @@ void GenericJoystick::setModel(const QString& model)
     m_model = model;
 }
 
-QString GenericJoystick::getVendor() const
+QString GenericJoystick::vendor() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_vendor;
@@ -49,7 +52,7 @@ void GenericJoystick::setVendor(const QString& vendor)
     m_vendor = vendor;
 }
 
-controls::ControlPtr GenericJoystick::getControlById(const QString& controlId) const 
+controls::ControlPtr GenericJoystick::controlById(const QString& controlId) const 
 {
     QnMutexLocker lock(&m_mutex);
 
@@ -60,7 +63,7 @@ controls::ControlPtr GenericJoystick::getControlById(const QString& controlId) c
     return controlItr->second;
 }
 
-std::vector<controls::ControlPtr> GenericJoystick::getControls() const
+std::vector<controls::ControlPtr> GenericJoystick::controls() const
 {
     QnMutexLocker lock(&m_mutex);
     std::vector<controls::ControlPtr> result;
@@ -131,12 +134,12 @@ void GenericJoystick::notifyControlStateChanged(
     const QString& controlId,
     const State& state)
 {
-    auto control = getControlById(controlId);
+    auto control = controlById(controlId);
     auto normalizedState = control->fromRawToNormalized(state);
     control->notifyControlStateChanged(normalizedState);
 }
 
-driver::AbstractJoystickDriver* GenericJoystick::getDriver() const
+driver::AbstractJoystickDriver* GenericJoystick::driver() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_driver;
@@ -149,4 +152,7 @@ void GenericJoystick::setDriver(driver::AbstractJoystickDriver* driver)
 }
 
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx

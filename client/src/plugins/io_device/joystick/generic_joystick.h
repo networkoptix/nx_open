@@ -9,6 +9,9 @@
 
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
 
 class GenericJoystick: public AbstractJoystick
@@ -17,18 +20,18 @@ public:
     GenericJoystick();
     virtual ~GenericJoystick() override;
 
-    virtual QString getId() const;
+    virtual QString id() const;
     virtual void setId(const QString& id);
 
-    virtual QString getModel() const override;
+    virtual QString model() const override;
     virtual void setModel(const QString& model) override;
 
-    virtual QString getVendor() const override;
+    virtual QString vendor() const override;
     virtual void setVendor(const QString& vendor) override;
 
-    virtual controls::ControlPtr getControlById(const QString& controlId) const override;
+    virtual controls::ControlPtr controlById(const QString& controlId) const override;
 
-    virtual std::vector<controls::ControlPtr> getControls() const override;
+    virtual std::vector<controls::ControlPtr> controls() const override;
     virtual void setControls(std::vector<controls::ControlPtr> joystickControls) override;
 
     virtual std::vector<controls::ButtonPtr> getButtons();
@@ -43,7 +46,7 @@ public:
     virtual bool setControlState(const QString& controlId, const State& state) override;
     virtual void notifyControlStateChanged(const QString& controlId, const State& state) override;
 
-    virtual driver::AbstractJoystickDriver* getDriver() const override;
+    virtual driver::AbstractJoystickDriver* driver() const override;
     virtual void setDriver(driver::AbstractJoystickDriver* driver) override;
 
 private:
@@ -78,10 +81,9 @@ std::vector<std::shared_ptr<ControlType>> GenericJoystick::filterControls(const 
 {
     std::vector<std::shared_ptr<ControlType>> filtered;
 
-    for (auto& item: controlMap)
+    for (const auto& item: controlMap)
     {
-        auto casted = std::dynamic_pointer_cast<ControlType>(item.second);
-        if (casted)
+        if (auto casted = std::dynamic_pointer_cast<ControlType>(item.second))
             filtered.push_back(casted);
     }
 
@@ -110,4 +112,7 @@ void GenericJoystick::addControls(
 }
 
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx

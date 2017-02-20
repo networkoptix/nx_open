@@ -8,6 +8,9 @@
 #include <plugins/io_device/joystick/joystick_common.h>
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
 
 class AbstractJoystick;
@@ -25,13 +28,13 @@ struct Range
         max(kDefaultMaxRangeValue) 
     {};
 
-    Range(nx::joystick::StateElement minimum, nx::joystick::StateElement maximum):
+    Range(StateElement minimum, StateElement maximum):
         min(minimum),
         max(maximum)
     {};
 
-    nx::joystick::StateElement min;
-    nx::joystick::StateElement max;
+    StateElement min;
+    StateElement max;
 };
 
 typedef std::vector<Range> Ranges;
@@ -39,50 +42,48 @@ typedef std::vector<Range> Ranges;
 class BaseControl: public AbstractControl
 {
 public:
-    BaseControl(nx::joystick::State::size_type stateSize);
+    BaseControl(State::size_type stateSize);
 
     virtual QString getId() const override;
     virtual void setId(const QString& id) override;
 
-    virtual nx::joystick::AbstractJoystick* getParentDevice() const override;
-    virtual void setParentDevice(nx::joystick::AbstractJoystick* joytsick) override;
+    virtual AbstractJoystick* getParentDevice() const override;
+    virtual void setParentDevice(AbstractJoystick* joytsick) override;
 
     virtual QString getDescription() const override;
     virtual void setDescription(const QString& description) override;
 
-    virtual nx::joystick::ControlCapabilities getCapabilities() const override;
-    virtual void setCapabilities(nx::joystick::ControlCapabilities capabilities) override;
+    virtual ControlCapabilities getCapabilities() const override;
+    virtual void setCapabilities(ControlCapabilities capabilities) override;
 
-    virtual nx::joystick::State getState() const override;
-    virtual void setState(const nx::joystick::State& state) override;
+    virtual State getState() const override;
+    virtual void setState(const State& state) override;
 
-    virtual void notifyControlStateChanged(const nx::joystick::State& state) override;
-    virtual bool addEventHandler(
-        nx::joystick::EventType eventType,
-        nx::joystick::EventHandler handler) override;
+    virtual void notifyControlStateChanged(const State& state) override;
+    virtual bool addEventHandler(EventType eventType, EventHandler handler) override;
 
     virtual void applyOverride(
         const QString overrideName,
         const QString& overrideValue) override;
 
 protected:
-    typedef std::map<nx::joystick::EventType, std::vector<EventHandler>> EventHandlerMap;
-    typedef std::set<nx::joystick::EventType> EventSet; 
+    typedef std::map<EventType, std::vector<EventHandler>> EventHandlerMap;
+    typedef std::set<EventType> EventSet; 
 
     virtual bool isEventTypeSupported(EventType eventType) const;
     virtual EventSet checkForEventsUnsafe() const;
-    virtual void setStateUnsafe(const nx::joystick::State& state);
-    virtual nx::joystick::EventParameters makeParametersForEvent(
-        nx::joystick::EventType eventType) const;
+    virtual void setStateUnsafe(const State& state);
 
-    virtual nx::joystick::State fromRawToNormalized(const nx::joystick::State& raw) const;
-    virtual nx::joystick::State fromNormalizedToRaw(const nx::joystick::State& normalized) const;
+    virtual EventParameters makeParametersForEvent(EventType eventType) const;
+
+    virtual State fromRawToNormalized(const State& raw) const;
+    virtual State fromNormalizedToRaw(const State& normalized) const;
 
 protected:
     QString m_id;
     QString m_description;
-    nx::joystick::AbstractJoystick* m_parentDevice;
-    nx::joystick::ControlCapabilities m_capabilities;
+    AbstractJoystick* m_parentDevice;
+    ControlCapabilities m_capabilities;
     State m_state;
     
     EventHandlerMap m_eventHandlers;
@@ -92,4 +93,7 @@ protected:
 
 } // namespace controls
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx

@@ -13,14 +13,17 @@
 #include <utils/common/singleton.h>
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
-namespace  driver {
+namespace driver {
 
 class MmWinDriver: 
     public AbstractJoystickDriver,
     public Singleton<MmWinDriver>
 {
-
+    
 public: 
     MmWinDriver(HWND windowId);
     virtual ~MmWinDriver() override;
@@ -29,9 +32,9 @@ public:
     virtual bool captureJoystick(JoystickPtr& joystickToCapture) override;
     virtual bool releaseJoystick(JoystickPtr& joystickToRelease) override;
     virtual bool setControlState(
-        const QString& joystickId, 
-        const QString& controlId, 
-        const nx::joystick::State& state) override;
+        const QString& joystickId,
+        const QString& controlId,
+        const State& state) override;
 
     void notifyJoystickStateChanged(const JOYINFOEX& info, uint joystickIndex);
     void notifyHardwareConfigurationChanged();
@@ -59,6 +62,9 @@ private:
 
 } // namespace driver
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx
 
 #endif // defined(Q_OS_WIN)

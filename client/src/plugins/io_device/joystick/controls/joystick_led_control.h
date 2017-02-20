@@ -4,6 +4,9 @@
 #include <boost/optional/optional.hpp>
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
 namespace controls {
 
@@ -28,5 +31,8 @@ typedef std::shared_ptr<Led> LedPtr;
 
 } // namespace controls
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx
 

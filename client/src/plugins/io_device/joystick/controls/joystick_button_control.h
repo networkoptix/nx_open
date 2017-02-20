@@ -3,6 +3,9 @@
 #include "base_joystick_control.h"
 
 namespace nx {
+namespace client {
+namespace plugins {
+namespace io_device {
 namespace joystick {
 namespace controls {
 
@@ -20,16 +23,16 @@ public:
     Button();
     virtual ButtonState getButtonState() const;
     virtual void notifyButtonStateChanged(ButtonState buttonState);
-    virtual void notifyButtonStateChanged(const nx::joystick::State& state);
+    virtual void notifyButtonStateChanged(const State& state);
 
 protected:
-    virtual bool isEventTypeSupported(nx::joystick::EventType eventType) const override;
+    virtual bool isEventTypeSupported(EventType eventType) const override;
     virtual EventSet checkForEventsUnsafe() const override;
-    virtual void setStateUnsafe(const nx::joystick::State& state);
+    virtual void setStateUnsafe(const State& state);
 
 private:
-    nx::joystick::StateElement fromButtonStateToStateElement(ButtonState buttonState) const;
-    ButtonState fromStateElementToButtonState(nx::joystick::StateElement StateElement) const;
+    StateElement fromButtonStateToStateElement(ButtonState buttonState) const;
+    ButtonState fromStateElementToButtonState(StateElement StateElement) const;
 
     ButtonState getButtonStateUnsafe() const;
 
@@ -46,5 +49,8 @@ typedef std::shared_ptr<Button> ButtonPtr;
 
 } // namespace controls
 } // namespace joystick
+} // namespace io_device
+} // namespace plugins
+} // namespace client
 } // namespace nx
 
