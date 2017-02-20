@@ -22,10 +22,10 @@ angular.module('cloudApp')
                     scope.languages = languages;
                 });
                 scope.changeLanguage = function(language){
-                    if(language == L.language){
-                        return;
-                    }
                     if(!scope.accountMode){
+                        if(language == L.language){
+                            return;
+                        }
                         cloudApi.changeLanguage(language).then(function(){
                             window.location.reload();
                         });

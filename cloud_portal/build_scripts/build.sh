@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR
 . ../env/bin/activate
@@ -46,7 +46,7 @@ do
     cp -rf $dir/front_end/images/* $TARGET_DIR/$CUSTOMIZATION/static/images
 
     echo "Overwrite static"
-    cp -rf $dir/front_end/views/* $TARGET_DIR/$CUSTOMIZATION/static/views
+    cp -rf $dir/front_end/views/* $TARGET_DIR/$CUSTOMIZATION/static/views || true
 
     echo "Building front_end finished"
 
