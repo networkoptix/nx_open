@@ -28,10 +28,6 @@ const QnSoftwareVersion kRpathIncludedVersion(3, 0);
     to windows. */
 const QnSoftwareVersion kWindowClassFixedVersion(3, 0);
 
-#if defined(Q_OS_LINUX)
-const QString kLdLibraryPathVariable = "LD_LIBRARY_PATH";
-#endif
-
 } // namespace
 
 
@@ -387,6 +383,8 @@ bool ApplauncherProcess::startApplication(
             QString ldLibraryPath = installation->libraryPath();
             if (!ldLibraryPath.isEmpty() && QFile::exists(ldLibraryPath))
             {
+                const QString kLdLibraryPathVariable = "LD_LIBRARY_PATH";
+
                 QRegExp varRegExp(QString("%1=(.+)").arg(kLdLibraryPathVariable));
 
                 auto it = environment.begin();
