@@ -9,6 +9,14 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
+#if !defined(SSL_OP_NO_TLSv1_1)
+    #define SSL_OP_NO_TLSv1_1 0
+#endif
+
+#if !defined(SSL_OP_NO_TLSv1_2)
+    #define SSL_OP_NO_TLSv1_2 0
+#endif
+
 namespace nx {
 namespace network {
 namespace ssl {
