@@ -60,9 +60,9 @@ TYPED_TEST_CASE_P(ServerSocketTest);
 TYPED_TEST_P(ServerSocketTest, accept_async_on_blocking_socket_results_in_error)
 {
 #ifndef _DEBUG
-    whenMovedServerSocketToNonBlockingMode();
-    whenCalledAcceptAsync();
-    thenErrorShouldBeReported();
+    this->whenMovedServerSocketToNonBlockingMode();
+    this->whenCalledAcceptAsync();
+    this->thenErrorShouldBeReported();
 #endif
     // In debug mode, assert is triggered inside socket.
 }
