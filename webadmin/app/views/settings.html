@@ -19,7 +19,7 @@
 
 
             <tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
-                <tab heading="Server" active="active.server">
+                <tab heading="{{L.settings.tabs.server}}" active="active.server">
                     <div>
                         <form novalidate name="settingsForm" class="form-horizontal" role="form" >
                             <h3>Port</h3>
@@ -64,7 +64,7 @@
                     </div>
                 </tab>
 
-                <tab heading="System" active="active.system">
+                <tab heading="{{L.settings.tabs.system}}" active="active.system">
                     <div>
                         <h3>Name</h3>
                         <div class="row">
@@ -113,7 +113,7 @@
                     </div>
                 </tab>
 
-                <tab heading="Device" active="active.device" ng-if="controlDevice">
+                <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
                     <div ng-if="settings.flags.canSetupNetwork">
                         <h3>Device Network Settings</h3>
                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>

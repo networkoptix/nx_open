@@ -18,6 +18,11 @@
         "commonMessage": "This password is in top most popular passwords in the world"
     },
     "settings":{
+        "tabs":{
+            "server":"Server",
+            "system":"System",
+            "device":"Device"
+        },
         "confirmRestart": "Restart server?",
         "couldntCheckInternet": "Could not check cloud connection",
         "confirmRestoreDefault": "Clear database and settings? This process will take some time and server will be restarted afterwards.",
@@ -49,6 +54,13 @@
 
         "nx1ControlHint": "Client application has been started. Use a keyboard/mouse or mobile application to control it."
 
+    },
+    "info":{
+        "tabs":{
+            "healthMonitoring": "Health monitoring",
+            "storage": "Storage",
+            "log": "Log"
+        }
     },
     "join":{
         "systemIsUnreacheble": "System is unreachable or does not exist.",
