@@ -481,8 +481,6 @@ TEST_F(SocketUdtNew, connectionProperlyClosed)
     startSyncUdtSocketServer();
     connectToUdtServer();
 
-    const auto clientSocketHandle = m_clientSock->handle();
-
     closeConnection();
     assertAcceptedConnectionReceivedFin();
 }

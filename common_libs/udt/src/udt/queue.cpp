@@ -113,7 +113,7 @@ static SendedPacketVerifier packetVerifier;
 
 } // namespace
 
-#endif DEBUG_RECORD_PACKET_HISTORY
+#endif // DEBUG_RECORD_PACKET_HISTORY
 
 
 CUnitQueue::CUnitQueue():
