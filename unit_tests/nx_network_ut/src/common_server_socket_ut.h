@@ -32,7 +32,7 @@ protected:
     {
         nx::utils::promise<SystemError::ErrorCode> acceptDone;
         m_serverSocket.acceptAsync(
-            [&acceptDone](SystemError::ErrorCode sysErrorCode, AbstractStreamSocket* socket)
+            [&acceptDone](SystemError::ErrorCode sysErrorCode, AbstractStreamSocket* /*socket*/)
             {
                 acceptDone.set_value(sysErrorCode);
             });
