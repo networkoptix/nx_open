@@ -126,8 +126,7 @@ bool ConfigHolder::load(const QString& configPath)
 
     QnMutexLocker lock(&m_mutex);
     m_config = Config();
-    QJson::deserialize(data, &m_config);
-    return true;
+    return QJson::deserialize(data, &m_config);
 }
 
 } // namespace config

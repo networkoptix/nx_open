@@ -38,7 +38,9 @@ void Manager::start()
     QnMutexLocker lock(&m_mutex);
     loadDrivers();
 
-    if (!loadMappings())
+    bool loaded = loadMappings();
+    Q_ASSERT(loaded);
+    if (!loaded)
         return;
 
     applyMappingsAndCaptureJoysticks();
