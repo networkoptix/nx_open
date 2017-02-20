@@ -33,8 +33,7 @@
     <message>
         <source>Zoom timeline
 to view more bookmarks</source>
-        <comment>Use &apos;
-&apos; to split message in two lines (required)</comment>
+        <comment>It is highly recommended to split message in two lines</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
