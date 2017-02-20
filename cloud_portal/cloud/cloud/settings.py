@@ -272,20 +272,16 @@ else:
 
 NOTIFICATIONS_CONFIG = {
     'activate_account': {
-        'engine': 'email',
-        'subject': 'Confirm your account'
+        'engine': 'email'
     },
     'restore_password': {
-        'engine': 'email',
-        'subject': 'Restore your password'
+        'engine': 'email'
     },
     'system_invite': {
-        'engine': 'email',
-        'subject': 'Video system was shared with you'
+        'engine': 'email'
     },
     'system_shared': {
-        'engine': 'email',
-        'subject': 'Video system was shared with you'
+        'engine': 'email'
     },
 }
 

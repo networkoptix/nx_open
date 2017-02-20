@@ -6,24 +6,35 @@ angular.module('cloudApp')
             restrict: 'EA',
             templateUrl: Config.viewsDir + 'components/language-select.html',
             scope:{
-                system:'='
+                system:'=',
+                accountMode:'=',
+                ngModel: '='
             },
             link:function(scope, element, attrs, ngModel){
                 cloudApi.getLanguages().then(function(data){
                     var languages = data.data;
-                    var activeLanguage = _.find(languages, function(lang){
+                    scope.activeLanguage = _.find(languages, function(lang){
                         return lang.language == L.language;
-                    })
-                    scope.activeLanguage = activeLanguage? activeLanguage.name: "LANGUAGE";
+                    });
+                    if(!scope.activeLanguage){
+                        scope.activeLanguage = languages[0];
+                    }
                     scope.languages = languages;
                 });
                 scope.changeLanguage = function(language){
-                    if(language == L.language){
-                        return;
+                    if(!scope.accountMode){
+                        if(language == L.language){
+                            return;
+                        }
+                        cloudApi.changeLanguage(language).then(function(){
+                            window.location.reload();
+                        });
+                    }else{
+                        scope.ngModel = language;
+                        scope.activeLanguage = _.find(scope.languages, function(lang){
+                            return lang.language == scope.ngModel;
+                        });
                     }
-                    cloudApi.changeLanguage(language).then(function(){
-                        window.location.reload();
-                    });
                 }
             }
         };

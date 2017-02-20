@@ -72,7 +72,7 @@ angular.module('cloudApp')
                 return doShare();
             }
         },{
-            successMessage: 'New permissions saved'
+            successMessage: L.sharing.permissionsSaved
         }).then(function(){
             $scope.$parent.ok($scope.user);
         });

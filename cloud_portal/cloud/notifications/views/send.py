@@ -23,7 +23,7 @@ def send_notification(request):
             validation_error = True
             error_data['message'] = ['This field is required.']
 
-        if 'customization' not in request.data:
+        if 'customization' not in request.data or not request.data['customization']:
             validation_error = True
             error_data['customization'] = ['This field is required.']
 

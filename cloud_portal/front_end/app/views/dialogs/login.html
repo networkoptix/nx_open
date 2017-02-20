@@ -3,7 +3,7 @@
     <form name="loginForm" novalidate>
     <div class="modal-body" >
         <div class="form-group" validate-field>
-            <label for="email">Email address</label>
+            <label for="email">Email</label>
             <input type="email" class="form-control" ng-model="auth.email" id="email" name="email"
                    validate-email maxlength="255"
                    required autofocus>
@@ -20,7 +20,7 @@
     <div class="modal-footer">
         <process-button process="login"
                         form="loginForm"
-                        button-text="'Log in'"></process-button>
+                        button-text="'Log In'"></process-button>
 
         <a href="/restore_password" ng-click="close()" class="form-control-static">Forgot password?</a>
     </div>
