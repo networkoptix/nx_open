@@ -22,6 +22,11 @@ public:
         init();
     }
 
+    ~ServerSocketTest()
+    {
+        m_serverSocket.pleaseStopSync();
+    }
+
 protected:
     void whenMovedServerSocketToNonBlockingMode()
     {
@@ -59,12 +64,9 @@ TYPED_TEST_CASE_P(ServerSocketTest);
 
 TYPED_TEST_P(ServerSocketTest, accept_async_on_blocking_socket_results_in_error)
 {
-#ifndef _DEBUG
     this->whenMovedServerSocketToNonBlockingMode();
     this->whenCalledAcceptAsync();
     this->thenErrorShouldBeReported();
-#endif
-    // In debug mode, assert is triggered inside socket.
 }
 
 REGISTER_TYPED_TEST_CASE_P(ServerSocketTest, accept_async_on_blocking_socket_results_in_error);

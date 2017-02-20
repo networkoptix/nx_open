@@ -955,8 +955,12 @@ void UdtStreamServerSocket::acceptAsync(
         AbstractStreamSocket*)> handler)
 {
     bool nonBlockingMode = false;
-    NX_ASSERT(getNonBlockingMode(&nonBlockingMode));
-    NX_ASSERT(nonBlockingMode);
+    if (!getNonBlockingMode(&nonBlockingMode))
+    {
+        const auto sysErrorCode = SystemError::getLastOSErrorCode();
+        return post(
+            [handler = std::move(handler), sysErrorCode]() { handler(sysErrorCode, nullptr); });
+    }
     if (!nonBlockingMode)
     {
         return post(
