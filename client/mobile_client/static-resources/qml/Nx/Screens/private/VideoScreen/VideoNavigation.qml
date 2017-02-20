@@ -3,6 +3,7 @@ import QtGraphicalEffects 1.0
 import QtQuick.Window 2.2
 import Qt.labs.controls 1.0
 import Nx 1.0
+import Nx.Media 1.0
 import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
@@ -12,7 +13,7 @@ Item
 
     property string resourceId
     property var videoScreenController
-    property bool paused: videoScreenController.mediaPlayer.playbackState !== QnPlayer.Playing
+    property bool paused: videoScreenController.mediaPlayer.playbackState !== MediaPlayer.Playing
 
     property real controlsOpacity: 1.0
 
