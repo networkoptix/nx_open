@@ -23,7 +23,7 @@ SECONDS_TO_WAIT_BEFORE_KILL_9=120
 export VMS_PLUGIN_DIR="$PREFIX/plugins"
 export SASL_PATH="$LIBS_PATH/sasl2"
 
-ulimit -n 8192
+ulimit -n $(cat /proc/sys/fs/file-max 2>/dev/null || echo 8192)
 ulimit -c unlimited
 
 process_core_dump()
