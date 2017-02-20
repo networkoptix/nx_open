@@ -300,7 +300,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters& p
         result << params.description;
         break;
     case SoftwareTriggerEvent:
-        result = tr("Trigger: %1").arg(getSoftwareTriggerName(params));
+        result << tr("Trigger: %1").arg(getSoftwareTriggerName(params));
         break;
     default:
         break;
