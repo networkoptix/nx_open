@@ -26,10 +26,16 @@ public:
 protected:
     virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent* event) override;
     virtual void mouseMoveEvent(QGraphicsSceneMouseEvent* event) override;
+    virtual void changeEvent(QEvent* event) override;
+
+protected:
+    void ensurePixmap(int devicePixelRatio);
 
 private:
     qint64 m_indicatorPosition;
     bool m_indicatorVisible;
+
+    QPixmap m_pixmap;
 
 private:
     Q_DECLARE_PRIVATE(QnTimeScrollBar)
