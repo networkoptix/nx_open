@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source> ms</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse Logs</source>
         <translation type="unfinished">瀏覽記錄</translation>
     </message>
@@ -324,11 +319,6 @@
     </message>
     <message>
         <location/>
-        <source>&lt;Cameras...&gt; </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Backup Quality</source>
         <translation type="unfinished"></translation>
     </message>
@@ -400,11 +390,6 @@
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
         <source>Refresh</source>
         <translation>重新整理</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation>所有攝影機</translation>
     </message>
     <message>
         <location/>
@@ -557,18 +542,8 @@
     </message>
     <message>
         <location/>
-        <source>0.0.0.0</source>
-        <translation type="unfinished">0.0.0.0</translation>
-    </message>
-    <message>
-        <location/>
         <source>End IP</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>0.0.0.255</source>
-        <translation type="unfinished">0.0.0.255</translation>
     </message>
     <message>
         <location/>
@@ -638,11 +613,6 @@
         <location/>
         <source>Camera Settings Control</source>
         <translation>攝影機設定控制</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation>保留攝影機串流及相關設定</translation>
     </message>
     <message>
         <location/>
@@ -726,11 +696,6 @@
     </message>
     <message>
         <location/>
-        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation>計算GOP流量而非每秒流量(這會增加攝影機的流量)</translation>
-    </message>
-    <message>
-        <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation>警告! 這將導致錄影排程中的畫質與FPS設定失去關聯.</translation>
     </message>
@@ -757,6 +722,16 @@
     <message>
         <location/>
         <source>Force motion detection for stream:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Keep camera streams and profiles settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -799,11 +774,6 @@
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source>Panic Mode: </source>
-        <translation>緊急模式:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule Settings</source>
         <translation>排程設定</translation>
     </message>
@@ -849,12 +819,6 @@
     </message>
     <message>
         <location/>
-        <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation>秒</translation>
-    </message>
-    <message>
-        <location/>
         <source>Post-Recording</source>
         <translation>事後錄影</translation>
     </message>
@@ -862,11 +826,6 @@
         <location/>
         <source>Copy Schedule...</source>
         <translation>複製排程…</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion + Low-Res </source>
-        <translation>位移高解析錄影+全時低解析錄影</translation>
     </message>
     <message>
         <location/>
@@ -913,6 +872,16 @@
         <source>Apply changes before copying schedule.</source>
         <translation type="unfinished">複製排程前先套用變更</translation>
     </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ChangeUserPasswordDialog</name>
@@ -923,24 +892,15 @@
     </message>
 </context>
 <context>
-    <name>CloudManagementWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
-        <source>&lt;2. Connect system
-to the cloud&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>ConnectToCloudDialog</name>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
-        <source>Email or password is not recognized.</source>
+        <source>Stay logged in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Stay logged in</source>
+        <source>Incorrect Email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1012,14 +972,6 @@ to the cloud&gt;</source>
     </message>
 </context>
 <context>
-    <name>DateRangeWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/common/date_range_widget.ui"/>
-        <source>-</source>
-        <translation type="unfinished">-</translation>
-    </message>
-</context>
-<context>
     <name>EventLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
@@ -1043,11 +995,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished">所有攝影機</translation>
-    </message>
-    <message>
-        <location/>
         <source>Event Rules...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1058,11 +1005,6 @@ to the cloud&gt;</source>
         <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
         <source>HTTP content</source>
         <translation>HTTP內容</translation>
-    </message>
-    <message>
-        <location/>
-        <source>HTTP url</source>
-        <translation>HTTP url</translation>
     </message>
     <message>
         <location/>
@@ -1087,6 +1029,11 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Content type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP URL</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1156,11 +1103,6 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Mount Angle Correction:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>°</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1243,7 +1185,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots</source>
+        <source>Run application when PC Boots up</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1287,13 +1229,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;無影像&gt;</translation>
+        <source>Loading Image...Please Wait.</source>
+        <translation>載入影像…請稍等.</translation>
     </message>
     <message>
         <location/>
-        <source>Loading Image...Please Wait.</source>
-        <translation>載入影像…請稍等.</translation>
+        <source>No image</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1327,16 +1269,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Clear</source>
         <translation>清除</translation>
-    </message>
-    <message>
-        <location/>
-        <source> cells</source>
-        <translation>格</translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation>%</translation>
     </message>
     <message>
         <location/>
@@ -1481,11 +1413,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Features</source>
         <translation>功能</translation>
-    </message>
-    <message>
-        <location/>
-        <source>This license type requires a higher software version.</source>
-        <translation>此授權類型適用於更高階版本.</translation>
     </message>
 </context>
 <context>
@@ -1675,23 +1602,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source> seconds</source>
-        <translation>秒</translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation>%</translation>
-    </message>
-    <message>
-        <location/>
         <source>Background Image</source>
         <translation>背景圖像</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;無影像&gt;</translation>
     </message>
     <message>
         <location/>
@@ -1733,12 +1645,17 @@ to the cloud&gt;</source>
         <source>Tour cycle</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation type="unfinished">秒</translation>
+    </message>
 </context>
 <context>
     <name>MessageBox</name>
     <message>
         <location filename="../src/ui/dialogs/common/message_box.ui"/>
-        <source>Don&apos;t show this message again</source>
+        <source>Do not show this message again</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1778,11 +1695,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Enable Audio</source>
         <translation>啟用聲音</translation>
-    </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1992,7 +1904,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Email or password is not recognized.</source>
+        <source>Incorrect Email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2040,11 +1952,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Login:</source>
         <translation type="unfinished">登入:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>admin</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2431,11 +2338,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>9000</source>
-        <translation>9000</translation>
-    </message>
-    <message>
-        <location/>
         <source>Failover</source>
         <translation>備援</translation>
     </message>
@@ -2760,11 +2662,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source> TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Additional storage:</source>
         <translation type="unfinished">附加的儲存空間:</translation>
     </message>
@@ -2890,7 +2787,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>System time is synchronized with the Internet and is independent from server&apos;s local time.
+        <source>System time is synchronized with the Internet and is independent from server local time.
 Selected server will be used as a time server if the system has no Internet access.</source>
         <translation type="unfinished"></translation>
     </message>

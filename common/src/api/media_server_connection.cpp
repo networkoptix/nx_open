@@ -91,6 +91,7 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (BookmarkUpdateObject, "cameraBookmarks/update")
     (BookmarkDeleteObject, "cameraBookmarks/delete")
     (InstallUpdateObject, "installUpdate")
+    (InstallUpdateUnauthenticatedObject, "installUpdateUnauthenticated")
     (Restart, "restart")
     (ConfigureObject, "configure")
     (PingSystemObject, "pingSystem")
@@ -271,6 +272,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             processJsonReply<QnCameraBookmark>(this, response, handle);
             break;
         case InstallUpdateObject:
+        case InstallUpdateUnauthenticatedObject:
             processJsonReply<QnUploadUpdateReply>(this, response, handle);
             break;
         case Restart:
@@ -923,6 +925,17 @@ int QnMediaServerConnection::installUpdate(
     params << QnRequestParam("delayed", delayed);
 
     return sendAsyncGetRequestLogged(InstallUpdateObject,
+        params, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
+}
+
+int QnMediaServerConnection::installUpdateUnauthenticated(
+    const QString& updateId, bool delayed, QObject* target, const char* slot)
+{
+    QnRequestParamList params;
+    params << QnRequestParam("updateId", updateId);
+    params << QnRequestParam("delayed", delayed);
+
+    return sendAsyncGetRequestLogged(InstallUpdateUnauthenticatedObject,
         params, QN_STRINGIZE_TYPE(QnUploadUpdateReply), target, slot);
 }
 

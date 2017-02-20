@@ -20,6 +20,7 @@
 
 #include <utils/common/app_info.h>
 #include "utils/common/cryptographic_hash.h"
+#include <api/global_settings.h>
 
 static const int MAX_CACHE_SIZE_BYTES = 1024 * 64;
 
@@ -270,8 +271,10 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket)
     if (response->port == 0)
         return true;
 
-    emit responseReceived(*response, SocketAddress(remoteEndpoint.address.toString(), response->port));
-
+    emit responseReceived(
+        *response,
+        SocketAddress(remoteEndpoint.address.toString(), response->port),
+        remoteEndpoint.address);
     return true;
 }
 
@@ -315,21 +318,25 @@ void QnMulticastModuleFinder::run()
 
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis)
         {
-            QnMutexLocker lk(&m_mutex);
-
-            for (UDPSocket *socket : m_clientSockets)
+            if (m_clientMode ||
+                (!qnGlobalSettings->isNewSystem() && qnGlobalSettings->isAutoDiscoveryEnabled()))
             {
-                if (!socket->send(revealRequest.data(), revealRequest.size()))
+                QnMutexLocker lk(&m_mutex);
+                for (UDPSocket *socket : m_clientSockets)
                 {
-                    //failed to send packet ???
-                    SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                    NX_LOGX(lit("Failed to send packet to %1. %2")
-                        .arg(socket->getForeignAddress().toString())
-                        .arg(SystemError::toString(prevErrorCode)),
-                        cl_logDEBUG1);
-                    //TODO #ak if corresponding interface is down, should remove socket from set
+                    if (!socket->send(revealRequest.data(), revealRequest.size()))
+                    {
+                        //failed to send packet ???
+                        SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+                        NX_LOGX(lit("Failed to send packet to %1. %2")
+                            .arg(socket->getForeignAddress().toString())
+                            .arg(SystemError::toString(prevErrorCode)),
+                            cl_logDEBUG1);
+                        //TODO #ak if corresponding interface is down, should remove socket from set
+                    }
                 }
             }
+
             m_prevPingClock = currentClock;
         }
 

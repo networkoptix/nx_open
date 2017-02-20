@@ -16,7 +16,7 @@ def test_server_should_pick_archive_file_with_time_after_db_time(env, camera, sa
     print
     print env.server.name, env.server.url, env.server.ecs_guid
     camera_id = env.server.add_camera(camera)
-    storage = env.server.get_storage()
+    storage = env.server.storage
     sample = sample_media_file
 
     start_times_1 = []

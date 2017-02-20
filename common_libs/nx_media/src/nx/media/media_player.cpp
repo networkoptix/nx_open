@@ -214,7 +214,7 @@ private:
     void setLiveMode(bool value);
     void setAspectRatio(double value);
     void setPosition(qint64 value);
-    void setCurrentResolution(const QSize& size);
+    void updateCurrentResolution(const QSize& size);
 
     void resetLiveBufferState();
     void updateLiveBufferState(BufferState value);
@@ -335,7 +335,7 @@ void PlayerPrivate::setPosition(qint64 value)
     emit q->positionChanged();
 }
 
-void PlayerPrivate::setCurrentResolution(const QSize& size)
+void PlayerPrivate::updateCurrentResolution(const QSize& size)
 {
     if (currentResolution == size)
         return;
@@ -474,7 +474,7 @@ void PlayerPrivate::presentNextFrame()
     setMediaStatus(Player::MediaStatus::Loaded);
     gotDataTimer.restart();
 
-    setCurrentResolution(videoFrameToRender->size());
+    updateCurrentResolution(videoFrameToRender->size());
 
     FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
 
@@ -877,7 +877,7 @@ void Player::stop()
             d->archiveReader.reset();
     }
     d->videoFrameToRender.reset();
-    d->setCurrentResolution(QSize());
+    d->updateCurrentResolution(QSize());
 
     d->setState(State::Stopped);
     d->log(lit("stop() END"));

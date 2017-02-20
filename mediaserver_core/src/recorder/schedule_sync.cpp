@@ -18,8 +18,7 @@
 #include <numeric>
 
 QnScheduleSync::QnScheduleSync()
-    : m_backupSyncOn(false),
-      m_syncing(false),
+    : m_syncing(false),
       m_forced(false),
       m_interrupted(false),
       m_failReported(false),
@@ -286,7 +285,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
 
             while (fileSize > 0)
             {
-                if (m_interrupted || !m_backupSyncOn) {
+                if (m_interrupted || m_needStop) {
                     return CopyError::Interrupted;
                 }
                 qint64 startTime = qnSyncTime->currentMSecsSinceEpoch();
@@ -313,7 +312,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         fromFile.reset();
         toFile.reset();
 
-        if (m_interrupted || !m_backupSyncOn) {
+        if (m_interrupted || m_needStop) {
             return CopyError::Interrupted;
         }
         // add chunk to catalog
@@ -391,6 +390,7 @@ QnBusiness::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
     m_syncEndTimePoint = chunk.endTimeMs();
 
     initSyncData();
+    m_syncing = true;
 
     while (1) {
         auto chunkKeyVector = getOldestChunk(m_syncTimePoint);
@@ -446,7 +446,7 @@ QnBusiness::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 
 void QnScheduleSync::stop()
 {
-    m_backupSyncOn  = false;
+    pleaseStop();
     m_forced        = false;
     m_syncing       = false;
     m_interrupted   = true;
@@ -454,10 +454,19 @@ void QnScheduleSync::stop()
     wait();
 }
 
+void QnScheduleSync::pleaseStop()
+{
+    if (isRunning())
+    {
+        QnLongRunnable::pleaseStop();
+        m_stopPromise.set_value();
+    }
+}
+
 int QnScheduleSync::state() const
 {
     int result = 0;
-    result |= m_backupSyncOn ? Started : Idle;
+    result |= m_needStop ? Idle : Started;
     result |= m_syncing ? Syncing : 0;
     result |= m_forced ? Forced : 0;
     return result;
@@ -465,7 +474,7 @@ int QnScheduleSync::state() const
 
 int QnScheduleSync::interrupt()
 {
-    if (!m_backupSyncOn)
+    if (m_needStop)
         return Idle;
     m_syncing = false;
     m_forced = false;
@@ -475,7 +484,7 @@ int QnScheduleSync::interrupt()
 
 int QnScheduleSync::forceStart()
 {
-    if (!m_backupSyncOn)
+    if (m_needStop)
         return Idle;
     if (m_forced)
         return Forced;
@@ -534,17 +543,15 @@ void QnScheduleSync::renewSchedule()
 
 void QnScheduleSync::run()
 {
-    static const auto
-    REDUNDANT_SYNC_TIMEOUT = std::chrono::seconds(5);
-    m_backupSyncOn = true;
+    static const auto REDUNDANT_SYNC_TIMEOUT = std::chrono::seconds(5);
+    auto stopFuture = m_stopPromise.get_future();
 
-    while (m_backupSyncOn)
+    while (!m_needStop)
     {
-        std::this_thread::sleep_for(
-            REDUNDANT_SYNC_TIMEOUT
-        );
+        stopFuture.wait_for(REDUNDANT_SYNC_TIMEOUT);
 
-        if (!m_backupSyncOn.load())
+
+        if (m_needStop)
             return;
 
         renewSchedule();
@@ -553,7 +560,7 @@ void QnScheduleSync::run()
 
         auto isItTimeForSync = [this] ()
         {
-            if (!m_backupSyncOn)
+            if (m_needStop)
                 return SyncCode::Interrupted;
             if (m_forced)
                 return SyncCode::Ok;
@@ -598,10 +605,6 @@ void QnScheduleSync::run()
 
         if (isItTimeForSync() == SyncCode::Ok) // we are there
         {
-            m_syncing = true;
-            if (m_forced)
-                m_failReported = false;
-
             while (true)
             {
                 bool hasRebuildingStorages = qnNormalStorageMan->hasRebuildingStorages();
@@ -620,6 +623,9 @@ void QnScheduleSync::run()
             if (m_interrupted)
                 continue;
 
+            if (m_forced)
+                m_failReported = false;
+
             auto result = synchronize(isItTimeForSync);
             qint64 syncEndTimePointLocal = 0;
             {
@@ -637,7 +643,8 @@ void QnScheduleSync::run()
             if (backupFailed && !m_failReported) {
                 emit backupFinished(syncEndTimePointLocal, result);
                 m_failReported = true;
-            } else if (!backupFailed) {
+            }
+            else if (!backupFailed) {
                 emit backupFinished(syncEndTimePointLocal, result);
                 m_failReported = false;
             }

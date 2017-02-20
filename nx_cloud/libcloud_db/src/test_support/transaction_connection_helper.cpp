@@ -6,6 +6,7 @@
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 TransactionConnectionHelper::TransactionConnectionHelper():
     m_moduleGuid(QnUuid::createUuid()),
@@ -22,7 +23,7 @@ TransactionConnectionHelper::~TransactionConnectionHelper()
 
 TransactionConnectionHelper::ConnectionId 
     TransactionConnectionHelper::establishTransactionConnection(
-        const SocketAddress& appserver2Endpoint,
+        const QUrl& appserver2BaseUrl,
         const std::string& login,
         const std::string& password,
         KeepAlivePolicy keepAlivePolicy)
@@ -57,7 +58,8 @@ TransactionConnectionHelper::ConnectionId
     m_connections.emplace(
         connectionId,
         std::move(connectionContext));
-    const QUrl url(lit("http://%1/cdb/ec2/events").arg(appserver2Endpoint.toString()));
+    QUrl url = appserver2BaseUrl;
+    url.setPath("/cdb/ec2/events");
     transactionConnectionPtr->doOutgoingConnect(url);
 
     return connectionId;
@@ -167,5 +169,6 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
     m_condition.wakeAll();
 }
 
+} // namespace test
 } // namespace cdb
 } // namespace nx

@@ -20,6 +20,8 @@
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
 
+#include <network/system_description.h>
+
 #include <api/global_settings.h>
 
 #include <ui/actions/action_manager.h>
@@ -1040,7 +1042,7 @@ void QnResourceTreeModelNode::setName(const QString& name)
         {
             case Qn::SystemNode:
             case Qn::CloudSystemNode:
-                m_displayName = tr("<Unnamed system>");
+                m_displayName = QnSystemDescription::extractSystemName(m_displayName);
                 changed = true;
                 break;
             default:

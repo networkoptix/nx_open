@@ -321,7 +321,7 @@ bool SelfUpdater::updateMinilauncher()
     {
         NX_LOGX(lit("Source minilauncher could not be found at %1!")
             .arg(sourceMinilauncherPath), cl_logERROR);
-        //silently exiting because we still can't do anything
+        // Silently exiting because we still can't do anything.
         return true;
     }
 

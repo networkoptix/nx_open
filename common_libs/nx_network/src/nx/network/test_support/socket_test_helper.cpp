@@ -522,16 +522,18 @@ bool RandomDataTcpServer::start(std::chrono::milliseconds rwTimeout)
     m_rwTimeout = rwTimeout;
     if (!m_serverSocket)
         m_serverSocket = SocketFactory::createStreamServerSocket();
-    if( !(m_doNotBind || m_serverSocket->bind(m_localAddress)) ||
-        !m_serverSocket->listen() )
+
+    if (!(m_doNotBind || m_serverSocket->bind(m_localAddress)) ||
+        !m_serverSocket->listen() ||
+        !m_serverSocket->setNonBlockingMode(true))
     {
         m_serverSocket.reset();
         return false;
     }
-    m_serverSocket->acceptAsync( std::bind(
-        &RandomDataTcpServer::onNewConnection, this,
-        std::placeholders::_1, std::placeholders::_2 ) );
 
+    m_serverSocket->acceptAsync(std::bind(
+        &RandomDataTcpServer::onNewConnection, this,
+        std::placeholders::_1, std::placeholders::_2));
     return true;
 }
 

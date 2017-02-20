@@ -110,7 +110,7 @@ public:
         return lessThanTimestamp(d1, d2);
     }
 
-    bool lessLexicographically(const QnLightBusinessActionP& d1, const QnLightBusinessActionP& d2) const
+    bool lessThanLexicographically(const QnLightBusinessActionP& d1, const QnLightBusinessActionP& d2) const
     {
         int rez = d1->compareString.compare(d2->compareString);
         if (rez != 0)
@@ -147,7 +147,7 @@ public:
                 lessThan = &DataIndex::lessThanActionType;
                 break;
             default:
-                lessThan = &DataIndex::lessLexicographically;
+                lessThan = &DataIndex::lessThanLexicographically;
                 for (auto record : m_records)
                     record->compareString = m_parent->textData(m_sortCol, *record);
                 break;
@@ -287,7 +287,7 @@ QnResourcePtr QnEventLogModel::getResource(Column column, const QnBusinessAction
 
 QString QnEventLogModel::getUserNameById(const QnUuid& id)
 {
-    static const auto kRemovedUserName = tr("<User removed>");
+    static const auto kRemovedUserName = L'<' + tr("User removed") + L'>';
 
     const auto userResource = qnResPool->getResourceById(id).dynamicCast<QnUserResource>();
     return (userResource.isNull() ? kRemovedUserName : userResource->getName());

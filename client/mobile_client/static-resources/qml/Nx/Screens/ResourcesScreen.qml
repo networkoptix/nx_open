@@ -39,6 +39,7 @@ Page
         target: resourcesScreen
         property: "title"
         value: connectionManager.systemName
+        when: connectionManager.online
     }
 
     QtObject
@@ -103,7 +104,7 @@ Page
         keepStatuses: !resourcesScreen.warningVisible
             && connectionManager.connectionState !== QnConnectionManager.Ready
 
-        paused: !activePage
+        active: activePage
 
         ScrollIndicator.vertical: ScrollIndicator
         {

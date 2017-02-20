@@ -594,7 +594,7 @@ protected:
 
 TEST_F(UdtSocketPerformance, DISABLED_SimplexSync)
 {
-    std::thread acceptThread(
+    nx::utils::thread acceptThread(
         [&]()
         {
             const auto client = accept();
@@ -602,7 +602,7 @@ TEST_F(UdtSocketPerformance, DISABLED_SimplexSync)
             sendSync(client.get());
         });
 
-    std::thread clientThread(
+    nx::utils::thread clientThread(
         [&]()
         {
             const auto client = connect();
@@ -616,20 +616,20 @@ TEST_F(UdtSocketPerformance, DISABLED_SimplexSync)
 
 TEST_F(UdtSocketPerformance, DISABLED_DuplexSync)
 {
-    std::thread acceptThread(
+    nx::utils::thread acceptThread(
         [&]()
         {
             const auto client = accept();
-            std::thread t([&](){ recvSync(client.get()); });
+            nx::utils::thread t([&](){ recvSync(client.get()); });
             sendSync(client.get());
             t.join();
         });
 
-    std::thread clientThread(
+    nx::utils::thread clientThread(
         [&]()
         {
             const auto client = connect();
-            std::thread t([&](){ sendSync(client.get()); });
+            nx::utils::thread t([&](){ sendSync(client.get()); });
             recvSync(client.get());
             t.join();
         });

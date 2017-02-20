@@ -292,6 +292,7 @@ private:
         auto tcpServerSocket = std::make_unique<TCPServerSocket>(AF_INET);
         NX_GTEST_ASSERT_TRUE(tcpServerSocket->bind(SocketAddress(HostAddress::localhost, 0)));
         NX_GTEST_ASSERT_TRUE(tcpServerSocket->listen(256));
+        NX_GTEST_ASSERT_TRUE(tcpServerSocket->setNonBlockingMode(true));
         m_localServerAddress = tcpServerSocket->getLocalAddress();
         return tcpServerSocket;
     }

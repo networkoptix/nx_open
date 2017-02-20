@@ -18,19 +18,14 @@
 
 namespace {
 
-qreal getAspectRatioFromImage(const QString& fileName)
+QnAspectRatio getAspectRatioFromImage(const QString& fileName)
 {
     NX_ASSERT(FileTypeSupport::isImageFileExt(fileName), "File is not image!");
 
     QImage image;
-    if (QFile::exists(fileName) && image.load(fileName))
-    {
-        const qreal height = image.height();
-        const qreal width = image.width();
-        if (!qFuzzyIsNull(height) || !qFuzzyIsNull(width))
-            return (width / height);
-    }
-    return -1;
+    return (QFile::exists(fileName) && image.load(fileName)
+        ? QnAspectRatio(image.width(), image.height())
+        : QnAspectRatio());
 }
 
 } // namespace
@@ -53,7 +48,7 @@ QnAviResource::~QnAviResource()
 {
 }
 
-qreal QnAviResource::imageAspectRatio() const
+QnAspectRatio QnAviResource::imageAspectRatio() const
 {
     return m_imageAspectRatio;
 }

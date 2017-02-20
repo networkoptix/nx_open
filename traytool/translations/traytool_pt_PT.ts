@@ -54,34 +54,6 @@
         <translation>Não foi possível acede aos serviços instalados</translation>
     </message>
     <message>
-        <source> (stopping)</source>
-        <translation> (a parar)</translation>
-    </message>
-    <message>
-        <source> (paused)</source>
-        <translation> (pausado)</translation>
-    </message>
-    <message>
-        <source> (starting)</source>
-        <translation> (A iniciar)</translation>
-    </message>
-    <message>
-        <source> (pausing)</source>
-        <translation> (a pausar)</translation>
-    </message>
-    <message>
-        <source> (started)</source>
-        <translation> (iniciado)</translation>
-    </message>
-    <message>
-        <source> (resuming)</source>
-        <translation> (resumindo)</translation>
-    </message>
-    <message>
-        <source> (stopped)</source>
-        <translation> (parado)</translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation>Ocorreu um erro enquanto tentava aceder aos serviços instalados:</translation>
     </message>
@@ -111,6 +83,34 @@
     </message>
     <message>
         <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>starting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>resuming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pausing</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

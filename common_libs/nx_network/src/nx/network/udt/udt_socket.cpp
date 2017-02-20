@@ -442,6 +442,12 @@ void UdtSocket<InterfaceToImplement>::bindToAioThread(aio::AbstractAioThread* ai
 }
 
 template<typename InterfaceToImplement>
+bool UdtSocket<InterfaceToImplement>::isInSelfAioThread() const
+{
+    return Pollable::isInSelfAioThread();
+}
+
+template<typename InterfaceToImplement>
 Pollable* UdtSocket<InterfaceToImplement>::pollable()
 {
     return this;
@@ -911,6 +917,9 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
         std::pair<SystemError::ErrorCode, AbstractStreamSocket*>
     > acceptedSocketPromise;
 
+    if (!setNonBlockingMode(true))
+        return nullptr;
+
     acceptAsync(
         [this, &acceptedSocketPromise](
             SystemError::ErrorCode errorCode, AbstractStreamSocket* socket)
@@ -925,6 +934,10 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
         });
 
     auto acceptedSocketPair = acceptedSocketPromise.get_future().get();
+
+    if (!setNonBlockingMode(false))
+        return nullptr;
+
     if (acceptedSocketPair.first != SystemError::noError)
     {
         SystemError::setLastErrorCode(acceptedSocketPair.first);
@@ -938,6 +951,12 @@ void UdtStreamServerSocket::acceptAsync(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> handler)
 {
+#ifdef _DEBUG
+    bool nonBlockingMode = false;
+    NX_ASSERT(getNonBlockingMode(&nonBlockingMode));
+    NX_ASSERT(nonBlockingMode);
+#endif
+
     return m_aioHelper->acceptAsync(
         [handler = std::move(handler)](
             SystemError::ErrorCode errorCode,

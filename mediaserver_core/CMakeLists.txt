@@ -16,7 +16,7 @@ nx_copy_if_different(${NX_STORAGE_SDK_PACKAGE} "${CMAKE_CURRENT_BINARY_DIR}/reso
 
 execute_process(
     COMMAND
-        java -jar "$ENV{environment}/bin/apidoctool.jar"
+        java -jar "${APIDOCTOOL_PATH}/apidoctool.jar"
         code-to-xml
         -vms-path "${PROJECT_SOURCE_DIR}"
         -template-xml "${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml"

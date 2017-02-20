@@ -168,6 +168,11 @@ QnUuid QnUuid::fromStringSafe(const QByteArray& uuid)
     return QnUuid(QUuid(uuid));
 }
 
+QnUuid QnUuid::fromStringSafe(const char* uuid)
+{
+    return QnUuid(QUuid(uuid));
+}
+
 QnUuid QnUuid::fromStringSafe(const std::string& uuid)
 {
     return QnUuid(QUuid(QByteArray::fromRawData(uuid.c_str(), (int)uuid.size())));

@@ -9,7 +9,7 @@ class QnGlobalMonitorPrivate;
 
 /**
  * A proxy monitor object suitable for usage as an application-wide monitor.
- * 
+ *
  * Updates on regular time intervals and is thread-safe.
  */
 class QnGlobalMonitor: public QnPlatformMonitor {
@@ -18,12 +18,16 @@ class QnGlobalMonitor: public QnPlatformMonitor {
     typedef QnPlatformMonitor base_type;
 
 public:
+
+    static const int kDefaultUpdatePeridMs = 2500;
+
     /**
      * \param base                      Base platform monitor to get actual data from.
      *                                  Global monitor claims ownership of this object.
      * \param parent                    Parent of this object.
+     * \param updatePeriodMs            statistics update period. It's disabled if 0.
      */
-    QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent = NULL);
+    QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent, int updatePeriodMs);
     virtual ~QnGlobalMonitor();
 
     /**

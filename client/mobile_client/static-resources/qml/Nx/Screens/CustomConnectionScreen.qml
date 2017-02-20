@@ -160,13 +160,13 @@ Page
         }
         else if (credentialsEditor.login.trim().length === 0)
         {
-            credentialsEditor.loginErrorText = qsTr("Login can't be empty")
+            credentialsEditor.loginErrorText = qsTr("Login cannot be empty")
             credentialsEditor.displayLoginError = true
             return false
         }
         else if (credentialsEditor.password.trim().length === 0)
         {
-            credentialsEditor.passwordErrorText = qsTr("Password can't be empty")
+            credentialsEditor.passwordErrorText = qsTr("Password cannot be empty")
             credentialsEditor.displayPasswordError = true
             return false
         }

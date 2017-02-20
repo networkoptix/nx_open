@@ -52,6 +52,7 @@ public:
     virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override { m_abstractSocketProvider()->dispatch( std::move(handler) ); }
     virtual nx::network::aio::AbstractAioThread* getAioThread() const override { return m_abstractSocketProvider()->getAioThread(); }
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override { m_abstractSocketProvider()->bindToAioThread( aioThread ); }
+    virtual bool isInSelfAioThread() const override { return m_abstractSocketProvider()->isInSelfAioThread(); }
 
 private:
     AbstractSocketProviderType m_abstractSocketProvider;

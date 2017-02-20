@@ -160,7 +160,7 @@ void ConnectionManager::pushTransaction(
     nx_http::RequestProcessedHandler completionHandler)
 {
     if (!request.requestLine.url.path().startsWith(kPushEc2TransactionPath) &&
-        !request.requestLine.url.path().startsWith(kPushEc2TransactionDeprecatedPath)) // TODO: #ak remove after 3.0 release
+        !request.requestLine.url.path().startsWith(kDeprecatedPushEc2TransactionPath)) // TODO: #ak remove after 3.0 release
     {
         return completionHandler(nx_http::StatusCode::notFound);
     }

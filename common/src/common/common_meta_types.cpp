@@ -130,6 +130,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnMacAddress>();
     qRegisterMetaType<QnPeerRuntimeInfo>();
+    qRegisterMetaType<HostAddress>();
     qRegisterMetaType<SocketAddress>();
 
     //qRegisterMetaType<QnParam>();

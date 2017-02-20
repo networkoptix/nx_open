@@ -5,5 +5,15 @@
             <param name = "MaxFPS" default_value ="15"/>
         </params>
     </resource>
+    <resource name = "DCS-960L" public="DLINK_COMMON">
+        <params>
+            <param name = "MaxFPS" default_value ="30"/>
+        </params>
+    </resource>
+    <resource name = "DCS-932L" public="DLINK_COMMON">
+        <params>
+            <param name = "MaxFPS" default_value ="20"/>
+        </params>
+    </resource>
     </oem>
 </resources>

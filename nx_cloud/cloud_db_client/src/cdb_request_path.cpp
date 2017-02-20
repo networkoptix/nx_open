@@ -33,8 +33,8 @@ const char* kSubscribeToSystemEventsPath = "/cdb/event/subscribe";
 
 const char* kPingPath = "/cdb/ping";
 
-const char* kEstablishEc2TransactionConnectionDeprecatedPath = "/ec2/events/ConnectingStage1";
-const char* kPushEc2TransactionDeprecatedPath = "/ec2/forward_events/";
+const char* kDeprecatedEstablishEc2TransactionConnectionPath = "/ec2/events/ConnectingStage1";
+const char* kDeprecatedPushEc2TransactionPath = "/ec2/forward_events/";
 
 const char* kEstablishEc2TransactionConnectionPath = "/cdb/ec2/events/ConnectingStage1";
 const char* kPushEc2TransactionPath = "/cdb/ec2/forward_events/";

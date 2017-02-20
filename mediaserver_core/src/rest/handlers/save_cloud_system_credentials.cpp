@@ -211,9 +211,9 @@ bool QnSaveCloudSystemCredentialsHandler::insertCloudOwner(
     userData.isAdmin = true;
     userData.isEnabled = true;
     userData.realm = QnAppInfo::realm();
-    userData.hash = "password_is_in_cloud";
-    userData.digest = "password_is_in_cloud";
-        
+    userData.hash = ec2::ApiUserData::kCloudPasswordStub;
+    userData.digest = ec2::ApiUserData::kCloudPasswordStub;
+
     const auto resultCode =
         QnAppServerConnectionFactory::getConnection2()
             ->getUserManager(Qn::kSystemAccess)->saveSync(userData);
@@ -245,11 +245,7 @@ bool QnSaveCloudSystemCredentialsHandler::initializeCloudRelatedManagers(
 {
     using namespace nx::cdb;
 
-    m_cloudManagerGroup->connectionManager.setCloudCredentials(
-        data.cloudSystemID,
-        data.cloudAuthKey);
-
-    api::ResultCode resultCode = 
+    api::ResultCode resultCode =
         m_cloudManagerGroup->authenticationNonceFetcher.initializeConnectionToCloudSync();
     if (resultCode != api::ResultCode::ok)
     {

@@ -34,17 +34,17 @@ class Account:
 
 } // namespace
 
-// TODO: #ak following test should be broke into something like
+// TODO: #ak following test should be broken into something like:
 //
 //{
-//    havingIssuedAccountRegistrationRequest();
-//    expectingReceivalOfActiveAccountNotification();
-//    expectingAccountActivationCodeWorks();
+//    whenIssuedAccountRegistrationRequest();
+//    assertAccountActivationNotificationHasBeenSent();
+//    assertAccountActivationCodeWorks();
 //}
 //
 //{
-//    havingIssuedAccountRegistrationRequest();
-//    expectingFailureToBindSystemToAccount();
+//    whenIssuedAccountRegistrationRequest();
+//    assertAccountCannotBindSystem();
 //}
 
 TEST_F(Account, activation)
@@ -322,7 +322,7 @@ TEST_F(Account, bad_registration)
     url.setPort(endpoint().port);
     url.setScheme("http");
     url.setPath("/cdb/account/register");
-    std::promise<void> donePromise;
+    nx::utils::promise<void> donePromise;
     auto doneFuture = donePromise.get_future();
     QObject::connect(
         client.get(), &nx_http::AsyncHttpClient::done,

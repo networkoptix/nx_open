@@ -15,15 +15,24 @@ class QFile;
 class QIODevice;
 class QnZipExtractor;
 
-class QnServerUpdateTool : public QObject, public Singleton<QnServerUpdateTool> {
+class QnServerUpdateTool : public QObject, public Singleton<QnServerUpdateTool>
+{
     Q_OBJECT
+
 public:
-    enum ReplyCode {
+    enum ReplyCode
+    {
         NoReply = -1,
         UploadFinished = -2,
         NoError = -3,
         UnknownError = -4,
         NoFreeSpace = -5
+    };
+
+    enum class UpdateType
+    {
+        Instant,
+        Delayed
     };
 
     QnServerUpdateTool();
@@ -32,8 +41,7 @@ public:
     bool addUpdateFile(const QString &updateId, const QByteArray &data);
     qint64 addUpdateFileChunkSync(const QString &updateId, const QByteArray &data, qint64 offset);
     void addUpdateFileChunkAsync(const QString &updateId, const QByteArray &data, qint64 offset);
-    bool installUpdate(const QString &updateId);
-    void installUpdateDelayed(const QString &updateId);
+    bool installUpdate(const QString &updateId, UpdateType updateType = UpdateType::Instant);
 
     void removeUpdateFiles(const QString& updateId);
 

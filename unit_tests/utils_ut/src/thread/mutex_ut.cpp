@@ -3,6 +3,7 @@
 #include <thread>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/thread.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/stoppable.h>
 
@@ -28,7 +29,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock2)
     QnMutex m1;
     QnMutex m2;
 
-    std::thread t1(
+    utils::thread t1(
         [&]()
         {
             QnMutexLocker lock1(&m1);
@@ -37,7 +38,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock2)
         });
 
 
-    std::thread t2(
+    utils::thread t2(
         [&]()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -56,7 +57,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock3)
     QnMutex m2;
     QnMutex m3;
 
-    std::thread t1(
+    utils::thread t1(
         [&]()
         {
             QnMutexLocker lock1(&m1);
@@ -65,7 +66,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock3)
         });
 
 
-    std::thread t2(
+    utils::thread t2(
         [&]()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
@@ -74,7 +75,7 @@ TEST(MutexAnalyzer, DISABLED_Deadlock3)
             NX_LOG(lm("Thread 2"), cl_logDEBUG1);
         });
 
-    std::thread t3(
+    utils::thread t3(
         [&]()
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(500));

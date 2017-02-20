@@ -31,19 +31,21 @@ public:
 
     virtual ~AbstractAsyncClient() = default;
 
+    typedef nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> ConnectHandler;
     typedef std::function<void(Message)> IndicationHandler;
     typedef std::function<void()> ReconnectHandler;
-    typedef utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode, Message)> RequestHandler;
+    typedef utils::MoveOnlyFunc<void(SystemError::ErrorCode, Message)> RequestHandler;
     typedef std::function<void()> TimerHandler;
 
     /** Asynchronously openes connection to the server
      *
      * \param endpoint Address to use
+     * \param handler Is called when 1st connection attempt has passed regadless of it's success.
      * \note shall be called only once (to provide address) reconnect will
      *      happen automatically
      */
-    virtual void connect(SocketAddress endpoint, bool useSsl = false) = 0;
+    virtual void connect(
+        SocketAddress endpoint, bool useSsl = false, ConnectHandler handler = nullptr) = 0;
 
     /** Subscribes for certain indications
      *

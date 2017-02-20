@@ -179,7 +179,7 @@ void QnCameraDiagnosticsDialog::at_tool_diagnosticsStepResult(CameraDiagnostics:
 }
 
 void QnCameraDiagnosticsDialog::at_tool_diagnosticsDone() {
-    ui->textEdit->append(tr("Diagnostics complete!"));
+    ui->textEdit->append(tr("Diagnostics complete"));
 
     m_finished = true;
 

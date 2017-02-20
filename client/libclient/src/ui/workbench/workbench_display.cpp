@@ -1629,8 +1629,8 @@ void QnWorkbenchDisplay::synchronize(QnResourceWidget *widget, bool animate)
         return;
     }
 
-    synchronizeGeometry(widget, animate);
     synchronizeZoomRect(widget);
+    synchronizeGeometry(widget, animate);
     synchronizeLayer(widget);
 }
 

@@ -99,6 +99,8 @@ protected:
 
     void setResolutionMode(Qn::ResolutionMode resolutionMode);
 
+    void setCurrentLayoutCellSpacing(Qn::CellSpacing spacing);
+
     QnBusinessRulesDialog *businessRulesDialog() const;
 
     QnEventLogDialog *businessEventsLogDialog() const;
@@ -173,11 +175,6 @@ protected:
 
     void at_adjustVideoAction_triggered();
     void at_beforeExitAction_triggered();
-
-    void at_setCurrentLayoutItemSpacing0Action_triggered();
-    void at_setCurrentLayoutItemSpacing10Action_triggered();
-    void at_setCurrentLayoutItemSpacing20Action_triggered();
-    void at_setCurrentLayoutItemSpacing30Action_triggered();
 
     void at_createZoomWindowAction_triggered();
 

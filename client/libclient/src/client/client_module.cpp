@@ -53,7 +53,6 @@
 #include <nx/utils/log/log.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec2_lib.h>
-#include <nx_speech_synthesizer/text_to_wav.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -313,11 +312,6 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     common->store(new QnQtbugWorkaround());
 #endif
 
-#ifndef DISABLE_FESTIVAL
-    auto textToWaveServer = qnCommon->store(new TextToWaveServer());
-    textToWaveServer->start();
-#endif
-
     common->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
 }
 
@@ -394,6 +388,13 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
             : startupParams.videoWallItemGuid.toString();
         logFileNameSuffix.replace(QRegExp(QLatin1String("[{}]")), QLatin1String("_"));
     }
+    else if (qnClientInstanceManager->isValid())
+    {
+        int idx = qnClientInstanceManager->instanceIndex();
+        if (idx > 0)
+            logFileNameSuffix = L'_' + QString::number(idx) + L'_';
+    }
+
 
     static const int DEFAULT_MAX_LOG_FILE_SIZE = 10 * 1024 * 1024;
     static const int DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;

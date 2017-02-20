@@ -2,6 +2,7 @@ import QtQuick 2.6
 import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
+import Nx.Models 1.0
 import com.networkoptix.qml 1.0
 
 import "private/VideoScreen"
@@ -67,6 +68,8 @@ PageBase
             NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
         }
 
+        property real cameraUiOpacity: 1.0
+
         Timer
         {
             id: offlineStatusDelay
@@ -114,6 +117,7 @@ PageBase
         }
 
         opacity: d.uiOpacity
+        titleOpacity: d.cameraUiOpacity
 
         controls:
         [
@@ -175,6 +179,7 @@ PageBase
         height: mainWindow.height
 
         visible: dummyLoader.status != Loader.Ready && !screenshot.visible
+        opacity: d.cameraUiOpacity
 
         mediaPlayer: videoScreenController.mediaPlayer
         resourceHelper: videoScreenController.resourceHelper
@@ -189,6 +194,7 @@ PageBase
         height: sourceSize.height == 0 ? 0 : width * sourceSize.height / sourceSize.width
         y: (mainWindow.height - height) / 3 - header.height
         visible: status == Image.Ready
+        opacity: d.cameraUiOpacity
     }
 
     Loader
@@ -197,7 +203,7 @@ PageBase
         anchors.right: parent.right
         anchors.rightMargin: 8
         y: header.y
-        opacity: d.uiOpacity
+        opacity: Math.min(d.uiOpacity, d.cameraUiOpacity)
         active: showCameraInfo
         sourceComponent: InformationLabel
         {
@@ -258,14 +264,7 @@ PageBase
             icon: lp("/images/previous.png")
             radius: width / 2
             z: 1
-            onClicked:
-            {
-                if (!camerasModel)
-                    return
-
-                videoScreen.resourceId = camerasModel.previousResourceId(videoScreen.resourceId)
-                    || camerasModel.previousResourceId("")
-            }
+            onClicked: switchToPreviousCamera()
         }
 
         Button
@@ -283,14 +282,7 @@ PageBase
             icon: lp("/images/next.png")
             radius: width / 2
             z: 1
-            onClicked:
-            {
-                if (!camerasModel)
-                    return
-
-                videoScreen.resourceId = camerasModel.nextResourceId(videoScreen.resourceId)
-                    || camerasModel.nextResourceId("")
-            }
+            onClicked: switchToNextCamera()
         }
     }
 
@@ -301,6 +293,7 @@ PageBase
         VideoNavigation
         {
             videoScreenController: d.controller
+            controlsOpacity: d.cameraUiOpacity
         }
     }
 
@@ -323,9 +316,48 @@ PageBase
         height: video.height
         anchors.left: parent.right
         anchors.top: video.top
-        opacity: navigationLoader.opacity
+        opacity: Math.min(navigationLoader.opacity, d.cameraUiOpacity)
     }
 
+    SequentialAnimation
+    {
+        id: cameraSwitchAnimation
+
+        property string newResourceId
+        property string thumbnail
+
+        NumberAnimation
+        {
+            target: d
+            property: "cameraUiOpacity"
+            to: 0.0
+            duration: 200
+        }
+
+        ScriptAction
+        {
+            script:
+            {
+                videoScreen.resourceId = cameraSwitchAnimation.newResourceId
+                initialScreenshot = cameraSwitchAnimation.thumbnail
+                video.clear()
+            }
+        }
+
+        NumberAnimation
+        {
+            target: d
+            property: "cameraUiOpacity"
+            to: 1.0
+            duration: 200
+        }
+    }
+
+    ModelDataAccessor
+    {
+        id: camerasModelAccessor
+        model: camerasModel
+    }
 
     function hideUi()
     {
@@ -346,5 +378,34 @@ PageBase
             hideUi()
         else
             showUi()
+    }
+
+    function switchToCamera(id)
+    {
+        cameraSwitchAnimation.stop()
+        cameraSwitchAnimation.newResourceId = id
+        cameraSwitchAnimation.thumbnail = camerasModelAccessor.getData(
+            camerasModel.rowByResourceId(id), "thumbnail")
+        cameraSwitchAnimation.start()
+    }
+
+    function switchToPreviousCamera()
+    {
+        if (!camerasModel)
+            return
+
+        switchToCamera(
+            camerasModel.previousResourceId(videoScreen.resourceId)
+                || camerasModel.previousResourceId(""))
+    }
+
+    function switchToNextCamera()
+    {
+        if (!camerasModel)
+            return
+
+        switchToCamera(
+            camerasModel.nextResourceId(videoScreen.resourceId)
+                || camerasModel.nextResourceId(""))
     }
 }

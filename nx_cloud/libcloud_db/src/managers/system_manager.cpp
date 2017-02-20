@@ -937,8 +937,9 @@ nx::db::DBResult SystemManager::shareSystem(
     api::SystemSharingEx existingSharing;
     dbResult = m_systemSharingDao.fetchSharing(
         queryContext, inviteeAccount->email, sharing.systemId, &existingSharing);
-    if (dbResult == nx::db::DBResult::ok)   //< Sharing already exists.
+    if (dbResult == nx::db::DBResult::ok)
     {
+        // Sharing already exists. Updating sharing.
         static_cast<api::SystemSharing&>(existingSharing) = sharing;
         return insertOrReplaceSharing(queryContext, std::move(existingSharing));
     }
@@ -949,19 +950,39 @@ nx::db::DBResult SystemManager::shareSystem(
         return dbResult;
     }
 
+    dbResult = addNewSharing(queryContext, *inviteeAccount, sharing);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
+
+    if (notificationCommand == NotificationCommand::sendNotification)
+    {
+        dbResult = notifyUserAboutNewSystem(
+            queryContext, grantorEmail, *inviteeAccount, sharing);
+        if (dbResult != db::DBResult::ok)
+            return dbResult;
+    }
+
+    return nx::db::DBResult::ok;
+}
+
+nx::db::DBResult SystemManager::addNewSharing(
+    nx::db::QueryContext* const queryContext,
+    const data::AccountData& inviteeAccount,
+    const data::SystemSharing& sharing)
+{
     api::SystemSharingEx sharingWithCalculatedData = createDerivedFromBase(sharing);
     sharingWithCalculatedData.lastLoginTime = std::chrono::system_clock::now();
-    sharingWithCalculatedData.accountId = inviteeAccount->id;
+    sharingWithCalculatedData.accountId = inviteeAccount.id;
 
-    dbResult = m_systemSharingDao.calculateUsageFrequencyForANewSystem(
+    auto dbResult = m_systemSharingDao.calculateUsageFrequencyForANewSystem(
         queryContext,
-        inviteeAccount->id,
+        inviteeAccount.id,
         sharingWithCalculatedData.systemId,
         &sharingWithCalculatedData.usageFrequency);
     if (dbResult != nx::db::DBResult::ok)
     {
         NX_LOGX(lm("Error calculating usage frequency for sharing (%1, %2)")
-            .arg(sharing.systemId).arg(inviteeAccount->email), cl_logDEBUG1);
+            .arg(sharing.systemId).arg(inviteeAccount.email), cl_logDEBUG1);
         return dbResult;
     }
 
@@ -971,19 +992,38 @@ nx::db::DBResult SystemManager::shareSystem(
     if (dbResult != nx::db::DBResult::ok)
     {
         NX_LOGX(lm("Error updating sharing (%1, %2) in Db")
-            .arg(sharing.systemId).arg(inviteeAccount->email), cl_logDEBUG1);
+            .arg(sharing.systemId).arg(inviteeAccount.email), cl_logDEBUG1);
         return dbResult;
     }
 
-    if (notificationCommand == NotificationCommand::sendNotification)
-    {
-        dbResult = scheduleSystemHasBeenSharedNotification(
-            queryContext, grantorEmail, sharing);
-        if (dbResult != db::DBResult::ok)
-            return dbResult;
-    }
-
     return nx::db::DBResult::ok;
+}
+
+nx::db::DBResult SystemManager::deleteSharing(
+    nx::db::QueryContext* const queryContext,
+    const std::string& systemId,
+    const data::AccountData& inviteeAccount)
+{
+    const auto dbResult = m_systemSharingDao.deleteSharing(
+        queryContext,
+        systemId,
+        {{"account_id", ":accountId", QnSql::serialized_field(inviteeAccount.id)}});
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
+
+    api::SystemSharingEx sharing;
+    sharing.accountEmail = inviteeAccount.email;
+    sharing.accountId = inviteeAccount.id;
+    sharing.systemId = systemId;
+    sharing.accessRole = api::SystemAccessRole::none;
+
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        [this, sharing = std::move(sharing)]() mutable
+        {
+            updateSharingInCache(std::move(sharing));
+        });
+
+    return dbResult;
 }
 
 nx::db::DBResult SystemManager::insertOrReplaceSharing(
@@ -1041,19 +1081,41 @@ nx::db::DBResult SystemManager::fillSystemSharedNotification(
     return db::DBResult::ok;
 }
 
-nx::db::DBResult SystemManager::scheduleSystemHasBeenSharedNotification(
+nx::db::DBResult SystemManager::notifyUserAboutNewSystem(
     nx::db::QueryContext* const queryContext,
     const std::string& grantorEmail,
+    const data::AccountData& inviteeAccount,
     const api::SystemSharing& sharing)
 {
-    auto notification = std::make_unique<SystemSharedNotification>();
+    std::unique_ptr<AbstractNotification> notification;
 
-    auto dbResult = fillSystemSharedNotification(
-        queryContext,
-        grantorEmail, sharing.systemId, sharing.accountEmail,
-        notification.get());
-    if (dbResult != db::DBResult::ok)
-        return dbResult;
+    switch (inviteeAccount.statusCode)
+    {
+        case api::AccountStatus::invited:
+        {
+            auto inviteNotification = std::make_unique<InviteUserNotification>();
+            auto dbResult = prepareInviteNotification(
+                queryContext, grantorEmail, inviteeAccount,
+                sharing.systemId, inviteNotification.get());
+            if (dbResult != nx::db::DBResult::ok)
+                return dbResult;
+            notification = std::move(inviteNotification);
+            break;
+        }
+
+        default:
+        {
+            auto sharingNotification = std::make_unique<SystemSharedNotification>();
+            auto dbResult = fillSystemSharedNotification(
+                queryContext,
+                grantorEmail, sharing.systemId, sharing.accountEmail,
+                sharingNotification.get());
+            if (dbResult != db::DBResult::ok)
+                return dbResult;
+            notification = std::move(sharingNotification);
+            break;
+        }
+    }
 
     queryContext->transaction()->addOnSuccessfulCommitHandler(
         [this,
@@ -1624,7 +1686,7 @@ nx::db::DBResult SystemManager::fillCache()
 template<typename Func>
 nx::db::DBResult SystemManager::doBlockingDbQuery(Func func)
 {
-    std::promise<db::DBResult> cacheFilledPromise;
+    nx::utils::promise<db::DBResult> cacheFilledPromise;
     auto future = cacheFilledPromise.get_future();
 
     //starting async operation
@@ -1831,33 +1893,6 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
     }
 
     return db::DBResult::ok;
-}
-
-nx::db::DBResult SystemManager::deleteSharing(
-    nx::db::QueryContext* const queryContext,
-    const std::string& systemId,
-    const data::AccountData& inviteeAccount)
-{
-    const auto dbResult = m_systemSharingDao.deleteSharing(
-        queryContext,
-        systemId,
-        {{"account_id", ":accountId", QnSql::serialized_field(inviteeAccount.id)}});
-    if (dbResult != nx::db::DBResult::ok)
-        return dbResult;
-
-    api::SystemSharingEx sharing;
-    sharing.accountEmail = inviteeAccount.email;
-    sharing.accountId = inviteeAccount.id;
-    sharing.systemId = systemId;
-    sharing.accessRole = api::SystemAccessRole::none;
-
-    queryContext->transaction()->addOnSuccessfulCommitHandler(
-        [this, sharing = std::move(sharing)]() mutable
-        {
-            updateSharingInCache(std::move(sharing));
-        });
-
-    return dbResult;
 }
 
 void SystemManager::onEc2RemoveUserDone(

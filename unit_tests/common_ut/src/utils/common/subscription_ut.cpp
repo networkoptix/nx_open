@@ -1,8 +1,10 @@
 #include <gtest/gtest.h>
-#include <utils/common/subscription.h>
 
 #include <atomic>
 #include <thread>
+
+#include <nx/utils/std/thread.h>
+#include <utils/common/subscription.h>
 
 TEST(UtilsCommon, SubscriptionGuard)
 {
@@ -51,7 +53,7 @@ TEST(UtilsCommon, SubscriptionThreadSafe)
         &subscription1);
 
     // notify from different thread
-    std::thread thread([&]() { subscription.notify(3); });
+    nx::utils::thread thread([&]() { subscription.notify(3); });
 
     // wait for thread to start
     std::this_thread::sleep_for(std::chrono::seconds(1));

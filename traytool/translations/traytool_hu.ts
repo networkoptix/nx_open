@@ -54,34 +54,6 @@
         <translation>A(z) %1 szolgáltatások nincsenek telepítve</translation>
     </message>
     <message>
-        <source> (stopped)</source>
-        <translation> (leállítva)</translation>
-    </message>
-    <message>
-        <source> (starting)</source>
-        <translation> (indul)</translation>
-    </message>
-    <message>
-        <source> (stopping)</source>
-        <translation> (leáll)</translation>
-    </message>
-    <message>
-        <source> (started)</source>
-        <translation> (elindult)</translation>
-    </message>
-    <message>
-        <source> (resuming)</source>
-        <translation> (újraindul)</translation>
-    </message>
-    <message>
-        <source> (paused)</source>
-        <translation> (szüneteltetve)</translation>
-    </message>
-    <message>
-        <source> (pausing)</source>
-        <translation>(szünetel)</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;Kilépés</translation>
     </message>
@@ -111,6 +83,34 @@
     </message>
     <message>
         <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>starting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>resuming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pausing</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

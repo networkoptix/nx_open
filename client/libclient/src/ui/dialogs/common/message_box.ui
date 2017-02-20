@@ -6,15 +6,9 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>450</width>
+    <width>400</width>
     <height>143</height>
    </rect>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>450</width>
-    <height>0</height>
-   </size>
   </property>
   <layout class="QVBoxLayout" name="mainLayout">
    <property name="spacing">
@@ -91,16 +85,37 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>8</height>
+           <height>0</height>
           </size>
          </property>
         </spacer>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBox">
-         <property name="text">
-          <string>Don't show this message again</string>
-         </property>
+        <widget class="QWidget" name="checkBoxWidget" native="true">
+         <layout class="QVBoxLayout" name="checkBoxLayout">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>8</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QCheckBox" name="checkBox">
+            <property name="text">
+             <string>Do not show this message again</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -133,9 +148,6 @@
    </item>
   </layout>
  </widget>
- <tabstops>
-  <tabstop>checkBox</tabstop>
- </tabstops>
  <resources/>
  <connections>
   <connection>

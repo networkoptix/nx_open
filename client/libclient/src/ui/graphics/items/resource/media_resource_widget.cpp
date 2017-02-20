@@ -598,8 +598,8 @@ qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
     if (aviResource && aviResource->flags().testFlag(Qn::still_image))
     {
         const auto aspect = aviResource->imageAspectRatio();
-        if (aspect > 0)
-            return aspect;
+        if (aspect.isValid())
+            return aspect.toFloat();
     }
 
     /* Here we get 0.0 if no custom aspect ratio set. */
@@ -1478,7 +1478,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const
 
     QString hqLqString;
     if (hasVideo() && !m_resource->toResource()->hasFlags(Qn::local))
-        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Low-Res") : tr("Hi-Res");
+        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Lo-Res") : tr("Hi-Res");
 
     static const int kDetailsTextPixelSize = 11;
 
