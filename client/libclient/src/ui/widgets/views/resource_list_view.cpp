@@ -1,14 +1,16 @@
 #include "resource_list_view.h"
 
+#include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/models/resource/resource_list_sorted_model.h>
 #include <ui/style/helper.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 
 namespace {
 
 static const int kMaximumRows = 10;
-static const int kRecommendedWidth = 400;
+static const int kRecommendedWidth = 284;
 
 }
 
@@ -26,10 +28,19 @@ QnResourceListView::QnResourceListView(QWidget* parent):
     setUniformRowHeights(true);
     setHeaderHidden(true);
     setFocusPolicy(Qt::NoFocus);
+    setSelectionMode(QAbstractItemView::NoSelection);
+    setProperty(style::Properties::kSideIndentation, qVariantFromValue(QnIndents()));
+    setProperty(style::Properties::kSuppressHoverPropery, true);
 
     auto itemDelegate = new QnResourceItemDelegate(this);
     itemDelegate->setCustomInfoLevel(Qn::RI_WithUrl);
     setItemDelegate(itemDelegate);
+
+    if (parent)
+    {
+        const auto scrollBar = new QnSnappedScrollBar(parent->window());
+        setVerticalScrollBar(scrollBar->proxyScrollBar());
+    }
 }
 
 QnResourceListView::QnResourceListView(const QnResourceList& resources, QWidget* parent):

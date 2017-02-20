@@ -15,8 +15,8 @@ class TimeProtocolServer:
 public:
     TimeProtocolServer(
         bool sslRequired,
-        SocketFactory::NatTraversalType natTraversalRequired)
-        :
+        nx::network::NatTraversalSupport natTraversalRequired)
+    :
         base_type(sslRequired, natTraversalRequired)
     {
     }

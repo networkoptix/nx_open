@@ -103,6 +103,8 @@ private:
     boost::optional<in6_addr> m_ipV6;
 };
 
+Q_DECLARE_METATYPE(HostAddress)
+
 //!Represents host and port (e.g. 127.0.0.1:1234)
 class NX_NETWORK_API SocketAddress
 {

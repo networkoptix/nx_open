@@ -95,10 +95,15 @@ QnBusinessRuleWidget::~QnBusinessRuleWidget()
 
 void QnBusinessRuleWidget::retranslateUi()
 {
-    ui->eventResourcesHolder->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
-        tr("<Any Device>"),
-        tr("<Any Camera>")
-    ));
+    auto braced = [](const QString& source)
+        {
+            return L'<' + source + L'>';
+        };
+
+    ui->eventResourcesHolder->setText(braced(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Any Device"),
+        tr("Any Camera")
+    )));
 
     ui->actionResourcesHolder->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         tr("Select at least one device"),

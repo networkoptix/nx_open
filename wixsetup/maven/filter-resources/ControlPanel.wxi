@@ -2,14 +2,14 @@
 
 <Include>
   <Property Id="ARPCOMMENTS" Value="${company.name} ${display.product.name}" />
-  <Property Id="ARPCONTACT" Value="${company.url}" />
+  <Property Id="ARPCONTACT" Value="${companyUrl}" />
   <Property Id="ARPPRODUCTICON" Value="favicon.ico" />
-  <Property Id="ARPHELPLINK" Value="${product.url}" />
-  <Property Id="ARPREADME" Value="${product.url}" />
+  <Property Id="ARPHELPLINK" Value="${productUrl}" />
+  <Property Id="ARPREADME" Value="${productUrl}" />
   <Property Id="ARPURLINFOABOUT" Value="${company.name} ${display.product.name}" />
-  <Property Id="ARPURLUPDATEINFO" Value="${product.url}" />
-  <Property Id="ARPHELPTELEPHONE" Value="${company.url}" />
-  <Property Id="ARPAUTHORIZEDCDFPREFIX" Value="${company.url}" />
+  <Property Id="ARPURLUPDATEINFO" Value="${productUrl}" />
+  <Property Id="ARPHELPTELEPHONE" Value="${companyUrl}" />
+  <Property Id="ARPAUTHORIZEDCDFPREFIX" Value="${companyUrl}" />
 
   <Property Id="ARPNOREPAIR" Value="1" />    
   <Property Id="ARPNOMODIFY" Value="1" />    

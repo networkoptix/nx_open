@@ -296,7 +296,7 @@ namespace
 
         if (showMoreTooltip)
         {
-            static const auto kMoreItemsCaption = tr("Zoom timeline\nto view more bookmarks", "Use '\n' to split message in two lines (required)");
+            static const auto kMoreItemsCaption = tr("Zoom timeline\nto view more bookmarks", "It is highly recommended to split message in two lines");
             insertMoreItemsMessage(kMoreItemsCaption, colors, m_mainLayout, this);
         }
 

@@ -29,8 +29,6 @@ public:
                 32
             #endif
         );
-        // Default expiration timeout is 30 seconds, but there is a bug in QT older than v.5.3.
-        pool.setExpiryTimeout(-1);
     }
 };
 
@@ -75,10 +73,10 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
         QnMutexLocker lock( &m_searchProcessMutex );
         m_searchProcesses.insert(processUuid, searcher);
 
-        // TODO: #ak: better not to use concurrent here, since calling QtConcurrent::run from running
-        // task looks unreliable in some extreme case.
+        // TODO: #ak: better not to use concurrent here, since calling QtConcurrent::run from
+        // running task looks unreliable in some extreme case.
         // Consider using async fsm here (this one should be quite simple).
-        // NOTEL boost::bind is here temporarily: untill QnConcurrent::run supports arbitrary
+        // NOTE: boost::bind is here temporarily, until QnConcurrent::run supports arbitrary
         // number of arguments.
         m_searchProcessRuns.insert(processUuid,
             QnConcurrent::run(

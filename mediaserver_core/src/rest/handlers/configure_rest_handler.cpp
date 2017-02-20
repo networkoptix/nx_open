@@ -64,6 +64,10 @@ int QnConfigureRestHandler::executePost(
     return execute(std::move(data), result, owner);
 }
 
+// NOTE: Some parameters are undocumented and are used only by the server internally before calling
+// /api/mergeSystem.
+// TODO: Consider splitting into two methods: a public one (similar to the currently documented),
+// and the proprietary one for the internal server use.
 int QnConfigureRestHandler::execute(
     const ConfigureSystemData& data,
     QnJsonRestResult &result,
@@ -79,6 +83,13 @@ int QnConfigureRestHandler::execute(
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return CODE_OK;
+    }
+
+    // Configure request must support systemName changes to maintain compatibility with NxTool
+    if (!data.systemName.isEmpty())
+    {
+        qnGlobalSettings->setSystemName(data.systemName);
+        qnGlobalSettings->synchronizeNowSync();
     }
 
     /* set system id and move tran log time */

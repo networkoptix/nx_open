@@ -63,7 +63,10 @@ public:
         const std::string& password,
         std::chrono::milliseconds updateInterval);
 
-    static void setFactoryFunc(FactoryFunc factoryFunc);
+    /**
+     * @return Initial factory func.
+     */
+    static FactoryFunc setFactoryFunc(FactoryFunc factoryFunc);
 };
 
 /**

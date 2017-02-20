@@ -442,6 +442,12 @@ void UdtSocket<InterfaceToImplement>::bindToAioThread(aio::AbstractAioThread* ai
 }
 
 template<typename InterfaceToImplement>
+bool UdtSocket<InterfaceToImplement>::isInSelfAioThread() const
+{
+    return Pollable::isInSelfAioThread();
+}
+
+template<typename InterfaceToImplement>
 Pollable* UdtSocket<InterfaceToImplement>::pollable()
 {
     return this;
@@ -876,7 +882,8 @@ UdtStreamServerSocket::UdtStreamServerSocket(int ipVersion):
 
 UdtStreamServerSocket::~UdtStreamServerSocket()
 {
-    m_aioHelper->cancelIOSync();
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
 }
 
 bool UdtStreamServerSocket::listen( int backlog )
@@ -910,6 +917,9 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
         std::pair<SystemError::ErrorCode, AbstractStreamSocket*>
     > acceptedSocketPromise;
 
+    if (!setNonBlockingMode(true))
+        return nullptr;
+
     acceptAsync(
         [this, &acceptedSocketPromise](
             SystemError::ErrorCode errorCode, AbstractStreamSocket* socket)
@@ -924,6 +934,10 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
         });
 
     auto acceptedSocketPair = acceptedSocketPromise.get_future().get();
+
+    if (!setNonBlockingMode(false))
+        return nullptr;
+
     if (acceptedSocketPair.first != SystemError::noError)
     {
         SystemError::setLastErrorCode(acceptedSocketPair.first);
@@ -937,6 +951,12 @@ void UdtStreamServerSocket::acceptAsync(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> handler)
 {
+#ifdef _DEBUG
+    bool nonBlockingMode = false;
+    NX_ASSERT(getNonBlockingMode(&nonBlockingMode));
+    NX_ASSERT(nonBlockingMode);
+#endif
+
     return m_aioHelper->acceptAsync(
         [handler = std::move(handler)](
             SystemError::ErrorCode errorCode,
@@ -967,14 +987,23 @@ void UdtStreamServerSocket::cancelIOSync()
 }
 
 void UdtStreamServerSocket::pleaseStop(
-    nx::utils::MoveOnlyFunc< void() > handler )
+    nx::utils::MoveOnlyFunc< void() > completionHandler)
 {
-    m_aioHelper->cancelIOAsync( std::move( handler ) );
+    // TODO #ak: Add general implementation to Socket class and remove this method.
+    dispatch(
+        [this, completionHandler = std::move(completionHandler)]()
+        {
+            stopWhileInAioThread();
+            completionHandler();
+        });
 }
 
-void UdtStreamServerSocket::pleaseStopSync(bool /*assertIfCalledUnderLock*/)
+void UdtStreamServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
 {
-    m_aioHelper->cancelIOSync();
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
+    else
+        QnStoppableAsync::pleaseStopSync(assertIfCalledUnderLock);
 }
 
 AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
@@ -1005,5 +1034,10 @@ AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
     return acceptedSocket;
 }
 
-}   //network
-}   //nx
+void UdtStreamServerSocket::stopWhileInAioThread()
+{
+    m_aioHelper->stopPolling();
+}
+
+} // namespace network
+} // namespace nx

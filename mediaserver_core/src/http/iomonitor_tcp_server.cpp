@@ -23,8 +23,7 @@ public:
     QnIOStateDataList dataToSend;
     QByteArray requestBuffer;
 
-    QByteArray nextMessageToSend;
-    QByteArray messageToSend;
+    std::deque<QByteArray> messagesToSend;
 };
 
 QnIOMonitorConnectionProcessor::QnIOMonitorConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
@@ -79,14 +78,14 @@ void QnIOMonitorConnectionProcessor::run()
         using namespace std::placeholders;
         d->socket->readSomeAsync( &d->requestBuffer, std::bind( &QnIOMonitorConnectionProcessor::onSomeBytesReadAsync, this, d->socket.data(), _1, _2 ) );
 
-        setData(camera->ioStates());
+        addData(camera->ioStates());
         QnMutexLocker lock(&d->waitMutex);
         while (!needToStop()
                && d->socket->isConnected()
                && camera->getStatus() >= Qn::Online
                && camera->getParentId() == qnCommon->moduleGUID())
         {
-            sendNextMessage();
+            sendData();
             d->waitCond.wait(&d->waitMutex);
         }
         disconnect( camera.data(), nullptr, this, nullptr );
@@ -103,7 +102,7 @@ void QnIOMonitorConnectionProcessor::at_cameraInitDone(const QnResourcePtr &reso
     QnMutexLocker lock(&d->waitMutex);
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if (camera && camera->isInitialized()) {
-        setData(camera->ioStates());
+        addData(camera->ioStates());
         d->waitCond.wakeAll();
     }
 }
@@ -136,7 +135,7 @@ void QnIOMonitorConnectionProcessor::at_cameraIOStateChanged(
     d->waitCond.wakeAll();
 }
 
-void QnIOMonitorConnectionProcessor::sendNextMessage()
+void QnIOMonitorConnectionProcessor::sendData()
 {
     Q_D(QnIOMonitorConnectionProcessor);
 
@@ -150,22 +149,19 @@ void QnIOMonitorConnectionProcessor::sendNextMessage()
         [this, messageToSend=std::move(messageToSend)]
         {
             Q_D(QnIOMonitorConnectionProcessor);
-            if (!d->messageToSend.isEmpty())
-            {
-                d->nextMessageToSend = messageToSend;
-                return;
-            }
-            sendNextMessage(std::move(messageToSend));
+            d->messagesToSend.push_back(std::move(messageToSend));
+            if (d->messagesToSend.size() > 1)
+                return; //< previous IO in progress
+            sendNextMessage();
         });
 }
 
-void QnIOMonitorConnectionProcessor::sendNextMessage(QByteArray message)
+void QnIOMonitorConnectionProcessor::sendNextMessage()
 {
     Q_D(QnIOMonitorConnectionProcessor);
 
-    d->messageToSend = std::move(message);
     using namespace std::placeholders;
-    d->socket->sendAsync(d->messageToSend,
+    d->socket->sendAsync(d->messagesToSend.front(),
         std::bind(&QnIOMonitorConnectionProcessor::onDataSent, this, _1, _2));
 }
 
@@ -173,7 +169,7 @@ void QnIOMonitorConnectionProcessor::onDataSent(SystemError::ErrorCode errorCode
 {
     Q_D(QnIOMonitorConnectionProcessor);
 
-    d->messageToSend.clear(); //< mark send done
+    d->messagesToSend.pop_front(); //< mark send done
     if (errorCode != SystemError::noError)
     {
         qWarning() << "QnIOMonitorConnectionProcessor::onDataSent write error. errCode=" << errorCode;
@@ -181,16 +177,16 @@ void QnIOMonitorConnectionProcessor::onDataSent(SystemError::ErrorCode errorCode
         return;
     }
 
-    if (!d->nextMessageToSend.isEmpty())
-        sendNextMessage(std::move(d->nextMessageToSend));
-    d->nextMessageToSend.clear();
+    if (!d->messagesToSend.empty())
+        sendNextMessage();
 }
 
-void QnIOMonitorConnectionProcessor::setData(QnIOStateDataList&& value)
+void QnIOMonitorConnectionProcessor::addData(QnIOStateDataList&& value)
 {
     Q_D(QnIOMonitorConnectionProcessor);
     QnMutexLocker lock(&d->dataMutex);
-    d->dataToSend = value;
+    for (const auto& ioState: value)
+        d->dataToSend.push_back(ioState);
 }
 
 void QnIOMonitorConnectionProcessor::addData(QnIOStateData&& value)

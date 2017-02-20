@@ -147,6 +147,7 @@ namespace Qn
         LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */
         LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QnUuid>. */
         LayoutBookmarksModeRole,                    /**< Role for layout's bookmarks mode state. */
+        LayoutActiveItemRole,                       /**< Role for layout active item. Value of type QnUuid. */
 
         /* Item-based. */
         ItemUuidRole,                               /**< Role for item's UUID. Value of type QnUuid. */
@@ -286,6 +287,14 @@ namespace Qn
     };
     Q_DECLARE_FLAGS(ResourceSavingFlags, ResourceSavingFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceSavingFlags)
+
+    enum class CellSpacing
+    {
+        None,
+        Small,
+        Medium,
+        Large
+    };
 
     /**
      * Time display mode.

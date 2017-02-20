@@ -55,7 +55,7 @@ QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullp
 
         QnEmailAddress email(text);
         if (email.smtpServer().isNull())
-            return Qn::ValidationResult(tr("No preset found. Use 'Advanced' option."));
+            return Qn::ValidationResult(tr("No preset found. Use \"Advanced\" option."));
 
         return Qn::kValidResult;
     });
@@ -65,7 +65,7 @@ QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullp
     ui->signatureInputField->setTitle(tr("System Signature"));
     ui->signatureInputField->setPlaceholderText(tr("Enter a short system description here."));
     ui->supportInputField->setTitle(tr("Support Signature"));
-    ui->supportInputField->setPlaceholderText(QnAppInfo::supportLink());
+    ui->supportInputField->setPlaceholderText(QnAppInfo::supportUrl());
 
     QnAligner* aligner = new QnAligner(this);
     aligner->registerTypeAccessor<QnInputField>(QnInputField::createLabelWidthAccessor());

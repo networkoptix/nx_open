@@ -91,7 +91,7 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
 {
     ui->setupUi(this);
     setWindowTitle(tr("Connect to %1",
-        "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
+        "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
 
     Q_D(QnConnectToCloudDialog);
 
@@ -115,7 +115,7 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
     ui->enterCloudAccountLabel->setFont(font);
     ui->enterCloudAccountLabel->setProperty(style::Properties::kDontPolishFontProperty, true);
     ui->enterCloudAccountLabel->setText(tr("Enter %1 Account",
-        "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
+        "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
     ui->enterCloudAccountLabel->setForegroundRole(QPalette::Light);
 
     ui->loginInputField->setTitle(tr("Email"));
@@ -275,7 +275,7 @@ void QnConnectToCloudDialogPrivate::showSuccess(const QString& cloudLogin)
     q->accept();
 
     QnMessageBox::success(q->parentWidget(),
-        tr("The System connected to %1", "%1 is name of cloud (like 'Nx Cloud')")
+        tr("System connected to %1", "%1 is the cloud name (like 'Nx Cloud')")
             .arg(QnAppInfo::cloudName()));
 }
 
@@ -284,7 +284,7 @@ void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
     Q_Q(QnConnectToCloudDialog);
 
     QnMessageBox::critical(q,
-        tr("Failed to connect the System to %1", "%1 is name of cloud (like 'Nx Cloud')")
+        tr("Failed to connect System to %1", "%1 is the cloud name (like 'Nx Cloud')")
             .arg(QnAppInfo::cloudName()),
         message);
 

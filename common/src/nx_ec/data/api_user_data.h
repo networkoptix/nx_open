@@ -9,6 +9,8 @@ namespace ec2 {
 
 struct ApiUserData: ApiResourceData
 {
+    static constexpr const char* kCloudPasswordStub = "password_is_in_cloud";
+
     ApiUserData():
         isAdmin(false),
         permissions(Qn::NoGlobalPermissions),
@@ -56,8 +58,8 @@ struct ApiUserData: ApiResourceData
     QnLatin1Array hash;
     QnLatin1Array cryptSha512Hash; /**< Hash suitable to be used in /etc/shadow file. */
     QString realm;
-	bool isLdap;
-	bool isEnabled;
+    bool isLdap;
+    bool isEnabled;
 
     /** Whether the user is created from the Cloud. */
     bool isCloud;

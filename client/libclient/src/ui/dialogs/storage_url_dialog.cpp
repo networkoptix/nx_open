@@ -218,7 +218,7 @@ void QnStorageUrlDialog::accept()
     if (storageAlreadyUsed(m_storage.url))
     {
         const auto extras =
-            tr("It's not recommended to use one recording location for different servers.")
+            tr("It is not recommended to use one recording location for different servers.")
             + L'\n' + tr("Add this storage anyway?");
 
         QnMessageBox messageBox(QnMessageBoxIcon::Warning,

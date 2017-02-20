@@ -772,7 +772,7 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream()
 
     QnMessageBox dialog(QnMessageBoxIcon::Warning,
         tr("Secondary stream disabled for this camera"),
-        tr("\"Motion + Low - Res\" recording option can't be set."),
+        tr("\"Motion + Low - Res\" recording option cannot be set."),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton);
 
     const auto recordAlways = dialog.addButton(
@@ -780,7 +780,7 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream()
     dialog.addButton(
         tr("Enable Secondary Stream"), QDialogButtonBox::NoRole);
 
-    dialog.setButtonAutoDetection(QnButtonDetection::EscapeButton);
+    dialog.setButtonAutoDetection(QnButtonDetection::NoDetection);
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return  false;
 
@@ -911,7 +911,7 @@ void QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked()
 {
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Reset motion regions to default?"),
-        tr("This action can't be undone."),
+        tr("This action cannot be undone."),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 

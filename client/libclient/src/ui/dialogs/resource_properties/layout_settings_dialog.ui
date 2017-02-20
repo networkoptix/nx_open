@@ -197,7 +197,7 @@
               <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
              </property>
              <property name="suffix">
-              <string> cells</string>
+              <string notr="true">&lt; cells&gt;</string>
              </property>
              <property name="minimum">
               <number>1</number>
@@ -226,7 +226,7 @@
               <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
              </property>
              <property name="suffix">
-              <string> cells</string>
+              <string notr="true">&lt; cells&gt;</string>
              </property>
              <property name="minimum">
               <number>1</number>
@@ -255,7 +255,7 @@
               <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
              </property>
              <property name="suffix">
-              <string>%</string>
+              <string notr="true">%</string>
              </property>
              <property name="minimum">
               <number>5</number>

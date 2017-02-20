@@ -90,12 +90,20 @@ libnx_utils \
 libpostproc \
 libudt )
 
-#additional libs for nx1 client
-if [[ "${box}" == "bpi" ]]; then
+if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
     LIBS_TO_COPY+=(
+    # Put non-raspberry pi (bananapi, nx1) specific server libs here    
         libGLESv2 \
         libMali \
-        libUMP )
+        libUMP    
+    )
+fi
+
+# Additional libs for nx1
+if [[ "${box}" == "bpi" ]]; then
+    LIBS_TO_COPY+=(
+    # Put nx1(bpi) specific server libs here
+    )
     if [[ ! -z "$WITH_CLIENT" ]]; then
         LIBS_TO_COPY+=( \
             ldpreloadhook \

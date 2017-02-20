@@ -44,6 +44,7 @@ namespace style
         static const int kMenuButtonIndicatorMargin;    /**< Margin between menu button text and dropdown indicator */
         static const int kTextButtonIconMargin;         /**< Margin between text button icon and text */
         static const int kPushButtonIconMargin;         /**< Margin around push button icon */
+        static const QSize kMinimumDialogSize;          /**< Minimum dialog window size */
 
         static const int kTabBarFontPixelSize;
         static const int kTextEditFontPixelSize;
@@ -58,6 +59,7 @@ namespace style
         static const qreal kDisabledItemOpacity;        /**< Default disabled item opacity */
         static const qreal kDisabledBrandedButtonOpacity; /**< Branded buttons disabled opacity */
         static const int kMinimumFormLabelWidth;        /**< Minimal text label width in forms */
+        static const qreal kMinimumTableRows;           /**< Space for how many rows should minimal table height ensure */
     };
 
     class Properties

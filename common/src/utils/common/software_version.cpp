@@ -41,6 +41,11 @@ bool QnSoftwareVersion::isNull() const {
     return m_data[0] == 0 && m_data[1] == 0 && m_data[2] == 0 && m_data[3] == 0;
 }
 
+bool QnSoftwareVersion::isLessThan(const QnSoftwareVersion& other) const
+{
+    return *this < other;
+}
+
 bool operator<(const QnSoftwareVersion &l, const QnSoftwareVersion &r) {
     return std::lexicographical_compare(l.m_data.begin(), l.m_data.end(), r.m_data.begin(), r.m_data.end());
 }

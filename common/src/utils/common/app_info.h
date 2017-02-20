@@ -47,7 +47,8 @@ public:
     static Q_INVOKABLE QString companyUrl();
 
     static Q_INVOKABLE QString supportEmailAddress();
-    static Q_INVOKABLE QString supportLink();
+    static Q_INVOKABLE QString supportUrl();
+    static Q_INVOKABLE QString supportPhone();
 
     static Q_INVOKABLE QString showcaseUrl();               //#GDM #FIXME will not work in 3.0
     static Q_INVOKABLE QString settingsUrl();               //#GDM #FIXME will not work in 3.0

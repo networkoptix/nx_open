@@ -130,6 +130,10 @@ class NX_NETWORK_API MixedSslSocket: public SslSocket
 public:
     MixedSslSocket(AbstractStreamSocket* wrappedSocket);
 
+    virtual int recv(void* buffer, unsigned int bufferLen, int flags) override;
+    virtual int send(const void* buffer, unsigned int bufferLen) override;
+    virtual bool setNonBlockingMode(bool val) override;
+
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
         nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
@@ -147,11 +151,12 @@ public:
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
 
 private:
+    bool updateInternalBlockingMode();
+
     Q_DECLARE_PRIVATE(MixedSslSocket);
 };
 
-class NX_NETWORK_API SslServerSocket
-:
+class NX_NETWORK_API SslServerSocket:
     public SslSocketServerImplementationDelegate
 {
     typedef SslSocketServerImplementationDelegate base_type;
@@ -164,6 +169,7 @@ public:
     virtual bool listen(int queueLen) override;
     virtual AbstractStreamSocket* accept() override;
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
     virtual void acceptAsync(
         nx::utils::MoveOnlyFunc<void(

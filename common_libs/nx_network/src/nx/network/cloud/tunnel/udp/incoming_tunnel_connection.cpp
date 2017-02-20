@@ -57,7 +57,7 @@ IncomingTunnelConnection::IncomingTunnelConnection(
 void IncomingTunnelConnection::accept(AcceptHandler handler)
 {
     NX_ASSERT(!m_acceptHandler, Q_FUNC_INFO, "Concurrent accept");
-    m_serverSocket->dispatch(
+    m_serverSocket->post(
         [this, handler = std::move(handler)]()
         {
             if (m_state != SystemError::noError)
@@ -66,21 +66,21 @@ void IncomingTunnelConnection::accept(AcceptHandler handler)
             m_acceptHandler = std::move(handler);
             m_serverSocket->acceptAsync(
                 [this](SystemError::ErrorCode code, AbstractStreamSocket* socket)
-            {
-                NX_LOGX(lm("Accepted %1 (%2)")
-                    .arg(socket).arg(SystemError::toString(code)), cl_logDEBUG2);
+                {
+                    NX_LOGX(lm("Accepted %1 (%2)")
+                        .arg(socket).arg(SystemError::toString(code)), cl_logDEBUG2);
 
-                if (code != SystemError::noError)
-                    m_state = code;
-                else
-                    m_controlConnection->resetLastKeepAlive();
+                    if (code != SystemError::noError)
+                        m_state = code;
+                    else
+                        m_controlConnection->resetLastKeepAlive();
 
-                const auto handler = std::move(m_acceptHandler);
-                m_acceptHandler = nullptr;
-                handler(
-                    SystemError::noError,
-                    std::unique_ptr<AbstractStreamSocket>(socket));
-            });
+                    decltype(m_acceptHandler) handler;
+                    handler.swap(m_acceptHandler);
+                    handler(
+                        SystemError::noError,
+                        std::unique_ptr<AbstractStreamSocket>(socket));
+                });
         });
 }
 

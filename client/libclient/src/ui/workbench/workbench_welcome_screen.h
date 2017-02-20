@@ -159,6 +159,8 @@ signals:
 
     void openTile(const QString& systemId);
 
+    void switchPage(int pageIndex);
+
 private:
     void connectToSystemInternal(
         const QString& systemId,

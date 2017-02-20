@@ -16,7 +16,7 @@ namespace
         {
             /* NX_ASSERT does not stop debugging here. */
             NX_ASSERT(parent->thread() == QThread::currentThread(), Q_FUNC_INFO,
-                "Timer cannot be child of QObject, located in an another thread. Use targetThread "
+                "Timer cannot be child of QObject, located in another thread. Use targetThread "
                 "parameter instead and guarded callback.");
         }
 

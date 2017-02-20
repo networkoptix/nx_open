@@ -22,6 +22,10 @@
 
 namespace ec2 {
 
+namespace update_http_handler_detail {
+
+// TODO: Move to ApiIdData. Then consider moving this and fillId() methods out of Api*Data.
+
 template<typename RequestData>
 void fixRequestDataIfNeeded(RequestData* const /*requestData*/)
 {
@@ -30,9 +34,17 @@ void fixRequestDataIfNeeded(RequestData* const /*requestData*/)
 template<>
 void fixRequestDataIfNeeded<ApiUserData>(ApiUserData* const userData)
 {
-    if (userData->isCloud && userData->name.isEmpty())
-        userData->name = userData->email;
+    if (userData->isCloud)
+    {
+        if (userData->name.isEmpty())
+            userData->name = userData->email;
+
+        if (userData->digest.isEmpty())
+            userData->digest = ApiUserData::kCloudPasswordStub;
+    }
 }
+
+} // namespace update_http_handler_detail
 
 /**
  * RestAPI request handler for update requests.
@@ -143,7 +155,7 @@ private:
                 return nx_http::StatusCode::unsupportedMediaType;
         }
 
-        fixRequestDataIfNeeded(requestData);
+        update_http_handler_detail::fixRequestDataIfNeeded(requestData);
 
         return nx_http::StatusCode::ok;
     }

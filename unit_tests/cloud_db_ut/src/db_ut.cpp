@@ -111,7 +111,7 @@ TEST_F(DbFailure, basic)
     accountData.email = generateRandomEmailAddress();
     accountData.passwordHa1 = "sdfdsfsdf";
     insertDelay = true;
-    std::promise<api::ResultCode> newAccountRegisteredPromise;
+    nx::utils::promise<api::ResultCode> newAccountRegisteredPromise;
     cdbConnection->accountManager()->registerNewAccount(
         std::move(accountData),
         [&newAccountRegisteredPromise](

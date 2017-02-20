@@ -296,9 +296,9 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
     QString mkvFileFilter = tr("Matroska (*.mkv)");
 
     QString allowedFormatFilter =
-        aviFileFilter
+        mkvFileFilter
         + filterSeparator
-        + mkvFileFilter;
+        + aviFileFilter;
 
     bool canUseBinaryExport = isBinaryExportSupported() && timelapseFrameStepMs == 0;
     if (canUseBinaryExport)
@@ -449,11 +449,21 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
             const QnVirtualCameraResourcePtr camera = mediaResource.dynamicCast<QnVirtualCameraResource>();
             if (camera && !transcodeWarnShown)
             {
-                const int bigValue = std::numeric_limits<int>::max();
-                for (const auto& stream : camera->mediaStreams().streams)
+                const auto streams = camera->mediaStreams().streams;
+                auto defaultStream = std::find_if(streams.cbegin(), streams.cend(),
+                    [](const CameraMediaStreamInfo& stream)
+                    {
+                        return stream.encoderIndex == CameraMediaStreamInfo::PRIMARY_STREAM_INDEX;
+                    });
+
+                if (defaultStream != streams.cend())
                 {
-                    auto filters = imageParameters.createFilterChain(stream.getResolution(), QSize(bigValue, bigValue));
-                    const QSize resultResolution = imageParameters.updatedResolution(filters, stream.getResolution());
+                    const int bigValue = std::numeric_limits<int>::max();
+                    const auto resolution = defaultStream->getResolution();
+                    NX_ASSERT(resolution.isValid());
+
+                    auto filters = imageParameters.createFilterChain(resolution, QSize(bigValue, bigValue));
+                    const QSize resultResolution = imageParameters.updatedResolution(filters, resolution);
                     if (resultResolution.width() > imageParameters.defaultResolutionLimit.width() ||
                         resultResolution.height() > imageParameters.defaultResolutionLimit.height())
                     {
@@ -466,12 +476,11 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
                         if (!confirmed)
                             return;
-                        else
-                            break; // do not show warning for other tracks
                     }
 
                 }
             }
+
             if (!transcodeWarnShown)
             {
                 transcodeWarnShown = true;
@@ -585,7 +594,7 @@ bool QnWorkbenchExportHandler::confirmExportTooBigExeFile() const
 {
     return confirmExport(QnMessageBoxIcon::Warning,
         tr("EXE format not recommended"),
-        tr("EXE files over 4 GB can't be opened by double click due to a Windows limitation.")
+        tr("EXE files over 4 GB cannot be opened by double click due to a Windows limitation.")
             + L'\n' + tr("Export to EXE anyway?"));
 }
 

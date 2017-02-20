@@ -1,6 +1,7 @@
 #include "avi_resource.h"
 
 #include <QtCore/QDir>
+#include <QtGui/QImage>
 
 #include "avi_archive_delegate.h"
 
@@ -15,6 +16,19 @@
 
 #include "filetypesupport.h"
 
+namespace {
+
+QnAspectRatio getAspectRatioFromImage(const QString& fileName)
+{
+    NX_ASSERT(FileTypeSupport::isImageFileExt(fileName), "File is not image!");
+
+    QImage image;
+    return (QFile::exists(fileName) && image.load(fileName)
+        ? QnAspectRatio(image.width(), image.height())
+        : QnAspectRatio());
+}
+
+} // namespace
 QnAviResource::QnAviResource(const QString& file)
 {
     //setUrl(QDir::cleanPath(file));
@@ -22,13 +36,21 @@ QnAviResource::QnAviResource(const QString& file)
     QString shortName = QFileInfo(file).fileName();
     setName(shortName.mid(shortName.indexOf(QLatin1Char('?'))+1));
     if (FileTypeSupport::isImageFileExt(file)) 
+    {
         addFlags(Qn::still_image);
+        m_imageAspectRatio = getAspectRatioFromImage(file);
+    }
     m_timeZoneOffset = Qn::InvalidUtcOffset;
     setId(guidFromArbitraryData(getUniqueId().toUtf8()));
 }
 
 QnAviResource::~QnAviResource()
 {
+}
+
+QnAspectRatio QnAviResource::imageAspectRatio() const
+{
+    return m_imageAspectRatio;
 }
 
 QString QnAviResource::toString() const

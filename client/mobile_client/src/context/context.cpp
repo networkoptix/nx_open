@@ -60,9 +60,10 @@ QnContext::QnContext(QObject* parent) :
     connect(m_connectionManager, &QnConnectionManager::connectionVersionChanged,
             this, [this]()
     {
-        const bool useLayouts = m_connectionManager->connectionVersion() < kUserRightsRefactoredVersion;
-        auto camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
-        camerasWatcher->setUseLayouts(useLayouts);
+        const bool compatibilityMode =
+            m_connectionManager->connectionVersion() < kUserRightsRefactoredVersion;
+        const auto camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
+        camerasWatcher->setCompatiblityMode(compatibilityMode);
     });
 
     connect(qnSettings, &QnMobileClientSettings::valueChanged, this,

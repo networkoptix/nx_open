@@ -138,7 +138,7 @@ Page
         onConnectionStateChanged:
         {
             if (connectionManager.connectionState === QnConnectionManager.Connected)
-                Workflow.openResourcesScreen(connectionManager.systemName)
+                Workflow.openResourcesScreen(connectionManager.systemName || systemName)
         }
 
         onConnectionFailed:
@@ -152,17 +152,22 @@ Page
     {
         hideWarning()
 
-        if (credentialsEditor.address.trim().length == 0)
+        if (credentialsEditor.address.trim().length === 0)
         {
             credentialsEditor.addressErrorText = qsTr("Enter server address")
             credentialsEditor.displayAddressError = true
             return false
         }
-        else if ((credentialsEditor.login.trim().length == 0)
-            || (credentialsEditor.password.trim().length == 0))
+        else if (credentialsEditor.login.trim().length === 0)
         {
-            credentialsEditor.credentialsErrorText = qsTr("All fields must be filled")
-            credentialsEditor.displayUserCredentialsError = true
+            credentialsEditor.loginErrorText = qsTr("Login cannot be empty")
+            credentialsEditor.displayLoginError = true
+            return false
+        }
+        else if (credentialsEditor.password.trim().length === 0)
+        {
+            credentialsEditor.passwordErrorText = qsTr("Password cannot be empty")
+            credentialsEditor.displayPasswordError = true
             return false
         }
         return true
@@ -180,11 +185,13 @@ Page
 
     function showWarning(status, info)
     {
-        if (status == QnConnectionManager.UnauthorizedConnectionResult)
+        if (status === QnConnectionManager.UnauthorizedConnectionResult)
         {
-            credentialsEditor.credentialsErrorText =
+            credentialsEditor.loginErrorText = ""
+            credentialsEditor.passwordErrorText =
                 LoginUtils.connectionErrorText(QnConnectionManager.UnauthorizedConnectionResult)
-            credentialsEditor.displayUserCredentialsError = true
+            credentialsEditor.displayLoginError = true
+            credentialsEditor.displayPasswordError = true
         }
         else
         {
@@ -192,13 +199,14 @@ Page
             credentialsEditor.displayAddressError = true
         }
 
-        if (status == QnConnectionManager.IncompatibleVersionConnectionResult)
+        if (status === QnConnectionManager.IncompatibleVersionConnectionResult)
             Workflow.openOldClientDownloadSuggestion()
     }
 
     function hideWarning()
     {
-        credentialsEditor.displayUserCredentialsError = false
+        credentialsEditor.displayLoginError = false
+        credentialsEditor.displayPasswordError = false
         credentialsEditor.displayAddressError = false
     }
 

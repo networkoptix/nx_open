@@ -5,14 +5,19 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/helpers/layout_item_aggregator.h>
 #include <utils/common/connective.h>
 #include <nx/utils/string.h>
 #include <common/common_module.h>
 #include <watchers/user_watcher.h>
 #include <watchers/available_cameras_watcher.h>
+#include <watchers/layout_cameras_watcher.h>
 #include <mobile_client/mobile_client_roles.h>
+
+using nx::client::mobile::LayoutCamerasWatcher;
 
 namespace {
 
@@ -27,7 +32,8 @@ struct ModelItem
     ModelItem(const QnLayoutResourcePtr& layout) :
         layout(layout),
         id(layout ? layout->getId() : QnUuid())
-    {}
+    {
+    }
 
     ModelItem(const QnMediaServerResourcePtr& server) :
         server(server),
@@ -93,9 +99,14 @@ private:
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceRemoved(const QnResourcePtr& resource);
     void at_resourceParentIdChanged(const QnResourcePtr& resource);
-    void at_serverFlagsChanged(const QnResourcePtr& resource);
+
+    int itemRow(const QnUuid& id) const;
+    void updateItem(const QnUuid& id);
+    void addLayout(const QnLayoutResourcePtr& layout);
+    void removeLayout(const QnLayoutResourcePtr& layout);
 
     QList<ModelItem> m_itemsList;
+    QHash<QnUuid, QSharedPointer<LayoutCamerasWatcher>> m_layoutCameraWatcherById;
     QnUserResourcePtr m_user;
     int m_allCamerasCount;
 };
@@ -185,8 +196,13 @@ QVariant QnLayoutsModelUnsorted::data(const QModelIndex& index, int role) const
             {
                 case QnLayoutsModel::ItemType::AllCameras:
                     return m_allCamerasCount;
+
                 case QnLayoutsModel::ItemType::Layout:
-                    return item.layout->getItems().size();
+                {
+                    const auto watcher = m_layoutCameraWatcherById.value(item.id);
+                    return watcher ? watcher->count() : 0;
+                }
+
                 default:
                     return -1;
             }
@@ -220,7 +236,7 @@ void QnLayoutsModelUnsorted::resetModel()
         if (!isLayoutSuitable(layout))
             continue;
 
-        m_itemsList.append(layout);
+        addLayout(layout);
     }
 
     if (qnResourceAccessManager->hasGlobalPermission(m_user, Qn::GlobalControlVideoWallPermission))
@@ -228,9 +244,6 @@ void QnLayoutsModelUnsorted::resetModel()
         const auto servers = qnResPool->getResources<QnMediaServerResource>();
         for (const auto& server : servers)
         {
-            connect(server, &QnMediaServerResource::serverFlagsChanged,
-                    this, &QnLayoutsModelUnsorted::at_serverFlagsChanged);
-
             if (!isServerSuitable(server))
                 continue;
 
@@ -271,15 +284,12 @@ void QnLayoutsModelUnsorted::at_resourceAdded(const QnResourcePtr& resource)
         return;
 
     connect(layout, &QnLayoutResource::parentIdChanged,
-            this, &QnLayoutsModelUnsorted::at_resourceParentIdChanged);
+        this, &QnLayoutsModelUnsorted::at_resourceParentIdChanged);
 
     if (!isLayoutSuitable(layout))
         return;
 
-    const auto row = m_itemsList.size();
-    beginInsertRows(QModelIndex(), row, row);
-    m_itemsList.append(layout);
-    endInsertRows();
+    addLayout(layout);
 }
 
 void QnLayoutsModelUnsorted::at_resourceRemoved(const QnResourcePtr& resource)
@@ -288,21 +298,9 @@ void QnLayoutsModelUnsorted::at_resourceRemoved(const QnResourcePtr& resource)
     if (!layout)
         return;
 
-    disconnect(layout, nullptr, this, nullptr);
+    layout->disconnect(this);
 
-    auto it = std::find_if(m_itemsList.begin(), m_itemsList.end(),
-                           [id = layout->getId()](const ModelItem& item)
-                           {
-                               return id == item.id;
-                           }
-    );
-    if (it == m_itemsList.end())
-        return;
-
-    const auto row = std::distance(m_itemsList.begin(), it);
-    beginRemoveRows(QModelIndex(), row, row);
-    m_itemsList.erase(it);
-    endRemoveRows();
+    removeLayout(layout);
 }
 
 void QnLayoutsModelUnsorted::at_resourceParentIdChanged(const QnResourcePtr& resource)
@@ -311,39 +309,66 @@ void QnLayoutsModelUnsorted::at_resourceParentIdChanged(const QnResourcePtr& res
     if (!layout)
         return;
 
-    bool suitable = isLayoutSuitable(layout);
-
-    auto it = std::find_if(m_itemsList.begin(), m_itemsList.end(),
-                           [id = layout->getId()](const ModelItem& item)
-                           {
-                               return id == item.id;
-                           }
-    );
-
-    bool exists = it != m_itemsList.end();
+    const bool suitable = isLayoutSuitable(layout);
+    const bool exists = itemRow(layout->getId()) >= 0;
 
     if (suitable == exists)
         return;
 
     if (suitable)
-    {
-        const auto row = m_itemsList.size();
-        beginInsertRows(QModelIndex(), row, row);
-        m_itemsList.append(layout);
-        endInsertRows();
-    }
+        addLayout(layout);
     else
-    {
-        const auto row = std::distance(m_itemsList.begin(), it);
-        beginRemoveRows(QModelIndex(), row, row);
-        m_itemsList.erase(it);
-        endRemoveRows();
-    }
+        removeLayout(layout);
 }
 
-void QnLayoutsModelUnsorted::at_serverFlagsChanged(const QnResourcePtr& resource)
+int QnLayoutsModelUnsorted::itemRow(const QnUuid& id) const
 {
-    QN_UNUSED(resource);
+    auto it = std::find_if(m_itemsList.begin(), m_itemsList.end(),
+        [&id](const ModelItem& item) { return id == item.id; });
+
+    if (it == m_itemsList.end())
+        return -1;
+
+    return std::distance(m_itemsList.begin(), it);
+}
+
+void QnLayoutsModelUnsorted::updateItem(const QnUuid& id)
+{
+    const auto row = itemRow(id);
+    if (row < 0)
+        return;
+
+    const auto idx = index(row);
+    emit dataChanged(idx, idx);
+}
+
+void QnLayoutsModelUnsorted::addLayout(const QnLayoutResourcePtr& layout)
+{
+    const auto layoutId = layout->getId();
+
+    const auto watcher = QSharedPointer<LayoutCamerasWatcher>(new LayoutCamerasWatcher(this));
+    watcher->setLayout(layout);
+    m_layoutCameraWatcherById[layoutId] = watcher;
+
+    const auto row = m_itemsList.size();
+    beginInsertRows(QModelIndex(), row, row);
+    m_itemsList.append(layout);
+    endInsertRows();
+
+    connect(watcher, &LayoutCamerasWatcher::countChanged, this,
+        [this, layoutId]() { updateItem(layoutId); });
+}
+
+void QnLayoutsModelUnsorted::removeLayout(const QnLayoutResourcePtr& layout)
+{
+    const auto row = itemRow(layout->getId());
+    if (row < 0)
+        return;
+
+    beginRemoveRows(QModelIndex(), row, row);
+    m_itemsList.removeAt(row);
+    m_layoutCameraWatcherById.remove(layout->getId());
+    endRemoveRows();
 }
 
 QnLayoutsModel::QnLayoutsModel(QObject* parent) :

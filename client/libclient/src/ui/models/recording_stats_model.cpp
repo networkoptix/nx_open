@@ -207,16 +207,32 @@ qreal QnRecordingStatsModel::chartData(const QModelIndex& index) const
 
 QVariant QnRecordingStatsModel::footerData(const QModelIndex &index, int role) const
 {
-    switch(role) {
-    case Qt::DisplayRole:
-        return footerDisplayData(index);
-    case Qt::ToolTipRole:
-        return tooltipText(static_cast<Columns>(index.column()));
+    switch(role)
+    {
+        case Qt::DisplayRole:
+            return footerDisplayData(index);
+        case Qt::ToolTipRole:
+            return tooltipText(static_cast<Columns>(index.column()));
+        case Qt::DecorationRole:
+        {
+            if (index.column() != CameraNameColumn)
+                break;
 
-    case Qn::RecordingStatsDataRole:
-        return QVariant::fromValue<QnCamRecordingStatsData>(m_footer);
-    default:
-        break;
+            // Makes always-selected cameras icon
+            const auto source = qnResIconCache->icon(QnResourceIconCache::Cameras);
+            QIcon result;
+            for (const auto& size: source.availableSizes(QIcon::Selected))
+            {
+                const auto selectedPixmap = source.pixmap(size, QIcon::Selected);
+                result.addPixmap(selectedPixmap, QIcon::Normal);
+                result.addPixmap(selectedPixmap, QIcon::Selected);
+            }
+            return result;
+        }
+        case Qn::RecordingStatsDataRole:
+            return QVariant::fromValue<QnCamRecordingStatsData>(m_footer);
+        default:
+            break;
     }
 
     return QVariant();
@@ -371,11 +387,10 @@ QString QnRecordingStatsModel::formatDurationString(const QnCamRecordingStatsDat
     static const int kMsecPerSec = 1000;
     static const QString kSeparator(L' ');
     static const Qt::TimeSpanFormat kFormat = Qt::Years | Qt::Months | Qt::Days | Qt::Hours;
-    static const int kDoNotSuppress = -1;
 
     qint64 durationMs = data.archiveDurationSecs * kMsecPerSec;
     qint64 referenceMs = qnSyncTime->currentMSecsSinceEpoch();
 
     return QTimeSpan(QDateTime::fromMSecsSinceEpoch(referenceMs), durationMs)
-        .toApproximateString(kDoNotSuppress, kFormat, QTimeSpan::SuffixFormat::Full, kSeparator);
+        .toApproximateString(QTimeSpan::kDoNotSuppressSecondUnit, kFormat, QTimeSpan::SuffixFormat::Full, kSeparator);
 }

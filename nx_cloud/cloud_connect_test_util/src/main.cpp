@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <thread>
 
+#include <nx/network/cloud/tunnel/connector_factory.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/argument_parser.h>
 #include <nx/utils/string.h>
@@ -20,17 +21,20 @@ void printHelp()
     nx::cctu::printHttpClientOptions(&std::cout);
 
     std::cout <<
-        "\n"
-        "Common options:\n"
-        "  --enforce-mediator={endpoint}    Enforces custom mediator address\n"
-        "  --log-level={level}              Log level to console"
-        "  --rw-timeout={time}              Socket send/recv timeouts"
-        "\n"
-        << std::endl;
+        std::endl <<
+        "Common options:" << std::endl <<
+        "  --enforce-mediator={endpoint}    Enforces custom mediator address" << std::endl <<
+        "  --log-level={level}              Log level to console" << std::endl <<
+        "  --rw-timeout={time}              Socket send/recv timeouts" << std::endl <<
+        "  --disable-udp                    Disable UDP hole punching" << std::endl <<
+        std::endl <<
+        std::endl;
 }
 
 int main(int argc, const char* argv[])
 {
+    using namespace nx::network;
+
     nx::utils::ArgumentParser args(argc, argv);
     if (args.get("help"))
     {
@@ -38,11 +42,18 @@ int main(int argc, const char* argv[])
         return 0;
     }
 
-    nx::network::SocketGlobals::InitGuard socketGlobalsGuard;
+    SocketGlobals::InitGuard socketGlobalsGuard;
 
     // common options
     QnLog::applyArguments(args);
-    nx::network::SocketGlobals::applyArguments(args);
+    SocketGlobals::applyArguments(args);
+
+    if (args.get("disable-udp"))
+    {
+        cloud::ConnectorFactory::setEnabledCloudConnectMask(
+            cloud::ConnectorFactory::getEnabledCloudConnectMask() &
+            ~((int)cloud::CloudConnectType::udpHp));
+    }
 
     // reading mode
     if (args.get("listen"))

@@ -1,13 +1,14 @@
-find_sources(src CPP_FILES HPP_FILES)
-qt5_wrap_cpp(MOC_FILES ${HPP_FILES})
+nx_add_target(nx_audio LIBRARY PUBLIC_LIBS nx_streaming)
 
-add_library(nx_audio
-    ${CPP_FILES} ${MOC_FILES}
-    src/StdAfx.cpp src/StdAfx.h
-)
+if(LINUX)
+    if(ANDROID)
+        rdep_add_package(openal)
+    endif()
+    target_link_libraries(nx_audio PUBLIC openal)
+endif()
 
-add_precompiled_header(nx_audio src/StdAfx.h FORCEINCLUDE)
-
-target_include_directories(nx_audio PUBLIC src)
-
-target_link_libraries(nx_audio PUBLIC nx_streaming openal)
+if(MACOSX)
+    find_library(OpenAL_LIBRARY OpenAL)
+    mark_as_advanced(OpenAL_LIBRARY)
+    target_link_libraries(nx_audio PUBLIC ${OpenAL_LIBRARY})
+endif()

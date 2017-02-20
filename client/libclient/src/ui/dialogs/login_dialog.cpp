@@ -448,7 +448,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
     m_autoFoundItem->removeRows(0, m_autoFoundItem->rowCount());
     if (m_foundSystems.size() == 0)
     {
-        QStandardItem* noLocalEcs = new QStandardItem(tr("<none>"));
+        QStandardItem* noLocalEcs = new QStandardItem(L'<' + tr("none") + L'>');
         noLocalEcs->setFlags(Qt::ItemIsEnabled);
         m_autoFoundItem->appendRow(noLocalEcs);
         return;
@@ -618,7 +618,7 @@ void QnLoginDialog::at_saveButton_clicked()
     {
         QnMessageBox dialog(QnMessageBoxIcon::Question,
             tr("Overwrite existing connection?"),
-            tr("There is an another connection with the same name."),
+            tr("There is another connection with the same name."),
             QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, this);
 
         dialog.addCustomButton(QnMessageBoxCustomButton::Overwrite,

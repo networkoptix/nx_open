@@ -6,11 +6,15 @@
 #include <media_server_process.h>
 #include <nx/network/socket_global.h>
 
-MediaServerLauncher::MediaServerLauncher(const QString& tmpDir):
+MediaServerLauncher::MediaServerLauncher(const QString& tmpDir, DisabledFeatures disabledFeatures):
     m_workDirResource(tmpDir),
     m_serverEndpoint(HostAddress::localhost, 0),
     m_firstStartup(true)
 {
+    if (disabledFeatures.testFlag(DisabledFeature::noResorseDiscovery))
+        addSetting(QnServer::kNoResourceDiscovery, "1");
+    if (disabledFeatures.testFlag(DisabledFeature::noMonitorStatistics))
+        addSetting(QnServer::kNoMonitorStatistics, "1");
 }
 
 MediaServerLauncher::~MediaServerLauncher()
@@ -28,9 +32,9 @@ int MediaServerLauncher::port() const
     return m_mediaServerProcess->getTcpPort();
 }
 
-void MediaServerLauncher::addSetting(const QString& name, const QString& value)
+void MediaServerLauncher::addSetting(const QString& name, const QVariant& value)
 {
-    m_customSettings.emplace_back(name, value);
+    m_customSettings.emplace_back(name, value.toString());
 }
 
 void MediaServerLauncher::prepareToStart()
@@ -75,7 +79,7 @@ bool MediaServerLauncher::start()
 {
     prepareToStart();
 
-    std::promise<bool> processStartedPromise;
+    nx::utils::promise<bool> processStartedPromise;
     auto future = processStartedPromise.get_future();
 
     connect(

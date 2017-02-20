@@ -147,3 +147,11 @@ QRect QnTreeView::visualRect(const QModelIndex& index) const
 
     return result;
 }
+
+QItemSelectionModel::SelectionFlags QnTreeView::selectionCommand(
+    const QModelIndex& index, const QEvent* event) const
+{
+    const auto result = base_type::selectionCommand(index, event);
+    emit selectionChanging(result, index, event);
+    return result;
+}

@@ -781,7 +781,7 @@ namespace nx_http
             const size_t bytesParsed = parseReceivedBytes(bytesRead);
             QByteArray receivedBytesLeft;
             if (bytesParsed != (std::size_t)-1)
-                receivedBytesLeft = m_responseBuffer.mid(bytesParsed);
+                receivedBytesLeft = m_responseBuffer.mid((int)bytesParsed);
             m_responseBuffer.resize(0);
 
             bool continueReceiving = false;
@@ -1061,6 +1061,7 @@ namespace nx_http
         {
             m_request.requestLine.url = m_contentLocationUrl.path();
             m_request.requestLine.url.setQuery(m_contentLocationUrl.query());
+            m_request.requestLine.url.setFragment(m_contentLocationUrl.fragment());
         }
 
         m_request.requestLine.version = useHttp11 ? nx_http::http_1_1 : nx_http::http_1_0;

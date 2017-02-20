@@ -100,9 +100,9 @@ bool QnGenericTabbedDialog::forcefullyClose()
     if (!canDiscardChanges())
         return false;
 
+    hide();
     discardChanges();
     loadDataToUi();
-    hide();
     return true;
 }
 

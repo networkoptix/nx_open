@@ -31,6 +31,7 @@ QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr &license, QWid
     }
 
     setWarningStyle(ui->errorLabel);
+    ui->errorLabel->setText(QnLicense::errorMessage(QnLicense::FutureLicense));
     ui->errorLabel->setVisible(license->type() == Qn::LC_Invalid);
 
     QString licenseText = licenseDescription(license);

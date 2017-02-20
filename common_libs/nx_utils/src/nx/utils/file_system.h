@@ -45,6 +45,17 @@ Result NX_UTILS_API copy(const QString& sourcePath, const QString& targetPath,
 
 bool NX_UTILS_API ensureDir(const QDir& dir);
 
+// Functions below are intended for usage in situations where QCoreApplication is unavailable 
+QString NX_UTILS_API applicationFilePath(const QString& defaultFilePath);
+QString NX_UTILS_API applicationDirPath(const QString& defaultFilePath);
+
+QString NX_UTILS_API applicationFilePath(int argc, char** argv);
+QString NX_UTILS_API applicationDirPath(int argc, char** argv);
+
+#ifdef Q_OS_WIN
+QString applicationFileNameInternal(const QString& defaultFileName);
+#endif
+
 } // namespace file_system
 } // namespace utils
 } // namespace nx

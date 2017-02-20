@@ -298,7 +298,6 @@ QDebug operator<<(QDebug dbg, QnWorkbenchConnectHandler::PhysicalState state)
 QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_connectingHandle(0),
     m_logicalState(LogicalState::disconnected),
     m_physicalState(PhysicalState::disconnected),
     m_warnMessagesDisplayed(false)
@@ -342,8 +341,24 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     connect(action(QnActions::LogoutFromCloud), &QAction::triggered, this,
         [this]
         {
-            if (m_logicalState == LogicalState::disconnected)
-                return;
+            switch (m_logicalState)
+            {
+                case LogicalState::disconnected:
+                case LogicalState::testing:
+                case LogicalState::installing_updates:
+                    return;
+                case LogicalState::connecting:
+                case LogicalState::connecting_to_target:
+                    if (isConnectionToCloud(m_connecting.url))
+                        disconnectFromServer(true, true);
+                    return;
+                case LogicalState::connected:
+                case LogicalState::reconnecting:
+                    break;
+                default:
+                    NX_ASSERT(false, "Unhandled connection state");
+            }
+
 
             /* Check if we need to log out if logged in under this user. */
             QString currentLogin = QnAppServerConnectionFactory::url().userName();
@@ -380,7 +395,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
     ec2::AbstractECConnectionPtr connection)
 {
     /* Check if we have entered 'connect' method again while were in 'connecting...' state */
-    if (m_connectingHandle != handle)
+    if (m_connecting.handle != handle)
         return;
 
     if (m_logicalState == LogicalState::disconnected)
@@ -389,7 +404,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
     if (m_physicalState != PhysicalState::testing)
         return;
 
-    m_connectingHandle = 0;
+    m_connecting.reset();
 
     /* Preliminary exit if application was closed while we were in the inner loop. */
     NX_ASSERT(!context()->closingDown());
@@ -625,7 +640,7 @@ void QnWorkbenchConnectHandler::stopReconnecting()
         m_reconnectDialog->deleteLater(); /*< We may get here from this dialog 'reject' handler. */
     m_reconnectDialog.clear();
     m_reconnectHelper.reset();
-    m_connectingHandle = 0;
+    m_connecting.reset();
 }
 
 void QnWorkbenchConnectHandler::setState(LogicalState logicalValue, PhysicalState physicalValue)
@@ -777,7 +792,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed()
 void QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived()
 {
     /* Avoid double reconnect when server is very slow or in debug. */
-    m_connectingHandle = 0;
+    m_connecting.reset();
 
     NX_ASSERT(m_logicalState != LogicalState::disconnected);
     if (m_logicalState == LogicalState::disconnected)
@@ -925,8 +940,9 @@ void QnWorkbenchConnectHandler::connectToServer(const QUrl &url)
         return;
 
     setPhysicalState(PhysicalState::testing);
-    m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
+    m_connecting.handle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
         url, clientInfo(), this, &QnWorkbenchConnectHandler::handleConnectReply);
+    m_connecting.url = url;
 }
 
 bool QnWorkbenchConnectHandler::disconnectFromServer(bool force, bool isErrorReason)
@@ -963,10 +979,10 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
     const bool invalidState = ((m_logicalState != LogicalState::testing)
         && (m_logicalState != LogicalState::connecting_to_target));
 
-    if (m_connectingHandle != handle || invalidState)
+    if (m_connecting.handle != handle || invalidState)
         return;
 
-    m_connectingHandle = 0;
+    m_connecting.reset();
 
     /* Preliminary exit if application was closed while we were in the inner loop. */
     NX_ASSERT(!context()->closingDown());
@@ -1069,13 +1085,14 @@ void QnWorkbenchConnectHandler::testConnectionToServer(
     setLogicalState(force ? LogicalState::connecting_to_target : LogicalState::testing);
 
     setPhysicalState(PhysicalState::testing);
-    m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
+    m_connecting.handle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
         url, this,
         [this, options, url, force]
         (int handle, ec2::ErrorCode errorCode, const QnConnectionInfo& connectionInfo)
         {
             handleTestConnectionReply(handle, url, errorCode, connectionInfo, options, force);
         });
+    m_connecting.url = url;
 }
 
 bool QnWorkbenchConnectHandler::tryToRestoreConnection()

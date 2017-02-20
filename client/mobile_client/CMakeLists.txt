@@ -1,30 +1,37 @@
+find_package(Qt5 COMPONENTS WebChannel WebSockets)
+
 set(product.title "${mobile_client.name}")
 set(product.display.title "${mobile_client.display.name}")
-
-find_sources(src CPP_FILES HPP_FILES)
-qt5_wrap_cpp(MOC_FILES ${HPP_FILES})
-
-generate_qrc(${CMAKE_CURRENT_BINARY_DIR}/mobile_client.qrc
-    "${CMAKE_CURRENT_SOURCE_DIR}/static-resources"
-    "${customization_dir}/mobile_client/resources")
 
 nx_configure_file(
     maven/filter-resources/mobile_client_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
-add_executable(mobile_client
-    ${CPP_FILES} ${MOC_FILES}
-    ${CMAKE_CURRENT_BINARY_DIR}/mobile_client_app_info_impl.cpp
-    src/StdAfx.cpp src/StdAfx.h
-    ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.qrc)
+file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
 
-target_include_directories(mobile_client PRIVATE src)
+set(target_args
+    ADDITIONAL_SOURCES
+        "${CMAKE_CURRENT_BINARY_DIR}/mobile_client_app_info_impl.cpp"
+    ADDITIONAL_RESOURCES
+        "${customization_dir}/mobile_client/resources"
+    OTHER_SOURCES
+        ${QML_FILES}
+    PUBLIC_LIBS
+        Qt5::WebChannel Qt5::WebSockets
+        qtsingleguiapplication
+        libclient_core)
 
-add_precompiled_header(mobile_client src/StdAfx.h FORCEINCLUDE)
+if(ANDROID)
+    nx_add_target(mobile_client LIBRARY LIBRARY_TYPE SHARED ${target_args})
+else()
+    nx_add_target(mobile_client EXECUTABLE ${target_args})
+endif()
 
-find_package(Qt5 COMPONENTS WebChannel WebSockets)
-
-target_link_libraries(mobile_client
-    Qt5::WebChannel Qt5::WebSockets
-    qtsingleguiapplication
-    client_core)
+if(ANDROID)
+    target_link_libraries(mobile_client
+        PUBLIC
+            common
+            nx_streaming
+            nx_network
+            GLESv2 z log)
+endif()

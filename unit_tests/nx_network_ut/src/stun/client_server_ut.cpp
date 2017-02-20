@@ -4,8 +4,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <common/common_globals.h>
-#include <nx/utils/test_support/sync_queue.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/network/stun/async_client_user.h>
@@ -13,6 +11,10 @@
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/test_support/sync_queue.h>
+
+#include <common/common_globals.h>
+#include <utils/common/guard.h>
 
 namespace nx {
 namespace stun {
@@ -119,11 +121,20 @@ protected:
 
 TEST_F(StunClientServerTest, Connectivity)
 {
-    EXPECT_EQ(sendTestRequestSync(), SystemError::notConnected); //< No address.
+    std::atomic<size_t> timerTicks;
+    const auto incrementTimer = [&timerTicks]() { ++timerTicks; };
+    const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
+    utils::TestSyncQueue<bool> reconnectEvents;
+    auto reconnectHandler =
+        [&reconnectEvents] { reconnectEvents.push(true); };
+
+    EXPECT_EQ(SystemError::notConnected, sendTestRequestSync()); //< No address.
 
     const auto address = startServer();
     server.reset();
     client->connect(address);
+    auto clientGuard = makeScopedGuard([this]() { client->pleaseStopSync(); });
+
     EXPECT_THAT(sendTestRequestSync(), testing::AnyOf(
         SystemError::connectionRefused, SystemError::connectionReset,
         SystemError::timedOut)); //< No server to connect.
@@ -135,15 +146,10 @@ TEST_F(StunClientServerTest, Connectivity)
     server.reset();
     EXPECT_NE(sendTestRequestSync(), SystemError::noError);
 
-    utils::TestSyncQueue<bool> reconnectEvents;
-    client->addOnReconnectedHandler([&]{ reconnectEvents.push(true); });
+    client->addOnReconnectedHandler(reconnectHandler);
 
     startServer(address);
     reconnectEvents.pop(); //< Automatic reconnect is expected.
-
-    std::atomic<size_t> timerTicks;
-    const auto incrementTimer = [&timerTicks]() { ++timerTicks; };
-    const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
 
     // There might be a small delay before server creates connection from accepted socket.
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
@@ -199,7 +205,8 @@ TEST_F(StunClientServerTest, RequestResponse)
         const auto addr = response.getAttribute<stun::attrs::XorMappedAddress>();
         ASSERT_NE(nullptr, addr);
         ASSERT_EQ(stun::attrs::XorMappedAddress::IPV4, addr->family);
-        ASSERT_EQ(ntohl(HostAddress::localhost.ipV4()->s_addr), addr->address.ipv4);
+        const auto ipv4 = ntohl(HostAddress::localhost.ipV4()->s_addr);
+        ASSERT_EQ(ipv4, addr->address.ipv4);
     }
     {
         Message request(Header(MessageClass::request, 0xFFF /* unknown */));
@@ -277,6 +284,28 @@ TEST_F(StunClientServerTest, AsyncClientUser)
             EXPECT_EQ(user->responses.pop().first, SystemError::noError);
         user->pleaseStopSync();
     }
+}
+
+TEST_F(StunClientServerTest, cancellation)
+{
+    const auto address = startServer();
+
+    utils::TestSyncQueue<bool> reconnectEvents;
+    auto reconnectHandler =
+        [&reconnectEvents] { reconnectEvents.push(true); };
+
+    std::atomic<size_t> timerTicks(0);
+    const auto incrementTimer = [&timerTicks]() { ++timerTicks; };
+    const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
+
+    auto clientGuard = makeScopedGuard([this]() { client->pleaseStopSync(); });
+    client->connect(address);
+    client->addOnReconnectedHandler(reconnectHandler);
+    client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 50));
+
+    server.reset();
 }
 
 } // namespace test

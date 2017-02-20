@@ -4,8 +4,9 @@
 #include <QtCore/QDebug>
 #include <QtCore/QElapsedTimer>
 
-#include <recording/time_period_list.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/test_support/test_options.h>
+#include <recording/time_period_list.h>
 
 namespace {
 #ifdef _DEBUG
@@ -37,32 +38,29 @@ void PrintTo(const QnTimePeriodList& periodList, ::std::ostream* os) {
     }
 }
 
+static const qint64 kTwoYearsMs = 1000ll * 60 * 60 * 24 * 365 * 2;
+static const qint64 kTwoMonthMs = 1000ll * 60 * 60 * 24 * 60;
+static const qint64 kChunkLengthMs = 1000ll * 60; //< One minute each.
+static const qint64 kChunkSpaceMs = 1000ll * 5; //< 5 seconds spacing.
+static const  int kMergingListsCount = 10;
+
 TEST( QnTimePeriodsListTest, mergeBigData )
 {
-    /* Two years of chunks. */
-    qint64 totalLengthMs = 1000ll * 60 * 60 * 24 * 365 * 2;
-
-    /* One minute each. */
-    qint64 chunkLengthMs = 1000ll * 60;
-
-    /* 5 seconds spacing. */
-    qint64 chunkSpaceMs = 1000ll * 5;
-
-    const int mergingListsCount = 10;
-
     std::vector<QnTimePeriodList> lists;
-    for (int i = 0; i < mergingListsCount; ++i)
+    for (int i = 0; i < kMergingListsCount; ++i)
         lists.push_back(QnTimePeriodList());
 
     QnTimePeriodList resultPeriods;
 
+    const auto totalLengthMs = nx::utils::AppInfo::isArm() ? kTwoMonthMs : kTwoMonthMs;
     qint64 start = 0;
-    while (start < totalLengthMs) {
-        for (int i = 0; i < mergingListsCount; ++i)
-            lists[i].push_back(QnTimePeriod(start + i, chunkLengthMs));
+    while (start < totalLengthMs)
+    {
+        for (int i = 0; i < kMergingListsCount; ++i)
+            lists[i].push_back(QnTimePeriod(start + i, kChunkLengthMs));
 
-        resultPeriods.push_back(QnTimePeriod(start, chunkLengthMs + mergingListsCount - 1));
-        start += (chunkLengthMs + chunkSpaceMs);
+        resultPeriods.push_back(QnTimePeriod(start, kChunkLengthMs + kMergingListsCount - 1));
+        start += (kChunkLengthMs + kChunkSpaceMs);
     }
 
     QElapsedTimer t;
@@ -71,46 +69,37 @@ TEST( QnTimePeriodsListTest, mergeBigData )
     qint64 elapsed =  t.elapsed();
 
     ASSERT_EQ(resultPeriods, merged);
-    if (!nx::utils::TestOptions::areTimeAssertsDisabled())
+    if (!nx::utils::AppInfo::isArm() && !nx::utils::TestOptions::areTimeAssertsDisabled())
         ASSERT_LE(elapsed, bigDataTestsLimitMs);
 }
 
 TEST( QnTimePeriodsListTest, unionBigData )
 {
-    /* Two years of chunks. */
-    qint64 totalLengthMs = 1000ll * 60 * 60 * 24 * 365 * 2;
-
-    /* One minute each. */
-    qint64 chunkLengthMs = 1000ll * 60;
-
-    /* 5 seconds spacing. */
-    qint64 chunkSpaceMs = 1000ll * 5;
-
-    const int mergingListsCount = 10;
-
     QVector<QnTimePeriodList> lists;
-    for (int i = 0; i < mergingListsCount; ++i)
+    for (int i = 0; i < kMergingListsCount; ++i)
         lists << QnTimePeriodList();
 
     QnTimePeriodList resultPeriods;
 
+    const auto totalLengthMs = nx::utils::AppInfo::isArm() ? kTwoMonthMs : kTwoMonthMs;
     qint64 start = 0;
-    while (start < totalLengthMs) {
-        for (int i = 0; i < mergingListsCount; ++i)
-            lists[i].push_back(QnTimePeriod(start + i, chunkLengthMs));
+    while (start < totalLengthMs)
+    {
+        for (int i = 0; i < kMergingListsCount; ++i)
+            lists[i].push_back(QnTimePeriod(start + i, kChunkLengthMs));
 
-        resultPeriods.push_back(QnTimePeriod(start, chunkLengthMs + mergingListsCount - 1));
-        start += (chunkLengthMs + chunkSpaceMs);
+        resultPeriods.push_back(QnTimePeriod(start, kChunkLengthMs + kMergingListsCount - 1));
+        start += (kChunkLengthMs + kChunkSpaceMs);
     }
 
     QElapsedTimer t;
     t.start();
-    for (int i = 1; i < mergingListsCount; ++i)
+    for (int i = 1; i < kMergingListsCount; ++i)
         QnTimePeriodList::unionTimePeriods(lists[0], lists[i]);
     qint64 elapsed =  t.elapsed();
 
     ASSERT_EQ(resultPeriods, lists[0]);
-    if (!nx::utils::TestOptions::areTimeAssertsDisabled())
+    if (!nx::utils::AppInfo::isArm() && !nx::utils::TestOptions::areTimeAssertsDisabled())
         ASSERT_LE(elapsed, bigDataTestsLimitMs);
 }
 

@@ -188,6 +188,13 @@ signals:
     void layoutsChanged();
 
     /**
+    * This signal is emitted whenever a new item is about to be assigned to the role.
+    *
+    * \param role                      Item role.
+    */
+    void itemAboutToBeChanged(Qn::ItemRole role);
+
+    /**
      * This signal is emitted whenever a new item is assigned to the role.
      *
      * \param role                      Item role.

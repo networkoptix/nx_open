@@ -283,12 +283,10 @@ int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter &filter)
 } // namespace
 
 static const qint64 CLEANUP_INTERVAL = 1000000ll * 3600;
-static const qint64 DEFAULT_EVENT_KEEP_PERIOD = 1000000ll * 3600 * 24 * 30; //< 30 days
 
 QnServerDb::QnServerDb():
     m_lastCleanuptime(0),
     m_auditCleanuptime(0),
-    m_eventKeepPeriod(DEFAULT_EVENT_KEEP_PERIOD),
     m_runtimeActionsTotalRecords(0),
     m_tran(m_sdb, m_mutex)
 {
@@ -319,11 +317,6 @@ QnServerDb::QnServerDb():
 QnServerDb::QnDbTransaction* QnServerDb::getTransaction()
 {
     return &m_tran;
-}
-
-void QnServerDb::setEventLogPeriod(qint64 periodUsec)
-{
-    m_eventKeepPeriod = periodUsec;
 }
 
 bool QnServerDb::createDatabase()
@@ -444,7 +437,7 @@ bool QnServerDb::addAuditRecords(const std::map<int, QnAuditRecord>& records)
         NX_ASSERT(data.eventType != Qn::AR_NotDefined);
         NX_ASSERT((data.eventType & (data.eventType - 1)) == 0);
 
-        insQuery.bindValue("id", itr->first);
+        insQuery.bindValue(":id", itr->first);
         QnSql::bind(data, &insQuery);
         if (!execSQLQuery(&insQuery, Q_FUNC_INFO))
             return false;
@@ -506,7 +499,8 @@ bool QnServerDb::cleanupEvents()
         m_lastCleanuptime = currentTime;
         QSqlQuery delQuery(m_sdb);
         delQuery.prepare("DELETE FROM runtime_actions where timestamp < :timestamp");
-        int utc = (currentTime - m_eventKeepPeriod)/1000000ll;
+        int utc = currentTime / 1000000ll - qnGlobalSettings->eventLogPeriodDays() * 3600 * 24;
+
         delQuery.bindValue(":timestamp", utc);
         rez = execSQLQuery(&delQuery, Q_FUNC_INFO);
 

@@ -1,5 +1,4 @@
-#ifndef VIDEOWALL_ITEM_DATA_H
-#define VIDEOWALL_ITEM_DATA_H
+#pragma once
 
 #include <QtCore/QHash>
 #include <QtCore/QList>
@@ -17,12 +16,9 @@ class QMimeData;
  *                                          screen or even some of them. Can have a layout.
  *                                          Can be available for editing to several users at once.
  */
-class QnVideoWallItem {
+class QnVideoWallItem
+{
 public:
-    QnVideoWallItem() {
-        runtimeStatus.online = false;
-    }
-
     /**
      * @brief layout                        Id of this item's layout resource (if any).
      */
@@ -46,28 +42,32 @@ public:
     QnScreenSnaps screenSnaps;
 
     /** Status of the running videowall instance bound to this item. Runtime status, should not be serialized or saved. */
-    struct {
-        bool online;
+    struct
+    {
+        bool online = false;
         QnUuid controlledBy;
     } runtimeStatus;
 
     static QString mimeType();
 
-    static void serializeUuids(const QList<QnUuid> &uuids, QMimeData *mimeData);
+    static void serializeUuids(const QList<QnUuid>& uuids, QMimeData* mimeData);
 
-    static QList<QnUuid> deserializeUuids(const QMimeData *mimeData);
+    static QList<QnUuid> deserializeUuids(const QMimeData* mimeData);
 
-    friend bool operator==(const QnVideoWallItem &l, const QnVideoWallItem &r) {
-        return (l.layout == r.layout 
+    friend bool operator==(const QnVideoWallItem& l, const QnVideoWallItem& r)
+    {
+        return (l.layout == r.layout
             && l.uuid == r.uuid
             && l.pcUuid == r.pcUuid
             && l.name == r.name
             && l.screenSnaps == r.screenSnaps
             && l.runtimeStatus.online == r.runtimeStatus.online
-            && l.runtimeStatus.controlledBy == r.runtimeStatus.controlledBy 
+            && l.runtimeStatus.controlledBy == r.runtimeStatus.controlledBy
             );
     }
 };
+
+QDebug operator<<(QDebug dbg, const QnVideoWallItem& item);
 
 Q_DECLARE_METATYPE(QnVideoWallItem)
 Q_DECLARE_TYPEINFO(QnVideoWallItem, Q_MOVABLE_TYPE);
@@ -75,8 +75,5 @@ Q_DECLARE_TYPEINFO(QnVideoWallItem, Q_MOVABLE_TYPE);
 typedef QList<QnVideoWallItem> QnVideoWallItemList;
 typedef QHash<QnUuid, QnVideoWallItem> QnVideoWallItemMap;
 
-
 Q_DECLARE_METATYPE(QnVideoWallItemList)
 Q_DECLARE_METATYPE(QnVideoWallItemMap)
-
-#endif // VIDEOWALL_ITEM_DATA_H

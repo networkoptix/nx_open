@@ -453,8 +453,8 @@ void QnServerUpdatesWidget::discardChanges()
     else
     {
         QnMessageBox::warning(this,
-            tr("Update can't be canceled at this stage"),
-            tr("Please wait until it's finished."));
+            tr("Update cannot be canceled at this stage"),
+            tr("Please wait until it is finished."));
     }
 }
 
@@ -790,7 +790,7 @@ void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& l
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 
-    dialog.addCustomWidget(new QnResourceListView(failedServers, true));
+    dialog.addCustomWidget(new QnResourceListView(failedServers, false, &dialog));
     dialog.addButton(tr("Force Update"), QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
 
     const auto result = dialog.exec();

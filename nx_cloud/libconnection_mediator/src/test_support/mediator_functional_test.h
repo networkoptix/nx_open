@@ -40,8 +40,15 @@ class MediatorFunctionalTest:
     public utils::test::ModuleLauncher<MediatorProcessPublic>
 {
 public:
+    enum MediatorTestFlags
+    {
+        noFlags = 0,
+        useTestCloudDataProvider = 1,
+        initiailizeSocketGlobals,
+    };
+
     //!Calls \a start
-    MediatorFunctionalTest();
+    MediatorFunctionalTest(int flags = useTestCloudDataProvider | initiailizeSocketGlobals);
     ~MediatorFunctionalTest();
 
     virtual bool waitUntilStarted() override;
@@ -73,11 +80,13 @@ public:
         getListeningPeers() const;
 
 private:
+    const int m_testFlags;
     QString m_tmpDir;
     int m_stunPort;
     int m_httpPort;
     //MediatorConnector m_mediatorConnector;
     LocalCloudDataProvider m_cloudDataProvider;
+    boost::optional<AbstractCloudDataProviderFactory::FactoryFunc> m_factoryFuncToRestore;
 };
 
 }   // namespace hpm

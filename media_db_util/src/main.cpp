@@ -7,7 +7,9 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_properties.h>
 #include <utils/common/util.h>
+#include <utils/common/writer_pool.h>
 #include <utils/db/db_helper.h>
+#include <media_server/settings.h>
 
 namespace aux
 {
@@ -141,6 +143,8 @@ int main(int argc, char** argv)
     std::unique_ptr<QnResourceStatusDictionary> statusDictionary = std::unique_ptr<QnResourceStatusDictionary>(new QnResourceStatusDictionary);
     std::unique_ptr<QnResourcePropertyDictionary> propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(new QnResourcePropertyDictionary);
     std::unique_ptr<QnStorageDbPool> dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
+    MSSettings::initializeROSettings();
+    QnWriterPool writerPool;
 
 
     aux::Config cfg;
@@ -148,7 +152,7 @@ int main(int argc, char** argv)
 
     QnFileStorageResourcePtr fileStorage(new QnFileStorageResource);
     fileStorage->setUrl(QFileInfo(cfg.fileName).absolutePath());
-    if (!fileStorage->initOrUpdate())
+    if (fileStorage->initOrUpdate() != Qn::StorageInit_Ok)
         qFatal("Failed to initialize file storage");
 
     if (!fileStorage->isFileExists(cfg.fileName))
