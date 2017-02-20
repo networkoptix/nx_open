@@ -469,6 +469,7 @@ void Stick::setStateUnsafe(const State& state)
 {
     m_previousPosition = m_state;
     m_state = state;
+    fixState(&m_state);
 }
 
 State Stick::fromRawToNormalized(const State& raw) const 
@@ -545,6 +546,16 @@ bool Stick::isZeroPosition(const State& position) const
     Q_ASSERT(position.size() == kMaxDegreesOfFreedom);
 
     return distance(position, kZeroPositionState) < m_threshold;
+}
+
+void Stick::fixState(State* inOutState)
+{
+    auto& state = *inOutState;
+    for (auto i = 0; i < state.size(); ++i)
+    {
+        if (std::abs(state[i]) < m_threshold)
+            state[i] = 0;
+    }
 }
 
 } // namespace controls

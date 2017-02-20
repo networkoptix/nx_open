@@ -157,6 +157,8 @@ private:
 
     bool isZeroPosition(const State& position) const;
 
+    void fixState(State* inOutState);
+
 private:
     StateElement m_threshold;
     State m_previousPosition;

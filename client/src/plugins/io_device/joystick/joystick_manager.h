@@ -43,10 +43,10 @@ private:
         const controls::ControlPtr& control,
         const EventParameters& eventParameters);
 
-    boost::optional<Qn::ItemDataRole> fromActionParamterNameToItemDataRole(
+    boost::optional<Qn::ItemDataRole> fromActionParameterNameToItemDataRole(
         const QString& actionParamterName) const;
 
-    QVariant fromActionParamtereValueToVariant(
+    QVariant fromActionParameterValueToVariant(
         Qn::ItemDataRole dataRole,
         const QString& actionParamterValue) const;
 

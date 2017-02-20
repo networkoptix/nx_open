@@ -178,13 +178,13 @@ QnActionParameters Manager::createActionParameters(
 
     for(const auto& actParameter: rule.actionParameters)
     {
-        auto dataRole = fromActionParamterNameToItemDataRole(actParameter.first);
+        auto dataRole = fromActionParameterNameToItemDataRole(actParameter.first);
         if (!dataRole)
             continue;
 
         actionParameters.setArgument(
             dataRole.get(),
-            fromActionParamtereValueToVariant(
+            fromActionParameterValueToVariant(
                 dataRole.get(),
                 actParameter.second));
     }
@@ -192,7 +192,7 @@ QnActionParameters Manager::createActionParameters(
     return actionParameters;
 }
 
-boost::optional<Qn::ItemDataRole> Manager::fromActionParamterNameToItemDataRole(
+boost::optional<Qn::ItemDataRole> Manager::fromActionParameterNameToItemDataRole(
     const QString& actionParamterName) const
 {
     if (actionParamterName == config::kPresetIndexParameterName)
@@ -201,7 +201,7 @@ boost::optional<Qn::ItemDataRole> Manager::fromActionParamterNameToItemDataRole(
     return boost::none;
 }
 
-QVariant Manager::fromActionParamtereValueToVariant(
+QVariant Manager::fromActionParameterValueToVariant(
     Qn::ItemDataRole dataRole,
     const QString& actionParameterValue) const
 {
