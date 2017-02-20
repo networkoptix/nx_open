@@ -176,6 +176,7 @@ Item
             {
                 if (!moving)
                 {
+                    videoScreenController.setPosition(position)
                     if (resumeWhenDragFinished)
                         videoScreenController.play()
                     else
