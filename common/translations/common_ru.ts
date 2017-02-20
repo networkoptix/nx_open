@@ -18,19 +18,19 @@
     <name>MergeSystemsStatusStrings</name>
     <message>
         <source>The password or user name is invalid.</source>
-        <translation>Недопустимое имя пользователя или пароль.</translation>
+        <translation>Неверное имя пользователя или пароль.</translation>
     </message>
     <message>
         <source>This user does not have permissions for the requested operation.</source>
-        <translation>Этот пользователь не имеет разрешения для запрашиваемой операции.</translation>
+        <translation>Этот пользователь не имеет полномочий для запрашиваемой операции.</translation>
     </message>
     <message>
         <source>Cannot create database backup.</source>
-        <translation>Не удается создать резервную копию базы данных.</translation>
+        <translation>Не удаётся создать резервную копию базы данных.</translation>
     </message>
     <message>
         <source>System name is not configured yet.</source>
-        <translation>Имя системы еще не настроено.</translation>
+        <translation>Имя системы ещё не настроено.</translation>
     </message>
     <message>
         <source>Unknown error.</source>
@@ -49,43 +49,43 @@
         <translation>Объединить?</translation>
     </message>
     <message>
-        <source>Cannot connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>In this version you can only merge systems which are not connected to %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">В этой версии можно объединять только системы, которые не связаны с %1.</translation>
+        <translation>В этой версии можно объединять только системы, которые не связаны с %1.</translation>
     </message>
     <message>
         <source>Both systems are connected to %1. Merge is not allowed.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Обе системы подключены к %1. Объединение не допускается.</translation>
+        <translation>Обе системы подключены к %1. Объединение не допускается.</translation>
     </message>
     <message>
         <source>These systems are built with different %1 URL. Merge is not allowed.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
+        <translation>Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
+    </message>
+    <message>
+        <source>Cannot connect to the other system because current system is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Не удаётся подключиться к другой системе, поскольку текущая система уже подключена к %1.</translation>
     </message>
     <message>
         <source>System was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Система не найдена.</translation>
     </message>
     <message>
         <source>The discovered system %1 has an incompatible version %2.</source>
         <comment>%1 is name of System, %2 is version information</comment>
-        <translation type="unfinished">Найденная система %1 несовместима с версией %2.</translation>
+        <translation>Найденная система %1 несовместима с версией %2.</translation>
     </message>
     <message>
         <source>The discovered system %1 is in safe mode.</source>
         <comment>%1 is name of System</comment>
-        <translation type="unfinished">Найденная система %1 находится в безопасном режиме.</translation>
+        <translation>Найденная система %1 находится в безопасном режиме.</translation>
     </message>
     <message>
         <source>Could not configure the remote system %1.</source>
         <comment>%1 is name of System</comment>
-        <translation type="unfinished">Не удалось настроить удаленную систему %1.</translation>
+        <translation>Не удалось настроить удаленную систему %1.</translation>
     </message>
 </context>
 <context>
@@ -491,24 +491,24 @@
     </message>
     <message>
         <source>Server &quot;%1&quot; has a license problem</source>
-        <translation type="unfinished"></translation>
+        <translation>Проблема с лицензией на сервере &apos;%1&apos;</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; has finished an archive backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер &apos;%1&apos; завершил резервное копирование архива</translation>
     </message>
     <message>
         <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Резервное копирование архива завершено не полностью, так как время, отведенное на резевное копирование, истекло. Резервоное копирование выполнено до %1</translation>
     </message>
     <message>
         <source>MAC #%1: %2</source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation type="unfinished">MAC #%1: %2  {1:?} {2?}</translation>
+        <translation>MAC #%1: %2</translation>
     </message>
     <message>
         <source>Send Email</source>
-        <translation type="unfinished"></translation>
+        <translation>Отправить Email</translation>
     </message>
 </context>
 <context>
@@ -663,63 +663,63 @@
     </message>
     <message>
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-        <translation type="unfinished">Убедитесь, что порт %1 доступен (например, проброшен).</translation>
+        <translation>Убедитесь, что порт %1 доступен (например, проброшен).</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках устройства.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках камеры.</translation>
     </message>
     <message>
         <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках устройства.</translation>
     </message>
     <message>
         <source>If it does not help, restore factory defaults on the device web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Если это не помогает, восстановите заводские настройки на web-странице устройства.</translation>
     </message>
     <message>
         <source>If it does not help, restore factory defaults on the camera web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Если это не помогает, восстановите заводские настройки на web-странице камеры.</translation>
     </message>
     <message>
         <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-        <translation type="unfinished"></translation>
+        <translation>Если это не помогает, восстановите заводские настройки на web-странице модуля ввода/вывода.</translation>
     </message>
     <message>
         <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно открыть медиа ссылку %1. Ошибка подключения к медиа порту %2.</translation>
     </message>
     <message>
         <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно открыть медиа ссылку %1. Подключение к порту %2 сброшено.</translation>
     </message>
     <message>
         <source>Could not parse device response. URL %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно разобрать ответ устройства. URL %1, имя запроса %2.</translation>
     </message>
     <message>
         <source>Could not parse camera response. URL %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно разобрать ответ камеры. URL %1, имя запроса %2.</translation>
     </message>
     <message>
         <source>Could not parse I/O module response. URL %1, request name %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно разобрать ответ модуля ввода/вывода. URL %1, имя запроса %2.</translation>
     </message>
     <message>
         <source>No supported media tracks at URL %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет поддерживаемых медиа треков по ссылке %1.</translation>
     </message>
     <message>
         <source>Not authorized. URL %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не авторизован. URL %1.</translation>
     </message>
     <message>
         <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>Невозможно открыть медиа ссылку %1. Неподдерживаемый протокол %2.</translation>
     </message>
 </context>
 <context>
@@ -730,7 +730,7 @@
     </message>
     <message>
         <source>Could not find encoder for codec %1.</source>
-        <translation>Не найден кодировщик для кодек %1.</translation>
+        <translation>Не найден кодировщик для кодека %1.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
@@ -742,27 +742,27 @@
     </message>
     <message>
         <source>Could not find decoder for codec %1.</source>
-        <translation>Не найден кодировщик для кодек %1.</translation>
+        <translation>Не найден кодировщик для кодека %1.</translation>
     </message>
     <message>
         <source>Could not initialize resampling context, error code: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось инициализировать контекст, код ошибки: %1</translation>
     </message>
     <message>
         <source>Could not allocate sample buffers, error code: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось выделить буферы, код ошибки: %1</translation>
     </message>
     <message>
         <source>Could not send audio frame to encoder, Error code: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось отправить аудиоданные кодировщику, код ошибки: %1.</translation>
     </message>
     <message>
         <source>Could not receive audio packet from encoder, Error code: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось получить аудио пакет от кодировщика, код ошибки: %1.</translation>
     </message>
     <message>
         <source>Could not receive audio frame from decoder, Error code: %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Не удалось получить аудиоданные от декодера, код ошибки: %1.</translation>
     </message>
 </context>
 <context>
@@ -907,7 +907,7 @@
     </message>
     <message>
         <source>License is expired</source>
-        <translation>Срок действия лицензии истек</translation>
+        <translation>Срок действия лицензии истёк</translation>
     </message>
     <message>
         <source>Invalid type</source>
@@ -923,7 +923,7 @@
     </message>
     <message>
         <source>This license type requires higher software version</source>
-        <translation type="unfinished"></translation>
+        <translation>Данный тип лицензии требует более поздней версии ПО.</translation>
     </message>
 </context>
 <context>
@@ -962,24 +962,24 @@
     </message>
     <message numerus="yes">
         <source>Activate %n more %1.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Активируйте ещё %n %1.</numerusform>
+            <numerusform>Активируйте ещё %n %1.</numerusform>
+            <numerusform>Активируйте ещё %n %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more %1 will be used.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Будет использовано ещё %n %1.</numerusform>
+            <numerusform>Будет использовано ещё %n %1.</numerusform>
+            <numerusform>Будет использовано ещё %n %1.</numerusform>
         </translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
         <comment>%1 is a hardware ID, %2 is an activation time</comment>
-        <translation type="unfinished"></translation>
+        <translation>Этот лицензионный ключ уже был активирован на аппаратный ID %1 на %2. Свяжитесь со службой поддержки для получения лицензии.</translation>
     </message>
 </context>
 <context>
@@ -1104,15 +1104,15 @@
     </message>
     <message>
         <source>Hardware ID: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Аппаратный ID: %1</translation>
     </message>
     <message>
         <source>Licensed To: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Лицензировано для: %1</translation>
     </message>
     <message>
         <source>Watermark: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Водяной знак: %1</translation>
     </message>
 </context>
 <context>
@@ -1215,7 +1215,7 @@
     <name>QnSystemDescription</name>
     <message>
         <source>Unnamed system</source>
-        <translation type="unfinished"></translation>
+        <translation>Система без имени</translation>
     </message>
 </context>
 <context>
@@ -1275,7 +1275,7 @@
     <message>
         <source>w</source>
         <comment>Suffix for displaying weeks</comment>
-        <translation>w</translation>
+        <translation>н</translation>
     </message>
     <message>
         <source>M</source>
@@ -1451,11 +1451,11 @@
     </message>
     <message>
         <source>Has access to whole system and can do everything.</source>
-        <translation>Имеет доступ к всей системе и может делать все.</translation>
+        <translation>Имеет доступ ко всей системе и может делать все.</translation>
     </message>
     <message>
         <source>Has access to whole system and can manage it. Can create users.</source>
-        <translation>Имеет доступ к всей системе и может ей управлять. Может создавать пользователей.</translation>
+        <translation>Имеет доступ ко всей системе и может ей управлять. Может создавать пользователей.</translation>
     </message>
     <message>
         <source>Can manage all cameras and bookmarks.</source>
@@ -1467,7 +1467,7 @@
     </message>
     <message>
         <source>Can view live video from all cameras.</source>
-        <translation>Можно посмотреть живое видео со всех камер.</translation>
+        <translation>Может смотреть живое видео со всех камер.</translation>
     </message>
     <message>
         <source>Custom user role.</source>

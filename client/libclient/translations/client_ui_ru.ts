@@ -272,7 +272,7 @@
     <message>
         <location/>
         <source>Bitrate limitation could lead to backup failure.</source>
-        <translation>Ограничение битрейта может привести к сбоям при резервном копирования.</translation>
+        <translation>Ограничение битрейта может привести к сбоям при резервном копировании.</translation>
     </message>
     <message>
         <location/>
@@ -290,7 +290,7 @@
     <message>
         <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
         <source>Backup Settings</source>
-        <translation>Параметры резервного копирования</translation>
+        <translation>Настройки резервного копирования</translation>
     </message>
     <message>
         <location/>
@@ -305,7 +305,7 @@
     <message>
         <location/>
         <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
-        <translation>Внимание! Резервироваться будут только последующие данные! Существующий архив резервироваться не будет.</translation>
+        <translation>Резервироваться будут только последующие данные. Существующий архив резервироваться не будет.</translation>
     </message>
     <message>
         <location/>
@@ -594,7 +594,7 @@
     <message>
         <location/>
         <source>Advanced settings are unavailable</source>
-        <translation>Расширенные параметры недоступны</translation>
+        <translation>Расширенные настройки недоступны</translation>
     </message>
 </context>
 <context>
@@ -722,12 +722,12 @@
     <message>
         <location/>
         <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
-        <translation type="unfinished"></translation>
+        <translation>Считать битрейт по блокам, а не по секундам (увеличит битрейт для камеры)</translation>
     </message>
     <message>
         <location/>
         <source>Keep camera streams and profiles settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Не менять настройки потоков и профилей камеры</translation>
     </message>
 </context>
 <context>
@@ -869,12 +869,12 @@
     <message>
         <location/>
         <source>Panic Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Запись по тревоге:</translation>
     </message>
     <message>
         <location/>
         <source>Motion + Lo-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>Дд + Низ</translation>
     </message>
 </context>
 <context>
@@ -895,7 +895,7 @@
     <message>
         <location/>
         <source>Incorrect Email or password</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверный Email / пароль</translation>
     </message>
 </context>
 <context>
@@ -1028,7 +1028,7 @@
     <message>
         <location/>
         <source>HTTP URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL HTTPS</translation>
     </message>
 </context>
 <context>
@@ -1087,7 +1087,7 @@
     <message>
         <location/>
         <source>Fisheye Dewarping</source>
-        <translation>Развертка камер &quot;рыбий глаз&quot;</translation>
+        <translation>Развёртка камер &quot;рыбий глаз&quot;</translation>
     </message>
     <message>
         <location/>
@@ -1102,12 +1102,12 @@
     <message>
         <location/>
         <source>Y Offset</source>
-        <translation>Смещение по оси Y</translation>
+        <translation>Смещение по Y</translation>
     </message>
     <message>
         <location/>
         <source>X Offset</source>
-        <translation>Смещение по x</translation>
+        <translation>Смещение по X</translation>
     </message>
     <message>
         <location/>
@@ -1180,7 +1180,7 @@
     <message>
         <location/>
         <source>Run application when PC Boots up</source>
-        <translation type="unfinished"></translation>
+        <translation>Запустить приложение при загрузке компьютера</translation>
     </message>
 </context>
 <context>
@@ -1224,12 +1224,12 @@
     <message>
         <location/>
         <source>Loading Image...Please Wait.</source>
-        <translation>Загрузка изображения... Пожалуйста, подождите.</translation>
+        <translation>Загрузка изображения...Пожалуйста, подождите.</translation>
     </message>
     <message>
         <location/>
         <source>No image</source>
-        <translation type="unfinished"></translation>
+        <translation>Нет изображения</translation>
     </message>
 </context>
 <context>
@@ -1272,7 +1272,7 @@
     <message>
         <location/>
         <source>Processing Image...Please Wait.</source>
-        <translation>Обработка изображения... Пожалуйста, подождите.</translation>
+        <translation>Обработка изображения...Пожалуйста, подождите.</translation>
     </message>
     <message>
         <location/>
@@ -1401,7 +1401,7 @@
     <message>
         <location/>
         <source>Locked to Hardware ID:</source>
-        <translation>Привязано к Аппаратному идентификатору:</translation>
+        <translation>Привязано к Аппаратному ID:</translation>
     </message>
     <message>
         <location/>
@@ -1510,7 +1510,7 @@
     <message>
         <location/>
         <source>Hardware ID</source>
-        <translation>Аппаратный идентификатор</translation>
+        <translation>Аппаратный ID</translation>
     </message>
     <message>
         <location/>
@@ -1642,7 +1642,7 @@
     <message>
         <location/>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>сек</translation>
     </message>
 </context>
 <context>
@@ -1650,7 +1650,7 @@
     <message>
         <location filename="../src/ui/dialogs/common/message_box.ui"/>
         <source>Do not show this message again</source>
-        <translation type="unfinished"></translation>
+        <translation>Больше не показывать это сообщение</translation>
     </message>
 </context>
 <context>
@@ -1719,7 +1719,7 @@
     <message>
         <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
         <source>Show to administrators only</source>
-        <translation>Только Администраторам</translation>
+        <translation>Только администраторам</translation>
     </message>
     <message>
         <location/>
@@ -1881,7 +1881,7 @@
     <message>
         <location/>
         <source>Enable tile interface</source>
-        <translation>Включить интерфейс</translation>
+        <translation>Включите интерфейс &quot;плитка&quot;</translation>
     </message>
 </context>
 <context>
@@ -1899,7 +1899,7 @@
     <message>
         <location/>
         <source>Incorrect Email or password</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверный Email / пароль</translation>
     </message>
 </context>
 <context>
@@ -2251,7 +2251,7 @@
     <message>
         <location/>
         <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-        <translation>Рекомендуется использовать мощный компьютер для &apos;Лучшего&apos; качества и разрешения.</translation>
+        <translation>Для наилучшего качества и разрешения рекомендуется использовать мощный компьютер.</translation>
     </message>
     <message>
         <location/>
@@ -2705,12 +2705,12 @@
     <message>
         <location/>
         <source>Backup Settings...</source>
-        <translation>Параметры резервного копирования...</translation>
+        <translation>Настройки резервного копирования...</translation>
     </message>
     <message>
         <location/>
         <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-        <translation>Запись на отключенное хранилище прекратится. Однако, удаление устаревших записей будет продолжаться.</translation>
+        <translation>Запись на отключённое хранилище прекратится. Однако, удаление устаревших записей будет продолжаться.</translation>
     </message>
 </context>
 <context>
@@ -2769,7 +2769,7 @@
     <message>
         <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation>Внимание! Это сделает настройки качества и частоты кадров (FPS) неактуальными.</translation>
+        <translation>Внимание! Это сделает настройки &quot;Качество&quot; и &quot;Частота кадров&quot; (FPS) неактуальными в расписании.</translation>
     </message>
 </context>
 <context>
@@ -2783,7 +2783,8 @@
         <location/>
         <source>System time is synchronized with the Internet and is independent from server local time.
 Selected server will be used as a time server if the system has no Internet access.</source>
-        <translation type="unfinished"></translation>
+        <translation>Системное время синхронизируется с Интернетом и не зависит от местного времени сервера. 
+Выбранный сервер будет использоваться как сервер времени, если у системе нет доступа в сеть Интернет.</translation>
     </message>
 </context>
 <context>
@@ -2823,8 +2824,8 @@ Selected server will be used as a time server if the system has no Internet acce
         <location/>
         <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-        <translation>В системе еще не настроены пользовательские роли. 
-Для создания используется кнопка «Новая роль».</translation>
+        <translation>В системе ещё не созданы пользовательские роли. 
+Для создания испольуйте кнопку &quot;Новая роль&quot;.</translation>
     </message>
     <message>
         <location/>

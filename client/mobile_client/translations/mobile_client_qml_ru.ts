@@ -42,7 +42,7 @@
     </message>
     <message>
         <source>Go to %1</source>
-        <translation>Перейти к %1</translation>
+        <translation>Перейти в %1</translation>
     </message>
 </context>
 <context>
@@ -68,7 +68,7 @@
     </message>
     <message>
         <source>Create account</source>
-        <translation>Создать учетную запись</translation>
+        <translation>Создать учётную запись</translation>
     </message>
     <message>
         <source>Forgot your password?</source>
@@ -76,7 +76,7 @@
     </message>
     <message>
         <source>Cannot connect to %1</source>
-        <translation>Не удается подключиться к %1</translation>
+        <translation>Не удаётся подключиться к %1</translation>
     </message>
     <message>
         <source>Email and password cannot be empty</source>
@@ -84,11 +84,11 @@
     </message>
     <message>
         <source>Log in</source>
-        <translation type="unfinished"></translation>
+        <translation>Вход</translation>
     </message>
     <message>
         <source>Incorrect Email or password</source>
-        <translation type="unfinished"></translation>
+        <translation>Неверный Email / пароль</translation>
     </message>
 </context>
 <context>
@@ -107,11 +107,11 @@
     </message>
     <message>
         <source>Delete login &quot;%1&quot;?</source>
-        <translation>Удалить логин «%1»?</translation>
+        <translation>Удалить логин &quot;%1&quot;?</translation>
     </message>
     <message>
         <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
-        <translation>Адреса серверов и логины останутся сохраненными. Чтобы удалить всю информацию о подключениях требуется удалить все сохраненные логины.</translation>
+        <translation>Адреса серверов и логины останутся сохраненными. Чтобы удалить всю информацию о подключениях, требуется удалить все сохраненные логины.</translation>
     </message>
     <message>
         <source>Delete connection?</source>
@@ -119,18 +119,18 @@
     </message>
     <message>
         <source>Login cannot be empty</source>
-        <translation type="unfinished"></translation>
+        <translation>Логин должен быть задан</translation>
     </message>
     <message>
         <source>Password cannot be empty</source>
-        <translation type="unfinished"></translation>
+        <translation>Пароль не может быть пустым</translation>
     </message>
 </context>
 <context>
     <name>DeveloperSettingsScreen</name>
     <message>
         <source>Developer Settings</source>
-        <translation>Параметры для разработчиков</translation>
+        <translation>Настройки для разработчиков</translation>
     </message>
     <message>
         <source>Log Level</source>
@@ -178,7 +178,7 @@
     <message>
         <source>To connect to old servers please download the legacy application from the App Store.</source>
         <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-        <translation>Для соединения со старой версией сервера загрузите предыдущее приложение из Apple Store.</translation>
+        <translation>Для соединения со старой версией сервера загрузите предыдущее приложение из App Store.</translation>
     </message>
     <message>
         <source>To connect to old servers please download the legacy application from the Internet.</source>
@@ -235,19 +235,19 @@
     </message>
     <message>
         <source>Hi-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>Выс</translation>
     </message>
     <message>
         <source>Lo-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>Низ</translation>
     </message>
     <message>
         <source>Keyfr + Lo-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>Ключ. кадр + Низ</translation>
     </message>
     <message>
         <source>Custom-Res</source>
-        <translation type="unfinished"></translation>
+        <translation>Др</translation>
     </message>
 </context>
 <context>
@@ -261,15 +261,15 @@
     <name>LiteClientControlScreen</name>
     <message>
         <source>Cannot start client</source>
-        <translation>Не удается запустить клиент</translation>
+        <translation>Не удаётся запустить клиент</translation>
     </message>
     <message>
         <source>Cannot stop client</source>
-        <translation>Не удается остановить клиент</translation>
+        <translation>Не удаётся остановить клиент</translation>
     </message>
     <message>
         <source>Please make sure that display is connected to %1.</source>
-        <translation>Пожалуйста, убедитесь, что дисплей подключен к %1.</translation>
+        <translation>Пожалуйста, убедитесь, что дисплей подключён к %1.</translation>
     </message>
     <message>
         <source>%1 is offline</source>
@@ -301,7 +301,7 @@
     <name>NoDisplayDummy</name>
     <message>
         <source>No display connected</source>
-        <translation>Не подключен дисплей</translation>
+        <translation>Не подключён дисплей</translation>
     </message>
 </context>
 <context>
@@ -358,7 +358,7 @@
     </message>
     <message>
         <source>Cannot connect to server</source>
-        <translation>Не удается подключиться к серверу</translation>
+        <translation>Не удаётся подключиться к серверу</translation>
     </message>
     <message>
         <source>Press %1 to exit</source>
@@ -383,7 +383,7 @@
     <name>SessionCredentialsEditor</name>
     <message>
         <source>Host : Port</source>
-        <translation>Узел: порт</translation>
+        <translation>Узел : порт</translation>
     </message>
     <message>
         <source>Login</source>
@@ -406,7 +406,7 @@
     <name>SessionItem</name>
     <message>
         <source>This server has too old version. Please update it to the latest version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Версия этого сервера устарела. Пожалуйста, обновите его до последней версии.</translation>
     </message>
 </context>
 <context>
@@ -417,7 +417,7 @@
     </message>
     <message>
         <source>Cannot connect to %1</source>
-        <translation>Не удается подключиться к %1</translation>
+        <translation>Не удаётся подключиться к %1</translation>
     </message>
     <message>
         <source>No systems found</source>
@@ -429,11 +429,11 @@
     </message>
     <message>
         <source>Cannot connect to the system &quot;%1&quot;</source>
-        <translation>Не удается подключиться к системе &quot;%1&quot;</translation>
+        <translation>Не удаётся подключиться к системе &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Cannot connect to the server</source>
-        <translation>Не удается подключиться к серверу</translation>
+        <translation>Не удаётся подключиться к серверу</translation>
     </message>
     <message>
         <source>Check your network connection or contact a system administrator</source>
@@ -560,7 +560,7 @@
     </message>
     <message>
         <source>Cannot load video</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка при получении видео</translation>
     </message>
 </context>
 <context>

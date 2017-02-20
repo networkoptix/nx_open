@@ -24,7 +24,7 @@
     </message>
     <message>
         <source>UAC must be enabled to request privileges for non-admin users.</source>
-        <translation>Контроль учетных записей (UAC) должен быть включен для запроса привилегий пользователей.</translation>
+        <translation>Контроль учетных записей (UAC) должен быть включён для запроса привилегий пользователей.</translation>
     </message>
 </context>
 <context>
@@ -87,31 +87,31 @@
     </message>
     <message>
         <source>stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>остановлен</translation>
     </message>
     <message>
         <source>starting</source>
-        <translation type="unfinished"></translation>
+        <translation>запускается</translation>
     </message>
     <message>
         <source>stopping</source>
-        <translation type="unfinished"></translation>
+        <translation>заканчивает работу</translation>
     </message>
     <message>
         <source>started</source>
-        <translation type="unfinished"></translation>
+        <translation>запущен</translation>
     </message>
     <message>
         <source>resuming</source>
-        <translation type="unfinished"></translation>
+        <translation>возобновляется</translation>
     </message>
     <message>
         <source>paused</source>
-        <translation type="unfinished"></translation>
+        <translation>приостановлен</translation>
     </message>
     <message>
         <source>pausing</source>
-        <translation type="unfinished"></translation>
+        <translation>приостанавливается</translation>
     </message>
 </context>
 </TS>
