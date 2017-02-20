@@ -3277,9 +3277,11 @@ QSize QnNxStyle::sizeFromContents(
                     width += iconSize + kQtHeaderIconMargin;
                 }
 
+                static constexpr int kUnusedHeight = 0;
+
                 const int height = header->orientation == Qt::Horizontal
                     ? qMax(textSize.height(), Metrics::kHeaderSize)
-                    : textSize.height();
+                    : kUnusedHeight; //< vertical header height is calculated elsewhere
 
                 return QSize(width, height);
             }
