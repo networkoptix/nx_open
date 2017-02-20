@@ -74,7 +74,8 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
         [this](int state)
         {
             ui->comboBoxForcedMotionStream->setEnabled(
-                static_cast<Qt::CheckState>(state) == Qt::Checked);
+                static_cast<Qt::CheckState>(state) == Qt::Checked
+                && ui->checkBoxForceMotionDetection->isEnabled());
         });
 
     connect(
@@ -131,12 +132,16 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     const int kPrimaryStreamMdIndex = 0;
     const int kSecondaryStreamMdIndex = 1;
     int forcedMotionStreamIndex = -1;
+    bool allCamerasSupportForceMotion = true;
 
     int camCnt = 0;
     foreach(const QnVirtualCameraResourcePtr &camera, cameras)
     {
         if (isArecontCamera(camera))
             arecontCamerasCount++;
+        if (!camera->supportedMotionType().testFlag(Qn::MT_SoftwareGrid))
+            allCamerasSupportForceMotion = false;
+
         anyHasDualStreaming |= camera->hasDualStreaming();
 
         if (camera->hasDualStreaming()) {
@@ -262,8 +267,11 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     ui->comboBoxForcedMotionStream->setCurrentIndex(
          gotForcedMotionStream ? forcedMotionStreamIndex : kPrimaryStreamMdIndex);
 
+    ui->checkBoxForceMotionDetection->setEnabled(allCamerasSupportForceMotion);
+
     ui->comboBoxForcedMotionStream->setEnabled(
-        ui->checkBoxForceMotionDetection->checkState() == Qt::Checked);
+        ui->checkBoxForceMotionDetection->checkState() == Qt::Checked
+        && ui->checkBoxForceMotionDetection->isEnabled());
 
     updateControlBlock();
     ui->settingsGroupBox->setVisible(arecontCamerasCount != cameras.size());
@@ -295,8 +303,10 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
 
     Qn::SecondStreamQuality quality = (Qn::SecondStreamQuality) sliderPosToQuality(ui->qualitySlider->value());
 
-    for (const QnVirtualCameraResourcePtr &camera: cameras) {
-        if (globalControlEnabled && !isArecontCamera(camera)) {
+    for (const QnVirtualCameraResourcePtr &camera: cameras)
+    {
+        if (globalControlEnabled && !isArecontCamera(camera))
+        {
             if (disableControls)
                 camera->setCameraControlDisabled(true);
             else if (enableControls)
