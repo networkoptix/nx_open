@@ -28,6 +28,27 @@ Item
             : (height - item.height) / 2)
     }
 
+    readonly property size implicitSize:
+    {
+        if (sourceSize.width === 0.0 || sourceSize.height === 0.0)
+            return Qt.size(0, 0)
+
+        var videoAr = (customAspectRatio == 0
+            ? sourceSize.width / sourceSize.height
+            : customAspectRatio)
+
+        var width = sourceSize.width
+        var height = width / videoAr
+
+        if (Utils.isRotated90(videoRotation))
+            return Qt.size(width, height)
+        else
+            return Qt.size(height, width)
+    }
+
+    implicitWidth: implicitSize.width
+    implicitHeight: implicitSize.height
+
     onCustomAspectRatioChanged: updateSize()
     onVideoRotationChanged: updateSize()
     onSourceSizeChanged: updateSize()
@@ -61,6 +82,9 @@ Item
 
     function boundedSize(width, height)
     {
+        if (height === 0.0 || sourceSize.height === 0.0)
+            return Qt.size(0, 0)
+
         var rotated90 = Utils.isRotated90(videoRotation)
         var boundAr = width / height
         var videoAr = (customAspectRatio == 0

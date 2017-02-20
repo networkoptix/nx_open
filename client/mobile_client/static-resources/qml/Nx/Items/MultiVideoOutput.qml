@@ -1,84 +1,53 @@
 import QtQuick 2.6
-
-import Nx.Items 1.0
-
-import com.networkoptix.qml 1.0
+import Nx.Media 1.0
+import Nx.Core 1.0
 
 Item
 {
     id: multiVideoOutput
 
-    property QnMediaResourceHelper resourceHelper: null
+    property MediaResourceHelper resourceHelper: null
     property MediaPlayer mediaPlayer: null
 
     readonly property size channelSize: __sourceSize
     readonly property size layoutSize: resourceHelper ? resourceHelper.layoutSize : Qt.size(1, 1)
     readonly property real cellWidth: width / layoutSize.width
     readonly property real cellHeight: height / layoutSize.height
-    property real customAspectRatio: mediaPlayer
-        ? mediaPlayer.aspectRatio
-        : resourceHelper
-            ? resourceHelper.customAspectRatio
-            : __channelAspectRatio
 
-    property real __channelAspectRatio:
-        __sourceSize.height > 0 ? __sourceSize.width / __sourceSize.height : 0
-    property size __sourceSize: Qt.size(640, 480) // Just some default value
+    property size __sourceSize
 
     implicitWidth: __sourceSize.width * layoutSize.width
     implicitHeight: __sourceSize.height * layoutSize.height
 
     Repeater
     {
-        model: resourceHelper ? resourceHelper.channelCount : 0
+        id: repeater
 
-        VideoPositioner
+        model: resourceHelper && resourceHelper.channelCount
+
+        VideoOutput
         {
             property point layoutPosition: resourceHelper.channelPosition(index)
 
-            customAspectRatio: multiVideoOutput.customAspectRatio
-
+            fillMode: VideoOutput.Stretch
             width: cellWidth
             height: cellHeight
             x: layoutPosition.x * cellWidth
             y: layoutPosition.y * cellHeight
 
-            item: QnVideoOutput
+            onSourceRectChanged:
             {
-                fillMode: QnVideoOutput.Stretch
-
-                Component.onCompleted:
-                {
-                    setPlayer(mediaPlayer, index)
-                    multiVideoOutput.clearRequested.connect(
-                        function()
-                        {
-                            clear()
-                        })
-                }
-                onSourceRectChanged:
-                {
-                    if (index > 0 && __sourceSize.width > 0)
-                        return
-
-                    if (customAspectRatio > 0)
-                    {
-                        __sourceSize =
-                            Qt.size(sourceRect.height * customAspectRatio, sourceRect.height)
-                    }
-                    else
-                    {
-                        __sourceSize = Qt.size(sourceRect.width, sourceRect.height)
-                    }
-                }
+                if (index === 0 && __sourceSize.width === 0.0)
+                    __sourceSize = Qt.size(sourceRect.width, sourceRect.height)
             }
+
+            Component.onCompleted: setPlayer(mediaPlayer, index)
         }
     }
 
-    signal clearRequested()
-
     function clear()
     {
-        clearRequested()
+        for (var i = 0; i < repeater.count; ++i)
+            repeater.itemAt(i).clear()
     }
 }
