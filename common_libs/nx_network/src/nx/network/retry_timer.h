@@ -68,7 +68,6 @@ public:
     RetryTimer(const RetryPolicy& policy, aio::AbstractAioThread* aioThread = nullptr);
     virtual ~RetryTimer();
 
-    virtual aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     /**

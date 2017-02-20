@@ -54,23 +54,17 @@ bool RetryPolicy::operator==(const RetryPolicy& rhs) const
 
 RetryTimer::RetryTimer(const RetryPolicy& policy, aio::AbstractAioThread* aioThread):
     aio::BasicPollable(aioThread),
+    m_timer(std::make_unique<aio::Timer>(aioThread)),
     m_retryPolicy(policy),
     m_triesMade(0)
 {
+    bindToAioThread(getAioThread());
     reset();
-    m_timer = std::make_unique<aio::Timer>(aioThread);
 }
 
 RetryTimer::~RetryTimer()
 {
     stopWhileInAioThread();
-}
-
-aio::AbstractAioThread* RetryTimer::getAioThread() const
-{
-    const auto aioThread = aio::BasicPollable::getAioThread();
-    m_timer->bindToAioThread(aioThread);
-    return aioThread;
 }
 
 void RetryTimer::bindToAioThread(aio::AbstractAioThread* aioThread)
