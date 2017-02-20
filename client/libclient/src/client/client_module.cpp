@@ -390,9 +390,11 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     }
     else if (startupParams.selfUpdateMode)
     {
+        // we hope self-updater will run only once per time and will not overflow log-file
+        // qnClientInstanceManager is not initialized in self-update mode
         logFileNameSuffix = lit("self_update");
     }
-    else if (qnClientInstanceManager->isValid())
+    else if (qnClientInstanceManager && qnClientInstanceManager->isValid())
     {
         int idx = qnClientInstanceManager->instanceIndex();
         if (idx > 0)
