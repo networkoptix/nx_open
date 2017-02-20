@@ -45,7 +45,7 @@ void Led::setColor(Color color)
 bool Led::canChangeColor() const
 {
     auto caps = getCapabilities();
-    return caps & ControlCapability::colorChange;
+    return caps.testFlag(ControlCapability::colorChange);
 }
 
 } // namespace controls
