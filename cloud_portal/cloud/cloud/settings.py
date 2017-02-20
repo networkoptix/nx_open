@@ -194,7 +194,17 @@ REST_FRAMEWORK = {
 
 # Celery settings section
 
-BROKER_URL = 'rabbit'
+#Configure AWS SQS
+#Broker_url = 'sqs://{aws_access_key_id}:{aws_secret_access_key}@'
+#BROKER_TRANSPORT_OPTIONS
+#   queue_name_prefix allows you to name the queue for sqs
+#   region allows you to specify the aws region
+
+BROKER_URL = 'sqs://AKIAIQVGGMML4WNBECRA:jmXYHNKOAL9gYYaxAVClgegzShjaPF27ycvBOV1s@'
+BROKER_TRANSPORT_OPTIONS = {
+    'queue_name_prefix' : 'cloud-portal-',
+    'region' : 'us-east-1'
+}
 RESULT_PERSISTENT = True
 CELERY_RESULT_BACKEND = 'django-db'
 
