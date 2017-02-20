@@ -16,37 +16,38 @@ log = logging.getLogger(__name__)
 
 class HttpError(RuntimeError):
 
-    def __init__(self, url, status_code, reason):
-         RuntimeError.__init__(self, '[%d] HTTP Error: %s for url: %s' % (status_code, reason, url))
+    def __init__(self, server_name, url, status_code, reason):
+         RuntimeError.__init__(self, '[%d] HTTP Error: %s for server %s url: %s' % (status_code, reason, server_name, url))
          self.status_code = status_code
          self.reason = reason
 
         
 class ServerRestApiError(RuntimeError):
 
-    def __init__(self, url, error, error_string):
-        RuntimeError.__init__(self, 'Server %s REST API request returned error: [%s] %s' % (url, error, error_string))
+    def __init__(self, server_name, url, error, error_string):
+        RuntimeError.__init__(self, 'Server %s at %s REST API request returned error: [%s] %s' % (server_name, url, error, error_string))
         self.error = error
         self.error_string = error_string
 
 
 class ServerRestApiProxy(object):
 
-    def __init__(self, url, user, password):
+    def __init__(self, server_name, url, user, password):
+        self._server_name = server_name
         self._url = url
         self._user = user
         self._password = password
 
     def __getattr__(self, name):
-        return ServerRestApiProxy(self._url + '/' + name, self._user, self._password)
+        return ServerRestApiProxy(self._server_name, self._url + '/' + name, self._user, self._password)
 
     def get(self, raise_exception=True, timeout_sec=None, headers=None, **kw):
-        log.debug('GET %s %s', self._url, kw)
+        log.debug('%s: GET %s %s', self._server_name, self._url, kw)
         params = {name: self._get_param_to_str(value) for name, value in kw.items()}
         return self._make_request(raise_exception, timeout_sec, requests.get, self._url, headers=headers, params=params)
 
     def post(self, raise_exception=True, timeout_sec=None, headers=None, **kw):
-        log.debug('POST %s %s', self._url, kw)
+        log.debug('%s: POST %s %s', self._server_name, self._url, kw)
         return self._make_request(raise_exception, timeout_sec, requests.post, self._url, headers=headers, json=kw)
 
     def _get_param_to_str(self, value):
@@ -67,7 +68,7 @@ class ServerRestApiProxy(object):
         log.debug('\t--> [%d] %s', response.status_code, response.content)
         if raise_exception:
             if 400 <= response.status_code < 600:
-                raise HttpError(url, response.status_code, response.reason)
+                raise HttpError(self._server_name, url, response.status_code, response.reason)
             else:
                 response.raise_for_status()
         json = response.json()
@@ -78,20 +79,21 @@ class ServerRestApiProxy(object):
             return json
         if int(error):
             log.debug('%s', json)
-            raise ServerRestApiError(self._url, json['error'], json['errorString'])
+            raise ServerRestApiError(self._server_name, self._url, json['error'], json['errorString'])
         else:
             return json['reply']
 
 
 class RestApiBase(object):
 
-    def __init__(self, url, user, password):
+    def __init__(self, server_name, url, user, password):
+        self.server_name = server_name
         self.url = url
         self.user = user
         self.password = password
 
     def _make_proxy(self, path):
-        return ServerRestApiProxy(self.url + path, self.user, self.password)
+        return ServerRestApiProxy(self.server_name, self.url + path, self.user, self.password)
 
 
 class ServerRestApi(RestApiBase):

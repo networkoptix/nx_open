@@ -32,9 +32,12 @@ MEDIASERVER_CLOUDHOST_SIZE = len(MEDIASERVER_CLOUDHOST_TAG + ' ' + MEDIASERVER_D
 MEDIASERVER_CLOUDHOST_FPATH = '/opt/networkoptix/mediaserver/lib/libcommon.so'
 
 CLOUD_HOST_TIMEOUT_SEC = 10
-MEDIASERVER_CREDENTIALS_TIMEOUT_SEC = 60 *5
+MEDIASERVER_CREDENTIALS_TIMEOUT_SEC = 60 * 5
 MEDIASERVER_MERGE_TIMEOUT_SEC = MEDIASERVER_CREDENTIALS_TIMEOUT_SEC
 DEFAULT_CUSTOMIZATION = 'default'
+
+DEFAULT_SERVER_LOG_LEVEL = 'DEBUG'
+
 
 log = logging.getLogger(__name__)
 
@@ -149,6 +152,7 @@ class ServerPersistentInfo(object):
 class Server(object):
 
     def __init__(self, name, box, url, cloud_host_rest_api):
+        self.title = name
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
         self.box = box
         self.url = url
@@ -166,7 +170,7 @@ class Server(object):
     def __repr__(self):
         return 'Server%r@%s' % (self.name, self.url)
 
-    def init(self, must_start, reset):
+    def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL):
         self._is_started = was_started = self.service.get_status()
         log.info('Service for %s %s started', self, self._is_started and 'WAS' or 'was NOT')
         if reset:
@@ -174,7 +178,7 @@ class Server(object):
                 self.stop_service()
             self.storage.cleanup()
             self.patch_binary_set_cloud_host(MEDIASERVER_DEFAULT_CLOUDHOST)  # may be changed by previous tests...
-            self.reset_config()
+            self.reset_config(logLevel=log_level)
             if must_start:
                 self.start_service()
         else:
@@ -186,7 +190,7 @@ class Server(object):
             assert not reset or not self.is_system_set_up(), 'Failed to properly reinit server - it reported to be already set up'
 
     def _init_rest_api(self):
-        self.rest_api = ServerRestApi(self.url, self.user, self.password)
+        self.rest_api = ServerRestApi(self.title, self.url, self.user, self.password)
 
     def is_started(self):
         assert self._is_started is not None, 'is_started state is still unknown'
@@ -248,9 +252,9 @@ class Server(object):
         self.reset_config()
         self.restart()
 
-    def reset_config(self):
+    def reset_config(self, **kw):
         self.box.run_ssh_command(['cp', MEDIASERVER_CONFIG_PATH_INITIAL, MEDIASERVER_CONFIG_PATH])
-        self.change_config(removeDbOnStartup=1)
+        self.change_config(removeDbOnStartup=1, **kw)
 
     def restart(self, timeout=30):
         t = time.time()
@@ -367,6 +371,7 @@ class Server(object):
         else:
             other_server._set_user_password(self.user, self.password)
         self._wait_for_servers_to_merge(other_server)
+        time.sleep(5)  # servers still need some time to settle down; hope this time will be enough
 
     def _wait_for_servers_to_merge(self, other_server):
         t = time.time()
