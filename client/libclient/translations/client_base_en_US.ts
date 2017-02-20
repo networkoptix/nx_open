@@ -6268,19 +6268,19 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You cannot receive system notifications via Email.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Some users have not set their Email addresses.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>They cannot receive system notifications via Email.</source>
+        <source>System is running in safe mode.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>System is running in safe mode.</source>
+        <source>You cannot receive system notifications by Email.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>They cannot receive system notifications by Email.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
