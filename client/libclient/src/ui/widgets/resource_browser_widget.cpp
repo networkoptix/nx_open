@@ -77,7 +77,7 @@ const int kNoDataFontWeight = QFont::Light;
 
 const auto kHtmlLabelNoInfoFormat = lit("<center><span style='font-weight: 500'>%1</span></center>");
 const auto kHtmlLabelDefaultFormat = lit("<center><span style='font-weight: 500'>%1</span> %2</center>");
-const auto kHtmlLabelUserFormat = lit("<center><span style='font-weight: 500'>%1</span> &mdash; %2</center>");
+const auto kHtmlLabelUserFormat = lit("<center><span style='font-weight: 500'>%1</span>, %2</center>");
 
 const QSize kMaxThumbnailSize(224, 184);
 
@@ -587,34 +587,45 @@ bool QnResourceBrowserWidget::showOwnTooltip(const QPointF& pos)
     if (!m_tooltipWidget)
         return true; // default tooltip should not be displayed anyway
 
-    QModelIndex index = itemIndexAt(pos.toPoint());
+    const QModelIndex index = itemIndexAt(pos.toPoint());
     if (!index.isValid())
         return true;
 
-    QVariant toolTip = index.data(Qt::ToolTipRole);
-    QString toolTipText = toolTip.convert(QVariant::String) ? toolTip.toString() : QString();
-
+    const QString toolTipText = index.data(Qt::ToolTipRole).toString();
     if (toolTipText.isEmpty())
     {
         hideToolTip();
     }
     else
     {
-        auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        auto extraInfo = QnResourceDisplayInfo(resource).extraInfo();
+        const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+        const auto extraInfo = QnResourceDisplayInfo(resource).extraInfo();
+
+        const auto userDisplayedName =
+            [&resource](const QString& defaultName)
+            {
+                if (const auto user = resource.dynamicCast<QnUserResource>())
+                {
+                    const auto name = user->fullName().trimmed();
+                    if (!name.isEmpty())
+                        return name;
+                }
+
+                return defaultName;
+            };
 
         QString text;
         if (extraInfo.isEmpty())
             text = kHtmlLabelNoInfoFormat.arg(toolTipText);
         else if (resource && resource->hasFlags(Qn::user))
-            text = kHtmlLabelUserFormat.arg(toolTipText).arg(extraInfo);
+            text = kHtmlLabelUserFormat.arg(userDisplayedName(toolTipText)).arg(extraInfo);
         else
             text = kHtmlLabelDefaultFormat.arg(toolTipText).arg(extraInfo);
 
         m_tooltipWidget->setText(text);
         m_tooltipWidget->pointTo(QPointF(geometry().right(), pos.y()));
 
-        auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+        const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
         m_tooltipWidget->setResource(camera);
         m_tooltipWidget->setThumbnailVisible(camera != nullptr);
 
