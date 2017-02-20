@@ -388,6 +388,10 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
             : startupParams.videoWallItemGuid.toString();
         logFileNameSuffix.replace(QRegExp(QLatin1String("[{}]")), QLatin1String("_"));
     }
+    else if (startupParams.selfUpdateMode)
+    {
+        logFileNameSuffix = lit("self_update");
+    }
     else if (qnClientInstanceManager->isValid())
     {
         int idx = qnClientInstanceManager->instanceIndex();
