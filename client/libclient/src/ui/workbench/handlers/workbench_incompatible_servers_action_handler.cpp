@@ -228,7 +228,7 @@ QString QnWorkbenchIncompatibleServersActionHandler::requestPassword() const
 
         if (password.isEmpty())
         {
-            QnMessageBox::warning(mainWindow(), tr("Password cannot be empty!"));
+            QnMessageBox::warning(mainWindow(), tr("Password cannot be empty."));
             continue;
         }
 

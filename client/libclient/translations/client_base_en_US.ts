@@ -1686,13 +1686,13 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>affect all servers in the system</source>
-        <comment>Relates to &apos;Global Settings&apos; subject</comment>
+        <source>Lo-Res Streams</source>
+        <comment>Cameras Backup</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Lo-Res Streams</source>
-        <comment>Cameras Backup</comment>
+        <source>affect all servers in System</source>
+        <comment>Relates to &apos;Global Settings&apos; subject</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2231,10 +2231,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Diagnostics complete!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Diagnostics for device %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2280,6 +2276,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Confirming target I/O module provides media stream.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Diagnostics complete</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2870,10 +2870,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Check Server internet connection or try again later.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Server may be restarting now. Please try again later.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2948,11 +2944,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection to %1 is not established.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Client version: %1.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2965,7 +2956,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection to %1 is not ready yet. Check server internet connection or try again later.</source>
+        <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
@@ -3117,15 +3108,15 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &quot;none&quot; value in screen recording settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Could not find audio encoder &quot;%1&quot;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Could not initialize audio device &quot;%1&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5824,11 +5815,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No Servers connected to internet</source>
+        <source>Cannot perform the test.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cannot perform the test.</source>
+        <source>No Servers connected to Internet</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7260,10 +7251,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Password cannot be empty!</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Connecting to the current system...</source>
         <translation></translation>
     </message>
@@ -7289,6 +7276,10 @@ to %1</source>
     </message>
     <message>
         <source>Server connected to System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password cannot be empty.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

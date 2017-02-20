@@ -74,9 +74,7 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
         return tr("LDAP Server connection timed out.") + L'\n'
             + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::CloudTemporaryUnauthorizedConnectionResult:
-        return tr("Connection to %1 is not ready yet. "
-            "Check server internet connection or try again later.",
-            "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName())
+        return getErrorString(ErrorStrings::CloudIsNotReady)
             + L'\n' + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::ForbiddenConnectionResult:
         return tr("Operation is not permitted now. It could happen due to server is restarting now. Please try again later.")
@@ -153,9 +151,7 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
         case Qn::CloudTemporaryUnauthorizedConnectionResult:
             QnMessageBox::critical(parentWidget,
                 kFailedToConnectText,
-                tr("Connection to %1 is not established.",
-                    "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName())
-                    + L'\n' + tr("Check Server internet connection or try again later.")
+                getErrorString(ErrorStrings::CloudIsNotReady)
                     + L'\n' + getErrorString(ErrorStrings::ContactAdministrator));
             break;
         case Qn::ForbiddenConnectionResult:
@@ -383,6 +379,10 @@ QString QnConnectionDiagnosticsHelper::getErrorString(ErrorStrings id)
             return tr("If this error persists, please contact your VMS administrator.");
         case ErrorStrings::UnableConnect:
             return tr("Unable to connect to the server");
+        case ErrorStrings::CloudIsNotReady:
+            return tr("Connection to %1 is not ready yet. "
+                "Check server Internet connection or try again later.",
+                "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName());
         default:
             NX_ASSERT(false, Q_FUNC_INFO, "Should never get here");
             break;

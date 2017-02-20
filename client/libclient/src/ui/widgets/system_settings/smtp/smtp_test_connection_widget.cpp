@@ -103,7 +103,7 @@ bool QnSmtpTestConnectionWidget::testSettings(const QnEmailSettings &value)
     if (!serverConnection)
     {
         QnMessageBox::warning(this,
-            tr("No Servers connected to internet"), tr("Cannot perform the test."));
+            tr("No Servers connected to Internet"), tr("Cannot perform the test."));
         return false;
     }
 
