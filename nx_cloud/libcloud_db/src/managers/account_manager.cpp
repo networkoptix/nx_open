@@ -29,8 +29,6 @@
 namespace nx {
 namespace cdb {
 
-static const std::chrono::seconds kUnconfirmedAccountExpirationSec(3*24*60*60);
-
 AccountManager::AccountManager(
     const conf::Settings& settings,
     const StreeManager& streeManager,
@@ -687,7 +685,9 @@ db::DBResult AccountManager::issueAccountActivationCode(
             emailVerificationCode);
         insertEmailVerificationQuery.bindValue(
             2,
-            QDateTime::currentDateTimeUtc().addSecs(kUnconfirmedAccountExpirationSec.count()));
+            QDateTime::currentDateTimeUtc().addSecs(
+                std::chrono::duration_cast<std::chrono::seconds>(
+                    m_settings.accountManager().accountActivationCodeExpirationTimeout).count()));
         if( !insertEmailVerificationQuery.exec() )
         {
             NX_LOG(lit("Could not insert account verification code into DB. %1").
