@@ -69,6 +69,36 @@ static std::string dumpPacket(const CPacket& packet)
     return ss.str();
 }
 
+static void dumpAddr(std::ostream& os, const sockaddr* addr)
+{
+    if (addr->sa_family == AF_INET)
+    {
+        os <<
+            std::hex << ntohl(((const sockaddr_in*)addr)->sin_addr.s_addr) << ":" <<
+            std::dec << ntohs(((const sockaddr_in*)addr)->sin_port);
+    }
+}
+
+static std::string dumpPacket(const CPacket& packet, const sockaddr* addr)
+{
+    std::ostringstream ss;
+    ss <<
+        "id " << packet.m_iID << ", "
+        "type " << (int)packet.getType()<<", "
+        "addr ";
+
+    dumpAddr(ss, addr);
+
+    return ss.str();
+}
+
+static std::string dumpAddr(const sockaddr* addr)
+{
+    std::ostringstream ss;
+    dumpAddr(ss, addr);
+    return ss.str();
+}
+
 class SendedPacketVerifier
 {
 public:
