@@ -75,7 +75,7 @@ void CloudConnectionManager::setCloudCredentials(
     const QString& cloudAuthKey)
 {
     NX_LOGX(lm("New cloud credentials: %1:%2")
-        .arg(cloudSystemId).arg(cloudAuthKey.size()), cl_logDEBUG1);
+        .arg(cloudSystemId).arg(cloudAuthKey.size()), cl_logINFO);
 
     if (cloudSystemId.isEmpty() != cloudAuthKey.isEmpty())
         return; //< Ignoring intermediate state.
@@ -239,8 +239,8 @@ bool CloudConnectionManager::makeSystemLocal()
 void CloudConnectionManager::cloudSettingsChanged()
 {
     NX_LOGX(lm("Cloud settings has been changed. cloudSystemId %1, cloudAuthKey %2")
-        .arg(qnGlobalSettings->cloudSystemId()).arg(qnGlobalSettings->cloudAuthKey()),
-        cl_logDEBUG1);
+        .arg(qnGlobalSettings->cloudSystemId()).arg(qnGlobalSettings->cloudAuthKey().size()),
+        cl_logINFO);
 
     setCloudCredentials(
         qnGlobalSettings->cloudSystemId(),

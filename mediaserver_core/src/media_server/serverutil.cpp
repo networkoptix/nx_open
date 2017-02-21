@@ -298,9 +298,14 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
 
 bool resetSystemToStateNew()
 {
+    NX_LOGX(lit("Resetting system to the \"new\" state"), cl_logINFO);
+
     qnGlobalSettings->setLocalSystemId(QnUuid());   //< Marking system as a "new".
     if (!qnGlobalSettings->synchronizeNowSync())
+    {
+        NX_LOGX(lit("Error saving changes to global settings"), cl_logINFO);
         return false;
+    }
 
     auto adminUserResource = qnResPool->getAdministrator();
     PasswordData data;
