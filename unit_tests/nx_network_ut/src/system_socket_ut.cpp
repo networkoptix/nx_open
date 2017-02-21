@@ -8,6 +8,7 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 
+#include "common_server_socket_ut.h"
 
 namespace nx {
 namespace network {
@@ -151,6 +152,8 @@ NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE(
     TEST, DISABLED_TcpSocketV6to4,
     [](){ return std::make_unique<TCPServerSocket>(AF_INET); },
     [](){ return std::make_unique<TCPSocket>(AF_INET6); })
+
+INSTANTIATE_TYPED_TEST_CASE_P(TCPServerSocket, ServerSocketTest, TCPServerSocket);
 
 }   //test
 }   //network
