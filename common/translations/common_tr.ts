@@ -17,6 +17,11 @@
 <context>
     <name>MergeSystemsStatusStrings</name>
     <message>
+        <source>The discovered system %1 has an incompatible version %2.</source>
+        <comment>%1 is name of the system, %2 is version information</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>The password or user name is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -25,11 +30,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Cannot create database backup.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>System name is not configured yet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -49,6 +58,16 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>The discovered system %1 is in safe mode.</source>
+        <comment>%1 is name of the system</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not configure the remote system %1.</source>
+        <comment>%1 is name of the system</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>In this version you can only merge systems which are not connected to %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
@@ -64,27 +83,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cannot connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <source>System name is not configured yet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>System was not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The discovered system %1 has an incompatible version %2.</source>
-        <comment>%1 is name of System, %2 is version information</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The discovered system %1 is in safe mode.</source>
-        <comment>%1 is name of System</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not configure the remote system %1.</source>
-        <comment>%1 is name of System</comment>
+        <source>Unknown error.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -395,38 +398,6 @@
         <source>Do HTTP request</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-        <comment>%1 means time, %2 means date</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Device does not respond to network requests.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server stopped unexpectedly.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not enough licenses. Recording has been disabled on following devices:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Motion on Cameras</source>
         <translation type="unfinished">
@@ -470,24 +441,35 @@
         </translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; has a license problem</source>
+        <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+        <comment>%1 means time, %2 means date</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Device does not respond to network requests.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server &quot;%1&quot; has finished an archive backup</source>
+        <source>Server stopped unexpectedly.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+        <source>Not enough licenses. Recording has been disabled on following devices:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>MAC #%1: %2</source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <source>Not enough licenses. Recording has been disabled on following cameras:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Send Email</source>
+        <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -878,6 +860,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Free</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Free license</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Invalid signature</source>
         <translation type="unfinished"></translation>
     </message>
@@ -891,14 +881,6 @@
     </message>
     <message>
         <source>Invalid type</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Free</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Free license</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
