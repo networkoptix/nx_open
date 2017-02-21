@@ -62,7 +62,7 @@ void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusiness::Fields f
         }
 
         ui->relayComboBox->clear();
-        ui->relayComboBox->addItem(tr("<automatic>"), QString());
+        ui->relayComboBox->addItem(L'<' + tr("automatic") + L'>', QString());
         for (const auto& relayInput: inputPorts)
             ui->relayComboBox->addItem(relayInput.getName(), relayInput.id);
     }

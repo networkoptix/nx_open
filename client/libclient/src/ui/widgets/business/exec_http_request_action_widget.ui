@@ -50,7 +50,7 @@
    <item row="0" column="0">
     <widget class="QLabel" name="httpUrlLabel">
      <property name="text">
-      <string>HTTP url</string>
+      <string>HTTP URL</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

@@ -55,7 +55,7 @@ QnSmtpSimpleSettingsWidget::QnSmtpSimpleSettingsWidget(QWidget* parent /*= nullp
 
         QnEmailAddress email(text);
         if (email.smtpServer().isNull())
-            return Qn::ValidationResult(tr("No preset found. Use 'Advanced' option."));
+            return Qn::ValidationResult(tr("No preset found. Use \"Advanced\" option."));
 
         return Qn::kValidResult;
     });

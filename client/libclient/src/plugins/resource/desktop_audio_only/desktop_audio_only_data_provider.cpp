@@ -153,7 +153,7 @@ bool QnDesktopAudioOnlyDataProvider::initAudioEncoder()
 
     if(audioCodec == 0)
     {
-        m_lastErrorStr = tr("Could not find audio encoder '%1'.")
+        m_lastErrorStr = tr("Could not find audio encoder \"%1\".")
             .arg(kEncoderCodecName);
         return false;
     }
@@ -163,7 +163,7 @@ bool QnDesktopAudioOnlyDataProvider::initAudioEncoder()
 
     encoderCtx->codec_id = audioCodec->id;
     encoderCtx->codec_type = AVMEDIA_TYPE_AUDIO;
-    encoderCtx->sample_fmt = 
+    encoderCtx->sample_fmt =
         QnFfmpegHelper::fromQtAudioFormatToFfmpegSampleType(
             fromQtAudioFormat(format));
 
@@ -199,7 +199,7 @@ bool QnDesktopAudioOnlyDataProvider::initInputDevices()
     {
         if (secondaryAudioDevice.isNull())
         {
-            m_lastErrorStr = tr("Primary audio device isn't selected.");
+            m_lastErrorStr = tr("Primary audio device is not selected.");
             return false;
         }
 

@@ -17,43 +17,24 @@
 <context>
     <name>MergeSystemsStatusStrings</name>
     <message>
-        <source>The system was not found.</source>
-        <translation>Система не найдена.</translation>
-    </message>
-    <message>
         <source>The password or user name is invalid.</source>
-        <translation>Недопустимое имя пользователя или пароль.</translation>
+        <translation>Неверное имя пользователя или пароль.</translation>
     </message>
     <message>
         <source>This user does not have permissions for the requested operation.</source>
-        <translation>Этот пользователь не имеет разрешения для запрашиваемой операции.</translation>
+        <translation>Этот пользователь не имеет полномочий для запрашиваемой операции.</translation>
     </message>
     <message>
         <source>Cannot create database backup.</source>
-        <translation>Не удается создать резервную копию базы данных.</translation>
+        <translation>Не удаётся создать резервную копию базы данных.</translation>
     </message>
     <message>
         <source>System name is not configured yet.</source>
-        <translation>Имя системы еще не настроено.</translation>
+        <translation>Имя системы ещё не настроено.</translation>
     </message>
     <message>
         <source>Unknown error.</source>
         <translation>Неизвестная ошибка.</translation>
-    </message>
-    <message>
-        <source>The discovered system %1 has an incompatible version %2.</source>
-        <comment>%1 is name of the system, %2 is version information</comment>
-        <translation>Найденная система %1 несовместима с версией %2.</translation>
-    </message>
-    <message>
-        <source>The discovered system %1 is in safe mode.</source>
-        <comment>%1 is name of the system</comment>
-        <translation>Найденная система %1 находится в безопасном режиме.</translation>
-    </message>
-    <message>
-        <source>Could not configure the remote system %1.</source>
-        <comment>%1 is name of the system</comment>
-        <translation>Не удалось настроить удаленную систему %1.</translation>
     </message>
     <message>
         <source>You are about to merge Systems with Starter licenses.</source>
@@ -68,24 +49,43 @@
         <translation>Объединить?</translation>
     </message>
     <message>
-        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Не удается подключиться к другой системе, поскольку нынешняя система уже подключена к %1.</translation>
-    </message>
-    <message>
         <source>In this version you can only merge systems which are not connected to %1.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">В этой версии можно объединять только системы, которые не связаны с %1.</translation>
+        <translation>В этой версии можно объединять только системы, которые не связаны с %1.</translation>
     </message>
     <message>
         <source>Both systems are connected to %1. Merge is not allowed.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Обе системы подключены к %1. Объединение не допускается.</translation>
+        <translation>Обе системы подключены к %1. Объединение не допускается.</translation>
     </message>
     <message>
         <source>These systems are built with different %1 URL. Merge is not allowed.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
+        <translation>Эти системы построены с различными %1 URL. Объединение не допускается.</translation>
+    </message>
+    <message>
+        <source>Cannot connect to the other system because current system is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Не удаётся подключиться к другой системе, поскольку текущая система уже подключена к %1.</translation>
+    </message>
+    <message>
+        <source>System was not found.</source>
+        <translation>Система не найдена.</translation>
+    </message>
+    <message>
+        <source>The discovered system %1 has an incompatible version %2.</source>
+        <comment>%1 is name of System, %2 is version information</comment>
+        <translation>Найденная система %1 несовместима с версией %2.</translation>
+    </message>
+    <message>
+        <source>The discovered system %1 is in safe mode.</source>
+        <comment>%1 is name of System</comment>
+        <translation>Найденная система %1 находится в безопасном режиме.</translation>
+    </message>
+    <message>
+        <source>Could not configure the remote system %1.</source>
+        <comment>%1 is name of System</comment>
+        <translation>Не удалось настроить удаленную систему %1.</translation>
     </message>
 </context>
 <context>
@@ -97,10 +97,6 @@
     <message>
         <source>Panic recording</source>
         <translation>Запись по тревоге</translation>
-    </message>
-    <message>
-        <source>Send email</source>
-        <translation>Отправить email</translation>
     </message>
     <message>
         <source>Write to log</source>
@@ -262,14 +258,6 @@
         <translation>При %2: %1</translation>
     </message>
     <message>
-        <source>%1 --&gt; %2</source>
-        <translation type="unfinished">%1 --&gt; %2</translation>
-    </message>
-    <message>
-        <source>Server &apos;%1&apos; has a license problem</source>
-        <translation>Проблема с лицензией на сервере &apos;%1&apos;</translation>
-    </message>
-    <message>
         <source>An unknown event has occurred</source>
         <translation>Произошло неизвестное событие</translation>
     </message>
@@ -292,11 +280,6 @@
     <message>
         <source>Caption: %1</source>
         <translation>Заголовок: %1</translation>
-    </message>
-    <message>
-        <source>MAC #%1: %2 </source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation type="unfinished">MAC #%1: %2 </translation>
     </message>
     <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -369,10 +352,6 @@
         <translation>Резервное копирование архива завершено</translation>
     </message>
     <message>
-        <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation>Сервер &apos;%1&apos; завершил резервное копирование архива</translation>
-    </message>
-    <message>
         <source>Generic Event at %1</source>
         <translation>Генерируемое событие на %1</translation>
     </message>
@@ -386,7 +365,7 @@
     </message>
     <message>
         <source>I/O Module %1 was disconnected</source>
-        <translation>Модуль ввода/вывода %1  отсоединен</translation>
+        <translation>Модуль ввода/вывода %1 отсоединен</translation>
     </message>
     <message>
         <source>Conflicting Address: %1</source>
@@ -411,10 +390,6 @@
     <message>
         <source>Archive backup failed: File catalog error</source>
         <translation>Ошибка резервного копирования архива: Ошибка файлового каталога</translation>
-    </message>
-    <message>
-        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation>Резервное копирование архива завершено не полностью, так как время, отведенное на резевное копирование, истекло. Резервоное копирование выполнено до %1</translation>
     </message>
     <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
@@ -514,6 +489,27 @@
             <numerusform>Конфликт IP адреса камер</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Server &quot;%1&quot; has a license problem</source>
+        <translation>Проблема с лицензией на сервере &apos;%1&apos;</translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has finished an archive backup</source>
+        <translation>Сервер &apos;%1&apos; завершил резервное копирование архива</translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+        <translation>Резервное копирование архива завершено не полностью, так как время, отведенное на резевное копирование, истекло. Резервоное копирование выполнено до %1</translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2</source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation>MAC #%1: %2</translation>
+    </message>
+    <message>
+        <source>Send Email</source>
+        <translation>Отправить Email</translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -558,24 +554,8 @@
         <translation>Невозможно подключиться к http порту %1.</translation>
     </message>
     <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation>Невозможно открыть медиа ссылку %1. Ошибка подключения к медиа порту %2.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation>Невозможно открыть медиа ссылку %1. Подключение к порту %2 сброшено.</translation>
-    </message>
-    <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>Попробуйте обновить прошивку камеры. Если проблема останется, свяжитесь с технической поддержкой.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.</source>
-        <translation>Нет поддерживаемых медиа треков по ссылке %1.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation>Невозможно открыть медиа ссылку %1. Неподдерживаемый протокол %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
@@ -608,34 +588,6 @@
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>Убедитесь, что камера подключена к сети. Попробуйте её перезагрузить.</translation>
-    </message>
-    <message>
-        <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation>Невозможно разобрать ответ устройства. URL %1, имя запроса %2.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>Невозможно разобрать ответ камеры. URL %1, имя запроса %2.</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>Не авторизован. URL %1.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
-        <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках устройства.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках камеры.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
-        <translation>Если это не помогает, восстановите заводские настройки на web-странице устройства.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation>Если это не помогает, восстановите заводские настройки на web-странице камеры.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -682,18 +634,6 @@
         <translation>Убедитесь, что модуль ввода/вывода подключен к сети. Попробуйте его перезагрузить.</translation>
     </message>
     <message>
-        <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation>Невозможно разобрать ответ модуля ввода/вывода. URL %1, имя запроса %2.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation>Попробуйте включить запись (если она отключена).</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation>Если это не помогает, восстановите заводские настройки на web-странице модуля ввода/вывода.</translation>
-    </message>
-    <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>Запрос модуля ввода/вывода &quot;%1&quot; вернул ошибку &quot;%2&quot;.</translation>
     </message>
@@ -725,6 +665,62 @@
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
         <translation>Убедитесь, что порт %1 доступен (например, проброшен).</translation>
     </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
+        <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках устройства.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
+        <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках камеры.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
+        <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках устройства.</translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the device web-page.</source>
+        <translation>Если это не помогает, восстановите заводские настройки на web-странице устройства.</translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the camera web-page.</source>
+        <translation>Если это не помогает, восстановите заводские настройки на web-странице камеры.</translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation>Если это не помогает, восстановите заводские настройки на web-странице модуля ввода/вывода.</translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+        <translation>Невозможно открыть медиа ссылку %1. Ошибка подключения к медиа порту %2.</translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation>Невозможно открыть медиа ссылку %1. Подключение к порту %2 сброшено.</translation>
+    </message>
+    <message>
+        <source>Could not parse device response. URL %1, request name %2.</source>
+        <translation>Невозможно разобрать ответ устройства. URL %1, имя запроса %2.</translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. URL %1, request name %2.</source>
+        <translation>Невозможно разобрать ответ камеры. URL %1, имя запроса %2.</translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. URL %1, request name %2.</source>
+        <translation>Невозможно разобрать ответ модуля ввода/вывода. URL %1, имя запроса %2.</translation>
+    </message>
+    <message>
+        <source>No supported media tracks at URL %1.</source>
+        <translation>Нет поддерживаемых медиа треков по ссылке %1.</translation>
+    </message>
+    <message>
+        <source>Not authorized. URL %1.</source>
+        <translation>Не авторизован. URL %1.</translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
+        <translation>Невозможно открыть медиа ссылку %1. Неподдерживаемый протокол %2.</translation>
+    </message>
 </context>
 <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -734,7 +730,7 @@
     </message>
     <message>
         <source>Could not find encoder for codec %1.</source>
-        <translation>Не найден кодировщик для кодек %1.</translation>
+        <translation>Не найден кодировщик для кодека %1.</translation>
     </message>
     <message>
         <source>Could not initialize audio encoder.</source>
@@ -746,26 +742,26 @@
     </message>
     <message>
         <source>Could not find decoder for codec %1.</source>
-        <translation>Не найден кодировщик для кодек %1.</translation>
+        <translation>Не найден кодировщик для кодека %1.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t initialize resampling context, error code: %1</source>
+        <source>Could not initialize resampling context, error code: %1</source>
         <translation>Не удалось инициализировать контекст, код ошибки: %1</translation>
     </message>
     <message>
-        <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
+        <source>Could not allocate sample buffers, error code: %1</source>
         <translation>Не удалось выделить буферы, код ошибки: %1</translation>
     </message>
     <message>
-        <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
+        <source>Could not send audio frame to encoder, Error code: %1.</source>
         <translation>Не удалось отправить аудиоданные кодировщику, код ошибки: %1.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
+        <source>Could not receive audio packet from encoder, Error code: %1.</source>
         <translation>Не удалось получить аудио пакет от кодировщика, код ошибки: %1.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
+        <source>Could not receive audio frame from decoder, Error code: %1.</source>
         <translation>Не удалось получить аудиоданные от декодера, код ошибки: %1.</translation>
     </message>
 </context>
@@ -835,7 +831,7 @@
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
-        <translation>Для этого устройства доступны только одиночные лицензии</translation>
+        <translation>Для этого устройства доступна только одиночная лицензия</translation>
     </message>
     <message>
         <source>Unknown error</source>
@@ -851,31 +847,31 @@
     </message>
     <message>
         <source>Analog Encoder</source>
-        <translation>Аналоговый энкодер</translation>
+        <translation>Аналоговый кодировщик</translation>
     </message>
     <message>
         <source>Trial Licenses</source>
-        <translation>Временная лицензия</translation>
+        <translation>Временные лицензии</translation>
     </message>
     <message>
         <source>Analog Licenses</source>
-        <translation>Лицензия на аналоговую камеру</translation>
+        <translation>Лицензии на аналоговую камеру</translation>
     </message>
     <message>
         <source>Professional Licenses</source>
-        <translation>Профессиональная лицензия</translation>
+        <translation>Профессиональные лицензии</translation>
     </message>
     <message>
         <source>Edge Licenses</source>
-        <translation>Лицензия Edge</translation>
+        <translation>Лицензии Edge</translation>
     </message>
     <message>
         <source>Vmax Licenses</source>
-        <translation>Лицензия Vmax</translation>
+        <translation>Vmax лицензии</translation>
     </message>
     <message>
         <source>Analog Encoder Licenses</source>
-        <translation>Лицензии на аналоговые энкодеры</translation>
+        <translation>Лицензии на аналоговые кодировщики</translation>
     </message>
     <message>
         <source>Video Wall Licenses</source>
@@ -902,10 +898,6 @@
         <translation>Неверные лицензии</translation>
     </message>
     <message>
-        <source>This license type requires higher software version.</source>
-        <translation>Данный тип лицензии требует более старшей версии ПО.</translation>
-    </message>
-    <message>
         <source>Invalid signature</source>
         <translation>Неверная подпись</translation>
     </message>
@@ -915,7 +907,7 @@
     </message>
     <message>
         <source>License is expired</source>
-        <translation>Срок действия лицензии истек</translation>
+        <translation>Срок действия лицензии истёк</translation>
     </message>
     <message>
         <source>Invalid type</source>
@@ -928,6 +920,10 @@
     <message>
         <source>Free license</source>
         <translation>Бесплатная лицензия</translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version</source>
+        <translation>Данный тип лицензии требует более поздней версии ПО.</translation>
     </message>
 </context>
 <context>
@@ -957,10 +953,6 @@
         <translation>Вы пытаетесь активировать несовместимую с вашим программным обеспечением лицензию. Обратитесь в службу поддержки для получения правильного лицензионного ключа.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation>Этот лицензионный ключ был активирован {{time}} для аппаратного ID {{hwid}}. Пожалуйста, обратитесь в службу поддержки для получения правильного лицензионного ключа.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
         <translation>При активации лицензионного ключа произошла ошибка базы данных.</translation>
     </message>
@@ -969,20 +961,25 @@
         <translation>При активации лицензионного ключа произошла ошибка при получении данных. Пожалуйста, свяжитесь со службой поддержки.</translation>
     </message>
     <message numerus="yes">
-        <source>Activate %n more %1. </source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <source>Activate %n more %1.</source>
+        <translation>
+            <numerusform>Активируйте ещё %n %1.</numerusform>
+            <numerusform>Активируйте ещё %n %1.</numerusform>
+            <numerusform>Активируйте ещё %n %1.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <source>%n more %1 will be used. </source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <source>%n more %1 will be used.</source>
+        <translation>
+            <numerusform>Будет использовано ещё %n %1.</numerusform>
+            <numerusform>Будет использовано ещё %n %1.</numerusform>
+            <numerusform>Будет использовано ещё %n %1.</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
+        <comment>%1 is a hardware ID, %2 is an activation time</comment>
+        <translation>Этот лицензионный ключ уже был активирован на аппаратный ID %1 на %2. Свяжитесь со службой поддержки для получения лицензии.</translation>
     </message>
 </context>
 <context>
@@ -990,13 +987,6 @@
     <message>
         <source>New Server</source>
         <translation>Новый сервер</translation>
-    </message>
-</context>
-<context>
-    <name>QnPropertyStorage</name>
-    <message>
-        <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>Неверное значение параметра %1. Ожидается %2, введено %3.</translation>
     </message>
 </context>
 <context>
@@ -1105,24 +1095,24 @@
         <translation>Неизвестно</translation>
     </message>
     <message>
-        <source>Hardware ID: </source>
-        <translation>Аппаратный идентификатор: </translation>
-    </message>
-    <message>
-        <source>Watermark: </source>
-        <translation>Водяной знак: </translation>
-    </message>
-    <message>
         <source>Trial License</source>
         <translation>Временная лицензия</translation>
     </message>
     <message>
-        <source>Licensed To: </source>
-        <translation>Лицензировано для: </translation>
-    </message>
-    <message>
         <source>FREE License</source>
         <translation>Бесплатная лицензия</translation>
+    </message>
+    <message>
+        <source>Hardware ID: %1</source>
+        <translation>Аппаратный ID: %1</translation>
+    </message>
+    <message>
+        <source>Licensed To: %1</source>
+        <translation>Лицензировано для: %1</translation>
+    </message>
+    <message>
+        <source>Watermark: %1</source>
+        <translation>Водяной знак: %1</translation>
     </message>
 </context>
 <context>
@@ -1185,17 +1175,12 @@
         <extracomment>Short for &apos;Preset&apos;</extracomment>
         <translation>Пред</translation>
     </message>
-    <message>
-        <source>-</source>
-        <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation type="unfinished">-</translation>
-    </message>
 </context>
 <context>
     <name>QnStreamRecorder</name>
     <message>
         <source>Corresponding container in FFMPEG library was not found.</source>
-        <translation>Контейнер  не был найден в библиотеке FFMPEG.</translation>
+        <translation>Не найден соответствующий контейнер в библиотекe FFMPEG.</translation>
     </message>
     <message>
         <source>Could not create output file for video recording.</source>
@@ -1207,7 +1192,7 @@
     </message>
     <message>
         <source>Could not allocate output audio stream.</source>
-        <translation>Невозможно создать буфер для звукового  потока.</translation>
+        <translation>Невозможно создать буфер для звукового потока.</translation>
     </message>
     <message>
         <source>Invalid audio codec information.</source>
@@ -1216,10 +1201,6 @@
     <message>
         <source>Video or audio codec is incompatible with the selected format.</source>
         <translation>Видео или аудио кодек несовместим с выбранным форматом.</translation>
-    </message>
-    <message>
-        <source>Error during watermark generation for file &apos;%1&apos;.</source>
-        <translation>Ошибка при генерации водяного знака для файла %1.</translation>
     </message>
     <message>
         <source>File write error. Not enough free space.</source>
@@ -1233,8 +1214,8 @@
 <context>
     <name>QnSystemDescription</name>
     <message>
-        <source>&lt;Unnamed system&gt;</source>
-        <translation>&lt;Система без имени&gt;</translation>
+        <source>Unnamed system</source>
+        <translation>Система без имени</translation>
     </message>
 </context>
 <context>
@@ -1294,7 +1275,7 @@
     <message>
         <source>w</source>
         <comment>Suffix for displaying weeks</comment>
-        <translation>w</translation>
+        <translation>н</translation>
     </message>
     <message>
         <source>M</source>
@@ -1470,11 +1451,11 @@
     </message>
     <message>
         <source>Has access to whole system and can do everything.</source>
-        <translation>Имеет доступ к всей системе и может делать все.</translation>
+        <translation>Имеет доступ ко всей системе и может делать все.</translation>
     </message>
     <message>
         <source>Has access to whole system and can manage it. Can create users.</source>
-        <translation>Имеет доступ к всей системе и может ей управлять. Может создавать пользователей.</translation>
+        <translation>Имеет доступ ко всей системе и может ей управлять. Может создавать пользователей.</translation>
     </message>
     <message>
         <source>Can manage all cameras and bookmarks.</source>
@@ -1486,7 +1467,7 @@
     </message>
     <message>
         <source>Can view live video from all cameras.</source>
-        <translation>Можно посмотреть живое видео со всех камер.</translation>
+        <translation>Может смотреть живое видео со всех камер.</translation>
     </message>
     <message>
         <source>Custom user role.</source>

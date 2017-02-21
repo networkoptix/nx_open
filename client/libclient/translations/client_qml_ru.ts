@@ -13,14 +13,14 @@
     </message>
     <message>
         <source>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</source>
-        <translation>Проверьте сетевое подключение или нажмите кнопку «Подключиться к серверу», чтобы ввести адрес сервера</translation>
+        <translation>Проверьте сетевое подключение или нажмите кнопку &quot;Подключиться к серверу&quot;, чтобы ввести адрес сервера</translation>
     </message>
 </context>
 <context>
     <name>FactorySystemTileArea</name>
     <message>
         <source>Click to setup</source>
-        <translation>Нажмите для установки</translation>
+        <translation>Нажмите для настройки</translation>
     </message>
 </context>
 <context>
