@@ -598,6 +598,11 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     {
         using namespace nx::network;
         qnCloudStatusWatcher->logSession(info.cloudSystemId);
+        if (qnCloudStatusWatcher->stayConnected())
+        {
+            qnSettings->setAutoLogin(true);
+            qnSettings->save();
+        }
         return;
     }
 
