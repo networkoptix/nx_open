@@ -198,7 +198,7 @@ def test_restart_one_server(env_merged):
     # Ensure both servers are merged and sync
     exp_arecontRtspEnabled = \
          not change_bool_setting(env_merged.one, 'arecontRtspEnabled')
-    #wait_for_settings_merge(env_merged)
+    wait_for_settings_merge(env_merged)
     check_system_settings(
         env_merged.two,
         arecontRtspEnabled = bool_to_str(exp_arecontRtspEnabled))
