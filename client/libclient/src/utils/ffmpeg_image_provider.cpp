@@ -1,5 +1,7 @@
 #include "ffmpeg_image_provider.h"
 
+#include <client/client_globals.h>
+
 #include <core/resource/resource.h>
 
 #include <decoders/video/ffmpeg_video_decoder.h>
@@ -21,9 +23,22 @@ QImage QnFfmpegImageProvider::image() const {
     return m_image;
 }
 
-void QnFfmpegImageProvider::doLoadAsync() {
+QSize QnFfmpegImageProvider::sizeHint() const
+{
+    NX_ASSERT(false);
+    return m_image.size();
+}
 
-    QnAviArchiveDelegatePtr archiveDelegate(new QnAviArchiveDelegate());  
+Qn::ThumbnailStatus QnFfmpegImageProvider::status() const
+{
+    NX_ASSERT(false);
+    return Qn::ThumbnailStatus::Invalid;
+}
+
+void QnFfmpegImageProvider::doLoadAsync()
+{
+
+    QnAviArchiveDelegatePtr archiveDelegate(new QnAviArchiveDelegate());
     if (!archiveDelegate->open(m_resource))
         return;
 
@@ -41,13 +56,13 @@ void QnFfmpegImageProvider::doLoadAsync() {
     auto data = archiveDelegate->getNextData();
     if (!data)
         return;
-    
+
     QnCompressedVideoDataPtr frame = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     if (!frame)
         return;
 
     /* Preparing frame to correctly decode it as a screenshot. */
-    frame->flags |= QnAbstractMediaData::MediaFlags_DecodeTwice | QnAbstractMediaData::MediaFlags_StillImage;  
+    frame->flags |= QnAbstractMediaData::MediaFlags_DecodeTwice | QnAbstractMediaData::MediaFlags_StillImage;
 
     QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
     QnFfmpegVideoDecoder decoder(frame->compressionType, frame, false);

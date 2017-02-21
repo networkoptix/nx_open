@@ -9,6 +9,7 @@
 class QLabel;
 class QnTextEditLabel;
 class QnResourcePreviewWidget;
+class QnCameraThumbnailManager;
 
 class QnResourceDetailsWidget : public Connective<QnPanel>
 {
@@ -24,10 +25,11 @@ public:
     QString description() const;
     void setDescription(const QString& description);
 
-    const QnResourcePtr& targetResource() const;
-    void setTargetResource(const QnResourcePtr& target);
+    QnResourcePtr resource() const;
+    void setResource(const QnResourcePtr& resource);
 
 private:
+    QScopedPointer<QnCameraThumbnailManager> m_thumbnailManager;
     QnResourcePreviewWidget* m_preview;
     QnTextEditLabel* m_nameTextEdit;
     QLabel* m_descriptionLabel;

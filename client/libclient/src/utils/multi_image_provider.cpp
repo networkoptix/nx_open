@@ -1,56 +1,121 @@
 #include "multi_image_provider.h"
 
-QnMultiImageProvider::QnMultiImageProvider(Providers providers, Qt::Orientation orientation, int spacing, QObject *parent):
+#include <client/client_globals.h>
+
+namespace {
+
+static const QPoint kOffset(0, 0);
+static const QSize kMaxSize(160, 160);
+
+} // namespace
+
+QnMultiImageProvider::QnMultiImageProvider(
+    Providers providers,
+    Qt::Orientation orientation,
+    int spacing,
+    QObject* parent)
+    :
     base_type(parent),
-    m_providers(std::move(providers))
+    m_providers(std::move(providers)),
+    m_orientation(orientation),
+    m_spacing(spacing)
 {
+    int key = 0;
     for (const auto& provider: m_providers)
     {
-        connect(provider.get(), &QnImageProvider::imageChanged, this, [this, orientation, spacing](const QImage &loadedImage)
-        {
-            if (loadedImage.isNull())
-                return;
-
-            enum { kMaxSize = 160 };
-            const auto newHeight = std::min<int>(kMaxSize, loadedImage.height());
-            const auto newWidth = std::min<int>(kMaxSize, loadedImage.width());
-            QSize newSize(newWidth, newHeight);
-            QRect rect(0, 0, newWidth, newHeight);
-            std::ptrdiff_t key =  (ptrdiff_t) sender();
-
-            if (!m_image.isNull())
+        connect(provider.get(), &QnImageProvider::imageChanged, this,
+            [this, key](const QImage &loadedImage)
             {
-                auto existsOffset = m_imageRects.find(key);
-                if (existsOffset == m_imageRects.end())
+                if (loadedImage.isNull())
+                    return;
+
+                QSize newSize = loadedImage.size().boundedTo(kMaxSize);
+                QRect rect(kOffset, newSize);
+
+                if (!m_image.isNull())
                 {
-                    if (orientation == Qt::Vertical) {
-                        newSize = QSize(qMax(newWidth, m_image.width()), m_image.height() + newHeight + spacing);
-                        rect.translate(0, m_image.height() + spacing);
+                    auto existsOffset = m_imageRects.find(key);
+                    if (existsOffset == m_imageRects.end())
+                    {
+                        if (m_orientation == Qt::Vertical)
+                        {
+                            newSize = QSize(qMax(newSize.width(), m_image.width()),
+                                m_image.height() + newSize.height() + m_spacing);
+                            rect.translate(0, m_image.height() + m_spacing);
+                        }
+                        else
+                        {
+                            newSize = QSize(m_image.width() + newSize.width() + m_spacing,
+                                qMax(newSize.height(), m_image.height()));
+                            rect.translate(m_image.width() + m_spacing, 0);
+                        }
                     }
-                    else {
-                        newSize = QSize(m_image.width() + newWidth + spacing, qMax(newHeight, m_image.height()));
-                        rect.translate(m_image.width() + spacing, 0);
+                    else
+                    {
+                        // paint image at the same place as previous time
+                        rect = *existsOffset;
+                        newSize = m_image.size();
                     }
                 }
-                else {
-                    // paint image at the same place as previous time
-                    rect = *existsOffset;
-                    newSize = m_image.size();
-                }
-            }
 
-            m_imageRects[key] = rect;
-            QImage mergedImage(newSize, QImage::Format_ARGB32_Premultiplied);
-            mergedImage.fill(Qt::black);
-            QPainter p(&mergedImage);
-            p.drawImage(0, 0, m_image);
-            p.drawImage(rect, loadedImage);
-            p.end();
-            m_image = mergedImage;
+                m_imageRects[key] = rect;
+                QImage mergedImage(newSize, QImage::Format_ARGB32_Premultiplied);
+                mergedImage.fill(Qt::black);
+                QPainter p(&mergedImage);
+                p.drawImage(0, 0, m_image);
+                p.drawImage(rect, loadedImage);
+                p.end();
+                m_image = mergedImage;
 
-            emit imageChanged(m_image);
-        });
+                emit imageChanged(m_image);
+            });
+
+        connect(provider.get(), &QnImageProvider::statusChanged, this,
+            [this] {emit statusChanged(status()); });
+        connect(provider.get(), &QnImageProvider::sizeHintChanged, this,
+            [this] { emit sizeHintChanged(sizeHint()); });
+
+        ++key;
     }
+}
+
+QImage QnMultiImageProvider::image() const
+{
+    return m_image;
+}
+
+QSize QnMultiImageProvider::sizeHint() const
+{
+    //TODO: #gdm improve logic, sizeHintChanged
+    QSize result;
+    for (const auto& provider: m_providers)
+    {
+        QSize subImageSize = provider->sizeHint().boundedTo(kMaxSize);
+        if (m_orientation == Qt::Vertical)
+        {
+            result.setWidth(qMax(result.width(), subImageSize.width()));
+            result.setHeight(result.height() + m_spacing + subImageSize.height());
+        }
+        else
+        {
+            result.setWidth(result.width() + m_spacing + subImageSize.width());
+            result.setHeight(qMax(result.height(), subImageSize.height()));
+        }
+
+    }
+    return result;
+
+}
+
+Qn::ThumbnailStatus QnMultiImageProvider::status() const
+{
+    //TODO: #gdm improve logic, statusChanged
+    for (const auto& provider: m_providers)
+    {
+        if (provider->status() == Qn::ThumbnailStatus::Loaded)
+            return Qn::ThumbnailStatus::Loaded;
+    }
+    return Qn::ThumbnailStatus::Loading;
 }
 
 void QnMultiImageProvider::doLoadAsync()

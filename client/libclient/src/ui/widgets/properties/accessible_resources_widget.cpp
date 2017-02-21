@@ -53,7 +53,6 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     m_accessibleResourcesModel(new QnAccessibleResourcesModel(this))
 {
     ui->setupUi(this);
-
     switch (m_filter)
     {
         case QnResourceAccessFilter::LayoutsFilter:
@@ -421,7 +420,7 @@ void QnAccessibleResourcesWidget::updateThumbnail(const QModelIndex& index)
     QModelIndex baseIndex = index.sibling(index.row(), QnAccessibleResourcesModel::NameColumn);
     QString toolTip = baseIndex.data(Qt::ToolTipRole).toString();
     ui->detailsWidget->setName(toolTip);
-    ui->detailsWidget->setTargetResource(index.data(Qn::ResourceRole).value<QnResourcePtr>());
+    ui->detailsWidget->setResource(index.data(Qn::ResourceRole).value<QnResourcePtr>());
     ui->detailsWidget->layout()->activate();
 }
 

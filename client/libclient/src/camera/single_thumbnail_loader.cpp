@@ -16,10 +16,9 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
                                                  int rotation,
                                                  const QSize &size,
                                                  QnThumbnailRequestData::ThumbnailFormat format,
-                                                 QSharedPointer<QnCameraThumbnailManager> statusPixmapManager,
-                                                 QObject *parent)
-    : base_type(parent)
-    , m_request()
+                                                 QObject *parent):
+    base_type(parent),
+    m_request()
 {
     NX_ASSERT(camera, Q_FUNC_INFO, "Camera must exist here");
     NX_ASSERT(qnCommon->currentServer(), Q_FUNC_INFO, "We must be connected here");
@@ -33,36 +32,37 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
 
     if (!camera || !camera->hasVideo(nullptr))
     {
-        if (statusPixmapManager)
-        {
-            QPixmap statusPixmap = statusPixmapManager->statusPixmap(QnCameraThumbnailManager::NoData);
-            m_image = statusPixmap.toImage();
-        }
+//         if (statusPixmapManager)
+//         {
+//             QPixmap statusPixmap = statusPixmapManager->statusPixmap(QnCameraThumbnailManager::NoData);
+//             m_image = statusPixmap.toImage();
+//         }
         return;
     }
 
-    if (statusPixmapManager)
-    {
-        QPixmap statusPixmap = statusPixmapManager->statusPixmap(QnCameraThumbnailManager::Loading);
-        m_image = statusPixmap.toImage();
-    }
+//     if (statusPixmapManager)
+//     {
+//         QPixmap statusPixmap = statusPixmapManager->statusPixmap(QnCameraThumbnailManager::Loading);
+//         m_image = statusPixmap.toImage();
+//     }
 
     /* Making connection through event loop to handle data from another thread. */
-    connect(this, &QnSingleThumbnailLoader::imageLoaded, this, [this, size, format, statusPixmapManager](const QByteArray &data)
-    {
-        if (!data.isEmpty())
+    connect(this, &QnSingleThumbnailLoader::imageLoaded, this,
+        [this, size, format](const QByteArray &data)
         {
-            QByteArray imageFormat = QnLexical::serialized<QnThumbnailRequestData::ThumbnailFormat>(format).toUtf8();
-            m_image.loadFromData(data, imageFormat);
-        }
-        else if (statusPixmapManager)
-        {
-            QPixmap statusPixmap = statusPixmapManager->statusPixmap(QnCameraThumbnailManager::NoData);
-            m_image = statusPixmap.toImage();
-        }
+            if (!data.isEmpty())
+            {
+                QByteArray imageFormat = QnLexical::serialized<QnThumbnailRequestData::ThumbnailFormat>(format).toUtf8();
+                m_image.loadFromData(data, imageFormat);
+            }
+//             else if (statusPixmapManager)
+//             {
+//                 QPixmap statusPixmap = statusPixmapManager->statusPixmap(QnCameraThumbnailManager::NoData);
+//                 m_image = statusPixmap.toImage();
+//             }
 
-        emit imageChanged(m_image);
-    }
+            emit imageChanged(m_image);
+        }
     , Qt::QueuedConnection);
 
 }
@@ -81,7 +81,20 @@ QImage QnSingleThumbnailLoader::image() const {
     return m_image;
 }
 
-void QnSingleThumbnailLoader::doLoadAsync() {
+QSize QnSingleThumbnailLoader::sizeHint() const
+{
+    NX_ASSERT(false);
+    return m_image.size();
+}
+
+Qn::ThumbnailStatus QnSingleThumbnailLoader::status() const
+{
+    NX_ASSERT(false);
+    return Qn::ThumbnailStatus::Invalid;
+}
+
+void QnSingleThumbnailLoader::doLoadAsync()
+{
     if (!qnCommon->currentServer())
     {
         emit imageLoaded(QByteArray());
@@ -89,16 +102,17 @@ void QnSingleThumbnailLoader::doLoadAsync() {
     }
 
     QPointer<QnSingleThumbnailLoader> guard(this);
-    auto handle = qnCommon->currentServer()->restConnection()->cameraThumbnailAsync(m_request,  [this, guard] (bool success, rest::Handle id, const QByteArray &imageData)
-    {
-        if (!guard)
-            return;
+    auto handle = qnCommon->currentServer()->restConnection()->cameraThumbnailAsync(m_request,
+        [this, guard] (bool success, rest::Handle id, const QByteArray &imageData)
+        {
+            if (!guard)
+                return;
 
-        Q_UNUSED(id);
-        if (!success)
-            return;
-        emit imageLoaded(imageData);
-    });
+            Q_UNUSED(id);
+            if (!success)
+                return;
+            emit imageLoaded(imageData);
+        });
 
     if (handle <= 0)
     {

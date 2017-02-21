@@ -6,63 +6,62 @@
 
 #include <api/server_rest_connection_fwd.h>
 
+#include <client/client_globals.h>
+
 #include <core/resource/resource_fwd.h>
+
+#include <utils/image_provider.h>
 
 #include <nx/utils/uuid.h>
 
-class QnCameraThumbnailManager : public QObject
+class QnCameraThumbnailManager: public QnImageProvider
 {
     Q_OBJECT
-public:
-    enum ThumbnailStatus
-    {
-        None,
-        Loading,
-        Loaded,
-        NoData,
-        Refreshing
-    };
 
+    using base_type = QnImageProvider;
+public:
     explicit QnCameraThumbnailManager(QObject* parent = nullptr);
     virtual ~QnCameraThumbnailManager();
 
-    void selectResource(const QnSecurityCamResourcePtr& camera);
+    QnVirtualCameraResourcePtr selectedCamera() const;
+    void selectCamera(const QnVirtualCameraResourcePtr& camera);
 
     QSize thumbnailSize() const;
     void setThumbnailSize(const QSize& size);
 
-    QPixmap statusPixmap(ThumbnailStatus status);
+    virtual QImage image() const override;
+    virtual QSize sizeHint() const override;
+    virtual Qn::ThumbnailStatus status() const override;
 
 signals:
-    void statusChanged(const QnUuid& resourceId, ThumbnailStatus status);
     void thumbnailReady(const QnUuid& resourceId, const QPixmap& thumbnail);
 
-private slots:
+protected:
+    virtual void doLoadAsync() override;
+
+private:
     void at_resPool_statusChanged(const QnResourcePtr& resource);
     void at_resPool_resourceRemoved(const QnResourcePtr& resource);
 
 private:
-    Q_SIGNAL void thumbnailReadyDelayed(const QnUuid& resourceId, const QPixmap& thumbnail);
+    rest::Handle loadThumbnailForCamera(const QnVirtualCameraResourcePtr& camera);
 
-    rest::Handle loadThumbnailForCamera(const QnSecurityCamResourcePtr& camera);
-
-    bool isUpdateRequired(const QnSecurityCamResourcePtr& camera, const ThumbnailStatus status) const;
+    bool isUpdateRequired(const QnVirtualCameraResourcePtr& camera, Qn::ThumbnailStatus status) const;
     void forceRefreshThumbnails();
 
     QPixmap scaledPixmap(const QPixmap& pixmap) const;
-    void updateStatusPixmaps();
 
     struct ThumbnailData
     {
         ThumbnailData();
 
         QImage thumbnail;
-        ThumbnailStatus status;
+        Qn::ThumbnailStatus status;
         rest::Handle loadingHandle;
     };
 
-    QHash<QnSecurityCamResourcePtr, ThumbnailData> m_thumbnailByCamera;
+    QHash<QnVirtualCameraResourcePtr, ThumbnailData> m_thumbnailByCamera;
+    QnVirtualCameraResourcePtr m_selectedCamera;
     QSize m_thumnailSize;
-    QHash<ThumbnailStatus, QPixmap> m_statusPixmaps;
-    QTimer *m_refreshingTimer;
+    QTimer* m_refreshingTimer;
 };

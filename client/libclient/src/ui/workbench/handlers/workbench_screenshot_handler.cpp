@@ -89,11 +89,12 @@ QnScreenshotLoader::QnScreenshotLoader(const QnScreenshotParameters& parameters,
 {
 }
 
-QnScreenshotLoader::~QnScreenshotLoader() {
-    return;
+QnScreenshotLoader::~QnScreenshotLoader()
+{
 }
 
-void QnScreenshotLoader::setBaseProvider(QnImageProvider *imageProvider) {
+void QnScreenshotLoader::setBaseProvider(QnImageProvider *imageProvider)
+{
     m_baseProvider.reset(imageProvider);
     if (!imageProvider)
         return;
@@ -102,21 +103,39 @@ void QnScreenshotLoader::setBaseProvider(QnImageProvider *imageProvider) {
     imageProvider->loadAsync();
 }
 
-QImage QnScreenshotLoader::image() const {
+QImage QnScreenshotLoader::image() const
+{
     if (!m_baseProvider)
         return QImage();
     return m_baseProvider->image();
 }
 
-QnScreenshotParameters QnScreenshotLoader::parameters() const {
+QSize QnScreenshotLoader::sizeHint() const
+{
+    if (!m_baseProvider)
+        return QSize();
+    return m_baseProvider->sizeHint();
+}
+
+Qn::ThumbnailStatus QnScreenshotLoader::status() const
+{
+    if (!m_baseProvider)
+        return Qn::ThumbnailStatus::Invalid;
+    return m_baseProvider->status();
+}
+
+QnScreenshotParameters QnScreenshotLoader::parameters() const
+{
     return m_parameters;
 }
 
-void QnScreenshotLoader::setParameters(const QnScreenshotParameters &parameters) {
+void QnScreenshotLoader::setParameters(const QnScreenshotParameters &parameters)
+{
     m_parameters = parameters;
 }
 
-void QnScreenshotLoader::doLoadAsync() {
+void QnScreenshotLoader::doLoadAsync()
+{
     m_isReady = true;
 
     QImage img = image();
@@ -128,7 +147,8 @@ void QnScreenshotLoader::doLoadAsync() {
     m_isReady = false;
 }
 
-void QnScreenshotLoader::at_imageLoaded(const QImage &image) {
+void QnScreenshotLoader::at_imageLoaded(const QImage &image)
+{
     if (!m_isReady)
         return;
     emit imageChanged(image);

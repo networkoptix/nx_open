@@ -1,6 +1,6 @@
-#ifndef FISHEYE_CALIBRATION_WIDGET_H
-#define FISHEYE_CALIBRATION_WIDGET_H
+#pragma once
 
+#include <QtCore/QPointer>
 #include <QtWidgets/QWidget>
 
 #include <utils/common/connective.h>
@@ -54,11 +54,9 @@ private:
 private:
     QScopedPointer<Ui::QnFisheyeCalibrationWidget> ui;
     QScopedPointer<QnFisheyeCalibrator> m_calibrator;
-    QnImageProvider* m_imageProvider;
+    QPointer<QnImageProvider> m_imageProvider;
     QTimer* m_updateTimer;
 
     int m_lastError;
     bool m_inLoading;
 };
-
-#endif // FISHEYE_CALIBRATION_WIDGET_H

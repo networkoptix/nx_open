@@ -19,7 +19,6 @@ class ResourceSelectionDialog;
 }
 
 class QnResourceTreeModel;
-class QnCameraThumbnailManager;
 
 class QnResourceSelectionDialog: public QnSessionAwareButtonBoxDialog
 {
