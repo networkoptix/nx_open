@@ -141,7 +141,6 @@ static const int kDisableAllSslVerions =
 
 void SslStaticData::setAllowedServerVersions(const String& versions)
 {
-    NX_ASSERT(!s_isInitialized, "Too late to specify SSL versions");
     NX_LOG(lm("Set server SSL versions: %1").container(versions), cl_logALWAYS);
 
     int disabledVersions = kDisableAllSslVerions;
@@ -171,6 +170,8 @@ void SslStaticData::setAllowedServerVersions(const String& versions)
         NX_ASSERT(false, "Attempt to disable all SSL versions");
     else
         s_disabledServerVersions = disabledVersions;
+
+    NX_ASSERT(!s_isInitialized, "SSL version does not take effect after first SSL engine usage");
 }
 
 std::atomic<bool> SslStaticData::s_isInitialized(false);
