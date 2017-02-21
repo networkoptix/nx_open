@@ -18,6 +18,7 @@ class QnResourceDetailsWidget : public Connective<QnPanel>
 
 public:
     explicit QnResourceDetailsWidget(QWidget* parent = nullptr);
+    virtual ~QnResourceDetailsWidget() override;
 
     QString name() const;
     void setName(const QString& name);

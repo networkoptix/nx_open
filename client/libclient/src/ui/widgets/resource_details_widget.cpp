@@ -60,6 +60,10 @@ QnResourceDetailsWidget::QnResourceDetailsWidget(QWidget* parent) :
     layout->setSpacing(spacing);
 }
 
+QnResourceDetailsWidget::~QnResourceDetailsWidget()
+{
+}
+
 QString QnResourceDetailsWidget::name() const
 {
     return m_nameTextEdit->toPlainText();
