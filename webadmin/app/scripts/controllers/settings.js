@@ -4,6 +4,7 @@ angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $rootScope, $modal, $log, mediaserver, $poll,
                                           cloudAPI, $location, $timeout, dialogs, nativeClient) {
 
+        $scope.L = L;
 
         function updateActive(){
             $scope.active={

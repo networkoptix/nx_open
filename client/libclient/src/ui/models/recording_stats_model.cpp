@@ -387,11 +387,10 @@ QString QnRecordingStatsModel::formatDurationString(const QnCamRecordingStatsDat
     static const int kMsecPerSec = 1000;
     static const QString kSeparator(L' ');
     static const Qt::TimeSpanFormat kFormat = Qt::Years | Qt::Months | Qt::Days | Qt::Hours;
-    static const int kDoNotSuppress = -1;
 
     qint64 durationMs = data.archiveDurationSecs * kMsecPerSec;
     qint64 referenceMs = qnSyncTime->currentMSecsSinceEpoch();
 
     return QTimeSpan(QDateTime::fromMSecsSinceEpoch(referenceMs), durationMs)
-        .toApproximateString(kDoNotSuppress, kFormat, QTimeSpan::SuffixFormat::Full, kSeparator);
+        .toApproximateString(QTimeSpan::kDoNotSuppressSecondUnit, kFormat, QTimeSpan::SuffixFormat::Full, kSeparator);
 }

@@ -75,10 +75,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid email or password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cannot connect to %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -88,6 +84,10 @@
     </message>
     <message>
         <source>Log in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect Email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -118,11 +118,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Login can&apos;t be empty</source>
+        <source>Login cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Password can&apos;t be empty</source>
+        <source>Password cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -226,27 +226,27 @@
         <translation type="unfinished">Desconhecido</translation>
     </message>
     <message>
-        <source>Hi-res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low-res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low-res key-frames</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Custom-res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1 fps</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hi-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyfr + Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom-Res</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -405,7 +405,7 @@
 <context>
     <name>SessionItem</name>
     <message>
-        <source>This server has too old version. </source>
+        <source>This server has too old version. Please update it to the latest version.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -559,8 +559,8 @@
         <translation type="unfinished">Câmara offline</translation>
     </message>
     <message>
-        <source>Can&apos;t load video</source>
-        <translation type="unfinished">Não foi possível carregar o video</translation>
+        <source>Cannot load video</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

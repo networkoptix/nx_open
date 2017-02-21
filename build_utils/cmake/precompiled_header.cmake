@@ -22,8 +22,12 @@ function(_generate_pch_parameters target pch_dir)
     set(include_directories
         "$<$<BOOL:${include_directories}>:-I$<JOIN:${include_directories},\n-I>\n>")
 
-    set(framework_directories
-        "$<$<BOOL:${CMAKE_FRAMEWORK_PATH}>:-iframework $<JOIN:${CMAKE_FRAMEWORK_PATH},\n-iframework >\n>")
+    if(MACOSX)
+        set(framework_directories
+            "$<$<BOOL:${CMAKE_FRAMEWORK_PATH}>:-iframework $<JOIN:${CMAKE_FRAMEWORK_PATH},\n-iframework >\n>")
+    else()
+        set(framework_directories)
+    endif()
 
     set(definitions
         "$<TARGET_PROPERTY:${target},COMPILE_DEFINITIONS>")

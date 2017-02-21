@@ -149,7 +149,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
     switch (errorCode)
     {
         case QnConnectToCurrentSystemTool::NoError:
-            QnMessageBox::success(mainWindow(), tr("Server connected to the System"));
+            QnMessageBox::success(mainWindow(), tr("Server connected to System"));
             break;
 
         case QnConnectToCurrentSystemTool::UpdateFailed:
@@ -228,7 +228,7 @@ QString QnWorkbenchIncompatibleServersActionHandler::requestPassword() const
 
         if (password.isEmpty())
         {
-            QnMessageBox::warning(mainWindow(), tr("Password cannot be empty!"));
+            QnMessageBox::warning(mainWindow(), tr("Password cannot be empty."));
             continue;
         }
 

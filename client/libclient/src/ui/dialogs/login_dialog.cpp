@@ -448,7 +448,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
     m_autoFoundItem->removeRows(0, m_autoFoundItem->rowCount());
     if (m_foundSystems.size() == 0)
     {
-        QStandardItem* noLocalEcs = new QStandardItem(tr("<none>"));
+        QStandardItem* noLocalEcs = new QStandardItem(L'<' + tr("none") + L'>');
         noLocalEcs->setFlags(Qt::ItemIsEnabled);
         m_autoFoundItem->appendRow(noLocalEcs);
         return;

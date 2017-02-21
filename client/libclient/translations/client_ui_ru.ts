@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source> ms</source>
-        <translation> мс</translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse Logs</source>
         <translation>Просмотр журнала событий</translation>
     </message>
@@ -166,7 +161,7 @@
     <message>
         <location/>
         <source>Get Installed Versions</source>
-        <translation>Получить версию установленного ПО</translation>
+        <translation>Получить версии установленных компонентов</translation>
     </message>
 </context>
 <context>
@@ -244,7 +239,7 @@
     <message>
         <location/>
         <source>Email settings</source>
-        <translation>Настройки e-mail</translation>
+        <translation>Настройки Email</translation>
     </message>
     <message>
         <location/>
@@ -277,7 +272,7 @@
     <message>
         <location/>
         <source>Bitrate limitation could lead to backup failure.</source>
-        <translation>Ограничение битрейта может привести к сбоям при резервном копирования.</translation>
+        <translation>Ограничение битрейта может привести к сбоям при резервном копировании.</translation>
     </message>
     <message>
         <location/>
@@ -295,7 +290,7 @@
     <message>
         <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
         <source>Backup Settings</source>
-        <translation>Параметры резервного копирования</translation>
+        <translation>Настройки резервного копирования</translation>
     </message>
     <message>
         <location/>
@@ -310,7 +305,7 @@
     <message>
         <location/>
         <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
-        <translation>Внимание! Резервироваться будут только последующие данные! Существующий архив резервироваться не будет.</translation>
+        <translation>Резервироваться будут только последующие данные. Существующий архив резервироваться не будет.</translation>
     </message>
     <message>
         <location/>
@@ -321,11 +316,6 @@
         <location/>
         <source>Backup Archive From</source>
         <translation>Резервировать архив с</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;Cameras...&gt; </source>
-        <translation>&lt;Камеры...&gt; </translation>
     </message>
     <message>
         <location/>
@@ -400,11 +390,6 @@
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
         <source>Refresh</source>
         <translation>Обновить</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation>&lt; Любая камера &gt;</translation>
     </message>
     <message>
         <location/>
@@ -533,7 +518,7 @@
     <message>
         <location/>
         <source>Add device(s)...</source>
-        <translation>Добавить устройства...</translation>
+        <translation>Добавить устройств(а)...</translation>
     </message>
     <message>
         <location/>
@@ -543,7 +528,7 @@
     <message>
         <location/>
         <source>Device Address</source>
-        <translation>Адрес устройства:</translation>
+        <translation>Адрес устройства</translation>
     </message>
     <message>
         <location/>
@@ -552,18 +537,8 @@
     </message>
     <message>
         <location/>
-        <source>0.0.0.0</source>
-        <translation>0.0.0.0</translation>
-    </message>
-    <message>
-        <location/>
         <source>End IP</source>
         <translation>Конечный IP адрес</translation>
-    </message>
-    <message>
-        <location/>
-        <source>0.0.0.255</source>
-        <translation>0.0.0.255</translation>
     </message>
     <message>
         <location/>
@@ -573,7 +548,7 @@
     <message>
         <location/>
         <source>Discovery Port</source>
-        <translation>П&amp;орт:</translation>
+        <translation>Порт</translation>
     </message>
     <message>
         <location/>
@@ -619,7 +594,7 @@
     <message>
         <location/>
         <source>Advanced settings are unavailable</source>
-        <translation>Расширенные параметры недоступны</translation>
+        <translation>Расширенные настройки недоступны</translation>
     </message>
 </context>
 <context>
@@ -633,11 +608,6 @@
         <location/>
         <source>Camera Settings Control</source>
         <translation>Управление настройками камеры</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation>Не менять настройки потоков и профилей камеры</translation>
     </message>
     <message>
         <location/>
@@ -737,12 +707,7 @@
     <message>
         <location/>
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation>Настройка &quot;Разрешить системе оптимизировать настройки камер&quot; отключена в диалоге &quot;Администрирование системы&quot;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation>Считать битрейт по блокам, а не по секундам (увеличит битрейт для камеры)</translation>
+        <translation>Настройка &quot;Разрешить системе оптимизировать настройки камер&quot; отключена в диалоге &quot;Администрирование системы&quot;.</translation>
     </message>
     <message>
         <location/>
@@ -753,6 +718,16 @@
         <location/>
         <source>Force motion detection for stream:</source>
         <translation>Жестко задать обнаружение движения по потоку:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
+        <translation>Считать битрейт по блокам, а не по секундам (увеличит битрейт для камеры)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Keep camera streams and profiles settings</source>
+        <translation>Не менять настройки потоков и профилей камеры</translation>
     </message>
 </context>
 <context>
@@ -793,11 +768,6 @@
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source>Panic Mode: </source>
-        <translation>Запись по тревоге:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule Settings</source>
         <translation>Настройки расписания</translation>
     </message>
@@ -820,11 +790,6 @@
         <location/>
         <source>Motion Only</source>
         <translation>Только движение (ДД)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion + Low-Res </source>
-        <translation>Движение + Низкое разрешение</translation>
     </message>
     <message>
         <location/>
@@ -860,12 +825,6 @@
         <location/>
         <source>Pre-Recording</source>
         <translation>Пре-запись</translation>
-    </message>
-    <message>
-        <location/>
-        <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation>с</translation>
     </message>
     <message>
         <location/>
@@ -905,7 +864,17 @@
     <message>
         <location/>
         <source>Apply changes before copying schedule.</source>
-        <translation>Сохраните изменения перед копированием</translation>
+        <translation>Сохраните изменения перед копированием.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation>Запись по тревоге:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Lo-Res</source>
+        <translation>Дд + Низ</translation>
     </message>
 </context>
 <context>
@@ -917,15 +886,6 @@
     </message>
 </context>
 <context>
-    <name>CloudManagementWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
-        <source>&lt;2. Connect system
-to the cloud&gt;</source>
-        <translation>&lt; 2. Подключить систему к облаку &gt;</translation>
-    </message>
-</context>
-<context>
     <name>ConnectToCloudDialog</name>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
@@ -934,8 +894,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Incorrect email or password</source>
-        <translation type="unfinished"></translation>
+        <source>Incorrect Email or password</source>
+        <translation>Неверный Email / пароль</translation>
     </message>
 </context>
 <context>
@@ -1006,14 +966,6 @@ to the cloud&gt;</source>
     </message>
 </context>
 <context>
-    <name>DateRangeWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/common/date_range_widget.ui"/>
-        <source>-</source>
-        <translation>-</translation>
-    </message>
-</context>
-<context>
     <name>EventLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
@@ -1037,11 +989,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation>&lt; Любая камера &gt;</translation>
-    </message>
-    <message>
-        <location/>
         <source>Event Rules...</source>
         <translation>Правила событий...</translation>
     </message>
@@ -1052,11 +999,6 @@ to the cloud&gt;</source>
         <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
         <source>HTTP content</source>
         <translation>HTTP запрос</translation>
-    </message>
-    <message>
-        <location/>
-        <source>HTTP url</source>
-        <translation>HTTP URL</translation>
     </message>
     <message>
         <location/>
@@ -1082,6 +1024,11 @@ to the cloud&gt;</source>
         <location/>
         <source>Content type</source>
         <translation>Тип содержимого</translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP URL</source>
+        <translation>URL HTTPS</translation>
     </message>
 </context>
 <context>
@@ -1140,7 +1087,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Fisheye Dewarping</source>
-        <translation>Развертка камер &quot;рыбий глаз&quot;</translation>
+        <translation>Развёртка камер &quot;рыбий глаз&quot;</translation>
     </message>
     <message>
         <location/>
@@ -1154,18 +1101,13 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>°</source>
-        <translation>°</translation>
-    </message>
-    <message>
-        <location/>
         <source>Y Offset</source>
-        <translation>Смещение по оси Y</translation>
+        <translation>Смещение по Y</translation>
     </message>
     <message>
         <location/>
         <source>X Offset</source>
-        <translation>Смещение по x</translation>
+        <translation>Смещение по X</translation>
     </message>
     <message>
         <location/>
@@ -1237,7 +1179,7 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots</source>
+        <source>Run application when PC Boots up</source>
         <translation>Запустить приложение при загрузке компьютера</translation>
     </message>
 </context>
@@ -1282,12 +1224,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Loading Image...Please Wait.</source>
-        <translation>Загрузка изображения... Пожалуйста, подождите.</translation>
+        <translation>Загрузка изображения...Пожалуйста, подождите.</translation>
     </message>
     <message>
         <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;Нет изображения&gt;</translation>
+        <source>No image</source>
+        <translation>Нет изображения</translation>
     </message>
 </context>
 <context>
@@ -1300,7 +1242,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>General Settings</source>
-        <translation> Общие настройки</translation>
+        <translation>Общие настройки</translation>
     </message>
     <message>
         <location/>
@@ -1315,7 +1257,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Browse...</source>
-        <translation>Выбрать...</translation>
+        <translation>Обзор...</translation>
     </message>
     <message>
         <location/>
@@ -1330,17 +1272,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Processing Image...Please Wait.</source>
-        <translation>Обработка изображения... Пожалуйста, подождите.</translation>
-    </message>
-    <message>
-        <location/>
-        <source> cells</source>
-        <translation> ячеек</translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation>%</translation>
+        <translation>Обработка изображения...Пожалуйста, подождите.</translation>
     </message>
     <message>
         <location/>
@@ -1469,17 +1401,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Locked to Hardware ID:</source>
-        <translation>Привязано к Аппаратному идентификатору:</translation>
+        <translation>Привязано к Аппаратному ID:</translation>
     </message>
     <message>
         <location/>
         <source>Features</source>
         <translation>Особенности</translation>
-    </message>
-    <message>
-        <location/>
-        <source>This license type requires a higher software version.</source>
-        <translation>Для использования такого типа лицензии требуется более новая версия ПО.</translation>
     </message>
 </context>
 <context>
@@ -1548,7 +1475,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Browse...</source>
-        <translation>Выбрать...</translation>
+        <translation>Обзор...</translation>
     </message>
     <message>
         <location/>
@@ -1573,7 +1500,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>License Key</source>
-        <translation>Лицензионный ключ:</translation>
+        <translation>Лицензионный ключ</translation>
     </message>
     <message>
         <location/>
@@ -1583,12 +1510,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Hardware ID</source>
-        <translation>Аппаратный идентификатор:</translation>
+        <translation>Аппаратный ID</translation>
     </message>
     <message>
         <location/>
         <source>Activation Key File</source>
-        <translation>Файл с ключом активации:</translation>
+        <translation>Файл с ключом активации</translation>
     </message>
 </context>
 <context>
@@ -1669,43 +1596,28 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source> seconds</source>
-        <translation>с</translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation>%</translation>
-    </message>
-    <message>
-        <location/>
         <source>Background Image</source>
         <translation>Фоновое изображение</translation>
     </message>
     <message>
         <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;Нет изображения&gt;</translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse...</source>
-        <translation>Выбрать...</translation>
+        <translation>Обзор...</translation>
     </message>
     <message>
         <location/>
         <source>Language</source>
-        <translation>Язык:</translation>
+        <translation>Язык</translation>
     </message>
     <message>
         <location/>
         <source>Time Mode</source>
-        <translation>Шкала времени:</translation>
+        <translation>Шкала времени</translation>
     </message>
     <message>
         <location/>
         <source>Image</source>
-        <translation>Изображение:</translation>
+        <translation>Изображение</translation>
     </message>
     <message>
         <location/>
@@ -1715,7 +1627,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Intensity</source>
-        <translation>Непрозрачность:</translation>
+        <translation>Интенсивность</translation>
     </message>
     <message>
         <location/>
@@ -1727,12 +1639,17 @@ to the cloud&gt;</source>
         <source>Tour cycle</source>
         <translation>Цикличность тура</translation>
     </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation>сек</translation>
+    </message>
 </context>
 <context>
     <name>MessageBox</name>
     <message>
         <location filename="../src/ui/dialogs/common/message_box.ui"/>
-        <source>Don&apos;t show this message again</source>
+        <source>Do not show this message again</source>
         <translation>Больше не показывать это сообщение</translation>
     </message>
 </context>
@@ -1773,11 +1690,6 @@ to the cloud&gt;</source>
         <source>Expert</source>
         <translation>Экспертные</translation>
     </message>
-    <message>
-        <location/>
-        <source>TextLabel</source>
-        <translation>TextLabel</translation>
-    </message>
 </context>
 <context>
     <name>PlaySoundBusinessActionWidget</name>
@@ -1807,7 +1719,7 @@ to the cloud&gt;</source>
     <message>
         <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
         <source>Show to administrators only</source>
-        <translation>Только Администраторам</translation>
+        <translation>Только администраторам</translation>
     </message>
     <message>
         <location/>
@@ -1969,7 +1881,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Enable tile interface</source>
-        <translation>Включить интерфейс</translation>
+        <translation>Включите интерфейс &quot;плитка&quot;</translation>
     </message>
 </context>
 <context>
@@ -1986,8 +1898,8 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>Incorrect email or password</source>
-        <translation type="unfinished"></translation>
+        <source>Incorrect Email or password</source>
+        <translation>Неверный Email / пароль</translation>
     </message>
 </context>
 <context>
@@ -2034,11 +1946,6 @@ to the cloud&gt;</source>
         <location/>
         <source>Login:</source>
         <translation>Логин:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>admin</source>
-        <translation type="unfinished">admin</translation>
     </message>
 </context>
 <context>
@@ -2156,7 +2063,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Browse...</source>
-        <translation>Выбрать...</translation>
+        <translation>Обзор...</translation>
     </message>
     <message>
         <location/>
@@ -2344,22 +2251,22 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-        <translation>Рекомендуется использовать мощный компьютер для &apos;Лучшего&apos; качества и разрешения.</translation>
+        <translation>Для наилучшего качества и разрешения рекомендуется использовать мощный компьютер.</translation>
     </message>
     <message>
         <location/>
         <source>Browse...</source>
-        <translation>Выбрать...</translation>
+        <translation>Обзор...</translation>
     </message>
     <message>
         <location/>
         <source>Resolution</source>
-        <translation>Разрешение:</translation>
+        <translation>Разрешение</translation>
     </message>
     <message>
         <location/>
         <source>Recording Quality</source>
-        <translation>Качество записи:</translation>
+        <translation>Качество записи</translation>
     </message>
 </context>
 <context>
@@ -2413,7 +2320,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Global Email Settings...</source>
-        <translation>&amp;Настройки e-mail...</translation>
+        <translation>Настройки почты...</translation>
     </message>
 </context>
 <context>
@@ -2422,11 +2329,6 @@ to the cloud&gt;</source>
         <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
         <source>Ping</source>
         <translation>Проверить подключение</translation>
-    </message>
-    <message>
-        <location/>
-        <source>9000</source>
-        <translation type="unfinished">9000</translation>
     </message>
     <message>
         <location/>
@@ -2446,7 +2348,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>IP Address</source>
-        <translation>IP адрес:</translation>
+        <translation>IP адрес</translation>
     </message>
     <message>
         <location/>
@@ -2598,12 +2500,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Firmware</source>
-        <translation>Версия прошивки:</translation>
+        <translation>Версия прошивки</translation>
     </message>
     <message>
         <location/>
         <source>Vendor</source>
-        <translation>Производитель:</translation>
+        <translation>Производитель</translation>
     </message>
     <message>
         <location/>
@@ -2623,7 +2525,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>IP Address</source>
-        <translation>IP адрес:</translation>
+        <translation>IP адрес</translation>
     </message>
     <message>
         <location/>
@@ -2633,12 +2535,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>MAC Address</source>
-        <translation>MAC адрес:</translation>
+        <translation>MAC адрес</translation>
     </message>
     <message>
         <location/>
         <source>Sensitivity</source>
-        <translation>Чувствительность:</translation>
+        <translation>Чувствительность</translation>
     </message>
     <message>
         <location/>
@@ -2754,11 +2656,6 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source> TB</source>
-        <translation> ТБ</translation>
-    </message>
-    <message>
-        <location/>
         <source>Additional storage:</source>
         <translation>Дополнительное хранилище:</translation>
     </message>
@@ -2808,12 +2705,12 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Backup Settings...</source>
-        <translation>Параметры резервного копирования...</translation>
+        <translation>Настройки резервного копирования...</translation>
     </message>
     <message>
         <location/>
         <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-        <translation>Запись на отключенное хранилище прекратится. Однако, удаление устаревших записей будет продолжаться.</translation>
+        <translation>Запись на отключённое хранилище прекратится. Однако, удаление устаревших записей будет продолжаться.</translation>
     </message>
 </context>
 <context>
@@ -2872,7 +2769,7 @@ to the cloud&gt;</source>
     <message>
         <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation>Внимание! Это сделает настройки качества и частоты кадров (FPS) неактуальными.</translation>
+        <translation>Внимание! Это сделает настройки &quot;Качество&quot; и &quot;Частота кадров&quot; (FPS) неактуальными в расписании.</translation>
     </message>
 </context>
 <context>
@@ -2884,9 +2781,10 @@ to the cloud&gt;</source>
     </message>
     <message>
         <location/>
-        <source>System time is synchronized with the Internet and is independent from server&apos;s local time.
+        <source>System time is synchronized with the Internet and is independent from server local time.
 Selected server will be used as a time server if the system has no Internet access.</source>
-        <translation>Системное время синхронизируется с Интернетом и не зависит от местного времени сервера. Выбранный сервер будет использоваться как сервер времени, если у системе нет доступа в сеть Интернет.</translation>
+        <translation>Системное время синхронизируется с Интернетом и не зависит от местного времени сервера. 
+Выбранный сервер будет использоваться как сервер времени, если у системе нет доступа в сеть Интернет.</translation>
     </message>
 </context>
 <context>
@@ -2926,7 +2824,8 @@ Selected server will be used as a time server if the system has no Internet acce
         <location/>
         <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-        <translation>В системе еще не настроены пользовательские роли. Для создания используется кнопка «Новая роль».</translation>
+        <translation>В системе ещё не созданы пользовательские роли. 
+Для создания испольуйте кнопку &quot;Новая роль&quot;.</translation>
     </message>
     <message>
         <location/>

@@ -172,7 +172,7 @@ def format_ts(strings, file_name):
         xml_file.write(xml_content)
 
 
-js_strings = extract_strings('../static/scripts', 'language.js', mode='js')
+js_strings = extract_strings('../static/', 'language.json', mode='js')
 
 html_strings = extract_strings('../static/views', '.html')  # , dir_exclude='static'
 

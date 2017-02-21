@@ -50,34 +50,6 @@
         <translation>・%1・番のサービスがインストールされました</translation>
     </message>
     <message>
-        <source> (stopped)</source>
-        <translation> (停止)</translation>
-    </message>
-    <message>
-        <source> (starting)</source>
-        <translation> (始動)</translation>
-    </message>
-    <message>
-        <source> (stopping)</source>
-        <translation> (停止中)</translation>
-    </message>
-    <message>
-        <source> (started)</source>
-        <translation> (始動済み)</translation>
-    </message>
-    <message>
-        <source> (resuming)</source>
-        <translation>・(再開中)</translation>
-    </message>
-    <message>
-        <source> (paused)</source>
-        <translation>・(一時停止しました)</translation>
-    </message>
-    <message>
-        <source> (pausing)</source>
-        <translation>・(一時停止中)</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>終了(&amp;Q)</translation>
     </message>
@@ -111,6 +83,34 @@
     </message>
     <message>
         <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>starting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>resuming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pausing</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

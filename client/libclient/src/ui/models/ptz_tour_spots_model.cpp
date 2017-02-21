@@ -221,7 +221,7 @@ QVariant QnPtzTourSpotsModel::data(const QModelIndex &index, int role) const {
                 if (preset.id == spot.presetId)
                     return preset.name;
             }
-            return tr("<Invalid>");
+            return L'<' + tr("Invalid") + L'>';
         case TimeColumn:
             return stayTimeToString(spot.stayTime);
         case SpeedColumn:

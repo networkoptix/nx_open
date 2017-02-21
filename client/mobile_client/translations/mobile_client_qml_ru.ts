@@ -42,7 +42,7 @@
     </message>
     <message>
         <source>Go to %1</source>
-        <translation>Перейти к %1</translation>
+        <translation>Перейти в %1</translation>
     </message>
 </context>
 <context>
@@ -56,7 +56,7 @@
     <name>CredentialsEditor</name>
     <message>
         <source>Email</source>
-        <translation>Адрес электронной почты</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Password</source>
@@ -68,27 +68,27 @@
     </message>
     <message>
         <source>Create account</source>
-        <translation>Создать учетную запись</translation>
+        <translation>Создать учётную запись</translation>
     </message>
     <message>
         <source>Forgot your password?</source>
         <translation>Забыли пароль?</translation>
     </message>
     <message>
-        <source>Invalid email or password</source>
-        <translation>Недопустимый адрес электронной почты или пароль</translation>
-    </message>
-    <message>
         <source>Cannot connect to %1</source>
-        <translation>Не удается подключиться к %1</translation>
+        <translation>Не удаётся подключиться к %1</translation>
     </message>
     <message>
         <source>Email and password cannot be empty</source>
-        <translation>Адрес электронной почты и пароль не могут быть пустыми</translation>
+        <translation>Email и пароль не могут быть пустыми</translation>
     </message>
     <message>
         <source>Log in</source>
-        <translation type="unfinished"></translation>
+        <translation>Вход</translation>
+    </message>
+    <message>
+        <source>Incorrect Email or password</source>
+        <translation>Неверный Email / пароль</translation>
     </message>
 </context>
 <context>
@@ -107,22 +107,22 @@
     </message>
     <message>
         <source>Delete login &quot;%1&quot;?</source>
-        <translation>Удалить логин «%1»?</translation>
+        <translation>Удалить логин &quot;%1&quot;?</translation>
     </message>
     <message>
         <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
-        <translation>Адреса серверов и логины останутся сохраненными. Чтобы удалить всю информацию о подключениях требуется удалить все сохраненные логины.</translation>
+        <translation>Адреса серверов и логины останутся сохраненными. Чтобы удалить всю информацию о подключениях, требуется удалить все сохраненные логины.</translation>
     </message>
     <message>
         <source>Delete connection?</source>
         <translation>Удалить подключение?</translation>
     </message>
     <message>
-        <source>Login can&apos;t be empty</source>
-        <translation>Логин должен быть задан.</translation>
+        <source>Login cannot be empty</source>
+        <translation>Логин должен быть задан</translation>
     </message>
     <message>
-        <source>Password can&apos;t be empty</source>
+        <source>Password cannot be empty</source>
         <translation>Пароль не может быть пустым</translation>
     </message>
 </context>
@@ -130,7 +130,7 @@
     <name>DeveloperSettingsScreen</name>
     <message>
         <source>Developer Settings</source>
-        <translation>Параметры для разработчиков</translation>
+        <translation>Настройки для разработчиков</translation>
     </message>
     <message>
         <source>Log Level</source>
@@ -178,7 +178,7 @@
     <message>
         <source>To connect to old servers please download the legacy application from the App Store.</source>
         <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-        <translation>Для соединения со старой версией сервера загрузите предыдущее приложение из Apple Store.</translation>
+        <translation>Для соединения со старой версией сервера загрузите предыдущее приложение из App Store.</translation>
     </message>
     <message>
         <source>To connect to old servers please download the legacy application from the Internet.</source>
@@ -226,28 +226,28 @@
         <translation>Неизвестно</translation>
     </message>
     <message>
-        <source>Hi-res</source>
-        <translation>Выс. Разр.</translation>
-    </message>
-    <message>
-        <source>Low-res</source>
-        <translation>Низ. Разр.</translation>
-    </message>
-    <message>
-        <source>Low-res key-frames</source>
-        <translation>Ключ. кадры с низ. разр.</translation>
-    </message>
-    <message>
-        <source>Custom-res</source>
-        <translation>Польз. разр.</translation>
-    </message>
-    <message>
         <source>%1 fps</source>
         <translation>%1 кадр/с</translation>
     </message>
     <message>
         <source>%1 Mbps</source>
         <translation>%1 Мбит/с</translation>
+    </message>
+    <message>
+        <source>Hi-Res</source>
+        <translation>Выс</translation>
+    </message>
+    <message>
+        <source>Lo-Res</source>
+        <translation>Низ</translation>
+    </message>
+    <message>
+        <source>Keyfr + Lo-Res</source>
+        <translation>Ключ. кадр + Низ</translation>
+    </message>
+    <message>
+        <source>Custom-Res</source>
+        <translation>Др</translation>
     </message>
 </context>
 <context>
@@ -261,15 +261,15 @@
     <name>LiteClientControlScreen</name>
     <message>
         <source>Cannot start client</source>
-        <translation>Не удается запустить клиент</translation>
+        <translation>Не удаётся запустить клиент</translation>
     </message>
     <message>
         <source>Cannot stop client</source>
-        <translation>Не удается остановить клиент</translation>
+        <translation>Не удаётся остановить клиент</translation>
     </message>
     <message>
         <source>Please make sure that display is connected to %1.</source>
-        <translation>Пожалуйста, убедитесь, что дисплей подключен к %1.</translation>
+        <translation>Пожалуйста, убедитесь, что дисплей подключён к %1.</translation>
     </message>
     <message>
         <source>%1 is offline</source>
@@ -301,7 +301,7 @@
     <name>NoDisplayDummy</name>
     <message>
         <source>No display connected</source>
-        <translation>Не подключен дисплей</translation>
+        <translation>Не подключён дисплей</translation>
     </message>
 </context>
 <context>
@@ -358,7 +358,7 @@
     </message>
     <message>
         <source>Cannot connect to server</source>
-        <translation>Не удается подключиться к серверу</translation>
+        <translation>Не удаётся подключиться к серверу</translation>
     </message>
     <message>
         <source>Press %1 to exit</source>
@@ -383,7 +383,7 @@
     <name>SessionCredentialsEditor</name>
     <message>
         <source>Host : Port</source>
-        <translation>Узел: порт</translation>
+        <translation>Узел : порт</translation>
     </message>
     <message>
         <source>Login</source>
@@ -405,8 +405,8 @@
 <context>
     <name>SessionItem</name>
     <message>
-        <source>This server has too old version. </source>
-        <translation>Версия этого сервера слишком старая. </translation>
+        <source>This server has too old version. Please update it to the latest version.</source>
+        <translation>Версия этого сервера устарела. Пожалуйста, обновите его до последней версии.</translation>
     </message>
 </context>
 <context>
@@ -417,7 +417,7 @@
     </message>
     <message>
         <source>Cannot connect to %1</source>
-        <translation>Не удается подключиться к %1</translation>
+        <translation>Не удаётся подключиться к %1</translation>
     </message>
     <message>
         <source>No systems found</source>
@@ -429,11 +429,11 @@
     </message>
     <message>
         <source>Cannot connect to the system &quot;%1&quot;</source>
-        <translation>Не удается подключиться к системе &quot;%1&quot;</translation>
+        <translation>Не удаётся подключиться к системе &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Cannot connect to the server</source>
-        <translation>Не удается подключиться к серверу</translation>
+        <translation>Не удаётся подключиться к серверу</translation>
     </message>
     <message>
         <source>Check your network connection or contact a system administrator</source>
@@ -559,7 +559,7 @@
         <translation>Камера не в сети</translation>
     </message>
     <message>
-        <source>Can&apos;t load video</source>
+        <source>Cannot load video</source>
         <translation>Ошибка при получении видео</translation>
     </message>
 </context>

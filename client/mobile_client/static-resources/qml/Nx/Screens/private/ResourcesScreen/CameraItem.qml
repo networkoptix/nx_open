@@ -16,7 +16,7 @@ Control
     property bool keepStatus: false
     property alias resourceId: resourceHelper.resourceId
 
-    property bool paused: false
+    property bool active: false
 
     signal clicked()
     signal thumbnailRefreshRequested()
@@ -245,7 +245,7 @@ Control
                 resourceId: cameraItem.resourceId
                 Component.onCompleted:
                 {
-                    if (!paused)
+                    if (active)
                         playLive()
                 }
                 videoQuality: QnPlayer.LowIframesOnlyVideoQuality
@@ -257,10 +257,10 @@ Control
                 target: cameraItem
                 onPausedChanged:
                 {
-                    if (cameraItem.paused)
-                        mediaPlayer.stop()
-                    else
+                    if (active)
                         mediaPlayer.playLive()
+                    else
+                        mediaPlayer.stop()
                 }
             }
         }
@@ -275,7 +275,7 @@ Control
 
         interval: initialLoadDelay
         repeat: true
-        running: connectionManager.connectionState === QnConnectionManager.Ready
+        running: active && connectionManager.connectionState === QnConnectionManager.Ready
 
         onTriggered:
         {
@@ -293,7 +293,7 @@ Control
     Timer
     {
         interval: 2000
-        running: true
+        running: active
         onTriggered: d.videoAllowed = true
     }
 }

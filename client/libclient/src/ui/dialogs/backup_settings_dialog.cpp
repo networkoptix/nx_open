@@ -25,7 +25,7 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent) :
 
     QString title = lit("%1\t(%2)")
         .arg(tr("Global Settings"))
-        .arg(tr("affect all servers in the system", "Relates to 'Global Settings' subject"));
+        .arg(tr("affect all servers in System", "Relates to 'Global Settings' subject"));
 
     ui->globalSettingsGroupBox->setTitle(title);
 
@@ -87,7 +87,7 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent) :
                 .filtered<QnVirtualCameraResource>());
         });
 
-    ui->qualityComboBox->addItem(tr("Low-Res Streams", "Cameras Backup"),
+    ui->qualityComboBox->addItem(tr("Lo-Res Streams", "Cameras Backup"),
         QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackup_LowQuality));
     ui->qualityComboBox->addItem(tr("Hi-Res Streams", "Cameras Backup"),
         QVariant::fromValue<Qn::CameraBackupQualities>(Qn::CameraBackup_HighQuality));

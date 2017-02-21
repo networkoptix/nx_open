@@ -21,13 +21,15 @@ QnTextPixmap renderText(const QString& text, const QPen& pen, const QFont& font,
         ? metrics.elidedText(text, elideMode, width)
         : text;
 
-    const QRect textRect = metrics.boundingRect(renderText);
-
-    if (textRect.isEmpty())
+    if (renderText.isEmpty())
         return QnTextPixmap();
 
-    const QSize size = textRect.size();
-    const QPoint origin = textRect.topLeft();
+    const QSize size = metrics.size(0, renderText);
+
+    if (size.isEmpty())
+        return QnTextPixmap();
+
+    const QPoint origin(metrics.leftBearing(renderText[0]), -metrics.ascent());
 
     const auto pixelRatio = qApp->devicePixelRatio();
     const auto pixmapSize = size * pixelRatio;

@@ -453,8 +453,8 @@ void QnServerUpdatesWidget::discardChanges()
     else
     {
         QnMessageBox::warning(this,
-            tr("Update can't be canceled at this stage"),
-            tr("Please wait until it's finished."));
+            tr("Update cannot be canceled at this stage"),
+            tr("Please wait until it is finished."));
     }
 }
 

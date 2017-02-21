@@ -17,10 +17,6 @@
 <context>
     <name>MergeSystemsStatusStrings</name>
     <message>
-        <source>The system was not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>The password or user name is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -41,21 +37,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The discovered system %1 has an incompatible version %2.</source>
-        <comment>%1 is name of the system, %2 is version information</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The discovered system %1 is in safe mode.</source>
-        <comment>%1 is name of the system</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not configure the remote system %1.</source>
-        <comment>%1 is name of the system</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You are about to merge Systems with Starter licenses.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -65,11 +46,6 @@
     </message>
     <message>
         <source>Merge anyway?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Can&apos;t connect to the other system because current system is already connected to %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -85,6 +61,30 @@
     <message>
         <source>These systems are built with different %1 URL. Merge is not allowed.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to the other system because current system is already connected to %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered system %1 has an incompatible version %2.</source>
+        <comment>%1 is name of System, %2 is version information</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The discovered system %1 is in safe mode.</source>
+        <comment>%1 is name of System</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not configure the remote system %1.</source>
+        <comment>%1 is name of System</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -137,10 +137,6 @@
     <message>
         <source>Repeat sound</source>
         <translation>サウンド繰返し</translation>
-    </message>
-    <message>
-        <source>Send email</source>
-        <translation>メール送信</translation>
     </message>
     <message>
         <source>Speak</source>
@@ -260,14 +256,6 @@
         <translation>%1 %2</translation>
     </message>
     <message>
-        <source>%1 --&gt; %2</source>
-        <translation>%1 --&gt; %2</translation>
-    </message>
-    <message>
-        <source>Server &apos;%1&apos; has a license problem</source>
-        <translation>サーバー &apos;%1&apos;はライセンスに問題があります</translation>
-    </message>
-    <message>
         <source>An unknown event has occurred</source>
         <translation>不明なイベント</translation>
     </message>
@@ -288,11 +276,6 @@
     <message>
         <source>Caption: %1</source>
         <translation>キャプション: %1</translation>
-    </message>
-    <message>
-        <source>MAC #%1: %2 </source>
-        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation>MAC #%1: %2 </translation>
     </message>
     <message>
         <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -365,10 +348,6 @@
         <translation>アーカイブバックアップ終了</translation>
     </message>
     <message>
-        <source>Server &apos;%1&apos; has finished an archive backup</source>
-        <translation>サーバー &apos;%1&apos;アーカイブバックアップ終了</translation>
-    </message>
-    <message>
         <source>Generic Event at %1</source>
         <translation>一般的イベント  %1</translation>
     </message>
@@ -407,10 +386,6 @@
     <message>
         <source>Archive backup failed: File catalog error</source>
         <translation>アーカイブバックアップ失敗　ファイルカタログエラー</translation>
-    </message>
-    <message>
-        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
-        <translation>アーカイブバックアップ終了しましたが時間超過の為に完全ではありまｓでん　データは %1 にバックアップされます</translation>
     </message>
     <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
@@ -494,6 +469,27 @@
             <numerusform></numerusform>
         </translation>
     </message>
+    <message>
+        <source>Server &quot;%1&quot; has a license problem</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2</source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation type="unfinished">MAC #%1: %2  {1:?} {2?}</translation>
+    </message>
+    <message>
+        <source>Send Email</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -538,24 +534,8 @@
         <translation>httpポート%1.に接続できません.</translation>
     </message>
     <message>
-        <source>Cannot open media url %1. Failed to connect to media port %2.</source>
-        <translation>メディアurl%1.を開けません　メディアポート%2.への接続失敗.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Connection to port %2 was closed unexpectedly.</source>
-        <translation>メディアurl %1を開けません　ポート%2が閉じられました.</translation>
-    </message>
-    <message>
         <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
         <translation>ファームウェアの更新を行ってください　問題が継続する場合はサポートにお問合せください.</translation>
-    </message>
-    <message>
-        <source>No supported media tracks at url %1.</source>
-        <translation>サポートされないメディアトラック　url%1.</translation>
-    </message>
-    <message>
-        <source>Cannot open media url %1. Unsupported media protocol %2.</source>
-        <translation>メディアurl%1が開けません　サポートされないメディアプロトコル %2.</translation>
     </message>
     <message>
         <source>Failed to configure parameter %1.</source>
@@ -588,34 +568,6 @@
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>カメラがネットワークに接続されている事を確認して再起動を行ってください.</translation>
-    </message>
-    <message>
-        <source>Could not parse device response. Url %1, request name %2.</source>
-        <translation>デバイス応答がありません Url %1 リクエスト名 %2.</translation>
-    </message>
-    <message>
-        <source>Could not parse camera response. Url %1, request name %2.</source>
-        <translation>カメラ応答がありません Url %1 リクエスト名 %2.</translation>
-    </message>
-    <message>
-        <source>Not authorized. Url %1.</source>
-        <translation>許可されないUrl %1.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
-        <translation>録画を開始してデバイス設定のFPSを減らしてください.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
-        <translation>録画を開始してカメラ設定のFPSを減らしてください.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
-        <translation>解決しない場合はデバイスWebページより工場出荷時にリストアしてください.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
-        <translation>解決しない場合はカメラWebページより工場出荷時にリストアしてください.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -662,18 +614,6 @@
         <translation>IOモジュールがネットワークに接続されているか確認し　IOモジュールの再起動を行ってください.</translation>
     </message>
     <message>
-        <source>Could not parse I/O module response. Url %1, request name %2.</source>
-        <translation>IOモジュールの応答を解析できませんでした　Url %1,　リクエスト名 %2.</translation>
-    </message>
-    <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
-        <translation>録画設定を行い（設定してない場合）IOモジュールのFPS設定を減らしてください.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
-        <translation>解決しない場合はIOモジュールWebページより工場出荷時にリストアしてください.</translation>
-    </message>
-    <message>
         <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
         <translation>IOモジュールリクエスト &quot;%1&quot; はエラー &quot;%2&quot;.で失敗しました.</translation>
     </message>
@@ -705,6 +645,62 @@
         <source>Make sure port %1 is accessible (e.g. forwarded).</source>
         <translation type="unfinished">ポートt %1 にアクセス可能か確認してください.</translation>
     </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the device web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the camera web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse device response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse camera response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. URL %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No supported media tracks at URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Not authorized. URL %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -729,23 +725,23 @@
         <translation type="unfinished">コーデック%1のエンコーダーを見つけられません.</translation>
     </message>
     <message>
-        <source>Couldn&apos;t initialize resampling context, error code: %1</source>
+        <source>Could not initialize resampling context, error code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t allocate sample buffers, error code: %1</source>
+        <source>Could not allocate sample buffers, error code: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t send audio frame to encoder, Error code: %1.</source>
+        <source>Could not send audio frame to encoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio packet from encoder, Error code: %1.</source>
+        <source>Could not receive audio packet from encoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t receive audio frame from decoder, Error code: %1.</source>
+        <source>Could not receive audio frame from decoder, Error code: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -882,10 +878,6 @@
         <translation>無効なライセンス</translation>
     </message>
     <message>
-        <source>This license type requires higher software version.</source>
-        <translation>このライセンスタイプには新しいバージョンが必要です.</translation>
-    </message>
-    <message>
         <source>Invalid signature</source>
         <translation type="unfinished">無効な署名</translation>
     </message>
@@ -907,6 +899,10 @@
     </message>
     <message>
         <source>Free license</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This license type requires higher software version</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -933,10 +929,6 @@
         <translation>互換性のないライセンスキーを入力しました　サポート窓口にお問合せ下さい.</translation>
     </message>
     <message>
-        <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation>このライセンスキーはハードウェアID {{hwid}}  {{time}} に既にアクティベートされています..</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
         <translation>ライセンスアクティベートエラー　データベースエラー発生.</translation>
     </message>
@@ -945,16 +937,21 @@
         <translation>ライセンスキーのアクティベートエラー　サポート窓口にお問い合わせください.</translation>
     </message>
     <message numerus="yes">
-        <source>Activate %n more %1. </source>
+        <source>Activate %n more %1.</source>
         <translation type="unfinished">
-            <numerusform>アクティベートには追加で %n 以上の %1 が必要.</numerusform>
+            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <source>%n more %1 will be used. </source>
+        <source>%n more %1 will be used.</source>
         <translation type="unfinished">
-            <numerusform> %n 以上の %1 を使用.</numerusform>
+            <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
+        <comment>%1 is a hardware ID, %2 is an activation time</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -962,13 +959,6 @@
     <message>
         <source>New Server</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnPropertyStorage</name>
-    <message>
-        <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
-        <translation>・&apos;%3&apos;の提供した予想される・%2,の因数・&apos;%1&apos;の値が無効です。</translation>
     </message>
 </context>
 <context>
@@ -1065,24 +1055,24 @@
         <translation>未知の値</translation>
     </message>
     <message>
-        <source>Hardware ID: </source>
-        <translation>ハードウェアID:</translation>
-    </message>
-    <message>
-        <source>Watermark: </source>
-        <translation>電子透かし:</translation>
-    </message>
-    <message>
         <source>Trial License</source>
         <translation>トライアルライセンストライアルライセンス</translation>
     </message>
     <message>
-        <source>Licensed To: </source>
-        <translation>以下にライセンス:</translation>
-    </message>
-    <message>
         <source>FREE License</source>
         <translation>無償ライセンス</translation>
+    </message>
+    <message>
+        <source>Hardware ID: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Licensed To: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Watermark: %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1145,11 +1135,6 @@
         <extracomment>Short for &apos;Preset&apos;</extracomment>
         <translation>PS</translation>
     </message>
-    <message>
-        <source>-</source>
-        <extracomment>Short for &apos;Undefined&apos;</extracomment>
-        <translation>未</translation>
-    </message>
 </context>
 <context>
     <name>QnStreamRecorder</name>
@@ -1178,10 +1163,6 @@
         <translation>ビデオまたは音声コーディックは選択したフォーマットと互換性がありません.</translation>
     </message>
     <message>
-        <source>Error during watermark generation for file &apos;%1&apos;.</source>
-        <translation>ファイル &apos;%1&apos;用の電子透かしの作成中にエラーが発生しました.</translation>
-    </message>
-    <message>
         <source>File write error. Not enough free space.</source>
         <translation>空き容量が十分でない為に書き込みエラー.</translation>
     </message>
@@ -1193,7 +1174,7 @@
 <context>
     <name>QnSystemDescription</name>
     <message>
-        <source>&lt;Unnamed system&gt;</source>
+        <source>Unnamed system</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

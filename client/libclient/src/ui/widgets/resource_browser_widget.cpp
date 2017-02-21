@@ -87,7 +87,8 @@ static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* it
         return;
 
     const auto resource = qnResPool->getResourceByUniqueId(item->resourceUid());
-    NX_ASSERT(resource);
+    if (!resource)
+        return;
 
     tree->update(resource);
 }

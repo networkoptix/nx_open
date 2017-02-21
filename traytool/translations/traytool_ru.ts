@@ -24,7 +24,7 @@
     </message>
     <message>
         <source>UAC must be enabled to request privileges for non-admin users.</source>
-        <translation>Контроль учетных записей (UAC) должен быть включен для запроса привилегий пользователей.</translation>
+        <translation>Контроль учетных записей (UAC) должен быть включён для запроса привилегий пользователей.</translation>
     </message>
 </context>
 <context>
@@ -50,34 +50,6 @@
         <translation>Сервисы %1 не установлены</translation>
     </message>
     <message>
-        <source> (stopped)</source>
-        <translation> (остановлен)</translation>
-    </message>
-    <message>
-        <source> (starting)</source>
-        <translation> (запускается)</translation>
-    </message>
-    <message>
-        <source> (stopping)</source>
-        <translation> (заканчивает работу)</translation>
-    </message>
-    <message>
-        <source> (started)</source>
-        <translation> (запущен)</translation>
-    </message>
-    <message>
-        <source> (resuming)</source>
-        <translation> (возобновляется)</translation>
-    </message>
-    <message>
-        <source> (paused)</source>
-        <translation> (пауза)</translation>
-    </message>
-    <message>
-        <source> (pausing)</source>
-        <translation> (приостанавливается)</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;Выход</translation>
     </message>
@@ -95,7 +67,7 @@
     </message>
     <message>
         <source>Server will be stopped. Continue?</source>
-        <translation>Медиасервер будет остановлен. Продолжить?</translation>
+        <translation>Сервер будет остановлен. Продолжить?</translation>
     </message>
     <message>
         <source>Show Server Log</source>
@@ -112,6 +84,34 @@
     <message>
         <source>Server Web Page</source>
         <translation>Открыть web-страницу сервера</translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation>остановлен</translation>
+    </message>
+    <message>
+        <source>starting</source>
+        <translation>запускается</translation>
+    </message>
+    <message>
+        <source>stopping</source>
+        <translation>заканчивает работу</translation>
+    </message>
+    <message>
+        <source>started</source>
+        <translation>запущен</translation>
+    </message>
+    <message>
+        <source>resuming</source>
+        <translation>возобновляется</translation>
+    </message>
+    <message>
+        <source>paused</source>
+        <translation>приостановлен</translation>
+    </message>
+    <message>
+        <source>pausing</source>
+        <translation>приостанавливается</translation>
     </message>
 </context>
 </TS>

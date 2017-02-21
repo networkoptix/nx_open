@@ -80,7 +80,7 @@ void Resources::layoutAlreadyExists(QWidget* parent)
 {
     QnSessionAwareMessageBox::warning(parent,
         tr("There is another layout with the same name"),
-        tr("You don't have permission to overwrite it."));
+        tr("You do not have permission to overwrite it."));
 }
 
 bool Resources::overrideLayout(QWidget* parent)
@@ -191,8 +191,8 @@ bool Resources::changeVideoWallLayout(QWidget* parent,
     const QnResourceList& inaccessible)
 {
     const auto extras = tr("You are going to delete some resources to which you have "
-        "access from Video Wall only. You won't see them in your resource list after it and won't "
-        "be able to add them to Video Wall again.");
+        "access from Video Wall only. You will not see them in your resource list after it and "
+        "will not be able to add them to Video Wall again.");
 
     return showCompositeDialog(parent, QString(),
         tr("You will lose access to following resources:"),

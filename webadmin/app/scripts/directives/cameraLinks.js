@@ -19,6 +19,18 @@ angular.module('webadminApp')
                 scope.resolution = '640p';
                 scope.useAuth = true;
 
+                scope.streamName = function(stream){
+                    switch(stream.encoderIndex){
+                        case 0:
+                            return L.cameraLinks.highStream;
+                        case 1:
+                            return L.cameraLinks.lowStream;
+                        case -1:
+                            return L.cameraLinks.transcoding;
+                    }
+                    return L.cameraLinks.unknown;
+                };
+
                 scope.formatLink = function(camera, stream,transport){
                     var linkTemplates = {
                         'preview': 'http://{{host}}/api/image?physicalId={{physicalId}}{{previewPosition}}{{auth}}',

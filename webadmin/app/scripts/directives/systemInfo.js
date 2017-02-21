@@ -18,6 +18,7 @@ angular.module('webadminApp')
                     }
 
                     server.apiUrl = window.location.protocol + '//' + ips[i] + port;
+                    server.apiUrlFormatted = server.apiUrl.replace('http://','').replace('https://','');
 
                     mediaserver.pingServer(server.apiUrl).catch(function(error){
                         if(i < ips.length-1) {

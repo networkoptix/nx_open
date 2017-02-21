@@ -56,6 +56,8 @@ namespace style
 
     const int Metrics::kPushButtonIconMargin = 6;
 
+    const QSize Metrics::kMinimumDialogSize(400, 64);
+
     const int Metrics::kTabBarFontPixelSize = 12;
     const int Metrics::kTextEditFontPixelSize = 14;
     const int Metrics::kHeaderViewFontPixelSize = 14;

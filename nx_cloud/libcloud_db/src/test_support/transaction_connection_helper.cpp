@@ -12,7 +12,8 @@ namespace test {
 TransactionConnectionHelper::TransactionConnectionHelper():
     m_moduleGuid(QnUuid::createUuid()),
     m_runningInstanceGuid(QnUuid::createUuid()),
-    m_transactionConnectionIdSequence(0)
+    m_transactionConnectionIdSequence(0),
+    m_removeConnectionAfterClosure(false)
 {
 }
 
@@ -20,6 +21,11 @@ TransactionConnectionHelper::~TransactionConnectionHelper()
 {
     closeAllConnections();
     m_aioTimer.pleaseStopSync();
+}
+
+void TransactionConnectionHelper::setRemoveConnectionAfterClosure(bool val)
+{
+    m_removeConnectionAfterClosure = val;
 }
 
 TransactionConnectionHelper::ConnectionId
@@ -144,6 +150,12 @@ void TransactionConnectionHelper::closeAllConnections()
         connectionContext.second.connection->pleaseStopSync();
 }
 
+std::size_t TransactionConnectionHelper::activeConnectionCount() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_connections.size();
+}
+
 ec2::ApiPeerData TransactionConnectionHelper::localPeer() const
 {
     return ec2::ApiPeerData(
@@ -156,18 +168,61 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
     ec2::QnTransactionTransportBase* connection,
     ec2::QnTransactionTransportBase::State newState)
 {
-    if (newState == ec2::QnTransactionTransportBase::Connected)
+    switch (newState)
     {
-        // Connection events are reported under lock.
-        m_aioTimer.post(
-            [connection]()
-            {
-                connection->setState(ec2::QnTransactionTransportBase::ReadyForStreaming);
-                connection->startListening();
-            });
+        case ec2::QnTransactionTransportBase::Connected:
+            moveConnectionToReadyForStreamingState(connection);
+            break;
+
+        case ec2::QnTransactionTransportBase::Error:
+        case ec2::QnTransactionTransportBase::Closed:
+            if (m_removeConnectionAfterClosure)
+                removeConnection(connection);
+            break;
+
+        default:
+            break;
     }
 
     m_condition.wakeAll();
+}
+
+void TransactionConnectionHelper::moveConnectionToReadyForStreamingState(
+    ec2::QnTransactionTransportBase* connection)
+{
+    connection->post(
+        [connection]()
+        {
+            connection->setState(ec2::QnTransactionTransportBase::ReadyForStreaming);
+            connection->startListening();
+        });
+}
+
+void TransactionConnectionHelper::removeConnection(
+    ec2::QnTransactionTransportBase* connection)
+{
+    const auto connectionId = getConnectionId(connection);
+
+    connection->post(
+        [this, connectionId]()
+        {
+            QnMutexLocker lk(&m_mutex);
+            m_connections.erase(connectionId);
+        });
+}
+
+TransactionConnectionHelper::ConnectionId 
+    TransactionConnectionHelper::getConnectionId(
+        ec2::QnTransactionTransportBase* connection) const
+{
+    QnMutexLocker lk(&m_mutex);
+    for (const auto& val: m_connections)
+    {
+        if (val.second.connection.get() == connection)
+            return val.first;
+    }
+
+    return ConnectionId();
 }
 
 } // namespace test
