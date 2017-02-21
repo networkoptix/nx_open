@@ -70,7 +70,7 @@ class Vagrant(object):
             if not config.is_allocated:
                 continue
             for script in config.provision_scripts:
-                shutil.copy2(script, self._vagrant_dir)
+                shutil.copy2(os.path.join(TEST_DIR, script), self._vagrant_dir)
             if box2status[config.box_name()] != 'running':
                 self._start_box(config.box_name())
             self._init_box(config)
