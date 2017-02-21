@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/stun/async_client.h>
+#include <nx/network/stun/async_client_user.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/utils/random.h>
@@ -19,9 +20,14 @@ class StunClient:
     public ::testing::Test
 {
 public:
+    StunClient()
+    {
+        m_stunClient = std::make_shared<nx::stun::AsyncClient>();
+    }
+
     ~StunClient()
     {
-        m_stunClient.pleaseStopSync();
+        m_stunClient->pleaseStopSync();
         if (m_server)
         {
             m_server->pleaseStopSync();
@@ -35,9 +41,26 @@ protected:
         return m_dispatcher;
     }
 
+    std::shared_ptr<nx::stun::AsyncClient> getStunClient()
+    {
+        return m_stunClient;
+    }
+
+    void givenRegularStunServer()
+    {
+        using namespace std::placeholders;
+
+        m_dispatcher.registerRequestProcessor(
+            kTestMethodNumber,
+            std::bind(&StunClient::sendResponse, this, _1, _2));
+
+        startServer();
+    }
+
     void givenClientConnectedToServer()
     {
-        startServer();
+        if (!m_server)
+            startServer();
 
         connectClientToTheServer();
     }
@@ -63,7 +86,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        m_stunClient.connect(m_serverEndpoint, false);
+        m_stunClient->connect(m_serverEndpoint, false);
 
         sendRequest();
     }
@@ -91,30 +114,39 @@ protected:
 
     void connectClientToTheServer()
     {
-        nx::utils::promise<SystemError::ErrorCode> connectedPromise;
-        m_stunClient.setOnConnectionClosedHandler(
+        m_stunClient->setOnConnectionClosedHandler(
             [this](SystemError::ErrorCode closeReason)
             {
                 m_connectionClosedPromise.set_value(closeReason);
             });
-        m_stunClient.connect(
-            m_serverEndpoint,
+
+        nx::utils::promise<SystemError::ErrorCode> connectedPromise;
+        m_stunClient->connect(
+            SocketAddress(HostAddress("localhost"), m_serverEndpoint.port),
             false,
             [&connectedPromise](SystemError::ErrorCode sysErrorCode)
             {
                 connectedPromise.set_value(sysErrorCode);
             });
+
         ASSERT_EQ(SystemError::noError, connectedPromise.get_future().get());
+        ASSERT_EQ(m_serverEndpoint, m_stunClient->remoteAddress());
     }
 
     void sendRequest()
+    {
+        sendRequest(m_stunClient.get());
+    }
+
+    template<typename AsyncClientType>
+    void sendRequest(AsyncClientType* client)
     {
         using namespace std::placeholders;
 
         stun::Message request(stun::Header(
             stun::MessageClass::request,
             kTestMethodNumber));
-        m_stunClient.sendRequest(
+        client->sendRequest(
             std::move(request),
             std::bind(&StunClient::storeRequestResult, this, _1, _2));
     }
@@ -125,7 +157,7 @@ protected:
     }
 
 private:
-    nx::stun::AsyncClient m_stunClient;
+    std::shared_ptr<nx::stun::AsyncClient> m_stunClient;
     nx::utils::promise<SystemError::ErrorCode> m_connectionClosedPromise;
     nx::utils::SyncQueue<SystemError::ErrorCode> m_requestResult;
     SocketAddress m_serverEndpoint;
@@ -137,6 +169,18 @@ private:
         nx::stun::Message /*message*/)
     {
         connection->close();
+    }
+
+    void sendResponse(
+        std::shared_ptr<stun::AbstractServerConnection> connection,
+        nx::stun::Message request)
+    {
+        nx::stun::Message response(
+            stun::Header(
+                stun::MessageClass::successResponse,
+                request.header.method,
+                request.header.transactionId));
+        connection->sendMessage(std::move(response));
     }
 
     void storeRequestResult(SystemError::ErrorCode sysErrorCode, stun::Message /*response*/)
@@ -194,10 +238,20 @@ protected:
 private:
     void randomlyCloseConnection(
         std::shared_ptr<stun::AbstractServerConnection> connection,
-        nx::stun::Message /*message*/)
+        nx::stun::Message request)
     {
         if (nx::utils::random::number<int>(0, 1) > 0)
+        {
             connection->close();
+            return;
+        }
+
+        nx::stun::Message response(
+            stun::Header(
+                stun::MessageClass::successResponse,
+                request.header.method,
+                request.header.transactionId));
+        connection->sendMessage(std::move(response));
     }
 };
 
@@ -208,6 +262,57 @@ TEST_F(FtStunClient, every_request_result_is_delivered)
     thenEveryRequestResultHasBeenReceived();
 }
 
+//-------------------------------------------------------------------------------------------------
+// FtStunClientUser
+
+class FtStunClientUser:
+    public FtStunClient
+{
+protected:
+    void assertIfResponseReportedAfterClientRemoval()
+    {
+        constexpr int kTestRunCount = 100;
+
+        for (int i = 0; i < kTestRunCount; ++i)
+        {
+            std::atomic<bool> clientUserStopped(false);
+            auto clientUser = std::make_unique<AsyncClientUser>(getStunClient());
+
+            stun::Message request(stun::Header(
+                stun::MessageClass::request,
+                kTestMethodNumber));
+            clientUser->sendRequest(
+                std::move(request),
+                [&clientUserStopped](SystemError::ErrorCode /*sysErrorCode*/, stun::Message /*response*/)
+                {
+                    ASSERT_FALSE(clientUserStopped.load());
+                });
+
+            std::this_thread::sleep_for(
+                std::chrono::milliseconds(nx::utils::random::number<int>(0, 10)));
+
+            nx::utils::promise<void> clientUserRemoved;
+            clientUser->post(
+                [&clientUser, &clientUserRemoved, &clientUserStopped]()
+                {
+                    clientUser->pleaseStopSync();
+                    clientUserStopped = true;
+                    clientUserRemoved.set_value();
+                });
+            clientUserRemoved.get_future().wait();
+        }
+    }
+};
+
+TEST_F(FtStunClientUser, correct_cancellation)
+{
+    using namespace std::placeholders;
+
+    givenRegularStunServer();
+    givenClientConnectedToServer();
+    assertIfResponseReportedAfterClientRemoval();
+}
+
 } // namespace test
-} // namespace hpm
+} // namespace stun
 } // namespase nx

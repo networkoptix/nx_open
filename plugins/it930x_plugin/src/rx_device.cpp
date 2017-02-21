@@ -92,7 +92,7 @@ namespace ite
         static const int WATCHDOG_GOOD_TIMEOUT = 3000;      // ms
         static const int WATCHDOG_BAD_TIMEOUT = 3 * 1000;  // ms
 
-        m_watchDogThread = std::thread(
+        m_watchDogThread = nx::utils::thread(
             [this]
             {
                 if(open())

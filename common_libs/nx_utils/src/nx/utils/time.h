@@ -1,5 +1,8 @@
 #pragma once
 
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+
 #include <chrono>
 
 namespace nx {
@@ -19,19 +22,24 @@ NX_UTILS_API std::chrono::seconds timeSinceEpoch();
 NX_UTILS_API std::chrono::steady_clock::time_point monotonicTime();
 
 /**
- * On Linux, get filename of a file which is used to set system time zone.
- * @param timeZoneId IANA id of a time zone.
- * @return On Linux - time zone file name, or a null string if time zone id is not valid; on
- *     other platforms - an empty string.
- */
-NX_UTILS_API QString getTimeZoneFile(const QString& timeZoneId);
-
-/**
  * On Linux, set system time zone. On other platforms, do nothing, return true.
  * @param timeZoneId IANA id of a time zone.
- * @return False on error, invalid timeZoneId or unsupported platform, true on success.
+ * @return False on error, unsupported timeZoneId or unsupported platform, true on success.
  */
 NX_UTILS_API bool setTimeZone(const QString& timeZoneId);
+
+/**
+ * @return List of ids of time zones which are supported by setTimeZone().
+ */
+NX_UTILS_API QStringList getSupportedTimeZoneIds();
+
+/**
+ * Get the current time zone id. ATTENTION: This id is NOT guaranteed to be in the result of
+ * getSupportedTimeZoneIds(). Also it is not guaranteed to be exactly the one actually set by the
+ * previous call to setTimeZone() or by other means, though is guaranteed to have the same
+ * UTC offset as the latter.
+ */
+NX_UTILS_API QString getCurrentTimeZoneId();
 
 /**
  * On Linux, set system date and time. On other plaforms, do nothing, return true.

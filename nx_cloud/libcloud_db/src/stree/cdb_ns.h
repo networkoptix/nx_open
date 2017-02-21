@@ -29,6 +29,7 @@ enum Value
 
     systemId,
     systemStatus,   /** int */
+    customization,
 
     dataAccountRightsOnSystem,
 

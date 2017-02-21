@@ -10,7 +10,7 @@ namespace nx {
 namespace network {
 namespace aio {
 
-class PollSetFactory:
+class NX_NETWORK_API PollSetFactory:
     public Singleton<PollSetFactory>
 {
 public:
@@ -18,6 +18,7 @@ public:
 
     std::unique_ptr<AbstractPollSet> create();
 
+    void enableUdt();
     void disableUdt();
 
 private:

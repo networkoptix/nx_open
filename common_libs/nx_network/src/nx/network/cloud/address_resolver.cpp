@@ -201,21 +201,26 @@ void AddressResolver::resolveAsync(
 {
     if (hostName.isIpAddress())
     {
+        DEBUG_LOG(lm("IP %1 is already resolved").str(hostName));
         AddressEntry entry(AddressType::direct, hostName);
         return handler(SystemError::noError, std::deque<AddressEntry>({std::move(entry)}));
     }
 
-    // Checking if hostName is fixed address.
-    const auto hostStr = hostName.toString().toStdString();
-    const auto ipv4Address = inet_addr(hostStr.c_str());
-    if (ipv4Address != INADDR_NONE)
+    // Checking if hostName is fixed address, to speed up resolution when IPv6 is disabled.
+    if (ipVersion == AF_INET)
     {
-        // Resolved.
-        struct in_addr resolvedAddress;
-        memset(&resolvedAddress, 0, sizeof(resolvedAddress));
-        resolvedAddress.s_addr = ipv4Address;
-        AddressEntry entry(AddressType::direct, HostAddress(resolvedAddress));
-        return handler(SystemError::noError, std::deque<AddressEntry>({ std::move(entry) }));
+        const auto hostStr = hostName.toString().toStdString();
+        const auto ipv4Address = inet_addr(hostStr.c_str());
+        if (ipv4Address != INADDR_NONE)
+        {
+            // Resolved.
+            DEBUG_LOG("Hostname %1 is IP v4 address");
+            struct in_addr resolvedAddress;
+            memset(&resolvedAddress, 0, sizeof(resolvedAddress));
+            resolvedAddress.s_addr = ipv4Address;
+            AddressEntry entry(AddressType::direct, HostAddress(resolvedAddress));
+            return handler(SystemError::noError, std::deque<AddressEntry>({ std::move(entry) }));
+        }
     }
 
     if (SocketGlobals::config().isHostDisabled(hostName))

@@ -7,11 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>550</width>
-    <height>268</height>
+    <height>344</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Merge Systems...</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -114,7 +117,7 @@
               <item row="1" column="1">
                <widget class="QLineEdit" name="loginEdit">
                 <property name="text">
-                 <string>admin</string>
+                 <string notr="true">admin</string>
                 </property>
                </widget>
               </item>
@@ -242,7 +245,7 @@
          <property name="text">
           <string notr="true" extracomment="Text is set in the source file.">Success!
 
-The system was configured successfully.
+System was configured successfully.
 The servers from the remote system should appear in your system soon.</string>
          </property>
          <property name="alignment">

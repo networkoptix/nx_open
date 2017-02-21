@@ -1408,11 +1408,14 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return resyncIfNeeded({ClearLog, ResyncLog});
     }
 
-    if (updateName.endsWith(lit("/83_add_default_webpages.sql")))
+    if (updateName.endsWith(lit("/85_add_default_webpages.sql")))
     {
         return ec2::database::migrations::addDefaultWebpages(m_sdb)
             && resyncIfNeeded(ResyncWebPages);
     }
+
+    if (updateName.endsWith(lit("/86_fill_cloud_user_digest.sql")))
+        return resyncIfNeeded(ResyncUsers);
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
@@ -1964,6 +1967,9 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiSetReso
 
 ErrorCode QnDbManager::saveCamera(const ApiCameraData& params)
 {
+    if (params.physicalId.isEmpty())
+        return ec2::ErrorCode::forbidden;
+
     qint32 internalId;
     ErrorCode result = insertOrReplaceResource(params, &internalId);
     if (result != ErrorCode::ok)

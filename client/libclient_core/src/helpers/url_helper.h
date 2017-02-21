@@ -20,6 +20,8 @@ public:
     Q_INVOKABLE QString password() const;
     Q_INVOKABLE QString path() const;
 
+    Q_INVOKABLE QUrl cleanUrl() const;
+
 private:
     QUrl m_url;
 };

@@ -1,0 +1,11 @@
+pytest
+pytest-timeout
+pytest-capturelog
+pytz
+tzlocal
+requests>=2.12.5
+python-vagrant
+Jinja2
+hachoir-core
+hachoir-parser
+hachoir-metadata

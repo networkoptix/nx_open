@@ -40,7 +40,7 @@ public:
     QVideoFramePtr dequeueVideoFrame();
     qint64 queueVideoDurationUsec() const;
 
-    const AudioOutput* audioOutput() const;
+    ConstAudioOutputPtr audioOutput() const;
 
     /** Can be Invalid if not available. */
     QSize currentResolution() const;
@@ -78,6 +78,9 @@ public:
 
     /** Ask thread to stop. It's a non-blocking call. Thread will be stopped later. */
     virtual void pleaseStop() override;
+
+    /** Turn on / off audio. It allowed to call from other thread. */
+    void setAudioEnabled(bool value);
 signals:
     /** Hint to render to display current data with no delay due to seek operation in progress. */
     void hurryUp();
@@ -141,16 +144,15 @@ private:
     typedef std::unique_ptr<SeamlessVideoDecoder> SeamlessVideoDecoderPtr;
     std::vector<SeamlessVideoDecoderPtr> m_videoDecoders;
     std::unique_ptr<SeamlessAudioDecoder> m_audioDecoder;
-    std::unique_ptr<AudioOutput> m_audioOutput;
+    AudioOutputPtr m_audioOutput;
 
     std::deque<QVideoFramePtr> m_decodedVideo;
     QnWaitCondition m_queueWaitCond;
-    QnMutex m_queueMutex; //< sync with player thread
-    QnMutex m_dataProviderMutex; //< sync with dataProvider thread
-    QnMutex m_decoderMutex; //< sync with create/destroy decoder
+    mutable QnMutex m_queueMutex; //< sync with player thread
+    mutable QnMutex m_jumpMutex; //< sync jump related logic
+    mutable QnMutex m_decoderMutex; //< sync with create/destroy decoder
 
-    int m_awaitJumpCounter; //< how many jump requests are queued
-    int m_buffering; //< reserved for future use for panoramic cameras
+    int m_awaitingJumpCounter; //< how many jump requests are queued
 
     struct BofFrameInfo
     {
@@ -159,20 +161,12 @@ private:
         int videoChannel;
         int frameNumber;
     };
-    BofFrameInfo m_hurryUpToFrame; //< display all data with no delay till this frame number at specified video channel
 
     std::atomic<qint64> m_lastMediaTimeUsec; //< UTC usec timestamp for the very last packet
 
     // Delay video decoding. Used for AV sync.
     std::deque<QnCompressedVideoDataPtr> m_predecodeQueue;
 
-    enum class NoDelayState
-    {
-        Disabled, //< noDelay state isn't used
-        Activated, //< noDelay state is activated
-        WaitForNextBOF //< noDelay will be disabled as soon as next BOF frame is received
-    };
-    NoDelayState m_noDelayState;
     int m_sequence;
 
     VideoGeometryAccessor m_videoGeometryAccessor;
@@ -181,6 +175,7 @@ private:
     std::atomic<qint64> m_lastDisplayedTimeUs;
     MultiSensorHelper m_awaitingFramesMask;
     int m_emptyPacketCounter;
+    std::atomic<bool> m_audioEnabled;
 };
 
 } // namespace media

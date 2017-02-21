@@ -214,17 +214,6 @@ Qn::AuthResult QnAuthHelper::authenticate(
                             return authResult;
                         }
                     }
-                    else if (userResource->isLdap() &&
-                        userResource->passwordExpired())
-                    {
-                        authResult = doPasswordProlongation(userResource);
-                        if (authResult != Qn::Auth_OK) {
-                            //requesting password update from client
-                            nx_http::insertOrReplaceHeader(
-                                &response.headers,
-                                nx_http::HttpHeader(Qn::REALM_HEADER_NAME, desiredRealm.toLatin1()));
-                        }
-                    }
                 }
             }
             else {
@@ -261,27 +250,16 @@ Qn::AuthResult QnAuthHelper::authenticate(
             if (!userResource->isEnabled())
                 return Qn::Auth_WrongLogin;
 
-            if (userResource->isLdap() && !userDigestData.empty())
+            if (userResource->isLdap() &&
+                (userResource->getDigest().isEmpty() || userResource->getRealm() != desiredRealm))
             {
-                //this block is supposed to be executed after changing password on LDAP server
-                //checking for digest in received request
-
                 //checking received credentials for validity
-                if (checkDigestValidity(userResource, userDigestData.ha1Digest) == Qn::Auth_OK)
-                {
-                    //changing stored user's password
-                    applyClientCalculatedPasswordHashToResource(userResource, userDigestData);
-                }
-            }
-
-            if (userResource->getDigest().isEmpty() && userResource->isLdap())
-            {
-                //requesting client to calculate users's digest
-                nx_http::insertOrReplaceHeader(
-                    &response.headers,
-                    nx_http::HttpHeader(Qn::REALM_HEADER_NAME, desiredRealm.toLatin1()));
-
-                return Qn::Auth_WrongDigest;   //user has no password yet
+                Qn::AuthResult authResult = checkDigestValidity(userResource, userDigestData.ha1Digest);
+                if (authResult != Qn::Auth_OK)
+                    return authResult;
+                //changing stored user's password
+                applyClientCalculatedPasswordHashToResource(userResource, userDigestData);
+                userResource->prolongatePassword();
             }
         }
 

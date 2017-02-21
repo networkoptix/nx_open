@@ -28,6 +28,9 @@ void PrintTo(const HostAddress& val, ::std::ostream* os) {
     *os << val.toString().toStdString();
 }
 
+//-------------------------------------------------------------------------------------------------
+// std::chrono
+
 namespace std {
 namespace chrono {
 
@@ -58,3 +61,19 @@ void PrintTo(const time_point<steady_clock>& val, ::std::ostream* os)
 
 }   //chrono
 }   //std
+
+//-------------------------------------------------------------------------------------------------
+// nx::hpm::api
+
+namespace nx {
+namespace hpm {
+namespace api {
+
+void PrintTo(ResultCode val, ::std::ostream* os)
+{
+    *os << toString(val).toStdString();
+}
+
+} // namespace api
+} // namespace hpm
+} // namespace nx

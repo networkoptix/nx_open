@@ -9,6 +9,7 @@
 
 class QTimer;
 class QnAsyncHttpClientReply;
+class HostAddress;
 class SocketAddress;
 struct QnModuleInformation;
 
@@ -30,7 +31,9 @@ public slots:
     void checkUrl(const QUrl &url);
 
 signals:
-    void responseReceived(const QnModuleInformation &moduleInformation, const SocketAddress &address);
+    void responseReceived(
+        const QnModuleInformation &moduleInformation,
+        const SocketAddress &endpoint, const HostAddress &ip);
 
 private:
     void enqueRequest(const QUrl &url);

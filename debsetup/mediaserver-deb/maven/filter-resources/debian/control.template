@@ -3,7 +3,7 @@ Source: ${deb.customization.company.name}-mediaserver
 Version: VERSION
 Installed-Size: INSTALLED_SIZE
 Architecture: ${target.arch}
-Maintainer: ${company.name} <${company.support.address}>
+Maintainer: ${company.name} <${supportEmail}>
 Pre-Depends: debconf
 Depends: ${common.depends}${arch.depends}
 Recommends:
@@ -13,5 +13,5 @@ Replaces: ${deb.customization.company.name}-mediaserver-1.2 (<< VERSION), ${deb.
 Provides: ${deb.customization.company.name}-mediaserver, ${deb.customization.company.name}-entcontroller
 Section: database
 Priority: optional
-Homepage: ${company.url}
-Description: ${company.name} ${display.product.name} Media Server
+Homepage: ${companyUrl}
+Description: ${company.name} ${mediaserver.display.name}

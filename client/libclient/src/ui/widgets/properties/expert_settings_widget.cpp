@@ -13,6 +13,8 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+#include <ui/workaround/widgets_signals_workaround.h>
+#include <ui/common/checkbox_utils.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
@@ -23,6 +25,8 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     m_qualityEditable(false)
 {
     ui->setupUi(this);
+
+    QnCheckbox::autoCleanTristate(ui->checkBoxForceMotionDetection);
 
     setWarningStyle(ui->settingsWarningLabel);
     setWarningStyle(ui->settingsDisabledWarningLabel);
@@ -65,6 +69,23 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     connect(ui->checkBoxSecondaryRecorder, SIGNAL(toggled(bool)), this, SLOT(at_dataChanged()));
     connect(ui->comboBoxTransport, SIGNAL(currentIndexChanged(int)), this, SLOT(at_dataChanged()));
 
+    connect(
+        ui->checkBoxForceMotionDetection, &QCheckBox::stateChanged,
+        [this](int state)
+        {
+            ui->comboBoxForcedMotionStream->setEnabled(
+                static_cast<Qt::CheckState>(state) == Qt::Checked
+                && ui->checkBoxForceMotionDetection->isEnabled());
+        });
+
+    connect(
+        ui->checkBoxForceMotionDetection, &QCheckBox::toggled,
+        this, &QnCameraExpertSettingsWidget::at_dataChanged);
+
+    connect(
+        ui->comboBoxForcedMotionStream, QnComboboxCurrentIndexChanged,
+        this, &QnCameraExpertSettingsWidget::at_dataChanged);
+
     setHelpTopic(ui->qualityGroupBox, Qn::CameraSettings_SecondStream_Help);
     setHelpTopic(ui->settingsDisableControlCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
     setHelpTopic(ui->checkBoxPrimaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);
@@ -105,11 +126,22 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     bool sameRtpTransport = true;
     QString rtpTransport;
 
+    bool sameMdPolicies = true;
+    QString mdPolicy;
+
+    const int kPrimaryStreamMdIndex = 0;
+    const int kSecondaryStreamMdIndex = 1;
+    int forcedMotionStreamIndex = -1;
+    bool allCamerasSupportForceMotion = true;
+
     int camCnt = 0;
     foreach(const QnVirtualCameraResourcePtr &camera, cameras)
     {
         if (isArecontCamera(camera))
             arecontCamerasCount++;
+        if (!camera->supportedMotionType().testFlag(Qn::MT_SoftwareGrid))
+            allCamerasSupportForceMotion = false;
+
         anyHasDualStreaming |= camera->hasDualStreaming();
 
         if (camera->hasDualStreaming()) {
@@ -156,6 +188,24 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
             sameRtpTransport = false;
         rtpTransport = camRtpTransport;
 
+        auto forcedMotionStreamProperty = camera->getProperty(QnMediaResource::motionStreamKey());
+        if (forcedMotionStreamProperty != mdPolicy && camCnt > 0)
+            sameMdPolicies = false;
+        mdPolicy = forcedMotionStreamProperty;
+
+        if (!forcedMotionStreamProperty.isEmpty())
+        {
+            if (forcedMotionStreamProperty == QnMediaResource::primaryStreamValue())
+            {
+                forcedMotionStreamIndex = kPrimaryStreamMdIndex;
+            }
+            else if (forcedMotionStreamProperty == QnMediaResource::secondaryStreamValue()
+                && forcedMotionStreamIndex != kPrimaryStreamMdIndex)
+            {
+                forcedMotionStreamIndex = kSecondaryStreamMdIndex;
+            }
+        }
+
         camCnt++;
     }
 
@@ -201,6 +251,28 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     else
         ui->comboBoxTransport->setCurrentIndex(-1);
 
+    ui->comboBoxForcedMotionStream->clear();
+    ui->comboBoxForcedMotionStream->addItem(tr("Primary"), QnMediaResource::primaryStreamValue());
+
+    if (anyHasDualStreaming)
+        ui->comboBoxForcedMotionStream->addItem(tr("Secondary"), QnMediaResource::secondaryStreamValue());
+
+    bool gotForcedMotionStream = forcedMotionStreamIndex != -1;
+
+    QnCheckbox::setupTristateCheckbox(
+        ui->checkBoxForceMotionDetection,
+        sameMdPolicies,
+        gotForcedMotionStream);
+
+    ui->comboBoxForcedMotionStream->setCurrentIndex(
+         gotForcedMotionStream ? forcedMotionStreamIndex : kPrimaryStreamMdIndex);
+
+    ui->checkBoxForceMotionDetection->setEnabled(allCamerasSupportForceMotion);
+
+    ui->comboBoxForcedMotionStream->setEnabled(
+        ui->checkBoxForceMotionDetection->checkState() == Qt::Checked
+        && ui->checkBoxForceMotionDetection->isEnabled());
+
     updateControlBlock();
     ui->settingsGroupBox->setVisible(arecontCamerasCount != cameras.size());
     ui->settingsDisableControlCheckBox->setTristate(!sameControlState);
@@ -214,7 +286,8 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
             && ui->checkBoxPrimaryRecorder->checkState() == Qt::Unchecked
             && (ui->checkBoxBitratePerGOP->checkState() == Qt::Unchecked || !ui->checkBoxBitratePerGOP->isEnabled())
             && ui->checkBoxSecondaryRecorder->checkState() == Qt::Unchecked
-            && ui->comboBoxTransport->currentIndex() == 0;
+            && ui->comboBoxTransport->currentIndex() == 0
+            && ui->checkBoxForceMotionDetection->checkState() == Qt::Unchecked;
 
     ui->assureCheckBox->setEnabled(!cameras.isEmpty() && defaultValues);
     ui->assureCheckBox->setChecked(!defaultValues);
@@ -230,8 +303,10 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
 
     Qn::SecondStreamQuality quality = (Qn::SecondStreamQuality) sliderPosToQuality(ui->qualitySlider->value());
 
-    for (const QnVirtualCameraResourcePtr &camera: cameras) {
-        if (globalControlEnabled && !isArecontCamera(camera)) {
+    for (const QnVirtualCameraResourcePtr &camera: cameras)
+    {
+        if (globalControlEnabled && !isArecontCamera(camera))
+        {
             if (disableControls)
                 camera->setCameraControlDisabled(true);
             else if (enableControls)
@@ -255,6 +330,22 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
             camera->setProperty(QnMediaResource::rtpTransportKey(), txt);
         }
 
+        auto mdPolicyCheckState = ui->checkBoxForceMotionDetection->checkState();
+        if (mdPolicyCheckState == Qt::Unchecked)
+        {
+            camera->setProperty(QnMediaResource::motionStreamKey(), QString());
+        }
+        else if (mdPolicyCheckState == Qt::Checked)
+        {
+            auto index = ui->comboBoxForcedMotionStream->currentIndex();
+            if (index >= 0)
+            {
+                auto mdPolicy = ui->comboBoxForcedMotionStream->itemData(index).toString();
+
+                if (isMdPolicyAllowedForCamera(camera, mdPolicy))
+                    camera->setProperty(QnMediaResource::motionStreamKey(), mdPolicy);
+            }
+        }
     }
 }
 
@@ -262,6 +353,15 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
 bool QnCameraExpertSettingsWidget::isArecontCamera(const QnVirtualCameraResourcePtr &camera) const {
     QnResourceTypePtr cameraType = qnResTypePool->getResourceType(camera->getTypeId());
     return cameraType && cameraType->getManufacture() == lit("ArecontVision");
+}
+
+bool QnCameraExpertSettingsWidget::isMdPolicyAllowedForCamera(const QnVirtualCameraResourcePtr& camera, const QString& mdPolicy) const
+{
+    bool hasDualStreaming  = camera->hasDualStreaming();
+
+    return mdPolicy.isEmpty() //< Do not force MD policy
+        || mdPolicy == QnMediaResource::primaryStreamValue()
+        || (mdPolicy == QnMediaResource::secondaryStreamValue() && hasDualStreaming);
 }
 
 void QnCameraExpertSettingsWidget::at_dataChanged()
@@ -279,6 +379,8 @@ void QnCameraExpertSettingsWidget::at_restoreDefaultsButton_clicked()
     ui->checkBoxBitratePerGOP->setChecked(false);
     ui->checkBoxSecondaryRecorder->setChecked(false);
     ui->comboBoxTransport->setCurrentIndex(0);
+    ui->checkBoxForceMotionDetection->setCheckState(Qt::Unchecked);
+    ui->comboBoxForcedMotionStream->setCurrentIndex(0);
 }
 
 void QnCameraExpertSettingsWidget::at_qualitySlider_valueChanged(int value) {

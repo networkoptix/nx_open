@@ -254,12 +254,6 @@ SocketAddress::SocketAddress(const char* utf8Str):
 {
 }
 
-SocketAddress::SocketAddress(const QUrl& url):
-    address(url.host()),
-    port((quint16)url.port(0))
-{
-}
-
 bool SocketAddress::operator==(const SocketAddress& rhs) const
 {
     return address == rhs.address && port == rhs.port;

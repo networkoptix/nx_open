@@ -118,7 +118,9 @@ void QnDirectModuleFinder::start() {
 void QnDirectModuleFinder::pleaseStop() {
     m_checkTimer->stop();
     m_requestQueue.clear();
-    for (QnAsyncHttpClientReply *reply: m_activeRequests) {
+    for (auto reply: m_activeRequests)
+    {
+        reply->disconnect(this);
         reply->asyncHttpClient()->pleaseStopSync();
         reply->deleteLater();
     }
@@ -217,10 +219,9 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply)
     if (connectionResult == Qn::IncompatibleInternalConnectionResult)
     {
         NX_LOG(lit("QnDirectModuleFinder. Received reply from incompatible server: url %1, "
-            "customization %2, cloud host %3. Ignoring reply...")
+            "customization %2. Ignoring reply...")
             .arg(url.toString())
-            .arg(moduleInformation.customization)
-            .arg(moduleInformation.cloudHost),
+            .arg(moduleInformation.customization),
              cl_logDEBUG2);
         return;
     }
@@ -231,7 +232,10 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply)
     NX_LOG(lit("QnDirectModuleFinder. Received success reply from url %1")
         .arg(url.toString()), cl_logDEBUG2);
 
-    emit responseReceived(moduleInformation, SocketAddress(url.host(), url.port()));
+    emit responseReceived(
+        moduleInformation,
+        SocketAddress(url.host(), url.port()),
+        reply->asyncHttpClient()->socket()->getForeignAddress().address);
 }
 
 void QnDirectModuleFinder::at_checkTimer_timeout() {

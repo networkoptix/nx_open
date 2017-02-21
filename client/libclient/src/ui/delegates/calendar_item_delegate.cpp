@@ -140,17 +140,20 @@ void QnCalendarItemDelegate::paintCell(QPainter *painter
     painter->drawRect(rect);
 }
 
-void QnCalendarItemDelegate::paintCellText(QPainter *painter
-    , const QPalette &palette
-    , const QRect &rect
-    , const QString &text
-    , bool isEnabled) const
+void QnCalendarItemDelegate::paintCellText(QPainter* painter,
+    const QPalette& palette,
+    const QRect& rect,
+    const QString& text,
+    bool isEnabled,
+    QPalette::ColorRole foregroundRole) const
 {
     const QnScopedPainterPenRollback penRollback(painter);
     const QnScopedPainterFontRollback fontRollback(painter);
 
-    const QColor color = (isEnabled ? palette.color(QPalette::Active, QPalette::Text)
+    const QColor color = (isEnabled
+        ? palette.color(QPalette::Active, foregroundRole)
         : palette.color(QPalette::Disabled, QPalette::Text));
+
     QFont font = painter->font();
     font.setBold(isEnabled);
 

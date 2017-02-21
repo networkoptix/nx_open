@@ -14,12 +14,15 @@ class QnSystemHostsModel: public Connective<QAbstractListModel>
 
     Q_PROPERTY(QString systemId READ systemId WRITE setSystemId NOTIFY systemIdChanged)
     Q_PROPERTY(QUrl firstHost READ firstHost NOTIFY firstHostChanged)
-    Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY isEmptyChanged)
-    Q_PROPERTY(int count READ count NOTIFY countChanged)
 
     using base_type = Connective<QAbstractListModel>;
 
 public:
+    enum Roles
+    {
+        UrlRole = Qt::UserRole + 1
+    };
+
     QnSystemHostsModel(QObject *parent = nullptr);
 
     virtual ~QnSystemHostsModel();
@@ -29,8 +32,6 @@ public: // Properties
 
     void setSystemId(const QString &id);
     QUrl firstHost() const;
-    bool isEmpty() const;
-    int count() const;
 
 public: // overrides
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -38,9 +39,6 @@ public: // overrides
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     QHash<int, QByteArray> roleNames() const override;
-
-public: // QML reachable functions
-    Q_INVOKABLE QVariant getData(const QString& dataRole, int row);
 
 private:
     void reloadHosts();
@@ -60,8 +58,6 @@ private:
 signals:
     void systemIdChanged();
     void firstHostChanged();
-    void isEmptyChanged();
-    void countChanged();
 
 private:
     typedef QScopedPointer<QnDisconnectHelper> DisconnectHelper;

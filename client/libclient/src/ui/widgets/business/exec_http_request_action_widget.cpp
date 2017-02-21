@@ -4,16 +4,34 @@
 #include <business/business_action_parameters.h>
 #include <utils/common/scoped_value_rollback.h>
 
+namespace
+{
+
+static const int kAutoContentItemIndex = 0;
+
+} // namespace
+
 QnExecHttpRequestActionWidget::QnExecHttpRequestActionWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::ExecHttpRequestActionWidget)
 {
     ui->setupUi(this);
 
-    connect(ui->httpUrlLineEdit,      &QLineEdit::textChanged,       this, &QnExecHttpRequestActionWidget::paramsChanged);
-    connect(ui->loginLineEdit,        &QLineEdit::textChanged,       this, &QnExecHttpRequestActionWidget::paramsChanged);
-    connect(ui->passwordLineEdit,     &QLineEdit::textChanged,       this, &QnExecHttpRequestActionWidget::paramsChanged);
-    connect(ui->contentTextEdit,      &QPlainTextEdit::textChanged,  this, &QnExecHttpRequestActionWidget::paramsChanged);
+    connect(ui->httpUrlLineEdit,      &QLineEdit::textChanged,        this, &QnExecHttpRequestActionWidget::paramsChanged);
+    connect(ui->loginLineEdit,        &QLineEdit::textChanged,        this, &QnExecHttpRequestActionWidget::paramsChanged);
+    connect(ui->passwordLineEdit,     &QLineEdit::textChanged,        this, &QnExecHttpRequestActionWidget::paramsChanged);
+    connect(ui->contentTextEdit,      &QPlainTextEdit::textChanged,   this, &QnExecHttpRequestActionWidget::paramsChanged);
+    connect(ui->comboBoxContentType,  &QComboBox::currentTextChanged, this, &QnExecHttpRequestActionWidget::paramsChanged);
+
+    ui->comboBoxContentType->addItem(tr("Auto")); //< should have kAutoContentItemIndex position.
+
+    ui->comboBoxContentType->addItem(lit("text/plain"));
+    ui->comboBoxContentType->addItem(lit("text/html"));
+    ui->comboBoxContentType->addItem(lit("application/html"));
+    ui->comboBoxContentType->addItem(lit("application/json"));
+    ui->comboBoxContentType->addItem(lit("application/xml"));
+
+    Q_ASSERT(ui->comboBoxContentType->itemText(kAutoContentItemIndex) == tr("Auto"));
 }
 
 QnExecHttpRequestActionWidget::~QnExecHttpRequestActionWidget()
@@ -25,7 +43,8 @@ void QnExecHttpRequestActionWidget::updateTabOrder(QWidget *before, QWidget *aft
     setTabOrder(ui->httpUrlLineEdit, ui->loginLineEdit);
     setTabOrder(ui->loginLineEdit, ui->passwordLineEdit);
     setTabOrder(ui->passwordLineEdit, ui->contentTextEdit);
-    setTabOrder(ui->contentTextEdit, after);
+    setTabOrder(ui->contentTextEdit, ui->comboBoxContentType);
+    setTabOrder(ui->comboBoxContentType, after);
 }
 
 void QnExecHttpRequestActionWidget::at_model_dataChanged(QnBusiness::Fields fields)
@@ -39,6 +58,10 @@ void QnExecHttpRequestActionWidget::at_model_dataChanged(QnBusiness::Fields fiel
     const auto params = model()->actionParams();
     QUrl url(params.url);
     ui->contentTextEdit->setPlainText(params.text);
+    if (params.contentType.isEmpty())
+        ui->comboBoxContentType->setCurrentIndex(kAutoContentItemIndex);
+    else
+        ui->comboBoxContentType->setCurrentText(params.contentType);
     ui->httpUrlLineEdit->setText(url.toString(QUrl::RemoveUserInfo));
     ui->loginLineEdit->setText(url.userName());
     ui->passwordLineEdit->setText(url.password());
@@ -61,5 +84,8 @@ void QnExecHttpRequestActionWidget::paramsChanged()
 
     params.url = url.toString();
     params.text = ui->contentTextEdit->toPlainText();
+    params.contentType = ui->comboBoxContentType->currentText().trimmed();
+    if (params.contentType == ui->comboBoxContentType->itemText(kAutoContentItemIndex))
+        params.contentType.clear(); //< Auto value
     model()->setActionParams(params);
 }

@@ -18,7 +18,7 @@ class AudioOutput
 public:
 
     static const qint64 kUnknownPosition = -1;
-    
+
     /**
      * @param initialBufferUsec Initial media buffer size.
      * @param maxBufferUsec Media buffer grows automatically in range
@@ -27,7 +27,7 @@ public:
     AudioOutput(int initialBufferUsec, int maxBufferUsec);
 
     virtual ~AudioOutput();
-            
+
     /** Pause play audio */
     void suspend();
 
@@ -77,6 +77,8 @@ private:
     QScopedPointer<AudioOutputPrivate> d_ptr;
     Q_DECLARE_PRIVATE(AudioOutput);
 };
+typedef std::shared_ptr<AudioOutput> AudioOutputPtr;
+typedef std::shared_ptr<const AudioOutput> ConstAudioOutputPtr;
 
 } // namespace media
 } // namespace nx

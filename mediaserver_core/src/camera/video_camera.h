@@ -14,6 +14,7 @@
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <streaming/hls/hls_live_playlist_manager.h>
 #include <core/dataprovider/live_stream_provider.h>
+#include <api/helpers/thumbnail_request_data.h>
 
 
 class QnVideoCameraGopKeeper;
@@ -31,7 +32,6 @@ public:
     virtual QnLiveStreamProviderPtr getPrimaryReader() override;
     virtual QnLiveStreamProviderPtr getSecondaryReader() override;
 
-
     int copyLastGop(
         bool primaryLiveStream, 
         qint64 skipTime, 
@@ -42,9 +42,15 @@ public:
     //QnMediaContextPtr getVideoCodecContext(bool primaryLiveStream);
     //QnMediaContextPtr getAudioCodecContext(bool primaryLiveStream);
     QnConstCompressedVideoDataPtr getLastVideoFrame(bool primaryLiveStream, int channel) const;
-    QnConstCompressedVideoDataPtr getFrameByTime(bool primaryLiveStream, qint64 time, bool iFrameAfterTime, int channel) const;
     QnConstCompressedAudioDataPtr getLastAudioFrame(bool primaryLiveStream) const;
-	Q_SLOT void at_camera_resourceChanged();
+
+    std::unique_ptr<QnConstDataPacketQueue> getFrameSequenceByTime(
+        bool primaryLiveStream,
+        qint64 time,
+        int channel,
+        QnThumbnailRequestData::RoundMethod roundMethod) const;
+
+    Q_SLOT void at_camera_resourceChanged();
     void beforeStop();
 
     bool isSomeActivity() const;

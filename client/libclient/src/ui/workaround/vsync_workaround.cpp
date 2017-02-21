@@ -37,9 +37,8 @@ bool QnVSyncWorkaround::eventFilter(QObject *object, QEvent *event) {
     return false;
 }
 
-void QnVSyncWorkaround::updateWatchedWidget() {
-    if (qApp->activePopupWidget())
-        qApp->processEvents(QEventLoop::AllEvents, kTimeBetweenUpdatesMs);
+void QnVSyncWorkaround::updateWatchedWidget()
+{
     QEvent forcedUpdate(QEvent::UpdateRequest);
     m_updateEventToPass = &forcedUpdate;
     QCoreApplication::sendEvent(m_watched, &forcedUpdate);

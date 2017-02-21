@@ -120,7 +120,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
         &QnSearchBookmarksDialogPrivate::reset);
 
     m_ui->filterLineEdit->lineEdit()->setPlaceholderText(
-        tr("Search bookmarks by name, tag or description"));
+        tr("Search"));
 
     QnItemViewAutoHider::create(m_ui->gridBookmarks, tr("No bookmarks"));
 }

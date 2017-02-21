@@ -52,8 +52,7 @@ namespace ConnectionType
 }
 
 
-class QnTransactionTransportBase
-:
+class QnTransactionTransportBase:
     public QObject,
     public nx::network::aio::BasicPollable
 {

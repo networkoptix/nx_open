@@ -24,7 +24,6 @@
 #include <watchers/cloud_status_watcher.h>
 #include <watchers/server_address_watcher.h>
 #include <finders/systems_finder.h>
-#include <client/client_recent_connections_manager.h>
 #include <client/system_weights_manager.h>
 #include <utils/media/ffmpeg_initializer.h>
 
@@ -47,7 +46,6 @@ QnMobileClientModule::QnMobileClientModule(
     QObject(parent)
 {
     Q_INIT_RESOURCE(appserver2);
-    Q_INIT_RESOURCE(libclient_core);
     Q_INIT_RESOURCE(mobile_client);
 
     QnMobileClientMetaTypes::initialize();
@@ -84,7 +82,6 @@ QnMobileClientModule::QnMobileClientModule(
     common->store(new QnCameraHistoryPool());
     common->store(new QnRuntimeInfoManager());
     common->store(new QnMobileClientCameraFactory());
-    common->store(new QnClientRecentConnectionsManager());
 
     common->store(new QnResourcesChangesManager());
 

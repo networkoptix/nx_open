@@ -1,47 +1,39 @@
-/**********************************************************
-* Oct 5, 2015
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 namespace nx {
 namespace cdb {
 
-extern const char* kAccountRegisterPath;
-extern const char* kAccountActivatePath;
-extern const char* kAccountGetPath;
-extern const char* kAccountUpdatePath;
-extern const char* kAccountPasswordResetPath;
-extern const char* kAccountReactivatePath;
-extern const char* kAccountCreateTemporaryCredentialsPath;
+extern const char* const kAccountRegisterPath;
+extern const char* const kAccountActivatePath;
+extern const char* const kAccountGetPath;
+extern const char* const kAccountUpdatePath;
+extern const char* const kAccountPasswordResetPath;
+extern const char* const kAccountReactivatePath;
+extern const char* const kAccountCreateTemporaryCredentialsPath;
 
-extern const char* kSystemBindPath;
-extern const char* kSystemUnbindPath;
-extern const char* kSystemGetPath;
-extern const char* kSystemSharePath;
-extern const char* kSystemGetCloudUsersPath;
-extern const char* kSystemGetAccessRoleListPath;
-extern const char* kSystemRenamePath;
-extern const char* kSystemUpdatePath;
-extern const char* kSystemRecordUserSessionStartPath;
+extern const char* const kSystemBindPath;
+extern const char* const kSystemUnbindPath;
+extern const char* const kSystemGetPath;
+extern const char* const kSystemSharePath;
+extern const char* const kSystemGetCloudUsersPath;
+extern const char* const kSystemGetAccessRoleListPath;
+extern const char* const kSystemRenamePath;
+extern const char* const kSystemUpdatePath;
+extern const char* const kSystemRecordUserSessionStartPath;
 
-extern const char* kAuthGetNoncePath;
-extern const char* kAuthGetAuthenticationPath;
+extern const char* const kAuthGetNoncePath;
+extern const char* const kAuthGetAuthenticationPath;
 
-extern const char* kSubscribeToSystemEventsPath;
+extern const char* const kSubscribeToSystemEventsPath;
 
-extern const char* kPingPath;
+extern const char* const kPingPath;
 
-extern const char* kEstablishEc2TransactionConnectionDeprecatedPath;
-extern const char* kPushEc2TransactionDeprecatedPath;
+extern const char* const kEstablishEc2TransactionConnectionPath;
+extern const char* const kDeprecatedEstablishEc2TransactionConnectionPath;
 
-extern const char* kEstablishEc2TransactionConnectionPath;
-extern const char* kPushEc2TransactionPath;
-
-/** Maintenance. */
-extern const char* kMaintenanceGetVmsConnections;
-extern const char* kMaintenanceGetTransactionLog;
+// Maintenance.
+extern const char* const kMaintenanceGetVmsConnections;
+extern const char* const kMaintenanceGetTransactionLog;
 
 } // namespace cdb
 } // namespace nx

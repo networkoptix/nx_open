@@ -12,10 +12,12 @@ class QnResourceListView: public QnTreeView
 {
     using base_type = QnTreeView;
 public:
-    explicit QnResourceListView(QWidget* parent = nullptr);
-    QnResourceListView(const QnResourceList& resources, QWidget* parent = nullptr);
+    /* If parent is specified, the view creates snapped vertical scroll bar at window edge.
+     * If parent is not specified, the view uses normal vertical scroll bar. */
+    explicit QnResourceListView(QWidget* parent);
+    QnResourceListView(const QnResourceList& resources, QWidget* parent);
     QnResourceListView(const QnResourceList& resources, bool simplify,
-        QWidget* parent = nullptr);
+        QWidget* parent);
 
     QnResourceList resources() const;
     void setResources(const QnResourceList& resources);

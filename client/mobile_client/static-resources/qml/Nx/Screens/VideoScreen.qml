@@ -2,6 +2,7 @@ import QtQuick 2.6
 import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
+import Nx.Models 1.0
 import com.networkoptix.qml 1.0
 
 import "private/VideoScreen"
@@ -43,6 +44,8 @@ PageBase
     {
         id: d
 
+        property alias controller: videoScreenController
+
         property var videoNavigation: navigationLoader.item
 
         property bool showOfflineStatus: false
@@ -52,6 +55,20 @@ PageBase
                 || videoScreenController.cameraUnauthorized
                 || videoScreenController.failed)
             && !videoScreenController.mediaPlayer.playing
+
+        property real uiOpacity: 1.0
+        Behavior on uiOpacity
+        {
+            NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
+        }
+
+        property real navigationOpacity: 1.0
+        Behavior on navigationOpacity
+        {
+            NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
+        }
+
+        property real cameraUiOpacity: 1.0
 
         Timer
         {
@@ -67,9 +84,8 @@ PageBase
                 if (videoScreenController.serverOffline)
                 {
                     exitFullscreen()
-                    navigationLoader.opacity = 0.0
-                    navigationBarTint.opacity = 0.0
-                    toolBar.opacity = 1.0
+                    navigationOpacity = 0.0
+                    uiOpacity = 1.0
                 }
                 else if (videoScreenController.cameraOffline)
                 {
@@ -78,8 +94,7 @@ PageBase
             }
             else
             {
-                navigationLoader.opacity = 1.0
-                navigationBarTint.opacity = 1.0
+                d.navigationOpacity = 1.0
             }
         }
     }
@@ -101,7 +116,8 @@ PageBase
             source: lp("/images/toolbar_gradient.png")
         }
 
-        Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+        opacity: d.uiOpacity
+        titleOpacity: d.cameraUiOpacity
 
         controls:
         [
@@ -148,6 +164,9 @@ PageBase
         MenuItem
         {
             text: qsTr("Information")
+            checkable: true
+            checked: showCameraInfo
+            onCheckedChanged: showCameraInfo = checked
         }
     }
 
@@ -160,6 +179,7 @@ PageBase
         height: mainWindow.height
 
         visible: dummyLoader.status != Loader.Ready && !screenshot.visible
+        opacity: d.cameraUiOpacity
 
         mediaPlayer: videoScreenController.mediaPlayer
         resourceHelper: videoScreenController.resourceHelper
@@ -174,6 +194,21 @@ PageBase
         height: sourceSize.height == 0 ? 0 : width * sourceSize.height / sourceSize.width
         y: (mainWindow.height - height) / 3 - header.height
         visible: status == Image.Ready
+        opacity: d.cameraUiOpacity
+    }
+
+    Loader
+    {
+        id: informationLabelLoader
+        anchors.right: parent.right
+        anchors.rightMargin: 8
+        y: header.y
+        opacity: Math.min(d.uiOpacity, d.cameraUiOpacity)
+        active: showCameraInfo
+        sourceComponent: InformationLabel
+        {
+            videoScreenController: d.controller
+        }
     }
 
     Loader
@@ -210,7 +245,7 @@ PageBase
         width: parent.width
 
         visible: opacity > 0
-        Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+        opacity: Math.min(d.uiOpacity, d.navigationOpacity)
 
         sourceComponent: (videoScreenController.accessRightsHelper.canViewArchive
             ? navigationComponent : liveNavigationComponent)
@@ -229,14 +264,7 @@ PageBase
             icon: lp("/images/previous.png")
             radius: width / 2
             z: 1
-            onClicked:
-            {
-                if (!camerasModel)
-                    return
-
-                videoScreen.resourceId = camerasModel.previousResourceId(videoScreen.resourceId)
-                    || camerasModel.previousResourceId("")
-            }
+            onClicked: switchToPreviousCamera()
         }
 
         Button
@@ -254,14 +282,7 @@ PageBase
             icon: lp("/images/next.png")
             radius: width / 2
             z: 1
-            onClicked:
-            {
-                if (!camerasModel)
-                    return
-
-                videoScreen.resourceId = camerasModel.nextResourceId(videoScreen.resourceId)
-                    || camerasModel.nextResourceId("")
-            }
+            onClicked: switchToNextCamera()
         }
     }
 
@@ -271,7 +292,8 @@ PageBase
 
         VideoNavigation
         {
-            mediaPlayer: videoScreenController.mediaPlayer
+            videoScreenController: d.controller
+            controlsOpacity: d.cameraUiOpacity
         }
     }
 
@@ -281,7 +303,7 @@ PageBase
 
         LiveVideoNavigation
         {
-            mediaPlayer: videoScreenController.mediaPlayer
+            videoScreenController: d.controller
         }
     }
 
@@ -294,16 +316,52 @@ PageBase
         height: video.height
         anchors.left: parent.right
         anchors.top: video.top
-
-        Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+        opacity: Math.min(navigationLoader.opacity, d.cameraUiOpacity)
     }
 
+    SequentialAnimation
+    {
+        id: cameraSwitchAnimation
+
+        property string newResourceId
+        property string thumbnail
+
+        NumberAnimation
+        {
+            target: d
+            property: "cameraUiOpacity"
+            to: 0.0
+            duration: 200
+        }
+
+        ScriptAction
+        {
+            script:
+            {
+                videoScreen.resourceId = cameraSwitchAnimation.newResourceId
+                initialScreenshot = cameraSwitchAnimation.thumbnail
+                video.clear()
+            }
+        }
+
+        NumberAnimation
+        {
+            target: d
+            property: "cameraUiOpacity"
+            to: 1.0
+            duration: 200
+        }
+    }
+
+    ModelDataAccessor
+    {
+        id: camerasModelAccessor
+        model: camerasModel
+    }
 
     function hideUi()
     {
-        navigationLoader.opacity = 0.0
-        toolBar.opacity = 0.0
-        navigationBarTint.opacity = 0.0
+        d.uiOpacity = 0.0
         if (Utils.isMobile())
             enterFullscreen()
     }
@@ -311,9 +369,7 @@ PageBase
     function showUi()
     {
         exitFullscreen()
-        navigationLoader.opacity = 1.0
-        toolBar.opacity = 1.0
-        navigationBarTint.opacity = 1.0
+        d.uiOpacity = 1.0
     }
 
     function toggleUi()
@@ -322,5 +378,34 @@ PageBase
             hideUi()
         else
             showUi()
+    }
+
+    function switchToCamera(id)
+    {
+        cameraSwitchAnimation.stop()
+        cameraSwitchAnimation.newResourceId = id
+        cameraSwitchAnimation.thumbnail = camerasModelAccessor.getData(
+            camerasModel.rowByResourceId(id), "thumbnail")
+        cameraSwitchAnimation.start()
+    }
+
+    function switchToPreviousCamera()
+    {
+        if (!camerasModel)
+            return
+
+        switchToCamera(
+            camerasModel.previousResourceId(videoScreen.resourceId)
+                || camerasModel.previousResourceId(""))
+    }
+
+    function switchToNextCamera()
+    {
+        if (!camerasModel)
+            return
+
+        switchToCamera(
+            camerasModel.nextResourceId(videoScreen.resourceId)
+                || camerasModel.nextResourceId(""))
     }
 }

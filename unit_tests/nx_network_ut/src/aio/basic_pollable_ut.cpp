@@ -1,8 +1,12 @@
+#include <atomic>
+
 #include <gtest/gtest.h>
 
-#include <nx/network/aio/aioservice.h>
+#include <nx/network/aio/aio_service.h>
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/aio/pollset_factory.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace network {
@@ -180,6 +184,137 @@ TEST_F(BasicPollable, pleaseStop)
 TEST_F(BasicPollable, pleaseStopSync)
 {
     // TODO
+}
+
+//-------------------------------------------------------------------------------------------------
+// PerformanceBasicPollable
+
+template<typename Func>
+class PerformanceBasicPollable:
+    public BasicPollable
+{
+public:
+    PerformanceBasicPollable(Func func):
+        m_func(func)
+    {
+    }
+
+protected:
+    struct Result
+    {
+        std::chrono::milliseconds testDuration;
+        std::size_t asyncCallsMade;
+    };
+
+    void givenAioServiceWithRegularPollSet()
+    {
+        PollSetFactory::instance()->disableUdt();
+        m_customAioService = std::make_unique<aio::AIOService>();
+        PollSetFactory::instance()->enableUdt();
+        ASSERT_TRUE(m_customAioService->isInitialized());
+    }
+
+    void runTest()
+    {
+        constexpr auto testDuration = std::chrono::seconds(3);
+
+        std::atomic<std::size_t> postCallCounter(0);
+
+        std::unique_ptr<aio::BasicPollable> aioObject;
+        if (m_customAioService)
+            aioObject = std::make_unique<aio::BasicPollable>(m_customAioService.get(), nullptr);
+        else
+            aioObject = std::make_unique<aio::BasicPollable>();
+
+        std::size_t prevCallCounter = (std::size_t)-1;
+        const auto endTime = std::chrono::steady_clock::now() + testDuration;
+        while (std::chrono::steady_clock::now() < endTime)
+        {
+            if (prevCallCounter != postCallCounter)
+            {
+                prevCallCounter = postCallCounter;
+                (aioObject.get()->*m_func)(
+                    [&postCallCounter]()
+                    {
+                        ++postCallCounter;
+                    });
+            }
+
+            std::this_thread::yield();
+        }
+
+        aioObject->pleaseStopSync();
+
+        m_result.testDuration = testDuration;
+        m_result.asyncCallsMade = postCallCounter;
+    }
+
+    void printResult()
+    {
+        using namespace std::chrono;
+
+        std::cout << "post performance. Total " << m_result.asyncCallsMade << " calls made in "
+            << m_result.testDuration.count() << " ms. That gives "
+            << (m_result.asyncCallsMade * 1000 / m_result.testDuration.count()) << " calls per second"
+            << std::endl;
+    }
+
+private:
+    Result m_result;
+    std::unique_ptr<aio::AIOService> m_customAioService;
+    Func m_func;
+};
+
+//-------------------------------------------------------------------------------------------------
+// post
+
+class PerformanceBasicPollablePost:
+    public PerformanceBasicPollable<decltype(&aio::BasicPollable::post)>
+{
+public:
+    PerformanceBasicPollablePost():
+        PerformanceBasicPollable<decltype(&aio::BasicPollable::post)>(&aio::BasicPollable::post)
+    {
+    }
+};
+
+TEST_F(PerformanceBasicPollablePost, defaultPollset)
+{
+    runTest();
+    printResult();
+}
+
+TEST_F(PerformanceBasicPollablePost, regularPollSet)
+{
+    givenAioServiceWithRegularPollSet();
+    runTest();
+    printResult();
+}
+
+//-------------------------------------------------------------------------------------------------
+// dispatch
+
+class PerformanceBasicPollableDispatch:
+    public PerformanceBasicPollable<decltype(&aio::BasicPollable::dispatch)>
+{
+public:
+    PerformanceBasicPollableDispatch():
+        PerformanceBasicPollable<decltype(&aio::BasicPollable::dispatch)>(&aio::BasicPollable::dispatch)
+    {
+    }
+};
+
+TEST_F(PerformanceBasicPollableDispatch, defaultPollset)
+{
+    runTest();
+    printResult();
+}
+
+TEST_F(PerformanceBasicPollableDispatch, regularPollSet)
+{
+    givenAioServiceWithRegularPollSet();
+    runTest();
+    printResult();
 }
 
 } // namespace test

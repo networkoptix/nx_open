@@ -211,6 +211,9 @@ void QnAvailableCameraListModelPrivate::resetResources()
 
 void QnAvailableCameraListModelPrivate::addCamera(const QnResourcePtr& resource, bool silent)
 {
+    if (resources.contains(resource))
+        return;
+
     Q_Q(QnAvailableCameraListModel);
 
     if (!q->filterAcceptsResource(resource))

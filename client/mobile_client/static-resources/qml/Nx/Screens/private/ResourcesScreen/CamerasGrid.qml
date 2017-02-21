@@ -9,6 +9,7 @@ GridView
     property real spacing: 8
     property alias layoutId: camerasModel.layoutId
     property bool keepStatuses: false
+    property bool active: false
 
     cellWidth: (width - leftMargin - rightMargin) / d.thumbnailsInRow
     cellHeight: cellWidth * 3 / 4 + 24 + 16
@@ -35,6 +36,8 @@ GridView
         status: model.resourceStatus
         thumbnail: model.thumbnail
         keepStatus: camerasGrid.keepStatuses
+        resourceId: model.uuid
+        active: camerasGrid.active
 
         onClicked:
         {

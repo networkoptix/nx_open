@@ -3,7 +3,7 @@
 #include <ui/common/geometry.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
-#include <utils/common/unused.h>
+#include <nx/utils/unused.h>
 
 namespace {
 

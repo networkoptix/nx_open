@@ -30,6 +30,7 @@
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <ui/dialogs/common/file_messages.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
@@ -320,7 +321,8 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
 
     dialog->hide();
     qint64 endTime = QDateTime::currentMSecsSinceEpoch();
-    QnMessageBox::information(mainWindow(), lit("Success"), lit("%1 screenshots done for %2 seconds").arg(count).arg((endTime - startTime) / 1000));
+    QnMessageBox::success(mainWindow(),
+        lit("%1 screenshots done for %2 seconds").arg(count).arg((endTime - startTime) / 1000));
 }
 
 
@@ -422,15 +424,11 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
         if (!fileName.toLower().endsWith(selectedExtension)) {
             fileName += selectedExtension;
 
-            if (QFile::exists(fileName)) {
-                QDialogButtonBox::StandardButton button = QnMessageBox::information(
-                    mainWindow(),
-                    tr("Save As"),
-                    tr("File '%1' already exists. Do you want to overwrite it?").arg(QFileInfo(fileName).fileName()),
-                    QDialogButtonBox::Yes | QDialogButtonBox::No
-                    );
-                if (button == QDialogButtonBox::No)
-                    continue;
+            if (QFile::exists(fileName)
+                && !QnFileMessages::confirmOverwrite(
+                    mainWindow(), QFileInfo(fileName).fileName()))
+            {
+                continue;
             }
         }
 
@@ -439,13 +437,10 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
         if (wasLoggedIn && !context()->user())
             return false;
 
-        if (QFile::exists(fileName) && !QFile::remove(fileName)) {
-            QnMessageBox::critical(
-                mainWindow(),
-                tr("Could not overwrite file."),
-                tr("File '%1' is used by another process. Please enter another name.").arg(QFileInfo(fileName).fileName()),
-                QDialogButtonBox::Ok
-                );
+        if (QFile::exists(fileName) && !QFile::remove(fileName))
+        {
+            QnFileMessages::overwriteFailed(
+                mainWindow(), QFileInfo(fileName).fileName());
             continue;
         }
 
@@ -511,14 +506,11 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
     QString filename = parameters.filename;
 
-    if (result.isNull() || !result.save(filename)) {
+    if (result.isNull() || !result.save(filename))
+    {
         hideProgress();
 
-        QnMessageBox::critical(
-            mainWindow(),
-            tr("Could not save screenshot."),
-            tr("An error occurred while saving screenshot '%1'.").arg(QFileInfo(filename).fileName())
-        );
+        QnMessageBox::critical(mainWindow(), tr("Failed to save screenshot"));
         return;
     }
 
@@ -611,9 +603,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
 
     if (!imageProvider)
     {
-        QnMessageBox::warning(mainWindow()
-            , tr("Error")
-            , tr("Error while taking screenshot"));
+        QnMessageBox::critical(mainWindow(), tr("Failed to take screenshot"));
         return;
     }
 

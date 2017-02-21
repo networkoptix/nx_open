@@ -4,8 +4,10 @@
 #include <network/module_finder.h>
 #include <network/system_helpers.h>
 #include <network/local_system_description.h>
+
 #include <nx/network/socket_global.h>
 #include <nx/network/socket_common.h>
+#include <nx/network/url/url_parse_helper.h>
 
 namespace {
 
@@ -186,7 +188,7 @@ void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
     const auto serverHost = systemDescription->getServerHost(moduleInformation.id);
     removeServer(moduleInformation);
     addServer(moduleInformation);
-    updatePrimaryAddress(moduleInformation, SocketAddress(serverHost));
+    updatePrimaryAddress(moduleInformation, nx::network::url::getEndpoint(serverHost));
 }
 
 void QnDirectSystemsFinder::updatePrimaryAddress(const QnModuleInformation &moduleInformation

@@ -413,10 +413,16 @@
                             <name>filter</name>
                             <description>This parameter is used for motion search ("periodsType" must be 1).
                                 Match motion on a video by specified rectangle.
-                                <br/>Format: <code>&lt;rect1&gt;;&lt;rect2&gt;;&lt;rectN&gt;</code>
-                                <br/>Each "rectI" format: <code>&lt;x,y,width,height&gt;</code>
+                                <br/>Format: string with a JSON list of <i>sensors</i>,
+                                each <i>sensor</i> is a JSON list of <i>rects</i>, each <i>rect</i> is:
+                                <br/><code>{"x": <i>x</i>, "y": <i>y</i>, "width": <i>width</i>, "height": <i>height</i>}</code>
                                 <br/>All values are measured in relative portions of a video frame,
-                                "x" and "width" in range [0..43], "y" and "height" in range [0..31].
+                                <i>x</i> and <i>width</i> in range [0..43], <i>y</i> and <i>height</i> in range [0..31],
+                                zero is the left-top corner.
+                                <br/>Example of a full-frame rectangle for a single-sensor camera:
+                                <code>[[{"x":0,"y":0,"width":43,"height":31}]]</code>
+                                <br/>Example of two rectangles for a single-sensor camera:
+                                <code>[[{"x":0,"y":0,"width":5,"height":7},{"x":12,"y":10,"width":8,"height":6}]]</code>
                             </description>
                             <optional>true</optional>
                         </param>
@@ -457,7 +463,7 @@
                                 </value>
                                 <value>
                                     <name>1</name>
-                                    <description>Only chunks with motion (parameter "motionRegions" is required).</description>
+                                    <description>Only chunks with motion (parameter "filter" is required).</description>
                                 </value>
                             </values>
                         </param>
@@ -1063,9 +1069,7 @@
               <function>
                 <name>manualCamera/add</name>
                 <description>
-                  Manually add camera(s). If several cameras are added, parameters
-                  "url" and "manufacturer" must be defined several times with incrementing
-                  suffix "0", "1", etc.
+                  Manually add camera(s).
 <p>
 Parameters should be passed as a JSON object in POST message body with
 content type "application/json". Example of such object:
@@ -1077,8 +1081,8 @@ content type "application/json". Example of such object:
     [
         {
             "uniqueId": "00-1A-07-00-FF-FF",
-            "url": "192.168.0.100"
-            "manufacturer": "3100",
+            "url": "192.168.0.100",
+            "manufacturer": "3100"
         }
     ]
 }
@@ -1410,7 +1414,7 @@ content type "application/json". Example of such object:
                     <params/>
                     <result>
                       <caption>
-                        JSON with error code
+                        JSON with error code.
                         When all is OK errorString will be empty. In case of error errorString will contain:
                         UP_TO_DATE if the provided version is already installed;
                         INVALID_FILE if the provided file cannot be opened as a ZIP archive;
@@ -1484,40 +1488,26 @@ content type "application/json". Example of such object:
                   </function>
                   <function>
                     <name>configure</name>
-                    <description>Configure server parameters.</description>
+                    <description>Configure various server parameters.</description>
                     <permissions>Administrator.</permissions>
-                    <method>GET</method>
+                    <method>POST</method>
                     <params>
                         <param>
                             <name>systemName</name>
-                            <description>New system name for the server.</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>wholeSystem</name>
-                            <description>Flag shows if the specified system name must be set to the all servers in the system.</description>
+                            <description>System display name. It affects all servers in the system.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>port</name>
-                            <description>New listening port.</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>password</name>
-                            <description>New administrator password.</description>
-                            <optional>true</optional>
-                        </param>
-                        <param>
-                            <name>oldPassword</name>
-                            <description>Old administrator password.</description>
+                            <description>Server API port. It affects the current server only.</description>
                             <optional>true</optional>
                         </param>
                     </params>
                     <result>
                         <caption>
-                            JSON with error code and flag "restartNeeded" that shows if the server must be restarted to apply settings.
-                            Error string contains a hint to identify a problem: SYSTEM_NAME, PORT or PASSWORD.
+                            JSON with error code, error string, and flag "restartNeeded" that shows
+                            whether the server must be restarted to apply settings. Error string
+                            contains a hint to identify the problem: "SYSTEM_NAME" or "PORT".
                         </caption>
                     </result>
                 </function>
@@ -1685,7 +1675,7 @@ content type "application/json". Example of such object:
                     <method>GET</method>
                     <params/>
                     <result>
-                        <caption>JSON with error code</caption>
+                        <caption>JSON with error code.</caption>
                     </result>
                 </function>
                 <function proprietary="true">

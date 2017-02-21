@@ -10,6 +10,7 @@ class QnMediaResourceHelper : public Connective<QObject>
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(Qn::ResourceStatus resourceStatus READ resourceStatus NOTIFY resourceStatusChanged)
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
+    Q_PROPERTY(QString serverName READ serverName NOTIFY serverNameChanged)
     Q_PROPERTY(qreal customAspectRatio READ customAspectRatio NOTIFY customAspectRatioChanged)
     Q_PROPERTY(int customRotation READ customRotation NOTIFY customRotationChanged)
     Q_PROPERTY(int channelCount READ channelCount NOTIFY videoLayoutChanged)
@@ -28,6 +29,7 @@ public:
 
     Qn::ResourceStatus resourceStatus() const;
     QString resourceName() const;
+    QString serverName() const;
     qreal customAspectRatio() const;
     int customRotation() const;
     int channelCount() const;
@@ -38,6 +40,7 @@ signals:
     void resourceIdChanged();
     void resourceStatusChanged();
     void resourceNameChanged();
+    void serverNameChanged();
     void customAspectRatioChanged();
     void customRotationChanged();
     void videoLayoutChanged();

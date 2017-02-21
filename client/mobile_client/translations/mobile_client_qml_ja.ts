@@ -75,15 +75,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid email or password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cannot connect to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Email and password cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect Email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -95,6 +99,30 @@
     </message>
     <message>
         <source>Connect to Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter server address</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete login &quot;%1&quot;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete connection?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -192,6 +220,37 @@
     </message>
 </context>
 <context>
+    <name>InformationLabel</name>
+    <message>
+        <source>Unknown</source>
+        <translation type="unfinished">不明</translation>
+    </message>
+    <message>
+        <source>%1 fps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hi-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyfr + Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LaunchButton</name>
     <message>
         <source>Turn On</source>
@@ -205,15 +264,15 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please make sure that display is connected to Nx1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cannot stop client</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Nx1 is offline</source>
+        <source>Please make sure that display is connected to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 is offline</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -316,7 +375,7 @@
 <context>
     <name>ServerOfflineDummy</name>
     <message>
-        <source>Nx1 is offline</source>
+        <source>%1 is offline</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -340,6 +399,13 @@
     </message>
     <message>
         <source>Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SessionItem</name>
+    <message>
+        <source>This server has too old version. Please update it to the latest version.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -387,6 +453,14 @@
     <message>
         <source>Settings</source>
         <translation type="unfinished">設定</translation>
+    </message>
+    <message>
+        <source>Live previews in the cameras list</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save passwords for servers</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -485,8 +559,8 @@
         <translation type="unfinished">カメラオフライン</translation>
     </message>
     <message>
-        <source>Can&apos;t load video</source>
-        <translation type="unfinished">画像が読み込めません</translation>
+        <source>Cannot load video</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

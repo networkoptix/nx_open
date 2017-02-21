@@ -117,8 +117,25 @@ run_watchdog()
 {
     while true; do
         start
-        #avioding sleep mode
-        echo 0 > /sys/class/graphics/fb0/blank
+        # Sometimes our flagship product (Lite Client) behaves slightly incorrectly in certain conditions. 
+        # To avoid confusion, I need to put some background here.
+        # First of all, it can work in 2 different modes:
+        # - web (displaying browser and web-client inside)
+        # - video (displaying video)
+        # Second, to avoid more confusion, it is necessary to mention that "video mode" is subdivided by 2 different ones:
+        # - 2x2: Lite client displays 4 videos and decodes secondary (low resolution) stream from each camera
+        #   (as you know, cameras may deliver several streams simultaneously). Software decoding is used in this case.
+        # - 1x1: Lite client displays 1 video and decodes primary (high resolution) stream from a camera.
+        #   Hardware decoding is used in this case.
+        # So, when Lite Client is working in video mode and 2x2 sub-mode, it turns the display blank 
+        # after a certain timeout (about 5 minutes). It can exit from blank mode by mouse or keyboard.
+        # This behavior should be disabled by the consoleblank=0 parameter passed to the kernel, however in this mode it doesn't work.
+        # Luckily, screen blanking can be forced off by the following command and it will reset the counter.
+        # There are a lot of interesting commands related to display subsystem here:
+        # http://linux-sunxi.org/Display
+        # Todo: add detail explanation how to pass parameters to the kernel, provide more background information, 
+        # resolve further confusion that may arise, make America great again, save the whales.
+        echo "0" >/sys/class/graphics/fb0/blank
         sleep 20
     done
 }

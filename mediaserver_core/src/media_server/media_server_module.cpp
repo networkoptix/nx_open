@@ -18,6 +18,7 @@
 #include <utils/common/buffered_file.h>
 #include <utils/common/writer_pool.h>
 #include "master_server_status_watcher.h"
+#include "settings.h"
 
 QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint, QObject *parent):
     QObject(parent)
@@ -31,9 +32,15 @@ QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint
 #ifdef ENABLE_ONVIF
     store<PasswordHelper>(new PasswordHelper());
 
-    auto soapServer = store(new QnSoapServer());
-    soapServer->bind();
-    soapServer->start();     //starting soap server to accept event notifications from onvif cameras
+    const bool isDiscoveryDisabled =
+        MSSettings::roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
+    QnSoapServer* soapServer = nullptr;
+    if (!isDiscoveryDisabled)
+    {
+        soapServer = store(new QnSoapServer());
+        soapServer->bind();
+        soapServer->start();     //starting soap server to accept event notifications from onvif cameras
+    }
 #endif //ENABLE_ONVIF
 
     m_common = new QnCommonModule(this);

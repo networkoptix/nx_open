@@ -34,6 +34,14 @@ Page
         }
     ]
 
+    Binding
+    {
+        target: resourcesScreen
+        property: "title"
+        value: connectionManager.systemName
+        when: connectionManager.online
+    }
+
     QtObject
     {
         id: d
@@ -95,6 +103,8 @@ Page
 
         keepStatuses: !resourcesScreen.warningVisible
             && connectionManager.connectionState !== QnConnectionManager.Ready
+
+        active: activePage
 
         ScrollIndicator.vertical: ScrollIndicator
         {

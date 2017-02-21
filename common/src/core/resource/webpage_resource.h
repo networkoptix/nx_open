@@ -16,6 +16,8 @@ public:
     virtual QString getUniqueId() const override;
 
     virtual void setUrl(const QString& url) override;
+
+    static QString nameForUrl(const QUrl& url);
 };
 
 Q_DECLARE_METATYPE(QnWebPageResourcePtr)

@@ -230,9 +230,6 @@ void TestConnection::onConnected( SystemError::ErrorCode errorCode )
 
 void TestConnection::startIO()
 {
-    //TODO #ak we need mutex here because async socket API lacks way to start async read and write atomically.
-        //Should note that aio::AIOService provides such functionality
-
     switch (m_transmissionMode)
     {
         case TestTransmissionMode::spam: return startSpamIO();
@@ -525,16 +522,18 @@ bool RandomDataTcpServer::start(std::chrono::milliseconds rwTimeout)
     m_rwTimeout = rwTimeout;
     if (!m_serverSocket)
         m_serverSocket = SocketFactory::createStreamServerSocket();
-    if( !(m_doNotBind || m_serverSocket->bind(m_localAddress)) ||
-        !m_serverSocket->listen() )
+
+    if (!(m_doNotBind || m_serverSocket->bind(m_localAddress)) ||
+        !m_serverSocket->listen() ||
+        !m_serverSocket->setNonBlockingMode(true))
     {
         m_serverSocket.reset();
         return false;
     }
-    m_serverSocket->acceptAsync( std::bind(
-        &RandomDataTcpServer::onNewConnection, this,
-        std::placeholders::_1, std::placeholders::_2 ) );
 
+    m_serverSocket->acceptAsync(std::bind(
+        &RandomDataTcpServer::onNewConnection, this,
+        std::placeholders::_1, std::placeholders::_2));
     return true;
 }
 

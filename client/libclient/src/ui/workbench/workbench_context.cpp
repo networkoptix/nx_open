@@ -229,32 +229,33 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
         case SystemUri::ClientCommand::Client:
         {
             QString systemId = uri.systemId();
-            if (!systemId.isEmpty())
+            if (systemId.isEmpty())
+                return false;
+
+            bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
+
+            QUrl systemUrl = QUrl::fromUserInput(systemId);
+            NX_LOG(lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()), cl_logDEBUG1);
+
+            systemUrl.setUserName(auth.user);
+            systemUrl.setPassword(auth.password);
+
+            if (systemIsCloud)
             {
-                bool systemIsCloud = !QnUuid::fromStringSafe(systemId).isNull();
-
-                QUrl systemUrl = QUrl::fromUserInput(systemId);
-                NX_LOG(lit("Custom URI: Connecting to system %1").arg(systemUrl.toString()), cl_logDEBUG1);
-
-                systemUrl.setUserName(auth.user);
-                systemUrl.setPassword(auth.password);
-
-                if (systemIsCloud)
-                {
-                    qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
-                    NX_LOG(lit("Custom URI: System is cloud, connecting to cloud first"), cl_logDEBUG1);
-                }
-
-                auto parameters = QnActionParameters().withArgument(Qn::UrlRole, systemUrl);
-                parameters.setArgument(Qn::ForceRole, true);
-                menu()->trigger(QnActions::ConnectAction, parameters);
+                qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
+                NX_LOG(lit("Custom URI: System is cloud, connecting to cloud first"), cl_logDEBUG1);
             }
-            break;
+
+            auto parameters = QnActionParameters().withArgument(Qn::UrlRole, systemUrl);
+            parameters.setArgument(Qn::ForceRole, true);
+            menu()->trigger(QnActions::ConnectAction, parameters);
+            return true;
+
         }
         default:
             break;
     }
-    return true;
+    return false;
 }
 
 bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& startupParams)
@@ -302,22 +303,22 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
         }
     }
 
-    /* If no input files were supplied --- open connection settings dialog.
+    /* If no input files were supplied --- open welcome page.
     * Do not try to connect in the following cases:
     * * we were not connected and clicked "Open in new window"
     * * we have opened exported exe-file
-    * Otherwise we should try to connect or show Login Dialog.
+    * Otherwise we should try to connect or show welcome page.
     */
+    const auto welcomeScreen = instance<QnWorkbenchWelcomeScreen>();
+    welcomeScreen->setVisibleControls(true);
+
     if (!connectUsingCustomUri(startupParams.customUri)
         && startupParams.instantDrop.isEmpty()
-        && !haveInputFiles)
+        && !haveInputFiles
+        && !connectUsingCommandLineAuth(startupParams)
+        )
     {
-        if (!connectUsingCommandLineAuth(startupParams))
-        {
-            const auto welcomeScreen = instance<QnWorkbenchWelcomeScreen>();
-            welcomeScreen->setVisibleControls(true);
-            return false;
-        }
+        return false;
     }
 
     if (!startupParams.videoWallGuid.isNull())

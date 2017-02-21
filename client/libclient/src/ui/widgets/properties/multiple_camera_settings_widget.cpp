@@ -225,25 +225,28 @@ bool QnMultipleCameraSettingsWidget::isValidSecondStream()
     if (ui->expertSettingsWidget->isSecondStreamEnabled())
         return true;
 
-    auto button = QnMessageBox::warning(
-        this,
-        tr("Invalid Schedule"),
-        tr("Second stream is disabled on these cameras. Motion + LQ option has no effect. "\
-            "Press \"Yes\" to change recording type to \"Always\" or \"No\" to re-enable second stream."),
-        QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Yes);
+    QnMessageBox dialog(QnMessageBoxIcon::Warning,
+        tr("Secondary stream disabled for these cameras"),
+        tr("\"Motion + Low - Res\" recording option cannot be set."),
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton);
 
-    switch (button)
+    const auto recordAlways = dialog.addButton(
+        tr("Set Recording to \"Always\""), QDialogButtonBox::YesRole);
+    dialog.addButton(
+        tr("Enable Secondary Stream"), QDialogButtonBox::NoRole);
+
+    dialog.setButtonAutoDetection(QnButtonDetection::NoDetection);
+    if (dialog.exec() == QDialogButtonBox::Cancel)
+        return false;
+
+    if (dialog.clickedButton() == recordAlways)
     {
-        case QDialogButtonBox::Yes:
-            ui->cameraScheduleWidget->setScheduleTasks(filteredTasks);
-            return true;
-        case QDialogButtonBox::No:
-            ui->expertSettingsWidget->setSecondStreamEnabled();
-            return true;
-        default:
-            return false;
+        ui->cameraScheduleWidget->setScheduleTasks(filteredTasks);
+        return true;
     }
+
+    ui->expertSettingsWidget->setSecondStreamEnabled();
+    return true;
 }
 
 bool QnMultipleCameraSettingsWidget::hasDbChanges() const
@@ -312,7 +315,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources()
             else
             {
                 ui->loginEdit->setText(QString());
-                ui->loginEdit->setPlaceholderText(tr("<multiple values>", "LoginEdit"));
+                ui->loginEdit->setPlaceholderText(L'<' + tr("multiple values") + L'>');
             }
             m_loginWasEmpty = ui->loginEdit->text().isEmpty();
 
@@ -324,7 +327,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources()
             else
             {
                 ui->passwordEdit->setText(QString());
-                ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
+                ui->passwordEdit->setPlaceholderText(L'<' + tr("multiple values") + L'>');
             }
             m_passwordWasEmpty = ui->passwordEdit->text().isEmpty();
         }

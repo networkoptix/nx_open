@@ -23,7 +23,8 @@ void SystemManager::bindSystem(
     api::SystemRegistrationData registrationData,
     std::function<void(api::ResultCode, api::SystemData)> completionHandler)
 {
-    registrationData.customization = QnAppInfo::customizationName().toStdString();
+    if (registrationData.customization.empty())
+        registrationData.customization = QnAppInfo::customizationName().toStdString();
     executeRequest(
         kSystemBindPath,
         std::move(registrationData),
@@ -45,8 +46,20 @@ void SystemManager::unbindSystem(
 void SystemManager::getSystems(
     std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
 {
+    api::Filter filter;
+    filter.nameToValue.emplace(
+        api::FilterField::customization,
+        QnAppInfo::customizationName().toStdString());
+    getSystemsFiltered(filter, std::move(completionHandler));
+}
+
+void SystemManager::getSystemsFiltered(
+    const api::Filter& filter,
+    std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
+{
     executeRequest(
         kSystemGetPath,
+        filter,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemDataExList()));
 }

@@ -1,8 +1,3 @@
-/**********************************************************
-* Feb 3, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include "../abstract_tunnel_connector.h"
@@ -17,8 +12,7 @@
 #include <nx/network/udt/udt_socket.h>
 
 #include "nx/network/cloud/data/connect_data.h"
-#include "nx/network/cloud/mediator_connections.h"
-
+#include "nx/network/cloud/mediator_client_connections.h"
 
 namespace nx {
 namespace network {

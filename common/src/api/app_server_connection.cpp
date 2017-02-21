@@ -96,7 +96,7 @@ void QnAppServerConnectionFactory::setInstanceGuid(const QnUuid &uuid)
     }
 }
 
-const QnConnectionInfo& QnAppServerConnectionFactory::connectionInfo()
+QnConnectionInfo QnAppServerConnectionFactory::connectionInfo()
 {
     if (auto factory = qn_appServerConnectionFactory_instance())
         return factory->m_connectionInfo;

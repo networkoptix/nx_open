@@ -303,4 +303,10 @@ QnTextInput
             onTriggered: { control.selectAll() }
         }
     }
+
+    Component.onCompleted:
+    {
+        if (Qt.platform.os == "android")
+            passwordCharacter = "\u2022"
+    }
 }

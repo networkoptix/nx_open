@@ -83,7 +83,7 @@ QVariant QnMobileClientSettings::readValueFromSettings(
     {
         case LastUsedConnection:
             return qVariantFromValue(
-                QJson::deserialized<QnLocalConnectionData>(baseValue.toByteArray()));
+                QJson::deserialized<LastConnectionData>(baseValue.toByteArray()));
 
         default:
             break;
@@ -112,7 +112,7 @@ void QnMobileClientSettings::writeValueToSettings(
 
         case LastUsedConnection:
         {
-            auto connection = value.value<QnLocalConnectionData>();
+            auto connection = value.value<LastConnectionData>();
             processedValue = QString::fromUtf8(QJson::serialized(connection));
             break;
         }

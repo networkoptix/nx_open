@@ -25,7 +25,6 @@ Module
     property string showcaseUrl: "http://networkoptix.com/files/showcase"
     property string testUpdateFeedUrl: "http://updates.hdwitness.com/updates.json"
     property string prodUpdateFeedUrl: "http://updates.hdwitness.com/updates.json"
-    property string updateUrl: "http://networkoptix.com/download"
     property string updateGeneratorUrl: "http://updates.hdw.mx/upcombiner/upcombine"
     property string supportEmail: "support@networkoptix.com"
     property string supportUrl: "http://support.networkoptix.com"
@@ -49,6 +48,9 @@ Module
 
     property string backgroundImage:
         '{"enabled": true, "name": ":/skin/background.png", "mode": "Crop", "opacity": "0.03"}'
+
+    property string defaultWebPages:
+        '{"Home Page": "http://networkoptix.com", "Support": "http://support.networkoptix.com"}'
 
     property string macBundleIdentifier: "com.networkoptix.HDWitness2"
 

@@ -10,7 +10,9 @@
 class QTimer;
 class QnAbstractSystemsFinder;
 
-typedef QHash<QString, QnWeightData> QnWeightsDataHash;
+using nx::client::core::WeightData;
+
+typedef QHash<QString, WeightData> QnWeightsDataHash;
 
 class QnSystemsWeightsManager:
     public QObject,
@@ -28,6 +30,10 @@ public:
 
     qreal unknownSystemsWeight() const;
 
+    void setWeight(
+        const QnUuid& localSystemId,
+        qreal weight);
+
 signals:
     void weightsChanged();
 
@@ -38,7 +44,7 @@ private:
 
     void setUnknownSystemsWeight(qreal value);
 
-    void addLocalWeightData(const QnWeightData& data);
+    void addLocalWeightData(const WeightData& data);
 
     void processSystemDiscovered(const QnSystemDescriptionPtr& system);
 

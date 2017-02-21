@@ -1,0 +1,57 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# This file is generated from {{ template_fpath }}. Don't edit manually, your changes may be lost!
+
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box_url = "http://noptix.enk.me/vagrant-boxes/ubuntu-14-04-functest-20160906.box"
+  config.vm.box = "autotest"
+  config.ssh.forward_agent = true
+
+  config.vm.provider :virtualbox do |vb|
+    vb.memory = 512
+    vb.cpus = 1
+    vb.customize [:modifyvm, :id, "--cpuexecutioncap", "75"]
+    vb.customize [:modifyvm, :id, "--ioapic", "on"]
+    vb.customize [:modifyvm, :id, "--vram", "32"]
+    # network created by virtualbox by default conflicts with nx moscow local network 10.0.2.0/23; natnet1 will override it
+    vb.customize [:modifyvm, :id, "--natnet1", "{{ natnet1 }}"]
+  end
+
+
+  {% for box in boxes -%}
+
+  config.vm.define "{{ box.box_name() }}" do |box|
+
+    box.vm.provider :virtualbox do |vb|
+      vb.name = "{{ box.vm_box_name() }}"
+
+      {%- for command in box.get_vagrant_config_commands('virtualbox') %}
+
+      {{ command.expand('vb') }}
+
+      {%- endfor %}
+    end
+
+    {%- if box.ip_address %}
+
+    box.ssh.host = "{{ box.ip_address }}"
+    box.ssh.port = 22
+
+    {%- endif %}
+
+    box.vm.hostname = "{{ box.box_name() }}"
+
+    {% for command in box.get_vagrant_config_commands('vm') -%}
+
+    {{ command.expand('box') }}
+
+    {% endfor %}
+  
+  end
+
+  {% endfor %}
+
+end

@@ -44,12 +44,9 @@ int QnGetTimeZonesRestHandler::executeGet(
 {
     std::vector<TimeZoneInfo> outputData;
 
-    for (const auto& timeZoneId: QTimeZone::availableTimeZoneIds())
+    for (const auto& timeZoneId: nx::utils::getSupportedTimeZoneIds())
     {
-        if (nx::utils::getTimeZoneFile(timeZoneId).isNull())
-            continue;
-
-        QTimeZone timeZone(timeZoneId);
+        QTimeZone timeZone(timeZoneId.toLatin1());
         TimeZoneInfo record;
         record.id = timeZone.id();
         record.displayName = timeZone.displayName(

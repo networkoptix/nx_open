@@ -104,10 +104,11 @@ void TemporaryAccountPasswordManager::registerTemporaryCredentials(
 
 std::string TemporaryAccountPasswordManager::generateRandomPassword() const
 {
-    const auto buffer = nx::utils::generateRandomName(
-        nx::utils::random::number<size_t>(10, 20));
-
-    return std::string(buffer.data(), buffer.size());
+    std::string password(nx::utils::random::number<size_t>(10, 20), 'a');
+    std::generate(
+        password.begin(), password.end(),
+        []() { return nx::utils::random::number<int>('a', 'z'); });
+    return password;
 }
 
 void TemporaryAccountPasswordManager::addRandomCredentials(

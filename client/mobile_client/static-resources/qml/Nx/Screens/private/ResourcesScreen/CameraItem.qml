@@ -3,6 +3,7 @@ import Qt.labs.templates 1.0
 import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
+import Nx.Settings 1.0
 import com.networkoptix.qml 1.0
 
 Control
@@ -13,6 +14,9 @@ Control
     property string thumbnail
     property int status
     property bool keepStatus: false
+    property alias resourceId: resourceHelper.resourceId
+
+    property bool active: false
 
     signal clicked()
     signal thumbnailRefreshRequested()
@@ -31,6 +35,14 @@ Control
                                status == QnCameraListModel.NotDefined ||
                                status == QnCameraListModel.Unauthorized
         property bool unauthorized: status == QnCameraListModel.Unauthorized
+
+        // This property prevents video component re-creation while scrolling.
+        property bool videoAllowed: false
+    }
+
+    QnMediaResourceHelper
+    {
+        id: resourceHelper
     }
 
     Binding
@@ -72,10 +84,15 @@ Control
                     if (d.offline)
                         return thumbnailDummyComponent
 
-                    if (!cameraItem.thumbnail)
-                        return thumbnailPreloaderComponent
+                    if (!d.videoAllowed || !settings.liveVideoPreviews)
+                    {
+                        if (!cameraItem.thumbnail)
+                            return thumbnailPreloaderComponent
 
-                    return thumbnailComponent
+                        return thumbnailComponent
+                    }
+
+                    return videoComponent
                 }
             }
         }
@@ -180,6 +197,75 @@ Control
         }
     }
 
+    Component
+    {
+        id: videoComponent
+
+        Item
+        {
+            width: thumbnailContainer.width
+            height: thumbnailContainer.height
+
+            VideoPositioner
+            {
+                id: video
+
+                anchors.fill: parent
+                customAspectRatio: resourceHelper.customAspectRatio || mediaPlayer.aspectRatio
+                videoRotation: resourceHelper.customRotation
+                sourceSize: Qt.size(videoOutput.sourceRect.width, videoOutput.sourceRect.height)
+                visible: mediaPlayer.playing
+
+                item: QnVideoOutput
+                {
+                    id: videoOutput
+                    player: mediaPlayer
+                    fillMode: QnVideoOutput.Stretch
+                }
+            }
+
+            Image
+            {
+                anchors.fill: parent
+                source: cameraItem.thumbnail
+                fillMode: Qt.KeepAspectRatio
+                visible: !video.visible && status === Image.Ready
+            }
+
+            ThreeDotBusyIndicator
+            {
+                anchors.centerIn: parent
+                visible: !video.visible
+            }
+
+            MediaPlayer
+            {
+                id: mediaPlayer
+
+                resourceId: cameraItem.resourceId
+                Component.onCompleted:
+                {
+                    if (active)
+                        playLive()
+                }
+                videoQuality: QnPlayer.LowIframesOnlyVideoQuality
+                audioEnabled: false
+            }
+
+            Connections
+            {
+                target: cameraItem
+                onPausedChanged:
+                {
+                    if (active)
+                        mediaPlayer.playLive()
+                    else
+                        mediaPlayer.stop()
+                }
+            }
+        }
+    }
+
     Timer
     {
         id: refreshTimer
@@ -189,7 +275,7 @@ Control
 
         interval: initialLoadDelay
         repeat: true
-        running: connectionManager.connectionState === QnConnectionManager.Ready
+        running: active && connectionManager.connectionState === QnConnectionManager.Ready
 
         onTriggered:
         {
@@ -202,5 +288,12 @@ Control
             if (!running)
                 interval = initialLoadDelay
         }
+    }
+
+    Timer
+    {
+        interval: 2000
+        running: active
+        onTriggered: d.videoAllowed = true
     }
 }

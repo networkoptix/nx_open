@@ -5,7 +5,6 @@
 
 #include <QtXml/QXmlDefaultHandler>
 
-#include <api/global_settings.h>
 #include <common/common_globals.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
@@ -33,8 +32,10 @@ static DeviceSearcher* UPNPDeviceSearcherInstance = nullptr;
 const QString DeviceSearcher::DEFAULT_DEVICE_TYPE = lit("%1 Server")
         .arg(QnAppInfo::organizationName());
 
-DeviceSearcher::DeviceSearcher( unsigned int discoverTryTimeoutMS )
+DeviceSearcher::DeviceSearcher(
+    QnGlobalSettings* globalSettings, unsigned int discoverTryTimeoutMS )
 :
+    m_globalSettings(globalSettings),
     m_discoverTryTimeoutMS( discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS ),
     m_timerID( 0 ),
     m_readBuf( new char[READ_BUF_CAPACITY] ),
@@ -285,8 +286,22 @@ void DeviceSearcher::onSomeBytesRead(
         startFetchDeviceXml( uuidStr, descriptionUrl, remoteHost );
 }
 
+static bool isUpnpMulticastEnabled(const QnGlobalSettings* settings)
+{
+    if (!settings)
+        return true;
+
+    if (settings->isNewSystem())
+        return false;
+
+    return settings->isAutoDiscoveryEnabled() || settings->isUpnpPortMappingEnabled();
+}
+
 void DeviceSearcher::dispatchDiscoverPackets()
 {
+    if (!isUpnpMulticastEnabled(m_globalSettings))
+        return;
+
     for(const  QnInterfaceAndAddr& iface: getAllIPv4Interfaces() )
     {
         const std::shared_ptr<AbstractDatagramSocket>& sock = getSockByIntf(iface);

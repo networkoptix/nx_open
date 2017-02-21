@@ -12,9 +12,11 @@ Object
     readonly property bool serverOffline:
         connectionManager.connectionState === QnConnectionManager.Reconnecting
     readonly property bool cameraOffline:
-        mediaPlayer.liveMode && resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
+        mediaPlayer.liveMode
+            && resourceHelper.resourceStatus === QnMediaResourceHelper.Offline
     readonly property bool cameraUnauthorized:
-        mediaPlayer.liveMode && resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
+        mediaPlayer.liveMode
+            && resourceHelper.resourceStatus === QnMediaResourceHelper.Unauthorized
     readonly property bool failed: mediaPlayer.failed
     readonly property bool offline: serverOffline || cameraOffline
 
@@ -36,11 +38,15 @@ Object
     property alias accessRightsHelper: accessRightsHelper
     property alias mediaPlayer: mediaPlayer
 
+    signal playerJump(real position)
+
     QtObject
     {
         id: d
         property bool resumeOnActivate: false
         property bool resumeOnOnline: false
+        property real lastPosition: -1
+        property bool waitForLastPosition: false
     }
 
     QnMediaResourceHelper
@@ -60,6 +66,14 @@ Object
         resourceId: resourceHelper.resourceId
         onPlayingChanged: setKeepScreenOn(playing)
         maxTextureSize: getMaxTextureSize()
+        onMediaStatusChanged:
+        {
+            if (d.waitForLastPosition && mediaStatus == QnPlayer.Loaded)
+            {
+                d.lastPosition = position
+                d.waitForLastPosition = false
+            }
+        }
     }
 
     Connections
@@ -70,7 +84,7 @@ Object
             if (!Utils.isMobile())
                 return
 
-            if (Qt.application.state == Qt.ApplicationActive)
+            if (Qt.application.state === Qt.ApplicationActive)
             {
                 if (d.resumeOnActivate)
                     mediaPlayer.play()
@@ -101,6 +115,12 @@ Object
         }
     }
 
+    onResourceIdChanged:
+    {
+        playerJump(d.lastPosition)
+        mediaPlayer.position = d.lastPosition
+    }
+
     Component.onCompleted:
     {
         if (cameraOffline || cameraUnauthorized || resourceId == "")
@@ -109,4 +129,38 @@ Object
         mediaPlayer.playLive()
     }
     Component.onDestruction: setKeepScreenOn(false)
+
+    function play()
+    {
+        mediaPlayer.play()
+
+        d.lastPosition = mediaPlayer.liveMode ? -1 : mediaPlayer.position
+        d.waitForLastPosition = (mediaPlayer.mediaStatus !== QnPlayer.Loaded)
+    }
+
+    function playLive()
+    {
+        mediaPlayer.position = -1
+        play()
+    }
+
+    function stop()
+    {
+        mediaPlayer.stop()
+    }
+
+    function pause()
+    {
+        mediaPlayer.pause()
+    }
+
+    function preview()
+    {
+        mediaPlayer.preview()
+    }
+
+    function setPosition(position)
+    {
+        mediaPlayer.position = position
+    }
 }

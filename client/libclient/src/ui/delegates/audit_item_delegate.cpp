@@ -532,12 +532,11 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
             linkRect.setLeft(actualRect.right());
 
         QString elidedLinkText = option.fontMetrics.elidedText(linkText, option.textElideMode, linkRect.width());
-
-        QPalette::ColorGroup group = option.state.testFlag(QStyle::State_MouseOver) ? QPalette::Normal : QPalette::Inactive;
+        QColor linkColor = style::linkColor(option.palette, option.state.testFlag(QStyle::State_MouseOver));
 
         QFont font(option.font);
         painter->setFont(font);
-        painter->setPen(option.palette.color(group, QPalette::Link));
+        painter->setPen(linkColor);
         painter->drawText(linkRect, kTextFlags, elidedLinkText);
     }
 

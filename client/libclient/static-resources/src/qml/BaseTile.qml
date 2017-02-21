@@ -10,6 +10,7 @@ Item
     id: control;
 
     property Item visualParent;
+    property Item view;
 
     property alias tileColor: tileArea.color;
     property bool isHovered: (hoverIndicator.containsMouse ||
@@ -44,8 +45,15 @@ Item
     function forceCollapsedState()
     {
         control.forceImmediateAnimation = true;
+        tileHolder.state = "expanded";
         tileHolder.state = "collapsed";
         control.forceImmediateAnimation = false;
+    }
+
+    function cancelAnimationOnCollapse()
+    {
+        if (transition.running && tileHolder.state == "collapsed")
+            control.forceCollapsedState();
     }
 
     function toggle()
@@ -56,6 +64,8 @@ Item
     implicitWidth: 280;
     implicitHeight: 96;
     z: (transition.running ? 100 : 0)
+
+    onSystemIdChanged: { forceCollapsedState(); }
 
     Connections
     {
@@ -68,16 +78,17 @@ Item
           */
         target: parent;
 
-        onXChanged:
-        {
-            if (transition.running && tileHolder.state == "collapsed")
-            {
-                tileHolder.state = "expanded"
-                tileHolder.state = "collapsed"
-            }
-        }
+        onXChanged: { control.cancelAnimationOnCollapse(); }
     }
 
+    Connections
+    {
+        target: view;
+        onXChanged: { control.cancelAnimationOnCollapse(); }
+        onYChanged: { control.cancelAnimationOnCollapse(); }
+        onWidthChanged: { control.cancelAnimationOnCollapse(); }
+        onHeightChanged: { control.cancelAnimationOnCollapse(); }
+    }
 
     Item
     {

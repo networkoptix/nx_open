@@ -163,6 +163,9 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this, batchToggleCheckboxes);
     connect(ui->controlsTreeView,  &QnTreeView::spacePressed, this, batchToggleCheckboxes);
 
+    connect(ui->resourcesTreeView, &QnTreeView::selectionChanging,
+        this, &QnAccessibleResourcesWidget::handleSelectionChanging);
+
     connect(ui->resourcesTreeView, &QAbstractItemView::entered, this, &QnAccessibleResourcesWidget::updateThumbnail);
     updateThumbnail();
 }
@@ -477,5 +480,37 @@ void QnAccessibleResourcesWidget::at_itemViewKeyPress(QObject* watched, QEvent* 
             default:
                 break;
         }
+    }
+}
+
+/* Shift-mouseclick selection process should set checkboxes
+ * in all affected rows to the state the originating row has. */
+void QnAccessibleResourcesWidget::handleSelectionChanging(
+    QItemSelectionModel::SelectionFlags selectionFlags,
+    const QModelIndex& index, const QEvent* event)
+{
+    const bool specialHandling = event && event->type() == QEvent::MouseButtonPress
+        && static_cast<const QMouseEvent*>(event)->modifiers().testFlag(Qt::ShiftModifier);
+
+    if (!specialHandling)
+        return;
+
+    const auto current = ui->resourcesTreeView->currentIndex(); //< originating item
+    if (!current.isValid() || !index.isValid() || !selectionFlags.testFlag(QItemSelectionModel::Select))
+        return;
+
+    const auto newCheckValue = current.sibling(current.row(),
+        QnAccessibleResourcesModel::CheckColumn).data(Qt::CheckStateRole);
+
+    QAbstractItemModel* model = ui->resourcesTreeView->model();
+
+    QPair<int, int> range(index.row(), current.row());
+    if (range.first > range.second)
+        qSwap(range.first, range.second);
+
+    for (int i = range.first; i <= range.second; ++i)
+    {
+        model->setData(index.sibling(i, QnAccessibleResourcesModel::CheckColumn),
+            newCheckValue, Qt::CheckStateRole);
     }
 }

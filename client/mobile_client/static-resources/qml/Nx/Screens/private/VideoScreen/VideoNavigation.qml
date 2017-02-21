@@ -11,9 +11,10 @@ Item
     id: videoNavigation
 
     property string resourceId
-    property var mediaPlayer
+    property var videoScreenController
+    property bool paused: videoScreenController.mediaPlayer.playbackState !== QnPlayer.Playing
 
-    property bool paused: mediaPlayer.playbackState != QnPlayer.Playing
+    property real controlsOpacity: 1.0
 
     implicitWidth: parent ? parent.width : 0
     implicitHeight: navigator.height + navigationPanel.height
@@ -23,7 +24,19 @@ Item
     {
         id: d
 
+        property real controlsOpacity: videoNavigation.controlsOpacity
+        property real timelineOpacity: cameraChunkProvider.loading ? 0.0 : 1.0
+        Behavior on timelineOpacity
+        {
+            NumberAnimation { duration: d.timelineOpacity > 0 ? 0 : 200 }
+        }
+
         readonly property bool hasArchive: timeline.startBound > 0
+        readonly property bool liveMode:
+            videoScreenController
+                && videoScreenController.mediaPlayer.liveMode
+                && !playbackController.paused
+        property real resumePosition: -1
 
         function updateNavigatorPosition()
         {
@@ -45,7 +58,7 @@ Item
     QnCameraChunkProvider
     {
         id: cameraChunkProvider
-        resourceId: mediaPlayer.resourceId
+        resourceId: videoScreenController.resourceId
     }
 
     Timer
@@ -121,6 +134,16 @@ Item
 
         Image
         {
+            width: parent.width
+            anchors.bottom: timeline.bottom
+            height: timeline.chunkBarHeight
+            source: lp("/images/timeline_chunkbar_preloader.png")
+            sourceSize: Qt.size(timeline.chunkBarHeight, timeline.chunkBarHeight)
+            fillMode: Image.Tile
+        }
+
+        Image
+        {
             width: timeline.width
             height: sourceSize.height
             anchors.bottom: timeline.bottom
@@ -135,13 +158,13 @@ Item
 
             property bool resumeWhenDragFinished: false
 
-            enabled: startBound > 0
+            enabled: d.hasArchive
 
             anchors.bottom: parent.bottom
             width: parent.width
             height: 104
 
-            stickToEnd: mediaPlayer.liveMode && !paused
+            stickToEnd: d.liveMode && !paused
 
             chunkBarHeight: 32
             textY: height - chunkBarHeight - 16 - 24
@@ -153,18 +176,24 @@ Item
             {
                 if (!moving)
                 {
-                    mediaPlayer.position = position
+                    videoScreenController.setPosition(position)
                     if (resumeWhenDragFinished)
-                        mediaPlayer.play()
+                        videoScreenController.play()
+                    else
+                        videoScreenController.pause()
                 }
             }
-            onPositionTapped: mediaPlayer.position = position
+            onPositionTapped:
+            {
+                d.resumePosition = -1
+                videoScreenController.setPosition(position)
+            }
             onPositionChanged:
             {
                 if (!dragging)
                     return
 
-                mediaPlayer.position = position
+                videoScreenController.setPosition(position)
             }
 
             onDraggingChanged:
@@ -172,7 +201,8 @@ Item
                 if (dragging)
                 {
                     resumeWhenDragFinished = !videoNavigation.paused
-                    mediaPlayer.pause()
+                    videoScreenController.preview()
+                    d.resumePosition = -1
                 }
             }
 
@@ -180,8 +210,8 @@ Item
             {
                 target: timeline
                 property: "position"
-                value: mediaPlayer.position
-                when: !timeline.moving && !mediaPlayer.liveMode
+                value: videoScreenController.mediaPlayer.position
+                when: !timeline.moving && !d.liveMode
             }
         }
 
@@ -227,9 +257,12 @@ Item
 
         OpacityMask
         {
+            id: timelineOpactiyMask
+
             anchors.fill: timeline
             source: timeline.timelineView
             maskSource: timelineMask
+            opacity: Math.min(d.controlsOpacity, d.timelineOpacity)
 
             Component.onCompleted: timeline.timelineView.visible = false
         }
@@ -243,8 +276,8 @@ Item
             anchors.bottom: timeline.bottom
             anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2
             color: ColorTheme.windowText
-            visible: timeline.startBound <= 0
-            opacity: 0.5
+            visible: !d.hasArchive
+            opacity: 0.5 * timelineOpactiyMask.opacity
         }
 
         Pane
@@ -302,9 +335,9 @@ Item
                 onClicked:
                 {
                     playbackController.checked = false
-                    mediaPlayer.playLive()
+                    videoScreenController.playLive()
                 }
-                opacity: mediaPlayer.liveMode ? 0.0 : 1.0
+                opacity: d.liveMode ? 0.0 : 1.0
                 Behavior on opacity { NumberAnimation { duration: 200 } }
             }
 
@@ -332,6 +365,7 @@ Item
             width: parent.width
             anchors.bottom: timeline.bottom
             anchors.bottomMargin: timeline.chunkBarHeight + 16
+            opacity: d.controlsOpacity
 
             Text
             {
@@ -348,7 +382,7 @@ Item
                 text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy", "DO NOT TRANSLATE THIS STRING!"))
                 color: ColorTheme.windowText
 
-                opacity: mediaPlayer.liveMode ? 0.0 : 1.0
+                opacity: d.liveMode ? 0.0 : 1.0
                 Behavior on opacity { NumberAnimation { duration: 200 } }
             }
 
@@ -358,7 +392,7 @@ Item
 
                 anchors.horizontalCenter: parent.horizontalCenter
 
-                y: mediaPlayer.liveMode ? (parent.height - height) / 2 : parent.height - height
+                y: d.liveMode ? (parent.height - height) / 2 : parent.height - height
                 Behavior on y { NumberAnimation { duration: 200 } }
 
                 width: timeLabel.visible ? timeLabel.width : liveLabel.width
@@ -368,7 +402,7 @@ Item
                 {
                     id: timeLabel
                     dateTime: timeline.positionDate
-                    visible: !mediaPlayer.liveMode
+                    visible: !d.liveMode
                 }
 
                 Text
@@ -379,7 +413,7 @@ Item
                     font.weight: Font.Normal
                     color: ColorTheme.windowText
                     text: qsTr("LIVE")
-                    visible: mediaPlayer.liveMode
+                    visible: d.liveMode
                 }
             }
         }
@@ -392,14 +426,28 @@ Item
             anchors.verticalCenterOffset: -150
             anchors.horizontalCenter: parent.horizontalCenter
 
-            loading: !paused && (mediaPlayer.loading || timeline.dragging)
+            loading: !paused && (videoScreenController.mediaPlayer.loading || timeline.dragging)
             paused: videoNavigation.paused
+
+            opacity: d.controlsOpacity
+
             onClicked:
             {
                 if (paused)
-                    mediaPlayer.play()
+                {
+                    if (d.resumePosition > 0)
+                    {
+                        videoScreenController.setPosition(d.resumePosition)
+                        d.resumePosition = -1
+                    }
+                    videoScreenController.play()
+                }
                 else
-                    mediaPlayer.pause()
+                {
+                    if (d.liveMode)
+                        d.resumePosition = videoScreenController.mediaPlayer.position
+                    videoScreenController.pause()
+                }
             }
         }
 
@@ -410,7 +458,7 @@ Item
             anchors.bottom: playbackController.bottom
             width: 2
             height: 8
-            visible: timeline.startBound > 0
+            visible: d.hasArchive
         }
 
         Rectangle
@@ -420,7 +468,7 @@ Item
             anchors.bottom: parent.bottom
             width: 2
             height: timeline.chunkBarHeight + 8
-            visible: timeline.startBound > 0
+            visible: d.hasArchive
         }
     }
 
@@ -443,7 +491,8 @@ Item
             onDatePicked:
             {
                 close()
-                mediaPlayer.position = date.getTime()
+                d.resumePosition = -1
+                videoScreenController.setPosition(date.getTime())
             }
         }
     }
@@ -457,4 +506,10 @@ Item
     }
 
     Component.onCompleted: d.updateNavigatorPosition()
+
+    Connections
+    {
+        target: videoScreenController
+        onPlayerJump: timeline.jumpTo(position)
+    }
 }

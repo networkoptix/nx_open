@@ -2,7 +2,7 @@
 #include "widget_table_delegate.h"
 
 #include <QtCore/QVarLengthArray>
-#include <private/qabstractitemmodel_p.h>
+#include <QtCore/private/qabstractitemmodel_p.h>
 
 #include <utils/common/event_processors.h>
 

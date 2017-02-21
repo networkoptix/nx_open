@@ -32,11 +32,12 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/delegates/business_rule_item_delegate.h>
+#include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/common/item_view_auto_hider.h>
-
+#include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
@@ -227,6 +228,9 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     ui->tableView->installEventFilter(this);
 
+    ui->tableView->setMinimumHeight(style::Metrics::kHeaderSize
+        + style::Metrics::kButtonHeight * style::Hints::kMinimumTableRows);
+
     ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate(this));
 
     connect(m_rulesViewModel, &QAbstractItemModel::dataChanged, this, &QnBusinessRulesDialog::at_model_dataChanged);
@@ -390,46 +394,56 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
     if (!accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
         return;
 
-    if (QnMessageBox::warning(this,
-                             tr("Confirm Rules Reset"),
-                             tr("Are you sure you want to reset rules to the defaults?") + L'\n' +
-                                tr("This action CANNOT be undone!"),
-                             QDialogButtonBox::StandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel),
-                             QDialogButtonBox::Cancel) == QDialogButtonBox::Cancel)
+    QnMessageBox dialog(QnMessageBoxIcon::Question,
+        tr("Reset all rules to default?"),
+        tr("This action cannot be undone."),
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
+        this);
+
+    dialog.addCustomButton(QnMessageBoxCustomButton::Reset,
+        QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
+    if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
     QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager(Qn::kSystemAccess)->resetBusinessRules(
         ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
 }
 
-void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChange change, bool ok) {
-    if (!ok) {
-        switch (change) {
-        case RulesLoaded:
-            QnMessageBox::critical(this, tr("Error"), tr("Error while receiving rules."));
-            break;
-        case RuleSaved:
-            QnMessageBox::critical(this, tr("Error"), tr("Error while saving rule."));
-            break;
+void QnBusinessRulesDialog::at_afterModelChanged(QnBusinessRulesActualModelChange change, bool ok)
+{
+    if (!ok)
+    {
+        switch (change)
+        {
+            case RulesLoaded:
+                QnMessageBox::critical(this, tr("Failed to retrieve rules"));
+                break;
+            case RuleSaved:
+                QnMessageBox::critical(this, tr("Failed to save rule"));
+                break;
         }
         return;
     }
 
-    if (change == RulesLoaded) {
+    if (change == RulesLoaded)
+    {
         updateFilter();
     }
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_resources_deleted( int handle, ec2::ErrorCode errorCode ) {
+void QnBusinessRulesDialog::at_resources_deleted( int handle, ec2::ErrorCode errorCode )
+{
     if (!m_deleting.contains(handle))
         return;
 
-    if( errorCode != ec2::ErrorCode::ok ) {
-        QnMessageBox::critical(this, tr("Error while deleting rule."), ec2::toString(errorCode));
+    if(errorCode != ec2::ErrorCode::ok)
+    {
+        QnMessageBox::critical(this, ec2::toString(errorCode));
         m_pendingDeleteRules.append(m_deleting[handle]);
         return;
     }
+
     m_deleting.remove(handle);
     updateControlButtons();
 }
@@ -474,31 +488,34 @@ void QnBusinessRulesDialog::createActions() {
     m_popupMenu->addAction(scheduleAct);
 }
 
-bool QnBusinessRulesDialog::saveAll() {
+bool QnBusinessRulesDialog::saveAll()
+{
     QModelIndexList modified = m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, -1, Qt::MatchExactly);
     QModelIndexList invalid = m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ValidRole, false, -1, Qt::MatchExactly);
     QSet<QModelIndex> invalid_modified = invalid.toSet().intersect(modified.toSet());
 
-    if (!invalid_modified.isEmpty()) {
-        QDialogButtonBox::StandardButton btn =  QnMessageBox::question(this,
-                          tr("Confirm Save"),
-                          tr("Some rules are not valid. Should they be disabled?"),
-                          QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-                          QDialogButtonBox::Cancel);
+    if (!invalid_modified.isEmpty())
+    {
+        const QDialogButtonBox::StandardButton btn =
+            QnMessageBox::warning(this,
+                tr("Some rules are not valid. Disable them?"), QString(),
+                QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
+                QDialogButtonBox::Yes);
 
-        switch (btn) {
-        case QDialogButtonBox::Yes:
-            foreach (QModelIndex idx, invalid_modified) {
-                m_rulesViewModel->rule(idx)->setDisabled(true);
-            }
-            break;
-        case QDialogButtonBox::No:
-            break;
-        default:
-            return false;
+        switch (btn)
+        {
+            case QDialogButtonBox::Yes:
+                foreach (QModelIndex idx, invalid_modified)
+                {
+                    m_rulesViewModel->rule(idx)->setDisabled(true);
+                }
+                break;
+            case QDialogButtonBox::No:
+                break;
+            default:
+                return false;
         }
     }
-
 
     foreach (QModelIndex idx, modified) {
         m_rulesViewModel->saveRule(idx);
@@ -578,18 +595,18 @@ bool QnBusinessRulesDialog::tryClose(bool force) {
     if (!hasChanges)
         return true;
 
-    QDialogButtonBox::StandardButton btn =  QnMessageBox::question(this,
-        tr("Confirm Exit"),
-        tr("Unsaved changes will be lost. Save?"),
-        QDialogButtonBox::Yes | QDialogButtonBox::No | QDialogButtonBox::Cancel,
-        QDialogButtonBox::Cancel);
+    const auto result = QnMessageBox::question(this,
+        tr("Apply changes before exit?"), QString(),
+        QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Apply);
 
-    switch (btn) {
-    case QDialogButtonBox::Yes:
+    switch (result)
+    {
+    case QDialogButtonBox::Apply:
         if (!saveAll())
             return false;   // Cancel was pressed in the confirmation dialog
         break;
-    case QDialogButtonBox::No:
+    case QDialogButtonBox::Discard:
         m_rulesViewModel->reset();
         break;
     default:

@@ -19,7 +19,7 @@
 #include <isd/amux/amux_iface.h>
 #endif
 #include <utils/media/pts_to_clock_mapper.h>
-#include <nx/network/aio/aioeventhandler.h>
+#include <nx/network/aio/aio_event_handler.h>
 #include <nx/network/aio/pollable.h>
 
 #include "isd_audio_packet.h"

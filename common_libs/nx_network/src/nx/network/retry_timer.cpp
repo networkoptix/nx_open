@@ -18,12 +18,11 @@ constexpr const std::chrono::milliseconds RetryPolicy::kNoMaxDelay;
 constexpr const std::chrono::milliseconds RetryPolicy::kDefaultInitialDelay;
 constexpr const std::chrono::milliseconds RetryPolicy::kDefaultMaxDelay;
 
-RetryPolicy::RetryPolicy()
-:
-    m_maxRetryCount(kDefaultMaxRetryCount),
-    m_initialDelay(kDefaultInitialDelay),
-    m_delayMultiplier(kDefaultDelayMultiplier),
-    m_maxDelay(kDefaultMaxDelay)
+RetryPolicy::RetryPolicy():
+    maxRetryCount(kDefaultMaxRetryCount),
+    initialDelay(kDefaultInitialDelay),
+    delayMultiplier(kDefaultDelayMultiplier),
+    maxDelay(kDefaultMaxDelay)
 {
 }
 
@@ -33,60 +32,19 @@ RetryPolicy::RetryPolicy(
     unsigned int delayMultiplier,
     std::chrono::milliseconds maxDelay)
 :
-    m_maxRetryCount(maxRetryCount),
-    m_initialDelay(initialDelay),
-    m_delayMultiplier(delayMultiplier),
-    m_maxDelay(maxDelay)
+    maxRetryCount(maxRetryCount),
+    initialDelay(initialDelay),
+    delayMultiplier(delayMultiplier),
+    maxDelay(maxDelay)
 {
 }
 
 bool RetryPolicy::operator==(const RetryPolicy& rhs) const
 {
-    return m_maxRetryCount == rhs.m_maxRetryCount
-        && m_initialDelay == rhs.m_initialDelay
-        && m_delayMultiplier == rhs.m_delayMultiplier
-        && m_maxDelay == rhs.m_maxDelay;
-}
-
-void RetryPolicy::setMaxRetryCount(unsigned int retryCount)
-{
-    m_maxRetryCount = retryCount;
-}
-
-unsigned int RetryPolicy::maxRetryCount() const
-{
-    return m_maxRetryCount;
-}
-
-void RetryPolicy::setInitialDelay(std::chrono::milliseconds delay)
-{
-    m_initialDelay = delay;
-}
-
-std::chrono::milliseconds RetryPolicy::initialDelay() const
-{
-    return m_initialDelay;
-}
-
-/** Value of 0 means no multiplier (actually, same as 1) */
-void RetryPolicy::setDelayMultiplier(unsigned int multiplier)
-{
-    m_delayMultiplier = multiplier;
-}
-
-unsigned int RetryPolicy::delayMultiplier() const
-{
-    return m_delayMultiplier;
-}
-
-void RetryPolicy::setMaxDelay(std::chrono::milliseconds delay)
-{
-    m_maxDelay = delay;
-}
-
-std::chrono::milliseconds RetryPolicy::maxDelay() const
-{
-    return m_maxDelay;
+    return maxRetryCount == rhs.maxRetryCount
+        && initialDelay == rhs.initialDelay
+        && delayMultiplier == rhs.delayMultiplier
+        && maxDelay == rhs.maxDelay;
 }
 
 
@@ -96,11 +54,12 @@ std::chrono::milliseconds RetryPolicy::maxDelay() const
 
 RetryTimer::RetryTimer(const RetryPolicy& policy, aio::AbstractAioThread* aioThread):
     aio::BasicPollable(aioThread),
+    m_timer(std::make_unique<aio::Timer>(aioThread)),
     m_retryPolicy(policy),
     m_triesMade(0)
 {
+    bindToAioThread(getAioThread());
     reset();
-    m_timer = std::make_unique<aio::Timer>(aioThread);
 }
 
 RetryTimer::~RetryTimer()
@@ -120,10 +79,10 @@ bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFun
         return false;
 
     if ((m_triesMade > 0) &&
-        (m_retryPolicy.delayMultiplier() > 0) &&
+        (m_retryPolicy.delayMultiplier > 0) &&
         (m_currentDelay < m_effectiveMaxDelay))
     {
-        auto newDelay = m_currentDelay * m_retryPolicy.delayMultiplier();
+        auto newDelay = m_currentDelay * m_retryPolicy.delayMultiplier;
         if (newDelay == std::chrono::milliseconds::zero())
             newDelay = std::chrono::milliseconds(1);
         if (newDelay < m_currentDelay)
@@ -143,10 +102,10 @@ bool RetryTimer::scheduleNextTry(nx::utils::MoveOnlyFunc<void()> doAnotherTryFun
 
 unsigned int RetryTimer::retriesLeft() const
 {
-    if (m_retryPolicy.maxRetryCount() == RetryPolicy::kInfiniteRetries)
+    if (m_retryPolicy.maxRetryCount == RetryPolicy::kInfiniteRetries)
         return RetryPolicy::kInfiniteRetries;
 
-    return m_retryPolicy.maxRetryCount() - m_triesMade;
+    return m_retryPolicy.maxRetryCount - m_triesMade;
 }
 
 boost::optional<std::chrono::nanoseconds> RetryTimer::timeToEvent() const
@@ -161,12 +120,28 @@ std::chrono::milliseconds RetryTimer::currentDelay() const
 
 void RetryTimer::reset()
 {
-    m_currentDelay = m_retryPolicy.initialDelay();
+    m_currentDelay = m_retryPolicy.initialDelay;
     m_effectiveMaxDelay = 
-        m_retryPolicy.maxDelay() == RetryPolicy::kNoMaxDelay
+        m_retryPolicy.maxDelay == RetryPolicy::kNoMaxDelay
         ? std::chrono::milliseconds::max()
-        : m_retryPolicy.maxDelay();
+        : m_retryPolicy.maxDelay;
     m_triesMade = 0;
+}
+
+void RetryTimer::cancelAsync(nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    m_timer->cancelAsync(
+        [this, completionHandler = std::move(completionHandler)]()
+        {
+            reset();
+            completionHandler();
+        });
+}
+
+void RetryTimer::cancelSync()
+{
+    m_timer->cancelSync();
+    reset();
 }
 
 void RetryTimer::stopWhileInAioThread()
@@ -174,5 +149,5 @@ void RetryTimer::stopWhileInAioThread()
     m_timer.reset();
 }
 
-}   //network
-}   //nx
+} // namespace network
+} // namespace nx

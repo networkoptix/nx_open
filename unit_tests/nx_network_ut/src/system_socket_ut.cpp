@@ -1,4 +1,4 @@
-
+#include <memory>
 #include <thread>
 
 #include <gtest/gtest.h>
@@ -8,6 +8,7 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 
+#include "common_server_socket_ut.h"
 
 namespace nx {
 namespace network {
@@ -18,26 +19,26 @@ TEST( TcpSocket, KeepAliveOptions )
     if( SocketFactory::isStreamSocketTypeEnforced() )
         return;
 
-    const auto socket = std::make_unique< TCPSocket >(AF_INET );
+    const auto socket = std::make_unique< TCPSocket >( AF_INET );
     boost::optional< KeepAliveOptions > result;
-    result.is_initialized();
 
     // Enable
-    ASSERT_TRUE( socket->setKeepAlive( KeepAliveOptions( 5, 1, 3 ) ) );
+    typedef std::chrono::seconds seconds;
+    ASSERT_TRUE( socket->setKeepAlive( KeepAliveOptions( seconds(5), seconds(1), 3 ) ) );
     ASSERT_TRUE( socket->getKeepAlive( &result ) );
     ASSERT_TRUE( static_cast< bool >( result ) );
 
     #if defined( Q_OS_LINUX )
-        EXPECT_EQ( result->timeSec, 5 );
-        EXPECT_EQ( result->intervalSec, 1 );
+        EXPECT_EQ( result->time.count(), 5 );
+        EXPECT_EQ( result->interval.count(), 1 );
         EXPECT_EQ( result->probeCount, 3 );
     #elif defined( Q_OS_WIN )
-        EXPECT_EQ( result->timeSec, 5 );
-        EXPECT_EQ( result->intervalSec, 1 );
+        EXPECT_EQ( result->time.count(), 5 );
+        EXPECT_EQ( result->interval.count(), 1 );
         EXPECT_EQ( result->probeCount, 0 ); // means default
-    #else
-        EXPECT_EQ( result->timeSec, 0 ); // means default
-        EXPECT_EQ( result->intervalSec, 0 ); // means default
+    #elif defined( Q_OS_MACX )
+        EXPECT_EQ( result->time.count(), 5 );
+        EXPECT_EQ( result->interval.count(), 0 ); // means default
         EXPECT_EQ( result->probeCount, 0 ); // means default
     #endif
 
@@ -49,7 +50,7 @@ TEST( TcpSocket, KeepAliveOptions )
 
 TEST(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
 {
-    const auto socket = std::make_unique< TCPSocket >(AF_INET );
+    const auto socket = std::make_unique< TCPSocket >( AF_INET );
     boost::optional< KeepAliveOptions > result;
     ASSERT_TRUE( socket->getKeepAlive( &result ) );
     ASSERT_FALSE( static_cast< bool >( result ) );
@@ -58,7 +59,8 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
 static void waitForKeepAliveDisconnect(AbstractStreamSocket* socket)
 {
     Buffer buffer(1024, Qt::Uninitialized);
-    ASSERT_TRUE(socket->setKeepAlive(KeepAliveOptions(10, 5, 3)));
+    ASSERT_TRUE(socket->setKeepAlive(KeepAliveOptions(
+        std::chrono::seconds(10), std::chrono::seconds(5), 3)));
 
     NX_LOG(lm("waitForKeepAliveDisconnect recv"), cl_logINFO);
     EXPECT_LT(socket->recv(buffer.data(), buffer.size()), 0);
@@ -75,7 +77,7 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsServer)
     NX_LOGX(lm("Server address: %1").str(server->getLocalAddress()), cl_logINFO);
 
     std::unique_ptr<AbstractStreamSocket> client(server->accept());
-    ASSERT_TRUE(client);
+    ASSERT_TRUE(client != nullptr);
     waitForKeepAliveDisconnect(client.get());
 }
 
@@ -115,6 +117,20 @@ TEST(TcpServerSocketIpv6, BindsToLocalAddress)
     ASSERT_EQ(HostAddress::localhost, socket.getLocalAddress().address);
 }
 
+TEST(TcpSocket, ConnectErrorReporting)
+{
+    // Connecting to port 1 which is reserved for now deprecated TCPMUX service.
+    // So, in most cases can expect port 1 to be unused.
+    const SocketAddress localAddress(HostAddress::localhost, 1);
+
+    TCPSocket tcpSocket(AF_INET);
+    const bool connectResult = tcpSocket.connect(localAddress, 1500);
+    const auto connectErrorCode = SystemError::getLastOSErrorCode();
+    ASSERT_FALSE(connectResult);
+    ASSERT_NE(SystemError::noError, connectErrorCode);
+    ASSERT_FALSE(tcpSocket.isConnected());
+}
+
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     TEST, TcpSocketV4,
     [](){ return std::make_unique<TCPServerSocket>(AF_INET); },
@@ -125,17 +141,19 @@ NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     [](){ return std::make_unique<TCPServerSocket>(AF_INET6); },
     [](){ return std::make_unique<TCPSocket>(AF_INET6); })
 
-// TODO: Figure out why it does not work for any local address:
-NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE(
+// NOTE: Currenly IP v4 address 127.0.0.1 is represented as ::1 IP v6 address, which is not true.
+// TODO: Enable these tests when IP v6 is properly supported.
+NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE(
     TEST, DISABLED_TcpSocketV4to6,
     [](){ return std::make_unique<TCPServerSocket>(AF_INET6); },
     [](){ return std::make_unique<TCPSocket>(AF_INET); })
 
-// TODO: Figure out why it does not work for any local address:
-NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE(
+NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE(
     TEST, DISABLED_TcpSocketV6to4,
     [](){ return std::make_unique<TCPServerSocket>(AF_INET); },
     [](){ return std::make_unique<TCPSocket>(AF_INET6); })
+
+INSTANTIATE_TYPED_TEST_CASE_P(TCPServerSocket, ServerSocketTest, TCPServerSocket);
 
 }   //test
 }   //network

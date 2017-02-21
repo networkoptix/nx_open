@@ -172,29 +172,32 @@ void GraphicsLabel::changeEvent(QEvent *event) {
     base_type::changeEvent(event);
 }
 
-void GraphicsLabel::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
+void GraphicsLabel::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
     Q_D(GraphicsLabel);
-
     base_type::paint(painter, option, widget);
 
-    if(d->performanceHint == PixmapCaching) 
+    if (d->performanceHint == PixmapCaching)
     {
         d->ensurePixmaps();
-
         const auto dpiPixmapSize = (d->pixmap.size() / d->pixmap.devicePixelRatio());
         const QPointF position = QnGeometry::aligned(dpiPixmapSize, rect(), d->alignment).topLeft();
         paintPixmapSharp(painter, d->pixmap, position);
     }
-    else 
+    else
     {
         QnScopedPainterPenRollback penRollback(painter, d->textColor());
         QnScopedPainterFontRollback fontRollback(painter, font());
 
-        if(d->performanceHint == NoCaching) {
+        if (d->performanceHint == NoCaching)
+        {
             painter->drawText(rect(), d->alignment, d->text);
-        } else {
+        }
+        else
+        {
             d->ensureStaticText();
-            painter->drawStaticText(0.0, 0.0, d->staticText);
+            const QPointF position = QnGeometry::aligned(d->staticText.size(), rect(), d->alignment).topLeft();
+            painter->drawStaticText(position, d->staticText);
         }
     }
 }

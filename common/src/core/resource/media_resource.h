@@ -66,6 +66,9 @@ public:
     static QString dynamicVideoLayoutKey();
     static QString motionStreamKey();
 
+    static QString primaryStreamValue();
+    static QString secondaryStreamValue();
+
     static QnConstResourceVideoLayoutPtr getDefaultVideoLayout();
 
 protected:

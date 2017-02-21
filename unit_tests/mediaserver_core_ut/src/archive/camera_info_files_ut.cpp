@@ -1,5 +1,7 @@
+#include <functional>
 #include <thread>
 #include <algorithm>
+#include <array>
 #include <gtest/gtest.h>
 #include <recorder/camera_info.h>
 #include <recorder/device_file_catalog.h>
@@ -7,13 +9,7 @@
 class ComposerTestHandler : public nx::caminfo::ComposerHandler
 {
 public:
-    enum CameraPresense
-    {
-        CameraByIdFound,
-        CameraByIdNOTFound
-    };
-
-    ComposerTestHandler(CameraPresense hasCamera = CameraByIdFound): m_hasCamera(hasCamera)
+    ComposerTestHandler()
     {
         m_properties.append(QPair<QString, QString>("plainTestPropName", "plainTestPropValue"));
         m_properties.append(QPair<QString, QString>("specSymbolsTestPropName", "spec\r\n\r\nSymbolPro\npValue"));
@@ -49,20 +45,15 @@ public:
         return m_properties;
     }
 
-    virtual bool hasCamera() const override
-    {
-        return m_hasCamera == CameraByIdFound;
-    }
-
     void addProperty()
     {
         m_properties.append(QPair<QString, QString>("additionalPropName", "additionalPr\r\n\ropValue"));
     }
 
 private:
-    CameraPresense m_hasCamera;
     QList<QPair<QString, QString>> m_properties;
 };
+
 
 class WriterTestHandler : public nx::caminfo::WriterHandler
 {
@@ -84,7 +75,7 @@ public:
         return m_needStop;
     }
 
-    virtual bool replaceFile(const QString& path, const QByteArray& data) override
+    virtual bool handleFileData(const QString& path, const QByteArray& data) override
     {
         if (m_filesWritten.contains(path))
             return false;
@@ -122,6 +113,11 @@ public:
         m_needStop = value;
     }
 
+    void setHasCamera(bool value)
+    {
+        m_hasCamera = value;
+    }
+
     void resetWrittenData()
     {
         m_filesWritten.clear();
@@ -138,6 +134,7 @@ private:
     QStringList m_storagesUrls;
     QStringList m_camerasIds;
     bool m_needStop;
+    bool m_hasCamera;
 };
 
 const char *const kInfoFilePattern= R"#("cameraName"="testName"
@@ -161,7 +158,7 @@ const char *const kInfoFileWithAdditionalPropPattern= R"#("cameraName"="testName
 
 TEST(ComposerTest, CameraFound)
 {
-    ComposerTestHandler composerHandler(ComposerTestHandler::CameraByIdFound);
+    ComposerTestHandler composerHandler;
     nx::caminfo::Composer composer;
 
     auto result = composer.make(&composerHandler);
@@ -170,10 +167,9 @@ TEST(ComposerTest, CameraFound)
 
 TEST(ComposerTest, CameraNOTFound)
 {
-    ComposerTestHandler composerHandler(ComposerTestHandler::CameraByIdNOTFound);
     nx::caminfo::Composer composer;
 
-    ASSERT_TRUE(composer.make(&composerHandler).isEmpty());
+    ASSERT_TRUE(composer.make(nullptr).isEmpty());
 }
 
 class DerivedTestWriter : public nx::caminfo::Writer
@@ -325,4 +321,278 @@ TEST_F(WriterTest, IntervalTest)
     writer.write();
     thenWrittenFiles(12);
     thenAllFilesContainsPatternData(PatternData::WithAdditionalProp);
+}
+
+
+const QnUuid kModuleGuid = QnUuid::fromStringSafe(lit("{95a380a7-f7d7-4a4a-906f-b9c101a33ef1}"));
+const QnUuid kArchiveCamTypeGuid = QnUuid::fromStringSafe(lit("{1d250fa0-ce88-4358-9bc9-4f39d0ce3b12}"));
+
+QString kCameraId("cameraId");
+QString kFilePath("/some/" + kCameraId);
+
+const std::array<const char*, 5> kInvalidFileDataList = {
+R"#("cameraName"="testName"
+"cameraModel"="testModel"
+"groupId"="testGroupId"
+"groupName"="testGroupName
+"cameraUrl"="testUrl"
+"plainTestPropName"="plainTestPropValue"
+"specSymbolsTestPropName"="specSymbolPropValue"
+"additionalPropName"="additionalPropValue"
+)#",
+
+R"#("cameraName"="testName"
+"cameraModel"="testModel"
+"groupId"="testGroupId"
+"groupName"="testGroupName"
+"cameraUrl"="testUrl"
+"plainTestPropName""plainTestPropValue"
+"specSymbolsTestPropName"="specSymbolPropValue"
+"additionalPropName"="additionalPropValue"
+)#",
+
+R"#("cameraName"="testName"
+"cameraModel"="testModel"
+"testGroupId"
+"groupName"="testGroupName"
+"cameraUrl"="testUrl"
+"plainTestPropName"="plainTestPropValue"
+"specSymbolsTestPropName"="specSymbolPropValue"
+"additionalPropName"="additionalPropValue"
+)#",
+
+R"#("cameraName"="testName"
+="testModel"
+"groupId"="testGroupId"
+"groupName"="testGroupName"
+"cameraUrl"="testUrl"
+"plainTestPropName"="plainTestPropValue"
+"specSymbolsTestPropName"="specSymbolPropValue"
+"additionalPropName"="additionalPropValue"
+)#",
+
+R"#("cameraName"="testName"
+"cameraModel"="testModel"
+"groupId"="testGroupId"
+"groupName"="testGroupName"
+"cameraUrl"=
+"plainTestPropName"="plainTestPropValue"
+"specSymbolsTestPropName"="specSymbolPropValue"
+"additionalPropName"="additionalPropValue"
+)#",
+
+};
+
+enum class CameraPresence
+{
+    InTheResourcePool,
+    NotInTheResourcePool
+};
+
+enum class ModuleGuid
+{
+    Found,
+    NotFound
+};
+
+enum class ArchiveCamTypeId
+{
+    Found,
+    NotFound
+};
+
+enum class GetFileData
+{
+    Successfull,
+    Failed
+};
+
+enum class ResultIs
+{
+    Empty,
+    NotEmpty
+};
+
+class ReaderTestHandler: public nx::caminfo::ReaderHandler
+{
+public:
+    QnUuid moduleGuid() const override
+    {
+        return moduleGuidFlag == ModuleGuid::Found ? kModuleGuid : QnUuid();
+    }
+
+    QnUuid archiveCamTypeId() const override
+    {
+        return archiveCamTypeIdFlag == ArchiveCamTypeId::Found ? kArchiveCamTypeGuid : QnUuid();
+    }
+
+    bool isCameraInResPool(const QnUuid&) const override
+    {
+        return camInRpFlag == CameraPresence::InTheResourcePool;
+    }
+
+    void handleError(const nx::caminfo::ReaderErrorInfo& errorInfo) const override
+    {
+        errMsg = errorInfo.message;
+    }
+
+    CameraPresence camInRpFlag;
+    ModuleGuid moduleGuidFlag;
+    ArchiveCamTypeId archiveCamTypeIdFlag;
+
+    mutable QString errMsg;
+};
+
+class ReaderTest: public ::testing::Test
+{
+protected:
+    ReaderTest() :
+        fileInfo(QnAbstractStorageResource::FileInfo(kFilePath, 1))
+    {}
+
+    void when(CameraPresence presenceFlag,
+              ModuleGuid moduleGuidFlag,
+              ArchiveCamTypeId archiveCamTypeIdFlag,
+              GetFileData getFileDataFlag)
+    {
+        readerHandler.camInRpFlag = presenceFlag;
+        readerHandler.moduleGuidFlag = moduleGuidFlag;
+        readerHandler.archiveCamTypeIdFlag = archiveCamTypeIdFlag;
+
+        if (getFileDataFlag == GetFileData::Successfull)
+            getDataFunc = [](const QString&) { return QByteArray(kInfoFileWithAdditionalPropPattern); };
+        else
+            getDataFunc = [](const QString&) { return QByteArray(); };
+
+        getDataFunc2 = [](const QString&) { return QByteArray(kInfoFilePattern); };
+    }
+
+    void then(ResultIs resultIsFlag)
+    {
+        if (resultIsFlag == ResultIs::Empty)
+        {
+            ASSERT_EQ(camDataList.size(), 0);
+            ASSERT_FALSE(readerHandler.errMsg.isEmpty());
+        }
+        else
+        {
+            ASSERT_EQ(camDataList.size(), 1);
+        }
+        readerHandler.errMsg.clear();
+    }
+
+    void thenDataIsCorrect()
+    {
+        const nx::caminfo::ArchiveCameraData& camData = camDataList[0];
+        const ec2::ApiCameraData& coreData = camData.coreData;
+
+        ASSERT_EQ(coreData.groupId, "testGroupId");
+        ASSERT_EQ(coreData.groupName, "testGroupName");
+        ASSERT_EQ(coreData.id, guidFromArbitraryData(lit("cameraId")));
+        ASSERT_EQ(coreData.mac, QnLatin1Array());
+        ASSERT_EQ(coreData.model, "testModel");
+        ASSERT_EQ(coreData.name, "testName");
+        ASSERT_EQ(coreData.parentId, kModuleGuid);
+        ASSERT_EQ(coreData.physicalId, fileInfo.fileName());
+        ASSERT_EQ(coreData.typeId, kArchiveCamTypeGuid);
+        ASSERT_EQ(coreData.url, "testUrl");
+    }
+
+
+    ReaderTestHandler readerHandler;
+    std::function<QByteArray(const QString&)> getDataFunc;
+    std::function<QByteArray(const QString&)> getDataFunc2;
+    QnAbstractStorageResource::FileInfo fileInfo;
+    nx::caminfo::ArchiveCameraDataList camDataList;
+};
+
+TEST_F(ReaderTest, HandlerError_moduleGuid)
+{
+    when(CameraPresence::NotInTheResourcePool,
+         ModuleGuid::NotFound,
+         ArchiveCamTypeId::Found,
+         GetFileData::Successfull);
+    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(&camDataList);
+    then(ResultIs::Empty);
+}
+
+TEST_F(ReaderTest, HandlerError_cameraIsInResPool)
+{
+    when(CameraPresence::InTheResourcePool,
+         ModuleGuid::Found,
+         ArchiveCamTypeId::Found,
+         GetFileData::Successfull);
+    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(&camDataList);
+    then(ResultIs::Empty);
+}
+
+TEST_F(ReaderTest, HandlerError_typeIdNotFound)
+{
+    when(CameraPresence::NotInTheResourcePool,
+         ModuleGuid::Found,
+         ArchiveCamTypeId::NotFound,
+         GetFileData::Successfull);
+    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(&camDataList);
+    then(ResultIs::Empty);
+}
+
+TEST_F(ReaderTest, HandlerError_getFileDataError)
+{
+    when(CameraPresence::NotInTheResourcePool,
+         ModuleGuid::Found,
+         ArchiveCamTypeId::Found,
+         GetFileData::Failed);
+    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(&camDataList);
+    then(ResultIs::Empty);
+}
+
+TEST_F(ReaderTest, ErrorsInData)
+{
+    when(CameraPresence::NotInTheResourcePool,
+         ModuleGuid::Found,
+         ArchiveCamTypeId::Found,
+         GetFileData::Successfull);
+    for (const char* fileData: kInvalidFileDataList)
+    {
+        nx::caminfo::Reader(
+            &readerHandler, 
+            fileInfo, 
+            [fileData](const QString&)
+            {
+                return QByteArray(fileData);
+            }
+            )(&camDataList);
+
+        then(ResultIs::Empty);
+    }
+}
+
+TEST_F(ReaderTest, CorrectData)
+{
+    when(CameraPresence::NotInTheResourcePool,
+         ModuleGuid::Found,
+         ArchiveCamTypeId::Found,
+         GetFileData::Successfull);
+    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(&camDataList);
+    then(ResultIs::NotEmpty);
+    thenDataIsCorrect();
+}
+
+TEST_F(ReaderTest, CorrectDataMultiple)
+{
+    when(CameraPresence::NotInTheResourcePool,
+         ModuleGuid::Found,
+         ArchiveCamTypeId::Found,
+         GetFileData::Successfull);
+
+    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc2)(&camDataList);
+    ASSERT_EQ(camDataList[0].properties.size(), 2);
+
+    camDataList.clear();
+    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc)(&camDataList);
+    ASSERT_EQ(camDataList[0].properties.size(), 3);
+
+    camDataList.clear();
+    nx::caminfo::Reader(&readerHandler, fileInfo, getDataFunc2)(&camDataList);
+    ASSERT_EQ(camDataList[0].properties.size(), 2);
 }

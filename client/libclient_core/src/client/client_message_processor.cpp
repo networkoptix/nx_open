@@ -126,12 +126,15 @@ void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->getMiscNotificationManager()->disconnect(this);
 }
 
-void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status)
+void QnClientMessageProcessor::onResourceStatusChanged(
+    const QnResourcePtr &resource,
+    Qn::ResourceStatus status,
+    ec2::NotificationSource /*source*/)
 {
     resource->setStatus(status);
 }
 
-void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, const QnUuid& peerId)
+void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, ec2::NotificationSource source)
 {
     NX_ASSERT(resource);
     /*
@@ -159,7 +162,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, con
     resource->addFlags(Qn::remote);
     resource->removeFlags(Qn::local);
 
-    QnCommonMessageProcessor::updateResource(resource, peerId);
+    QnCommonMessageProcessor::updateResource(resource, source);
     if (!ownResource)
     {
         qnResPool->addResource(resource);

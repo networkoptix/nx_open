@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <typeinfo>
 
 #include <boost/optional.hpp>
 
@@ -24,6 +25,12 @@ struct StorageInstance
 {
     QnSerializerStorage<QnJsonSerializer>* operator()() const;
 };
+
+QJsonObject::const_iterator findField(
+    const QJsonObject& jsonObject,
+    const QString& fieldName,
+    DeprecatedFieldNames* deprecatedFieldNames,
+    const std::type_info& structTypeInfo);
 
 } // namespace QJsonDetail
 
@@ -154,19 +161,27 @@ bool deserialize(QnJsonContext* ctx, const QJsonValueRef& value, T* outTarget)
 }
 
 template<class T>
-bool deserialize(QnJsonContext* ctx, const QJsonObject& value, const QString& key, T* outTarget,
-    bool optional = false, bool* found = nullptr)
+bool deserialize(
+    QnJsonContext* ctx,
+    const QJsonObject& value,
+    const QString& key,
+    T* outTarget,
+    bool optional = false,
+    bool* outFound = nullptr,
+    DeprecatedFieldNames* deprecatedFieldNames = nullptr,
+    const std::type_info& structTypeInfo = typeid(nullptr_t))
 {
-    QJsonObject::const_iterator pos = value.find(key);
-    if(pos == value.end())
+    QJsonObject::const_iterator pos = QJsonDetail::findField(
+        value, key, deprecatedFieldNames, structTypeInfo);
+    if (pos == value.end())
     {
-        if(found)
-            *found = false;
+        if (outFound != nullptr)
+            *outFound = false;
         return optional;
     }
 
-    if(found)
-        *found = true;
+    if (outFound != nullptr)
+        *outFound = true;
 
     bool ok = QJson::deserialize(ctx, *pos, outTarget);
     if (!ok && !optional)

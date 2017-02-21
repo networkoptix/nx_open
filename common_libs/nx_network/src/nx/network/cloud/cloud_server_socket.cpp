@@ -19,7 +19,7 @@ namespace cloud {
 
 namespace {
 const int kDefaultAcceptQueueSize = 128;
-const KeepAliveOptions kDefaultKeepAlive(60, 10, 5);
+const KeepAliveOptions kDefaultKeepAlive(std::chrono::minutes(1), std::chrono::seconds(10), 5);
 } // namespace
 
 static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers()
@@ -80,7 +80,7 @@ CloudServerSocket::CloudServerSocket(
     m_acceptQueueLen(kDefaultAcceptQueueSize),
     m_state(State::init)
 {
-    m_mediatorConnection->bindToAioThread(getAioThread());
+    bindToAioThread(getAioThread());
 
     // TODO: #mu default values for m_socketAttributes shall match default
     //           system vales: think how to implement this...
@@ -390,6 +390,7 @@ void CloudServerSocket::onListenRequestCompleted(
     NX_ASSERT(m_state == State::registeringOnMediator);
     if (resultCode == nx::hpm::api::ResultCode::ok)
     {
+        NX_LOGX(lm("Listen request completed successfully"), cl_logDEBUG1);
         m_state = State::listening;
 
         m_mediatorConnection->setOnReconnectedHandler(
@@ -397,10 +398,14 @@ void CloudServerSocket::onListenRequestCompleted(
 
         // This is important to know if connection is lost, so server will use some keep alive even
         // even if mediator does not ask it to use any.
-        m_mediatorConnection->client()->setKeepAliveOptions(
-            response.tcpConnectionKeepAlive ? *response.tcpConnectionKeepAlive : kDefaultKeepAlive);
+        const auto keepAliveOptions = response.tcpConnectionKeepAlive
+            ? *response.tcpConnectionKeepAlive : kDefaultKeepAlive;
 
-        NX_LOGX(lm("Listen request completed successfully"), cl_logDEBUG1);
+        if (response.cloudConnectOptions.testFlag(hpm::api::serverChecksConnectionState))
+            m_mediatorConnection->monitorListeningState(keepAliveOptions.maxDelay());
+        else
+            m_mediatorConnection->client()->setKeepAliveOptions(keepAliveOptions);
+
         auto acceptHandler = std::move(m_savedAcceptHandler);
         m_savedAcceptHandler = nullptr;
         if (acceptHandler)

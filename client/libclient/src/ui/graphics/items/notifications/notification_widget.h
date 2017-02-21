@@ -47,9 +47,6 @@ signals:
     void closeTriggered();
     void buttonClicked(const QString& alias);
 
-protected:
-    virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;
-
 private slots:
     void at_thumbnailLabel_clicked(Qt::MouseButton button);
 
@@ -73,7 +70,6 @@ public:
     QString text() const;
 
     void addActionButton(const QIcon& icon,
-                         const QString& tooltip = QString(),
                          QnActions::IDType actionId = QnActions::NoAction,
                          const QnActionParameters& parameters = QnActionParameters(),
                          bool defaultAction = false);
@@ -96,11 +92,14 @@ public:
 
     virtual void setGeometry(const QRectF& geometry) override;
 
+    void triggerDefaultAction(); //< emits actionTriggered with default action
+
 signals:
     void notificationLevelChanged();
     void closeTriggered();
     void actionTriggered(QnActions::IDType actionId, const QnActionParameters& parameters);
     void buttonClicked(const QString& alias);
+    void linkActivated(const QString& link);
 
 protected:
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
@@ -114,7 +113,6 @@ private slots:
     void updateToolTipVisibility();
     void updateToolTipPosition();
 
-    void at_thumbnail_clicked();
     void at_loop_sound();
 
 private:

@@ -29,6 +29,9 @@ const QLatin1String kDefaultSystemUserToRunUnder("");
 const QLatin1String kDataDir("general/dataDir");
 const QLatin1String kDefaultDataDir("");
 
+const QLatin1String kCloudConnectOptions("general/cloudConnectOptions");
+const QLatin1String kDefaultCloudConnectOptions("");
+
 //CloudDB settings
 const QLatin1String kRunWithCloud("cloud_db/runWithCloud");
 const QLatin1String kDefaultRunWithCloud("true");
@@ -55,12 +58,18 @@ const QLatin1String kDefaultStunEndpointsToListen("0.0.0.0:3345");
 const QLatin1String kStunKeepAliveOptions("stun/keepAliveOptions");
 const QLatin1String kDefaultStunKeepAliveOptions("{ 10, 10, 3 }");
 
+const QLatin1String kStunConnectionInactivityTimeout("stun/connectionInactivityTimeout");
+const std::chrono::hours kDefaultStunInactivityTimeout(10);
+
 //HTTP
 const QLatin1String kHttpEndpointsToListen("http/addrToListenList");
 const QLatin1String kDefaultHttpEndpointsToListen("0.0.0.0:3355");
 
 const QLatin1String kHttpKeepAliveOptions("http/keepAliveOptions");
 const QLatin1String kDefaultHttpKeepAliveOptions("");
+
+const QLatin1String kHttpConnectionInactivityTimeout("http/connectionInactivityTimeout");
+const std::chrono::hours kDefaultHttpInactivityTimeout(1);
 
 const QString kModuleName = lit("connection_mediator");
 
@@ -212,6 +221,9 @@ void Settings::loadConfiguration()
     m_general.dataDir = m_settings.value(
         kDataDir,
         kDefaultDataDir).toString();
+    m_general.cloudConnectOptions = QnLexical::deserialized<api::CloudConnectOptions>(m_settings.value(
+        kCloudConnectOptions,
+        kDefaultCloudConnectOptions).toString());
 
     //log
     m_logging.load(m_settings);
@@ -253,12 +265,18 @@ void Settings::loadConfiguration()
     m_stun.keepAliveOptions = KeepAliveOptions::fromString(
         m_settings.value(kStunKeepAliveOptions, kDefaultStunKeepAliveOptions).toString());
 
+    m_stun.connectionInactivityTimeout = nx::utils::parseOptionalTimerDuration(
+        m_settings.value(kStunConnectionInactivityTimeout).toString(), kDefaultStunInactivityTimeout);
+
     readEndpointList(
         m_settings.value(kHttpEndpointsToListen, kDefaultHttpEndpointsToListen).toString(),
         &m_http.addrToListenList);
 
     m_http.keepAliveOptions = KeepAliveOptions::fromString(
         m_settings.value(kHttpKeepAliveOptions, kDefaultHttpKeepAliveOptions).toString());
+
+    m_http.connectionInactivityTimeout = nx::utils::parseOptionalTimerDuration(
+        m_settings.value(kHttpConnectionInactivityTimeout).toString(), kDefaultHttpInactivityTimeout);
 
     m_dbConnectionOptions.loadFromSettings(&m_settings);
 
@@ -282,20 +300,22 @@ void Settings::loadConfiguration()
                 m_settings.value(kTunnelInactivityTimeout).toString(),
                 kDefaultTunnelInactivityTimeout));
 
-    m_connectionParameters.tcpReverseRetryPolicy.setMaxRetryCount(m_settings.value(
-        tcp_reverse_retry_policy::kMaxCount,
-        network::RetryPolicy::kDefaultMaxRetryCount).toInt());
-    m_connectionParameters.tcpReverseRetryPolicy.setInitialDelay(
+    m_connectionParameters.tcpReverseRetryPolicy.maxRetryCount =
+        m_settings.value(
+            tcp_reverse_retry_policy::kMaxCount,
+            network::RetryPolicy::kDefaultMaxRetryCount).toInt();
+    m_connectionParameters.tcpReverseRetryPolicy.initialDelay = 
         nx::utils::parseTimerDuration(m_settings.value(
             tcp_reverse_retry_policy::kInitialDelay).toString(),
-        network::RetryPolicy::kDefaultInitialDelay));
-    m_connectionParameters.tcpReverseRetryPolicy.setDelayMultiplier(m_settings.value(
-        tcp_reverse_retry_policy::kDelayMultiplier,
-        network::RetryPolicy::kDefaultDelayMultiplier).toInt());
-    m_connectionParameters.tcpReverseRetryPolicy.setMaxDelay(
+        network::RetryPolicy::kDefaultInitialDelay);
+    m_connectionParameters.tcpReverseRetryPolicy.delayMultiplier =
+        m_settings.value(
+            tcp_reverse_retry_policy::kDelayMultiplier,
+            network::RetryPolicy::kDefaultDelayMultiplier).toInt();
+    m_connectionParameters.tcpReverseRetryPolicy.maxDelay =
         nx::utils::parseTimerDuration(m_settings.value(
             tcp_reverse_retry_policy::kMaxDelay).toString(),
-        network::RetryPolicy::kDefaultMaxDelay));
+        network::RetryPolicy::kDefaultMaxDelay);
 
     m_connectionParameters.tcpReverseHttpTimeouts.sendTimeout =
         nx::utils::parseTimerDuration(m_settings.value(

@@ -210,6 +210,9 @@ public:
               certaind thread type is not the same)
      */
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) = 0;
+
+    //!Returns true if this socket in own AIO thread
+    virtual bool isInSelfAioThread() const;
 };
 
 //!Interface for writing to/reading from socket
@@ -373,19 +376,30 @@ struct NX_NETWORK_API StreamSocketInfo
 
 struct NX_NETWORK_API KeepAliveOptions
 {
-    /** timeout, in seconds, with no activity until the first keep-alive
-     *  packet is sent */
-    int timeSec;
+    /** Timeout, in seconds, with no activity until the first keep-alive packet is sent. */
+    std::chrono::seconds time;
 
-    /** interval, in seconds, between when successive keep-alive packets
-     *  are sent if no acknowledgement is received */
-    int intervalSec;
+    /**
+     * Interval, in seconds, between when successive keep-alive packets are sent if no
+     * acknowledgement is received.
+     */
+    std::chrono::seconds interval;
 
-    /** the number of unacknowledged probes to send before considering
-     *  the connection dead and notifying the application layer */
-    int probeCount;
+    /**
+     * The number of unacknowledged probes to send before considering the connection dead and
+     * notifying the application layer.
+     */
+    size_t probeCount;
 
-    KeepAliveOptions(int timeSec = 0, int intervalSec = 0, int probeCount = 0);
+    /** Maximum time before lost connection can be acknowledged. */
+    std::chrono::seconds maxDelay() const;
+
+    KeepAliveOptions(
+        std::chrono::seconds time = std::chrono::seconds::zero(),
+        std::chrono::seconds interval = std::chrono::seconds::zero(),
+        size_t probeCount = 0);
+
+    KeepAliveOptions(size_t time, size_t interval, size_t count);
     bool operator==(const KeepAliveOptions& rhs) const;
 
     QString toString() const;

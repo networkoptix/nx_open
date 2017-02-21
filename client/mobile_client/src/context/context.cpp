@@ -18,6 +18,9 @@
 #include <watchers/user_watcher.h>
 #include <helpers/cloud_url_helper.h>
 #include <helpers/nx_globals_object.h>
+#include <helpers/system_helpers.h>
+#include <settings/last_connection.h>
+#include <settings/qml_settings_adaptor.h>
 #include <nx/utils/url_builder.h>
 
 using namespace nx::vms::utils;
@@ -32,6 +35,7 @@ QnContext::QnContext(QObject* parent) :
     base_type(parent),
     m_nxGlobals(new NxGlobalsObject(this)),
     m_connectionManager(new QnConnectionManager(this)),
+    m_settings(new QmlSettingsAdaptor(this)),
     m_appInfo(new QnMobileAppInfo(this)),
     m_uiController(new QnMobileClientUiController(this)),
     m_cloudUrlHelper(new QnCloudUrlHelper(
@@ -56,10 +60,29 @@ QnContext::QnContext(QObject* parent) :
     connect(m_connectionManager, &QnConnectionManager::connectionVersionChanged,
             this, [this]()
     {
-        const bool useLayouts = m_connectionManager->connectionVersion() < kUserRightsRefactoredVersion;
-        auto camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
-        camerasWatcher->setUseLayouts(useLayouts);
+        const bool compatibilityMode =
+            m_connectionManager->connectionVersion() < kUserRightsRefactoredVersion;
+        const auto camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
+        camerasWatcher->setCompatiblityMode(compatibilityMode);
     });
+
+    connect(qnSettings, &QnMobileClientSettings::valueChanged, this,
+        [this](int id)
+        {
+            switch (id)
+            {
+                case QnMobileClientSettings::AutoLogin:
+                    emit autoLoginEnabledChanged();
+                    break;
+
+                case QnMobileClientSettings::ShowCameraInfo:
+                    emit showCameraInfoChanged();
+                    break;
+
+                default:
+                    break;
+            }
+        });
 }
 
 QnContext::~QnContext() {}
@@ -72,6 +95,11 @@ QnCloudStatusWatcher* QnContext::cloudStatusWatcher() const
 QnUserWatcher* QnContext::userWatcher() const
 {
     return qnCommon->instance<QnUserWatcher>();
+}
+
+QmlSettingsAdaptor* QnContext::settings() const
+{
+    return m_settings;
 }
 
 void QnContext::quitApplication()
@@ -139,7 +167,19 @@ void QnContext::setAutoLoginEnabled(bool enabled)
         return;
 
     qnSettings->setAutoLoginMode(intMode);
-    emit autoLoginEnabledChanged();
+}
+
+bool QnContext::showCameraInfo() const
+{
+    return qnSettings->showCameraInfo();
+}
+
+void QnContext::setShowCameraInfo(bool showCameraInfo)
+{
+    if (showCameraInfo == qnSettings->showCameraInfo())
+        return;
+
+    qnSettings->setShowCameraInfo(showCameraInfo);
 }
 
 bool QnContext::testMode() const
@@ -152,24 +192,27 @@ QString QnContext::initialTest() const
     return qnSettings->initialTest();
 }
 
-void QnContext::removeSavedConnection(const QString& systemName)
+void QnContext::removeSavedConnection(const QString& localSystemId, const QString& userName)
 {
-    auto lastConnections = qnClientCoreSettings->recentLocalConnections();
+    using namespace nx::client::core::helpers;
 
-    auto connectionEqual = [systemName](const QnLocalConnectionData& connection)
-    {
-        return connection.systemName == systemName;
-    };
-    lastConnections.erase(std::remove_if(lastConnections.begin(), lastConnections.end(), connectionEqual),
-                          lastConnections.end());
+    const auto localId = QnUuid::fromStringSafe(localSystemId);
 
-    qnClientCoreSettings->setRecentLocalConnections(lastConnections);
+    NX_ASSERT(!localId.isNull());
+    if (localId.isNull())
+        return;
+
+    removeCredentials(localId, userName);
+
+    if (userName.isEmpty() || !hasCredentials(localId))
+        removeConnection(localId);
+
     qnClientCoreSettings->save();
 }
 
 void QnContext::clearLastUsedConnection()
 {
-    qnSettings->setLastUsedConnection(QnLocalConnectionData());
+    qnSettings->setLastUsedConnection(LastConnectionData());
 }
 
 QString QnContext::getLastUsedSystemName() const
@@ -179,7 +222,7 @@ QString QnContext::getLastUsedSystemName() const
 
 QUrl QnContext::getLastUsedUrl() const
 {
-    return qnSettings->lastUsedConnection().urlWithPassword();
+    return qnSettings->lastUsedConnection().urlWithCredentials();
 }
 
 QUrl QnContext::getInitialUrl() const

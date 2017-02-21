@@ -221,8 +221,8 @@ public:
 
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
-    void calcTimeDrift() const; // calculate clock diff between camera and local clock at seconds
-    static int calcTimeDrift(const QString& deviceUrl);
+    void calcTimeDrift(int* outSoapRes = nullptr) const; // calculate clock diff between camera and local clock at seconds
+    static int calcTimeDrift(const QString& deviceUrl, int* outSoapRes = nullptr);
 
     virtual bool getParamPhysical(const QString &id, QString &value) override;
     virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result);
@@ -249,6 +249,9 @@ public:
     int getMaxChannels() const;
 
     void updateToChannel(int value);
+
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout(
+        const QnAbstractStreamDataProvider* dataProvider) const override;
 
     bool detectVideoSourceCount();
 
@@ -550,7 +553,7 @@ private:
     QElapsedTimer m_advSettingsLastUpdated;
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
 	mutable QnOnvifServiceUrls m_serviceUrls;
-
+    mutable QnResourceVideoLayoutPtr m_videoLayout;
 protected:
     QnCameraAdvancedParams m_advancedParameters;
     int m_onvifRecieveTimeout;

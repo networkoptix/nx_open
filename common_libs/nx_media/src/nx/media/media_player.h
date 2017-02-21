@@ -17,6 +17,20 @@ typedef QnSharedResourcePointer<QnResource> QnResourcePtr;
 namespace nx {
 namespace media {
 
+struct PlayerStatistics
+{
+private:
+    Q_GADGET
+    Q_PROPERTY(qreal framerate MEMBER framerate CONSTANT)
+    Q_PROPERTY(qreal bitrate MEMBER bitrate CONSTANT)
+    Q_PROPERTY(QString codec MEMBER codec CONSTANT)
+
+public:
+    qreal framerate = 0.0;
+    qreal bitrate = 0.0;
+    QString codec;
+};
+
 class PlayerPrivate;
 
 /**
@@ -77,9 +91,14 @@ class Player: public QObject
     /**
      * Is (0, 0) if no video is playing or the resolution is not available.
      */
-    Q_PROPERTY(QSize currentResolution READ currentResolution)
+    Q_PROPERTY(QSize currentResolution READ currentResolution NOTIFY currentResolutionChanged)
 
     Q_PROPERTY(QRect videoGeometry READ videoGeometry WRITE setVideoGeometry NOTIFY videoGeometryChanged)
+
+    /**
+     * Enable or disable audio playback. It has no effect if audio track is missing in source media.
+     */
+    Q_PROPERTY(bool audioEnabled READ isAudioEnabled WRITE setAudioEnabled NOTIFY audioEnabledChanged)
 
 public:
     enum class State
@@ -87,6 +106,7 @@ public:
         Stopped,
         Playing,
         Paused,
+        Previewing,
     };
 
     enum class MediaStatus
@@ -148,7 +168,7 @@ public:
     void setReconnectOnPlay(bool reconnectOnPlay);
 
     /**
-     * Returns true if current playback position is 'now' time (live video from a camera).
+     * @return True if current playback position is 'now' time (live video from a camera).
      * For non-camera sources like local files it is already false.
      */
     bool liveMode() const;
@@ -156,15 +176,30 @@ public:
 
     int videoQuality() const;
     void setVideoQuality(int videoQuality);
+    /**
+     * @return Video quality of the video stream being played back. May differ from videoQuality().
+     */
+    Q_INVOKABLE VideoQuality actualVideoQuality() const;
 
     QSize currentResolution() const;
 
     QRect videoGeometry() const;
     void setVideoGeometry(const QRect& rect);
 
+    // Namespace specification is required for QML.
+    Q_INVOKABLE nx::media::PlayerStatistics currentStatistics() const;
+
+    bool isAudioEnabled() const;
+    void setAudioEnabled(bool value);
+
 public slots:
     void play();
     void pause();
+
+    /**
+     * Preview mode similar to pause mode but optimized for fast seek.
+     */
+    void preview();
     void stop();
 
 signals:
@@ -179,6 +214,8 @@ signals:
     void aspectRatioChanged();
     void videoQualityChanged();
     void videoGeometryChanged();
+    void currentResolutionChanged();
+    void audioEnabledChanged();
 
 protected: //< for tests
     void testSetOwnedArchiveReader(QnArchiveStreamReader* archiveReader);
@@ -186,8 +223,10 @@ protected: //< for tests
 
 private:
     QScopedPointer<PlayerPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(Player);
+    Q_DECLARE_PRIVATE(Player)
 };
 
 } // namespace media
 } // namespace nx
+
+Q_DECLARE_METATYPE(nx::media::PlayerStatistics)

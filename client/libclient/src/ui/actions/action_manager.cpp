@@ -22,6 +22,7 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_layout.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
@@ -992,6 +993,9 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::NoTarget).
         text(tr("Account Settings..."));
 
+    factory(QnActions::HideCloudPromoAction).
+        flags(Qn::NoTarget);
+
     factory(QnActions::OpenCloudRegisterUrl).
         flags(Qn::NoTarget).
         text(tr("Create Account..."));
@@ -1228,10 +1232,10 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnRunningVideowallActionCondition(this));
 
-    factory(QnActions::DetachFromVideoWallAction).
-        flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
+    factory(QnActions::ClearVideoWallScreen).
+        flags(Qn::Tree | Qn::VideoWallReviewScene | Qn::SingleTarget | Qn::MultiTarget | Qn::VideoWallItemTarget).
         requiredGlobalPermission(Qn::GlobalControlVideoWallPermission).
-        text(tr("Detach Layout")).
+        text(tr("Clear Screen")).
         autoRepeat(false).
         condition(new QnDetachFromVideoWallActionCondition(this));
 
@@ -1606,7 +1610,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(QnActions::ServerAddCameraManuallyAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
-        text(tr("Add Device(s)...")).   //intentionally hardcode devices here
+        text(tr("Add Device...")).   //intentionally hardcode devices here
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
@@ -1697,33 +1701,37 @@ QnActionManager::QnActionManager(QObject *parent):
     {
         factory.beginGroup();
 
-        factory(QnActions::SetCurrentLayoutItemSpacing0Action).
+        factory(QnActions::SetCurrentLayoutItemSpacingNoneAction).
             flags(Qn::Scene | Qn::NoTarget).
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("None")).
             checkable().
-            checked(qnGlobals->defaultLayoutCellSpacing() == 0.0);
+            checked(qnGlobals->defaultLayoutCellSpacing()
+                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::None));
 
-        factory(QnActions::SetCurrentLayoutItemSpacing10Action).
+        factory(QnActions::SetCurrentLayoutItemSpacingSmallAction).
             flags(Qn::Scene | Qn::NoTarget).
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("Small")).
             checkable().
-            checked(qnGlobals->defaultLayoutCellSpacing() == 0.1);
+            checked(qnGlobals->defaultLayoutCellSpacing()
+                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Small));
 
-        factory(QnActions::SetCurrentLayoutItemSpacing20Action).
+        factory(QnActions::SetCurrentLayoutItemSpacingMediumAction).
             flags(Qn::Scene | Qn::NoTarget).
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("Medium")).
             checkable().
-            checked(qnGlobals->defaultLayoutCellSpacing() == 0.2);
+            checked(qnGlobals->defaultLayoutCellSpacing()
+                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Medium));
 
-        factory(QnActions::SetCurrentLayoutItemSpacing30Action).
+        factory(QnActions::SetCurrentLayoutItemSpacingLargeAction).
             flags(Qn::Scene | Qn::NoTarget).
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("Large")).
             checkable().
-            checked(qnGlobals->defaultLayoutCellSpacing() == 0.3);
+            checked(qnGlobals->defaultLayoutCellSpacing()
+                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Large));
         factory.endGroup();
 
     } factory.endSubMenu();

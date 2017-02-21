@@ -18,6 +18,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/std/thread.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include <common/common_globals.h>
@@ -83,7 +84,7 @@ protected:
         const QUrl url(lit("%1://%2/%3")
             .arg(scheme).arg(m_testHttpServer->serverAddress().toString()).arg(path));
 
-        std::promise<void> promise;
+        nx::utils::promise<void> promise;
         NX_LOGX(lm("httpsTest: %1").str(url), cl_logINFO);
 
         const auto client = nx_http::AsyncHttpClient::create();
@@ -102,7 +103,7 @@ protected:
         const QUrl url(lit("http://%1%2")
             .arg(m_testHttpServer->serverAddress().toString()).arg(path));
 
-        std::promise<void> promise;
+        nx::utils::promise<void> promise;
         NX_LOGX(lm("testResult: %1").str(url), cl_logINFO);
 
         const auto client = nx_http::AsyncHttpClient::create();
@@ -165,8 +166,6 @@ TEST_F(AsyncHttpClientTest, ServerModRewrite)
 namespace {
 static void testHttpClientForFastRemove(const QUrl& url)
 {
-    nx_http::AsyncHttpClient::create()->doGet(url);
-
     // use different delays (10us - 0.5s) to catch problems on different stages
     for (uint time = 10; time < 500000; time *= 2)
     {
@@ -175,6 +174,7 @@ static void testHttpClientForFastRemove(const QUrl& url)
 
         // kill the client after some delay
         std::this_thread::sleep_for(std::chrono::microseconds(time));
+        client->pleaseStopSync();
     }
 }
 } // namespace
@@ -184,6 +184,10 @@ TEST_F(AsyncHttpClientTest, FastRemove)
     testHttpClientForFastRemove(lit("http://127.0.0.1/"));
     testHttpClientForFastRemove(lit("http://localhost/"));
     testHttpClientForFastRemove(lit("http://doestNotExist.host/"));
+
+    testHttpClientForFastRemove(lit("https://127.0.0.1/"));
+    testHttpClientForFastRemove(lit("https://localhost/"));
+    testHttpClientForFastRemove(lit("https://doestNotExist.host/"));
 }
 
 TEST_F(AsyncHttpClientTest, FastRemoveBadHost)
@@ -373,7 +377,7 @@ TEST_F(AsyncHttpClientTest, ConnectionBreak)
         "not enough content");
 
     nx::utils::promise<int> serverPort;
-    std::thread serverThread(
+    nx::utils::thread serverThread(
         [&]()
         {
             const auto server = std::make_unique<nx::network::TCPServerSocket>(
@@ -655,7 +659,7 @@ TEST_F(AsyncHttpClientTest, ReusingExistingConnection)
             httpClient->doGet(testUrl);
         }
 
-        constexpr const auto responseWaitDelay = std::chrono::seconds(2);
+        constexpr const auto responseWaitDelay = std::chrono::seconds(3);
         ASSERT_TRUE((bool) responseQueue.pop(responseWaitDelay));
         ASSERT_TRUE((bool) responseQueue.pop(responseWaitDelay));
     }
@@ -681,7 +685,7 @@ public:
 
     bool bindAndListen()
     {
-        if (!m_serverSocket.bind(SocketAddress(HostAddress::localhost, 0)) |
+        if (!m_serverSocket.bind(SocketAddress(HostAddress::localhost, 0)) ||
             !m_serverSocket.listen())
         {
             return false;
@@ -758,7 +762,8 @@ X-Nx-Result-Code: ok
     )http");
 
     TestTcpServer testTcpServer(std::move(dataToSend));
-    ASSERT_TRUE(testTcpServer.bindAndListen());
+    ASSERT_TRUE(testTcpServer.bindAndListen())
+        << SystemError::getLastOSErrorText().toStdString();
     testTcpServer.start();
 
     QUrl url(lit("http://%1/secret/path").arg(testTcpServer.endpoint().toString()));

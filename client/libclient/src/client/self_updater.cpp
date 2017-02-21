@@ -315,9 +315,19 @@ bool SelfUpdater::updateMinilauncher()
         return true;
     }
 
+    const auto sourceMinilauncherPath = QDir(qApp->applicationDirPath()).absoluteFilePath(
+        QnClientAppInfo::minilauncherBinaryName());
+    if (!QFileInfo::exists(sourceMinilauncherPath))
+    {
+        NX_LOGX(lit("Source minilauncher could not be found at %1!")
+            .arg(sourceMinilauncherPath), cl_logERROR);
+        // Silently exiting because we still can't do anything.
+        return true;
+    }
+
     bool success = true;
     for (const QString& installRoot : getClientInstallRoots())
-        success &= updateMinilauncherInDir(installRoot);
+        success &= updateMinilauncherInDir(installRoot, sourceMinilauncherPath);
     return success;
 }
 
@@ -445,7 +455,8 @@ bool SelfUpdater::runMinilaucher()
     return false;
 }
 
-bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot)
+bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot,
+    const QString& sourceMinilauncherPath)
 {
     if (isMinilaucherUpdated(installRoot))
         return true;
@@ -481,15 +492,6 @@ bool SelfUpdater::updateMinilauncherInDir(const QDir& installRoot)
     /* On linux (and mac?) applaucher binary should not be renamed, we only update shell script. */
 
     NX_LOGX(lit("Updating minilauncher..."), cl_logINFO);
-    const auto sourceMinilauncherPath = QDir(qApp->applicationDirPath()).absoluteFilePath(
-        QnClientAppInfo::minilauncherBinaryName());
-    if (!QFileInfo::exists(sourceMinilauncherPath))
-    {
-        NX_LOGX(lit("Source minilauncher could not be found at %1!")
-            .arg(sourceMinilauncherPath), cl_logERROR);
-        return false;
-    }
-
     const QDir binDir(installRoot.absoluteFilePath(QnClientAppInfo::binDirSuffix()));
 
     const QString minilauncherPath =

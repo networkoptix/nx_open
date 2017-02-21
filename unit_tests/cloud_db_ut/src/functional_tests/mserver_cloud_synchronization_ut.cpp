@@ -16,8 +16,9 @@
 #include <utils/common/app_info.h>
 #include <utils/common/id.h>
 
+#include <test_support/transaction_connection_helper.h>
+
 #include "ec2/cloud_vms_synchro_test_helper.h"
-#include "ec2/transaction_connection_helper.h"
 #include "email_manager_mocked.h"
 
 namespace nx {
@@ -125,7 +126,7 @@ TEST_F(Ec2MserverCloudSynchronization, adding_user_locally_while_offline)
         {
             // Removing user locally.
             ASSERT_EQ(
-                ec2::ErrorCode::ok,
+                ::ec2::ErrorCode::ok,
                 appserver2()->moduleInstance()->ecConnection()
                 ->getUserManager(Qn::kSystemAccess)->removeSync(account2VmsData.id));
 
@@ -208,7 +209,7 @@ TEST_F(Ec2MserverCloudSynchronization, adding_user_in_cloud_and_removing_locally
         addCloudUserLocally(testAccount.email, &accountVmsData);
 
         ASSERT_EQ(
-            ec2::ErrorCode::ok,
+            ::ec2::ErrorCode::ok,
             appserver2()->moduleInstance()->ecConnection()
                 ->getUserManager(Qn::kSystemAccess)->removeSync(accountVmsData.id));
 
@@ -227,7 +228,7 @@ TEST_F(Ec2MserverCloudSynchronization, adding_user_in_cloud_and_removing_locally
         waitForCloudAndVmsToSyncUsers();
 
         ASSERT_EQ(
-            ec2::ErrorCode::ok,
+            ::ec2::ErrorCode::ok,
             appserver2()->moduleInstance()->ecConnection()
                 ->getUserManager(Qn::kSystemAccess)->removeSync(accountVmsData.id));
 
@@ -393,7 +394,7 @@ TEST_F(Ec2MserverCloudSynchronization, rename_system)
 
             ::ec2::ApiResourceParamWithRefDataList resultParamList;
             ASSERT_EQ(
-                ec2::ErrorCode::ok,
+                ::ec2::ErrorCode::ok,
                 appserver2()->moduleInstance()->ecConnection()
                     ->getResourceManager(Qn::kSystemAccess)
                     ->saveSync(paramList, &resultParamList));

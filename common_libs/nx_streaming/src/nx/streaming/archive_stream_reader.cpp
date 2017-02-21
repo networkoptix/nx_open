@@ -247,11 +247,11 @@ bool QnArchiveStreamReader::init()
 
     m_jumpMtx.unlock();
 
+    m_delegate->setQuality(quality, true, resolution);
     // It is optimization: open and jump at same time
     if (jumpTime != qint64(AV_NOPTS_VALUE))
         m_delegate->seek(jumpTime, true);
 
-    m_delegate->setQuality(quality, true, resolution);
     bool opened = m_delegate->open(m_resource);
 
     if (requiredJumpTime != qint64(AV_NOPTS_VALUE))

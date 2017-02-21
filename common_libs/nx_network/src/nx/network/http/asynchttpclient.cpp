@@ -433,9 +433,14 @@ namespace nx_http
     void AsyncHttpClient::setProxyVia(const SocketAddress& proxyEndpoint)
     {
         if (proxyEndpoint.isNull())
+        {
             m_proxyEndpoint.reset();
+        }
         else
+        {
+            NX_ASSERT(proxyEndpoint.port > 0);
             m_proxyEndpoint = proxyEndpoint;
+        }
     }
 
     void AsyncHttpClient::setDisablePrecalculatedAuthorization(bool val)

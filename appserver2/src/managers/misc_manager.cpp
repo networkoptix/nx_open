@@ -6,7 +6,9 @@
 
 namespace ec2 {
 
-void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiSystemIdData> &transaction)
+void QnMiscNotificationManager::triggerNotification(
+    const QnTransaction<ApiSystemIdData> &transaction, 
+    NotificationSource /*source*/)
 {
     emit systemIdChangeRequested(transaction.params.systemId,
                                    transaction.params.sysIdTime,

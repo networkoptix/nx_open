@@ -1,24 +1,25 @@
 #pragma once
 
 /*
- * Class to dynamically change hovered links color.
- *  Unhovered link color is QApplication::palette().color(QPalette::Link) - default Qt behavior
- *  Hovered link color is m_label->color(QPalette::Link) - this class implements it
+ * Class to dynamically change hovered/unhovered label links color and cursor.
+ *  Color is changed to style::linkColor(m_label, isHovered).
+ *  It uses Link and LinkVisited palette entries.
  */
 class QnLinkHoverProcessor : public QObject
 {
 public:
     explicit QnLinkHoverProcessor(QLabel* parent);
 
-protected:
-    virtual QColor hoveredColor() const;
-
 private:
+    enum class UpdateTime { Now, Later };
+    void updateColors(UpdateTime when);
     void linkHovered(const QString& href);
-    auto labelChangeFunctor(const QString& text, bool hovered);
+    void changeLabelState(const QString& text, bool hovered);
+    bool updateOriginalText();
 
 private:
     QLabel* m_label;
     QString m_originalText;
-    QString m_currentText;
+    QString m_alteredText;
+    QString m_hoveredLink;
 };

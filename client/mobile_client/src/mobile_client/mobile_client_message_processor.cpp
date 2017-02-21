@@ -3,10 +3,18 @@
 #include <core/resource/resource.h>
 #include <core/resource/mobile_client_camera_factory.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
 #include <nx/network/socket_common.h>
+#include <compatibility/user_permissions.h>
+
+namespace detail {
+
+const QnSoftwareVersion kUserPermissionsRefactoredVersion(3, 0);
+
+} using namespace detail;
 
 QnMobileClientMessageProcessor::QnMobileClientMessageProcessor() :
     base_type()
@@ -28,9 +36,23 @@ bool QnMobileClientMessageProcessor::isConnected() const
 
 void QnMobileClientMessageProcessor::updateResource(
     const QnResourcePtr &resource,
-    const QnUuid& peerId)
+    ec2::NotificationSource source)
 {
-    base_type::updateResource(resource, peerId);
+    using namespace nx::common::compatibility::user_permissions;
+
+    // TODO: #mshevchenko #3.1 Refactor it to use API versioning instead.
+    const auto& info = QnAppServerConnectionFactory::connectionInfo();
+    if (info.version < kUserPermissionsRefactoredVersion)
+    {
+        if (const auto user = resource.dynamicCast<QnUserResource>())
+        {
+            const auto v26Permissions =
+                static_cast<GlobalPermissionsV26>(static_cast<int>(user->getRawPermissions()));
+            user->setRawPermissions(migrateFromV26(v26Permissions));
+        }
+    }
+
+    base_type::updateResource(resource, source);
 
     if (resource->getId() == qnCommon->remoteGUID())
         updateMainServerApiUrl(resource.dynamicCast<QnMediaServerResource>());

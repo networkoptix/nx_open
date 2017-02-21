@@ -2,7 +2,7 @@
 
 #include "abstract_incoming_tunnel_connection.h"
 
-#include <nx/network/cloud/mediator_connections.h>
+#include <nx/network/cloud/mediator_server_connections.h>
 
 namespace nx {
 namespace network {

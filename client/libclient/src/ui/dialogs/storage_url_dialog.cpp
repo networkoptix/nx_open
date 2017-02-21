@@ -202,7 +202,7 @@ void QnStorageUrlDialog::accept()
 
     if (result.status() == 0 && initStatus == Qn::StorageInit_WrongAuth)
     {
-        QnMessageBox::warning(this, tr("Invalid Storage"), tr("Invalid external storage credentials."));
+        QnMessageBox::warning(this, tr("Invalid credentials for external storage"));
         return;
     }
 
@@ -211,21 +211,26 @@ void QnStorageUrlDialog::accept()
             && m_storage.isWritable
             && m_storage.isExternal))
     {
-        QnMessageBox::warning(this, tr("Invalid Storage"), tr("Provided storage path does not point to a valid external storage location."));
+        QnMessageBox::warning(this, tr("Invalid storage path"));
         return;
     }
 
     if (storageAlreadyUsed(m_storage.url))
     {
-        QString message = tr("System has other server(s) using the same network storage path. "\
-                             "Recording data by multiple servers to exactly same place is not recommended.");
+        const auto extras =
+            tr("It is not recommended to use one recording location for different servers.")
+            + L'\n' + tr("Add this storage anyway?");
 
-        QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning!"), message, QDialogButtonBox::Cancel);
-        messageBox.addButton(tr("Add storage"), QDialogButtonBox::AcceptRole);
+        QnMessageBox messageBox(QnMessageBoxIcon::Warning,
+            tr("Storage path used by another server"),
+            extras, QDialogButtonBox::Cancel);
+        messageBox.addButton(tr("Add Storage"),
+            QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
 
         if (messageBox.exec() == QDialogButtonBox::Cancel)
             return;
     }
+
 
     base_type::accept();
 }

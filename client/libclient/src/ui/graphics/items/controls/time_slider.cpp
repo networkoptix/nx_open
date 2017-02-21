@@ -2564,6 +2564,9 @@ void QnTimeSlider::drawThumbnails(QPainter* painter, const QRectF& rect)
     if (thumbnailsLoader()->timeStep() <= 0)
         return;
 
+    if (thumbnailsLoader()->thumbnailSize().isEmpty())
+        return;
+
     qreal aspectRatio = QnGeometry::aspectRatio(thumbnailsLoader()->thumbnailSize());
     qreal thumbnailWidth = rect.height() * aspectRatio;
 

@@ -124,7 +124,8 @@ public:
 protected:
     virtual void onResourceStatusChanged(
         const QnResourcePtr& /*resource*/,
-        Qn::ResourceStatus /*status*/) override
+        Qn::ResourceStatus /*status*/,
+        ec2::NotificationSource /*source*/) override
     {
     }
 
@@ -135,7 +136,7 @@ protected:
 
     virtual void updateResource(
         const QnResourcePtr& resource,
-        const QnUuid& /*authorPeerId*/) override
+        ec2::NotificationSource /*source*/) override
     {
         m_resourcePool->addResource(resource);
     }

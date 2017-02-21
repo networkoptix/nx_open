@@ -54,10 +54,7 @@ QList<QnResourcePtr> QnFlirResourceSearcher::checkHostAddr(const QUrl& url, cons
         return result;
 
     if(!eipClient.registerSession())
-    {
-        qDebug() << "FLIR checkHostAddr failed to register session";
         return result;
-    }
 
     const auto vendorId = getVendorIdFromDevice(eipClient);
     if(vendorId != kFlirVendorId)

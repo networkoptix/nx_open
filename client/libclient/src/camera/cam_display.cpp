@@ -861,8 +861,16 @@ void QnCamDisplay::onBeforeJump(qint64 time)
     m_emptyPacketCounter = 0;
     if (m_extTimeSrc && m_eofSignalSended && time != DATETIME_NOW)
     {
+        /**
+         * Function m_extTimeSrc->onEofReached is used for EOF logic.
+         * This call is required to prevent unexpected EOF signal after async seek() call.
+         * But variable m_eofSignalSended is used to display state in UI only.
+         * So, I've introduced this hack. Don't update this variable unless 1-st frame will be received.
+         * Otherwise client could get change true -> false -> true state if seek to the same position.
+         */
+
         m_extTimeSrc->onEofReached(this, false);
-        m_eofSignalSended = false;
+        //m_eofSignalSended = false;
     }
     clearUnprocessedData();
     {
@@ -1317,8 +1325,14 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 
     if (emptyData && !flushCurrentBuffer)
     {
-        //if (speed == 0)
-        //    return true;
+        bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
+        if (!emptyData->flags.testFlag(QnAbstractMediaData::MediaFlags_GotFromRemotePeer) &&
+            isVideoCamera)
+        {
+            // Local EOF packet could be created on TCP stream reconnect.
+            // Ignore such packets for video cameras.
+            return true;
+        }
 
         m_emptyPacketCounter++;
         // empty data signal about EOF, or read/network error. So, check counter bofore EOF signaling
@@ -1327,7 +1341,6 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
         if (m_emptyPacketCounter >= 3 || isFillerPacket)
         {
             bool isLive = emptyData->flags & QnAbstractMediaData::MediaFlags_LIVE;
-            bool isVideoCamera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource) != 0;
             if (m_extTimeSrc && !isLive && isVideoCamera && !m_eofSignalSended && !isFillerPacket) {
                 m_extTimeSrc->onEofReached(this, true); // jump to live if needed
                 m_eofSignalSended = true;

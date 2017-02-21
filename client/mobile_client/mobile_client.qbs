@@ -4,7 +4,7 @@ import qbs.FileInfo
 GenericProduct
 {
     name: "mobile_client"
-    type: "application"
+    type: qbs.targetOS.contains("android") ? "dynamiclibrary" : "application"
 
     condition: project.withMobileClient
 
@@ -20,7 +20,7 @@ GenericProduct
         "liteMode": vms.box == "bpi",
         "android.oldPackageName": customization.androidOldPackageName,
         "ios.old_app_appstore_id" : customization.iosOldAppstoreId,
-        "mobile.nx1_customized_name": customization.liteDeviceName
+        "liteDeviceName": customization.liteDeviceName
     })
 
     Group

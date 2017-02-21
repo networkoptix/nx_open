@@ -230,6 +230,30 @@
         },
         {
             "keys": [
+                "Network Optix|Nx-Cube",
+                "Network Optix|E12A"
+            ],
+            "nxDeviceModel": "Nx-Cube-0512A",
+            "nxDeviceName": "Nx-Cube"
+        },
+        {
+            "keys": [
+                "Network Optix|Nx-Dome",
+                "Network Optix|E924"
+            ],
+            "nxDeviceModel": "Nx-Dome-05924",
+            "nxDeviceName": "Nx-Dome"
+        },
+        {
+            "keys": [
+                "Network Optix|Nx-Fisheye",
+                "Network Optix|E925"
+            ],
+            "nxDeviceModel": "Nx-Fisheye-05925",
+            "nxDeviceName": "Nx-Fisheye"
+        },
+        {
+            "keys": [
                 "Network Optix|Nx-Cube-0512A"
             ],
             "advancedParametersTemplate": "nx-cube.xml"
@@ -357,10 +381,10 @@
                 "*|VS8801",
                 "VS8401|*",
                 "*|VS8401",
-                "Digital Watchdog|DW-CPUHDE04",
-                "Digital Watchdog|DW-CPUHDE08",
-                "Digital Watchdog|DW-CPUHDE16",
-                "Digital Watchdog|VMAX A1",
+                "DW|DW-CPUHDE04",
+                "DW|DW-CPUHDE08",
+                "DW|DW-CPUHDE16",
+                "DW|VMAX A1",
                 "Pravis Systems Co., Ltd.|VMAX A1"                
             ],
             "analogEncoder": true
@@ -459,7 +483,8 @@
                 "DW|DWC-MF21M4TIR","Win4NET Co., Ltd.|Clebo-MF21M4TIR",
                 "DW|DWC-MF21M8TIR","Win4NET Co., Ltd.|Clebo-MF21M8TIR",
                 "DW|DWC-MF21M4FM","Win4NET Co., Ltd.|Clebo-MF21M4FM",
-                "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM"
+                "DW|DWC-MF21M8FM","Win4NET Co., Ltd.|Clebo-MF21M8FM",
+                "DW|DWC-MB950TIR", "DW|DWC-MV950TIR"
             ],
             "ptzCapabilities": "NoPtzCapabilities"
         },
@@ -555,7 +580,9 @@
             "keys": [
                 "VISTA|VK2-600PTZ",
                 "VISTA|VK2-1080PTZ",
-                "VISTA|VK2-ENCODER"
+                "VISTA|VK2-ENCODER",
+		"Pelco|D5220",
+                "Pelco|PelcoD5220"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
         },
@@ -631,6 +658,10 @@
                     "VideoEncoderConfigurationA16,VideoEncoderConfigurationA32"   
                 ]
             }
+        },
+        {
+            "keys": ["Hikvision|DS-2CD63C2F-IS"],
+            "parseOnvifNotificationsWithHttpReader": true
         },
         {
             "keys": [
@@ -716,7 +747,9 @@
                 "Honeywell|H4D2S2",
                 "Honeywell|H4D3S2",
                 "Honeywell|H4D5S2",
-                "Honeywell|HDZ302LIW"
+                "Honeywell|HDZ302LIW",
+
+                "Dahua|DH-SD6AL240-HNI"
             ],
             "preferredAuthScheme": "Automatic"
         },
@@ -1567,7 +1600,7 @@
 			],
 			"shouldAppearAsSingleChannel": true,
 			"doNotAddVendorToDeviceName": true,
-			"videoLayout": "width=3;height=2;sensors=0,1,2,4,3,5",
+			"videoLayout": "width=3;height=2;sensors=0,1,2,-1,3,-1",
 			"defaultAR":"4x3"
 		},
 		{
@@ -1680,7 +1713,105 @@
             "keys": ["DW|DWC-MV950TIR"],
             "forceOnvifAdvancedParameters": true
 
-        }
+        },
+        {
+            "keys":["Digital_Watchdog|DWC-PB6M4T"],
+            "forcedOnvifParams": 
+            {
+                "videoEncoders":
+                [
+                    "0,3",
+                    "1,4",
+                    "2,5"
+                ]
+            },
+            "multiresourceVideoChannelMapping": [
+                {
+                    "resourceChannel": 1,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [0]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 2,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [1]
+                        }
+                    ]
+                },
+                {
+                    "resourceChannel": 3,
+                    "channelMap": [
+                        {
+                            "originalChannel": 0,
+                            "mappedChannels": [2]
+                        }
+                    ]
+                }
+            ],
+            "doNotConfigureCamera": false,
+            "ignoreMultisensors": true,
+            "shouldAppearAsSingleChannel": true,
+            "videoLayout": "width=3;height=1;sensors=0,1,2"
+        },
+        {
+            "keys": [
+                "Cellinx|STH795"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1,   1],
+                        "logical": [ 0, 360]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [  -1,    1],
+                        "logical": [  0,  -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 1],
+                        "logical": [1, 31.55],
+                        "logicalMultiplier": 35.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "Redvision|RVX-IP30-IRWL-W"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1,   1],
+                        "logical": [ 0, 360]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [  0.3333,    -1],
+                        "logical": [  -90,  60]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [1, 7],
+                        "logicalMultiplier": 75,
+                        "space": "35MmEquiv"
+                    }
+                }
+            },
+            "onvifPtzDigitsAfterDecimalPoint": 7
+        }		
     ]
 }
 

@@ -18,6 +18,7 @@ extern "C" {
 #include "aligned_mem_video_buffer.h"
 
 #include <QtCore/QFile>
+#include <QtCore/QDebug>
 
 #if defined(TARGET_OS_IPHONE)
 #include <CoreVideo/CoreVideo.h>
@@ -30,6 +31,14 @@ namespace nx {
 namespace media {
 
 namespace {
+
+
+    bool isFatalError(int ffmpegErrorCode)
+    {
+        static const int kHWAcceleratorFailed = 0xb1b4b1ab;
+
+        return ffmpegErrorCode == kHWAcceleratorFailed;
+    }
 
     static enum AVPixelFormat get_format(AVCodecContext *s, const enum AVPixelFormat *pix_fmts)
     {
@@ -82,15 +91,13 @@ public:
 public:
     IOSMemoryBufferPrivate(AVFrame* _frame):
         QAbstractVideoBufferPrivate(),
-        frame(av_frame_alloc()),
+        frame(_frame),
         mapMode(QAbstractVideoBuffer::NotMapped)
     {
-        av_frame_move_ref(frame, _frame);
     }
 
     virtual ~IOSMemoryBufferPrivate()
     {
-        av_buffer_unref(&frame->buf[0]);
         av_frame_free(&frame);
     }
 
@@ -205,9 +212,6 @@ public:
 
     ~IOSVideoDecoderPrivate()
     {
-        if (codecContext)
-            av_videotoolbox_default_free(codecContext);
-
         closeCodecContext();
         av_frame_free(&frame);
     }
@@ -248,6 +252,9 @@ void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
 
 void IOSVideoDecoderPrivate::closeCodecContext()
 {
+    if (codecContext)
+        av_videotoolbox_default_free(codecContext);
+
     QnFfmpegHelper::deleteAvCodecContext(codecContext);
     codecContext = 0;
 }
@@ -341,11 +348,22 @@ int IOSVideoDecoder::decode(
     int gotPicture = 0;
     int res = avcodec_decode_video2(d->codecContext, d->frame, &gotPicture, &avpkt);
     if (res <= 0 || !gotPicture)
+    {
+        qWarning() << "IOS decoder error. gotPicture=" << gotPicture << "errCode=" << QString::number(res, 16);
+        // hardware decoder crash if use same frame after decoding error. It seems
+        // leaves invalid ref_count on error.
+        av_frame_free(&d->frame);
+        d->frame = av_frame_alloc();
+
+        if (isFatalError(res))
+            d->closeCodecContext(); //< reset all
+
         return res; //< Negative value means error, zero means buffering.
+    }
 
     QSize frameSize(d->frame->width, d->frame->height);
     qint64 startTimeMs = d->frame->pkt_dts / 1000;
-    int frameNum = d->frame->coded_picture_number;
+    int frameNum = qMax(0, d->codecContext->frame_number - 1);
 
     QVideoFrame::PixelFormat qtPixelFormat = QVideoFrame::Format_Invalid;
     if (d->frame->data[3])
@@ -358,9 +376,15 @@ int IOSVideoDecoder::decode(
         qtPixelFormat = toQtPixelFormat((AVPixelFormat)d->frame->format);
     }
     if (qtPixelFormat == QVideoFrame::Format_Invalid)
+    {
+        // Recreate frame just in case.
+        // I am not sure hardware decoder can reuse it.
+        av_frame_free(&d->frame);
+        d->frame = av_frame_alloc();
         return -1; //< report error
+    }
 
-    QAbstractVideoBuffer* buffer = new IOSMemoryBuffer(d->frame); //< frame is moved here. null object after the call
+    QAbstractVideoBuffer* buffer = new IOSMemoryBuffer(d->frame);
     d->frame = av_frame_alloc();
     QVideoFrame* videoFrame = new QVideoFrame(buffer, frameSize, qtPixelFormat);
     videoFrame->setStartTime(startTimeMs);

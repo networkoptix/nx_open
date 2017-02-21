@@ -193,7 +193,7 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
                 case QnStorageResource::kSizeDetectionOmitted:
                     return tr("Loading...");
                 default:
-                    return tr("%1 Gb").arg(QString::number(storageData.totalSpace / kBytesInGB, 'f', 1));
+                    return tr("%1 GB").arg(QString::number(storageData.totalSpace / kBytesInGB, 'f', 1));
             }
         }
 
@@ -306,7 +306,7 @@ Qt::ItemFlags QnStorageListModel::flags(const QModelIndex& index) const
 
         if (index.column() == CheckBoxColumn && !storageData.isWritable)
             return false;
-        
+
         return storageData.isOnline ||
             !storageIsActive(storageData);
     };

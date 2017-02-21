@@ -100,7 +100,7 @@
      <item row="2" column="1">
       <widget class="QLineEdit" name="portLineEdit">
        <property name="text">
-        <string>9000</string>
+        <string notr="true">9000</string>
        </property>
        <property name="readOnly">
         <bool>true</bool>

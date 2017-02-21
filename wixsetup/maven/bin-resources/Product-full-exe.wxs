@@ -19,8 +19,8 @@
         <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
             <Payload SourceFile="License.html" />
             <Payload SourceFile="installer_bg.png" />
-            <Payload SourceFile="logo_big.png" />
-            <Payload SourceFile="logo_small.png" />
+            <Payload SourceFile="logo-102x102.png" />
+            <Payload SourceFile="logo-64x64.png" />
 
             <bal:WixExtendedBootstrapperApplication 
                 SuppressOptionsUI="no"
@@ -31,8 +31,10 @@
             />
         </BootstrapperApplicationRef>
 
+        <Variable Name="InstallerTitle" Value="!(loc.InstallerTitleBundle)" />
+
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
-        <WixVariable Id="WixExtbaThemeWxl" Value="OptixThemeFull.wxl" />
+        <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme_$(var.installerLanguage).wxl" />
 
         <Variable Name="InstallClientAndServer" Type="numeric" Value="1" />
         <Variable Name="InstallClientOnly" Type="numeric" Value="0" />

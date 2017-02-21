@@ -16,5 +16,11 @@ GenericProduct
         Depends { name: "udt" }
 
         cpp.defines: ["NX_NETWORK_API=" + vms_cpp.apiImportMacro]
+
+        Properties
+        {
+            condition: qbs.targetOS.contains("android")
+            cpp.libraryPaths: [product.buildDirectory]
+        }
     }
 }

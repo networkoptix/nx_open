@@ -73,7 +73,10 @@ QString QnAppInfo::boostVersion()
 
 bool QnAppInfo::beta()
 {
-    return ${beta};
+    static const auto betaString = QStringLiteral("${beta}").toLower();
+    static const bool beta =
+        (betaString == lit("on") || betaString == lit("true"));
+    return beta;
 }
 
 QString QnAppInfo::productName()
@@ -122,22 +125,27 @@ QString QnAppInfo::mediaFolderName()
 
 QString QnAppInfo::licensingEmailAddress()
 {
-    return QStringLiteral("${company.license.address}");
+    return QStringLiteral("${licenseEmail}");
 }
 
 QString QnAppInfo::companyUrl()
 {
-    return QStringLiteral("${company.url}");
+    return QStringLiteral("${companyUrl}");
 }
 
 QString QnAppInfo::supportEmailAddress()
 {
-    return QStringLiteral("${company.support.address}");
+    return QStringLiteral("${supportEmail}");
 }
 
-QString QnAppInfo::supportLink()
+QString QnAppInfo::supportUrl()
 {
-    return QStringLiteral("${company.support.link}");
+    return QStringLiteral("${supportUrl}");
+}
+
+QString QnAppInfo::supportPhone()
+{
+    return QStringLiteral("${supportPhone}");
 }
 
 QString QnAppInfo::showcaseUrl()
@@ -198,4 +206,3 @@ bool QnAppInfo::freeLicenseIsTrial()
 {
     return ${freeLicenseIsTrial};
 }
-

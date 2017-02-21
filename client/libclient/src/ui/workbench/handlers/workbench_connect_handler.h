@@ -121,7 +121,14 @@ private:
     void showPreloader();
 
 private:
-    int m_connectingHandle;
+    struct
+    {
+        int handle = 0;
+        QUrl url;
+
+        void reset() { handle = 0; url = QUrl(); }
+    } m_connecting;
+
     LogicalState m_logicalState;
     PhysicalState m_physicalState;
 

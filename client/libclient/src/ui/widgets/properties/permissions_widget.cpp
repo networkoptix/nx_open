@@ -24,6 +24,8 @@ QnPermissionsWidget::QnPermissionsWidget(QnAbstractPermissionsModel* permissions
     NX_ASSERT(m_permissionsModel);
     ui->setupUi(this);
 
+    //TODO: #GDM think where to store flags set to avoid duplication
+
     /* Manager permissions. */
     addCheckBox(Qn::GlobalEditCamerasPermission,         tr("Edit camera settings"),
         tr("This is also required to create/edit PTZ presets and tours."));
@@ -76,10 +78,6 @@ void QnPermissionsWidget::applyChanges()
         else
             value &= ~permission(checkbox);
     }
-
-    /* We must set special 'Custom' flag for the users to avoid collisions with built-in roles. */
-    if (m_permissionsModel->subject().user())
-        value |= Qn::GlobalCustomUserPermission;
 
     m_permissionsModel->setRawPermissions(value);
 }

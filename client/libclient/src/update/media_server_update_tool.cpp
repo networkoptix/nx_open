@@ -118,11 +118,13 @@ void QnMediaServerUpdateTool::setPeerStageProgress(const QnUuid &peerId, QnPeerU
 
 void QnMediaServerUpdateTool::finishUpdate(const QnUpdateResult &result)
 {
-    emit updateFinished(result);
     setStage(QnFullUpdateStage::Init);
 
     m_updateProcess->deleteLater();
     m_updateProcess = nullptr;
+
+    /* We must emit signal after m_updateProcess clean, so ::isUpdating() will return false. */
+    emit updateFinished(result);
 }
 
 QnMediaServerResourceList QnMediaServerUpdateTool::targets() const {

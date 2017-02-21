@@ -259,10 +259,6 @@ UnifiedPollSet::UnifiedPollSet(std::unique_ptr<AbstractUdtEpollWrapper> udtEpoll
         m_udtEpollWrapper = std::make_unique<UdtEpollWrapper>();
 
     m_epollFd = UDT::epoll_create();
-    m_interruptSocket.setNonBlockingMode(true);
-    m_interruptSocket.bind(SocketAddress(HostAddress::localhost, 0));
-    if (!add(&m_interruptSocket, aio::etRead))
-        m_interruptSocket.close();
 }
 
 UnifiedPollSet::~UnifiedPollSet()
@@ -272,13 +268,12 @@ UnifiedPollSet::~UnifiedPollSet()
 
 bool UnifiedPollSet::isValid() const
 {
-    return (m_epollFd != -1) && (m_interruptSocket.handle() != INVALID_SOCKET);
+    return m_epollFd != -1;
 }
 
 void UnifiedPollSet::interrupt()
 {
-    static const quint8 buffer[kInterruptBufferSize] = { 0 };
-    m_interruptSocket.sendTo(buffer, sizeof(buffer), m_interruptSocket.getLocalAddress());
+    UDT::epoll_interrupt_wait(m_epollFd);
 }
 
 bool UnifiedPollSet::add(Pollable* const sock, EventType eventType, void* /*userData*/)
@@ -355,16 +350,6 @@ int UnifiedPollSet::poll(int millisToWait)
         SystemError::setLastErrorCode(
             detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
         return -1;
-    }
-
-    auto it = m_readSysFds.find(m_interruptSocket.handle());
-    if (it != m_readSysFds.end())
-    {
-        quint8 buffer[kInterruptBufferSize];
-        m_interruptSocket.recv(buffer, sizeof(buffer), 0); // Ignoring result and data...
-
-        --result;
-        m_readSysFds.erase(it);
     }
 
     removePhantomSockets(&m_readUdtFds);

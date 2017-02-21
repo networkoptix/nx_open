@@ -14,7 +14,6 @@
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 
-
 class QnUserRoleSettingsWidgetPrivate: public Connective<QObject>
 {
     using base_type = Connective<QObject>;
@@ -247,16 +246,16 @@ private:
 
         Q_Q(QnUserRoleSettingsWidget);
 
-        replacementMessageBox = new QnMessageBox(QnMessageBox::Warning,
-            Qn::Empty_Help,
-            q->ui->deleteGroupButton->text(),
-            tr("Choose an action to do with users who had this role:"),
-            QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
-            q->window());
+        const auto text = tr("Please select the action to perform to %n users with this role", "",
+            usersModel->rowCount());
+
+        replacementMessageBox = new QnMessageBox(QnMessageBoxIcon::Question, text,
+            QString(), QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+            QDialogButtonBox::Ok, q->window());
 
         auto customWidget = new QWidget(replacementMessageBox);
 
-        deleteRadioButton = new QRadioButton(tr("Delete"), customWidget);
+        deleteRadioButton = new QRadioButton(tr("Delete such users"), customWidget);
         deleteRadioButton->setChecked(true);
 
         changeRadioButton = new QRadioButton(tr("Assign a new role"), customWidget);

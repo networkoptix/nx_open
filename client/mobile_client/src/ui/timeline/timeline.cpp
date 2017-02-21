@@ -401,31 +401,73 @@ void QnTimeline::setWindow(qint64 windowStart, qint64 windowEnd) {
     if (d->windowStart == windowStart && d->windowEnd == windowEnd)
         return;
 
+    d->zoomKineticHelper.stop();
+    d->stickyPointKineticHelper.stop();
+    d->targetPosition = -1;
+
     d->windowStart = windowStart;
     d->windowEnd = windowEnd;
     d->updateZoomLevel();
-    update();
+
     emit windowStartChanged();
     emit windowEndChanged();
     emit positionChanged();
+
+    update();
 }
 
 qint64 QnTimeline::position() const {
     return windowStart() + (windowEnd() - windowStart()) / 2;
 }
 
-void QnTimeline::setPosition(qint64 position) {
-    if (position == this->position() && (d->targetPosition == -1 || d->targetPosition == position))
+void QnTimeline::setPosition(qint64 position)
+{
+    if (position == this->position()
+        && (d->targetPosition == -1 || d->targetPosition == position))
+    {
         return;
+    }
 
     clearCorrection();
 
     setStickToEnd(position < 0);
 
     if (!stickToEnd())
-        d->targetPosition = qBound(d->startBoundTime, position, d->endBoundTime != -1 ? d->endBoundTime : QDateTime::currentMSecsSinceEpoch());
+    {
+        d->targetPosition = qBound(
+            d->startBoundTime,
+            position,
+            d->endBoundTime != -1
+                ? d->endBoundTime
+                : QDateTime::currentMSecsSinceEpoch());
+    }
 
     update();
+}
+
+void QnTimeline::setPositionImmediately(qint64 position)
+{
+    if (position == this->position()
+        && (d->targetPosition == -1 || d->targetPosition == position))
+    {
+        return;
+    }
+
+    clearCorrection();
+
+    setStickToEnd(position < 0);
+
+    const auto windowSize = windowEnd() - windowStart();
+    const auto endBound = d->endBoundTime != -1
+        ? d->endBoundTime
+        : QDateTime::currentMSecsSinceEpoch();
+
+    position = stickToEnd()
+        ? endBound
+        : qBound(d->startBoundTime, position, endBound);
+
+    const auto newWindowEnd = position + windowSize / 2;
+    setWindow(newWindowEnd - windowSize, newWindowEnd);
 }
 
 QDateTime QnTimeline::positionDate() const {

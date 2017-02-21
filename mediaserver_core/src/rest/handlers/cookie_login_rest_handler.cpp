@@ -11,15 +11,7 @@
 #include <http/custom_headers.h>
 #include <network/client_authenticate_helper.h>
 #include "current_user_rest_handler.h"
-
-struct QnCookieData
-{
-    QnLatin1Array auth;
-};
-#define QnCookieData_Fields (auth)
-
-QN_FUSION_DECLARE_FUNCTIONS(QnCookieData, (json))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((QnCookieData), (json), _Fields)
+#include <api/model/cookie_login_data.h>
 
 int QnCookieLoginRestHandler::executePost(
     const QString &/*path*/,

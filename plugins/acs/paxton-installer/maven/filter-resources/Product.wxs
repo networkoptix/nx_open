@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-  <Product Id="*" Name="${display.product.name} Paxton Plugin" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${paxtonInstaller.upgradeCode}">
+  <Product Id="*" Name="${display.product.name} Paxton Plugin" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${ax.upgradeCode}">
     <Package InstallerVersion="405" Compressed="yes" InstallScope="perMachine" />
 
     <?ifdef env.CommonProgramFiles(x86) ?>

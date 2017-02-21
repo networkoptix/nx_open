@@ -30,6 +30,7 @@ ReverseConnectionPool::ReverseConnectionPool(
         }),
     m_isReconnectHandlerSet(false)
 {
+    bindToAioThread(getAioThread());
 }
 
 ReverseConnectionPool::~ReverseConnectionPool()
@@ -37,13 +38,20 @@ ReverseConnectionPool::~ReverseConnectionPool()
     pleaseStopSync(false);
 }
 
+void ReverseConnectionPool::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    Parent::bindToAioThread(aioThread);
+    m_mediatorConnection->bindToAioThread(aioThread);
+    m_acceptor.bindToAioThread(aioThread);
+}
+
 bool ReverseConnectionPool::start(HostAddress publicIp, uint16_t port, bool waitForRegistration)
 {
     m_publicIp = std::move(publicIp);
     SocketAddress serverAddress(HostAddress::anyHost, port);
     if (!m_acceptor.start(
-        SocketGlobals::outgoingTunnelPool().ownPeerId(),
-        serverAddress, m_mediatorConnection->getAioThread()))
+            SocketGlobals::outgoingTunnelPool().ownPeerId(),
+            serverAddress, m_mediatorConnection->getAioThread()))
     {
         NX_LOGX(lm("Could not start acceptor on %1: %2")
             .strs(serverAddress, SystemError::getLastOSErrorText()), cl_logWARNING);
@@ -116,25 +124,6 @@ std::shared_ptr<ReverseConnectionSource>
     }
 }
 
-void ReverseConnectionPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
-{
-    m_mediatorConnection->pleaseStop(
-        [this, handler = std::move(completionHandler)]()
-        {
-            m_acceptor.pleaseStop();
-
-            // Holders are need to be stopped here, as other shared_ptrs are not primary.
-            for (auto& suffix: m_connectionHolders)
-            {
-                for (auto& holder: suffix.second)
-                    holder.second->pleaseStopSync();
-            }
-
-            m_connectionHolders.clear();
-            handler();
-        });
-}
-
 void ReverseConnectionPool::setPoolSize(boost::optional<size_t> value)
 {
     m_acceptor.setPoolSize(std::move(value));
@@ -145,6 +134,21 @@ void ReverseConnectionPool::setPoolSize(boost::optional<size_t> value)
 void ReverseConnectionPool::setKeepAliveOptions(boost::optional<KeepAliveOptions> value)
 {
     m_acceptor.setKeepAliveOptions(std::move(value));
+}
+
+void ReverseConnectionPool::stopWhileInAioThread()
+{
+    m_mediatorConnection.reset();
+    m_acceptor.pleaseStopSync();
+
+    // Holders are need to be stopped here, as other shared_ptrs are not primary.
+    for (auto& suffix: m_connectionHolders)
+    {
+        for (auto& holder: suffix.second)
+            holder.second->pleaseStopSync();
+    }
+
+    m_connectionHolders.clear();
 }
 
 bool ReverseConnectionPool::registerOnMediator(bool waitForRegistration)

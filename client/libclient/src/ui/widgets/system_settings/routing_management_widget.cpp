@@ -517,10 +517,10 @@ void QnRoutingManagementWidget::at_serverAddressesModel_dataChanged(const QModel
 void QnRoutingManagementWidget::reportUrlEditingError(int error) {
     switch (error) {
     case QnServerAddressesModel::InvalidUrl:
-        QnMessageBox::critical(this, tr("Error"), tr("You have entered an invalid URL."));
+        QnMessageBox::warning(this, tr("Invalid URL"));
         break;
     case QnServerAddressesModel::ExistingUrl:
-        QnMessageBox::warning(this, tr("Warning"), tr("This URL is already in the address list."));
+        QnMessageBox::information(this, tr("URL already added"));
         break;
     }
 }

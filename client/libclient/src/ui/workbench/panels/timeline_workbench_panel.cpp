@@ -277,7 +277,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
         &TimelineWorkbenchPanel::at_sliderResizerWidget_wheelEvent);
 
     /* Create a shadow: */
-    auto shadow = new QnEdgeShadowWidget(item, Qt::TopEdge, NxUi::kShadowThickness);
+    auto shadow = new QnEdgeShadowWidget(parentWidget, item, Qt::TopEdge, NxUi::kShadowThickness);
     shadow->setZValue(NxUi::ShadowItemZOrder);
 
     updateGeometry();

@@ -4,6 +4,11 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
 
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/url/url_parse_helper.h>
+#include <nx/fusion/serialization/lexical.h>
+
 #include "api/session_manager.h"
 #include <api/app_server_connection.h>
 #include <api/model/ping_reply.h>
@@ -24,10 +29,7 @@
 #include "utils/common/delete_later.h"
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
-#include <nx/network/http/asynchttpclient.h>
-#include <nx/network/socket_global.h>
 #include "network/networkoptixmodulerevealcommon.h"
-#include "nx/fusion/serialization/lexical.h"
 #include "api/server_rest_connection.h"
 #include <common/common_module.h>
 #include <api/global_settings.h>
@@ -143,6 +145,13 @@ QString QnMediaServerResource::getName() const
             return (*lk)->name;
     }
     return QnResource::getName();
+}
+
+QString QnMediaServerResource::toSearchString() const
+{
+    return base_type::toSearchString()
+        + L' '
+        + getUrl();
 }
 
 void QnMediaServerResource::setName( const QString& name )
@@ -363,7 +372,7 @@ SocketAddress QnMediaServerResource::getPrimaryAddress() const
     QnMutexLocker lock(&m_mutex);
     if (!m_primaryAddress.isNull())
         return m_primaryAddress;
-    return SocketAddress(QUrl(m_url));
+    return nx::network::url::getEndpoint(QUrl(m_url));
 }
 
 Qn::PanicMode QnMediaServerResource::getPanicMode() const
@@ -590,7 +599,7 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusCh
                         .arg(res->getId().toString())
                         .arg(res->getName())
                         .arg(res->getUrl()), cl_logDEBUG2);
-                emit res->statusChanged(res, Qn::StatusChangeReason::Default);
+                emit res->statusChanged(res, Qn::StatusChangeReason::Local);
             }
         }
     }

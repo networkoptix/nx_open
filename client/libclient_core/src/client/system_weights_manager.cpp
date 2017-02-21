@@ -13,7 +13,7 @@ namespace {
 
 void addOrUpdateWeightData(
     const QString& id,
-    const QnWeightData& data,
+    const WeightData& data,
     QnWeightsDataHash& target)
 {
     const auto it = target.find(id);
@@ -42,7 +42,7 @@ QnWeightsDataHash fromCloudSystemData(const QnCloudSystemList& data)
     QnWeightsDataHash result;
     for (const auto& cloudData: data)
     {
-        const QnWeightData weightData({ cloudData.localId, cloudData.weight,
+        const WeightData weightData({ cloudData.localId, cloudData.weight,
             cloudData.lastLoginTimeUtcMs, true});
 
         result.insert(cloudData.cloudId, weightData);
@@ -53,6 +53,7 @@ QnWeightsDataHash fromCloudSystemData(const QnCloudSystemList& data)
 
 QnWeightsDataHash recalculatedWeights(QnWeightsDataHash source)
 {
+    using namespace nx::client::core;
     for (auto& data: source)
         data.weight = helpers::calculateSystemWeight(data.weight, data.lastConnectedUtcMs);
 
@@ -129,7 +130,7 @@ void QnSystemsWeightsManager::setSystemsFinder(QnAbstractSystemsFinder* finder)
     // TODO: #ynikitenkov add processing of systems's removal.
 }
 
-void QnSystemsWeightsManager::addLocalWeightData(const QnWeightData& data)
+void QnSystemsWeightsManager::addLocalWeightData(const nx::client::core::WeightData& data)
 {
     const auto localId = data.localId.toString();
     const bool found = m_baseWeights.contains(localId);
@@ -164,7 +165,7 @@ void QnSystemsWeightsManager::processSystemDiscovered(const QnSystemDescriptionP
 
     // Inserts weight for unknown system
     static const bool kFakeConnection = false;
-    const QnWeightData unknownSystemWeight({ system->localId(), unknownSystemsWeight(),
+    const WeightData unknownSystemWeight({ system->localId(), unknownSystemsWeight(),
         QDateTime::currentMSecsSinceEpoch(), kFakeConnection });
     addLocalWeightData(unknownSystemWeight);
 }
@@ -213,5 +214,31 @@ void QnSystemsWeightsManager::setUnknownSystemsWeight(qreal value)
 
     m_unknownSystemWeight = value;
     emit unknownSystemsWeightChanged();
+}
+
+void QnSystemsWeightsManager::setWeight(
+    const QnUuid& localSystemId,
+    qreal weight)
+{
+    auto localWeights = qnClientCoreSettings->localSystemWeightsData();
+    const auto it = std::find_if(localWeights.begin(), localWeights.end(),
+        [localSystemId](const nx::client::core::WeightData& data)
+        {
+            return (data.localId == localSystemId);
+        });
+
+    const auto lastConnected = QDateTime::currentMSecsSinceEpoch();
+    if (it == localWeights.end())
+    {
+        localWeights.append(nx::client::core::WeightData({
+            localSystemId, weight, lastConnected, true}));
+    }
+    else
+    {
+        it->lastConnectedUtcMs = lastConnected;
+        it->weight = weight;
+    }
+
+    qnClientCoreSettings->setLocalSystemWeightsData(localWeights);
 }
 

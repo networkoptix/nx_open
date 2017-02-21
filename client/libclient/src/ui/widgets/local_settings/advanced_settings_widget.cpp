@@ -8,10 +8,13 @@
 #include <client/client_settings.h>
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_show_once_settings.h>
 
 #include <common/common_module.h>
 
 #include <core/resource/resource_directory_browser.h>
+
+#include <text/time_strings.h>
 
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
@@ -32,6 +35,8 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     ui(new Ui::AdvancedSettingsWidget)
 {
     ui->setupUi(this);
+
+    ui->maximumLiveBufferLengthSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Milliseconds));
 
     setHelpTopic(ui->browseLogsButton,          Qn::SystemSettings_General_Logs_Help);
     setHelpTopic(ui->doubleBufferCheckbox,      Qn::SystemSettings_General_DoubleBuffering_Help);
@@ -112,10 +117,9 @@ void QnAdvancedSettingsWidget::at_browseLogsButton_clicked()
 {
     const QString logsLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation)
         + lit("/log");
-    if (!QDir(logsLocation).exists()) {
-        QnMessageBox::information(this,
-                                 tr("Information"),
-                                 tr("Folder '%1' does not exist.").arg(logsLocation));
+    if (!QDir(logsLocation).exists())
+    {
+        QnMessageBox::warning(this, tr("Folder not found"), logsLocation);
         return;
     }
     QDesktopServices::openUrl(QLatin1String("file:///") + logsLocation);
@@ -142,7 +146,7 @@ void QnAdvancedSettingsWidget::at_clearCacheButton_clicked()
 
 void QnAdvancedSettingsWidget::at_resetAllWarningsButton_clicked()
 {
-    qnSettings->setShowOnceMessages(0);
+    qnClientShowOnce->reset();
 }
 
 bool QnAdvancedSettingsWidget::isAudioDownmixed() const

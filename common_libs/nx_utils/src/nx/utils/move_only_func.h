@@ -44,13 +44,14 @@ class MoveOnlyFunc
         MoveOnlyFuncWrapper& operator=(const MoveOnlyFuncWrapper&)
         {
             NX_ASSERT(false);
+            return *this;
         }
         MoveOnlyFuncWrapper(MoveOnlyFuncWrapper&& rhs)
         :
             m_func(std::move(rhs.m_func))
         {
         }
-        MoveOnlyFuncWrapper& operator=(MoveOnlyFuncWrapper&& rhs)
+        MoveOnlyFuncWrapper& operator=(MoveOnlyFuncWrapper&& rhs) noexcept
         {
             if (&rhs == this)
                 return *this;
@@ -68,7 +69,7 @@ class MoveOnlyFunc
 
 public:
     MoveOnlyFunc() = default;
-    
+
     MoveOnlyFunc(std::function<F> func)
     :
         std::function<F>(std::move(func))

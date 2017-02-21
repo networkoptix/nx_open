@@ -1,5 +1,4 @@
-#ifndef QN_DISPLAY_WIDGET_RENDERER_H
-#define QN_DISPLAY_WIDGET_RENDERER_H
+#pragma once
 
 //#define TEST_FISHEYE_CALIBRATOR
 
@@ -21,7 +20,7 @@ class DecodedPictureToOpenGLUploader;
 class QnGLRenderer;
 
 class QnResourceWidgetRenderer
-:
+    :
     public QnAbstractRenderer
 {
     Q_OBJECT;
@@ -30,7 +29,7 @@ public:
     /*!
         \param context MUST not be NULL
     */
-    QnResourceWidgetRenderer(QObject* parent, QGLContext* context );
+    QnResourceWidgetRenderer(QObject* parent, QGLContext* context);
     void setChannelCount(int channelCount);
 
 
@@ -44,7 +43,7 @@ public:
         \note This method is not thread-safe and must be called from decoder thread only
         \note Renderer is not required to draw \a image immediately. It is allowed to add frame to some internal render queue and draw when appropriate
     */
-    virtual void draw( const QSharedPointer<CLVideoDecoderOutput>& image ) override;
+    virtual void draw(const QSharedPointer<CLVideoDecoderOutput>& image) override;
     //!Ignore frames currently in render queue
     virtual void discardAllFramesPostedToDisplay(int channel) override;
     //!Blocks till last frame passed to \a draw method is displayed on screen
@@ -70,7 +69,7 @@ public:
     void skip(int channel); // TODO: #Elric replace with setEnabled
 
     virtual qint64 getTimestampOfNextFrameToRender(int channel) const override;
-    virtual void blockTimeValue(int channelNumber, qint64  timestamp ) const  override;
+    virtual void blockTimeValue(int channelNumber, qint64  timestamp) const  override;
     virtual void unblockTimeValue(int channelNumber) const  override;
     virtual bool isTimeBlocked(int channelNumber) const override;
 
@@ -84,7 +83,7 @@ public:
 
     const QGLContext* glContext() const;
 
-    bool isDisplaying( const QSharedPointer<CLVideoDecoderOutput>& image ) const;
+    bool isDisplaying(const QSharedPointer<CLVideoDecoderOutput>& image) const;
 
     void setImageCorrection(const ImageCorrectionParams& value);
     void setFisheyeController(QnFisheyePtzController* controller);
@@ -103,7 +102,7 @@ public:
 signals:
     /**
      * This signal is emitted whenever the source geometry is changed.
-     * 
+     *
      * \param newSourceSize             New source size.
      */
     void sourceSizeChanged();
@@ -113,7 +112,7 @@ signals:
 private:
     QSize getMostFrequentChannelSourceSize() const;
     int getMostFrequentSize(std::map<int, int>& sizeMap) const;
-    
+
 private:
     struct RenderingTools
     {
@@ -124,12 +123,12 @@ private:
         int framesSinceJump;
 
         RenderingTools()
-        :
-            renderer( NULL ),
-            uploader( NULL ),
-            timestampBlocked( false ),
-            forcedTimestampValue( AV_NOPTS_VALUE ),
-            framesSinceJump( 0 )
+            :
+            renderer(NULL),
+            uploader(NULL),
+            timestampBlocked(false),
+            forcedTimestampValue(AV_NOPTS_VALUE),
+            framesSinceJump(0)
         {
         }
     };
@@ -149,7 +148,7 @@ private:
     QSize m_channelScreenSize;
 
     QGLContext* m_glContext;
-    
+
     QRectF m_displayRect[CL_MAX_CHANNELS];
 
     std::vector<bool> m_renderingEnabled;
@@ -160,5 +159,3 @@ private:
     bool m_isCircleDetected;
 #endif
 };
-
-#endif // QN_DISPLAY_WIDGET_RENDERER_H

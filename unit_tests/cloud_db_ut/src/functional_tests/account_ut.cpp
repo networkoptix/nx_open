@@ -34,17 +34,17 @@ class Account:
 
 } // namespace
 
-// TODO: #ak following test should be broke into something like
+// TODO: #ak following test should be broken into something like:
 //
 //{
-//    havingIssuedAccountRegistrationRequest();
-//    expectingReceivalOfActiveAccountNotification();
-//    expectingAccountActivationCodeWorks();
+//    whenIssuedAccountRegistrationRequest();
+//    assertAccountActivationNotificationHasBeenSent();
+//    assertAccountActivationCodeWorks();
 //}
 //
 //{
-//    havingIssuedAccountRegistrationRequest();
-//    expectingFailureToBindSystemToAccount();
+//    whenIssuedAccountRegistrationRequest();
+//    assertAccountCannotBindSystem();
 //}
 
 TEST_F(Account, activation)
@@ -322,7 +322,7 @@ TEST_F(Account, bad_registration)
     url.setPort(endpoint().port);
     url.setScheme("http");
     url.setPath("/cdb/account/register");
-    std::promise<void> donePromise;
+    nx::utils::promise<void> donePromise;
     auto doneFuture = donePromise.get_future();
     QObject::connect(
         client.get(), &nx_http::AsyncHttpClient::done,
@@ -774,213 +774,6 @@ TEST_F(Account, reset_password_activates_account)
     result = getAccount(account1.email, account1NewPassword, &account1);
     ASSERT_EQ(api::ResultCode::ok, result);
     ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
-}
-
-TEST_F(Account, temporary_credentials)
-{
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    api::AccountData account1;
-    std::string account1Password;
-    api::ResultCode result = addActivatedAccount(&account1, &account1Password);
-    ASSERT_EQ(result, api::ResultCode::ok);
-
-    for (int i = 0; i < 3; ++i)
-    {
-        api::TemporaryCredentialsParams params;
-        if (i == 0)
-            params.timeouts.expirationPeriod = std::chrono::hours(1);
-        else if (i == 1)
-            params.type = "long";
-        else if (i == 2)
-            params.type = "short";
-        api::TemporaryCredentials temporaryCredentials;
-        result = createTemporaryCredentials(
-            account1.email,
-            account1Password,
-            params,
-            &temporaryCredentials);
-        ASSERT_EQ(api::ResultCode::ok, result);
-        if (i == 0)
-        {
-            ASSERT_EQ(
-                params.timeouts.expirationPeriod,
-                temporaryCredentials.timeouts.expirationPeriod);
-        }
-        else if (i == 1)
-        {
-            ASSERT_EQ(
-                std::chrono::hours(24)*30,
-                temporaryCredentials.timeouts.expirationPeriod);
-            ASSERT_FALSE(temporaryCredentials.timeouts.autoProlongationEnabled);
-        }
-        else if (i == 2)
-        {
-            ASSERT_EQ(
-                std::chrono::minutes(60),
-                temporaryCredentials.timeouts.expirationPeriod);
-            ASSERT_TRUE(temporaryCredentials.timeouts.autoProlongationEnabled);
-            ASSERT_EQ(
-                std::chrono::minutes(10),
-                temporaryCredentials.timeouts.prolongationPeriod);
-        }
-
-        for (int j = 0; j < 2; ++j)
-        {
-            if (j == 1)
-                ASSERT_TRUE(restart());
-
-            result = getAccount(
-                temporaryCredentials.login,
-                temporaryCredentials.password,
-                &account1);
-            ASSERT_EQ(api::ResultCode::ok, result);
-            ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
-        }
-
-        //checking that account update is forbidden
-        std::string account1NewPassword = account1Password + "new";
-        api::AccountUpdateData update;
-        update.passwordHa1 = nx_http::calcHa1(
-            account1.email.c_str(),
-            moduleInfo().realm.c_str(),
-            account1NewPassword.c_str()).constData();
-        update.fullName = account1.fullName + "new";
-        update.customization = account1.customization + "new";
-
-        result = updateAccount(
-            temporaryCredentials.login,
-            temporaryCredentials.password,
-            update);
-        ASSERT_EQ(result, api::ResultCode::forbidden);
-    }
-}
-
-TEST_F(Account, temporary_credentials_expiration)
-{
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    constexpr const auto expirationPeriod = std::chrono::seconds(5);
-
-    api::AccountData account1;
-    std::string account1Password;
-    api::ResultCode result = addActivatedAccount(&account1, &account1Password);
-    ASSERT_EQ(result, api::ResultCode::ok);
-
-    api::TemporaryCredentialsParams params;
-    params.timeouts.expirationPeriod = expirationPeriod;
-    api::TemporaryCredentials temporaryCredentials;
-    result = createTemporaryCredentials(
-        account1.email,
-        account1Password,
-        params,
-        &temporaryCredentials);
-    ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(
-        expirationPeriod,
-        temporaryCredentials.timeouts.expirationPeriod);
-
-    result = getAccount(
-        temporaryCredentials.login,
-        temporaryCredentials.password,
-        &account1);
-    ASSERT_EQ(api::ResultCode::ok, result);
-
-    std::this_thread::sleep_for(expirationPeriod);
-
-    for (int i = 0; i < 2; ++i)
-    {
-        if (i == 1)
-            ASSERT_TRUE(restart());
-
-        result = getAccount(
-            temporaryCredentials.login,
-            temporaryCredentials.password,
-            &account1);
-        ASSERT_EQ(api::ResultCode::notAuthorized, result);
-    }
-}
-
-TEST_F(Account, temporary_credentials_login_to_system)
-{
-    constexpr const auto expirationPeriod = std::chrono::seconds(50);
-
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    const auto account = addActivatedAccount2();
-    const auto system = addRandomSystemToAccount(account);
-
-    api::TemporaryCredentialsParams params;
-    params.timeouts.expirationPeriod = expirationPeriod;
-    api::TemporaryCredentials temporaryCredentials;
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        createTemporaryCredentials(
-            account.email,
-            account.password,
-            params,
-            &temporaryCredentials));
-
-    auto cdbConnection = connection(system.id, system.authKey);
-
-    api::AuthRequest authRequest;
-    authRequest.nonce = api::generateCloudNonceBase(system.id);
-    authRequest.realm = QnAppInfo::realm().toStdString();
-    authRequest.username = temporaryCredentials.login;
-
-    api::ResultCode resultCode = api::ResultCode::ok;
-    api::AuthResponse authResponse;
-    std::tie(resultCode, authResponse) =
-        makeSyncCall<api::ResultCode, api::AuthResponse>(
-            std::bind(
-                &nx::cdb::api::AuthProvider::getAuthenticationResponse,
-                cdbConnection->authProvider(),
-                authRequest,
-                std::placeholders::_1));
-    ASSERT_EQ(api::ResultCode::ok, resultCode);
-    ASSERT_EQ(account.email, authResponse.authenticatedAccountData.accountEmail);
-}
-
-TEST_F(Account, temporary_credentials_removed_on_password_change)
-{
-    constexpr const auto expirationPeriod = std::chrono::seconds(50);
-
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    auto account = addActivatedAccount2();
-    const auto system = addRandomSystemToAccount(account);
-
-    api::TemporaryCredentialsParams params;
-    params.timeouts.expirationPeriod = expirationPeriod;
-    api::TemporaryCredentials temporaryCredentials;
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        createTemporaryCredentials(
-            account.email,
-            account.password,
-            params,
-            &temporaryCredentials));
-
-    std::string account1NewPassword = account.password + "new";
-    api::AccountUpdateData accountUpdateData;
-    accountUpdateData.passwordHa1 = nx_http::calcHa1(
-        account.email.c_str(),
-        moduleInfo().realm.c_str(),
-        account1NewPassword.c_str()).constData();
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        updateAccount(account.email, account.password, accountUpdateData));
-
-    for (int i = 0; i < 2; ++i)
-    {
-        if (i == 1)
-            restart();
-
-        api::AccountData accountData;
-        ASSERT_EQ(
-            api::ResultCode::notAuthorized,
-            getAccount(temporaryCredentials.login, temporaryCredentials.password, &accountData));
-    }
 }
 
 TEST_F(Account, created_while_sharing)

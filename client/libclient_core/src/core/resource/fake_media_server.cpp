@@ -22,7 +22,7 @@ void QnFakeMediaServerResource::setFakeServerModuleInformation(const ec2::ApiDis
         m_serverData = serverData;
     }
 
-    setStatus(serverData.status, Qn::StatusChangeReason::Default);
+    setStatus(serverData.status, Qn::StatusChangeReason::Local);
 
     QList<SocketAddress> addressList;
     for (const QString &address : serverData.remoteAddresses)

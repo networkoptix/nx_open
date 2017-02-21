@@ -82,6 +82,7 @@
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/app_info.h>
+#include <helpers/system_helpers.h>
 
 #include <watchers/cloud_status_watcher.h>
 
@@ -92,8 +93,7 @@ static const int kMessagesDelayMs = 5000;
 
 bool isConnectionToCloud(const QUrl& url)
 {
-    const bool isCloudHost = nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host());
-    return isCloudHost;
+    return nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host());
 }
 
 bool isSameConnectionUrl(const QUrl& first, const QUrl& second)
@@ -103,26 +103,24 @@ bool isSameConnectionUrl(const QUrl& first, const QUrl& second)
         && (first.userName() == second.userName()));
 }
 
-QString getConnectionName(const QnLocalConnectionData& data)
+QString getConnectionName(const QString& systemName, const QUrl& url)
 {
     static const auto kNameTemplate = QnWorkbenchConnectHandler::tr("%1 in %2",
         "%1 is user name, %2 is name of system");
 
-    return kNameTemplate.arg(data.url.userName(), data.systemName);
+    return kNameTemplate.arg(url.userName(), systemName);
 }
 
-void removeCustomConnection(const QnLocalConnectionData& data)
+void removeCustomConnection(const QnUuid& localId, const QUrl& url)
 {
-    if (!data.password.isEmpty())
-        return;
-
-    NX_ASSERT(!data.localId.isNull(), "We can't remove custom user connections");
+    NX_ASSERT(!localId.isNull(), "We can't remove custom user connections");
 
     auto customConnections = qnSettings->customConnections();
+
     const auto itSameSystem = std::find_if(customConnections.begin(), customConnections.end(),
-        [localId = data.localId, user = data.url.userName()](const QnConnectionData& value)
+        [&localId, user = url.userName()](const QnConnectionData& value)
         {
-            return ((localId == value.localId) && (value.url.userName() == user));
+            return localId == value.localId && value.url.userName() == user;
         });
 
     if (itSameSystem == customConnections.end())
@@ -133,60 +131,46 @@ void removeCustomConnection(const QnLocalConnectionData& data)
     qnSettings->save();
 }
 
-void storeCustomConnection(const QnLocalConnectionData& data)
+void storeCustomConnection(const QnUuid& localId, const QString& systemName, const QUrl& url)
 {
-    if (data.password.isEmpty())
+    if (url.password().isEmpty())
         return;
 
-    NX_ASSERT(!data.localId.isNull(), "We can't remove custom user connections");
+    NX_ASSERT(!localId.isNull(), "We can't remove custom user connections");
 
     auto customConnections = qnSettings->customConnections();
 
-    static const auto kNameTemplate = QnWorkbenchConnectHandler::tr("%1 in %2",
-        "%1 is user name, %2 is name of system");
-
-    const auto connectionName = getConnectionName(data);
-    QUrl urlWithPassword = data.url;
-    urlWithPassword.setPassword(data.password.value());
-
-    /*
-    if (itSameSystem != customConnections.end())
-        return; // We don't add stored connection to system if it is exist
-    */
-
     const auto itSameUrl = std::find_if(customConnections.begin(), customConnections.end(),
-        [url = data.url](const QnConnectionData& value)
+        [&url](const QnConnectionData& value)
         {
             return isSameConnectionUrl(url, value.url);
         });
 
     const bool sameUrlFound = (itSameUrl != customConnections.end());
-    if (sameUrlFound && (itSameUrl->url.password() == urlWithPassword.password()))
+    if (sameUrlFound && (itSameUrl->url.password() == url.password()))
         return; // We don't add/update stored connection with existing url and same password
 
     if (sameUrlFound)
-        itSameUrl->url = urlWithPassword; // Just updates password
-
-    ///
+        itSameUrl->url = url;
 
     const auto itSameSystem = std::find_if(customConnections.begin(), customConnections.end(),
-        [id = data.localId, user = data.url.userName()](const QnConnectionData& value)
+        [&localId, userName = url.userName()](const QnConnectionData& value)
         {
-            return ((id == value.localId) && (value.url.userName() == user));
+            return localId == value.localId && value.url.userName() == userName;
         });
 
     const bool sameSystemFound = (itSameSystem != customConnections.end());
     if (sameSystemFound)
-        itSameSystem->url = urlWithPassword;    // Updates credentials and host
+        itSameSystem->url = url;
 
     if (!sameSystemFound && !sameUrlFound)
     {
         // Adds new stored connection
-        auto connection = QnConnectionData(connectionName, urlWithPassword, data.localId);
+        auto connectionName = getConnectionName(systemName, url);
         if (customConnections.contains(connectionName))
-            connection.name = customConnections.generateUniqueName(connectionName);
+            connectionName = customConnections.generateUniqueName(connectionName);
 
-        customConnections.append(connection);
+        customConnections.append(QnConnectionData(connectionName, url, localId));
     }
 
     qnSettings->setCustomConnections(customConnections);
@@ -202,15 +186,13 @@ void storeLocalSystemConnection(
 {
     if (autoLogin)
         storePassword = true;
+
     if (!storePassword)
         url.setPassword(QString());
 
-    QnLocalConnectionData connectionData;
-    if (!helpers::storeLocalSystemConnection(
-        systemName, localSystemId, url, connectionData))
-    {
-        return;
-    }
+    using namespace nx::client::core::helpers;
+
+    storeConnection(localSystemId, systemName, url);
 
     qnClientCoreSettings->save();
 
@@ -219,9 +201,9 @@ void storeLocalSystemConnection(
     qnSettings->setAutoLogin(autoLogin);
 
     if (storePassword)
-        storeCustomConnection(connectionData);
+        storeCustomConnection(localSystemId, systemName, url);
     else
-        removeCustomConnection(connectionData);
+        removeCustomConnection(localSystemId, url);
 
     qnSettings->save();
 }
@@ -316,7 +298,6 @@ QDebug operator<<(QDebug dbg, QnWorkbenchConnectHandler::PhysicalState state)
 QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_connectingHandle(0),
     m_logicalState(LogicalState::disconnected),
     m_physicalState(PhysicalState::disconnected),
     m_warnMessagesDisplayed(false)
@@ -350,7 +331,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
         &QnWorkbenchConnectHandler::at_disconnectAction_triggered);
 
     connect(action(QnActions::OpenLoginDialogAction), &QAction::triggered, this,
-        &QnWorkbenchConnectHandler::showLoginDialog);
+        &QnWorkbenchConnectHandler::showLoginDialog, Qt::QueuedConnection);
     connect(action(QnActions::BeforeExitAction), &QAction::triggered, this,
         [this]
         {
@@ -360,8 +341,24 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     connect(action(QnActions::LogoutFromCloud), &QAction::triggered, this,
         [this]
         {
-            if (m_logicalState == LogicalState::disconnected)
-                return;
+            switch (m_logicalState)
+            {
+                case LogicalState::disconnected:
+                case LogicalState::testing:
+                case LogicalState::installing_updates:
+                    return;
+                case LogicalState::connecting:
+                case LogicalState::connecting_to_target:
+                    if (isConnectionToCloud(m_connecting.url))
+                        disconnectFromServer(true, true);
+                    return;
+                case LogicalState::connected:
+                case LogicalState::reconnecting:
+                    break;
+                default:
+                    NX_ASSERT(false, "Unhandled connection state");
+            }
+
 
             /* Check if we need to log out if logged in under this user. */
             QString currentLogin = QnAppServerConnectionFactory::url().userName();
@@ -398,7 +395,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
     ec2::AbstractECConnectionPtr connection)
 {
     /* Check if we have entered 'connect' method again while were in 'connecting...' state */
-    if (m_connectingHandle != handle)
+    if (m_connecting.handle != handle)
         return;
 
     if (m_logicalState == LogicalState::disconnected)
@@ -407,7 +404,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
     if (m_physicalState != PhysicalState::testing)
         return;
 
-    m_connectingHandle = 0;
+    m_connecting.reset();
 
     /* Preliminary exit if application was closed while we were in the inner loop. */
     NX_ASSERT(!context()->closingDown());
@@ -449,6 +446,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
             }
             break;
         case Qn::IncompatibleProtocolConnectionResult:
+        case Qn::IncompatibleCloudHostConnectionResult:
             menu()->trigger(QnActions::DelayedForcedExitAction);
             break;
         default:    //error
@@ -572,14 +570,29 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     /**
      * Note! We don't save connection to cloud or new systems. But we have to update
      * weights for any connection using its local id
+     *
+     * Also, we always store connection if StorePassword flag is set because it means
+     * it is not initial connection to factory system.
      */
 
-    const auto serverModuleInfo = qnModuleFinder->moduleInformation(info.serverId());
-    if (helpers::isNewSystem(serverModuleInfo))
+    const bool storePassword = options.testFlag(StorePassword);
+    if (!storePassword && helpers::isNewSystem(info))
         return;
 
     const auto localId = helpers::getLocalSystemId(info);
-    helpers::updateWeightData(localId);
+    nx::client::core::helpers::updateWeightData(localId);
+
+    // Stores local credentials for successful connection
+    const bool autoLogin = options.testFlag(AutoLogin);
+    if (helpers::isLocalUser(url.userName()))
+    {
+        const auto credentials = (storePassword || autoLogin
+            ? QnCredentials(url)
+            : QnCredentials(url.userName(), QString()));
+
+        nx::client::core::helpers::storeCredentials(localId, credentials);
+        qnClientCoreSettings->save();
+    }
 
     if (options.testFlag(IsCloudConnection))
     {
@@ -588,12 +601,13 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
         return;
     }
 
+    // Stores connection if it is local
     storeLocalSystemConnection(
         info.systemName,
         localId,
         url,
-        options.testFlag(StorePassword),
-        options.testFlag(AutoLogin)
+        storePassword,
+        autoLogin
     );
 }
 
@@ -626,7 +640,7 @@ void QnWorkbenchConnectHandler::stopReconnecting()
         m_reconnectDialog->deleteLater(); /*< We may get here from this dialog 'reject' handler. */
     m_reconnectDialog.clear();
     m_reconnectHelper.reset();
-    m_connectingHandle = 0;
+    m_connecting.reset();
 }
 
 void QnWorkbenchConnectHandler::setState(LogicalState logicalValue, PhysicalState physicalValue)
@@ -778,7 +792,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed()
 void QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived()
 {
     /* Avoid double reconnect when server is very slow or in debug. */
-    m_connectingHandle = 0;
+    m_connecting.reset();
 
     NX_ASSERT(m_logicalState != LogicalState::disconnected);
     if (m_logicalState == LogicalState::disconnected)
@@ -881,7 +895,7 @@ void QnWorkbenchConnectHandler::at_connectToCloudSystemAction_triggered()
     QUrl url = system->getServerHost(reachableServer->id);
     auto credentials = qnCloudStatusWatcher->credentials();
     url.setUserName(credentials.user);
-    url.setPassword(credentials.password);
+    url.setPassword(credentials.password.value());
 
     menu()->trigger(QnActions::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, url));
 }
@@ -926,8 +940,9 @@ void QnWorkbenchConnectHandler::connectToServer(const QUrl &url)
         return;
 
     setPhysicalState(PhysicalState::testing);
-    m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
+    m_connecting.handle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
         url, clientInfo(), this, &QnWorkbenchConnectHandler::handleConnectReply);
+    m_connecting.url = url;
 }
 
 bool QnWorkbenchConnectHandler::disconnectFromServer(bool force, bool isErrorReason)
@@ -964,10 +979,10 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
     const bool invalidState = ((m_logicalState != LogicalState::testing)
         && (m_logicalState != LogicalState::connecting_to_target));
 
-    if (m_connectingHandle != handle || invalidState)
+    if (m_connecting.handle != handle || invalidState)
         return;
 
-    m_connectingHandle = 0;
+    m_connecting.reset();
 
     /* Preliminary exit if application was closed while we were in the inner loop. */
     NX_ASSERT(!context()->closingDown());
@@ -980,6 +995,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
     switch (status)
     {
         case Qn::IncompatibleProtocolConnectionResult:
+        case Qn::IncompatibleCloudHostConnectionResult:
             // Do not store connection if applauncher is offline
             if (!applauncher::checkOnline(false))
                 break;
@@ -998,6 +1014,7 @@ void QnWorkbenchConnectHandler::handleTestConnectionReply(
             connectToServer(url);
             break;
         case Qn::IncompatibleProtocolConnectionResult:
+        case Qn::IncompatibleCloudHostConnectionResult:
             menu()->trigger(QnActions::DelayedForcedExitAction);
             break;
         default:
@@ -1068,13 +1085,14 @@ void QnWorkbenchConnectHandler::testConnectionToServer(
     setLogicalState(force ? LogicalState::connecting_to_target : LogicalState::testing);
 
     setPhysicalState(PhysicalState::testing);
-    m_connectingHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
+    m_connecting.handle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
         url, this,
         [this, options, url, force]
         (int handle, ec2::ErrorCode errorCode, const QnConnectionInfo& connectionInfo)
         {
             handleTestConnectionReply(handle, url, errorCode, connectionInfo, options, force);
         });
+    m_connecting.url = url;
 }
 
 bool QnWorkbenchConnectHandler::tryToRestoreConnection()

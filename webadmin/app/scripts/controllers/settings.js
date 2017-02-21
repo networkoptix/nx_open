@@ -4,6 +4,7 @@ angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $rootScope, $modal, $log, mediaserver, $poll,
                                           cloudAPI, $location, $timeout, dialogs, nativeClient) {
 
+        $scope.L = L;
 
         function updateActive(){
             $scope.active={
@@ -144,7 +145,10 @@ angular.module('webadminApp')
             });
         }
 
-        function errorHandler(){
+        function errorHandler(result){
+            if(result == 'cancel'){ // That's fine, dialog was cancelled
+                return false;
+            }
             dialogs.alert (L.settings.connnetionError);
             return false;
         }

@@ -1,46 +1,39 @@
-/**********************************************************
-* Oct 5, 2015
-* akolesnikov
-***********************************************************/
-
 #include "cdb_request_path.h"
 
 namespace nx {
 namespace cdb {
 
-const char* kAccountRegisterPath = "/cdb/account/register";
-const char* kAccountActivatePath = "/cdb/account/activate";
-const char* kAccountGetPath = "/cdb/account/get";
-const char* kAccountUpdatePath = "/cdb/account/update";
-const char* kAccountPasswordResetPath = "/cdb/account/resetPassword";
-const char* kAccountReactivatePath = "/cdb/account/reactivate";
-const char* kAccountCreateTemporaryCredentialsPath = "/cdb/account/createTemporaryCredentials";
+const char* const kAccountRegisterPath = "/cdb/account/register";
+const char* const kAccountActivatePath = "/cdb/account/activate";
+const char* const kAccountGetPath = "/cdb/account/get";
+const char* const kAccountUpdatePath = "/cdb/account/update";
+const char* const kAccountPasswordResetPath = "/cdb/account/resetPassword";
+const char* const kAccountReactivatePath = "/cdb/account/reactivate";
+const char* const kAccountCreateTemporaryCredentialsPath = "/cdb/account/createTemporaryCredentials";
 
-const char* kSystemBindPath = "/cdb/system/bind";
-const char* kSystemUnbindPath = "/cdb/system/unbind";
-const char* kSystemGetPath = "/cdb/system/get";
-const char* kSystemSharePath = "/cdb/system/share";
-const char* kSystemGetCloudUsersPath = "/cdb/system/getCloudUsers";
-const char* kSystemGetAccessRoleListPath = "/cdb/system/getAccessRoleList";
-const char* kSystemRenamePath = "/cdb/system/rename";
-const char* kSystemUpdatePath = "/cdb/system/update";
-const char* kSystemRecordUserSessionStartPath = "/cdb/system/recordUserSessionStart";
+const char* const kSystemBindPath = "/cdb/system/bind";
+const char* const kSystemUnbindPath = "/cdb/system/unbind";
+const char* const kSystemGetPath = "/cdb/system/get";
+const char* const kSystemSharePath = "/cdb/system/share";
+const char* const kSystemGetCloudUsersPath = "/cdb/system/getCloudUsers";
+const char* const kSystemGetAccessRoleListPath = "/cdb/system/getAccessRoleList";
+const char* const kSystemRenamePath = "/cdb/system/rename";
+const char* const kSystemUpdatePath = "/cdb/system/update";
+const char* const kSystemRecordUserSessionStartPath = "/cdb/system/recordUserSessionStart";
 
-const char* kAuthGetNoncePath = "/cdb/auth/getNonce";
-const char* kAuthGetAuthenticationPath = "/cdb/auth/getAuthentication";
+const char* const kAuthGetNoncePath = "/cdb/auth/getNonce";
+const char* const kAuthGetAuthenticationPath = "/cdb/auth/getAuthentication";
 
-const char* kSubscribeToSystemEventsPath = "/cdb/event/subscribe";
+const char* const kSubscribeToSystemEventsPath = "/cdb/event/subscribe";
 
-const char* kPingPath = "/cdb/ping";
+const char* const kPingPath = "/cdb/ping";
 
-const char* kEstablishEc2TransactionConnectionDeprecatedPath = "/ec2/events/ConnectingStage1";
-const char* kPushEc2TransactionDeprecatedPath = "/ec2/forward_events/";
+// TODO: These values are coupled with nx::cdb::api::kEc2EventsPath in "ec2_request_paths.h".
+const char* const kEstablishEc2TransactionConnectionPath = "/cdb/ec2/events/ConnectingStage1";
+const char* const kDeprecatedEstablishEc2TransactionConnectionPath = "/ec2/events/ConnectingStage1";
 
-const char* kEstablishEc2TransactionConnectionPath = "/cdb/ec2/events/ConnectingStage1";
-const char* kPushEc2TransactionPath = "/cdb/ec2/forward_events/";
-
-const char* kMaintenanceGetVmsConnections = "/cdb/maintenance/getVmsConnections";
-const char* kMaintenanceGetTransactionLog = "/cdb/maintenance/getTransactionLog";
+const char* const kMaintenanceGetVmsConnections = "/cdb/maintenance/getVmsConnections";
+const char* const kMaintenanceGetTransactionLog = "/cdb/maintenance/getTransactionLog";
 
 } // namespace cdb
 } // namespace nx

@@ -1,7 +1,6 @@
 pragma Singleton
 
 import QtQuick 2.5;
-import NetworkOptix.Qml 1.0;
 
 QtObject
 {
@@ -128,6 +127,11 @@ QtObject
             {
                 readonly property color link: context.getPaletteColor("blue", 2);
                 readonly property color linkHovered: context.getPaletteColor("blue", 4);
+            }
+
+            property QtObject titleBar: QtObject
+            {
+                readonly property color shadow: colorWithAlpha(getPaletteColor("dark", 0), 0.15);
             }
         }
     }

@@ -44,7 +44,7 @@ private:
 
     void serializationTest()
     {
-        std::cout << "    [ SUBTEST ] serialization" << std::endl;
+        std::cout << "[  SUBTEST ] serialization" << std::endl;
 
         for (const auto& testData: m_testValues)
         {
@@ -52,7 +52,7 @@ private:
             Attribute testAttribute = testData.value;
 
             nx::Buffer serializedBuffer;
-            serializedBuffer.reserve(sizeof(serializedPrototype));
+            serializedBuffer.reserve(serializedPrototype.size());
             std::size_t bytesWritten = 0;
             MessageSerializerBuffer stream(&serializedBuffer);
             ASSERT_EQ(
@@ -65,7 +65,7 @@ private:
 
     void deserializationTest()
     {
-        std::cout << "    [ SUBTEST ] deserialization" << std::endl;
+        std::cout << "[  SUBTEST ] deserialization" << std::endl;
 
         for (const auto& testData: m_testValues)
         {
@@ -80,7 +80,7 @@ private:
 
     void serializationReversibleTest()
     {
-        std::cout << "    [ SUBTEST ] serializationReversible" << std::endl;
+        std::cout << "[  SUBTEST ] serializationReversible" << std::endl;
 
         const Attribute originalAttribute = m_testValues.front().value;
         nx::Buffer buffer;

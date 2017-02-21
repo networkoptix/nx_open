@@ -175,19 +175,24 @@ bool QnUserSettingsWidget::hasChanges() const
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
         const auto selectedRole = this->selectedRole();
-
-        return selectedRole == Qn::UserRole::CustomUserRole
+        const bool changed = selectedRole == Qn::UserRole::CustomUserRole
             ? m_model->user()->userRoleId() != selectedUserRoleId()
             : m_model->user()->userRole() != selectedRole;
+        if (changed)
+            return true;
     }
 
     if (permissions.testFlag(Qn::WriteEmailPermission))
+    {
         if (m_model->user()->getEmail() != ui->emailInputField->text())
             return true;
+    }
 
     if (permissions.testFlag(Qn::WriteFullNamePermission))
+    {
         if (m_model->user()->fullName() != ui->nameInputField->text().trimmed())
             return true;
+    }
 
     return false;
 }
@@ -324,8 +329,11 @@ void QnUserSettingsWidget::applyChanges()
     if (permissions.testFlag(Qn::WriteAccessRightsPermission))
     {
         m_model->user()->setUserRoleId(selectedUserRoleId());
-        if (selectedRole() != Qn::UserRole::CustomPermissions)
-            m_model->user()->setRawPermissions(QnUserRolesManager::userRolePermissions(selectedRole()));
+
+        // We must set special 'Custom' flag for the users to avoid collisions with built-in roles.
+        m_model->user()->setRawPermissions(selectedRole() == Qn::UserRole::CustomPermissions
+            ? Qn::GlobalCustomUserPermission
+            : QnUserRolesManager::userRolePermissions(selectedRole()));
     }
 
     if (!ui->userTypeWidget->isHidden())
@@ -420,7 +428,7 @@ void QnUserSettingsWidget::setupInputFields()
             {
                 bool passwordWasValid = ui->passwordInputField->lastValidationResult() != QValidator::Invalid;
                 if (ui->passwordInputField->isValid() != passwordWasValid)
-                    ui->passwordInputField->validate();
+                    ui->passwordInputField->updateDisplayState();
             }
         });
 
@@ -449,7 +457,7 @@ void QnUserSettingsWidget::setupInputFields()
                 if (user->getEmail().toLower() != email)
                     continue;
 
-                return Qn::ValidationResult(tr("Cloud user with specified email already exists."));
+                return Qn::ValidationResult(tr("Cloud user with specified Email already exists."));
             }
 
             result = Qn::defaultEmailValidator()(text);
@@ -483,7 +491,7 @@ void QnUserSettingsWidget::setupInputFields()
         this, &QnUserSettingsWidget::updatePasswordPlaceholders);
 
     connect(ui->passwordInputField, &QnInputField::editingFinished,
-        ui->confirmPasswordInputField, &QnInputField::validate);
+        ui->confirmPasswordInputField, &QnInputField::updateDisplayState);
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);

@@ -8,8 +8,11 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-
 #include <core/resource/user_resource.h>
+
+#include <common/common_module.h>
+#include <network/system_helpers.h>
+#include <helpers/system_helpers.h>
 
 #include <ui/common/read_only.h>
 #include <ui/common/aligner.h>
@@ -167,16 +170,12 @@ void QnUserProfileWidget::applyChanges()
             url.setPassword(m_newPassword);
             QnAppServerConnectionFactory::setUrl(url);
 
-            auto connections = qnClientCoreSettings->recentLocalConnections();
-            if (!connections.isEmpty() &&
-                !connections.first().password.isEmpty() &&
-                qnUrlEqual(connections.first().url, url))
-            {
-                auto current = connections.takeFirst();
-                current.password.setValue(m_newPassword);
-                connections.prepend(current);
-                qnClientCoreSettings->setRecentLocalConnections(connections);
-            }
+            using namespace nx::client::core::helpers;
+
+            const auto localSystemId = helpers::getLocalSystemId(qnCommon->moduleInformation());
+            if (getCredentials(localSystemId, url.userName()).isValid())
+                storeCredentials(localSystemId, QnCredentials(url));
+            qnClientCoreSettings->save();
 
             auto lastUsed = qnSettings->lastUsedConnection();
             if (!lastUsed.url.password().isEmpty() && qnUrlEqual(lastUsed.url, url))

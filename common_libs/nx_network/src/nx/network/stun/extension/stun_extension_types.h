@@ -13,37 +13,49 @@ namespace methods {
 
 enum Value
 {
-    /** Pings mediaserver endpoints and reports verified onese
-        *  Request: SystemId, ServerId, PublicEndpointList
-        *  Response: PublicEndpointList (vrified) */
+    /**
+     * Pings mediaserver endpoints and reports verified onese.
+     * Request: SystemId, ServerId, PublicEndpointList.
+     * Response: PublicEndpointList (vrified).
+     */
     ping = stun::MethodType::userMethod,
 
-    /** Registers mediaserver for external connections.
-        *  Request: SystemId, ServerId, PublicEndpointList */
+    /**
+     * Registers mediaserver for external connections.
+     * Request: SystemId, ServerId, PublicEndpointList.
+     */
     bind,
 
-    /** Notifies mediator that server is ready to accept cloud connections */
+    /** Notifies mediator that server is ready to accept cloud connections. */
     listen,
 
-    /** server uses this request to confirm its willingness to proceed with cloud connection */
+    /** Server uses this request to confirm its willingness to proceed with cloud connection. */
     connectionAck,
 
-    /** Returns host name list included in domain */
+    /** Returns host name list included in domain. */
     resolveDomain,
 
-    /** Returns host's public address list and suitable connections methods */
+    /** Returns host's public address list and suitable connections methods. */
     resolvePeer,
 
-    /** Initiate connection to some mediaserver
-        *  Request: \class PeerId, \class HostName, \class ConnectionId
-        *  Response: \class PublicEndpointList (opt), \class TcpHpEndpointList (opt),
-        *            \class UdtHpEndpointList (opt)
-        */
+    /**
+     * Initiate connection to some mediaserver.
+     * Request: PeerId, HostName, ConnectionId.
+     * Response: PublicEndpointList (opt), TcpHpEndpointList (opt), UdtHpEndpointList (opt).
+     */
     connect,
+
+    /** Notifies mediator about connection attemt result. */
     connectionResult,
+
     udpHolePunchingSyn,
     tunnelConnectionChosen,
+
+    /** Registers client for incoming connections (for reverse connect). */
     clientBind,
+
+    /** Veifies current peer state from mediator's perspective (e.g. is listening). */
+    getConnectionState,
 };
 
 NX_NETWORK_API nx::String toString(Value val);
@@ -54,18 +66,18 @@ namespace indications {
 
 enum Value
 {
-    /** Indicates requested connection
-        *  Attrs: \class PeerId, \class ConnectionId,
-        *         \class PublicEndpointList (opt), \class TcpHpEndpointList (opt),
-        *         \class UdtHpEndpointList (opt)
-        */
+    /**
+     * Indicates requested connection.
+     * Attrs: PeerId, ConnectionId, PublicEndpointList (opt), TcpHpEndpointList (opt),
+     *     UdtHpEndpointList (opt)
+     */
     connectionRequested = MethodType::userIndication,
 
-    /** Indicates update information about on-going connection establishment
-        *  Attrs: \class ConnectionId,
-        *         \class PublicEndpointList (opt), \class TcpHpEndpointList (opt),
-        *         \class UdtHpEndpointList (opt)
-        */
+    /**
+     * Indicates update information about on-going connection establishment
+     * Attrs: ConnectionId, PublicEndpointList (opt), TcpHpEndpointList (opt),
+     *     UdtHpEndpointList (opt)
+     */
     connectionUpdate
 };
 
@@ -92,6 +104,7 @@ enum AttributeType
     peerId,
     connectionId,
     cloudConnectVersion,
+    cloudConnectOptions,
 
     hostName = stun::attrs::userDefined + 0x200,
     hostNameList,
@@ -102,6 +115,7 @@ enum AttributeType
     ignoreSourceAddress,
     tcpReverseEndpointList,
     isPersistent,
+    isListening,
 
     udpHolePunchingResultCode = stun::attrs::userDefined + 0x400,
     rendezvousConnectTimeout,

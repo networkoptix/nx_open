@@ -204,7 +204,7 @@ QString QnTimelineZoomLevel::longestText() const
         case Hours:
             return lit("00:00");
         case Years:
-            return lit("9999");
+            return lit("0000");
         case Days:
         case Months:
             // Cannot be evaluated accurately.

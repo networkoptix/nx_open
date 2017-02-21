@@ -76,7 +76,7 @@ enum class RemotePeerAccess
 
 namespace access_helpers {
 
-enum class Mode 
+enum class Mode
 {
     read,
     write
@@ -153,6 +153,7 @@ struct NotificationParams
     QnUpdatesNotificationManager* updatesNotificationManager;
     QnMiscNotificationManager* miscNotificationManager;
     QnDiscoveryNotificationManager* discoveryNotificationManager;
+    NotificationSource source;
 };
 
 template<typename ParamType>

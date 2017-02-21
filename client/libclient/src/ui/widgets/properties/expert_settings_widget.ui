@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>982</width>
-    <height>611</height>
+    <width>1097</width>
+    <height>682</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -36,7 +36,7 @@
          <item>
           <widget class="QCheckBox" name="settingsDisableControlCheckBox">
            <property name="text">
-            <string>Keep camera streams' and profiles' settings</string>
+            <string>Keep camera streams and profiles settings</string>
            </property>
           </widget>
          </item>
@@ -316,7 +316,7 @@
          <item>
           <widget class="QCheckBox" name="checkBoxBitratePerGOP">
            <property name="text">
-            <string>Calculate bitrate per GOP instead of bitrate per second (It'll increase bitrate for camera)</string>
+            <string>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</string>
            </property>
           </widget>
          </item>
@@ -332,6 +332,48 @@
             </size>
            </property>
           </spacer>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupBoxMotionDetection">
+        <property name="title">
+         <string>Motion detection control</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_7">
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <property name="sizeConstraint">
+            <enum>QLayout::SetNoConstraint</enum>
+           </property>
+           <item>
+            <widget class="QCheckBox" name="checkBoxForceMotionDetection">
+             <property name="text">
+              <string>Force motion detection for stream:</string>
+             </property>
+             <property name="tristate">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="comboBoxForcedMotionStream"/>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_7">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>

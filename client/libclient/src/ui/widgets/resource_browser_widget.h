@@ -13,6 +13,8 @@
 
 #include <client/client_globals.h>
 
+#include <nx/utils/disconnect_helper.h>
+
 class QComboBox;
 class QLineEdit;
 class QTabWidget;
@@ -122,6 +124,7 @@ public:
     void hideToolTip();
     void showToolTip();
 
+    void clearSelection();
 signals:
     void currentTabChanged();
     void selectionChanged();
@@ -169,7 +172,7 @@ private slots:
     void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();
 
-    void at_workbench_itemChanged(Qn::ItemRole role);
+    void at_workbench_itemChange(Qn::ItemRole role);
     void at_layout_itemAdded(QnWorkbenchItem* item);
     void at_layout_itemRemoved(QnWorkbenchItem* item);
 
@@ -186,6 +189,7 @@ private:
     HoverFocusProcessor* m_hoverProcessor;
 
     QMap<QnActions::IDType, QAction*> m_renameActions;
+    QnDisconnectHelperPtr m_disconnectHelper;
 };
 
 #endif // QN_RESOURCE_BROWSER_WIDGET_H

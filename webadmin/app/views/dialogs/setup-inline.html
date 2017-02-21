@@ -7,9 +7,9 @@
 
 <div class="panel-body text-center" ng-if="stepIs('initFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Couldn't initiate your system</h2>
+    <h2>Cannot initialize System</h2>
     <p class="master-description">
-        Authorization failed for some reason.
+        Authorization failed.
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Try again</button>
@@ -19,8 +19,8 @@
 
 <div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Couldn't setup your system</h2>
-    <p class="master-description">Your system cannot be configured. <br>
+    <h2>Cannot setup System</h2>
+    <p class="master-description">The  system cannot be configured. <br>
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
@@ -28,44 +28,29 @@
     </p>
 </div>
 
-<div class="panel-body text-center" ng-if="stepIs('start')">
-    <div ng-class="{'vertical-center':!settings.liteClient,'master-description':settings.liteClient}">
+<div class="panel-body text-center panel-body-big" ng-if="stepIs('start')">
+    <div ng-class="{'vertical-bottom':!settings.liteClient, 'master-description': settings.liteClient}">
         <h2>Get Started with {{Config.productName}}</h2>
-        <p>You need to configure your server before using it.<br>
-        Don't worry, this won't take long.</p>
+        <p>Please configure the server first.<br>
+            Choose an option.</p>
+        <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
+        <button class="btn btn-primary" ng-click="next()">Setup New System</button>
+
+        <div class="horisontal-line-text">
+            <span class="line"></span>
+            <span class="text">or</span>
+            <span class="line"></span>
+        </div>
+        <button class="btn btn-default" ng-click="skip()">Add to Existing System</button><br>
+        <small>(if {{Config.productName}} has been already setup)</small><br>
+        <small ng-if="!settings.liteClient">&nbsp;</small>
     </div>
-
-    <p ng-class="{'vertical-bottom':!settings.liteClient}">
-        Already have Nx Witness?<br>
-        <a href="" ng-click="skip()">Merge server with existing system</a>
-    </p>
-
-    <div class="row lite-client-instruction panel-footer" ng-if="settings.liteClient">
-        <div class="col-xs-12">
-            <p>
-                You also can set it up from another computer by connecting<br>
-                to this device by one of the next ways:
-            </p>
-        </div>
-        <div class="col-xs-6">
-            <div class="text-center"><b>Using web browser</b></div>
-            <div class="col-xs-4 text-right">Address</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
-        </div>
-        <div class="col-xs-6">
-            <div class="text-center"><b>Using {{Config.productName}} application</b></div>
-            <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
-            <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
-            <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
-        </div>
-    </div>
-
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('systemName')">
-    <h2>Give your System a name</h2>
+    <h2>Enter System Name</h2>
     <p class="master-description">
-        It'll help you identify or find your System.
+        It will help to identify or find System.
     </p>
     <form class="master-controls" name="forms.systemNameForm" novalidate>
         <div class="form-group" validate-field>
@@ -114,7 +99,7 @@
 
 
 <div class="panel-body text-center"  ng-if="stepIs('chooseCloudOrLocal')">
-    <h2>Choose system type</h2>
+    <h2>Choose System type</h2>
     <div class="row radio-panels">
         <div class="col-xs-6 radio-panel ">
             <div class="radio-panel-body"
@@ -124,7 +109,7 @@
                 <div class="master-icon"><span class="icon-localSystem"></span></div>
                 <h3>Local</h3>
                 <p>
-                    Works in local network only<br>
+                    Works in local networks only<br>
                     Does not require Internet connection
                 </p>
             </div>
@@ -157,17 +142,17 @@
     </div>
     <h2>{{Config.cloud.productName}} account</h2>
     <p class="master-description">
-        To use cloud system you should have an account on {{Config.cloud.productName}}
+        An account is required to use the cloud system {{Config.cloud.productName}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-primary" ng-click="createAccount()" auto-focus>Create new account</button>&nbsp;&nbsp;
+        <button class="btn btn-primary" ng-click="createAccount()" auto-focus>Create a new account</button>&nbsp;&nbsp;
         <button class="btn btn-default" ng-click="next('cloudLogin', true)">Use existing</button>
     </p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('cloudAuthorizedIntro')">
-    <p>Your system will be connected to</p>
+    <p>System will be connected to</p>
 
     <div class="master-icon"><span class="icon-cloud"></span></div>
 
@@ -181,7 +166,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudLogin')">
     <div class="master-icon"><span class="icon-cloud"></span></div>
 
-    <h2>Log in to <span class="product-name add-version">{{Config.cloud.productName}}</span></h2>
+    <h2>Login to <span class="product-name add-version">{{Config.cloud.productName}}</span></h2>
 
     <form class="master-controls" name="forms.cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
         <div class="form-group" validate-field>
@@ -230,7 +215,7 @@
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('localLogin')">
-    <h2>Set up administrator's password</h2>
+    <h2>Set up an administrator password</h2>
     <form class="master-controls" name="forms.localForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field>
             <!-- <input ng-model="settings.localLogin" name="localLogin" class="form-control"
@@ -285,7 +270,7 @@
 </div>
 
 <div class="panel-body text-center" ng-hide="!stepIs('merge')">
-    <h2>Connect server to existing system</h2>
+    <h2>Connect the server to the existing system</h2>
     <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
         <div class="form-group" validate-field >
 
@@ -343,13 +328,24 @@
 
 <div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Couldn't merge systems</h2>
+    <h2>Cannot merge systems</h2>
     <p class="master-description">
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Try again</button>
-        <button class="btn btn-default" ng-click="skip()">Set up separate system</button>
+        <button class="btn btn-default" ng-click="skip()">Setup a separate system</button>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('mergeTemporaryFailure')">
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>System was successfully merged, but is not ready yet.</h2>
+    <p class="master-description">
+        {{settings.remoteError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">Try again</button>
     </p>
 </div>
 
@@ -362,7 +358,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>System is ready for use</h2>
-    <p>Log in</p>
+    <p>Login</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>Sharing and account settings</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="open {{Config.cloud.productName}}"
@@ -380,7 +376,7 @@
 
 
 <div class="panel-body text-center" ng-if="stepIs('configureWrongNetwork')">
-    <p><b>You need to configure network settings first</b></p>
+    <p><b>Please configure network settings first</b></p>
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">
@@ -389,7 +385,7 @@
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('configureNetworkForInternet')">
-    <p><b>Configure network to set up Internet connection</b></p>
+    <p><b>Configure the network to set up Internet connection</b></p>
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">
@@ -399,9 +395,9 @@
 
 
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnServer')">
-    <h2>Connect your server to the Internet</h2>
+    <h2>Connect the server to the Internet</h2>
     <p class="master-description">
-        Set up Internet connection on your server to be able <br> to connect to it anywhere using {{Config.cloud.productName}}.
+        Set up Internet connection on the server to be able <br> to connect to it anywhere using {{Config.cloud.productName}}.
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Try again</button>
@@ -416,7 +412,7 @@
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
     <h2>Cannot connect to {{Config.cloud.productName}}</h2>
     <p class="master-description">
-        Check your internet connection.
+        Check the Internet connection.
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">Try again</button>
@@ -426,7 +422,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Couldn't connect to {{Config.cloud.productName}}</h2>
+    <h2>Cannot connect to {{Config.cloud.productName}}</h2>
     <p class="master-description">
         {{cloudError}}
     </p>
@@ -438,7 +434,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Couldn't setup your system</h2>
+    <h2>Cannot setup System</h2>
     <p class="master-description">Something went totally wrong. <br>
         Error description: {{settings.localError}}
     </p>
@@ -447,7 +443,28 @@
     </p>
 </div>
 
-<div class="panel-footer">
+
+<div class="panel-footer lite-client-instruction" ng-if="settings.liteClient && stepIs('start')">
+    <p>
+        It is possible to set it up from another computer by connecting<br>
+        to this device by one of the following ways:
+    </p>
+    <div class="row">
+        <div class="col-xs-6">
+            <div class="text-center"><b>Using web browser</b></div>
+            <div class="col-xs-4 text-right">Address</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
+        </div>
+        <div class="col-xs-6">
+            <div class="text-center"><b>Using {{Config.productName}} application</b></div>
+            <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
+            <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
+            <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-footer" ng-hide="activeStep.noFooter">
     <button class="btn btn-default"
             ng-if="activeStep.cancel"
             ng-disabled="lockNextButton"

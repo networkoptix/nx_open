@@ -30,8 +30,10 @@ namespace settings_names {
 
 const QString kNameDisabledVendors(lit("disabledVendors"));
 const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
+const QString kNameAutoUpdateThumbnails(lit("autoUpdateThumbnails"));
 const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
 const QString kAuditTrailPeriodDaysName(lit("auditTrailPeriodDays"));
+const QString kEventLogPeriodDaysName(lit("eventLogPeriodDays"));
 const QString kNameHost(lit("smtpHost"));
 const QString kNamePort(lit("smtpPort"));
 const QString kNameUser(lit("smtpUser"));
@@ -112,9 +114,16 @@ public:
     bool isCameraSettingsOptimizationEnabled() const;
     void setCameraSettingsOptimizationEnabled(bool cameraSettingsOptimizationEnabled);
 
+    /**
+     * Allow server auto open streams to cameras sometimes to update camera thumbnail
+     */
+    bool isAutoUpdateThumbnailsEnabled() const;
+    void setAutoUpdateThumbnailsEnabled(bool value);
+
     bool isAuditTrailEnabled() const;
     void setAuditTrailEnabled(bool value);
     int auditTrailPeriodDays() const;
+    int eventLogPeriodDays() const;
 
     bool isAutoDiscoveryEnabled() const;
     void setAutoDiscoveryEnabled(bool enabled);
@@ -233,7 +242,9 @@ signals:
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
     void auditTrailPeriodDaysChanged();
+    void eventLogPeriodDaysChanged();
     void cameraSettingsOptimizationChanged();
+    void autoUpdateThumbnailsChanged();
     void autoDiscoveryChanged();
     void emailSettingsChanged();
     void ldapSettingsChanged();
@@ -242,6 +253,7 @@ signals:
     void upnpPortMappingEnabledChanged();
     void ec2ConnectionSettingsChanged(const QString& key);
     void cloudSettingsChanged();
+    void cloudCredentialsChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -258,8 +270,10 @@ private:
 
 private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_autoUpdateThumbnailsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
     QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor;
+    QnResourcePropertyAdaptor<int>* m_eventLogPeriodDaysAdaptor;
 
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_autoDiscoveryEnabledAdaptor;

@@ -33,7 +33,7 @@ public:
 private:
     QnMutex m_mutex;
 
-private slots:
+private:
     void at_adminUserChanged( const QnResourcePtr& resource );
 };
 

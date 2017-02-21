@@ -1,5 +1,5 @@
 import QtQuick 2.6;
-import NetworkOptix.Qml 1.0;
+import Nx.Models 1.0;
 
 import ".."
 
@@ -20,7 +20,7 @@ Item
     property bool autoLogin: expandedArea.autoLoginCheckBox.checked;
     property bool isConnecting: false;
     property var hostsModel;
-    property var recentLocalConnectionsModel;
+    property var authenticationDataModel;
 
     property var prevTabObject;
 
@@ -65,8 +65,8 @@ Item
 
     Connections
     {
-        target: (recentLocalConnectionsModel ? recentLocalConnectionsModel : null);
-        onConnectionDataChanged: { control.impl.updatePasswordData(index); }
+        target: authDataAccessor;
+        onDataChanged: { control.impl.updatePasswordData(startRow); }
     }
 
     Column
@@ -87,7 +87,6 @@ Item
 
             isAvailable: enabled && control.isExpandedTile && !control.isConnecting;
 
-            comboBoxTextRole: "display";
             comboBoxValueRole: "url";
             iconUrl: "qrc:/skin/welcome_page/server.png";                   // TODO: add ecosystem class for hovered icons
             hoveredIconUrl: "qrc:/skin/welcome_page/server_hover.png";
@@ -107,19 +106,25 @@ Item
         {
             id: userChooseItem;
 
-            model: control.recentLocalConnectionsModel;
+            model: control.authenticationDataModel;
 
             Connections
             {
-                target: userChooseItem.model;
-                ignoreUnknownSignals: true;
-                onFirstUserChanged: userChooseItem.forceCurrentIndex(0);    //< Resets user to first
+                target: authDataAccessor;
+                onDataChanged:
+                {
+                    if (startRow == 0)
+                        userChooseItem.forceCurrentIndex(0); // Resets user to first.
+                }
+                onModelChanged:
+                {
+                    userChooseItem.forceCurrentIndex(userChooseItem.currentItemIndex);
+                }
             }
 
             isAvailable: enabled && control.isExpandedTile  && !control.isConnecting;
             visible: control.impl.hasRecentConnections;
 
-            comboBoxTextRole: "userName";
             iconUrl: "qrc:/skin/welcome_page/user.png";
             hoveredIconUrl: "qrc:/skin/welcome_page/user_hover.png";
             disabledIconUrl: "qrc:/skin/welcome_page/user_disabled.png";
@@ -171,31 +176,25 @@ Item
         }
     }
 
+    ModelDataAccessor
+    {
+        id: authDataAccessor;
+        model: authenticationDataModel || null;
+    }
+
     property QtObject impl: QtObject
     {
-        readonly property bool hasRecentConnections: (recentLocalConnectionsModel && recentLocalConnectionsModel.hasConnections);
+        readonly property bool hasRecentConnections: authDataAccessor.count > 0;
 
         function updatePasswordData(currentItemIndex)
         {
             if (currentItemIndex !== userChooseItem.currentItemIndex)
                 return; // Do not update if it is not current item
 
-            if (currentItemIndex == -1) //< In case of non-existent user
-            {
-                expandedArea.savePasswordCheckbox.checked = false;  // Reset "Store password" checkbox
-                expandedArea.passwordTextField.text = "";
-                return;
-            }
-
-            var hasStoredPasswordValue = (control.recentLocalConnectionsModel
-                && control.recentLocalConnectionsModel.getData("hasStoredPassword", currentItemIndex));
-
-            // value can be <undefined>, thus we use explicit conversion here
-            var hasStoredPassword = (hasStoredPasswordValue ? true : false);
-            expandedArea.savePasswordCheckbox.checked = hasStoredPassword;
-
-            expandedArea.passwordTextField.text = (hasStoredPassword ?
-                recentLocalConnectionsModel.getData("password", currentItemIndex) : "")
+            var credentials = authDataAccessor.getData(currentItemIndex, "credentials");
+            var password = credentials && credentials.password;
+            expandedArea.savePasswordCheckbox.checked = !!password;
+            expandedArea.passwordTextField.text = password || "";
         }
     }
 

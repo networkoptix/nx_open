@@ -23,8 +23,10 @@ TimeProtocolConnection::~TimeProtocolConnection()
     stopWhileInAioThread();
 }
 
-void TimeProtocolConnection::startReadingConnection()
+void TimeProtocolConnection::startReadingConnection(
+    boost::optional<std::chrono::milliseconds> inactivityTimeout)
 {
+    NX_ASSERT(!inactivityTimeout);
     using namespace std::placeholders;
 
     std::uint32_t utcTimeSeconds = ::time(NULL);
@@ -36,10 +38,13 @@ void TimeProtocolConnection::startReadingConnection()
         .arg(utcTimeSeconds).str(m_socket->getForeignAddress()),
         cl_logDEBUG2);
 
-    utcTimeSeconds += kSecondsFrom19000101To19700101;
+    utcTimeSeconds += network::kSecondsFrom19000101To19700101;
     utcTimeSeconds = htonl(utcTimeSeconds);
     m_outputBuffer.resize(sizeof(utcTimeSeconds));
     memcpy(m_outputBuffer.data(), &utcTimeSeconds, sizeof(utcTimeSeconds));
+
+    if (!m_socket->setNonBlockingMode(true))
+        return m_socketServer->closeConnection(SystemError::getLastOSErrorCode(), this);
 
     m_socket->sendAsync(
         m_outputBuffer,

@@ -1,34 +1,42 @@
 #pragma once
 
 #include <QtCore/QString>
+#include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <utils/crypt/encoded_string.h>
 
 struct QnCredentials
 {
 private:
     Q_GADGET
     Q_PROPERTY(QString user MEMBER user CONSTANT)
-    Q_PROPERTY(QString password MEMBER password CONSTANT)
+    Q_PROPERTY(QString password READ decodedPassword CONSTANT)
 
 public:
     QnCredentials() {}
-    QnCredentials(const QString& usr, const QString& pwd):
-        user(usr),
-        password(pwd)
+    QnCredentials(const QString& user, const QString& password):
+        user(user),
+        password(password)
     {}
     QnCredentials(const QAuthenticator& auth):
         user(auth.user()),
         password(auth.password())
     {}
 
+    explicit QnCredentials(const QUrl& url):
+        user(url.userName()),
+        password(url.password())
+    {}
+
     QAuthenticator toAuthenticator() const;
 
     QString user;
-    QString password;
+    QnEncodedString password;
 
-    Q_INVOKABLE bool isNull() const;
+    QString decodedPassword() const;
+
     Q_INVOKABLE bool isEmpty() const;
 
     /**
@@ -42,7 +50,7 @@ public:
 
 inline uint qHash(const QnCredentials& creds)
 {
-    return qHash(creds.user) ^ qHash(creds.password);
+    return qHash(creds.user) ^ qHash(creds.password.value());
 }
 
 inline uint qHash(const QAuthenticator& auth)
@@ -51,4 +59,4 @@ inline uint qHash(const QAuthenticator& auth)
 }
 
 #define QnCredentials_Fields (user)(password)
-QN_FUSION_DECLARE_FUNCTIONS(QnCredentials, (metatype)(eq)(json)(ubjson)(xml)(csv_record))
+QN_FUSION_DECLARE_FUNCTIONS(QnCredentials, (metatype)(eq)(json))

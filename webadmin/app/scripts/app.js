@@ -54,6 +54,10 @@ angular.module('webadminApp', [
             templateUrl: 'views/info.html',
             controller: 'InfoCtrl'
         })
+        .when('/developers/changelog', {
+            templateUrl: 'views/api_changelog.html',
+            controller: 'MainCtrl'
+        })
         .when('/developers', {
             templateUrl: 'views/developers.html',
             controller: 'MainCtrl'

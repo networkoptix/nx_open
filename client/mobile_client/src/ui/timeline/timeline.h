@@ -68,6 +68,7 @@ public:
 
     qint64 position() const;
     void setPosition(qint64 position);
+    Q_INVOKABLE void setPositionImmediately(qint64 position);
 
     QDateTime positionDate() const;
     void setPositionDate(const QDateTime &dateTime);

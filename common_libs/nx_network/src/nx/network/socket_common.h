@@ -103,6 +103,8 @@ private:
     boost::optional<in6_addr> m_ipV6;
 };
 
+Q_DECLARE_METATYPE(HostAddress)
+
 //!Represents host and port (e.g. 127.0.0.1:1234)
 class NX_NETWORK_API SocketAddress
 {
@@ -114,7 +116,6 @@ public:
     SocketAddress(const QString& str);
     SocketAddress(const QByteArray& utf8Str);
     SocketAddress(const char* utf8Str);
-    SocketAddress(const QUrl& url);
 
     bool operator==(const SocketAddress& rhs) const;
     bool operator!=(const SocketAddress& rhs) const;

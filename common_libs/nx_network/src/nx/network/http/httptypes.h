@@ -59,7 +59,7 @@ namespace nx_http
         \return < 0, if \a one < \a two. 0 if \a one == \a two. > 0 if \a one > \a two
     */
     int NX_NETWORK_API strcasecmp( const StringType& one, const StringType& two );
-    
+
     int NX_NETWORK_API defaultPortForScheme( const StringType& scheme );
 
     /************************************************************************/
@@ -377,7 +377,7 @@ namespace nx_http
     public:
         StatusLine statusLine;
         HttpHeaders headers;
-        BufferType messageBody;
+        BufferType messageBody; //< ATTENTION: Not used on client side.
 
         Response() = default;
         Response(Response&&) = default;

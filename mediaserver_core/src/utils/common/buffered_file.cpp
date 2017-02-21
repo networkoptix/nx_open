@@ -40,6 +40,13 @@ QueueFileWriter::~QueueFileWriter()
     stop();
 }
 
+void QueueFileWriter::pleaseStop()
+{
+    QnLongRunnable::pleaseStop();
+    QnMutexLocker lock(&m_dataMutex);
+    m_dataWaitCond.wakeAll();
+}
+
 qint64 QueueFileWriter::writeRanges(QBufferedFile* file, std::vector<QnMediaCyclicBuffer::Range> ranges)
 {
     FileBlockInfo fb(file);

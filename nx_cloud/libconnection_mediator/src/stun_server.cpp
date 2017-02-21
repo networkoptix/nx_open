@@ -21,7 +21,11 @@ StunServer::StunServer(const conf::Settings& settings):
 
 bool StunServer::bind()
 {
-    //accepting STUN requests by both tcp and udt
+    m_tcpStunServer->forEachListener(
+        [this](stun::SocketServer* server)
+        {
+            server->setConnectionInactivityTimeout(m_settings.stun().connectionInactivityTimeout);
+        });
 
     if (!m_tcpStunServer->bind(m_settings.stun().addrToListenList))
     {
@@ -31,11 +35,6 @@ bool StunServer::bind()
     }
 
     m_endpoints = m_tcpStunServer->endpoints();
-    m_tcpStunServer->forEachListener(
-        [this](stun::SocketServer* server)
-        {
-            server->setConnectionKeepAliveOptions(m_settings.stun().keepAliveOptions);
-        });
 
     if (!m_udpStunServer->bind(m_endpoints /*m_settings.stun().addrToListenList*/))
     {

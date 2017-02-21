@@ -50,6 +50,38 @@ const QnResourceCriterionGroup & QnResourceSearchProxyModel::criteria()
     return m_criterionGroup;
 }
 
+QnResourceSearchQuery QnResourceSearchProxyModel::query() const
+{
+    return m_query;
+}
+
+void QnResourceSearchProxyModel::setQuery(const QnResourceSearchQuery& query)
+{
+    if (m_query == query)
+        return;
+
+    m_query = query;
+
+    clearCriteria();
+    setFilterWildcard(L'*' + query.text + L'*');
+    if (query.text.isEmpty())
+    {
+        addCriterion(QnResourceCriterionGroup(QnResourceCriterion::Reject,
+            QnResourceCriterion::Reject));
+    }
+    else
+    {
+        addCriterion(QnResourceCriterionGroup(query.text));
+        addCriterion(QnResourceCriterion(Qn::user));
+        addCriterion(QnResourceCriterion(Qn::layout));
+    }
+    if (query.flags != 0)
+    {
+        addCriterion(QnResourceCriterion(query.flags, QnResourceProperty::flags,
+            QnResourceCriterion::Next, QnResourceCriterion::Reject));
+    }
+}
+
 void QnResourceSearchProxyModel::invalidateFilter()
 {
     m_invalidating = false;

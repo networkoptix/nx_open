@@ -2,6 +2,7 @@
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/cloud/cloud_connect_version.h>
+#include <nx/network/cloud/cloud_connect_options.h>
 #include <nx/network/stun/message.h>
 
 #include "stun_message_data.h"
@@ -16,6 +17,9 @@ class NX_NETWORK_API ListenRequest:
 public:
     constexpr static const auto kMethod = stun::extension::methods::listen;
 
+    // TODO: #mux Remove systemId and serverId as redandant.
+    // Every server message is signed up with system id, server id and message integrity based on
+    // authentification key by MediatorServerConnection.
     nx::String systemId;
     nx::String serverId;
     CloudConnectVersion cloudConnectVersion;
@@ -32,6 +36,7 @@ public:
     constexpr static const auto kMethod = stun::extension::methods::listen;
 
     boost::optional<KeepAliveOptions> tcpConnectionKeepAlive;
+    CloudConnectOptions cloudConnectOptions;
 
     ListenResponse();
     void serializeAttributes(nx::stun::Message* const message);

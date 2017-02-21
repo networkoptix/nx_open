@@ -1,4 +1,12 @@
 #!/bin/bash
+### BEGIN INIT INFO
+# Provides:          NX Time Server
+# Required-Start:    networking
+# Required-Stop:
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: NX Time Server
+### END INIT INFO
 
 RETVAL=0
 
@@ -79,7 +87,7 @@ run_watchdog() {
     while true
     do
         start
-        sleep 5 
+        sleep 5
     done
 }
 

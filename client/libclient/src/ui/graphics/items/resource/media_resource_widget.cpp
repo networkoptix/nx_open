@@ -81,6 +81,7 @@
 #include <api/common_message_processor.h>
 #include <business/actions/abstract_business_action.h>
 #include <utils/media/sse_helper.h>
+#include <plugins/resource/avi/avi_resource.h>
 
 namespace {
 
@@ -593,6 +594,14 @@ void QnMediaResourceWidget::createPtzController()
 
 qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
 {
+    const auto aviResource = m_resource.dynamicCast<QnAviResource>();
+    if (aviResource && aviResource->flags().testFlag(Qn::still_image))
+    {
+        const auto aspect = aviResource->imageAspectRatio();
+        if (aspect.isValid())
+            return aspect.toFloat();
+    }
+
     /* Here we get 0.0 if no custom aspect ratio set. */
     qreal result = resource()->customAspectRatio();
     if (!qFuzzyIsNull(result))
@@ -1469,7 +1478,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const
 
     QString hqLqString;
     if (hasVideo() && !m_resource->toResource()->hasFlags(Qn::local))
-        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Low-Res") : tr("Hi-Res");
+        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Lo-Res") : tr("Hi-Res");
 
     static const int kDetailsTextPixelSize = 11;
 
@@ -1625,6 +1634,17 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
     const ResourceStates states = getResourceStates();
 
+    //TODO: #GDM #3.1 This really requires hell a lot of refactoring
+    // for live video make a quick check: status has higher priority than EOF
+    if (states.isRealTimeSource)
+    {
+        if (states.isOffline)
+            return Qn::OfflineOverlay;
+
+        if (states.isUnauthorized)
+            return Qn::UnauthorizedOverlay;
+    }
+
     if (m_camera && m_camera->hasFlags(Qn::io_module))
     {
         if (states.isOffline)
@@ -1647,11 +1667,12 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
             return Qn::IoModuleDisabledOverlay;
     }
 
+    if (m_display->camDisplay()->isEOFReached())
+        return Qn::NoDataOverlay;
+
     if (resource->hasFlags(Qn::local_image))
     {
         if (resource->getStatus() == Qn::Offline)
-            return Qn::NoDataOverlay;
-        if (m_display->camDisplay()->isStillImage() && m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
         return Qn::EmptyOverlay;
     }
@@ -1678,9 +1699,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (m_display->camDisplay()->isLongWaiting())
     {
-        if (m_display->camDisplay()->isEOFReached())
-            return Qn::NoDataOverlay;
-
         auto loader = context()->instance<QnCameraDataManager>()->loader(m_resource, false);
         if (loader && loader->periods(Qn::RecordingContent).containTime(m_display->camDisplay()->getExternalTime() / 1000))
             return base_type::calculateStatusOverlay(Qn::Online, states.hasVideo);
@@ -1690,9 +1708,6 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     if (m_display->isPaused())
     {
-        if (m_display->camDisplay()->isEOFReached())
-            return Qn::NoDataOverlay;
-
         if (!states.hasVideo)
             return Qn::NoVideoDataOverlay;
 

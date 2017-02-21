@@ -20,7 +20,7 @@ ApiDiscoveryData toApiDiscoveryData(
 }
 
 
-void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction)
+void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction, NotificationSource /*source*/)
 {
     NX_ASSERT(transaction.command == ApiCommand::discoverPeer, "Invalid command for this function", Q_FUNC_INFO);
 
@@ -32,7 +32,7 @@ void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<Api
 //    emit peerDiscoveryRequested(QUrl(transaction.params.url));
 }
 
-void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryData> &transaction)
+void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryData> &transaction, NotificationSource /*source*/)
 {
     NX_ASSERT(transaction.command == ApiCommand::addDiscoveryInformation ||
                transaction.command == ApiCommand::removeDiscoveryInformation,
@@ -46,18 +46,18 @@ void QnDiscoveryNotificationManager::triggerNotification(const ApiDiscoveryData 
     emit discoveryInformationChanged(discoveryData, addInformation);
 }
 
-void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran)
+void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryDataList> &tran, NotificationSource /*source*/)
 {
     for (const ApiDiscoveryData &data: tran.params)
         emit discoveryInformationChanged(data, true);
 }
 
-void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveredServerData> &tran)
+void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveredServerData> &tran, NotificationSource /*source*/)
 {
     emit discoveredServerChanged(tran.params);
 }
 
-void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveredServerDataList> &tran)
+void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveredServerDataList> &tran, NotificationSource /*source*/)
 {
     emit gotInitialDiscoveredServers(tran.params);
 }

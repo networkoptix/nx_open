@@ -58,7 +58,10 @@ static int checkPermissions(
     return nx_http::StatusCode::ok;
 }
 
-static int processAddOrUpdate(
+static const QString kInvalidParamsMessage =
+    lit("Missing parameter(s) or invalid parameter values");
+
+static int performAddOrUpdate(
     QnBookmarkOperation op,
     int ownerPort,
     const QnRequestParamList& params,
@@ -70,7 +73,7 @@ static int processAddOrUpdate(
     if (!request.isValid())
     {
         return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
-            lit("Missing parameter(s)"),
+            kInvalidParamsMessage,
             outBody, outContentType, request.format, request.extraFormatting,
             QnRestResult::MissingParameter);
     }
@@ -104,7 +107,7 @@ static int performDelete(
     if (!request.isValid())
     {
         return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
-            lit("Missing parameter(s)"),
+            kInvalidParamsMessage,
             outBody, outContentType, request.format, request.extraFormatting,
             QnRestResult::MissingParameter);
     }
@@ -131,7 +134,7 @@ static int performGetTags(
     if (!request.isValid())
     {
         return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
-            lit("Missing parameter(s)"),
+            kInvalidParamsMessage,
             outBody, outContentType, request.format, request.extraFormatting,
             QnRestResult::MissingParameter);
     }
@@ -155,7 +158,7 @@ static int performGet(
     if (!request.isValid())
     {
         return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
-            lit("Missing parameter(s)"),
+            kInvalidParamsMessage,
             outBody, outContentType, request.format, request.extraFormatting,
             QnRestResult::MissingParameter);
     }
@@ -196,7 +199,7 @@ int QnMultiserverBookmarksRestHandler::executeGet(
     {
         case QnBookmarkOperation::Add:
         case QnBookmarkOperation::Update:
-            return processAddOrUpdate(op, ownerPort, params, &result, &contentType);
+            return performAddOrUpdate(op, ownerPort, params, &result, &contentType);
 
         case QnBookmarkOperation::Delete:
             return performDelete(ownerPort, params, &result, &contentType);

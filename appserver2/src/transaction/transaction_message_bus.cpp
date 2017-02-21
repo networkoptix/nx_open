@@ -786,7 +786,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             if (!onGotServerRuntimeInfo(tran, sender, transportHeader))
                 return; // already processed. do not proxy and ignore transaction
             if (m_handler)
-                m_handler->triggerNotification(tran);
+                m_handler->triggerNotification(tran, NotificationSource::Remote);
             break;
         case ApiCommand::updatePersistentSequence:
             updatePersistentMarker(tran, sender);
@@ -851,7 +851,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             }
 
             if (m_handler)
-                m_handler->triggerNotification(tran);
+                m_handler->triggerNotification(tran, NotificationSource::Remote);
 
             // this is required to allow client place transactions directly into transaction message bus
             if (tran.command == ApiCommand::getFullInfo)
@@ -1578,6 +1578,14 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::DirectConnection);
 
     QnMutexLocker lock(&m_mutex);
+
+    NX_ASSERT(
+        std::find_if(
+            m_connectingConnections.begin(), m_connectingConnections.end(),
+            [&connectionGuid](QnTransactionTransport* connection)
+                { return connection->connectionGuid() == connectionGuid; }
+        ) == m_connectingConnections.end());
+
     transport->moveToThread(thread());
     m_connectingConnections << transport;
     NX_ASSERT(!m_connections.contains(remotePeer.id));
@@ -1849,7 +1857,7 @@ void QnTransactionMessageBus::at_runtimeDataUpdated(const QnTransaction<ApiRunti
 {
     // data was changed by local transaction log (old data instance for same peer was removed), emit notification to apply new data version outside
     if (m_handler)
-        m_handler->triggerNotification(tran);
+        m_handler->triggerNotification(tran, NotificationSource::Local);
 }
 
 void QnTransactionMessageBus::emitRemotePeerUnauthorized(const QnUuid& id)

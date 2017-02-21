@@ -190,7 +190,7 @@ QString QnCloudStatusWatcher::cloudLogin() const
 
 QString QnCloudStatusWatcher::cloudPassword() const
 {
-    return credentials().password;
+    return credentials().password.value();
 }
 
 QString QnCloudStatusWatcher::effectiveUserName() const
@@ -255,7 +255,7 @@ void QnCloudStatusWatcher::setCredentials(const QnCredentials& credentials, bool
     Q_D(QnCloudStatusWatcher);
 
     const auto loweredCredentials =
-        QnCredentials(credentials.user.toLower(), credentials.password);
+        QnCredentials(credentials.user.toLower(), credentials.password.value());
 
     if (d->credentials == loweredCredentials)
         return;
@@ -437,7 +437,7 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
 
     cloudConnection = qnCloudConnectionProvider->createConnection();
     cloudConnection->setCredentials(credentials.user.toStdString(),
-        credentials.password.toStdString());
+        credentials.password.value().toStdString());
 
     /* Very simple email check. */
     if (credentials.user.contains(L'@'))

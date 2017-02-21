@@ -11,7 +11,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/object_destruction_flag.h>
 
-#include "aioeventhandler.h"
+#include "aio_event_handler.h"
 #include "basic_pollable.h"
 
 namespace nx {
@@ -48,6 +48,10 @@ public:
      */
     void cancelSync();
 
+protected:
+    virtual void stopWhileInAioThread() override;
+    virtual void eventTriggered(Pollable* sock, aio::EventType eventType) throw() override;
+
 private:
     nx::utils::MoveOnlyFunc<void()> m_handler;
     std::chrono::milliseconds m_timeout;
@@ -55,9 +59,6 @@ private:
     AIOService& m_aioService;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
     int m_internalTimerId;
-
-    virtual void stopWhileInAioThread() override;
-    virtual void eventTriggered(Pollable* sock, aio::EventType eventType) throw() override;
 };
 
 } // namespace aio

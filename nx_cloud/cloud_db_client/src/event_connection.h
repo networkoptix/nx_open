@@ -36,8 +36,8 @@ class EventConnection:
 public:
     EventConnection(
         network::cloud::CloudModuleUrlFetcher* const endPointFetcher);
-        virtual ~EventConnection();
-
+    virtual ~EventConnection();
+        
     virtual void start(
         api::SystemEventHandlers eventHandlers,
         std::function<void(api::ResultCode)> completionHandler) override;
@@ -61,11 +61,11 @@ private:
     std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;
     network::RetryTimer m_reconnectTimer;
     State m_state;
-    SocketAddress m_cdbEndpoint;
+    QUrl m_cdbUrl;
 
     void cdbEndpointResolved(
         nx_http::StatusCode::Value resCode,
-        SocketAddress endpoint);
+        QUrl url);
     void initiateConnection();
     void connectionAttemptHasFailed(api::ResultCode result);
 
@@ -75,7 +75,7 @@ private:
         const std::string& proxyHost,
         std::uint16_t proxyPort) override;
 
-private slots:
+private:
     void onHttpResponseReceived(nx_http::AsyncHttpClientPtr);
     void onSomeMessageBodyAvailable(nx_http::AsyncHttpClientPtr);
     void onHttpClientDone(nx_http::AsyncHttpClientPtr);

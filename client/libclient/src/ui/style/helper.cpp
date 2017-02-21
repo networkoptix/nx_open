@@ -1,6 +1,6 @@
 #include "helper.h"
 
-#include <private/qfont_p.h>
+#include <QtGui/private/qfont_p.h>
 
 namespace style
 {
@@ -56,6 +56,8 @@ namespace style
 
     const int Metrics::kPushButtonIconMargin = 6;
 
+    const QSize Metrics::kMinimumDialogSize(400, 64);
+
     const int Metrics::kTabBarFontPixelSize = 12;
     const int Metrics::kTextEditFontPixelSize = 14;
     const int Metrics::kHeaderViewFontPixelSize = 14;
@@ -63,11 +65,14 @@ namespace style
     const int Metrics::kCalendarHeaderFontPixelSize = 11;
 
     const qreal Hints::kDisabledItemOpacity = 0.3;
+    const qreal Hints::kDisabledBrandedButtonOpacity = 0.2;
     const int Hints::kMinimumFormLabelWidth = 64 - Metrics::kDefaultTopLevelMargin;
+    const qreal Hints::kMinimumTableRows = 3.0;
 
     const char* Properties::kHoveredRowProperty = "_qn_hoveredRow";
     const char* Properties::kHoveredIndexProperty = "_qn_hoveredIndex";
     const char* Properties::kAccentStyleProperty = "_qn_accentStyle";
+    const char* Properties::kWarningStyleProperty = "_qn_warningStyle";
     const char* Properties::kSliderLength = "_qn_sliderLength";
     const char* Properties::kSliderFeatures = "_qn_sliderFeatures";
     const char* Properties::kDontPolishFontProperty = "_qn_dontPolishFont";
@@ -82,27 +87,32 @@ namespace style
     const char* Properties::kMenuNoMouseReplayRect = "_qn_menuNoMouseReplayRect";
 
 
-    bool isDark(const QColor &color)
+    bool isDark(const QColor& color)
     {
         return color.toHsl().lightness() < 128;
     }
 
+    QColor linkColor(const QPalette& palette, bool hovered)
+    {
+        return palette.color(hovered ? QPalette::LinkVisited : QPalette::Link);
+    }
 
-    RectCoordinates::RectCoordinates(const QRectF &rect)
-        : rect(rect)
-    {}
+    RectCoordinates::RectCoordinates(const QRectF& rect):
+        rect(rect)
+    {
+    }
 
     qreal RectCoordinates::x(qreal x)
     {
-        if (rect.isEmpty())
-            return 0;
-        return rect.left() + rect.width() * x;
+        return rect.isEmpty()
+            ? 0
+            : rect.left() + rect.width() * x;
     }
 
     qreal RectCoordinates::y(qreal y)
     {
-        if (rect.isEmpty())
-            return 0;
-        return rect.top() + rect.height() * y;
+        return rect.isEmpty()
+            ? 0
+            : rect.top() + rect.height() * y;
     }
 }

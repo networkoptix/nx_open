@@ -11,19 +11,19 @@ namespace ec2
     public:
         QnMediaServerNotificationManager();
 
-        void triggerNotification( const QnTransaction<ApiMediaServerData>& tran );
+        void triggerNotification( const QnTransaction<ApiMediaServerData>& tran, NotificationSource source);
 
-        void triggerNotification( const QnTransaction<ApiStorageData>& tran );
+        void triggerNotification( const QnTransaction<ApiStorageData>& tran, NotificationSource source);
 
-        void triggerNotification( const QnTransaction<ApiStorageDataList>& tran );
+        void triggerNotification( const QnTransaction<ApiStorageDataList>& tran, NotificationSource source);
 
-        void triggerNotification( const QnTransaction<ApiIdData>& tran );
+        void triggerNotification( const QnTransaction<ApiIdData>& tran, NotificationSource source);
 
-        void triggerNotification( const QnTransaction<ApiIdDataList>& tran );
+        void triggerNotification( const QnTransaction<ApiIdDataList>& tran, NotificationSource source);
 
-        void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesData>& tran );
+        void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesData>& tran, NotificationSource source);
 
-        void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran );
+        void triggerNotification( const QnTransaction<ApiMediaServerUserAttributesDataList>& tran, NotificationSource source);
     };
 
     typedef std::shared_ptr<QnMediaServerNotificationManager> QnMediaServerNotificationManagerPtr;

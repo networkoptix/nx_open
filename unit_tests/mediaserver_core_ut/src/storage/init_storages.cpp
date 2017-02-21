@@ -1,5 +1,4 @@
 #include "media_server/settings.h"
-#include "mediaserver_helper/media_server_helper.h"
 #include "storage/storage_test_helper.h"
 #include "media_server_process.h"
 #include "media_server_process_aux.h"
@@ -7,6 +6,7 @@
 #include "core/resource/storage_resource.h"
 #include "media_server_process.h"
 #include "common/common_module.h"
+#include "mediaserver_launcher.h"
 
 #define GTEST_HAS_TR1_TUPLE     0
 #define GTEST_USE_OWN_TR1_TUPLE 1
@@ -17,18 +17,13 @@
 
 TEST(InitStoragesTest, main)
 {
-    nx::ut::utils::MediaServerTestFuncTypeList testList;
-    testList.push_back(
-        []() 
-        {
-            auto storages = qnResPool->getResources<QnStorageResource>();
-            ASSERT_TRUE(storages.isEmpty());
-        });
-    nx::ut::utils::MediaServerHelper helper(testList);
-    MSSettings::roSettings()->setValue(
+    MediaServerLauncher launcher;
+    launcher.addSetting(
         nx_ms_conf::MIN_STORAGE_SPACE,
         (qint64)std::numeric_limits<int64_t>::max());
-    helper.start();
+    ASSERT_TRUE(launcher.start());
+    auto storages = qnResPool->getResources<QnStorageResource>();
+    ASSERT_TRUE(storages.isEmpty());
 }
 
 TEST(SaveRestoreStoragesInfoFromConfig, main)
@@ -56,10 +51,10 @@ TEST(SaveRestoreStoragesInfoFromConfig, main)
     ASSERT_EQ(restoreData.getSpaceLimitForStorage(path2), spaceLimit2);
 }
 
-class UnmountedStoragesFilterTest : public ::testing::Test
+class UnmountedLocalStoragesFilterTest : public ::testing::Test
 {
 protected:
-    UnmountedStoragesFilterTest() :
+    UnmountedLocalStoragesFilterTest() :
         mediaFolderName(lit("HD Witness Media")),
         unmountedFilter(mediaFolderName),
         spaceLimit(10 * 1024 * 1024 * 1024ll)
@@ -105,12 +100,12 @@ protected:
     nx::ut::utils::FileStorageTestHelper storageTestHelper;
     QString basePath = "/some/path";
     QString mediaFolderName;
-    nx::mserver_aux::UnmountedStoragesFilter unmountedFilter;
+    nx::mserver_aux::UnmountedLocalStoragesFilter unmountedFilter;
     qint64 spaceLimit;
     QnStorageResourceList unmountedStorages;
 };
 
-TEST_F(UnmountedStoragesFilterTest , main)
+TEST_F(UnmountedLocalStoragesFilterTest , main)
 {
     when(PathFound::yes, MediaFolderSuffix::yes);
     then(StorageUnmounted::no);

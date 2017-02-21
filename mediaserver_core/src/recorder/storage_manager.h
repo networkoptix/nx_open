@@ -50,15 +50,7 @@ class QnStorageManager: public QObject
 {
     Q_OBJECT
     friend class TestHelper;
-    friend class nx::caminfo::ServerHandler;
-
-    struct ArchiveCameraData
-    {
-        ec2::ApiCameraData coreData;
-        ec2::ApiResourceParamDataList properties;
-    };
-
-    typedef std::vector<ArchiveCameraData> ArchiveCameraDataList;
+    friend class nx::caminfo::ServerWriterHandler;
 
 public:
     typedef QMap<int, QnStorageResourcePtr> StorageMap;
@@ -193,7 +185,7 @@ public slots:
 private:
     friend class TestStorageThread;
 
-    void createArchiveCameras(const ArchiveCameraDataList& archiveCameras);
+    void createArchiveCameras(const nx::caminfo::ArchiveCameraDataList& archiveCameras);
     void getRecordedPeriodsInternal(std::vector<QnTimePeriodList>& periods,
                                     const QnSecurityCamResourceList &cameras,
                                     qint64 startTime, qint64 endTime, qint64 detailLevel,  bool keepSmallChunks,
@@ -217,9 +209,7 @@ private:
     DeviceFileCatalogPtr getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
 
     void loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog,
-                                      ArchiveCameraDataList &archiveCamerasList, std::function<void(int current, int total)> progressCallback = nullptr);
-
-    void loadCameraInfo(const QnAbstractStorageResource::FileInfo &fileInfo, ArchiveCameraDataList &archiveCameraList, const QnStorageResourcePtr &storage) const;
+                                      nx::caminfo::ArchiveCameraDataList &archiveCamerasList, std::function<void(int current, int total)> progressCallback = nullptr);
 
     void replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog, QnStorageResourcePtr extraAllowedStorage);
@@ -312,7 +302,7 @@ private:
     mutable QnMutex m_occupiedSpaceInfoMutex;
     StorageSpaceInfoMap m_occupiedSpaceInfo;
 
-    nx::caminfo::ServerHandler m_camInfoWriterHandler;
+    nx::caminfo::ServerWriterHandler m_camInfoWriterHandler;
     nx::caminfo::Writer m_camInfoWriter;
 };
 

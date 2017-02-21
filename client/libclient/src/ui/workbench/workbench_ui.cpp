@@ -170,7 +170,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Windowed title shadow. */
     auto windowedTitleShadow = new QnEdgeShadowWidget(m_controlsWidget,
-        Qt::TopEdge, NxUi::kShadowThickness, true);
+        m_controlsWidget, Qt::TopEdge, NxUi::kShadowThickness, QnEdgeShadowWidget::kInner);
     windowedTitleShadow->setZValue(NxUi::ShadowItemZOrder);
 
 #ifdef QN_DEBUG_WIDGET

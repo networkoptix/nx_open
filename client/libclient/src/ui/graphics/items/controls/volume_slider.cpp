@@ -77,7 +77,7 @@ void QnVolumeSlider::sliderChange(SliderChange change) {
             nx::audio::AudioDevice::instance()->setVolume(value / 100.0);
 
         setToolTip(
-            nx::audio::AudioDevice::instance()->isMute() ? tr("Muted") : tr("%1%").arg(value));
+            nx::audio::AudioDevice::instance()->isMute() ? tr("Muted") : lit("%1%").arg(value));
     }
 }
 

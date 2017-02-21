@@ -78,7 +78,7 @@ TitleWorkbenchPanel::TitleWorkbenchPanel(
     m_opacityAnimatorGroup->addAnimator(opacityAnimator(m_showButton));
 
     /* Create a shadow: */
-    auto shadow = new QnEdgeShadowWidget(item, Qt::BottomEdge, NxUi::kShadowThickness);
+    auto shadow = new QnEdgeShadowWidget(parentWidget, item, Qt::BottomEdge, NxUi::kShadowThickness);
     shadow->setZValue(NxUi::ShadowItemZOrder);
 
     updateControlsGeometry();

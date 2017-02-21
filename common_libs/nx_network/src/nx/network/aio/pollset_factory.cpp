@@ -23,6 +23,11 @@ std::unique_ptr<AbstractPollSet> PollSetFactory::create()
         return std::make_unique<PollSetWrapper<PollSet>>();
 }
 
+void PollSetFactory::enableUdt()
+{
+    m_udtEnabled = true;
+}
+
 void PollSetFactory::disableUdt()
 {
     m_udtEnabled = false;

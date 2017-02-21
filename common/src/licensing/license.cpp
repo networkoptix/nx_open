@@ -326,6 +326,8 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
         return gotError(errCode, InvalidSignature);
 
     QnPeerRuntimeInfo info = QnRuntimeInfoManager::instance()->items()->getItem(mode == VM_Regular ? serverId() : qnCommon->remoteGUID());
+
+    // #TODO: #ynikitenkov It does not make sense in case of VM_JustAdded. #refactor
     if (info.uuid.isNull())
         return gotError(errCode, InvalidHardwareID); // peer where license was activated not found
 
@@ -440,7 +442,7 @@ QString QnLicense::errorMessage(ErrorCode errCode)
     case TooManyLicensesPerDevice:
         return tr("Only single license is allowed for this device");
     case FutureLicense:
-        return tr("This license type requires higher software version.");
+        return tr("This license type requires higher software version");
     default:
         return tr("Unknown error");
     }

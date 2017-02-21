@@ -70,18 +70,20 @@ QSize QnGetImageHelper::updateDstSize(const QSharedPointer<QnSecurityCamResource
 }
 
 
-QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
-                                                                   bool useHQ,
-                                                                   QnThumbnailRequestData::RoundMethod roundMethod,
-                                                                   const QnSecurityCamResourcePtr &res,
-                                                                   QnServerArchiveDelegate& serverDelegate,
-                                                                   int prefferedChannel)
+QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
+    qint64 time,
+    bool useHQ,
+    QnThumbnailRequestData::RoundMethod roundMethod,
+    const QnSecurityCamResourcePtr &res,
+    QnServerArchiveDelegate& serverDelegate,
+    int prefferedChannel)
 {
     auto camera = qnCameraPool->getVideoCamera(res);
 
-    QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
-
+    CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnConstCompressedVideoDataPtr video;
+    std::unique_ptr<QnConstDataPacketQueue> videoSequence;
+
     if (time == DATETIME_NOW)
     {
         // get live data
@@ -115,15 +117,31 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
         }
         video = getNextArchiveVideoPacket(serverDelegate, roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod ? time : AV_NOPTS_VALUE);
 
-        if (!video && camera) {
-            video = camera->getFrameByTime(useHQ, time, roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod, prefferedChannel); // try approx frame from GOP keeper
-            time = DATETIME_NOW;
-        }
+        // try approx frame from GOP keeper
         if (!video && camera)
-            video = camera->getFrameByTime(!useHQ, time, roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod, prefferedChannel); // try approx frame from GOP keeper
+        {
+            videoSequence = camera->getFrameSequenceByTime(
+                useHQ,
+                time,
+                prefferedChannel,
+                roundMethod);
+        }
+
+        if (!videoSequence && camera)
+        {
+            videoSequence = camera->getFrameSequenceByTime(
+                !useHQ,
+                time,
+                prefferedChannel,
+                roundMethod);
+        }
     }
+
+    if (videoSequence && videoSequence->size() > 0)
+        return decodeFrameSequence(videoSequence, time);
+
     if (!video)
-        return QSharedPointer<CLVideoDecoderOutput>();
+        return CLVideoDecoderOutputPtr();
 
     QnFfmpegVideoDecoder decoder(video->compressionType, video, false);
     bool gotFrame = false;
@@ -146,8 +164,10 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
             video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
         }
     }
+
     if (video)
         outFrame->channel = video->channelNumber;
+
     return outFrame;
 }
 
@@ -309,4 +329,33 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQualit
         }
     }
     return outFrame;
+}
+
+CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
+    std::unique_ptr<QnConstDataPacketQueue>& sequence,
+    quint64 time)
+{
+    if (!sequence || sequence->isEmpty())
+        return CLVideoDecoderOutputPtr();
+
+    bool gotFrame = false;
+    auto randomAccess = sequence->lock();
+    auto firstFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(randomAccess.at(0));
+
+    if (!firstFrame)
+        return CLVideoDecoderOutputPtr();
+
+    CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
+    QnFfmpegVideoDecoder decoder(firstFrame->compressionType, firstFrame, false);
+
+    for (auto i = 0; i < randomAccess.size() && !gotFrame; ++i)
+    {
+        auto frame = std::dynamic_pointer_cast<const QnCompressedVideoData>(randomAccess.at(i));
+        gotFrame = decoder.decode(frame, &outFrame);
+        if (frame->timestamp >= time)
+            break;
+    }
+    while (decoder.decode(QnConstCompressedVideoDataPtr(), &outFrame))
+        gotFrame = true; //< flush decoder buffer
+    return gotFrame ? outFrame : CLVideoDecoderOutputPtr();
 }

@@ -43,6 +43,11 @@ QUrl QnCloudUrlHelper::restorePasswordUrl() const
     return makeUrl(lit("/restore_password"), false);
 }
 
+QUrl QnCloudUrlHelper::faqUrl() const
+{
+    return makeUrl(lit("/content/faq"), false);
+}
+
 QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
 {
     SystemUri uri(QnAppInfo::defaultCloudPortalUrl());
@@ -50,7 +55,7 @@ QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
     if (auth)
     {
         auto credentials = qnCloudStatusWatcher->createTemporaryCredentials();
-        uri.setAuthenticator(credentials.user, credentials.password);
+        uri.setAuthenticator(credentials.user, credentials.password.value());
     }
 
     uri.setReferral(m_source, m_context);

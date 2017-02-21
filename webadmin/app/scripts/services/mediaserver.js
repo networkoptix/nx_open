@@ -213,6 +213,7 @@ angular.module('webadminApp')
                         var nonce = data.data.reply.nonce;
 
                         var auth = self.digest(login, password, realm, nonce);
+                        var authRtsp = self.digest(login, password, realm, nonce, 'PLAY');
 
                         $log.log("Login2: nonce is " + nonce);
                         $log.log("Login2: auth is " + auth);
@@ -233,6 +234,7 @@ angular.module('webadminApp')
                             $localStorage.nonce = nonce;
                             $localStorage.realm = realm;
                             $localStorage.auth = auth;
+                            $localStorage.authRtsp = authRtsp;
 
                             $log.log("Login3: cookieLogin success!");
                             return data.data.reply;
@@ -257,7 +259,7 @@ angular.module('webadminApp')
                 return $localStorage.auth;
             },
             authForRtsp:function(){
-                return $localStorage.auth; // auth_rtsp
+                return $localStorage.authRtsp; // auth_rtsp
             },
 
             previewUrl:function(cameraPhysicalId,time,width,height){

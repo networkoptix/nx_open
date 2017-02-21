@@ -24,46 +24,48 @@ QnWorkbenchResourcesChangesWatcher::~QnWorkbenchResourcesChangesWatcher() {
 
 void QnWorkbenchResourcesChangesWatcher::showWarningDialog(const QnResourceList& resources)
 {
-    const auto message = qnCommon->isReadOnly()
-        ? tr("The system is in Safe Mode.")
-            + L'\n'
-            + tr("It is not allowed to make any changes except license activation.")
-            + L'\n'
-            + tr("The following %n items are not saved.", "", resources.size())
-        : tr("Could not save the following %n items to Server.", "", resources.size());
+    const auto extras = (qnCommon->isReadOnly()
+        ? tr("System is in the Safe Mode. It is not allowed "
+            "to make any changes except license activation.")
+            + L'\n' + tr("The following %n items are not saved:", "", resources.size())
 
-    QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        Qn::Empty_Help,
-        tr("Error"),
-        tr("Error while saving changes"),
-        QDialogButtonBox::Ok,
+        : tr("The following %n items are not saved:", "", resources.size()));
+
+    const auto icon = static_cast<QnMessageBoxIcon>(qnCommon->isReadOnly()
+        ? QnMessageBoxIcon::Warning
+        : QnMessageBoxIcon::Critical);
+
+    const auto text = (qnCommon->isReadOnly()
+        ? tr("Changing System configuration not allowed in Safe Mode")
+        : tr("Failed to save changes"));
+
+    QnMessageBox dialog(icon, text, extras,
+        QDialogButtonBox::Ok, QDialogButtonBox::Ok,
         mainWindow());
-    messageBox.setDefaultButton(QDialogButtonBox::Ok);
-    messageBox.setInformativeText(message);
-    messageBox.addCustomWidget(new QnResourceListView(resources));
-    messageBox.exec();
+    dialog.addCustomWidget(new QnResourceListView(resources, &dialog));
+    dialog.exec();
 }
 
 void QnWorkbenchResourcesChangesWatcher::showDeleteErrorDialog(const QnResourceList& resources)
 {
-    const auto message = qnCommon->isReadOnly()
-        ? tr("The system is in Safe Mode.")
-        + L'\n'
-        + tr("It is not allowed to make any changes except license activation.")
-        + L'\n'
-        + tr("The following %n items are not deleted.", "", resources.size())
-        : tr("Could not delete the following %n items from Server.", "", resources.size());
+    const auto extras = (qnCommon->isReadOnly()
+        ? tr("System is in the Safe Mode. It is not allowed to "
+            "make any changes except license activation.")
+        + L'\n' + tr("The following %n items are not deleted:", "", resources.size())
 
-    QnMessageBox messageBox(
-        QnMessageBox::Warning,
-        Qn::Empty_Help,
-        tr("Error"),
-        tr("Error while deleting items"),
-        QDialogButtonBox::Ok,
+        : QString());
+
+    const auto icon = static_cast<QnMessageBoxIcon>(qnCommon->isReadOnly()
+        ? QnMessageBoxIcon::Warning
+        : QnMessageBoxIcon::Critical);
+
+    const auto text = (qnCommon->isReadOnly()
+        ? tr("Deleting objects not allowed in Safe Mode")
+        : tr("Failed to delete %n items:", "", resources.size()));
+
+    QnMessageBox dialog(icon, text, extras,
+        QDialogButtonBox::Ok, QDialogButtonBox::Ok,
         mainWindow());
-    messageBox.setDefaultButton(QDialogButtonBox::Ok);
-    messageBox.setInformativeText(message);
-    messageBox.addCustomWidget(new QnResourceListView(resources));
-    messageBox.exec();
+    dialog.addCustomWidget(new QnResourceListView(resources, &dialog));
+    dialog.exec();
 }

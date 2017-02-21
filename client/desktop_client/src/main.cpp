@@ -57,6 +57,11 @@
 #include <ui/workaround/mac_utils.h>
 #endif
 
+#ifndef DISABLE_FESTIVAL
+#include <nx_speech_synthesizer/text_to_wav.h>
+#include <nx/utils/file_system.h>
+#endif
+
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
 #include <utils/common/command_line_parser.h>
@@ -135,6 +140,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     QScopedPointer<QnWorkbenchAccessController> accessController(new QnWorkbenchAccessController());
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(accessController.data()));
 
+    #if defined(Q_OS_LINUX)
+        qputenv("RESOURCE_NAME", QnAppInfo::productNameShort().toUtf8());
+    #endif
+
     /* Create main window. */
     Qt::WindowFlags flags = qnRuntime->isVideoWallMode()
         ? Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint
@@ -143,6 +152,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     context->setMainWindow(mainWindow.data());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
     application->setActivationWindow(mainWindow.data());
+
+    #if defined(Q_OS_LINUX)
+        qunsetenv("RESOURCE_NAME");
+    #endif
 
     QDesktopWidget *desktop = qApp->desktop();
     bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen && startupParams.screen < desktop->screenCount();
@@ -212,6 +225,14 @@ int main(int argc, char** argv)
 
 #ifdef Q_OS_MAC
     mac_setLimits();
+#endif
+
+#ifndef DISABLE_FESTIVAL
+    std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
+        nx::utils::file_system::applicationDirPath(argc, argv));
+
+    textToWaveServer->start();
+    textToWaveServer->waitForStarted();
 #endif
 
     /* These attributes must be set before application instance is created. */

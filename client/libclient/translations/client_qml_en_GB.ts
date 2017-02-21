@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US" sourcelanguage="en">
+<TS version="2.1" language="en_GB" sourcelanguage="en">
 <context>
     <name>EmptyTilesPlaceholder</name>
     <message>
@@ -68,11 +68,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>New System</source>
+        <source>UNREACHABLE</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>UNREACHABLE</source>
+        <source>New Server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

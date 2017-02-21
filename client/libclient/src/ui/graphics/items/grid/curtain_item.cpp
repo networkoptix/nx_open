@@ -21,12 +21,13 @@ QRectF QnCurtainItem::boundingRect() const {
     return m_boundingRect;
 }
 
-void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
+void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget)
+{
 #ifdef Q_OS_WIN
     QRectF viewportRect = painter->transform().inverted().mapRect(QRectF(widget->rect()));
     painter->fillRect(viewportRect, m_color);
 #else
-    QnGlNativePainting::begin(QGLContext::currentContext(),painter);
+    QnGlNativePainting::begin(QGLContext::currentContext(), painter);
 
     QnOpenGLRendererManager::instance(QGLContext::currentContext())->pushModelViewMatrix();
     QnOpenGLRendererManager::instance(QGLContext::currentContext())->setModelViewMatrix(QMatrix4x4());
@@ -34,8 +35,11 @@ void QnCurtainItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, Q
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    const auto widgetRect = widget->geometry();
+    const qreal ratio = painter->device()->devicePixelRatio();
+    const auto rect = QRectF(widgetRect.topLeft() * ratio, widgetRect.size() * ratio);
     QnOpenGLRendererManager::instance(QGLContext::currentContext())->setColor(m_color);
-    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawColoredQuad(widget->geometry());
+    QnOpenGLRendererManager::instance(QGLContext::currentContext())->drawColoredQuad(rect);
 
     glDisable(GL_BLEND);
 

@@ -39,6 +39,32 @@ bool SocketGlobals::Config::isHostDisabled(const HostAddress& host) const
     return false;
 }
 
+//-------------------------------------------------------------------------------------------------
+// SocketGlobals::AioServiceGuard
+
+SocketGlobals::AioServiceGuard::AioServiceGuard()
+{
+}
+
+SocketGlobals::AioServiceGuard::~AioServiceGuard()
+{
+    if (m_aioService)
+        m_aioService->pleaseStopSync();
+}
+
+void SocketGlobals::AioServiceGuard::initialize()
+{
+    m_aioService = std::make_unique<aio::AIOService>();
+}
+
+aio::AIOService& SocketGlobals::AioServiceGuard::aioService()
+{
+    return *m_aioService;
+}
+
+//-------------------------------------------------------------------------------------------------
+// SocketGlobals
+
 SocketGlobals::SocketGlobals(int initializationFlags):
     m_initializationFlags(initializationFlags),
     m_log(QnLog::logs())
@@ -46,32 +72,24 @@ SocketGlobals::SocketGlobals(int initializationFlags):
     if (m_initializationFlags & InitializationFlags::disableUdt)
         m_pollSetFactory.disableUdt();
 
-    m_aioService = std::make_unique<aio::AIOService>();
+    m_aioServiceGuard.initialize();
 }
 
 SocketGlobals::~SocketGlobals()
 {
-    // NOTE: can be move out into QnStoppableAsync::pleaseStop,
-    //       what does not make any sense so far
+    // NOTE: should be moved to QnStoppableAsync::pleaseStop
 
-    nx::utils::promise< void > promise;
+    nx::utils::promise< void > cloudServicesStoppedPromise;
     {
-        utils::BarrierHandler barrier([&](){ promise.set_value(); });
+        utils::BarrierHandler barrier([&](){ cloudServicesStoppedPromise.set_value(); });
         m_debugConfigTimer->pleaseStop(barrier.fork());
         m_addressResolver->pleaseStop(barrier.fork());
         m_addressPublisher->pleaseStop(barrier.fork());
-        //m_mediatorConnector->pleaseStop(barrier.fork());
         m_outgoingTunnelPool->pleaseStop(barrier.fork());
         m_tcpReversePool->pleaseStop(barrier.fork());
     }
 
-    promise.get_future().wait();
-    //m_mediatorConnector.reset();
-    //auto mediatorConnectorGuard = makeScopedGuard(
-    //    [this]()
-    //    {
-    //        m_mediatorConnector->pleaseStopSync(false);
-    //    });
+    cloudServicesStoppedPromise.get_future().wait();
 
     for (const auto& init: m_customInits)
     {
@@ -103,7 +121,10 @@ void SocketGlobals::deinit()
     QnMutexLocker lock(&s_mutex);
     if (--s_counter == 0) //< Last out.
     {
-        delete s_instance;
+        {
+            QnMutexUnlocker unlock(&lock);
+            delete s_instance;
+        }
         s_initState = InitState::deinitializing; //< Allow creating Pollable(s) in destructor.
         s_instance = nullptr;
         s_initState = InitState::none;

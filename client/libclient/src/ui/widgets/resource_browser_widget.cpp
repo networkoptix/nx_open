@@ -81,6 +81,18 @@ const auto kHtmlLabelUserFormat = lit("<center><span style='font-weight: 500'>%1
 
 const QSize kMaxThumbnailSize(224, 184);
 
+static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* item)
+{
+    if (!item)
+        return;
+
+    const auto resource = qnResPool->getResourceByUniqueId(item->resourceUid());
+    if (!resource)
+        return;
+
+    tree->update(resource);
+}
+
 } // namespace
 
 // -------------------------------------------------------------------------- //
@@ -221,7 +233,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     m_ignoreFilterChanges(false),
     m_filterTimerId(0),
     m_tooltipWidget(nullptr),
-    m_hoverProcessor(nullptr)
+    m_hoverProcessor(nullptr),
+    m_disconnectHelper(new QnDisconnectHelper())
 {
     ui->setupUi(this);
 
@@ -251,21 +264,21 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     setHelpTopic(this, Qn::MainWindow_Tree_Help);
     setHelpTopic(ui->searchTab, Qn::MainWindow_Tree_Search_Help);
 
-    connect(ui->typeComboBox, QnComboboxCurrentIndexChanged,
+    *m_disconnectHelper << connect(ui->typeComboBox, QnComboboxCurrentIndexChanged,
         this, [this]() { updateFilter(false); });
-    connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged,
+    *m_disconnectHelper << connect(ui->filterLineEdit, &QnSearchLineEdit::textChanged,
         this, [this]() { updateFilter(false); });
-    connect(ui->filterLineEdit->lineEdit(), &QLineEdit::editingFinished,
+    *m_disconnectHelper << connect(ui->filterLineEdit->lineEdit(), &QLineEdit::editingFinished,
         this, [this]() { updateFilter(true); });
 
-    connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated,
+    *m_disconnectHelper << connect(ui->resourceTreeWidget, &QnResourceTreeWidget::activated,
         this, &QnResourceBrowserWidget::handleItemActivated);
-    connect(ui->searchTreeWidget, &QnResourceTreeWidget::activated,
+    *m_disconnectHelper << connect(ui->searchTreeWidget, &QnResourceTreeWidget::activated,
         this, &QnResourceBrowserWidget::handleItemActivated);
 
-    connect(ui->tabWidget, &QTabWidget::currentChanged,
+    *m_disconnectHelper << connect(ui->tabWidget, &QTabWidget::currentChanged,
         this, &QnResourceBrowserWidget::at_tabWidget_currentChanged);
-    connect(ui->resourceTreeWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
+    *m_disconnectHelper << connect(ui->resourceTreeWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
         this, &QnResourceBrowserWidget::selectionChanged);
 
     /* Connect to context. */
@@ -276,17 +289,21 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     ui->tabWidget->setProperty(style::Properties::kTabBarIndent, style::Metrics::kDefaultTopLevelMargin);
     ui->tabWidget->tabBar()->setMaximumHeight(32);
 
-    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged,
+    *m_disconnectHelper << connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged,
         this, &QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged);
-    connect(workbench(), &QnWorkbench::currentLayoutChanged,
+    *m_disconnectHelper << connect(workbench(), &QnWorkbench::currentLayoutChanged,
         this, &QnResourceBrowserWidget::at_workbench_currentLayoutChanged);
-    connect(workbench(), &QnWorkbench::itemChanged,
-        this, &QnResourceBrowserWidget::at_workbench_itemChanged);
+    *m_disconnectHelper << connect(workbench(), &QnWorkbench::itemAboutToBeChanged,
+        this, &QnResourceBrowserWidget::at_workbench_itemChange);
+    *m_disconnectHelper << connect(workbench(), &QnWorkbench::itemChanged,
+        this, &QnResourceBrowserWidget::at_workbench_itemChange);
 
-    connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged,
-        this, &QnResourceBrowserWidget::updateIcons);
+    *m_disconnectHelper << connect(accessController(),
+        &QnWorkbenchAccessController::globalPermissionsChanged,
+        this,
+        &QnResourceBrowserWidget::updateIcons);
 
-    connect(this->context(), &QnWorkbenchContext::userChanged,
+    *m_disconnectHelper << connect(this->context(), &QnWorkbenchContext::userChanged,
         this, [this]() { ui->tabWidget->setCurrentWidget(ui->resourcesTab); });
 
     installEventHandler({ ui->resourceTreeWidget->treeView()->verticalScrollBar(),
@@ -309,8 +326,10 @@ QnResourceBrowserWidget::~QnResourceBrowserWidget()
     ui->searchTreeWidget->setWorkbench(nullptr);
     ui->resourceTreeWidget->setWorkbench(nullptr);
 
-    /* Workaround against #3797 */
-    ui->typeComboBox->setEnabled(false);
+    /* This class is one of the most significant reasons of crashes on exit. Workarounding it.. */
+    m_disconnectHelper.reset();
+
+    ui->typeComboBox->setEnabled(false); // #3797
 }
 
 QComboBox* QnResourceBrowserWidget::typeComboBox() const
@@ -777,6 +796,11 @@ void QnResourceBrowserWidget::showToolTip()
     animator->animateTo(1.0);
 }
 
+void QnResourceBrowserWidget::clearSelection()
+{
+    currentSelectionModel()->clear();
+}
+
 void QnResourceBrowserWidget::updateIcons()
 {
     QnResourceItemDelegate::Options opts = QnResourceItemDelegate::RecordingIcons;
@@ -850,6 +874,8 @@ void QnResourceBrowserWidget::keyReleaseEvent(QKeyEvent* event)
 
 void QnResourceBrowserWidget::timerEvent(QTimerEvent* event)
 {
+    QWidget::timerEvent(event);
+
     if (event->timerId() == m_filterTimerId)
     {
         killTimer(m_filterTimerId);
@@ -862,27 +888,16 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent* event)
 
             QString filter = ui->filterLineEdit->text();
             Qn::ResourceFlags flags = static_cast<Qn::ResourceFlags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
+            QnResourceSearchQuery query(filter, flags);
 
-            model->clearCriteria();
-            model->setFilterWildcard(L'*' + filter + L'*');
-            if (filter.isEmpty())
-            {
-                model->addCriterion(QnResourceCriterionGroup(QnResourceCriterion::Reject, QnResourceCriterion::Reject));
-            }
-            else
-            {
-                model->addCriterion(QnResourceCriterionGroup(filter));
-                model->addCriterion(QnResourceCriterion(Qn::user));
-                model->addCriterion(QnResourceCriterion(Qn::layout));
-            }
-            if (flags != 0)
-                model->addCriterion(QnResourceCriterion(flags, QnResourceProperty::flags, QnResourceCriterion::Next, QnResourceCriterion::Reject));
+            /* Checking manually until initial model criteria is here */
+            if (model->query() == query)
+                return;
 
+            model->setQuery(query);
             setupInitialModelCriteria(model);
         }
     }
-
-    QWidget::timerEvent(event);
 }
 
 void QnResourceBrowserWidget::paintEvent(QPaintEvent* event)
@@ -892,7 +907,6 @@ void QnResourceBrowserWidget::paintEvent(QPaintEvent* event)
     {
         QPainter painter(this);
         QRect rectToFill(rect());
-        rectToFill.adjust(1, 1, -1, -1);
         // rectToFill.setBottom(ui->horizontalLine->mapTo(this, QPoint(0, 0)).y()); //TODO #vkutin this line might be needed later. Remove it if not.
         painter.fillRect(rectToFill, palette().alternateBase());
     }
@@ -937,25 +951,22 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutChanged()
     connect(layout, SIGNAL(itemRemoved(QnWorkbenchItem*)), this, SLOT(at_layout_itemRemoved(QnWorkbenchItem*)));
 }
 
-void QnResourceBrowserWidget::at_workbench_itemChanged(Qn::ItemRole /*role*/)
+void QnResourceBrowserWidget::at_workbench_itemChange(Qn::ItemRole role)
 {
     /* Raised state has changed. */
-    if (ui->tabWidget->currentWidget() == ui->resourcesTab)
-        ui->resourceTreeWidget->update();
-    else
-        ui->searchTreeWidget->update();
+    updateTreeItem(currentTreeWidget(), workbench()->item(role));
 }
 
-void QnResourceBrowserWidget::at_layout_itemAdded(QnWorkbenchItem*)
+void QnResourceBrowserWidget::at_layout_itemAdded(QnWorkbenchItem* item)
 {
     /* Bold state has changed. */
-    currentTreeWidget()->update();
+    updateTreeItem(currentTreeWidget(), item);
 }
 
-void QnResourceBrowserWidget::at_layout_itemRemoved(QnWorkbenchItem*)
+void QnResourceBrowserWidget::at_layout_itemRemoved(QnWorkbenchItem* item)
 {
     /* Bold state has changed. */
-    currentTreeWidget()->update();
+    updateTreeItem(currentTreeWidget(), item);
 }
 
 void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index)

@@ -32,12 +32,16 @@ donotrebuild
 vms*.pro
 .idea
 .branch.properties
+.cloudHost.properties
 x86/*
 x64/*
 target/*
 target-bpi/*
 packages.config
 .vs
+.git
+TAGS
+*.kdev4
 
 .DS_Store
 Debug
@@ -153,14 +157,13 @@ statserver/build
 statserver/dist
 
 *test-tmp.cfg
-func_tests/ssh.*.conf
+func_tests_old/ssh.*.conf
 
 statserver/statserver.egg-info
 
 common/src/plugins/resource/avi/filetypes.h
 
 *test-tmp.cfg
-func_tests/ssh.*.conf
 
 customization/*.html
 

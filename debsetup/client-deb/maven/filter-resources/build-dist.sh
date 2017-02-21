@@ -79,6 +79,9 @@ for f in `find $ICONSTAGE -name "*.png"`; do mv $f `dirname $f`/`basename $f .pn
 # Copy help
 cp -r $CLIENT_HELP_PATH/* $HELPSTAGE
 
+# Copy fonts
+cp -r "$CLIENT_BIN_PATH/fonts" "$BINSTAGE"
+
 # Copy backgrounds
 cp -r $CLIENT_BG_PATH/* $BGSTAGE
 

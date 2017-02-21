@@ -211,25 +211,27 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
         QPoint textPos = textRect.topLeft() + QPoint(textPadding, option.fontMetrics.ascent()
             + qCeil((textRect.height() - option.fontMetrics.height()) / 2.0));
 
-        NX_ASSERT(textEnd > textPos.x());
-        const auto main = m_textPixmapCache.pixmap(baseName, option.font, mainColor,
-            textEnd - textPos.x(), option.textElideMode);
-
-        if (!main.pixmap.isNull())
+        if (textEnd > textPos.x())
         {
-            painter->drawPixmap(textPos + main.origin, main.pixmap);
-            textPos.rx() += main.origin.x() + main.size().width() + kExtraTextMargin;
-        }
-
-        if (textEnd > textPos.x() && !main.elided() && !extraInfo.isEmpty())
-        {
-            option.font.setWeight(QFont::Normal);
-
-            const auto extra = m_textPixmapCache.pixmap(extraInfo, option.font, extraColor,
+            const auto main = m_textPixmapCache.pixmap(baseName, option.font, mainColor,
                 textEnd - textPos.x(), option.textElideMode);
 
-            if (!extra.pixmap.isNull())
-                painter->drawPixmap(textPos + extra.origin, extra.pixmap);
+            if (!main.pixmap.isNull())
+            {
+                painter->drawPixmap(textPos + main.origin, main.pixmap);
+                textPos.rx() += main.origin.x() + main.size().width() + kExtraTextMargin;
+            }
+
+            if (textEnd > textPos.x() && !main.elided() && !extraInfo.isEmpty())
+            {
+                option.font.setWeight(QFont::Normal);
+
+                const auto extra = m_textPixmapCache.pixmap(extraInfo, option.font, extraColor,
+                    textEnd - textPos.x(), option.textElideMode);
+
+                if (!extra.pixmap.isNull())
+                    painter->drawPixmap(textPos + extra.origin, extra.pixmap);
+            }
         }
     }
 

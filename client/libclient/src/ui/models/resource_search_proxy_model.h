@@ -9,6 +9,22 @@
 
 #include <ui/models/resource/resource_compare_helper.h>
 
+struct QnResourceSearchQuery
+{
+    QString text;
+    Qn::ResourceFlags flags;
+
+    QnResourceSearchQuery():
+        text(), flags(0) {}
+    QnResourceSearchQuery(const QString& text, Qn::ResourceFlags flags):
+        text(text), flags(flags) {}
+
+    bool operator==(const QnResourceSearchQuery& other) const
+    {
+        return text == other.text && flags == other.flags;
+    }
+};
+
 /**
  * A resource filtering model that uses resource criteria for filtering.
  */
@@ -30,6 +46,8 @@ public:
 
     const QnResourceCriterionGroup &criteria();
 
+    QnResourceSearchQuery query() const;
+    void setQuery(const QnResourceSearchQuery& query);
 protected:
 
     // --------------------------------------------------------------
@@ -68,6 +86,7 @@ protected:
 private:
     QnResourceCriterionGroup m_criterionGroup;
     bool m_invalidating;
+    QnResourceSearchQuery m_query;
 };
 
 Q_DECLARE_METATYPE(QnResourceSearchProxyModel *)

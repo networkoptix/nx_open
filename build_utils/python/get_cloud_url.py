@@ -50,18 +50,22 @@ def main():
     parser.add_argument('-i', '--instance', metavar="instance", default="", help="cloud instance name (default is empty)", required = True)
     parser.add_argument('-c', '--customization', help="customization name", required = True)    
     parser.add_argument('-t', '--target', help="output to file")
+    parser.add_argument('--host', help="directly provided host")
     parser.add_argument('--timeout', default=10, type=int, help="request timeout")
 
     args = parser.parse_args()
 
     print "Requesting cloud host for customization {0}, instance {1}".format(args.customization, args.instance)
+    validHost = args.host and not args.host.startswith('$')
+    if validHost:
+        print "Provided host {0}, network request will not occur".format(args.host)
 
     global verbose
     verbose = args.verbose
     if verbose and args.target:
         print "Result will be saved to {0}".format(args.target)
-
-    host = getHostOnline(args.instance, args.customization, args.timeout)
+        
+    host = args.host if validHost else getHostOnline(args.instance, args.customization, args.timeout)
     if host:
         writeToTarget(host, args.target)
     else:
