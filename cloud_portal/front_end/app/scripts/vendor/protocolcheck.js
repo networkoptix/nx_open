@@ -221,7 +221,7 @@
             openUriWithTimeoutHack(uri, failCallback, successCallback, Config.openClientTimeout);
         } else if (browser.isIE) {
             openUriUsingIEInOlderWindows(uri, failCallback, successCallback);
-        } else if (browser.isSafari) {
+        } else if (browser.isSafari && !detectmob()) { // Mobile safari doesn't work this way
              // Here we need some special workaround
              openUriWithHiddenFrame(uri, failCallback, successCallback);
         } else if (detectmob()){
