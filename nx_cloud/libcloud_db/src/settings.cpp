@@ -27,16 +27,23 @@ const QLatin1String kDataDir("dataDir");
 
 const QLatin1String kChangeUser("changeUser");
 
-//notification settings
+//-------------------------------------------------------------------------------------------------
+// Notifications settings
 const QLatin1String kNotificationUrl("notification/url");
 
 const QLatin1String kNotificationEnabled("notification/enabled");
 const bool kDefaultNotificationEnabled = true;
 
-//account manager
+//-------------------------------------------------------------------------------------------------
+// Account manager settings
+const QLatin1String kAccountActivationCodeExpirationTimeout("accountManager/accountActivationCodeExpirationTimeout");
+const std::chrono::seconds kDefaultAccountActivationCodeExpirationTimeout = std::chrono::hours(3*24);
+
 const QLatin1String kPasswordResetCodeExpirationTimeout("accountManager/passwordResetCodeExpirationTimeout");
 const std::chrono::seconds kDefaultPasswordResetCodeExpirationTimeout = std::chrono::hours(24);
 
+//-------------------------------------------------------------------------------------------------
+// System manager settings
 const QLatin1String kReportRemovedSystemPeriodSec("systemManager/reportRemovedSystemPeriod");
 const std::chrono::seconds kDefaultReportRemovedSystemPeriodSec = std::chrono::hours(30 * 24);  //a month
 
@@ -49,7 +56,8 @@ const std::chrono::seconds kDefaultDropExpiredSystemsPeriodSec = std::chrono::ho
 const QLatin1String kControlSystemStatusByDb("systemManager/controlSystemStatusByDb");
 const bool kDefaultControlSystemStatusByDb = false;
 
-//auth settings
+//-------------------------------------------------------------------------------------------------
+// Authentication settings
 const QString kModuleName = lit("cloud_db");
 
 const QLatin1String kAuthXmlPath("auth/rulesXmlPath");
@@ -64,8 +72,8 @@ const std::chrono::seconds kDefaultIntermediateResponseValidityPeriod = std::chr
 const QLatin1String kConnectionInactivityPeriod("auth/connectionInactivityPeriod");
 const std::chrono::milliseconds kDefaultConnectionInactivityPeriod(0); //< disabled
 
-
-//event manager settings
+//-------------------------------------------------------------------------------------------------
+// Event manager settings
 const QLatin1String kMediaServerConnectionIdlePeriod("eventManager/mediaServerConnectionIdlePeriod");
 const auto kDefaultMediaServerConnectionIdlePeriod = std::chrono::minutes(1);
 
@@ -76,28 +84,29 @@ namespace nx {
 namespace cdb {
 namespace conf {
 
-Notification::Notification()
-:
+Notification::Notification():
     enabled(kDefaultNotificationEnabled)
 {
 }
 
-SystemManager::SystemManager()
-:
+AccountManager::AccountManager():
+    accountActivationCodeExpirationTimeout(kDefaultAccountActivationCodeExpirationTimeout),
+    passwordResetCodeExpirationTimeout(kDefaultPasswordResetCodeExpirationTimeout)
+{
+}
+
+SystemManager::SystemManager():
     controlSystemStatusByDb(kDefaultControlSystemStatusByDb)
 {
 }
 
-
-EventManager::EventManager()
-:
+EventManager::EventManager():
     mediaServerConnectionIdlePeriod(kDefaultMediaServerConnectionIdlePeriod)
 {
 }
 
 
-Settings::Settings()
-:
+Settings::Settings():
     m_settings(
         QnAppInfo::organizationNameForSettings(),
         QnLibCloudDbAppInfo::applicationName(),
@@ -244,6 +253,11 @@ void Settings::loadConfiguration()
             kDefaultNotificationEnabled ? "true" : "false").toString() == "true";
 
     //accountManager
+    m_accountManager.accountActivationCodeExpirationTimeout = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            m_settings.value(kAccountActivationCodeExpirationTimeout).toString(),
+            kDefaultAccountActivationCodeExpirationTimeout));
+
     m_accountManager.passwordResetCodeExpirationTimeout = duration_cast<seconds>(
         nx::utils::parseTimerDuration(
             m_settings.value(kPasswordResetCodeExpirationTimeout).toString(),

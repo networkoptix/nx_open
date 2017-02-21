@@ -355,7 +355,7 @@ void socketTransferAsync(
 
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
-    ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count() * 2));
+    //ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count() * 2));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
     ASSERT_TRUE(server->listen(testClientCount())) << lastError();
 
@@ -376,8 +376,8 @@ void socketTransferAsync(
 
         acceptedClients.emplace_back(socket);
         auto& client = acceptedClients.back();
-        if (!client->setSendTimeout(kTestTimeout) ||
-            !client->setSendTimeout(kTestTimeout) ||
+        if (/*!client->setSendTimeout(kTestTimeout) ||
+            !client->setSendTimeout(kTestTimeout) ||*/
             !client->setNonBlockingMode(true))
         {
             EXPECT_TRUE(false) << lastError();
@@ -424,8 +424,8 @@ void socketTransferAsync(
         const auto testClient = clientMaker();
         const auto clientGuard = makeScopedGuard([&](){ testClient->pleaseStopSync(); });
         ASSERT_TRUE(testClient->setNonBlockingMode(true));
-        ASSERT_TRUE(testClient->setSendTimeout(kTestTimeout.count()));
-        ASSERT_TRUE(testClient->setRecvTimeout(kTestTimeout.count()));
+        //ASSERT_TRUE(testClient->setSendTimeout(kTestTimeout.count()));
+        //ASSERT_TRUE(testClient->setRecvTimeout(kTestTimeout.count()));
 
         QByteArray clientBuffer;
         clientBuffer.reserve(128);
