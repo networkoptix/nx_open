@@ -52,6 +52,29 @@ void executeButtonMenu(QnToolButton* invoker, QMenu* menu, const QPoint& offset 
     invoker->setDown(false);
 }
 
+/* If a widget is visible directly or within a graphics proxy: */
+bool isWidgetVisible(const QWidget* widget)
+{
+    if (!widget->isVisible())
+        return false; //< widget is not visible to the screen or a proxy
+
+    if (const auto proxy = widget->window()->graphicsProxyWidget())
+    {
+        if (!proxy->isVisible() || !proxy->scene())
+            return false; //< proxy is not visible or doesn't belong to a scene
+
+        for (const auto view: proxy->scene()->views())
+        {
+            if (isWidgetVisible(view))
+                return true; //< scene is visible
+        }
+
+        return false; // scene has no visible views
+    }
+
+    return true; //< widget is visible directly to the screen
+}
+
 } // namespace
 
 class QnMainWindowTitleBarWidgetPrivate: public QObject
@@ -123,7 +146,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
         [this]()
         {
             Q_D(QnMainWindowTitleBarWidget);
-            if (!d->mainMenuButton->isVisible())
+            if (!isWidgetVisible(d->mainMenuButton))
                 return;
             static const QPoint kVerticalOffset(0, 2);
             d->mainMenuHolder.reset(menu()->newMenu(Qn::MainScope, nullptr));
