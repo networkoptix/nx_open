@@ -54,6 +54,7 @@ protected:
             {
                 auto cc = std::make_unique<IncomingControlConnection>(
                     kConnectionId.toUtf8(), std::move(tmpSocket), connectionParameters);
+                tmpSocketGuard.disarm();
 
                 cc->start(nullptr /* do not wait for select in test */);
                 m_connection = std::make_unique<IncomingTunnelConnection>(std::move(cc));
