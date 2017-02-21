@@ -108,9 +108,10 @@ void AccountManager::authenticateByName(
 
 void AccountManager::registerAccount(
     const AuthorizationInfo& authzInfo,
-    data::AccountData account,
+    data::AccountRegistrationData accountRegistrationData,
     std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler)
 {
+    data::AccountData account(std::move(accountRegistrationData));
     account.statusCode = api::AccountStatus::awaitingActivation;
 
     //fetching request source

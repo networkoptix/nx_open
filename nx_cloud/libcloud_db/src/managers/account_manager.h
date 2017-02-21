@@ -33,8 +33,7 @@ class StreeManager;
 /**
  * \note Methods of this class are re-enterable
  */
-class AccountManager
-:
+class AccountManager:
     public AbstractAuthenticationDataProvider
 {
 public:
@@ -68,7 +67,7 @@ public:
      */
     void registerAccount(
         const AuthorizationInfo& authzInfo,
-        data::AccountData accountData,
+        data::AccountRegistrationData accountData,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler );
     /**
      * On success, account moved to "activated" state.

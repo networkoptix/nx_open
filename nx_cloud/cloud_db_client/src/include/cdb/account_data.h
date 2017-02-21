@@ -1,18 +1,10 @@
-/**********************************************************
-* Sep 3, 2015
-* NetworkOptix
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_CDB_ACCOUNT_DATA_H
-#define NX_CDB_ACCOUNT_DATA_H
+#pragma once
 
 #include <cstdint>
 #include <chrono>
 #include <string>
 
 #include <boost/optional.hpp>
-
 
 namespace nx {
 namespace cdb {
@@ -25,6 +17,19 @@ enum class AccountStatus
     activated = 2,
     blocked = 3,
     invited = 4,
+};
+
+class AccountRegistrationData
+{
+public:
+    //!User email. Used as unique user id
+    std::string email;
+    //!Hex representation of HA1 (see rfc2617) digest of user's password
+    std::string passwordHa1;
+    //!Hex representation of HA1 (see rfc2617) digest calculated with SHA-256 hash
+    std::string passwordHa1Sha256;
+    std::string fullName;
+    std::string customization;
 };
 
 class AccountData
@@ -41,8 +46,17 @@ public:
     std::string customization;
     AccountStatus statusCode;
 
-    AccountData()
-    :
+    AccountData():
+        statusCode(AccountStatus::invalid)
+    {
+    }
+
+    AccountData(AccountRegistrationData registrationData):
+        email(std::move(registrationData.email)),
+        passwordHa1(std::move(registrationData.passwordHa1)),
+        passwordHa1Sha256(std::move(registrationData.passwordHa1Sha256)),
+        fullName(std::move(registrationData.fullName)),
+        customization(std::move(registrationData.customization)),
         statusCode(AccountStatus::invalid)
     {
     }
@@ -83,8 +97,7 @@ public:
     std::chrono::seconds prolongationPeriod;
 
 
-    TemporaryCredentialsTimeouts()
-    :
+    TemporaryCredentialsTimeouts():
         expirationPeriod(0),
         autoProlongationEnabled(false),
         prolongationPeriod(0)
@@ -117,8 +130,6 @@ public:
     TemporaryCredentialsTimeouts timeouts;
 };
 
-}   //api
-}   //cdb
-}   //nx
-
-#endif  //NX_CDB_ACCOUNT_DATA_H
+} // namespace api
+} // namespace cdb
+} // namespace nx
