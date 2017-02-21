@@ -7,7 +7,7 @@
     <div class="modal-body" class="col-sm-12">
         <ng-form name="findSystemForm">
             <div class="form-group">
-                <label for="otherSystemUrl" class="control-label">Other System's URL</label>
+                <label for="otherSystemUrl" class="control-label">Other System URL</label>
                 <div class="">
                     <div class="input-group" dropdown>
                         <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="host:port" required />
@@ -30,7 +30,7 @@
 
 
             <div class="form-group">
-                <label for="otherSystemLogin" class="control-label">Other System's Login</label>
+                <label for="otherSystemLogin" class="control-label">Other System Login</label>
                 <div class="">
                     <input ng-model="settings.login" name="otherSystemLogin" id="otherSystemLogin" class="form-control" type="text"
                            placeholder="Login" required>
@@ -38,7 +38,7 @@
             </div>
 
             <div class="form-group">
-                <label for="otherSystemPassword" class="control-label">Other System's Password</label>
+                <label for="otherSystemPassword" class="control-label">Other System Password</label>
                 <div class="">
                     <input type="password" ng-model="settings.password"  class="form-control" id="otherSystemPassword"
                            autocomplete="new-password"
@@ -48,16 +48,16 @@
         </ng-form>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <label for="currentSystemPassword" class="control-label">Your Password (for current system)</label>
+            <label for="currentSystemPassword" class="control-label">Current Password (for this system)</label>
             <div class="">
                 <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="Password" required />
             </div>
         </div>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <p>You are about to merge the current system <b>{{systems.systemName}}</b> with the system <b>{{systems.joinSystemName}}</b></p>
+            <p>The current system is about to be merged <b>{{systems.systemName}}</b> with the system <b>{{systems.joinSystemName}}</b></p>
             <p>
-                The new system will have password and name from the system:<br/>
+                The new system will have password and name from the following system:<br/>
                 <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (current)</label> <br/>
                 <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
             </p>

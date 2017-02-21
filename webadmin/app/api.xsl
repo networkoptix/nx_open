@@ -49,6 +49,7 @@
                         </div>
                         <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
                             <ul class="nav navbar-nav navbar-right">
+                                <li ><a href="api_changelog.html">Breaking changes to the previous API version</a></li>
                                 <li ><a href="index.html">Web administration</a></li>
                             </ul>
                         </nav>
