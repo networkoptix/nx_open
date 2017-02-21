@@ -37,7 +37,7 @@ CloudConnectionManager::CloudConnectionManager():
         this, &CloudConnectionManager::cloudSettingsChanged);
 
     Qn::directConnect(
-        qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
+        qnGlobalSettings, &QnGlobalSettings::cloudCredentialsChanged,
         this, &CloudConnectionManager::cloudSettingsChanged);
 }
 
