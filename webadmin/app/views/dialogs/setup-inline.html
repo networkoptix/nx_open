@@ -7,7 +7,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('initFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Cannot initialize the system</h2>
+    <h2>Cannot initialize System</h2>
     <p class="master-description">
         Authorization failed.
     </p>
@@ -19,7 +19,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Cannot setup the system</h2>
+    <h2>Cannot setup System</h2>
     <p class="master-description">The  system cannot be configured. <br>
         <span ng-bind-html="settings.localError"></span>
     </p>
@@ -50,7 +50,7 @@
 <div class="panel-body text-center" ng-if="stepIs('systemName')">
     <h2>Enter System Name</h2>
     <p class="master-description">
-        It will help to identify or find the system.
+        It will help to identify or find System.
     </p>
     <form class="master-controls" name="forms.systemNameForm" novalidate>
         <div class="form-group" validate-field>
@@ -99,7 +99,7 @@
 
 
 <div class="panel-body text-center"  ng-if="stepIs('chooseCloudOrLocal')">
-    <h2>Choose the system type</h2>
+    <h2>Choose System type</h2>
     <div class="row radio-panels">
         <div class="col-xs-6 radio-panel ">
             <div class="radio-panel-body"
@@ -152,7 +152,7 @@
 
 
 <div class="panel-body text-center" ng-if="stepIs('cloudAuthorizedIntro')">
-    <p>The system will be connected to</p>
+    <p>System will be connected to</p>
 
     <div class="master-icon"><span class="icon-cloud"></span></div>
 
@@ -434,7 +434,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Cannot setup the system</h2>
+    <h2>Cannot setup System</h2>
     <p class="master-description">Something went totally wrong. <br>
         Error description: {{settings.localError}}
     </p>
