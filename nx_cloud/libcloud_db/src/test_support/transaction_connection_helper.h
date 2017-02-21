@@ -29,6 +29,8 @@ public:
     TransactionConnectionHelper();
     ~TransactionConnectionHelper();
 
+    void setRemoveConnectionAfterClosure(bool val);
+
     /**
      * @return New connection id.
      */
@@ -58,6 +60,8 @@ public:
 
     void closeAllConnections();
 
+    std::size_t activeConnectionCount() const;
+
 private:
     struct ConnectionContext
     {
@@ -76,12 +80,18 @@ private:
     QnWaitCondition m_condition;
     std::atomic<ConnectionId> m_transactionConnectionIdSequence;
     nx::network::aio::Timer m_aioTimer;
+    bool m_removeConnectionAfterClosure;
 
     ::ec2::ApiPeerData localPeer() const;
 
     void onTransactionConnectionStateChanged(
         ::ec2::QnTransactionTransportBase* /*connection*/,
         ::ec2::QnTransactionTransportBase::State /*newState*/);
+
+    void moveConnectionToReadyForStreamingState(
+        ec2::QnTransactionTransportBase* connection);
+    void removeConnection(ec2::QnTransactionTransportBase* connection);
+    ConnectionId getConnectionId(ec2::QnTransactionTransportBase* connection) const;
 };
 
 } // namespace test

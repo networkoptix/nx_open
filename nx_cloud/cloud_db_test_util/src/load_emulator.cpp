@@ -16,7 +16,9 @@ LoadEmulator::LoadEmulator(
     m_cdbUrl(cdbUrl),
     m_transactionConnectionCount(100)
 {
+    m_cdbClient.setCloudUrl(m_cdbUrl);
     m_cdbClient.setCredentials(accountEmail, accountPassword);
+    m_connectionHelper.setRemoveConnectionAfterClosure(true);
 }
 
 void LoadEmulator::setTransactionConnectionCount(int connectionCount)
@@ -31,6 +33,11 @@ void LoadEmulator::start()
     // Fetching system list.
     m_cdbClient.systemManager()->getSystems(
         std::bind(&LoadEmulator::onSystemListReceived, this, _1, _2));
+}
+
+std::size_t LoadEmulator::activeConnectionCount() const
+{
+    return m_connectionHelper.activeConnectionCount();
 }
 
 void LoadEmulator::onSystemListReceived(
