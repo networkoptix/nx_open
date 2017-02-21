@@ -20,10 +20,12 @@ public:
     explicit QnDateRangeWidget(QWidget* parent = nullptr);
     virtual ~QnDateRangeWidget();
 
+    /** Selected UTC date range in milliseconds since epoch. */
     qint64 startTimeMs() const;
     qint64 endTimeMs() const;
     void setRange(qint64 startTimeMs, qint64 endTimeMs);
 
+    /** Selected date range in system time spec. */
     QDate startDate() const;
     QDate endDate() const;
 
@@ -42,6 +44,4 @@ private:
 
 private:
     QScopedPointer<Ui::DateRangeWidget> ui;
-    qint64 m_startTimeMs;
-    qint64 m_endTimeMs;
 };
