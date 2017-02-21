@@ -50,9 +50,10 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
         case QnSystemHealth::CloudPromo:
         {
             const QString kLearnMoreText = tr("Learn more");
-            const QString kMessage = tr("Check out <b>%1</b> Beta "
-                                        "&mdash; connect to your servers from anywhere",
-                "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName());
+            const QString kCloudBeta = lit("<b>%1</b> Beta").arg(QnAppInfo::cloudName());
+
+            const QString kMessage = tr("Check out %1 &mdash; connect to your servers from anywhere",
+                "%1 is the cloud name (like 'Nx Cloud')").arg(kCloudBeta);
 
             const QString kTemplate = lit("<p>%1</p><p><a href=\"settings\">%2</a></p>");
             return kTemplate.arg(kMessage, kLearnMoreText);
