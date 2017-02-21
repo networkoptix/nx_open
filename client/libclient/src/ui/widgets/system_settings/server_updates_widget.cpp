@@ -797,9 +797,10 @@ void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& l
     dialog.addButton(tr("Force Update"), QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
 
     const auto result = dialog.exec();
-    lowFreeSpaceWarning.ignore = true;
     if (result == QDialogButtonBox::Cancel)
-        m_updateTool->cancelUpdate();
+        return;
+
+    lowFreeSpaceWarning.ignore = true;
 }
 
 void QnServerUpdatesWidget::at_tool_updatesCheckCanceled()
@@ -884,6 +885,9 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
 
             case QnUpdateResult::Cancelled:
                 QnMessageBox::information(this, tr("Update canceled"));
+                break;
+
+            case QnUpdateResult::CancelledSilently:
                 break;
 
             case QnUpdateResult::AlreadyUpdated:
