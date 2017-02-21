@@ -191,14 +191,14 @@ def test_restart_one_server(env_merged):
     env_merged.two.setup_cloud_system()
     env_merged.two.rest_api.ec2.getUsers.get()
 
-    # # Merge systems (takeRemoteSettings = false)
-    # env_merged.two.merge_systems(env_merged.one)
-    # env_merged.two.rest_api.ec2.getUsers.get()
+    # Merge systems (takeRemoteSettings = false)
+    env_merged.two.merge_systems(env_merged.one)
+    env_merged.two.rest_api.ec2.getUsers.get()
 
-    # # Ensure both servers are merged and sync
-    # exp_arecontRtspEnabled = \
-    #      not change_bool_setting(env_merged.one, 'arecontRtspEnabled')
-    # #wait_for_settings_merge(env_merged)
-    # check_system_settings(
-    #     env_merged.two,
-    #     arecontRtspEnabled = bool_to_str(exp_arecontRtspEnabled))
+    # Ensure both servers are merged and sync
+    exp_arecontRtspEnabled = \
+         not change_bool_setting(env_merged.one, 'arecontRtspEnabled')
+    #wait_for_settings_merge(env_merged)
+    check_system_settings(
+        env_merged.two,
+        arecontRtspEnabled = bool_to_str(exp_arecontRtspEnabled))
