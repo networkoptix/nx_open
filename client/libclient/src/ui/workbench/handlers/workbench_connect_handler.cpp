@@ -600,6 +600,7 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
         qnCloudStatusWatcher->logSession(info.cloudSystemId);
         if (qnCloudStatusWatcher->stayConnected())
         {
+            qnSettings->setLastUsedConnection({info.systemName, url, localId});
             qnSettings->setAutoLogin(true);
             qnSettings->save();
         }
