@@ -319,6 +319,18 @@ void QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered()
     auto speed = menu()->currentParameters(sender())
         .argument<QVector3D>(Qn::ItemDataRole::PtzSpeedRole);
 
+    auto item = widget->item();
+
+    if (!item)
+        return;
+
+    auto rotation = item->rotation() + (item->data<bool>(Qn::ItemFlipRole, false) ? 0.0 : 180.0);
+    auto controller = widget->ptzController();
+
+    if (!controller)
+        return;
+
+    speed = applyRotation(speed, rotation);
     widget->ptzController()->continuousMove(speed);
 }
 
@@ -348,4 +360,31 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()
                     Qn::PtzObjectIdRole,
                     presetList[presetIndex].id));
     }
+}
+
+QVector3D QnWorkbenchPtzHandler::applyRotation(const QVector3D& speed, qreal rotation) const
+{
+    QVector3D transformedSpeed = speed;
+
+    rotation = static_cast<qint64>(rotation >= 0 ? rotation + 0.5 : rotation - 0.5) % 360;
+    if (rotation < 0)
+        rotation += 360;
+
+    if (rotation >= 45 && rotation < 135)
+    {
+        transformedSpeed.setX(-speed.y());
+        transformedSpeed.setY(speed.x());
+    }
+    else if (rotation >= 135 && rotation < 225)
+    {
+        transformedSpeed.setX(-speed.x());
+        transformedSpeed.setY(-speed.y());
+    }
+    else if (rotation >= 225 && rotation < 315)
+    {
+        transformedSpeed.setX(speed.y());
+        transformedSpeed.setY(-speed.x());
+    }
+
+    return transformedSpeed;
 }

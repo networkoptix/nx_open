@@ -26,6 +26,10 @@ private slots:
 
     void at_ptzContinuousMoveAction_triggered();
     void at_ptzActivatePresetByIndexAction_triggered();
+
+private:
+    QVector3D applyRotation(const QVector3D& speed, qreal rotation) const;
+
 };
 
 #endif // WORKBENCH_PTZ_HANDLER_H
