@@ -319,6 +319,14 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Ctrl+Alt+F</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Alt+D</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Drop Resources</source>
         <translation type="unfinished"></translation>
     </message>
@@ -351,11 +359,23 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Ctrl+Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Previous Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Ctrl+Shift+Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Select All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+A</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -375,6 +395,10 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>F11</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Help</source>
         <translation type="unfinished"></translation>
     </message>
@@ -388,6 +412,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>I/O Module Diagnostics...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+L</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -443,7 +471,15 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Alt+Space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Connect to Server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+C</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -456,6 +492,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Stop Panic Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+P</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -479,11 +519,19 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Ctrl+T</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+N</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -515,6 +563,10 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Ctrl+O</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Layout(s)...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -531,7 +583,19 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Ctrl+S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save Current Layout As...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Shift+S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Alt+S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -544,6 +608,14 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Stop Screen Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+R</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Esc</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -571,6 +643,30 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Alt+Enter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+Return</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+F</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Version Mismatch Message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Beta Version Warning Message</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Ask About Statistics Reporting</source>
         <translation type="unfinished"></translation>
     </message>
@@ -580,6 +676,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>System Administration...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Alt+A</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -607,11 +707,23 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Ctrl+B</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+E</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Devices List</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cameras List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+M</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -627,7 +739,15 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>F1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+F4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -675,6 +795,14 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Ctrl+Enter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Return</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Identify</source>
         <translation type="unfinished"></translation>
     </message>
@@ -696,6 +824,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Del</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -723,11 +855,23 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Enter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Return</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Restore Item</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Show Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+I</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -783,6 +927,10 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Alt+G</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Hide Motion/Smart Search</source>
         <translation type="unfinished"></translation>
     </message>
@@ -803,11 +951,23 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Alt+C</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Take Screenshot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Alt+S</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Image Enhancement...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Alt+J</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -840,6 +1000,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Rename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>F2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1003,7 +1167,15 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Alt+T</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+W</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1015,7 +1187,15 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>[</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Mark Selection End</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>]</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1047,6 +1227,50 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Ctrl+Alt+Shift++</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Increment Debug Counter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Alt+Shift+-</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Decrement Debug Counter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Alt+Shift+R</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Resource Pool</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Calibrate PTZ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Get PTZ Position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Alt+Shift+D</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Debug Control Panel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Play</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1055,7 +1279,15 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Ctrl+Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Previous Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Right</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1063,7 +1295,15 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Z</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>To Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>X</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1071,7 +1311,15 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Ctrl+Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Volume Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ctrl+Down</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1079,11 +1327,23 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>M</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Toggle Mute</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>L</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Jump to Live</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>S</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1167,6 +1427,10 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Ctrl+Alt+T</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Disable Background Animation</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1200,10 +1464,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Add Bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export Rapid Review...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1638,14 +1898,20 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Select Sound</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Text</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Source camera</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>Source and %n more cameras</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1990,26 +2256,6 @@ to view more bookmarks</source>
     <message>
         <source>Applying changes...</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnCameraAdvancedSettingsWidget</name>
-    <message>
-        <source>Loading...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnCameraAudioTransmitPolicy</name>
-    <message>
-        <source>Select device</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%1 doesn&apos;t support two-way audio</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
     </message>
 </context>
 <context>
@@ -2690,25 +2936,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>QnDesktopAudioOnlyDataProvider</name>
-    <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not initialize audio encoder.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Primary audio device isn&apos;t selected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Sample format of input device %1 is not supported.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnDesktopDataProvider</name>
     <message>
         <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
@@ -2898,11 +3125,9 @@ to view more bookmarks</source>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <source>and %n user(s) more...</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+    <message>
+        <source>and %1 user(s) more...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2932,50 +3157,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Schedule settings are not compatible with some devices.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnExportTimelapseDialog</name>
-    <message>
-        <source>sec</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>min</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>hrs</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>days</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ms</source>
-        <comment>Suffix for displaying milliseconds in rapid review dialog</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>s</source>
-        <comment>Suffix for displaying seconds in rapid review dialog</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>m</source>
-        <comment>Suffix for displaying minutes in rapid review dialog</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>h</source>
-        <comment>Suffix for displaying hours in rapid review dialog</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>d</source>
-        <comment>Suffix for displaying days in rapid review dialog</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3369,6 +3550,10 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Timed Out</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3400,6 +3585,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Could not perform a test.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None of your servers are connected to the Internet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3739,6 +3928,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>The information you have entered is not valid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Paramaters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4279,10 +4472,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Some changes will take effect only after application restart. Do you want to restart the application now?</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Audio Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnProgressDialog</name>
@@ -4664,10 +4853,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>less than an hour</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Bitrate</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
@@ -4817,6 +5002,10 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
+        <source>Export bookmark...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Search bookmarks by name, tag or description</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4844,26 +5033,16 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;All My I/O Modules&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export Bookmark...</source>
+        <source>&lt;%n camera(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n I/O module(s)&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5407,6 +5586,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>TLS</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5432,10 +5615,6 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>The provided parameters are not valid. Could not perform a test.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Could not perform a test.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5490,6 +5669,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Loading...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No video stream</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5598,17 +5781,13 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Backup was never started.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+        <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>%n Device(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>No devices selected</source>
@@ -6047,25 +6226,6 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Select file...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnTwoWayAudioWidgetPrivate</name>
-    <message>
-        <source>Input device is not selected.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Streaming is not ready yet, please try again later.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Network error.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hold to Speak</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6645,22 +6805,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>%1 has detected that you have a high resolution screen and as a result %1 may not be displaying well.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>We are aware of this issue and a fix will be coming in v3.0.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In the meantime please adjust your screen&apos;s resolution if needed for a better experience.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>HiDpi Screens Support Warning</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnWorkbenchBookmarksHandler</name>
@@ -6696,11 +6840,9 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Press %1 to search bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
+    <message>
         <source>Are you sure you want to delete these %n bookmarks?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6949,10 +7091,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Selected period is too short and cannot be exported as Rapid Review.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7146,6 +7284,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to set position on camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PTZ_CALIBRATION_%1.jpg</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
