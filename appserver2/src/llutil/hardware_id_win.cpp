@@ -190,7 +190,7 @@ static void findMacAddresses(IWbemServices* pSvc, QnMacAndDeviceClassList& devic
 
                 for (const QString& xclass : classes)
                 {
-                    if (value.mid(0, 3) == xclass)
+                    if (value.contains(xclass, Qt::CaseInsensitive))
                     {
                         device.xclass = xclass;
                     }
