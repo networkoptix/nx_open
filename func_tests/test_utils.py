@@ -175,3 +175,15 @@ def print_list(name, values):
     log.debug('%s:', name)
     for i, value in enumerate(values):
         log.debug('\t #%d: %s', i, value)
+
+def bool_to_str(val, falseStr = 'false', trueStr = 'true'):
+    if val: return trueStr
+    else: return falseStr
+
+def str_to_bool(val):
+    v = val.lower()
+    if val == 'false' or val == '0':
+        return False
+    elif val == 'true' or val == '1':
+        return True
+    raise Exception('Invalid boolean "%s"' % val)
