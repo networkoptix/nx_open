@@ -894,7 +894,7 @@
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or password</source>
+        <source>Incorrect Email or Password</source>
         <translation>Неверный Email / пароль</translation>
     </message>
 </context>
@@ -1179,7 +1179,7 @@
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots up</source>
+        <source>Run Application when PC Boots up</source>
         <translation>Запустить приложение при загрузке компьютера</translation>
     </message>
 </context>
@@ -1898,7 +1898,7 @@
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or password</source>
+        <source>Incorrect Email or Password</source>
         <translation>Неверный Email / пароль</translation>
     </message>
 </context>
@@ -2077,13 +2077,13 @@
     </message>
     <message>
         <location/>
-        <source>Warning: file with same name already exists!</source>
-        <translation>Предупреждение: файл с таким именем уже существует!</translation>
+        <source>Options</source>
+        <translation>Настройки</translation>
     </message>
     <message>
         <location/>
-        <source>Options</source>
-        <translation>Настройки</translation>
+        <source>Warning: file with the same name already exists!</source>
+        <translation>Предупреждение: файл с таким именем уже существует!</translation>
     </message>
 </context>
 <context>
@@ -2782,7 +2782,7 @@
     <message>
         <location/>
         <source>System time is synchronized with the Internet and is independent from server local time.
-Selected server will be used as a time server if the system has no Internet access.</source>
+Selected server will be used as a time server if System has no Internet access.</source>
         <translation>Системное время синхронизируется с Интернетом и не зависит от местного времени сервера. 
 Выбранный сервер будет использоваться как сервер времени, если у системе нет доступа в сеть Интернет.</translation>
     </message>
@@ -2825,7 +2825,7 @@ Selected server will be used as a time server if the system has no Internet acce
         <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
         <translation>В системе ещё не созданы пользовательские роли. 
-Для создания испольуйте кнопку &quot;Новая роль&quot;.</translation>
+Для создания используйте кнопку &quot;Новая роль&quot;.</translation>
     </message>
     <message>
         <location/>

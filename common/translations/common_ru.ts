@@ -393,7 +393,7 @@
     </message>
     <message>
         <source>Archive backup is canceled by user. Data is backed up to %1</source>
-        <translation>Резервное копирование отменено пользователем. Резервоное копирование выполнено до %1</translation>
+        <translation>Резервное копирование отменено пользователем. Резервное копирование выполнено до %1</translation>
     </message>
     <message>
         <source>Do HTTP request</source>
@@ -499,7 +499,7 @@
     </message>
     <message>
         <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-        <translation>Резервное копирование архива завершено не полностью, так как время, отведенное на резевное копирование, истекло. Резервоное копирование выполнено до %1</translation>
+        <translation>Резервное копирование архива завершено не полностью, так как время, отведенное на резевное копирование, истекло. Резервное копирование выполнено до %1</translation>
     </message>
     <message>
         <source>MAC #%1: %2</source>
