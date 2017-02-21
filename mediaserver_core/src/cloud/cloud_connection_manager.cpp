@@ -75,7 +75,7 @@ void CloudConnectionManager::setCloudCredentials(
     const QString& cloudAuthKey)
 {
     NX_LOGX(lm("New cloud credentials: %1:%2")
-        .arg(cloudSystemId).arg(cloudAuthKey.size()), cl_logDEBUG2);
+        .arg(cloudSystemId).arg(cloudAuthKey.size()), cl_logDEBUG1);
 
     if (cloudSystemId.isEmpty() != cloudAuthKey.isEmpty())
         return; //< Ignoring intermediate state.
@@ -221,7 +221,7 @@ bool CloudConnectionManager::resetCloudData()
 
 bool CloudConnectionManager::makeSystemLocal()
 {
-    NX_LOGX(lm("Making system local"), cl_logDEBUG2);
+    NX_LOGX(lm("Making system local"), cl_logINFO);
 
     auto adminUser = qnResPool->getAdministrator();
     if (adminUser && !adminUser->isEnabled() && !qnGlobalSettings->localSystemId().isNull())
@@ -240,7 +240,7 @@ void CloudConnectionManager::cloudSettingsChanged()
 {
     NX_LOGX(lm("Cloud settings has been changed. cloudSystemId %1, cloudAuthKey %2")
         .arg(qnGlobalSettings->cloudSystemId()).arg(qnGlobalSettings->cloudAuthKey()),
-        cl_logDEBUG2);
+        cl_logDEBUG1);
 
     setCloudCredentials(
         qnGlobalSettings->cloudSystemId(),
