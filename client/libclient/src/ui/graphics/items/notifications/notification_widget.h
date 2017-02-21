@@ -17,6 +17,7 @@ class QnFramedWidget;
 class QGraphicsLinearLayout;
 class HoverFocusProcessor;
 class QnImageProvider;
+class QnGraphicsToolTipWidget;
 
 class QnNotificationToolTipWidget: public Clickable<QnStyledTooltipWidget>
 {
@@ -137,7 +138,7 @@ private:
     QnImageProvider* m_imageProvider;
     QColor m_color;
 
-    QnNotificationToolTipWidget* m_tooltipWidget;
+    QnGraphicsToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_toolTipHoverProcessor;
     HoverFocusProcessor* m_hoverProcessor;
     bool m_pendingPositionUpdate;

@@ -11,6 +11,7 @@
 #include <ui/common/notification_levels.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/standard/graphics_label.h>
+#include <ui/graphics/items/generic/graphics_tooltip_widget.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
@@ -163,7 +164,7 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
     m_notificationLevel(QnNotificationLevel::Value::OtherNotification),
     m_imageProvider(nullptr),
     m_color(QnNotificationLevel::notificationColor(m_notificationLevel)),
-    m_tooltipWidget(new QnNotificationToolTipWidget(this)),
+    m_tooltipWidget(new QnGraphicsToolTipWidget(this)),
     m_toolTipHoverProcessor(new HoverFocusProcessor(this)),
     m_hoverProcessor(new HoverFocusProcessor(this)),
     m_pendingPositionUpdate(false),
@@ -193,9 +194,9 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
     m_tooltipWidget->setAcceptHoverEvents(true);
     m_tooltipWidget->installEventFilter(this);
     m_tooltipWidget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true);
-    connect(m_tooltipWidget, &QnNotificationToolTipWidget::buttonClicked,    this, &QnNotificationWidget::buttonClicked);
-    connect(m_tooltipWidget, &QnNotificationToolTipWidget::thumbnailClicked, this, &QnNotificationWidget::triggerDefaultAction);
-    connect(m_tooltipWidget, &QnNotificationToolTipWidget::closeTriggered,   this, &QnNotificationWidget::closeTriggered);
+//     connect(m_tooltipWidget, &QnNotificationToolTipWidget::buttonClicked,    this, &QnNotificationWidget::buttonClicked);
+//     connect(m_tooltipWidget, &QnNotificationToolTipWidget::thumbnailClicked, this, &QnNotificationWidget::triggerDefaultAction);
+//     connect(m_tooltipWidget, &QnNotificationToolTipWidget::closeTriggered,   this, &QnNotificationWidget::closeTriggered);
     connect(m_tooltipWidget, &QnNotificationToolTipWidget::tailPosChanged,   this, &QnNotificationWidget::updateToolTipPosition);
     connect(this,            &QnNotificationWidget::geometryChanged,         this, &QnNotificationWidget::updateToolTipPosition);
 
@@ -265,11 +266,12 @@ void QnNotificationWidget::setNotificationLevel(QnNotificationLevel::Value notif
 void QnNotificationWidget::setImageProvider(QnImageProvider* provider)
 {
     m_imageProvider = provider;
+    m_tooltipWidget->setImageProvider(provider);
 }
 
 void QnNotificationWidget::setTooltipEnclosingRect(const QRectF& rect)
 {
-    m_tooltipWidget->setEnclosingGeometry(rect);
+//    m_tooltipWidget->setEnclosingGeometry(rect);
 }
 
 void QnNotificationWidget::setGeometry(const QRectF& geometry)
@@ -355,7 +357,8 @@ void QnNotificationWidget::hideToolTip()
 
 void QnNotificationWidget::showToolTip()
 {
-    m_tooltipWidget->ensureThumbnail(m_imageProvider);
+    m_imageProvider->loadAsync();
+    //m_tooltipWidget->ensureThumbnail(m_imageProvider);
     opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
 }
 

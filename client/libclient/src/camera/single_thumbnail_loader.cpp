@@ -18,7 +18,8 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
                                                  QnThumbnailRequestData::ThumbnailFormat format,
                                                  QObject *parent):
     base_type(parent),
-    m_request()
+    m_request(),
+    m_status(Qn::ThumbnailStatus::Invalid)
 {
     NX_ASSERT(camera, Q_FUNC_INFO, "Camera must exist here");
     NX_ASSERT(qnCommon->currentServer(), Q_FUNC_INFO, "We must be connected here");
@@ -32,19 +33,9 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
 
     if (!camera || !camera->hasVideo(nullptr))
     {
-//         if (statusPixmapManager)
-//         {
-//             QPixmap statusPixmap = statusPixmapManager->statusPixmap(QnCameraThumbnailManager::NoData);
-//             m_image = statusPixmap.toImage();
-//         }
+        setStatus(Qn::ThumbnailStatus::NoData);
         return;
     }
-
-//     if (statusPixmapManager)
-//     {
-//         QPixmap statusPixmap = statusPixmapManager->statusPixmap(QnCameraThumbnailManager::Loading);
-//         m_image = statusPixmap.toImage();
-//     }
 
     /* Making connection through event loop to handle data from another thread. */
     connect(this, &QnSingleThumbnailLoader::imageLoaded, this,
@@ -55,13 +46,13 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
                 QByteArray imageFormat = QnLexical::serialized<QnThumbnailRequestData::ThumbnailFormat>(format).toUtf8();
                 m_image.loadFromData(data, imageFormat);
             }
-//             else if (statusPixmapManager)
-//             {
-//                 QPixmap statusPixmap = statusPixmapManager->statusPixmap(QnCameraThumbnailManager::NoData);
-//                 m_image = statusPixmap.toImage();
-//             }
+            else
+            {
+                setStatus(Qn::ThumbnailStatus::NoData);
+            }
 
             emit imageChanged(m_image);
+            emit sizeHintChanged(sizeHint());
         }
     , Qt::QueuedConnection);
 
@@ -77,26 +68,34 @@ void QnSingleThumbnailLoader::setRequestData(const QnThumbnailRequestData& data)
     m_request = data;
 }
 
-QImage QnSingleThumbnailLoader::image() const {
+QImage QnSingleThumbnailLoader::image() const
+ {
     return m_image;
 }
 
 QSize QnSingleThumbnailLoader::sizeHint() const
 {
-    NX_ASSERT(false);
+/*    NX_ASSERT(false);*/
+
+    //TODO: #GDM process request size and camera aspect ratio (and rotation?)
     return m_image.size();
 }
 
 Qn::ThumbnailStatus QnSingleThumbnailLoader::status() const
 {
-    NX_ASSERT(false);
-    return Qn::ThumbnailStatus::Invalid;
+    return m_status;
 }
 
 void QnSingleThumbnailLoader::doLoadAsync()
 {
+    if (m_status == Qn::ThumbnailStatus::Loaded)
+        setStatus(Qn::ThumbnailStatus::Refreshing);
+    else
+        setStatus(Qn::ThumbnailStatus::Loading);
+
     if (!qnCommon->currentServer())
     {
+        setStatus(Qn::ThumbnailStatus::NoData);
         emit imageLoaded(QByteArray());
         return;
     }
@@ -109,6 +108,7 @@ void QnSingleThumbnailLoader::doLoadAsync()
                 return;
 
             Q_UNUSED(id);
+            setStatus(success ? Qn::ThumbnailStatus::Loaded : Qn::ThumbnailStatus::NoData);
             if (!success)
                 return;
             emit imageLoaded(imageData);
@@ -116,9 +116,18 @@ void QnSingleThumbnailLoader::doLoadAsync()
 
     if (handle <= 0)
     {
+        setStatus(Qn::ThumbnailStatus::NoData);
         emit imageLoaded(QByteArray());
     }
 }
 
+void QnSingleThumbnailLoader::setStatus(Qn::ThumbnailStatus status)
+{
+    if (status == m_status)
+        return;
+
+    m_status = status;
+    emit statusChanged(status);
+}
 
 
