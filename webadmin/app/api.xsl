@@ -48,7 +48,7 @@
                         </div>
                         <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
                             <ul class="nav navbar-nav">
-                                <li class="active"><a href="">Api reference</a></li>
+                                <li class="active"><a href=""><b>Api reference</b></a></li>
                             </ul>
                             <ul class="nav navbar-nav navbar-right">
                                 <li ><a href="index.html">Web administration</a></li>
@@ -99,7 +99,7 @@
                                     </li>
                                 </xsl:for-each>
                                 <li>
-                                    <a href="index.html/#/developers/changelog" title="Breaking changes">
+                                    <a href="index.html#/developers/changelog" title="Breaking changes">
                                         API Breaking Changes
                                     </a>
                                 </li>
