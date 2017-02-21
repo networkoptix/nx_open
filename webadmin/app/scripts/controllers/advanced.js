@@ -105,6 +105,13 @@ angular.module('webadminApp')
                 }
             });
         });
+        $scope.formatTotalSpace = function(storage){
+            var totalSpace = 'Reserved' +': ' + $scope.formatSpace(storage.reservedSpace) + ", \n" +
+                             'Free' +': ' + $scope.formatSpace(storage.freeSpace) + ", \n" +
+                             'Occupied' +': ' + $scope.formatSpace(storage.totalSpace-storage.freeSpace) + ", \n" +
+                             'Total' +': ' + $scope.formatSpace(storage.totalSpace);
+            return totalSpace;
+        };
 
         $scope.formatSpace = function(bytes){
             var precision = 2;
