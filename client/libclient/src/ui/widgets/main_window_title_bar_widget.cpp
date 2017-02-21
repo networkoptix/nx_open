@@ -12,7 +12,6 @@
 #include <ui/widgets/cloud_status_panel.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/common/tool_button.h>
-#include <ui/workaround/qtbug_workaround.h>
 #include <ui/actions/action_manager.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_resource.h>
@@ -117,9 +116,18 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     connect(d->mainMenuButton, &QnToolButton::justPressed, this,
         [this]()
         {
+            action(QnActions::MainMenuAction)->trigger();
+        });
+
+    connect(action(QnActions::MainMenuAction), &QAction::triggered, this,
+        [this]()
+        {
             Q_D(QnMainWindowTitleBarWidget);
+            if (!d->mainMenuButton->isVisible())
+                return;
             static const QPoint kVerticalOffset(0, 2);
             d->mainMenuHolder.reset(menu()->newMenu(Qn::MainScope, nullptr));
+            d->mainMenuButton->setDown(true);
             executeButtonMenu(d->mainMenuButton, d->mainMenuHolder.data(), kVerticalOffset);
         });
 
@@ -216,23 +224,6 @@ void QnMainWindowTitleBarWidget::setTabBarStuffVisible(bool visible)
     d->newTabButton->setVisible(visible);
     d->currentLayoutsButton->setVisible(visible);
     action(QnActions::OpenNewTabAction)->setEnabled(visible);
-}
-
-bool QnMainWindowTitleBarWidget::event(QEvent* event)
-{
-    Q_D(QnMainWindowTitleBarWidget);
-
-    bool result = base_type::event(event);
-
-    if (event->type() == QnEvent::WinSystemMenu)
-    {
-        if (d->mainMenuButton->isVisible())
-            d->mainMenuButton->click();
-
-        result = true;
-    }
-
-    return result;
 }
 
 void QnMainWindowTitleBarWidget::mouseDoubleClickEvent(QMouseEvent* event)
