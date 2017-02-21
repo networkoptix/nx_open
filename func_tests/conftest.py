@@ -4,6 +4,7 @@ import logging
 import pytest
 from utils import SimpleNamespace
 from test_utils import ServerFactory, EnvironmentBuilder
+from vagrant_box_config import box_config_factory
 from server_rest_api import CloudRestApi
 from camera import MEDIA_SAMPLE_FPATH, SampleMediaFile, Camera
 from server import MEDIASERVER_DEFAULT_CLOUDHOST
@@ -44,13 +45,17 @@ def http_schema(request):
 
 
 @pytest.fixture
+def box():
+    return box_config_factory
+
+@pytest.fixture
 def server():
     return ServerFactory()
 
 
 @pytest.fixture
 def cloud_host_rest_api():
-    return CloudRestApi('http://%s/' % MEDIASERVER_DEFAULT_CLOUDHOST, CLOUD_USER_NAME, CLOUD_USER_PASSWORD)
+    return CloudRestApi('cloud', 'http://%s/' % MEDIASERVER_DEFAULT_CLOUDHOST, CLOUD_USER_NAME, CLOUD_USER_PASSWORD)
 
 @pytest.fixture
 def camera():

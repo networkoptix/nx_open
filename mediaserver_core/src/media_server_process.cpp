@@ -2123,6 +2123,11 @@ void MediaServerProcess::run()
         nx_ms_conf::DEFAULT_CREATE_FULL_CRASH_DUMP ).toBool() );
 #endif
 
+    const auto allowedSslVersions = MSSettings::roSettings()->value(
+        nx_ms_conf::ALLOWED_SSL_VERSIONS, QString()).toString();
+    if (!allowedSslVersions.isEmpty())
+        nx::network::SslEngine::setAllowedServerVersions(allowedSslVersions.toUtf8());
+
     nx::network::SslEngine::useOrCreateCertificate(
         MSSettings::roSettings()->value(
             nx_ms_conf::SSL_CERTIFICATE_PATH,
