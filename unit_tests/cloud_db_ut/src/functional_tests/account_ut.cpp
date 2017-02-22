@@ -848,7 +848,7 @@ class AccountNewTest:
     public Account
 {
 public:
-    static const constexpr auto kTimeShift = std::chrono::hours(3);
+    static constexpr std::chrono::seconds kTimeShift = std::chrono::hours(3);
 
     AccountNewTest():
         m_timeShift(nx::utils::test::ClockType::system)
@@ -917,6 +917,8 @@ private:
         return account;
     }
 };
+
+constexpr std::chrono::seconds AccountNewTest::kTimeShift;
 
 TEST_F(AccountNewTest, account_timestamps)
 {
