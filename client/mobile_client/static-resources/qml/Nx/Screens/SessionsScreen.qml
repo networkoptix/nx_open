@@ -146,7 +146,7 @@ Page
         anchors.fill: parent
         anchors.topMargin: -16
         anchors.bottomMargin: -24
-        title: qsTr("No systems found")
+        title: qsTr("No Systems found")
         description: qsTr(
              "Check your network connection or press \"%1\" button "
                  + "to enter a known server address.").arg(customConnectionButton.text)
@@ -166,8 +166,8 @@ Page
     function openConnectionWarningDialog(systemName)
     {
         var message = systemName ?
-                    qsTr("Cannot connect to the system \"%1\"").arg(systemName) :
-                    qsTr("Cannot connect to the server")
+                    qsTr("Cannot connect to System \"%1\"").arg(systemName) :
+                    qsTr("Cannot connect to Server")
         Workflow.openStandardDialog(
             message, qsTr("Check your network connection or contact a system administrator"))
     }

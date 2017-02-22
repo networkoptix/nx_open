@@ -75,13 +75,13 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             return QString();
 
         case QnSystemHealth::EmailIsEmpty:
-            messageParts << tr("Email address is not set.") << tr("You cannot receive system notifications by Email.");
+            messageParts << tr("Email address is not set.") << tr("You cannot receive System notifications by Email.");
             break;
         case QnSystemHealth::SmtpIsNotSet:
-            messageParts << tr("Email server is not set.") << tr("You cannot receive system notifications by Email.");
+            messageParts << tr("Email server is not set.") << tr("You cannot receive System notifications by Email.");
             break;
         case QnSystemHealth::UsersEmailIsEmpty:
-            messageParts << tr("Some users have not set their Email addresses.") << tr("They cannot receive system notifications by Email.");
+            messageParts << tr("Some users have not set their Email addresses.") << tr("They cannot receive System notifications by Email.");
             break;
         case QnSystemHealth::NoPrimaryTimeServer:
             messageParts << tr("Server times are not synchronized and a common time could not be detected automatically.");
