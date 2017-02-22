@@ -21,7 +21,7 @@ angular.module('cloudApp')
 
             $scope.reactivatingSuccess = $routeParams.reactivatingSuccess;
             $scope.activationSuccess = $routeParams.activationSuccess;
-            $scope.restoringSuccess = $routeParams.changeSuccess;
+            $scope.restoringSuccess = $routeParams.restoringSuccess;
             $scope.changeSuccess = $routeParams.changeSuccess;
 
 
