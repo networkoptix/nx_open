@@ -10,32 +10,6 @@ import yaml
 import shutil
 import codecs
 
-# 1. read ts into xml
-# Read branding info
-
-branding_messages = {}
-
-
-def read_branding():
-    branding_file = 'branding.ts'
-    tree = eTree.parse(branding_file)
-    root = tree.getroot()
-
-    for context in root.iter('context'):
-        name = context.find('name').text
-        if name != 'global':
-            continue
-        for message in context.iter('message'):
-            source = message.find('source').text
-            translation = message.find('translation').text
-            branding_messages[source] = translation
-
-
-def process_branding(content):
-    for src, trans in branding_messages.iteritems():
-        content = content.replace(src, trans)
-    return content
-
 
 def make_dir(filename):
     dirname = os.path.dirname(filename)
@@ -51,11 +25,9 @@ def make_dir(filename):
 def save_content(filename, content):
     if filename:
         # proceed with branding
-        active_content = process_branding(content)
-
         make_dir(filename)
         with codecs.open(filename, "w", "utf-8") as file:
-            file.write(active_content)
+            file.write(content)
             file.close()
 
 
@@ -82,7 +54,7 @@ def process_files(lang, root_directory, xml_filename):
                 target_filename = os.path.join(root_directory, "lang_" + lang, filename)
                 html_mode = active_filename.endswith('.html') or active_filename.endswith('.mustache')
                 try:
-                    with open(active_filename, 'r') as file_descriptor:
+                    with codecs.open(active_filename, 'r', 'utf-8') as file_descriptor:
                         active_content = file_descriptor.read()
                 except IOError as a:
                     print(a)
@@ -123,7 +95,6 @@ def generate_languages_files(languages):
         shutil.copytree(os.path.join('static', 'views'), os.path.join(lang_dir, 'views'))
 
         process_files(lang, 'static', 'cloud_portal.ts')
-        process_files(lang, 'templates', 'cloud_templates.ts')
 
         language_json_filename = os.path.join("../../..", "translations", lang, 'language.json')
 
@@ -134,19 +105,6 @@ def generate_languages_files(languages):
 
     save_content('static/languages.json', json.dumps(languages_json, ensure_ascii=False))
 
-
-def process_app_associations():
-    app_filename = 'static/apple-app-site-association'
-    with open(app_filename, 'r') as file_descriptor:
-        active_content = file_descriptor.read()
-    active_content = process_branding(active_content)
-    save_content(app_filename, active_content)
-
-
-read_branding()
-
-# Branding for apple-app-site-association
-process_app_associations()
 
 # Read config - get languages there
 config = yaml.safe_load(open('cloud_portal.yaml'))

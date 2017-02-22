@@ -101,10 +101,18 @@ do
     python ../../../build_scripts/localize.py
     popd
 
-    echo "clean branding files"
-    rm -rf $TARGET_DIR/$CUSTOMIZATION/*.ts
-
     echo "Localization success"
+
+
+    echo "------------------------------"
+    echo "Branding"
+    pushd $TARGET_DIR/$CUSTOMIZATION
+    python ../../../build_scripts/branding.py
+    rm -rf *.ts
+    popd
+    echo "Branding success"
+
+
 done
 
 echo "Done!"
