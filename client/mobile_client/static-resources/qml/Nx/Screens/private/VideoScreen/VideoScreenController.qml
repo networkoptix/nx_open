@@ -154,6 +154,11 @@ Object
         mediaPlayer.pause()
     }
 
+    function preview()
+    {
+        mediaPlayer.preview()
+    }
+
     function setPosition(position)
     {
         mediaPlayer.position = position

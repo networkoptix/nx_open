@@ -1248,7 +1248,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Export Rapid Review...</source>
+        <source>Connect to System</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1291,6 +1291,18 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Account Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Account...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Stop Sharing Layout</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1303,23 +1315,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Show Notifications</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hide Notifications</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connect to System</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Account Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create Account...</source>
+        <source>Add Device...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1327,11 +1323,15 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add Device...</source>
+        <source>Export Rapid Review...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Clear Screen</source>
+        <source>Show Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Notifications</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1418,14 +1418,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Details for %1 session(s) of %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Details for %1 camera(s) of %2</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No sessions</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1439,6 +1431,14 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Select cameras to see their details</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Details for %1 session(s) of %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Details for %1 camera(s) of %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1654,6 +1654,15 @@ to view more bookmarks</source>
 <context>
     <name>QnBackupSettingsDialog</name>
     <message>
+        <source>Global Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>affect all servers in the system</source>
+        <comment>Relates to &apos;Global Settings&apos; subject</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>By Schedule</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1673,15 +1682,6 @@ to view more bookmarks</source>
     <message>
         <source>All Streams</source>
         <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Global Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>affect all servers in the system</source>
-        <comment>Relates to &apos;Global Settings&apos; subject</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1729,6 +1729,10 @@ to view more bookmarks</source>
 <context>
     <name>QnBuildNumberDialog</name>
     <message>
+        <source>Select Build</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Build Number</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1742,10 +1746,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>The password is incorrect.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select Build</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1936,15 +1936,14 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Filter by devices...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Filter by cameras...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Reset all rules to default?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>This action can&apos;t be undone.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1957,6 +1956,14 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Some rules are not valid. Disable them?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter by devices...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filter by cameras...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2068,15 +2075,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Scanning hosts...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Scanning host...</source>
-        <extracomment>Scanning host... (0 devices found)</extracomment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Server offline</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2105,11 +2103,20 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No devices found</source>
+        <source>Scanning hosts...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scanning host...</source>
+        <extracomment>Scanning host... (0 devices found)</extracomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>All devices already added</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No devices found</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2127,27 +2134,15 @@ to view more bookmarks</source>
 <context>
     <name>QnCameraAdvancedSettingsWidget</name>
     <message>
-        <source>Loading...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Primary Stream</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Secondary Stream</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Camera has no secondary stream</source>
+        <source>I/O Module ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>I/O Module ID</source>
+        <source>Camera ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2163,6 +2158,10 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Primary Stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>URL is not available. Open stream and try again.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2172,6 +2171,14 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>I/O module has no audio stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera has no secondary stream</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2472,6 +2479,30 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Motion detection disabled or not supported</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming not supported for this camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming and motion detection not supported for this camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion detection disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>High minimum value can lead to archive length decrease on other devices.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2497,30 +2528,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Motion detection disabled or not supported</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Dual-Streaming not supported for this camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Dual-Streaming and motion detection not supported for this camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Motion detection disabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2657,16 +2664,6 @@ to view more bookmarks</source>
 <context>
     <name>QnCloudManagementWidget</name>
     <message>
-        <source>Connect to your Systems
-from anywhere with any
-devices</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Known limitations</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Disconnect System from %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
@@ -2699,6 +2696,16 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Connect to your Systems
+from anywhere with any
+devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Known limitations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>%1 is in Beta.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
@@ -2712,7 +2719,8 @@ to %1</source>
 <context>
     <name>QnCloudStatusPanel</name>
     <message>
-        <source>Logging in...</source>
+        <source>Cannot connect to %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2720,8 +2728,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cannot connect to %1</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <source>Logging in...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2734,6 +2741,16 @@ to %1</source>
 </context>
 <context>
     <name>QnConnectToCloudDialog</name>
+    <message>
+        <source>Connect to %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter %1 Account</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Email</source>
         <translation type="unfinished"></translation>
@@ -2748,16 +2765,6 @@ to %1</source>
     </message>
     <message>
         <source>Forgot password?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connect to %1</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enter %1 Account</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2836,11 +2843,21 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Connection to the %1 is not ready yet. Check media server internet connection or try again later.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Failed to connect to Server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Incorrect username or password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to %1 is not established.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2860,6 +2877,18 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Restart %1 in compatibility mode will be required.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to restart %1 in compatibility mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please close %1 and start it again using the shortcut in the start menu.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Client and Server have different versions</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2874,11 +2903,23 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>You have to download another version of %1 to connect to this Server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Download Client version %1?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Download</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You have to restart %1 in compatibility mode to connect to this Server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart %1 in compatibility mode?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2894,53 +2935,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Restart %1 in compatibility mode will be required.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to restart %1 in compatibility mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please close %1 and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You have to download another version of %1 to connect to this Server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You have to restart %1 in compatibility mode to connect to this Server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Restart %1 in compatibility mode?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to restart %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connection to %1 is not established.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Client version: %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server version: %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Operation is not permitted now. It could happen due to server is restarting now. Please try again later.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connection to %1 is not ready yet. Check server internet connection or try again later.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3106,11 +3101,29 @@ to %1</source>
 <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
     <message>
+        <source>Failed to disconnect the System from %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Next</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Internal system error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect the System from %1?</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All cloud users will be deleted.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3123,6 +3136,11 @@ to %1</source>
     </message>
     <message>
         <source>Set local owner password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You won&apos;t be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3147,29 +3165,6 @@ to %1</source>
     </message>
     <message>
         <source>Passwords do not match.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Disconnect</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All cloud users will be deleted.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You will not be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to disconnect System from %1</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Disconnect System from %1?</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3269,15 +3264,15 @@ to %1</source>
         <source>Users</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Open camera</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>%n users</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Open camera</source>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <source>and %n users more...</source>
@@ -3886,9 +3881,17 @@ to %1</source>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Export licenses to a file</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>At least %n %1 are required</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n %1 are currently in use</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Copy To Clipboard</source>
@@ -3908,6 +3911,10 @@ to %1</source>
     </message>
     <message>
         <source>You already activated this license</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export licenses to a file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3965,18 +3972,6 @@ to %1</source>
     <message>
         <source>License already activated on another server</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>At least %n %1 are required</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n %1 are currently in use</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
     </message>
     <message>
         <source>Please make sure it is entered correctly.</source>
@@ -4092,7 +4087,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Restart required</source>
+        <source>Some changes will take effect only after %1 restart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4104,7 +4099,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Some changes will take effect only after %1 restart</source>
+        <source>Restart required</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4139,11 +4134,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Delete connection?</source>
+        <source>There is another connection with the same name.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>There is another connection with the same name.</source>
+        <source>Delete connection?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4153,6 +4148,11 @@ to %1</source>
 </context>
 <context>
     <name>QnLoginToCloudDialog</name>
+    <message>
+        <source>Log in to %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
     <message>
         <source>Email</source>
         <translation type="unfinished"></translation>
@@ -4171,11 +4171,6 @@ to %1</source>
     </message>
     <message>
         <source>Learn more about</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Log in to %1</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4325,11 +4320,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>The login cannot be empty.</source>
+        <source>New Server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>New Server</source>
+        <source>The login cannot be empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4514,7 +4509,7 @@ to %1</source>
 <context>
     <name>QnPerformanceTest</name>
     <message>
-        <source>For full - featured mode, please use another computer</source>
+        <source>Performance of this computer allows running %1 in configuration mode only.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4522,7 +4517,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Performance of this computer allows running %1 in configuration mode only.</source>
+        <source>For full - featured mode, please use another computer</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4855,14 +4850,6 @@ to %1</source>
         <source>Cameras from other servers and removed cameras</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>%1 TB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 GB</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Total %1 %n devices</source>
         <comment>%1 is long dash, do not replace</comment>
@@ -4886,6 +4873,14 @@ to %1</source>
     </message>
     <message>
         <source>Bitrate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 TB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4975,6 +4970,10 @@ to %1</source>
 <context>
     <name>QnResourceTreeModelNode</name>
     <message>
+        <source>Local Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Servers</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5011,7 +5010,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Local Files</source>
+        <source>&lt;Unnamed system&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5067,11 +5066,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No bookmarks</source>
+        <source>Search</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Search</source>
+        <source>No bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5272,11 +5271,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Apply changes before switching to another server?</source>
+        <source>Server Web Page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server Web Page</source>
+        <source>Apply changes before switching to another server?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5349,6 +5348,10 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Checking for updates...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>You will have to update the client manually using an installer.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5365,15 +5368,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Download the Latest Version Update File</source>
+        <source>Specific Build...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Selected Version</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Download Update File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5390,6 +5389,42 @@ to %1</source>
     </message>
     <message>
         <source>Copy Link to Clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update to Specific Build</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download the Latest Version Update File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download Update File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System update in process</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel Update</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue in Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update can&apos;t be canceled at this stage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please wait until it&apos;s finished.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5426,14 +5461,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Update Finished...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Checking for updates...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Downloading updates...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5453,30 +5480,6 @@ to %1</source>
         <source>Installing updates...</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Specific Build...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Update to Specific Build</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Update System</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>System update in process</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel Update</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Continue in Background</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Not enough free space at %n Servers:</source>
         <translation type="unfinished">
@@ -5492,11 +5495,23 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Update Finished...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Server update completed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Please update %1 manually using an installation package.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Update completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 will be restarted to the updated version.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5509,14 +5524,6 @@ to %1</source>
     </message>
     <message>
         <source>Update failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please update %1 manually using an installation package.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 will be restarted to the updated version.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5602,10 +5609,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>FPS too high</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5619,6 +5622,10 @@ to %1</source>
     </message>
     <message>
         <source>FPS in the schedule was lowered from %1 to %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5759,11 +5766,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Network error</source>
+        <source>Invalid parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid parameters</source>
+        <source>Can&apos;t perform the test.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5771,7 +5778,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cannot perform the test.</source>
+        <source>Network error</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5817,6 +5824,10 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Please check authentication information</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Device Settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5840,10 +5851,6 @@ to %1</source>
         <source>Activate License</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Please check authentication information</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnStorageAnalyticsWidget</name>
@@ -5863,10 +5870,6 @@ to %1</source>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Export selected events to file</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>%n TB</source>
         <comment>TB - terabytes</comment>
@@ -5875,8 +5878,7 @@ to %1</source>
         </translation>
     </message>
     <message>
-        <source>TB</source>
-        <comment>TB - terabytes</comment>
+        <source>Export selected events to file</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5903,6 +5905,26 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You can cancel this operation at any moment without data loss.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Continue anyway?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hard disk load will increase significantly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Add more drives to use them as backup storage.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5912,6 +5934,14 @@ to %1</source>
     </message>
     <message>
         <source>Apply changes to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one device in the Backup Settings to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one camera in the Backup Settings to start backup.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5944,34 +5974,6 @@ to %1</source>
     </message>
     <message>
         <source>Next backup is not scheduled.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You can cancel this operation at any moment without data loss.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Continue anyway?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hard disk load will increase significantly</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select at least one device in the Backup Settings to start backup.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select at least one camera in the Backup Settings to start backup.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6306,11 +6308,11 @@ to %1</source>
 <context>
     <name>QnTimeSlider</name>
     <message>
-        <source>Live</source>
+        <source>No thumbnails available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No thumbnails available</source>
+        <source>Live</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6328,10 +6330,6 @@ to %1</source>
 <context>
     <name>QnTwoWayAudioWidgetPrivate</name>
     <message>
-        <source>Hold to Speak</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Input device is not selected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6341,6 +6339,10 @@ to %1</source>
     </message>
     <message>
         <source>Network error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hold to Speak</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6538,19 +6540,19 @@ to %1</source>
         <source>Users will have no permissions unless changed later.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Assign a new role</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Delete such users</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Please select the action to perform to %n users with this role</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Delete such users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Assign a new role</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6583,6 +6585,10 @@ to %1</source>
 <context>
     <name>QnUserSettingsDialog</name>
     <message>
+        <source>Enabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>User Information</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6603,6 +6609,14 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>User is disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply changes before switching to another user?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>New User...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6612,18 +6626,6 @@ to %1</source>
     </message>
     <message>
         <source>User Settings - %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User is disabled</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Apply changes before switching to another user?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6820,18 +6822,6 @@ to %1</source>
         <source>Beta version %1</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Confirm files deleting</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Client</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>Failed to move %n devices</source>
         <translation type="unfinished">
@@ -6867,6 +6857,10 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Confirm files deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>There is another user with the same name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6883,11 +6877,23 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Client</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Please update all components to the version %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Some functionality may be unavailable or not working properly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6930,10 +6936,6 @@ to %1</source>
     </message>
     <message>
         <source>System sends anonymous usage statistics</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>To disable it, go to System Administration dialog.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7052,6 +7054,10 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>AVI format is not recommended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Exporting Video</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7097,6 +7103,10 @@ to %1</source>
     </message>
     <message>
         <source>Export anyway?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7161,14 +7171,6 @@ to %1</source>
     </message>
     <message>
         <source>Failed to export video</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>AVI format is not recommended</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

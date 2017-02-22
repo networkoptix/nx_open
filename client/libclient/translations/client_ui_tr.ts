@@ -271,17 +271,17 @@
     </message>
     <message>
         <location/>
-        <source>Bitrate limitation could lead to backup failure.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Finish</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bitrate limitation could lead to backup failure.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -889,12 +889,12 @@
     <name>ConnectToCloudDialog</name>
     <message>
         <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
-        <source>Stay logged in</source>
+        <source>Incorrect email or password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or password</source>
+        <source>Stay logged in</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -997,7 +997,7 @@
     <name>ExecHttpRequestActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
-        <source>HTTP content</source>
+        <source>Password to authenticate (optional)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1007,17 +1007,17 @@
     </message>
     <message>
         <location/>
+        <source>HTTP content</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP url</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Login</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Password to authenticate (optional)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1027,7 +1027,7 @@
     </message>
     <message>
         <location/>
-        <source>HTTP URL</source>
+        <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1058,12 +1058,12 @@
     </message>
     <message>
         <location/>
-        <source>Rapid Review speed</source>
+        <source>Frames Interval</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Frames Interval</source>
+        <source>Rapid Review speed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1144,17 +1144,17 @@
     </message>
     <message>
         <location/>
+        <source>Local Media Folders</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Add...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Local Media Folders</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1616,6 +1616,16 @@
     </message>
     <message>
         <location/>
+        <source>Show additional info in tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tour cycle</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Image</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1627,16 +1637,6 @@
     <message>
         <location/>
         <source>Intensity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Show additional info in tree</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Tour cycle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2036,12 +2036,12 @@
     </message>
     <message>
         <location/>
-        <source>Link copied</source>
+        <source>You have the latest version installed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>You have the latest version installed</source>
+        <source>Link copied</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2661,6 +2661,11 @@
     </message>
     <message>
         <location/>
+        <source> TB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Server is offline. Statistics are not available.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2689,6 +2694,11 @@
     </message>
     <message>
         <location/>
+        <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
         <source>Reindex Archive</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2705,11 +2715,6 @@
     <message>
         <location/>
         <source>Backup Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
