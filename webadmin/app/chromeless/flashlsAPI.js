@@ -7,7 +7,10 @@ var flashlsAPI = function(flashObject) {
 	this.constructor(flashObject);
 
 	this.load = function(url) {
-    this.flashObject.playerLoad(url);
+		if(url.indexOf("http")!=0){
+			url = window.location.origin + url;
+		}
+    	this.flashObject.playerLoad(url);
 	}
 
 	this.play = function(offset) {
