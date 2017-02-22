@@ -1599,7 +1599,7 @@ void QnStorageManager::clearSpace(bool forced)
             }
 
             qint64 toDeleteForStorage = storage->getSpaceLimit() - storage->getFreeSpace();
-            NX_LOG(lit("[Cleanup, measure]: storage: %1, spaceLImit: %2, freeSpace: %3, toDelete: %4")
+            NX_LOG(lit("[Cleanup, measure]: storage: %1, spaceLimit: %2, freeSpace: %3, toDelete: %4")
                     .arg(storage->getUrl())
                     .arg(storage->getSpaceLimit())
                     .arg(storage->getFreeSpace())
