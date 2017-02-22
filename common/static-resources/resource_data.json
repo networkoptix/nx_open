@@ -546,7 +546,8 @@
                 "General|IP Camera",
                 "H264|N51820L",
                 "TRUEN Co., Ltd.|TN-P4230CSLXIR",
-                "TRUEN Co. Ltd.|*"
+                "TRUEN Co. Ltd.|*",
+				"Vista|VK2-3MPEFEDre"
             ],
             "ptzTraits": "FourWayPtz"
         },
