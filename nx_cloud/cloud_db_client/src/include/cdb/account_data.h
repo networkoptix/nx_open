@@ -45,9 +45,14 @@ public:
     std::string fullName;
     std::string customization;
     AccountStatus statusCode;
+    std::chrono::system_clock::time_point registrationTime;
+    /**
+     * Zero, if account has not been activated yet.
+     */
+    std::chrono::system_clock::time_point activationTime;
 
     AccountData():
-        statusCode(AccountStatus::invalid)
+        AccountData(AccountRegistrationData())
     {
     }
 
@@ -78,13 +83,11 @@ public:
     boost::optional<std::string> passwordHa1Sha256;
 };
 
-
 class AccountEmail
 {
 public:
     std::string email;
 };
-
 
 class TemporaryCredentialsTimeouts
 {
@@ -105,7 +108,9 @@ public:
     }
 };
 
-/** Input parameters of create_temporary_credentials request. */
+/**
+ * Input parameters of create_temporary_credentials request.
+ */
 class TemporaryCredentialsParams
 {
 public:

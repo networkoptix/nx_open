@@ -752,6 +752,16 @@ ON system_to_account (account_id, system_id);
 
 )sql";
 
+/**
+ * #CLOUD-922. Adding account registration/activation timestamps.
+ */
+static const char kAddAccountTimestamps[] = R"sql(
+
+ALTER TABLE account ADD COLUMN registration_time_utc BIGINT;
+ALTER TABLE account ADD COLUMN activation_time_utc BIGINT;
+
+)sql";
+
 } // namespace db
 } // namespace cdb
 } // namespace nx

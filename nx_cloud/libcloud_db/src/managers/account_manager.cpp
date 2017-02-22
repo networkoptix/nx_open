@@ -147,7 +147,7 @@ void AccountManager::activate(
     m_dbManager->executeUpdate<data::AccountConfirmationCode, std::string>(
         std::bind(&AccountManager::verifyAccount, this, _1, _2, _3),
         std::move(emailVerificationCode),
-        std::bind(&AccountManager::accountVerified, this,
+        std::bind(&AccountManager::sendActivateAccountResponse, this,
                     m_startedAsyncCallsCounter.getScopedIncrement(),
                     _1, _2, _3, _4, std::move(completionHandler)));
 }
@@ -402,6 +402,8 @@ db::DBResult AccountManager::insertAccount(
     if (account.customization.empty())
         account.customization = QnAppInfo::customizationName().toStdString();
 
+    account.registrationTime = nx::utils::utcTime();
+
     const auto dbResult = m_accountDbController.insert(queryContext, account);
     if (dbResult != nx::db::DBResult::ok)
         return dbResult;
@@ -424,24 +426,10 @@ nx::db::DBResult AccountManager::updateAccount(
     if (account.id.empty() || account.email.empty())
         return nx::db::DBResult::ioError;
 
-    QSqlQuery updateAccountQuery(*queryContext->connection());
-    updateAccountQuery.prepare(
-        R"sql(
-        UPDATE account 
-        SET password_ha1=:passwordHa1, password_ha1_sha256=:passwordHa1Sha256, 
-            full_name=:fullName, customization=:customization, status_code=:statusCode
-        WHERE id=:id AND email=:email
-        )sql");
-    QnSql::bind(account, &updateAccountQuery);
-    if (!updateAccountQuery.exec())
-    {
-        NX_LOG(lm("Could not update account (%1, %2) into DB. %3")
-            .arg(account.email).arg(QnLexical::serialized(account.statusCode))
-            .arg(updateAccountQuery.lastError().text()),
-            cl_logDEBUG1);
-        return nx::db::DBResult::ioError;
-    }
-
+    auto dbResult = m_accountDbController.update(queryContext, account);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
+    
     queryContext->transaction()->addOnSuccessfulCommitHandler(
         [this, account = std::move(account)]() mutable
         {
@@ -547,28 +535,17 @@ db::DBResult AccountManager::fillCache()
 
 db::DBResult AccountManager::fetchAccounts(nx::db::QueryContext* queryContext)
 {
-    QSqlQuery readAccountsQuery(*queryContext->connection());
-    readAccountsQuery.setForwardOnly(true);
-    readAccountsQuery.prepare(
-        "SELECT id, email, password_ha1 as passwordHa1, password_ha1_sha256 as passwordHa1Sha256, "
-               "full_name as fullName, customization, status_code as statusCode "
-        "FROM account" );
-    if (!readAccountsQuery.exec())
-    {
-        NX_LOG(lit("Failed to read account list from DB. %1").
-            arg(readAccountsQuery.lastError().text()), cl_logWARNING);
-        return db::DBResult::ioError;
-    }
-
     std::vector<data::AccountData> accounts;
-    QnSql::fetch_many( readAccountsQuery, &accounts );
+    auto dbResult = m_accountDbController.fetchAccounts(queryContext, &accounts);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
 
-    for (auto& account : accounts)
+    for (auto& account: accounts)
     {
         auto emailCopy = account.email;
         if (!m_cache.insert(std::move(emailCopy), std::move(account)))
         {
-            NX_ASSERT( false );
+            NX_ASSERT(false);
         }
     }
 
@@ -732,76 +709,65 @@ void AccountManager::accountReactivated(
             : data::AccountConfirmationCode());
 }
 
+void AccountManager::activateAccountInCache(
+    std::string accountEmail,
+    std::chrono::system_clock::time_point activationTime)
+{
+    m_cache.atomicUpdate(
+        accountEmail,
+        [activationTime](api::AccountData& account)
+        {
+            account.statusCode = api::AccountStatus::activated;
+            account.activationTime = activationTime;
+        });
+}
+
 nx::db::DBResult AccountManager::verifyAccount(
     nx::db::QueryContext* const queryContext,
     const data::AccountConfirmationCode& verificationCode,
     std::string* const resultAccountEmail )
 {
-    QSqlQuery getAccountByVerificationCode(*queryContext->connection());
-    getAccountByVerificationCode.setForwardOnly(true);
-    getAccountByVerificationCode.prepare(
-        "SELECT a.email "
-        "FROM email_verification ev, account a "
-        "WHERE ev.account_id = a.id AND ev.verification_code LIKE :code" );
-    QnSql::bind( verificationCode, &getAccountByVerificationCode );
-    if( !getAccountByVerificationCode.exec() )
-        return db::DBResult::ioError;
-    if( !getAccountByVerificationCode.next() )
-    {
-        NX_LOG( lit("Email verification code %1 was not found in the database").
-            arg( QString::fromStdString(verificationCode.code) ), cl_logDEBUG1 );
-        return db::DBResult::notFound;
-    }
-    const std::string accountEmail = QnSql::deserialized_field<QString>(
-        getAccountByVerificationCode.value(0)).toStdString();
+    std::string accountEmail;
+    auto dbResult = m_accountDbController.getAccountEmailByVerificationCode(
+        queryContext, verificationCode, &accountEmail);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
 
-    QSqlQuery removeVerificationCode(*queryContext->connection());
-    removeVerificationCode.prepare(
-        "DELETE FROM email_verification WHERE verification_code LIKE :code" );
-    QnSql::bind( verificationCode, &removeVerificationCode );
-    if( !removeVerificationCode.exec() )
-    {
-        NX_LOG(lit("Failed to remove account verification code %1 from DB. %2")\
-            .arg(QString::fromStdString(verificationCode.code))
-            .arg(removeVerificationCode.lastError().text()),
-            cl_logDEBUG1);
-        return db::DBResult::ioError;
-    }
+    dbResult = m_accountDbController.removeVerificationCode(
+        queryContext, verificationCode);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
 
-    QSqlQuery updateAccountStatus(*queryContext->connection());
-    updateAccountStatus.prepare(
-        "UPDATE account SET status_code = ? WHERE email = ?" );
-    updateAccountStatus.bindValue( 0, static_cast<int>(api::AccountStatus::activated) );
-    updateAccountStatus.bindValue( 1, QnSql::serialized_field(accountEmail) );
-    if( !updateAccountStatus.exec() )
-    {
-        NX_LOG(lm("Failed to update account %1 status. %2").
-            arg(accountEmail).arg(updateAccountStatus.lastError().text()),
-            cl_logDEBUG1);
-        return db::DBResult::ioError;
-    }
+    const auto accountActivationTime = nx::utils::utcTime();
+    dbResult = m_accountDbController.updateAccountToActiveStatus(
+        queryContext, accountEmail, accountActivationTime);
+    if (dbResult != nx::db::DBResult::ok)
+        return dbResult;
+
+    queryContext->transaction()->addOnSuccessfulCommitHandler(
+        std::bind(&AccountManager::activateAccountInCache, this,
+            accountEmail, accountActivationTime));
 
     *resultAccountEmail = std::move(accountEmail);
 
     return db::DBResult::ok;
 }
 
-void AccountManager::accountVerified(
+void AccountManager::sendActivateAccountResponse(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult resultCode,
     data::AccountConfirmationCode /*verificationCode*/,
-    const std::string accountEmail,
-    std::function<void(api::ResultCode, api::AccountEmail)> completionHandler )
+    std::string accountEmail,
+    std::function<void(api::ResultCode, api::AccountEmail)> completionHandler)
 {
-    if( resultCode != db::DBResult::ok )
+    if (resultCode != db::DBResult::ok)
+    {
         return completionHandler(
             dbResultToApiResult(resultCode),
             api::AccountEmail());
+    }
 
-    m_cache.atomicUpdate(
-        accountEmail,
-        []( api::AccountData& account ){ account.statusCode = api::AccountStatus::activated; } );
     api::AccountEmail response;
     response.email = accountEmail;
     completionHandler(

@@ -52,6 +52,7 @@ DbInstanceController::DbInstanceController(const nx::db::ConnectionOptions& dbCo
     dbStructureUpdater().addUpdateScript(
         {{nx::db::RdbmsDriverType::mysql, db::kRestoreSystemToAccountReferenceUniquenessMySql},
          {nx::db::RdbmsDriverType::unknown, db::kRestoreSystemToAccountReferenceUniquenessSqlite}});
+    dbStructureUpdater().addUpdateScript(db::kAddAccountTimestamps);
 }
 
 } // namespace rdb

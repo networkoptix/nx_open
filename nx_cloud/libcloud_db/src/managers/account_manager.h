@@ -170,13 +170,16 @@ private:
         nx::db::QueryContext* const tran,
         const data::AccountConfirmationCode& verificationCode,
         std::string* const accountEmail);
-    void accountVerified(
+    void sendActivateAccountResponse(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult resultCode,
         data::AccountConfirmationCode verificationCode,
-        const std::string accountEmail,
+        std::string accountEmail,
         std::function<void(api::ResultCode, api::AccountEmail)> completionHandler);
+    void activateAccountInCache(
+        std::string accountEmail,
+        std::chrono::system_clock::time_point activationTime);
 
     nx::db::DBResult updateAccountInDB(
         bool activateAccountIfNotActive,

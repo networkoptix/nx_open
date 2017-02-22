@@ -43,7 +43,7 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AccountStatus)
 
 #define AccountData_Fields \
     (id)(email)(passwordHa1)(passwordHa1Sha256)\
-    (fullName)(customization)(statusCode)
+    (fullName)(customization)(statusCode)(registrationTime)(activationTime)
 
 
 ////////////////////////////////////////////////////////////
