@@ -10,7 +10,7 @@ static const QString kMetadataFlagsKey(lit("metadata"));
 } // namespace
 FrameMetadata::FrameMetadata():
     flags(QnAbstractMediaData::MediaFlags_None),
-    noDelay(false),
+    displayHint(DisplayHint::regular),
     frameNum(-1),
     sar(1.0),
     videoChannel(0),

@@ -262,9 +262,9 @@ TEST_F(SocketUdt, rendezvousConnect)
     connectionsGenerator.pleaseStopSync();
     server.pleaseStopSync();
 
-    ASSERT_GT(connectionsGenerator.totalConnectionsEstablished(), 0);
-    ASSERT_GT(connectionsGenerator.totalBytesSent(), 0);
-    ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0);
+    ASSERT_GT(connectionsGenerator.totalConnectionsEstablished(), 0U);
+    ASSERT_GT(connectionsGenerator.totalBytesSent(), 0U);
+    ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0U);
 }
 
 TEST_F(SocketUdt, rendezvousConnectWithDelay)
@@ -345,9 +345,9 @@ TEST_F(SocketUdt, rendezvousConnectWithDelay)
     generator->pleaseStopSync();
     server->pleaseStopSync();
 
-    ASSERT_GT(generator->totalConnectionsEstablished(), 0);
-    ASSERT_GT(generator->totalBytesSent(), 0);
-    ASSERT_GT(generator->totalBytesReceived(), 0);
+    ASSERT_GT(generator->totalConnectionsEstablished(), 0U);
+    ASSERT_GT(generator->totalBytesSent(), 0U);
+    ASSERT_GT(generator->totalBytesReceived(), 0U);
 }
 
 TEST_F(SocketUdt, acceptingFirstConnection)
@@ -467,10 +467,10 @@ TEST_F(SocketUdtNew, simpleTest)
         ASSERT_NE(nullptr, acceptedSocket);
 
         std::array<char, 128> testBuf;
-        ASSERT_EQ(testBuf.size(), m_clientSock->send(testBuf.data(), testBuf.size()));
+        ASSERT_EQ((int)testBuf.size(), m_clientSock->send(testBuf.data(), testBuf.size()));
 
         std::array<char, testBuf.size()> readBuf;
-        ASSERT_EQ(sizeof(testBuf), acceptedSocket->recv(readBuf.data(), readBuf.size(), 0));
+        ASSERT_EQ((int)readBuf.size(), acceptedSocket->recv(readBuf.data(), readBuf.size(), 0));
 
         closeConnection();
     }
@@ -544,7 +544,7 @@ TEST_F(SocketUdt, allDataReadAfterFin)
                     SystemError::ErrorCode errorCode, size_t bytesSent) mutable
                 {
                     ASSERT_EQ(SystemError::noError, errorCode);
-                    ASSERT_EQ(msgSize, bytesSent);
+                    ASSERT_EQ((size_t)msgSize, bytesSent);
                     clientSock.reset();
                 });
         }

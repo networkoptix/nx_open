@@ -517,7 +517,7 @@ TEST( QnMulticodecRtpReader, DISABLED_rtpParsingPerformance )
     ASSERT_EQ( stat( testDataFilePath, &st ), 0 );
     testData.resize( st.st_size );
     testFile.read( const_cast<char*>(testData.data()), testData.size() );
-    ASSERT_EQ( testFile.gcount(), testData.size() );
+    ASSERT_EQ( (size_t)testFile.gcount(), testData.size() );
     testFile.close();
 
     QnNetworkResourcePtr resource( new QnNetworkResource() );

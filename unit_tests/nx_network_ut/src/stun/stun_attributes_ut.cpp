@@ -58,7 +58,7 @@ private:
             ASSERT_EQ(
                 nx_api::SerializerState::done,
                 testAttribute.serialize(&stream, &bytesWritten));
-            ASSERT_EQ(serializedPrototype.size(), bytesWritten);
+            ASSERT_EQ((size_t)serializedPrototype.size(), bytesWritten);
             ASSERT_EQ(serializedPrototype, serializedBuffer);
         }
     }

@@ -70,7 +70,7 @@
         "wrongUrl": "Unable to connect to the specified server.",
         "newSystemError": "Cannot merge systems. Remote system is not configured.",
         "safeMode": "Cannot merge systems. Remote system is in safe mode.",
-        "configError": "Cannot merge systems. Maybe one of the systems is in safe mode.",
+        "configError": "Cannot merge systems. Maybe one of Systems is in safe mode.",
         "cloudError": "Cannot merge systems. Dependent system is connected to cloud. You need to disconnect it first.",
         "cloudBothError": "Cannot merge systems. Both systems are connected to cloud. You need to disconnect one first.",
         "cloudHostConflict": "Cannot merge systems, because servers are built with different cloud hosts",

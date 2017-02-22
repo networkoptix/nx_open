@@ -280,8 +280,6 @@ angular.module('webadminApp')
                         scope.flashSource = "components/flashlsChromeless_debug.swf";
                     }
 
-
-                    scope.flashParam = flashlsAPI.flashParams();
                     if(flashlsAPI.ready()){
                         flashlsAPI.kill();
                         scope.flashls = false; // Destroy it!

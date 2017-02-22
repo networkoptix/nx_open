@@ -40,5 +40,5 @@ TEST(PcpRouter, DISABLED_RealMap)
     pcp::Router router("10.0.2.103");
     router.mapPort(mapping);
 
-    EXPECT_GT(mapping.lifeTime, 0);
+    EXPECT_GT(mapping.lifeTime, 0U);
 }
