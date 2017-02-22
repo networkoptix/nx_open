@@ -1,6 +1,7 @@
 #include "timeline.h"
 
 #include <array>
+#include <chrono>
 
 #include <QtQuick/QSGGeometryNode>
 #include <QtQuick/QSGGeometry>
@@ -35,7 +36,7 @@ namespace {
     const qreal stripesMovingSpeed = 0.002;
     const qreal windowMovingSpeed = 0.04;
     const qint64 correctionThreshold = 5000;
-    const qint64 defaultWindowSize = 90 * 60 * 1000;
+    const auto kDefaultWindowSize = std::chrono::milliseconds(std::chrono::hours(12)).count();
     const qint64 kMSecsInMinute = 60 * 1000;
 
     struct TextMarkInfo
@@ -168,8 +169,8 @@ public:
         startBoundTime(-1),
         endBoundTime(-1),
         targetPosition(-1),
-        windowStart(QDateTime::currentMSecsSinceEpoch() - defaultWindowSize),
-        windowEnd(windowStart + defaultWindowSize * 2),
+        windowStart(QDateTime::currentMSecsSinceEpoch() - kDefaultWindowSize),
+        windowEnd(windowStart + kDefaultWindowSize * 2),
         textTexture(0),
         textLevel(1.0),
         targetTextLevel(1.0),
@@ -1186,7 +1187,7 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
 
     qint64 liveTime = QDateTime::currentMSecsSinceEpoch();
 
-    qint64 startBound = startBoundTime == -1 ? liveTime - defaultWindowSize : startBoundTime;
+    qint64 startBound = startBoundTime == -1 ? liveTime - kDefaultWindowSize : startBoundTime;
     qint64 endBound = endBoundTime == -1 ? liveTime : endBoundTime;
 
     zoomKineticHelper.update();
