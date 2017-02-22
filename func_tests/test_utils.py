@@ -52,12 +52,13 @@ class EnvironmentBuilder(object):
         self._bin_dir = options.bin_dir
         self._reset_servers = options.reset_servers
         self._recreate_boxes = options.recreate_boxes
+        self._vm_name_prefix = options.vm_name_prefix
         self._cloud_host_rest_api = cloud_host_rest_api
         self._boxes_config = []
         self._last_box_idx = 0
 
     def _load_boxes_config_from_cache(self):
-        return [BoxConfig.from_dict(d) for d in self._cache.get(self.vagrant_boxes_cache_key, [])]
+        return [BoxConfig.from_dict(d, self._vm_name_prefix) for d in self._cache.get(self.vagrant_boxes_cache_key, [])]
 
     def _save_boxes_config_to_cache(self):
         self._cache.set(self.vagrant_boxes_cache_key, [config.to_dict() for config in self._boxes_config])
@@ -71,6 +72,7 @@ class EnvironmentBuilder(object):
                 config = required_config
                 self._last_box_idx += 1
                 config.idx = self._last_box_idx
+                config.vm_name_prefix = self._vm_name_prefix
                 self._boxes_config.append(config)
             log.info('BOX CONFIG %s: %s', config.box_name(), config)
             config.is_allocated = True
