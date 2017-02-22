@@ -60,6 +60,21 @@ Item
     {
         id: cameraChunkProvider
         resourceId: videoScreenController.resourceId
+
+        onLoadingChanged:
+        {
+            if (loading)
+                return
+
+            var liveMs = (new Date()).getTime()
+            var lastChunkEndMs = closestChunkEndMs(liveMs, false)
+
+            if (lastChunkEndMs <= 0)
+                lastChunkEndMs = liveMs
+
+            timeline.windowSize =
+                Math.max((liveMs - lastChunkEndMs) / 0.4, timeline.defaultWindowSize)
+        }
     }
 
     Timer
