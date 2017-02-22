@@ -412,8 +412,6 @@ angular.module('webadminApp')
                         url: url,
                         takeRemoteSettings: !keepMySystem
                     });
-                },function(error){
-                    return $q.reject(error);
                 });
             },
             pingSystem: function(url, remoteLogin, remotePassword){
