@@ -180,9 +180,15 @@ Item
                     videoScreenController.setPosition(position)
                     if (resumeWhenDragFinished)
                         videoScreenController.play()
+                    else
+                        videoScreenController.pause()
                 }
             }
-            onPositionTapped: videoScreenController.setPosition(position)
+            onPositionTapped:
+            {
+                d.resumePosition = -1
+                videoScreenController.setPosition(position)
+            }
             onPositionChanged:
             {
                 if (!dragging)
@@ -196,7 +202,8 @@ Item
                 if (dragging)
                 {
                     resumeWhenDragFinished = !videoNavigation.paused
-                    videoScreenController.pause()
+                    videoScreenController.preview()
+                    d.resumePosition = -1
                 }
             }
 
@@ -438,8 +445,9 @@ Item
                 }
                 else
                 {
+                    if (d.liveMode)
+                        d.resumePosition = videoScreenController.mediaPlayer.position
                     videoScreenController.pause()
-                    d.resumePosition = videoScreenController.mediaPlayer.position
                 }
             }
         }
@@ -484,6 +492,7 @@ Item
             onDatePicked:
             {
                 close()
+                d.resumePosition = -1
                 videoScreenController.setPosition(date.getTime())
             }
         }
