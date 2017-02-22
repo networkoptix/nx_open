@@ -34,7 +34,6 @@ def process_branding(content):
 
 def make_dir(filename):
     dirname = os.path.dirname(filename)
-    print ("make dir " + dirname + " for " + filename)
     if not os.path.exists(dirname):
         try:
             os.makedirs(dirname)

@@ -100,11 +100,9 @@ do
 
         echo "Copy default views - with default language"
         cp -rf $TARGET_DIR/$CUSTOMIZATION/static/views/* $TARGET_DIR/$CUSTOMIZATION/static/lang_$LANG/views/
-        cp -rf $TARGET_DIR/$CUSTOMIZATION/static/language.json $TARGET_DIR/$CUSTOMIZATION/static/lang_$LANG/
 
         echo "Overwrite them with localized sources"
         cp -rf $lang_dir/views/* $TARGET_DIR/$CUSTOMIZATION/static/lang_$LANG/views/ || true
-        cp -rf $lang_dir/language.json $TARGET_DIR/$CUSTOMIZATION/static/lang_$LANG/ || true
     done
 
     echo "Localization success"

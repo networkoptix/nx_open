@@ -31,18 +31,37 @@ def save_content(filename, content):
             file.close()
 
 
-def generate_languages_files(languages):
+def merge(source, destination):
+    for key, value in source.items():
+        if isinstance(value, dict):
+            # get node or create one
+            node = destination.setdefault(key, {})
+            merge(value, node)
+        else:
+            destination[key] = value
+
+    return destination
+
+
+def generate_languages_files(languages, template_filename):
     languages_json = []
     # Localize this language
+    with codecs.open(template_filename, 'r', 'utf-8') as file_descriptor:
+        template = json.load(file_descriptor)
+
     for lang in languages:
+        all_strings = {}
+        merge(template, all_strings)
         language_json_filename = os.path.join("../../..", "translations", lang, 'language.json')
-        with open(language_json_filename, 'r') as file_descriptor:
+        with codecs.open(language_json_filename, 'r', 'utf-8') as file_descriptor:
             data = json.load(file_descriptor)
             data["language"] = lang
             languages_json.append({
                 "language": lang,
                 "name": data["language_name"] if "language_name" in data else data["name"]
             })
+            merge(data, all_strings)
+        save_content("static/lang_" + lang + "/language.json", json.dumps(all_strings, ensure_ascii=False))
     save_content('static/languages.json', json.dumps(languages_json, ensure_ascii=False))
 
 
@@ -53,4 +72,4 @@ config = yaml.safe_load(open('cloud_portal.yaml'))
 if 'languages' not in config:
     raise 'No languages section in cloud_portal.yaml'
 
-generate_languages_files(config['languages'])
+generate_languages_files(config['languages'], 'static/language.json')
