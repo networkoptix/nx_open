@@ -758,6 +758,7 @@ nx::db::DBResult SystemManager::insertNewSystemDataToDb(
         nx::utils::timeSinceEpoch().count() +
         std::chrono::duration_cast<std::chrono::seconds>(
             m_settings.systemManager().notActivatedSystemLivePeriod).count();
+    result->systemData.registrationTime = nx::utils::utcTime();
     dbResult = m_systemDao.insert(queryContext, result->systemData, account.id);
     if (dbResult != db::DBResult::ok)
         return dbResult;

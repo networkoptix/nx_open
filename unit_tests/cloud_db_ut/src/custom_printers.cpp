@@ -76,7 +76,12 @@ void PrintTo(const nanoseconds& val, ::std::ostream* os)
 
 void PrintTo(const time_point<steady_clock>& val, ::std::ostream* os)
 {
-    *os << val.time_since_epoch().count() << "ns (utc)";
+    *os << val.time_since_epoch().count() << "ns (monotonic)";
+}
+
+void PrintTo(const time_point<system_clock>& val, ::std::ostream* os)
+{
+    *os << duration_cast<milliseconds>(val.time_since_epoch()).count() << "ms (utc)";
 }
 
 } // namespace chrono
