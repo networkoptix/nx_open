@@ -818,7 +818,7 @@ angular.module('webadminApp')
                         $scope.next('merge');
                     }
                 },
-                retryMergeCredentials:function(){
+                retryMergeCredentials:{
                     onShow: updateCredentialsAfterMerge
                 },
                 mergeTemporaryFailure:{
