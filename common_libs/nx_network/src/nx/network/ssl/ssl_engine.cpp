@@ -65,7 +65,7 @@ String SslEngine::makeCertificateAndKey(
     if (!name
         || !nameSet("C", country) || !nameSet("O", company) || !nameSet("CN", common)
         || !X509_set_issuer_name(x509.get(), name)
-        || !X509_sign(x509.get(), pkey.get(), EVP_sha1()))
+        || !X509_sign(x509.get(), pkey.get(), EVP_sha256()))
     {
         NX_LOG("SSL: Unable to sign X509 cert", cl_logWARNING);
         return String();
