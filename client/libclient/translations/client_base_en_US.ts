@@ -2822,10 +2822,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Connection to the Server could not be established.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Connection details that you have entered are incorrect, please try again.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2958,6 +2954,10 @@ to %1</source>
     <message>
         <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connection to Server could not be established.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4037,15 +4037,15 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please send Email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please send the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Hardware ID copied to clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please send Email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7338,7 +7338,7 @@ to %1</source>
         </translation>
     </message>
     <message>
-        <source>System is in the Safe Mode. It is not allowed to make any changes except license activation.</source>
+        <source>System is in Safe Mode. It is not allowed to make any changes except license activation.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7469,10 +7469,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>Enter the name of the Video Wall to create:</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>New Matrix %1</source>
         <translation></translation>
     </message>
@@ -7482,10 +7478,6 @@ to %1</source>
     </message>
     <message>
         <source>To enable this feature, please activate a Video Wall license.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Activate one more license to start the Video Wall control session.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7502,10 +7494,6 @@ to %1</source>
             <numerusform>Delete item?</numerusform>
             <numerusform>Delete %n items?</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Activate one more license to start the Video Wall.</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Stop Video Wall?</source>
@@ -7542,6 +7530,18 @@ to %1</source>
         <source>Screen is being controlled by another user</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Activate one more license to start Video Wall control session.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the name of Video Wall to create:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Activate one more license to start Video Wall.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchWebPageHandler</name>
@@ -7554,7 +7554,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Enter URL of the Web Page to add:</source>
+        <source>Enter URL of Web Page to add:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7740,11 +7740,11 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To display local files on the Video Wall, please attach them using computer where Video Wall is hosted.</source>
+        <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
+        <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

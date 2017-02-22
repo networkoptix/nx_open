@@ -72,13 +72,13 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
     {
         const QString emailLink = lit("<a href=\"mailto:%1\">%1</a>").arg(licensingEmail.value());
         ui->manualActivationTextWidget->setText(
-            tr("Please send Email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.")
+            tr("Please send Email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.")
             .arg(emailLink));
     }
     else
     {
         ui->manualActivationTextWidget->setText(
-            tr("Please send the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.")
+            tr("Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.")
             .arg(QnAppInfo::licensingEmailAddress()));
     }
 

@@ -1092,7 +1092,7 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
 
 
     QnVideoWallLicenseUsageProposer proposer(m_licensesHelper.data(), 0, 1);
-    if (!validateLicenses(tr("Activate one more license to start the Video Wall control session.")))
+    if (!validateLicenses(tr("Activate one more license to start Video Wall control session.")))
         return false;
 
     auto layout = workbench()->currentLayout()->resource();
@@ -1455,7 +1455,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
     dialog->setWindowTitle(tr("New Video Wall..."));
-    dialog->setText(tr("Enter the name of the Video Wall to create:"));
+    dialog->setText(tr("Enter the name of Video Wall to create:"));
     dialog->setName(proposedName);
     dialog->setWindowModality(Qt::ApplicationModal);
 
@@ -1590,7 +1590,7 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered()
     if (videoWall.isNull())
         return;
 
-    if (!validateLicenses(tr("Activate one more license to start the Video Wall.")))
+    if (!validateLicenses(tr("Activate one more license to start Video Wall.")))
         return;
 
     switchToVideoWallMode(videoWall);
