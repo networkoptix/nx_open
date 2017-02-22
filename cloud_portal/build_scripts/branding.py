@@ -139,11 +139,13 @@ def brand_file(filename):
     save_content(filename, active_content)
 
 
-def brand_directory(directory, file_filter):
+def brand_directory(directory, file_filter, exclude_file = None):
     all_strings = []
     for root, dirs, files in os.walk(directory):
         for filename in files:
             if filename.endswith(file_filter):
+                if exclude_file and filename.endswith(exclude_file):
+                    continue
                 brand_file(os.path.join(root, filename))
 
 
@@ -151,10 +153,8 @@ def precess_branding_for_all():
     # files to brand:
 
     brand_file('static/apple-app-site-association')
-    brand_file('static/language.json')
-    brand_file('static/503.html')
-
-    brand_directory('static/views', '.html')
+    brand_directory('static', '.html', 'index.html')
+    brand_directory('static', '.json')
     brand_directory('templates', '.mustache')
     brand_directory('templates', '.json')
     pass
