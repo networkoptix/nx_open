@@ -148,6 +148,7 @@ def precess_branding_for_all():
 
     brand_file('static/apple-app-site-association')
     brand_file('static/language.json')
+    brand_file('static/503.html')
 
     brand_directory('static/views', '.html')
     brand_directory('templates', '.mustache')

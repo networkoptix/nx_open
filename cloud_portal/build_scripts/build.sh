@@ -62,7 +62,7 @@ do
         lang_dir=${lang_dir%*/}
         LANG=${lang_dir/..\/translations\//}
 
-        echo $TARGET_DIR/$CUSTOMIZATION/templates/$LANG
+        echo "$TARGET_DIR/$CUSTOMIZATION/templates/$LANG"
 
         mkdir $TARGET_DIR/$CUSTOMIZATION/templates/$LANG
         mkdir $TARGET_DIR/$CUSTOMIZATION/templates/$LANG/src
@@ -86,27 +86,35 @@ do
     echo "Templates success"
 
     echo "------------------------------"
-    echo "Localization"
+    echo "Localization - portal"
 
-    echo "Generate blank translation files"
-    pushd $TARGET_DIR/$CUSTOMIZATION
-    python ../../../build_scripts/generate_ts.py
-    popd
+    for lang_dir in ../translations/*/
+    do
+        lang_dir=${lang_dir%*/}
+        LANG=${lang_dir/..\/translations\//}
 
-    echo "Copy branding and translation files"
-    cp -f $dir/*.ts $TARGET_DIR/$CUSTOMIZATION
+        echo "$TARGET_DIR/$CUSTOMIZATION/static/lang_$LANG/views/"
 
-    pushd $TARGET_DIR/$CUSTOMIZATION
-    echo "Customizing and localizing"
-    python ../../../build_scripts/localize.py
-    popd
+        mkdir $TARGET_DIR/$CUSTOMIZATION/static/lang_$LANG
+        mkdir $TARGET_DIR/$CUSTOMIZATION/static/lang_$LANG/views/
+
+        echo "Copy default views - with default language"
+        cp -rf $TARGET_DIR/$CUSTOMIZATION/static/views/* $TARGET_DIR/$CUSTOMIZATION/static/lang_$LANG/views/
+        cp -rf $TARGET_DIR/$CUSTOMIZATION/static/language.json $TARGET_DIR/$CUSTOMIZATION/static/lang_$LANG/
+
+        echo "Overwrite them with localized sources"
+        cp -rf $lang_dir/views/* $TARGET_DIR/$CUSTOMIZATION/static/lang_$LANG/views/ || true
+        cp -rf $lang_dir/language.json $TARGET_DIR/$CUSTOMIZATION/static/lang_$LANG/ || true
+    done
 
     echo "Localization success"
 
 
     echo "------------------------------"
     echo "Branding"
+    cp $dir/branding.ts $TARGET_DIR/$CUSTOMIZATION
     pushd $TARGET_DIR/$CUSTOMIZATION
+    python ../../../build_scripts/generate_languages_json.py
     python ../../../build_scripts/branding.py
     rm -rf *.ts
     popd
