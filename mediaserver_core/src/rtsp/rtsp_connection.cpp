@@ -786,6 +786,13 @@ int QnRtspConnectionProcessor::composeDescribe()
         {
             bool isVideoTrack = (i < numVideo);
             QnRtspFfmpegEncoder* ffmpegEncoder = createRtspFfmpegEncoder(isVideoTrack);
+            if (!isVideoTrack)
+            {
+                const int audioTrackIndex = i - numVideo;
+                QnConstResourceAudioLayoutPtr audioLayout = d->mediaRes->getAudioLayout(d->liveDpHi.data());
+                if (audioLayout && audioLayout->channelCount() >= audioTrackIndex)
+                    ffmpegEncoder->setCodecContext(audioLayout->getAudioTrackInfo(audioTrackIndex).codecContext);
+            }
             encoder = QnRtspEncoderPtr(ffmpegEncoder);
         }
         else {
