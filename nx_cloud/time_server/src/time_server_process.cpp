@@ -3,6 +3,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/network/time/time_protocol_client.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/log/log_initializer.h>
 #include <utils/common/guard.h>
 #include <utils/common/systemerror.h>
 
@@ -15,7 +16,7 @@ namespace time_server {
 
 namespace {
 static const SocketAddress timeProtocolServerEndpoint =
-    SocketAddress(HostAddress::anyHost, kTimeProtocolDefaultPort);
+    SocketAddress(HostAddress::anyHost, network::kTimeProtocolDefaultPort);
 } // namespace
 
 TimeServerProcess::TimeServerProcess(int argc, char **argv):
@@ -61,7 +62,7 @@ int TimeServerProcess::exec()
             return 0;
         }
 
-        initializeQnLog(
+        utils::log::initialize(
             settings.logging(),
             settings.dataDir(),
             TimeServerAppInfo::applicationDisplayName(),
@@ -70,7 +71,8 @@ int TimeServerProcess::exec()
 
         TimeProtocolServer timeProtocolServer(
             false,
-            SocketFactory::NatTraversalType::nttDisabled);
+            network::NatTraversalSupport::disabled);
+
         if (!timeProtocolServer.bind(timeProtocolServerEndpoint))
         {
             const auto sysErrorCode = SystemError::getLastOSErrorCode();

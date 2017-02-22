@@ -7,6 +7,10 @@
 #include <QtWidgets/QApplication>
 
 #include <api/app_server_connection.h>
+#include <api/server_rest_connection.h>
+
+#include <business/business_event_rule.h>
+#include <business/business_strings_helper.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -17,7 +21,10 @@
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
 
+#include <common/common_module.h>
+
 #include <core/resource/media_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
@@ -39,6 +46,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/recording_status_helper.h>
+#include <ui/common/text_pixmap_cache.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/proxy_label.h>
@@ -56,6 +64,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/globals.h>
+#include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/style/nx_style.h>
 #include <ui/widgets/properties/camera_settings_tab.h>
@@ -81,6 +90,7 @@
 #include <api/common_message_processor.h>
 #include <business/actions/abstract_business_action.h>
 #include <utils/media/sse_helper.h>
+#include <plugins/resource/avi/avi_resource.h>
 
 namespace {
 
@@ -218,6 +228,52 @@ void clearSensitivityRegion(MotionGrid& grid, const QPoint& at)
         }
     }
 };
+
+//TODO: #vkutin This software trigger buttons implementation is a stub
+// Actual implementation will be done as soon as software triggers specification is ready.
+
+constexpr int kTriggerButtonWidth = 232;
+constexpr qreal kTriggerButtonOpacity = 0.5;
+
+QnImageButtonWidget* createTriggerButton(const QString& text)
+{
+    const auto size = QSize(kTriggerButtonWidth, style::Metrics::kButtonHeight);
+    const auto rect = QRect(QPoint(0, 0), size);
+
+    auto button = new QnImageButtonWidget;
+    button->setFixedSize(size);
+
+    const auto pixelRatio = qApp->devicePixelRatio();
+    const auto pixmapSize = size * pixelRatio;
+
+    const auto prepareImage =
+        [&](QStyle::State state) -> QPixmap
+        {
+            QPixmap pixmap(pixmapSize);
+            pixmap.fill(Qt::transparent);
+            pixmap.setDevicePixelRatio(pixelRatio);
+
+            QStyleOptionButton option;
+            option.rect = rect;
+            option.palette = button->palette();
+            option.state = state | QStyle::State_Enabled;
+            option.text = text;
+
+            QPainter painter(&pixmap);
+            button->style()->drawControl(QStyle::CE_PushButton, &option, &painter);
+            return pixmap;
+        };
+
+    QIcon icon;
+    icon.addPixmap(prepareImage(QStyle::State_None),      QIcon::Normal);
+    icon.addPixmap(prepareImage(QStyle::State_MouseOver), QIcon::Active);
+    icon.addPixmap(prepareImage(QStyle::State_Sunken),    QnIcon::Pressed);
+
+    button->setIcon(icon);
+    button->setOpacity(kTriggerButtonOpacity);
+
+    return button;
+}
 
 } // anonymous namespace
 
@@ -428,6 +484,16 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     updateOverlayButton();
     setImageEnhancement(item->imageEnhancement());
 
+    resetSoftwareTriggerButtons();
+
+    connect(messageProcessor, &QnCommonMessageProcessor::businessRuleReset,
+        this, &QnMediaResourceWidget::resetSoftwareTriggerButtons);
+    //TODO: #vkutin Optimize. No need to rebuild the whole list each time.
+    connect(messageProcessor, &QnCommonMessageProcessor::businessRuleChanged,
+        this, &QnMediaResourceWidget::resetSoftwareTriggerButtons);
+    connect(messageProcessor, &QnCommonMessageProcessor::businessRuleDeleted,
+        this, &QnMediaResourceWidget::resetSoftwareTriggerButtons);
+
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
 }
@@ -444,6 +510,70 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     for (auto* data : m_binaryMotionMask)
         qFreeAligned(data);
     m_binaryMotionMask.clear();
+}
+
+void QnMediaResourceWidget::resetSoftwareTriggerButtons()
+{
+    //TODO: #vkutin This implementation is a stub
+    // Actual implementation will be done as soon as software triggers specification is ready.
+
+    /* Delete existing buttons: */
+    for (const auto& id: m_softwareTriggerIds)
+        overlayWidgets()->positionOverlay->removeItem(id);
+
+    m_softwareTriggers.clear();
+    m_softwareTriggerIds.clear();
+
+    if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
+        return;
+
+    /* Obtain camera id: */
+    const auto resourceId = m_resource->toResource()->getId();
+
+    /* Gather software trigger ids relevant to this camera from all business rules: */
+    const auto rules = QnCommonMessageProcessor::instance()->businessRules();
+    for (auto iter = rules.begin(); iter != rules.end(); ++iter)
+    {
+        const auto& rule = iter.value();
+
+        if (rule->eventType() != QnBusiness::SoftwareTriggerEvent)
+            continue;
+
+        if (!rule->eventResources().empty() && !rule->eventResources().contains(resourceId))
+            continue;
+
+        const auto triggerName = rule->eventParams().inputPortId.trimmed();
+        m_softwareTriggers.insert(triggerName);
+    }
+
+    /* Create buttons (sorted by std::set with default QString comparison): */
+    int pos = 0;
+    for (const auto& id: m_softwareTriggers)
+    {
+        auto trigger = createTriggerButton(QnBusinessStringsHelper::getSoftwareTriggerName(id));
+        m_softwareTriggerIds << overlayWidgets()->positionOverlay->insertItem(pos++, trigger);
+
+        connect(trigger, &QnImageButtonWidget::clicked, this,
+            [this, id, resourceId]()
+            {
+                if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
+                    return;
+
+                qnCommon->currentServer()->restConnection()->softwareTriggerCommand(
+                    resourceId, id,
+                    [this](bool success, rest::Handle id, const QnJsonRestResult& result)
+                    {
+                        Q_UNUSED(id);
+                        if (success && result.error == QnRestResult::NoError)
+                            return;
+
+                        QnMessageBox::warning(mainWindow(),
+                            tr("Failed to invoke Software Trigger"),
+                            result.errorString);
+                    },
+                    QThread::currentThread());
+            });
+    }
 }
 
 void QnMediaResourceWidget::createButtons()
@@ -593,6 +723,14 @@ void QnMediaResourceWidget::createPtzController()
 
 qreal QnMediaResourceWidget::calculateVideoAspectRatio() const
 {
+    const auto aviResource = m_resource.dynamicCast<QnAviResource>();
+    if (aviResource && aviResource->flags().testFlag(Qn::still_image))
+    {
+        const auto aspect = aviResource->imageAspectRatio();
+        if (aspect.isValid())
+            return aspect.toFloat();
+    }
+
     /* Here we get 0.0 if no custom aspect ratio set. */
     qreal result = resource()->customAspectRatio();
     if (!qFuzzyIsNull(result))
@@ -1469,7 +1607,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const
 
     QString hqLqString;
     if (hasVideo() && !m_resource->toResource()->hasFlags(Qn::local))
-        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Low-Res") : tr("Hi-Res");
+        hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Lo-Res") : tr("Hi-Res");
 
     static const int kDetailsTextPixelSize = 11;
 
@@ -1624,6 +1762,17 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
     const ResourceStates states = getResourceStates();
+
+    //TODO: #GDM #3.1 This really requires hell a lot of refactoring
+    // for live video make a quick check: status has higher priority than EOF
+    if (states.isRealTimeSource)
+    {
+        if (states.isOffline)
+            return Qn::OfflineOverlay;
+
+        if (states.isUnauthorized)
+            return Qn::UnauthorizedOverlay;
+    }
 
     if (m_camera && m_camera->hasFlags(Qn::io_module))
     {

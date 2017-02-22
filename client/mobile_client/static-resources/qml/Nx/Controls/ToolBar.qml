@@ -8,6 +8,7 @@ ToolBarBase
     property alias leftButtonIcon: leftButton.icon
     property alias title: label.text
     property alias controls: controlsRow.data
+    property alias titleOpacity: label.opacity
 
     signal leftButtonClicked()
 

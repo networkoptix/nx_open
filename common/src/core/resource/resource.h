@@ -114,7 +114,6 @@ public:
     QnResourcePool *resourcePool() const;
     void setResourcePool(QnResourcePool *resourcePool);
 
-    virtual QString toString() const;
     virtual QString toSearchString() const;
 
 

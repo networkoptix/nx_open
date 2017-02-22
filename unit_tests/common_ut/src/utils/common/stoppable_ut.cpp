@@ -1,9 +1,10 @@
 #include <gtest/gtest.h>
+
 #include <utils/common/stoppable.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/std/future.h>
-
+#include <nx/utils/std/thread.h>
 
 struct StoppableTestClass
     : public QnStoppableAsync
@@ -12,7 +13,7 @@ public:
     StoppableTestClass()
         : m_isRunning( true )
     {
-        m_thread = std::thread( [ this ]()
+        m_thread = nx::utils::thread( [ this ]()
         {
             nx::utils::MoveOnlyFunc< void() > handler;
             {
@@ -43,7 +44,7 @@ private:
     bool m_isRunning;
     QnWaitCondition m_condition;
     nx::utils::MoveOnlyFunc< void() > m_handler;
-    std::thread m_thread;
+    nx::utils::thread m_thread;
 };
 
 TEST( QnStoppableAsync, SingleAsync )

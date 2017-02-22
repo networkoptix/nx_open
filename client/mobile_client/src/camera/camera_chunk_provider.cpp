@@ -43,7 +43,11 @@ void QnCameraChunkProvider::setResourceId(const QString& id)
     emit bottomBoundChanged();
     emit bottomBoundDateChanged();
 
-    auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id));
+    const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id));
+
+    m_loading = !camera.isNull();
+    emit loadingChanged();
+
     if (!camera)
         return;
 
@@ -55,6 +59,9 @@ void QnCameraChunkProvider::setResourceId(const QString& id)
             emit timePeriodsUpdated();
             emit bottomBoundChanged();
             emit bottomBoundDateChanged();
+
+            m_loading = false;
+            emit loadingChanged();
         });
 
     connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged,
@@ -77,6 +84,11 @@ QDateTime QnCameraChunkProvider::bottomBoundDate() const
     return bottomBoundMs > 0
         ? QDateTime::fromMSecsSinceEpoch(bottomBoundMs, Qt::UTC)
         : QDateTime();
+}
+
+bool QnCameraChunkProvider::isLoading() const
+{
+    return m_loading;
 }
 
 QDateTime QnCameraChunkProvider::closestChunkStartDate(
@@ -136,4 +148,8 @@ void QnCameraChunkProvider::update()
         return;
 
     m_loader->load(QString(), 1);
+
+    auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(
+        m_loader->resource()->getId());
+    qnCameraHistoryPool->updateCameraHistoryAsync(camera, nullptr);
 }

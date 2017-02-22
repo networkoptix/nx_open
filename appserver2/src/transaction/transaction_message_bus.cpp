@@ -1578,6 +1578,14 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
     connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::DirectConnection);
 
     QnMutexLocker lock(&m_mutex);
+
+    NX_ASSERT(
+        std::find_if(
+            m_connectingConnections.begin(), m_connectingConnections.end(),
+            [&connectionGuid](QnTransactionTransport* connection)
+                { return connection->connectionGuid() == connectionGuid; }
+        ) == m_connectingConnections.end());
+
     transport->moveToThread(thread());
     m_connectingConnections << transport;
     NX_ASSERT(!m_connections.contains(remotePeer.id));

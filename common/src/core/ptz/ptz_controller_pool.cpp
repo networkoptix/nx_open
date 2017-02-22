@@ -77,7 +77,6 @@ QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
     const int maxThreads = 32;
 #endif
     d->commandThreadPool->setMaxThreadCount(maxThreads);
-    d->commandThreadPool->setExpiryTimeout(-1); // default expiration timeout is 30 second. But it has a bug in QT < v.5.3
 
     connect(d->resourcePool,    &QnResourcePool::resourceAdded,             this,   &QnPtzControllerPool::registerResource);
     connect(d->resourcePool,    &QnResourcePool::resourceRemoved,           this,   &QnPtzControllerPool::unregisterResource);

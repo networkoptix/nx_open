@@ -91,15 +91,14 @@ public:
 public:
     IOSMemoryBufferPrivate(AVFrame* _frame):
         QAbstractVideoBufferPrivate(),
-        frame(av_frame_alloc()),
+        frame(_frame),
         mapMode(QAbstractVideoBuffer::NotMapped)
     {
-        av_frame_move_ref(frame, _frame);
     }
 
     virtual ~IOSMemoryBufferPrivate()
     {
-        av_frame_free(&frame); //< It includes av_frame_unref
+        av_frame_free(&frame);
     }
 
     virtual int map(
@@ -364,7 +363,7 @@ int IOSVideoDecoder::decode(
 
     QSize frameSize(d->frame->width, d->frame->height);
     qint64 startTimeMs = d->frame->pkt_dts / 1000;
-    int frameNum = d->frame->coded_picture_number;
+    int frameNum = qMax(0, d->codecContext->frame_number - 1);
 
     QVideoFrame::PixelFormat qtPixelFormat = QVideoFrame::Format_Invalid;
     if (d->frame->data[3])
@@ -385,7 +384,7 @@ int IOSVideoDecoder::decode(
         return -1; //< report error
     }
 
-    QAbstractVideoBuffer* buffer = new IOSMemoryBuffer(d->frame); //< frame is moved here. null object after the call
+    QAbstractVideoBuffer* buffer = new IOSMemoryBuffer(d->frame);
     d->frame = av_frame_alloc();
     QVideoFrame* videoFrame = new QVideoFrame(buffer, frameSize, qtPixelFormat);
     videoFrame->setStartTime(startTimeMs);

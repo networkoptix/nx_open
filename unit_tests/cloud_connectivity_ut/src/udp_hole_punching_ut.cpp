@@ -86,15 +86,15 @@ public:
     }
 };
 
-NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE_EX(
+NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE_EX(
     TEST_F, UdpHolePunching,
     [&](){ return cloudServerSocket(); },
     [](){ return std::make_unique<CloudStreamSocket>(AF_INET); },
     SocketAddress(m_server->fullName()));
 
-TEST_F(UdpHolePunching, SimpleSyncSsl)
+TEST_F(UdpHolePunching, TransferSyncSsl)
 {
-    network::test::socketSimpleSync(
+    network::test::socketTransferSync(
         [&]() { return std::make_unique<SslServerSocket>(cloudServerSocket().release(), false); },
         []() { return std::make_unique<SslSocket>(new CloudStreamSocket(AF_INET), false); },
         SocketAddress(m_server->fullName()));
@@ -146,9 +146,6 @@ public:
         m_tunnelOpened(false)
     {
         using namespace std::placeholders;
-
-        //ConnectorFactory::setEnabledCloudConnectMask(
-        //    static_cast<int>(CloudConnectType::forwardedTcpPort));
 
         SocketGlobals::outgoingTunnelPool().onTunnelClosedSubscription().subscribe(
             std::bind(&CloudConnectTunnel::onTunnelClosed, this, _1),

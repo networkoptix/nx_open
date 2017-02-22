@@ -146,7 +146,7 @@ QString QnBusinessRulesViewModel::columnTitle(QnBusiness::Columns column) const
     switch (column)
     {
         case QnBusiness::ModifiedColumn:
-            return tr("#");
+            return lit("#");
         case QnBusiness::DisabledColumn:
             return tr("On");
         case QnBusiness::EventColumn:
@@ -154,7 +154,7 @@ QString QnBusinessRulesViewModel::columnTitle(QnBusiness::Columns column) const
         case QnBusiness::SourceColumn:
             return tr("Source");
         case QnBusiness::SpacerColumn:
-            return tr("->");
+            return lit("->");
         case QnBusiness::ActionColumn:
             return tr("Action");
         case QnBusiness::TargetColumn:

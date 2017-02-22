@@ -50,34 +50,6 @@
         <translation>%1 서비스 설치 안됨</translation>
     </message>
     <message>
-        <source> (stopped)</source>
-        <translation>(정지)</translation>
-    </message>
-    <message>
-        <source> (starting)</source>
-        <translation>(시작중)</translation>
-    </message>
-    <message>
-        <source> (stopping)</source>
-        <translation>(정지중)</translation>
-    </message>
-    <message>
-        <source> (started)</source>
-        <translation>(시작)</translation>
-    </message>
-    <message>
-        <source> (resuming)</source>
-        <translation>(재시작중)</translation>
-    </message>
-    <message>
-        <source> (paused)</source>
-        <translation>(일시정지)</translation>
-    </message>
-    <message>
-        <source> (pausing)</source>
-        <translation>(정지중)</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;나가기</translation>
     </message>
@@ -111,6 +83,34 @@
     </message>
     <message>
         <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>starting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>resuming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pausing</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

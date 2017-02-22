@@ -5,31 +5,51 @@
 
 
 Vagrant.configure("2") do |config|
+
   config.vm.box_url = "http://noptix.enk.me/vagrant-boxes/ubuntu-14-04-functest-20160906.box"
   config.vm.box = "autotest"
-  config.vm.network :private_network, type: :dhcp
   config.ssh.forward_agent = true
 
   config.vm.provider :virtualbox do |vb|
     vb.memory = 512
     vb.cpus = 1
-    vb.gui = false
-    vb.customize ["modifyvm", :id, "--cpuexecutioncap", "75"]
-    vb.customize ["modifyvm", :id, "--ioapic", "on"]
-    vb.customize ["modifyvm", :id, "--vram", "32"]
+    vb.customize [:modifyvm, :id, "--cpuexecutioncap", "75"]
+    vb.customize [:modifyvm, :id, "--ioapic", "on"]
+    vb.customize [:modifyvm, :id, "--vram", "32"]
+    # network created by virtualbox by default conflicts with nx moscow local network 10.0.2.0/23; natnet1 will override it
+    vb.customize [:modifyvm, :id, "--natnet1", "{{ natnet1 }}"]
   end
+
 
   {% for box in boxes -%}
 
-  config.vm.define "{{ box.name }}" do |box|
+  config.vm.define "{{ box.box_name() }}" do |box|
+
     box.vm.provider :virtualbox do |vb|
-      vb.customize ["modifyvm", :id, "--name", "{{ box.name }}"]
-      vb.customize ["setextradata", :id, "VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled", 1]
+      vb.name = "{{ box.vm_box_name() }}"
+
+      {%- for command in box.get_vagrant_config_commands('virtualbox') %}
+
+      {{ command.expand('vb') }}
+
+      {%- endfor %}
     end
-    #box.vm.synced_folder "mediaserver-default", "/opt/networkoptix", owner: "root", group: "root"
-    box.vm.hostname = "{{ box.name }}"
-    box.vm.network :forwarded_port, guest: 7001, host: {{ box.forwarded_port }}
-    box.vm.provision :shell, inline: "sudo DEBIAN_FRONTEND=noninteractive dpkg -i --force-depends /vagrant/networkoptix-mediaserver.deb"
+
+    {%- if box.ip_address %}
+
+    box.ssh.host = "{{ box.ip_address }}"
+    box.ssh.port = 22
+
+    {%- endif %}
+
+    box.vm.hostname = "{{ box.box_name() }}"
+
+    {% for command in box.get_vagrant_config_commands('vm') -%}
+
+    {{ command.expand('box') }}
+
+    {% endfor %}
+  
   end
 
   {% endfor %}

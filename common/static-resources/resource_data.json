@@ -580,7 +580,9 @@
             "keys": [
                 "VISTA|VK2-600PTZ",
                 "VISTA|VK2-1080PTZ",
-                "VISTA|VK2-ENCODER"
+                "VISTA|VK2-ENCODER",
+		"Pelco|D5220",
+                "Pelco|PelcoD5220"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
         },
@@ -656,6 +658,10 @@
                     "VideoEncoderConfigurationA16,VideoEncoderConfigurationA32"   
                 ]
             }
+        },
+        {
+            "keys": ["Hikvision|DS-2CD63C2F-IS"],
+            "parseOnvifNotificationsWithHttpReader": true
         },
         {
             "keys": [
@@ -741,7 +747,9 @@
                 "Honeywell|H4D2S2",
                 "Honeywell|H4D3S2",
                 "Honeywell|H4D5S2",
-                "Honeywell|HDZ302LIW"
+                "Honeywell|HDZ302LIW",
+
+                "Dahua|DH-SD6AL240-HNI"
             ],
             "preferredAuthScheme": "Automatic"
         },
@@ -1592,7 +1600,7 @@
 			],
 			"shouldAppearAsSingleChannel": true,
 			"doNotAddVendorToDeviceName": true,
-			"videoLayout": "width=3;height=2;sensors=0,1,2,4,3,5",
+			"videoLayout": "width=3;height=2;sensors=0,1,2,-1,3,-1",
 			"defaultAR":"4x3"
 		},
 		{
@@ -1750,7 +1758,60 @@
             "ignoreMultisensors": true,
             "shouldAppearAsSingleChannel": true,
             "videoLayout": "width=3;height=1;sensors=0,1,2"
-        }
+        },
+        {
+            "keys": [
+                "Cellinx|STH795"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1,   1],
+                        "logical": [ 0, 360]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [  -1,    1],
+                        "logical": [  0,  -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 1],
+                        "logical": [1, 31.55],
+                        "logicalMultiplier": 35.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "Redvision|RVX-IP30-IRWL-W"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1,   1],
+                        "logical": [ 0, 360]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [  0.3333,    -1],
+                        "logical": [  -90,  60]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [1, 7],
+                        "logicalMultiplier": 75,
+                        "space": "35MmEquiv"
+                    }
+                }
+            },
+            "onvifPtzDigitsAfterDecimalPoint": 7
+        }		
     ]
 }
 

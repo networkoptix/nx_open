@@ -40,9 +40,12 @@ std::unique_ptr<AbstractCloudDataProvider> AbstractCloudDataProviderFactory::cre
     }
 }
 
-void AbstractCloudDataProviderFactory::setFactoryFunc(FactoryFunc factoryFunc)
+AbstractCloudDataProviderFactory::FactoryFunc 
+    AbstractCloudDataProviderFactory::setFactoryFunc(FactoryFunc factoryFunc)
 {
+    auto prevFunc = std::move(cloudDataProviderFactoryFunc);
     cloudDataProviderFactoryFunc = std::move(factoryFunc);
+    return prevFunc;
 }
 
 

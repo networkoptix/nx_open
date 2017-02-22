@@ -304,9 +304,6 @@ private:
 
     nx::caminfo::ServerWriterHandler m_camInfoWriterHandler;
     nx::caminfo::Writer m_camInfoWriter;
-
-    nx::caminfo::ServerReaderHandler m_camInfoReadHandler;
-    nx::caminfo::Reader m_camInfoReader;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

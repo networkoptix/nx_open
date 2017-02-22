@@ -23,7 +23,6 @@ QnStreamMixer::QnStreamMixer() :
 
 QnStreamMixer::~QnStreamMixer()
 {
-    QnMutexLocker lock(&m_mutex);
     for (auto& source: m_sourceMap)
         source.provider->removeDataProcessor(this);
 

@@ -6,7 +6,7 @@
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/ec_proto_version.h>
 
-#include <cloud_db_client/src/cdb_request_path.h>
+#include <cdb/ec2_request_paths.h>
 #include <http/custom_headers.h>
 #include <utils/common/guard.h>
 
@@ -84,7 +84,7 @@ void ConnectionManager::createTransactionConnection(
     nx_http::Response* const response,
     nx_http::RequestProcessedHandler completionHandler)
 {
-    // GET ec2/events/ConnectingStage2?guid=%7B8b939668-837d-4658-9d7a-e2cc6c12a38b%7D&
+    // GET /ec2/events/ConnectingStage2?guid=%7B8b939668-837d-4658-9d7a-e2cc6c12a38b%7D&
     //  runtime-guid=%7B0eac9718-4e37-4459-8799-c3023d4f7cb5%7D&system-identity-time=0&isClient
     // TODO: #ak
 
@@ -102,14 +102,14 @@ void ConnectionManager::createTransactionConnection(
     nx::String contentEncoding;
     if (!fetchDataFromConnectRequest(request, &connectionId, &remotePeer, &contentEncoding))
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG, 
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Error parsing createTransactionConnection request from (%1.%2; %3)")
             .arg(remotePeer.id).arg(systemId).str(connection->socket()->getForeignAddress()),
             cl_logDEBUG1);
         return completionHandler(nx_http::StatusCode::badRequest);
     }
 
-    NX_LOGX(QnLog::EC2_TRAN_LOG, 
+    NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("Received createTransactionConnection request from (%1.%2; %3). connectionId %4")
         .arg(remotePeer.id).arg(systemId).str(connection->socket()->getForeignAddress())
         .arg(connectionId),
@@ -144,7 +144,7 @@ void ConnectionManager::createTransactionConnection(
         return completionHandler(nx_http::StatusCode::forbidden);
     }
 
-    auto requestResult = 
+    auto requestResult =
         prepareOkResponseToCreateTransactionConnection(
             connectionId,
             contentEncoding,
@@ -159,8 +159,10 @@ void ConnectionManager::pushTransaction(
     nx_http::Response* const /*response*/,
     nx_http::RequestProcessedHandler completionHandler)
 {
-    if (!request.requestLine.url.path().startsWith(kPushEc2TransactionPath) &&
-        !request.requestLine.url.path().startsWith(kPushEc2TransactionDeprecatedPath)) // TODO: #ak remove after 3.0 release
+    const auto path = request.requestLine.url.path();
+    if (!path.startsWith(api::kPushEc2TransactionPath + lit("/")) &&
+        // TODO: #ak remove (together with the constant) after 3.0 release.
+        !path.startsWith(api::kDeprecatedPushEc2TransactionPath + lit("/")))
     {
         return completionHandler(nx_http::StatusCode::notFound);
     }
@@ -168,7 +170,7 @@ void ConnectionManager::pushTransaction(
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG, 
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Received %1 request from %2 without required header %3")
             .arg(request.requestLine.url.path()).str(connection->socket()->getForeignAddress())
             .arg(Qn::EC2_CONNECTION_GUID_HEADER_NAME),
@@ -183,7 +185,7 @@ void ConnectionManager::pushTransaction(
     auto connectionIter = connectionByIdIndex.find(connectionId);
     if (connectionIter == connectionByIdIndex.end())
     {
-        NX_LOGX(QnLog::EC2_TRAN_LOG, 
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Received %1 request from %2 for unknown connection %3")
             .arg(request.requestLine.url.path()).str(connection->socket()->getForeignAddress())
             .arg(connectionId),
@@ -191,7 +193,7 @@ void ConnectionManager::pushTransaction(
         return completionHandler(nx_http::StatusCode::notFound);
     }
 
-    NX_LOGX(QnLog::EC2_TRAN_LOG, 
+    NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("Received %1 request from %2 for connection %3")
         .arg(request.requestLine.url.path()).str(connection->socket()->getForeignAddress())
         .arg(connectionId),
@@ -213,7 +215,7 @@ void ConnectionManager::dispatchTransaction(
     const nx::String& systemId,
     std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer)
 {
-    NX_LOGX(QnLog::EC2_TRAN_LOG, 
+    NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("systemId %1. Dispatching transaction %2")
         .arg(systemId).str(transactionSerializer->transactionHeader()),
         cl_logDEBUG2);
@@ -296,7 +298,7 @@ bool ConnectionManager::isSystemConnected(const std::string& systemId) const
     const auto systemIter = connectionBySystemIdAndPeerIdIndex.lower_bound(
         FullPeerName{nx::String(systemId.c_str()), nx::String()});
 
-    return 
+    return
         systemIter != connectionBySystemIdAndPeerIdIndex.end() &&
         systemIter->fullPeerName.systemId == systemId;
 }
@@ -343,7 +345,7 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
             this, context.connection->connectionGuid().toByteArray(),
             std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
-    NX_LOGX(QnLog::EC2_TRAN_LOG, 
+    NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("Adding new transaction connection %1 from %2")
         .arg(context.connectionId)
         .str(context.connection->commonTransportHeaderOfRemoteTransaction()),
@@ -429,16 +431,16 @@ void ConnectionManager::removeConnectionByIter(
     connectionIndex.erase(connectionIterator);
 
     TransactionTransport* existingConnectionPtr = existingConnection.get();
-    
+
     NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("Removing transaction connection %1 from %2")
             .arg(existingConnectionPtr->connectionGuid())
             .str(existingConnectionPtr->commonTransportHeaderOfRemoteTransaction()),
         cl_logDEBUG1);
 
-    // ::ec2::TransactionTransportBase does not support its removal 
+    // ::ec2::TransactionTransportBase does not support its removal
     //  in signal handler, so have to remove it delayed.
-    // TODO: #ak have to ensure somehow that no events from 
+    // TODO: #ak have to ensure somehow that no events from
     //  connectionContext.connection are delivered.
 
     existingConnectionPtr->post(
@@ -520,7 +522,7 @@ bool ConnectionManager::fetchDataFromConnectRequest(
     if (query.hasQueryItem("format"))
         if (!QnLexical::deserialize(query.queryItemValue("format"), &dataFormat))
         {
-            NX_LOGX(QnLog::EC2_TRAN_LOG, 
+            NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Invalid value of \"format\" field: %1")
                 .arg(query.queryItemValue("format")), cl_logDEBUG1);
             return false;
@@ -553,7 +555,7 @@ void ConnectionManager::processSpecialTransaction(
     const auto& connectionByIdIndex = m_connections.get<kConnectionByIdIndex>();
     auto connectionIter = connectionByIdIndex.find(transportHeader.connectionId);
     if (connectionIter == connectionByIdIndex.end())
-        return; //< This can happen since connection destruction happens with some 
+        return; //< This can happen since connection destruction happens with some
                 //  delay after connection has been removed from m_connections.
     lk.unlock();
 
@@ -563,7 +565,7 @@ void ConnectionManager::processSpecialTransaction(
         std::move(handler));
 }
 
-nx_http::RequestResult 
+nx_http::RequestResult
     ConnectionManager::prepareOkResponseToCreateTransactionConnection(
         const nx::String& connectionId,
         const nx::String& contentEncoding,
@@ -598,7 +600,7 @@ nx_http::RequestResult
                 QSharedPointer<AbstractCommunicatingSocket>(connection->takeSocket().release()));
             connectionIter->connection->startOutgoingChannel();
         };
-    requestResult.dataSource = 
+    requestResult.dataSource =
         std::make_unique<nx_http::EmptyMessageBodySource>(
             ec2::TransactionTransport::TUNNEL_CONTENT_TYPE,
             boost::none);

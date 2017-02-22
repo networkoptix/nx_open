@@ -13,7 +13,10 @@ bool AbstractSocket::bind(const QString& localAddress, unsigned short localPort)
 
 bool AbstractSocket::isInSelfAioThread() const
 {
-    return pollable()->isInSelfAioThread();
+    // AbstractSocket does not provide const pollable() just to simplify implementation, so it is
+    // safe to perform a const_cast.
+    const nx::network::Pollable* p = const_cast<AbstractSocket*>(this)->pollable();
+    return p->isInSelfAioThread();
 }
 
 ////////////////////////////////////////////////////////////

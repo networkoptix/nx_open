@@ -1,7 +1,10 @@
 pytest
+pytest-timeout
+pytest-capturelog
+pytest-cpp
 pytz
 tzlocal
-requests
+requests>=2.12.5
 python-vagrant
 Jinja2
 hachoir-core

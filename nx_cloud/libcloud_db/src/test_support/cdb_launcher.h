@@ -218,6 +218,37 @@ public:
     bool isStartedWithExternalDb() const;
     bool placePreparedDB(const QString& dbDumpPath);
 
+    /**
+     * Convenience functions.
+     * These methods throw on failure.
+     */
+
+    AccountWithPassword addActivatedAccount2();
+    api::SystemData addRandomSystemToAccount(
+        const AccountWithPassword& account);
+    api::SystemData addRandomSystemToAccount(
+        const AccountWithPassword& account,
+        const api::SystemData& systemPrototype);
+    void shareSystemEx(
+        const AccountWithPassword& from,
+        const api::SystemData& what,
+        const AccountWithPassword& to,
+        api::SystemAccessRole targetRole);
+    void shareSystemEx(
+        const AccountWithPassword& from,
+        const api::SystemData& what,
+        const std::string& emailToShareWith,
+        api::SystemAccessRole targetRole);
+
+    void enableUser(
+        const AccountWithPassword& who,
+        const api::SystemData& what,
+        const AccountWithPassword& whom);
+    void disableUser(
+        const AccountWithPassword& who,
+        const api::SystemData& what,
+        const AccountWithPassword& whom);
+
 private:
     int m_port;
     std::unique_ptr<
@@ -225,6 +256,12 @@ private:
         decltype(&destroyConnectionFactory)
     > m_connectionFactory;
     api::ModuleInfo m_moduleInfo;
+
+    void setUserEnabledFlag(
+        const AccountWithPassword& who,
+        const api::SystemData& what,
+        const AccountWithPassword& whom,
+        bool isEnabled);
 };
 
 namespace api {

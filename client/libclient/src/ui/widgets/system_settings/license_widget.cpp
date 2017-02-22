@@ -13,6 +13,8 @@
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/style/custom_style.h>
 
+#include <utils/email/email.h>
+
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
 #include <utils/common/event_processors.h>
@@ -62,14 +64,24 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
         ? tr("Activate Trial License")
         : tr("Activate Free License"));
 
-    const QString emailAddress = lit("<a href=\"mailto:%1\">%1</a>").arg(QnAppInfo::licensingEmailAddress());
-
     setPaletteColor(ui->manualActivationTextWidget, QPalette::WindowText,
         ui->manualActivationTextWidget->palette().color(QPalette::Light));
-    // TODO: #Elric move to product features?
-    ui->manualActivationTextWidget->setText(
-        tr("Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.")
-            .arg(emailAddress));
+
+    QnEmailAddress licensingEmail(QnAppInfo::licensingEmailAddress());
+    if (licensingEmail.isValid())
+    {
+        const QString emailLink = lit("<a href=\"mailto:%1\">%1</a>").arg(licensingEmail.value());
+        ui->manualActivationTextWidget->setText(
+            tr("Please send Email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.")
+            .arg(emailLink));
+    }
+    else
+    {
+        ui->manualActivationTextWidget->setText(
+            tr("Please send the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.")
+            .arg(QnAppInfo::licensingEmailAddress()));
+    }
+
 
     setWarningStyle(ui->licenseKeyWarningLabel);
     ui->licenseKeyWarningLabel->setVisible(false);
@@ -104,7 +116,7 @@ QnLicenseWidget::QnLicenseWidget(QWidget *parent) :
     connect(ui->copyHwidButton, &QPushButton::clicked, this, [this]
     {
         qApp->clipboard()->setText(ui->hardwareIdEdit->text());
-        QnMessageBox::success(this, tr("Hardware id copied to clipboard"));
+        QnMessageBox::success(this, tr("Hardware ID copied to clipboard"));
     });
 
     connect(ui->pasteKeyButton, &QPushButton::clicked, this, [this]

@@ -60,9 +60,7 @@ public:
     virtual int mediaPort() const;
     void setMediaPort( int newPort );
 
-    virtual QString toString() const;
-    QString toSearchString() const;
-
+    virtual QString toSearchString() const override;
 
     void addNetworkStatus(NetworkStatus status);
     void removeNetworkStatus(NetworkStatus status);

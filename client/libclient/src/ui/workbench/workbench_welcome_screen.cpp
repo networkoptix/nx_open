@@ -198,21 +198,21 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
         const auto credentialsList =
             qnClientCoreSettings->systemAuthenticationData()[system->localId()];
 
-        if (credentialsList.isEmpty() || credentialsList.first().password.isEmpty())
+        if (!credentialsList.isEmpty() && !credentialsList.first().password.isEmpty())
+        {
+            static const bool kNeverAutologin = false;
+            static const bool kAlwaysStorePassword = true;
+
+            const auto credentials = credentialsList.first();
+            const auto firstServerId = system->servers().first().id;
+            const auto serverHost = system->getServerHost(firstServerId);
+
+            connectToLocalSystem(system->id(), serverHost.toString(),
+                credentials.user, credentials.password.value(),
+                kAlwaysStorePassword, kNeverAutologin);
+
             return;
-
-        static const bool kNeverAutologin = false;
-        static const bool kAlwaysStorePassword = true;
-
-        const auto credentials = credentialsList.first();
-        const auto firstServerId = system->servers().first().id;
-        const auto serverHost = system->getServerHost(firstServerId);
-
-        connectToLocalSystem(system->id(), serverHost.toString(),
-            credentials.user, credentials.password.value(),
-            kAlwaysStorePassword, kNeverAutologin);
-
-        return;
+        }
     }
 
     // Just expand online local tile
@@ -375,7 +375,8 @@ void QnWorkbenchWelcomeScreen::makeDrop(const QList<QUrl>& urls)
     if (resources.isEmpty())
         return;
 
-    menu()->triggerIfPossible(QnActions::DropResourcesAction, QnActionParameters(resources));
+    if (menu()->triggerIfPossible(QnActions::DropResourcesAction, QnActionParameters(resources)))
+        action(QnActions::ResourcesModeAction)->setChecked(true);
 }
 
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(

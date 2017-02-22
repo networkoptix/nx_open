@@ -336,7 +336,8 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     m_controlMode.sequence = 0;
     m_controlMode.cacheTimer = new QTimer(this);
     m_controlMode.cacheTimer->setInterval(cacheMessagesTimeoutMs);
-    connect(m_controlMode.cacheTimer, &QTimer::timeout, this, &QnWorkbenchVideoWallHandler::at_controlModeCacheTimer_timeout);
+    connect(m_controlMode.cacheTimer, &QTimer::timeout, this,
+        &QnWorkbenchVideoWallHandler::at_controlModeCacheTimer_timeout);
 
     QnUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull())
@@ -348,70 +349,69 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     m_controlMode.pcUuid = pcUuid.toString();
 
     /* Common connections */
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnWorkbenchVideoWallHandler::at_resPool_resourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved);
-    foreach(const QnResourcePtr &resource, qnResPool->getResources())
+    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        &QnWorkbenchVideoWallHandler::at_resPool_resourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        &QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved);
+    for (const QnResourcePtr& resource: qnResPool->getResources())
         at_resPool_resourceAdded(resource);
 
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, [this](const QnPeerRuntimeInfo &info)
-    {
-        if (info.data.peer.peerType == Qn::PT_VideowallClient)
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
+        [this](const QnPeerRuntimeInfo &info)
         {
-            setItemOnline(info.data.videoWallInstanceGuid, true);
-        }
-        else if (!info.data.videoWallControlSession.isNull())
-        {
-            setItemControlledBy(info.data.videoWallControlSession, info.uuid, true);
-        }
-    });
+            if (info.data.peer.peerType == Qn::PT_VideowallClient)
+            {
+                setItemOnline(info.data.videoWallInstanceGuid, true);
+            }
+            else if (!info.data.videoWallControlSession.isNull())
+            {
+                setItemControlledBy(info.data.videoWallControlSession, info.uuid, true);
+            }
+        });
 
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoRemoved, this, [this](const QnPeerRuntimeInfo &info)
-    {
-        if (info.data.peer.peerType == Qn::PT_VideowallClient)
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
+        [this](const QnPeerRuntimeInfo &info)
         {
-            setItemOnline(info.data.videoWallInstanceGuid, false);
-        }
-        else if (!info.data.videoWallControlSession.isNull())
-        {
-            setItemControlledBy(info.data.videoWallControlSession, info.uuid, false);
-        }
-    });
+            if (info.data.peer.peerType == Qn::PT_VideowallClient)
+            {
+                setItemOnline(info.data.videoWallInstanceGuid, false);
+            }
+            else if (!info.data.videoWallControlSession.isNull())
+            {
+                setItemControlledBy(info.data.videoWallControlSession, info.uuid, false);
+            }
+        });
 
     /* Handle simultaneous control mode enter. */
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, [this](const QnPeerRuntimeInfo &info)
-    {
-        /* Ignore own info change. */
-        if (info.uuid == qnCommon->moduleGUID())
-            return;
-
-        if (info.data.videoWallControlSession.isNull())
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
+        [this](const QnPeerRuntimeInfo &info)
         {
-            setItemControlledBy(info.data.videoWallControlSession, info.uuid, false);
-        }
-        else
-        {
-            setItemControlledBy(info.data.videoWallControlSession, info.uuid, true);
-        }
+            /* Ignore own info change. */
+            if (info.uuid == qnCommon->moduleGUID())
+                return;
 
-        /* Skip if we are not controlling videowall now. */
-        if (!m_controlMode.active)
-            return;
+            bool isControlled = !info.data.videoWallControlSession.isNull();
+            setItemControlledBy(info.data.videoWallControlSession, info.uuid, isControlled);
 
-        auto layout = workbench()->currentLayout()->resource();
+            /* Skip if we are not controlling videowall now. */
+            if (!m_controlMode.active)
+                return;
 
-        /* Check the conflict. */
-        if (info.data.videoWallControlSession.isNull() ||
-            (layout && info.data.videoWallControlSession != layout->getId()))
-            return;
+            auto layout = workbench()->currentLayout()->resource();
 
-        /* Order by guid. */
-        if (info.uuid < qnCommon->moduleGUID())
-        {
-            setControlMode(false);
-            showControlledByAnotherUserMessage();
-        }
+            /* Check the conflict. */
+            if (info.data.videoWallControlSession.isNull() ||
+                (layout && info.data.videoWallControlSession != layout->getId()))
+                return;
 
-    });
+            /* Order by guid. */
+            if (info.uuid < qnCommon->moduleGUID())
+            {
+                setControlMode(false);
+                showControlledByAnotherUserMessage();
+            }
+
+        });
 
 
     foreach(const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
@@ -429,7 +429,8 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     {
         /* Videowall reaction actions */
 
-        connect(action(QnActions::DelayedOpenVideoWallItemAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered);
+        connect(action(QnActions::DelayedOpenVideoWallItemAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered);
 
         connect(clientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
             [this]
@@ -448,39 +449,66 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
 
         /* Control videowall actions */
 
-        connect(action(QnActions::NewVideoWallAction),              &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered);
-        connect(action(QnActions::AttachToVideoWallAction),         &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered);
-        connect(action(QnActions::DetachFromVideoWallAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered);
-        connect(action(QnActions::DeleteVideoWallItemAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered);
-        connect(action(QnActions::StartVideoWallAction),            &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered);
-        connect(action(QnActions::StopVideoWallAction),             &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered);
-        connect(action(QnActions::RenameVideowallEntityAction),     &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_renameAction_triggered);
-        connect(action(QnActions::IdentifyVideoWallAction),         &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered);
-        connect(action(QnActions::StartVideoWallControlAction),     &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered);
-        connect(action(QnActions::OpenVideoWallsReviewAction),      &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered);
-        connect(action(QnActions::SaveCurrentVideoWallReviewAction),&QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_saveCurrentVideoWallReviewAction_triggered);
-        connect(action(QnActions::SaveVideoWallReviewAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered);
-        connect(action(QnActions::DropOnVideoWallItemAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered);
-        connect(action(QnActions::PushMyScreenToVideowallAction),   &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered);
-        connect(action(QnActions::VideowallSettingsAction),         &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered);
-        connect(action(QnActions::SaveVideowallMatrixAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered);
-        connect(action(QnActions::LoadVideowallMatrixAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered);
-        connect(action(QnActions::DeleteVideowallMatrixAction),     &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered);
+        connect(action(QnActions::NewVideoWallAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered);
+        connect(action(QnActions::AttachToVideoWallAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered);
+        connect(action(QnActions::ClearVideoWallScreen), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered);
+        connect(action(QnActions::DeleteVideoWallItemAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered);
+        connect(action(QnActions::StartVideoWallAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered);
+        connect(action(QnActions::StopVideoWallAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered);
+        connect(action(QnActions::RenameVideowallEntityAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_renameAction_triggered);
+        connect(action(QnActions::IdentifyVideoWallAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered);
+        connect(action(QnActions::StartVideoWallControlAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered);
+        connect(action(QnActions::OpenVideoWallsReviewAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered);
+        connect(action(QnActions::SaveCurrentVideoWallReviewAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_saveCurrentVideoWallReviewAction_triggered);
+        connect(action(QnActions::SaveVideoWallReviewAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered);
+        connect(action(QnActions::DropOnVideoWallItemAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered);
+        connect(action(QnActions::PushMyScreenToVideowallAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered);
+        connect(action(QnActions::VideowallSettingsAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered);
+        connect(action(QnActions::SaveVideowallMatrixAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered);
+        connect(action(QnActions::LoadVideowallMatrixAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered);
+        connect(action(QnActions::DeleteVideowallMatrixAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered);
 
-        connect(display(), &QnWorkbenchDisplay::widgetAdded, this, &QnWorkbenchVideoWallHandler::at_display_widgetAdded);
-        connect(display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved, this, &QnWorkbenchVideoWallHandler::at_display_widgetAboutToBeRemoved);
+        connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
+            &QnWorkbenchVideoWallHandler::at_display_widgetAdded);
+        connect(display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved, this,
+            &QnWorkbenchVideoWallHandler::at_display_widgetAboutToBeRemoved);
 
-        connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this, &QnWorkbenchVideoWallHandler::at_workbench_currentLayoutAboutToBeChanged);
-        connect(workbench(), &QnWorkbench::currentLayoutChanged, this, &QnWorkbenchVideoWallHandler::at_workbench_currentLayoutChanged);
+        connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this,
+            &QnWorkbenchVideoWallHandler::at_workbench_currentLayoutAboutToBeChanged);
+        connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
+            &QnWorkbenchVideoWallHandler::at_workbench_currentLayoutChanged);
 
-        connect(navigator(), &QnWorkbenchNavigator::positionChanged, this, &QnWorkbenchVideoWallHandler::at_navigator_positionChanged);
-        connect(navigator(), &QnWorkbenchNavigator::playingChanged, this, &QnWorkbenchVideoWallHandler::at_navigator_playingChanged);
-        connect(navigator(), &QnWorkbenchNavigator::speedChanged, this, &QnWorkbenchVideoWallHandler::at_navigator_speedChanged);
+        connect(navigator(), &QnWorkbenchNavigator::positionChanged, this,
+            &QnWorkbenchVideoWallHandler::at_navigator_positionChanged);
+        connect(navigator(), &QnWorkbenchNavigator::playingChanged, this,
+            &QnWorkbenchVideoWallHandler::at_navigator_playingChanged);
+        connect(navigator(), &QnWorkbenchNavigator::speedChanged, this,
+            &QnWorkbenchVideoWallHandler::at_navigator_speedChanged);
 
-        connect(context()->instance<QnWorkbenchStreamSynchronizer>(), &QnWorkbenchStreamSynchronizer::runningChanged,
-            this, &QnWorkbenchVideoWallHandler::at_workbenchStreamSynchronizer_runningChanged);
+        connect(context()->instance<QnWorkbenchStreamSynchronizer>(),
+            &QnWorkbenchStreamSynchronizer::runningChanged,
+            this,
+            &QnWorkbenchVideoWallHandler::at_workbenchStreamSynchronizer_runningChanged);
 
-        foreach(QnResourceWidget *widget, display()->widgets())
+        for (auto widget: display()->widgets())
             at_display_widgetAdded(widget);
     }
 }
@@ -1096,8 +1124,8 @@ void QnWorkbenchVideoWallHandler::showFailedToApplyChanges() const
 void QnWorkbenchVideoWallHandler::showControlledByAnotherUserMessage() const
 {
     QnMessageBox::warning(mainWindow(),
-        tr("Screen controlled by another user"),
-        tr("Control session can't be started."));
+        tr("Screen is being controlled by another user"),
+        tr("Control session cannot be started."));
 }
 
 void QnWorkbenchVideoWallHandler::setControlMode(bool active)
@@ -1339,17 +1367,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
     qnResPool->markLayoutAutoGenerated(layout);
     layout->addFlags(Qn::local); // TODO: #Elric #EC2
 
-    if (sourceLayout)
-    {
-        layout->setCellSpacing(sourceLayout->cellSpacing());
-        layout->setCellAspectRatio(sourceLayout->cellAspectRatio());
-        layout->setItems(sourceLayout->getItems());
-        layout->setBackgroundImageFilename(sourceLayout->backgroundImageFilename());
-        layout->setBackgroundOpacity(sourceLayout->backgroundOpacity());
-        layout->setBackgroundSize(sourceLayout->backgroundSize());
-        layout->setLocked(sourceLayout->locked());
-    }
-    else
+    if (!sourceLayout)
     {
         qreal desiredAspectRatio = defaultAr;
         for (qreal ar : aspectRatios.keys())
@@ -1536,7 +1554,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
         mainWindow());
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources));
+    messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
     auto result = messageBox.exec();
 
     if (result == QDialogButtonBox::Cancel)
@@ -1921,18 +1939,15 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
         case Action::SetAction:
             if (checkLocalFiles(targetIndex, targetLayout))
                 resetLayout(QnVideoWallItemIndexList() << targetIndex, targetLayout);
-            else
-                cleanupUnusedLayouts();
             break;
         case Action::SwapAction:
             if (checkLocalFiles(targetIndex, targetLayout) && checkLocalFiles(sourceIndex, currentLayout))
                 swapLayouts(targetIndex, targetLayout, sourceIndex, currentLayout);
-            else
-                cleanupUnusedLayouts();
             break;
         default:
             break;
     }
+    cleanupUnusedLayouts();
 }
 
 void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered()
@@ -1990,7 +2005,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered()
 
     if (matrix.layoutByItem.isEmpty())
     {
-        QnMessageBox::warning(mainWindow(), tr("Can't save empty matrix"));
+        QnMessageBox::warning(mainWindow(), tr("Cannot save empty matrix"));
         return;
     }
 
@@ -2068,7 +2083,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
 
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources));
+    messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
 
     if (messageBox.exec() == QDialogButtonBox::Cancel)
         return;

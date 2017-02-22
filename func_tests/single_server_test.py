@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import time
 import pytest
 import pytz
 from test_utils import print_list
@@ -16,7 +17,7 @@ def test_server_should_pick_archive_file_with_time_after_db_time(env, camera, sa
     print
     print env.server.name, env.server.url, env.server.ecs_guid
     camera_id = env.server.add_camera(camera)
-    storage = env.server.get_storage()
+    storage = env.server.storage
     sample = sample_media_file
 
     start_times_1 = []
@@ -49,6 +50,7 @@ def test_server_should_pick_archive_file_with_time_after_db_time(env, camera, sa
         storage.save_media_sample(camera, st, sample)
     env.server.start_service()
 
+    time.sleep(10)  # servers still need some time to settle down; hope this time will be enough
     # after restart new periods must be picked:
     recorded_periods = env.server.get_recorded_time_periods(camera_id)
     assert recorded_periods != expected_periods_1, 'Server did not pick up new media archive files'

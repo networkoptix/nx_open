@@ -106,9 +106,11 @@ bool QnGlobalSettings::isInitialized() const
 }
 
 QnGlobalSettings::AdaptorList QnGlobalSettings::initEmailAdaptors() {
-    QString defaultSupportLink = QnAppInfo::supportLink();
+    QString defaultSupportLink = QnAppInfo::supportUrl();
     if (defaultSupportLink.isEmpty())
         defaultSupportLink = QnAppInfo::supportEmailAddress();
+    if (defaultSupportLink.isEmpty())
+        defaultSupportLink = QnAppInfo::supportPhone();
 
     m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameHost, QString(), this);
     m_fromAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameFrom, QString(), this);
@@ -258,6 +260,15 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initCloudAdaptors()
     for (QnAbstractResourcePropertyAdaptor* adaptor : result)
         connect(adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnGlobalSettings::cloudSettingsChanged, Qt::QueuedConnection);
 
+    connect(
+        m_cloudSystemIdAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, &QnGlobalSettings::cloudCredentialsChanged,
+        Qt::QueuedConnection);
+    connect(
+        m_cloudAuthKeyAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, &QnGlobalSettings::cloudCredentialsChanged,
+        Qt::QueuedConnection);
+
     return result;
 }
 
@@ -267,6 +278,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_localSystemIdAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameLocalSystemId, QString(), this);
     m_disabledVendorsAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(kNameDisabledVendors, QString(), this);
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameCameraSettingsOptimization, true, this);
+    m_autoUpdateThumbnailsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAutoUpdateThumbnails, true, this);
     m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(kNameAuditTrailEnabled, true, this);
     m_auditTrailPeriodDaysAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         kAuditTrailPeriodDaysName,
@@ -311,6 +323,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(m_auditTrailPeriodDaysAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailPeriodDaysChanged,         Qt::QueuedConnection);
     connect(m_eventLogPeriodDaysAdaptor,            &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::eventLogPeriodDaysChanged,           Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
+    connect(m_autoUpdateThumbnailsAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::autoUpdateThumbnailsChanged,         Qt::QueuedConnection);
     connect(m_autoDiscoveryEnabledAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::autoDiscoveryChanged,                Qt::QueuedConnection);
     connect(m_updateNotificationsEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::updateNotificationsChanged,          Qt::QueuedConnection);
     connect(m_upnpPortMappingEnabledAdaptor,        &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::upnpPortMappingEnabledChanged,       Qt::QueuedConnection);
@@ -321,6 +334,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_localSystemIdAdaptor
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
+        << m_autoUpdateThumbnailsAdaptor
         << m_auditTrailEnabledAdaptor
         << m_auditTrailPeriodDaysAdaptor
         << m_eventLogPeriodDaysAdaptor
@@ -361,6 +375,16 @@ bool QnGlobalSettings::isCameraSettingsOptimizationEnabled() const
 void QnGlobalSettings::setCameraSettingsOptimizationEnabled(bool cameraSettingsOptimizationEnabled)
 {
     m_cameraSettingsOptimizationAdaptor->setValue(cameraSettingsOptimizationEnabled);
+}
+
+bool QnGlobalSettings::isAutoUpdateThumbnailsEnabled() const
+{
+    return m_autoUpdateThumbnailsAdaptor->value();
+}
+
+void QnGlobalSettings::setAutoUpdateThumbnailsEnabled(bool value)
+{
+    m_autoUpdateThumbnailsAdaptor->setValue(value);
 }
 
 bool QnGlobalSettings::isAuditTrailEnabled() const
@@ -466,9 +490,10 @@ QnEmailSettings QnGlobalSettings::emailSettings() const
      * VMS-1055 - default email changed to link.
      * We are checking if the value is not overridden and replacing it by the updated one.
      */
-    if (result.supportEmail == QnAppInfo::supportEmailAddress() && !QnAppInfo::supportLink().isEmpty())
+    if (result.supportEmail == QnAppInfo::supportEmailAddress() &&
+        !QnAppInfo::supportUrl().isEmpty())
     {
-        result.supportEmail = QnAppInfo::supportLink();
+        result.supportEmail = QnAppInfo::supportUrl();
     }
 
     return result;

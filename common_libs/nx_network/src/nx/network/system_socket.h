@@ -24,8 +24,6 @@
 namespace nx {
 namespace network {
 
-typedef CommonSocketImpl PollableSystemSocketImpl;
-
 namespace aio {
 template<class SocketType> class BaseAsyncSocketImplHelper;
 template<class SocketType> class AsyncSocketImplHelper;
@@ -46,11 +44,10 @@ struct NX_NETWORK_API SystemSocketAddress
 };
 
 /**
- * Base class representing basic communication endpoint
+ * Base class representing basic communication endpoint.
  */
 template<typename InterfaceToImplement>
-class Socket
-:
+class Socket:
     public InterfaceToImplement,
     public nx::network::Pollable
 {
@@ -59,11 +56,11 @@ public:
         int type,
         int protocol,
         int ipVersion,
-        PollableSystemSocketImpl* impl = nullptr );
+        CommonSocketImpl* impl = nullptr );
     Socket(
         int sockDesc,
         int ipVersion,
-        PollableSystemSocketImpl* impl = nullptr );
+        CommonSocketImpl* impl = nullptr );
 
     Socket(const Socket&) = delete;
     Socket& operator=(const Socket&) = delete;
@@ -102,7 +99,6 @@ public:
     virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
     virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override;
 
-
     /**
      * If WinSock, unload the WinSock DLLs; otherwise do nothing.  We ignore
      * this in our sample client code but include it in the library for
@@ -137,7 +133,7 @@ private:
 };
 
 /**
- * Socket which is able to connect, send, and receive.
+ * Socket that is able to connect, send, and receive.
  */
 template<class InterfaceToImplement>
 class CommunicatingSocket:
@@ -150,12 +146,12 @@ public:
         int type,
         int protocol,
         int ipVersion,
-        PollableSystemSocketImpl* sockImpl = nullptr );
+        CommonSocketImpl* sockImpl = nullptr );
 
     CommunicatingSocket(
         int newConnSD,
         int ipVersion,
-        PollableSystemSocketImpl* sockImpl = nullptr );
+        CommonSocketImpl* sockImpl = nullptr );
 
     virtual ~CommunicatingSocket();
 
@@ -266,6 +262,7 @@ public:
 
 private:
     bool setListen(int queueLen);
+    void stopWhileInAioThread();
 };
 
 class NX_NETWORK_API UDPSocket:
@@ -274,7 +271,11 @@ class NX_NETWORK_API UDPSocket:
     typedef CommunicatingSocket<AbstractDatagramSocket> base_type;
 
 public:
-    static const unsigned int MAX_PACKET_SIZE = 64*1024 - 24 - 8;   //maximum ip datagram size - ip header length - udp header length
+    static const unsigned int MAX_IP_DATAGRAM_LENGTH = 64 * 1024;
+    static const unsigned int IP_HEADER_MAX_LENGTH = 24;
+    static const unsigned int UDP_HEADER_LENGTH = 8;
+    static const unsigned int MAX_PACKET_SIZE =
+        MAX_IP_DATAGRAM_LENGTH - IP_HEADER_MAX_LENGTH - UDP_HEADER_LENGTH;
 
     explicit UDPSocket(int ipVersion = AF_INET);
     UDPSocket(const UDPSocket&) = delete;
@@ -319,8 +320,8 @@ public:
         const SocketAddress& foreignAddress,
         std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) override;
     /**
-     * Implementation of AbstractCommunicatingSocket::recv.
-     * Actually calls UDPSocket::recvFrom and saves datagram source address/port
+     * Actually calls UDPSocket::recvFrom and makes datagram source address/port 
+     *   available through UDPSocket::lastDatagramSourceAddress.
      */
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
     virtual int recvFrom(
@@ -333,9 +334,8 @@ public:
     virtual SocketAddress lastDatagramSourceAddress() const override;
     virtual bool hasData() const override;
     /**
-     * Implementation of AbstractDatagramSocket::setMulticastIF.
-     * Set the multicast send interface
-     * @param multicastIF multicast interface for sending packets
+     * Sets the multicast send interface.
+     * @param multicastIF multicast interface for sending packets.
      */
     virtual bool setMulticastIF( const QString& multicastIF ) override;
 

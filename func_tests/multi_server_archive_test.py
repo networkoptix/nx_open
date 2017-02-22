@@ -1,4 +1,3 @@
-import pprint
 from datetime import datetime, timedelta
 import uuid
 import pytest
@@ -11,7 +10,7 @@ from server import TimePeriod
 def env(env_builder, server):
     one = server()
     two = server()
-    return env_builder(merge_servers=['one', 'two'], one=one, two=two)
+    return env_builder(merge_servers=[one, two], one=one, two=two)
 
 
 def test_merged_archive(env, camera, sample_media_file):
@@ -20,8 +19,8 @@ def test_merged_archive(env, camera, sample_media_file):
     print env.two.name, env.two.url, env.two.ecs_guid
     print camera, sample_media_file
     camera_id = env.one.add_camera(camera)
-    one_storage = env.one.get_storage()
-    two_storage = env.two.get_storage()
+    one_storage = env.one.storage
+    two_storage = env.two.storage
     sample = sample_media_file
     print 'Sample duration:', sample.duration
 

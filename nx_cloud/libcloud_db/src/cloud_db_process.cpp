@@ -13,7 +13,6 @@
 #include <type_traits>
 
 #include <QtCore/QDir>
-#include <QtSql/QSqlQuery>
 
 #include <nx/network/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
@@ -32,6 +31,7 @@
 #include <utils/db/db_structure_updater.h>
 
 #include <cloud_db_client/src/cdb_request_path.h>
+#include <cdb/ec2_request_paths.h>
 
 #include "access_control/authentication_manager.h"
 #include "dao/rdb/db_instance_controller.h"
@@ -417,7 +417,7 @@ void CloudDBProcess::registerApiHandlers(
     // ec2::ConnectionManager
     // TODO: #ak remove after 3.0 release.
     registerHttpHandler(
-        kEstablishEc2TransactionConnectionDeprecatedPath,
+        kDeprecatedEstablishEc2TransactionConnectionPath,
         &ec2::ConnectionManager::createTransactionConnection,
         ec2ConnectionManager);
 
@@ -427,8 +427,8 @@ void CloudDBProcess::registerApiHandlers(
         ec2ConnectionManager);
 
     registerHttpHandler(
-        //kPushEc2TransactionPath,
-        nx_http::kAnyPath.toStdString().c_str(),   //dispatcher does not support max prefix by now
+        //api::kPushEc2TransactionPath,
+        nx_http::kAnyPath.toStdString().c_str(), //< Dispatcher does not support max prefix by now.
         &ec2::ConnectionManager::pushTransaction,
         ec2ConnectionManager);
 

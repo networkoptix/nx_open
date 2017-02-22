@@ -240,7 +240,7 @@ bool QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& camer
             QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
             QDialogButtonBox::Apply, mainWindow());
 
-        messageBox.addCustomWidget(new QnResourceListView(unsavedCameras));
+        messageBox.addCustomWidget(new QnResourceListView(unsavedCameras, &messageBox));
         const auto result = messageBox.exec();
         switch (result)
         {

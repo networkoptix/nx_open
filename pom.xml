@@ -327,7 +327,7 @@
                             </files>
                             <quiet>true</quiet>
                         </configuration>
-                    </execution>                    
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -790,6 +790,7 @@
                 <module>testcamera</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
+                <module>nx_cloud/time_server</module>
                 <module>plugins/it930x_plugin</module>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>

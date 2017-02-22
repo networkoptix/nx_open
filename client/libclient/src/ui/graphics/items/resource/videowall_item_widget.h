@@ -41,12 +41,6 @@ public:
     const QnResourceWidgetFrameColors &frameColors() const;
     void setFrameColors(const QnResourceWidgetFrameColors &frameColors);
 
-    bool isInfoVisible() const;
-    void setInfoVisible(bool visible, bool animate = true);
-
-signals:
-    void infoVisibleChanged(bool visible);
-
 protected:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual void paintFrame(QPainter *painter, const QRectF &paintRect);
@@ -117,19 +111,11 @@ private:
     /** Status overlay. */
     QnStatusOverlayController* m_statusOverlayController;
 
-    /** Info overlay */
-    bool m_infoVisible;
-
     /* Widgets for overlaid stuff. */
     QnViewportBoundWidget *m_headerOverlayWidget;
     QGraphicsLinearLayout *m_headerLayout;
     GraphicsWidget *m_headerWidget;
     GraphicsLabel *m_headerLabel;
-    QnImageButtonWidget* m_infoButton;
-
-    QnViewportBoundWidget *m_footerOverlayWidget;
-    GraphicsWidget *m_footerWidget;
-    GraphicsLabel *m_footerLabel;
 };
 
 #endif // LAYOUT_RESOURCE_OVERLAY_WIDGET_H

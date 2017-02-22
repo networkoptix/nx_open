@@ -36,4 +36,6 @@ void QnClientCoreMetaTypes::initialize()
     qRegisterMetaType<QnUrlHelper>();
     qmlRegisterUncreatableType<QnUrlHelper>(
         "Nx", 1, 0, "UrlHelper", lit("Cannot create an instance of UrlHelper."));
+    qmlRegisterUncreatableType<QnSoftwareVersion>(
+        "Nx", 1, 0, "SoftwareVersion", lit("Cannot create an instance of SoftwareVersion."));
 }

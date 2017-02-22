@@ -13,7 +13,7 @@ Item
     property bool rounded: false
     property real radius: rounded ? width / 2 : 0
     property bool alwaysCompleteHighlightAnimation: false
-
+    property bool rippleEffectEnabled: !liteMode
     property Ripple _currentRipple: null
 
     layer.enabled: radius > 0
@@ -41,7 +41,7 @@ Item
                 return
             }
 
-            if (_currentRipple)
+            if (_currentRipple && rippleEffectEnabled)
             {
                 fadeOutAnimation.duration = _currentRipple.fadeOutDuration
                 _currentRipple.fadeOut()
@@ -61,6 +61,9 @@ Item
 
         onPressAndHold:
         {
+            if (!rippleEffectEnabled)
+                return
+
             _currentRipple = rippleComponent.createObject(materialEffect)
             _currentRipple.fadeInDuration = 400
             if (centered || mouseArea.mouseX == undefined || mouseArea.mouseY == undefined)
@@ -71,20 +74,23 @@ Item
 
         onReleased:
         {
-            if (_currentRipple)
+            if (rippleEffectEnabled)
             {
-                fadeOutAnimation.duration = _currentRipple.fadeOutDuration
-                _currentRipple.fadeOut()
-                _currentRipple = null
-            }
-            else
-            {
-                var ripple = rippleComponent.createObject(materialEffect)
-                fadeOutAnimation.duration = ripple.scaleDuration
-                if (centered || mouseArea.mouseX == undefined || mouseArea.mouseY == undefined)
-                    ripple.splash(width / 2, height / 2)
+                if (_currentRipple)
+                {
+                    fadeOutAnimation.duration = _currentRipple.fadeOutDuration
+                    _currentRipple.fadeOut()
+                    _currentRipple = null
+                }
                 else
-                    ripple.splash(mouseArea.mouseX, mouseArea.mouseY)
+                {
+                    var ripple = rippleComponent.createObject(materialEffect)
+                    fadeOutAnimation.duration = ripple.scaleDuration
+                    if (centered || mouseArea.mouseX == undefined || mouseArea.mouseY == undefined)
+                        ripple.splash(width / 2, height / 2)
+                    else
+                        ripple.splash(mouseArea.mouseX, mouseArea.mouseY)
+                }
             }
 
             fadeInAnimation.complete()
@@ -97,7 +103,7 @@ Item
         id: highlightRectangle
 
         anchors.fill: parent
-        color: "#30ffffff"
+        color: liteMode ? "#18ffffff" : "#30ffffff"
         opacity: 0
 
         SequentialAnimation

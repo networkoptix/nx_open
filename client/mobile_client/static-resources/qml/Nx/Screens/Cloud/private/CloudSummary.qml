@@ -6,6 +6,8 @@ Item
 {
     implicitHeight: column.implicitHeight
 
+    signal loggedOut()
+
     Column
     {
         id: column
@@ -27,7 +29,11 @@ Item
             text: qsTr("Log out")
             width: parent.width
 
-            onClicked: setCloudCredentials("", "")
+            onClicked:
+            {
+                setCloudCredentials("", "")
+                loggedOut()
+            }
         }
 
         Item { width: 1; height: 10 }

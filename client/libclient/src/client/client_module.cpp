@@ -225,7 +225,6 @@ void QnClientModule::startLocalSearchers()
 void QnClientModule::initMetaInfo()
 {
     Q_INIT_RESOURCE(appserver2);
-    Q_INIT_RESOURCE(libclient_core);
     Q_INIT_RESOURCE(libclient);
     QnClientMetaTypes::initialize();
 }
@@ -389,6 +388,13 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
             : startupParams.videoWallItemGuid.toString();
         logFileNameSuffix.replace(QRegExp(QLatin1String("[{}]")), QLatin1String("_"));
     }
+    else if (qnClientInstanceManager->isValid())
+    {
+        int idx = qnClientInstanceManager->instanceIndex();
+        if (idx > 0)
+            logFileNameSuffix = L'_' + QString::number(idx) + L'_';
+    }
+
 
     static const int DEFAULT_MAX_LOG_FILE_SIZE = 10 * 1024 * 1024;
     static const int DEFAULT_MSG_LOG_ARCHIVE_SIZE = 5;

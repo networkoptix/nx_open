@@ -29,6 +29,9 @@ const QLatin1String kDefaultSystemUserToRunUnder("");
 const QLatin1String kDataDir("general/dataDir");
 const QLatin1String kDefaultDataDir("");
 
+const QLatin1String kCloudConnectOptions("general/cloudConnectOptions");
+const QLatin1String kDefaultCloudConnectOptions("");
+
 //CloudDB settings
 const QLatin1String kRunWithCloud("cloud_db/runWithCloud");
 const QLatin1String kDefaultRunWithCloud("true");
@@ -218,6 +221,9 @@ void Settings::loadConfiguration()
     m_general.dataDir = m_settings.value(
         kDataDir,
         kDefaultDataDir).toString();
+    m_general.cloudConnectOptions = QnLexical::deserialized<api::CloudConnectOptions>(m_settings.value(
+        kCloudConnectOptions,
+        kDefaultCloudConnectOptions).toString());
 
     //log
     m_logging.load(m_settings);

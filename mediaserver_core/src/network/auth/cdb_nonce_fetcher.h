@@ -69,7 +69,6 @@ private:
     mutable QnMutex m_mutex;
     CloudConnectionManager* const m_cloudConnectionManager;
     AbstractNonceProvider* m_defaultGenerator;
-    bool m_boundToCloud;
     //map<cdb_nonce, valid_time>
     mutable std::deque<NonceCtx> m_cdbNonceQueue;
     QElapsedTimer m_monotonicClock;
@@ -78,6 +77,7 @@ private:
     std::random_device m_rd;
     std::default_random_engine m_randomEngine;
     std::uniform_int_distribution<short> m_nonceTrailerRandomGenerator;
+    nx::utils::TimerManager* m_timerManager;
 
     void fetchCdbNonceAsync();
     void gotNonce(nx::cdb::api::ResultCode resCode, nx::cdb::api::NonceData nonce);
@@ -85,7 +85,5 @@ private:
     void removeExpiredNonce(const QnMutexLockerBase&, qint64 curClock);
 
     void cloudBindingStatusChangedUnsafe(const QnMutexLockerBase&, bool boundToCloud);
-
-private slots:
     void cloudBindingStatusChanged(bool boundToCloud);
 };

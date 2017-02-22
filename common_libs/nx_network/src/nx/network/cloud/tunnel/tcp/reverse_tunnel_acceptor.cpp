@@ -72,7 +72,8 @@ void ReverseTunnelAcceptor::callAcceptHandler(
     SystemError::ErrorCode code,
     std::unique_ptr<AbstractIncomingTunnelConnection> connection)
 {
-    const auto handler = std::move(m_acceptHandler);
+    decltype(m_acceptHandler) handler;
+    handler.swap(m_acceptHandler);
     handler(code, std::move(connection));
 }
 

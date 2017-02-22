@@ -395,15 +395,17 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_motionSelectionInstrument, &MotionSelectionInstrument::selectionProcessFinished,
         m_resizingInstrument, &ResizingInstrument::recursiveEnable);
 
-    connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_handScrollInstrument,         SLOT(recursiveDisable()));
-    connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_handScrollInstrument,         SLOT(recursiveEnable()));
-    connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_moveInstrument,               SLOT(recursiveDisable()));
-    connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_moveInstrument,               SLOT(recursiveEnable()));
-    connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_motionSelectionInstrument,    SLOT(recursiveDisable()));
-    connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_motionSelectionInstrument,    SLOT(recursiveEnable()));
-    connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         m_itemLeftClickInstrument,      SLOT(recursiveDisable()));
-    connect(ptzInstrument,              SIGNAL(ptzProcessFinished(QnMediaResourceWidget *)),                                        m_itemLeftClickInstrument,      SLOT(recursiveEnable()));
-    connect(ptzInstrument,              SIGNAL(ptzProcessStarted(QnMediaResourceWidget *)),                                         this,                           SLOT(at_ptzProcessStarted(QnMediaResourceWidget *)));
+    connect(ptzInstrument, &PtzInstrument::ptzProcessStarted, m_handScrollInstrument, &Instrument::recursiveDisable);
+    connect(ptzInstrument, &PtzInstrument::ptzProcessFinished, m_handScrollInstrument, &Instrument::recursiveEnable);
+    connect(ptzInstrument, &PtzInstrument::ptzProcessStarted, m_moveInstrument, &Instrument::recursiveDisable);
+    connect(ptzInstrument, &PtzInstrument::ptzProcessFinished, m_moveInstrument, &Instrument::recursiveEnable);
+    connect(ptzInstrument, &PtzInstrument::ptzProcessStarted, m_motionSelectionInstrument, &Instrument::recursiveDisable);
+    connect(ptzInstrument, &PtzInstrument::ptzProcessFinished, m_motionSelectionInstrument, &Instrument::recursiveEnable);
+    connect(ptzInstrument, &PtzInstrument::ptzProcessStarted, m_itemLeftClickInstrument, &Instrument::recursiveDisable);
+    connect(ptzInstrument, &PtzInstrument::ptzProcessFinished, m_itemLeftClickInstrument, &Instrument::recursiveEnable);
+    connect(ptzInstrument, &PtzInstrument::ptzProcessStarted, m_resizingInstrument, &Instrument::recursiveDisable);
+    connect(ptzInstrument, &PtzInstrument::ptzProcessFinished, m_resizingInstrument, &Instrument::recursiveEnable);
+    connect(ptzInstrument, &PtzInstrument::ptzProcessStarted, this, &QnWorkbenchController::at_ptzProcessStarted);
 
     connect(m_zoomWindowInstrument,       SIGNAL(zoomWindowProcessStarted(QnMediaResourceWidget *)),                                  m_handScrollInstrument,         SLOT(recursiveDisable()));
     connect(m_zoomWindowInstrument,       SIGNAL(zoomWindowProcessFinished(QnMediaResourceWidget *)),                                 m_handScrollInstrument,         SLOT(recursiveEnable()));

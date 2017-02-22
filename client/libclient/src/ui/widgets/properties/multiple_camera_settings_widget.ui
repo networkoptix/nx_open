@@ -157,9 +157,6 @@
    </item>
    <item>
     <widget class="QnAlertBar" name="alertBar" native="true">
-     <property name="text" stdset="0">
-      <string>TextLabel</string>
-     </property>
     </widget>
    </item>
   </layout>

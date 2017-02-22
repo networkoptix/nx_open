@@ -1,0 +1,4 @@
+add_subdirectory(genericrtspplugin)
+add_subdirectory(image_library_plugin)
+add_subdirectory(mjpg_link)
+add_subdirectory(it930x_plugin)

@@ -60,7 +60,7 @@
      <item>
       <widget class="QSpinBox" name="maximumLiveBufferLengthSpinBox">
        <property name="suffix">
-        <string> ms</string>
+        <string notr="true">&lt; ms&gt;</string>
        </property>
        <property name="minimum">
         <number>10</number>

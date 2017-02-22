@@ -9,11 +9,13 @@ QnToolButton::QnToolButton(QWidget* parent): base_type(parent)
 
 void QnToolButton::adjustIconSize()
 {
-    QIcon icon = this->icon();
-    if (icon.isNull())
-        return;
+    if (!icon().isNull())
+       setIconSize(calculateIconSize());
+}
 
-    setIconSize(QnSkin::maximumSize(icon));
+QSize QnToolButton::calculateIconSize() const
+{
+    return QnSkin::maximumSize(icon());
 }
 
 void QnToolButton::mousePressEvent(QMouseEvent* event)

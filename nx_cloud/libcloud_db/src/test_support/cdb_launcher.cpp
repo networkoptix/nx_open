@@ -904,6 +904,109 @@ bool CdbLauncher::placePreparedDB(const QString& dbDumpPath)
         QFileDevice::ReadUser | QFileDevice::WriteUser);
 }
 
+AccountWithPassword CdbLauncher::addActivatedAccount2()
+{
+    //creating two accounts
+    AccountWithPassword account;
+    const auto result = CdbLauncher::addActivatedAccount(&account, &account.password);
+    if (result != api::ResultCode::ok)
+    {
+        throw std::runtime_error(lm("Failed to add account. %1")
+            .str(api::toString(result)).toStdString());
+    }
+    return account;
+}
+
+api::SystemData CdbLauncher::addRandomSystemToAccount(
+    const AccountWithPassword& account)
+{
+    return addRandomSystemToAccount(account, api::SystemData());
+}
+
+api::SystemData CdbLauncher::addRandomSystemToAccount(
+    const AccountWithPassword& account,
+    const api::SystemData& systemPrototype)
+{
+    api::SystemData system1 = systemPrototype;
+    const auto result = CdbLauncher::bindRandomSystem(account.email, account.password, &system1);
+    if (result != api::ResultCode::ok)
+    {
+        throw std::runtime_error(lm("Failed to bind system to account. %1")
+            .str(api::toString(result)).toStdString());
+    }
+    return system1;
+}
+
+void CdbLauncher::shareSystemEx(
+    const AccountWithPassword& from,
+    const api::SystemData& what,
+    const AccountWithPassword& to,
+    api::SystemAccessRole targetRole)
+{
+    const auto result = CdbLauncher::shareSystem(
+        from.email, from.password, what.id, to.email, targetRole);
+    if (result != api::ResultCode::ok)
+    {
+        throw std::runtime_error(lm("Failed to share system. %1")
+            .str(api::toString(result)).toStdString());
+    }
+}
+
+void CdbLauncher::shareSystemEx(
+    const AccountWithPassword& from,
+    const api::SystemData& what,
+    const std::string& emailToShareWith,
+    api::SystemAccessRole targetRole)
+{
+    auto result = CdbLauncher::shareSystem(
+        from.email, from.password, what.id, emailToShareWith, targetRole);
+    if (result != api::ResultCode::ok)
+    {
+        throw std::runtime_error(lm("Failed to share system. %1")
+            .str(api::toString(result)).toStdString());
+    }
+}
+
+void CdbLauncher::enableUser(
+    const AccountWithPassword& who,
+    const api::SystemData& what,
+    const AccountWithPassword& whom)
+{
+    setUserEnabledFlag(who, what, whom, true);
+}
+
+void CdbLauncher::disableUser(
+    const AccountWithPassword& who,
+    const api::SystemData& what,
+    const AccountWithPassword& whom)
+{
+    setUserEnabledFlag(who, what, whom, false);
+}
+
+void CdbLauncher::setUserEnabledFlag(
+    const AccountWithPassword& who,
+    const api::SystemData& what,
+    const AccountWithPassword& whom,
+    bool isEnabled)
+{
+    api::SystemSharingEx userData;
+    auto result = getSystemSharing(who.email, who.password, what.id, whom.email, &userData);
+    if (result != api::ResultCode::ok)
+    {
+        throw std::runtime_error(lm("Failed to get system sharing. %1")
+            .str(api::toString(result)).toStdString());
+    }
+
+    userData.isEnabled = isEnabled;
+
+    result = shareSystem(who.email, who.password, userData);
+    if (result != api::ResultCode::ok)
+    {
+        throw std::runtime_error(lm("Failed to share system. %1")
+            .str(api::toString(result)).toStdString());
+    }
+}
+
 namespace api {
 
 bool operator==(const api::AccountData& left, const api::AccountData& right)

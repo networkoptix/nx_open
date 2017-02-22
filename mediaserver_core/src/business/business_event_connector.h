@@ -54,7 +54,7 @@ public slots:
         \param value true, if input activated. false, if deactivated
     */
     void at_cameraInput(const QnResourcePtr &resource, const QString& inputPortID, bool value, qint64 timeStampUsec);
-    
+
     void at_customEvent(const QString &resourceName, const QString& caption, const QString& description, const QnEventMetaData& metadata, QnBusiness::EventState eventState, qint64 timeStamp);
 
     /*!
@@ -77,6 +77,8 @@ public slots:
     void at_archiveRebuildFinished(const QnResourcePtr& resource, QnSystemHealth::MessageType msgType);
 
     void at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
+
+    void at_softwareTrigger(const QnResourcePtr& resource, const QString& triggerId, qint64 timeStamp);
 
     bool createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage = 0);
 private slots:

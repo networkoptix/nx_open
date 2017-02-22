@@ -1414,6 +1414,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             && resyncIfNeeded(ResyncWebPages);
     }
 
+    if (updateName.endsWith(lit("/86_fill_cloud_user_digest.sql")))
+        return resyncIfNeeded(ResyncUsers);
+
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
 }

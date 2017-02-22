@@ -17,8 +17,8 @@ public:
 public:
     QnUserResourcePtr user;
 
-    bool userHasAdminPermissions = false;
-    bool useLayouts = false;
+    bool userHasAllMediaAccess = false;
+    bool compatibilityMode = false;
 
     QScopedPointer<detail::Watcher> watcher;
 };
@@ -36,10 +36,10 @@ QnAvailableCamerasWatcher::QnAvailableCamerasWatcher(QObject* parent):
             if (!subject.isUser() || subject.user() != d->user)
                 return;
 
-            const bool userHasAdminPermissions = value.testFlag(Qn::GlobalAdminPermission);
-            if (d->userHasAdminPermissions != userHasAdminPermissions)
+            const bool userHasAllMediaAccess = value.testFlag(Qn::GlobalAccessAllMediaPermission);
+            if (d->userHasAllMediaAccess != userHasAllMediaAccess)
             {
-                d->userHasAdminPermissions = userHasAdminPermissions;
+                d->userHasAllMediaAccess = userHasAllMediaAccess;
                 d->updateWatcher();
             }
         });
@@ -62,8 +62,8 @@ void QnAvailableCamerasWatcher::setUser(const QnUserResourcePtr& user)
         return;
 
     d->user = user;
-    d->userHasAdminPermissions =
-        user && qnGlobalPermissionsManager->hasGlobalPermission(user, Qn::GlobalAdminPermission);
+    d->userHasAllMediaAccess = user &&
+        qnGlobalPermissionsManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission);
     d->updateWatcher();
 }
 
@@ -76,19 +76,19 @@ QnVirtualCameraResourceList QnAvailableCamerasWatcher::availableCameras() const
     return d->watcher->cameras().values();
 }
 
-bool QnAvailableCamerasWatcher::useLayouts() const
+bool QnAvailableCamerasWatcher::compatibilityMode() const
 {
     Q_D(const QnAvailableCamerasWatcher);
-    return d->useLayouts;
+    return d->compatibilityMode;
 }
 
-void QnAvailableCamerasWatcher::setUseLayouts(bool useLayouts)
+void QnAvailableCamerasWatcher::setCompatiblityMode(bool compatibilityMode)
 {
     Q_D(QnAvailableCamerasWatcher);
-    if (this->useLayouts() == useLayouts)
+    if (d->compatibilityMode == compatibilityMode)
         return;
 
-    d->useLayouts = useLayouts;
+    d->compatibilityMode = compatibilityMode;
     d->updateWatcher();
 }
 
@@ -114,7 +114,7 @@ void QnAvailableCamerasWatcherPrivate::updateWatcher()
     if (!user)
         return;
 
-    if (useLayouts && !userHasAdminPermissions)
+    if (compatibilityMode && !userHasAllMediaAccess)
         watcher.reset(new detail::LayoutBasedWatcher(user));
     else
         watcher.reset(new detail::PermissionsBasedWatcher(user));

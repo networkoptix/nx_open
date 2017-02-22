@@ -26,6 +26,7 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(const QnAbstractBusiness
         case QnBusiness::CameraMotionEvent:
         case QnBusiness::CameraInputEvent:
         case QnBusiness::ServerStartEvent:
+        case QnBusiness::SoftwareTriggerEvent:
             return Value::CommonNotification;
 
         /* Yellow notifications */

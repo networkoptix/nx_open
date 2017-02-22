@@ -24,6 +24,7 @@ Page
             flat: true
             leftPadding: 0
             rightPadding: 0
+            labelPadding: 8
             visible: cloudStatusWatcher.status == QnCloudStatusWatcher.LoggedOut
             onClicked: Workflow.openCloudScreen()
         }
@@ -81,7 +82,7 @@ Page
             ownerDescription: cloudSystem ? model.ownerDescription : ""
             online: model.isConnectable
             compatible: model.isCompatible
-            invalidVersion: !compatible && !model.isCompatibleVesion ? model.wrongVersion : ""
+            invalidVersion: model.wrongVersion ? model.wrongVersion.toString() : ""
         }
         highlight: Rectangle
         {

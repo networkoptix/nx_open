@@ -29,8 +29,6 @@
 namespace nx {
 namespace cdb {
 
-static const std::chrono::seconds kUnconfirmedAccountExpirationSec(3*24*60*60);
-
 AccountManager::AccountManager(
     const conf::Settings& settings,
     const StreeManager& streeManager,
@@ -527,7 +525,7 @@ void AccountManager::setUpdateAccountSubroutine(UpdateAccountSubroutine func)
 
 db::DBResult AccountManager::fillCache()
 {
-    std::promise<db::DBResult> cacheFilledPromise;
+    nx::utils::promise<db::DBResult> cacheFilledPromise;
     auto future = cacheFilledPromise.get_future();
 
     //starting async operation
@@ -687,7 +685,9 @@ db::DBResult AccountManager::issueAccountActivationCode(
             emailVerificationCode);
         insertEmailVerificationQuery.bindValue(
             2,
-            QDateTime::currentDateTimeUtc().addSecs(kUnconfirmedAccountExpirationSec.count()));
+            QDateTime::currentDateTimeUtc().addSecs(
+                std::chrono::duration_cast<std::chrono::seconds>(
+                    m_settings.accountManager().accountActivationCodeExpirationTimeout).count()));
         if( !insertEmailVerificationQuery.exec() )
         {
             NX_LOG(lit("Could not insert account verification code into DB. %1").

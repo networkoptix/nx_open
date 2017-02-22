@@ -145,6 +145,7 @@
 #include <rest/handlers/test_email_rest_handler.h>
 #include <rest/handlers/test_ldap_rest_handler.h>
 #include <rest/handlers/update_rest_handler.h>
+#include <rest/handlers/update_unauthenticated_rest_handler.h>
 #include <rest/handlers/update_information_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
@@ -513,14 +514,14 @@ static QStringList listRecordFolders()
     QStringList folderPaths;
 
 #ifdef Q_OS_WIN
-    for (const WinDriveInfo& drive: getWinDrivesInfo()) 
+    for (const WinDriveInfo& drive: getWinDrivesInfo())
     {
         if (!(drive.access | WinDriveInfo::Writable) || drive.type != DRIVE_FIXED)
             continue;
-        
+
         folderPaths.append(QDir::toNativeSeparators(drive.path) + QnAppInfo::mediaFolderName());
      }
- 
+
 #endif
 
 #ifdef Q_OS_LINUX
@@ -1006,7 +1007,6 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[])
     m_dumpSystemResourceUsageTaskID(0),
     m_stopping(false)
 {
-    m_platform.reset(new QnPlatformAbstraction());
     serviceMainInstance = this;
 
     parseCommandLineParameters(argc, argv);
@@ -1022,6 +1022,12 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[])
         MSSettings::initializeRunTimeSettings();
 
     addCommandLineParametersFromConfig();
+
+    const bool isStatisticsDisabled =
+        MSSettings::roSettings()->value(QnServer::kNoMonitorStatistics, false).toBool();
+
+    m_platform.reset(new QnPlatformAbstraction(
+        isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs));
 }
 
 void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
@@ -1757,6 +1763,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getSystemId", new QnGetSystemIdRestHandler());
     reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
     reg("api/installUpdate", new QnUpdateRestHandler());
+    reg("api/installUpdateUnauthenticated", new QnUpdateUnauthenticatedRestHandler());
     reg("api/restart", new QnRestartRestHandler(), kAdmin);
     reg("api/connect", new QnOldClientConnectRestHandler());
     reg("api/moduleInformation", new QnModuleInformationRestHandler());
@@ -1883,29 +1890,17 @@ bool MediaServerProcess::initTcpListener(
 
 std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
 {
-    auto mapper = std::make_unique<nx_upnp::PortMapper>();
-
-    const auto configValue = MSSettings::roSettings()->value(
-        nx::settings_names::kNameUpnpPortMappingEnabled);
-
-    if (!configValue.isNull())
-    {
-        // config value prevail
-        mapper->setIsEnabled(configValue.toBool());
-    }
-    else
-    {
-        // otherwise it's controlled by qnGlobalSettings
-        auto updateEnabled = [mapper = mapper.get()]()
+    auto mapper = std::make_unique<nx_upnp::PortMapper>(/*isEnabled*/ false);
+    auto updateEnabled =
+        [mapper = mapper.get()]()
         {
-            mapper->setIsEnabled(qnGlobalSettings->isUpnpPortMappingEnabled());
+            const auto isCloudSystem = !qnGlobalSettings->cloudSystemId().isEmpty();
+            mapper->setIsEnabled(isCloudSystem && qnGlobalSettings->isUpnpPortMappingEnabled());
         };
 
-        updateEnabled();
-        connect(
-            qnGlobalSettings, &QnGlobalSettings::upnpPortMappingEnabledChanged,
-            std::move(updateEnabled));
-    }
+    connect(qnGlobalSettings, &QnGlobalSettings::upnpPortMappingEnabledChanged, updateEnabled);
+    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, updateEnabled);
+    updateEnabled();
 
     mapper->enableMapping(
         m_mediaServer->getPort(), nx_upnp::PortMapper::Protocol::TCP,
@@ -2128,6 +2123,11 @@ void MediaServerProcess::run()
         nx_ms_conf::DEFAULT_CREATE_FULL_CRASH_DUMP ).toBool() );
 #endif
 
+    const auto allowedSslVersions = MSSettings::roSettings()->value(
+        nx_ms_conf::ALLOWED_SSL_VERSIONS, QString()).toString();
+    if (!allowedSslVersions.isEmpty())
+        nx::network::SslEngine::setAllowedServerVersions(allowedSslVersions.toUtf8());
+
     nx::network::SslEngine::useOrCreateCertificate(
         MSSettings::roSettings()->value(
             nx_ms_conf::SSL_CERTIFICATE_PATH,
@@ -2165,8 +2165,9 @@ void MediaServerProcess::run()
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/static/*"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("/crossdomain.xml"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/startLiteClient"), AuthMethod::noAuth);
-    // TODO: #3.1 Enable authentication for /api/installUpdates when offline cloud authentication is implemented.
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdate"), AuthMethod::noAuth);
+    // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud authentication is implemented.
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdateUnauthenticated"), AuthMethod::noAuth);
 
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), AuthMethod::noAuth );
@@ -2615,11 +2616,10 @@ void MediaServerProcess::run()
     QnResource::initAsyncPoolInstance()->setMaxThreadCount( MSSettings::roSettings()->value(
         nx_ms_conf::RESOURCE_INIT_THREADS_COUNT,
         nx_ms_conf::DEFAULT_RESOURCE_INIT_THREADS_COUNT ).toInt() );
-    QnResource::initAsyncPoolInstance()->setExpiryTimeout(-1); // default expiration timeout is 30 second. But it has a bug in QT < v.5.3
-    QThreadPool::globalInstance()->setExpiryTimeout(-1);
+    QnResource::initAsyncPoolInstance();
 
     // ============================
-    std::unique_ptr<nx_upnp::DeviceSearcher> upnpDeviceSearcher(new nx_upnp::DeviceSearcher());
+    std::unique_ptr<nx_upnp::DeviceSearcher> upnpDeviceSearcher(new nx_upnp::DeviceSearcher(qnGlobalSettings));
     std::unique_ptr<QnMdnsListener> mdnsListener(new QnMdnsListener());
 
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(m_mediaServer->getId()) );
@@ -2728,7 +2728,9 @@ void MediaServerProcess::run()
 
 
     QnResourceDiscoveryManager::instance()->setReady(true);
-    if( !ec2Connection->connectionInfo().ecDbReadOnly )
+    const bool isDiscoveryDisabled =
+        MSSettings::roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
+    if( !ec2Connection->connectionInfo().ecDbReadOnly && !isDiscoveryDisabled)
         QnResourceDiscoveryManager::instance()->start();
     //else
     //    we are not able to add cameras to DB anyway, so no sense to do discover
@@ -2764,14 +2766,16 @@ void MediaServerProcess::run()
         std::chrono::milliseconds(SYSTEM_USAGE_DUMP_TIMEOUT));
 
     QnRecordingManager::instance()->start();
-    QnMServerResourceSearcher::instance()->start();
+    if (!isDiscoveryDisabled)
+        QnMServerResourceSearcher::instance()->start();
     m_universalTcpListener->start();
     serverConnector->start();
 #if 1
     if (ec2Connection->connectionInfo().ecUrl.scheme() == "file") {
         // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
         qnCommon->setCloudMode(true);
-        m_moduleFinder->start();
+        if (!isDiscoveryDisabled)
+            m_moduleFinder->start();
     }
 #endif
     qnBackupStorageMan->scheduleSync()->start();

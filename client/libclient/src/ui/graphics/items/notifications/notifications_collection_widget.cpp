@@ -628,7 +628,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
         case QnSystemHealth::CloudPromo:
         {
             item->addActionButton(
-                qnSkin->icon("events/cloud_promo.png"),
+                qnSkin->icon("cloud/cloud_20.png"),
                 QnActions::PreferencesCloudTabAction);
 
             const auto hideCloudPromoNextRun =

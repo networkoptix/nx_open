@@ -114,20 +114,23 @@ protected:
 
     void connectClientToTheServer()
     {
-        nx::utils::promise<SystemError::ErrorCode> connectedPromise;
         m_stunClient->setOnConnectionClosedHandler(
             [this](SystemError::ErrorCode closeReason)
             {
                 m_connectionClosedPromise.set_value(closeReason);
             });
+
+        nx::utils::promise<SystemError::ErrorCode> connectedPromise;
         m_stunClient->connect(
-            m_serverEndpoint,
+            SocketAddress(HostAddress("localhost"), m_serverEndpoint.port),
             false,
             [&connectedPromise](SystemError::ErrorCode sysErrorCode)
             {
                 connectedPromise.set_value(sysErrorCode);
             });
+
         ASSERT_EQ(SystemError::noError, connectedPromise.get_future().get());
+        ASSERT_EQ(m_serverEndpoint, m_stunClient->remoteAddress());
     }
 
     void sendRequest()

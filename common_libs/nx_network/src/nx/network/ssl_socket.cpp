@@ -843,7 +843,7 @@ public:
         const nx::Buffer& buffer,
         std::function<void(SystemError::ErrorCode,std::size_t)>&& op)
     {
-        // We have to recive some data at first to be able to understand if this connection
+        // We have to receive some data at first to be able to understand if this connection
         // is secure or not by analyzing client's request.
         NX_ASSERT(m_isInitialized);
         NX_ASSERT(m_isSsl);
@@ -1016,7 +1016,7 @@ SslSocket::SslSocket(
 
     // NOTE: Currently all IO operations are implemented over async because current SSL
     //     implementation is too twisted to support runtime mode switches.
-    // TODO: SSL sockets should be reimplemented to simplify overall appoarch and support
+    // TODO: SSL sockets should be reimplemented to simplify overall approach and support
     //     runtime mode switches.
     bool nonBlockingMode = false;
     if (!wrappedSocket->getNonBlockingMode(&nonBlockingMode))
@@ -1223,14 +1223,8 @@ int SslSocket::recvInternal(void* buffer, unsigned int bufferLen, int flags)
 int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(SslSocket);
-    if (d->shutdown)
-    {
-        SystemError::setLastErrorCode(SystemError::notConnected);
-        return -1;
-    }
-
     unsigned int timeout = 0;
-    if (d->nonBlockingMode || flags & MSG_DONTWAIT) //< Emulate non-blocking mode by vary small timeout.
+    if (d->nonBlockingMode || flags & MSG_DONTWAIT) //< Emulate non-blocking mode by a very small timeout.
     {
         if (!d->wrappedSocket->getRecvTimeout(&timeout))
             return -1;
@@ -1247,6 +1241,12 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
             d->wrappedSocket->setRecvTimeout(timeout);
 
         SystemError::setLastErrorCode(SystemError::already);
+        return -1;
+    }
+
+    if (d->shutdown)
+    {
+        SystemError::setLastErrorCode(SystemError::notConnected);
         return -1;
     }
 
@@ -1270,7 +1270,7 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 
     auto result = promise.get_future().get();
 
-    if (d->nonBlockingMode || flags & MSG_DONTWAIT) //< Emulate non-blocking mode by vary small timeout.
+    if (d->nonBlockingMode || flags & MSG_DONTWAIT) //< Emulate non-blocking mode by a very small timeout.
     {
         if (!d->wrappedSocket->setRecvTimeout(timeout))
             return -1;
@@ -1296,14 +1296,8 @@ int SslSocket::sendInternal(const void* buffer, unsigned int bufferLen)
 int SslSocket::send(const void* buffer, unsigned int bufferLen)
 {
     Q_D(SslSocket);
-    if (d->shutdown)
-    {
-        SystemError::setLastErrorCode(SystemError::notConnected);
-        return -1;
-    }
-
     unsigned int timeout = 0;
-    if (d->nonBlockingMode) //< Emulate non-blocking mode by vary small timeout.
+    if (d->nonBlockingMode) //< Emulate non-blocking mode by a very small timeout.
     {
         if (!d->wrappedSocket->getSendTimeout(&timeout))
             return -1;
@@ -1323,6 +1317,12 @@ int SslSocket::send(const void* buffer, unsigned int bufferLen)
         return -1;
     }
 
+    if (d->shutdown)
+    {
+        SystemError::setLastErrorCode(SystemError::notConnected);
+        return -1;
+    }
+
     nx::Buffer localBuffer(static_cast<const char*>(buffer), bufferLen);
     sendAsync(
         localBuffer,
@@ -1338,7 +1338,7 @@ int SslSocket::send(const void* buffer, unsigned int bufferLen)
 
     auto result = promise.get_future().get();
 
-    if (d->nonBlockingMode) //< Emulate non-blocking mode by vary small timeout.
+    if (d->nonBlockingMode) //< Emulate non-blocking mode by a very small timeout.
     {
         if (!d->wrappedSocket->setSendTimeout(timeout))
             return -1;
@@ -1657,6 +1657,49 @@ MixedSslSocket::MixedSslSocket(AbstractStreamSocket* wrappedSocket)
         d->ssl.get(), d->wrappedSocket));
 }
 
+int MixedSslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
+{
+    Q_D(MixedSslSocket);
+    auto helper = static_cast<MixedSslAsyncBioHelper*>(d->asyncSslHelper.get());
+    if (helper->is_initialized() && !helper->is_ssl())
+    {
+        if (!updateInternalBlockingMode())
+            return -1;
+
+        return d->wrappedSocket->recv(buffer, bufferLen, flags);
+    }
+
+    return SslSocket::recv(buffer, bufferLen, flags);
+}
+
+int MixedSslSocket::send(const void* buffer, unsigned int bufferLen)
+{
+    Q_D(MixedSslSocket);
+    auto helper = static_cast<MixedSslAsyncBioHelper*>(d->asyncSslHelper.get());
+    if (helper->is_initialized() && !helper->is_ssl())
+    {
+        if (!updateInternalBlockingMode())
+            return -1;
+
+        return d->wrappedSocket->send(buffer, bufferLen);
+    }
+
+    return SslSocket::send(buffer, bufferLen);
+}
+
+bool MixedSslSocket::setNonBlockingMode(bool val)
+{
+    Q_D(MixedSslSocket);
+    if (!SslSocket::setNonBlockingMode(val))
+        return false;
+
+    auto helper = static_cast<MixedSslAsyncBioHelper*>(d->asyncSslHelper.get());
+    if (helper->is_initialized() && !helper->is_ssl())
+        return updateInternalBlockingMode();
+
+    return true;
+}
+
 void MixedSslSocket::cancelIOAsync(
     nx::network::aio::EventType eventType,
     nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler)
@@ -1758,6 +1801,22 @@ void MixedSslSocket::sendAsync(
         });
 }
 
+bool MixedSslSocket::updateInternalBlockingMode()
+{
+    Q_D(MixedSslSocket);
+    bool nonBlockingMode;
+    if (!d->wrappedSocket->getNonBlockingMode(&nonBlockingMode))
+        return false;
+
+    if (d->nonBlockingMode != nonBlockingMode)
+    {
+        if (!d->wrappedSocket->setNonBlockingMode(d->nonBlockingMode))
+            return false;
+    }
+
+    return true;
+}
+
 SslServerSocket::SslServerSocket(
     AbstractStreamServerSocket* delegateSocket,
     bool allowNonSecureConnect)
@@ -1788,6 +1847,11 @@ AbstractStreamSocket* SslServerSocket::accept()
 void SslServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 {
     return m_delegateSocket->pleaseStop(std::move(handler));
+}
+
+void SslServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
+{
+    return m_delegateSocket->pleaseStopSync(assertIfCalledUnderLock);
 }
 
 void SslServerSocket::acceptAsync(

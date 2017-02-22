@@ -446,14 +446,9 @@ void QnResource::removeFlags(Qn::ResourceFlags flags)
     emit flagsChanged(toSharedPointer(this));
 }
 
-QString QnResource::toString() const
-{
-    return getName() + QLatin1String("  ") + getUniqueId();
-}
-
 QString QnResource::toSearchString() const
 {
-    return toString();
+    return getId().toSimpleString() + L' ' + getName();
 }
 
 QnResourcePtr QnResource::getParentResource() const

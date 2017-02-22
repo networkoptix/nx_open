@@ -32,7 +32,8 @@ QString htmlFormattedParagraph(const QString &text
     , bool isBold = false
     , bool isItalic = false);
 
-QString makeHref(const QString &text, const QUrl &url);
+QString makeHref(const QString& text, const QUrl& url);
+QString makeHref(const QString& text, const QString& link);
 
 QString escapeHtml(const QString& input);
 

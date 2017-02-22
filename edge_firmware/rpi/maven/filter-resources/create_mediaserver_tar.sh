@@ -88,10 +88,16 @@ libnx_network \
 libnx_streaming \
 libnx_utils \
 libpostproc \
-libudt \
-libGLESv2 \
-libMali \
-libUMP )
+libudt )
+
+if [[ "${box}" == "bpi" || "${box}" == "bananapi" ]]; then
+    LIBS_TO_COPY+=(
+    # Put non-raspberry pi (bananapi, nx1) specific server libs here    
+        libGLESv2 \
+        libMali \
+        libUMP    
+    )
+fi
 
 # Additional libs for nx1
 if [[ "${box}" == "bpi" ]]; then

@@ -1371,19 +1371,21 @@ void QnPlOnvifResource::setTimeDrift(int value)
     m_timeDriftTimer.restart();
 }
 
-void QnPlOnvifResource::calcTimeDrift() const
+void QnPlOnvifResource::calcTimeDrift(int* outSoapRes) const
 {
-    m_timeDrift = calcTimeDrift(getDeviceOnvifUrl());
+    m_timeDrift = calcTimeDrift(getDeviceOnvifUrl(), outSoapRes);
     m_timeDriftTimer.restart();
 }
 
-int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl)
+int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl, int* outSoapRes)
 {
     DeviceSoapWrapper soapWrapper(deviceUrl.toStdString(), QString(), QString(), 0);
 
     _onvifDevice__GetSystemDateAndTime request;
     _onvifDevice__GetSystemDateAndTimeResponse response;
     int soapRes = soapWrapper.GetSystemDateAndTime(request, response);
+    if (outSoapRes)
+        *outSoapRes = soapRes;
 
     if (soapRes == SOAP_OK && response.SystemDateAndTime && response.SystemDateAndTime->UTCDateTime)
     {
@@ -2592,7 +2594,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
     for (uint i = 0; i < response.Configurations.size(); ++i)
     {
         onvifXsd__VideoSourceConfiguration* conf = response.Configurations.at(i);
-        if (!conf || conf->SourceToken != srcToken)
+        if (!conf || conf->SourceToken != srcToken || !(conf->Bounds))
             continue;
 
         {
@@ -2838,7 +2840,7 @@ bool QnPlOnvifResource::loadXmlParametersInternal(QnCameraAdvancedParams &params
     {
         NX_LOG(lit("Error while parsing xml (onvif) %1").arg(paramsTemplateFileName), cl_logWARNING);
     }
-    
+
 
     return result;
 }
@@ -3478,10 +3480,16 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     }
     _onvifEvents__PullMessagesResponse response;
 
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    const bool useHttpReader = resData.value<bool>(
+        Qn::PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER,
+        false);
+
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> asyncPullMessagesCallWrapper(
         new GSoapAsyncPullMessagesCallWrapper(
             std::move(soapWrapper),
-            &PullPointSubscriptionWrapper::pullMessages ),
+            &PullPointSubscriptionWrapper::pullMessages,
+            useHttpReader),
         [memToFreeOnResponseDone](GSoapAsyncPullMessagesCallWrapper* ptr){
             for( void* pObj: memToFreeOnResponseDone )
                 ::free( pObj );

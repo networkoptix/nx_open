@@ -94,10 +94,10 @@
         "_": "Globals settings. These ones will go away in one of the future versions.",
 
         "frameColor":               "QColor(128, 128, 128, 196)",
-        "businessRuleDisabledHighlightColor": "QColor(64, 64, 64)",
-        "businessRuleInvalidBackgroundColor": "QColor(150, 0, 0)",
-        "businessRuleInvalidColumnBackgroundColor": "QColor(204, 0, 0)",
-        "businessRuleInvalidHighlightColor": "brand_core",
+        "businessRuleInvalidBackgroundColor": "red_core.setAlpha(77)",
+        "businessRuleInvalidColumnBackgroundColor": "red_core.setAlpha(77)",
+        "businessRuleDisabledHighlightColor": "brand_core.setAlpha(77)",
+        "businessRuleInvalidHighlightColor": "brand_core.setAlpha(77)",
         "errorTextColor": "red_l2",
         "warningTextColor": "yellow_core",
         "successTextColor": "green_l2",
@@ -212,21 +212,21 @@
         "palette": {
             "default": {
                 "base":             "transparent",
-                "midlight":         "dark10.setAlpha(102)",
+                "midlight":         "dark12.setAlpha(102)",
                 "highlight":        "brand_core.setAlpha(77)",
                 "text":             "light10",
                 "highlightedText":  "light4"
             },
             "disabled": {
                 "base":             "transparent",
-                "midlight":         "dark10.setAlpha(102)",
+                "midlight":         "dark12.setAlpha(102)",
                 "highlight":        "brand_core.setAlpha(77)",
                 "text":             "light10.setAlpha(77)",
                 "highlightedText":  "light4.setAlpha(77)"
             },
             "inactive": {
                 "base":             "transparent",
-                "midlight":         "dark10.setAlpha(102)",
+                "midlight":         "dark12.setAlpha(102)",
                 "highlight":        "brand_core.setAlpha(77)",
                 "text":             "light10",
                 "highlightedText":  "light4"

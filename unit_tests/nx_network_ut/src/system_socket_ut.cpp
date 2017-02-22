@@ -8,6 +8,7 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 
+#include "common_server_socket_ut.h"
 
 namespace nx {
 namespace network {
@@ -30,15 +31,15 @@ TEST( TcpSocket, KeepAliveOptions )
     #if defined( Q_OS_LINUX )
         EXPECT_EQ( result->time.count(), 5 );
         EXPECT_EQ( result->interval.count(), 1 );
-        EXPECT_EQ( result->probeCount, 3 );
+        EXPECT_EQ( result->probeCount, 3U );
     #elif defined( Q_OS_WIN )
         EXPECT_EQ( result->time.count(), 5 );
         EXPECT_EQ( result->interval.count(), 1 );
-        EXPECT_EQ( result->probeCount, 0 ); // means default
+        EXPECT_EQ( result->probeCount, 0U ); // means default
     #elif defined( Q_OS_MACX )
         EXPECT_EQ( result->time.count(), 5 );
         EXPECT_EQ( result->interval.count(), 0 ); // means default
-        EXPECT_EQ( result->probeCount, 0 ); // means default
+        EXPECT_EQ( result->probeCount, 0U ); // means default
     #endif
 
     // Disable
@@ -140,17 +141,19 @@ NX_NETWORK_BOTH_SOCKET_TEST_CASE(
     [](){ return std::make_unique<TCPServerSocket>(AF_INET6); },
     [](){ return std::make_unique<TCPSocket>(AF_INET6); })
 
-// TODO: Figure out why it does not work for any local address:
-NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE(
+// NOTE: Currenly IP v4 address 127.0.0.1 is represented as ::1 IP v6 address, which is not true.
+// TODO: Enable these tests when IP v6 is properly supported.
+NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE(
     TEST, DISABLED_TcpSocketV4to6,
     [](){ return std::make_unique<TCPServerSocket>(AF_INET6); },
     [](){ return std::make_unique<TCPSocket>(AF_INET); })
 
-// TODO: Figure out why it does not work for any local address:
-NX_NETWORK_TRANSMIT_SOCKET_TESTS_CASE(
+NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE(
     TEST, DISABLED_TcpSocketV6to4,
     [](){ return std::make_unique<TCPServerSocket>(AF_INET); },
     [](){ return std::make_unique<TCPSocket>(AF_INET6); })
+
+INSTANTIATE_TYPED_TEST_CASE_P(TCPServerSocket, ServerSocketTest, TCPServerSocket);
 
 }   //test
 }   //network

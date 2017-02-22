@@ -63,6 +63,7 @@ public:
 
 private:
     void writeInfoIfNeeded(const QString& infoFilePath, const QByteArray& infoFileData);
+    bool isWriteNeeded(const QString& infoFilePath, const QByteArray& infoFileData) const;
     static QString makeFullPath(
         const QString& storageUrl,
         QnServer::ChunksCatalog catalog,
@@ -169,16 +170,15 @@ class Reader
     };
 
 public:
-    Reader(ReaderHandler* readerHandler);
+    Reader(ReaderHandler* readerHandler,
+           const QnAbstractStorageResource::FileInfo& fileInfo,
+           std::function<QByteArray(const QString&)> getFileDataFunc);
 
-    void loadCameraInfo(
-        const QnAbstractStorageResource::FileInfo &fileInfo,
-        ArchiveCameraDataList &archiveCameraList,
-        std::function<QByteArray(const QString&)> getFileDataFunc);
+    void operator()(ArchiveCameraDataList* outArchiveCameraList);
 
 private:
     bool initArchiveCamData();
-    bool cameraAlreadyExists() const;
+    bool cameraAlreadyExists(const ArchiveCameraDataList* camerasList) const;
     bool readFileData();
     bool parseData();
     ParseResult parseLine(const QString& line) const;
@@ -189,7 +189,6 @@ private:
     ReaderHandler* m_handler;
     mutable ReaderErrorInfo m_lastError;
     ArchiveCameraData m_archiveCamData;
-    ArchiveCameraDataList* m_archiveCamList;
     QByteArray m_fileData;
     const QnAbstractStorageResource::FileInfo* m_fileInfo;
     std::function<QByteArray(const QString&)> m_getDataFunc;

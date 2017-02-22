@@ -34,7 +34,7 @@ public:
             [](nx_http::HttpServerConnection* connection)
             {
                 auto socket = connection->takeSocket();
-                std::thread serverThread(
+                nx::utils::thread serverThread(
                     [sock = std::move(socket)]()
                     {
                         int result = 0;

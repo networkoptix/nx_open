@@ -81,6 +81,18 @@ const auto kHtmlLabelUserFormat = lit("<center><span style='font-weight: 500'>%1
 
 const QSize kMaxThumbnailSize(224, 184);
 
+static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* item)
+{
+    if (!item)
+        return;
+
+    const auto resource = qnResPool->getResourceByUniqueId(item->resourceUid());
+    if (!resource)
+        return;
+
+    tree->update(resource);
+}
+
 } // namespace
 
 // -------------------------------------------------------------------------- //
@@ -281,8 +293,10 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
         this, &QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged);
     *m_disconnectHelper << connect(workbench(), &QnWorkbench::currentLayoutChanged,
         this, &QnResourceBrowserWidget::at_workbench_currentLayoutChanged);
+    *m_disconnectHelper << connect(workbench(), &QnWorkbench::itemAboutToBeChanged,
+        this, &QnResourceBrowserWidget::at_workbench_itemChange);
     *m_disconnectHelper << connect(workbench(), &QnWorkbench::itemChanged,
-        this, &QnResourceBrowserWidget::at_workbench_itemChanged);
+        this, &QnResourceBrowserWidget::at_workbench_itemChange);
 
     *m_disconnectHelper << connect(accessController(),
         &QnWorkbenchAccessController::globalPermissionsChanged,
@@ -782,6 +796,11 @@ void QnResourceBrowserWidget::showToolTip()
     animator->animateTo(1.0);
 }
 
+void QnResourceBrowserWidget::clearSelection()
+{
+    currentSelectionModel()->clear();
+}
+
 void QnResourceBrowserWidget::updateIcons()
 {
     QnResourceItemDelegate::Options opts = QnResourceItemDelegate::RecordingIcons;
@@ -932,25 +951,22 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutChanged()
     connect(layout, SIGNAL(itemRemoved(QnWorkbenchItem*)), this, SLOT(at_layout_itemRemoved(QnWorkbenchItem*)));
 }
 
-void QnResourceBrowserWidget::at_workbench_itemChanged(Qn::ItemRole /*role*/)
+void QnResourceBrowserWidget::at_workbench_itemChange(Qn::ItemRole role)
 {
     /* Raised state has changed. */
-    if (ui->tabWidget->currentWidget() == ui->resourcesTab)
-        ui->resourceTreeWidget->update();
-    else
-        ui->searchTreeWidget->update();
+    updateTreeItem(currentTreeWidget(), workbench()->item(role));
 }
 
-void QnResourceBrowserWidget::at_layout_itemAdded(QnWorkbenchItem*)
+void QnResourceBrowserWidget::at_layout_itemAdded(QnWorkbenchItem* item)
 {
     /* Bold state has changed. */
-    currentTreeWidget()->update();
+    updateTreeItem(currentTreeWidget(), item);
 }
 
-void QnResourceBrowserWidget::at_layout_itemRemoved(QnWorkbenchItem*)
+void QnResourceBrowserWidget::at_layout_itemRemoved(QnWorkbenchItem* item)
 {
     /* Bold state has changed. */
-    currentTreeWidget()->update();
+    updateTreeItem(currentTreeWidget(), item);
 }
 
 void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index)

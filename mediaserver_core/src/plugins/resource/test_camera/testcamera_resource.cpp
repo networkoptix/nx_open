@@ -3,9 +3,6 @@
 #include "testcamera_resource.h"
 #include "testcamera_stream_reader.h"
 
-
-const QString QnTestCameraResource::MANUFACTURE(lit("NetworkOptix"));
-
 QnTestCameraResource::QnTestCameraResource()
 {
 }
@@ -17,7 +14,7 @@ int QnTestCameraResource::getMaxFps() const
 
 QString QnTestCameraResource::getDriverName() const
 {
-    return MANUFACTURE;
+    return QLatin1String(kManufacturer);
 }
 
 void QnTestCameraResource::setIframeDistance(int /*frames*/, int /*timems*/)

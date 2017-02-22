@@ -182,7 +182,6 @@ public:
 
     //!Returns handle for PollSet
     virtual nx::network::Pollable* pollable() = 0;
-    const nx::network::Pollable* pollable() const { return const_cast<AbstractSocket*>(this)->pollable(); }
 
     //!Call \a handler from within aio thread \a sock is bound to
     /*!

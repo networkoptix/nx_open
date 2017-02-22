@@ -128,6 +128,11 @@ QtObject
                 readonly property color link: context.getPaletteColor("blue", 2);
                 readonly property color linkHovered: context.getPaletteColor("blue", 4);
             }
+
+            property QtObject titleBar: QtObject
+            {
+                readonly property color shadow: colorWithAlpha(getPaletteColor("dark", 0), 0.15);
+            }
         }
     }
 

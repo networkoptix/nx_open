@@ -1,4 +1,5 @@
 import QtQuick 2.6;
+import Nx 1.0;
 import Nx.Models 1.0;
 
 import "."
@@ -24,8 +25,6 @@ BaseTile
     // TODO: #ynikitenkov Will be available in 3.1, remove property and related code.
     readonly property bool offlineCloudConnectionsDisabled: true;
 
-    onSystemIdChanged: { forceCollapsedState(); }
-
     isConnecting: ((control.systemId == context.connectingToSystem)
         && context.connectingToSystem.length && !impl.isFactoryTile);
 
@@ -34,7 +33,7 @@ BaseTile
         if (impl.isFactoryTile)
             return true;
 
-        if (wrongVersion.length || !isCompatibleInternal)
+        if (wrongVersion || !isCompatibleInternal)
             return false;
 
 
@@ -75,7 +74,7 @@ BaseTile
             if (control.impl.isFactoryTile)
                 return false;    //< We don't have indicator for new systems
 
-            return (wrongVersion.length || compatibleVersion.length
+            return (wrongVersion || compatibleVersion
                 || !control.isConnectable || !isCompatibleInternal);
         }
 
@@ -83,10 +82,10 @@ BaseTile
         {
             if (!isCompatibleInternal)
                 return qsTr("INCOMPATIBLE");
-            if (wrongVersion.length)
-                return wrongVersion;
-            if (compatibleVersion.length)
-                return compatibleVersion;
+            if (wrongVersion)
+                return wrongVersion.toString(SoftwareVersion.BugfixFormat);
+            if (compatibleVersion)
+                return compatibleVersion.toString(SoftwareVersion.BugfixFormat);
             if (!control.isRunning)
                 return qsTr("OFFLINE");
             if (!control.isReachable)
@@ -97,20 +96,17 @@ BaseTile
 
         textColor:
         {
-           if (wrongVersion.length ||
-                compatibleVersion.length || !isCompatibleInternal)
-           {
+           if (wrongVersion || compatibleVersion || !isCompatibleInternal)
                return Style.colors.shadow;
-           }
            else
                return Style.colors.windowText;
         }
 
         color:
         {
-            if (wrongVersion.length || !isCompatibleInternal)
+            if (wrongVersion || !isCompatibleInternal)
                 return Style.colors.red_main;
-            else if (compatibleVersion.length)
+            else if (compatibleVersion)
                 return Style.colors.yellow_main;
             else
                 return Style.colors.custom.systemTile.offlineIndicatorBkg;

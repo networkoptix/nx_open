@@ -4,6 +4,9 @@ namespace nx {
 namespace hpm {
 namespace api {
 
+/**
+ * Indicates cloud connect supported features by peer.
+ */
 enum class CloudConnectVersion
 {
     /** Used when cloudConnectionVersion attribute is missing in message */

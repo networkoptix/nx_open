@@ -365,11 +365,11 @@ void QnServerUpdatesWidget::updateDownloadButton()
         && !m_latestVersion.isNull()
         && m_updatesModel->lowestInstalledVersion() >= m_latestVersion;
 
-    bool showButton = m_mode == QnServerUpdatesWidget::Mode::LatestVersion
+    bool showButton = m_mode != QnServerUpdatesWidget::Mode::LocalFile
         && !hasLatestVersion;
 
     ui->downloadButton->setVisible(showButton);
-    ui->downloadButton->setText(ui->targetVersionLabel->text() == kNoVersionNumberText
+    ui->downloadButton->setText(m_mode == Mode::LatestVersion
         ? tr("Download the Latest Version Update File")
         : tr("Download Update File"));
 }
@@ -453,8 +453,8 @@ void QnServerUpdatesWidget::discardChanges()
     else
     {
         QnMessageBox::warning(this,
-            tr("Update can't be canceled at this stage"),
-            tr("Please wait until it's finished."));
+            tr("Update cannot be canceled at this stage"),
+            tr("Please wait until it is finished."));
     }
 }
 
@@ -558,7 +558,8 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
             break;
 
         case QnCheckForUpdateResult::InternetProblem:
-            versionText = kNoVersionNumberText;
+            if (m_mode == Mode::LatestVersion)
+                versionText = kNoVersionNumberText;
             detail = tr("Unable to check updates on the Internet.");
             break;
 
@@ -789,7 +790,7 @@ void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& l
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 
-    dialog.addCustomWidget(new QnResourceListView(failedServers, true));
+    dialog.addCustomWidget(new QnResourceListView(failedServers, false, &dialog));
     dialog.addButton(tr("Force Update"), QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
 
     const auto result = dialog.exec();

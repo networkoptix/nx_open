@@ -249,7 +249,10 @@ nx::hpm::api::ResultCode MediaServerEmulator::updateTcpAddresses(
     utils::promise<nx::hpm::api::ResultCode> promise;
     m_mediatorAddressPublisher->updateAddresses(
         std::move(addresses),
-        [&promise](nx::hpm::api::ResultCode success) { promise.set_value(success); });
+        [&promise](nx::hpm::api::ResultCode resultCode)
+        {
+            promise.set_value(resultCode);
+        });
 
     return promise.get_future().get();
 }

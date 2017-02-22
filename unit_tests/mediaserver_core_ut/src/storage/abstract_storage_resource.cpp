@@ -89,7 +89,7 @@ protected:
         fileDeletor = std::unique_ptr<QnFileDeletor>(new QnFileDeletor);
         pluginManager = std::unique_ptr<PluginManager>( new PluginManager);
 
-        platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction);
+        platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
 
         QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnFileStorageResource::instance, true);
         PluginManager::instance()->loadPlugins(MSSettings::roSettings());
@@ -438,10 +438,10 @@ private:
 
 class MockStorageResource1 : public AbstractMockStorageResource {
 public:
-	MockStorageResource1() : AbstractMockStorageResource((qint64)10 * 1024 * 1024 * 1024) {}
+	MockStorageResource1() : AbstractMockStorageResource((qint64)3 * 1024 * 1024 * 1024 * 1024) {}
 
     virtual qint64 getTotalSpace() const override {
-        return (qint64)10 * 1024 * 1024 * 1024;
+        return (qint64)3 * 1024 * 1024 * 1024 * 1024;
     }
 
     virtual qint64 getFreeSpace() override {
@@ -451,10 +451,10 @@ public:
 
 class MockStorageResource2 : public AbstractMockStorageResource {
 public:
-	MockStorageResource2() : AbstractMockStorageResource((qint64)20 * 1024 * 1024 * 1024) {}
+	MockStorageResource2() : AbstractMockStorageResource((qint64)3 * 1024 * 1024 * 1024 * 1024) {}
 
     virtual qint64 getTotalSpace() const override {
-        return (qint64)20 * 1024 * 1024 * 1024;
+        return (qint64)3 * 1024 * 1024 * 1024 * 1024;
     }
 
     virtual qint64 getFreeSpace() override {
@@ -464,10 +464,10 @@ public:
 
 class MockStorageResource3 : public AbstractMockStorageResource {
 public:
-	MockStorageResource3() : AbstractMockStorageResource((qint64)30 * 1024 * 1024 * 1024) {}
+	MockStorageResource3() : AbstractMockStorageResource((qint64)3 * 1024 * 1024 * 1024 * 1024) {}
 
     virtual qint64 getTotalSpace() const override {
-        return (qint64)30 * 1024 * 1024 * 1024;
+        return (qint64)3 * 1024 * 1024 * 1024 * 1024;
     }
 
     virtual qint64 getFreeSpace() override {
@@ -502,6 +502,113 @@ struct OccupiedSpaceAccess
 		return storageManager->getSpaceInfoUsageCoeff(storageIndex);
 	}
 };
+
+struct StorageUseStats
+{
+    int selected;
+    qint64 written;
+    int selectInARowOverflow;
+    StorageUseStats() : 
+        selected(0), 
+        written(0),
+        selectInARowOverflow(0) {}
+};
+
+using StorageUseStatsMap = std::unordered_map<int, StorageUseStats>;
+
+const char* filler()
+{
+    return "\t\t\t\t";
+}
+
+void printStorageUseStatsHeader(int storagesCount,
+                                int recordersCount,
+                                int writtenBlock,
+                                int totalWrites,
+                                int overflowLimit)
+{
+    printf("\n\n%sStorage selection algorithms test\n\n", filler());
+    printf("Storages count:                     %d\n", storagesCount);
+    printf("Write block size:                   %d\n", writtenBlock);
+    printf("Parallel recorders count:           %d\n", recordersCount);
+    printf("Total writes:                       %d\n", totalWrites);
+    printf("Select same storage in a row limit: %d\n", overflowLimit);
+    printf("\n");
+}
+
+class StorageUseStatsPrinter {
+public:
+    StorageUseStatsPrinter(const StorageUseStatsMap& statsMap, 
+                           int recordersCount,
+                           int writtenBlock,
+                           int totalWrites,
+                           int overflowLimit) :
+        m_statsMap(statsMap)
+    {
+        printStorageUseStatsHeader(m_statsMap.size(),
+                                   recordersCount,
+                                   writtenBlock,
+                                   totalWrites,
+                                   overflowLimit);
+    }
+
+    void operator()() const
+    {
+        printTableHeader();
+        printStoragesStats();
+    }
+
+private:
+    void printTableHeader() const
+    {
+        for (const auto& statEntry: m_statsMap)
+            printf("Storage %d%s", statEntry.first, filler());
+
+        printf("\n");
+    }    
+
+    void printStoragesStats() const
+    {
+        printSelected();
+        printWritten();
+        printOverflow();
+    }
+
+    void printSelected() const
+    {
+        forEachStatsEntry([this] (const StorageUseStats& stats) {
+            printf("Selected: %d%s", stats.selected, "\t\t\t");
+        });
+        printf("\n");
+    }
+
+    void printWritten() const
+    {
+        forEachStatsEntry([this] (const StorageUseStats& stats) {
+            printf("Bytes written: %lld%s", stats.written, "\t\t");
+        });
+        printf("\n");
+    }
+
+    void printOverflow() const
+    {
+        forEachStatsEntry([this] (const StorageUseStats& stats) {
+            printf("Overflows: %d%s", stats.selectInARowOverflow, filler());
+        });
+        printf("\n");
+    }
+
+    template<typename F>
+    void forEachStatsEntry(F f) const
+    {
+        for (const auto& entryPair: m_statsMap)
+            f(entryPair.second);
+    }
+
+private:
+    const StorageUseStatsMap& m_statsMap;
+};
+
 
 TEST(Storage_load_balancing_algorithm_test, Main)
 {
@@ -571,28 +678,23 @@ TEST(Storage_load_balancing_algorithm_test, Main)
 
     QnUuid currentStorageId;
 
-    const int kMaxStorageUseInARow = 15;
+    const int kMaxStorageUseInARow = 5;
     const int kMaxUseInARowOverflowCount = 5;
-    const int kWriteCount = 500;
+    const int kWriteCount = 2 * 100;
 	const int kWrittenBlock = 10 * 1024;
 	const size_t kRecordersCount = 10;
 
-	struct StorageUseStats
-	{
-		int selected;
-		qint64 written;
-		StorageUseStats() : selected(0), written(0) {}
-	};
-
     int currentStorageUseCount = 0;
     int useInARowOverflowCount = 0;
+    int totalWrites = 0;
+
 	std::unordered_map<int, StorageUseStats> storagesUsageData;
 	std::mutex testMutex;
-	std::vector<std::thread> recorders;
+	std::vector<nx::utils::thread> recorders;
 
 	for (size_t i = 0; i < kRecordersCount; ++i)
 	{
-		recorders.emplace_back(std::thread(
+		recorders.emplace_back(nx::utils::thread(
 		[&]
 		{
 			for (int i = 0; i < kWriteCount; ++i)
@@ -603,6 +705,7 @@ TEST(Storage_load_balancing_algorithm_test, Main)
 				OccupiedSpaceAccess::addSpaceInfoOccupiedValue(qnNormalStorageMan, storageIndex, kWrittenBlock);
 
 				std::lock_guard<std::mutex> lock(testMutex);
+                ++totalWrites;
 				++storagesUsageData[storageIndex].selected;
 				storagesUsageData[storageIndex].written += kWrittenBlock;
 
@@ -610,7 +713,10 @@ TEST(Storage_load_balancing_algorithm_test, Main)
 				{
 					currentStorageId = storage->getId();
 					if (currentStorageUseCount > kMaxStorageUseInARow)
+                    {
 						++useInARowOverflowCount;
+                        ++storagesUsageData[storageIndex].selectInARowOverflow;
+                    }
 					currentStorageUseCount = 0;
 				}
 				else
@@ -625,28 +731,19 @@ TEST(Storage_load_balancing_algorithm_test, Main)
 		if (t.joinable())
 			t.join();
 
+    StorageUseStatsPrinter(storagesUsageData, 
+                           kRecordersCount, 
+                           kWrittenBlock, 
+                           totalWrites,
+                           kMaxStorageUseInARow)();
+
     /*  Actually, due to probabilistic nature of selecting storage algorithm
     *   some storage may be selected more than kMaxStorageUseIARow times.
     *   Let's at least check that such peaks are not too often.
     *   kMaxUseInARowOverflowCount peak breaches on 1 * 1000 * 100 selections seem fair enough.
     */
     ASSERT_TRUE(useInARowOverflowCount < kMaxUseInARowOverflowCount);
-
-	/*	Storages are of 10, 20, and 30 gb size accordingly.
-	*	So we should've recorded on the second storage twice as much as on the first
-	*	and on the third - roughly the same amount as the first + the second.
-	*
-	*	As for deltas.
-	*	Total recorded size is 100'000 * 10240 bytes ~= 980 mb.
-	*	Hence roughly we should have in the end:
-	*		- 1st - 170mb
-	*		- 2nd - 330mb
-	*		- 3rd - 500mb
-	*	Hence, a fair delta amount would be around dozen(s) of megabytes.
-	*	Let it be 10mb in the first check and 20mb in the second check.
-	*/
-	ASSERT_TRUE(std::abs(storagesUsageData[0].written*2 - storagesUsageData[1].written) <= 10 * 1024 * 1024);
-	ASSERT_TRUE(std::abs(storagesUsageData[0].written +
-						 storagesUsageData[1].written -
-						 storagesUsageData[2].written) <= 20 * 1024 * 1024);
+    ASSERT_EQ(totalWrites, 2000);
+    for (int i = 0; i < 3; ++i)
+        ASSERT_LE(qAbs((double)storagesUsageData[i].selected / totalWrites - 0.3), 0.09);
 }

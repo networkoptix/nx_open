@@ -19,6 +19,8 @@ Pane
     property alias ownerDescription: informationBlock.ownerDescription
     property alias invalidVersion: informationBlock.invalidVersion
 
+    readonly property string kMinimimVersion: "1.3.1"
+
     padding: 0
 
     implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
@@ -95,6 +97,15 @@ Pane
     {
         if (!compatible)
         {
+            if (Nx.softwareVersion(invalidVersion).isLessThan(Nx.softwareVersion(kMinimimVersion))
+                || applicationInfo.oldMobileClientUrl() == "")
+            {
+                Workflow.openStandardDialog("",
+                    qsTr("This server has too old version. "
+                        + "Please update it to the latest version."))
+                return
+            }
+
             Workflow.openOldClientDownloadSuggestion()
             return
         }
@@ -103,10 +114,15 @@ Pane
         {
             if (!hostsModel.isEmpty)
             {
-                connectionManager.connectToServer(
+                if (!connectionManager.connectToServer(
                     hostsModel.firstHost,
                     cloudStatusWatcher.credentials.user,
-                    cloudStatusWatcher.credentials.password)
+                    cloudStatusWatcher.credentials.password))
+                {
+                    sessionsScreen.openConnectionWarningDialog(systemName)
+                    return
+                }
+
                 Workflow.openResourcesScreen(systemName)
             }
         }
@@ -114,10 +130,15 @@ Pane
         {
             if (authenticationDataModel.hasStoredPassword)
             {
-                connectionManager.connectToServer(
+                if (!connectionManager.connectToServer(
                     hostsModel.firstHost,
                     authenticationDataModel.defaultCredentials.user,
-                    authenticationDataModel.defaultCredentials.password)
+                    authenticationDataModel.defaultCredentials.password))
+                {
+                    sessionsScreen.openConnectionWarningDialog(systemName)
+                    return
+                }
+
                 Workflow.openResourcesScreen(systemName)
             }
             else

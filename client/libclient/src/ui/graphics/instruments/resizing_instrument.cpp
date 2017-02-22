@@ -1,6 +1,8 @@
 #include "resizing_instrument.h"
 
 #include <QtWidgets/QGraphicsWidget>
+#include <QtCore/QtMath>
+
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/frame_section_queryable.h>
 #include <ui/common/cursor_cache.h>
@@ -205,17 +207,21 @@ bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
     if (!widget || section == Qt::NoSection)
         return false;
 
-    const auto cursorShape = Qn::calculateHoverCursorShape(section);
-    if (cursorShape == widget->cursor().shape() && cursorShape != Qt::BitmapCursor)
+    if (widget->cursor().shape() == Qn::calculateHoverCursorShape(section))
         return false;
 
     /* Note that rotation is estimated using a very simple method here.
      * A better way would be to calculate local rotation at cursor position,
      * but currently there is not need for such precision. */
     const auto rect = widget->rect();
-    const auto rotation = QnGeometry::atan2(
-        widget->mapToScene(rect.topRight()) - widget->mapToScene(rect.topLeft())) * 180.0 / M_PI;
-    const auto cursor = QnCursorCache::instance()->cursor(cursorShape, rotation, 5.0);
+    auto rotation = qRadiansToDegrees(QnGeometry::atan2(
+        widget->mapToScene(rect.topRight()) - widget->mapToScene(rect.topLeft())));
+    if (section == Qt::TitleBarArea)
+    {
+        // We don't want rotated Arrow cursor.
+        rotation = 0;
+    }
+    const auto cursor = QnCursorCache::instance()->cursorForWindowSection(section, rotation, 5.0);
 
     const auto newAffected = getAffectedWidgets(viewport, correctedPos);
     const auto lostWidgets = subtractWidgets(m_affectedWidgets, newAffected);

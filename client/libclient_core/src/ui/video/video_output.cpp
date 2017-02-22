@@ -190,6 +190,13 @@ void QnVideoOutput::updateNativeSize()
     d->updateNativeSize();
 }
 
+Q_INVOKABLE void QnVideoOutput::clear()
+{
+    Q_D(QnVideoOutput);
+    if (d->backend)
+        d->backend->present(QVideoFrame());
+}
+
 QRectF QnVideoOutput::sourceRect() const
 {
     Q_D(const QnVideoOutput);

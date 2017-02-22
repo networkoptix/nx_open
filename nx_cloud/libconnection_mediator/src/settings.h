@@ -8,6 +8,7 @@
 
 #include <QtCore/QUrl> 
 
+#include <nx/network/cloud/cloud_connect_options.h>
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log_initializer.h>
@@ -26,6 +27,7 @@ struct General
 {
     QString systemUserToRunUnder;
     QString dataDir;
+    api::CloudConnectOptions cloudConnectOptions = api::emptyCloudConnectOptions;
 };
 
 struct CloudDB

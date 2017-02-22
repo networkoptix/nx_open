@@ -445,7 +445,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         return result;
 
     if (hasGlobalPermission(subject, Qn::GlobalEditCamerasPermission))
-        result |= Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::WriteNamePermission;
+        result |= Qn::ReadWriteSavePermission | Qn::WriteNamePermission;
 
     return result;
 }
@@ -529,6 +529,11 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     if (!subject.isValid() || !layout)
         return Qn::NoPermissions;
 
+    QnUuid ownerId = layout->getParentId();
+
+    /* Access to videowall layouts. */
+    const auto videowall = qnResPool->getResourceById<QnVideoWallResource>(ownerId);
+
     //TODO: #GDM Code duplication with QnWorkbenchAccessController::calculatePermissionsInternal
     auto checkReadOnly =
         [this](Qn::Permissions permissions)
@@ -539,11 +544,16 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
         };
 
     auto checkLocked =
-        [this, layout](Qn::Permissions permissions)
+        [this, layout, videowall](const Qn::Permissions permissions)
         {
             if (!layout->locked())
                 return permissions;
-            return permissions& ~(Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission);
+
+            Qn::Permissions forbidden = Qn::AddRemoveItemsPermission | Qn::WriteNamePermission;
+            if (!videowall) // videowall layouts can be removed even when locked
+                forbidden |= Qn::RemovePermission;
+
+            return permissions & ~forbidden;
         };
 
     /* Layouts with desktop cameras are not to be modified but can be removed. */
@@ -568,10 +578,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
             if (subject.user() && subject.user()->isOwner())
                 return Qn::FullLayoutPermissions;
 
-            QnUuid ownerId = layout->getParentId();
 
-            /* Access to videowall layouts. */
-            const auto videowall = qnResPool->getResourceById<QnVideoWallResource>(ownerId);
             if (videowall)
             {
                 /* Videowall layout. */

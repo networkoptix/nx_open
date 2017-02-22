@@ -716,11 +716,11 @@ TEST(MediaDbTest, ReadWrite_MT)
     //write header explicitely
     boost::apply_visitor(RecordWriteVisitor(&dbHelper), tdm.dataVector[0].data);
 
-    std::vector<std::thread> threads;
+    std::vector<nx::utils::thread> threads;
     for (size_t i = 0; i < threadsNum; ++i)
     {
         threads.emplace_back(
-            std::thread([&dbHelper, &tdm, i, recordsCount]
+            nx::utils::thread([&dbHelper, &tdm, i, recordsCount]
                         {
                             size_t j = i * recordsCount + 1;
                             for (; j < (i + 1) * recordsCount + 1; ++j)
@@ -764,7 +764,7 @@ TEST(MediaDbTest, ReadWrite_MT)
     for (size_t i = 0; i < threadsNum; ++i)
     {
             threads.emplace_back(
-                std::thread([&dbHelper, &tdm, i, recordsCount]
+                nx::utils::thread([&dbHelper, &tdm, i, recordsCount]
                             {
                                 size_t j = i * recordsCount + 1;
                                 for (; j < (i + 1) * recordsCount + 1; ++j)
@@ -824,7 +824,7 @@ TEST(MediaDbTest, StorageDB)
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
     }
     commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction);
+    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
 
     std::unique_ptr<QnResourceStatusDictionary> statusDictionary;
     if (!qnStatusDictionary) {
@@ -851,12 +851,12 @@ TEST(MediaDbTest, StorageDB)
     sdb.loadFullFileCatalog();
 
     QnMutex mutex;
-    std::vector<std::thread> threads;
+    std::vector<nx::utils::thread> threads;
     TestChunkManager tcm(128);
 
     auto writerFunc = [&mutex, &sdb, &tcm]
     {
-        for (int i = 0; i < 1000; ++i)
+        for (int i = 0; i < 100; ++i)
         {
             int diceRoll = genRandomNumber<0, 10>();
             switch (diceRoll)
@@ -908,9 +908,9 @@ TEST(MediaDbTest, StorageDB)
     };
 
     for (size_t i = 0; i < 3; ++i)
-        threads.push_back(std::thread(writerFunc));
+        threads.push_back(nx::utils::thread(writerFunc));
 
-    threads.push_back(std::thread(readerFunc));
+    threads.push_back(nx::utils::thread(readerFunc));
 
     for (auto &t : threads)
         t.join();
@@ -975,7 +975,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
                 new QnResourceStatusDictionary);
     }
 
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction);
+    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
     std::unique_ptr<QnResourcePropertyDictionary> propDictionary;
     if (!propertyDictionary) {
         propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(

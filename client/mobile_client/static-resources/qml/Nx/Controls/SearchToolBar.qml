@@ -45,6 +45,9 @@ ToolBarBase
         {
             icon: lp("/images/clear.png")
             onClicked: clear()
+            opacity: searchField.text ? 1.0 : 0.0
+            Behavior on opacity { NumberAnimation { duration: 100 } }
+            alwaysCompleteHighlightAnimation: false
         }
     }
 

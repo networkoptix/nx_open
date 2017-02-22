@@ -425,8 +425,11 @@ template<typename InterfaceToImplement>
 AbstractSocket::SOCKET_HANDLE UdtSocket<InterfaceToImplement>::handle() const
 {
     NX_ASSERT(!isClosed());
-    NX_ASSERT(sizeof(UDTSOCKET) == sizeof(AbstractSocket::SOCKET_HANDLE));
-    return *reinterpret_cast<const AbstractSocket::SOCKET_HANDLE*>(&m_impl->udtHandle);
+    static_assert(
+        sizeof(UDTSOCKET) <= sizeof(AbstractSocket::SOCKET_HANDLE),
+        "One have to fix UdtSocket<InterfaceToImplement>::handle() implementation");
+    //return *reinterpret_cast<const AbstractSocket::SOCKET_HANDLE*>(&m_impl->udtHandle);
+    return static_cast<AbstractSocket::SOCKET_HANDLE>(m_impl->udtHandle);
 }
 
 template<typename InterfaceToImplement>
@@ -882,7 +885,8 @@ UdtStreamServerSocket::UdtStreamServerSocket(int ipVersion):
 
 UdtStreamServerSocket::~UdtStreamServerSocket()
 {
-    m_aioHelper->cancelIOSync();
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
 }
 
 bool UdtStreamServerSocket::listen( int backlog )
@@ -916,6 +920,9 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
         std::pair<SystemError::ErrorCode, AbstractStreamSocket*>
     > acceptedSocketPromise;
 
+    if (!setNonBlockingMode(true))
+        return nullptr;
+
     acceptAsync(
         [this, &acceptedSocketPromise](
             SystemError::ErrorCode errorCode, AbstractStreamSocket* socket)
@@ -930,6 +937,10 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()
         });
 
     auto acceptedSocketPair = acceptedSocketPromise.get_future().get();
+
+    if (!setNonBlockingMode(false))
+        return nullptr;
+
     if (acceptedSocketPair.first != SystemError::noError)
     {
         SystemError::setLastErrorCode(acceptedSocketPair.first);
@@ -943,6 +954,19 @@ void UdtStreamServerSocket::acceptAsync(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> handler)
 {
+    bool nonBlockingMode = false;
+    if (!getNonBlockingMode(&nonBlockingMode))
+    {
+        const auto sysErrorCode = SystemError::getLastOSErrorCode();
+        return post(
+            [handler = std::move(handler), sysErrorCode]() { handler(sysErrorCode, nullptr); });
+    }
+    if (!nonBlockingMode)
+    {
+        return post(
+            [handler = std::move(handler)]() { handler(SystemError::notSupported, nullptr); });
+    }
+
     return m_aioHelper->acceptAsync(
         [handler = std::move(handler)](
             SystemError::ErrorCode errorCode,
@@ -973,14 +997,23 @@ void UdtStreamServerSocket::cancelIOSync()
 }
 
 void UdtStreamServerSocket::pleaseStop(
-    nx::utils::MoveOnlyFunc< void() > handler )
+    nx::utils::MoveOnlyFunc< void() > completionHandler)
 {
-    m_aioHelper->cancelIOAsync( std::move( handler ) );
+    // TODO #ak: Add general implementation to Socket class and remove this method.
+    dispatch(
+        [this, completionHandler = std::move(completionHandler)]()
+        {
+            stopWhileInAioThread();
+            completionHandler();
+        });
 }
 
-void UdtStreamServerSocket::pleaseStopSync(bool /*assertIfCalledUnderLock*/)
+void UdtStreamServerSocket::pleaseStopSync(bool assertIfCalledUnderLock)
 {
-    m_aioHelper->cancelIOSync();
+    if (isInSelfAioThread())
+        stopWhileInAioThread();
+    else
+        QnStoppableAsync::pleaseStopSync(assertIfCalledUnderLock);
 }
 
 AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
@@ -1011,5 +1044,10 @@ AbstractStreamSocket* UdtStreamServerSocket::systemAccept()
     return acceptedSocket;
 }
 
-}   //network
-}   //nx
+void UdtStreamServerSocket::stopWhileInAioThread()
+{
+    m_aioHelper->stopPolling();
+}
+
+} // namespace network
+} // namespace nx

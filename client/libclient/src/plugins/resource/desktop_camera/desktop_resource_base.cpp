@@ -27,11 +27,6 @@ QnUuid QnDesktopResource::getDesktopResourceUuid()
     return kDesktopResourceUuid;
 }
 
-QString QnDesktopResource::toString() const
-{
-    return getUniqueId();
-}
-
 void QnDesktopResource::addConnection(const QnMediaServerResourcePtr &server)
 {
     qDebug() << "Adding connection";

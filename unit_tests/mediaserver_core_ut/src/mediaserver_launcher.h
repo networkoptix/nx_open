@@ -16,13 +16,26 @@ class MediaServerLauncher: public QObject
 {
     Q_OBJECT
 public:
-    MediaServerLauncher(const QString& tmpDir = QString());
+
+    enum class DisabledFeature
+    {
+        none                = 0x00,
+        noResorseDiscovery  = 0x01,
+        noMonitorStatistics = 0x02,
+
+        all = noResorseDiscovery | noMonitorStatistics
+    };
+    Q_DECLARE_FLAGS(DisabledFeatures, DisabledFeature)
+
+    MediaServerLauncher(
+        const QString& tmpDir = QString(),
+        DisabledFeatures disabledFeatures = DisabledFeature::all);
     ~MediaServerLauncher();
 
     SocketAddress endpoint() const;
     int port() const;
 
-    void addSetting(const QString& name, const QString& value);
+    void addSetting(const QString& name, const QVariant& value);
 
     /**
      * Run media server at the current thread

@@ -115,7 +115,7 @@ private:
     template<typename AsyncClientFunc>
         bool doRequest(AsyncClientFunc func);
 
-    private slots:
+private slots:
     void onResponseReceived();
     void onSomeMessageBodyAvailable();
     void onDone();

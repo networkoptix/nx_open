@@ -124,6 +124,7 @@ public:
     void hideToolTip();
     void showToolTip();
 
+    void clearSelection();
 signals:
     void currentTabChanged();
     void selectionChanged();
@@ -171,7 +172,7 @@ private slots:
     void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();
 
-    void at_workbench_itemChanged(Qn::ItemRole role);
+    void at_workbench_itemChange(Qn::ItemRole role);
     void at_layout_itemAdded(QnWorkbenchItem* item);
     void at_layout_itemRemoved(QnWorkbenchItem* item);
 

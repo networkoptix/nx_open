@@ -42,7 +42,7 @@ namespace ec2
         QDateTime plannedReportTime(const QDateTime& now);
         ErrorCode initiateReport(QString* reportApi = 0);
 
-    private slots:
+    private:
         void finishReport(nx_http::AsyncHttpClientPtr httpClient);
 
     private:

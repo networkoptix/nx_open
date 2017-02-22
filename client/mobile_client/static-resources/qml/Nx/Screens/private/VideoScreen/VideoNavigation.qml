@@ -11,10 +11,10 @@ Item
     id: videoNavigation
 
     property string resourceId
-
     property var videoScreenController
-
     property bool paused: videoScreenController.mediaPlayer.playbackState !== QnPlayer.Playing
+
+    property real controlsOpacity: 1.0
 
     implicitWidth: parent ? parent.width : 0
     implicitHeight: navigator.height + navigationPanel.height
@@ -24,9 +24,19 @@ Item
     {
         id: d
 
+        property real controlsOpacity: videoNavigation.controlsOpacity
+        property real timelineOpacity: cameraChunkProvider.loading ? 0.0 : 1.0
+        Behavior on timelineOpacity
+        {
+            NumberAnimation { duration: d.timelineOpacity > 0 ? 0 : 200 }
+        }
+
         readonly property bool hasArchive: timeline.startBound > 0
         readonly property bool liveMode:
-            videoScreenController && videoScreenController.mediaPlayer.liveMode
+            videoScreenController
+                && videoScreenController.mediaPlayer.liveMode
+                && !playbackController.paused
+        property real resumePosition: -1
 
         function updateNavigatorPosition()
         {
@@ -124,6 +134,16 @@ Item
 
         Image
         {
+            width: parent.width
+            anchors.bottom: timeline.bottom
+            height: timeline.chunkBarHeight
+            source: lp("/images/timeline_chunkbar_preloader.png")
+            sourceSize: Qt.size(timeline.chunkBarHeight, timeline.chunkBarHeight)
+            fillMode: Image.Tile
+        }
+
+        Image
+        {
             width: timeline.width
             height: sourceSize.height
             anchors.bottom: timeline.bottom
@@ -159,9 +179,15 @@ Item
                     videoScreenController.setPosition(position)
                     if (resumeWhenDragFinished)
                         videoScreenController.play()
+                    else
+                        videoScreenController.pause()
                 }
             }
-            onPositionTapped: videoScreenController.setPosition(position)
+            onPositionTapped:
+            {
+                d.resumePosition = -1
+                videoScreenController.setPosition(position)
+            }
             onPositionChanged:
             {
                 if (!dragging)
@@ -175,7 +201,8 @@ Item
                 if (dragging)
                 {
                     resumeWhenDragFinished = !videoNavigation.paused
-                    videoScreenController.pause()
+                    videoScreenController.preview()
+                    d.resumePosition = -1
                 }
             }
 
@@ -230,9 +257,12 @@ Item
 
         OpacityMask
         {
+            id: timelineOpactiyMask
+
             anchors.fill: timeline
             source: timeline.timelineView
             maskSource: timelineMask
+            opacity: Math.min(d.controlsOpacity, d.timelineOpacity)
 
             Component.onCompleted: timeline.timelineView.visible = false
         }
@@ -247,7 +277,7 @@ Item
             anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2
             color: ColorTheme.windowText
             visible: !d.hasArchive
-            opacity: 0.5
+            opacity: 0.5 * timelineOpactiyMask.opacity
         }
 
         Pane
@@ -335,6 +365,7 @@ Item
             width: parent.width
             anchors.bottom: timeline.bottom
             anchors.bottomMargin: timeline.chunkBarHeight + 16
+            opacity: d.controlsOpacity
 
             Text
             {
@@ -397,12 +428,26 @@ Item
 
             loading: !paused && (videoScreenController.mediaPlayer.loading || timeline.dragging)
             paused: videoNavigation.paused
+
+            opacity: d.controlsOpacity
+
             onClicked:
             {
                 if (paused)
+                {
+                    if (d.resumePosition > 0)
+                    {
+                        videoScreenController.setPosition(d.resumePosition)
+                        d.resumePosition = -1
+                    }
                     videoScreenController.play()
+                }
                 else
+                {
+                    if (d.liveMode)
+                        d.resumePosition = videoScreenController.mediaPlayer.position
                     videoScreenController.pause()
+                }
             }
         }
 
@@ -446,6 +491,7 @@ Item
             onDatePicked:
             {
                 close()
+                d.resumePosition = -1
                 videoScreenController.setPosition(date.getTime())
             }
         }

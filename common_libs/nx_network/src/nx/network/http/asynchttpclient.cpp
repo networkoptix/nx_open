@@ -44,7 +44,7 @@ namespace nx_http
     constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultSendTimeout;
     constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout;
     constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout;
-    
+
     constexpr int kMaxNumberOfRedirects = 5;
 
     AsyncHttpClient::Timeouts::Timeouts(
@@ -182,7 +182,7 @@ namespace nx_http
     {
         if (m_lastSysErrorCode != SystemError::noError)
             return m_lastSysErrorCode;
-        // Ensuring system error code is always non-zero in case of failure 
+        // Ensuring system error code is always non-zero in case of failure
         //  to simplify AsyncHttpClient user's life.
         return failed() ? SystemError::connectionReset : SystemError::noError;
     }
@@ -781,7 +781,7 @@ namespace nx_http
             const size_t bytesParsed = parseReceivedBytes(bytesRead);
             QByteArray receivedBytesLeft;
             if (bytesParsed != (std::size_t)-1)
-                receivedBytesLeft = m_responseBuffer.mid(bytesParsed);
+                receivedBytesLeft = m_responseBuffer.mid((int)bytesParsed);
             m_responseBuffer.resize(0);
 
             bool continueReceiving = false;
@@ -975,7 +975,7 @@ namespace nx_http
 
                 break;
             }
-            
+
             case StatusCode::proxyAuthenticationRequired:
             {
                 if (!m_proxyAuthorizationTried &&
@@ -986,7 +986,7 @@ namespace nx_http
                 }
                 break;
             }
-            
+
             case StatusCode::found:
             case StatusCode::movedPermanently:
                 return sendRequestToNewLocation(response);
@@ -1054,9 +1054,16 @@ namespace nx_http
 
         m_request.requestLine.method = httpMethod;
         if (m_proxyEndpoint)
+        {
             m_request.requestLine.url = m_contentLocationUrl;
+        }
         else    //if no proxy specified then erasing http://host:port from request url
-            m_request.requestLine.url = m_contentLocationUrl.path() + (m_contentLocationUrl.hasQuery() ? (QLatin1String("?") + m_contentLocationUrl.query()) : QString());
+        {
+            m_request.requestLine.url = m_contentLocationUrl.path();
+            m_request.requestLine.url.setQuery(m_contentLocationUrl.query());
+            m_request.requestLine.url.setFragment(m_contentLocationUrl.fragment());
+        }
+
         m_request.requestLine.version = useHttp11 ? nx_http::http_1_1 : nx_http::http_1_0;
 
         nx_http::insertOrReplaceHeader(
@@ -1315,7 +1322,7 @@ namespace nx_http
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler;
     };
 
-    } // namespace 
+    } // namespace
 
     template<typename ... Args>
     void AsyncHttpClient::doHttpOperation(

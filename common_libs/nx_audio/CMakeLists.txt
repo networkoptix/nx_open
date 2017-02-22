@@ -1,19 +1,14 @@
-project(nx_audio)
-set(PROJECT_SHORTNAME "nx_audio")
-set(PROJECT_LONGNAME "${short.company.name} Audio Library")
+nx_add_target(nx_audio LIBRARY PUBLIC_LIBS nx_streaming)
 
-find_sources(src)
-ADD_MSVC_PRECOMPILED_HEADER("StdAfx.h" "${PROJECT_SOURCE_DIR}/src/StdAfx.cpp" CPP_FILES)
-process_resources()
-add_translations(translations)
-qt5_wrap_ui(UI_HEADERS ${UI_FILES})
-qt5_add_resources(RESOURCE_FILES ${PROJECT_BINARY_DIR}/${PROJECT_SHORTNAME}.qrc)
+if(LINUX)
+    if(ANDROID)
+        rdep_add_package(openal)
+    endif()
+    target_link_libraries(nx_audio PUBLIC openal)
+endif()
 
-add_library(${PROJECT_SHORTNAME} ${DEFAULT_LIBRARY_TYPE}
-  ${UI_HEADERS}
-  ${CPP_FILES}
-  ${RESOURCE_FILES}
-)
-target_link_libraries(${PROJECT_SHORTNAME}
-  Qt5::Core
-)
+if(MACOSX)
+    find_library(OpenAL_LIBRARY OpenAL)
+    mark_as_advanced(OpenAL_LIBRARY)
+    target_link_libraries(nx_audio PUBLIC ${OpenAL_LIBRARY})
+endif()
