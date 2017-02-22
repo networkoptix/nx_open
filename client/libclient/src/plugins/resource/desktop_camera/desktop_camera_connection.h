@@ -41,7 +41,7 @@ private:
     QnMutex m_mutex;
 };
 
-typedef QSharedPointer<QnDesktopCameraConnection> QnDesktopCameraConnectionPtr;
+using QnDesktopCameraConnectionPtr = std::unique_ptr<QnDesktopCameraConnection>;
 
 class QnDesktopCameraConnectionProcessor: public QnTCPConnectionProcessor
 {
