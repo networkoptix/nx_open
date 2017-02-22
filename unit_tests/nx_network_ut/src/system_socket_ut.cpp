@@ -31,15 +31,15 @@ TEST( TcpSocket, KeepAliveOptions )
     #if defined( Q_OS_LINUX )
         EXPECT_EQ( result->time.count(), 5 );
         EXPECT_EQ( result->interval.count(), 1 );
-        EXPECT_EQ( result->probeCount, 3 );
+        EXPECT_EQ( result->probeCount, 3U );
     #elif defined( Q_OS_WIN )
         EXPECT_EQ( result->time.count(), 5 );
         EXPECT_EQ( result->interval.count(), 1 );
-        EXPECT_EQ( result->probeCount, 0 ); // means default
+        EXPECT_EQ( result->probeCount, 0U ); // means default
     #elif defined( Q_OS_MACX )
         EXPECT_EQ( result->time.count(), 5 );
         EXPECT_EQ( result->interval.count(), 0 ); // means default
-        EXPECT_EQ( result->probeCount, 0 ); // means default
+        EXPECT_EQ( result->probeCount, 0U ); // means default
     #endif
 
     // Disable

@@ -493,7 +493,7 @@ static void transferSyncAsync(AbstractStreamSocket* sender, AbstractStreamSocket
         [&](SystemError::ErrorCode code, size_t size)
         {
             EXPECT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
-            EXPECT_EQ(size, kTestMessage.size());
+            EXPECT_EQ(size, (size_t)kTestMessage.size());
             EXPECT_EQ(buffer, kTestMessage);
             promise.set_value();
         });
@@ -509,7 +509,7 @@ static void transferAsyncSync(AbstractStreamSocket* sender, AbstractStreamSocket
         [&](SystemError::ErrorCode code, size_t size)
         {
             EXPECT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
-            EXPECT_EQ(kTestMessage.size(), size);
+            EXPECT_EQ((size_t)kTestMessage.size(), size);
             promise.set_value();
         });
 
@@ -535,7 +535,7 @@ static void transferAsync(AbstractStreamSocket* sender, AbstractStreamSocket* re
         [&](SystemError::ErrorCode code, size_t size)
         {
             ASSERT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
-            ASSERT_EQ(kTestMessage.size(), size);
+            ASSERT_EQ((size_t)kTestMessage.size(), size);
             sendPromise.set_value();
         });
 
@@ -548,7 +548,7 @@ static void transferAsync(AbstractStreamSocket* sender, AbstractStreamSocket* re
         [&](SystemError::ErrorCode code, size_t size)
         {
             EXPECT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
-            EXPECT_EQ(kTestMessage.size(), size);
+            EXPECT_EQ((size_t)kTestMessage.size(), size);
             readPromise.set_value();
         });
 
@@ -663,7 +663,7 @@ void socketTransferFragmentation(
             [&](SystemError::ErrorCode code, size_t size)
             {
                 EXPECT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
-                EXPECT_EQ(kMessage.size(), size);
+                EXPECT_EQ((size_t)kMessage.size(), size);
                 promise.set_value();
             });
 
@@ -949,8 +949,8 @@ void acceptedSocketOptionsInheritance(
     ASSERT_TRUE(accepted->getSendTimeout(&acceptedSocketSendTimeout));
 
     // Timeouts are not inherited.
-    ASSERT_EQ(0, acceptedSocketRecvTimeout);
-    ASSERT_EQ(0, acceptedSocketSendTimeout);
+    ASSERT_EQ(0U, acceptedSocketRecvTimeout);
+    ASSERT_EQ(0U, acceptedSocketSendTimeout);
 }
 
 template<typename ClientSocketMaker>
