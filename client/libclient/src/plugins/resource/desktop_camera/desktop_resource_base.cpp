@@ -39,7 +39,7 @@ void QnDesktopResource::addConnection(const QnMediaServerResourcePtr &server)
 
     auto connection = QnDesktopCameraConnectionPtr(new QnDesktopCameraConnection(this, server));
     connection->start();
-    m_connectionPool.insert({server->getId(), std::move(connection)});
+    m_connectionPool.emplace(server->getId(), std::move(connection));
 }
 
 void QnDesktopResource::removeConnection(const QnMediaServerResourcePtr &server)
