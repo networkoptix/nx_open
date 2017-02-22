@@ -2,6 +2,7 @@ import os
 import re
 import xml.etree.ElementTree as eTree
 from os.path import join
+import htmlmin
 
 import json
 import errno
@@ -46,6 +47,10 @@ def save_content(filename, content):
     if filename:
         # proceed with branding
         active_content = process_branding(content)
+
+        if filename.endswith('.html'):
+            content = htmlmin.minify(content, remove_comments=True, remove_empty_space=True,
+                                     remove_optional_attribute_quotes=False)
 
         make_dir(filename)
         with codecs.open(filename, "w", "utf-8") as file:
