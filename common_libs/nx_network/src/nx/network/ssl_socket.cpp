@@ -1510,17 +1510,21 @@ bool SslSocket::shutdown()
 {
     Q_D(SslSocket);
     d->shutdown.store(true);
+    DEBUG_LOG("Shutdown...");
 
     utils::promise<void> promise;
     d->wrappedSocket->pleaseStop(
-        [d, &promise]()
+        [this, d, &promise]()
         {
+            DEBUG_LOG("Shutdown: notify send");
             if (auto promisePtr = d->sendPromisePtr.exchange(nullptr))
                 promisePtr->set_value({SystemError::interrupted, 0});
 
+            DEBUG_LOG("Shutdown: notify recv");
             if (auto promisePtr = d->recvPromisePtr.exchange(nullptr))
                 promisePtr->set_value({SystemError::interrupted, 0});
 
+            NX_LOGX("Socket is shutdown", cl_logDEBUG1);
             promise.set_value();
         });
 
