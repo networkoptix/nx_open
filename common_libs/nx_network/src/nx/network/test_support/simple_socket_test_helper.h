@@ -394,7 +394,7 @@ void socketTransferAsync(
                     return serverResults.push(code);
 
                 EXPECT_STREQ(serverBuffer.data(), testMessage.data());
-                if (size < testMessage.size())
+                if (size < (size_t)testMessage.size())
                     return serverResults.push(SystemError::connectionReset);
 
                 serverBuffer.resize(0);
