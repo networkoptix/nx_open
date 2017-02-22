@@ -24,7 +24,7 @@ angular.module('cloudApp')
                 notAuthorized: L.errorCodes.passwordMismatch
             },
             successMessage: L.system.successDisconnected,
-            errorPrefix:'Cannot delete the system:'
+            errorPrefix:L.errorCodes.cantDisconnectSystemPrefix
         }).then(function(){
             dialogs.closeMe($scope, true);
         });

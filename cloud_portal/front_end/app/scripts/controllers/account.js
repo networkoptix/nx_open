@@ -27,8 +27,8 @@ angular.module('cloudApp')
                 return result;
             });
         },{
-            successMessage:'Your account was successfully saved.',
-            errorPrefix:'Couldn\'t save your data:',
+            successMessage:L.account.accountSavedSuccess,
+            errorPrefix: L.errorCodes.cantChangeAccountPrefix,
             logoutForbidden: true
         });
 
@@ -38,8 +38,8 @@ angular.module('cloudApp')
             errorCodes:{
                 notAuthorized: L.errorCodes.oldPasswordMistmatch
             },
-            successMessage:'Your password was successfully changed.',
-            errorPrefix:'Couldn\'t change your password:',
+            successMessage:L.account.passwordChangedSuccess,
+            errorPrefix:L.errorCodes.cantChangePasswordPrefix,
             ignoreUnauthorized: true
         });
     }]);

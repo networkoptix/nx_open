@@ -52,50 +52,73 @@ do
 
 
     echo "------------------------------"
-    echo "Building templates"
+    echo "Building templates - for each language"
 
     mkdir $TARGET_DIR/$CUSTOMIZATION/templates/
-    mkdir $TARGET_DIR/$CUSTOMIZATION/templates/src
-
-    echo "Process sources"
-    cp -rf ../cloud/notifications/static/templates/* $TARGET_DIR/$CUSTOMIZATION/templates/src/
-
-    echo "Copy custom styles"
-    cp $dir/front_end/styles/_custom_palette.scss $TARGET_DIR/$CUSTOMIZATION/templates/src/
-
-    echo "Run processing"
-    pushd $TARGET_DIR/$CUSTOMIZATION/templates/src
-    python preprocess.py
-    popd
-
-    echo "Clean sources"
-    rm -rf $TARGET_DIR/$CUSTOMIZATION/templates/src
-
-    echo "Copy additional templates files"
     cp -rf $dir/templates/* $TARGET_DIR/$CUSTOMIZATION/templates
 
+    for lang_dir in ../translations/*/
+    do
+        lang_dir=${lang_dir%*/}
+        LANG=${lang_dir/..\/translations\//}
+
+        echo "$TARGET_DIR/$CUSTOMIZATION/templates/$LANG"
+
+        mkdir $TARGET_DIR/$CUSTOMIZATION/templates/$LANG
+        mkdir $TARGET_DIR/$CUSTOMIZATION/templates/$LANG/src
+
+        echo "Copy template sources - with default language"
+        cp -rf ../cloud/notifications/static/templates/* $TARGET_DIR/$CUSTOMIZATION/templates/$LANG/src/
+
+        echo "Overwrite them with localized sources"
+        cp -rf $lang_dir/templates/* $TARGET_DIR/$CUSTOMIZATION/templates/$LANG/src/ || true
+
+        echo "Copy custom styles"
+        cp $dir/front_end/styles/_custom_palette.scss $TARGET_DIR/$CUSTOMIZATION/templates/$LANG/src/
+
+        pushd $TARGET_DIR/$CUSTOMIZATION/templates/$LANG/src
+        python preprocess.py
+        popd
+
+        echo "Clean sources"
+        rm -rf $TARGET_DIR/$CUSTOMIZATION/templates/src
+    done
     echo "Templates success"
 
     echo "------------------------------"
-    echo "Localization"
+    echo "Localization - portal"
 
-    echo "Generate blank translation files"
-    pushd $TARGET_DIR/$CUSTOMIZATION
-    python ../../../build_scripts/generate_ts.py
-    popd
+    for lang_dir in ../translations/*/
+    do
+        lang_dir=${lang_dir%*/}
+        LANG=${lang_dir/..\/translations\//}
 
-    echo "Copy branding and translation files"
-    cp -f $dir/*.ts $TARGET_DIR/$CUSTOMIZATION
+        echo "$TARGET_DIR/$CUSTOMIZATION/static/lang_$LANG/views/"
 
-    pushd $TARGET_DIR/$CUSTOMIZATION
-    echo "Customizing and localizing"
-    python ../../../build_scripts/localize.py
-    popd
+        mkdir $TARGET_DIR/$CUSTOMIZATION/static/lang_$LANG
+        mkdir $TARGET_DIR/$CUSTOMIZATION/static/lang_$LANG/views/
 
-    echo "clean branding files"
-    rm -rf $TARGET_DIR/$CUSTOMIZATION/*.ts
+        echo "Copy default views - with default language"
+        cp -rf $TARGET_DIR/$CUSTOMIZATION/static/views/* $TARGET_DIR/$CUSTOMIZATION/static/lang_$LANG/views/
+
+        echo "Overwrite them with localized sources"
+        cp -rf $lang_dir/views/* $TARGET_DIR/$CUSTOMIZATION/static/lang_$LANG/views/ || true
+    done
 
     echo "Localization success"
+
+
+    echo "------------------------------"
+    echo "Branding"
+    cp $dir/branding.ts $TARGET_DIR/$CUSTOMIZATION
+    pushd $TARGET_DIR/$CUSTOMIZATION
+    python ../../../build_scripts/generate_languages_json.py
+    python ../../../build_scripts/branding.py
+    rm -rf *.ts
+    popd
+    echo "Branding success"
+
+
 done
 
 echo "Done!"
