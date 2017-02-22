@@ -16,6 +16,8 @@ DEFAULT_BIN_DIR = os.path.expanduser('/tmp/binaries')
 CLOUD_USER_NAME = 'anikitin@networkoptix.com'
 CLOUD_USER_PASSWORD ='qweasd123'
 
+DEFAULT_VM_NAME_PREFIX = 'funtest-'
+
 log = logging.getLogger(__name__)
 
 
@@ -28,6 +30,8 @@ def pytest_addoption(parser):
                      help='skip servers reset/cleanup on test setup')
     parser.addoption('--recreate-boxes', action='store_true',
                      help='destroy and create again vagrant boxes')
+    parser.addoption('--vm-name-prefix', default=DEFAULT_VM_NAME_PREFIX,
+                     help='prefix for virtualenv machine names')
 
 @pytest.fixture
 def run_options(request):
@@ -36,6 +40,7 @@ def run_options(request):
         bin_dir=request.config.getoption('--bin-dir'),
         reset_servers=not request.config.getoption('--no-servers-reset'),
         recreate_boxes=request.config.getoption('--recreate-boxes'),
+        vm_name_prefix=request.config.getoption('--vm-name-prefix'),
         )
 
 

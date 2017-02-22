@@ -72,10 +72,10 @@ class Vagrant(object):
             for script in config.provision_scripts:
                 shutil.copy2(os.path.join(TEST_DIR, script), self._vagrant_dir)
             if box2status[config.box_name()] != 'running':
-                self._start_box(config.box_name())
+                self._start_box(config)
             self._init_box(config)
         self._write_vagrantfile(boxes_config)  # now ip_address is known for just-started boxes - write it
-        self._write_ssh_config(self.boxes.keys())  # update ssh config with new addresses
+        self._write_ssh_config(self.boxes.keys())  # write ssh config for all boxes, with new addresses
         for box in self.boxes.values():
             self._load_box_timezone(box)
 
@@ -87,8 +87,9 @@ class Vagrant(object):
         log.debug('IP address for %s: %s', config.box_name(), config.ip_address)
         self.boxes[config.box_name()] = VagrantBox(self, config)
 
-    def _start_box(self, box_name):
-        log.info('Starting/creating box: %r...', box_name)
+    def _start_box(self, config):
+        box_name = config.box_name()
+        log.info('Starting/creating box: %r, vm %r...', box_name, config.vm_box_name())
         self._wrap_vagrant_call(self._vagrant.up, vm_name=box_name)
         self._write_box_ssh_config(box_name)
         self.run_ssh_command(box_name, 'vagrant', ['sudo', 'cp', '-r', '/home/vagrant/.ssh', '/root/'])
@@ -97,7 +98,8 @@ class Vagrant(object):
         adapter_idx = 1  # use ip address from first host network
         output = subprocess.check_output([
             'VBoxManage', '--nologo', 'guestproperty', 'get',
-            config.vm_box_name(), '/VirtualBox/GuestInfo/Net/%d/V4/IP' % adapter_idx])
+            config.vm_box_name(), '/VirtualBox/GuestInfo/Net/%d/V4/IP' % adapter_idx],
+            stderr=subprocess.STDOUT)
         l = output.strip().split()
         assert l[0] == 'Value:', repr(output)  # Does interface exist?
         return l[1]
@@ -118,8 +120,9 @@ class Vagrant(object):
         with open(os.path.join(self._vagrant_dir, 'Vagrantfile'), 'w') as f:
             f.write(vagrantfile)
 
+    # write ssh config with single box in it
     def _write_box_ssh_config(self, box_name):
-        with open(self._ssh_config_path, 'a') as f:
+        with open(self._ssh_config_path, 'w') as f:
             f.write(self._vagrant.ssh_config(box_name))
 
     def _write_ssh_config(self, box_name_list):

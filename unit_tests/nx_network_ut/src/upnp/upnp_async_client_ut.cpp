@@ -59,7 +59,7 @@ TEST( UpnpAsyncClient, DISABLED_GetIp )
         nx::utils::promise< AsyncClient::MappingList > prom;
         client.getAllMappings( URL,
                      [&]( const AsyncClient::MappingList& v ) { prom.set_value( v ); } );
-        EXPECT_EQ( prom.get_future().get().size(), 2 ); // mappings from Skype ;)
+        EXPECT_EQ( prom.get_future().get().size(), 2U ); // mappings from Skype ;)
     }
 }
 

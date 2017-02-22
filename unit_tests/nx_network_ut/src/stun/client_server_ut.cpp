@@ -141,7 +141,7 @@ TEST_F(StunClientServerTest, Connectivity)
 
     startServer(address);
     EXPECT_EQ(sendTestRequestSync(), SystemError::noError);
-    EXPECT_EQ(1, server->connectionCount());
+    EXPECT_EQ(1U, server->connectionCount());
 
     server.reset();
     EXPECT_NE(sendTestRequestSync(), SystemError::noError);
@@ -153,11 +153,11 @@ TEST_F(StunClientServerTest, Connectivity)
 
     // There might be a small delay before server creates connection from accepted socket.
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    EXPECT_EQ(1, server->connectionCount());
+    EXPECT_EQ(1U, server->connectionCount());
 
     client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
     std::this_thread::sleep_for(timerPeriod * 5);
-    EXPECT_GT(timerTicks, 3); //< Expect at least 3 timer ticks in 5 periods.
+    EXPECT_GT(timerTicks, 3U); //< Expect at least 3 timer ticks in 5 periods.
 
     server.reset();
     EXPECT_NE(sendTestRequestSync(), SystemError::noError);
@@ -165,17 +165,17 @@ TEST_F(StunClientServerTest, Connectivity)
 
     // Wait some time so client will retry to connect again and again.
     std::this_thread::sleep_for(defaultSettings().reconnectPolicy.initialDelay * 5);
-    EXPECT_EQ(0, timerTicks); //< Timer does not tick while connection is brocken;
+    EXPECT_EQ(0U, timerTicks); //< Timer does not tick while connection is brocken;
 
     startServer(address);
     reconnectEvents.pop(); // Automatic reconnect is expected, again.
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    EXPECT_EQ(1, server->connectionCount());
+    EXPECT_EQ(1U, server->connectionCount());
 
     client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
     std::this_thread::sleep_for(timerPeriod * 5);
-    EXPECT_GT(timerTicks, 3); //< Expect at least 3 timer ticks in 5 periods.
+    EXPECT_GT(timerTicks, 3U); //< Expect at least 3 timer ticks in 5 periods.
 }
 
 TEST_F(StunClientServerTest, RequestResponse)
@@ -238,7 +238,7 @@ TEST_F(StunClientServerTest, Indications)
     client->setIndicationHandler(0xCD, recvWaiter.pusher());
 
     EXPECT_EQ(sendTestRequestSync(), SystemError::noError);
-    EXPECT_EQ(1, server->connectionCount());
+    EXPECT_EQ(1U, server->connectionCount());
 
     EXPECT_EQ(sendIndicationSync(0xAB), SystemError::noError);
     EXPECT_EQ(sendIndicationSync(0xCD), SystemError::noError);

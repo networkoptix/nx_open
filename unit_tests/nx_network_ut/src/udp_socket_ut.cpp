@@ -65,7 +65,7 @@ void udpSocketTransferTest(int ipVersion, const HostAddress& targetHost)
             ASSERT_EQ(SystemError::noError, code);
             ASSERT_TRUE(ip.address.isIpAddress());
             ASSERT_EQ(receiverEndpoint.toString(), ip.toString());
-            ASSERT_EQ(kTestMessage.size(), size);
+            ASSERT_EQ((size_t)kTestMessage.size(), size);
             sendPromise.set_value();
         });
 
