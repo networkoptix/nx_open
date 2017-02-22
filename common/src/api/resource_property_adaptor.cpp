@@ -1,6 +1,7 @@
 #include "resource_property_adaptor.h"
 
 #include <core/resource/resource.h>
+#include <core/resource_management/resource_properties.h>
 
 // -------------------------------------------------------------------------- //
 // QnAbstractResourcePropertyAdaptor
@@ -217,6 +218,8 @@ void QnAbstractResourcePropertyAdaptor::processSaveRequestsNoLock(const QnResour
     m_pendingSave.storeRelease(0);
 
     resource->setProperty(m_key, serializedValue);
+
+    propertyDictionary->saveParamsAsync(resource->getId());
 }
 
 void QnAbstractResourcePropertyAdaptor::enqueueSaveRequest()
