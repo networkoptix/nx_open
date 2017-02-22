@@ -178,9 +178,9 @@ def print_list(name, values):
     for i, value in enumerate(values):
         log.debug('\t #%d: %s', i, value)
 
-def bool_to_str(val, falseStr = 'false', trueStr = 'true'):
-    if val: return trueStr
-    else: return falseStr
+def bool_to_str(val, false_str = 'false', true_str = 'true'):
+    if val: return true_str
+    else: return false_str
 
 def str_to_bool(val):
     v = val.lower()
