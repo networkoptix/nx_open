@@ -63,7 +63,7 @@ angular.module('cloudApp')
                 },
                 ignoreUnauthorized: true,
                 holdAlerts:true,
-                errorPrefix:L.errorCodes.cantChangePasswordPrefix + ':'
+                errorPrefix:L.errorCodes.cantChangePasswordPrefix
             }).then(function(){
                 setContext('changeSuccess');
                 $location.path('/restore_password/success', false); // Change url, do not reload
@@ -77,7 +77,7 @@ angular.module('cloudApp')
                 },
                 ignoreUnauthorized: true,
                 holdAlerts:true,
-                errorPrefix:L.errorCodes.cantSendActivationPrefix + ':'
+                errorPrefix:L.errorCodes.cantSendActivationPrefix
             }).then(function(){
                 $scope.restoring = false;
                 $scope.restoringSuccess = true;
@@ -102,7 +102,7 @@ angular.module('cloudApp')
                         return false;
                     },
                 },
-                errorPrefix:L.errorCodes.cantActivatePrefix + ':'
+                errorPrefix:L.errorCodes.cantActivatePrefix
             }).then(function(){
                 setContext('activateSuccess');
                 $scope.activationSuccess = true;
@@ -118,7 +118,7 @@ angular.module('cloudApp')
                     notFound: L.errorCodes.emailNotFound
                 },
                 holdAlerts:true,
-                errorPrefix:L.errorCodes.cantSendConfirmationPrefix + ':'
+                errorPrefix:L.errorCodes.cantSendConfirmationPrefix
             }).then(function(){
                 setContext('reactivatingSuccess');
                 $location.path('/activate/send', false); // Change url, do not reload
