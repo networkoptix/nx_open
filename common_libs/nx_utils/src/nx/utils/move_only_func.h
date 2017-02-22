@@ -63,6 +63,8 @@ class MoveOnlyFunc:
     };
 
 public:
+    using result_type = typename std::function<F>::result_type;
+
     MoveOnlyFunc() = default;
 
     MoveOnlyFunc(std::function<F> func):
@@ -100,7 +102,14 @@ public:
         return *this;
     }
 
-    using std::function<F>::operator();
+    template<typename ... Args>
+    result_type operator()(Args&& ... args) const
+    {
+        NX_CRITICAL(*this);
+        return std::function<F>::operator()(std::forward<Args>(args)...);
+    }
+
+    //using std::function<F>::operator();
     using std::function<F>::operator bool;
 
     void swap(MoveOnlyFunc& other)
