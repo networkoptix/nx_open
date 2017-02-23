@@ -70,7 +70,7 @@ angular.module('cloudApp')
                 }
             },
             holdAlerts:true,
-            errorPrefix:'Some error has happened:'
+            errorPrefix:L.errorCodes.cantRegisterPrefix
         }).then(function(){
             $scope.context.process = 'registerSuccess';
             if($scope.account.code){

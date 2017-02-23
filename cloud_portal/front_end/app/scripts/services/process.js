@@ -42,7 +42,7 @@ angular.module('cloudApp')
                     holdAlerts = settings.holdAlerts;
                     successMessage = settings.successMessage;
 
-                    errorPrefix = settings.errorPrefix? (settings.errorPrefix + ' ') : '';
+                    errorPrefix = settings.errorPrefix? (settings.errorPrefix + ': ') : '';
                 }
                 return {
                     success:false,
