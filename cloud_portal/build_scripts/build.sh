@@ -62,21 +62,21 @@ do
         lang_dir=${lang_dir%*/}
         LANG=${lang_dir/..\/translations\//}
 
-        echo "$TARGET_DIR/$CUSTOMIZATION/templates/$LANG"
+        echo "$TARGET_DIR/$CUSTOMIZATION/templates/lang_$LANG"
 
-        mkdir $TARGET_DIR/$CUSTOMIZATION/templates/$LANG
-        mkdir $TARGET_DIR/$CUSTOMIZATION/templates/$LANG/src
+        mkdir $TARGET_DIR/$CUSTOMIZATION/templates/lang_$LANG
+        mkdir $TARGET_DIR/$CUSTOMIZATION/templates/lang_$LANG/src
 
         echo "Copy template sources - with default language"
-        cp -rf ../cloud/notifications/static/templates/* $TARGET_DIR/$CUSTOMIZATION/templates/$LANG/src/
+        cp -rf ../cloud/notifications/static/templates/* $TARGET_DIR/$CUSTOMIZATION/templates/lang_$LANG/src/
 
         echo "Overwrite them with localized sources"
-        cp -rf $lang_dir/templates/* $TARGET_DIR/$CUSTOMIZATION/templates/$LANG/src/ || true
+        cp -rf $lang_dir/templates/* $TARGET_DIR/$CUSTOMIZATION/templates/lang_$LANG/src/ || true
 
         echo "Copy custom styles"
-        cp $dir/front_end/styles/_custom_palette.scss $TARGET_DIR/$CUSTOMIZATION/templates/$LANG/src/
+        cp $dir/front_end/styles/_custom_palette.scss $TARGET_DIR/$CUSTOMIZATION/templates/lang_$LANG/src/
 
-        pushd $TARGET_DIR/$CUSTOMIZATION/templates/$LANG/src
+        pushd $TARGET_DIR/$CUSTOMIZATION/templates/lang_$LANG/src
         python preprocess.py
         popd
 
