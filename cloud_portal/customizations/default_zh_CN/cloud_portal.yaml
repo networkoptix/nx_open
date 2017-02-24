@@ -34,3 +34,5 @@ admins:
 
 languages:
     - zh_CN
+
+queue_name: '$INSTANCE_NAME'

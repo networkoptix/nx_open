@@ -48,3 +48,5 @@ languages:
     - hu
     - he
     - pt_PT    
+
+queue_name: $INSTANCE_NAME

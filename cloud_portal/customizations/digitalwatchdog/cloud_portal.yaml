@@ -37,3 +37,5 @@ languages:
     - en_US
     - fr
     - es
+
+queue_name: '$INSTANCE_NAME'

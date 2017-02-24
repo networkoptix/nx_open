@@ -34,3 +34,5 @@ admins:
 
 languages:
     - ru
+
+queue_name: '$INSTANCE_NAME'

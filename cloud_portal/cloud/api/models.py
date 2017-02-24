@@ -29,3 +29,7 @@ class Account(models.Model):
     @staticmethod
     def is_authenticated():
         return True
+
+    @staticmethod
+    def is_anonymous():
+        return False
