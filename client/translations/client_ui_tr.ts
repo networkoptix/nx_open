@@ -6,32 +6,32 @@
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>Hakkında</translation>
     </message>
     <message>
         <location/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilgi</translation>
     </message>
     <message>
         <location/>
         <source>Credits</source>
-        <translation type="unfinished"></translation>
+        <translation>Krediler</translation>
     </message>
     <message>
         <location/>
         <source>GPU Information</source>
-        <translation type="unfinished"></translation>
+        <translation>GPU Bilgisi</translation>
     </message>
     <message>
         <location/>
         <source>Connected servers</source>
-        <translation type="unfinished"></translation>
+        <translation>Bağlı Sunucular</translation>
     </message>
     <message>
         <location/>
         <source>Support</source>
-        <translation type="unfinished"></translation>
+        <translation>Destek</translation>
     </message>
 </context>
 <context>
@@ -39,32 +39,32 @@
     <message>
         <location filename="../src/ui/dialogs/adjust_video_dialog.ui"/>
         <source>Image Enhancement</source>
-        <translation type="unfinished"></translation>
+        <translation>Görüntü İyileştirme</translation>
     </message>
     <message>
         <location/>
         <source>Enable image enhancement</source>
-        <translation type="unfinished"></translation>
+        <translation>Görüntü İyileştirmeyi Etkinleştir</translation>
     </message>
     <message>
         <location/>
         <source>Gamma</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrast Derecesi</translation>
     </message>
     <message>
         <location/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Otomatik</translation>
     </message>
     <message>
         <location/>
         <source>Black level</source>
-        <translation type="unfinished"></translation>
+        <translation>Karanlık Seviyesi</translation>
     </message>
     <message>
         <location/>
         <source>White level</source>
-        <translation type="unfinished"></translation>
+        <translation>Aydınlık Seviyesi</translation>
     </message>
 </context>
 <context>
@@ -72,22 +72,22 @@
     <message>
         <location filename="../src/ui/widgets/business/aggregation_widget.ui"/>
         <source>Check to set aggregation period</source>
-        <translation type="unfinished"></translation>
+        <translation>Toplama Periyodunu Ayarlamak İçin Kontrol Et</translation>
     </message>
     <message>
         <location/>
         <source>Interval of action :</source>
-        <translation type="unfinished"></translation>
+        <translation>Eylem Aralığı :</translation>
     </message>
     <message>
         <location/>
         <source>No more than once per</source>
-        <translation type="unfinished"></translation>
+        <translation>Defadan Daha Fazla Değil</translation>
     </message>
     <message>
         <location/>
         <source>Instant</source>
-        <translation type="unfinished"></translation>
+        <translation>Derhal</translation>
     </message>
 </context>
 <context>
@@ -95,87 +95,87 @@
     <message>
         <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
         <source>Audit Trail</source>
-        <translation type="unfinished"></translation>
+        <translation>Denetim Merkezi</translation>
     </message>
     <message>
         <location/>
         <source>From</source>
-        <translation type="unfinished"></translation>
+        <translation>Dan</translation>
     </message>
     <message>
         <location/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Yenile</translation>
     </message>
     <message>
         <location/>
         <source>User actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Kullanıcı Hareketleri</translation>
     </message>
     <message>
         <location/>
         <source>Watching archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Arşiv İzleme</translation>
     </message>
     <message>
         <location/>
         <source>Exporting video</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Aktarma</translation>
     </message>
     <message>
         <location/>
         <source>Watching live</source>
-        <translation type="unfinished"></translation>
+        <translation>Canlı İzleme</translation>
     </message>
     <message>
         <location/>
         <source>Login/logout</source>
-        <translation type="unfinished"></translation>
+        <translation>Giriş/Çıkış</translation>
     </message>
     <message>
         <location/>
         <source>Event rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Olay Kuralları</translation>
     </message>
     <message>
         <location/>
         <source>Server actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunucu Hareketleri</translation>
     </message>
     <message>
         <location/>
         <source>E-mail settings</source>
-        <translation type="unfinished"></translation>
+        <translation>E-Mail Ayarları</translation>
     </message>
     <message>
         <location/>
         <source>System actions</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistem Hareketleri</translation>
     </message>
     <message>
         <location/>
         <source>Select all</source>
-        <translation type="unfinished"></translation>
+        <translation>Tümünü Seç</translation>
     </message>
     <message>
         <location/>
         <source>Sessions</source>
-        <translation type="unfinished"></translation>
+        <translation>Oturumlar</translation>
     </message>
     <message>
         <location/>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Detaylar</translation>
     </message>
     <message>
         <location/>
         <source>To</source>
-        <translation type="unfinished"></translation>
+        <translation>Ya</translation>
     </message>
     <message>
         <location/>
         <source>All Servers are offline. Audit data is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tüm Sunucular Çevrimdışı. Veri Denetimi Mevcut Değil.</translation>
     </message>
 </context>
 <context>
@@ -183,32 +183,32 @@
     <message>
         <location filename="../src/ui/dialogs/backup_schedule_dialog.ui"/>
         <source>Backup Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>Yedekleme Takvimi...</translation>
     </message>
     <message>
         <location/>
         <source>Execute backup on the following days:</source>
-        <translation type="unfinished"></translation>
+        <translation>Yedekleme İşlemi Çalışma Aralığı:</translation>
     </message>
     <message>
         <location/>
         <source>Finish:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitir:</translation>
     </message>
     <message>
         <location/>
         <source>Start:</source>
-        <translation type="unfinished"></translation>
+        <translation>Başlat:</translation>
     </message>
     <message>
         <location/>
         <source>Limit Bandwidth to:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bant Genişliği Sınırı:</translation>
     </message>
     <message>
         <location/>
         <source>Mbit/s</source>
-        <translation type="unfinished"></translation>
+        <translation>Mbit/s</translation>
     </message>
 </context>
 <context>
@@ -216,27 +216,27 @@
     <message>
         <location filename="../src/ui/widgets/business/bookmark_business_action_widget.ui"/>
         <source>Fixed duration:</source>
-        <translation type="unfinished"></translation>
+        <translation>Belirlenmiş Zaman:</translation>
     </message>
     <message>
         <location/>
         <source>Tags:</source>
-        <translation type="unfinished"></translation>
+        <translation>Etiketler:</translation>
     </message>
     <message>
         <location/>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>saniye</translation>
     </message>
     <message>
         <location/>
         <source>Pre-recording:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kayıt Öncesi Süre:</translation>
     </message>
     <message>
         <location/>
         <source>Post-recording:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kayıt Sonrası Süre:</translation>
     </message>
 </context>
 <context>
@@ -244,32 +244,32 @@
     <message>
         <location filename="../src/ui/widgets/bookmark_widget.ui"/>
         <source>&amp;Name</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;İsim</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Zaman Aşımı</translation>
     </message>
     <message>
         <location/>
         <source>T&amp;ags</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Etiketler</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Description</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Açıklama</translation>
     </message>
     <message>
         <location/>
         <source>List of tags divided by commas or spaces</source>
-        <translation type="unfinished"></translation>
+        <translation>Virgül veya Boşlukla Ayrılmış Etiketlerin Listesi</translation>
     </message>
     <message>
         <location/>
         <source>Popular tags</source>
-        <translation type="unfinished"></translation>
+        <translation>Popüler Etiketler</translation>
     </message>
 </context>
 <context>
@@ -277,27 +277,27 @@
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
         <source>Bookmark Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Yer İmi Günlüğü</translation>
     </message>
     <message>
         <location/>
         <source>-</source>
-        <translation type="unfinished"></translation>
+        <translation>-</translation>
     </message>
     <message>
         <location/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Yenile</translation>
     </message>
     <message>
         <location/>
         <source>&lt; Any camera &gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Herhangi Bir Kamera&gt;</translation>
     </message>
     <message>
         <location/>
         <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tüm Sunucular Çevrimdışı. Günlükler Mevcut Değil.</translation>
     </message>
 </context>
 <context>
@@ -305,37 +305,37 @@
     <message>
         <location filename="../src/ui/widgets/business/business_rule_widget.ui"/>
         <source>Event</source>
-        <translation type="unfinished"></translation>
+        <translation>Durum</translation>
     </message>
     <message>
         <location/>
         <source>When</source>
-        <translation type="unfinished"></translation>
+        <translation>Başlama Zamanı</translation>
     </message>
     <message>
         <location/>
         <source>at</source>
-        <translation type="unfinished"></translation>
+        <translation>Konum</translation>
     </message>
     <message>
         <location/>
         <source>Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>Takvim...</translation>
     </message>
     <message>
         <location/>
         <source>Action</source>
-        <translation type="unfinished"></translation>
+        <translation>Hareket</translation>
     </message>
     <message>
         <location/>
         <source>Do</source>
-        <translation type="unfinished"></translation>
+        <translation>Yap</translation>
     </message>
     <message>
         <location/>
         <source>Comments:</source>
-        <translation type="unfinished"></translation>
+        <translation>Yorumlar:</translation>
     </message>
 </context>
 <context>
@@ -343,32 +343,32 @@
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui"/>
         <source>Alarm/Event Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Alarm/Olay Kuralları</translation>
     </message>
     <message>
         <location/>
         <source>Add</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekle</translation>
     </message>
     <message>
         <location/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Sil</translation>
     </message>
     <message>
         <location/>
         <source>Event log</source>
-        <translation type="unfinished"></translation>
+        <translation>Olay Günlükleri</translation>
     </message>
     <message>
         <location/>
         <source>Advanced...</source>
-        <translation type="unfinished"></translation>
+        <translation>Gelişmiş...</translation>
     </message>
     <message>
         <location/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation>X</translation>
     </message>
 </context>
 <context>
@@ -376,107 +376,107 @@
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
         <source>Add device(s)...</source>
-        <translation type="unfinished"></translation>
+        <translation>Aygıt(lar) Ekle...</translation>
     </message>
     <message>
         <location/>
         <source>Selected Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Seçilen Sunucu:</translation>
     </message>
     <message>
         <location/>
         <source>Server is offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunucu Çevrimdışı</translation>
     </message>
     <message>
         <location/>
         <source>Device Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aygıt Adresi:</translation>
     </message>
     <message>
         <location/>
         <source>IP, hostname, RTSP link...</source>
-        <translation type="unfinished"></translation>
+        <translation>IP, Hostname, RTSP Linki...</translation>
     </message>
     <message>
         <location/>
         <source>S&amp;tart IP:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Başlangıç IP&apos;si:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;End IP:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Bitiş IP&apos;si:</translation>
     </message>
     <message>
         <location/>
         <source>S&amp;ubnet Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Alt Ağ Tara</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Giriş:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Şifre:</translation>
     </message>
     <message>
         <location/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Otomatik</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Discovery Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Keşif Port&apos;u:</translation>
     </message>
     <message>
         <location/>
         <source>Discovered Devices:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bulunan Aygıtlar:</translation>
     </message>
     <message>
         <location/>
         <source>Brand</source>
-        <translation type="unfinished"></translation>
+        <translation>Marka</translation>
     </message>
     <message>
         <location/>
         <source>Model</source>
-        <translation type="unfinished"></translation>
+        <translation>Model</translation>
     </message>
     <message>
         <location/>
         <source>Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adres</translation>
     </message>
     <message>
         <location/>
         <source>Scanning...</source>
-        <translation type="unfinished"></translation>
+        <translation>Taranıyor...</translation>
     </message>
     <message>
         <location/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Bitir</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Scan</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Tara</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Add selected</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Seçilenleri Ekle</translation>
     </message>
     <message>
         <location/>
         <source>New Scan...</source>
-        <translation type="unfinished"></translation>
+        <translation>Yeni Tarama...</translation>
     </message>
 </context>
 <context>
@@ -484,12 +484,12 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Yenile</translation>
     </message>
     <message>
         <location/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
+        <translation>Kategori</translation>
     </message>
 </context>
 <context>
@@ -497,12 +497,12 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
         <source>This camera has no advanced settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Bu Kamera Gelişmiş Ayarlar İçermiyor</translation>
     </message>
     <message>
         <location/>
         <source>about:blank</source>
-        <translation type="unfinished"></translation>
+        <translation>about:blank</translation>
     </message>
 </context>
 <context>
@@ -510,122 +510,122 @@
     <message>
         <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
         <source>I have read the manual and understand the risks</source>
-        <translation type="unfinished"></translation>
+        <translation>Uyarıları Okudum ve Riskleri Anladım</translation>
     </message>
     <message>
         <location/>
         <source>Camera Settings Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera Ayar Kontrolü</translation>
     </message>
     <message>
         <location/>
         <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera Profil ve Akış Ayarlarını Sakla</translation>
     </message>
     <message>
         <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uyarı! Bu Kayıt Takvimindeki Kaliteyi ve FPS Ayarlarını Etkileyebilir.</translation>
     </message>
     <message>
         <location/>
         <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Sistemin Kameraları Optimize Etmesine İzin Ver&quot; Yönetici Tarafından Devre Dışı Bırakıldı.</translation>
     </message>
     <message>
         <location/>
         <source>Secondary Stream Control</source>
-        <translation type="unfinished"></translation>
+        <translation>İkincil Akış Kontrolü</translation>
     </message>
     <message>
         <location/>
         <source>Override secondary stream quality</source>
-        <translation type="unfinished"></translation>
+        <translation>İkincil Akış Kalitesini Geçersiz Kıl</translation>
     </message>
     <message>
         <location/>
         <source>Do not use</source>
-        <translation type="unfinished"></translation>
+        <translation>Kullanma</translation>
     </message>
     <message>
         <location/>
         <source>Low quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Düşük Kalite</translation>
     </message>
     <message>
         <location/>
         <source>Medium quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Orta Kalite</translation>
     </message>
     <message>
         <location/>
         <source>High quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Yüksek Kalite</translation>
     </message>
     <message>
         <location/>
         <source>Warning! Low quality may result in low resolution image.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uyarı! Düşük Kalite Düşük Çözünürlüğe Sebep Olabilir.</translation>
     </message>
     <message>
         <location/>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uyarı! Yüksek Kalite Seçimi CPU ve Ağ Performansını Etkileyebilir ve Ek Sorunlara Yol Açabilir.</translation>
     </message>
     <message>
         <location/>
         <source>Archive control</source>
-        <translation type="unfinished"></translation>
+        <translation>Arşiv Kontrolü</translation>
     </message>
     <message>
         <location/>
         <source>Do not archive primary stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Birincil Akışı Arşivleme</translation>
     </message>
     <message>
         <location/>
         <source>Do not archive secondary stream</source>
-        <translation type="unfinished"></translation>
+        <translation>İkincil Akışı Arşivleme</translation>
     </message>
     <message>
         <location/>
         <source>Media streaming control</source>
-        <translation type="unfinished"></translation>
+        <translation>Medya Akış Kontrolü</translation>
     </message>
     <message>
         <location/>
         <source>RTP transport:</source>
-        <translation type="unfinished"></translation>
+        <translation>RTP Transport&apos;u:</translation>
     </message>
     <message>
         <location/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Otomatik</translation>
     </message>
     <message>
         <location/>
         <source>TCP</source>
-        <translation type="unfinished"></translation>
+        <translation>TCP</translation>
     </message>
     <message>
         <location/>
         <source>UDP</source>
-        <translation type="unfinished"></translation>
+        <translation>UDP</translation>
     </message>
     <message>
         <location/>
         <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation type="unfinished"></translation>
+        <translation>Saniye Başı Bit Hızı Yerine GOP Başı Bit Hızını Hesapla(Kamera İçin Bit Hızını Yükseltecek)</translation>
     </message>
     <message>
         <location/>
         <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uyarı! Sistem Performansınızın Potansiyel Etkisinden Kesin Olarak Eminseniz Bu Ayarları Değiştirmeyin.</translation>
     </message>
     <message>
         <location/>
         <source>Restore Defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>Varsayılanları Geri Yükle</translation>
     </message>
 </context>
 <context>
@@ -633,7 +633,7 @@
     <message>
         <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
         <source>Input ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>Giriş ID:</translation>
     </message>
 </context>
 <context>
@@ -641,7 +641,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
         <source>Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrele:</translation>
     </message>
 </context>
 <context>
@@ -649,12 +649,12 @@
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
         <source>&amp;Output ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Output ID:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Auto-reset in (sec):</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Otomatik Yeniden Başlatma (saniye):</translation>
     </message>
 </context>
 <context>
@@ -662,123 +662,123 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
         <source>Enable Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera Kaydını Etkinleştir</translation>
     </message>
     <message>
         <location/>
         <source>Get More Licenses...</source>
-        <translation type="unfinished"></translation>
+        <translation>Daha Fazla Lisans Al...</translation>
     </message>
     <message>
         <location/>
         <source>Recording Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Kayıt Takvimi</translation>
     </message>
     <message>
         <location/>
         <source>Show Quality on Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Kayıt Kalitesini Takvimde Göster</translation>
     </message>
     <message>
         <location/>
         <source>Panic Mode: </source>
-        <translation type="unfinished"></translation>
+        <translation>Panik Modu:</translation>
     </message>
     <message>
         <location/>
         <source>Show FPS on Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>FPS&apos;yi Takvimde Göster</translation>
     </message>
     <message>
         <location/>
         <source>Note: Recording Schedule is based on Server Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Not:Kayıt Takvimi Sunucu Zamanına Bağlıdır</translation>
     </message>
     <message>
         <location/>
         <source>Schedule Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Takvim Ayarları</translation>
     </message>
     <message>
         <location/>
         <source>FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>FPS</translation>
     </message>
     <message>
         <location/>
         <source>Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalite</translation>
     </message>
     <message>
         <location/>
         <source>Record Always</source>
-        <translation type="unfinished"></translation>
+        <translation>Daima Kaydet</translation>
     </message>
     <message>
         <location/>
         <source>Motion Only</source>
-        <translation type="unfinished"></translation>
+        <translation>Sedece Hareket</translation>
     </message>
     <message>
         <location/>
         <source>Motion + Low-Res </source>
-        <translation type="unfinished"></translation>
+        <translation>Hareket + Düşük Çözünürlük</translation>
     </message>
     <message>
         <location/>
         <source>Do Not Record</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaydetme</translation>
     </message>
     <message>
         <location/>
         <source>Fixed Archive Length</source>
-        <translation type="unfinished"></translation>
+        <translation>Sabit Arşiv Uzunluğu</translation>
     </message>
     <message>
         <location/>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Otomatik</translation>
     </message>
     <message>
         <location/>
         <source>Min. Days</source>
-        <translation type="unfinished"></translation>
+        <translation>Min. Gün</translation>
     </message>
     <message>
         <location/>
         <source>Max. Days</source>
-        <translation type="unfinished"></translation>
+        <translation>Max. Gün</translation>
     </message>
     <message>
         <location/>
         <source>Motion Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Hareket Kaydı</translation>
     </message>
     <message>
         <location/>
         <source>Pre-Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Ön Kayıt Süresi</translation>
     </message>
     <message>
         <location/>
         <source> s</source>
         <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>saniye</translation>
     </message>
     <message>
         <location/>
         <source>Post-Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Son Kayıt Süresi</translation>
     </message>
     <message>
         <location/>
         <source>Apply changes before copying schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Değişiklikleri Takvimi Kopyalamadan Önce Uygula</translation>
     </message>
     <message>
         <location/>
         <source>Copy Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>Takvimi Kopyala...</translation>
     </message>
 </context>
 <context>
@@ -786,17 +786,17 @@
     <message>
         <location filename="../src/ui/dialogs/connection_name_dialog.ui"/>
         <source>Save connection as...</source>
-        <translation type="unfinished"></translation>
+        <translation>Bağlantıyı Olarak Kaydet...</translation>
     </message>
     <message>
         <location/>
         <source>Enter name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Bağlantı Adı Gir:</translation>
     </message>
     <message>
         <location/>
         <source>Save password</source>
-        <translation type="unfinished"></translation>
+        <translation>Şifreyi Kaydet</translation>
     </message>
 </context>
 <context>
@@ -804,12 +804,12 @@
     <message>
         <location filename="../src/ui/dialogs/connection_testing_dialog.ui"/>
         <source>Connection Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Bağlantı Testi</translation>
     </message>
     <message>
         <location/>
         <source>Testing connection...</source>
-        <translation type="unfinished"></translation>
+        <translation>Bağlantı Test Ediliyor...</translation>
     </message>
 </context>
 <context>
@@ -817,22 +817,22 @@
     <message>
         <location filename="../src/ui/widgets/business/custom_business_event_widget.ui"/>
         <source>Source contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaynak İçeriği:</translation>
     </message>
     <message>
         <location/>
         <source>Keywords separated by space</source>
-        <translation type="unfinished"></translation>
+        <translation>Anahtar Kelimeler Boşluk İle Ayrılır</translation>
     </message>
     <message>
         <location/>
         <source>Caption contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Başlık İçeriği:</translation>
     </message>
     <message>
         <location/>
         <source>Description contains:</source>
-        <translation type="unfinished"></translation>
+        <translation>Açıklama İçeriği:</translation>
     </message>
 </context>
 <context>
@@ -840,12 +840,12 @@
     <message>
         <location filename="../src/ui/widgets/settings/database_management_widget.ui"/>
         <source>Create Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Yedek Oluştur...</translation>
     </message>
     <message>
         <location/>
         <source>Restore from Backup...</source>
-        <translation type="unfinished"></translation>
+        <translation>Yedekten Geri Yükle...</translation>
     </message>
 </context>
 <context>
@@ -853,32 +853,32 @@
     <message>
         <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
         <source>Event Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Olay Günlükleri</translation>
     </message>
     <message>
         <location/>
         <source>-</source>
-        <translation type="unfinished"></translation>
+        <translation>-</translation>
     </message>
     <message>
         <location/>
         <source>Clear Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtreyi Temizle</translation>
     </message>
     <message>
         <location/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Yenile</translation>
     </message>
     <message>
         <location/>
         <source>Alarm/Event Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Alarm/Olay Kuralları</translation>
     </message>
     <message>
         <location/>
         <source>All Servers are offline. Logs are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tüm Sunucular Çevrimdışı. Günlükler Mevcut Değil.</translation>
     </message>
 </context>
 <context>
@@ -886,7 +886,7 @@
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>&amp;PTZ preset:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;PTZ Turu:</translation>
     </message>
 </context>
 <context>
@@ -894,27 +894,27 @@
     <message>
         <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui"/>
         <source>Ceiling Mount</source>
-        <translation type="unfinished"></translation>
+        <translation>Tavan Montajı</translation>
     </message>
     <message>
         <location/>
         <source>Wall Mount</source>
-        <translation type="unfinished"></translation>
+        <translation>Duvar Montajı</translation>
     </message>
     <message>
         <location/>
         <source>Floor/Table Mount</source>
-        <translation type="unfinished"></translation>
+        <translation>Masa/Yer Montajı</translation>
     </message>
     <message>
         <location/>
         <source>Camera View Angle Correction</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera Görüntü Açısı Doğrulaması</translation>
     </message>
     <message>
         <location/>
         <source>Calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalibrasyon</translation>
     </message>
 </context>
 <context>
@@ -922,77 +922,77 @@
     <message>
         <location filename="../src/ui/widgets/settings/general_preferences_widget.ui"/>
         <source>Main Media Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Varsayılan Medya Klasörü</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Gözat...</translation>
     </message>
     <message>
         <location/>
         <source>Extra Media Folders</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekstra Medya Klasörleri</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Add...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ekle...</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Kaldır</translation>
     </message>
     <message>
         <location/>
         <source>Misc</source>
-        <translation type="unfinished"></translation>
+        <translation>Diğer</translation>
     </message>
     <message>
         <location/>
         <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation type="unfinished"></translation>
+        <translation>Sesi 5.1&apos;den 2.1&apos;e Karıştır</translation>
     </message>
     <message>
         <location/>
         <source>Restart required</source>
-        <translation type="unfinished"></translation>
+        <translation>Yeniden Başlatma Gerekiyor</translation>
     </message>
     <message>
         <location/>
         <source>Auto Pause Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Videoyu Otomatik Durdur</translation>
     </message>
     <message>
         <location/>
         <source>after</source>
-        <translation type="unfinished"></translation>
+        <translation>sonra</translation>
     </message>
     <message>
         <location/>
         <source>Minutes of Inactivity</source>
-        <translation type="unfinished"></translation>
+        <translation>Hareket Olmayan Dakika</translation>
     </message>
     <message>
         <location/>
         <source>Run Application when PC Boots:</source>
-        <translation type="unfinished"></translation>
+        <translation>Uygulamayı Başlangıçta Çalıştır:</translation>
     </message>
     <message>
         <location/>
         <source>Double Buffering:</source>
-        <translation type="unfinished"></translation>
+        <translation>Çift Tamponlama:</translation>
     </message>
     <message>
         <location/>
         <source>Browse Logs</source>
-        <translation type="unfinished"></translation>
+        <translation>Günlüklere Gözat</translation>
     </message>
     <message>
         <location/>
         <source>Clear Local Cache</source>
-        <translation type="unfinished"></translation>
+        <translation>Yerel Önbelleği Temizle</translation>
     </message>
 </context>
 <context>
@@ -1000,77 +1000,77 @@
     <message>
         <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui"/>
         <source>Administration</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistem Yönetimi</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Alarm/Event Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Alarm/Olay Kuralları...</translation>
     </message>
     <message>
         <location/>
         <source>Ctrl+E</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+E</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Event Log...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Durum Günlükleri...</translation>
     </message>
     <message>
         <location/>
         <source>Ctrl+L</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+L</translation>
     </message>
     <message>
         <location/>
         <source>Ctrl+M</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+M</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Health Monitoring...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Sağlık Denetimi...</translation>
     </message>
     <message>
         <location/>
         <source>Monitor All Servers on a Single Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Tüm Sunucuları Tek Bir Ekrana Bağla</translation>
     </message>
     <message>
         <location/>
         <source>Audit Trail...</source>
-        <translation type="unfinished"></translation>
+        <translation>Denetim Merkezi...</translation>
     </message>
     <message>
         <location/>
         <source>Open Audit Trail Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Denetim Merkezi Günlüğünü Aç</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Bookmarks...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Yer İmleri...</translation>
     </message>
     <message>
         <location/>
         <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl+B</translation>
     </message>
     <message>
         <location/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Yer İmi Listesini Aç (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location/>
         <source>System Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistem Ayarları</translation>
     </message>
     <message>
         <location/>
         <source>System Backup and Restore</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistem Yedekleme ve Geri Yükleme</translation>
     </message>
 </context>
 <context>
@@ -1078,22 +1078,22 @@
     <message>
         <location filename="../src/ui/widgets/properties/image_control_widget.ui"/>
         <source>Image Control</source>
-        <translation type="unfinished"></translation>
+        <translation>Görüntü Kontrolü</translation>
     </message>
     <message>
         <location/>
         <source>Force aspect ratio to:</source>
-        <translation type="unfinished"></translation>
+        <translation>En-Boy Oranını Zorla:</translation>
     </message>
     <message>
         <location/>
         <source>This is a fish-eye lens camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Bu Bir Fish-Eye Lensli Kameradır</translation>
     </message>
     <message>
         <location/>
         <source>Default Rotation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Varsayılan Rotasyon:</translation>
     </message>
 </context>
 <context>
@@ -1101,17 +1101,17 @@
     <message>
         <location filename="../src/ui/dialogs/image_preview_dialog.ui"/>
         <source>Image View</source>
-        <translation type="unfinished"></translation>
+        <translation>Görüntüle</translation>
     </message>
     <message>
         <location/>
         <source>&lt;No image&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Görüntü Yok&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Loading Image...Please Wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Görüntü Yükleniyor... Lütfen Bekleyin.</translation>
     </message>
 </context>
 <context>
@@ -1119,77 +1119,77 @@
     <message>
         <location filename="../src/ui/dialogs/layout_settings_dialog.ui"/>
         <source>Layout Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekran Ayarları</translation>
     </message>
     <message>
         <location/>
         <source>General Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Genel Ayarlar</translation>
     </message>
     <message>
         <location/>
         <source>Layout is Locked</source>
-        <translation type="unfinished"></translation>
+        <translation>İzleme Penceresi Kilitlendi</translation>
     </message>
     <message>
         <location/>
         <source>Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Arka Plan</translation>
     </message>
     <message>
         <location/>
         <source>Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>Gözat...</translation>
     </message>
     <message>
         <location/>
         <source>View...</source>
-        <translation type="unfinished"></translation>
+        <translation>Görünüm...</translation>
     </message>
     <message>
         <location/>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>Temizle</translation>
     </message>
     <message>
         <location/>
         <source>Processing Image...Please Wait.</source>
-        <translation type="unfinished"></translation>
+        <translation>Görüntü İşleniyor...Lütfen Bekleyin.</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Crop to monitor aspect ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ekran Çözünürlüğünü Kırp</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Width:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Genişlik:</translation>
     </message>
     <message>
         <location/>
         <source> cells</source>
-        <translation type="unfinished"></translation>
+        <translation>hücre</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Height:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Uzunluk:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Opacity:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Bulanıklık:</translation>
     </message>
     <message>
         <location/>
         <source>%</source>
-        <translation type="unfinished"></translation>
+        <translation>%</translation>
     </message>
     <message>
         <location/>
         <source>Keep Aspect Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekran Çözünürlük Oranını Koru</translation>
     </message>
 </context>
 <context>
@@ -1197,47 +1197,47 @@
     <message>
         <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
         <source>LDAP Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAP Ayarları</translation>
     </message>
     <message>
         <location/>
         <source>Server UR&amp;L:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Sunucu URL&apos;si:</translation>
     </message>
     <message>
         <location/>
         <source>ldap(s)://host:port</source>
-        <translation type="unfinished"></translation>
+        <translation>Idap(s)://host:port</translation>
     </message>
     <message>
         <location/>
         <source>Ad&amp;min DN:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Admin DN&apos;si:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Şifre:</translation>
     </message>
     <message>
         <location/>
         <source>Search Base:</source>
-        <translation type="unfinished"></translation>
+        <translation>Arama Tabanı:</translation>
     </message>
     <message>
         <location/>
         <source>Search Filter:</source>
-        <translation type="unfinished"></translation>
+        <translation>Arama Filtresi:</translation>
     </message>
     <message>
         <location/>
         <source>Optional</source>
-        <translation type="unfinished"></translation>
+        <translation>Tercihe Bağlı</translation>
     </message>
     <message>
         <location/>
         <source>Testing...</source>
-        <translation type="unfinished"></translation>
+        <translation>Test Ediliyor...</translation>
     </message>
 </context>
 <context>
@@ -1245,27 +1245,27 @@
     <message>
         <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
         <source>Fetch Users from LDAP...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kullanıcıları LDAP&apos;den Çek...</translation>
     </message>
     <message>
         <location/>
         <source>Select users to import</source>
-        <translation type="unfinished"></translation>
+        <translation>İçeri Aktarmak İçin Kullanıcıları Seç</translation>
     </message>
     <message>
         <location/>
         <source>Filter...</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrele...</translation>
     </message>
     <message>
         <location/>
         <source>Loading...</source>
-        <translation type="unfinished"></translation>
+        <translation>Yükleniyor...</translation>
     </message>
     <message>
         <location/>
         <source>Connection error</source>
-        <translation type="unfinished"></translation>
+        <translation>Bağlantı Hatası</translation>
     </message>
 </context>
 <context>
@@ -1273,37 +1273,37 @@
     <message>
         <location filename="../src/ui/dialogs/license_details_dialog.ui"/>
         <source>License Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisans Detayları</translation>
     </message>
     <message>
         <location/>
         <source>Generic</source>
-        <translation type="unfinished"></translation>
+        <translation>Genel</translation>
     </message>
     <message>
         <location/>
         <source>License Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisans Türü:</translation>
     </message>
     <message>
         <location/>
         <source>License Key:</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisans Anahtarı:</translation>
     </message>
     <message>
         <location/>
         <source>Locked to Hardware ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>Donanım ID&apos;sine Kilitle:</translation>
     </message>
     <message>
         <location/>
         <source>Features</source>
-        <translation type="unfinished"></translation>
+        <translation>Özellikler</translation>
     </message>
     <message>
         <location/>
         <source>This license type requires a higher software version.</source>
-        <translation type="unfinished"></translation>
+        <translation>BU lisans türü daha yüksek bir yazılım sürümü gerektiriyor.</translation>
     </message>
 </context>
 <context>
@@ -1311,22 +1311,22 @@
     <message>
         <location filename="../src/ui/widgets/settings/license_manager_widget.ui"/>
         <source>Active Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisansları Etkinleştir</translation>
     </message>
     <message>
         <location/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaldır</translation>
     </message>
     <message>
         <location/>
         <source>Selected License Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Seçilen Lisans Detayları</translation>
     </message>
     <message>
         <location/>
         <source>New License</source>
-        <translation type="unfinished"></translation>
+        <translation>Yeni Lisans</translation>
     </message>
 </context>
 <context>
@@ -1334,7 +1334,7 @@
     <message>
         <location filename="../src/ui/dialogs/license_notification_dialog.ui"/>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Uyarı</translation>
     </message>
 </context>
 <context>
@@ -1342,67 +1342,67 @@
     <message>
         <location filename="../src/ui/widgets/settings/license_widget.ui"/>
         <source>Automatic Activation via Internet</source>
-        <translation type="unfinished"></translation>
+        <translation>İnternet Üzerinden Otomatik Etkinleştirme</translation>
     </message>
     <message>
         <location/>
         <source>Manual Activation</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuel Olarak Etkinleştirme</translation>
     </message>
     <message>
         <location/>
         <source>License Key:</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisans Anahtarı:</translation>
     </message>
     <message>
         <location/>
         <source>Paste from Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Panodan Yapıştır</translation>
     </message>
     <message>
         <location/>
         <source>License Key is Invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisans Anahtarı Geçersiz</translation>
     </message>
     <message>
         <location/>
         <source>Hardware ID:</source>
-        <translation type="unfinished"></translation>
+        <translation>Donanım ID&apos;si:</translation>
     </message>
     <message>
         <location/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Panoya Yapıştır</translation>
     </message>
     <message>
         <location/>
         <source>Activation Key File:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivasyon Anahtarı Dosyası:</translation>
     </message>
     <message>
         <location/>
         <source>Select License File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisans Dosyası Seç...</translation>
     </message>
     <message>
         <location/>
         <source>Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>Gözat...</translation>
     </message>
     <message>
         <location/>
         <source>License will be bound to the current server</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisans Geçerli Sunucuya Bağlı Olacak</translation>
     </message>
     <message>
         <location/>
         <source>Activate Free License</source>
-        <translation type="unfinished"></translation>
+        <translation>Deneme Lisansını Etkinleştir</translation>
     </message>
     <message>
         <location/>
         <source>Activate License</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisansı Etkinleştir</translation>
     </message>
 </context>
 <context>
@@ -1410,12 +1410,12 @@
     <message>
         <location filename="../src/ui/widgets/licensing/licenses_propose_widget.ui"/>
         <source>Licensing</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisans</translation>
     </message>
     <message>
         <location/>
         <source>Get More Licenses...</source>
-        <translation type="unfinished"></translation>
+        <translation>Daha Fazla Lisans Al...</translation>
     </message>
 </context>
 <context>
@@ -1424,52 +1424,52 @@
         <location filename="../src/ui/dialogs/login_dialog.ui"/>
         <source>Connect to Server</source>
         <comment>Groupbox Title</comment>
-        <translation type="unfinished"></translation>
+        <translation>Sunucuya Bağlan</translation>
     </message>
     <message>
         <location/>
         <source>Save...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaydet...</translation>
     </message>
     <message>
         <location/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Sil</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Connection Options:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Bağlantı Seçenekleri:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Host:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Host:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Giriş:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Şifre:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Test</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Test Et</translation>
     </message>
     <message>
         <location/>
         <source>P&amp;ort:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Port:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Auto-Login</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Otomatik Giriş</translation>
     </message>
 </context>
 <context>
@@ -1477,102 +1477,102 @@
     <message>
         <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui"/>
         <source>Look and Feel</source>
-        <translation type="unfinished"></translation>
+        <translation>Görünüm ve Tema</translation>
     </message>
     <message>
         <location/>
         <source>Time Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Zaman Modu:</translation>
     </message>
     <message>
         <location/>
         <source>Language:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dil:</translation>
     </message>
     <message>
         <location/>
         <source>Show IP in tree:</source>
-        <translation type="unfinished"></translation>
+        <translation>IP Listesinde Göster:</translation>
     </message>
     <message>
         <location/>
         <source>Skin:</source>
-        <translation type="unfinished"></translation>
+        <translation>Görünüm:</translation>
     </message>
     <message>
         <location/>
         <source>Tour sequence cycle time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tur Zamanı Devir Süresi:</translation>
     </message>
     <message>
         <location/>
         <source>Restart required.</source>
-        <translation type="unfinished"></translation>
+        <translation>Yeniden Başlatma Gerekli.</translation>
     </message>
     <message>
         <location/>
         <source> seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>Saniye</translation>
     </message>
     <message>
         <location/>
         <source>Background Animation</source>
-        <translation type="unfinished"></translation>
+        <translation>Arkaplan Animasyonu</translation>
     </message>
     <message>
         <location/>
         <source>Enable Background Animation</source>
-        <translation type="unfinished"></translation>
+        <translation>Arkaplan Animasyonunu Etkinleştir</translation>
     </message>
     <message>
         <location/>
         <source>Color:</source>
-        <translation type="unfinished"></translation>
+        <translation>Renk:</translation>
     </message>
     <message>
         <location/>
         <source>Select color...</source>
-        <translation type="unfinished"></translation>
+        <translation>Renk Seç...</translation>
     </message>
     <message>
         <location/>
         <source>Intensity:</source>
-        <translation type="unfinished"></translation>
+        <translation>Yuğunluk:</translation>
     </message>
     <message>
         <location/>
         <source>%</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Background Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Arkaplan Görüntüsü</translation>
     </message>
     <message>
         <location/>
         <source>Enable Background Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Arkaplan Görüntüsünü Etkinleştir</translation>
     </message>
     <message>
         <location/>
         <source>Image:</source>
-        <translation type="unfinished"></translation>
+        <translation>Görüntü:</translation>
     </message>
     <message>
         <location/>
         <source>&lt;No image&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;Görüntü Yok&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>Gözat...</translation>
     </message>
     <message>
         <location/>
         <source>Mode:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mod:</translation>
     </message>
 </context>
 <context>
@@ -1580,37 +1580,37 @@
     <message>
         <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Genel</translation>
     </message>
     <message>
         <location/>
         <source>Authentication</source>
-        <translation type="unfinished"></translation>
+        <translation>Kimlik Doğrulama</translation>
     </message>
     <message>
         <location/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Şifre:</translation>
     </message>
     <message>
         <location/>
         <source>Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>Giriş:</translation>
     </message>
     <message>
         <location/>
         <source>Enable Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Sesi Etkinleştir</translation>
     </message>
     <message>
         <location/>
         <source>Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaydediliyor</translation>
     </message>
     <message>
         <location/>
         <source>Expert</source>
-        <translation type="unfinished"></translation>
+        <translation>Uzman</translation>
     </message>
 </context>
 <context>
@@ -1618,17 +1618,17 @@
     <message>
         <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
         <source>Manage...</source>
-        <translation type="unfinished"></translation>
+        <translation>Yönet...</translation>
     </message>
     <message>
         <location/>
         <source>Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ses:</translation>
     </message>
     <message>
         <location/>
         <source>Test...</source>
-        <translation type="unfinished"></translation>
+        <translation>Test Et...</translation>
     </message>
 </context>
 <context>
@@ -1636,12 +1636,12 @@
     <message>
         <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
         <source>Show to administrators only</source>
-        <translation type="unfinished"></translation>
+        <translation>Sadece Yöneticilere Göster</translation>
     </message>
     <message>
         <location/>
         <source>Global Notification Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Genel Uyarı Sistemi...</translation>
     </message>
 </context>
 <context>
@@ -1649,17 +1649,17 @@
     <message>
         <location filename="../src/ui/widgets/settings/popup_settings_widget.ui"/>
         <source>Show all notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Tüm Bildirimleri Göster</translation>
     </message>
     <message>
         <location/>
         <source>Alarms/Events</source>
-        <translation type="unfinished"></translation>
+        <translation>Alarmlar/Olaylar</translation>
     </message>
     <message>
         <location/>
         <source>System Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistem Bildirimleri</translation>
     </message>
 </context>
 <context>
@@ -1667,7 +1667,7 @@
     <message>
         <location filename="../src/ui/dialogs/preferences_dialog.ui"/>
         <source>Local Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Yerel Ayarlar</translation>
     </message>
 </context>
 <context>
@@ -1675,52 +1675,52 @@
     <message>
         <location filename="../src/ui/dialogs/ptz_manage_dialog.ui"/>
         <source>Save Current Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Mevcut Konumu Kaydet</translation>
     </message>
     <message>
         <location/>
         <source>Go To Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Konuma Git</translation>
     </message>
     <message>
         <location/>
         <source>Create Tour</source>
-        <translation type="unfinished"></translation>
+        <translation>Tur Oluştur</translation>
     </message>
     <message>
         <location/>
         <source>Start Tour</source>
-        <translation type="unfinished"></translation>
+        <translation>Tura Başla</translation>
     </message>
     <message>
         <location/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Sil</translation>
     </message>
     <message>
         <location/>
         <source>Details</source>
-        <translation type="unfinished"></translation>
+        <translation>Detaylar</translation>
     </message>
     <message>
         <location/>
         <source>No Tour Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Tur Seçilmedi</translation>
     </message>
     <message>
         <location/>
         <source>Preview</source>
-        <translation type="unfinished"></translation>
+        <translation>Önizleme</translation>
     </message>
     <message>
         <location/>
         <source>No preview available</source>
-        <translation type="unfinished"></translation>
+        <translation>Önizleme Mevcut Değil</translation>
     </message>
     <message>
         <location/>
         <source>Get Preview</source>
-        <translation type="unfinished"></translation>
+        <translation>Önizleme Al</translation>
     </message>
 </context>
 <context>
@@ -1728,17 +1728,17 @@
     <message>
         <location filename="../src/ui/dialogs/ptz_preset_dialog.ui"/>
         <source>Save Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Konumu Kaydet</translation>
     </message>
     <message>
         <location/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>İsim:</translation>
     </message>
     <message>
         <location/>
         <source>Hotkey:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kısayol:</translation>
     </message>
 </context>
 <context>
@@ -1746,12 +1746,12 @@
     <message>
         <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
         <source>Attach to Video Wall...</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Duvarına Ekle...</translation>
     </message>
     <message>
         <location/>
         <source>Preview</source>
-        <translation type="unfinished"></translation>
+        <translation>Önizleme</translation>
     </message>
 </context>
 <context>
@@ -1759,22 +1759,22 @@
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
         <source>Install a specific build.</source>
-        <translation type="unfinished"></translation>
+        <translation>Özel Yapı Kur.</translation>
     </message>
     <message>
         <location/>
         <source>Build Number:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sürüm Numarası:</translation>
     </message>
     <message>
         <location/>
         <source>99990</source>
-        <translation type="unfinished"></translation>
+        <translation>99990</translation>
     </message>
     <message>
         <location/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Şifre:</translation>
     </message>
 </context>
 <context>
@@ -1782,7 +1782,7 @@
     <message>
         <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
         <source>Bookmark</source>
-        <translation type="unfinished"></translation>
+        <translation>Yer İmi</translation>
     </message>
 </context>
 <context>
@@ -1790,17 +1790,17 @@
     <message>
         <location filename="../src/ui/dialogs/credentials_dialog.ui"/>
         <source>Enter a valid username and password...</source>
-        <translation type="unfinished"></translation>
+        <translation>Geçerli Bir Kullanıcı Adı ve Şifre Girin...</translation>
     </message>
     <message>
         <location/>
         <source>User:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kullanıcı Adı:</translation>
     </message>
     <message>
         <location/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Şifre:</translation>
     </message>
 </context>
 <context>
@@ -1808,7 +1808,7 @@
     <message>
         <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.ui"/>
         <source>Auto Calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>Otomatik Kalibrasyon</translation>
     </message>
 </context>
 <context>
@@ -1816,7 +1816,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/ioport_settings_widget.ui"/>
         <source>Form</source>
-        <translation type="unfinished"></translation>
+        <translation>Biçim</translation>
     </message>
 </context>
 <context>
@@ -1824,17 +1824,17 @@
     <message>
         <location filename="../src/ui/dialogs/media_file_settings_dialog.ui"/>
         <source>File Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Dosya Ayarları</translation>
     </message>
     <message>
         <location/>
         <source>Picture is not loaded</source>
-        <translation type="unfinished"></translation>
+        <translation>Resim Yüklenemedi</translation>
     </message>
     <message>
         <location/>
         <source>This is a fish-eye lens file</source>
-        <translation type="unfinished"></translation>
+        <translation>Bu Bir Fish Eye Lens Dosyasıdır</translation>
     </message>
 </context>
 <context>
@@ -1842,32 +1842,32 @@
     <message>
         <location filename="../src/ui/dialogs/merge_systems_dialog.ui"/>
         <source>Merge Systems...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistemleri Birleştir...</translation>
     </message>
     <message>
         <location/>
         <source>Server URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunucu URL&apos;si:</translation>
     </message>
     <message>
         <location/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Şifre:</translation>
     </message>
     <message>
         <location/>
         <source>Check</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrol Et</translation>
     </message>
     <message>
         <location/>
         <source>The new system will have password and name from the system:</source>
-        <translation type="unfinished"></translation>
+        <translation>Yeni Sistem Mevcut Sistemden İsim ve Şifre Alacaktır:</translation>
     </message>
     <message>
         <location/>
         <source>You will be reconnected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Yeniden Bağlanacaksınız.</translation>
     </message>
 </context>
 <context>
@@ -1875,27 +1875,27 @@
     <message>
         <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui"/>
         <source>Notification Sounds</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildirim Sesleri</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Play</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Oynat</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Add...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ekle...</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Rename...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Yeniden Adlandır...</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Delete...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Sil...</translation>
     </message>
 </context>
 <context>
@@ -1903,17 +1903,17 @@
     <message>
         <location filename="../src/ui/widgets/resource_tree_widget.ui"/>
         <source>Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrele</translation>
     </message>
     <message>
         <location/>
         <source>Reset Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtreyi Sıfırla</translation>
     </message>
     <message>
         <location/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation>X</translation>
     </message>
 </context>
 <context>
@@ -1921,22 +1921,22 @@
     <message>
         <location filename="../src/ui/widgets/routing_management_widget.ui"/>
         <source>Available Server Addresses</source>
-        <translation type="unfinished"></translation>
+        <translation>Mevcut Sunucu Adresleri</translation>
     </message>
     <message>
         <location/>
         <source>Add URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL Ekle</translation>
     </message>
     <message>
         <location/>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaldır</translation>
     </message>
     <message>
         <location/>
         <source>Removing this connection option could lead to system malfunction.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bu Bağlantıyı Kaldırmak Sistem Çökmelerine Sebep Olabilir.</translation>
     </message>
 </context>
 <context>
@@ -1944,62 +1944,62 @@
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui"/>
         <source>Available Update:</source>
-        <translation type="unfinished"></translation>
+        <translation>Güncelleme Mevcut:</translation>
     </message>
     <message>
         <location/>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilinmeyen</translation>
     </message>
     <message>
         <location/>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Güncelle</translation>
     </message>
     <message>
         <location/>
         <source>Update from file:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dosyadan Güncelle:</translation>
     </message>
     <message>
         <location/>
         <source>Archive url:</source>
-        <translation type="unfinished"></translation>
+        <translation>Arşiv URL&apos;si:</translation>
     </message>
     <message>
         <location/>
         <source>Copy to Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Panoya Kopyala</translation>
     </message>
     <message>
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
-        <translation type="unfinished"></translation>
+        <translation>Manuel Güncelleme İçin Linkteki Arşiv Dosyasını İndirin ve Kullanın:</translation>
     </message>
     <message>
         <location/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>İptal</translation>
     </message>
     <message>
         <location/>
         <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-        <translation type="unfinished"></translation>
+        <translation>Görünüşe Göre Güncelleme Beklenenden Daha Fazla Sürecek. Lütfen Beklemeye Devam Ediniz.</translation>
     </message>
     <message>
         <location/>
         <source>Check for updates automatically</source>
-        <translation type="unfinished"></translation>
+        <translation>Güncellemeleri Otomatik Kontrol Et</translation>
     </message>
     <message>
         <location/>
         <source>Unable to check updates on the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>İnternetten Güncellemeleri Kontrol Etme Başarısız.</translation>
     </message>
 </context>
 <context>
@@ -2007,7 +2007,7 @@
     <message>
         <location filename="../src/ui/dialogs/system_administration_dialog.ui"/>
         <source>System Administration</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistem Yönetimi</translation>
     </message>
 </context>
 <context>
@@ -2015,32 +2015,32 @@
     <message>
         <location filename="../src/ui/dialogs/two_step_file_dialog.ui"/>
         <source>Folder:</source>
-        <translation type="unfinished"></translation>
+        <translation>Klasör:</translation>
     </message>
     <message>
         <location/>
         <source>Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>Gözat...</translation>
     </message>
     <message>
         <location/>
         <source>Filename:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dosya Adı:</translation>
     </message>
     <message>
         <location/>
         <source>Format:</source>
-        <translation type="unfinished"></translation>
+        <translation>Biçim:</translation>
     </message>
     <message>
         <location/>
         <source>Warning: file with same name already exists!</source>
-        <translation type="unfinished"></translation>
+        <translation>Uyarı:Aynı İsimle Bir Dosya Zaten Var!</translation>
     </message>
     <message>
         <location/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Seçenekler</translation>
     </message>
 </context>
 <context>
@@ -2048,7 +2048,7 @@
     <message>
         <location filename="../src/ui/dialogs/update_dialog.ui"/>
         <source>Update Servers</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunucuları Güncelle</translation>
     </message>
 </context>
 <context>
@@ -2056,42 +2056,42 @@
     <message>
         <location filename="../src/ui/widgets/settings/user_management_widget.ui"/>
         <source>Filter...</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrele...</translation>
     </message>
     <message>
         <location/>
         <source>New User...</source>
-        <translation type="unfinished"></translation>
+        <translation>Yeni Kullanıcı...</translation>
     </message>
     <message>
         <location/>
         <source>LDAP Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>LDAP Ayarları...</translation>
     </message>
     <message>
         <location/>
         <source>Fetch Users from LDAP...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kullanıcıları LDAP&apos;den Çek...</translation>
     </message>
     <message>
         <location/>
         <source>Enable Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Seçilenleri Etkinleştir</translation>
     </message>
     <message>
         <location/>
         <source>Disable Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Seçilenleri Devre Dışı Bırak</translation>
     </message>
     <message>
         <location/>
         <source>Delete Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Seçilenleri Sil</translation>
     </message>
     <message>
         <location/>
         <source>Clear Selection</source>
-        <translation type="unfinished"></translation>
+        <translation>Seçilenleri Temizle</translation>
     </message>
 </context>
 <context>
@@ -2099,17 +2099,17 @@
     <message>
         <location filename="../src/ui/dialogs/videowall_settings_dialog.ui"/>
         <source>Video Wall Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Wall Ayarları</translation>
     </message>
     <message>
         <location/>
         <source>Launch video wall when Windows starts.</source>
-        <translation type="unfinished"></translation>
+        <translation>Windows Başlayınca Video Wall&apos;u Başlat.</translation>
     </message>
     <message>
         <location/>
         <source>Place shortcut on desktop.</source>
-        <translation type="unfinished"></translation>
+        <translation>Masaüstünde Kısayol Oluştur.</translation>
     </message>
 </context>
 <context>
@@ -2117,12 +2117,12 @@
     <message>
         <location filename="../src/ui/dialogs/reconnect_info_dialog.ui"/>
         <source>Reconnecting...</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekrar Bağlanılıyor...</translation>
     </message>
     <message>
         <location/>
         <source>Please wait while the connection is being restored...</source>
-        <translation type="unfinished"></translation>
+        <translation>Tekrar Bağlanılırken Lütfen Bekleyin...</translation>
     </message>
 </context>
 <context>
@@ -2130,32 +2130,32 @@
     <message>
         <location filename="../src/ui/widgets/business/recording_business_action_widget.ui"/>
         <source>Quality:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalite:</translation>
     </message>
     <message>
         <location/>
         <source>FPS</source>
-        <translation type="unfinished"></translation>
+        <translation>FPS</translation>
     </message>
     <message>
         <location/>
         <source>Pre-Recording:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ön Kayıt Süresi:</translation>
     </message>
     <message>
         <location/>
         <source>s</source>
-        <translation type="unfinished"></translation>
+        <translation>s</translation>
     </message>
     <message>
         <location/>
         <source>Post-Recording:</source>
-        <translation type="unfinished"></translation>
+        <translation>Son Kayıt Süresi:</translation>
     </message>
     <message>
         <location/>
         <source>max</source>
-        <translation type="unfinished"></translation>
+        <translation>max</translation>
     </message>
 </context>
 <context>
@@ -2163,132 +2163,132 @@
     <message>
         <location filename="../src/ui/widgets/settings/recording_settings_widget.ui"/>
         <source>Video Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Kaydı</translation>
     </message>
     <message>
         <location/>
         <source>Temporary Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Geçici Dosya</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Browse...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Gözat...</translation>
     </message>
     <message>
         <location/>
         <source>Capture Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Yakalama Modu</translation>
     </message>
     <message>
         <location/>
         <source>Fullscreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Tam Ekran</translation>
     </message>
     <message>
         <location/>
         <source>Application Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Uygulama Penceresi</translation>
     </message>
     <message>
         <location/>
         <source>Additional Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Ek Seçenekler</translation>
     </message>
     <message>
         <location/>
         <source>Disable Aero</source>
-        <translation type="unfinished"></translation>
+        <translation>Aero&apos;yu Devre Dışı Bırak</translation>
     </message>
     <message>
         <location/>
         <source>Capture Cursor</source>
-        <translation type="unfinished"></translation>
+        <translation>Yakalama İmleci</translation>
     </message>
     <message>
         <location/>
         <source>Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalite</translation>
     </message>
     <message>
         <location/>
         <source>Resolution:</source>
-        <translation type="unfinished"></translation>
+        <translation>Çözünürlük:</translation>
     </message>
     <message>
         <location/>
         <source>Native</source>
-        <translation type="unfinished"></translation>
+        <translation>Yerel</translation>
     </message>
     <message>
         <location/>
         <source>Quarter Native</source>
-        <translation type="unfinished"></translation>
+        <translation>Quarter Native</translation>
     </message>
     <message>
         <location/>
         <source>1920x1080</source>
-        <translation type="unfinished"></translation>
+        <translation>1920x1080</translation>
     </message>
     <message>
         <location/>
         <source>1280x720</source>
-        <translation type="unfinished"></translation>
+        <translation>1280x720</translation>
     </message>
     <message>
         <location/>
         <source>640x480</source>
-        <translation type="unfinished"></translation>
+        <translation>640x480</translation>
     </message>
     <message>
         <location/>
         <source>320x240</source>
-        <translation type="unfinished"></translation>
+        <translation>320x240</translation>
     </message>
     <message>
         <location/>
         <source>Recording Quality:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kayıt Kalitesi:</translation>
     </message>
     <message>
         <location/>
         <source>Best</source>
-        <translation type="unfinished"></translation>
+        <translation>En iyi</translation>
     </message>
     <message>
         <location/>
         <source>Average</source>
-        <translation type="unfinished"></translation>
+        <translation>Ortalama</translation>
     </message>
     <message>
         <location/>
         <source>Performance</source>
-        <translation type="unfinished"></translation>
+        <translation>Performans</translation>
     </message>
     <message>
         <location/>
         <source>Audio Grabber</source>
-        <translation type="unfinished"></translation>
+        <translation>Ses </translation>
     </message>
     <message>
         <location/>
         <source>Primary Device:</source>
-        <translation type="unfinished"></translation>
+        <translation>Birincil Aygıt:</translation>
     </message>
     <message>
         <location/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Yok</translation>
     </message>
     <message>
         <location/>
         <source>External Device:</source>
-        <translation type="unfinished"></translation>
+        <translation>Harici Aygıt:</translation>
     </message>
     <message>
         <location/>
         <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-        <translation type="unfinished"></translation>
+        <translation>En iyi kalite ve çözünürlük için güçlü bir bilgisayar tavsiye edilir.</translation>
     </message>
 </context>
 <context>
@@ -2296,62 +2296,62 @@
     <message>
         <location filename="../src/ui/widgets/properties/recording_statistics_widget.ui"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Yenile</translation>
     </message>
     <message>
         <location/>
         <source>Forecast for full storage(s) usage</source>
-        <translation type="unfinished"></translation>
+        <translation>Tüm Depolama Alanı Kullanımı İçin Tahmini Süre</translation>
     </message>
     <message>
         <location/>
         <source>1000 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>1000 Tb</translation>
     </message>
     <message>
         <location/>
         <source>100 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>100 Tb</translation>
     </message>
     <message>
         <location/>
         <source>0 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>0 Tb</translation>
     </message>
     <message>
         <location/>
         <source>1 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>1 Tb</translation>
     </message>
     <message>
         <location/>
         <source>Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>Tb</translation>
     </message>
     <message>
         <location/>
         <source>Additional storage:</source>
-        <translation type="unfinished"></translation>
+        <translation>Depolama Alanı Ekle:</translation>
     </message>
     <message>
         <location/>
         <source>10 Tb</source>
-        <translation type="unfinished"></translation>
+        <translation>10 Tb</translation>
     </message>
     <message>
         <location/>
         <source>Current usage</source>
-        <translation type="unfinished"></translation>
+        <translation>Mevcut Kullanım</translation>
     </message>
     <message>
         <location/>
         <source>Forecast</source>
-        <translation type="unfinished"></translation>
+        <translation>Tahmini Süre</translation>
     </message>
     <message>
         <location/>
         <source>Servers is offline. Statistics is not available.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunucu Çevrimdışı. İstatistikler Kullanılamıyor.</translation>
     </message>
 </context>
 <context>
@@ -2359,22 +2359,22 @@
     <message>
         <location filename="../src/ui/widgets/resource_browser_widget.ui"/>
         <source>Resources</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaynaklar</translation>
     </message>
     <message>
         <location/>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Arama</translation>
     </message>
     <message>
         <location/>
         <source>Reset Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtreleri Sıfırla</translation>
     </message>
     <message>
         <location/>
         <source>X</source>
-        <translation type="unfinished"></translation>
+        <translation>X</translation>
     </message>
 </context>
 <context>
@@ -2382,7 +2382,7 @@
     <message>
         <location filename="../src/ui/dialogs/resource_list_dialog.ui"/>
         <source>Never suggest saving layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Bir Daha Bunu Gösterme</translation>
     </message>
 </context>
 <context>
@@ -2390,22 +2390,22 @@
     <message>
         <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui"/>
         <source>Speak the following:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aşağıdakileri Söyleyin:</translation>
     </message>
     <message>
         <location/>
         <source>Type any text here</source>
-        <translation type="unfinished"></translation>
+        <translation>Herhangi Bir Metin Girin</translation>
     </message>
     <message>
         <location/>
         <source>Volume:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ses:</translation>
     </message>
     <message>
         <location/>
         <source>Test...</source>
-        <translation type="unfinished"></translation>
+        <translation>Test Et...</translation>
     </message>
 </context>
 <context>
@@ -2413,12 +2413,12 @@
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
         <source>&amp;Additional Recipients:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Diğer Alıcılar:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Global Email Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Genel E Posta Ayarları...</translation>
     </message>
 </context>
 <context>
@@ -2426,37 +2426,37 @@
     <message>
         <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>İsim:</translation>
     </message>
     <message>
         <location/>
         <source>IP Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>IP Adresi:</translation>
     </message>
     <message>
         <location/>
         <source>Ping</source>
-        <translation type="unfinished"></translation>
+        <translation>Ping</translation>
     </message>
     <message>
         <location/>
         <source>Port:</source>
-        <translation type="unfinished"></translation>
+        <translation>Port:</translation>
     </message>
     <message>
         <location/>
         <source>9000</source>
-        <translation type="unfinished"></translation>
+        <translation>9000</translation>
     </message>
     <message>
         <location/>
         <source>Failover</source>
-        <translation type="unfinished"></translation>
+        <translation>Failover</translation>
     </message>
     <message>
         <location/>
         <source>Failover Priority...</source>
-        <translation type="unfinished"></translation>
+        <translation>Failover Önceliği...</translation>
     </message>
 </context>
 <context>
@@ -2464,17 +2464,17 @@
     <message>
         <location filename="../src/ui/widgets/business/show_on_alarm_layout_action_widget.ui"/>
         <source>for</source>
-        <translation type="unfinished"></translation>
+        <translation>için</translation>
     </message>
     <message>
         <location/>
         <source>Force Alarm Layout opening</source>
-        <translation type="unfinished"></translation>
+        <translation>Alarm Ekranını Açmaya Zorla</translation>
     </message>
     <message>
         <location/>
         <source>Also show source camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Ayrıca Kaynak Kamerayı Göster</translation>
     </message>
 </context>
 <context>
@@ -2482,27 +2482,27 @@
     <message>
         <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
         <source>seconds</source>
-        <translation type="unfinished"></translation>
+        <translation>saniye</translation>
     </message>
     <message>
         <location/>
         <source>Rule will work only for prolonged events</source>
-        <translation type="unfinished"></translation>
+        <translation>Kural Sadece Devam Eden Olaylarda Çalışacaktır</translation>
     </message>
     <message>
         <location/>
         <source>Also show on source camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaynak Kamerada Göster</translation>
     </message>
     <message>
         <location/>
         <source>Display text for:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ekranda Görünecek Metin:</translation>
     </message>
     <message>
         <location/>
         <source>Use custom text:</source>
-        <translation type="unfinished"></translation>
+        <translation>Özel Metin Kullan:</translation>
     </message>
 </context>
 <context>
@@ -2510,17 +2510,17 @@
     <message>
         <location filename="../src/ui/dialogs/sign_dialog.ui"/>
         <source>Watermark Check</source>
-        <translation type="unfinished"></translation>
+        <translation>Filigran Kontrolü</translation>
     </message>
     <message>
         <location/>
         <source>Checked File:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrol Edilen Dosya:</translation>
     </message>
     <message>
         <location/>
         <source>Check Result:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrol Et:</translation>
     </message>
 </context>
 <context>
@@ -2528,157 +2528,157 @@
     <message>
         <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui"/>
         <source>General</source>
-        <translation type="unfinished"></translation>
+        <translation>Genel</translation>
     </message>
     <message>
         <location/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>İsim:</translation>
     </message>
     <message>
         <location/>
         <source>Model:</source>
-        <translation type="unfinished"></translation>
+        <translation>Model:</translation>
     </message>
     <message>
         <location/>
         <source>Firmware:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aygıt Yazılımı:</translation>
     </message>
     <message>
         <location/>
         <source>Vendor:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sağlayıcı:</translation>
     </message>
     <message>
         <location/>
         <source>Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adres</translation>
     </message>
     <message>
         <location/>
         <source>Ping</source>
-        <translation type="unfinished"></translation>
+        <translation>Ping</translation>
     </message>
     <message>
         <location/>
         <source>Web Page:</source>
-        <translation type="unfinished"></translation>
+        <translation>Web Sayfası:</translation>
     </message>
     <message>
         <location/>
         <source>IP Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>IP Adresi:</translation>
     </message>
     <message>
         <location/>
         <source>MAC Address:</source>
-        <translation type="unfinished"></translation>
+        <translation>MAC Adresi:</translation>
     </message>
     <message>
         <location/>
         <source>Authentication</source>
-        <translation type="unfinished"></translation>
+        <translation>Kimlik Doğrulama</translation>
     </message>
     <message>
         <location/>
         <source>Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>Giriş:</translation>
     </message>
     <message>
         <location/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Şifre:</translation>
     </message>
     <message>
         <location/>
         <source>Enable Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>Sesi Etkinleştir</translation>
     </message>
     <message>
         <location/>
         <source>Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaydediliyor</translation>
     </message>
     <message>
         <location/>
         <source>Motion</source>
-        <translation type="unfinished"></translation>
+        <translation>Hareket</translation>
     </message>
     <message>
         <location/>
         <source>Motion is not available for this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bu Kamera İçin Hareket Mevcut Değil.</translation>
     </message>
     <message>
         <location/>
         <source>Motion Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Hareket Ayarları</translation>
     </message>
     <message>
         <location/>
         <source>Motion Detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Hareket Algılama</translation>
     </message>
     <message>
         <location/>
         <source>Hardware (camera built-in)</source>
-        <translation type="unfinished"></translation>
+        <translation>Donanım (Dahili Kamera)</translation>
     </message>
     <message>
         <location/>
         <source>Software - maximum FPS could decrease slightly on server</source>
-        <translation type="unfinished"></translation>
+        <translation>Yazılım - Maksimum FPS Sunucuda Düşüşe Sebep Olabilir</translation>
     </message>
     <message>
         <location/>
         <source>Sensitivity:</source>
-        <translation type="unfinished"></translation>
+        <translation>Duyarlılık:</translation>
     </message>
     <message>
         <location/>
         <source>Motion Mask (0)</source>
-        <translation type="unfinished"></translation>
+        <translation>Hareket Maskesi (0)</translation>
     </message>
     <message>
         <location/>
         <source>Maximum sensitivity (9)</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimum Duyarlılık (9)</translation>
     </message>
     <message>
         <location/>
         <source>Camera web page:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera Web Sayfası:</translation>
     </message>
     <message>
         <location/>
         <source>URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL</translation>
     </message>
     <message>
         <location/>
         <source>Reset Motion Regions</source>
-        <translation type="unfinished"></translation>
+        <translation>Hareket Bölgelerini Sıfırla</translation>
     </message>
     <message>
         <location/>
         <source>Fisheye</source>
-        <translation type="unfinished"></translation>
+        <translation>Fish-Eye</translation>
     </message>
     <message>
         <location/>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Gelişmiş</translation>
     </message>
     <message>
         <location/>
         <source>Expert</source>
-        <translation type="unfinished"></translation>
+        <translation>Uzman</translation>
     </message>
     <message>
         <location/>
         <source>I/O ports</source>
-        <translation type="unfinished"></translation>
+        <translation>I/O Portları</translation>
     </message>
 </context>
 <context>
@@ -2686,62 +2686,62 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_advanced_settings_widget.ui"/>
         <source>SMTP &amp;Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;SMTP Sunucusu:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;User:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Kullanıcı:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Şifre:</translation>
     </message>
     <message>
         <location/>
         <source>Email:</source>
-        <translation type="unfinished"></translation>
+        <translation>E Posta:</translation>
     </message>
     <message>
         <location/>
         <source>P&amp;ort:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Port:</translation>
     </message>
     <message>
         <location/>
         <source>Unsecure Connection</source>
-        <translation type="unfinished"></translation>
+        <translation>Güvenli Olmayan Bağlantı</translation>
     </message>
     <message>
         <location/>
         <source>(recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>(önerilen)</translation>
     </message>
     <message>
         <location/>
         <source>Secure connection using TLS.</source>
-        <translation type="unfinished"></translation>
+        <translation>TLS Kullanarak Bağlantıyı Güvence Altına Al.</translation>
     </message>
     <message>
         <location/>
         <source>Secure connection using SSL.</source>
-        <translation type="unfinished"></translation>
+        <translation>SSL Kullanarak Bağlantıyı Güvence Altına Al.</translation>
     </message>
     <message>
         <location/>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Sistem İmzası:</translation>
     </message>
     <message>
         <location/>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kısa Bir Sistem Açıklaması Giriniz.</translation>
     </message>
     <message>
         <location/>
         <source>Support Signature:</source>
-        <translation type="unfinished"></translation>
+        <translation>Destek İmzası:</translation>
     </message>
 </context>
 <context>
@@ -2749,17 +2749,17 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_settings_widget.ui"/>
         <source>Outgoing Email Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Giden Posta Ayarları</translation>
     </message>
     <message>
         <location/>
         <source>Advanced settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Gelişmiş Ayarlar...</translation>
     </message>
     <message>
         <location/>
         <source>Test</source>
-        <translation type="unfinished"></translation>
+        <translation>Test Et</translation>
     </message>
 </context>
 <context>
@@ -2767,27 +2767,27 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_simple_settings_widget.ui"/>
         <source>&amp;Email:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Email:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Şifre:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;System Signature:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Sistem İmzası:</translation>
     </message>
     <message>
         <location/>
         <source>Enter a short system description here.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kısa Bir Sistem Açıklaması Girin.</translation>
     </message>
     <message>
         <location/>
         <source>Support Signature:</source>
-        <translation type="unfinished"></translation>
+        <translation>Destek İmzası:</translation>
     </message>
 </context>
 <context>
@@ -2795,42 +2795,43 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp_test_connection_widget.ui"/>
         <source>Server:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunucu:</translation>
     </message>
     <message>
         <location/>
         <source>Port:</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Bağlantı Noktası</translatorcomment>
+        <translation>Port:</translation>
     </message>
     <message>
         <location/>
         <source>User:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kullanıcı:</translation>
     </message>
     <message>
         <location/>
         <source>Security:</source>
-        <translation type="unfinished"></translation>
+        <translation>Güvenlik:</translation>
     </message>
     <message>
         <location/>
         <source>Progress:</source>
-        <translation type="unfinished"></translation>
+        <translation>İlerleme Durumu:</translation>
     </message>
     <message>
         <location/>
         <source>Result:</source>
-        <translation type="unfinished"></translation>
+        <translation>Sonuç:</translation>
     </message>
     <message>
         <location/>
         <source>OK</source>
-        <translation type="unfinished"></translation>
+        <translation>Tamam</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>İptal</translation>
     </message>
 </context>
 <context>
@@ -2838,93 +2839,93 @@
     <message>
         <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
         <source>Main Storage Locations</source>
-        <translation type="unfinished"></translation>
+        <translation>Ana Depolama Alanı Yerleri</translation>
     </message>
     <message>
         <location/>
         <source>Add External Storage...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ek Depolama Alanı Ekle...</translation>
     </message>
     <message>
         <location/>
         <source>Rebuild Archive Index</source>
-        <translation type="unfinished"></translation>
+        <translation>Arşivi Tekrar Dizinle</translation>
     </message>
     <message>
         <location/>
         <source>You haven&apos;t configured any backup storage. Backup won&apos;t be performed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Henüz Bir Yedekleme Depolama Alanı Ayarlanmadı. Yedekleme Alınmayacak.</translation>
     </message>
     <message>
         <location/>
         <source>Storage backup is available if there are 2 or more valid storage drives in the system.</source>
-        <translation type="unfinished"></translation>
+        <translation>Depolama Alanı Yedeklemesi Sistemde Geçerli İki veya Daha Fazla Sürücü Varsa Geçerlidir.</translation>
     </message>
     <message>
         <location/>
         <source>Backup Storage Locations</source>
-        <translation type="unfinished"></translation>
+        <translation>Yedekleme Depolama Alanı Yerleri</translation>
     </message>
     <message>
         <location/>
         <source>Global Backup Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Geniş Çaplı Yedekleme Ayarları</translation>
     </message>
     <message>
         <location/>
         <source>Backup Archive From:</source>
-        <translation type="unfinished"></translation>
+        <translation>Yedeklemeyi Şurdan Arşivle:</translation>
     </message>
     <message>
         <location/>
         <source>Backup Quality:</source>
-        <translation type="unfinished"></translation>
+        <translation>Yedekleme Kalitesi:</translation>
     </message>
     <message>
         <location/>
         <source>&lt;Select at least one camera&gt; </source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;En az bir kamera seç&gt;</translation>
     </message>
     <message>
         <location/>
         <source>Server Backup Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunucu Yedekleme Ayarları</translation>
     </message>
     <message>
         <location/>
         <source>Execute Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Yedeklemeyi Çalıştır</translation>
     </message>
     <message>
         <location/>
         <source>Set Schedule...</source>
-        <translation type="unfinished"></translation>
+        <translation>Takvim Kur...</translation>
     </message>
     <message>
         <location/>
         <source>Start Backup Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Yedeklemeyi Başlat</translation>
     </message>
     <message>
         <location/>
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation type="unfinished"></translation>
+        <translation>Depolama Alanını Kontrol Etmemek Yazmayı Durdurmaya Yol Açacak. En Eski Kamera Görüntülerini Sürücüden Kaldırmayı Engellemeyecek.</translation>
     </message>
     <message>
         <location/>
         <source>Backup Time Label</source>
-        <translation type="unfinished"></translation>
+        <translation>Yedekleme Zaman Etiketi</translation>
     </message>
     <message>
         <location/>
         <source>Backup progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Yedekleme İlerleme Durumu</translation>
     </message>
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>İptal</translation>
     </message>
 </context>
 <context>
@@ -2932,7 +2933,7 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>İptal</translation>
     </message>
 </context>
 <context>
@@ -2940,27 +2941,27 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location filename="../src/ui/dialogs/storage_url_dialog.ui"/>
         <source>Add External Storage...</source>
-        <translation type="unfinished"></translation>
+        <translation>Harici Depolama Ekle...</translation>
     </message>
     <message>
         <location/>
         <source>Protocol:</source>
-        <translation type="unfinished"></translation>
+        <translation>Protokol:</translation>
     </message>
     <message>
         <location/>
         <source>URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL:</translation>
     </message>
     <message>
         <location/>
         <source>Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>Giriş:</translation>
     </message>
     <message>
         <location/>
         <source>Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>Şifre:</translation>
     </message>
 </context>
 <context>
@@ -2968,22 +2969,22 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
         <source>(recommended)</source>
-        <translation type="unfinished"></translation>
+        <translation>(Önerilen)</translation>
     </message>
     <message>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
-        <translation type="unfinished"></translation>
+        <translation>Anonim Kullanım Bilgisini ve Hata Raporlarını Gönder</translation>
     </message>
     <message>
         <location/>
         <source>Enable audit trail</source>
-        <translation type="unfinished"></translation>
+        <translation>Denetim Merkezini Etkinleştir</translation>
     </message>
     <message>
         <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uyarı! Bu Kayıt Takvimindeki Kaliteyi ve FPS Ayarlarını Etkileyebilir.</translation>
     </message>
 </context>
 <context>
@@ -2991,17 +2992,17 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location filename="../src/ui/widgets/settings/time_server_selection_widget.ui"/>
         <source>Current System Time:</source>
-        <translation type="unfinished"></translation>
+        <translation>Güncel Sistem Saati:</translation>
     </message>
     <message>
         <location/>
         <source>Synchronizing...</source>
-        <translation type="unfinished"></translation>
+        <translation>Eşitleniyor...</translation>
     </message>
     <message>
         <location/>
         <source>Choose a locally available server to act as the time server if the system has no Internet access:</source>
-        <translation type="unfinished"></translation>
+        <translation>Eğer Sistemin İnternet Erişimi Yoksa Zaman Sunucusu Olarak Yerel Bir Sunucu Seçin:</translation>
     </message>
 </context>
 <context>
@@ -3009,52 +3010,52 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location filename="../src/ui/dialogs/user_settings_dialog.ui"/>
         <source>Create New User</source>
-        <translation type="unfinished"></translation>
+        <translation>Yeni Kullanıcı Yarat</translation>
     </message>
     <message>
         <location/>
         <source>Access rights</source>
-        <translation type="unfinished"></translation>
+        <translation>Erişim Hakları</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Login:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Giriş:</translation>
     </message>
     <message>
         <location/>
         <source>C&amp;urrent Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>M&amp;evcut Şife:</translation>
     </message>
     <message>
         <location/>
         <source>E&amp;mail:</source>
-        <translation type="unfinished"></translation>
+        <translation>E&amp;Mail:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Şifre:</translation>
     </message>
     <message>
         <location/>
         <source>Advanced...</source>
-        <translation type="unfinished"></translation>
+        <translation>Gelişmiş...</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Access Rights:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Erişim Hakları:</translation>
     </message>
     <message>
         <location/>
         <source>&amp;Confirm Password:</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Şifreyi Onayla:</translation>
     </message>
     <message>
         <location/>
         <source>Enabled:</source>
-        <translation type="unfinished"></translation>
+        <translation>İzin Ver:</translation>
     </message>
 </context>
 <context>
@@ -3062,27 +3063,27 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
         <source>Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Takvim</translation>
     </message>
     <message>
         <location/>
         <source>Note: Schedule is based on server time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Not: Takvim sunucu saatine göre ayarlanacaktır.</translation>
     </message>
     <message>
         <location/>
         <source>Schedule Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Takvim Ayarları</translation>
     </message>
     <message>
         <location/>
         <source>On</source>
-        <translation type="unfinished"></translation>
+        <translation>Açık</translation>
     </message>
     <message>
         <location/>
         <source>Off</source>
-        <translation type="unfinished"></translation>
+        <translation>Kapalı</translation>
     </message>
 </context>
 </TS>
