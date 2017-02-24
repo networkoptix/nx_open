@@ -200,9 +200,10 @@ REST_FRAMEWORK = {
 #   queue_name_prefix allows you to name the queue for sqs
 #   region allows you to specify the aws region
 
+
 BROKER_URL = 'sqs://AKIAIQVGGMML4WNBECRA:jmXYHNKOAL9gYYaxAVClgegzShjaPF27ycvBOV1s@'
 BROKER_TRANSPORT_OPTIONS = {
-    'queue_name_prefix' : 'cloud-portal-',
+    'queue_name_prefix' : conf['queue_name'] + '-',
     'region' : 'us-east-1'
 }
 RESULT_PERSISTENT = True

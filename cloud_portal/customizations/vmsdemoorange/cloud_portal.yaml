@@ -47,4 +47,6 @@ languages:
     - vi_VN
     - hu
     - he
-    - pt_PT 
+    - pt_PT
+
+queue_name: '$INSTANCE_NAME'
