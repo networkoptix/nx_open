@@ -1,12 +1,11 @@
 import os
 import re
 import xml.etree.ElementTree as eTree
-import yaml
 from os.path import join
+import htmlmin
 
 import json
 import errno
-import yaml
 import shutil
 import codecs
 
@@ -20,11 +19,7 @@ def read_branding():
     branding_file = 'branding.ts'
     tree = eTree.parse(branding_file)
     root = tree.getroot()
-
     for context in root.iter('context'):
-        name = context.find('name').text
-        if name != 'global':
-            continue
         for message in context.iter('message'):
             source = message.find('source').text
             translation = message.find('translation').text
@@ -39,7 +34,6 @@ def process_branding(content):
 
 def make_dir(filename):
     dirname = os.path.dirname(filename)
-    print ("make dir " + dirname + " for " + filename)
     if not os.path.exists(dirname):
         try:
             os.makedirs(dirname)
@@ -52,6 +46,10 @@ def save_content(filename, content):
     if filename:
         # proceed with branding
         active_content = process_branding(content)
+
+        if filename.endswith('.html'):
+            content = htmlmin.minify(content, remove_comments=True, remove_empty_space=True,
+                                     remove_optional_attribute_quotes=False)
 
         make_dir(filename)
         with codecs.open(filename, "w", "utf-8") as file:
@@ -123,7 +121,6 @@ def generate_languages_files(languages):
         shutil.copytree(os.path.join('static', 'views'), os.path.join(lang_dir, 'views'))
 
         process_files(lang, 'static', 'cloud_portal.ts')
-        process_files(lang, 'templates', 'cloud_templates.ts')
 
         language_json_filename = os.path.join("../../..", "translations", lang, 'language.json')
 
@@ -135,24 +132,33 @@ def generate_languages_files(languages):
     save_content('static/languages.json', json.dumps(languages_json, ensure_ascii=False))
 
 
-def process_app_associations():
-    app_filename = 'static/apple-app-site-association'
-    with open(app_filename, 'r') as file_descriptor:
+def brand_file(filename):
+    with codecs.open(filename, 'r', 'utf-8') as file_descriptor:
         active_content = file_descriptor.read()
     active_content = process_branding(active_content)
-    save_content(app_filename, active_content)
+    save_content(filename, active_content)
+
+
+def brand_directory(directory, file_filter, exclude_file = None):
+    all_strings = []
+    for root, dirs, files in os.walk(directory):
+        for filename in files:
+            if filename.endswith(file_filter):
+                if exclude_file and filename.endswith(exclude_file):
+                    continue
+                brand_file(os.path.join(root, filename))
+
+
+def precess_branding_for_all():
+    # files to brand:
+
+    brand_file('static/apple-app-site-association')
+    brand_directory('static', '.html', 'index.html')
+    brand_directory('static', '.json')
+    brand_directory('templates', '.mustache')
+    brand_directory('templates', '.json')
+    pass
 
 
 read_branding()
-
-# Branding for apple-app-site-association
-process_app_associations()
-
-# Read config - get languages there
-config = yaml.safe_load(open('cloud_portal.yaml'))
-
-# Iterate languages
-if 'languages' not in config:
-    raise 'No languages section in cloud_portal.yaml'
-
-generate_languages_files(config['languages'])
+precess_branding_for_all()

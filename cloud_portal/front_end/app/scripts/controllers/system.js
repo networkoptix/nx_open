@@ -31,7 +31,7 @@ angular.module('cloudApp')
                     return false;
                 },
             },
-            errorPrefix:'System info is unavailable:'
+            errorPrefix: L.errorCodes.cantGetSystemInfoPrefix
         }).then(function (){
             if($scope.system.permissions.editUsers){
                 $scope.gettingSystemUsers.run();
@@ -66,7 +66,7 @@ angular.module('cloudApp')
                 }
             }).finally(delayedUpdateSystemInfo);
         },{
-            errorPrefix:'Users list is unavailable:'
+            errorPrefix: L.errorCodes.cantGetUsersListPrefix
         });
 
 
@@ -100,7 +100,7 @@ angular.module('cloudApp')
                             return $scope.system.deleteFromCurrentAccount();
                         },{
                             successMessage: L.system.successDeleted.replace('{systemName}', $scope.system.info.name),
-                            errorPrefix:'Cannot delete the system:'
+                            errorPrefix: L.errorCodes.cantUnshareWithMeSystemPrefix
                         }).then(reloadSystems);
                         $scope.deletingSystem.run();
                     });
@@ -134,7 +134,7 @@ angular.module('cloudApp')
                         return $scope.system.deleteUser(user);
                     },{
                         successMessage: L.system.permissionsRemoved.replace('{email}',user.email),
-                        errorPrefix:'Sharing failed:'
+                        errorPrefix: L.errorCodes.cantSharePrefix
                     });
                     $scope.unsharing.run();
                 });
