@@ -213,7 +213,9 @@ bool Socket<InterfaceToImplement>::shutdown()
         return true;
 
 #ifdef _WIN32
-    return ::shutdown(m_fd, SD_BOTH) == 0;
+    bool rez = ::shutdown(m_fd, SD_BOTH) == 0;
+    ::SetEvent(m_hEventObject); //< terminate current wait call
+    return rez;
 #else
     return ::shutdown(m_fd, SHUT_RDWR) == 0;
 #endif
@@ -235,6 +237,7 @@ bool Socket<InterfaceToImplement>::close()
     m_fd = -1;
 
 #ifdef _WIN32
+    ::CloseHandle(m_hEventObject);
     return ::closesocket(fd) == 0;
 #else
     return ::close(fd) == 0;
@@ -280,6 +283,11 @@ bool Socket<InterfaceToImplement>::setNonBlockingMode( bool val )
     if( ioctlsocket( m_fd, FIONBIO, &_val ) == 0 )
     {
         m_nonBlockingMode = val;
+        WSAEventSelect(
+            m_fd,
+            m_hEventObject,
+            val ? 0 : FD_READ); //< subscribe/unsubscribe socket to eventObject
+
         return true;
     }
     else
@@ -520,6 +528,9 @@ bool Socket<InterfaceToImplement>::createSocket(int type, int protocol)
     }
 #endif
 
+#ifdef WIN32
+    m_hEventObject = ::CreateEvent(0, false, false, nullptr); //< used for sync mode
+#endif
     return true;
 }
 
@@ -664,7 +675,19 @@ int CommunicatingSocket<InterfaceToImplement>::recv(void* buffer, unsigned int b
     }
     else
     {
+        bool isNonBlockingMode;
+        if (!getNonBlockingMode(&isNonBlockingMode))
+            return -1;
+
+        if (!isNonBlockingMode && m_hEventObject)
+        {
+            int waitResult = WaitForSingleObject(m_hEventObject, m_readTimeoutMS);
+            if (waitResult == WAIT_TIMEOUT)
+                return -1;
+        }
+
         bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags);
+
     }
 #else
     unsigned int recvTimeout = 0;
