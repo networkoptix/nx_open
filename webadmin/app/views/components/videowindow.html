@@ -46,7 +46,7 @@
     </div>
 
 
-    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}" ng-include="'views/components/flashls.html'">
+    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}" ng-include="Config.viewsDir + 'components/flashls.html'">
     </div>
 
     <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading}">

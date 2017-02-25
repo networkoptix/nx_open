@@ -2,6 +2,7 @@
 /*exported Config */
 
 var Config = {
+    viewsDir: 'views/', //'lang_' + lang + '/views/';
 
     defaultLogin: 'admin',
     defaultPassword: 'admin',

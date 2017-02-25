@@ -66,7 +66,7 @@ angular.module('webadminApp')
         function callLogin(){
             if (loginDialog === null) { //Dialog is not displayed
                 loginDialog = $modal.open({
-                    templateUrl: 'views/login.html',
+                    templateUrl: Config.viewsDir + 'login.html',
                     keyboard:false,
                     backdrop:'static'
                 });
@@ -589,6 +589,9 @@ angular.module('webadminApp')
             },
             getCommonPasswords:function(){
                 return wrapGet('commonPasswordsList.json');
+            },
+            getLanguages:function(){
+                return wrapGet('lanuages.json');
             },
 
             networkSettings:function(settings){
