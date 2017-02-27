@@ -1,12 +1,12 @@
-#include "proxy_video_decoder_private.h"
+#include "proxy_video_decoder_impl.h"
 #if defined(ENABLE_PROXY_DECODER)
 
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLShaderProgram>
 
-#define OUTPUT_PREFIX "ProxyVideoDecoder<gl>: "
-#include "proxy_video_decoder_utils.h"
+#include <nx/utils/debug_utils.h>
 
+#include "proxy_video_decoder_utils.h"
 #include "proxy_video_decoder_gl_utils.h"
 
 namespace nx {
@@ -14,16 +14,14 @@ namespace media {
 
 namespace {
 
-static const bool USE_SHARED_CTX = true;
+static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder<gl>: ";
+static constexpr bool USE_SHARED_CTX = true;
 
-class Impl
-:
-    public ProxyVideoDecoderPrivate
+class Impl: public ProxyVideoDecoderImpl
 {
 public:
-    Impl(const Params& params)
-    :
-        ProxyVideoDecoderPrivate(params),
+    Impl(const Params& params):
+        ProxyVideoDecoderImpl(params),
         m_program(nullptr),
         m_yTex(QOpenGLTexture::Target2D),
         m_uTex(QOpenGLTexture::Target2D),
@@ -81,16 +79,14 @@ private:
     QOpenGLTexture m_vTex;
 };
 
-class Impl::TextureBuffer
-:
-    public QAbstractVideoBuffer
+class Impl::TextureBuffer: public QAbstractVideoBuffer
 {
 public:
     TextureBuffer(
         const FboPtr& fbo,
-        const std::shared_ptr<ProxyVideoDecoderPrivate>& owner,
+        const std::shared_ptr<ProxyVideoDecoderImpl>& owner,
         const ConstYuvBufferPtr& yuvBuffer)
-    :
+        :
         QAbstractVideoBuffer(GLTextureHandle),
         m_fbo(fbo),
         m_owner(std::dynamic_pointer_cast<Impl>(owner)),
@@ -498,7 +494,7 @@ int Impl::decode(
 
 //-------------------------------------------------------------------------------------------------
 
-ProxyVideoDecoderPrivate* ProxyVideoDecoderPrivate::createImplGl(const Params& params)
+ProxyVideoDecoderImpl* ProxyVideoDecoderImpl::createImplGl(const Params& params)
 {
     PRINT << "Using this impl";
     return new Impl(params);

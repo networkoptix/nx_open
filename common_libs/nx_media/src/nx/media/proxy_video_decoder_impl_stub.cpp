@@ -1,22 +1,22 @@
-#include "proxy_video_decoder_private.h"
+#include "proxy_video_decoder_impl.h"
 #if defined(ENABLE_PROXY_DECODER)
 
-#include "aligned_mem_video_buffer.h"
+#include <nx/utils/debug_utils.h>
 
-#define OUTPUT_PREFIX "ProxyVideoDecoder<STUB>: "
 #include "proxy_video_decoder_utils.h"
+#include "aligned_mem_video_buffer.h"
 
 namespace nx {
 namespace media {
 
 namespace {
 
-class Impl
-:
-    public ProxyVideoDecoderPrivate
+static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder<stub>: ";
+
+class Impl: public ProxyVideoDecoderImpl
 {
 public:
-    using ProxyVideoDecoderPrivate::ProxyVideoDecoderPrivate;
+    using ProxyVideoDecoderImpl::ProxyVideoDecoderImpl;
 
     virtual int decode(
         const QnConstCompressedVideoDataPtr& compressedVideoData,
@@ -65,7 +65,7 @@ int Impl::decode(
 
 //-------------------------------------------------------------------------------------------------
 
-ProxyVideoDecoderPrivate* ProxyVideoDecoderPrivate::createImplStub(const Params& params)
+ProxyVideoDecoderImpl* ProxyVideoDecoderImpl::createImplStub(const Params& params)
 {
     PRINT << "Using this impl";
     return new Impl(params);

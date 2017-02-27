@@ -4,15 +4,14 @@
 #include <proxy_decoder.h>
 
 #include "proxy_video_decoder.h"
-#include "aligned_mem_video_buffer.h"
 
 namespace nx {
 namespace media {
 
 /**
- * Base class for different implementations of ProxyVideoDecoder functionality.
+ * Abstract base class for different implementations of ProxyVideoDecoder functionality.
  */
-class ProxyVideoDecoderPrivate // abstract
+class ProxyVideoDecoderImpl
 {
 public:
     struct Params
@@ -22,20 +21,20 @@ public:
         QSize resolution;
     };
 
-    static ProxyVideoDecoderPrivate* createImplStub(const Params& params);
-    static ProxyVideoDecoderPrivate* createImplDisplay(const Params& params);
-    static ProxyVideoDecoderPrivate* createImplRgb(const Params& params);
-    static ProxyVideoDecoderPrivate* createImplYuvPlanar(const Params& params);
-    static ProxyVideoDecoderPrivate* createImplYuvNative(const Params& params);
-    static ProxyVideoDecoderPrivate* createImplGl(const Params& params);
+    static ProxyVideoDecoderImpl* createImplStub(const Params& params);
+    static ProxyVideoDecoderImpl* createImplDisplay(const Params& params);
+    static ProxyVideoDecoderImpl* createImplRgb(const Params& params);
+    static ProxyVideoDecoderImpl* createImplYuvPlanar(const Params& params);
+    static ProxyVideoDecoderImpl* createImplYuvNative(const Params& params);
+    static ProxyVideoDecoderImpl* createImplGl(const Params& params);
 
-    ProxyVideoDecoderPrivate(const Params& params):
+    ProxyVideoDecoderImpl(const Params& params):
         m_params(params),
         m_proxyDecoder(ProxyDecoder::create(params.resolution.width(), params.resolution.height()))
     {
     }
 
-    virtual ~ProxyVideoDecoderPrivate() = default;
+    virtual ~ProxyVideoDecoderImpl() = default;
 
     /**
      * @param compressedVideoData Either is null, or has non-null data().
@@ -46,7 +45,7 @@ public:
         QVideoFramePtr* outDecodedFrame) = 0;
 
 protected:
-    const std::shared_ptr<ProxyVideoDecoderPrivate>& sharedPtrToThis() const
+    const std::shared_ptr<ProxyVideoDecoderImpl>& sharedPtrToThis() const
     {
         return m_params.owner->d;
     }

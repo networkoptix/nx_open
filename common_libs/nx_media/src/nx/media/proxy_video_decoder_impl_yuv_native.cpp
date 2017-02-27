@@ -1,22 +1,22 @@
-#include "proxy_video_decoder_private.h"
+#include "proxy_video_decoder_impl.h"
 #if defined(ENABLE_PROXY_DECODER)
 
-#include "aligned_mem_video_buffer.h"
+#include <nx/utils/debug_utils.h>
 
-#define OUTPUT_PREFIX "ProxyVideoDecoder<yuv_native>: "
 #include "proxy_video_decoder_utils.h"
+#include "aligned_mem_video_buffer.h"
 
 namespace nx {
 namespace media {
 
 namespace {
 
-class Impl
-:
-    public ProxyVideoDecoderPrivate
+static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder<yuv_native>: ";
+
+class Impl: public ProxyVideoDecoderImpl
 {
 public:
-    using ProxyVideoDecoderPrivate::ProxyVideoDecoderPrivate;
+    using ProxyVideoDecoderImpl::ProxyVideoDecoderImpl;
 
     virtual int decode(
         const QnConstCompressedVideoDataPtr& compressedVideoData,
@@ -26,23 +26,19 @@ private:
     class VideoBuffer;
 };
 
-class Impl::VideoBuffer
-:
-    public AlignedMemVideoBuffer
+class Impl::VideoBuffer: public AlignedMemVideoBuffer
 {
 public:
     VideoBuffer(
         uchar* data[4], int bytesPerLine[4], int planeCount,
-        const std::shared_ptr<ProxyVideoDecoderPrivate>& owner)
-    :
+        const std::shared_ptr<ProxyVideoDecoderImpl>& owner)
+        :
         AlignedMemVideoBuffer(data, bytesPerLine, planeCount),
         m_owner(std::dynamic_pointer_cast<Impl>(owner))
     {
     }
 
-    ~VideoBuffer() override
-    {
-    }
+    ~VideoBuffer() override {}
 
     virtual uchar* map(MapMode mode, int* numBytes, int* bytesPerLine) override
     {
@@ -144,7 +140,7 @@ int Impl::decode(
 
 //-------------------------------------------------------------------------------------------------
 
-ProxyVideoDecoderPrivate* ProxyVideoDecoderPrivate::createImplYuvNative(const Params& params)
+ProxyVideoDecoderImpl* ProxyVideoDecoderImpl::createImplYuvNative(const Params& params)
 {
     PRINT << "Using this impl";
     return new Impl(params);
