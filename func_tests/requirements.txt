@@ -1,5 +1,7 @@
 pytest
 pytest-timeout
+pytest-capturelog
+pytest-cpp
 pytz
 tzlocal
 requests>=2.12.5

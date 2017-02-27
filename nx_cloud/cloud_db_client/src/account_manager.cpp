@@ -19,7 +19,7 @@ AccountManager::AccountManager(network::cloud::CloudModuleUrlFetcher* const clou
 }
 
 void AccountManager::registerNewAccount(
-    api::AccountData accountData,
+    api::AccountRegistrationData accountData,
     std::function<void(api::ResultCode, api::AccountConfirmationCode)> completionHandler)
 {
     auto errorHandler = std::bind(completionHandler, std::placeholders::_1, api::AccountConfirmationCode());

@@ -19,6 +19,7 @@ int main(int argc, char* argv[])
     QString accountEmail;
     QString accountPassword;
     bool loadMode = false;
+    int connectionCount = 100;
     int testSystemsToGenerate = -1;
     QString fetchRequest;
 
@@ -27,6 +28,7 @@ int main(int argc, char* argv[])
     commandLineParser.addParameter(&accountEmail, "--user", "-u", "Account login");
     commandLineParser.addParameter(&accountPassword, "--password", "-p", "Account password");
     commandLineParser.addParameter(&loadMode, "--load", "-l", "Establish many connections");
+    commandLineParser.addParameter(&connectionCount, "--connections", "", "Test connection count");
     commandLineParser.addParameter(
         &testSystemsToGenerate, "--generate-systems", "-s", "Number of random systems to generate");
     commandLineParser.addParameter(&fetchRequest, "--fetch", nullptr, "Fetch data. Values: systems");
@@ -45,7 +47,8 @@ int main(int argc, char* argv[])
         return nx::cdb::client::establishManyConnections(
             cdbUrl.toStdString(),
             accountEmail.toStdString(),
-            accountPassword.toStdString());
+            accountPassword.toStdString(),
+            connectionCount);
     }
 
     if (testSystemsToGenerate > 0)

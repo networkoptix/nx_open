@@ -74,7 +74,7 @@ QnSmtpAdvancedSettingsWidget::QnSmtpAdvancedSettingsWidget(QWidget* parent /*= n
     ui->passwordInputField->setEchoMode(QLineEdit::Password);
 
     ui->signatureInputField->setTitle(tr("System Signature"));
-    ui->signatureInputField->setPlaceholderText(tr("Enter a short system description here."));
+    ui->signatureInputField->setPlaceholderText(tr("Enter a short System description here."));
 
     ui->supportInputField->setTitle(tr("Support Signature"));
     ui->supportInputField->setPlaceholderText(QnAppInfo::supportUrl());

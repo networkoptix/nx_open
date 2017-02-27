@@ -60,6 +60,21 @@ Item
     {
         id: cameraChunkProvider
         resourceId: videoScreenController.resourceId
+
+        onLoadingChanged:
+        {
+            if (loading)
+                return
+
+            var liveMs = (new Date()).getTime()
+            var lastChunkEndMs = closestChunkEndMs(liveMs, false)
+
+            if (lastChunkEndMs <= 0)
+                lastChunkEndMs = liveMs
+
+            timeline.windowSize =
+                Math.max((liveMs - lastChunkEndMs) / 0.4, timeline.defaultWindowSize)
+        }
     }
 
     Timer
@@ -180,9 +195,15 @@ Item
                     videoScreenController.setPosition(position)
                     if (resumeWhenDragFinished)
                         videoScreenController.play()
+                    else
+                        videoScreenController.pause()
                 }
             }
-            onPositionTapped: videoScreenController.setPosition(position)
+            onPositionTapped:
+            {
+                d.resumePosition = -1
+                videoScreenController.setPosition(position)
+            }
             onPositionChanged:
             {
                 if (!dragging)
@@ -196,7 +217,8 @@ Item
                 if (dragging)
                 {
                     resumeWhenDragFinished = !videoNavigation.paused
-                    videoScreenController.pause()
+                    videoScreenController.preview()
+                    d.resumePosition = -1
                 }
             }
 
@@ -438,8 +460,9 @@ Item
                 }
                 else
                 {
+                    if (d.liveMode)
+                        d.resumePosition = videoScreenController.mediaPlayer.position
                     videoScreenController.pause()
-                    d.resumePosition = videoScreenController.mediaPlayer.position
                 }
             }
         }
@@ -484,6 +507,7 @@ Item
             onDatePicked:
             {
                 close()
+                d.resumePosition = -1
                 videoScreenController.setPosition(date.getTime())
             }
         }

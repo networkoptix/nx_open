@@ -566,6 +566,8 @@ void QnResourceTreeWidget::update(const QnResourcePtr& resource)
         return;
 
     const auto model = ui->resourcesTreeView->model();
+    if (!model)
+        return;
 
     const auto start = model->index(0, 0, ui->resourcesTreeView->rootIndex());
 

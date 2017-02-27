@@ -556,8 +556,8 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
         case QnCheckForUpdateResult::NoNewerVersion:
             setPaletteColor(ui->errorLabel, QPalette::WindowText, qnGlobals->successTextColor());
             detail = m_targetVersion.isNull()
-                ? tr("All components in your system are up to date.")
-                : tr("All components in your system are up to this version.");
+                ? tr("All components in your System are up to date.")
+                : tr("All components in your System are up to this version.");
             break;
 
         case QnCheckForUpdateResult::InternetProblem:
@@ -595,7 +595,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
             break;
 
         case QnCheckForUpdateResult::IncompatibleCloudHost:
-            detail = tr("Incompatible %1 instance. To update disconnect system from %1 first.",
+            detail = tr("Incompatible %1 instance. To update disconnect System from %1 first.",
                 "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
                 .arg(QnAppInfo::cloudName());
             break;
@@ -797,9 +797,10 @@ void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& l
     dialog.addButton(tr("Force Update"), QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
 
     const auto result = dialog.exec();
-    lowFreeSpaceWarning.ignore = true;
     if (result == QDialogButtonBox::Cancel)
-        m_updateTool->cancelUpdate();
+        return;
+
+    lowFreeSpaceWarning.ignore = true;
 }
 
 void QnServerUpdatesWidget::at_tool_updatesCheckCanceled()
@@ -884,6 +885,9 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
 
             case QnUpdateResult::Cancelled:
                 QnMessageBox::information(this, tr("Update canceled"));
+                break;
+
+            case QnUpdateResult::CancelledSilently:
                 break;
 
             case QnUpdateResult::AlreadyUpdated:

@@ -80,7 +80,7 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
         return tr("Operation is not permitted now. It could happen due to server is restarting now. Please try again later.")
             + L'\n' + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::NetworkErrorConnectionResult:
-        return tr("Connection to the Server could not be established.") + L'\n'
+        return tr("Connection to Server could not be established.") + L'\n'
             + tr("Connection details that you have entered are incorrect, please try again.") + L'\n'
             + getErrorString(ErrorStrings::ContactAdministrator);
     case Qn::IncompatibleInternalConnectionResult:

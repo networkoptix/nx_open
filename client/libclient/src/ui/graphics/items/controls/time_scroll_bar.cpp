@@ -58,6 +58,20 @@ void QnTimeScrollBar::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
     /* Draw scrollbar groove and handle. */
     base_type::paint(painter, option, widget);
 
+    /* Draw handle pixmap. */
+    QStyleOptionSlider scrollBarOption;
+    initStyleOption(&scrollBarOption);
+    const auto sliderRect = style()->subControlRect(
+        QStyle::CC_ScrollBar,
+        &scrollBarOption,
+        QStyle::SC_ScrollBarSlider,
+        nullptr);
+
+    ensurePixmap(painter->device()->devicePixelRatio());
+    const auto size = m_pixmap.size() / m_pixmap.devicePixelRatio();
+    const auto rect = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size, sliderRect);
+    painter->drawPixmap(rect.topLeft(), m_pixmap);
+
     /* Draw indicator. */
     if (m_indicatorVisible)
     {
@@ -75,19 +89,6 @@ void QnTimeScrollBar::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
         QnScopedPainterAntialiasingRollback aaRollback(painter, false);
         painter->drawLine(QPointF(x, option->rect.top() + 1.0), QPointF(x, option->rect.bottom() - 1.0));
     }
-
-    QStyleOptionSlider scrollBarOption;
-    initStyleOption(&scrollBarOption);
-    const auto sliderRect = style()->subControlRect(
-        QStyle::CC_ScrollBar,
-        &scrollBarOption,
-        QStyle::SC_ScrollBarSlider,
-        nullptr);
-
-    ensurePixmap(painter->device()->devicePixelRatio());
-    const auto size = m_pixmap.size() / m_pixmap.devicePixelRatio();
-    const auto rect = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size, sliderRect);
-    painter->drawPixmap(rect.topLeft(), m_pixmap);
 }
 
 void QnTimeScrollBar::ensurePixmap(int devicePixelRatio)

@@ -260,6 +260,15 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initCloudAdaptors()
     for (QnAbstractResourcePropertyAdaptor* adaptor : result)
         connect(adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnGlobalSettings::cloudSettingsChanged, Qt::QueuedConnection);
 
+    connect(
+        m_cloudSystemIdAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, &QnGlobalSettings::cloudCredentialsChanged,
+        Qt::QueuedConnection);
+    connect(
+        m_cloudAuthKeyAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, &QnGlobalSettings::cloudCredentialsChanged,
+        Qt::QueuedConnection);
+
     return result;
 }
 

@@ -21,6 +21,7 @@ public:
     static bool isAndroid() { return applicationPlatform() == lit("android"); }
     static bool isIos() { return applicationPlatform() == lit("ios"); }
     static bool isMobile() { return isAndroid() || isIos(); }
+    static bool isWindows() { return applicationPlatform() == lit("windows"); }
 };
 
 } // namespace nx

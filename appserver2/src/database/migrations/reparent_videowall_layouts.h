@@ -8,8 +8,9 @@ namespace migrations {
 
 /**
  * In 3.0 normal layouts cannot be placed on the videowall. Special layouts with parent id set to
- * videowall id are used. Therefore we must clone users' layouts and re-parent existing layouts
- * (if auto-generated) to videowall.
+ * videowall id are used. Therefore we must re-parent existing layouts to videowall.
+ * Unused auto-generated layouts will be deleted from the client side automatically.
+ * Cloning and deleting here is forbidden due to synchronization issues.
  */
 bool reparentVideoWallLayouts(const QSqlDatabase& database);
 

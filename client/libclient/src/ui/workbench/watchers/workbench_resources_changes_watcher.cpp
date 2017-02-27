@@ -25,7 +25,7 @@ QnWorkbenchResourcesChangesWatcher::~QnWorkbenchResourcesChangesWatcher() {
 void QnWorkbenchResourcesChangesWatcher::showWarningDialog(const QnResourceList& resources)
 {
     const auto extras = (qnCommon->isReadOnly()
-        ? tr("System is in the Safe Mode. It is not allowed "
+        ? tr("System is in Safe Mode. It is not allowed "
             "to make any changes except license activation.")
             + L'\n' + tr("The following %n items are not saved:", "", resources.size())
 
@@ -49,7 +49,7 @@ void QnWorkbenchResourcesChangesWatcher::showWarningDialog(const QnResourceList&
 void QnWorkbenchResourcesChangesWatcher::showDeleteErrorDialog(const QnResourceList& resources)
 {
     const auto extras = (qnCommon->isReadOnly()
-        ? tr("System is in the Safe Mode. It is not allowed to "
+        ? tr("System is in Safe Mode. It is not allowed to "
             "make any changes except license activation.")
         + L'\n' + tr("The following %n items are not deleted:", "", resources.size())
 
