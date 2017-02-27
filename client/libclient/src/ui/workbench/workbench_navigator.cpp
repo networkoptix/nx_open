@@ -654,6 +654,8 @@ void QnWorkbenchNavigator::setSpeed(qreal speed)
 
         if (speed <= 0.0)
             setLive(false);
+        else if (!hasArchive())
+            setLive(true);
 
         updateSpeed();
     }
