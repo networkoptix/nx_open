@@ -1,6 +1,6 @@
 {
-    "language": "ru",
-    "language_name": "Русский",
+    "language": "en_US",
+    "language_name": "English (USA)",
     "dialogs":{
         "okButton": "Ok",
         "openLink": "Visit this link",
