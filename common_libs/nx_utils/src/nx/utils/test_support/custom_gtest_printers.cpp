@@ -48,7 +48,7 @@ void PrintTo(const steady_clock::time_point& val, ::std::ostream* os)
 
 void PrintTo(const system_clock::time_point& val, ::std::ostream* os)
 {
-    *os << duration_cast<milliseconds>(val.time_since_epoch()).count() << "ms (utc)";
+    *os << val.time_since_epoch().count() << "ns (utc)";
 }
 
 } // namespace chrono
