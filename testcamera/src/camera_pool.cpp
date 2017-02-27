@@ -113,7 +113,7 @@ void QnCameraPool::addCameras(int count, QStringList primaryFileList, QStringLis
             camera->setOfflineFreq(offlineFreq);
 
             QnFileCache::instance()->getMediaData(primaryFile);
-            if (secondaryFile.isEmpty()) { // secondary file is optional
+            if (!secondaryFile.isEmpty()) { // secondary file is optional
                 QnFileCache::instance()->getMediaData(secondaryFile);
             }
             m_cameras.insert(camera->getMac(), camera);
