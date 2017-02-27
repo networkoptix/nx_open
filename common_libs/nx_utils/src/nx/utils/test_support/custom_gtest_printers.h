@@ -3,13 +3,13 @@
 #include <chrono>
 #include <iostream>
 
-#include <QByteArray>
-#include <QString>
-
-#include <utils/db/types.h>
+#include <QtCore/QByteArray>
+#include <QtCore/QString>
+#include <QtCore/QUrl>
 
 NX_UTILS_API void PrintTo(const QByteArray& val, ::std::ostream* os);
 NX_UTILS_API void PrintTo(const QString& val, ::std::ostream* os);
+NX_UTILS_API void PrintTo(const QUrl& val, ::std::ostream* os);
 
 namespace std {
 namespace chrono {
