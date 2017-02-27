@@ -2,6 +2,8 @@
 
 #include <client/client_app_info.h>
 
+#include <utils/common/app_info.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/software_version.h>
 
@@ -49,4 +51,14 @@ QFileInfo QnClientInstallationsManager::miniLauncher()
     }
 
     return QFileInfo();
+}
+
+QFileInfo QnClientInstallationsManager::appLauncher()
+{
+    const QDir applauncherDir(
+        QStandardPaths::writableLocation(QStandardPaths::DataLocation)
+        + lit("/../applauncher/")
+        + QnAppInfo::customizationName());
+    const QDir binDir(applauncherDir.absoluteFilePath(QnClientAppInfo::binDirSuffix()));
+    return binDir.absoluteFilePath(QnClientAppInfo::applauncherBinaryName());
 }

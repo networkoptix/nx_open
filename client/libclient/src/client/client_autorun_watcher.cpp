@@ -46,10 +46,13 @@ QString QnClientAutoRunWatcher::autoRunKey() const
 
 QString QnClientAutoRunWatcher::autoRunPath() const
 {
-    // Intentionally ignoring userdata installations here
-    QFileInfo launcherFile = QnClientInstallationsManager::miniLauncher();
-    if (!launcherFile.exists())
-        return QString();
+    const QFileInfo appLauncherFile = QnClientInstallationsManager::appLauncher();
+    if (appLauncherFile.exists())
+        return toWindowsRegistryFormat(appLauncherFile.canonicalFilePath());
 
-    return toWindowsRegistryFormat(launcherFile.canonicalFilePath());
+    const QFileInfo miniLauncherFile = QnClientInstallationsManager::miniLauncher();
+    if (miniLauncherFile.exists())
+        return toWindowsRegistryFormat(miniLauncherFile.canonicalFilePath());
+
+    return QString();
 }

@@ -263,17 +263,27 @@ QString toWindowsRegistryFormat(const QString& path)
     return L'"' + QDir::toNativeSeparators(path).toLower() + L'"';
 }
 
+QString binaryPath()
+{
+    const QFileInfo appLauncherFile = QnClientInstallationsManager::appLauncher();
+    if (appLauncherFile.exists())
+        return toWindowsRegistryFormat(appLauncherFile.canonicalFilePath());
+
+    const QFileInfo miniLauncherFile = QnClientInstallationsManager::miniLauncher();
+    if (miniLauncherFile.exists())
+        return toWindowsRegistryFormat(miniLauncherFile.canonicalFilePath());
+
+    return QString();
+}
+
 //TODO: #GDM #VW clean nonexistent videowalls sometimes
 void setAutoRunEnabled(const QnUuid& videoWallUuid, bool value)
 {
     const QString key = qApp->applicationName() + L' ' + videoWallUuid.toString();
 
-    QFileInfo launcherFile = QnClientInstallationsManager::miniLauncher();
-    if (!launcherFile.exists())
-    {
-        nx::vms::utils::setAutoRunEnabled(key, QString(), false);
-        return;
-    }
+    const QString path = binaryPath();
+    if (path.isEmpty())
+        value = false; // intentionally disable autorun if all goes bad
 
     QStringList arguments;
     arguments << lit("--videowall");
@@ -284,11 +294,7 @@ void setAutoRunEnabled(const QnUuid& videoWallUuid, bool value)
     arguments << lit("--auth");
     arguments << QString::fromUtf8(url.toEncoded());
 
-    const QString path = toWindowsRegistryFormat(launcherFile.canonicalFilePath())
-        + L' '
-        + arguments.join(L' ');
-
-    nx::vms::utils::setAutoRunEnabled(key, path, value);
+    nx::vms::utils::setAutoRunEnabled(key, path + L' ' + arguments.join(L' '), value);
 }
 
 class QnVideowallReviewLayoutResource: public QnLayoutResource
