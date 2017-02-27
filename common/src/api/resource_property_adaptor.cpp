@@ -2,6 +2,11 @@
 
 #include <core/resource/resource.h>
 
+//TODO: #vkutin #GDM #common This class seems too complicated now.
+// 1. Is dynamic resource switching via setResource really needed?
+// 2. Since we moved DB sync out of this class, queueing changes seems no longer needed.
+
+
 // -------------------------------------------------------------------------- //
 // QnAbstractResourcePropertyAdaptor
 // -------------------------------------------------------------------------- //
@@ -217,6 +222,8 @@ void QnAbstractResourcePropertyAdaptor::processSaveRequestsNoLock(const QnResour
     m_pendingSave.storeRelease(0);
 
     resource->setProperty(m_key, serializedValue);
+
+    emit synchronizationNeeded(resource);
 }
 
 void QnAbstractResourcePropertyAdaptor::enqueueSaveRequest()

@@ -81,7 +81,7 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
 
                 if (!uri.authenticator().user.isEmpty() && !uri.authenticator().password.isEmpty())
                 {
-                    qnCloudStatusWatcher->setCredentials(QnCredentials(
+                    qnCloudStatusWatcher->setCredentials(QnEncodedCredentials(
                         uri.authenticator().user, uri.authenticator().password));
                 }
 
@@ -94,7 +94,7 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
             if (m_uiController)
             {
                 m_uiController->disconnectFromSystem();
-                qnCloudStatusWatcher->setCredentials(QnCredentials(
+                qnCloudStatusWatcher->setCredentials(QnEncodedCredentials(
                     uri.authenticator().user, uri.authenticator().password));
             }
             break;

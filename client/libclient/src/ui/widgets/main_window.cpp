@@ -81,6 +81,7 @@
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
+#include <ui/workaround/qtbug_workaround.h>
 #include <ui/workaround/vsync_workaround.h>
 
 #include <client/client_settings.h>
@@ -677,6 +678,10 @@ bool QnMainWindow::event(QEvent *event) {
         // Welcome screen looses focus after window deactivation. We restore it here.
         const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
         welcomeScreen->forceActiveFocus();
+    }
+    else if (event->type() == QnEvent::WinSystemMenu)
+    {
+        action(QnActions::MainMenuAction)->trigger();
     }
 
     if(m_dwm != NULL)

@@ -94,7 +94,7 @@ static void migrateFrom26To30()
 
         storeConnection(session.id, session.systemName, session.url);
         storeCredentials(
-            session.id, QnCredentials(session.url.userName(), session.url.password()));
+            session.id, QnEncodedCredentials(session.url.userName(), session.url.password()));
         weights.append(WeightData{session.id, 1.0, dateTime, true});
     }
 

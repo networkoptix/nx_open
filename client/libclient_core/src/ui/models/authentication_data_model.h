@@ -3,7 +3,7 @@
 #include <QtCore/QAbstractListModel>
 #include <QtCore/QUuid>
 
-#include <utils/common/credentials.h>
+#include <utils/common/encoded_credentials.h>
 
 class AuthenticationDataModel: public QAbstractListModel
 {
@@ -11,7 +11,7 @@ class AuthenticationDataModel: public QAbstractListModel
     typedef QAbstractListModel base_type;
 
     Q_PROPERTY(QUuid systemId READ systemId WRITE setSystemId NOTIFY systemIdChanged)
-    Q_PROPERTY(QnCredentials defaultCredentials
+    Q_PROPERTY(QnEncodedCredentials defaultCredentials
         READ defaultCredentials NOTIFY defaultCredentialsChanged)
 
 public:
@@ -28,7 +28,7 @@ public:
     QUuid systemId() const;
     void setSystemId(const QUuid& localId);
 
-    QnCredentials defaultCredentials() const;
+    QnEncodedCredentials defaultCredentials() const;
 
 public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -43,5 +43,5 @@ signals:
 
 private:
     QUuid m_systemId;
-    QList<QnCredentials> m_credentialsList;
+    QList<QnEncodedCredentials> m_credentialsList;
 };

@@ -87,7 +87,7 @@
         <translation>Вход</translation>
     </message>
     <message>
-        <source>Incorrect Email or password</source>
+        <source>Incorrect Email or Password</source>
         <translation>Неверный Email / пароль</translation>
     </message>
 </context>

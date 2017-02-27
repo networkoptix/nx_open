@@ -75,7 +75,7 @@
          <item>
           <widget class="QLabel" name="settingsDisabledWarningLabel">
            <property name="text">
-            <string>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</string>
+            <string>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</string>
            </property>
           </widget>
          </item>
@@ -412,7 +412,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</string>
+           <string>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</string>
           </property>
           <property name="wordWrap">
            <bool>true</bool>

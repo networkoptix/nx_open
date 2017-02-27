@@ -1392,12 +1392,6 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/77_fix_custom_permission_flag.sql")))
         return ec2::db::fixCustomPermissionFlag(m_sdb) && resyncIfNeeded(ResyncUsers);
 
-    if (updateName.endsWith(lit("/78_migrate_videowall_layouts.sql")))
-    {
-        return ec2::database::migrations::reparentVideoWallLayouts(m_sdb)
-            && resyncIfNeeded({ResyncLayouts, ResyncVideoWalls});
-    }
-
     if (updateName.endsWith(lit("/81_changed_status_stransaction_hash.sql")))
         return resyncIfNeeded({ClearLog, ResyncLog});
 
@@ -1416,6 +1410,12 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/86_fill_cloud_user_digest.sql")))
         return resyncIfNeeded(ResyncUsers);
+
+    if (updateName.endsWith(lit("/87_migrate_videowall_layouts.sql")))
+    {
+        return ec2::database::migrations::reparentVideoWallLayouts(m_sdb)
+            && resyncIfNeeded({ResyncLayouts, ResyncVideoWalls});
+    }
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
@@ -2137,14 +2137,6 @@ ErrorCode QnDbManager::removeMediaServerUserAttributes(const QnUuid& guid)
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::removeLayoutItems(qint32 id)
-{
-    if (!database::api::removeLayoutItems(m_sdb, id))
-        return ErrorCode::dbError;
-    return ErrorCode::ok;
-}
-
-
 ErrorCode QnDbManager::deleteUserProfileTable(const qint32 id)
 {
     QSqlQuery delQuery(m_sdb);
@@ -2515,29 +2507,9 @@ ErrorCode QnDbManager::removeServer(const QnUuid& guid)
 
 ErrorCode QnDbManager::removeLayout(const QnUuid& id)
 {
-    return removeLayoutInternal(id, getResourceInternalId(id));
-}
-
-ErrorCode QnDbManager::removeLayoutInternal(const QnUuid& id, const qint32 &internalId)
-{
-    //ErrorCode err = deleteAddParams(internalId);
-    //if (err != ErrorCode::ok)
-    //    return err;
-
-    ErrorCode err = removeLayoutItems(internalId);
-    if (err != ErrorCode::ok)
-        return err;
-
-    err = removeLayoutFromVideowallItems(id);
-    if (err != ErrorCode::ok)
-        return err;
-
-    err = deleteTableRecord(internalId, "vms_layout", "resource_ptr_id");
-    if (err != ErrorCode::ok)
-        return err;
-
-    err = deleteRecordFromResourceTable(internalId);
-    return err;
+    return database::api::removeLayout(m_sdb, id)
+        ? ErrorCode::ok
+        : ErrorCode::dbError;
 }
 
 ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran) {
@@ -4508,19 +4480,7 @@ ErrorCode QnDbManager::insertOrReplaceVideowall(const ApiVideowallData& data, qi
     return ErrorCode::dbError;
 }
 
-ErrorCode QnDbManager::removeLayoutFromVideowallItems(const QnUuid &layout_id) {
-    QByteArray emptyId = QnUuid().toRfc4122();
 
-    QSqlQuery query(m_sdb);
-    query.prepare("UPDATE vms_videowall_item set layout_guid = :empty_id WHERE layout_guid = :layout_id");
-    query.bindValue(":empty_id", emptyId);
-    query.bindValue(":layout_id", layout_id.toRfc4122());
-    if (query.exec())
-        return ErrorCode::ok;
-
-    qWarning() << Q_FUNC_INFO << query.lastError().text();
-    return ErrorCode::dbError;
-}
 
 ErrorCode QnDbManager::saveWebPage(const ApiWebPageData& params)
 {

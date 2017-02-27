@@ -187,7 +187,7 @@ void QnLoginToCloudDialogPrivate::at_loginButton_clicked()
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::errorChanged,
         this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error);
 
-    qnCloudStatusWatcher->setCredentials(QnCredentials(
+    qnCloudStatusWatcher->setCredentials(QnEncodedCredentials(
         q->ui->loginInputField->text().trimmed(),
         q->ui->passwordInputField->text().trimmed()));
 }
