@@ -972,7 +972,7 @@ nx::db::DBResult SystemManager::addNewSharing(
     const data::SystemSharing& sharing)
 {
     api::SystemSharingEx sharingWithCalculatedData = createDerivedFromBase(sharing);
-    sharingWithCalculatedData.lastLoginTime = std::chrono::system_clock::now();
+    sharingWithCalculatedData.lastLoginTime = nx::utils::utcTime();
     sharingWithCalculatedData.accountId = inviteeAccount.id;
 
     auto dbResult = m_systemSharingDao.calculateUsageFrequencyForANewSystem(
