@@ -731,7 +731,7 @@ void socketMultiConnect(
 
             connectedSockets.back()->connectAsync(
                 *endpointToConnectTo,
-                [&connectedSockets, clientsToConnect, connectNewClients]
+                [&connectedSockets, clientsToConnect, connectNewClients, &connectResults]
                     (SystemError::ErrorCode code)
                 {
                     connectResults.push(code);
@@ -753,7 +753,7 @@ void socketMultiConnect(
     decltype(connectedSockets) connectedSocketsToDelete;
     {
         QnMutexLocker lock(&connectedSocketsMutex);
-        auto connectedSocketsToDelete.swap(connectedSockets);
+        connectedSocketsToDelete.swap(connectedSockets);
         terminated = true;
     }
 
