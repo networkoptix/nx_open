@@ -556,6 +556,7 @@ void LLUtil::fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& ha
     // Find disabled NICs
     std::vector<_bstr_t> paths;
 
+#if 0
     if (vistaOrLater)
     {
         if (GetDisabledNICS(pSvc, paths) == S_OK)
@@ -563,7 +564,6 @@ void LLUtil::fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& ha
             // Temporarily enable them
             if (EnableNICSAtPaths(pSvc, paths) == S_OK)
             {
-#if 1
                 // Wait up to 10 seconds for all interfaces to be enabled
                 for (int i = 0; i < kInterfaceWaitingTries; i++)
                 {
@@ -578,10 +578,10 @@ void LLUtil::fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& ha
                         Sleep(kInterfaceWaitingTime);
                     }
                 }
-#endif
             }
         }
     }
+#endif
 
     findMacAddresses(pSvc, hardwareInfo.nics);
 
