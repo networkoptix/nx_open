@@ -163,18 +163,18 @@ TEST_F(AddressResolver, HostNameResolve3)
         std::deque<HostAddress> ips;
         const auto resultCode = dnsResolver.resolveSync(QLatin1String("ya.ru"), AF_INET, &ips);
         ASSERT_EQ(SystemError::noError, resultCode);
-        ASSERT_GE(ips.size(), 1);
+        ASSERT_GE(ips.size(), 1U);
         ASSERT_TRUE(ips.front().isIpAddress());
         ASSERT_TRUE((bool)ips.front().ipV4());
         ASSERT_TRUE((bool)ips.front().ipV6());
-        ASSERT_NE(0, ips.front().ipV4()->s_addr);
+        ASSERT_NE(0U, ips.front().ipV4()->s_addr);
     }
 
     {
         std::deque<HostAddress> ips;
         const auto resultCode = dnsResolver.resolveSync(QLatin1String("hren2349jf234.ru"), AF_INET, &ips);
         ASSERT_EQ(SystemError::hostNotFound, resultCode);
-        ASSERT_EQ(0, ips.size());
+        ASSERT_EQ(0U, ips.size());
     }
 
     {
@@ -195,9 +195,9 @@ TEST_F(AddressResolver, HostNameResolve3)
 
         dnsResolver.removeEtcHost(kTestHost);
 
-        ASSERT_EQ(1, ip4s.size());
+        ASSERT_EQ(1U, ip4s.size());
         ASSERT_EQ(kTestAddresses.front(), ip4s.front());
-        ASSERT_EQ(2, ip6s.size());
+        ASSERT_EQ(2U, ip6s.size());
         ASSERT_EQ(kTestAddresses.front(), ip6s.front());
         ASSERT_EQ(kTestAddresses.back(), ip6s.back());
     }
@@ -328,7 +328,7 @@ TEST_F(AddressResolverNat64, IPv4) // NAT64 not in use, IP v4 is just converted 
 {
     const auto entries = SocketGlobals::addressResolver().resolveSync(
         kV4, NatTraversalSupport::disabled, AF_INET);
-    ASSERT_EQ(1, entries.size());
+    ASSERT_EQ(1U, entries.size());
 
     ASSERT_EQ(cloud::AddressType::direct, entries.front().type);
     ASSERT_TRUE(entries.front().host.isIpAddress());
@@ -339,7 +339,7 @@ TEST_F(AddressResolverNat64, IPv6) // NAT64 returns 2 addresses: mapped IP v6 an
 {
     const auto entries = SocketGlobals::addressResolver().resolveSync(
         kV4, NatTraversalSupport::disabled, AF_INET6);
-    ASSERT_EQ(2, entries.size());
+    ASSERT_EQ(2U, entries.size());
 
     ASSERT_EQ(cloud::AddressType::direct, entries.front().type);
     ASSERT_TRUE(entries.front().host.isIpAddress());

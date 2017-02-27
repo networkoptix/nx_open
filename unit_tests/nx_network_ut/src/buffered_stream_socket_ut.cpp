@@ -69,7 +69,7 @@ TEST_F(BufferedStreamSocketTest, catchRecvEvent)
         {
             ASSERT_EQ(code, SystemError::noError);
             ASSERT_EQ(size, kTestMessage.size() * clientCount);
-            ASSERT_EQ(buffer.size(), size);
+            ASSERT_EQ((size_t)buffer.size(), size);
             ASSERT_TRUE(buffer.startsWith(kTestMessage));
             ASSERT_TRUE(buffer.endsWith(kTestMessage));
             acceptedResults.push(code);

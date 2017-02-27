@@ -115,20 +115,22 @@ def box_config_factory(name=None, install_server=True, provision_scripts=None, i
 class BoxConfig(object):
 
     @classmethod
-    def from_dict(cls, d):
+    def from_dict(cls, d, vm_name_prefix):
         return cls(idx=d['idx'],
                    name=d['name'],
                    provision_scripts=d['provision_scripts'],
                    vagrant_config_commands=[ConfigCommand.from_dict(command) for command in d['vagrant_config_commands']],
+                   vm_name_prefix=vm_name_prefix,
                    timezone=pytz.timezone(d['timezone']))
 
-    def __init__(self, idx, name, provision_scripts, vagrant_config_commands, ip_address=None, timezone=None):
+    def __init__(self, idx, name, provision_scripts, vagrant_config_commands, vm_name_prefix=None, timezone=None):
         assert timezone is None or isinstance(timezone, datetime.tzinfo), repr(timezone)
         self.idx = idx
         self.name = name
         self.provision_scripts = provision_scripts
         self.vagrant_config_commands = vagrant_config_commands
-        self.ip_address = ip_address  # str
+        self.vm_name_prefix = vm_name_prefix
+        self.ip_address = None  # str
         self.timezone = timezone  # str
         self.is_allocated = False
 
@@ -158,7 +160,8 @@ class BoxConfig(object):
         return 'box-%d%s' % (self.idx, suffix)
 
     def vm_box_name(self):
-        return 'funtest-%s' % self.box_name()
+        assert self.vm_name_prefix  # must be set before this call
+        return self.vm_name_prefix + self.box_name()
 
     def get_vagrant_config_commands(self, type):
         return [command for command in self.vagrant_config_commands if command.type() == type]

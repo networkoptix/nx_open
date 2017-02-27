@@ -87,13 +87,13 @@ TEST( HttpMultipartContentParser, genericTest )
             if (closeContent)
             {
                 ASSERT_TRUE(parser.eof());
-                ASSERT_EQ(5, frames.size());
+                ASSERT_EQ(5U, frames.size());
                 ASSERT_TRUE(frames[4].isEmpty());
             }
             else
             {
                 ASSERT_FALSE(parser.eof());
-                ASSERT_EQ(4, frames.size());
+                ASSERT_EQ(4U, frames.size());
             }
             ASSERT_EQ(frames[0], frame1);
             ASSERT_EQ(frames[1], frame2);
@@ -177,13 +177,13 @@ TEST( HttpMultipartContentParser, onlySizedData )
             if (closeContent)
             {
                 ASSERT_TRUE(parser.eof());
-                ASSERT_EQ(5, frames.size());
+                ASSERT_EQ(5U, frames.size());
                 ASSERT_TRUE(frames[4].isEmpty());
             }
             else
             {
                 ASSERT_FALSE(parser.eof());
-                ASSERT_EQ(4, frames.size());
+                ASSERT_EQ(4U, frames.size());
             }
             ASSERT_EQ(frame1, frames[0]);
             ASSERT_EQ(frame2, frames[1]);
@@ -236,7 +236,7 @@ TEST( HttpMultipartContentParser, unSizedDataSimple )
                 pos + dataStep <= testData.size() ? dataStep : QnByteArrayConstRef::npos ) );
         parser.flush();
 
-        ASSERT_EQ( frames.size(), 2 );
+        ASSERT_EQ( 2U, frames.size() );
         ASSERT_EQ( frames[0], frame1 );
         ASSERT_EQ( frames[1], frame2 );
     }
@@ -334,7 +334,7 @@ TEST(HttpMultipartContentParser, epilogueOnly)
         //parser.flush();
 
         ASSERT_TRUE(parser.eof());
-        ASSERT_EQ(1, frames.size());
+        ASSERT_EQ(1U, frames.size());
         ASSERT_TRUE(frames[0].isEmpty());
     }
 }
