@@ -859,11 +859,13 @@ public:
 protected:
     void givenNotActivatedAccount()
     {
-        m_registrationTimeRange.first = nx::utils::utcTime();
+        m_registrationTimeRange.first = 
+            nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
         auto result = addAccount(&m_account, &m_account.password, &m_activationCode);
         ASSERT_EQ(api::ResultCode::ok, result);
         ASSERT_TRUE(!m_activationCode.code.empty());
-        m_registrationTimeRange.second = nx::utils::utcTime();
+        m_registrationTimeRange.second = 
+            nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
     }
 
     void whenShiftedSystemTime()
@@ -873,11 +875,13 @@ protected:
 
     void whenActivatedAccount()
     {
-        m_activationTimeRange.first = nx::utils::utcTime();
+        m_activationTimeRange.first = 
+            nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
         std::string accountEmail;
         auto result = activateAccount(m_activationCode, &accountEmail);
         ASSERT_EQ(api::ResultCode::ok, result);
-        m_activationTimeRange.second = nx::utils::utcTime();
+        m_activationTimeRange.second = 
+            nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
     }
 
     void assertRegistrationTimestampIsCorrect()
