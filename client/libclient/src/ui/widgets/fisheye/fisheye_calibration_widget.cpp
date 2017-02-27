@@ -21,7 +21,6 @@ QnFisheyeCalibrationWidget::QnFisheyeCalibrationWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::QnFisheyeCalibrationWidget),
     m_calibrator(new QnFisheyeCalibrator()),
-    m_imageProvider(nullptr),
     m_lastError(QnFisheyeCalibrator::NoError),
     m_inLoading(false)
 {
@@ -62,20 +61,17 @@ void QnFisheyeCalibrationWidget::init()
 
 QnImageProvider* QnFisheyeCalibrationWidget::imageProvider() const
 {
-    return m_imageProvider;
+    return m_imageProvider.data();
 }
 
 //TODO: #GDM change to QnCameraThumbnailManager
 void QnFisheyeCalibrationWidget::setImageProvider(QnImageProvider* provider)
 {
-    // TODO: #GDM #Common ownership is not clear. Does this object claim ownership of provider?
-    // If not, then it should not rely on destruction order => need to store provider in
-    // QPointer and check that it's alive before usage.
     m_inLoading = false;
     if (m_imageProvider)
     {
         ui->imageWidget->disconnect(m_imageProvider);
-        disconnect(this, nullptr, m_imageProvider, nullptr);
+        m_imageProvider->disconnect(this);
     }
 
     m_updateTimer->stop();

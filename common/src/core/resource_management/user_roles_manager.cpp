@@ -143,10 +143,10 @@ QString QnUserRolesManager::userRoleDescription(Qn::UserRole userRole)
     switch (userRole)
     {
         case Qn::UserRole::Owner:
-            return tr("Has access to whole system and can do everything.");
+            return tr("Has access to whole System and can do everything.");
 
         case Qn::UserRole::Administrator:
-            return tr("Has access to whole system and can manage it. Can create users.");
+            return tr("Has access to whole System and can manage it. Can create users.");
 
         case Qn::UserRole::AdvancedViewer:
             return tr("Can manage all cameras and bookmarks.");

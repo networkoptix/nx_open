@@ -42,13 +42,13 @@ void removeConnection(const QnUuid& localSystemId, const QUrl& url)
     qnClientCoreSettings->setRecentLocalConnections(connections);
 }
 
-void storeCredentials(const QnUuid& localSystemId, const QnCredentials& credentials)
+void storeCredentials(const QnUuid& localSystemId, const QnEncodedCredentials& credentials)
 {
     auto credentialsHash = qnClientCoreSettings->systemAuthenticationData();
     auto& credentialsList = credentialsHash[localSystemId];
 
     auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
-        [&credentials](const QnCredentials& other)
+        [&credentials](const QnEncodedCredentials& other)
         {
             return credentials.user == other.user;
         });
@@ -74,7 +74,7 @@ void removeCredentials(const QnUuid& localSystemId, const QString& userName)
         auto& credentialsList = credentialsHash[localSystemId];
 
         auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
-            [&userName](const QnCredentials& other)
+            [&userName](const QnEncodedCredentials& other)
             {
                 return userName == other.user;
             });
@@ -86,13 +86,13 @@ void removeCredentials(const QnUuid& localSystemId, const QString& userName)
     qnClientCoreSettings->setSystemAuthenticationData(credentialsHash);
 }
 
-QnCredentials getCredentials(const QnUuid& localSystemId, const QString& userName)
+QnEncodedCredentials getCredentials(const QnUuid& localSystemId, const QString& userName)
 {
     auto credentialsHash = qnClientCoreSettings->systemAuthenticationData();
     auto& credentialsList = credentialsHash[localSystemId];
 
     auto it = std::find_if(credentialsList.begin(), credentialsList.end(),
-        [&userName](const QnCredentials& other)
+        [&userName](const QnEncodedCredentials& other)
         {
             return userName == other.user;
         });
@@ -100,7 +100,7 @@ QnCredentials getCredentials(const QnUuid& localSystemId, const QString& userNam
     if (it != credentialsList.end())
         return *it;
 
-    return QnCredentials();
+    return QnEncodedCredentials();
 }
 
 bool hasCredentials(const QnUuid& localSystemId)

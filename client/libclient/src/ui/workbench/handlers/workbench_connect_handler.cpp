@@ -587,8 +587,8 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     if (helpers::isLocalUser(url.userName()))
     {
         const auto credentials = (storePassword || autoLogin
-            ? QnCredentials(url)
-            : QnCredentials(url.userName(), QString()));
+            ? QnEncodedCredentials(url)
+            : QnEncodedCredentials(url.userName(), QString()));
 
         nx::client::core::helpers::storeCredentials(localId, credentials);
         qnClientCoreSettings->save();
@@ -598,6 +598,12 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     {
         using namespace nx::network;
         qnCloudStatusWatcher->logSession(info.cloudSystemId);
+        if (qnCloudStatusWatcher->stayConnected())
+        {
+            qnSettings->setLastUsedConnection({info.systemName, url, localId});
+            qnSettings->setAutoLogin(true);
+            qnSettings->save();
+        }
         return;
     }
 

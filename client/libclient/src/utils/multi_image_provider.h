@@ -1,28 +1,31 @@
-#ifndef MULTI_IMAGE_PROVIDER_H
-#define MULTI_IMAGE_PROVIDER_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtGui/QImage>
 #include "image_provider.h"
 #include <memory>
 
-class QnMultiImageProvider: public QnImageProvider 
+class QnMultiImageProvider: public QnImageProvider
 {
     Q_OBJECT
-    typedef QnImageProvider base_type;
+    using base_type = QnImageProvider;
 public:
     typedef std::vector<std::unique_ptr<QnImageProvider>> Providers;
 
-    QnMultiImageProvider(Providers providers, Qt::Orientation orientation, int spacing, QObject *parent = 0);
+    QnMultiImageProvider(Providers providers, Qt::Orientation orientation, int spacing,
+        QObject *parent = 0);
     virtual ~QnMultiImageProvider() {}
 
-    virtual QImage image() const override { return m_image; }
+    virtual QImage image() const override;
+    virtual QSize sizeHint() const override;
+    virtual Qn::ThumbnailStatus status() const override;
+
 protected:
     virtual void doLoadAsync() override;
 private:
     const Providers m_providers;
-    QMap<std::ptrdiff_t, QRect> m_imageRects;
+    const Qt::Orientation m_orientation;
+    const int m_spacing;
+    QMap<int, QRect> m_imageRects;
     QImage m_image;
 };
-
-#endif // MULTI_IMAGE_PROVIDER_H

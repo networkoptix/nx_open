@@ -121,8 +121,10 @@ public:
 
     void saveToResource();
     bool takeFromSettings(QSettings* settings);
+
 signals:
     void valueChanged();
+    void synchronizationNeeded(const QnResourcePtr& resource);
 
 protected:
     QString defaultSerializedValue() const;

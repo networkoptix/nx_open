@@ -307,7 +307,7 @@
 <context>
     <name>OfflineDummy</name>
     <message>
-        <source>You are not connected to any system</source>
+        <source>You are not connected to any System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -420,19 +420,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No systems found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot connect to the system &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot connect to the server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -445,6 +433,18 @@
     </message>
     <message>
         <source>Connect to Another Server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Systems found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to System &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to Server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
