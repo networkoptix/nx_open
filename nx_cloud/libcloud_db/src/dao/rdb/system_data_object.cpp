@@ -31,9 +31,9 @@ nx::db::DBResult SystemDataObject::insert(
         R"sql(
         INSERT INTO system(
                 id, name, customization, auth_key, owner_account_id,
-                status_code, expiration_utc_timestamp, opaque)
+                status_code, expiration_utc_timestamp, opaque, registration_time_utc)
         VALUES(:id, :name, :customization, :authKey, :ownerAccountID,
-               :status, :expirationTimeUtc, :opaque)
+               :status, :expirationTimeUtc, :opaque, :registrationTime)
         )sql");
 
     QnSql::bind(system, &insertSystemQuery);
@@ -210,7 +210,8 @@ nx::db::DBResult SystemDataObject::fetchSystems(
         SELECT system.id, system.name, system.customization, system.auth_key as authKey,
                account.email as ownerAccountEmail, system.status_code as status,
                system.expiration_utc_timestamp as expirationTimeUtc,
-               system.seq as systemSequence, system.opaque as opaque
+               system.seq as systemSequence, system.opaque as opaque, 
+               system.registration_time_utc as registrationTime
         FROM system, account
         WHERE system.owner_account_id = account.id
         )sql";

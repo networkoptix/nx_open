@@ -97,7 +97,7 @@ TEST_F(ListeningPeer, peer_disconnect)
     std::tie(statusCode, listeningPeers) = getListeningPeers();
     ASSERT_EQ(nx_http::StatusCode::ok, statusCode);
 
-    ASSERT_EQ(1, listeningPeers.systems.size());
+    ASSERT_EQ(1U, listeningPeers.systems.size());
 
     server1.reset();
 

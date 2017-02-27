@@ -1,18 +1,10 @@
-/**********************************************************
-* Sep 3, 2015
-* NetworkOptix
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_CDB_ACCOUNT_DATA_H
-#define NX_CDB_ACCOUNT_DATA_H
+#pragma once
 
 #include <cstdint>
 #include <chrono>
 #include <string>
 
 #include <boost/optional.hpp>
-
 
 namespace nx {
 namespace cdb {
@@ -27,22 +19,49 @@ enum class AccountStatus
     invited = 4,
 };
 
+class AccountRegistrationData
+{
+public:
+    /** User email. Used as unique user id. */
+    std::string email;
+    /** Hex representation of HA1 (see rfc2617) digest of user's password. */
+    std::string passwordHa1;
+    /** Hex representation of HA1 (see rfc2617) digest calculated with SHA-256 hash. */
+    std::string passwordHa1Sha256;
+    std::string fullName;
+    std::string customization;
+};
+
 class AccountData
 {
 public:
     std::string id;
-    //!User email. Used as unique user id
+    /** User email. Used as unique user id. */
     std::string email;
-    //!Hex representation of HA1 (see rfc2617) digest of user's password
+    /** Hex representation of HA1 (see rfc2617) digest of user's password. */
     std::string passwordHa1;
-    //!Hex representation of HA1 (see rfc2617) digest calculated with SHA-256 hash
+    /** Hex representation of HA1 (see rfc2617) digest calculated with SHA-256 hash. */
     std::string passwordHa1Sha256;
     std::string fullName;
     std::string customization;
     AccountStatus statusCode;
+    std::chrono::system_clock::time_point registrationTime;
+    /**
+     * Zero, if account has not been activated yet.
+     */
+    std::chrono::system_clock::time_point activationTime;
 
-    AccountData()
-    :
+    AccountData():
+        AccountData(AccountRegistrationData())
+    {
+    }
+
+    AccountData(AccountRegistrationData registrationData):
+        email(std::move(registrationData.email)),
+        passwordHa1(std::move(registrationData.passwordHa1)),
+        passwordHa1Sha256(std::move(registrationData.passwordHa1Sha256)),
+        fullName(std::move(registrationData.fullName)),
+        customization(std::move(registrationData.customization)),
         statusCode(AccountStatus::invalid)
     {
     }
@@ -60,10 +79,9 @@ public:
     boost::optional<std::string> passwordHa1;
     boost::optional<std::string> fullName;
     boost::optional<std::string> customization;
-    //!Hex representation of HA1 (see rfc2617) digest calculated with SHA-256 hash
+    /** Hex representation of HA1 (see rfc2617) digest calculated with SHA-256 hash. */
     boost::optional<std::string> passwordHa1Sha256;
 };
-
 
 class AccountEmail
 {
@@ -71,20 +89,18 @@ public:
     std::string email;
 };
 
-
 class TemporaryCredentialsTimeouts
 {
 public:
     std::chrono::seconds expirationPeriod;
-    /** if \a true, each request, authorized with these credentials, 
-        increases credentials life time by \a prolongationPeriod.
-    */
+    /**
+     * if true, each request, authorized with these credentials, 
+     * increases credentials life time by prolongationPeriod.
+     */
     bool autoProlongationEnabled;
     std::chrono::seconds prolongationPeriod;
 
-
-    TemporaryCredentialsTimeouts()
-    :
+    TemporaryCredentialsTimeouts():
         expirationPeriod(0),
         autoProlongationEnabled(false),
         prolongationPeriod(0)
@@ -92,19 +108,22 @@ public:
     }
 };
 
-/** Input parameters of \a create_temporary_credentials request */
+/**
+ * Input parameters of create_temporary_credentials request.
+ */
 class TemporaryCredentialsParams
 {
 public:
-    /** Type of key to issue.
-        Following types are defined:
-        - short
-        - long
-    */
+    /**
+     * Type of key to issue.
+     * Following types are defined:
+     * - short
+     * - long
+     */
     std::string type;
     /**
-        This structure is ignored if \a type is non-empty
-    */
+     * This structure is ignored if type is non-empty.
+     */
     TemporaryCredentialsTimeouts timeouts;
 };
 
@@ -113,12 +132,10 @@ class TemporaryCredentials
 public:
     std::string login;
     std::string password;
-    /** Parameters of credentials created */
+    /** Parameters of credentials created. */
     TemporaryCredentialsTimeouts timeouts;
 };
 
-}   //api
-}   //cdb
-}   //nx
-
-#endif  //NX_CDB_ACCOUNT_DATA_H
+} // namespace api
+} // namespace cdb
+} // namespace nx
