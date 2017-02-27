@@ -8,9 +8,7 @@ angular.module('webadminApp')
             scope:{
             },
             link:function(scope, element, attrs, ngModel){
-                console.log("init language select");
                 mediaserver.getLanguages().then(function(languages){
-                    console.log("got languages", languages);
                     scope.activeLanguage = _.find(languages, function(lang){
                         return lang.language == L.language;
                     });
@@ -23,9 +21,9 @@ angular.module('webadminApp')
                     if(language == L.language){
                         return;
                     }
-                    cloudApi.changeLanguage(language).then(function(){
-                        window.location.reload();
-                    });
+
+                    setLanguage(language);
+                    window.location.reload();
                 }
             }
         };

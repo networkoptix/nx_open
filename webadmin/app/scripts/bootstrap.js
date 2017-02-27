@@ -5,6 +5,18 @@
 */
 
 var L = {};
+
+function setLanguage(lang){
+
+    function setCookie(cname, cvalue, exdays) {
+        var d = new Date();
+        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+        var expires = "expires="+ d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    setCookie("language", lang, 100); // Almost never expiring cookie
+}
 (function LanguageDetect(){
 
     function getCookie(cname) {
