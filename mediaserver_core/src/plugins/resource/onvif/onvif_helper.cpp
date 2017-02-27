@@ -1,13 +1,16 @@
+#include "onvif_helper.h"
 
 #ifdef ENABLE_ONVIF
 
-#include "onvif_helper.h"
-#include "onvif/soapDeviceBindingProxy.h"
-#include <nx/utils/log/log.h>
-#include "core/resource/resource_type.h"
+#include <onvif/soapDeviceBindingProxy.h>
 
 #include <QtCore/QDebug>
 #include <QtCore/QRegExp>
+
+#include <nx/utils/log/log.h>
+#include <core/resource/resource_type.h>
+
+using nx::common::utils::Credentials;
 
 //const QRegExp& UNNEEDED_CHARACTERS = *new QRegExp("[\\t\\n -]+");
 static const QRegExp UNNEEDED_CHARACTERS(QLatin1String("[^\\d\\w]+"));
@@ -214,17 +217,17 @@ PasswordHelper::PasswordHelper()
 void PasswordHelper::setPasswordInfo(const char* manufacturer, const char* login, const char* passwd)
 {
     QLatin1String manufacturerStr(manufacturer);
-    manufacturerPasswords[manufacturerStr].emplace_back(login, passwd);
+    manufacturerPasswords[manufacturerStr].append(Credentials(login, passwd));
 }
 
 void PasswordHelper::setPasswordInfo(const char *manufacturer)
 {
     QLatin1String manufStr(manufacturer);
-    manufacturerPasswords[manufStr] =
-            std::list<std::pair<const char*, const char*>>();
+    manufacturerPasswords[manufStr] = CredentialsList();
 }
 
-const PasswordList PasswordHelper::getPasswordsByManufacturer(const QString& manufacturer) const
+const CredentialsList PasswordHelper::getCredentialsByManufacturer(
+    const QString& manufacturer) const
 {
 #ifdef ONVIF_DEBUG
     qDebug() << "PasswordHelper::getPasswordsByManufacturer: manufacturer: " << manufacturer
@@ -240,22 +243,11 @@ void PasswordHelper::printPasswords() const
 {
 #ifdef ONVIF_DEBUG
     qDebug() << "PasswordHelper::printPasswords:";
-    ManufacturerPasswords::const_iterator iter = manufacturerPasswords.begin();
-    while (iter != manufacturerPasswords.end()) {
-        qDebug() << "  Manufacturer: " << iter.key() << ": ";
-        PasswordList::ConstIterator listIter = iter.value().begin();
-        while (listIter != iter.value().end()) {
-            qDebug() << "    " << listIter->first << " / " << listIter->second;
-            ++listIter;
-        }
-        ++iter;
-    }
-
-    qDebug() << "  All passwords: ";
-    PasswordList::ConstIterator listIter = allPasswords.begin();
-    while (listIter != allPasswords.end()) {
-        qDebug() << "    " << listIter->first << " / " << listIter->second;
-        ++listIter;
+    for (auto it = manufacturerPasswords.begin(); it != manufacturerPasswords.end(); ++it)
+    {
+        qDebug() << "  Manufacturer: " << it.key() << ": ";
+        for (const auto& credentials: *it)
+            qDebug() << "    " << credentials.user << " / " << credentials.password;
     }
 #endif
 }

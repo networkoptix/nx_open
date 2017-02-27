@@ -323,9 +323,8 @@ angular.module('webadminApp')
                         break;
 
                     default:
-
                         $scope.settings.remoteError = errorMessage;
-                        if(error.data.error == 3){
+                        if(error.data.error == 3 && error.data.errorString.indexOf('not accessible yet') > 0){
                             $scope.next('mergeTemporaryFailure');
                             break;
                         }
@@ -818,9 +817,12 @@ angular.module('webadminApp')
                         $scope.next('merge');
                     }
                 },
+                retryMergeCredentials:{
+                    onShow: updateCredentialsAfterMerge
+                },
                 mergeTemporaryFailure:{
                     retry: function () {
-                        window.location.reload();
+                        $scope.next('retryMergeCredentials');
                     },
                     finish: true
                 },

@@ -7,23 +7,23 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/image_provider.h>
 
-class QnCameraThumbnailManager;
-
-class QnSingleThumbnailLoader : public QnImageProvider {
+class QnSingleThumbnailLoader: public QnImageProvider
+{
     Q_OBJECT
 
-    typedef QnImageProvider base_type;
+    using base_type = QnImageProvider;
 
 public:
     explicit QnSingleThumbnailLoader(const QnVirtualCameraResourcePtr &camera,
-                                     qint64 msecSinceEpoch = QnThumbnailRequestData::kLatestThumbnail,
-                                     int rotation = QnThumbnailRequestData::kDefaultRotation,
-                                     const QSize &size = QSize(),
-                                     QnThumbnailRequestData::ThumbnailFormat format = QnThumbnailRequestData::JpgFormat,
-                                     QSharedPointer<QnCameraThumbnailManager> statusPixmapManager = QSharedPointer<QnCameraThumbnailManager>(),
-                                     QObject *parent = NULL);
+        qint64 msecSinceEpoch = QnThumbnailRequestData::kLatestThumbnail,
+        int rotation = QnThumbnailRequestData::kDefaultRotation,
+        const QSize &size = QSize(),
+        QnThumbnailRequestData::ThumbnailFormat format = QnThumbnailRequestData::JpgFormat,
+        QObject *parent = NULL);
 
     virtual QImage image() const override;
+    virtual QSize sizeHint() const override;
+    virtual Qn::ThumbnailStatus status() const override;
 
     QnThumbnailRequestData requestData() const;
     void setRequestData(const QnThumbnailRequestData& data);

@@ -1,8 +1,3 @@
-/**********************************************************
-* Aug 6, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "account_data.h"
 
 #include <boost/algorithm/string/classification.hpp>
@@ -15,10 +10,29 @@
 
 #include "stree/cdb_ns.h"
 
-
 namespace nx {
 namespace cdb {
 namespace data {
+
+//-------------------------------------------------------------------------------------------------
+bool AccountRegistrationData::getAsVariant(int resID, QVariant* const value) const
+{
+    switch (resID)
+    {
+        case attr::accountEmail:
+            *value = QString::fromStdString(email);
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+AccountData::AccountData(AccountRegistrationData registrationData):
+    api::AccountData(std::move(registrationData))
+{
+}
 
 bool AccountData::getAsVariant( int resID, QVariant* const value ) const
 {
@@ -36,31 +50,31 @@ bool AccountData::getAsVariant( int resID, QVariant* const value ) const
     }
 }
 
+//-------------------------------------------------------------------------------------------------
 bool AccountConfirmationCode::getAsVariant(int /*resID*/, QVariant* const /*value*/) const
 {
     //TODO #ak
     return false;
 }
 
-
+//-------------------------------------------------------------------------------------------------
 bool AccountUpdateData::getAsVariant(int /*resID*/, QVariant* const /*value*/) const
 {
     //TODO #ak
     return false;
 }
 
-
+//-------------------------------------------------------------------------------------------------
 AccountUpdateDataWithEmail::AccountUpdateDataWithEmail()
 {
 }
 
-AccountUpdateDataWithEmail::AccountUpdateDataWithEmail(AccountUpdateData&& rhs)
-:
+AccountUpdateDataWithEmail::AccountUpdateDataWithEmail(AccountUpdateData&& rhs):
     AccountUpdateData(std::move(rhs))
 {
 }
 
-
+//-------------------------------------------------------------------------------------------------
 bool AccountEmail::getAsVariant(int resID, QVariant* const value) const
 {
     switch (resID)
@@ -74,7 +88,7 @@ bool AccountEmail::getAsVariant(int resID, QVariant* const value) const
     }
 }
 
-
+//-------------------------------------------------------------------------------------------------
 bool TemporaryCredentialsParams::getAsVariant(
     int resID, QVariant* const value) const
 {
@@ -113,7 +127,7 @@ void TemporaryCredentialsParams::put(int resID, const QVariant& value)
     }
 }
 
-
+//-------------------------------------------------------------------------------------------------
 std::string AccessRestrictions::toString() const
 {
     std::string result;
@@ -180,9 +194,8 @@ bool AccessRestrictions::authorize(const stree::AbstractResourceReader& requestA
         requestPath) == requestsDenied.end();
 }
 
-
-TemporaryAccountCredentials::TemporaryAccountCredentials()
-:
+//-------------------------------------------------------------------------------------------------
+TemporaryAccountCredentials::TemporaryAccountCredentials():
     expirationTimestampUtc(0),
     prolongationPeriodSec(0),
     maxUseCount(0),
@@ -191,12 +204,11 @@ TemporaryAccountCredentials::TemporaryAccountCredentials()
 {
 }
 
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (TemporaryAccountCredentials),
     (sql_record),
     _Fields)
 
-}   //data
-}   //cdb
-}   //nx
+} // namespace data
+} // namespace cdb
+} // namespace nx

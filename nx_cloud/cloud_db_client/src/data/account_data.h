@@ -23,17 +23,27 @@ namespace cdb {
 namespace api {
 
 ////////////////////////////////////////////////////////////
+//// class AccountRegistrationData
+////////////////////////////////////////////////////////////
+
+//TODO #ak add corresponding parser/serializer to fusion and remove this function
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountRegistrationData* const accountData);
+void serializeToUrlQuery(const AccountRegistrationData&, QUrlQuery* const urlQuery);
+
+#define AccountRegistrationData_Fields \
+    (email)(passwordHa1)(passwordHa1Sha256)\
+    (fullName)(customization)
+
+
+////////////////////////////////////////////////////////////
 //// class AccountData
 ////////////////////////////////////////////////////////////
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AccountStatus)
-//TODO #ak add corresponding parser/serializer to fusion and remove this function
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountData* const accountData);
-void serializeToUrlQuery(const AccountData&, QUrlQuery* const urlQuery);
 
 #define AccountData_Fields \
     (id)(email)(passwordHa1)(passwordHa1Sha256)\
-    (fullName)(customization)(statusCode)
+    (fullName)(customization)(statusCode)(registrationTime)(activationTime)
 
 
 ////////////////////////////////////////////////////////////
@@ -46,7 +56,7 @@ void serializeToUrlQuery(const AccountConfirmationCode&, QUrlQuery* const urlQue
 #define AccountConfirmationCode_Fields (code)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (AccountData)(AccountConfirmationCode),
+    (AccountRegistrationData)(AccountData)(AccountConfirmationCode),
     (json)(sql_record) )
 
 
