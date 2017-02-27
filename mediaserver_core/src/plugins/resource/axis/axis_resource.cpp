@@ -808,7 +808,7 @@ CLHttpStatus QnPlAxisResource::readAxisParameters(
     return status;
 }
 
-bool QnPlAxisResource::enableDuplexMode()
+bool QnPlAxisResource::enableDuplexMode() const
 {
     CLSimpleHTTPClient http (
         getHostAddress(),
