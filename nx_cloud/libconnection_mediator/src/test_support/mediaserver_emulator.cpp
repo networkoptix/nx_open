@@ -59,7 +59,7 @@ public:
                 Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
                 QJson::serialized(restResult));
 
-        handler({nx_http::StatusCode::ok, std::move(bodySource)});
+        handler(nx_http::RequestResult{nx_http::StatusCode::ok, std::move(bodySource)});
     }
 
 private:

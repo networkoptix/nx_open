@@ -9,6 +9,7 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/sync_queue.h>
 
+#include <utils/common/guard.h>
 
 namespace nx {
 namespace network {
@@ -21,8 +22,7 @@ static const auto kConnectionId = QnUuid().createUuid().toSimpleString();
 static const std::chrono::milliseconds kSocketTimeout(3000);
 static const std::chrono::milliseconds kMaxKeepAliveInterval(3000);
 
-class IncomingTunnelConnectionTest
-:
+class IncomingTunnelConnectionTest:
     public ::testing::Test
 {
 protected:
@@ -31,6 +31,8 @@ protected:
         utils::TestSyncQueue<SystemError::ErrorCode> results;
 
         auto tmpSocket = makeSocket(true);
+        auto tmpSocketGuard = makeScopedGuard([&tmpSocket]() { tmpSocket->pleaseStopSync(); });
+
         ASSERT_TRUE(tmpSocket->setSendTimeout(0));
         ASSERT_TRUE(tmpSocket->setRecvTimeout(0));
         m_connectionAddress = tmpSocket->getLocalAddress();
@@ -52,6 +54,7 @@ protected:
             {
                 auto cc = std::make_unique<IncomingControlConnection>(
                     kConnectionId.toUtf8(), std::move(tmpSocket), connectionParameters);
+                tmpSocketGuard.disarm();
 
                 cc->start(nullptr /* do not wait for select in test */);
                 m_connection = std::make_unique<IncomingTunnelConnection>(std::move(cc));
