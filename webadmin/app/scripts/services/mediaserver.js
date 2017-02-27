@@ -591,7 +591,7 @@ angular.module('webadminApp')
                 return wrapGet('commonPasswordsList.json');
             },
             getLanguages:function(){
-                return wrapGet('lanuages.json');
+                return wrapGet('languages.json');
             },
 
             networkSettings:function(settings){
