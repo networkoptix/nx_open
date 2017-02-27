@@ -1,9 +1,18 @@
-#ifndef QNSCREENMANAGER_H
-#define QNSCREENMANAGER_H
+#pragma once
 
 #include <QtCore/QSharedMemory>
 #include <QtCore/QRect>
 #include <QtCore/QTimer>
+
+struct ScreenUsageData
+{
+    quint64 pid;
+    quint64 screens;
+
+    ScreenUsageData();
+    void setScreens(const QSet<int> &screens);
+    QSet<int> getScreens() const;
+};
 
 class QnScreenManager : public QObject {
     Q_OBJECT
@@ -17,6 +26,8 @@ public:
     void updateCurrentScreens(const QWidget *widget);
     int nextFreeScreen() const;
 
+    bool isInitialized() const;
+
 private:
     void setCurrentScreens(const QSet<int> &screens);
 
@@ -26,10 +37,10 @@ private slots:
 
 private:
     mutable QSharedMemory m_sharedMemory;
+    ScreenUsageData m_localData; // fallback when shared memory is not accessible
     int m_index;
 
     QTimer *m_refreshDelayTimer;
     QRect m_geometry;
+    bool m_initialized;
 };
-
-#endif // QNSCREENMANAGER_H
