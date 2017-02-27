@@ -23,7 +23,7 @@ def send_notification(request):
             validation_error = True
             error_data['message'] = ['This field is required.']
 
-        if 'customization' not in request.data:
+        if 'customization' not in request.data or not request.data['customization']:
             validation_error = True
             error_data['customization'] = ['This field is required.']
 
@@ -36,3 +36,13 @@ def send_notification(request):
         raise APIRequestException(error.message, ErrorCodes.wrong_parameters, error_data=error.detail)
     return api_success()
 
+@api_view(['GET'])
+@permission_classes((AllowAny, ))
+@handle_exceptions
+def test(request):
+    from rest_framework.response import Response
+    from .. import tasks
+    from random import seed, randint
+    seed()
+    tasks.test_task.delay(randint(1,100),randint(1,5))
+    return Response('ok')

@@ -6,6 +6,7 @@
 @import '_theme_override';
 
 @import '_big_brother';
+@import '_languages';
 
 html {
   position: relative;
@@ -39,6 +40,10 @@ footer {
     color:  $light12;
     &:hover{
       color:$light16;
+    }
+
+    &.dropdown{
+      padding:6px;
     }
   }
   .navbar-right > li > a, .navbar-right > li > span > a{
@@ -148,6 +153,10 @@ footer {
   }
 
 
+}
+
+.warning-label{
+    color: $brand-danger;
 }
 
 .loading .auth-visible,
@@ -674,3 +683,63 @@ h2.version-number{
 .help-topic{
     margin-top:10px;
 }
+
+.dropdown-wide{
+    display:inline-block;
+    width:100%;
+}
+.dropdown .lang-sm{
+    margin-right: $padding-input-horizontal/2;
+}
+.two-columns{
+    -moz-column-count: 2;
+    /* Firefox */
+    -webkit-column-count: 2;
+    /* Safari and Chrome */
+    column-count: 2;
+}
+
+@mixin icon{
+  display: inline-block;
+  background-size: 112px 32px;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  background-image: url('/static/images/portal_icons.png');
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+    background-image: url('/static/images/portal_icons@2x.png');
+  }
+}
+
+@mixin kill-glyphicon{
+  @include icon;
+  &:before{
+    content:none;
+  }
+}
+
+.glyphicon-share{
+    @include kill-glyphicon;
+    background-position: -16px 0;
+}
+.glyphicon-eye-open{
+    @include kill-glyphicon;
+    background-position: -80px 0;
+}
+.glyphicon-eye-close{
+    @include kill-glyphicon;
+    background-position: -80px -16px;
+}
+.icon-caret{
+  @include icon;
+  background-position: 2px 0px;
+
+  margin-left:$padding-input-horizontal/2;
+  margin-top: 2px;
+  float:right;
+}
+.close-icon{
+  @include icon;
+  background-position: -32px 0;
+}
+

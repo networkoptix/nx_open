@@ -37,8 +37,9 @@ def sharing(request, system_id):
     elif request.method == 'POST':
         require_params(request, ('user_email', 'role'))
         # 2. share or change sharing
+        user_email = request.data['user_email'].lower()
         data = cloud_api.System.share(request.session['login'], request.session['password'], system_id,
-                                      request.data['user_email'],
+                                      user_email,
                                       request.data['role'])
 
         return api_success(data)
@@ -98,7 +99,8 @@ def disconnect(request):
         return api_success()
 
     require_params(request, ('email', 'password'))
-    cloud_api.System.unbind(request.data['email'], request.data['password'], request.data['system_id'])
+    email = request.data['email'].lower()
+    cloud_api.System.unbind(email, request.data['password'], request.data['system_id'])
     return api_success()
 
 
@@ -112,7 +114,8 @@ def connect(request):
         return api_success(data)
 
     require_params(request, ('email', 'password'))
-    data = cloud_api.System.bind(request.data['email'], request.data['password'], request.data['name'])
+    email = request.data['email'].lower()
+    data = cloud_api.System.bind(email, request.data['password'], request.data['name'])
     return api_success(data)
 
 

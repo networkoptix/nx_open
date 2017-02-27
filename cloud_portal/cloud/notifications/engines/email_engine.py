@@ -7,13 +7,16 @@ from django.conf import settings
 import json, os
 from util.config import get_config
 from util.helpers import get_language_for_email
+from api.helpers.exceptions import handle_exceptions, APIRequestException
 
 
+titles_cache = {}
 templates_cache = {}
 configs_cache = {}
 logos_cache = {}
 
 
+@handle_exceptions
 def send(email, msg_type, message, customization):
     custom_config = get_custom_config(customization)
     lang = get_language_for_email(email, custom_config['languages'])
@@ -26,15 +29,8 @@ def send(email, msg_type, message, customization):
         'portal_url': custom_config['cloud_portal']['url']
     }
 
-    if msg_type in settings.NOTIFICATIONS_CONFIG:
-        subject = custom_config["mail_prefix"] + ' ' + settings.NOTIFICATIONS_CONFIG[msg_type]['subject']
-    else:
-        message = {"type": msg_type,
-                   "data": json.dumps(message,
-                                      indent=4,
-                                      separators=(',', ': '))
-                   }
-        msg_type = 'unknown'
+    subject = custom_config["mail_prefix"] + ' ' + get_email_title(customization, lang, msg_type, templates_location)
+    subject = pystache.render(subject, {"message": message, "config": config})
 
     message_template = read_template(msg_type, templates_location)
     email_body = pystache.render(message_template, {"message": message, "config": config})
@@ -59,12 +55,25 @@ def get_custom_config(customization):
     return configs_cache[customization]
 
 
+def get_email_title(customization, lang, event, templates_location):
+    if customization not in titles_cache:
+        titles_cache[customization] = {}
+    if lang not in titles_cache[customization]:
+        filename = os.path.join(templates_location, "notifications-language.json")
+        with open(filename) as data_file:
+            titles_cache[customization][lang] = json.load(data_file)
+    return titles_cache[customization][lang][event]["emailSubject"]
+
+
 def read_template(name, location):
     filename = os.path.join(location, name + '.mustache')
     if filename not in templates_cache:
-        # filename = pkg_resources.resource_filename('relnotes', 'templates/{0}.mustache'.format(name))
-        with codecs.open(filename, 'r', 'utf-8') as stream:
-            templates_cache[filename] = stream.read()
+        try:
+            # filename = pkg_resources.resource_filename('relnotes', 'templates/{0}.mustache'.format(name))
+            with codecs.open(filename, 'r', 'utf-8') as stream:
+                templates_cache[filename] = stream.read()
+        except Exception as e:
+            raise type(e)(e.message + ' :' + filename)
     return templates_cache[filename]
 
 

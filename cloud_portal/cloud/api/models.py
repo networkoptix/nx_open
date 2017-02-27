@@ -9,9 +9,9 @@ class Account(models.Model):
     email = models.CharField(unique=True, max_length=255)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    created_date = models.DateField(auto_now_add=True)
-    activated_date = models.DateField(null=True, blank=True)
-    last_login = models.DateField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    activated_date = models.DateTimeField(null=True, blank=True)
+    last_login = models.DateTimeField(null=True, blank=True)
     subscribe = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -29,3 +29,7 @@ class Account(models.Model):
     @staticmethod
     def is_authenticated():
         return True
+
+    @staticmethod
+    def is_anonymous():
+        return False

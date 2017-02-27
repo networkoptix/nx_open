@@ -4,6 +4,7 @@ import htmlmin
 from inlinestyler.utils import inline_css
 import yaml
 import os
+import shutil
 from os.path import join
 import re
 import inlinestyler
@@ -31,11 +32,13 @@ css_content = read_branding(css_content)
 container_text = container_text.replace('{{>style_css}}', css_content)
 
 for file in os.listdir("."):
-    if file.endswith(".mustache.body"):
-        template_name = file.replace('.mustache.body', '')
+    if file.endswith(".mustache.html"):
+        template_name = file.replace('.mustache.html', '')
         new_file = open('../' + template_name + '.mustache', 'w')
-        text = container_text.replace('{{>body}}', open(template_name + '.mustache.body').read())
+        text = container_text.replace('{{>body}}', open(template_name + '.mustache.html').read())
         print >> new_file, htmlmin.minify(inline_css(text), remove_comments=True, remove_empty_space=True, remove_optional_attribute_quotes=False).encode('utf-8', 'replace')
+
+shutil.copyfile("notifications-language.json", "../notifications-language.json")
 
 """
 for f in ('camera_input', 'camera_ip_conflict', 'camera_motion', 'mediaserver_conflict', 'generic_event', 'mediaserver_failure', 'mediaserver_started', 'storage_failure', 'license_issue'):

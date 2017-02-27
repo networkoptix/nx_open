@@ -11,7 +11,7 @@ cloud_db:
     url: 'http://$CLOUD_DB_HOST:$CLOUD_DB_PORT/cdb'
 
 cloud_portal:
-    url: 'http://$CLOUD_PORTAL_HOST'
+    url: 'https://$CLOUD_PORTAL_HOST'
 
 cloud_gateway:
     url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT'
@@ -33,4 +33,6 @@ admins:
         - 'cloud-portal-admins@networkoptix.com'
 
 languages:
-    - en
+    - en_US
+
+queue_name: '$INSTANCE_NAME'

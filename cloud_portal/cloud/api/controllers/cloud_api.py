@@ -142,6 +142,7 @@ class Account(object):
         return temp_password, email
 
     @staticmethod
+    @lower_case_email
     def encode_password(email, password):
         realm = settings.CLOUD_CONNECT['password_realm']
         password_string = ':'.join((email, realm, password))

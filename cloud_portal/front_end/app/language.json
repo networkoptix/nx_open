@@ -1,5 +1,6 @@
 {
-  "language": "LANGUAGE",
+  "language": "LANGUAGE_CODE",
+  "language_name": "LANGUAGE_NAME",
   "productName": "PRODUCT_NAME",
   "clientProtocol": "CLIENT_PROTOCOL:",
   "dialogs": {
@@ -10,7 +11,7 @@
     "logoutAuthorisedText": null,
     "logoutAuthorisedTitle": "You are already logged in",
     "logoutAuthorisedContinueButton": "Continue with current account",
-    "logoutAuthorisedLogoutButton": "Log out"
+    "logoutAuthorisedLogoutButton": "Log Out"
   },
   "pageTitles": {
     "template": "{{title}} PRODUCT_NAME",
@@ -21,7 +22,7 @@
     "account": "Account settings -",
     "systems": "Systems -",
     "system": "System -",
-    "systemShare": "Share the system -",
+    "systemShare": "Share System -",
     "activate": "Activate account -",
     "activateSent": "Activate account -",
     "activateSuccess": "Account activated -",
@@ -47,101 +48,119 @@
   "accessRoles": {
     "disabled": {
       "label": "Disabled",
-      "description": "User is disabled and cannot log in to the system."
+      "description": "User is disabled and cannot log in to System"
     },
     "Owner": {
       "label": "Owner",
-      "description": "Unrestricted access including the ability to share and connect/disconnect system from cloud."
+      "description": "Unrestricted access including the ability to share and connect/disconnect System from cloud"
     },
     "Viewer": {
       "label": "Viewer",
-      "description": "Can view live video and browse the archive."
+      "description": "Can view live video and browse the archive"
     },
     "Live Viewer": {
       "label": "Live Viewer",
-      "description": "Can only view live video."
+      "description": "Can only view live video"
     },
     "Advanced Viewer": {
       "label": "Advanced Viewer",
-      "description": "Can view live video, browse the archive, configure cameras, control PTZ etc."
+      "description": "Can view live video, browse the archive, configure cameras, control PTZ etc"
     },
     "Administrator": {
       "label": "Administrator",
-      "description": "Unrestricted access including the ability to share."
+      "description": "Unrestricted access including the ability to share"
     },
     "Custom": {
       "label": "Custom",
-      "description": "Use the desktop client application to set up custom permissions."
+      "description": "Use the PRODUCT_NAME Client application to set up custom permissions"
     },
     "cloudAdmin": {
       "label": "Administrator",
-      "description": "Can configure system and share it."
+      "description": "Can configure System and share it"
     },
     "customRole": {
       "label": "Custom role",
-      "description": "Custom user role specified in the system."
+      "description": "Custom user role specified in System"
     }
   },
   "errorCodes": {
     "ok": "ok",
-    "cloudInvalidResponse": "Cloud DB returned an unexpected response.",
-    "notAuthorized": "Login or password are incorrect.",
-    "wrongParameters": "Some parameters on the form are incorrect.",
-    "wrongCode": "Account was already activated or confirmation code is incorrect.",
-    "forbidden": "You do not have permissions to perform this action.",
-    "accountNotActivated": "This account hasn't been activated yet. <a href=\"/activate\">Send activation link again</a>",
-    "accountBlocked": "This account has been blocked.",
+    "cantChangePasswordPrefix": "Cannot save new password",
+    "cantSendActivationPrefix": "Cannot send confirmation Email",
+    "cantDisconnectSystemPrefix": "Cannot delete the system",
+    "cantUnshareWithMeSystemPrefix": "Cannot delete the system",
+    "cantSharePrefix": "Cannot share the system",
+    "cantGetUsersListPrefix": "Users list is unavailable",
+    "cantGetSystemsListPrefix": "System list is unavailable",
+    "cantRegisterPrefix": "Some error happened",
+    "cantGetSystemInfoPrefix": "System info is unavailable",
+    "cantChangeAccountPrefix": "Cannot save changes",
+    "cantChangePasswordPrefix": "Cannot save password",
+    "cantActivatePrefix": "Cannot activate your account",
+    "cantSendConfirmationPrefix": "Cannot send confirmation Email",
+    "cloudInvalidResponse": "Cloud DB returned an unexpected response",
+    "notAuthorized": "Incorrect Email or password",
+    "wrongParameters": "Some parameters on the form are incorrect",
+    "wrongCode": "Account is already activated or confirmation code is incorrect",
+    "wrongCodeRestore": "Confirmation code is already used or incorrect",
+    "forbidden": "You do not have permissions to perform this action",
+    "accountNotActivated": "This account is not activated yet. <a href=\"/activate\">Send activation link again</a>",
+    "accountBlocked": "This account is blocked",
     "notFound": "Not found",
-    "alreadyExists": "Already exists",
-    "unknownError": "Unexpected error occured.",
-    "accountAlreadyActivated": "This account has been already activated.",
-    "emailNotFound": "This email has not been registered in portal.",
-    "emailAlreadyExists": "This email address has been already registered.",
-    "oldPasswordMistmatch": "Current password is incorrect.",
+    "alreadyExists": "This account already exists",
+    "unknownError": "Unexpected error occured",
+    "accountAlreadyActivated": "This account is already activated",
+    "EmailNotFound": "Account does not exist",
+    "EmailAlreadyExists": "This Email is already registered",
+    "oldPasswordMistmatch": "Current password is incorrect",
     "passwordMismatch": "Wrong password",
-    "systemForbidden": "You don't have access to this system.",
-    "systemNotFound": "System not found.",
-    "cantEditYourself": "Changing own permissions is not allowed.",
-    "cantEditAdmin": "This user already has administrator permissions.",
-    "cantOpenClient": "VMS_NAME application was not detected. <a href=\"/download\">Download</a>"
+    "cantEditYourself": "Changing own permissions is not allowed",
+    "cantEditAdmin": "This user has administrator permissions",
+    "cantOpenClient": "VMS_NAME application is not detected. <a href=\"/download\">Download</a>",
+    "lostConnection": "Connection to {{systemName}} was lost"
   },
   "passwordRequirements": {
     "minLengthMessage": "Password must contain at least 8 characters",
-    "requiredMessage": "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces.",
-    "weakMessage": "Use numbers, upper and lower case letters and special characters to make your password stronger.",
+    "requiredMessage": "Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
+    "weakMessage": "Use numbers, upper and lower case letters and special characters to make your password stronger",
     "strongMessage": "Strong password!",
     "commonMessage": "This password is in top most popular passwords in the world"
   },
   "sharing": {
-    "confirmOwner": "You are about to change the owner of the system. You will lose owner permissions. This action is irreversible. Are you sure?",
+    "confirmOwner": "If you change System owner, you will revoke ownership from the current account. This action is irreversible. Are you sure?",
     "shareTitle": "Share",
     "shareConfirmButton": "Share",
-    "editShareTitle": "Edit users' permissions",
-    "editShareConfirmButton": "Save"
+    "editShareTitle": "Edit Permissions",
+    "editShareConfirmButton": "Save",
+    "permissionsSaved": "New permissions saved"
   },
   "system": {
-    "yourSystem": "Your system",
+    "yourSystem": "Your System",
     "mySystemSearch": "IMeMyMine",
     "unavailable": "System is unreachable",
     "offline": "System is offline",
     "openClient": "Open in VMS_NAME",
     "confirmRenameTitle": "System name",
     "confirmRenameAction": "Save",
-    "successRename": "System name was successfully saved",
-    "confirmDisconnectTitle": "Disconnect system from PRODUCT_NAME?",
+    "successRename": "System name saved",
+    "confirmDisconnectTitle": "Disconnect System from PRODUCT_NAME?",
     "confirmDisconnectAction": "Disconnect",
-    "confirmUnshareFromMe": "You are about to disconnect this system from your account. You will not be able to access this system via cloud anymore. Are you sure?",
-    "confirmUnshareFromMeTitle": "Delete system?",
-    "confirmUnshareFromMeAction": "Delete",
-    "confirmUnshare": "You are going to restrict the access to this user. Are you sure?",
+    "confirmUnshareFromMe": "You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?",
+    "confirmUnshareFromMeTitle": "Disconnect System?",
+    "confirmUnshareFromMeAction": "Disconnect",
+    "confirmUnshare": "This user will not be able to access the system. Are you sure?",
     "confirmUnshareTitle": "Delete user?",
     "confirmUnshareAction": "Delete",
-    "successDisconnected": "System was successfully disconnected from PRODUCT_NAME",
-    "successDeleted": "System {systemName} was successfully deleted from your account",
-    "permissionsRemoved": "Permissions were removed from {email}"
+    "successDisconnected": "System is successfully disconnected from PRODUCT_NAME",
+    "successDeleted": "System {systemName} is successfully deleted from your account",
+    "permissionsRemoved": "Permissions were removed from {Email}"
+  },
+  "account": {
+      "accountSavedSuccess": "Your account was successfully saved",
+      "passwordChangedSuccess": "Your account was successfully saved"
   },
   "downloads": {
-    "noClientDetectedTitle": "Install VMS_NAME to view your system",
+    "noClientDetectedTitle": "Install VMS_NAME to view your System",
     "noClientDetectedMessage": null,
     "action": "Download VMS_NAME",
     "mobile": {
@@ -155,11 +174,11 @@
     "groups": {
       "windows": {
         "label": "Windows",
-        "supported": "Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012."
+        "supported": "Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
       },
       "mac": {
         "label": "Mac OS",
-        "supported": "OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion."
+        "supported": "OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion"
       },
       "linux": {
         "label": "Ubuntu Linux",
@@ -177,7 +196,7 @@
     "appTypes": {
       "client": "Client only",
       "server": "Server only",
-      "bundle": "Client & Server",
+      "bundle": "Client andy Server",
       "servertool": "Configuration tool"
     }
   }

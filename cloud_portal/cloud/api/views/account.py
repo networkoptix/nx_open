@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 import api
 from api.controllers.cloud_api import Account
+from api.account_backend import AccountBackend
 from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, \
     APIInternalException, api_success, ErrorCodes, require_params
 
@@ -21,6 +22,7 @@ def register(request):
     lang = detect_language_by_request(request)
     data = request.data
     data['language'] = lang
+    AccountBackend.check_email_in_portal(data['email'], False)  # Check if account is in Cloud_db
     serializer = CreateAccountSerializer(data=data)
     if not serializer.is_valid():
         raise APIRequestException('Wrong form parameters', ErrorCodes.wrong_parameters, error_data=serializer.errors)
@@ -35,7 +37,9 @@ def login(request):
     # authorize user here
     # return user
     require_params(request, ('email', 'password'))
-    user = django.contrib.auth.authenticate(username=request.data['email'], password=request.data['password'])
+    email = request.data['email'].lower()
+    password = request.data['password']
+    user = django.contrib.auth.authenticate(username=email, password=password)
     if user is None:
         raise APINotAuthorisedException('Username or password are invalid')
 
@@ -43,8 +47,8 @@ def login(request):
         request.session.set_expiry(0)
 
     django.contrib.auth.login(request, user)
-    request.session['login'] = request.data['email']
-    request.session['password'] = request.data['password']
+    request.session['login'] = email
+    request.session['password'] = password
     # TODO: This is awful security hole! But I can't remove it now, because I need password for future requests
 
     serializer = AccountSerializer(user, many=False)
@@ -66,6 +70,9 @@ def logout(request):
 @handle_exceptions
 def index(request):
     if request.method == 'GET':
+        # validate credentials in cloud_db
+        # password could be changed, ot temporary link expired
+        Account.get(request.session['login'], request.session['password'])
         # get authorized user here
         serializer = AccountSerializer(request.user, many=False)
         return Response(serializer.data)
@@ -131,7 +138,7 @@ def activate(request):
         if 'email' not in user_data:
             raise APIInternalException('No email from cloud_db', ErrorCodes.cloud_invalid_response)
 
-        email = user_data['email']
+        email = user_data['email'].lower()
         try:
             user = api.models.Account.objects.get(email=email)
             user.activated_date = timezone.now()
@@ -140,7 +147,9 @@ def activate(request):
             raise APIInternalException('No email in portal_db', ErrorCodes.portal_critical_error)
         return api_success()
     elif 'user_email' in request.data:
-        Account.reactivate(request.data['user_email'])
+        user_email = request.data['user_email'].lower()
+        AccountBackend.check_email_in_portal(user_email, True)  # Check if account is in Cloud_db
+        Account.reactivate(user_email)
     else:
         raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,
                                   error_data={'code': ['This field is required.'],
@@ -164,7 +173,9 @@ def restore_password(request):
 
         Account.restore_password(code, new_password)
     elif 'user_email' in request.data:
-        user_email = request.data['user_email']
+        user_email = request.data['user_email'].lower()
+        AccountBackend.check_email_in_portal(user_email, True)  # Check if account is in Cloud_db
+
         Account.reset_password(user_email)
     else:
         raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,

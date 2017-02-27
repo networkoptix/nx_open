@@ -20,10 +20,18 @@ angular.module('cloudApp')
             return $scope.system.getInfo();
         }, {
             errorCodes: {
-                forbidden: L.errorCodes.systemForbidden,
-                notFound: L.errorCodes.systemNotFound
+                forbidden: function(error){
+                    // Special handling for not having an access to the system
+                    $scope.systemNoAccess = true;
+                    return false;
+                },
+                notFound:  function(error){
+                    // Special handling for not having an access to the system
+                    $scope.systemNoAccess = true;
+                    return false;
+                },
             },
-            errorPrefix:'System info is unavailable:'
+            errorPrefix: L.errorCodes.cantGetSystemInfoPrefix
         }).then(function (){
             if($scope.system.permissions.editUsers){
                 $scope.gettingSystemUsers.run();
@@ -34,7 +42,15 @@ angular.module('cloudApp')
 
         function delayedUpdateSystemInfo(){
             var pollingSystemUpdate = $poll(function(){
-                return $scope.system.update();
+                return $scope.system.update().catch(function(error){
+                    if(error.data.resultCode == "forbidden"){
+                        // Either we lost access to the system
+                        // Or it was disconnected from the cloud
+                        // Send user to /systems/ and show him the message
+                        dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}", $scope.system.info.name), 'warning');
+                        $location.path("/systems/");
+                    }
+                });
             },Config.updateInterval);
 
             $scope.$on('$destroy', function( event ) {
@@ -50,7 +66,7 @@ angular.module('cloudApp')
                 }
             }).finally(delayedUpdateSystemInfo);
         },{
-            errorPrefix:'Users list is unavailable:'
+            errorPrefix: L.errorCodes.cantGetUsersListPrefix
         });
 
 
@@ -84,7 +100,7 @@ angular.module('cloudApp')
                             return $scope.system.deleteFromCurrentAccount();
                         },{
                             successMessage: L.system.successDeleted.replace('{systemName}', $scope.system.info.name),
-                            errorPrefix:'Cannot delete the system:'
+                            errorPrefix: L.errorCodes.cantUnshareWithMeSystemPrefix
                         }).then(reloadSystems);
                         $scope.deletingSystem.run();
                     });
@@ -118,7 +134,7 @@ angular.module('cloudApp')
                         return $scope.system.deleteUser(user);
                     },{
                         successMessage: L.system.permissionsRemoved.replace('{email}',user.email),
-                        errorPrefix:'Sharing failed:'
+                        errorPrefix: L.errorCodes.cantSharePrefix
                     });
                     $scope.unsharing.run();
                 });

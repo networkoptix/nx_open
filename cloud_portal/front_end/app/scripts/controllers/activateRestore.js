@@ -21,7 +21,7 @@ angular.module('cloudApp')
 
             $scope.reactivatingSuccess = $routeParams.reactivatingSuccess;
             $scope.activationSuccess = $routeParams.activationSuccess;
-            $scope.restoringSuccess = $routeParams.changeSuccess;
+            $scope.restoringSuccess = $routeParams.restoringSuccess;
             $scope.changeSuccess = $routeParams.changeSuccess;
 
 
@@ -58,19 +58,16 @@ angular.module('cloudApp')
                 return cloudApi.restorePassword($scope.data.restoreCode, $scope.data.newPassword);
             },{
                 errorCodes:{
-                    notFound: L.errorCodes.wrongCode,
-                    notAuthorized: L.errorCodes.wrongCode
+                    notFound: L.errorCodes.wrongCodeRestore,
+                    notAuthorized: L.errorCodes.wrongCodeRestore
                 },
+                ignoreUnauthorized: true,
                 holdAlerts:true,
-                errorPrefix:'Couldn\'t save new password:'
+                errorPrefix:L.errorCodes.cantChangePasswordPrefix
             }).then(function(){
                 setContext('changeSuccess');
                 $location.path('/restore_password/success', false); // Change url, do not reload
             });
-
-            $scope.directChange = function(){
-                return cloudApi.restorePassword($scope.data.restoreCode, $scope.data.newPassword);
-            };
 
             $scope.restore = process.init(function(){
                 return cloudApi.restorePasswordRequest($scope.data.email);
@@ -78,8 +75,9 @@ angular.module('cloudApp')
                 errorCodes:{
                     notFound: L.errorCodes.emailNotFound
                 },
+                ignoreUnauthorized: true,
                 holdAlerts:true,
-                errorPrefix:'Couldn\'t send confirmation email:'
+                errorPrefix:L.errorCodes.cantSendActivationPrefix
             }).then(function(){
                 $scope.restoring = false;
                 $scope.restoringSuccess = true;
@@ -95,10 +93,16 @@ angular.module('cloudApp')
                 return cloudApi.activate($scope.data.activateCode);
             },{
                 errorCodes:{
-                    notFound: L.errorCodes.wrongCode,
-                    notAuthorized: L.errorCodes.wrongCode
+                    notFound: function(){
+                        $scope.activationSuccess = false;
+                        return false;
+                    },
+                    notAuthorized: function(){
+                        $scope.activationSuccess = false;
+                        return false;
+                    },
                 },
-                errorPrefix:'Couldn\'t activate your account:'
+                errorPrefix:L.errorCodes.cantActivatePrefix
             }).then(function(){
                 setContext('activateSuccess');
                 $scope.activationSuccess = true;
@@ -114,7 +118,7 @@ angular.module('cloudApp')
                     notFound: L.errorCodes.emailNotFound
                 },
                 holdAlerts:true,
-                errorPrefix:'Couldn\'t send confirmation email:'
+                errorPrefix:L.errorCodes.cantSendConfirmationPrefix
             }).then(function(){
                 setContext('reactivatingSuccess');
                 $location.path('/activate/send', false); // Change url, do not reload

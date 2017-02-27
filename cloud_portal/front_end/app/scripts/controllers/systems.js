@@ -41,7 +41,8 @@ angular.module('cloudApp')
         $scope.gettingSystems = process.init(function(){
             return cloudApi.systems();
         },{
-            errorPrefix: 'Systems list is unavailable:'
+            errorPrefix: L.errorCodes.cantGetSystemsListPrefix,
+            logoutForbidden: true
         }).then(function(result){
             // Special mode - user will be redirected to default system if default system can be determined (if user has one system)
             if($routeParams.defaultMode && result.data.length == 1){

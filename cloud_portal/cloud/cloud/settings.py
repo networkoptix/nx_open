@@ -46,8 +46,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'kombu.transport.django',
-    'djcelery',
+    'django_celery_results',
     'rest_framework',
     'corsheaders',
     'notifications',
@@ -195,8 +194,20 @@ REST_FRAMEWORK = {
 
 # Celery settings section
 
-BROKER_URL = 'django://'
-CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
+#Configure AWS SQS
+#Broker_url = 'sqs://{aws_access_key_id}:{aws_secret_access_key}@'
+#BROKER_TRANSPORT_OPTIONS
+#   queue_name_prefix allows you to name the queue for sqs
+#   region allows you to specify the aws region
+
+
+BROKER_URL = 'sqs://AKIAIQVGGMML4WNBECRA:jmXYHNKOAL9gYYaxAVClgegzShjaPF27ycvBOV1s@'
+BROKER_TRANSPORT_OPTIONS = {
+    'queue_name_prefix' : conf['queue_name'] + '-',
+    'region' : 'us-east-1'
+}
+RESULT_PERSISTENT = True
+CELERY_RESULT_BACKEND = 'django-db'
 
 # / End of Celery settings section
 
@@ -262,20 +273,16 @@ else:
 
 NOTIFICATIONS_CONFIG = {
     'activate_account': {
-        'engine': 'email',
-        'subject': 'Confirm your account'
+        'engine': 'email'
     },
     'restore_password': {
-        'engine': 'email',
-        'subject': 'Restore your password'
+        'engine': 'email'
     },
     'system_invite': {
-        'engine': 'email',
-        'subject': 'Video system was shared with you'
+        'engine': 'email'
     },
     'system_shared': {
-        'engine': 'email',
-        'subject': 'Video system was shared with you'
+        'engine': 'email'
     },
 }
 

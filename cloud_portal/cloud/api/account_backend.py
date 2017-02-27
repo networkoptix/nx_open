@@ -8,14 +8,22 @@ from django.core.exceptions import ObjectDoesNotExist
 
 class AccountBackend(object):
     @staticmethod
+    def check_email_in_portal(email, check_email_exists):
+        mail_exists = models.Account.objects.filter(email=email.lower()).count() > 0
+        if not mail_exists and check_email_exists:
+            raise APILogicException('User is not in portal', ErrorCodes.not_found)
+        if mail_exists and not check_email_exists:
+            raise APILogicException('User already registered', ErrorCodes.account_exists)
+        return True
+
+    @staticmethod
     def authenticate(username=None, password=None):
         user = Account.get(username, password)
         if user and 'email' in user:
             try:
                 return models.Account.objects.get(email=user['email'])
             except ObjectDoesNotExist:
-                raise APILogicException('User is not in portal', ErrorCodes.portal_critical_error)
-
+                raise APILogicException('User is not in portal', ErrorCodes.not_found)
         return None
 
     @staticmethod
@@ -42,6 +50,7 @@ class AccountManager(db.models.Manager):
         if not email:
             raise APIRequestException('Email code is absent', ErrorCodes.wrong_parameters,
                                       error_data={'email': ['This field is required.']})
+        email = email.lower()
         # email = self.normalize_email(email)
         first_name = extra_fields.pop("first_name")
         last_name = extra_fields.pop("last_name")

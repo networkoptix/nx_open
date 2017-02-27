@@ -4,7 +4,7 @@
     <form name="accountForm" class="form-horizontal" novalidate>
 
         <div class="form-group">
-            <label class="col-sm-4 control-label">Email address</label>
+            <label class="col-sm-4 control-label">Email</label>
             <div class="col-sm-4">
                 <input type="text"  class="form-control" ng-model="account.email" readonly>
             </div>
@@ -28,11 +28,19 @@
                 <span class="help-block" ng-if="accountForm.lastName.$touched && accountForm.lastName.$error.required">Last name is required.</span>
             </div>
         </div>
+        <div class="form-group"  validate-field>
+            <label for="lastName"  class="col-sm-4 control-label">Language</label>
+            <div class="col-sm-4">
+                <language-select account-mode="true" ng-model="account.language"></language-select>
+            </div>
+            <div class="col-sm-4">
+            </div>
+        </div>
 
         <div class="form-group">
             <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> Subscribe to email newsletters</label>
+                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> Subscribe to Email newsletters</label>
                 </div>
             </div>
         </div>

@@ -96,12 +96,8 @@ angular.module('cloudApp')
                 });
             },
 
-            accountPost:function(firstName,lastName,subscribe){
-                return $http.post(apiBase + '/account',{
-                    first_name:firstName,
-                    last_name:lastName,
-                    subscribe:subscribe
-                });
+            accountPost:function(account){
+                return $http.post(apiBase + '/account', account);
             },
             changePassword:function(newPassword,oldPassword){
                 return $http.post(apiBase + '/account/changePassword',{
