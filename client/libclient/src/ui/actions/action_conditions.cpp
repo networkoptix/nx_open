@@ -41,7 +41,6 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/workbench.h>
-#include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
@@ -49,6 +48,8 @@
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/dialogs/ptz_manage_dialog.h>
+
+#include <nx/vms/utils/platform/autorun.h>
 
 #include "action_parameter_types.h"
 #include "action_manager.h"
@@ -1248,7 +1249,7 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
 
 Qn::ActionVisibility QnAutoStartAllowedActionCodition::check(const QnActionParameters &parameters) {
     Q_UNUSED(parameters)
-    if(!context()->instance<QnWorkbenchAutoStarter>()->isSupported())
+    if (!nx::vms::utils::isAutoRunSupported())
         return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }
