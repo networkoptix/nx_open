@@ -85,7 +85,7 @@ namespace {
     const int kMaxRtpRetryCountDefault(6);
 
     const QString kRtpTimeoutMs(lit("rtpTimeoutMs"));
-    const int kRtpTimeoutMsDefault(5000);
+    const int kRtpTimeoutMsDefault(10000);
 }
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent):
