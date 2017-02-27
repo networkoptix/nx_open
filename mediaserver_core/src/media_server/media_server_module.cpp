@@ -37,7 +37,7 @@ void installTranslations()
     QnTranslationManager::installTranslation(defaultTranslation);
 }
 
-}
+} // namespace
 
 QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint, QObject *parent):
     QObject(parent)
