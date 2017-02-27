@@ -9,9 +9,8 @@ angular.module('webadminApp')
             },
             link:function(scope, element, attrs, ngModel){
                 console.log("init language select");
-                mediaserver.getLanguages().then(function(data){
-                    console.log("got languages");
-                    var languages = data.data;
+                mediaserver.getLanguages().then(function(languages){
+                    console.log("got languages", languages);
                     scope.activeLanguage = _.find(languages, function(lang){
                         return lang.language == L.language;
                     });

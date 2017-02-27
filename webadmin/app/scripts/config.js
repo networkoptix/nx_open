@@ -5,6 +5,10 @@ var Config = {
     viewsDir: 'views/', //'lang_' + lang + '/views/';
 
     defaultLanguage: 'en_US',
+    supportedLanguages:[
+        'en_US', 'ru'
+    ],
+
     defaultLogin: 'admin',
     defaultPassword: 'admin',
     newServerFlag: 'SF_NewSystem',
