@@ -9,11 +9,11 @@ namespace nx {
 namespace utils {
 
 /**
- * @return By default, std::chrono::system_clock::now () is returned.
+ * @return By default, std::chrono::system_clock::now() is returned.
  */
 NX_UTILS_API std::chrono::system_clock::time_point utcTime();
 
-/** Should be used instead of \a ::time(). */
+/** Should be used instead of ::time(). */
 NX_UTILS_API std::chrono::seconds timeSinceEpoch();
 
 /**
@@ -46,6 +46,18 @@ NX_UTILS_API QString getCurrentTimeZoneId();
  * @return false on error or unsupported platform, true on success.
  */
 NX_UTILS_API bool setDateTime(qint64 millisecondsSinceEpoch);
+
+/**
+ * Rounds timePoint down to DurationTypeToRoundTo type.
+ */
+template<typename DurationTypeToRoundTo>
+std::chrono::system_clock::time_point floor(
+    std::chrono::system_clock::time_point timePoint)
+{
+    using namespace std::chrono;
+    return system_clock::time_point(
+        duration_cast<DurationTypeToRoundTo>(timePoint.time_since_epoch()));
+}
 
 namespace test {
 
@@ -120,7 +132,7 @@ private:
 
     /**
      * Test-only function!
-     * After this call \a utcTime() will add \a diff to return value.
+     * After this call utcTime() will add diff to return value.
      */
     NX_UTILS_API static void shiftCurrentTime(
         ClockType clockType,

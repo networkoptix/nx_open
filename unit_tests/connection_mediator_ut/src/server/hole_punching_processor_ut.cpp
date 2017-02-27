@@ -131,7 +131,7 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
         ASSERT_EQ(
             connectRequest.originatingPeerId,
             connectionRequestedEventData->originatingPeerID);
-        ASSERT_EQ(1, connectionRequestedEventData->udpEndpointList.size());
+        ASSERT_EQ(1U, connectionRequestedEventData->udpEndpointList.size());
         ASSERT_EQ(
             udpClient.localAddress().port,
             connectionRequestedEventData->udpEndpointList.front().port);    //not comparing interface since it may be 0.0.0.0 for server
