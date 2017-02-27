@@ -19,5 +19,5 @@ do
     cp -rf $lang_dir/views/* ../static/lang_$LANG/views/ || true
 done
 
-echo "Merge language.json"
-python localize.pys
+echo "Generate language.json"
+python generate_languages_json.py

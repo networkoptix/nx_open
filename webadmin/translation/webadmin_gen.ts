@@ -14,6 +14,26 @@
     </message>
     <message>
       <location/>
+      <source>language</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>LANGUAGE_CODE</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>language_name</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>LANGUAGE_NAME</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>dialogs</source>
       <translation> </translation>
     </message>
@@ -1723,6 +1743,11 @@
     </message>
     <message>
       <location/>
+      <source>language-select</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Logout&quot;</source>
       <translation> </translation>
     </message>
@@ -2367,6 +2392,19 @@
     <message>
       <location/>
       <source>chartData&quot;</source>
+      <translation> </translation>
+    </message>
+  </context>
+  <context>
+    <name>../static/views/components/languageSelect.html</name>
+    <message>
+      <location filename="../static/views/components/languageSelect.html"/>
+      <source>12}&quot; dropdown-menu aria-labelledby=&quot;language-dropdown&quot;&gt;</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>dropdown-toggle  in languages</source>
       <translation> </translation>
     </message>
   </context>
@@ -3199,12 +3237,12 @@
     </message>
     <message>
       <location/>
-      <source>styles/cf60828a.vendor-index.css</source>
+      <source>styles/ed99c677.vendor-index.css</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>styles/d3e048c8.index.css</source>
+      <source>styles/f8fabbc7.index.css</source>
       <translation> </translation>
     </message>
     <message>
