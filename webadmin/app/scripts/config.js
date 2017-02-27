@@ -4,6 +4,7 @@
 var Config = {
     viewsDir: 'views/', //'lang_' + lang + '/views/';
 
+    defaultLanguage: 'en_US',
     defaultLogin: 'admin',
     defaultPassword: 'admin',
     newServerFlag: 'SF_NewSystem',
