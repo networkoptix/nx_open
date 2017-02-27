@@ -102,8 +102,10 @@ void QnCameraPool::addCameras(int count, QStringList primaryFileList, QStringLis
         m_cameras.insert(camera->getMac(), camera);
     }
         
-    if (count < 0) { // Special case - we run one camera for each source
-        for (int i = 0; i < primaryFileList.length(); i++) {
+    if (count < 0) 
+    { // Special case - we run one camera for each source
+        for (int i = 0; i < primaryFileList.length(); i++) 
+        {
             QString primaryFile = primaryFileList[i];
             QString secondaryFile = i < secondaryFileList.length() ? secondaryFileList[i] : ""; // secondary file is optional
 
@@ -113,7 +115,8 @@ void QnCameraPool::addCameras(int count, QStringList primaryFileList, QStringLis
             camera->setOfflineFreq(offlineFreq);
 
             QnFileCache::instance()->getMediaData(primaryFile);
-            if (!secondaryFile.isEmpty()) { // secondary file is optional
+            if (!secondaryFile.isEmpty()) // secondary file is optional
+            { 
                 QnFileCache::instance()->getMediaData(secondaryFile);
             }
             m_cameras.insert(camera->getMac(), camera);
