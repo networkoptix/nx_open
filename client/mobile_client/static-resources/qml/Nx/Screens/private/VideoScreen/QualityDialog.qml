@@ -2,13 +2,14 @@ import QtQuick 2.6
 import Qt.labs.controls 1.0
 import Nx.Dialogs 1.0
 import Nx 1.0
+import Nx.Media 1.0
 import com.networkoptix.qml 1.0
 
 DialogBase
 {
     id: qualityDialog
 
-    property int activeQuality: QnPlayer.LowVideoQuality
+    property int activeQuality: MediaPlayer.LowVideoQuality
     property size actualQuality
 
     deleteOnClose: true
@@ -24,11 +25,17 @@ DialogBase
         }
         DialogMessage
         {
-            text: {
+            text:
+            {
                 if (actualQuality.width > 0 && actualQuality.height > 0)
                     return actualQuality.width + " x " + actualQuality.height
-                if (activeQuality != QnPlayer.LowVideoQuality && activeQuality != QnPlayer.HighVideoQuality)
+
+                if (activeQuality !== MediaPlayer.LowVideoQuality
+                    && activeQuality !== MediaPlayer.HighVideoQuality)
+                {
                     return activeQuality + 'p'
+                }
+
                 return qsTr("Unknown")
             }
             font.pixelSize: 14
@@ -39,12 +46,12 @@ DialogBase
 
         QualityItem
         {
-            quality: QnPlayer.LowVideoQuality
+            quality: MediaPlayer.LowVideoQuality
             text: qsTr("Highest speed")
         }
         QualityItem
         {
-            quality: QnPlayer.HighVideoQuality
+            quality: MediaPlayer.HighVideoQuality
             text: qsTr("Best quality")
         }
 

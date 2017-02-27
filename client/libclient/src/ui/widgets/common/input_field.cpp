@@ -53,7 +53,7 @@ public:
                             break;
 
                         default:
-                            updateDisplayState();
+                            updateDisplayStateDelayed();
                             break;
                     }
                     break;
@@ -68,7 +68,7 @@ public:
         return false;
     }
 
-    void updateDisplayState()
+    void updateDisplayStateDelayed()
     {
         const auto handler =
             [this]()
@@ -340,10 +340,10 @@ bool QnInputField::validate()
     return lastValidationResult();
 }
 
-void QnInputField::updateDisplayState()
+void QnInputField::updateDisplayStateDelayed()
 {
     Q_D(QnInputField);
-    d->updateDisplayState();
+    d->updateDisplayStateDelayed();
 }
 
 void QnInputField::clear()

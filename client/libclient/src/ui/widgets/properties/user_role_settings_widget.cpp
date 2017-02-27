@@ -246,7 +246,7 @@ private:
 
         Q_Q(QnUserRoleSettingsWidget);
 
-        const auto text = tr("Please select the action to perform to %n users with this role", "",
+        const auto text = tr("Please select an action to perform on %n users with this role", "",
             usersModel->rowCount());
 
         replacementMessageBox = new QnMessageBox(QnMessageBoxIcon::Question, text,

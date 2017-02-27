@@ -59,22 +59,63 @@ void QnTimeScrollBar::paint(QPainter* painter, const QStyleOptionGraphicsItem* o
     base_type::paint(painter, option, widget);
 
     /* Draw indicator. */
-    if (!m_indicatorVisible)
+    if (m_indicatorVisible)
+    {
+        auto relativePos = m_indicatorPosition - minimum();
+        auto range = maximum() - minimum() + pageStep();
+
+        if (relativePos < 0 || relativePos >= range)
+            return;
+
+        auto grooveFraction = static_cast<qreal>(relativePos) / range;
+        int x = option->rect.left() + static_cast<int>(option->rect.width() * grooveFraction + 0.5);
+
+        /* Paint it. */
+        QnScopedPainterPenRollback penRollback(painter, QPen(palette().text(), 2.0));
+        QnScopedPainterAntialiasingRollback aaRollback(painter, false);
+        painter->drawLine(QPointF(x, option->rect.top() + 1.0), QPointF(x, option->rect.bottom() - 1.0));
+    }
+
+    QStyleOptionSlider scrollBarOption;
+    initStyleOption(&scrollBarOption);
+    const auto sliderRect = style()->subControlRect(
+        QStyle::CC_ScrollBar,
+        &scrollBarOption,
+        QStyle::SC_ScrollBarSlider,
+        nullptr);
+
+    ensurePixmap(painter->device()->devicePixelRatio());
+    const auto size = m_pixmap.size() / m_pixmap.devicePixelRatio();
+    const auto rect = QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, size, sliderRect);
+    painter->drawPixmap(rect.topLeft(), m_pixmap);
+}
+
+void QnTimeScrollBar::ensurePixmap(int devicePixelRatio)
+{
+    static constexpr int kLineWidth = 1;
+    static constexpr int kGapWidth = 3;
+    static constexpr int kNumLines = 3;
+
+    static constexpr int kHeight = 8;
+    static constexpr int kWidth = kLineWidth * kNumLines + kGapWidth * (kNumLines - 1);
+
+    const auto pixmapSize = QSize(kWidth, kHeight) * devicePixelRatio;
+    if (m_pixmap.size() == pixmapSize && m_pixmap.devicePixelRatio() == devicePixelRatio)
         return;
 
-    auto relativePos = m_indicatorPosition - minimum();
-    auto range = maximum() - minimum() + pageStep();
+    m_pixmap = QPixmap(pixmapSize);
+    m_pixmap.setDevicePixelRatio(devicePixelRatio);
+    m_pixmap.fill(Qt::transparent);
 
-    if (relativePos < 0 || relativePos >= range)
-        return;
+    QPainter painter(&m_pixmap);
+    const auto brush = palette().light();
 
-    auto grooveFraction = static_cast<qreal>(relativePos) / range;
-    int x = option->rect.left() + static_cast<int>(option->rect.width() * grooveFraction + 0.5);
-
-    /* Paint it. */
-    QnScopedPainterPenRollback penRollback(painter, QPen(palette().text(), 2.0));
-    QnScopedPainterAntialiasingRollback aaRollback(painter, false);
-    painter->drawLine(QPointF(x, option->rect.top() + 1.0), QPointF(x, option->rect.bottom() - 1.0));
+    QRect stripe(0, 0, kLineWidth, kHeight);
+    for (int i = 0; i < kNumLines; ++i)
+    {
+        painter.fillRect(stripe, brush);
+        stripe.moveLeft(stripe.right() + kGapWidth);
+    }
 }
 
 void QnTimeScrollBar::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
@@ -128,4 +169,12 @@ void QnTimeScrollBar::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
     {
         base_type::mouseMoveEvent(event);
     }
+}
+
+void QnTimeScrollBar::changeEvent(QEvent* event)
+{
+    base_type::changeEvent(event);
+
+    if (event->type() == QEvent::PaletteChange)
+        m_pixmap = QPixmap();
 }
