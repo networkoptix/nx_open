@@ -245,6 +245,8 @@ private:
     void timelineCatchUp(qint64 toMs);
     bool isTimelineCatchingUp() const;
 
+    bool isCurrentWidgetSynced() const;
+
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
     QTime m_updateSliderTimer;

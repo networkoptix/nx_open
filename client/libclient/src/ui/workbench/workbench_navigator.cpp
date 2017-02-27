@@ -1153,10 +1153,11 @@ void QnWorkbenchNavigator::updateCurrentWidget()
     updateLines();
     updateCalendar();
 
-    if (!((m_currentWidgetFlags & WidgetSupportsSync) && (previousWidgetFlags & WidgetSupportsSync) && m_streamSynchronizer->isRunning()) && m_currentWidget)
+    if (!(isCurrentWidgetSynced() && previousWidgetFlags.testFlag(WidgetSupportsSync)) && m_currentWidget)
     {
         m_sliderDataInvalid = true;
-        m_sliderWindowInvalid |= (m_currentWidgetFlags & WidgetUsesUTC) != (previousWidgetFlags & WidgetUsesUTC);
+        m_sliderWindowInvalid |= (m_currentWidgetFlags.testFlag(WidgetUsesUTC)
+            != previousWidgetFlags.testFlag(WidgetUsesUTC));
     }
 
     updateSliderFromReader(false);
@@ -1346,6 +1347,11 @@ bool QnWorkbenchNavigator::isTimelineCatchingUp() const
         m_positionAnimator->targetValue() == m_previousMediaPosition;
 }
 
+bool QnWorkbenchNavigator::isCurrentWidgetSynced() const
+{
+    return m_streamSynchronizer->isRunning() && m_currentWidgetFlags.testFlag(WidgetSupportsSync);
+}
+
 void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
 {
     if (!m_timeSlider)
@@ -1466,7 +1472,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
                 return DATETIME_NOW;
 
             qint64 timeUSec;
-            if (m_streamSynchronizer->isRunning() && m_currentWidgetFlags.testFlag(WidgetSupportsSync))
+            if (isCurrentWidgetSynced())
                 timeUSec = m_streamSynchronizer->state().time; // Fetch "current" time instead of "displayed"
             else
                 timeUSec = mediaWidget->display()->camera()->getCurrentTime();
@@ -1548,8 +1554,10 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
         if (timeUSec >= 0)
             updateLive();
 
-        bool sync = (m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods));
-        if (isSearch || !sync)
+        const bool syncSupportedButDisabled = !m_streamSynchronizer->isRunning()
+            && m_currentWidgetFlags.testFlag(WidgetSupportsSync);
+
+        if (isSearch || syncSupportedButDisabled)
         {
             QVector<qint64> indicators;
             for (QnResourceWidget *widget : display()->widgets())
