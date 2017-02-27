@@ -283,11 +283,6 @@ bool Socket<InterfaceToImplement>::setNonBlockingMode( bool val )
     if( ioctlsocket( m_fd, FIONBIO, &_val ) == 0 )
     {
         m_nonBlockingMode = val;
-        WSAEventSelect(
-            m_fd,
-            m_hEventObject,
-            val ? 0 : FD_READ); //< subscribe/unsubscribe socket to eventObject
-
         return true;
     }
     else
@@ -472,6 +467,9 @@ Socket<InterfaceToImplement>::Socket(
     m_ipVersion( ipVersion ),
     m_nonBlockingMode( false )
 {
+#ifdef WIN32
+    m_hEventObject = ::CreateEvent(0, false, false, nullptr); //< used for sync mode
+#endif
 }
 
 #ifdef _WIN32
@@ -529,7 +527,8 @@ bool Socket<InterfaceToImplement>::createSocket(int type, int protocol)
 #endif
 
 #ifdef WIN32
-    m_hEventObject = ::CreateEvent(0, false, false, nullptr); //< used for sync mode
+    if (type == SOCK_STREAM)
+        m_hEventObject = ::CreateEvent(0, false, false, nullptr); //< used for sync mode
 #endif
     return true;
 }
@@ -679,14 +678,41 @@ int CommunicatingSocket<InterfaceToImplement>::recv(void* buffer, unsigned int b
         if (!getNonBlockingMode(&isNonBlockingMode))
             return -1;
 
-        if (!isNonBlockingMode && m_hEventObject)
-        {
-            int waitResult = WaitForSingleObject(m_hEventObject, m_readTimeoutMS);
-            if (waitResult == WAIT_TIMEOUT)
-                return -1;
-        }
+        const bool needWait = !isNonBlockingMode && m_hEventObject;
 
-        bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags);
+        WSAOVERLAPPED overlapped;
+        overlapped.hEvent = m_hEventObject;
+
+        WSABUF wsaBuffer;
+        wsaBuffer.len = bufferLen;
+        wsaBuffer.buf = (char*) buffer;
+        DWORD wsaFlags = 0;
+        DWORD* wsaBytesRead = (DWORD*) &bytesRead;
+
+        auto wsaResult = WSARecv(m_fd, &wsaBuffer, 1, wsaBytesRead, &wsaFlags,
+            needWait ? &overlapped : nullptr, nullptr);
+
+        if (needWait)
+        {
+            auto timeout = m_readTimeoutMS ? m_readTimeoutMS : INFINITE;
+            int waitResult = WaitForSingleObject(m_hEventObject, timeout);
+            if (!WSAGetOverlappedResult(m_fd, &overlapped, wsaBytesRead, FALSE, &wsaFlags))
+            {
+                const auto errCode = SystemError::getLastOSErrorCode();
+                if (errCode == WSA_IO_INCOMPLETE)
+                {
+                    ::CancelIo((HANDLE) m_fd);
+                    WaitForSingleObject(m_hEventObject, INFINITE);
+                    // Check status again in case of race condition
+                    while (!WSAGetOverlappedResult(m_fd, &overlapped, wsaBytesRead, FALSE, &wsaFlags))
+                    {
+                        if (SystemError::getLastOSErrorCode() != WSA_IO_INCOMPLETE)
+                            return -1;
+                        ::Sleep(0);
+                    }
+                }
+            }
+        }
 
     }
 #else
@@ -1683,7 +1709,7 @@ bool UDPSocket::setDestAddr(const SocketAddress& endpoint)
     else
     {
         std::deque<HostAddress> resolvedAddresses;
-        const SystemError::ErrorCode resultCode = 
+        const SystemError::ErrorCode resultCode =
             SocketGlobals::addressResolver().dnsResolver().resolveSync(
                 endpoint.address.toString(), m_ipVersion, &resolvedAddresses);
         if (resultCode != SystemError::noError)
@@ -1826,7 +1852,7 @@ int UDPSocket::recvFrom(
     if ((rtn == SOCKET_ERROR) &&
         (SystemError::getLastOSErrorCode() == SystemError::connectionReset))
     {
-        // Win32 can return connectionReset for UDP(!) socket 
+        // Win32 can return connectionReset for UDP(!) socket
         //   sometimes on receiving ICMP error response.
         SystemError::setLastErrorCode(SystemError::again);
         return -1;
