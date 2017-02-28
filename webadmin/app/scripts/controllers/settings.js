@@ -181,7 +181,13 @@ angular.module('webadminApp')
         }
 
         $scope.save = function () {
-            mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
+            if($scope.settings.port <= 1024){
+                dialogs.confirm(L.settings.unsafePortConfirm).then(function(){
+                    mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
+                });
+            }else {
+                mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
+            }
         };
 
 // execute/scryptname&mode
