@@ -49,6 +49,12 @@ Object
         property bool resumeOnOnline: false
         property real lastPosition: -1
         property bool waitForLastPosition: false
+
+        function savePosition()
+        {
+            lastPosition = mediaPlayer.liveMode ? -1 : mediaPlayer.position
+            waitForLastPosition = (mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
+        }
     }
 
     MediaResourceHelper
@@ -135,9 +141,7 @@ Object
     function play()
     {
         mediaPlayer.play()
-
-        d.lastPosition = mediaPlayer.liveMode ? -1 : mediaPlayer.position
-        d.waitForLastPosition = (mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
+        d.savePosition()
     }
 
     function playLive()
@@ -161,8 +165,10 @@ Object
         mediaPlayer.preview()
     }
 
-    function setPosition(position)
+    function setPosition(position, savePosition)
     {
         mediaPlayer.position = position
+        if (savePosition)
+            d.savePosition()
     }
 }

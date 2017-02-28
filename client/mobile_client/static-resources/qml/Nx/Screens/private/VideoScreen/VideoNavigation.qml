@@ -192,7 +192,7 @@ Item
             {
                 if (!moving)
                 {
-                    videoScreenController.setPosition(position)
+                    videoScreenController.setPosition(position, true)
                     if (resumeWhenDragFinished)
                         videoScreenController.play()
                     else
@@ -202,7 +202,7 @@ Item
             onPositionTapped:
             {
                 d.resumePosition = -1
-                videoScreenController.setPosition(position)
+                videoScreenController.setPosition(position, true)
             }
             onPositionChanged:
             {
@@ -508,7 +508,7 @@ Item
             {
                 close()
                 d.resumePosition = -1
-                videoScreenController.setPosition(date.getTime())
+                videoScreenController.setPosition(date.getTime(), true)
             }
         }
     }
