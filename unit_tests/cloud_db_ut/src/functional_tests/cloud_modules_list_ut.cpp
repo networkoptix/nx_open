@@ -75,7 +75,7 @@ protected:
 
 private:
     std::unique_ptr<cdb::CloudModuleUrlProvider> m_moduleUrlProvider;
-    std::string m_resultingXml;
+    QByteArray m_resultingXml;
 
     QString createTemporaryXmlTemplateFile()
     {
