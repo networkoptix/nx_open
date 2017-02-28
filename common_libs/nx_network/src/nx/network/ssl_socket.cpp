@@ -1268,7 +1268,7 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
             d->wrappedSocket->post(
                 [d, code, size]()
                 {
-                    if (auto promisePtr = d->syncSendPromise.exchange(nullptr))
+                    if (auto promisePtr = d->syncRecvPromise.exchange(nullptr))
                         promisePtr->set_value({code, size});
                 });
         };
