@@ -1497,6 +1497,12 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
 
         qint64 timeMSec = usecToMsec(timeUSec);
 
+        /* If in Live we change speed from 1 downwards, we go out of Live, but then
+         * receive next frame from camera which immediately jerks us back to Live.
+         * This evil hack is to prevent going back to Live in such case: */
+        if (timeMSec >= m_timeSlider->maximum() && speed() <= 0.0)
+            timeMSec = m_timeSlider->maximum() - 1;
+
         if (!keepInWindow || m_sliderDataInvalid)
         {
             /* Position was reset: */
