@@ -324,9 +324,9 @@ class Server(object):
         new_data = data[:idx] + padded_str + data[idx + MEDIASERVER_CLOUDHOST_SIZE:]
         assert len(new_data) == len(data)
         self.box.put_file(MEDIASERVER_CLOUDHOST_FPATH, new_data)
-        self._set_user_password(REST_API_USER, REST_API_PASSWORD)  # Must be reset to default onces
+        self.set_user_password(REST_API_USER, REST_API_PASSWORD)  # Must be reset to default onces
 
-    def set_system_system_settings(self, **kw):
+    def set_system_settings(self, **kw):
         self.rest_api.api.systemSettings.get(**kw)
         self.load_system_settings()
 
@@ -347,7 +347,7 @@ class Server(object):
             timeout_sec=60*5,
             **kw)
         settings = setup_response['settings']
-        self._set_user_password(self.cloud_host_rest_api.user, self.cloud_host_rest_api.password)
+        self.set_user_password(self.cloud_host_rest_api.user, self.cloud_host_rest_api.password)
         self._init_rest_api()
         self.load_system_settings()
         assert self.settings['systemName'] == self.name
@@ -355,7 +355,7 @@ class Server(object):
 
     def detach_from_cloud(self, password):
         self.rest_api.api.detachFromCloud.post(password = password)
-        self._set_user_password(REST_API_USER, password)
+        self.set_user_password(REST_API_USER, password)
 
     def merge_systems(self, other_server, take_remote_settings=False):
         log.info('Merging servers: %s with local_system_id=%r and %s with local_system_id=%r',
@@ -375,9 +375,9 @@ class Server(object):
             takeRemoteSettings=take_remote_settings,
             )
         if take_remote_settings:
-            self._set_user_password(other_server.user, other_server.password)
+            self.set_user_password(other_server.user, other_server.password)
         else:
-            other_server._set_user_password(self.user, self.password)
+            other_server.set_user_password(self.user, self.password)
         self._wait_for_servers_to_merge(other_server)
         time.sleep(5)  # servers still need some time to settle down; hope this time will be enough
 
@@ -394,7 +394,7 @@ class Server(object):
         pytest.fail('Timed out in %s seconds waiting for servers %s and %s to be merged'
                     % (MEDIASERVER_MERGE_TIMEOUT_SEC, self, other_server))
 
-    def _set_user_password(self, user, password):
+    def set_user_password(self, user, password):
         log.debug('%s got user/password: %r/%r', self, user, password)
         self.user = user
         self.password = password
