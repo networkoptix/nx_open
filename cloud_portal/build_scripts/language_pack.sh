@@ -31,6 +31,6 @@ cat crowdin.yaml >> $DIRECTORY/crowdin.yaml
 if [[ $CROWDIN_OPERATION == 'upload' ]]; then 
     echo "Uploading to Crowdin..."
     cd $DIRECTORY 
-    crowdin-cli upload sources
+    crowdin-cli-py upload sources
     cd ..
 fi
