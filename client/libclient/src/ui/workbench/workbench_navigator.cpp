@@ -139,8 +139,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_preciseNextSeek(false),
     m_autoPaused(false),
     m_lastSpeed(0.0),
-    m_lastMinimalSpeed(0.0),
-    m_lastMaximalSpeed(0.0),
+    m_lastSpeedRange(0.0, 0.0),
     m_lastAdjustTimelineToPosition(false),
     m_timelineRelevant(false),
     m_startSelectionAction(new QAction(this)),
@@ -639,7 +638,9 @@ qreal QnWorkbenchNavigator::speed() const
 
 void QnWorkbenchNavigator::setSpeed(qreal speed)
 {
-    speed = qBound(minimalSpeed(), speed, maximalSpeed());
+    const auto range = speedRange();
+
+    speed = qBound(-range.reverse, speed, range.forward);
     if (qFuzzyEquals(speed, this->speed()))
         return;
 
@@ -718,28 +719,24 @@ bool QnWorkbenchNavigator::currentWidgetHasVideo() const
     return m_currentMediaWidget && m_currentMediaWidget->hasVideo();
 }
 
-qreal QnWorkbenchNavigator::minimalSpeed() const
+QnSpeedRange QnWorkbenchNavigator::speedRange() const
 {
+    static constexpr qreal kMaxForwardSpeed = 16.0;
+    static constexpr qreal kMaxReverseSpeed = 16.0;
+    static constexpr qreal kUnitSpeed = 1.0;
+    static constexpr qreal kZeroSpeed = 0.0;
+
     if (!isPlayingSupported())
-        return 0.0;
+        return QnSpeedRange(kZeroSpeed, kZeroSpeed);
 
-    if (QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader())
-        if (!reader->isNegativeSpeedSupported())
-            return 0.0;
+    if (!currentWidgetHasVideo())
+        return QnSpeedRange(kUnitSpeed, kZeroSpeed);
 
-    return currentWidgetHasVideo()
-        ? -16.0
-        : 0.0;
-}
+    const auto reader = m_currentMediaWidget->display()->archiveReader();
+    NX_EXPECT(reader); //< checked in isPlayingSupported
 
-qreal QnWorkbenchNavigator::maximalSpeed() const
-{
-    if (!isPlayingSupported())
-        return 0.0;
-
-    return currentWidgetHasVideo()
-        ? 16.0
-        : 1.0;
+    const qreal reverse = reader->isNegativeSpeedSupported() ? kMaxReverseSpeed : kZeroSpeed;
+    return QnSpeedRange(kMaxForwardSpeed, reverse);
 }
 
 qint64 QnWorkbenchNavigator::positionUsec() const
@@ -1845,14 +1842,12 @@ void QnWorkbenchNavigator::updateSpeed()
 
 void QnWorkbenchNavigator::updateSpeedRange()
 {
-    qreal minimalSpeed = this->minimalSpeed();
-    qreal maximalSpeed = this->maximalSpeed();
-    if (qFuzzyEquals(minimalSpeed, m_lastMinimalSpeed) && qFuzzyEquals(maximalSpeed, m_lastMaximalSpeed))
+    const auto newSpeedRange = speedRange();
+
+    if (newSpeedRange.fuzzyEquals(m_lastSpeedRange))
         return;
 
-    m_lastMinimalSpeed = minimalSpeed;
-    m_lastMaximalSpeed = maximalSpeed;
-
+    m_lastSpeedRange = newSpeedRange;
     emit speedRangeChanged();
 }
 

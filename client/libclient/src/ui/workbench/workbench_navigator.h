@@ -16,6 +16,7 @@
 #include <recording/time_period.h>
 
 #include <ui/actions/action_target_provider.h>
+#include <ui/common/speed_range.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
@@ -101,8 +102,7 @@ public:
 
     qreal speed() const;
     Q_SLOT void setSpeed(qreal speed);
-    qreal minimalSpeed() const;
-    qreal maximalSpeed() const;
+    QnSpeedRange speedRange() const;
 
     qint64 positionUsec() const;
     void setPosition(qint64 positionUsec);
@@ -286,8 +286,7 @@ private:
     QHash<QnResourceDisplayPtr, bool> m_autoPausedResourceDisplays;
 
     qreal m_lastSpeed;
-    qreal m_lastMinimalSpeed;
-    qreal m_lastMaximalSpeed;
+    QnSpeedRange m_lastSpeedRange;
 
     bool m_lastAdjustTimelineToPosition;
 

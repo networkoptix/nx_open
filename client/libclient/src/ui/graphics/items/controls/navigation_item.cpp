@@ -338,8 +338,9 @@ QnNavigationItem::~QnNavigationItem()
 // -------------------------------------------------------------------------- //
 void QnNavigationItem::updateSpeedSliderParametersFromNavigator()
 {
-    qreal minimalSpeed = navigator()->minimalSpeed();
-    qreal maximalSpeed = navigator()->maximalSpeed();
+    const auto range = navigator()->speedRange();
+    qreal minimalSpeed = -range.reverse;
+    qreal maximalSpeed = range.forward;
 
     qreal speedStep, defaultSpeed;
     if (m_playButton->isChecked())
