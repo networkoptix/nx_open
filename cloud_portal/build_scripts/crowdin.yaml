@@ -1,9 +1,9 @@
 
 files:
   -
-    source: '/build_scripts/language_pack/**/*.*'
+    source: '/**/*.*'
     translation: '/translations/%locale_with_underscore%/**/%original_file_name%'
     ignore:
-      - /build_scripts/language_pack/crowdin.yaml
-      - /build_scripts/language_pack/views/debug.html
-      - /build_scripts/language_pack/views/static/eula.html
+      - /crowdin.yaml
+      - /views/debug.html
+      - /views/static/eula.html
