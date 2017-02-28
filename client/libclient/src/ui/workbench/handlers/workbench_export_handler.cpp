@@ -293,8 +293,8 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
         previousDir = qnSettings->mediaFolder();
 
     QStringList filters{
-        lit("AVI (*.avi)"),
         lit("Matroska (*.mkv)"),
+        lit("AVI (*.avi)"),
         lit("MP4 (*.mp4)")
     };
 
