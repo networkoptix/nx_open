@@ -39,7 +39,7 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
 
     /* Making connection through event loop to handle data from another thread. */
     connect(this, &QnSingleThumbnailLoader::imageLoaded, this,
-        [this, size, format](const QByteArray &data)
+        [this, format](const QByteArray &data)
         {
             if (!data.isEmpty())
             {
@@ -75,10 +75,10 @@ QImage QnSingleThumbnailLoader::image() const
 
 QSize QnSingleThumbnailLoader::sizeHint() const
 {
-/*    NX_ASSERT(false);*/
+    if (!m_image.isNull())
+        return m_image.size();
 
-    //TODO: #GDM process request size and camera aspect ratio (and rotation?)
-    return m_image.size();
+    return QnCameraThumbnailManager::sizeHintForCamera(m_request.camera, m_request.size);
 }
 
 Qn::ThumbnailStatus QnSingleThumbnailLoader::status() const

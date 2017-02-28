@@ -76,8 +76,6 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
     QnWorkbenchContextAware(context),
     m_headerWidget(new GraphicsWidget(this))
 {
-    //m_statusPixmapManager->setThumbnailSize(kDefaultThumbnailSize);
-
     int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
     auto newButton = [this, maxIconSize](QnActions::IDType actionId, int helpTopicId)
     {

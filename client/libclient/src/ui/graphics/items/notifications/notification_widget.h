@@ -7,56 +7,34 @@
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/styled_tooltip_widget.h>
+#include <ui/graphics/items/generic/graphics_tooltip_widget.h>
 
 #include <ui/actions/actions.h>
 #include <ui/actions/action_parameters.h>
 
 class QnProxyLabel;
-class QnClickableProxyLabel;
-class QnFramedWidget;
-class QGraphicsLinearLayout;
 class HoverFocusProcessor;
 class QnImageProvider;
-class QnGraphicsToolTipWidget;
 
-class QnNotificationToolTipWidget: public Clickable<QnStyledTooltipWidget>
+class QnNotificationToolTipWidget: public QnGraphicsToolTipWidget
 {
     Q_OBJECT
-    typedef Clickable<QnStyledTooltipWidget> base_type;
 
+    using base_type = QnGraphicsToolTipWidget;
 public:
     QnNotificationToolTipWidget(QGraphicsItem* parent = nullptr);
-
-    void ensureThumbnail(QnImageProvider* provider);
-
-    QString text() const;
-
-    /**
-     * \param text                      New text for this tool tip's label.
-     */
-    void setText(const QString& text);
 
     /** Rectangle where the tooltip should fit - in coordinates of list widget (parent's parent). */
     void setEnclosingGeometry(const QRectF& enclosingGeometry);
 
-    //reimp
-    void pointTo(const QPointF& pos);
     virtual void updateTailPos() override;
 
 signals:
-    void thumbnailClicked();
     void closeTriggered();
     void buttonClicked(const QString& alias);
 
-private slots:
-    void at_thumbnailLabel_clicked(Qt::MouseButton button);
-
 private:
-    QGraphicsLinearLayout* m_layout;
-    QnClickableProxyLabel* m_textLabel;
-    QnClickableProxyLabel* m_thumbnailLabel;
     QRectF m_enclosingRect;
-    QPointF m_pointTo;
 };
 
 class QnNotificationWidget: public Clickable<GraphicsWidget>
@@ -138,7 +116,7 @@ private:
     QnImageProvider* m_imageProvider;
     QColor m_color;
 
-    QnGraphicsToolTipWidget* m_tooltipWidget;
+    QnNotificationToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_toolTipHoverProcessor;
     HoverFocusProcessor* m_hoverProcessor;
     bool m_pendingPositionUpdate;
