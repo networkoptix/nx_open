@@ -449,17 +449,12 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
             const QnVirtualCameraResourcePtr camera = mediaResource.dynamicCast<QnVirtualCameraResource>();
             if (camera && !transcodeWarnShown)
             {
-                const auto streams = camera->mediaStreams().streams;
-                auto defaultStream = std::find_if(streams.cbegin(), streams.cend(),
-                    [](const CameraMediaStreamInfo& stream)
-                    {
-                        return stream.encoderIndex == CameraMediaStreamInfo::PRIMARY_STREAM_INDEX;
-                    });
+                const auto stream = camera->defaultStream();
+                const auto resolution = stream.getResolution();
 
-                if (defaultStream != streams.cend())
+                if (!resolution.isEmpty())
                 {
                     const int bigValue = std::numeric_limits<int>::max();
-                    const auto resolution = defaultStream->getResolution();
                     NX_ASSERT(resolution.isValid());
 
                     auto filters = imageParameters.createFilterChain(resolution, QSize(bigValue, bigValue));

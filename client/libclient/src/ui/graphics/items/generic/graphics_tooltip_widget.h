@@ -16,6 +16,9 @@ class QnGraphicsToolTipWidget: public QnStyledTooltipWidget
 public:
     QnGraphicsToolTipWidget(QGraphicsItem* parent = nullptr);
 
+    /** Tooltip text */
+    QString text() const;
+
     /**
     * Set tooltip text.
     * \param text                      New text for this tool tip's label.
@@ -43,11 +46,13 @@ protected:
 private:
     void forceLayoutUpdate();
 
+protected:
+    QPointF m_pointTo;
+
 private:
     QGraphicsProxyWidget* m_proxyWidget;
     QWidget* m_embeddedWidget;
     QnTextEditLabel* m_textLabel;
     QnResourcePreviewWidget* m_previewWidget;
-    QPointF m_pointTo;
     QSize m_maxThumbnailSize;
 };

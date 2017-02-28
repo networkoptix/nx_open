@@ -135,26 +135,7 @@ QImage QnCameraThumbnailManager::image() const
 
 QSize QnCameraThumbnailManager::sizeHint() const
 {
-    QSize result = m_thumnailSize;
-    if (!result.isEmpty() || result.isNull())
-        return result;
-    NX_ASSERT((result.width() == 0) ^ (result.height() == 0));
-
-    qreal aspectRatio = kDefaultAspectRatio;
-    if (m_selectedCamera)
-    {
-        const auto cameraAr = m_selectedCamera->aspectRatio();
-        if (cameraAr.isValid())
-            aspectRatio = cameraAr.toFloat();
-    }
-    NX_ASSERT(!qFuzzyIsNull(aspectRatio));
-
-    if (result.height() == 0)
-        result.setHeight(static_cast<int>(result.width() / aspectRatio));
-    else if (result.width() == 0)
-        result.setWidth(static_cast<int>(result.height() * aspectRatio));
-
-    return result;
+    return sizeHintForCamera(m_selectedCamera, m_thumnailSize);
 }
 
 Qn::ThumbnailStatus QnCameraThumbnailManager::status() const
@@ -163,6 +144,48 @@ Qn::ThumbnailStatus QnCameraThumbnailManager::status() const
         return Qn::ThumbnailStatus::Invalid;
 
     return m_thumbnailByCamera.value(m_selectedCamera).status;
+}
+
+QSize QnCameraThumbnailManager::sizeHintForCamera(const QnVirtualCameraResourcePtr& camera,
+    const QSize& limit)
+{
+    //TODO: #GDM process camera rotation?
+    qreal aspectRatio = kDefaultAspectRatio;
+    if (camera)
+    {
+        const auto cameraAr = camera->aspectRatio();
+        if (cameraAr.isValid())
+            aspectRatio = cameraAr.toFloat();
+    }
+    NX_ASSERT(!qFuzzyIsNull(aspectRatio));
+
+    QSize result(limit);
+
+    // Full-size image is requested
+    if (result.width() <= 0 && result.height() <= 0)
+    {
+        if (!camera)
+            return result;
+
+        const auto stream = camera->defaultStream();
+        result = stream.getResolution();
+    }
+    // Only height is given, calculating width by aspect ratio
+    else if (result.width() <= 0)
+    {
+        result.setWidth(static_cast<int>(result.height() * aspectRatio));
+    }
+    // Only width is given, calculating height by aspect ratio
+    else if (result.height() <= 0)
+    {
+        result.setHeight(static_cast<int>(result.width() / aspectRatio));
+    }
+    // If both width and height are set, aspect ratio is ignored.
+    else
+    {
+        NX_ASSERT(!result.isEmpty());
+    }
+    return result;
 }
 
 rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCameraResourcePtr& camera)

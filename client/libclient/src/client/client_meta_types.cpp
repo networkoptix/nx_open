@@ -66,6 +66,7 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<QnUpdateInfo>();
 
     qRegisterMetaType<Qn::LightModeFlags>();
+    qRegisterMetaType<Qn::ThumbnailStatus>();
 
     qRegisterMetaType<QnWeakObjectHash>();
     qRegisterMetaType<WeakGraphicsItemPointerList>();
