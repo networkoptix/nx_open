@@ -2,8 +2,8 @@
 
 struct QnSpeedRange
 {
-    qreal forward;
-    qreal reverse;
+    qreal forward; //< maximum forward speed (>= 0)
+    qreal reverse; //< maximum reverse speed (>= 0)
 
     QnSpeedRange(qreal forward = 0.0, qreal reverse = 0.0);
 
