@@ -10,6 +10,7 @@
 #include <client/client_app_info.h>
 #include <client/client_module.h>
 #include <client/client_startup_parameters.h>
+#include <client/client_installations_manager.h>
 
 #include <nx/vms/utils/app_info.h>
 #include <nx/vms/utils/platform/protocol_handler.h>
@@ -326,7 +327,7 @@ bool SelfUpdater::updateMinilauncher()
     }
 
     bool success = true;
-    for (const QString& installRoot : getClientInstallRoots())
+    for (const QString& installRoot: QnClientInstallationsManager::clientInstallRoots())
         success &= updateMinilauncherInDir(installRoot, sourceMinilauncherPath);
     return success;
 }
@@ -584,34 +585,6 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
     #endif // defined(Q_OS_LINUX)
 
     return true;
-}
-
-QStringList SelfUpdater::getClientInstallRoots() const
-{
-    QStringList result;
-
-    const QDir baseRoot(QnClientAppInfo::installationRoot() + lit("/client"));
-    for (const auto& entry: baseRoot.entryInfoList(QDir::NoDotAndDotDot | QDir::Dirs))
-    {
-        nx::utils::SoftwareVersion version(entry.fileName());
-        if (version.isNull())
-            continue;
-
-        const auto clientRoot = entry.absoluteFilePath();
-        const auto binDir = QDir(clientRoot).absoluteFilePath(QnClientAppInfo::binDirSuffix());
-        const auto clientBinary = QDir(binDir).absoluteFilePath(QnClientAppInfo::clientBinaryName());
-
-        if (!QFileInfo::exists(clientBinary))
-        {
-            NX_LOGX(lit("Could not find client binary in %1").arg(clientBinary), cl_logINFO);
-            NX_LOGX(lit("Skip client root: %1").arg(clientRoot), cl_logINFO);
-            continue;
-        }
-
-        result << clientRoot;
-    }
-
-    return result;
 }
 
 } // namespace client

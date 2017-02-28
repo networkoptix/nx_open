@@ -47,9 +47,8 @@ public:
 private:
     enum ConnectionOption
     {
-        IsCloudConnection = 0x1,
-        StorePassword = 0x2,
-        AutoLogin = 0x4
+        StorePassword = 0x1,
+        AutoLogin = 0x2
     };
     Q_DECLARE_FLAGS(ConnectionOptions, ConnectionOption)
 

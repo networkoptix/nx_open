@@ -2,10 +2,12 @@
 
 #include <client/client_globals.h>
 
+#include <ui/common/geometry.h>
+
 namespace {
 
 static const QPoint kOffset(0, 0);
-static const QSize kMaxSize(160, 160);
+static const QSize kMaxSize(400, 160);
 
 } // namespace
 
@@ -29,7 +31,7 @@ QnMultiImageProvider::QnMultiImageProvider(
                 if (loadedImage.isNull())
                     return;
 
-                QSize newSize = loadedImage.size().boundedTo(kMaxSize);
+                QSize newSize = QnGeometry::bounded(loadedImage.size(), kMaxSize, Qt::KeepAspectRatio).toSize();
                 QRect rect(kOffset, newSize);
 
                 if (!m_image.isNull())
@@ -60,13 +62,14 @@ QnMultiImageProvider::QnMultiImageProvider(
 
                 m_imageRects[key] = rect;
                 QImage mergedImage(newSize, QImage::Format_ARGB32_Premultiplied);
-                mergedImage.fill(Qt::black);
+                mergedImage.fill(Qt::transparent);
                 QPainter p(&mergedImage);
                 p.drawImage(0, 0, m_image);
                 p.drawImage(rect, loadedImage);
                 p.end();
                 m_image = mergedImage;
 
+                emit sizeHintChanged(sizeHint());
                 emit imageChanged(m_image);
             });
 
@@ -86,25 +89,13 @@ QImage QnMultiImageProvider::image() const
 
 QSize QnMultiImageProvider::sizeHint() const
 {
-    //TODO: #gdm improve logic, sizeHintChanged
-    QSize result;
-    for (const auto& provider: m_providers)
-    {
-        QSize subImageSize = provider->sizeHint().boundedTo(kMaxSize);
-        if (m_orientation == Qt::Vertical)
-        {
-            result.setWidth(qMax(result.width(), subImageSize.width()));
-            result.setHeight(result.height() + m_spacing + subImageSize.height());
-        }
-        else
-        {
-            result.setWidth(result.width() + m_spacing + subImageSize.width());
-            result.setHeight(qMax(result.height(), subImageSize.height()));
-        }
+    if (!m_image.isNull())
+        return m_image.size();
 
-    }
-    return result;
+    if (m_providers.empty())
+        return QSize();
 
+    return QnGeometry::bounded(m_providers.front()->sizeHint(), kMaxSize, Qt::KeepAspectRatio).toSize();
 }
 
 Qn::ThumbnailStatus QnMultiImageProvider::status() const

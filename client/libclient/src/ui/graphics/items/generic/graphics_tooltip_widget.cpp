@@ -66,6 +66,11 @@ void QnGraphicsToolTipWidget::forceLayoutUpdate()
     m_embeddedWidget->layout()->activate();
 }
 
+QString QnGraphicsToolTipWidget::text() const
+{
+    return m_textLabel->toPlainText();
+}
+
 void QnGraphicsToolTipWidget::setText(const QString& text)
 {
     m_textLabel->setText(text);
