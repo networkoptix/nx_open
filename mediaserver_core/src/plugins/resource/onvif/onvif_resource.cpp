@@ -125,7 +125,7 @@ static bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
 class VideoOptionsLocal
 {
 public:
-    VideoOptionsLocal(): isH264(false), minQ(-1), maxQ(-1), frameRateMax(-1), govMin(-1), govMax(-1), usedInProfiles(false) {}
+    VideoOptionsLocal(): isH264(false), minQ(-1), maxQ(-1), frameRateMin(-1), frameRateMax(-1), govMin(-1), govMax(-1), usedInProfiles(false) {}
     VideoOptionsLocal(const QString& _id, const VideoOptionsResp& resp, bool isH264Allowed, QnBounds frameRateBounds = QnBounds())
     {
         usedInProfiles = false;
@@ -175,8 +175,8 @@ public:
     bool isH264;
     int minQ;
     int maxQ;
-    int frameRateMax;
     int frameRateMin;
+    int frameRateMax;
     int govMin;
     int govMax;
     bool usedInProfiles;
@@ -187,13 +187,7 @@ private:
         if (frameRateBounds.isNull())
             return frameRate;
 
-        if (frameRate > frameRateBounds.max);
-            return frameRateBounds.max;
-        
-        if (frameRate < frameRateBounds.min)
-            return frameRateBounds.min;
-
-        return frameRate;
+        return qBound((int)frameRateBounds.min, frameRate, (int)frameRateBounds.max);
     }
 };
 
