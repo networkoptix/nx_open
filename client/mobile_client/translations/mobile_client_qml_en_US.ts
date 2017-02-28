@@ -75,15 +75,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid email or password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cannot connect to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Email and password cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -114,11 +118,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Login can&apos;t be empty</source>
+        <source>Login cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Password can&apos;t be empty</source>
+        <source>Password cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -222,27 +226,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hi-res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low-res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low-res key-frames</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Custom-res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1 fps</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hi-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyfr + Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom-Res</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -303,7 +307,7 @@
 <context>
     <name>OfflineDummy</name>
     <message>
-        <source>You are not connected to any system</source>
+        <source>You are not connected to any System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -401,7 +405,7 @@
 <context>
     <name>SessionItem</name>
     <message>
-        <source>This server has too old version. </source>
+        <source>This server has too old version. Please update it to the latest version.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -416,19 +420,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No systems found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot connect to the system &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot connect to the server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -441,6 +433,18 @@
     </message>
     <message>
         <source>Connect to Another Server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Systems found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to System &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to Server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -555,7 +559,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t load video</source>
+        <source>Cannot load video</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

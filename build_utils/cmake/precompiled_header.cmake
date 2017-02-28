@@ -1,278 +1,190 @@
-# Function for setting up precompiled headers. Usage:
-#
-#   add_library/executable(target
-#       pchheader.c pchheader.cpp pchheader.h)
-#
-#   add_precompiled_header(target pchheader.h
-#       [FORCEINCLUDE]
-#       [SOURCE_C pchheader.c]
-#       [SOURCE_CXX pchheader.cpp])
-#
-# Options:
-#
-#   FORCEINCLUDE: Add compiler flags to automatically include the
-#   pchheader.h from every source file. Works with both GCC and
-#   MSVC. This is recommended.
-#
-#   SOURCE_C/CXX: Specifies the .c/.cpp source file that includes
-#   pchheader.h for generating the pre-compiled header
-#   output. Defaults to pchheader.c. Only required for MSVC.
-#
-# Caveats:
-#
-#   * Its not currently possible to use the same precompiled-header in
-#     more than a single target in the same directory (No way to set
-#     the source file properties differently for each target).
-#
-#   * MSVC: A source file with the same name as the header must exist
-#     and be included in the target (E.g. header.cpp). Name of file
-#     can be changed using the SOURCE_CXX/SOURCE_C options.
-#
-# License:
-#
-# Copyright (C) 2009-2013 Lars Christensen <larsch@belunktum.dk>
-#
-# Permission is hereby granted, free of charge, to any person
-# obtaining a copy of this software and associated documentation files
-# (the 'Software') deal in the Software without restriction,
-# including without limitation the rights to use, copy, modify, merge,
-# publish, distribute, sublicense, and/or sell copies of the Software,
-# and to permit persons to whom the Software is furnished to do so,
-# subject to the following conditions:
-#
-# The above copyright notice and this permission notice shall be
-# included in all copies or substantial portions of the Software.
-#
-# THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-# NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
-# BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-# ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-# CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-
-include(CMakeParseArguments)
-
-macro(combine_arguments _variable)
-    set(_result "")
-    foreach(_element ${${_variable}})
-      set(_result "${_result} \"${_element}\"")
-    endforeach()
-    string(STRIP "${_result}" _result)
-    set(${_variable} "${_result}")
-endmacro()
-
-function(export_all_flags _filename)
-    set(_include_directories "$<TARGET_PROPERTY:${_target},INCLUDE_DIRECTORIES>" ${CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES})
-    set(_compile_definitions "$<TARGET_PROPERTY:${_target},COMPILE_DEFINITIONS>")
-    set(_compile_flags "$<TARGET_PROPERTY:${_target},COMPILE_FLAGS>" ${CMAKE_CXX_FLAGS})
-    set(_compile_options "$<TARGET_PROPERTY:${_target},COMPILE_OPTIONS>")
+function(_generate_pch_parameters target pch_dir)
+    set(flags
+        "$<TARGET_PROPERTY:${target},COMPILE_OPTIONS>"
+        "$<$<BOOL:$<TARGET_PROPERTY:${target},POSITION_INDEPENDENT_CODE>>:${CMAKE_CXX_COMPILE_OPTIONS_PIC}>"
+        ${CMAKE_CXX_FLAGS})
 
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        list(APPEND _compile_flags ${CMAKE_CXX_FLAGS_DEBUG})
+        list(APPEND flags ${CMAKE_CXX_FLAGS_DEBUG})
     elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-        list(APPEND _compile_flags ${CMAKE_CXX_FLAGS_RELEASE})
+        list(APPEND flags ${CMAKE_CXX_FLAGS_RELEASE})
     elseif(CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-        list(APPEND _compile_flags ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
+        list(APPEND flags ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
     elseif(CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
-        list(APPEND _compile_flags ${CMAKE_CXX_FLAGS_MINSIZEREL})
+        list(APPEND flags ${CMAKE_CXX_FLAGS_MINSIZEREL})
     endif()
 
-    set(_include_directories "$<$<BOOL:${_include_directories}>:-I$<JOIN:${_include_directories},\n-I>\n>")
-    set(_compile_definitions "$<$<BOOL:${_compile_definitions}>:-D$<JOIN:${_compile_definitions},\n-D>\n>")
-    set(_compile_flags "$<$<BOOL:${_compile_flags}>:$<JOIN:${_compile_flags},\n>\n>")
-    set(_compile_options "$<$<BOOL:${_compile_options}>:$<JOIN:${_compile_options},\n>\n>")
-    set(_fpic "$<$<BOOL:$<TARGET_PROPERTY:${_target},POSITION_INDEPENDENT_CODE>>:-fPIC>")
+    set(flags "$<$<BOOL:${flags}>:$<JOIN:${flags},\n>\n>")
 
-    file(GENERATE OUTPUT "${_filename}" CONTENT
-        "${_compile_definitions}${_include_directories}${_compile_flags}${_compile_options}${_fpic}\n")
+    set(include_directories
+        "$<TARGET_PROPERTY:${target},INCLUDE_DIRECTORIES>"
+        ${CMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES})
+    set(include_directories
+        "$<$<BOOL:${include_directories}>:-I$<JOIN:${include_directories},\n-I>\n>")
+
+    if(MACOSX)
+        set(framework_directories
+            "$<$<BOOL:${CMAKE_FRAMEWORK_PATH}>:-iframework $<JOIN:${CMAKE_FRAMEWORK_PATH},\n-iframework >\n>")
+    else()
+        set(framework_directories)
+    endif()
+
+    set(definitions
+        "$<TARGET_PROPERTY:${target},COMPILE_DEFINITIONS>")
+    set(definitions
+        "$<$<BOOL:${definitions}>:-D$<JOIN:${definitions},\n-D>\n>")
+
+    file(GENERATE OUTPUT "${pch_dir}.parameters" CONTENT
+        "${flags}${include_directories}${framework_directories}${definitions}\n")
 endfunction()
 
-function(add_precompiled_header _target _input)
-    cmake_parse_arguments(_PCH "" "SOURCE_C:SOURCE_CXX" "ADDITIONAL_FLAGS" ${ARGN})
-
-    get_filename_component(_input_we ${_input} NAME_WE)
-    if(NOT _PCH_SOURCE_CXX)
-        set(_PCH_SOURCE_CXX "${_input_we}.cpp")
-    endif()
-    if(NOT _PCH_SOURCE_C)
-        set(_PCH_SOURCE_C "${_input_we}.c")
-    endif()
-
-    if(MSVC)
-        set(_cxx_path "${CMAKE_CFG_INTDIR}/${_target}_cxx_pch")
-        set(_c_path "${CMAKE_CFG_INTDIR}/${_target}_c_pch")
-        make_directory("${_cxx_path}")
-        make_directory("${_c_path}")
-        set(_pch_cxx_header "${_cxx_path}/${_input}")
-        set(_pch_cxx_pch "${_cxx_path}/${_input_we}.pch")
-        set(_pch_c_header "${_c_path}/${_input}")
-        set(_pch_c_pch "${_c_path}/${_input_we}.pch")
-
-        get_target_property(sources ${_target} SOURCES)
-        foreach(_source ${sources})
-            set(_pch_compile_flags "")
-            if(_source MATCHES \\.\(cc|cxx|cpp|c\)$)
-                if(_source MATCHES \\.\(cpp|cxx|cc\)$)
-                    set(_pch_header "${_input}")
-                    set(_pch "${_pch_cxx_pch}")
-                else()
-                    set(_pch_header "${_input}")
-                    set(_pch "${_pch_c_pch}")
-            endif()
-
-            if(_source STREQUAL "${_PCH_SOURCE_CXX}")
-                set(_pch_compile_flags "${_pch_compile_flags} \"/Fp${_pch_cxx_pch}\" /Yc${_input}")
-                set(_pch_source_cxx_found TRUE)
-                set_source_files_properties("${_source}" PROPERTIES OBJECT_OUTPUTS "${_pch_cxx_pch}")
-            elseif(_source STREQUAL "${_PCH_SOURCE_C}")
-                set(_pch_compile_flags "${_pch_compile_flags} \"/Fp${_pch_c_pch}\" /Yc${_input}")
-                set(_pch_source_c_found TRUE)
-                set_source_files_properties("${_source}" PROPERTIES OBJECT_OUTPUTS "${_pch_c_pch}")
-            else()
-                if(_source MATCHES \\.\(cpp|cxx|cc\)$)
-                    set(_pch_compile_flags "${_pch_compile_flags} \"/Fp${_pch_cxx_pch}\" /Yu${_input}")
-                    set(_pch_source_cxx_needed TRUE)
-                    set_source_files_properties("${_source}" PROPERTIES OBJECT_DEPENDS "${_pch_cxx_pch}")
-                else()
-                    set(_pch_compile_flags "${_pch_compile_flags} \"/Fp${_pch_c_pch}\" /Yu${_input}")
-                    set(_pch_source_c_needed TRUE)
-                    set_source_files_properties("${_source}" PROPERTIES OBJECT_DEPENDS "${_pch_c_pch}")
-                endif()
-                set(_pch_compile_flags "${_pch_compile_flags} /FI${_input}")
-            endif()
-
-            get_source_file_property(_object_depends "${_source}" OBJECT_DEPENDS)
-            if(NOT _object_depends)
-                set(_object_depends)
-            endif()
-            if(_source MATCHES \\.\(cc|cxx|cpp\)$)
-                list(APPEND _object_depends "${_pch_header}")
-            else()
-                list(APPEND _object_depends "${_pch_header}")
-            endif()
-
-            set_source_files_properties(${_source} PROPERTIES
-                COMPILE_FLAGS "${_pch_compile_flags}"
-                OBJECT_DEPENDS "${_object_depends}")
-            endif()
-        endforeach()
-
-        if(_pch_source_cxx_needed AND NOT _pch_source_cxx_found)
-            message(FATAL_ERROR "A source file ${_PCH_SOURCE_CXX} for ${_input} is required for MSVC builds. Can be set with the SOURCE_CXX option.")
-        endif()
-        if(_pch_source_c_needed AND NOT _pch_source_c_found)
-            message(FATAL_ERROR "A source file ${_PCH_SOURCE_C} for ${_input} is required for MSVC builds. Can be set with the SOURCE_C option.")
-        endif()
-    endif(MSVC)
-
-    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-        set(CMAKE_COMPILER_IS_CLANGXX TRUE)
+function(_get_cxx_standard target STANDARD_VAR)
+    get_property(standard TARGET ${target} PROPERTY CXX_STANDARD)
+    if(standard STREQUAL "98")
+        set(standard "-std=c++98")
+    elseif(standard STREQUAL "11")
+        set(standard "-std=c++0x")
+    elseif(standard STREQUAL "14")
+        set(standard "-std=c++1y")
+    elseif(standard STREQUAL "17")
+        set(standard "-std=c++1z")
     else()
-        set(CMAKE_COMPILER_IS_CLANGXX FALSE)
+        unset(standard)
     endif()
 
-    if(NOT CMAKE_COMPILER_IS_GNUCXX AND NOT CMAKE_COMPILER_IS_CLANGXX)
-        return()
-    endif()
+    set(${STANDARD_VAR} ${standard} PARENT_SCOPE)
+endfunction()
 
-    get_property(_cxx_standard TARGET ${_target} PROPERTY CXX_STANDARD)
-    if(_cxx_standard STREQUAL "98")
-        set(_cxx_standard "-std=c++98")
-    elseif(_cxx_standard STREQUAL "11")
-        set(_cxx_standard "-std=c++0x")
-    elseif(_cxx_standard STREQUAL "14")
-        set(_cxx_standard "-std=c++1y")
-    elseif(_cxx_standard STREQUAL "17")
-        set(_cxx_standard "-std=c++1z")
-    else()
-        unset(_cxx_standard)
-    endif()
+function(_add_msvc_precompiled_header target input)
+    set(_cxx_path "${CMAKE_CFG_INTDIR}/${_target}_cxx_pch")
+    set(_c_path "${CMAKE_CFG_INTDIR}/${_target}_c_pch")
+    make_directory("${_cxx_path}")
+    make_directory("${_c_path}")
+    set(_pch_cxx_header "${_cxx_path}/${_input}")
+    set(_pch_cxx_pch "${_cxx_path}/${_input_we}.pch")
+    set(_pch_c_header "${_c_path}/${_input}")
+    set(_pch_c_pch "${_c_path}/${_input_we}.pch")
 
-    get_property(_c_standard TARGET ${_target} PROPERTY C_STANDARD)
-    if(_c_standard STREQUAL "90" OR _c_standard STREQUAL "99" OR _c_standard STREQUAL "11")
-        set(_c_standard "-std=c${_c_standard}")
-    endif()
-
-    get_filename_component(_name ${_input} NAME)
-    set(_pch_header "${_input}")
-    set(_pch_binary_dir "${CMAKE_CURRENT_BINARY_DIR}/${_target}_pch")
-    set(_pchfile "${_pch_binary_dir}/${_name}")
-
-    if(CMAKE_COMPILER_IS_CLANGXX)
-        set(_outdir "${_pch_binary_dir}/${_name}.pch")
-    else()
-        set(_outdir "${_pch_binary_dir}/${_name}.gch")
-    endif()
-
-    make_directory(${_outdir})
-
-    set(_output_cxx "${_outdir}/.c++")
-    set(_output_c "${_outdir}/.c")
-
-    set(_pch_flags_file "${_pch_binary_dir}/compile_flags.rsp")
-    export_all_flags("${_pch_flags_file}")
-    set(_compiler_FLAGS "@${_pch_flags_file}" ${_PCH_ADDITIONAL_FLAGS})
-
-    add_custom_command(
-        OUTPUT "${_pchfile}"
-        COMMAND "${CMAKE_COMMAND}" -E copy "${_pch_header}" "${_pchfile}"
-        DEPENDS "${_pch_header}"
-        COMMENT "Updating ${_pchfile}")
-
-    add_custom_command(
-        OUTPUT "${_output_cxx}"
-        COMMAND "${CMAKE_CXX_COMPILER}" ${_compiler_FLAGS} -x c++-header ${_cxx_standard}
-            -o "${_output_cxx}" "${_pchfile}"
-        DEPENDS "${_pchfile}" "${_pch_flags_file}"
-        COMMENT "Precompiling ${_name} for ${_target} (C++)")
-    add_custom_command(
-        OUTPUT "${_output_c}"
-        COMMAND "${CMAKE_C_COMPILER}" ${_compiler_FLAGS} -x c-header ${_c_standard}
-            -o "${_output_c}" "${_pchfile}"
-        DEPENDS "${_pchfile}" "${_pch_flags_file}"
-        COMMENT "Precompiling ${_name} for ${_target} (C)")
-
-    get_property(_sources TARGET ${_target} PROPERTY SOURCES)
-    foreach(_source ${_sources})
+    get_target_property(sources ${_target} SOURCES)
+    foreach(_source ${sources})
         set(_pch_compile_flags "")
-
         if(_source MATCHES \\.\(cc|cxx|cpp|c\)$)
-            get_source_file_property(_pch_compile_flags "${_source}" COMPILE_FLAGS)
-            if(NOT _pch_compile_flags)
-                set(_pch_compile_flags)
-            endif()
-            separate_arguments(_pch_compile_flags)
-            list(APPEND _pch_compile_flags -Winvalid-pch)
-
-            if(CMAKE_COMPILER_IS_CLANGXX)
-                if(_source MATCHES \\.\(cc|cxx|cpp\)$)
-                    list(APPEND _pch_compile_flags
-                        -Xclang -include-pch -Xclang ${_output_cxx})
-                else()
-                    list(APPEND _pch_compile_flags
-                        -Xclang -include-pch -Xclang ${_output_c})
-                endif()
+            if(_source MATCHES \\.\(cpp|cxx|cc\)$)
+                set(_pch_header "${_input}")
+                set(_pch "${_pch_cxx_pch}")
             else()
-                list(APPEND _pch_compile_flags -include ${_pchfile})
-            endif()
+                set(_pch_header "${_input}")
+                set(_pch "${_pch_c_pch}")
+        endif()
 
-            get_source_file_property(_object_depends "${_source}" OBJECT_DEPENDS)
-            if(NOT _object_depends)
-                set(_object_depends)
-            endif()
-            list(APPEND _object_depends "${_pchfile}")
-            if(_source MATCHES \\.\(cc|cxx|cpp\)$)
-                list(APPEND _object_depends "${_output_cxx}")
+        if(_source STREQUAL "${_PCH_SOURCE_CXX}")
+            set(_pch_compile_flags "${_pch_compile_flags} \"/Fp${_pch_cxx_pch}\" /Yc${_input}")
+            set(_pch_source_cxx_found TRUE)
+            set_source_files_properties("${_source}" PROPERTIES OBJECT_OUTPUTS "${_pch_cxx_pch}")
+        elseif(_source STREQUAL "${_PCH_SOURCE_C}")
+            set(_pch_compile_flags "${_pch_compile_flags} \"/Fp${_pch_c_pch}\" /Yc${_input}")
+            set(_pch_source_c_found TRUE)
+            set_source_files_properties("${_source}" PROPERTIES OBJECT_OUTPUTS "${_pch_c_pch}")
+        else()
+            if(_source MATCHES \\.\(cpp|cxx|cc\)$)
+                set(_pch_compile_flags "${_pch_compile_flags} \"/Fp${_pch_cxx_pch}\" /Yu${_input}")
+                set(_pch_source_cxx_needed TRUE)
+                set_source_files_properties("${_source}" PROPERTIES OBJECT_DEPENDS "${_pch_cxx_pch}")
             else()
-                list(APPEND _object_depends "${_output_c}")
+                set(_pch_compile_flags "${_pch_compile_flags} \"/Fp${_pch_c_pch}\" /Yu${_input}")
+                set(_pch_source_c_needed TRUE)
+                set_source_files_properties("${_source}" PROPERTIES OBJECT_DEPENDS "${_pch_c_pch}")
             endif()
+            set(_pch_compile_flags "${_pch_compile_flags} /FI${_input}")
+        endif()
 
-            combine_arguments(_pch_compile_flags)
-            set_source_files_properties(${_source} PROPERTIES
-                COMPILE_FLAGS "${_pch_compile_flags}"
-                OBJECT_DEPENDS "${_object_depends}")
+        get_source_file_property(_object_depends "${_source}" OBJECT_DEPENDS)
+        if(NOT _object_depends)
+            set(_object_depends)
+        endif()
+        if(_source MATCHES \\.\(cc|cxx|cpp\)$)
+            list(APPEND _object_depends "${_pch_header}")
+        else()
+            list(APPEND _object_depends "${_pch_header}")
+        endif()
+
+        set_source_files_properties(${_source} PROPERTIES
+            COMPILE_FLAGS "${_pch_compile_flags}"
+            OBJECT_DEPENDS "${_object_depends}")
         endif()
     endforeach()
+
+    if(_pch_source_cxx_needed AND NOT _pch_source_cxx_found)
+        message(FATAL_ERROR "A source file ${_PCH_SOURCE_CXX} for ${_input} is required for MSVC builds. Can be set with the SOURCE_CXX option.")
+    endif()
+    if(_pch_source_c_needed AND NOT _pch_source_c_found)
+        message(FATAL_ERROR "A source file ${_PCH_SOURCE_C} for ${_input} is required for MSVC builds. Can be set with the SOURCE_C option.")
+    endif()
+endfunction()
+
+function(_add_xcode_precompiled_header target input)
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_GCC_PRECOMPILE_PREFIX_HEADER "YES")
+    set_target_properties(${target} PROPERTIES XCODE_ATTRIBUTE_GCC_PREFIX_HEADER "${input}")
+endfunction()
+
+function(_add_gcc_clang_precompiled_header target input)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        set(pch_dir "${CMAKE_CURRENT_BINARY_DIR}/${target}.pch")
+    else()
+        set(pch_dir "${CMAKE_CURRENT_BINARY_DIR}/${target}.gch")
+    endif()
+    set(pch_file "${pch_dir}/c++")
+
+    _generate_pch_parameters(${target} ${pch_dir})
+    _get_cxx_standard(${target} cxx_standard)
+
+    file(MAKE_DIRECTORY "${pch_dir}")
+    add_custom_command(
+        OUTPUT "${pch_file}"
+        COMMAND "${CMAKE_CXX_COMPILER}"
+            "@${pch_dir}.parameters" ${cxx_standard} -x c++-header "${input}" -o "${pch_file}"
+        DEPENDS "${input}" "${pch_dir}.parameters"
+        COMMENT "Precompiling ${pch_dir}")
+
+    if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        set(pch_flags "-Xclang -include-pch -Xclang \"${pch_file}\" -Winvalid-pch")
+    else()
+        set(pch_flags "-include \"${CMAKE_CURRENT_BINARY_DIR}/${target}\" -Winvalid-pch")
+    endif()
+
+    get_target_property(sources ${target} SOURCES)
+    foreach(source ${sources})
+        if(NOT source MATCHES "\\.\(cpp|cxx|cc\)$")
+            continue()
+        endif()
+
+        get_source_file_property(flags "${source}" COMPILE_FLAGS)
+        if(NOT flags)
+            set(flags)
+        endif()
+        list(APPEND flags ${pch_flags})
+
+        get_source_file_property(depends "${source}" OBJECT_DEPENDS)
+        if(NOT depends)
+            set(depends)
+        endif()
+        list(APPEND depends "${input}" "${pch_file}")
+
+        set_source_files_properties("${source}"
+            PROPERTIES
+                COMPILE_FLAGS "${flags}"
+                OBJECT_DEPENDS "${depends}")
+    endforeach()
+endfunction()
+
+function(add_precompiled_header target input)
+    if(MSVC)
+        _add_msvc_precompiled_header(${target} ${input})
+    elseif(XCODE)
+        _add_xcode_precompiled_header(${target} ${input})
+    elseif(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        _add_gcc_clang_precompiled_header(${target} ${input})
+    else()
+        message(FATAL_ERROR "Precompiled header is not supported for target ${target}")
+    endif()
 endfunction()

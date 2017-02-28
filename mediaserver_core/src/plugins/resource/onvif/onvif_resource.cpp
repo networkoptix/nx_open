@@ -126,7 +126,7 @@ class VideoOptionsLocal
 {
 public:
     VideoOptionsLocal(): isH264(false), minQ(-1), maxQ(-1), frameRateMax(-1), govMin(-1), govMax(-1), usedInProfiles(false) {}
-    VideoOptionsLocal(const QString& _id, const VideoOptionsResp& resp, bool isH264Allowed)
+    VideoOptionsLocal(const QString& _id, const VideoOptionsResp& resp, bool isH264Allowed, QnBounds frameRateBounds = QnBounds())
     {
         usedInProfiles = false;
         id = _id;
@@ -147,7 +147,11 @@ public:
             std::sort(h264Profiles.begin(), h264Profiles.end());
 
             if (resp.Options->H264->FrameRateRange)
-                frameRateMax = resp.Options->H264->FrameRateRange->Max;
+            {
+                frameRateMax = restrictFrameRate(resp.Options->H264->FrameRateRange->Max, frameRateBounds);
+                frameRateMin = restrictFrameRate(resp.Options->H264->FrameRateRange->Min, frameRateBounds);
+            }
+
             if (resp.Options->H264->GovLengthRange) {
                 govMin = resp.Options->H264->GovLengthRange->Min;
                 govMax = resp.Options->H264->GovLengthRange->Max;
@@ -155,7 +159,10 @@ public:
         }
         else if (resp.Options->JPEG) {
             if (resp.Options->JPEG->FrameRateRange)
-                frameRateMax = resp.Options->JPEG->FrameRateRange->Max;
+            {
+                frameRateMax = restrictFrameRate(resp.Options->JPEG->FrameRateRange->Max, frameRateBounds);
+                frameRateMin = restrictFrameRate(resp.Options->JPEG->FrameRateRange->Min, frameRateBounds);
+            }
         }
         if (resp.Options->QualityRange) {
             minQ = resp.Options->QualityRange->Min;
@@ -169,9 +176,25 @@ public:
     int minQ;
     int maxQ;
     int frameRateMax;
+    int frameRateMin;
     int govMin;
     int govMax;
     bool usedInProfiles;
+
+private:
+    int restrictFrameRate(int frameRate, QnBounds frameRateBounds) const
+    {
+        if (frameRateBounds.isNull())
+            return frameRate;
+
+        if (frameRate > frameRateBounds.max);
+            return frameRateBounds.max;
+        
+        if (frameRate < frameRateBounds.min)
+            return frameRateBounds.min;
+
+        return frameRate;
+    }
 };
 
 bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2)
@@ -1371,19 +1394,21 @@ void QnPlOnvifResource::setTimeDrift(int value)
     m_timeDriftTimer.restart();
 }
 
-void QnPlOnvifResource::calcTimeDrift() const
+void QnPlOnvifResource::calcTimeDrift(int* outSoapRes) const
 {
-    m_timeDrift = calcTimeDrift(getDeviceOnvifUrl());
+    m_timeDrift = calcTimeDrift(getDeviceOnvifUrl(), outSoapRes);
     m_timeDriftTimer.restart();
 }
 
-int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl)
+int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl, int* outSoapRes)
 {
     DeviceSoapWrapper soapWrapper(deviceUrl.toStdString(), QString(), QString(), 0);
 
     _onvifDevice__GetSystemDateAndTime request;
     _onvifDevice__GetSystemDateAndTimeResponse response;
     int soapRes = soapWrapper.GetSystemDateAndTime(request, response);
+    if (outSoapRes)
+        *outSoapRes = soapRes;
 
     if (soapRes == SOAP_OK && response.SystemDateAndTime && response.SystemDateAndTime->UTCDateTime)
     {
@@ -1944,6 +1969,8 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     QStringList videoEncodersTokens;
     VideoConfigsResp confResponse;
 
+    auto frameRateBounds = resourceData.value<QnBounds>(Qn::FPS_BOUNDS_PARAM_NAME, QnBounds());
+
     if (forcedParams && forcedParams->videoEncoders.size() >= getChannel())
     {
         videoEncodersTokens = forcedParams->videoEncoders[getChannel()].split(L',');
@@ -1993,7 +2020,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
 
             if (optResp.Options->H264 || optResp.Options->JPEG)
             {
-                optionsList << VideoOptionsLocal(encoderToken, optResp, isH264Allowed());
+                optionsList << VideoOptionsLocal(encoderToken, optResp, isH264Allowed(), frameRateBounds);
             }
 #ifdef PL_ONVIF_DEBUG
             else
@@ -2592,7 +2619,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
     for (uint i = 0; i < response.Configurations.size(); ++i)
     {
         onvifXsd__VideoSourceConfiguration* conf = response.Configurations.at(i);
-        if (!conf || conf->SourceToken != srcToken)
+        if (!conf || conf->SourceToken != srcToken || !(conf->Bounds))
             continue;
 
         {
@@ -2838,7 +2865,7 @@ bool QnPlOnvifResource::loadXmlParametersInternal(QnCameraAdvancedParams &params
     {
         NX_LOG(lit("Error while parsing xml (onvif) %1").arg(paramsTemplateFileName), cl_logWARNING);
     }
-    
+
 
     return result;
 }
@@ -3478,10 +3505,16 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     }
     _onvifEvents__PullMessagesResponse response;
 
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    const bool useHttpReader = resData.value<bool>(
+        Qn::PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER,
+        false);
+
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> asyncPullMessagesCallWrapper(
         new GSoapAsyncPullMessagesCallWrapper(
             std::move(soapWrapper),
-            &PullPointSubscriptionWrapper::pullMessages ),
+            &PullPointSubscriptionWrapper::pullMessages,
+            useHttpReader),
         [memToFreeOnResponseDone](GSoapAsyncPullMessagesCallWrapper* ptr){
             for( void* pObj: memToFreeOnResponseDone )
                 ::free( pObj );

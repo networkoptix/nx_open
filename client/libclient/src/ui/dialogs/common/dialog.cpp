@@ -2,12 +2,13 @@
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
-
+#include <ui/style/helper.h>
 #include <ui/workaround/cancel_drag.h>
 
-QnDialog::QnDialog(QWidget* parent, Qt::WindowFlags flags) :
+QnDialog::QnDialog(QWidget* parent, Qt::WindowFlags flags):
     base_type(parent, flags),
-    m_resizeToContentsMode(0)
+    m_resizeToContentsMode(0),
+    m_safeMinimumSize(style::Metrics::kMinimumDialogSize)
 {
     cancelDrag(this);
 }
@@ -112,4 +113,48 @@ void QnDialog::fixWindowFlags()
     else
         flags &= ~Qt::WindowContextHelpButtonHint;
     setWindowFlags(flags);
+}
+
+QSize QnDialog::sizeHint() const
+{
+    return base_type::sizeHint().expandedTo(minimumSizeHint());
+}
+
+QSize QnDialog::minimumSizeHint() const
+{
+    return base_type::minimumSizeHint().expandedTo(m_safeMinimumSize);
+}
+
+void QnDialog::setSafeMinimumWidth(int width)
+{
+    setSafeMinimumSize({ width, safeMinimumHeight() });
+}
+
+int QnDialog::safeMinimumWidth() const
+{
+    return m_safeMinimumSize.width();
+}
+
+void QnDialog::setSafeMinimumHeight(int height)
+{
+    setSafeMinimumSize({ safeMinimumWidth(), height });
+}
+
+int QnDialog::safeMinimumHeight() const
+{
+    return m_safeMinimumSize.height();
+}
+
+void QnDialog::setSafeMinimumSize(const QSize& size)
+{
+    if (size == m_safeMinimumSize)
+        return;
+
+    m_safeMinimumSize = size;
+    updateGeometry();
+}
+
+QSize QnDialog::safeMinimumSize() const
+{
+    return m_safeMinimumSize;
 }

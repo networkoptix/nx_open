@@ -94,7 +94,7 @@ Item
         LoginButton
         {
             id: loginButton
-            text: "Log in"
+            text: qsTr("Log in")
             width: parent.width
             showProgress: d.connecting
             onClicked: login()
@@ -142,7 +142,7 @@ Item
             if (error == QnCloudStatusWatcher.InvalidCredentials)
             {
                 d.invalidCredentials = true
-                showWarning(qsTr("Invalid email or password"))
+                showWarning(qsTr("Incorrect Email or Password"))
             }
             else
             {

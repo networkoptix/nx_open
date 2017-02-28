@@ -10,7 +10,7 @@ function(nx_add_target name type)
 
     find_sources("${CMAKE_CURRENT_SOURCE_DIR}/src" cpp_files hpp_files)
     if(NOT NX_NO_MOC)
-        qt5_wrap_cpp(moc_files ${hpp_files})
+        qt5_wrap_cpp(moc_files ${hpp_files} OPTIONS --no-notes)
     endif()
 
     set(resources ${NX_ADDITIONAL_RESOURCES})
@@ -39,23 +39,19 @@ function(nx_add_target name type)
 
     set(sources ${cpp_files} ${moc_files} ${rcc_files} ${qm_files})
     if(NOT NX_NO_PCH)
-        set(sources ${sources}
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.cpp"
-            "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h")
+        set(sources ${sources} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h")
     endif()
 
     set(sources ${sources} ${NX_ADDITIONAL_SOURCES} ${NX_OTHER_RESOURCES} ${NX_OTHER_SOURCES})
 
     if("${type}" STREQUAL "EXECUTABLE")
         add_executable(${name} ${sources})
+        set_target_properties(${name} PROPERTIES SKIP_BUILD_RPATH OFF)
     elseif("${type}" STREQUAL "LIBRARY")
         add_library(${name} ${NX_LIBRARY_TYPE} ${sources})
     endif()
 
     if(NOT NX_NO_PCH)
-        if(MACOSX)
-            set(pch_flags ADDITIONAL_FLAGS -iframework "${QT_DIR}/lib")
-        endif()
         add_precompiled_header(${name} "${CMAKE_CURRENT_SOURCE_DIR}/src/StdAfx.h" ${pch_flags})
     endif()
 

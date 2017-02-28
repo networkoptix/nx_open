@@ -29,8 +29,6 @@ public:
                 32
             #endif
         );
-        // Default expiration timeout is 30 seconds, but there is a bug in QT older than v.5.3.
-        pool.setExpiryTimeout(-1);
     }
 };
 

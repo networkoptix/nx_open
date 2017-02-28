@@ -275,7 +275,7 @@ void QnConnectToCloudDialogPrivate::showSuccess(const QString& cloudLogin)
     q->accept();
 
     QnMessageBox::success(q->parentWidget(),
-        tr("The System connected to %1", "%1 is the cloud name (like 'Nx Cloud')")
+        tr("System connected to %1", "%1 is the cloud name (like 'Nx Cloud')")
             .arg(QnAppInfo::cloudName()));
 }
 
@@ -284,7 +284,7 @@ void QnConnectToCloudDialogPrivate::showFailure(const QString &message)
     Q_Q(QnConnectToCloudDialog);
 
     QnMessageBox::critical(q,
-        tr("Failed to connect the System to %1", "%1 is the cloud name (like 'Nx Cloud')")
+        tr("Failed to connect System to %1", "%1 is the cloud name (like 'Nx Cloud')")
             .arg(QnAppInfo::cloudName()),
         message);
 
@@ -341,7 +341,8 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
             {
                 qnClientCoreSettings->setCloudLogin(cloudLogin);
                 qnClientCoreSettings->setCloudPassword(cloudPassword);
-                qnCloudStatusWatcher->setCredentials(QnCredentials(cloudLogin, cloudPassword));
+                qnCloudStatusWatcher->setCredentials(
+                    QnEncodedCredentials(cloudLogin, cloudPassword));
             }
 
             if (guard && parentGuard)

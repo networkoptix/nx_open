@@ -9,8 +9,7 @@ namespace ec2 {
 
 struct ApiUserData: ApiResourceData
 {
-    // NOTE: A function is used to work around constexpr requiring a definition before C++17.
-    static constexpr const char* kCloudPasswordStub() { return "password_is_in_cloud"; }
+    static constexpr const char* kCloudPasswordStub = "password_is_in_cloud";
 
     ApiUserData():
         isAdmin(false),

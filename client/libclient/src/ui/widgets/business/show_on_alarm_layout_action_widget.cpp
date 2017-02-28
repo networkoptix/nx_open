@@ -98,7 +98,7 @@ void QnShowOnAlarmLayoutActionWidget::updateUsersButtonText()
     else if (users.empty() && roles.size() == 1)
         title = roles.front().name;
     else if (users.empty() && roles.empty())
-        title = tr("<All Users>");
+        title = L'<' + tr("All Users") + L'>';
     else if (roles.empty())
         title = tr("%n Users", "", users.size());
     else if (users.empty())

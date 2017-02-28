@@ -104,7 +104,7 @@ Page
         keepStatuses: !resourcesScreen.warningVisible
             && connectionManager.connectionState !== QnConnectionManager.Ready
 
-        paused: !activePage
+        active: activePage
 
         ScrollIndicator.vertical: ScrollIndicator
         {

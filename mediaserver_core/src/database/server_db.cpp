@@ -437,7 +437,7 @@ bool QnServerDb::addAuditRecords(const std::map<int, QnAuditRecord>& records)
         NX_ASSERT(data.eventType != Qn::AR_NotDefined);
         NX_ASSERT((data.eventType & (data.eventType - 1)) == 0);
 
-        insQuery.bindValue("id", itr->first);
+        insQuery.bindValue(":id", itr->first);
         QnSql::bind(data, &insQuery);
         if (!execSQLQuery(&insQuery, Q_FUNC_INFO))
             return false;

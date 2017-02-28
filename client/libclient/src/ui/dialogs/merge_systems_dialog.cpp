@@ -49,8 +49,8 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
         << tr("Success!")
         << QString()
         << QString()
-        << tr("The system was configured successfully.")
-        << tr("The servers from the remote system should appear in your system soon.");
+        << tr("System was configured successfully.")
+        << tr("The servers from the remote System should appear in your System soon.");
     ui->successLabel->setText(successMessage.join(L'\n'));
 
     ui->urlComboBox->lineEdit()->setPlaceholderText(tr("http(s)://host:port"));
@@ -154,7 +154,7 @@ void QnMergeSystemsDialog::updateKnownSystems()
 
     //TODO: #GDM #tr translators would go crazy
     ui->currentSystemLabel->setText(
-        tr("You are about to merge the current system %1 with the system")
+        tr("You are about to merge the current System %1 with System")
         .arg(displayName));
 
     ui->currentSystemRadioButton->setText(tr("%1 (current)").arg(displayName));
@@ -204,7 +204,7 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked()
     QString password = ui->passwordEdit->text();
 
     if ((url.scheme() != lit("http") && url.scheme() != lit("https")) || url.host().isEmpty()) {
-        updateErrorLabel(tr("The URL is invalid."));
+        updateErrorLabel(tr("URL is invalid."));
         updateConfigurationBlock();
         return;
     }
@@ -279,7 +279,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
         }
         else
         {
-            updateErrorLabel(tr("This is the current system URL."));
+            updateErrorLabel(tr("This is the current System URL."));
         }
 
         return;

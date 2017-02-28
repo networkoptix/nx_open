@@ -174,7 +174,7 @@ void QnUserProfileWidget::applyChanges()
 
             const auto localSystemId = helpers::getLocalSystemId(qnCommon->moduleInformation());
             if (getCredentials(localSystemId, url.userName()).isValid())
-                storeCredentials(localSystemId, QnCredentials(url));
+                storeCredentials(localSystemId, QnEncodedCredentials(url));
             qnClientCoreSettings->save();
 
             auto lastUsed = qnSettings->lastUsedConnection();

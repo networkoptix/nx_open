@@ -22,6 +22,7 @@
 
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_layout.h>
 
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
@@ -1700,33 +1701,37 @@ QnActionManager::QnActionManager(QObject *parent):
     {
         factory.beginGroup();
 
-        factory(QnActions::SetCurrentLayoutItemSpacing0Action).
+        factory(QnActions::SetCurrentLayoutItemSpacingNoneAction).
             flags(Qn::Scene | Qn::NoTarget).
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("None")).
             checkable().
-            checked(qnGlobals->defaultLayoutCellSpacing() == 0.0);
+            checked(qnGlobals->defaultLayoutCellSpacing()
+                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::None));
 
-        factory(QnActions::SetCurrentLayoutItemSpacing10Action).
+        factory(QnActions::SetCurrentLayoutItemSpacingSmallAction).
             flags(Qn::Scene | Qn::NoTarget).
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("Small")).
             checkable().
-            checked(qnGlobals->defaultLayoutCellSpacing() == 0.1);
+            checked(qnGlobals->defaultLayoutCellSpacing()
+                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Small));
 
-        factory(QnActions::SetCurrentLayoutItemSpacing20Action).
+        factory(QnActions::SetCurrentLayoutItemSpacingMediumAction).
             flags(Qn::Scene | Qn::NoTarget).
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("Medium")).
             checkable().
-            checked(qnGlobals->defaultLayoutCellSpacing() == 0.2);
+            checked(qnGlobals->defaultLayoutCellSpacing()
+                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Medium));
 
-        factory(QnActions::SetCurrentLayoutItemSpacing30Action).
+        factory(QnActions::SetCurrentLayoutItemSpacingLargeAction).
             flags(Qn::Scene | Qn::NoTarget).
             requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission).
             text(tr("Large")).
             checkable().
-            checked(qnGlobals->defaultLayoutCellSpacing() == 0.3);
+            checked(qnGlobals->defaultLayoutCellSpacing()
+                == QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Large));
         factory.endGroup();
 
     } factory.endSubMenu();

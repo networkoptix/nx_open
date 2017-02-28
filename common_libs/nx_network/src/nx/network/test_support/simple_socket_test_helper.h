@@ -355,7 +355,7 @@ void socketTransferAsync(
 
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
-    ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count() * 2));
+    //ASSERT_TRUE(server->setRecvTimeout(kTestTimeout.count() * 2));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
     ASSERT_TRUE(server->listen(testClientCount())) << lastError();
 
@@ -376,8 +376,8 @@ void socketTransferAsync(
 
         acceptedClients.emplace_back(socket);
         auto& client = acceptedClients.back();
-        if (!client->setSendTimeout(kTestTimeout) ||
-            !client->setSendTimeout(kTestTimeout) ||
+        if (/*!client->setSendTimeout(kTestTimeout) ||
+            !client->setSendTimeout(kTestTimeout) ||*/
             !client->setNonBlockingMode(true))
         {
             EXPECT_TRUE(false) << lastError();
@@ -394,7 +394,7 @@ void socketTransferAsync(
                     return serverResults.push(code);
 
                 EXPECT_STREQ(serverBuffer.data(), testMessage.data());
-                if (size < testMessage.size())
+                if (size < (size_t)testMessage.size())
                     return serverResults.push(SystemError::connectionReset);
 
                 serverBuffer.resize(0);
@@ -424,8 +424,8 @@ void socketTransferAsync(
         const auto testClient = clientMaker();
         const auto clientGuard = makeScopedGuard([&](){ testClient->pleaseStopSync(); });
         ASSERT_TRUE(testClient->setNonBlockingMode(true));
-        ASSERT_TRUE(testClient->setSendTimeout(kTestTimeout.count()));
-        ASSERT_TRUE(testClient->setRecvTimeout(kTestTimeout.count()));
+        //ASSERT_TRUE(testClient->setSendTimeout(kTestTimeout.count()));
+        //ASSERT_TRUE(testClient->setRecvTimeout(kTestTimeout.count()));
 
         QByteArray clientBuffer;
         clientBuffer.reserve(128);
@@ -493,7 +493,7 @@ static void transferSyncAsync(AbstractStreamSocket* sender, AbstractStreamSocket
         [&](SystemError::ErrorCode code, size_t size)
         {
             EXPECT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
-            EXPECT_EQ(size, kTestMessage.size());
+            EXPECT_EQ(size, (size_t)kTestMessage.size());
             EXPECT_EQ(buffer, kTestMessage);
             promise.set_value();
         });
@@ -509,7 +509,7 @@ static void transferAsyncSync(AbstractStreamSocket* sender, AbstractStreamSocket
         [&](SystemError::ErrorCode code, size_t size)
         {
             EXPECT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
-            EXPECT_EQ(kTestMessage.size(), size);
+            EXPECT_EQ((size_t)kTestMessage.size(), size);
             promise.set_value();
         });
 
@@ -535,7 +535,7 @@ static void transferAsync(AbstractStreamSocket* sender, AbstractStreamSocket* re
         [&](SystemError::ErrorCode code, size_t size)
         {
             ASSERT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
-            ASSERT_EQ(kTestMessage.size(), size);
+            ASSERT_EQ((size_t)kTestMessage.size(), size);
             sendPromise.set_value();
         });
 
@@ -548,7 +548,7 @@ static void transferAsync(AbstractStreamSocket* sender, AbstractStreamSocket* re
         [&](SystemError::ErrorCode code, size_t size)
         {
             EXPECT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
-            EXPECT_EQ(kTestMessage.size(), size);
+            EXPECT_EQ((size_t)kTestMessage.size(), size);
             readPromise.set_value();
         });
 
@@ -663,7 +663,7 @@ void socketTransferFragmentation(
             [&](SystemError::ErrorCode code, size_t size)
             {
                 EXPECT_EQ(SystemError::noError, code) << SystemError::toString(code).toStdString();
-                EXPECT_EQ(kMessage.size(), size);
+                EXPECT_EQ((size_t)kMessage.size(), size);
                 promise.set_value();
             });
 
@@ -687,6 +687,8 @@ void socketMultiConnect(
 
     std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
     std::vector<std::unique_ptr<AbstractStreamSocket>> connectedSockets;
+    QnMutex connectedSocketsMutex;
+    bool terminated = false;
 
     auto server = serverMaker();
     ASSERT_TRUE(server->setNonBlockingMode(true));
@@ -717,17 +719,19 @@ void socketMultiConnect(
     std::function<void(int)> connectNewClients =
         [&](int clientsToConnect)
         {
-            if (clientsToConnect == 0)
+            QnMutexLocker lock(&connectedSocketsMutex);
+
+            if (clientsToConnect == 0 || terminated)
                 return;
 
             auto testClient = clientMaker();
             ASSERT_TRUE(testClient->setNonBlockingMode(true));
             ASSERT_TRUE(testClient->setSendTimeout(timeout.count()));
-
             connectedSockets.push_back(std::move(testClient));
+
             connectedSockets.back()->connectAsync(
                 *endpointToConnectTo,
-                [&, clientsToConnect, connectNewClients]
+                [&connectedSockets, clientsToConnect, connectNewClients, &connectResults]
                     (SystemError::ErrorCode code)
                 {
                     connectResults.push(code);
@@ -745,7 +749,15 @@ void socketMultiConnect(
     }
 
     server->pleaseStopSync();
-    for (auto& socket : connectedSockets)
+
+    decltype(connectedSockets) connectedSocketsToDelete;
+    {
+        QnMutexLocker lock(&connectedSocketsMutex);
+        connectedSocketsToDelete.swap(connectedSockets);
+        terminated = true;
+    }
+
+    for (auto& socket: connectedSocketsToDelete)
         socket->pleaseStopSync();
 }
 
@@ -949,8 +961,8 @@ void acceptedSocketOptionsInheritance(
     ASSERT_TRUE(accepted->getSendTimeout(&acceptedSocketSendTimeout));
 
     // Timeouts are not inherited.
-    ASSERT_EQ(0, acceptedSocketRecvTimeout);
-    ASSERT_EQ(0, acceptedSocketSendTimeout);
+    ASSERT_EQ(0U, acceptedSocketRecvTimeout);
+    ASSERT_EQ(0U, acceptedSocketSendTimeout);
 }
 
 template<typename ClientSocketMaker>

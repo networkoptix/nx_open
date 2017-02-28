@@ -18,6 +18,8 @@
 
 #include <licensing/license.h>
 
+#include <text/time_strings.h>
+
 #include <ui/actions/action_manager.h>
 #include <ui/common/palette.h>
 #include <ui/common/read_only.h>
@@ -183,6 +185,8 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
     m_updating(false)
 {
     ui->setupUi(this);
+    ui->recordBeforeSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
+    ui->recordAfterSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
 
     NX_ASSERT(parent);
     QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
@@ -229,18 +233,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
             if (m_updating)
                 return;
 
-            switch (state)
-            {
-                case Qt::Checked:
-                    checkScheduleParamsSet();
-                    break;
-                case Qt::Unchecked:
-                    setScheduleAlert(QString());
-                    break;
-                default:
-                    break;
-            }
-
+            updateAlert(EnabledChange);
             emit scheduleEnabledChanged(state);
         };
 
@@ -251,18 +244,18 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
                 emit archiveRangeChanged();
         };
 
-    auto handleCellValueChanged =
-        [this](const QPoint& cell)
+    auto handleCellValuesChanged =
+        [this]()
         {
             if (m_updating)
                 return;
 
-            if (ui->gridWidget->cellValue(cell).recordingType != Qn::RT_Never)
-                checkRecordingEnabled();
-
+            updateAlert(ScheduleChange);
             emit scheduleTasksChanged();
         };
 
+    connect(ui->gridWidget, &QnScheduleGridWidget::cellValuesChanged,
+        this, handleCellValuesChanged);
     connect(ui->recordAlwaysButton, &QToolButton::toggled, this,
         &QnCameraScheduleWidget::updateGridParams);
     connect(ui->recordMotionButton, &QToolButton::toggled, this,
@@ -301,9 +294,6 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
 
     connect(ui->gridWidget, &QnScheduleGridWidget::cellActivated, this,
         &QnCameraScheduleWidget::at_gridWidget_cellActivated);
-
-    connect(ui->gridWidget, &QnScheduleGridWidget::cellValueChanged,
-        this, handleCellValueChanged);
 
     connect(ui->checkBoxMinArchive, &QCheckBox::stateChanged, this,
         &QnCameraScheduleWidget::updateArchiveRangeEnabledState);
@@ -898,10 +888,11 @@ void QnCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
     //TODO: #GDM is it really needed here?
     updateMaxFPS();
 
-    checkScheduleSet();
+    if (m_updating)
+        return;
 
-    if (!m_updating)
-        emit gridParamsChanged();
+    updateAlert(CurrentParamsChange);
+    emit gridParamsChanged();
 }
 
 void QnCameraScheduleWidget::setFps(int value)
@@ -1059,6 +1050,8 @@ void QnCameraScheduleWidget::updateColors()
 // -------------------------------------------------------------------------- //
 void QnCameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
 {
+    /* Called when a cell is Alt-clicked this handler fetches cell settings as current. */
+
     m_disableUpdateGridParams = true;
     const auto params = ui->gridWidget->cellValue(cell);
     switch (params.recordingType)
@@ -1081,7 +1074,6 @@ void QnCameraScheduleWidget::at_gridWidget_cellActivated(const QPoint &cell)
     {
         ui->fpsSpinBox->setValue(params.fps);
         ui->qualityComboBox->setCurrentIndex(qualityToComboIndex(params.quality));
-        checkRecordingEnabled();
     }
 
     m_disableUpdateGridParams = false;
@@ -1307,57 +1299,81 @@ void QnCameraScheduleWidget::setArchiveLengthAlert(const QString& archiveLengthA
     emit alert(m_archiveLengthAlert.isEmpty() ? m_scheduleAlert : m_archiveLengthAlert);
 }
 
-bool QnCameraScheduleWidget::checkCanEnableRecording()
+void QnCameraScheduleWidget::updateAlert(AlertReason when)
 {
-    setScheduleAlert(QString());
-    if (canEnableRecording())
-        return true;
+    /* License check and alert: */
+    const auto checkCanEnableRecording =
+        [this]() -> bool
+        {
+            if (canEnableRecording())
+                return true;
 
-    switch (ui->enableRecordingCheckBox->checkState())
+            switch (ui->enableRecordingCheckBox->checkState())
+            {
+                case Qt::Unchecked:
+                case Qt::PartiallyChecked:
+                    setScheduleAlert(tr("Not enough licenses to enable recording"));
+                    break;
+
+                case Qt::Checked:
+                    setScheduleAlert(tr("License limit exceeded, recording will not be enabled."));
+                    break;
+
+                default:
+                    break;
+            }
+
+            return false;
+        };
+
+    switch (when)
     {
-        case Qt::Unchecked:
-        case Qt::PartiallyChecked:
-            setScheduleAlert(tr("Not enough licenses to enable recording"));
+        /* Current "brush" was changed (mode, fps, quality): */
+        case CurrentParamsChange:
+        {
+            if (checkCanEnableRecording() && !isRecordingScheduled())
+                setScheduleAlert(tr("Select areas on the schedule to apply chosen parameters to."));
             break;
-        case Qt::Checked:
-            setScheduleAlert(tr("License limit exceeded, recording will not be enabled."));
+        }
+
+        /* Some cell(s) in the schedule were changed: */
+        case ScheduleChange:
+        {
+            if (isRecordingScheduled())
+            {
+                if (!checkCanEnableRecording())
+                    break;
+
+                if (!isScheduleEnabled())
+                {
+                    setScheduleAlert(tr("Turn on selector at the top of the window to enable recording."));
+                    break;
+                }
+            }
+
+            setScheduleAlert(QString());
             break;
-        default:
+        }
+
+        /* Recording was enabled or disabled: */
+        case EnabledChange:
+        {
+            if (isScheduleEnabled())
+            {
+                if (!checkCanEnableRecording())
+                    break;
+
+                if (!isRecordingScheduled())
+                {
+                    setScheduleAlert(tr("Set recording parameters and select areas on the schedule grid to apply them to."));
+                    break;
+                }
+            }
+
+            setScheduleAlert(QString());
             break;
+        }
     }
-
-    return false;
-}
-
-void QnCameraScheduleWidget::checkRecordingEnabled()
-{
-    if (!checkCanEnableRecording())
-        return;
-
-    if (isScheduleEnabled())
-        setScheduleAlert(QString());
-    else
-        setScheduleAlert(tr("Turn on selector at the top of the window to enable recording."));
-}
-
-void QnCameraScheduleWidget::checkScheduleSet()
-{
-    if (!checkCanEnableRecording())
-        return;
-
-    if (!isRecordingScheduled())
-        setScheduleAlert(tr("Select areas on the schedule to apply chosen parameters to."));
-}
-
-void QnCameraScheduleWidget::checkScheduleParamsSet()
-{
-    if (!checkCanEnableRecording())
-        return;
-
-    if (!isRecordingScheduled())
-        setScheduleAlert(tr("Set recording parameters and select areas on the schedule grid to apply them to."));
-    else
-        checkRecordingEnabled();
 }
 
 bool QnCameraScheduleWidget::isRecordingScheduled() const

@@ -1,15 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <TS language="en_US" sourcelanguage="en" version="2.1">
   <context>
-    <name>../static/scripts/language.js</name>
+    <name>../static/language.json</name>
     <message>
-      <location filename="../static/scripts/language.js"/>
+      <location filename="../static/language.json"/>
+      <source>warning-label</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>dialogs</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>okButton</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Ok</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Login to Nx Cloud</source>
+      <source>openLink</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Visit this link</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>openLinkWithTitle</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>To {{title}} visit this link</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>setup</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>createAccount</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>create account</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>errorNoHDD</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>This device is intended to work with hard disk drive installed.&lt;br&gt;Please turn off the device and install a hard disk drive.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>errorNoNetwork</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>This device needs network connection to work.&lt;br&gt;Please connect it to your local network ot Internet</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>passwordRequirements</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>minLengthMessage</source>
       <translation> </translation>
     </message>
     <message>
@@ -19,7 +94,17 @@
     </message>
     <message>
       <location/>
+      <source>requiredMessage</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Use only latin letters, numbers and keyboard \n symbols, avoid leading and trailing spaces.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>weakMessage</source>
       <translation> </translation>
     </message>
     <message>
@@ -29,7 +114,17 @@
     </message>
     <message>
       <location/>
+      <source>strongMessage</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Strong password!</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>commonMessage</source>
       <translation> </translation>
     </message>
     <message>
@@ -39,12 +134,32 @@
     </message>
     <message>
       <location/>
+      <source>settings</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>confirmRestart</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Do you want to restart server now?</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Couldn\'t check cloud connection</source>
+      <source>couldntCheckInternet</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Couldn't check cloud connection</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>confirmRestoreDefault</source>
       <translation> </translation>
     </message>
     <message>
@@ -54,12 +169,27 @@
     </message>
     <message>
       <location/>
+      <source>confirmRestoreDefaultTitle</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Restore factory defaults</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Can\'t proceed with action: unexpected error has happened</source>
+      <source>unexpectedError</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Can't proceed with action: unexpected error has happened</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>connnetionError</source>
       <translation> </translation>
     </message>
     <message>
@@ -69,7 +199,17 @@
     </message>
     <message>
       <location/>
+      <source>wrongPassword</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Wrong password.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>error</source>
       <translation> </translation>
     </message>
     <message>
@@ -79,7 +219,17 @@
     </message>
     <message>
       <location/>
+      <source>restartNeeded</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>All changes saved. New settings will be applied after restart. \n Do you want to restart server now?</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>settingsSaved</source>
       <translation> </translation>
     </message>
     <message>
@@ -89,17 +239,37 @@
     </message>
     <message>
       <location/>
-      <source>Do you want to restart server\'s operation system?</source>
+      <source>confirmHardwareRestart</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Do you want to restore all server\'s settings? Archive will be saved, but network settings will be reset.</source>
+      <source>Do you want to restart server's operation system?</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Do you want to restart all server\'s settings? Archive and network settings will be saved.</source>
+      <source>confirmRestoreSettings</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Do you want to restore all server's settings? Archive will be saved, but network settings will be reset.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>confirmRestoreSettingsNotNetwork</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Do you want to restart all server's settings? Archive and network settings will be saved.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>unavailable</source>
       <translation> </translation>
     </message>
     <message>
@@ -109,7 +279,127 @@
     </message>
     <message>
       <location/>
-      <source>System is unreachable or doesn\'t exist.</source>
+      <source>confirmDisconnectFromCloud</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disconnect system from {{CLOUD_NAME}}</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>confirmDisconnectFromCloudTitle</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>&lt;span class='warning-label'&gt;All cloud users will be deleted.&lt;/span&gt;&lt;br&gt;&lt;br&gt;You will be able to login to this System through local network with local administrator account.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>confirmDisconnectFromCloudAction</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disconnect</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>disconnectedSuccess</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>System was disconnected successfully</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>connectedSuccess</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>System was connected successfully</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>createLocalOwner</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>createLocalOwnerTitle</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Create local administrator</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>confirmChangePassword</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Change admin's password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>confirmChangePasswordTitle</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Are you sure you want to change system password? It will affect admin user and root password for some servers</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>confirmChangePasswordAction</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Save new password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>nx1ControlHint</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Client application was started. Use a keyboard or mobile application to control it.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>join</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>systemIsUnreacheble</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>System is unreachable or doesn't exist.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>incorrectCurrentPassword</source>
       <translation> </translation>
     </message>
     <message>
@@ -119,27 +409,97 @@
     </message>
     <message>
       <location/>
-      <source>Wrong password.</source>
+      <source>incorrectRemotePassword</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Found system has incompatible version.</source>
+      <source>Login or password are incorrect</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Wrong url.</source>
+      <source>incompatibleVersion</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Can\'t merge systems. Remote system is in safe mode.</source>
+      <source>System is unreachable, doesn't exist or has incompatible version.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Can\'t merge systems. Maybe one of the systems is in safe mode.</source>
+      <source>wrongUrl</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Unable to connect to specified server.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>newSystemError</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Can't merge systems. Remote system is not configured yet</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>safeMode</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Can't merge systems. Remote system is in safe mode.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>configError</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Can't merge systems. Maybe one of the systems is in safe mode.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>cloudError</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Can't merge systems. Dependent system is connected to cloud. You need to disconnect it first.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>cloudBothError</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Can't merge systems. Both systems are connected to cloud. You need to disconnect one first.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>cloudHostConflict</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Can't merge systems, because servers are built with different cloud hosts</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>licenceError</source>
       <translation> </translation>
     </message>
     <message>
@@ -149,7 +509,27 @@
     </message>
     <message>
       <location/>
+      <source>connectionFailed</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Connection failed:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>unknownError</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Unknown error</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>mergeFailed</source>
       <translation> </translation>
     </message>
     <message>
@@ -159,7 +539,62 @@
     </message>
     <message>
       <location/>
+      <source>mergeSucceed</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Merge succeed.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>newSystemDisplayName</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>New system</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>incompatibleProtocol</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>incompatible version</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>incompatibleCloudHost</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>cloud conflict</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>incompatibleCloudState</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>cloud connected</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>login</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>incorrectPassword</source>
       <translation> </translation>
     </message>
     <message>
@@ -169,12 +604,42 @@
     </message>
     <message>
       <location/>
+      <source>navigaion</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>cannotGetUser</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Server failure: cannot retrieve current user data</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
+      <source>offlineDialog</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>serverOffline</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>server is offline</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>restartDialog</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>serverStarting</source>
       <translation> </translation>
     </message>
     <message>
@@ -184,7 +649,17 @@
     </message>
     <message>
       <location/>
+      <source>serverRestarting</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>server is restarting</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>serverOffline</source>
       <translation> </translation>
     </message>
     <message>
@@ -194,7 +669,22 @@
     </message>
     <message>
       <location/>
+      <source>fileUpload</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>started</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Updating successfully started. It will take several minutes</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>upToDate</source>
       <translation> </translation>
     </message>
     <message>
@@ -204,7 +694,17 @@
     </message>
     <message>
       <location/>
+      <source>invalidFile</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Updating failed. Provided file is not a valid update archive.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>incompatibleSystem</source>
       <translation> </translation>
     </message>
     <message>
@@ -214,12 +714,27 @@
     </message>
     <message>
       <location/>
+      <source>extractionError</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Updating failed. Extraction failed, check available storage.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Updating failed. Couldn\'t execute installation script.</source>
+      <source>installationError</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Updating failed. Couldn't execute installation script.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>selectFiles</source>
       <translation> </translation>
     </message>
     <message>
@@ -242,17 +757,17 @@
     </message>
     <message>
       <location/>
-      <source>Any changes on this page may cause server failure. Please, use carefully.</source>
+      <source>Any changes on this page may cause server to work incorrectly.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Storages</source>
+      <source>Storage</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Url</source>
+      <source>URL</source>
       <translation> </translation>
     </message>
     <message>
@@ -297,12 +812,12 @@
     </message>
     <message>
       <location/>
-      <source>Set reserved space is greater than free space left. Possible partial remove of the video footage is expected.</source>
+      <source>Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Fix all settings, marked as red, to save it</source>
+      <source>Fix all highlighted settings to save it</source>
       <translation> </translation>
     </message>
     <message>
@@ -332,32 +847,32 @@
     </message>
     <message>
       <location/>
-      <source>Always: Log only the most important messages.</source>
+      <source>Always: Log errors, warnings and most important messages.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Error: Log errors.</source>
+      <source>Error: Log errors only.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Warning: Log warnings.</source>
+      <source>Warning: Log warnings and errors.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Info: Log information messages.</source>
+      <source>Always: Log errors, warnings and all messages.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Debug: Log debug messages.</source>
+      <source>Debug: Log every system message and debug information.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Debug2: Log additional debug messages.</source>
+      <source>Debug2: Log every system message and extended debug information.</source>
       <translation> </translation>
     </message>
     <message>
@@ -377,7 +892,7 @@
     </message>
     <message>
       <location/>
-      <source>Ensure you are using correct configuration.</source>
+      <source>Please ensure the configuration is correct.</source>
       <translation> </translation>
     </message>
     <message>
@@ -387,12 +902,7 @@
     </message>
     <message>
       <location/>
-      <source>Any changes on this page may cause system failure. Please, use carefully.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Some changes will be applied only after you restart</source>
+      <source>Some changes require restart</source>
       <translation> </translation>
     </message>
     <message>
@@ -457,9 +967,162 @@
     </message>
   </context>
   <context>
+    <name>../static/views/client.html</name>
+    <message>
+      <location filename="../static/views/client.html"/>
+      <source>Welcome to Lite Client</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Lite Client can show up to 4 live videos,</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>and can be controlled either by keyboard and mouse connected to the device,</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>or through mobile app</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>By keyboard/mouse</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select cell</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>or</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Single click</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Switch camera in a cell</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Wheel</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enter / exit fullscreen</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Double click</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Exit lite client</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Through mobile app</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Install</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>app via Google Play or App Store</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Connect to system &quot;&quot; (:)</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select &quot;&quot; screen in side menu</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Turn Lite Client on and select cameras to display</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Launch Lite Client</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>(Enter)</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>auto-focus</source>
+      <translation> </translation>
+    </message>
+  </context>
+  <context>
     <name>../static/views/debug.html</name>
     <message>
       <location filename="../static/views/debug.html"/>
+      <source>Generate stream links</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>System host (IP:port)</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>nonce</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>realm</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>method</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>login</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>link</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Generate events</source>
       <translation> </translation>
     </message>
@@ -617,22 +1280,12 @@
     <name>../static/views/developers.html</name>
     <message>
       <location filename="../static/views/developers.html"/>
-      <source>Developer Resources</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Go ahead. Develop something amazing with our API and SDK</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Server API</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>The Server API provides a standard set of API calls for 3rd party systems. Using the Server API developers have the ability to access nearly every feature available in the system's thick client, including - but not limited to - the ability to query/manage system resources (servers, cameras, users), manage users and permissions, pull live or recorded video out of the system, generate events, create rules, control PTZ cameras, and more.</source>
+      <source>Server API provides a standard set of API calls for 3rd party systems. It gives developers the ability to access almost every system feature available in the regular client: query/manage system resources (servers, cameras, users, permissions), pull live or recorded video out of the system, generate events, create rules, control PTZ cameras, and more.</source>
       <translation> </translation>
     </message>
     <message>
@@ -647,12 +1300,12 @@
     </message>
     <message>
       <location/>
-      <source>The Video Source Integration SDK enables easy integration of any video source (live or archived) into the system. With the SDK it's possible to create a method for discovering, displaying, analyzing and recording video from virtually any live or recorded video source (IP Cameras, NVR's, DVRs, etc). It also allows for integrating device I/O's and motion detection information.</source>
+      <source>Video Source Integration SDK provides the ability to integrate virtually any live or recorded video source (IP Cameras, NVR's, DVRs, etc) into the system. SDK makes possible to create methods for discovering, displaying, analyzing and recording video. It also allows integrating device I/O portss and motion detection information.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>get the SDK</source>
+      <source>get SDK</source>
       <translation> </translation>
     </message>
     <message>
@@ -662,7 +1315,7 @@
     </message>
     <message>
       <location/>
-      <source>The Storage SDK enables easy integration of any potential storage. Using the Storage SDK developers can read from or write to any storage location - locally available, remote storage, and even cloud servers. Creating a storage plugin requires implementing standard functions such as I/O stream, if file exist, delete file, list of files in the folder, etc. The Storage SDK also contains an example for using an FTP server as a storage location.</source>
+      <source>Storage SDK provides the ability to integrate potential storage  into the system. It allows developers to read read from or write to any storage location: local, remote, and even cloud one. Creating a storage plugin requires implementing standard functions such as: I/O stream, if file exist, delete file, list of files in the folder, etc.Storage SDK also contains an example for using an FTP server as a storage location.</source>
       <translation> </translation>
     </message>
     <message>
@@ -673,42 +1326,12 @@
   </context>
   <context>
     <name>../static/views/help.html</name>
-    <message>
-      <location filename="../static/views/help.html"/>
-      <source>Tools and links to help you better understand/interact with your VMS system</source>
-      <translation> </translation>
-    </message>
   </context>
   <context>
     <name>../static/views/info.html</name>
     <message>
       <location filename="../static/views/info.html"/>
-      <source>Software</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Version</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Architecture</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Platform</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Storage</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Below is a list of available storage locations currently configured for this server</source>
+      <source>Below is a list of storage locations available on this server</source>
       <translation> </translation>
     </message>
     <message>
@@ -728,27 +1351,22 @@
     </message>
     <message>
       <location/>
-      <source>Health monitoring</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Log</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Refresh</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>More lines</source>
+      <source>Open in new window</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Open in new window</source>
+      <source>Health monitoring</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Storage</source>
       <translation> </translation>
     </message>
     <message>
@@ -768,7 +1386,12 @@
     </message>
     <message>
       <location/>
-      <source>Writable&quot;</source>
+      <source>Writable</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Log&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -791,7 +1414,7 @@
     </message>
     <message>
       <location/>
-      <source>Other System's URL</source>
+      <source>Other System URL</source>
       <translation> </translation>
     </message>
     <message>
@@ -801,17 +1424,22 @@
     </message>
     <message>
       <location/>
-      <source>Other System's Password</source>
+      <source>Other System Login</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Current System's Password</source>
+      <source>Other System Password</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>You are about to merge the current system</source>
+      <source>Current Password (for this system)</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>The current system is about to be merged</source>
       <translation> </translation>
     </message>
     <message>
@@ -821,7 +1449,7 @@
     </message>
     <message>
       <location/>
-      <source>The new system will have password and name from the system:</source>
+      <source>The new system will have password and name from the following system:</source>
       <translation> </translation>
     </message>
     <message>
@@ -841,7 +1469,12 @@
     </message>
     <message>
       <location/>
-      <source>http(s)://host:port</source>
+      <source>host:port</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Login</source>
       <translation> </translation>
     </message>
     <message>
@@ -859,7 +1492,7 @@
     <name>../static/views/login.html</name>
     <message>
       <location filename="../static/views/login.html"/>
-      <source>Login</source>
+      <source>Log in</source>
       <translation> </translation>
     </message>
     <message>
@@ -884,7 +1517,7 @@
     </message>
     <message>
       <location/>
-      <source>Log in</source>
+      <source>auto-fill-sync auto-fill-sync</source>
       <translation> </translation>
     </message>
   </context>
@@ -897,7 +1530,12 @@
     </message>
     <message>
       <location/>
-      <source>Web client</source>
+      <source>Web Client</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Lite Client</source>
       <translation> </translation>
     </message>
     <message>
@@ -922,12 +1560,7 @@
     </message>
     <message>
       <location/>
-      <source>You are currently connected to the system '' through '' server as user ''</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Server name: {{settings.name}}&amp;#10;Version: {{settings.version}} {{settings.systemInformation.platform}} {{settings.systemInformation.arch}}&amp;#10;IP: {{settings.remoteAddresses}}</source>
+      <source>Log Out</source>
       <translation> </translation>
     </message>
     <message>
@@ -940,17 +1573,17 @@
     <name>../static/views/restart.html</name>
     <message>
       <location filename="../static/views/restart.html"/>
-      <source>Restarting system</source>
+      <source>Restarting system...</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Restarting system may take some seconds. You will be redirected automatically.</source>
+      <source>Restarting system... may take some seconds. You will be redirected automatically.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>If nothing happens for a while - you can refresh page manually</source>
+      <source>If nothing happens for a while, please refresh the page manually</source>
       <translation> </translation>
     </message>
     <message>
@@ -976,97 +1609,32 @@
     <name>../static/views/settings.html</name>
     <message>
       <location filename="../static/views/settings.html"/>
-      <source>The system is running in safe mode. Changes are impossible.</source>
+      <source>This device is intended to work with hard disk drive installed.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Cloud Connect</source>
+      <source>Please turn off the device and install a hard disk drive.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>This system is linked to  account</source>
+      <source>This device needs network connection to work.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Disconnect from</source>
+      <source>Please connect it to the local network ot Internet</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Go to  Portal</source>
+      <source>This device has wrong network configuration.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>This system is not linked to</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Learn more about</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Connect your server to internet to setup</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>You need internet connetion on your computer to connect your system to</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Connect to</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Create  Account</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>System Settings</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>System name</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Rename system</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Merge Systems</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Clean server</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>This action will return this server to its initial state: clear database and default settings. Server will be detached from current system.</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Restore factory defaults</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Server Settings</source>
+      <source>Please connect it to the network of set a correct IP address.</source>
       <translation> </translation>
     </message>
     <message>
@@ -1076,7 +1644,22 @@
     </message>
     <message>
       <location/>
-      <source>Save</source>
+      <source>Change port</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Reset server</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>This action will revert this server to defaults (clear the database and reset configuration). The server will be detached from the current system. Video archive will remain intact.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Restore factory defaults</source>
       <translation> </translation>
     </message>
     <message>
@@ -1096,7 +1679,127 @@
     </message>
     <message>
       <location/>
-      <source>Restore Server Factory Defaults</source>
+      <source>Change admin password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>If the system is local (not connected to the cloud) this will change the password for user &quot;admin&quot; and the recovery (root) password on some servers.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Otherwise this will change the recovery password only.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Change password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Name</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Rename system</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Merge systems</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Merge Systems</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>This system is linked to , system owner:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Disconnect from</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Go to  Portal</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>This system is not linked to</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Learn more</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Connect the server to the Internet to perform setup</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Iinternet connetion required to connect your system to</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Connect to</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Create  Account</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Device Network Settings</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Save settings and reboot the device</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Date and Time</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Time zone</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Date</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Time</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Save Date and Time</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Restore Server Settings</source>
       <translation> </translation>
     </message>
     <message>
@@ -1126,12 +1829,17 @@
     </message>
     <message>
       <location/>
-      <source>All servers in the system</source>
+      <source>Use a keyboard/mouse or mobile application to control it.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>You can switch to administration interface of another server</source>
+      <source>Server</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>active.server</source>
       <translation> </translation>
     </message>
     <message>
@@ -1141,7 +1849,42 @@
     </message>
     <message>
       <location/>
-      <source>Unavailable&quot;</source>
+      <source>false</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>System</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>active.system</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Device</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>active.device</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>networkSettings[0]</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>dateTimeSettings.openDate</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Close&quot; ui-timepicker</source>
       <translation> </translation>
     </message>
   </context>
@@ -1157,7 +1900,7 @@
     </message>
     <message>
       <location/>
-      <source>Please, use mobile application to view video</source>
+      <source>Please, use the mobile application to view video</source>
       <translation> </translation>
     </message>
     <message>
@@ -1167,7 +1910,7 @@
     </message>
     <message>
       <location/>
-      <source>Web Client flash player support was disabled for your system. You may have problems with playing video.</source>
+      <source>Web Client flash player support is disabled. Issues may occur during video playback.</source>
       <translation> </translation>
     </message>
     <message>
@@ -1182,7 +1925,7 @@
     </message>
     <message>
       <location/>
-      <source>Please, use mobile application to view video:</source>
+      <source>Please, use the mobile application to view video:</source>
       <translation> </translation>
     </message>
     <message>
@@ -1232,12 +1975,27 @@
     </message>
     <message>
       <location/>
-      <source>iOS doesn't support video larger than fullHD (2MP: 1920x1080).</source>
+      <source>iOS does not support video larger than fullHD (2MP: 1920x1080).</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>search cameras&quot;  &amp;&amp; cameras[server.id].length</source>
+      <source>search cameras</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>positionProvider.playedPosition</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>positionProvider.liveMode</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>activeCamera&quot;  &amp;&amp; cameras[server.id].length</source>
       <translation> </translation>
     </message>
     <message>
@@ -1252,7 +2010,92 @@
     </message>
   </context>
   <context>
-    <name>../static/views/webclient.html</name>
+    <name>../static/views/components/cameraLinks.html</name>
+    <message>
+      <location filename="../static/views/components/cameraLinks.html"/>
+      <source>Camera:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Name:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>PhysicalID:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP (url):</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>&amp;nbsp;</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Download:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>high</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>&amp;nbsp;</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>low</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>preview</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Link settings:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>&amp;nbsp;Use auth key</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Duration (sec):</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Resolution:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Playing position:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>for downloading</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>for transcoding&quot;</source>
+      <translation> </translation>
+    </message>
   </context>
   <context>
     <name>../static/views/components/cameraNode.html</name>
@@ -1294,7 +2137,17 @@
     </message>
     <message>
       <location/>
-      <source>Enter current system admin password to confirm action:</source>
+      <source>All fields are required</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Passwords do not match</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enter the system password to confirm the action:</source>
       <translation> </translation>
     </message>
     <message>
@@ -1309,7 +2162,17 @@
     </message>
     <message>
       <location/>
-      <source>Old Password&quot;</source>
+      <source>Login</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Repeat password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>password&quot; auto-focus auto-focus</source>
       <translation> </translation>
     </message>
   </context>
@@ -1318,6 +2181,49 @@
     <message>
       <location filename="../static/views/components/health.html"/>
       <source>Server is offline now!</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>chartData&quot;</source>
+      <translation> </translation>
+    </message>
+  </context>
+  <context>
+    <name>../static/views/components/networkSettings.html</name>
+    <message>
+      <location filename="../static/views/components/networkSettings.html"/>
+      <source>Use DHCP</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>IP</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Subnet mask</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Default gateway</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>DNS server</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>xxx.xxx.xxx.xxx&quot; ip-address</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>xxx.xxx.xxx.xxx&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -1331,6 +2237,11 @@
     <message>
       <location/>
       <source>fair</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>weak</source>
       <translation> </translation>
     </message>
     <message>
@@ -1351,6 +2262,59 @@
     <message>
       <location/>
       <source>Password&quot;</source>
+      <translation> </translation>
+    </message>
+  </context>
+  <context>
+    <name>../static/views/components/systemInfo.html</name>
+    <message>
+      <location filename="../static/views/components/systemInfo.html"/>
+      <source>Info</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>&amp;nbsp;</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>System</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>User</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Current Server</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Version</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Platform</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Architecture</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>All servers</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Unavailable&quot;</source>
       <translation> </translation>
     </message>
   </context>
@@ -1387,7 +2351,7 @@
     </message>
     <message>
       <location/>
-      <source>You need to</source>
+      <source>Please</source>
       <translation> </translation>
     </message>
     <message>
@@ -1417,12 +2381,12 @@
     </message>
     <message>
       <location/>
-      <source>Your browser or device doesn't support playing video from ARM-based servers.</source>
+      <source>This browser or device does not support video playback from ARM-based servers.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Your browser or device doesn't support playing video from this camera.</source>
+      <source>This browser or device does not support video playback from  this camera.</source>
       <translation> </translation>
     </message>
     <message>
@@ -1442,12 +2406,12 @@
     </message>
     <message>
       <location/>
-      <source>Your browser doesn't support video from ARM-based servers. Please, use Chromium browser instead.</source>
+      <source>This browser doesn't support video from ARM-based servers. Please, use Chromium browser instead.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Some error happened.</source>
+      <source>Error occurred.</source>
       <translation> </translation>
     </message>
     <message>
@@ -1480,12 +2444,12 @@
     </message>
     <message>
       <location/>
-      <source>Connecting system to</source>
+      <source>Connecting system to...</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>This may take about minute.</source>
+      <source>This may last a minute.</source>
       <translation> </translation>
     </message>
     <message>
@@ -1495,7 +2459,7 @@
     </message>
     <message>
       <location/>
-      <source>Cloud Email</source>
+      <source>Cloud Email&quot; auto-focus</source>
       <translation> </translation>
     </message>
     <message>
@@ -1513,12 +2477,12 @@
     </message>
     <message>
       <location/>
-      <source>Couldn't initiate your system</source>
+      <source>Cannot initialize the system</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Authorization failed for some reason.</source>
+      <source>Authorization failed.</source>
       <translation> </translation>
     </message>
     <message>
@@ -1528,27 +2492,62 @@
     </message>
     <message>
       <location/>
+      <source>Cannot setup the system</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>The  system cannot be configured.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
       <source>Get Started with</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>You need to configure your server before using it.</source>
+      <source>Please configure the server first.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Don't worry. This won't take long.</source>
+      <source>Choose an option.</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Give your System a name</source>
+      <source>Setup New System</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>It'll help you identify or find your system.</source>
+      <source>or</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Add to Existing System</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>(if you already have )</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>&amp;nbsp;</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Enter System Name</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>It'll help to identify or find the system.</source>
       <translation> </translation>
     </message>
     <message>
@@ -1563,27 +2562,62 @@
     </message>
     <message>
       <location/>
-      <source>Merge server with existing system</source>
+      <source>Choose the system type</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Connect your System to</source>
+      <source>Local</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Connect your system anywhere, anytime.</source>
+      <source>Works in local networks only</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Learn more</source>
+      <source>Does not require Internet connection</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Create new account</source>
+      <source>Cloud</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Available from everywhere</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Requires Internet connection</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Help me decide</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Learn more:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>account</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>An account is required to use the cloud system</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Create a new account</source>
       <translation> </translation>
     </message>
     <message>
@@ -1598,12 +2632,7 @@
     </message>
     <message>
       <location/>
-      <source>Skip this step for now</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Your system will be connected to</source>
+      <source>The system will be connected to</source>
       <translation> </translation>
     </message>
     <message>
@@ -1613,7 +2642,12 @@
     </message>
     <message>
       <location/>
-      <source>Login to your account</source>
+      <source>Login to</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Stay logged in</source>
       <translation> </translation>
     </message>
     <message>
@@ -1628,7 +2662,22 @@
     </message>
     <message>
       <location/>
-      <source>Set up administrator's password</source>
+      <source>To create an account please visit</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Set up an administrator password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>--&gt; Save password</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Password must contain different types of characters and have at least 8 symbols</source>
       <translation> </translation>
     </message>
     <message>
@@ -1643,7 +2692,7 @@
     </message>
     <message>
       <location/>
-      <source>Connect server to existing system</source>
+      <source>Connect the server to the existing system</source>
       <translation> </translation>
     </message>
     <message>
@@ -1658,17 +2707,32 @@
     </message>
     <message>
       <location/>
-      <source>Couldn't merge systems</source>
+      <source>Cannot merge systems</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Set up separate system</source>
+      <source>Setup a separate system</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>System is ready to use</source>
+      <source>System was successfully merged, but is not ready yet.</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Connecting to  ...</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>It may take several moments</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>System is ready for use</source>
       <translation> </translation>
     </message>
     <message>
@@ -1693,12 +2757,27 @@
     </message>
     <message>
       <location/>
-      <source>Connect your server to the Internet</source>
+      <source>Please configure network settings first</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Set up Internet connection on your server to be able</source>
+      <source>Save settings and reboot device</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Configure the network to set up Internet connection</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Connect the server to the Internet</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Set up Internet connection on the server to be able</source>
       <translation> </translation>
     </message>
     <message>
@@ -1708,22 +2787,22 @@
     </message>
     <message>
       <location/>
-      <source>Connect to the Internet</source>
+      <source>Setup local system</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Connect your device to the Internet to connect your system to .</source>
+      <source>Configure network settings</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Couldn't connect to cloud</source>
+      <source>Cannot connect to</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Couldn't setup your system</source>
+      <source>Check the Internet connection.</source>
       <translation> </translation>
     </message>
     <message>
@@ -1734,6 +2813,51 @@
     <message>
       <location/>
       <source>Error description:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>It is possible to set it up from another computer by connecting</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>to this device by one of the following ways:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Using web browser</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Address</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>https://:</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Using  application</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Host</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Port</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Password</source>
       <translation> </translation>
     </message>
     <message>
@@ -1753,12 +2877,17 @@
     </message>
     <message>
       <location/>
-      <source>System name</source>
+      <source>System name&quot; auto-focus</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Email</source>
+      <source>learn more about {{Config.cloud.productName}}&quot; auto-focus</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>Email&quot; auto-focus</source>
       <translation> </translation>
     </message>
     <message>
@@ -1768,17 +2897,27 @@
     </message>
     <message>
       <location/>
-      <source>Login</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
       <source>Repeat password</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>Password&quot;</source>
+      <source>Login</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>open {{Config.cloud.productName}}</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>networkSettings[0]</source>
+      <translation> </translation>
+    </message>
+    <message>
+      <location/>
+      <source>&quot; auto-focus auto-focus</source>
       <translation> </translation>
     </message>
   </context>
@@ -1819,12 +2958,7 @@
     </message>
     <message>
       <location/>
-      <source>If nothing happens for a while - you could check server condition manually</source>
-      <translation> </translation>
-    </message>
-    <message>
-      <location/>
-      <source>Refresh page</source>
+      <source>If nothing happens for a while - you could check server condition manually or refresh the page</source>
       <translation> </translation>
     </message>
     <message>
@@ -1844,7 +2978,7 @@
     </message>
     <message>
       <location/>
-      <source>/static/favicon.ico</source>
+      <source>/static/customization/favicon.ico</source>
       <translation> </translation>
     </message>
     <message>
@@ -1879,12 +3013,12 @@
     </message>
     <message>
       <location/>
-      <source>styles/053ca4b4.vendor-index.css</source>
+      <source>styles/cf60828a.vendor-index.css</source>
       <translation> </translation>
     </message>
     <message>
       <location/>
-      <source>styles/20ea3abe.index.css</source>
+      <source>styles/d3e048c8.index.css</source>
       <translation> </translation>
     </message>
     <message>

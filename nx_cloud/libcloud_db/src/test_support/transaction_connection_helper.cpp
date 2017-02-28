@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include <nx/utils/std/cpp14.h>
+#include <cdb/ec2_request_paths.h>
 
 namespace nx {
 namespace cdb {
@@ -11,7 +12,8 @@ namespace test {
 TransactionConnectionHelper::TransactionConnectionHelper():
     m_moduleGuid(QnUuid::createUuid()),
     m_runningInstanceGuid(QnUuid::createUuid()),
-    m_transactionConnectionIdSequence(0)
+    m_transactionConnectionIdSequence(0),
+    m_removeConnectionAfterClosure(false)
 {
 }
 
@@ -21,7 +23,12 @@ TransactionConnectionHelper::~TransactionConnectionHelper()
     m_aioTimer.pleaseStopSync();
 }
 
-TransactionConnectionHelper::ConnectionId 
+void TransactionConnectionHelper::setRemoveConnectionAfterClosure(bool val)
+{
+    m_removeConnectionAfterClosure = val;
+}
+
+TransactionConnectionHelper::ConnectionId
     TransactionConnectionHelper::establishTransactionConnection(
         const QUrl& appserver2BaseUrl,
         const std::string& login,
@@ -32,7 +39,7 @@ TransactionConnectionHelper::ConnectionId
     localPeerInfo.id = QnUuid::createUuid();
 
     ConnectionContext connectionContext;
-    connectionContext.connectionGuardSharedState = 
+    connectionContext.connectionGuardSharedState =
         std::make_unique<::ec2::ConnectionGuardSharedState>();
     connectionContext.connection =
         std::make_unique<test::TransactionTransport>(
@@ -59,7 +66,7 @@ TransactionConnectionHelper::ConnectionId
         connectionId,
         std::move(connectionContext));
     QUrl url = appserver2BaseUrl;
-    url.setPath("/cdb/ec2/events");
+    url.setPath(api::kEc2EventsPath);
     transactionConnectionPtr->doOutgoingConnect(url);
 
     return connectionId;
@@ -70,7 +77,7 @@ bool TransactionConnectionHelper::waitForState(
     ConnectionId connectionId,
     std::chrono::milliseconds durationToWait)
 {
-    // TODO: #ak This method can skip Connected state due Connected -> ReadyForStreaming 
+    // TODO: #ak This method can skip Connected state due Connected -> ReadyForStreaming
     //    transition in onTransactionConnectionStateChanged.
 
     using namespace std::chrono;
@@ -110,7 +117,7 @@ bool TransactionConnectionHelper::waitForState(
     }
 }
 
-::ec2::QnTransactionTransportBase::State 
+::ec2::QnTransactionTransportBase::State
     TransactionConnectionHelper::getConnectionStateById(
         ConnectionId connectionId) const
 {
@@ -143,6 +150,12 @@ void TransactionConnectionHelper::closeAllConnections()
         connectionContext.second.connection->pleaseStopSync();
 }
 
+std::size_t TransactionConnectionHelper::activeConnectionCount() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_connections.size();
+}
+
 ec2::ApiPeerData TransactionConnectionHelper::localPeer() const
 {
     return ec2::ApiPeerData(
@@ -155,18 +168,61 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
     ec2::QnTransactionTransportBase* connection,
     ec2::QnTransactionTransportBase::State newState)
 {
-    if (newState == ec2::QnTransactionTransportBase::Connected)
+    switch (newState)
     {
-        // Connection events are reported under lock.
-        m_aioTimer.post(
-            [connection]()
-            {
-                connection->setState(ec2::QnTransactionTransportBase::ReadyForStreaming);
-                connection->startListening();
-            });
+        case ec2::QnTransactionTransportBase::Connected:
+            moveConnectionToReadyForStreamingState(connection);
+            break;
+
+        case ec2::QnTransactionTransportBase::Error:
+        case ec2::QnTransactionTransportBase::Closed:
+            if (m_removeConnectionAfterClosure)
+                removeConnection(connection);
+            break;
+
+        default:
+            break;
     }
 
     m_condition.wakeAll();
+}
+
+void TransactionConnectionHelper::moveConnectionToReadyForStreamingState(
+    ec2::QnTransactionTransportBase* connection)
+{
+    connection->post(
+        [connection]()
+        {
+            connection->setState(ec2::QnTransactionTransportBase::ReadyForStreaming);
+            connection->startListening();
+        });
+}
+
+void TransactionConnectionHelper::removeConnection(
+    ec2::QnTransactionTransportBase* connection)
+{
+    const auto connectionId = getConnectionId(connection);
+
+    connection->post(
+        [this, connectionId]()
+        {
+            QnMutexLocker lk(&m_mutex);
+            m_connections.erase(connectionId);
+        });
+}
+
+TransactionConnectionHelper::ConnectionId 
+    TransactionConnectionHelper::getConnectionId(
+        ec2::QnTransactionTransportBase* connection) const
+{
+    QnMutexLocker lk(&m_mutex);
+    for (const auto& val: m_connections)
+    {
+        if (val.second.connection.get() == connection)
+            return val.first;
+    }
+
+    return ConnectionId();
 }
 
 } // namespace test

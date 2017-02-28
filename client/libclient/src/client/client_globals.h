@@ -288,6 +288,14 @@ namespace Qn
     Q_DECLARE_FLAGS(ResourceSavingFlags, ResourceSavingFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceSavingFlags)
 
+    enum class CellSpacing
+    {
+        None,
+        Small,
+        Medium,
+        Large
+    };
+
     /**
      * Time display mode.
      */
@@ -431,6 +439,15 @@ namespace Qn
         Navigation,     /**< navigation pane    */
         Calendar,       /**< calendar pane      */
         Thumbnails      /**< thumbnails pane    */
+    };
+
+    enum class ThumbnailStatus
+    {
+        Invalid,
+        Loading,
+        Loaded,
+        NoData,
+        Refreshing
     };
 
 } // namespace Qn

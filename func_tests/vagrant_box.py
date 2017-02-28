@@ -4,16 +4,11 @@ import logging
 import re
 import time
 import subprocess
+import shutil
 import pytz
-import requests
-import requests.exceptions
 import jinja2
 import vagrant
-from server import (
-    MEDIASERVER_LISTEN_PORT,
-    MEDIASERVER_CONFIG_PATH,
-    MEDIASERVER_CONFIG_PATH_INITIAL,
-    )
+from vagrant_box_config import DEFAULT_NATNET1, DEFAULT_HOSTNET
 
 
 TEST_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -60,61 +55,80 @@ class Vagrant(object):
                     log.error('================================= 8<=======================')
             raise
 
-    def init(self, boxes_config, recrete_boxes):
+    def destroy_all_boxes(self, boxes_config):
+        log.info('destroying old boxes: %s', ', '.join(config.vm_box_name() for config in boxes_config))
         self._write_vagrantfile(boxes_config)
-        if recrete_boxes:
-            self._destroy_all_boxes()
-            if os.path.exists(self._ssh_config_path):
-                os.remove(self._ssh_config_path)
+        self._destroy_all_boxes()
+        if os.path.exists(self._ssh_config_path):
+            os.remove(self._ssh_config_path)
+
+    # updates boxes_config: set ip_address and timezone
+    def init(self, boxes_config):
+        self._write_vagrantfile(boxes_config)
         box2status = {status.name: status.state for status in self._vagrant.status()}
-        for box_name in sorted(box2status):
-            self._init_box(box_name, box2status[box_name])
+        for config in boxes_config:
+            if not config.is_allocated:
+                continue
+            for script in config.provision_scripts:
+                shutil.copy2(os.path.join(TEST_DIR, script), self._vagrant_dir)
+            if box2status[config.box_name()] != 'running':
+                self._start_box(config)
+            self._init_box(config)
+        self._write_vagrantfile(boxes_config)  # now ip_address is known for just-started boxes - write it
+        self._write_ssh_config(self.boxes.keys())  # write ssh config for all boxes, with new addresses
+        for box in self.boxes.values():
+            self._load_box_timezone(box)
 
     def _destroy_all_boxes(self):
         self._wrap_vagrant_call(self._vagrant.destroy)
 
-    def _init_box(self, box_name, box_status):
-        must_start = box_status != 'running'
-        if must_start:
-            self._start_box(box_name)
-        ip_address = self._load_box_ip_address(box_name)
-        timezone = self._load_box_timezone(box_name)
-        box = VagrantBox(self, box_name, ip_address, timezone)
-        self.boxes[box_name] = box
-        if must_start:
-            box.wait_until_server_is_up()
-            log.info('Storing initial server configuration to %s', MEDIASERVER_CONFIG_PATH_INITIAL)
-            box.run_ssh_command(['cp', MEDIASERVER_CONFIG_PATH, MEDIASERVER_CONFIG_PATH_INITIAL])
+    def _init_box(self, config):
+        config.ip_address = self._load_box_ip_address(config)
+        log.debug('IP address for %s: %s', config.box_name(), config.ip_address)
+        self.boxes[config.box_name()] = VagrantBox(self, config)
 
-    def _start_box(self, box_name):
-        log.info('Starting/creating box: %r...', box_name)
+    def _start_box(self, config):
+        box_name = config.box_name()
+        log.info('Starting/creating box: %r, vm %r...', box_name, config.vm_box_name())
         self._wrap_vagrant_call(self._vagrant.up, vm_name=box_name)
-        self._write_ssh_config(box_name)
+        self._write_box_ssh_config(box_name)
         self.run_ssh_command(box_name, 'vagrant', ['sudo', 'cp', '-r', '/home/vagrant/.ssh', '/root/'])
 
-    def _load_box_ip_address(self, box_name):
-        output = self.run_ssh_command(box_name, 'root', ['ifconfig', 'eth1'])  # eth0 is nat required by vagrant
-        mo = re.search(r'inet addr:([0-9\.]+)', output)
-        assert mo, 'Unexpected ifconfig eth0 output:\n' + output
-        return mo.group(1)
+    def _load_box_ip_address(self, config):
+        adapter_idx = 1  # use ip address from first host network
+        output = subprocess.check_output([
+            'VBoxManage', '--nologo', 'guestproperty', 'get',
+            config.vm_box_name(), '/VirtualBox/GuestInfo/Net/%d/V4/IP' % adapter_idx],
+            stderr=subprocess.STDOUT)
+        l = output.strip().split()
+        assert l[0] == 'Value:', repr(output)  # Does interface exist?
+        return l[1]
 
-    def _load_box_timezone(self, box_name):
-        tzname = self.run_ssh_command(box_name, 'root', ['date', '+%Z'])
-        return pytz.timezone(tzname.rstrip())
+    def _load_box_timezone(self, box):
+        tzname = self.run_ssh_command(box.name, 'root', ['date', '+%Z'])
+        timezone = pytz.timezone(tzname.rstrip())
+        box.timezone = box.config.timezone = timezone
 
     def _write_vagrantfile(self, boxes_config):
         template_fpath = os.path.join(TEST_DIR, 'Vagrantfile.jinja2')
         with open(template_fpath) as f:
             template = jinja2.Template(f.read())
         vagrantfile = template.render(
+            natnet1=DEFAULT_NATNET1,
             template_fpath=template_fpath,
             boxes=boxes_config)
         with open(os.path.join(self._vagrant_dir, 'Vagrantfile'), 'w') as f:
             f.write(vagrantfile)
 
-    def _write_ssh_config(self, box_name):
-        with open(self._ssh_config_path, 'a') as f:
+    # write ssh config with single box in it
+    def _write_box_ssh_config(self, box_name):
+        with open(self._ssh_config_path, 'w') as f:
             f.write(self._vagrant.ssh_config(box_name))
+
+    def _write_ssh_config(self, box_name_list):
+        with open(self._ssh_config_path, 'w') as f:
+            for box_name in box_name_list:
+                f.write(self._vagrant.ssh_config(box_name))
 
     def make_sudo_command_args(self, box_name, user, args):
         return ['ssh', '-F', self._ssh_config_path, '%s@%s' % (user, box_name)] + list(args)
@@ -129,26 +143,19 @@ class Vagrant(object):
 
 class VagrantBox(object):
 
-    def __init__(self, vagrant, box_name, ip_address, timezone):
+    def __init__(self, vagrant, config):
         self._vagrant = vagrant
-        self.name = box_name
-        self.ip_address = ip_address  # str
-        self.timezone = timezone  # timezone
+        self.config = config
+        self.name = config.box_name()
+        self.ip_address = config.ip_address  # str
+        self.timezone = None
         self.servers = []
 
-    def __repr__(self):
-        return 'Box%r@%s/%s' % (self.name, self.ip_address, self.timezone)
+    def __str__(self):
+        return '%s@%s/%s' % (self.name, self.ip_address, self.timezone)
 
-    def wait_until_server_is_up(self, timeout_sec=30):
-        t = time.time()
-        while time.time() - t < timeout_sec:
-            try:
-                requests.get('http://%s:%d/' % (self.ip_address, MEDIASERVER_LISTEN_PORT))
-                return
-            except requests.exceptions.RequestException as x:
-                log.debug('Server %s is not started yet, waiting...', self)
-                time.sleep(0.5)
-        assert False, 'Server %s did not start in %s seconds' % (self, timeout_sec)
+    def __repr__(self):
+        return 'Box%s' % self
 
     def _make_sudo_command_args(self, args, user=None):
         return self._vagrant.make_sudo_command_args(self.name, user or 'root', args)

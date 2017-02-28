@@ -221,6 +221,9 @@ public:
     int maxRtpRetryCount() const;
     void setMaxRtpRetryCount(int newVal);
 
+    int rtpFrameTimeoutMs() const;
+    void setRtpFrameTimeoutMs(int newValue);
+
     std::chrono::seconds proxyConnectTimeout() const;
 
     /*!
@@ -253,6 +256,7 @@ signals:
     void upnpPortMappingEnabledChanged();
     void ec2ConnectionSettingsChanged(const QString& key);
     void cloudSettingsChanged();
+    void cloudCredentialsChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -335,6 +339,8 @@ private:
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets;
 
     QnResourcePropertyAdaptor<int>* m_maxRtpRetryCount;
+
+    QnResourcePropertyAdaptor<int>* m_rtpFrameTimeoutMs;
 
     AdaptorList m_allAdaptors;
 

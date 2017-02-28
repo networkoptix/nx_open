@@ -61,6 +61,9 @@ namespace
 
     const int kAuditTrailPeriodDaysDefault = 183;
     const int kEventLogPeriodDaysDefault = 30;
+
+    const QString kRtpTimeoutMs(lit("rtpTimeoutMs"));
+    const int kRtpTimeoutMsDefault(10000);
 }
 
 using namespace nx::settings_names;
@@ -260,6 +263,15 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initCloudAdaptors()
     for (QnAbstractResourcePropertyAdaptor* adaptor : result)
         connect(adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, &QnGlobalSettings::cloudSettingsChanged, Qt::QueuedConnection);
 
+    connect(
+        m_cloudSystemIdAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, &QnGlobalSettings::cloudCredentialsChanged,
+        Qt::QueuedConnection);
+    connect(
+        m_cloudAuthKeyAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, &QnGlobalSettings::cloudCredentialsChanged,
+        Qt::QueuedConnection);
+
     return result;
 }
 
@@ -307,6 +319,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kMaxRtpRetryCountDefault,
         this);
 
+    m_rtpFrameTimeoutMs = new QnLexicalResourcePropertyAdaptor<int>(
+        kRtpTimeoutMs,
+        kRtpTimeoutMsDefault,
+        this);
+
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
     connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
@@ -338,6 +355,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_arecontRtspEnabledAdaptor
         << m_maxRecorderQueueSizeBytes
         << m_maxRecorderQueueSizePackets
+        << m_rtpFrameTimeoutMs
         ;
 
     return result;
@@ -840,6 +858,16 @@ int QnGlobalSettings::maxRtpRetryCount() const
 void QnGlobalSettings::setMaxRtpRetryCount(int newVal)
 {
     m_maxRtpRetryCount->setValue(newVal);
+}
+
+int QnGlobalSettings::rtpFrameTimeoutMs() const
+{
+    return m_rtpFrameTimeoutMs->value();
+}
+
+void QnGlobalSettings::setRtpFrameTimeoutMs(int newValue)
+{
+    m_rtpFrameTimeoutMs->setValue(newValue);
 }
 
 int QnGlobalSettings::maxRecorderQueueSizeBytes() const

@@ -351,10 +351,11 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
     for (auto i = 0; i < randomAccess.size() && !gotFrame; ++i)
     {
         auto frame = std::dynamic_pointer_cast<const QnCompressedVideoData>(randomAccess.at(i));
-        gotFrame = decoder.decode(frame, &outFrame) && frame->timestamp >= time;
-        if (gotFrame)
-            return outFrame;
+        gotFrame = decoder.decode(frame, &outFrame);
+        if (frame->timestamp >= time)
+            break;
     }
-
-    return CLVideoDecoderOutputPtr();
+    while (decoder.decode(QnConstCompressedVideoDataPtr(), &outFrame))
+        gotFrame = true; //< flush decoder buffer
+    return gotFrame ? outFrame : CLVideoDecoderOutputPtr();
 }

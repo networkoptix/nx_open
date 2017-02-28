@@ -64,6 +64,10 @@ int QnConfigureRestHandler::executePost(
     return execute(std::move(data), result, owner);
 }
 
+// NOTE: Some parameters are undocumented and are used only by the server internally before calling
+// /api/mergeSystem.
+// TODO: Consider splitting into two methods: a public one (similar to the currently documented),
+// and the proprietary one for the internal server use.
 int QnConfigureRestHandler::execute(
     const ConfigureSystemData& data,
     QnJsonRestResult &result,
@@ -77,6 +81,7 @@ int QnConfigureRestHandler::execute(
     QString errStr;
     if (!validatePasswordData(data, &errStr))
     {
+        NX_LOG(lit("QnConfigureRestHandler: invalid password provided"), cl_logWARNING);
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return CODE_OK;
     }
@@ -95,12 +100,14 @@ int QnConfigureRestHandler::execute(
         if (!backupDatabase())
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
+            NX_LOG(lit("QnConfigureRestHandler: database backup error"), cl_logWARNING);
             return CODE_OK;
         }
 
         if (!changeLocalSystemId(data))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
+            NX_LOG(lit("QnConfigureRestHandler: can't change local system Id"), cl_logWARNING);
             return CODE_OK;
         }
         if (data.wholeSystem)
@@ -126,13 +133,17 @@ int QnConfigureRestHandler::execute(
     /* set port */
     int changePortResult = changePort(owner->accessRights(), data.port);
     if (changePortResult == ResultFail)
+    {
+        NX_LOG(lit("QnConfigureRestHandler: can't change TCP port"), cl_logWARNING);
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Port is busy"));
+    }
 
     /* set password */
     if (data.hasPassword())
     {
         if (!updateUserCredentials(data, QnOptionalBool(), qnResPool->getAdministrator()))
         {
+            NX_LOG(lit("QnConfigureRestHandler: can't update administrator credentials"), cl_logWARNING);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
         }
         else

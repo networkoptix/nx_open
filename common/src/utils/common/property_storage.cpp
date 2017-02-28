@@ -258,7 +258,7 @@ bool QnPropertyStorage::updateFromCommandLine(int &argc, const char **argv, QTex
         }
     }
 
-    if(!parser.parse(argc, argv, errorStream)) 
+    if(!parser.parse(argc, argv, errorStream))
         return false;
 
     bool result = true;
@@ -275,7 +275,7 @@ bool QnPropertyStorage::updateFromCommandLine(int &argc, const char **argv, QTex
         UpdateStatus status = updateValue(id, value);
         if(status == Failed) {
             if(errorStream) {
-                QString message = tr("Invalid value for '%1' argument - expected %2, provided '%3'.").
+                QString message = lit("Invalid value for '%1' argument - expected %2, provided '%3'.").
                     arg(name).
                     arg(QLatin1String(QMetaType::typeName(m_typeById.value(id, QMetaType::UnknownType)))).
                     arg(value.toString());
@@ -297,7 +297,7 @@ void QnPropertyStorage::lock() const {
 
 void QnPropertyStorage::unlock() const {
     m_lockDepth--;
-    
+
     if(m_lockDepth == 0 && !m_pendingNotifications.isEmpty()) {
         QSet<int> pendingNotifications = m_pendingNotifications;
         QHash<int, QnPropertyNotifier *> notifiers = m_notifiers;
@@ -337,10 +337,10 @@ void QnPropertyStorage::submitValuesToSettings(QSettings *settings, const QList<
 }
 
 QVariant QnPropertyStorage::readValueFromSettings(QSettings *settings, int id, const QVariant &defaultValue) {
-    /* In some cases QSettings::value returns invalid QVariant even when supplied 
+    /* In some cases QSettings::value returns invalid QVariant even when supplied
      * an adequate default value. So we check it manually. */
     QVariant value = settings->value(name(id));
-    return value.isValid() ? value : defaultValue; 
+    return value.isValid() ? value : defaultValue;
 }
 
 void QnPropertyStorage::writeValueToSettings(QSettings *settings, int id, const QVariant &value) const {
@@ -371,5 +371,5 @@ QVariant QnPropertyStorage::readValueFromJson(const QJsonObject &json, int id, c
         return defaultValue;
     }
 
-    return result; 
+    return result;
 }

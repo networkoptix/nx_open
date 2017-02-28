@@ -60,7 +60,7 @@ public:
     void suspend();
     void resume();
 
-    void doConnect();
+    bool doConnect();
     void doDisconnect();
 
     void updateConnectionState();
@@ -177,7 +177,7 @@ QnSoftwareVersion QnConnectionManager::connectionVersion() const
     return d->connectionVersion;
 }
 
-void QnConnectionManager::connectToServer(const QUrl& url)
+bool QnConnectionManager::connectToServer(const QUrl& url)
 {
     Q_D(QnConnectionManager);
 
@@ -189,10 +189,10 @@ void QnConnectionManager::connectToServer(const QUrl& url)
         actualUrl.setPort(defaultServerPort());
     actualUrl.setUserName(actualUrl.userName().toLower());
     d->setUrl(actualUrl);
-    d->doConnect();
+    return d->doConnect();
 }
 
-void QnConnectionManager::connectToServer(
+bool QnConnectionManager::connectToServer(
     const QUrl &url,
     const QString& userName,
     const QString& password)
@@ -200,10 +200,10 @@ void QnConnectionManager::connectToServer(
     auto urlWithAuth = url;
     urlWithAuth.setUserName(userName);
     urlWithAuth.setPassword(password);
-    connectToServer(urlWithAuth);
+    return connectToServer(urlWithAuth);
 }
 
-void QnConnectionManager::connectByUserInput(
+bool QnConnectionManager::connectByUserInput(
     const QString& address,
     const QString& userName,
     const QString& password)
@@ -214,7 +214,7 @@ void QnConnectionManager::connectByUserInput(
 
     url.setUserName(userName);
     url.setPassword(password);
-    connectToServer(url);
+    return connectToServer(url);
 }
 
 void QnConnectionManager::disconnectFromServer()
@@ -294,7 +294,7 @@ void QnConnectionManagerPrivate::resume()
     doConnect();
 }
 
-void QnConnectionManagerPrivate::doConnect()
+bool QnConnectionManagerPrivate::doConnect()
 {
     NX_LOG(lm("doConnect() BEGIN: url: %1").arg(url.toString()), cl_logDEBUG1);
     if (!url.isValid() || url.host().isEmpty())
@@ -303,7 +303,7 @@ void QnConnectionManagerPrivate::doConnect()
         updateConnectionState();
         emit q->connectionFailed(Qn::NetworkErrorConnectionResult, QVariant());
         NX_LOG(lm("doConnect() END: Invalid URL"), cl_logDEBUG1);
-        return;
+        return false;
     }
 
     qnCommon->updateRunningInstanceGuid();
@@ -319,6 +319,12 @@ void QnConnectionManagerPrivate::doConnect()
         &QnEc2ConnectionRequestResult::processEc2Reply);
 
     updateConnectionState();
+
+    if (connectionHandle == kInvalidHandle)
+    {
+        delete result;
+        return false;
+    }
 
     connect(result, &QnEc2ConnectionRequestResult::replyProcessed, this,
         [this, result, connectUrl]()
@@ -387,14 +393,14 @@ void QnConnectionManagerPrivate::doConnect()
 
             using namespace nx::client::core::helpers;
             storeConnection(localId, connectionInfo.systemName, url);
-            storeCredentials(localId, QnCredentials(url));
+            storeCredentials(localId, QnEncodedCredentials(url));
             updateWeightData(localId);
             qnClientCoreSettings->save();
 
             LastConnectionData connectionData{
                 connectionInfo.systemName,
                 QnUrlHelper(url).cleanUrl(),
-                QnCredentials(url)};
+                QnEncodedCredentials(url)};
             qnSettings->setLastUsedConnection(connectionData);
             qnSettings->save();
 
@@ -403,6 +409,7 @@ void QnConnectionManagerPrivate::doConnect()
         });
 
     NX_LOG(lm("doConnect() END"), cl_logDEBUG1);
+    return true;
 }
 
 void QnConnectionManagerPrivate::doDisconnect()

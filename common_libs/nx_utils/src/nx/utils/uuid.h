@@ -68,6 +68,7 @@ public:
      */
     static QnUuid fromStringSafe(const QString& uuid);
     static QnUuid fromStringSafe(const QByteArray& uuid);
+    static QnUuid fromStringSafe(const char* uuid);
     static QnUuid fromStringSafe(const std::string& uuid);
 
 private:

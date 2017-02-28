@@ -11,7 +11,7 @@
 #include <nx/utils/raii_guard.h>
 
 #include <utils/common/connective.h>
-#include <utils/common/credentials.h>
+#include <utils/common/encoded_credentials.h>
 
 class QnCloudStatusWatcher;
 class QQuickView;
@@ -165,7 +165,7 @@ private:
     void connectToSystemInternal(
         const QString& systemId,
         const QUrl& serverUrl,
-        const QnCredentials& credentials,
+        const QnEncodedCredentials& credentials,
         bool storePassword,
         bool autoLogin,
         const QnRaiiGuardPtr& completionTracker = QnRaiiGuardPtr());

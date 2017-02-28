@@ -1,5 +1,7 @@
 import QtQuick 2.6
 import Nx 1.0
+import Nx.Core 1.0
+import Nx.Media 1.0
 import Nx.Items 1.0
 import com.networkoptix.qml 1.0
 
@@ -13,10 +15,10 @@ Object
         connectionManager.connectionState === QnConnectionManager.Reconnecting
     readonly property bool cameraOffline:
         mediaPlayer.liveMode
-            && resourceHelper.resourceStatus === QnMediaResourceHelper.Offline
+            && resourceHelper.resourceStatus === MediaResourceHelper.Offline
     readonly property bool cameraUnauthorized:
         mediaPlayer.liveMode
-            && resourceHelper.resourceStatus === QnMediaResourceHelper.Unauthorized
+            && resourceHelper.resourceStatus === MediaResourceHelper.Unauthorized
     readonly property bool failed: mediaPlayer.failed
     readonly property bool offline: serverOffline || cameraOffline
 
@@ -49,7 +51,7 @@ Object
         property bool waitForLastPosition: false
     }
 
-    QnMediaResourceHelper
+    MediaResourceHelper
     {
         id: resourceHelper
     }
@@ -68,7 +70,7 @@ Object
         maxTextureSize: getMaxTextureSize()
         onMediaStatusChanged:
         {
-            if (d.waitForLastPosition && mediaStatus == QnPlayer.Loaded)
+            if (d.waitForLastPosition && mediaStatus === MediaPlayer.Loaded)
             {
                 d.lastPosition = position
                 d.waitForLastPosition = false
@@ -123,7 +125,7 @@ Object
 
     Component.onCompleted:
     {
-        if (cameraOffline || cameraUnauthorized || resourceId == "")
+        if (cameraOffline || cameraUnauthorized || resourceId === "")
             return
 
         mediaPlayer.playLive()
@@ -135,7 +137,7 @@ Object
         mediaPlayer.play()
 
         d.lastPosition = mediaPlayer.liveMode ? -1 : mediaPlayer.position
-        d.waitForLastPosition = (mediaPlayer.mediaStatus !== QnPlayer.Loaded)
+        d.waitForLastPosition = (mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
     }
 
     function playLive()
@@ -152,6 +154,11 @@ Object
     function pause()
     {
         mediaPlayer.pause()
+    }
+
+    function preview()
+    {
+        mediaPlayer.preview()
     }
 
     function setPosition(position)

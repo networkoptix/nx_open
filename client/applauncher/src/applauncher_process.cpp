@@ -21,10 +21,12 @@ namespace {
 /*! Since 3.0 client-bin uses relative rpath to specify its libs location.
     Thus we don't have to put it into LD_LIBRARY_PATH. */
 const QnSoftwareVersion kRpathIncludedVersion(3, 0);
-
-#if defined(Q_OS_LINUX)
-const QString kLdLibraryPathVariable = "LD_LIBRARY_PATH";
-#endif
+/*! Since 3.0 client uses correct window class name depending on its customization.
+    Previous versions use executable name as WM class (client-bin) which won't work properly
+    for startup notification protocol (which is used in many Linux distros launchers).
+    For these versions we pass -name <wmclass> parameter which sets the correct WM class
+    to windows. */
+const QnSoftwareVersion kWindowClassFixedVersion(3, 0);
 
 } // namespace
 
@@ -368,35 +370,47 @@ bool ApplauncherProcess::startApplication(
     //TODO/IMPL start process asynchronously ?
 
     const QString binPath = installation->executableFilePath();
-
     QStringList environment = QProcess::systemEnvironment();
-#ifdef Q_OS_LINUX
-    if (installation->version() < kRpathIncludedVersion)
-    {
-        QString ldLibraryPath = installation->libraryPath();
-        if (!ldLibraryPath.isEmpty() && QFile::exists(ldLibraryPath))
-        {
-            QRegExp varRegExp(QString("%1=(.+)").arg(kLdLibraryPathVariable));
-
-            auto it = environment.begin();
-            for (; it != environment.end(); ++it)
-            {
-                if (varRegExp.exactMatch(*it))
-                {
-                    *it = QString("%1=%2:%3").arg(
-                        kLdLibraryPathVariable, ldLibraryPath, varRegExp.cap(1));
-                    break;
-                }
-            }
-            if (it == environment.end())
-                environment.append(QString("%1=%2").arg(kLdLibraryPathVariable, ldLibraryPath));
-        }
-    }
-#endif
 
     QStringList arguments = task->appArgs.split(QLatin1String(" "), QString::SkipEmptyParts);
     if (!m_devModeKey.isEmpty())
         arguments.append(QString::fromLatin1("--dev-mode-key=%1").arg(devModeKey()));
+
+    if (QnAppInfo::applicationPlatform() == "linux")
+    {
+        if (installation->version() < kRpathIncludedVersion)
+        {
+            QString ldLibraryPath = installation->libraryPath();
+            if (!ldLibraryPath.isEmpty() && QFile::exists(ldLibraryPath))
+            {
+                const QString kLdLibraryPathVariable = "LD_LIBRARY_PATH";
+
+                QRegExp varRegExp(QString("%1=(.+)").arg(kLdLibraryPathVariable));
+
+                auto it = environment.begin();
+                for (; it != environment.end(); ++it)
+                {
+                    if (varRegExp.exactMatch(*it))
+                    {
+                        *it = QString("%1=%2:%3").arg(
+                            kLdLibraryPathVariable, ldLibraryPath, varRegExp.cap(1));
+                        break;
+                    }
+                }
+                if (it == environment.end())
+                {
+                    environment.append(
+                        QString("%1=%2").arg(kLdLibraryPathVariable, ldLibraryPath));
+                }
+            }
+        }
+
+        if (installation->version() < kWindowClassFixedVersion)
+        {
+            arguments.append("-name");
+            arguments.append(QnAppInfo::productNameShort());
+        }
+    }
 
     NX_LOG(QString::fromLatin1("Launching version %1 (path %2)").arg(task->version.toString()).arg(binPath), cl_logDEBUG2);
 

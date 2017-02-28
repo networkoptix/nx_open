@@ -9,7 +9,7 @@ Column
     property string userName;
     property bool isConnectable: false;
 
-    spacing: 10; // TODO: check is bottom margin is 8px
+    spacing: 14; // TODO: check is bottom margin is 8px
 
     NxLabel
     {
@@ -35,8 +35,8 @@ Column
 
         anchors.left: parent.left;
 
-        width: 24;
-        height: 24;
+        width: 20;
+        height: 20;
         source:
         {
            if (!context.isCloudEnabled)

@@ -77,9 +77,10 @@ signals:
     void connectionVersionChanged();
 
 public slots:
-    void connectToServer(const QUrl &url);
-    void connectToServer(const QUrl &url, const QString& userName, const QString& password);
-    void connectByUserInput(const QString& address, const QString& userName, const QString& password);
+    bool connectToServer(const QUrl &url);
+    bool connectToServer(const QUrl &url, const QString& userName, const QString& password);
+    bool connectByUserInput(
+        const QString& address, const QString& userName, const QString& password);
     void disconnectFromServer();
 
 private:

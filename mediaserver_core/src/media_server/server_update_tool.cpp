@@ -232,7 +232,23 @@ qint64 QnServerUpdateTool::addUpdateFileChunkInternal(const QString &updateId, c
     return UploadFinished;
 }
 
-bool QnServerUpdateTool::installUpdate(const QString &updateId) {
+bool QnServerUpdateTool::installUpdate(const QString &updateId, UpdateType updateType)
+{
+    if (updateType == UpdateType::Delayed)
+    {
+        NX_LOG(
+            lm("QnServerUpdateTool: Requested delayed installation of %1. Installing in %2 ms.")
+                .arg(updateId).arg(installationDelay),
+            cl_logINFO);
+
+        executeDelayed(
+            [updateId, this]() { installUpdate(updateId); },
+            installationDelay,
+            thread());
+
+        return true;
+    }
+
     NX_LOG(lit("QnServerUpdateTool: Starting update to %1").arg(updateId), cl_logINFO);
 
     QDir updateDir = getUpdateDir(updateId);
@@ -322,11 +338,6 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId) {
     QDir::setCurrent(currentDir);
 
     return true;
-}
-
-void QnServerUpdateTool::installUpdateDelayed(const QString &updateId) {
-    NX_LOG(lit("QnServerUpdateTool: Requested delayed installation of %1. Installing in %2 ms.").arg(updateId).arg(installationDelay), cl_logINFO);
-    executeDelayed([updateId, this]() { installUpdate(updateId); }, installationDelay, thread());
 }
 
 void QnServerUpdateTool::removeUpdateFiles(const QString& updateId)

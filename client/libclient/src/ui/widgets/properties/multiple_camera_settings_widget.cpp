@@ -227,7 +227,7 @@ bool QnMultipleCameraSettingsWidget::isValidSecondStream()
 
     QnMessageBox dialog(QnMessageBoxIcon::Warning,
         tr("Secondary stream disabled for these cameras"),
-        tr("\"Motion + Low - Res\" recording option can't be set."),
+        tr("\"Motion + Low - Res\" recording option cannot be set."),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton);
 
     const auto recordAlways = dialog.addButton(
@@ -315,7 +315,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources()
             else
             {
                 ui->loginEdit->setText(QString());
-                ui->loginEdit->setPlaceholderText(tr("<multiple values>", "LoginEdit"));
+                ui->loginEdit->setPlaceholderText(L'<' + tr("multiple values") + L'>');
             }
             m_loginWasEmpty = ui->loginEdit->text().isEmpty();
 
@@ -327,7 +327,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources()
             else
             {
                 ui->passwordEdit->setText(QString());
-                ui->passwordEdit->setPlaceholderText(tr("<multiple values>", "PasswordEdit"));
+                ui->passwordEdit->setPlaceholderText(L'<' + tr("multiple values") + L'>');
             }
             m_passwordWasEmpty = ui->passwordEdit->text().isEmpty();
         }

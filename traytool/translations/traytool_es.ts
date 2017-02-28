@@ -50,34 +50,6 @@
         <translation>No hay servicios instalados %1</translation>
     </message>
     <message>
-        <source> (stopped)</source>
-        <translation> (detenido)</translation>
-    </message>
-    <message>
-        <source> (starting)</source>
-        <translation> (iniciando)</translation>
-    </message>
-    <message>
-        <source> (stopping)</source>
-        <translation> (parando)</translation>
-    </message>
-    <message>
-        <source> (started)</source>
-        <translation> (iniciado)</translation>
-    </message>
-    <message>
-        <source> (resuming)</source>
-        <translation> (reanudación)</translation>
-    </message>
-    <message>
-        <source> (paused)</source>
-        <translation> (pausa)</translation>
-    </message>
-    <message>
-        <source> (pausing)</source>
-        <translation>(pausa)</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>&amp;Abandonar</translation>
     </message>
@@ -111,6 +83,34 @@
     </message>
     <message>
         <source>Server Web Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>starting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>stopping</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>started</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>resuming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>pausing</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

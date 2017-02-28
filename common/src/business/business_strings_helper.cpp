@@ -46,7 +46,7 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
                                     );
     case BookmarkAction:            return tr("Bookmark");
     case PanicRecordingAction:      return tr("Panic recording");
-    case SendMailAction:            return tr("Send email");
+    case SendMailAction:            return tr("Send Email");
     case DiagnosticsAction:         return tr("Write to log");
     case ShowPopupAction:           return tr("Show notification");
     case PlaySoundAction:           return tr("Repeat sound");
@@ -161,9 +161,9 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
     case ServerStartEvent:
         return tr("Server \"%1\" Started").arg(resourceName);
     case LicenseIssueEvent:
-        return tr("Server \'%1\' has a license problem").arg(resourceName);
+        return tr("Server \"%1\" has a license problem").arg(resourceName);
     case BackupFinishedEvent:
-        return tr("Server \'%1\' has finished an archive backup").arg(resourceName);
+        return tr("Server \"%1\" has finished an archive backup").arg(resourceName);
     case UserDefinedEvent:
         return (!params.caption.isEmpty() ? params.caption
             : (params.resourceName.isEmpty() ? tr("Generic Event")
@@ -232,15 +232,16 @@ QString QnBusinessStringsHelper::eventDetailsWithTimestamp(const QnBusinessEvent
     return eventTimestamp(params, aggregationCount) + delimiter + eventDetails(params, delimiter);
 }
 
-QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &params, const QString& delimiter)
+QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters& params,
+    const QString& delimiter)
 {
     using namespace QnBusiness;
 
-    QString result;
+    QStringList result;
 
     switch (params.eventType) {
     case CameraInputEvent: {
-        result = tr("Input Port: %1").arg(params.inputPortId);
+        result << tr("Input Port: %1").arg(params.inputPortId);
         break;
     }
     case StorageFailureEvent:
@@ -249,24 +250,22 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
     case LicenseIssueEvent:
     case BackupFinishedEvent:
     {
-        result += tr("Reason: %1").arg(eventReason(params));
+        result << tr("Reason: %1").arg(eventReason(params));
         break;
     }
     case CameraIpConflictEvent:
     {
-        result += tr("Conflicting Address: %1").arg(params.caption);
-        result += delimiter;
+        result << tr("Conflicting Address: %1").arg(params.caption);
         int n = 0;
         for (const QString& mac: params.description.split(QnIPConflictBusinessEvent::Delimiter))
-        {
-            result += delimiter;
-            result += tr("MAC #%1: %2 ").arg(++n).arg(mac);
-        }
+            result << tr("MAC #%1: %2").arg(++n).arg(mac);
+
         break;
     }
     case ServerConflictEvent:
     {
-        if (!params.description.isEmpty()) {
+        if (!params.description.isEmpty())
+        {
             QnCameraConflictList conflicts;
             conflicts.sourceServer = params.caption;
             conflicts.decode(params.description);
@@ -274,33 +273,31 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
             for (auto itr = conflicts.camerasByServer.begin(); itr != conflicts.camerasByServer.end(); ++itr)
             {
                 const QString &server = itr.key();
-                result += delimiter;
                 //: Conflicting Server #5: 10.0.2.1
-                result += tr("Conflicting Server #%1: %2").arg(++n).arg(server);
+                result << tr("Conflicting Server #%1: %2").arg(++n).arg(server);
                 int m = 0;
-                for (const QString &camera: conflicts.camerasByServer[server]) {
-                    result += delimiter;
-                    //: MAC #2: D0-50-99-38-1E-12
-                    result += tr("MAC #%1: %2 ").arg(++m).arg(camera);
-                }
+                //: MAC #2: D0-50-99-38-1E-12
+                for (const QString &camera: conflicts.camerasByServer[server])
+                    result << tr("MAC #%1: %2").arg(++m).arg(camera);
+
 
             }
         }
         else
         {
-            result += tr("Conflicting Server: %1").arg(params.caption);
+            result << tr("Conflicting Server: %1").arg(params.caption);
         }
         break;
     }
     case ServerStartEvent:
         break;
     case UserDefinedEvent:
-        result += params.description;
+        result << params.description;
         break;
     default:
         break;
     }
-    return result;
+    return result.join(delimiter);
 }
 
 QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount)
@@ -453,7 +450,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         qint64 timeStampMs = params.description.toLongLong();
         QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
         // todo: #gdm add server/client timezone conversion
-        result = tr("Archive backup finished, but isn't fully completed because backup time is over. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+        result = tr("Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
     }
     case BackupDone:
     {
@@ -585,5 +582,5 @@ QString QnBusinessStringsHelper::eventTypeString(
 QString QnBusinessStringsHelper::bruleDescriptionText(const QnBusinessEventRulePtr& bRule)
 {
     QString eventString = eventTypeString(bRule->eventType(), bRule->eventState(), bRule->actionType(), bRule->actionParams());
-    return tr("%1 --> %2").arg(eventString).arg(actionName(bRule->actionType()));
+    return lit("%1 --> %2").arg(eventString).arg(actionName(bRule->actionType()));
 }

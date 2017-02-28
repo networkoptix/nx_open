@@ -723,7 +723,7 @@ void QnLicenseManagerWidget::showActivationMessageLater(const QJsonObject& error
     {
         showMessageLater(QnMessageBoxIcon::Warning,
             tr("Invalid license key"),
-            tr("Please make sure it is entered correctly. ")
+            tr("Please make sure it is entered correctly.")
             + L'\n' + getProblemPersistMessage(),
             CopyToClipboardButton::Hide);
     }
@@ -771,9 +771,11 @@ void QnLicenseManagerWidget::showAlreadyActivatedLater(
     const QString& hwid,
     const QString& time)
 {
+
+    //TODO: #GDM #tr almost the same as in QnLicenseUsageHelper::activationMessage
     auto extras = (time.isEmpty()
-        ? tr("This license is already activated and linked to hardware id %1").arg(hwid)
-        : tr("This license is already activated and linked to hardware id %1 on %2")
+        ? tr("This license is already activated and linked to hardware ID %1").arg(hwid)
+        : tr("This license is already activated and linked to hardware ID %1 on %2")
             .arg(hwid).arg(time));
 
     extras += L'\n' + getContactSupportMessage();

@@ -245,7 +245,6 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
     auto report = getActiSystemInfo(actiRes);
     if (!report)
         return result;
-
     const auto kSerialNumber = report->value(kSystemInfoProductionIdParamName);
     const auto kMacAddress = report->value(kSystemInfoMacParamName);
     const auto kModel = report->value(kSystemInfoModelParamName);
@@ -288,6 +287,9 @@ boost::optional<QnActiResource::ActiSystemInfo> QnActiResourceSearcher::getActiS
         status,
         true);
 
+    if (shouldStop())
+        return boost::none;
+
     if (status != CL_HTTP_SUCCESS)
     {
         bool upnpDevInfoStatus = false;
@@ -297,7 +299,7 @@ boost::optional<QnActiResource::ActiSystemInfo> QnActiResourceSearcher::getActiS
 
         auto upnpDevInfo = getDeviceInfoSync(deviceXmlUrl, &upnpDevInfoStatus);
 
-        if (!upnpDevInfoStatus)
+        if (!upnpDevInfoStatus || shouldStop())
             return boost::none;
 
         actiResource->setUrl(upnpDevInfo.presentationUrl);
@@ -307,7 +309,7 @@ boost::optional<QnActiResource::ActiSystemInfo> QnActiResourceSearcher::getActiS
             status,
             true);
 
-        if(status != CL_HTTP_SUCCESS)
+        if(status != CL_HTTP_SUCCESS || shouldStop())
             return boost::none;
     }
 
@@ -446,7 +448,7 @@ void QnActiResourceSearcher::createResource(
     resource->setTypeId(m_resTypeId);
 
     if(isNx)
-    {    
+    {
         resourceData = qnCommon->dataPool()->data(NX_VENDOR, devInfo.modelName);
         auto name = resourceData.value<QString>(NX_DEVICE_NAME_PARAMETER_NAME);
         auto model = resourceData.value<QString>(NX_DEVICE_MODEL_PARAMETER_NAME);

@@ -287,7 +287,7 @@ QnResourcePtr QnEventLogModel::getResource(Column column, const QnBusinessAction
 
 QString QnEventLogModel::getUserNameById(const QnUuid& id)
 {
-    static const auto kRemovedUserName = tr("<User removed>");
+    static const auto kRemovedUserName = L'<' + tr("User removed") + L'>';
 
     const auto userResource = qnResPool->getResourceById(id).dynamicCast<QnUserResource>();
     return (userResource.isNull() ? kRemovedUserName : userResource->getName());

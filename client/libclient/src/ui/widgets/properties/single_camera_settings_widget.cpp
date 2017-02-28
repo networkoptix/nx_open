@@ -480,7 +480,6 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent)
                     -1,
                     kFisheyeThumbnailSize,
                     QnThumbnailRequestData::JpgFormat,
-                    QSharedPointer<QnCameraThumbnailManager>(),
                     this);
             ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }
@@ -772,7 +771,7 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream()
 
     QnMessageBox dialog(QnMessageBoxIcon::Warning,
         tr("Secondary stream disabled for this camera"),
-        tr("\"Motion + Low - Res\" recording option can't be set."),
+        tr("\"Motion + Low - Res\" recording option cannot be set."),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton);
 
     const auto recordAlways = dialog.addButton(
@@ -911,7 +910,7 @@ void QnSingleCameraSettingsWidget::at_resetMotionRegionsButton_clicked()
 {
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Reset motion regions to default?"),
-        tr("This action can't be undone."),
+        tr("This action cannot be undone."),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 

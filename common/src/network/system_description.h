@@ -46,6 +46,8 @@ public: // overrides
 
     bool safeMode() const override;
 
+    static QString extractSystemName(const QString& systemName);
+
 public:
     enum { kDefaultPriority = 0 };
     void addServer(const QnModuleInformation& serverInfo,
@@ -64,8 +66,6 @@ protected:
         const QString& systemId,
         const QnUuid& localSystemId,
         const QString& systemName);
-
-    static QString extractSystemName(const QString& systemName);
 
     void handleReachableServerAdded(const QnUuid& serverId);
 

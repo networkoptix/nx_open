@@ -210,7 +210,8 @@ void TitleWorkbenchPanel::setUsed(bool value)
         return;
 
     m_used = value;
-    setVisible(value, false);
+    setVisible(value, false); //< visibility via opacity
+    item->setVisible(value); //< true visibility on the scene
 }
 
 } //namespace NxUi

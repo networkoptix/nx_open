@@ -32,14 +32,8 @@ PreprocessRequestFunc removeJsonFields(const QSet<QString>& fields);
 
 namespace api_requests_detail {
 
-// TODO: Consider moving to nx_http::HttpClient.
-nx_http::BufferType readResponse(nx_http::HttpClient* httpClient);
-
 void doExecutePost(const MediaServerLauncher* const launcher, const QString& urlStr,
     const QByteArray& request, PreprocessRequestFunc preprocessRequestFunc, int httpStatus);
-
-void doExecuteGet(const MediaServerLauncher* const launcher, const QString& urlStr,
-    nx_http::BufferType* outResponse, int httpStatus);
 
 template<class RequestData>
 void executePost(
@@ -53,6 +47,9 @@ void executePost(
     ASSERT_NO_FATAL_FAILURE(doExecutePost(
         launcher, urlStr, request, std::move(preprocessRequestFunc), httpStatus));
 }
+
+void doExecuteGet(const MediaServerLauncher* const launcher, const QString& urlStr,
+    nx_http::BufferType* outResponse, int httpStatus);
 
 template<class ResponseData>
 void executeGet(

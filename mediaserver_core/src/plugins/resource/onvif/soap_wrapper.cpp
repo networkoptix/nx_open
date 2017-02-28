@@ -1,4 +1,3 @@
-
 #ifdef ENABLE_ONVIF
 
 #include <set>
@@ -26,6 +25,8 @@
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
 #include "media_server/settings.h"
+
+using nx::common::utils::Credentials;
 
 namespace {
 
@@ -418,23 +419,23 @@ QAuthenticator DeviceSoapWrapper::getDefaultPassword(const QString& manufacturer
     return result;
 }
 
-std::list<QnCredentials> DeviceSoapWrapper::getPossibleCredentials(
+std::list<nx::common::utils::Credentials> DeviceSoapWrapper::getPossibleCredentials(
     const QString& manufacturer,
     const QString& model) const
 {
     QnResourceData resData = qnCommon->dataPool()->data(manufacturer, model);
-    auto credentials = resData.value<QList<QnCredentials>>(
+    auto credentials = resData.value<QList<nx::common::utils::Credentials>>(
         Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
     return credentials.toStdList();
 }
 
-QnCredentials DeviceSoapWrapper::getForcedCredentials(
+nx::common::utils::Credentials DeviceSoapWrapper::getForcedCredentials(
     const QString& manufacturer,
     const QString& model)
 {
     QnResourceData resData = qnCommon->dataPool()->data(manufacturer, model);
-    auto credentials = resData.value<QnCredentials>(
+    auto credentials = resData.value<nx::common::utils::Credentials>(
         Qn::FORCED_DEFAULT_CREDENTIALS_PARAM_NAME);
 
     return credentials;
@@ -449,36 +450,29 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
     if (!forcedCredentials.user.isEmpty())
     {
         setLogin(forcedCredentials.user);
-        setPassword(forcedCredentials.password.value());
+        setPassword(forcedCredentials.password);
         return true;
     }
 
-    std::list<QnCredentials> possibleCredentials;
+    const auto oldCredentials =
+        PasswordHelper::instance()->getCredentialsByManufacturer(manufacturer);
+
+    auto possibleCredentials = oldCredentials;
+
     const auto credentialsFromResourceData = getPossibleCredentials(manufacturer, model);
-    const auto& oldPasswords = PasswordHelper::instance()->getPasswordsByManufacturer(manufacturer);
-
-    std::set<QnCredentials> oldCredentialsSet;
-
-    for (const auto& creds: oldPasswords)
+    for (const auto& credentials: credentialsFromResourceData)
     {
-        QnCredentials auth(QLatin1String(creds.first), QLatin1String(creds.second));
-        oldCredentialsSet.insert(auth);
-        possibleCredentials.push_back(auth);
+        if (!oldCredentials.contains(credentials))
+            possibleCredentials.append(credentials);
     }
 
-    for (const auto& creds: credentialsFromResourceData)
-    {
-        if (!oldCredentialsSet.count(creds))
-            possibleCredentials.push_back(creds);
-    }
-
-    for (const auto& auth: possibleCredentials)
+    for (const auto& credentials: possibleCredentials)
     {
         if (QnResource::isStopping())
             return false;
 
-        setLogin(auth.user);
-        setPassword(auth.password.value());
+        setLogin(credentials.user);
+        setPassword(credentials.password);
 
         NetIfacesReq request;
         NetIfacesResp response;
@@ -490,9 +484,9 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
 
     if (!possibleCredentials.empty())
     {
-        auto first = possibleCredentials.cbegin();
-        setLogin(first->user);
-        setPassword(first->password.value());
+        const auto& credentials = possibleCredentials.first();
+        setLogin(credentials.user);
+        setPassword(credentials.password);
     }
     else
     {

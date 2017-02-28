@@ -34,7 +34,7 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 
 #define SystemData_Fields (id)(name)(customization)(authKey)(ownerAccountEmail) \
                           (status)(cloudConnectionSubscriptionStatus)(systemSequence) \
-                          (opaque)
+                          (opaque)(registrationTime)
 #define SystemDataList_Fields (systems)
 
 //!for requests passing just system id
