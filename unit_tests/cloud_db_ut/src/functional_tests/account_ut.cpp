@@ -15,6 +15,7 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/server/fusion_request_result.h>
 #include <nx/utils/test_support/utils.h>
+#include <nx/utils/time.h>
 #include <utils/common/app_info.h>
 
 #include <utils/common/sync_call.h>
@@ -841,6 +842,103 @@ TEST_F(Account, created_while_sharing)
     ASSERT_EQ(1U, systems.size());
     ASSERT_EQ(system1.id, systems[0].id);
     ASSERT_EQ(newAccountAccessRoleInSystem1, systems[0].accessRole);
+}
+
+class AccountNewTest:
+    public Account
+{
+public:
+    static constexpr std::chrono::seconds kTimeShift = std::chrono::hours(3);
+
+    AccountNewTest():
+        m_timeShift(nx::utils::test::ClockType::system)
+    {
+        NX_GTEST_ASSERT_TRUE(startAndWaitUntilStarted());
+    }
+
+protected:
+    void givenNotActivatedAccount()
+    {
+        m_registrationTimeRange.first = 
+            nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
+        auto result = addAccount(&m_account, &m_account.password, &m_activationCode);
+        ASSERT_EQ(api::ResultCode::ok, result);
+        ASSERT_TRUE(!m_activationCode.code.empty());
+        m_registrationTimeRange.second = 
+            nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
+    }
+
+    void whenShiftedSystemTime()
+    {
+        m_timeShift.applyRelativeShift(kTimeShift);
+    }
+
+    void whenActivatedAccount()
+    {
+        m_activationTimeRange.first = 
+            nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
+        std::string accountEmail;
+        auto result = activateAccount(m_activationCode, &accountEmail);
+        ASSERT_EQ(api::ResultCode::ok, result);
+        m_activationTimeRange.second = 
+            nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
+    }
+
+    void assertRegistrationTimestampIsCorrect()
+    {
+        const auto account = getFreshAccountCopy();
+        ASSERT_GE(account.registrationTime, m_registrationTimeRange.first);
+        ASSERT_LE(account.registrationTime, m_registrationTimeRange.second);
+    }
+    
+    void assertActivationTimestampIsCorrect()
+    {
+        const auto account = getFreshAccountCopy();
+        ASSERT_GE(account.activationTime, m_activationTimeRange.first);
+        ASSERT_LE(account.activationTime, m_activationTimeRange.second);
+    }
+
+    void whenRestartedCloudDb()
+    {
+        ASSERT_TRUE(restart());
+    }
+
+private:
+    using TimeRange =
+        std::pair<std::chrono::system_clock::time_point, std::chrono::system_clock::time_point>;
+
+    nx::utils::test::ScopedTimeShift m_timeShift;
+    AccountWithPassword m_account;
+    api::AccountConfirmationCode m_activationCode;
+    TimeRange m_registrationTimeRange;
+    TimeRange m_activationTimeRange;
+
+    api::AccountData getFreshAccountCopy()
+    {
+        api::AccountData account;
+        auto result = getAccount(m_account.email, m_account.password, &account);
+        NX_GTEST_ASSERT_EQ(api::ResultCode::ok, result);
+        return account;
+    }
+};
+
+constexpr std::chrono::seconds AccountNewTest::kTimeShift;
+
+TEST_F(AccountNewTest, account_timestamps)
+{
+    givenNotActivatedAccount();
+
+    whenShiftedSystemTime();
+
+    whenActivatedAccount();
+
+    assertRegistrationTimestampIsCorrect();
+    assertActivationTimestampIsCorrect();
+
+    whenRestartedCloudDb();
+
+    assertRegistrationTimestampIsCorrect();
+    assertActivationTimestampIsCorrect();
 }
 
 } // namespace cdb

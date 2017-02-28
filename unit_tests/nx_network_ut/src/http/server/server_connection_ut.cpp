@@ -243,7 +243,7 @@ TEST_F(HttpAsyncServerConnectionTest, multipleRequestsTest)
         SocketFactory::tcpServerIpVersion());
 
     ASSERT_TRUE(socket->connect(m_testHttpServer->serverAddress()));
-    ASSERT_EQ(sizeof(testData) - 1, socket->send(testData, sizeof(testData) - 1));
+    ASSERT_EQ((int)sizeof(testData) - 1, socket->send(testData, sizeof(testData) - 1));
 }
 
 TEST_F(HttpAsyncServerConnectionTest, inactivityTimeout)

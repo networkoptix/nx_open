@@ -2,17 +2,30 @@
 
 #include <api/resource_property_adaptor.h>
 
+#include <core/resource/resource.h>
+#include <core/resource_management/resource_properties.h>
+
+
 QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControllerPtr &baseController):
     base_type(baseController),
     m_mode(mode)
 {
     m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(lit("ptzActiveObject"), QnPtzObject(), this);
-    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this, [this]{ emit changed(Qn::ActiveObjectPtzField); });
+    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this,
+        [this]() { emit changed(Qn::ActiveObjectPtzField); });
 
-    /* Adaptor is thread-safe and works even without resource, 
+    /* Adaptor is thread-safe and works even without resource,
      * exactly what we need for local mode. */
-    if(m_mode != Local)
-        m_adaptor->setResource(resource());
+    if (m_mode == Local)
+        return;
+
+    m_adaptor->setResource(resource());
+
+    connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::synchronizationNeeded, this,
+        [this](const QnResourcePtr& resource)
+        {
+            propertyDictionary->saveParamsAsync(resource->getId());
+        });
 }
 
 QnActivityPtzController::~QnActivityPtzController() {
@@ -20,7 +33,7 @@ QnActivityPtzController::~QnActivityPtzController() {
 }
 
 bool QnActivityPtzController::extends(Qn::PtzCapabilities capabilities) {
-    return 
+    return
         (capabilities & (Qn::PresetsPtzCapability | Qn::ToursPtzCapability)) &&
         !(capabilities & Qn::ActivityPtzCapability);
 }

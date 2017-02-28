@@ -7,6 +7,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QUrlQuery>
 
+#include <cdb/ec2_request_paths.h>
 #include <nx_ec/ec_proto_version.h>
 #include <nx/network/http/base64_decoder_filter.h>
 #include <nx/network/socket_factory.h>
@@ -22,7 +23,6 @@
 #include <utils/common/systemerror.h>
 #include <http/custom_headers.h>
 #include <api/global_settings.h>
-
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
 //!if not defined, ubjson is used
@@ -1090,7 +1090,10 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
             }
 
             m_postTranBaseUrl = m_remoteAddr;
-            m_postTranBaseUrl.setPath(lit("/ec2/forward_events"));
+            if (m_remotePeer.peerType == Qn::PT_CloudServer)
+                m_postTranBaseUrl.setPath(nx::cdb::api::kPushEc2TransactionPath);
+            else
+                m_postTranBaseUrl.setPath(lit("/ec2/forward_events"));
             m_postTranBaseUrl.setQuery( QString() );
         }
 

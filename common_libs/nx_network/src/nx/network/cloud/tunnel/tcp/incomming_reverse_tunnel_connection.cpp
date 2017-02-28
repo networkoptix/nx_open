@@ -20,9 +20,7 @@ IncomingReverseTunnelConnection::IncomingReverseTunnelConnection(
 void IncomingReverseTunnelConnection::start(
     aio::AbstractAioThread* aioThread, RetryPolicy policy, StartHandler handler)
 {
-    m_timer.reset(new RetryTimer(policy));
-    m_timer->bindToAioThread(aioThread);
-
+    m_timer.reset(new RetryTimer(policy, aioThread));
     m_startHandler = std::move(handler);
     m_timer->scheduleNextTry([this](){ spawnConnectorIfNeeded(); });
 }

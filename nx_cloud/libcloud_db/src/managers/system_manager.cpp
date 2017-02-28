@@ -758,6 +758,7 @@ nx::db::DBResult SystemManager::insertNewSystemDataToDb(
         nx::utils::timeSinceEpoch().count() +
         std::chrono::duration_cast<std::chrono::seconds>(
             m_settings.systemManager().notActivatedSystemLivePeriod).count();
+    result->systemData.registrationTime = nx::utils::utcTime();
     dbResult = m_systemDao.insert(queryContext, result->systemData, account.id);
     if (dbResult != db::DBResult::ok)
         return dbResult;
@@ -971,7 +972,7 @@ nx::db::DBResult SystemManager::addNewSharing(
     const data::SystemSharing& sharing)
 {
     api::SystemSharingEx sharingWithCalculatedData = createDerivedFromBase(sharing);
-    sharingWithCalculatedData.lastLoginTime = std::chrono::system_clock::now();
+    sharingWithCalculatedData.lastLoginTime = nx::utils::utcTime();
     sharingWithCalculatedData.accountId = inviteeAccount.id;
 
     auto dbResult = m_systemSharingDao.calculateUsageFrequencyForANewSystem(

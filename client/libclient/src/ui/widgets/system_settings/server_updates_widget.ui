@@ -44,7 +44,7 @@
       <item>
        <widget class="QLabel" name="dayWarningLabel">
         <property name="text">
-         <string>Applying system updates at the end of the week is not recommended.</string>
+         <string>Applying System updates at the end of the week is not recommended.</string>
         </property>
        </widget>
       </item>

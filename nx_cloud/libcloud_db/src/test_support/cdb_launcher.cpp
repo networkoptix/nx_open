@@ -172,6 +172,13 @@ api::ResultCode CdbLauncher::addAccount(
 
     auto connection = connectionFactory()->createConnection();
 
+    api::AccountRegistrationData registrationData;
+    registrationData.email = accountData->email;
+    registrationData.passwordHa1 = accountData->passwordHa1;
+    registrationData.passwordHa1Sha256 = accountData->passwordHa1Sha256;
+    registrationData.fullName = accountData->fullName;
+    registrationData.customization = accountData->customization;
+
     //adding account
     api::ResultCode result = api::ResultCode::ok;
     std::tie(result, *activationCode) = 
@@ -179,7 +186,7 @@ api::ResultCode CdbLauncher::addAccount(
             std::bind(
                 &nx::cdb::api::AccountManager::registerNewAccount,
                 connection->accountManager(),
-                *accountData,
+                registrationData,
                 std::placeholders::_1));
     return result;
 }

@@ -7,30 +7,35 @@
     "setup":{
         "createAccount": "create account",
         "errorNoHDD": "This device is intended to work with hard disk drive installed.<br>Please turn off the device and install a hard disk drive.",
-        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to your local network ot Internet"
+        "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the  local network ot Internet"
     },
     "passwordRequirements":
     {
         "minLengthMessage":"Password must contain at least 8 characters",
-        "requiredMessage": "Use only latin letters, numbers and keyboard \n symbols, avoid leading and trailing spaces.",
-        "weakMessage": "Use numbers, symbols in different case\n and special symbols to make your password stronger",
+        "requiredMessage": "Use only alphanumeric characters and keyboard \n symbols, avoid leading and trailing spaces.",
+        "weakMessage": "Use both upper- and lower-case letters \n and special symbols to make password stronger",
         "strongMessage": "Strong password!",
         "commonMessage": "This password is in top most popular passwords in the world"
     },
     "settings":{
-        "confirmRestart": "Do you want to restart server now?",
-        "couldntCheckInternet": "Couldn't check cloud connection",
-        "confirmRestoreDefault": "Do you want to clear database and settings? This process will take some time and server will be restarted afterwards.",
+        "tabs":{
+            "server":"Server",
+            "system":"System",
+            "device":"Device"
+        },
+        "confirmRestart": "Restart server?",
+        "couldntCheckInternet": "Could not check cloud connection",
+        "confirmRestoreDefault": "Clear database and settings? This process will take some time and server will be restarted afterwards.",
         "confirmRestoreDefaultTitle": "Restore factory defaults",
-        "unexpectedError": "Can't proceed with action: unexpected error has happened",
+        "unexpectedError": "Failed: unexpected error has happened",
         "connnetionError": "Connection error",
         "wrongPassword": "Wrong password.",
         "error": "Error: ",
-        "restartNeeded": "All changes saved. New settings will be applied after restart. \n Do you want to restart server now?",
+        "restartNeeded": "Changes saved. Restart server to apply new settings?",
         "settingsSaved": "Settings saved",
-        "confirmHardwareRestart": "Do you want to restart server's operation system?",
-        "confirmRestoreSettings": "Do you want to restore all server's settings? Archive will be saved, but network settings will be reset.",
-        "confirmRestoreSettingsNotNetwork": "Do you want to restart all server's settings? Archive and network settings will be saved.",
+        "confirmHardwareRestart": "Restart server operation system?",
+        "confirmRestoreSettings": "Restore all server settings? Archive will be saved, but network settings will be reset.",
+        "confirmRestoreSettingsNotNetwork": "Reset server configuration? Archive and network settings will be saved.",
         "unavailable": "Unavailable",
 
         "confirmDisconnectFromCloud":"Disconnect system from {{CLOUD_NAME}}",
@@ -43,26 +48,33 @@
         "createLocalOwnerTitle":"Create local administrator",
 
 
-        "confirmChangePassword": "Change admin's password",
-        "confirmChangePasswordTitle":"Are you sure you want to change system password? It will affect admin user and root password for some servers",
+        "confirmChangePassword": "Change admin password",
+        "confirmChangePasswordTitle":"Change system password? It will affect user 'admin' and the root password for some servers",
         "confirmChangePasswordAction": "Save new password",
 
-        "nx1ControlHint": "Client application was started. Use a keyboard or mobile application to control it."
+        "nx1ControlHint": "Client application has been started. Use a keyboard/mouse or mobile application to control it."
 
     },
+    "info":{
+        "tabs":{
+            "healthMonitoring": "Health monitoring",
+            "storage": "Storage",
+            "log": "Log"
+        }
+    },
     "join":{
-        "systemIsUnreacheble": "System is unreachable or doesn't exist.",
-        "incorrectCurrentPassword": "Incorrect current password",
-        "incorrectRemotePassword": "Login or password are incorrect",
-        "incompatibleVersion": "System is unreachable, doesn't exist or has incompatible version.",
-        "wrongUrl": "Unable to connect to specified server.",
-        "newSystemError": "Can't merge systems. Remote system is not configured yet",
-        "safeMode": "Can't merge systems. Remote system is in safe mode.",
-        "configError": "Can't merge systems. Maybe one of the systems is in safe mode.",
-        "cloudError": "Can't merge systems. Dependent system is connected to cloud. You need to disconnect it first.",
-        "cloudBothError": "Can't merge systems. Both systems are connected to cloud. You need to disconnect one first.",
-        "cloudHostConflict": "Can't merge systems, because servers are built with different cloud hosts",
-        "licenceError": "Warning: You are about to merge Systems with START licenses. As only 1 START license is allowed per System after your merge you will only have 1 START license remaining. If you understand this and would like to proceed please click Merge to continue.",
+        "systemIsUnreacheble": "System is unreachable or does not exist.",
+        "incorrectCurrentPassword": "Incorrect current password.",
+        "incorrectRemotePassword": "Login or password are incorrect.",
+        "incompatibleVersion": "System is unreachable, does not exist or has incompatible version.",
+        "wrongUrl": "Unable to connect to the specified server.",
+        "newSystemError": "Cannot merge systems. Remote system is not configured.",
+        "safeMode": "Cannot merge systems. Remote system is in safe mode.",
+        "configError": "Cannot merge systems. Maybe one of Systems is in safe mode.",
+        "cloudError": "Cannot merge systems. Dependent system is connected to cloud. You need to disconnect it first.",
+        "cloudBothError": "Cannot merge systems. Both systems are connected to cloud. You need to disconnect one first.",
+        "cloudHostConflict": "Cannot merge systems, because servers are built with different cloud hosts",
+        "licenceError": "Warning! You are about to merge Systems with Starter licenses. Only one Starter license is allowed per System, so the second license will be deactivated. Merge anyway?",
         "connectionFailed": "Connection failed: ",
         "unknownError": "Unknown error",
         "mergeFailed": "Merge failed: ",
@@ -87,12 +99,24 @@
         "serverOffline": "server is offline"
     },
     "fileUpload":{
-        "started": "Updating successfully started. It will take several minutes",
-        "upToDate": "Updating failed. The provided version is already installed.",
-        "invalidFile": "Updating failed. Provided file is not a valid update archive.",
-        "incompatibleSystem": "Updating failed. Provided file is targeted for another system.",
-        "extractionError": "Updating failed. Extraction failed, check available storage.",
-        "installationError": "Updating failed. Couldn't execute installation script.",
+        "started": "Update successfully started. It will take several minutes",
+        "upToDate": "Update failed. The provided version is already installed.",
+        "invalidFile": "Update failed. Provided file is not a valid update archive.",
+        "incompatibleSystem": "Update failed. Provided file is targeted for another system.",
+        "extractionError": "Update failed. Insufficient space to extract archive, check available storage.",
+        "installationError": "Updating failed. Cannot execute installation script.",
         "selectFiles": "Select files"
+    },
+    "cameraLinks":{
+        "highStream":"High stream",
+        "lowStream":"Low stream",
+        "transcoding": "Transcoding",
+        "unknown": "Unknown"
+    },
+    "advanced":{
+        "free": "Free",
+        "total": "Total",
+        "occupied": "Occupied",
+        "reserved": "Reserved"
     }
 }

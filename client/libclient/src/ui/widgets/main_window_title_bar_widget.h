@@ -30,7 +30,6 @@ public:
     void setTabBarStuffVisible(bool visible);
 
 protected:
-    virtual bool event(QEvent* event) override;
     virtual void mouseDoubleClickEvent(QMouseEvent* event) override;
     virtual void dragEnterEvent(QDragEnterEvent* event) override;
     virtual void dragMoveEvent(QDragMoveEvent* event) override;

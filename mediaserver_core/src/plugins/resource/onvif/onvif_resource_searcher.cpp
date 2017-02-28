@@ -24,7 +24,7 @@ namespace {
 /*
  *  Port list used for manual camera add
  */
-std::array<int, 5> kOnvifDeviceAltPorts =
+const static std::array<int, 5> kOnvifDeviceAltPorts =
 {
     8081, //FLIR default port
     8032, // DW default port
@@ -34,7 +34,7 @@ std::array<int, 5> kOnvifDeviceAltPorts =
 static const int kDefaultOnvifPort = 80;
 static const std::chrono::milliseconds kManualDiscoveryConnectTimeout(3000);
 
-}
+} // namespace
 
 bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
 {
@@ -106,12 +106,12 @@ int OnvifResourceSearcher::autoDetectDevicePort(const QUrl& url)
         socketList.push_back(std::move(sock));
     }
 
-    while (workers > 0)
+    while (workers > 0 && result == -1)
         waitCond.wait(&mutex);
 
+    lock.unlock();
     for (const auto& socket: socketList)
         socket->pleaseStopSync();
-
     return result > 0 ? result : kDefaultOnvifPort;
 }
 

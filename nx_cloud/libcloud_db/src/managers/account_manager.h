@@ -33,8 +33,7 @@ class StreeManager;
 /**
  * \note Methods of this class are re-enterable
  */
-class AccountManager
-:
+class AccountManager:
     public AbstractAuthenticationDataProvider
 {
 public:
@@ -68,7 +67,7 @@ public:
      */
     void registerAccount(
         const AuthorizationInfo& authzInfo,
-        data::AccountData accountData,
+        data::AccountRegistrationData accountData,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler );
     /**
      * On success, account moved to "activated" state.
@@ -171,13 +170,16 @@ private:
         nx::db::QueryContext* const tran,
         const data::AccountConfirmationCode& verificationCode,
         std::string* const accountEmail);
-    void accountVerified(
+    void sendActivateAccountResponse(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult resultCode,
         data::AccountConfirmationCode verificationCode,
-        const std::string accountEmail,
+        std::string accountEmail,
         std::function<void(api::ResultCode, api::AccountEmail)> completionHandler);
+    void activateAccountInCache(
+        std::string accountEmail,
+        std::chrono::system_clock::time_point activationTime);
 
     nx::db::DBResult updateAccountInDB(
         bool activateAccountIfNotActive,

@@ -30,11 +30,13 @@ namespace
         }
     }
 
+#if 0
     void splitToLines(const nx::Buffer& sourceText, std::vector<nx::Buffer>* const lines)
     {
         nx_http::LineSplitter lineSplitter;
         splitToLines(&lineSplitter, sourceText, lines);
     }
+#endif
 }
 
 #if 0
@@ -120,7 +122,7 @@ TEST( LineSplitter, TrailingLFTest )
         pos += bytesRead;
     }
 
-    ASSERT_EQ( 2, lines.size() );
+    ASSERT_EQ( 2U, lines.size() );
     ASSERT_EQ( "line1", lines[0] );
     ASSERT_EQ( "line2", lines[1] );
     nx::Buffer msgBody = testData.mid(pos);
@@ -145,6 +147,6 @@ TEST( LineSplitter, common )
     QnByteArrayConstRef lineBuffer;
     size_t bytesRead = 0;
     ASSERT_TRUE(lineSplitter.parseByLines(QByteArray("\r\n"), &lineBuffer, &bytesRead));
-    ASSERT_EQ(2, bytesRead);
+    ASSERT_EQ(2U, bytesRead);
     ASSERT_EQ("line3", lineBuffer);
 }
