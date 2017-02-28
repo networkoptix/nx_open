@@ -370,7 +370,6 @@ void QnNavigationItem::updateSpeedSliderSpeedFromNavigator()
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updatingSpeedSliderFromNavigator, true);
     m_speedSlider->setSpeed(navigator()->speed());
-    updatePlaybackButtonsPressed();
     updatePlayButtonChecked();
 }
 
@@ -381,28 +380,6 @@ void QnNavigationItem::updateNavigatorSpeedFromSpeedSlider()
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updatingNavigatorFromSpeedSlider, true);
     navigator()->setSpeed(m_speedSlider->roundedSpeed());
-    updatePlaybackButtonsPressed();
-}
-
-void QnNavigationItem::updatePlaybackButtonsPressed()
-{
-    qreal speed = navigator()->speed();
-
-    if (qFuzzyCompare(speed, 1.0) || qFuzzyIsNull(speed) || (speed > 0.0 && speed < 1.0))
-    {
-        m_stepForwardButton->setPressed(false);
-        m_stepBackwardButton->setPressed(false);
-    }
-    else if (speed > 1.0)
-    {
-        m_stepForwardButton->setPressed(true);
-        m_stepBackwardButton->setPressed(false);
-    }
-    else if (speed < 0.0)
-    {
-        m_stepForwardButton->setPressed(false);
-        m_stepBackwardButton->setPressed(true);
-    }
 }
 
 void QnNavigationItem::updatePlaybackButtonsIcons()
