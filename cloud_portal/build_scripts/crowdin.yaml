@@ -1,0 +1,11 @@
+project_identifier: cloud-test-api
+api_key: aa7305e136d3dc166cb96253d4377668
+base_path: /home/boris/jenkins/web/workspace/cloud_portal
+
+files:
+  -
+    source: '/build_scripts/language_pack/**/*.*'
+    translation: '/translations/%locale_with_underscore%/**/%original_file_name%'
+    ignore:
+      - /build_scripts/language_pack/crowdin.yaml
+      - /build_scripts/language_pack/views/debug.html

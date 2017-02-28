@@ -1,0 +1,14 @@
+{
+  "activate_account": {
+    "emailSubject": "Confirm your account"
+  },
+  "restore_password": {
+    "emailSubject": "Restore your password"
+  },
+  "system_invite": {
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
+  },
+  "system_shared": {
+    "emailSubject": "Video system {{message.system_name}} was shared with you"
+  }
+}
