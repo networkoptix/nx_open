@@ -19,6 +19,7 @@ Column
         anchors.right: parent.right;
 
         anchors.leftMargin: 4;
+        elide: Text.ElideRight;
 
         disableable: false;
         enabled: control.enabled;
