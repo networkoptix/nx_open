@@ -240,6 +240,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     if (businessAction->getParams().useSource)
         alarmCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
     alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
+    alarmCameras = alarmCameras.toSet().toList();
 
     QnResourcePtr resource = qnResPool->getResourceById(params.eventResourceId);
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();

@@ -116,6 +116,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
             if (businessAction->getParams().useSource)
                 targetCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
             targetCameras = accessController()->filtered(targetCameras, Qn::ViewContentPermission);
+            targetCameras = targetCameras.toSet().toList();
 
             if (targetCameras.isEmpty())
                 return;
