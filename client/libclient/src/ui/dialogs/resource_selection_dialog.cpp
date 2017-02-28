@@ -66,7 +66,6 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(Filter filter, QWidget* par
     m_updating(false)
 {
     ui->setupUi(this);
-
     setHelpTopic(ui->resourcesWidget->treeView(), Qn::Forced_Empty_Help);
 
     QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(ui->treeWidget);
@@ -298,7 +297,7 @@ void QnResourceSelectionDialog::updateThumbnail(const QModelIndex& index)
     QModelIndex baseIndex = index.sibling(index.row(), Qn::NameColumn);
     QString toolTip = baseIndex.data(Qt::ToolTipRole).toString();
     ui->detailsWidget->setName(toolTip);
-    ui->detailsWidget->setTargetResource(index.data(Qn::ResourceRole).value<QnResourcePtr>());
+    ui->detailsWidget->setResource(index.data(Qn::ResourceRole).value<QnResourcePtr>());
     ui->detailsWidget->layout()->activate();
 }
 

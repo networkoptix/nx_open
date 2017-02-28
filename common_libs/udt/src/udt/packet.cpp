@@ -7,18 +7,18 @@ modification, are permitted provided that the following conditions are
 met:
 
 * Redistributions of source code must retain the above
-  copyright notice, this list of conditions and the
-  following disclaimer.
+copyright notice, this list of conditions and the
+following disclaimer.
 
 * Redistributions in binary form must reproduce the
-  above copyright notice, this list of conditions
-  and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
+above copyright notice, this list of conditions
+and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
 
 * Neither the name of the University of Illinois
-  nor the names of its contributors may be used to
-  endorse or promote products derived from this
-  software without specific prior written permission.
+nor the names of its contributors may be used to
+endorse or promote products derived from this
+software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
 IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*****************************************************************************
 written by
-   Yunhong Gu, last updated 02/12/2011
+Yunhong Gu, last updated 02/12/2011
 *****************************************************************************/
 
 
@@ -153,19 +153,19 @@ const int CHandShake::m_iContentSize = 48;
 
 // Set up the aliases in the constructure
 CPacket::CPacket():
-m_iSeqNo((int32_t&)(m_nHeader[0])),
-m_iMsgNo((int32_t&)(m_nHeader[1])),
-m_iTimeStamp((int32_t&)(m_nHeader[2])),
-m_iID((int32_t&)(m_nHeader[3])),
-m_pcData((char*&)(m_PacketVector[1].iov_base)),
-__pad()
+    m_iSeqNo((int32_t&)(m_nHeader[0])),
+    m_iMsgNo((int32_t&)(m_nHeader[1])),
+    m_iTimeStamp((int32_t&)(m_nHeader[2])),
+    m_iID((int32_t&)(m_nHeader[3])),
+    m_pcData((char*&)(m_PacketVector[1].iov_base)),
+    __pad()
 {
-   for (int i = 0; i < 4; ++ i)
-      m_nHeader[i] = 0;
-   m_PacketVector[0].iov_base = (char *)m_nHeader;
-   m_PacketVector[0].iov_len = CPacket::m_iPktHdrSize;
-   m_PacketVector[1].iov_base = NULL;
-   m_PacketVector[1].iov_len = 0;
+    for (int i = 0; i < 4; ++i)
+        m_nHeader[i] = 0;
+    m_PacketVector[0].iov_base = (char *)m_nHeader;
+    m_PacketVector[0].iov_len = CPacket::m_iPktHdrSize;
+    m_PacketVector[1].iov_base = NULL;
+    m_PacketVector[1].iov_len = 0;
 }
 
 CPacket::~CPacket()
@@ -174,238 +174,238 @@ CPacket::~CPacket()
 
 int CPacket::getLength() const
 {
-   return m_PacketVector[1].iov_len;
+    return m_PacketVector[1].iov_len;
 }
 
 void CPacket::setLength(int len)
 {
-   m_PacketVector[1].iov_len = len;
+    m_PacketVector[1].iov_len = len;
 }
 
-void CPacket::pack(int pkttype, void* lparam, void* rparam, int size)
+void CPacket::pack(ControlPacketType pkttype, void* lparam, void* rparam, int size)
 {
-   // Set (bit-0 = 1) and (bit-1~15 = type)
-   m_nHeader[0] = 0x80000000 | (pkttype << 16);
+    // Set (bit-0 = 1) and (bit-1~15 = type)
+    m_nHeader[0] = 0x80000000 | (((int)pkttype) << 16);
 
-   // Set additional information and control information field
-   switch (pkttype)
-   {
-   case 2: //0010 - Acknowledgement (ACK)
-      // ACK packet seq. no.
-      if (NULL != lparam)
-         m_nHeader[1] = *(int32_t *)lparam;
+    // Set additional information and control information field
+    switch (pkttype)
+    {
+        case ControlPacketType::Acknowledgement: //0010 - Acknowledgement (ACK)
+                                          // ACK packet seq. no.
+            if (NULL != lparam)
+                m_nHeader[1] = *(int32_t *)lparam;
 
-      // data ACK seq. no. 
-      // optional: RTT (microsends), RTT variance (microseconds) advertised flow window size (packets), and estimated link capacity (packets per second)
-      m_PacketVector[1].iov_base = (char *)rparam;
-      m_PacketVector[1].iov_len = size;
+            // data ACK seq. no. 
+            // optional: RTT (microsends), RTT variance (microseconds) advertised flow window size (packets), and estimated link capacity (packets per second)
+            m_PacketVector[1].iov_base = (char *)rparam;
+            m_PacketVector[1].iov_len = size;
 
-      break;
+            break;
 
-   case 6: //0110 - Acknowledgement of Acknowledgement (ACK-2)
-      // ACK packet seq. no.
-      m_nHeader[1] = *(int32_t *)lparam;
+        case ControlPacketType::AcknowledgementOfAcknowledgement: //0110 - Acknowledgement of Acknowledgement (ACK-2)
+                                                           // ACK packet seq. no.
+            m_nHeader[1] = *(int32_t *)lparam;
 
-      // control info field should be none
-      // but "writev" does not allow this
-      m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
-      m_PacketVector[1].iov_len = 4; //0;
+            // control info field should be none
+            // but "writev" does not allow this
+            m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
+            m_PacketVector[1].iov_len = 4; //0;
 
-      break;
+            break;
 
-   case 3: //0011 - Loss Report (NAK)
-      // loss list
-      m_PacketVector[1].iov_base = (char *)rparam;
-      m_PacketVector[1].iov_len = size;
+        case ControlPacketType::LossReport: //0011 - Loss Report (NAK)
+                                     // loss list
+            m_PacketVector[1].iov_base = (char *)rparam;
+            m_PacketVector[1].iov_len = size;
 
-      break;
+            break;
 
-   case 4: //0100 - Congestion Warning
-      // control info field should be none
-      // but "writev" does not allow this
-      m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
-      m_PacketVector[1].iov_len = 4; //0;
-  
-      break;
+        case ControlPacketType::DelayWarning: //0100 - Congestion Warning
+                                       // control info field should be none
+                                       // but "writev" does not allow this
+            m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
+            m_PacketVector[1].iov_len = 4; //0;
 
-   case 1: //0001 - Keep-alive
-      // control info field should be none
-      // but "writev" does not allow this
-      m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
-      m_PacketVector[1].iov_len = 4; //0;
+            break;
 
-      break;
+        case ControlPacketType::KeepAlive: //0001 - Keep-alive
+                                    // control info field should be none
+                                    // but "writev" does not allow this
+            m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
+            m_PacketVector[1].iov_len = 4; //0;
 
-   case 0: //0000 - Handshake
-      // control info filed is handshake info
-      m_PacketVector[1].iov_base = (char *)rparam;
-      m_PacketVector[1].iov_len = size; //sizeof(CHandShake);
+            break;
 
-      break;
+        case ControlPacketType::Handshake: //0000 - Handshake
+                                    // control info filed is handshake info
+            m_PacketVector[1].iov_base = (char *)rparam;
+            m_PacketVector[1].iov_len = size; //sizeof(CHandShake);
 
-   case 5: //0101 - Shutdown
-      // control info field should be none
-      // but "writev" does not allow this
-      m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
-      m_PacketVector[1].iov_len = 4; //0;
+            break;
 
-      break;
+        case ControlPacketType::Shutdown: //0101 - Shutdown
+                                   // control info field should be none
+                                   // but "writev" does not allow this
+            m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
+            m_PacketVector[1].iov_len = 4; //0;
 
-   case 7: //0111 - Message Drop Request
-      // msg id 
-      m_nHeader[1] = *(int32_t *)lparam;
+            break;
 
-      //first seq no, last seq no
-      m_PacketVector[1].iov_base = (char *)rparam;
-      m_PacketVector[1].iov_len = size;
+        case ControlPacketType::MsgDropRequest: //0111 - Message Drop Request
+                                         // msg id 
+            m_nHeader[1] = *(int32_t *)lparam;
 
-      break;
+            //first seq no, last seq no
+            m_PacketVector[1].iov_base = (char *)rparam;
+            m_PacketVector[1].iov_len = size;
 
-   case 8: //1000 - Error Signal from the Peer Side
-      // Error type
-      m_nHeader[1] = *(int32_t *)lparam;
+            break;
 
-      // control info field should be none
-      // but "writev" does not allow this
-      m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
-      m_PacketVector[1].iov_len = 4; //0;
+        case ControlPacketType::RemotePeerFailure: //1000 - Error Signal from the Peer Side
+                                            // Error type
+            m_nHeader[1] = *(int32_t *)lparam;
 
-      break;
+            // control info field should be none
+            // but "writev" does not allow this
+            m_PacketVector[1].iov_base = (char *)&__pad; //NULL;
+            m_PacketVector[1].iov_len = 4; //0;
 
-   case 32767: //0x7FFF - Reserved for user defined control packets
-      // for extended control packet
-      // "lparam" contains the extended type information for bit 16 - 31
-      // "rparam" is the control information
-      m_nHeader[0] |= *(int32_t *)lparam;
+            break;
 
-      if (NULL != rparam)
-      {
-         m_PacketVector[1].iov_base = (char *)rparam;
-         m_PacketVector[1].iov_len = size;
-      }
-      else
-      {
-         m_PacketVector[1].iov_base = (char *)&__pad;
-         m_PacketVector[1].iov_len = 4;
-      }
+        case ControlPacketType::Reserved: //0x7FFF - Reserved for user defined control packets
+                                   // for extended control packet
+                                   // "lparam" contains the extended type information for bit 16 - 31
+                                   // "rparam" is the control information
+            m_nHeader[0] |= *(int32_t *)lparam;
 
-      break;
+            if (NULL != rparam)
+            {
+                m_PacketVector[1].iov_base = (char *)rparam;
+                m_PacketVector[1].iov_len = size;
+            }
+            else
+            {
+                m_PacketVector[1].iov_base = (char *)&__pad;
+                m_PacketVector[1].iov_len = 4;
+            }
 
-   default:
-      break;
-   }
+            break;
+
+        default:
+            break;
+    }
 }
 
 iovec* CPacket::getPacketVector()
 {
-   return m_PacketVector;
+    return m_PacketVector;
 }
 
-int CPacket::getFlag() const
+PacketFlag CPacket::getFlag() const
 {
-   // read bit 0
-   return m_nHeader[0] >> 31;
+    // read bit 0
+    return static_cast<PacketFlag>(m_nHeader[0] >> 31);
 }
 
-int CPacket::getType() const
+ControlPacketType CPacket::getType() const
 {
-   // read bit 1~15
-   return (m_nHeader[0] >> 16) & 0x00007FFF;
+    // read bit 1~15
+    return static_cast<ControlPacketType>((m_nHeader[0] >> 16) & 0x00007FFF);
 }
 
 int CPacket::getExtendedType() const
 {
-   // read bit 16~31
-   return m_nHeader[0] & 0x0000FFFF;
+    // read bit 16~31
+    return m_nHeader[0] & 0x0000FFFF;
 }
 
 int32_t CPacket::getAckSeqNo() const
 {
-   // read additional information field
-   return m_nHeader[1];
+    // read additional information field
+    return m_nHeader[1];
 }
 
 int CPacket::getMsgBoundary() const
 {
-   // read [1] bit 0~1
-   return m_nHeader[1] >> 30;
+    // read [1] bit 0~1
+    return m_nHeader[1] >> 30;
 }
 
 bool CPacket::getMsgOrderFlag() const
 {
-   // read [1] bit 2
-   return (1 == ((m_nHeader[1] >> 29) & 1));
+    // read [1] bit 2
+    return (1 == ((m_nHeader[1] >> 29) & 1));
 }
 
 int32_t CPacket::getMsgSeq() const
 {
-   // read [1] bit 3~31
-   return m_nHeader[1] & 0x1FFFFFFF;
+    // read [1] bit 3~31
+    return m_nHeader[1] & 0x1FFFFFFF;
 }
 
 CPacket* CPacket::clone() const
 {
-   CPacket* pkt = new CPacket;
-   memcpy(pkt->m_nHeader, m_nHeader, m_iPktHdrSize);
-   pkt->m_pcData = new char[m_PacketVector[1].iov_len];
-   memcpy(pkt->m_pcData, m_pcData, m_PacketVector[1].iov_len);
-   pkt->m_PacketVector[1].iov_len = m_PacketVector[1].iov_len;
+    CPacket* pkt = new CPacket;
+    memcpy(pkt->m_nHeader, m_nHeader, m_iPktHdrSize);
+    pkt->m_pcData = new char[m_PacketVector[1].iov_len];
+    memcpy(pkt->m_pcData, m_pcData, m_PacketVector[1].iov_len);
+    pkt->m_PacketVector[1].iov_len = m_PacketVector[1].iov_len;
 
-   return pkt;
+    return pkt;
 }
 
 CHandShake::CHandShake():
-m_iVersion(0),
-m_iType(0),
-m_iISN(0),
-m_iMSS(0),
-m_iFlightFlagSize(0),
-m_iReqType(0),
-m_iID(0),
-m_iCookie(0)
+    m_iVersion(0),
+    m_iType(0),
+    m_iISN(0),
+    m_iMSS(0),
+    m_iFlightFlagSize(0),
+    m_iReqType(0),
+    m_iID(0),
+    m_iCookie(0)
 {
-   for (int i = 0; i < 4; ++ i)
-      m_piPeerIP[i] = 0;
+    for (int i = 0; i < 4; ++i)
+        m_piPeerIP[i] = 0;
 }
 
 int CHandShake::serialize(char* buf, int& size)
 {
-   if (size < m_iContentSize)
-      return -1;
+    if (size < m_iContentSize)
+        return -1;
 
-   int32_t* p = (int32_t*)buf;
-   *p++ = m_iVersion;
-   *p++ = m_iType;
-   *p++ = m_iISN;
-   *p++ = m_iMSS;
-   *p++ = m_iFlightFlagSize;
-   *p++ = m_iReqType;
-   *p++ = m_iID;
-   *p++ = m_iCookie;
-   for (int i = 0; i < 4; ++ i)
-      *p++ = m_piPeerIP[i];
+    int32_t* p = (int32_t*)buf;
+    *p++ = m_iVersion;
+    *p++ = m_iType;
+    *p++ = m_iISN;
+    *p++ = m_iMSS;
+    *p++ = m_iFlightFlagSize;
+    *p++ = m_iReqType;
+    *p++ = m_iID;
+    *p++ = m_iCookie;
+    for (int i = 0; i < 4; ++i)
+        *p++ = m_piPeerIP[i];
 
-   size = m_iContentSize;
+    size = m_iContentSize;
 
-   return 0;
+    return 0;
 }
 
 int CHandShake::deserialize(const char* buf, int size)
 {
-   if (size < m_iContentSize)
-      return -1;
+    if (size < m_iContentSize)
+        return -1;
 
-   int32_t* p = (int32_t*)buf;
-   m_iVersion = *p++;
-   m_iType = *p++;
-   m_iISN = *p++;
-   m_iMSS = *p++;
-   m_iFlightFlagSize = *p++;
-   m_iReqType = *p++;
-   m_iID = *p++;
-   m_iCookie = *p++;
-   for (int i = 0; i < 4; ++ i)
-      m_piPeerIP[i] = *p++;
+    int32_t* p = (int32_t*)buf;
+    m_iVersion = *p++;
+    m_iType = *p++;
+    m_iISN = *p++;
+    m_iMSS = *p++;
+    m_iFlightFlagSize = *p++;
+    m_iReqType = *p++;
+    m_iID = *p++;
+    m_iCookie = *p++;
+    for (int i = 0; i < 4; ++i)
+        m_piPeerIP[i] = *p++;
 
-   return 0;
+    return 0;
 }

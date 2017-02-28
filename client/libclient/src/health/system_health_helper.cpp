@@ -50,9 +50,10 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
         case QnSystemHealth::CloudPromo:
         {
             const QString kLearnMoreText = tr("Learn more");
-            const QString kMessage = tr("Check out <b>%1</b> Beta "
-                                        "&mdash; connect to your servers from anywhere",
-                "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName());
+            const QString kCloudBeta = lit("<b>%1</b> Beta").arg(QnAppInfo::cloudName());
+
+            const QString kMessage = tr("Check out %1 &mdash; connect to your servers from anywhere",
+                "%1 is the cloud name (like 'Nx Cloud')").arg(kCloudBeta);
 
             const QString kTemplate = lit("<p>%1</p><p><a href=\"settings\">%2</a></p>");
             return kTemplate.arg(kMessage, kLearnMoreText);
@@ -74,13 +75,13 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             return QString();
 
         case QnSystemHealth::EmailIsEmpty:
-            messageParts << tr("Email address is not set.") << tr("You cannot receive system notifications by Email.");
+            messageParts << tr("Email address is not set.") << tr("You cannot receive System notifications by Email.");
             break;
         case QnSystemHealth::SmtpIsNotSet:
-            messageParts << tr("Email server is not set.") << tr("You cannot receive system notifications by Email.");
+            messageParts << tr("Email server is not set.") << tr("You cannot receive System notifications by Email.");
             break;
         case QnSystemHealth::UsersEmailIsEmpty:
-            messageParts << tr("Some users have not set their Email addresses.") << tr("They cannot receive system notifications by Email.");
+            messageParts << tr("Some users have not set their Email addresses.") << tr("They cannot receive System notifications by Email.");
             break;
         case QnSystemHealth::NoPrimaryTimeServer:
             messageParts << tr("Server times are not synchronized and a common time could not be detected automatically.");

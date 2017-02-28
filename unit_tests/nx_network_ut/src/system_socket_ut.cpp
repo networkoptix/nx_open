@@ -8,6 +8,7 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 
+#include "common_server_socket_ut.h"
 
 namespace nx {
 namespace network {
@@ -30,15 +31,15 @@ TEST( TcpSocket, KeepAliveOptions )
     #if defined( Q_OS_LINUX )
         EXPECT_EQ( result->time.count(), 5 );
         EXPECT_EQ( result->interval.count(), 1 );
-        EXPECT_EQ( result->probeCount, 3 );
+        EXPECT_EQ( result->probeCount, 3U );
     #elif defined( Q_OS_WIN )
         EXPECT_EQ( result->time.count(), 5 );
         EXPECT_EQ( result->interval.count(), 1 );
-        EXPECT_EQ( result->probeCount, 0 ); // means default
+        EXPECT_EQ( result->probeCount, 0U ); // means default
     #elif defined( Q_OS_MACX )
         EXPECT_EQ( result->time.count(), 5 );
         EXPECT_EQ( result->interval.count(), 0 ); // means default
-        EXPECT_EQ( result->probeCount, 0 ); // means default
+        EXPECT_EQ( result->probeCount, 0U ); // means default
     #endif
 
     // Disable
@@ -151,6 +152,8 @@ NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE(
     TEST, DISABLED_TcpSocketV6to4,
     [](){ return std::make_unique<TCPServerSocket>(AF_INET); },
     [](){ return std::make_unique<TCPSocket>(AF_INET6); })
+
+INSTANTIATE_TYPED_TEST_CASE_P(TCPServerSocket, ServerSocketTest, TCPServerSocket);
 
 }   //test
 }   //network

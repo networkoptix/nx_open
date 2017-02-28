@@ -7,18 +7,18 @@ modification, are permitted provided that the following conditions are
 met:
 
 * Redistributions of source code must retain the above
-  copyright notice, this list of conditions and the
-  following disclaimer.
+copyright notice, this list of conditions and the
+following disclaimer.
 
 * Redistributions in binary form must reproduce the
-  above copyright notice, this list of conditions
-  and the following disclaimer in the documentation
-  and/or other materials provided with the distribution.
+above copyright notice, this list of conditions
+and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
 
 * Neither the name of the University of Illinois
-  nor the names of its contributors may be used to
-  endorse or promote products derived from this
-  software without specific prior written permission.
+nor the names of its contributors may be used to
+endorse or promote products derived from this
+software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
 IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /*****************************************************************************
 written by
-   Yunhong Gu, last updated 01/27/2011
+Yunhong Gu, last updated 01/27/2011
 *****************************************************************************/
 
 #ifndef __UDT_CHANNEL_H__
@@ -49,124 +49,124 @@ written by
 class CChannel
 {
 public:
-   CChannel();
-   CChannel(int version);
-   ~CChannel();
+    CChannel();
+    CChannel(int version);
+    ~CChannel();
 
-      // Functionality:
-      //    Open a UDP channel.
-      // Parameters:
-      //    0) [in] addr: The local address that UDP will use.
-      // Returned value:
-      //    None.
+    // Functionality:
+    //    Open a UDP channel.
+    // Parameters:
+    //    0) [in] addr: The local address that UDP will use.
+    // Returned value:
+    //    None.
 
-   void open(const sockaddr* addr = NULL);
+    void open(const sockaddr* addr = NULL);
 
-      // Functionality:
-      //    Open a UDP channel based on an existing UDP socket.
-      // Parameters:
-      //    0) [in] udpsock: UDP socket descriptor.
-      // Returned value:
-      //    None.
+    // Functionality:
+    //    Open a UDP channel based on an existing UDP socket.
+    // Parameters:
+    //    0) [in] udpsock: UDP socket descriptor.
+    // Returned value:
+    //    None.
 
-   void open(UDPSOCKET udpsock);
+    void open(UDPSOCKET udpsock);
 
-      // Functionality:
-      //    Get the UDP sending buffer size.
-      // Parameters:
-      //    None.
-      // Returned value:
-      //    Current UDP sending buffer size.
+    // Functionality:
+    //    Get the UDP sending buffer size.
+    // Parameters:
+    //    None.
+    // Returned value:
+    //    Current UDP sending buffer size.
 
-   int getSndBufSize();
+    int getSndBufSize();
 
-      // Functionality:
-      //    Get the UDP receiving buffer size.
-      // Parameters:
-      //    None.
-      // Returned value:
-      //    Current UDP receiving buffer size.
+    // Functionality:
+    //    Get the UDP receiving buffer size.
+    // Parameters:
+    //    None.
+    // Returned value:
+    //    Current UDP receiving buffer size.
 
-   int getRcvBufSize();
+    int getRcvBufSize();
 
-      // Functionality:
-      //    Set the UDP sending buffer size.
-      // Parameters:
-      //    0) [in] size: expected UDP sending buffer size.
-      // Returned value:
-      //    None.
+    // Functionality:
+    //    Set the UDP sending buffer size.
+    // Parameters:
+    //    0) [in] size: expected UDP sending buffer size.
+    // Returned value:
+    //    None.
 
-   void setSndBufSize(int size);
+    void setSndBufSize(int size);
 
-      // Functionality:
-      //    Set the UDP receiving buffer size.
-      // Parameters:
-      //    0) [in] size: expected UDP receiving buffer size.
-      // Returned value:
-      //    None.
+    // Functionality:
+    //    Set the UDP receiving buffer size.
+    // Parameters:
+    //    0) [in] size: expected UDP receiving buffer size.
+    // Returned value:
+    //    None.
 
-   void setRcvBufSize(int size);
+    void setRcvBufSize(int size);
 
-      // Functionality:
-      //    Query the socket address that the channel is using.
-      // Parameters:
-      //    0) [out] addr: pointer to store the returned socket address.
-      // Returned value:
-      //    None.
+    // Functionality:
+    //    Query the socket address that the channel is using.
+    // Parameters:
+    //    0) [out] addr: pointer to store the returned socket address.
+    // Returned value:
+    //    None.
 
-   void getSockAddr(sockaddr* addr) const;
+    void getSockAddr(sockaddr* addr) const;
 
-      // Functionality:
-      //    Query the peer side socket address that the channel is connect to.
-      // Parameters:
-      //    0) [out] addr: pointer to store the returned socket address.
-      // Returned value:
-      //    None.
+    // Functionality:
+    //    Query the peer side socket address that the channel is connect to.
+    // Parameters:
+    //    0) [out] addr: pointer to store the returned socket address.
+    // Returned value:
+    //    None.
 
-   void getPeerAddr(sockaddr* addr) const;
+    void getPeerAddr(sockaddr* addr) const;
 
-      // Functionality:
-      //    Send a packet to the given address.
-      // Parameters:
-      //    0) [in] addr: pointer to the destination address.
-      //    1) [in] packet: reference to a CPacket entity.
-      // Returned value:
-      //    Actual size of data sent.
+    // Functionality:
+    //    Send a packet to the given address.
+    // Parameters:
+    //    0) [in] addr: pointer to the destination address.
+    //    1) [in] packet: reference to a CPacket entity.
+    // Returned value:
+    //    Actual size of data sent.
 
-   int sendto(const sockaddr* addr, CPacket& packet) const;
+    int sendto(const sockaddr* addr, CPacket& packet) const;
 
-      // Functionality:
-      //    Receive a packet from the channel and record the source address.
-      // Parameters:
-      //    0) [in] addr: pointer to the source address.
-      //    1) [in] packet: reference to a CPacket entity.
-      // Returned value:
-      //    Actual size of data received.
+    // Functionality:
+    //    Receive a packet from the channel and record the source address.
+    // Parameters:
+    //    0) [in] addr: pointer to the source address.
+    //    1) [in] packet: reference to a CPacket entity.
+    // Returned value:
+    //    Actual size of data received.
 
-   int recvfrom(sockaddr* addr, CPacket& packet) const;
+    int recvfrom(sockaddr* addr, CPacket& packet) const;
 
-   int shutdown();
-
-private:
-   void setUDPSockOpt();
+    int shutdown();
 
 private:
-   int m_iIPversion;                    // IP version
-   int m_iSockAddrSize;                 // socket address structure size (pre-defined to avoid run-time test)
+    void setUDPSockOpt();
 
-   UDPSOCKET m_iSocket;                 // socket descriptor
+private:
+    int m_iIPversion;                    // IP version
+    int m_iSockAddrSize;                 // socket address structure size (pre-defined to avoid run-time test)
 
-   int m_iSndBufSize;                   // UDP sending buffer size
-   int m_iRcvBufSize;                   // UDP receiving buffer size
+    UDPSOCKET m_iSocket;                 // socket descriptor
 
-      // Functionality:
-      //    Disconnect and close the UDP entity.
-      // Parameters:
-      //    None.
-      // Returned value:
-      //    None.
+    int m_iSndBufSize;                   // UDP sending buffer size
+    int m_iRcvBufSize;                   // UDP receiving buffer size
 
-   void closeSocket();
+                                         // Functionality:
+                                         //    Disconnect and close the UDP entity.
+                                         // Parameters:
+                                         //    None.
+                                         // Returned value:
+                                         //    None.
+
+    void closeSocket();
 };
 
 #endif

@@ -33,8 +33,7 @@
     <message>
         <source>Zoom timeline
 to view more bookmarks</source>
-        <comment>Use &apos;
-&apos; to split message in two lines (required)</comment>
+        <comment>It is highly recommended to split message in two lines</comment>
         <translation>Увеличьте масштаб шкалы времени
 чтобы увидеть больше закладок</translation>
     </message>
@@ -265,7 +264,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Cannot set the current position for camera &quot;%1&quot;</source>
-        <translation>Не удаётся задать текущую позицию камеры «%1»</translation>
+        <translation>Не удаётся задать текущую позицию камеры &quot;%1&quot;</translation>
     </message>
 </context>
 <context>
@@ -1695,14 +1694,14 @@ to view more bookmarks</source>
         <translation>Глобальные настройки</translation>
     </message>
     <message>
-        <source>affect all servers in the system</source>
-        <comment>Relates to &apos;Global Settings&apos; subject</comment>
-        <translation>влияют на все серверы в системе</translation>
-    </message>
-    <message>
         <source>Lo-Res Streams</source>
         <comment>Cameras Backup</comment>
         <translation>Потоки с низким качеством</translation>
+    </message>
+    <message>
+        <source>affect all servers in System</source>
+        <comment>Relates to &apos;Global Settings&apos; subject</comment>
+        <translation>влияют на все серверы в системе</translation>
     </message>
 </context>
 <context>
@@ -2250,10 +2249,6 @@ to view more bookmarks</source>
         <translation>Проверка корректности медиапотока.</translation>
     </message>
     <message>
-        <source>Diagnostics complete!</source>
-        <translation>Диагностика завершена</translation>
-    </message>
-    <message>
         <source>Diagnostics for device %1</source>
         <translation>Диагностика устройства %1</translation>
     </message>
@@ -2300,6 +2295,10 @@ to view more bookmarks</source>
     <message>
         <source>Confirming target I/O module provides media stream.</source>
         <translation>Подтверждение получения данных с модуля ввода/вывода.</translation>
+    </message>
+    <message>
+        <source>Diagnostics complete</source>
+        <translation>Диагностика завершена</translation>
     </message>
 </context>
 <context>
@@ -2903,10 +2902,6 @@ to %1</source>
         <translation>Неверное имя пользователя или пароль</translation>
     </message>
     <message>
-        <source>Check Server internet connection or try again later.</source>
-        <translation>Проверьте, что сервер подключен к Интернету, или повторите попытку позже.</translation>
-    </message>
-    <message>
         <source>Server may be restarting now. Please try again later.</source>
         <translation>Возможно, сервер сейчас перезагружается. Пожалуйста, повторите попытку позже.</translation>
     </message>
@@ -2981,11 +2976,6 @@ to %1</source>
         <translation>Не удалось перезапустить %1</translation>
     </message>
     <message>
-        <source>Connection to %1 is not established.</source>
-        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation>Подключение к %1 не установлено.</translation>
-    </message>
-    <message>
         <source>Client version: %1.</source>
         <translation>Версия клиента: %1.</translation>
     </message>
@@ -2998,7 +2988,7 @@ to %1</source>
         <translation>Операция не может быть выполнена. Это может произойти из-за того что сервер сейчас перезагружается. Пожалуйста, повторите попытку позже.</translation>
     </message>
     <message>
-        <source>Connection to %1 is not ready yet. Check server internet connection or try again later.</source>
+        <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation>Подключение к %1 ещё не установлено. Проверьте, что сервер подключен к сети Интернет или повторите попытку позже.</translation>
     </message>
@@ -3120,7 +3110,7 @@ to %1</source>
     </message>
     <message>
         <source>Could not find audio encoder &quot;%1&quot;.</source>
-        <translation>Невозможно обнаружить звуковой кодек &apos;%1&apos;.</translation>
+        <translation>Невозможно обнаружить звуковой кодек &quot;%1&quot;.</translation>
     </message>
     <message>
         <source>Primary audio device is not selected.</source>
@@ -3150,16 +3140,16 @@ to %1</source>
         <translation>Ширина экрана должна быть кратна 8.</translation>
     </message>
     <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &quot;none&quot; value in screen recording settings</source>
-        <translation>Форматы 44 и 48 кГц не поддерживаются устройством захвата звука. Пожалуйста, выберите другое устройство или значение &apos;нет&apos;</translation>
-    </message>
-    <message>
         <source>Could not find audio encoder &quot;%1&quot;.</source>
-        <translation>Невозможно обнаружить звуковой кодек &apos;%1&apos;.</translation>
+        <translation>Невозможно обнаружить звуковой кодек &quot;%1&quot;.</translation>
     </message>
     <message>
         <source>Could not initialize audio device &quot;%1&quot;.</source>
         <translation>Невозможно инициализировать звуковое устройство %1.</translation>
+    </message>
+    <message>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</source>
+        <translation>Форматы 44 и 48 кГц не поддерживаются устройством захвата звука. Пожалуйста, выберите другое устройство или значение &apos;нет&apos;</translation>
     </message>
 </context>
 <context>
@@ -3349,17 +3339,17 @@ to %1</source>
     <message numerus="yes">
         <source>and %n users more...</source>
         <translation>
-            <numerusform>и еще %n пользовалель...</numerusform>
-            <numerusform>и еще %n пользовалеля...</numerusform>
-            <numerusform>и еще %n пользовалелей...</numerusform>
+            <numerusform>и ещё %n пользователь...</numerusform>
+            <numerusform>и ещё %n пользователя...</numerusform>
+            <numerusform>и ещё %n пользователей...</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>and %n more...</source>
         <translation>
-            <numerusform>и еще %n...</numerusform>
-            <numerusform>и еще %n...</numerusform>
-            <numerusform>и еще %n...</numerusform>
+            <numerusform>и ещё %n...</numerusform>
+            <numerusform>и ещё %n...</numerusform>
+            <numerusform>и ещё %n...</numerusform>
         </translation>
     </message>
     <message>
@@ -4094,11 +4084,11 @@ to %1</source>
     </message>
     <message>
         <source>Please send Email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation>Для получения лицензионного ключа необходимо отослать Email, содержащий серийный номер и аппаратный ID, на %1.</translation>
+        <translation>Для получения лицензионного ключа необходимо отослать серийный номер и аппаратный ID на %1.</translation>
     </message>
     <message>
         <source>Please send the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation>Для получения лицензионного ключа необходимо отослать Email, содержащий серийный номер и аппаратный ID, на %1.</translation>
+        <translation>Для получения лицензионного ключа необходимо отослать серийный номер и аппаратный ID на %1.</translation>
     </message>
     <message>
         <source>Hardware ID copied to clipboard</source>
@@ -4471,7 +4461,7 @@ to %1</source>
     </message>
     <message>
         <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-        <translation>Режим записи «Движение + Низкое Разрешение» не может быть установлен.</translation>
+        <translation>Режим записи &quot;Движение + Низкое Разрешение&quot; не может быть установлен.</translation>
     </message>
 </context>
 <context>
@@ -5765,7 +5755,7 @@ to %1</source>
     </message>
     <message>
         <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
-        <translation>Режим записи «Движение + Низкое Разрешение» не может быть установлен.</translation>
+        <translation>Режим записи &quot;Движение + Низкое Разрешение&quot; не может быть установлен.</translation>
     </message>
 </context>
 <context>
@@ -5889,12 +5879,12 @@ to %1</source>
         <translation>Недопустимые параметры</translation>
     </message>
     <message>
-        <source>No Servers connected to internet</source>
-        <translation>Нет серверов, подключенных к Интернету</translation>
-    </message>
-    <message>
         <source>Cannot perform the test.</source>
         <translation>Не удаётся выполнить проверку.</translation>
+    </message>
+    <message>
+        <source>No Servers connected to Internet</source>
+        <translation>Нет серверов, подключенных к сети Интернет</translation>
     </message>
 </context>
 <context>
@@ -6032,7 +6022,7 @@ to %1</source>
     </message>
     <message>
         <source>Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</source>
-        <translation>Измените «Основное» на &quot;Резервное&quot; для некоторых хранилищ, указанных выше, для включения резервного копирования.</translation>
+        <translation>Измените &quot;Основное&quot; на &quot;Резервное&quot; для некоторых хранилищ, указанных выше, для включения резервного копирования.</translation>
     </message>
     <message>
         <source>Apply changes to start backup.</source>
@@ -6343,20 +6333,20 @@ to %1</source>
         <translation>Ошибка отправки Email</translation>
     </message>
     <message>
-        <source>You cannot receive system notifications via Email.</source>
-        <translation>Вы не можете получать оповещения по Email.</translation>
-    </message>
-    <message>
         <source>Some users have not set their Email addresses.</source>
         <translation>У некоторых пользователей не настроен Email.</translation>
     </message>
     <message>
-        <source>They cannot receive system notifications via Email.</source>
-        <translation>Они не могут получать оповещения по Email.</translation>
-    </message>
-    <message>
         <source>System is running in safe mode.</source>
         <translation>Система запущена в безопасном режиме.</translation>
+    </message>
+    <message>
+        <source>You cannot receive system notifications by Email.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>They cannot receive system notifications by Email.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7055,25 +7045,25 @@ to %1</source>
     <message numerus="yes">
         <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
         <translation>
-            <numerusform>Сервер «%1» не может получить доступ к %n устройству. Переместить его в любом случае?</numerusform>
-            <numerusform>Сервер «%1» не может получить доступ к %n устройствам. Переместить его в любом случае?</numerusform>
-            <numerusform>Сервер «%1» не может получить доступ к %n устройствам. Переместить его в любом случае?</numerusform>
+            <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройству. Переместить его в любом случае?</numerusform>
+            <numerusform>Сервер «%1» не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
+            <numerusform>Сервер «%1» не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
         <translation>
-            <numerusform>Сервер «%1» не может получить доступ к %n камере. Переместить ее в любом случае?</numerusform>
-            <numerusform>Сервер «%1» не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
-            <numerusform>Сервер «%1» не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
+            <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камере. Переместить ее в любом случае?</numerusform>
+            <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
+            <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n камерам. Переместить их в любом случае?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
         <translation>
-            <numerusform>Сервер «%1» не может получить доступ к %n устройству. Переместить его в любом случае?</numerusform>
-            <numerusform>Сервер «%1» не может получить доступ к %n устройствам. Переместить его в любом случае?</numerusform>
-            <numerusform>Сервер «%1» не может получить доступ к %n устройствам. Переместить его в любом случае?</numerusform>
+            <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройству. Переместить его в любом случае?</numerusform>
+            <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
+            <numerusform>Сервер &quot;%1&quot; не может получить доступ к %n устройствам. Переместить их в любом случае?</numerusform>
         </translation>
     </message>
     <message>
@@ -7341,10 +7331,6 @@ to %1</source>
         <translation>Пароль администратора</translation>
     </message>
     <message>
-        <source>Password cannot be empty!</source>
-        <translation>Пароль не может быть пустым!</translation>
-    </message>
-    <message>
         <source>Connecting to the current system...</source>
         <translation>Подключение к текущей системе...</translation>
     </message>
@@ -7371,6 +7357,10 @@ to %1</source>
     <message>
         <source>Server connected to System</source>
         <translation>Сервер подключен к системе</translation>
+    </message>
+    <message>
+        <source>Password cannot be empty.</source>
+        <translation>Пароль не может быть пустым.</translation>
     </message>
 </context>
 <context>
@@ -7833,7 +7823,7 @@ to %1</source>
     </message>
     <message>
         <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-        <translation>Вы собираетесь удалить некоторые ресурсы, доступные только из режима видео стены. Вы не увидите их в списке ресурсов после этого и не сможете снова добавить их на видеостену.</translation>
+        <translation>Вы собираетесь удалить некоторые ресурсы, доступные только из режима видеостены. Вы не увидите их в списке ресурсов после этого и не сможете снова добавить их на видеостену.</translation>
     </message>
 </context>
 <context>

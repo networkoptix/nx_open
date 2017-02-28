@@ -63,7 +63,8 @@ void QnThumbnailRequestData::loadFromParams(const QnRequestParamList& params)
     camera = nx::camera_id_helper::findCameraByFlexibleIds(
         /*outNotFoundCameraId*/ nullptr,
         params.toHash(),
-        {kCameraIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam});
+        {kCameraIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam})
+        .dynamicCast<QnVirtualCameraResource>();
 
     if (params.contains(kTimeParam))
     {

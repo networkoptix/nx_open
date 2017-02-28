@@ -1,5 +1,6 @@
 import QtQuick 2.6
 import Nx 1.0
+import Nx.Core 1.0
 import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
@@ -28,7 +29,7 @@ Rectangle
         property bool unauthorized: status == QnCameraListModel.Unauthorized
     }
 
-    QnMediaResourceHelper
+    MediaResourceHelper
     {
         id: resourceHelper
     }

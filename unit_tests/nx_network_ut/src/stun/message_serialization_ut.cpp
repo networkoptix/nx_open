@@ -163,7 +163,7 @@ TEST( StunMessageSerialization, CustomIndication )
           + Buffer( "9001" "0006" ) + Buffer( "ua1val" ).toHex().toUpper() + Buffer( "0000" )
           + Buffer( "9002" "0006" ) + Buffer( "ua2val" ).toHex().toUpper() + Buffer( "0000" );
 
-    ASSERT_EQ( serializedMessage.size(), serializedSize );
+    ASSERT_EQ( (size_t)serializedMessage.size(), serializedSize );
     EXPECT_EQ( MESSAGE, serializedMessage.toHex().toUpper() );
 
     Message parsed;
@@ -171,11 +171,11 @@ TEST( StunMessageSerialization, CustomIndication )
     parser.setMessage( &parsed );
     partialParse( parser, serializedMessage, 4 ); // parse by 4 byte chanks
 
-    ASSERT_EQ( serializedMessage.size(), serializedSize );
+    ASSERT_EQ( (size_t)serializedMessage.size(), serializedSize );
     ASSERT_EQ( parsed.header.messageClass, MessageClass::indication );
     ASSERT_EQ( parsed.header.method, MethodType::userMethod + 1 );
     ASSERT_EQ( parsed.header.transactionId.toHex().toUpper(), DEFAULT_TID );
-    ASSERT_EQ( parsed.attributes.size(), 2 );
+    ASSERT_EQ( parsed.attributes.size(), 2U );
 
     const auto attr1 = parsed.getAttribute< attrs::Unknown >( 0x9001 );
     ASSERT_NE( attr1, nullptr );
@@ -304,7 +304,7 @@ TEST( StunMessageSerialization, Authentification )
     ASSERT_EQ(parsed.header.messageClass, MessageClass::request);
     ASSERT_EQ(parsed.header.method, MethodType::bindingMethod);
     ASSERT_EQ(parsed.header.transactionId.toHex().toUpper(), DEFAULT_TID);
-    ASSERT_EQ(parsed.attributes.size(), 3);
+    ASSERT_EQ(parsed.attributes.size(), 3U);
 }
 
 // TODO: add some more test when we support some

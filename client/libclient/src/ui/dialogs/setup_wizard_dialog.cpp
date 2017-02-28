@@ -88,19 +88,19 @@ void QnSetupWizardDialog::setUrl(const QUrl& url)
     d->url = url;
 }
 
-QnCredentials QnSetupWizardDialog::localCredentials() const
+QnEncodedCredentials QnSetupWizardDialog::localCredentials() const
 {
     Q_D(const QnSetupWizardDialog);
-    return QnCredentials(d->loginInfo.localLogin, d->loginInfo.localPassword);
+    return QnEncodedCredentials(d->loginInfo.localLogin, d->loginInfo.localPassword);
 }
 
-QnCredentials QnSetupWizardDialog::cloudCredentials() const
+QnEncodedCredentials QnSetupWizardDialog::cloudCredentials() const
 {
     Q_D(const QnSetupWizardDialog);
-    return QnCredentials(d->loginInfo.cloudEmail, d->loginInfo.cloudPassword);
+    return QnEncodedCredentials(d->loginInfo.cloudEmail, d->loginInfo.cloudPassword);
 }
 
-void QnSetupWizardDialog::setCloudCredentials(const QnCredentials& value)
+void QnSetupWizardDialog::setCloudCredentials(const QnEncodedCredentials& value)
 {
     Q_D(QnSetupWizardDialog);
     d->loginInfo.cloudEmail = value.user;

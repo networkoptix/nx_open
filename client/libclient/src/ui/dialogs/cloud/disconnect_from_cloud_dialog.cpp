@@ -304,7 +304,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
         default:
             NX_ASSERT(false, "Invalid scenario");
             q->setIcon(QnMessageBoxIcon::Warning);
-            q->setText(tr("Internal system error"));
+            q->setText(lit("Internal system error"));
             q->setStandardButtons(QDialogButtonBox::NoButton);
             q->setDefaultButton(okButton, QnButtonAccent::Warning);
             break;
@@ -336,7 +336,7 @@ QString QnDisconnectFromCloudDialogPrivate::enterPasswordMessage() const
 
 QString QnDisconnectFromCloudDialogPrivate::disconnectWarnMessage() const
 {
-    return tr("You will be disconnected from this system and able to login again through local network with local account");
+    return tr("You will be disconnected from this System and able to login again through local network with local account");
 }
 
 void QnDisconnectFromCloudDialogPrivate::validateCloudPassword()
@@ -396,7 +396,7 @@ void QnDisconnectFromCloudDialogPrivate::setupResetPasswordPage()
 
     q->setText(tr("Set local owner password"));
     q->setInformativeText(
-        tr("You will not be able to connect to this system with your %1 account after you disconnect this system from %1.",
+        tr("You will not be able to connect to this System with your %1 account after you disconnect this System from %1.",
             "%1 is the cloud name (like 'Nx Cloud')")
             .arg(QnAppInfo::cloudName()));
 

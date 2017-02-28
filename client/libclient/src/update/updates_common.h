@@ -45,6 +45,7 @@ public:
     {
         Successful,
         Cancelled,
+        CancelledSilently,
         LockFailed,
         AlreadyUpdated,
         DownloadingFailed,

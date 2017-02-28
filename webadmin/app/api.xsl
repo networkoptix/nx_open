@@ -43,11 +43,13 @@
                     <div class="container">
                         <div class="navbar-header">
                             <a class="navbar-brand" data-toggle="tooltip" data-placement="bottom" href="index.html">
-                                <img src="customization/webadmin_logo.png" height="48"/>
+                                <img src="customization/webadmin_logo.png" height="40"/>
                             </a>
-                            <h3>API reference</h3>
                         </div>
                         <nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
+                            <ul class="nav navbar-nav">
+                                <li class="active"><a href=""><b>Api reference</b></a></li>
+                            </ul>
                             <ul class="nav navbar-nav navbar-right">
                                 <li ><a href="index.html">Web administration</a></li>
                             </ul>
@@ -96,6 +98,11 @@
                                         </ul>
                                     </li>
                                 </xsl:for-each>
+                                <li>
+                                    <a href="index.html#/developers/changelog" title="Breaking changes">
+                                        API Breaking Changes
+                                    </a>
+                                </li>
                             </ul>
                         </nav>
                         <div class="col-sm-9 scroll-container">

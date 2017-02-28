@@ -5,7 +5,7 @@
 #include <client_core/local_connection_data.h>
 #include <client/forgotten_systems_manager.h>
 #include <watchers/cloud_status_watcher.h>
-#include <utils/common/credentials.h>
+#include <utils/common/encoded_credentials.h>
 
 class QSettings;
 
@@ -34,7 +34,7 @@ public:
         PropertiesCount
     };
 
-    using SystemAuthenticationDataHash = QHash<QnUuid, QList<QnCredentials>>;
+    using SystemAuthenticationDataHash = QHash<QnUuid, QList<QnEncodedCredentials>>;
     using RecentLocalConnectionsHash = QHash<QnUuid, nx::client::core::LocalConnectionData>;
     using WeightDataList = QList<nx::client::core::WeightData>;
 
