@@ -348,9 +348,19 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
         }
     }
     else if (!dstRoute.id.isNull())
+    {
         dstRoute = QnRouter::instance()->routeTo(dstRoute.id);
+    }
     else
+    {
         dstRoute.addr = SocketAddress(dstUrl.host(), dstUrl.port(80));
+
+        // No dst route Id means proxy to external resource.
+        // All proxy hops have already been passed. Remove proxy-auth header.
+        auto itr = d->request.headers.find("Proxy-Authorization");
+        if (itr != d->request.headers.end())
+            d->request.headers.erase(itr);
+    }
 
     if (!dstRoute.id.isNull() && dstRoute.id != qnCommon->moduleGUID())
     {
