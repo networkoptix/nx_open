@@ -17,7 +17,6 @@ Pollable::Pollable(
     std::unique_ptr<CommonSocketImpl> impl )
 :
     m_fd( fd ),
-    m_hEventObject(0),
     m_impl( std::move(impl) ),
     m_readTimeoutMS( 0 ),
     m_writeTimeoutMS( 0 )

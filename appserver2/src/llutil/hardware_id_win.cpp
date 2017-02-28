@@ -556,7 +556,7 @@ void LLUtil::fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& ha
     // Find disabled NICs
     std::vector<_bstr_t> paths;
 
-#if 0
+#if 1
     if (vistaOrLater)
     {
         if (GetDisabledNICS(pSvc, paths) == S_OK)

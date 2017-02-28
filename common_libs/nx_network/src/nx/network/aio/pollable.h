@@ -66,9 +66,6 @@ public:
 
 protected:
     AbstractSocket::SOCKET_HANDLE m_fd;
-#ifdef WIN32
-    WSAEVENT m_hEventObject;
-#endif
     std::unique_ptr<CommonSocketImpl> m_impl;
     unsigned int m_readTimeoutMS;
     unsigned int m_writeTimeoutMS;
