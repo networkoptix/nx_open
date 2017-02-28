@@ -20,7 +20,7 @@ QT_VERSION="${qt.version}"
 ln -s /Applications $SRC/Applications
 
 mv $SRC/client.app "$APP_DIR"
-mv "$APP_DIR"/Contents/MacOS/protoco_handler.app "$APP_DIR"/Contents/MacOS/"$PROTOCOL_HANDLER_APP_NAME"
+mv "$APP_DIR"/Contents/MacOS/protocol_handler.app "$APP_DIR"/Contents/MacOS/"$PROTOCOL_HANDLER_APP_NAME"
 mkdir -p "$APP_DIR/Contents/Resources"
 cp logo.icns "$APP_DIR/Contents/Resources/appIcon.icns"
 cp logo.icns $SRC/.VolumeIcon.icns
