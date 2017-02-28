@@ -3,10 +3,10 @@
 #top {
     background-color: #00aeef; }
 
-#top a {
+.navbar-nav>ul>li>a {
     color: white; }
 
-#top a:hover {
+.navbar-nav>ul>li>a:hover {
     background-color: #009bd5; }
 
 #top a.navbar-brand:hover {

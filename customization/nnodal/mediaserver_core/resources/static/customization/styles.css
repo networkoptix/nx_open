@@ -14,12 +14,12 @@ $btn-primary-border:             darken($brand-primary, 5%) !default;
     background-color: $brand-primary;
 }
 
-#top a{
+.navbar-nav>ul>li>a {
     color:white;
 }
 
 
-#top a:hover{
+.navbar-nav>ul>li>a:hover {
     background-color: darken($brand-primary, 5%)
 }
 
@@ -114,10 +114,10 @@ rgba(166,206,57,1)  - Vista
 #top {
     background-color: #00aeef; }
 
-#top a {
+.navbar-nav>ul>li>a {
     color: white; }
 
-#top a:hover {
+.navbar-nav>ul>li>a:hover {
     background-color: #009bd5; }
 
 #top a.navbar-brand:hover {
