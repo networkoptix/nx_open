@@ -94,6 +94,7 @@ protected:
     virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
     virtual void stopInputPortMonitoringAsync() override;
     virtual bool isInputPortMonitored() const override;
+
 private:
     void clear();
     static QRect axisRectToGridRect(const QRect& axisRect);

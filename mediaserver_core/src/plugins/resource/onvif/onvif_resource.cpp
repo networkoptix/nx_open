@@ -126,7 +126,7 @@ class VideoOptionsLocal
 {
 public:
     VideoOptionsLocal(): isH264(false), minQ(-1), maxQ(-1), frameRateMax(-1), govMin(-1), govMax(-1), usedInProfiles(false) {}
-    VideoOptionsLocal(const QString& _id, const VideoOptionsResp& resp, bool isH264Allowed)
+    VideoOptionsLocal(const QString& _id, const VideoOptionsResp& resp, bool isH264Allowed, QnBounds frameRateBounds = QnBounds())
     {
         usedInProfiles = false;
         id = _id;
@@ -147,7 +147,11 @@ public:
             std::sort(h264Profiles.begin(), h264Profiles.end());
 
             if (resp.Options->H264->FrameRateRange)
-                frameRateMax = resp.Options->H264->FrameRateRange->Max;
+            {
+                frameRateMax = restrictFrameRate(resp.Options->H264->FrameRateRange->Max, frameRateBounds);
+                frameRateMin = restrictFrameRate(resp.Options->H264->FrameRateRange->Min, frameRateBounds);
+            }
+
             if (resp.Options->H264->GovLengthRange) {
                 govMin = resp.Options->H264->GovLengthRange->Min;
                 govMax = resp.Options->H264->GovLengthRange->Max;
@@ -155,7 +159,10 @@ public:
         }
         else if (resp.Options->JPEG) {
             if (resp.Options->JPEG->FrameRateRange)
-                frameRateMax = resp.Options->JPEG->FrameRateRange->Max;
+            {
+                frameRateMax = restrictFrameRate(resp.Options->JPEG->FrameRateRange->Max, frameRateBounds);
+                frameRateMin = restrictFrameRate(resp.Options->JPEG->FrameRateRange->Min, frameRateBounds);
+            }
         }
         if (resp.Options->QualityRange) {
             minQ = resp.Options->QualityRange->Min;
@@ -169,9 +176,25 @@ public:
     int minQ;
     int maxQ;
     int frameRateMax;
+    int frameRateMin;
     int govMin;
     int govMax;
     bool usedInProfiles;
+
+private:
+    int restrictFrameRate(int frameRate, QnBounds frameRateBounds) const
+    {
+        if (frameRateBounds.isNull())
+            return frameRate;
+
+        if (frameRate > frameRateBounds.max);
+            return frameRateBounds.max;
+        
+        if (frameRate < frameRateBounds.min)
+            return frameRateBounds.min;
+
+        return frameRate;
+    }
 };
 
 bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2)
@@ -1946,6 +1969,8 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     QStringList videoEncodersTokens;
     VideoConfigsResp confResponse;
 
+    auto frameRateBounds = resourceData.value<QnBounds>(Qn::FPS_BOUNDS_PARAM_NAME, QnBounds());
+
     if (forcedParams && forcedParams->videoEncoders.size() >= getChannel())
     {
         videoEncodersTokens = forcedParams->videoEncoders[getChannel()].split(L',');
@@ -1995,7 +2020,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
 
             if (optResp.Options->H264 || optResp.Options->JPEG)
             {
-                optionsList << VideoOptionsLocal(encoderToken, optResp, isH264Allowed());
+                optionsList << VideoOptionsLocal(encoderToken, optResp, isH264Allowed(), frameRateBounds);
             }
 #ifdef PL_ONVIF_DEBUG
             else
