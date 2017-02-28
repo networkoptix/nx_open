@@ -292,17 +292,17 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
 
-    QString aviFileFilter = tr("AVI (*.avi)");
-    QString mkvFileFilter = tr("Matroska (*.mkv)");
-
-    QString allowedFormatFilter =
-        mkvFileFilter
-        + filterSeparator
-        + aviFileFilter;
+    QStringList filters{
+        lit("AVI (*.avi)"),
+        lit("Matroska (*.mkv)"),
+        lit("MP4 (*.mp4)")
+    };
 
     bool canUseBinaryExport = isBinaryExportSupported() && timelapseFrameStepMs == 0;
     if (canUseBinaryExport)
-        allowedFormatFilter += filterSeparator + binaryFilterName();
+        filters << binaryFilterName();
+
+    QString allowedFormatFilter = filters.join(filterSeparator);
 
     QString fileName;
     bool binaryExport = false;
