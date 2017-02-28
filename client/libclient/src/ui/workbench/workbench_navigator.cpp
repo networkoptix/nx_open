@@ -721,22 +721,9 @@ bool QnWorkbenchNavigator::currentWidgetHasVideo() const
 
 QnSpeedRange QnWorkbenchNavigator::speedRange() const
 {
-    static constexpr qreal kMaxForwardSpeed = 16.0;
-    static constexpr qreal kMaxReverseSpeed = 16.0;
-    static constexpr qreal kUnitSpeed = 1.0;
-    static constexpr qreal kZeroSpeed = 0.0;
-
-    if (!isPlayingSupported())
-        return QnSpeedRange(kZeroSpeed, kZeroSpeed);
-
-    if (!currentWidgetHasVideo())
-        return QnSpeedRange(kUnitSpeed, kZeroSpeed);
-
-    const auto reader = m_currentMediaWidget->display()->archiveReader();
-    NX_EXPECT(reader); //< checked in isPlayingSupported
-
-    const qreal reverse = reader->isNegativeSpeedSupported() ? kMaxReverseSpeed : kZeroSpeed;
-    return QnSpeedRange(kMaxForwardSpeed, reverse);
+    return m_currentMediaWidget
+        ? m_currentMediaWidget->speedRange()
+        : QnSpeedRange();
 }
 
 qint64 QnWorkbenchNavigator::positionUsec() const

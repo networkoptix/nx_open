@@ -23,6 +23,7 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 #include <client/client_globals.h>
 #include <client/client_color_types.h>
 #include <camera/resource_display.h> //< TODO: #Elric FWD!
+#include <ui/common/speed_range.h>
 #include <ui/customization/customized.h>
 #include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
@@ -125,6 +126,9 @@ public:
 
     void setZoomWindowCreationModeEnabled(bool enabled);
     void setMotionSearchModeEnabled(bool enabled);
+
+    QnSpeedRange speedRange() const;
+    static const QnSpeedRange& maximumSpeedRange();
 
 signals:
     void motionSelectionChanged();
