@@ -377,6 +377,9 @@ void PlayerPrivate::at_gotVideoFrame()
     if (videoFrameToRender)
         return; //< We already have a frame to render. Ignore next frame (will be processed later).
 
+    if (!dataConsumer)
+        return;
+
     videoFrameToRender = dataConsumer->dequeueVideoFrame();
     if (!videoFrameToRender)
         return;
