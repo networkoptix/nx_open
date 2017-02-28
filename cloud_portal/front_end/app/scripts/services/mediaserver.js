@@ -72,6 +72,7 @@ angular.module('cloudApp')
                         cleanedUser.userRoleId = '{00000000-0000-0000-0000-000000000000}';
                     }
                     cleanedUser.email = cleanedUser.email.toLowerCase();
+                    cleanedUser.name = cleanedUser.name.toLowerCase();
                     return cleanedUser;
                 },
                 userObject: function(fullName, email){
