@@ -12,6 +12,7 @@ front_end/test/visual
 
 app/bower_components
 env
+build_scripts/language_pack/
 cloud/.idea
 cloud/static
 cloud/notifications/static/templates/*.mustache
