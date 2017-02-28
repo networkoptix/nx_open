@@ -172,8 +172,9 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
 
 QnClientModule::~QnClientModule()
 {
-    if (QnResourceDiscoveryManager::instance())
-        QnResourceDiscoveryManager::instance()->stop();
+    // Stop all long runnables before deinitializing singletons
+    QnLongRunnablePool::instance()->stopAll();
+
     QnResource::stopAsyncTasks();
 
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
