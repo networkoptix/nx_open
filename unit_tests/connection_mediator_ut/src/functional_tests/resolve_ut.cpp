@@ -68,7 +68,7 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
                 std::placeholders::_1));
 
         ASSERT_EQ(api::ResultCode::ok, resultCode);
-        ASSERT_EQ(1, resolveResponse.endpoints.size());
+        ASSERT_EQ(1U, resolveResponse.endpoints.size());
         ASSERT_EQ(
             system1Servers[i]->endpoint().toString(),
             resolveResponse.endpoints.front().toString());
@@ -100,7 +100,7 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
             std::placeholders::_1));
 
     ASSERT_EQ(api::ResultCode::ok, resultCode);
-    ASSERT_EQ(1, resolveResponse.endpoints.size());
+    ASSERT_EQ(1U, resolveResponse.endpoints.size());
     ASSERT_EQ(
         server2->endpoint().toString(),
         resolveResponse.endpoints.front().toString());
@@ -180,7 +180,7 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
             std::placeholders::_1));
 
     ASSERT_EQ(api::ResultCode::ok, resultCode);
-    ASSERT_EQ(1, resolveResponse.endpoints.size());
+    ASSERT_EQ(1U, resolveResponse.endpoints.size());
     ASSERT_EQ(
         mserverEmulator.endpoint().toString(),
         resolveResponse.endpoints.front().toString());
@@ -194,7 +194,7 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
             std::placeholders::_1));
 
     ASSERT_EQ(api::ResultCode::ok, resultCode);
-    ASSERT_EQ(1, resolveResponse.endpoints.size());
+    ASSERT_EQ(1U, resolveResponse.endpoints.size());
     ASSERT_EQ(
         mserverEmulator.endpoint().toString(),
         resolveResponse.endpoints.front().toString());

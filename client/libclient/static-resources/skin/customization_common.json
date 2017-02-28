@@ -434,6 +434,7 @@
             "default": {
                 "dark": "dark4",
                 "midlight": "dark12",
+                "light": "dark16",
                 "text": "light4"
             }
         }

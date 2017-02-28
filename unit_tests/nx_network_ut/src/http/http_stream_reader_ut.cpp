@@ -373,7 +373,7 @@ TEST( HttpStreamReader, MultipleMessages )
             ++messageNumber;
         }
 
-        ASSERT_EQ( messageNumber, messagesToParse.size() );
+        ASSERT_EQ( (size_t)messageNumber, messagesToParse.size() );
     }
 }
 
@@ -709,6 +709,6 @@ TEST( HttpStreamReader, MultipleRequests )
             ++messageNumber;
         }
 
-        ASSERT_EQ( messageNumber, messagesToParse.size() );
+        ASSERT_EQ( (size_t)messageNumber, messagesToParse.size() );
     }
 }

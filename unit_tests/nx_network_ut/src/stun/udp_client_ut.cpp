@@ -137,7 +137,7 @@ protected:
                     ASSERT_EQ(SystemError::noError, errorCode);
 
                     std::unique_lock<std::mutex> lk(m_mutex);
-                    ASSERT_EQ(1, m_expectedTransactionIDs.erase(response.header.transactionId));
+                    ASSERT_EQ(1U, m_expectedTransactionIDs.erase(response.header.transactionId));
                     if (m_expectedTransactionIDs.empty())
                         m_allResponsesHaveBeenReceived.set_value();
                 });
@@ -270,7 +270,7 @@ TEST_F(UdpClient, client_retransmits_general)
             std::placeholders::_1));
     ASSERT_EQ(SystemError::noError, errorCode);
     ASSERT_EQ(requestMessage.header.transactionId, response.header.transactionId);
-    ASSERT_EQ(2, totalMessagesReceived());
+    ASSERT_EQ(2U, totalMessagesReceived());
 }
 
 /**
@@ -306,7 +306,7 @@ TEST_F(UdpClient, client_retransmits_max_retransmits)
             requestMessage,
             std::placeholders::_1));
     ASSERT_EQ(SystemError::timedOut, errorCode);
-    ASSERT_EQ(MAX_RETRANSMISSIONS+1, totalMessagesReceived());
+    ASSERT_EQ((size_t)MAX_RETRANSMISSIONS+1, totalMessagesReceived());
 }
 
 /**

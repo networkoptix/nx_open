@@ -32,9 +32,12 @@ MEDIASERVER_CLOUDHOST_SIZE = len(MEDIASERVER_CLOUDHOST_TAG + ' ' + MEDIASERVER_D
 MEDIASERVER_CLOUDHOST_FPATH = '/opt/networkoptix/mediaserver/lib/libcommon.so'
 
 CLOUD_HOST_TIMEOUT_SEC = 10
-MEDIASERVER_CREDENTIALS_TIMEOUT_SEC = 60 *5
+MEDIASERVER_CREDENTIALS_TIMEOUT_SEC = 60 * 5
 MEDIASERVER_MERGE_TIMEOUT_SEC = MEDIASERVER_CREDENTIALS_TIMEOUT_SEC
 DEFAULT_CUSTOMIZATION = 'default'
+
+DEFAULT_SERVER_LOG_LEVEL = 'DEBUG2'
+
 
 log = logging.getLogger(__name__)
 
@@ -149,6 +152,7 @@ class ServerPersistentInfo(object):
 class Server(object):
 
     def __init__(self, name, box, url, cloud_host_rest_api):
+        self.title = name
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
         self.box = box
         self.url = url
@@ -166,7 +170,7 @@ class Server(object):
     def __repr__(self):
         return 'Server%r@%s' % (self.name, self.url)
 
-    def init(self, must_start, reset):
+    def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL):
         self._is_started = was_started = self.service.get_status()
         log.info('Service for %s %s started', self, self._is_started and 'WAS' or 'was NOT')
         if reset:
@@ -174,7 +178,7 @@ class Server(object):
                 self.stop_service()
             self.storage.cleanup()
             self.patch_binary_set_cloud_host(MEDIASERVER_DEFAULT_CLOUDHOST)  # may be changed by previous tests...
-            self.reset_config()
+            self.reset_config(logLevel=log_level)
             if must_start:
                 self.start_service()
         else:
@@ -182,11 +186,11 @@ class Server(object):
             if must_start != was_started:
                 self.set_service_status(must_start)
         if self._is_started:
-            self._load_system_settings()
+            self.load_system_settings()
             assert not reset or not self.is_system_set_up(), 'Failed to properly reinit server - it reported to be already set up'
 
     def _init_rest_api(self):
-        self.rest_api = ServerRestApi(self.url, self.user, self.password)
+        self.rest_api = ServerRestApi(self.title, self.url, self.user, self.password)
 
     def is_started(self):
         assert self._is_started is not None, 'is_started state is still unknown'
@@ -206,7 +210,7 @@ class Server(object):
         self.service.restart()
         self.wait_until_server_is_up()
         self._is_started = True
-        self._load_system_settings()
+        self.load_system_settings()
 
     def set_service_status(self, started):
         assert started != self._is_started, 'Service for %s is already %s' % (self, self._is_started and 'started' or 'stopped')
@@ -214,9 +218,9 @@ class Server(object):
         self.wait_for_server_status(started)
         self._is_started = started
         if started:
-            self._load_system_settings()
+            self.load_system_settings()
         
-    def _load_system_settings(self):
+    def load_system_settings(self):
         log.debug('%s: Loading settings...', self)
         self.settings = self.get_system_settings()
         self.local_system_id = self.settings['localSystemId']
@@ -248,9 +252,9 @@ class Server(object):
         self.reset_config()
         self.restart()
 
-    def reset_config(self):
+    def reset_config(self, **kw):
         self.box.run_ssh_command(['cp', MEDIASERVER_CONFIG_PATH_INITIAL, MEDIASERVER_CONFIG_PATH])
-        self.change_config(removeDbOnStartup=1)
+        self.change_config(removeDbOnStartup=1, **kw)
 
     def restart(self, timeout=30):
         t = time.time()
@@ -259,7 +263,7 @@ class Server(object):
         while time.time() - t < timeout:
             new_uptime = self._safe_api_call(self.get_uptime)
             if new_uptime and new_uptime < uptime:
-                self._load_system_settings()
+                self.load_system_settings()
                 return
             log.debug('Server did not restart yet, waiting...')
             time.sleep(0.5)
@@ -322,11 +326,15 @@ class Server(object):
         self.box.put_file(MEDIASERVER_CLOUDHOST_FPATH, new_data)
         self._set_user_password(REST_API_USER, REST_API_PASSWORD)  # Must be reset to default onces
 
-    def setup_local_system(self):
-        self.rest_api.api.setupLocalSystem.post(systemName=self.name, password=REST_API_PASSWORD)  # leave password unchanged
-        self._load_system_settings()
+    def set_system_system_settings(self, **kw):
+        self.rest_api.api.systemSettings.get(**kw)
+        self.load_system_settings()
 
-    def setup_cloud_system(self):
+    def setup_local_system(self, **kw):
+        self.rest_api.api.setupLocalSystem.post(systemName=self.name, password=REST_API_PASSWORD, **kw)  # leave password unchanged
+        self.load_system_settings()
+
+    def setup_cloud_system(self, **kw):
         cloud_response = self.cloud_host_rest_api.cdb.system.bind.get(
             name=self.name,
             customization=DEFAULT_CUSTOMIZATION,
@@ -337,13 +345,17 @@ class Server(object):
             cloudSystemID=cloud_response['id'],
             cloudAccountName=self.cloud_host_rest_api.user,
             timeout_sec=60*5,
-            )
+            **kw)
         settings = setup_response['settings']
-        assert settings['systemName'] == self.name
         self._set_user_password(self.cloud_host_rest_api.user, self.cloud_host_rest_api.password)
         self._init_rest_api()
-        self._load_system_settings()
+        self.load_system_settings()
+        assert self.settings['systemName'] == self.name
         return settings
+
+    def detach_from_cloud(self, password):
+        self.rest_api.api.detachFromCloud.post(password = password)
+        self._set_user_password(REST_API_USER, password)
 
     def merge_systems(self, other_server, take_remote_settings=False):
         log.info('Merging servers: %s with local_system_id=%r and %s with local_system_id=%r',
@@ -367,12 +379,13 @@ class Server(object):
         else:
             other_server._set_user_password(self.user, self.password)
         self._wait_for_servers_to_merge(other_server)
+        time.sleep(5)  # servers still need some time to settle down; hope this time will be enough
 
     def _wait_for_servers_to_merge(self, other_server):
         t = time.time()
         while time.time() - t < MEDIASERVER_MERGE_TIMEOUT_SEC:
-            self._load_system_settings()
-            other_server._load_system_settings()
+            self.load_system_settings()
+            other_server.load_system_settings()
             if self.local_system_id == other_server.local_system_id:
                 log.info('Servers are merged now, have common local_system_id=%r', self.local_system_id)
                 return
@@ -411,7 +424,7 @@ class Server(object):
     def change_system_id(self, new_guid):
         old_local_system_id = self.local_system_id
         self.rest_api.api.configure.get(localSystemId=new_guid)
-        self._load_system_settings()
+        self.load_system_settings()
         assert self.local_system_id != old_local_system_id
         assert self.local_system_id == new_guid
 

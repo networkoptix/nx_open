@@ -22,21 +22,6 @@ using namespace nx::hpm;
 
 namespace {
 
-api::NatTraversalResultCode mediatorResultToHolePunchingResult(
-    api::ResultCode resultCode)
-{
-    switch (resultCode)
-    {
-        case api::ResultCode::ok:
-            return api::NatTraversalResultCode::ok;
-        case api::ResultCode::networkError:
-        case api::ResultCode::timedOut:
-            return api::NatTraversalResultCode::noResponseFromMediator;
-        default:
-            return api::NatTraversalResultCode::mediatorReportedError;
-    }
-}
-
 SystemError::ErrorCode mediatorResultToSysErrorCode(api::ResultCode resultCode)
 {
     switch (resultCode)

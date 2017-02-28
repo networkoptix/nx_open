@@ -106,6 +106,7 @@ public:
         Stopped,
         Playing,
         Paused,
+        Previewing,
     };
 
     enum class MediaStatus
@@ -194,6 +195,11 @@ public:
 public slots:
     void play();
     void pause();
+
+    /**
+     * Preview mode similar to pause mode but optimized for fast seek.
+     */
+    void preview();
     void stop();
 
 signals:

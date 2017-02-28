@@ -260,7 +260,7 @@ bool QnMediaServerUpdateTool::cancelUpdate() {
 
     setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
 
-    m_updateProcess->pleaseStop();
+    m_updateProcess->stop();
 
     return true;
 }

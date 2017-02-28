@@ -49,32 +49,46 @@ protected:
         return newAccount;
     }
 
-    void havingDisabledUserInSystem(
+    void whenUserIsDisabledInSystem(
         const api::SystemData& system,
         const api::AccountData& user)
     {
         updateSharing(system, user, makeField(&api::SystemSharing::isEnabled, false));
     }
 
-    void havingEnabledUserInSystem(
+    void whenUserIsEnabledInSystem(
         const api::SystemData& system,
         const api::AccountData& user)
     {
         updateSharing(system, user, makeField(&api::SystemSharing::isEnabled, true));
     }
 
-    void assertIfUserCanSeeSystem(
+    void assertUserCannotSeeSystem(
         const AccountWithPassword& user,
         const api::SystemData& systemToCheck)
     {
         ASSERT_FALSE(isUserHasAccessToSystem(user, systemToCheck));
     }
 
-    void assertIfUserCannotSeeSystem(
+    void assertUserCanSeeSystem(
         const AccountWithPassword& user,
         const api::SystemData& systemToCheck)
     {
         ASSERT_TRUE(isUserHasAccessToSystem(user, systemToCheck));
+    }
+
+    api::SystemData fetchSystem(std::string systemId)
+    {
+        const auto account = m_registeredAccounts.begin()->second;
+        
+        api::SystemDataEx system;
+        auto resultCode = getSystem(
+            account.email,
+            account.password,
+            systemId,
+            &system);
+        NX_GTEST_ASSERT_EQ(api::ResultCode::ok, resultCode);
+        return system;
     }
 
 private:
@@ -131,7 +145,7 @@ private:
     }
 };
 
-}
+} // namespace
 
 TEST_F(FtSystem, unbind)
 {
@@ -1029,17 +1043,58 @@ TEST_F(FtSystem, disabled_user_does_not_see_system)
 {
     const auto system = givenSystem();
     const auto user = givenUserOfSystem(system);
-    havingDisabledUserInSystem(system, user);
-    assertIfUserCanSeeSystem(user, system);
+    whenUserIsDisabledInSystem(system, user);
+    assertUserCannotSeeSystem(user, system);
 }
 
 TEST_F(FtSystem, reenabled_user_can_see_system)
 {
     const auto system = givenSystem();
     const auto user = givenUserOfSystem(system);
-    havingDisabledUserInSystem(system, user);
-    havingEnabledUserInSystem(system, user);
-    assertIfUserCannotSeeSystem(user, system);
+    whenUserIsDisabledInSystem(system, user);
+    whenUserIsEnabledInSystem(system, user);
+    assertUserCanSeeSystem(user, system);
+}
+
+class FtSystemTimestamp:
+    public FtSystem
+{
+protected:
+    void whenSystemIsRegistered()
+    {
+        m_registrationTimeValidRange.first = nx::utils::utcTime();
+        m_system = givenSystem();
+        m_registrationTimeValidRange.second = nx::utils::utcTime();
+    }
+    
+    void assertRegistrationTimestampIsValid()
+    {
+        const auto system = fetchSystem(m_system.id);
+        ASSERT_GE(system.registrationTime, m_registrationTimeValidRange.first);
+        ASSERT_LE(system.registrationTime, m_registrationTimeValidRange.second);
+    }
+
+    void whenCdbIsRestarted()
+    {
+        ASSERT_TRUE(restart());
+    }
+    
+private:
+    std::pair<
+        std::chrono::system_clock::time_point,
+        std::chrono::system_clock::time_point
+    > m_registrationTimeValidRange;
+    api::SystemData m_system;
+};
+
+TEST_F(FtSystemTimestamp, registration_timestamp)
+{
+    whenSystemIsRegistered();
+    assertRegistrationTimestampIsValid();
+
+    whenCdbIsRestarted();
+
+    assertRegistrationTimestampIsValid();
 }
 
 } // namespace cdb

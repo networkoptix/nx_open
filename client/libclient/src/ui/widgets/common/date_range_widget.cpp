@@ -22,21 +22,6 @@ QDate defaultStartDate()
     return QDate::currentDate().addDays(kDefaultDaysOffset);
 }
 
-qint64 getStartOfTheDayMs(qint64 timeMs)
-{
-    QDateTime value(QDateTime::fromMSecsSinceEpoch(timeMs));
-    value.setTime(QTime(0, 0));
-    return value.toMSecsSinceEpoch();
-}
-
-qint64 getEndOfTheDayMs(qint64 timeMs)
-{
-    QDateTime value(QDateTime::fromMSecsSinceEpoch(timeMs));
-    value.setTime(QTime(0, 0));
-    value.addDays(1);
-    return value.toMSecsSinceEpoch();
-}
-
 QDate minAllowedDate()
 {
     static const QDate kMinAllowedDate(2000, 1, 1);
@@ -54,9 +39,7 @@ QDate maxAllowedDate()
 QnDateRangeWidget::QnDateRangeWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    ui(new Ui::DateRangeWidget()),
-    m_startTimeMs(0),
-    m_endTimeMs(0)
+    ui(new Ui::DateRangeWidget())
 {
     ui->setupUi(this);
 
@@ -84,26 +67,21 @@ qint64 QnDateRangeWidget::endTimeMs() const
 
 void QnDateRangeWidget::setRange(qint64 startTimeMs, qint64 endTimeMs)
 {
-    /* Working with the 1-day precision */
-    qint64 start = getStartOfTheDayMs(startTimeMs);
-    qint64 end = getEndOfTheDayMs(endTimeMs);
+    const QDate start = displayDate(startTimeMs);
+    const QDate end = displayDate(endTimeMs);
 
-    if (m_startTimeMs == start && m_endTimeMs == end)
+    if (start == startDate() && end == endDate())
         return;
-
-    m_startTimeMs = start;
-    m_endTimeMs = end;
 
     QSignalBlocker blockFrom(ui->dateEditFrom);
     ui->dateEditFrom->setDateRange(minAllowedDate(), maxAllowedDate());
-    ui->dateEditFrom->setDate(displayDate(start));
+    ui->dateEditFrom->setDate(start);
 
     QSignalBlocker blockTo(ui->dateEditTo);
     ui->dateEditTo->setDateRange(minAllowedDate(), maxAllowedDate());
-    ui->dateEditTo->setDate(displayDate(end));
+    ui->dateEditTo->setDate(end);
 
-    updateAllowedRange();
-    emit rangeChanged(start, end);
+    updateRange();
 }
 
 QDate QnDateRangeWidget::startDate() const
@@ -123,16 +101,8 @@ void QnDateRangeWidget::reset()
 
 void QnDateRangeWidget::updateRange()
 {
-    auto start = startTimeMs();
-    auto end = endTimeMs();
-    if (m_startTimeMs == start && m_endTimeMs == end)
-        return;
-
     updateAllowedRange();
-
-    m_startTimeMs = start;
-    m_endTimeMs = end;
-    emit rangeChanged(start, end);
+    emit rangeChanged(startTimeMs(), endTimeMs());
 }
 
 void QnDateRangeWidget::updateAllowedRange()
@@ -141,7 +111,7 @@ void QnDateRangeWidget::updateAllowedRange()
     ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), maxAllowedDate());
 }
 
-QDateTime QnDateRangeWidget::actualDateTime(const QDate &userDate) const
+QDateTime QnDateRangeWidget::actualDateTime(const QDate& userDate) const
 {
     // QDateTime is created from date, thus it always started from the start of the day in the
     // current timezone
@@ -150,8 +120,12 @@ QDateTime QnDateRangeWidget::actualDateTime(const QDate &userDate) const
 
     const auto timeWatcher = context()->instance<QnWorkbenchServerTimeWatcher>();
     const auto server = qnCommon->currentServer();
-    const auto serverUtcOffsetSecs = timeWatcher->utcOffset(server) / kMillisecondsInSeconds;
-    return QDateTime(userDate, QTime(0, 0), Qt::OffsetFromUTC, serverUtcOffsetSecs);
+    const auto serverUtcOffsetMs = timeWatcher->utcOffset(server);
+
+    static const QTime kMidnight(0, 0);
+    return (serverUtcOffsetMs != Qn::InvalidUtcOffset)
+        ? QDateTime(userDate, kMidnight, Qt::OffsetFromUTC, serverUtcOffsetMs / kMillisecondsInSeconds)
+        : QDateTime(userDate, kMidnight, Qt::UTC);
 }
 
 QDate QnDateRangeWidget::displayDate(qint64 timestampMs) const

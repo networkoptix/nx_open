@@ -12,6 +12,8 @@ class QnCameraChunkProvider;
 
 class QnTimeline : public QQuickItem {
     Q_OBJECT
+    Q_PROPERTY(qint64 defaultWindowSize READ defaultWindowSize CONSTANT)
+    Q_PROPERTY(qint64 windowSize READ windowSize WRITE setWindowSize NOTIFY windowSizeChanged)
     Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart NOTIFY windowStartChanged)
     Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd NOTIFY windowEndChanged)
     Q_PROPERTY(qint64 position READ position WRITE setPosition NOTIFY positionChanged)
@@ -55,6 +57,8 @@ public:
     int textY() const;
     void setTextY(int textY);
 
+    qint64 defaultWindowSize() const;
+
     qint64 windowStart() const;
     void setWindowStart(qint64 windowStart);
 
@@ -64,7 +68,9 @@ public:
     QDateTime windowEndDate() const;
     void setWindowEndDate(const QDateTime &dateTime);
 
-    void setWindow(qint64 windowStart, qint64 windowEnd);
+    Q_INVOKABLE void setWindow(qint64 windowStart, qint64 windowEnd);
+    qint64 windowSize() const;
+    void setWindowSize(qint64 windowSize);
 
     qint64 position() const;
     void setPosition(qint64 position);
@@ -110,6 +116,7 @@ public:
 signals:
     void zoomLevelChanged();
     void lowerTextOpacityChanged();
+    void windowSizeChanged();
     void windowStartChanged();
     void windowEndChanged();
     void positionChanged();
