@@ -6,21 +6,11 @@ namespace nx {
 namespace db {
 namespace test {
 
-QString TestWithDbHelper::sTemporaryDirectoryPath;
 boost::optional<nx::db::ConnectionOptions> TestWithDbHelper::sDbConnectionOptions;
 
 TestWithDbHelper::TestWithDbHelper(QString moduleName, QString tmpDir):
-    m_tmpDir(tmpDir)
+    utils::test::TestWithTemporaryDirectory(moduleName, tmpDir)
 {
-    if (m_tmpDir.isEmpty())
-    {
-        m_tmpDir =
-            (sTemporaryDirectoryPath.isEmpty() ? QDir::homePath() : sTemporaryDirectoryPath) +
-            lit("/%1_ut.data").arg(moduleName);
-    }
-    QDir(m_tmpDir).removeRecursively();
-    QDir().mkpath(testDataDir());
-
     m_dbConnectionOptions.driverType = RdbmsDriverType::sqlite;
 
     if (sDbConnectionOptions)
@@ -36,12 +26,6 @@ TestWithDbHelper::TestWithDbHelper(QString moduleName, QString tmpDir):
 
 TestWithDbHelper::~TestWithDbHelper()
 {
-    QDir(m_tmpDir).removeRecursively();
-}
-
-QString TestWithDbHelper::testDataDir() const
-{
-    return m_tmpDir;
 }
 
 const nx::db::ConnectionOptions& TestWithDbHelper::dbConnectionOptions() const
@@ -52,16 +36,6 @@ const nx::db::ConnectionOptions& TestWithDbHelper::dbConnectionOptions() const
 nx::db::ConnectionOptions& TestWithDbHelper::dbConnectionOptions()
 {
     return m_dbConnectionOptions;
-}
-
-void TestWithDbHelper::setTemporaryDirectoryPath(const QString& path)
-{
-    sTemporaryDirectoryPath = path;
-}
-
-QString TestWithDbHelper::temporaryDirectoryPath()
-{
-    return sTemporaryDirectoryPath;
 }
 
 void TestWithDbHelper::setDbConnectionOptions(

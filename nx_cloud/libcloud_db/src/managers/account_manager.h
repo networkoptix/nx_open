@@ -24,11 +24,9 @@ namespace cdb {
 
 class TemporaryAccountPasswordManager;
 class AbstractEmailManager;
-namespace conf
-{
-    class Settings;
-} // namespace conf
 class StreeManager;
+
+namespace conf { class Settings; }
 
 /**
  * \note Methods of this class are re-enterable

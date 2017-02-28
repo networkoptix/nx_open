@@ -76,7 +76,7 @@ private:
 
     void connectSessionFinished(
         ConnectSessionsDictionary::iterator,
-        api::ResultCode connectionResult);
+        api::NatTraversalResultCode connectionResult);
 };
 
 } // namespace hpm
