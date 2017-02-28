@@ -951,6 +951,8 @@ private:
 class SslSocketPrivate
 {
 public:
+    typedef utils::promise<std::pair<SystemError::ErrorCode, size_t>> AsyncPromise;
+
     AbstractStreamSocket* wrappedSocket;
     std::unique_ptr<SSL, decltype(&SSL_free)> ssl;
     bool isServerSide;
@@ -959,14 +961,14 @@ public:
     //!Socket works as regular socket (without encryption until this flag is set to \a true)
     bool ecnryptionEnabled;
     std::atomic<bool> nonBlockingMode;
-    std::atomic<bool> shutdown;
     std::unique_ptr<SslAsyncBioHelper> asyncSslHelper;
 
-    typedef utils::promise<std::pair<SystemError::ErrorCode, size_t>> AsyncPromise;
-    std::atomic<AsyncPromise*> recvPromisePtr;
-    std::atomic<AsyncPromise*> sendPromisePtr;
-    std::atomic<int> bioReadFlags;
+    QnMutex syncIoMutex;
+    bool isShutdown;
+    std::atomic<AsyncPromise*> syncRecvPromise;
+    std::atomic<AsyncPromise*> syncSendPromise;
 
+    std::atomic<int> bioReadFlags;
     std::atomic<bool> isSendInProgress;
     std::atomic<bool> isRecvInProgress;
 
@@ -978,9 +980,9 @@ public:
         extraBufferLen(0),
         ecnryptionEnabled(false),
         nonBlockingMode(false),
-        shutdown(false),
-        recvPromisePtr(nullptr),
-        sendPromisePtr(nullptr),
+        isShutdown(false),
+        syncRecvPromise(nullptr),
+        syncSendPromise(nullptr),
         bioReadFlags(0),
         isSendInProgress(false),
         isRecvInProgress(false)
@@ -1233,21 +1235,29 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
             return -1;
     }
 
+    const auto returnError =
+        [d, timeout, flags](SystemError::ErrorCode code) -> int
+        {
+            if (d->nonBlockingMode || flags & MSG_DONTWAIT)
+                d->wrappedSocket->setRecvTimeout(timeout);
+
+            SystemError::setLastErrorCode(code);
+            return -1;
+        };
+
     SslSocketPrivate::AsyncPromise promise;
-    if (d->recvPromisePtr.exchange(&promise))
     {
-        NX_ASSERT(false);
-        if (d->nonBlockingMode || flags & MSG_DONTWAIT)
-            d->wrappedSocket->setRecvTimeout(timeout);
+        QnMutexLocker lock(&d->syncIoMutex);
+        if (d->isShutdown)
+            return returnError(SystemError::notConnected);
 
-        SystemError::setLastErrorCode(SystemError::already);
-        return -1;
-    }
+        if (d->syncRecvPromise.load())
+        {
+            NX_ASSERT(false);
+            return returnError(SystemError::already);
+        }
 
-    if (d->shutdown)
-    {
-        SystemError::setLastErrorCode(SystemError::notConnected);
-        return -1;
+        d->syncRecvPromise = &promise;
     }
 
     nx::Buffer localBuffer;
@@ -1258,7 +1268,7 @@ int SslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
             d->wrappedSocket->post(
                 [d, code, size]()
                 {
-                    if (auto promisePtr = d->recvPromisePtr.exchange(nullptr))
+                    if (auto promisePtr = d->syncSendPromise.exchange(nullptr))
                         promisePtr->set_value({code, size});
                 });
         };
@@ -1306,21 +1316,29 @@ int SslSocket::send(const void* buffer, unsigned int bufferLen)
             return -1;
     }
 
+    const auto returnError =
+        [d, timeout](SystemError::ErrorCode code) -> int
+        {
+            if (d->nonBlockingMode)
+                d->wrappedSocket->setSendTimeout(timeout);
+
+            SystemError::setLastErrorCode(code);
+            return -1;
+        };
+
     SslSocketPrivate::AsyncPromise promise;
-    if (d->sendPromisePtr.exchange(&promise))
     {
-        NX_ASSERT(false);
-        if (d->nonBlockingMode)
-            d->wrappedSocket->setSendTimeout(timeout);
+        QnMutexLocker lock(&d->syncIoMutex);
+        if (d->isShutdown)
+            return returnError(SystemError::notConnected);
 
-        SystemError::setLastErrorCode(SystemError::already);
-        return -1;
-    }
+        if (d->syncSendPromise.load())
+        {
+            NX_ASSERT(false);
+            return returnError(SystemError::already);
+        }
 
-    if (d->shutdown)
-    {
-        SystemError::setLastErrorCode(SystemError::notConnected);
-        return -1;
+        d->syncSendPromise = &promise;
     }
 
     nx::Buffer localBuffer(static_cast<const char*>(buffer), bufferLen);
@@ -1331,7 +1349,7 @@ int SslSocket::send(const void* buffer, unsigned int bufferLen)
             d->wrappedSocket->post(
                 [d, code, size]()
                 {
-                    if (auto promisePtr = d->sendPromisePtr.exchange(nullptr))
+                    if (auto promisePtr = d->syncSendPromise.exchange(nullptr))
                         promisePtr->set_value({code, size});
                 });
         });
@@ -1509,19 +1527,22 @@ bool SslSocket::getNonBlockingMode(bool* value) const
 bool SslSocket::shutdown()
 {
     Q_D(SslSocket);
-    d->shutdown.store(true);
     DEBUG_LOG("Shutdown...");
+    {
+        QnMutexLocker lock(&d->syncIoMutex);
+        d->isShutdown = true;
+    }
 
     utils::promise<void> promise;
     d->wrappedSocket->pleaseStop(
         [this, d, &promise]()
         {
             DEBUG_LOG("Shutdown: notify send");
-            if (auto promisePtr = d->sendPromisePtr.exchange(nullptr))
+            if (auto promisePtr = d->syncSendPromise.exchange(nullptr))
                 promisePtr->set_value({SystemError::interrupted, 0});
 
             DEBUG_LOG("Shutdown: notify recv");
-            if (auto promisePtr = d->recvPromisePtr.exchange(nullptr))
+            if (auto promisePtr = d->syncRecvPromise.exchange(nullptr))
                 promisePtr->set_value({SystemError::interrupted, 0});
 
             NX_LOGX("Socket is shutdown", cl_logDEBUG1);
@@ -1568,7 +1589,7 @@ void SslSocket::readSomeAsync(
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     Q_D(SslSocket);
-    NX_ASSERT(d->nonBlockingMode.load() || d->recvPromisePtr.load());
+    NX_ASSERT(d->nonBlockingMode.load() || d->syncRecvPromise.load());
     if (!checkAsyncOperation(&d->isRecvInProgress, &handler, d->wrappedSocket, "SSL read"))
         return;
 
@@ -1576,7 +1597,7 @@ void SslSocket::readSomeAsync(
         [this, buffer, handler = std::move(handler)]() mutable
         {
             Q_D(SslSocket);
-            if (!d->nonBlockingMode.load() && !d->recvPromisePtr.load())
+            if (!d->nonBlockingMode.load() && !d->syncRecvPromise.load())
                 return handler(SystemError::invalidData, (size_t) -1);
 
             d->asyncSslHelper->asyncRecv(buffer, std::move(handler));
@@ -1588,7 +1609,7 @@ void SslSocket::sendAsync(
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     Q_D(SslSocket);
-    NX_ASSERT(d->nonBlockingMode.load() || d->sendPromisePtr.load());
+    NX_ASSERT(d->nonBlockingMode.load() || d->syncSendPromise.load());
     if (!checkAsyncOperation(&d->isSendInProgress, &handler, d->wrappedSocket, "SSL send"))
         return;
 
@@ -1596,7 +1617,7 @@ void SslSocket::sendAsync(
         [this,&buffer,handler]() mutable
         {
             Q_D(SslSocket);
-            if (!d->nonBlockingMode.load() && !d->sendPromisePtr.load())
+            if (!d->nonBlockingMode.load() && !d->syncSendPromise.load())
                 return handler(SystemError::invalidData, (size_t) -1);
 
             d->asyncSslHelper->asyncSend(buffer, std::move(handler));
@@ -1731,7 +1752,7 @@ void MixedSslSocket::readSomeAsync(
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     Q_D(MixedSslSocket);
-    NX_ASSERT(d->nonBlockingMode.load() || d->recvPromisePtr.load());
+    NX_ASSERT(d->nonBlockingMode.load() || d->syncRecvPromise.load());
     if (!checkAsyncOperation(&d->isRecvInProgress, &handler, d->wrappedSocket, "Mixed SSL read"))
         return;
 
@@ -1745,7 +1766,7 @@ void MixedSslSocket::readSomeAsync(
     d->wrappedSocket->dispatch(
         [d, helper, buffer, handler = std::move(handler)]() mutable
         {
-            if (!d->nonBlockingMode.load() && !d->recvPromisePtr.load())
+            if (!d->nonBlockingMode.load() && !d->syncRecvPromise.load())
                 return handler(SystemError::invalidData, (size_t) -1);
 
             if (!d->initState)
@@ -1767,7 +1788,7 @@ void MixedSslSocket::sendAsync(
     std::function<void(SystemError::ErrorCode, std::size_t)> handler)
 {
     Q_D(MixedSslSocket);
-    NX_ASSERT(d->nonBlockingMode.load() || d->sendPromisePtr.load());
+    NX_ASSERT(d->nonBlockingMode.load() || d->syncSendPromise.load());
     if (!checkAsyncOperation(&d->isSendInProgress, &handler, d->wrappedSocket, "Mixed SSL send"))
         return;
 
@@ -1788,7 +1809,7 @@ void MixedSslSocket::sendAsync(
     d->wrappedSocket->dispatch(
         [d, helper, &buffer, handler = std::move(handler)]() mutable
         {
-            if (!d->nonBlockingMode.load() && !d->sendPromisePtr.load())
+            if (!d->nonBlockingMode.load() && !d->syncSendPromise.load())
                 return handler(SystemError::invalidData, (size_t) -1);
 
             if (!d->initState)
