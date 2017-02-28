@@ -146,7 +146,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
                 responseHeaders);
         if (std::get<0>(authResult) == Qn::Auth_OK)
         {
-            NX_LOGX(lm("User %1 has been authentication successully by default authenticator")
+            NX_LOGX(lm("User %1 has been authenticated successully by default authenticator. Nonce %2")
                 .arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
 
             const auto authResource = std::get<1>(authResult).dynamicCast<QnUserResource>();
