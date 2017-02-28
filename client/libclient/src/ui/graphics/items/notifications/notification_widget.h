@@ -113,7 +113,7 @@ private:
     QnProxyLabel* m_textLabel;
     QnImageButtonWidget* m_closeButton;
     QnNotificationLevel::Value m_notificationLevel;
-    QnImageProvider* m_imageProvider;
+    QPointer<QnImageProvider> m_imageProvider;
     QColor m_color;
 
     QnNotificationToolTipWidget* m_tooltipWidget;

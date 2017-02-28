@@ -287,14 +287,15 @@ void QnNotificationWidget::hideToolTip()
 
 void QnNotificationWidget::showToolTip()
 {
-    m_imageProvider->loadAsync();
-    m_tooltipWidget->setThumbnailVisible(true);
+    if (m_imageProvider)
+        m_imageProvider->loadAsync();
+    m_tooltipWidget->setThumbnailVisible(!m_imageProvider.isNull());
     opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
 }
 
 void QnNotificationWidget::updateToolTipVisibility()
 {
-    if (m_toolTipHoverProcessor->isHovered() /*&& !m_tooltipWidget->text().isEmpty()*/)
+    if (m_toolTipHoverProcessor->isHovered() && !m_tooltipWidget->text().isEmpty())
         showToolTip();
     else
         hideToolTip();
