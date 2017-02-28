@@ -2154,7 +2154,7 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
 QnSpeedRange QnMediaResourceWidget::speedRange() const
 {
     static constexpr qreal kUnitSpeed = 1.0;
-    static constexpr qreal kZeroSpeed = 1.0;
+    static constexpr qreal kZeroSpeed = 0.0;
 
     if (!m_display || !m_display->archiveReader())
         return QnSpeedRange(kZeroSpeed, kZeroSpeed);
