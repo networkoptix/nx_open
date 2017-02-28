@@ -2209,7 +2209,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
 
     QSet<QnStorageResourcePtr> storages;
     for (const auto& storage: getUsedWritableStorages())
-        if (pred(storage))
+        if (pred(storage) && storage->getFreeSpace() > 150 * 1024 * 1024) //< Storage should have at least 150 mb of free space
             storages << storage;
 
 	auto getOptimalStorageRootFallback = [&storages, this]
