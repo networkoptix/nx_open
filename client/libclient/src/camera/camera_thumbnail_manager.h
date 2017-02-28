@@ -64,6 +64,6 @@ private:
 
     QHash<QnVirtualCameraResourcePtr, ThumbnailData> m_thumbnailByCamera;
     QnVirtualCameraResourcePtr m_selectedCamera;
-    QSize m_thumnailSize;
+    QSize m_thumbnailSize;
     QTimer* m_refreshingTimer;
 };

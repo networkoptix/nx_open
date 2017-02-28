@@ -34,7 +34,7 @@ QnCameraThumbnailManager::ThumbnailData::ThumbnailData():
 
 QnCameraThumbnailManager::QnCameraThumbnailManager(QObject* parent) :
     base_type(parent),
-    m_thumnailSize(kDefaultThumbnailSize),
+    m_thumbnailSize(kDefaultThumbnailSize),
     m_refreshingTimer(new QTimer(this))
 {
     m_refreshingTimer->setInterval(kUpdateThumbnailsPeriodMs);
@@ -100,28 +100,28 @@ void QnCameraThumbnailManager::selectCamera(const QnVirtualCameraResourcePtr& ca
 
 QSize QnCameraThumbnailManager::thumbnailSize() const
 {
-    return m_thumnailSize;
+    return m_thumbnailSize;
 }
 
 QPixmap QnCameraThumbnailManager::scaledPixmap(const QPixmap& pixmap) const
 {
     /* Check if no scaling required. */
-    if (m_thumnailSize.isNull())
+    if (m_thumbnailSize.isNull())
         return pixmap;
 
-    if (m_thumnailSize.width() == 0)
-        return pixmap.scaledToHeight(m_thumnailSize.height(), Qt::SmoothTransformation);
-    if (m_thumnailSize.height() == 0)
-        return pixmap.scaledToWidth(m_thumnailSize.width(), Qt::SmoothTransformation);
-    return pixmap.scaled(m_thumnailSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    if (m_thumbnailSize.width() == 0)
+        return pixmap.scaledToHeight(m_thumbnailSize.height(), Qt::SmoothTransformation);
+    if (m_thumbnailSize.height() == 0)
+        return pixmap.scaledToWidth(m_thumbnailSize.width(), Qt::SmoothTransformation);
+    return pixmap.scaled(m_thumbnailSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
 void QnCameraThumbnailManager::setThumbnailSize(const QSize &size)
 {
-    if (m_thumnailSize == size)
+    if (m_thumbnailSize == size)
         return;
 
-    m_thumnailSize = size;
+    m_thumbnailSize = size;
     emit sizeHintChanged(sizeHint());
 }
 
@@ -135,7 +135,7 @@ QImage QnCameraThumbnailManager::image() const
 
 QSize QnCameraThumbnailManager::sizeHint() const
 {
-    return sizeHintForCamera(m_selectedCamera, m_thumnailSize);
+    return sizeHintForCamera(m_selectedCamera, m_thumbnailSize);
 }
 
 Qn::ThumbnailStatus QnCameraThumbnailManager::status() const
@@ -195,7 +195,7 @@ rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCam
 
     QnThumbnailRequestData request;
     request.camera = camera;
-    request.size = m_thumnailSize;
+    request.size = m_thumbnailSize;
     request.imageFormat = QnThumbnailRequestData::JpgFormat;
     request.roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
     request.format = Qn::SerializationFormat::UbjsonFormat;
