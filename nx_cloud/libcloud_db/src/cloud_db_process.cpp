@@ -36,10 +36,12 @@
 #include "access_control/authentication_manager.h"
 #include "dao/rdb/db_instance_controller.h"
 #include "ec2/synchronization_engine.h"
+#include "http_handlers/get_cloud_modules_xml.h"
 #include "http_handlers/ping.h"
 #include "libcloud_db_app_info.h"
 #include "managers/account_manager.h"
 #include "managers/auth_provider.h"
+#include "managers/cloud_module_url_provider.h"
 #include "managers/email_manager.h"
 #include "managers/event_manager.h"
 #include "managers/maintenance_manager.h"
@@ -198,7 +200,8 @@ int CloudDBProcess::exec()
 
         //TODO #ak move following to stree xml
         QnAuthMethodRestrictionList authRestrictionList;
-        authRestrictionList.allow(PingHandler::kHandlerPath, AuthMethod::noAuth);
+        authRestrictionList.allow(http_handler::GetCloudModulesXml::kHandlerPath, AuthMethod::noAuth);
+        authRestrictionList.allow(http_handler::Ping::kHandlerPath, AuthMethod::noAuth);
         authRestrictionList.allow(kAccountRegisterPath, AuthMethod::noAuth);
         authRestrictionList.allow(kAccountActivatePath, AuthMethod::noAuth);
         authRestrictionList.allow(kAccountReactivatePath, AuthMethod::noAuth);
@@ -229,6 +232,9 @@ int CloudDBProcess::exec()
             kCdbGuid,
             &ec2SyncronizationEngine);
 
+        CloudModuleUrlProvider cloudModuleUrlProvider(
+            settings.moduleFinder().cloudModulesXmlTemplatePath);
+
         //registering HTTP handlers
         registerApiHandlers(
             &httpMessageDispatcher,
@@ -238,7 +244,8 @@ int CloudDBProcess::exec()
             &authProvider,
             &eventManager,
             &ec2SyncronizationEngine.connectionManager(),
-            &maintenanceManager);
+            &maintenanceManager,
+            cloudModuleUrlProvider);
         //TODO #ak remove eventManager.registerHttpHandlers and register in registerApiHandlers
         eventManager.registerHttpHandlers(
             authorizationManager,
@@ -307,13 +314,14 @@ void CloudDBProcess::registerApiHandlers(
     AuthenticationProvider* const authProvider,
     EventManager* const /*eventManager*/,
     ec2::ConnectionManager* const ec2ConnectionManager,
-    MaintenanceManager* const maintenanceManager)
+    MaintenanceManager* const maintenanceManager,
+    const CloudModuleUrlProvider& cloudModuleUrlProvider)
 {
-    msgDispatcher->registerRequestProcessor<PingHandler>(
-        PingHandler::kHandlerPath,
-        [&authorizationManager]() -> std::unique_ptr<PingHandler>
+    msgDispatcher->registerRequestProcessor<http_handler::Ping>(
+        http_handler::Ping::kHandlerPath,
+        [&authorizationManager]() -> std::unique_ptr<http_handler::Ping>
         {
-            return std::make_unique<PingHandler>(authorizationManager);
+            return std::make_unique<http_handler::Ping>(authorizationManager);
         });
 
     //---------------------------------------------------------------------------------------------
@@ -443,6 +451,16 @@ void CloudDBProcess::registerApiHandlers(
         kMaintenanceGetTransactionLog,
         &MaintenanceManager::getTransactionLog, maintenanceManager,
         EntityType::maintenance, DataActionType::fetch);
+
+    //---------------------------------------------------------------------------------------------
+    msgDispatcher->registerRequestProcessor<http_handler::GetCloudModulesXml>(
+        http_handler::GetCloudModulesXml::kHandlerPath,
+        [&authorizationManager, &cloudModuleUrlProvider]()
+            -> std::unique_ptr<http_handler::GetCloudModulesXml>
+        {
+            return std::make_unique<http_handler::GetCloudModulesXml>(
+                cloudModuleUrlProvider);
+        });
 }
 
 template<typename ManagerType, typename InputData, typename... OutputData>
