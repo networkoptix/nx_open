@@ -9,7 +9,7 @@ DMG_FILE="${artifact.name.client}.dmg"
 APP_DIR="$SRC/${display.product.name}.app"
 HELP=${ClientHelpSourceDir}
 RELEASE_VERSION=${release.version}
-PROTOCOL_HANDLER_APP_NAME=${protocol_handler_app_name}
+PROTOCOL_HANDLER_APP_NAME="${protocol_handler_app_name}"
 
 AS_SRC=app-store
 PKG_FILE="${artifact.name.client}.pkg"
