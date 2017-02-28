@@ -24,4 +24,6 @@ private:
     QUrl m_cloudUrl;
     QTimer m_timer;
     std::unique_ptr<nx::network::cloud::CloudModuleUrlFetcher> m_cdbEndPointFetcher;
+
+    void addCloudPeer(QUrl url);
 };

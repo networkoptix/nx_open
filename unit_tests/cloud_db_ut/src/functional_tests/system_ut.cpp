@@ -49,14 +49,14 @@ protected:
         return newAccount;
     }
 
-    void whenDisabledUserInSystem(
+    void whenUserIsDisabledInSystem(
         const api::SystemData& system,
         const api::AccountData& user)
     {
         updateSharing(system, user, makeField(&api::SystemSharing::isEnabled, false));
     }
 
-    void whenEnabledUserInSystem(
+    void whenUserIsEnabledInSystem(
         const api::SystemData& system,
         const api::AccountData& user)
     {
@@ -1043,7 +1043,7 @@ TEST_F(FtSystem, disabled_user_does_not_see_system)
 {
     const auto system = givenSystem();
     const auto user = givenUserOfSystem(system);
-    whenDisabledUserInSystem(system, user);
+    whenUserIsDisabledInSystem(system, user);
     assertUserCannotSeeSystem(user, system);
 }
 
@@ -1051,8 +1051,8 @@ TEST_F(FtSystem, reenabled_user_can_see_system)
 {
     const auto system = givenSystem();
     const auto user = givenUserOfSystem(system);
-    whenDisabledUserInSystem(system, user);
-    whenEnabledUserInSystem(system, user);
+    whenUserIsDisabledInSystem(system, user);
+    whenUserIsEnabledInSystem(system, user);
     assertUserCanSeeSystem(user, system);
 }
 
@@ -1060,7 +1060,7 @@ class FtSystemTimestamp:
     public FtSystem
 {
 protected:
-    void whenRegisterSystem()
+    void whenSystemIsRegistered()
     {
         m_registrationTimeValidRange.first = nx::utils::utcTime();
         m_system = givenSystem();
@@ -1074,7 +1074,7 @@ protected:
         ASSERT_LE(system.registrationTime, m_registrationTimeValidRange.second);
     }
 
-    void whenRestartedCdb()
+    void whenCdbIsRestarted()
     {
         ASSERT_TRUE(restart());
     }
@@ -1089,10 +1089,10 @@ private:
 
 TEST_F(FtSystemTimestamp, registration_timestamp)
 {
-    whenRegisterSystem();
+    whenSystemIsRegistered();
     assertRegistrationTimestampIsValid();
 
-    whenRestartedCdb();
+    whenCdbIsRestarted();
 
     assertRegistrationTimestampIsValid();
 }
