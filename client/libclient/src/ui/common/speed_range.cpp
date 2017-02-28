@@ -25,12 +25,12 @@ QnSpeedRange& QnSpeedRange::expandTo(QnSpeedRange& other)
     return *this;
 }
 
-QnSpeedRange QnSpeedRange::boundedTo(QnSpeedRange& other) const
+QnSpeedRange QnSpeedRange::limitedBy(QnSpeedRange& other) const
 {
     return QnSpeedRange(qMin(forward, other.forward), qMin(reverse, other.reverse));
 }
 
-QnSpeedRange& QnSpeedRange::boundTo(QnSpeedRange& other)
+QnSpeedRange& QnSpeedRange::limitBy(QnSpeedRange& other)
 {
     forward = qMin(forward, other.forward);
     reverse = qMin(reverse, other.reverse);

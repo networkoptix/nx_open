@@ -12,6 +12,6 @@ struct QnSpeedRange
     QnSpeedRange expandedTo(QnSpeedRange& other) const;
     QnSpeedRange& expandTo(QnSpeedRange& other);
 
-    QnSpeedRange boundedTo(QnSpeedRange& other) const;
-    QnSpeedRange& boundTo(QnSpeedRange& other);
+    QnSpeedRange limitedBy(QnSpeedRange& other) const;
+    QnSpeedRange& limitBy(QnSpeedRange& other);
 };
