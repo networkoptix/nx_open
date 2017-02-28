@@ -53,8 +53,7 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
 
             emit imageChanged(m_image);
             emit sizeHintChanged(sizeHint());
-        }
-    , Qt::QueuedConnection);
+        }, Qt::QueuedConnection);
 
 }
 
