@@ -62,7 +62,7 @@ static const QSize kDefaultThumbnailSize(0, QnThumbnailRequestData::kMinimumSize
 /** We limit the maximal number of notification items to prevent crashes due
  * to reaching GDI resource limit. */
 static const int kMaxNotificationItems = 128;
-static const int kMultiThumbnailSpacing = 4;
+static const int kMultiThumbnailSpacing = 1;
 static const int kMaxThumbnailCount = 5;
 
 const char* kItemResourcePropertyName = "_qn_itemResource";
