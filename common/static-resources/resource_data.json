@@ -635,6 +635,25 @@
         },
         {
             "keys": [
+                "Hikvision|DS-2CD6362F-I"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderToken_101,VideoEncoderToken_102",
+                    "VideoEncoderToken_201",
+                    "VideoEncoderToken_301",
+                    "VideoEncoderToken_401"
+                ]
+            },
+            "fpsBounds": {
+                "max": 15,
+                "min": 1
+            }
+        },
+        {
+            "keys": [
                 "Hikvision|DS-6716HWI"
             ],
             "forcedOnvifParams":
