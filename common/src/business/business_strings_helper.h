@@ -39,9 +39,8 @@ public:
                                     Qn::ResourceInfoLevel detailLevel,
                                     bool useHtml);
 
-    static QString eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
-    static QString eventDetails(const QnBusinessEventParameters &params, const QString& delimiter);
-    static QString renderEventDetailsText(QVariantMap contextMap);
+    static QStringList eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount);
+    static QStringList eventDetails(const QnBusinessEventParameters &params);
 
     //TODO: #vasilenko isPublic field is not used, why?
     static QString urlForCamera(const QnUuid& id, qint64 timestampUsec, bool isPublic);
@@ -54,10 +53,9 @@ public:
     static QString bruleDescriptionText(const QnBusinessEventRulePtr& bRule);
     static QnResourcePtr eventSource(const QnBusinessEventParameters &params);
 
-    /** Details of event: aggregation info, date and time, other info */
-    static QString aggregatedEventDetails(const QnAbstractBusinessActionPtr& action,
-                                              const QnBusinessAggregationInfo& aggregationInfo,
-                                              const QString& delimiter);
+    /** Details of event: aggregation info, date and time, other info, split by lines. */
+    static QStringList aggregatedEventDetails(const QnAbstractBusinessActionPtr& action,
+                                              const QnBusinessAggregationInfo& aggregationInfo);
     static QString eventReason(const QnBusinessEventParameters& params);
 
     static QString eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount);

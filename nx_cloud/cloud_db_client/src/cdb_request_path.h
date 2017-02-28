@@ -35,5 +35,7 @@ extern const char* const kDeprecatedEstablishEc2TransactionConnectionPath;
 extern const char* const kMaintenanceGetVmsConnections;
 extern const char* const kMaintenanceGetTransactionLog;
 
+extern const char* const kCloudModuleXmlPath;
+
 } // namespace cdb
 } // namespace nx
