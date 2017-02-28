@@ -70,6 +70,25 @@ protected:
         ASSERT_EQ(nx_http::StatusCode::ok, m_responseMessage.response->statusLine.statusCode);
     }
 
+    void assertServerAuthorizesCloudUserCredentials()
+    {
+        ASSERT_TRUE(userRequestIsAuthorizedByServer(accountEmail(), accountPassword()));
+    }
+
+    bool userRequestIsAuthorizedByServer(std::string userName, std::string password)
+    {
+        nx_http::HttpClient httpClient;
+        httpClient.setUserName(QString::fromStdString(userName).toLower());
+        httpClient.setUserPassword(QString::fromStdString(password));
+        if (!httpClient.doGet(lit("http://%1/ec2/getUsers").arg(mediaServerEndpoint().toString())))
+            return false;
+        if (httpClient.response() == nullptr)
+            return false;
+        if (httpClient.response()->statusLine.statusCode != nx_http::StatusCode::ok)
+            return false;
+        return true;
+    }
+
 private:
     api::NonceData m_cloudNonceData;
     nx_http::Message m_responseMessage;
@@ -135,13 +154,7 @@ private:
 
 TEST_F(FtCloudAuthentication, authorize_api_request_with_cloud_credentials)
 {
-    nx_http::HttpClient httpClient;
-    httpClient.setUserName(QString::fromStdString(accountEmail()));
-    httpClient.setUserPassword(QString::fromStdString(accountPassword()));
-    ASSERT_TRUE(httpClient.doGet(
-        lit("http://%1/ec2/getSettings").arg(mediaServerEndpoint().toString())));
-    ASSERT_NE(nullptr, httpClient.response());
-    ASSERT_EQ(nx_http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
+    assertServerAuthorizesCloudUserCredentials();
 }
 
 TEST_F(FtCloudAuthentication, one_step_digest_authentication_using_nonce_received_from_cloud)
@@ -149,4 +162,56 @@ TEST_F(FtCloudAuthentication, one_step_digest_authentication_using_nonce_receive
     givenCloudNonce();
     whenIssuedHttpRequestSignedWithThatNonce();
     thenRequestShouldBeFulfilled();
+}
+
+//-------------------------------------------------------------------------------------------------
+// FtCloudAuthenticationInviteUser
+
+class FtCloudAuthenticationInviteUser:
+    public FtCloudAuthentication
+{
+public:
+
+protected:
+    void inviteCloudUser()
+    {
+        m_inivitedUserEmail = cdb()->generateRandomEmailAddress();
+        api::SystemSharing sharing;
+        sharing.systemId = cloudSystem().id;
+        sharing.accessRole = api::SystemAccessRole::cloudAdmin;
+        sharing.accountEmail = m_inivitedUserEmail;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            cdb()->shareSystem(accountEmail(), accountPassword(), sharing));
+
+        api::AccountData newAccount;
+        newAccount.email = m_inivitedUserEmail;
+        api::AccountConfirmationCode accountConfirmationCode;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            cdb()->addAccount(&newAccount, &m_inivitedUserPassword, &accountConfirmationCode));
+        
+        std::string resultEmail;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            cdb()->activateAccount(accountConfirmationCode, &resultEmail));
+    }
+    
+    void assertInvitedUserIsAuthenticatedSuccessfully()
+    {
+        while (!userRequestIsAuthorizedByServer(m_inivitedUserEmail, m_inivitedUserPassword))
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+    }
+
+private:
+    std::string m_inivitedUserEmail;
+    std::string m_inivitedUserPassword;
+};
+
+TEST_F(FtCloudAuthenticationInviteUser, invited_user_is_authorized_by_mediaserver)
+{
+    inviteCloudUser();
+    assertInvitedUserIsAuthenticatedSuccessfully();
 }
