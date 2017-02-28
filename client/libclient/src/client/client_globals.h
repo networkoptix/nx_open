@@ -453,7 +453,7 @@ namespace Qn
 } // namespace Qn
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ItemRole)(Qn::TimeMode)(Qn::NodeType),
+    (Qn::ItemRole)(Qn::TimeMode)(Qn::NodeType)(Qn::ThumbnailStatus),
     (metatype)
     )
 
