@@ -196,49 +196,49 @@ QString QnBusinessStringsHelper::getResoureIPFromParams(const QnBusinessEventPar
 	return result.isNull() ? params.resourceName : result;
 }
 
-QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr& action, const QnBusinessAggregationInfo &aggregationInfo, Qn::ResourceInfoLevel detailLevel, bool useHtml) {
-
-    QString delimiter = useHtml
-            ? htmlDelimiter
-            : plainTextDelimiter;
+QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr& action,
+    const QnBusinessAggregationInfo &aggregationInfo,
+    Qn::ResourceInfoLevel detailLevel,
+    bool useHtml)
+{
+    QStringList result;
 
     QnBusinessEventParameters params = action->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
 
-    QString result;
-    result += tr("Event: %1").arg(eventName(eventType));
+    result << tr("Event: %1").arg(eventName(eventType));
 
     QString sourceText = getResoureNameFromParams(params, detailLevel);
-    if (!sourceText.isEmpty()) {
-        result += delimiter;
-        result += tr("Source: %1").arg(sourceText);
+    if (!sourceText.isEmpty())
+        result << tr("Source: %1").arg(sourceText);
+
+    if (eventType >= QnBusiness::UserDefinedEvent)
+    {
+        if (!params.caption.isEmpty())
+            result << tr("Caption: %1").arg(params.caption);
     }
 
-    if (eventType == QnBusiness::UserDefinedEvent) {
-        if (!params.caption.isEmpty()) {
-            result += delimiter;
-            result += tr("Caption: %1").arg(params.caption);
-        }
+    if (useHtml && eventType == QnBusiness::CameraMotionEvent)
+    {
+        result << tr("Url: %1").arg(urlForCamera(
+            params.eventResourceId, params.eventTimestampUsec, true));
     }
 
-    if (useHtml && eventType == QnBusiness::CameraMotionEvent) {
-        result += delimiter;
-        result += tr("Url: %1").arg(urlForCamera(params.eventResourceId, params.eventTimestampUsec, true));
-    }
+    const auto details = aggregatedEventDetails(action, aggregationInfo);
+    if (!details.isEmpty())
+        result << details;
 
-    result += delimiter;
-    result += aggregatedEventDetails(action, aggregationInfo, delimiter);
-
-    return result;
+    return result.join(useHtml ? htmlDelimiter : plainTextDelimiter);
 }
 
-QString QnBusinessStringsHelper::eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter)
+QStringList QnBusinessStringsHelper::eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount)
 {
-    return eventTimestamp(params, aggregationCount) + delimiter + eventDetails(params, delimiter);
+    return QStringList()
+        << eventTimestamp(params, aggregationCount)
+        << eventDetails(params);
 }
 
-QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters& params,
-    const QString& delimiter)
+QStringList QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters& params)
 {
     using namespace QnBusiness;
 
@@ -305,7 +305,8 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters& p
     default:
         break;
     }
-    return result.join(delimiter);
+
+    return result;
 }
 
 QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount)
@@ -500,19 +501,20 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     return result;
 }
 
-QString QnBusinessStringsHelper::aggregatedEventDetails(const QnAbstractBusinessActionPtr& action,
-                                              const QnBusinessAggregationInfo& aggregationInfo,
-                                              const QString& delimiter) {
-    QString result;
-    if (aggregationInfo.isEmpty()) {
-        result += eventDetailsWithTimestamp(action->getRuntimeParams(), action->getAggregationCount(), delimiter);
+QStringList QnBusinessStringsHelper::aggregatedEventDetails(
+    const QnAbstractBusinessActionPtr& action,
+    const QnBusinessAggregationInfo& aggregationInfo)
+{
+    QStringList result;
+    if (aggregationInfo.isEmpty())
+    {
+        result << eventDetailsWithTimestamp(action->getRuntimeParams(),
+            action->getAggregationCount());
     }
 
-    for (const QnInfoDetail& detail: aggregationInfo.toList()) {
-        if (!result.isEmpty())
-            result += delimiter;
-        result += eventDetailsWithTimestamp(detail.runtimeParams(), detail.count(), delimiter);
-    }
+    for (const QnInfoDetail& detail: aggregationInfo.toList())
+        result << eventDetailsWithTimestamp(detail.runtimeParams(), detail.count());
+
     return result;
 }
 
