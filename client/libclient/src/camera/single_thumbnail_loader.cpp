@@ -88,10 +88,10 @@ Qn::ThumbnailStatus QnSingleThumbnailLoader::status() const
 
 void QnSingleThumbnailLoader::doLoadAsync()
 {
-    if (m_status == Qn::ThumbnailStatus::Loaded)
-        setStatus(Qn::ThumbnailStatus::Refreshing);
-    else
-        setStatus(Qn::ThumbnailStatus::Loading);
+    if (m_status == Qn::ThumbnailStatus::Loaded || m_status == Qn::ThumbnailStatus::Loading)
+        return;
+
+    setStatus(Qn::ThumbnailStatus::Loading);
 
     if (!qnCommon->currentServer())
     {
