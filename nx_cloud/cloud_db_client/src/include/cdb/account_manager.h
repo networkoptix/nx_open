@@ -20,7 +20,7 @@ public:
      * @note Required access role: cloud module (e.g., user portal)
      */
     virtual void registerNewAccount(
-        api::AccountData accountData,
+        api::AccountRegistrationData accountData,
         std::function<void(api::ResultCode, api::AccountConfirmationCode)> completionHandler) = 0;
     /** Activate account supplying code returned by AccountManager::registerNewAccount. */
     virtual void activateAccount(

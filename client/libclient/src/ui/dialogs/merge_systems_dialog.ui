@@ -144,7 +144,7 @@
           <item>
            <widget class="QLabel" name="currentSystemLabel">
             <property name="text">
-             <string notr="true">You are about to merge the current system &lt;system name&gt; with the system</string>
+             <string notr="true">&lt;You are about to merge the current system &lt;system name&gt; with the system&gt;</string>
             </property>
            </widget>
           </item>
@@ -167,7 +167,7 @@
           <item>
            <widget class="QLabel" name="newSystemLabel">
             <property name="text">
-             <string>The new system will have password and name from the system:</string>
+             <string>The new System will have password and name from System:</string>
             </property>
            </widget>
           </item>

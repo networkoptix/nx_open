@@ -563,7 +563,7 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
 
     if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
     {
-        m_widget->m_thumbnailManager->selectResource(camera);
+        m_widget->m_thumbnailManager->selectCamera(camera);
         return false;
     }
 

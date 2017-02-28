@@ -51,6 +51,9 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     , m_exportBookmarkAction    (new QAction(tr("Export Bookmark..."), this))
     , m_removeBookmarksAction   (new QAction(action(QnActions::RemoveBookmarksAction)->text(), this))
     , m_updatingNow(false)
+
+    , utcRangeStartMs(utcStartTimeMs)
+    , utcRangeEndMs(utcFinishTimeMs)
 {
     m_ui->setupUi(m_owner);
     m_ui->refreshButton->setIcon(qnSkin->icon("buttons/refresh.png"));
@@ -86,6 +89,8 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     connect(m_ui->dateRangeWidget, &QnDateRangeWidget::rangeChanged, this,
         [this](qint64 startTimeMs, qint64 endTimeMs)
         {
+            if (m_updatingNow)
+                return;
             m_model->setRange(startTimeMs, endTimeMs);
             applyModelChanges();
         });
@@ -137,14 +142,7 @@ void QnSearchBookmarksDialogPrivate::applyModelChanges()
 
 void QnSearchBookmarksDialogPrivate::reset()
 {
-    {
-        QN_SCOPED_VALUE_ROLLBACK(&m_updatingNow, true);
-        resetToAllAvailableCameras();
-        m_ui->filterLineEdit->clear();
-        m_ui->dateRangeWidget->reset();
-    }
-
-    applyModelChanges();
+    setParameters(QString(), utcRangeStartMs, utcRangeEndMs);
 }
 
 void QnSearchBookmarksDialogPrivate::setParameters(const QString &filterText
@@ -155,16 +153,11 @@ void QnSearchBookmarksDialogPrivate::setParameters(const QString &filterText
         QN_SCOPED_VALUE_ROLLBACK(&m_updatingNow, true);
 
         resetToAllAvailableCameras();
-
         m_ui->filterLineEdit->lineEdit()->setText(filterText);
         m_ui->dateRangeWidget->setRange(utcStartTimeMs, utcFinishTimeMs);
-
-        m_model->setFilterText(filterText);
-        /* Start/end values are rounded in the widget to 1-day granularity. */
-        m_model->setRange(m_ui->dateRangeWidget->startTimeMs(), m_ui->dateRangeWidget->endTimeMs());
     }
 
-    applyModelChanges();
+    refresh();
 }
 
 bool QnSearchBookmarksDialogPrivate::fillActionParameters(QnActionParameters &params, QnTimePeriod &window)
@@ -299,7 +292,8 @@ void QnSearchBookmarksDialogPrivate::refresh()
         m_model->setFilterText(m_ui->filterLineEdit->lineEdit()->text());
         m_model->setRange(m_ui->dateRangeWidget->startTimeMs(), m_ui->dateRangeWidget->endTimeMs());
     }
-    m_model->applyFilter();
+
+    applyModelChanges();
 }
 
 

@@ -2,10 +2,10 @@
 #top {
     background-color: black; }
 
-#top a {
+.navbar-nav>ul>li>a {
     color: white; }
 
-#top a:hover {
+.navbar-nav>ul>li>a:hover {
     background-color: black; }
 
 #top a.navbar-brand:hover {

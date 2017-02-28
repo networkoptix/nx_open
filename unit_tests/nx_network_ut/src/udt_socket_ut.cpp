@@ -357,6 +357,9 @@ TEST_F(SocketUdt, acceptingFirstConnection)
     for (int i = 0; i < loopLength; ++i)
     {
         UdtStreamServerSocket serverSocket(AF_INET);
+        auto serverSocketGuard = makeScopedGuard(
+            [&serverSocket]() { serverSocket.pleaseStopSync(); });
+
         ASSERT_TRUE(serverSocket.bind(SocketAddress(HostAddress::localhost, 0)));
         const auto serverAddress = serverSocket.getLocalAddress();
         ASSERT_TRUE(serverSocket.listen());
@@ -381,8 +384,6 @@ TEST_F(SocketUdt, acceptingFirstConnection)
 
         const auto result = socketAcceptedPromise.get_future().get();
         ASSERT_EQ(SystemError::noError, result.first);
-
-        serverSocket.pleaseStopSync();
     }
 }
 

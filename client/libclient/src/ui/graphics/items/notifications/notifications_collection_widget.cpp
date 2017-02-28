@@ -9,7 +9,6 @@
 #include <business/business_strings_helper.h>
 
 #include <camera/single_thumbnail_loader.h>
-#include <camera/camera_thumbnail_manager.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
@@ -63,7 +62,7 @@ static const QSize kDefaultThumbnailSize(0, QnThumbnailRequestData::kMinimumSize
 /** We limit the maximal number of notification items to prevent crashes due
  * to reaching GDI resource limit. */
 static const int kMaxNotificationItems = 128;
-static const int kMultiThumbnailSpacing = 4;
+static const int kMultiThumbnailSpacing = 1;
 static const int kMaxThumbnailCount = 5;
 
 const char* kItemResourcePropertyName = "_qn_itemResource";
@@ -75,11 +74,8 @@ const char* kItemTimeStampPropertyName = "_qn_itemTimeStamp";
 QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
     base_type(parent, flags),
     QnWorkbenchContextAware(context),
-    m_headerWidget(new GraphicsWidget(this)),
-    m_statusPixmapManager(new QnCameraThumbnailManager())
+    m_headerWidget(new GraphicsWidget(this))
 {
-    m_statusPixmapManager->setThumbnailSize(kDefaultThumbnailSize);
-
     int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
     auto newButton = [this, maxIconSize](QnActions::IDType actionId, int helpTopicId)
     {
@@ -199,7 +195,6 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
         QnThumbnailRequestData::kDefaultRotation,
         kDefaultThumbnailSize,
         QnThumbnailRequestData::JpgFormat,
-        m_statusPixmapManager,
         item);
 
     item->setImageProvider(loader);
@@ -222,8 +217,7 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
             msecSinceEpoch,
             QnThumbnailRequestData::kDefaultRotation,
             kDefaultThumbnailSize,
-            QnThumbnailRequestData::JpgFormat,
-            m_statusPixmapManager));
+            QnThumbnailRequestData::JpgFormat));
 
         providers.push_back(std::move(provider));
     }
@@ -246,6 +240,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     if (businessAction->getParams().useSource)
         alarmCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
     alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
+    alarmCameras = alarmCameras.toSet().toList();
 
     QnResourcePtr resource = qnResPool->getResourceById(params.eventResourceId);
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();

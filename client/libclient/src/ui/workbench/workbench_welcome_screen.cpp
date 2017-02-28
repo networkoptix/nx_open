@@ -390,7 +390,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
     connectToSystemInternal(
         systemId,
         urlFromUserInput(serverUrl),
-        QnCredentials(userName, password),
+        QnEncodedCredentials(userName, password),
         storePassword,
         autoLogin);
 }
@@ -406,7 +406,7 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
     const auto callback = [localId, userName]()
         {
             nx::client::core::helpers::storeCredentials(
-                localId, QnCredentials(userName, QString()));
+                localId, QnEncodedCredentials(userName, QString()));
         };
 
     executeDelayedParented(callback, 0, this);
@@ -420,7 +420,7 @@ void QnWorkbenchWelcomeScreen::forceActiveFocus()
 void QnWorkbenchWelcomeScreen::connectToSystemInternal(
     const QString& systemId,
     const QUrl& serverUrl,
-    const QnCredentials& credentials,
+    const QnEncodedCredentials& credentials,
     bool storePassword,
     bool autoLogin,
     const QnRaiiGuardPtr& completionTracker)

@@ -203,11 +203,13 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
     };
 
     auto checkLocked = [this, layout](Qn::Permissions permissions)
-    {
-        if (!layout->locked())
-            return permissions;
-        return permissions &~ (Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission);
-    };
+        {
+            // Removable layouts must be checked via main pipeline
+            NX_ASSERT(!permissions.testFlag(Qn::RemovePermission));
+            if (!layout->locked())
+                return permissions;
+            return permissions &~ (Qn::AddRemoveItemsPermission | Qn::WriteNamePermission);
+        };
 
     /* Some layouts are created with predefined permissions. */
     QVariant permissions = layout->data().value(Qn::LayoutPermissionsRole);

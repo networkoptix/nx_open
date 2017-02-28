@@ -4,7 +4,7 @@
 
 #include <ui/dialogs/common/dialog.h>
 
-#include <utils/common/credentials.h>
+#include <utils/common/encoded_credentials.h>
 
 class QnSetupWizardDialogPrivate;
 class QnSetupWizardDialog : public QnDialog
@@ -22,9 +22,9 @@ public:
     QUrl url() const;
     void setUrl(const QUrl& url);
 
-    QnCredentials localCredentials() const;
-    QnCredentials cloudCredentials() const;
-    void setCloudCredentials(const QnCredentials& value);
+    QnEncodedCredentials localCredentials() const;
+    QnEncodedCredentials cloudCredentials() const;
+    void setCloudCredentials(const QnEncodedCredentials& value);
 
     bool savePassword() const;
 private:

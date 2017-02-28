@@ -687,6 +687,8 @@ void socketMultiConnect(
 
     std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
     std::vector<std::unique_ptr<AbstractStreamSocket>> connectedSockets;
+    QnMutex connectedSocketsMutex;
+    bool terminated = false;
 
     auto server = serverMaker();
     ASSERT_TRUE(server->setNonBlockingMode(true));
@@ -717,17 +719,19 @@ void socketMultiConnect(
     std::function<void(int)> connectNewClients =
         [&](int clientsToConnect)
         {
-            if (clientsToConnect == 0)
+            QnMutexLocker lock(&connectedSocketsMutex);
+
+            if (clientsToConnect == 0 || terminated)
                 return;
 
             auto testClient = clientMaker();
             ASSERT_TRUE(testClient->setNonBlockingMode(true));
             ASSERT_TRUE(testClient->setSendTimeout(timeout.count()));
-
             connectedSockets.push_back(std::move(testClient));
+
             connectedSockets.back()->connectAsync(
                 *endpointToConnectTo,
-                [&, clientsToConnect, connectNewClients]
+                [&connectedSockets, clientsToConnect, connectNewClients, &connectResults]
                     (SystemError::ErrorCode code)
                 {
                     connectResults.push(code);
@@ -745,7 +749,15 @@ void socketMultiConnect(
     }
 
     server->pleaseStopSync();
-    for (auto& socket : connectedSockets)
+
+    decltype(connectedSockets) connectedSocketsToDelete;
+    {
+        QnMutexLocker lock(&connectedSocketsMutex);
+        connectedSocketsToDelete.swap(connectedSockets);
+        terminated = true;
+    }
+
+    for (auto& socket: connectedSocketsToDelete)
         socket->pleaseStopSync();
 }
 

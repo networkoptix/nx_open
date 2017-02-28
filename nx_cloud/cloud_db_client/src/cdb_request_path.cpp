@@ -35,5 +35,7 @@ const char* const kDeprecatedEstablishEc2TransactionConnectionPath = "/ec2/event
 const char* const kMaintenanceGetVmsConnections = "/cdb/maintenance/getVmsConnections";
 const char* const kMaintenanceGetTransactionLog = "/cdb/maintenance/getTransactionLog";
 
+const char* const kCloudModuleXmlPath = "/cdb/cloud_modules.xml";
+
 } // namespace cdb
 } // namespace nx

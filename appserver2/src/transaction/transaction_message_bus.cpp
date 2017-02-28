@@ -1486,8 +1486,6 @@ QSet<QnUuid> QnTransactionMessageBus::checkAlivePeerRouteTimeout()
                 ++itr;
             }
         }
-        {
-        }
         if (peerInfo.routingInfo.isEmpty())
             lostPeers << peerInfo.peer.id;
     }

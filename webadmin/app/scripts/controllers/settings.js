@@ -98,7 +98,7 @@ angular.module('webadminApp')
 
         $scope.openJoinDialog = function () {
             $modal.open({
-                templateUrl: 'views/join.html',
+                templateUrl: Config.viewsDir + 'join.html',
                 controller: 'JoinCtrl',
                 resolve: {
                     items: function () {
@@ -135,7 +135,7 @@ angular.module('webadminApp')
 
         function restartServer(passPort){
             $modal.open({
-                templateUrl: 'views/restart.html',
+                templateUrl: Config.viewsDir + 'restart.html',
                 controller: 'RestartCtrl',
                 resolve:{
                     port:function(){
@@ -262,7 +262,7 @@ angular.module('webadminApp')
 
         function openCloudDialog(){
             $modal.open({
-                templateUrl: 'views/dialogs/cloudDialog.html',
+                templateUrl: Config.viewsDir + 'dialogs/cloudDialog.html',
                 controller: 'CloudDialogCtrl',
                 backdrop:'static',
                 size:'sm',

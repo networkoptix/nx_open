@@ -11,7 +11,7 @@ MediaServerLauncher::MediaServerLauncher(const QString& tmpDir, DisabledFeatures
     m_serverEndpoint(HostAddress::localhost, 0),
     m_firstStartup(true)
 {
-    if (disabledFeatures.testFlag(DisabledFeature::noResorseDiscovery))
+    if (disabledFeatures.testFlag(DisabledFeature::noResourceDiscovery))
         addSetting(QnServer::kNoResourceDiscovery, "1");
     if (disabledFeatures.testFlag(DisabledFeature::noMonitorStatistics))
         addSetting(QnServer::kNoMonitorStatistics, "1");

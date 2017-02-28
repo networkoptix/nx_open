@@ -74,7 +74,7 @@ void QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered()
     qnClientCoreSettings->setCloudPassword(QString());
 
     /* Updating login if were logged under temporary credentials. */
-    qnCloudStatusWatcher->setCredentials(QnCredentials(
+    qnCloudStatusWatcher->setCredentials(QnEncodedCredentials(
         qnCloudStatusWatcher->effectiveUserName(), QString()));
 }
 

@@ -65,7 +65,7 @@ api::SystemSharingEx BusinessDataGenerator::generateRandomSharing(
     sharing.accountFullName = account.fullName;
     sharing.accountId = account.id;
     sharing.isEnabled = true;
-    sharing.lastLoginTime = std::chrono::system_clock::now();
+    sharing.lastLoginTime = nx::utils::utcTime();
     sharing.systemId = systemId;
     sharing.vmsUserId = guidFromArbitraryData(
         sharing.accountEmail).toSimpleString().toStdString();

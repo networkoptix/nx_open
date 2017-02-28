@@ -515,9 +515,7 @@ namespace detail
         ErrorCode removeMediaServerUserAttributes(const QnUuid& guid);
 
         ErrorCode removeLayout(const QnUuid& id);
-        ErrorCode removeLayoutInternal(const QnUuid& id, const qint32 &internalId);
         ErrorCode saveLayout(const ApiLayoutData& params);
-        ErrorCode removeLayoutItems(qint32 id);
 
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnUuid& guid );

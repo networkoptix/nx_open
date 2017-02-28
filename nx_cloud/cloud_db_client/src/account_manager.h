@@ -28,7 +28,7 @@ public:
 
     //!Implementation of api::AccountManager::registerNewAccount
     virtual void registerNewAccount(
-        api::AccountData accountData,
+        api::AccountRegistrationData accountData,
         std::function<void(
             api::ResultCode,
             api::AccountConfirmationCode)> completionHandler) override;

@@ -15,6 +15,8 @@
 
 #include <camera/camera_bookmarks_manager.h>
 
+#include <client_core/client_core_settings.h>
+
 #include <client/client_app_info.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -28,7 +30,7 @@
 #include <client/startup_tile_manager.h>
 #include <client/client_settings_watcher.h>
 #include <client/client_show_once_settings.h>
-#include <client_core/client_core_settings.h>
+#include <client/client_autorun_watcher.h>
 
 #include <cloud/cloud_connection.h>
 
@@ -170,8 +172,9 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
 
 QnClientModule::~QnClientModule()
 {
-    if (QnResourceDiscoveryManager::instance())
-        QnResourceDiscoveryManager::instance()->stop();
+    // Stop all long runnables before deinitializing singletons
+    QnLongRunnablePool::instance()->stopAll();
+
     QnResource::stopAsyncTasks();
 
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
@@ -269,6 +272,9 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     /* Depends on QnClientSettings, QnClientInstanceManager and QnClientShowOnceSettings, never used directly. */
     common->store(new QnClientSettingsWatcher());
+
+    /* Depends on QnClientSettings, never used directly. */
+    common->store(new QnClientAutoRunWatcher());
 
     common->setModuleGUID(clientInstanceManager->instanceGuid());
     nx::network::SocketGlobals::outgoingTunnelPool()
@@ -388,7 +394,13 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
             : startupParams.videoWallItemGuid.toString();
         logFileNameSuffix.replace(QRegExp(QLatin1String("[{}]")), QLatin1String("_"));
     }
-    else if (qnClientInstanceManager->isValid())
+    else if (startupParams.selfUpdateMode)
+    {
+        // we hope self-updater will run only once per time and will not overflow log-file
+        // qnClientInstanceManager is not initialized in self-update mode
+        logFileNameSuffix = lit("self_update");
+    }
+    else if (qnClientInstanceManager && qnClientInstanceManager->isValid())
     {
         int idx = qnClientInstanceManager->instanceIndex();
         if (idx > 0)

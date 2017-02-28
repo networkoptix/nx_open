@@ -218,7 +218,7 @@ angular.module('webadminApp')
 
         $scope.restartServer = function(passPort){
             $modal.open({
-                templateUrl: 'views/restart.html',
+                templateUrl: Config.viewsDir + 'restart.html',
                 controller: 'RestartCtrl',
                 resolve:{
                     port:function(){

@@ -1,4 +1,6 @@
 {
+    "language": "LANGUAGE_CODE",
+    "language_name": "LANGUAGE_NAME",
     "dialogs":{
         "okButton": "Ok",
         "openLink": "Visit this link",

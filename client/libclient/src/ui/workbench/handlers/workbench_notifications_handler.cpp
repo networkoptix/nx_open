@@ -340,9 +340,11 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
 
         case QnSystemHealth::CloudPromo:
         {
+            const bool isOwner = context()->user()
+                && context()->user()->userRole() == Qn::UserRole::Owner;
             const bool canShow =
-                // show only to admins and owners
-                accessController()->hasGlobalPermission(Qn::GlobalAdminPermission)
+                // show only to owners
+                isOwner
                 // only if system is not connected to the cloud
                 && qnGlobalSettings->cloudSystemId().isNull()
                 // and if user did not close notification manually at least once

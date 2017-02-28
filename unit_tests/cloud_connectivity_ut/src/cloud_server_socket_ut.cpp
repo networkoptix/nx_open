@@ -274,7 +274,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     server->moveToListeningState();
 
     // there is no tunnels yet
-    ASSERT_EQ(addressBinder.get(addressManager.key).size(), 0);
+    ASSERT_EQ(addressBinder.get(addressManager.key).size(), 0U);
 
     hpm::api::ConnectionRequestedEvent event;
     event.connectSessionId = String("someSessionId");
@@ -290,7 +290,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     auto list = addressBinder.get(addressManager.key);
-    ASSERT_EQ(list.size(), 1);
+    ASSERT_EQ(list.size(), 1U);
 
     auto client = std::make_unique<TCPSocket>(AF_INET);
     ASSERT_TRUE(client->setNonBlockingMode(true));
@@ -375,7 +375,7 @@ protected:
                             cl_logDEBUG2);
 
                         ASSERT_EQ(code, SystemError::noError);
-                        ASSERT_EQ(size, network::test::kTestMessage.size());
+                        ASSERT_EQ(size, (size_t)network::test::kTestMessage.size());
                     });
 
                 {

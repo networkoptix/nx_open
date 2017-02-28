@@ -49,17 +49,18 @@ PlayerDataConsumer::PlayerDataConsumer(
     m_emptyPacketCounter(0),
     m_audioEnabled(true)
 {
-    connect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
-        this, &PlayerDataConsumer::onBeforeJump, Qt::DirectConnection);
-    connect(archiveReader.get(), &QnArchiveStreamReader::jumpOccured,
-        this, &PlayerDataConsumer::onJumpOccurred, Qt::DirectConnection);
-    connect(archiveReader.get(), &QnArchiveStreamReader::jumpCanceled,
-        this, &PlayerDataConsumer::onJumpCanceled, Qt::DirectConnection);
+    Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
+        this, &PlayerDataConsumer::onBeforeJump);
+    Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::jumpOccured,
+        this, &PlayerDataConsumer::onJumpOccurred);
+    Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::jumpCanceled,
+        this, &PlayerDataConsumer::onJumpCanceled);
 }
 
 PlayerDataConsumer::~PlayerDataConsumer()
 {
     stop();
+    directDisconnectAll();
 }
 
 void PlayerDataConsumer::pleaseStop()

@@ -1,49 +1,50 @@
-#ifndef IMAGE_PROVIDER_H
-#define IMAGE_PROVIDER_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtGui/QImage>
 
-class QnImageProvider: public QObject {
+#include <client/client_globals_fwd.h>
+
+class QnImageProvider: public QObject
+{
     Q_OBJECT
 
 public:
-    QnImageProvider(QObject *parent = 0): QObject(parent) {}
+    QnImageProvider(QObject* parent = nullptr);
     virtual ~QnImageProvider() {}
 
     virtual QImage image() const = 0;
+    virtual QSize sizeHint() const = 0;
+    virtual Qn::ThumbnailStatus status() const = 0;
 
 public slots:
-    void loadAsync() {
-        doLoadAsync();
-    }
+    void loadAsync();
 
 signals:
-    void imageChanged(const QImage &image);
+    void imageChanged(const QImage& image);
+    void statusChanged(Qn::ThumbnailStatus status);
+    void sizeHintChanged(const QSize& sizeHint);
 
 protected:
     virtual void doLoadAsync() = 0;
 
 };
 
-class QnBasicImageProvider: public QnImageProvider {
+class QnBasicImageProvider: public QnImageProvider
+{
     Q_OBJECT
 public:
-    QnBasicImageProvider(const QImage &image, QObject *parent = 0):
-        QnImageProvider(parent),
-        m_image(image)
-    {
-        connect(this, &QnBasicImageProvider::loadDelayed, this, &QnImageProvider::imageChanged, Qt::QueuedConnection);
-    }
+    QnBasicImageProvider(const QImage& image, QObject* parent = nullptr);
+
     virtual ~QnBasicImageProvider() {}
-    virtual QImage image() const override { return m_image; }
-signals:
-    void loadDelayed(const QImage &image);
+
+    virtual QImage image() const override;
+    virtual QSize sizeHint() const override;
+    virtual Qn::ThumbnailStatus status() const override;
+
 protected:
-    virtual void doLoadAsync() { emit loadDelayed(m_image); }
+    virtual void doLoadAsync() override;
+
 private:
     QImage m_image;
-
 };
-
-#endif // IMAGE_PROVIDER_H

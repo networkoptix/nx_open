@@ -20,10 +20,10 @@ public:
     enum class DisabledFeature
     {
         none                = 0x00,
-        noResorseDiscovery  = 0x01,
+        noResourceDiscovery = 0x01,
         noMonitorStatistics = 0x02,
 
-        all = noResorseDiscovery | noMonitorStatistics
+        all = noResourceDiscovery | noMonitorStatistics
     };
     Q_DECLARE_FLAGS(DisabledFeatures, DisabledFeature)
 
