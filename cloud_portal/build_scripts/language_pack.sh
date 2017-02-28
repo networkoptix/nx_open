@@ -1,12 +1,10 @@
 #!/bin/bash
 set -e
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd $DIR
-CROWDIN=$1
+CURRENTDIR=$(pwd)
+PARENTDIR=$(dirname -- "$CURRENTDIR")
+CROWDIN_OPERATION=$1
 DIRECTORY=language_pack
 . ../env/bin/activate
-
-echo $CROWDIN
 
 rm -rf $DIRECTORY || true
 mkdir $DIRECTORY
@@ -14,6 +12,8 @@ mkdir $DIRECTORY
 echo "Copy templates"
 
 mkdir $DIRECTORY/templates
+echo "project_identifier: cloud-portal" >> $DIRECTORY/crowdin.yaml
+echo "api_key: faf881fc7b7d8dc757eb069e53cba4b1" >> $DIRECTORY/crowdin.yaml
 cp -rf ../cloud/notifications/static/templates/*.html  $DIRECTORY/templates/
 cp -rf ../cloud/notifications/static/templates/*.json  $DIRECTORY/templates/
 
@@ -25,11 +25,11 @@ echo "Copy language.json"
 cp -rf ../front_end/app/language.json  $DIRECTORY/
 
 echo "Copy crowdin yaml"
-cp -rf crowdin.yaml $DIRECTORY/
+cat crowdin.yaml >> $DIRECTORY/crowdin.yaml
 
-if [[ $CROWDIN == 'upload' ]]; then 
+if [[ $CROWDIN_OPERATION == 'upload' ]]; then 
     echo "Uploading to Crowdin..."
     cd $DIRECTORY 
-    crowdin-cli upload sources
+    crowdin-cli-py upload sources
     cd ..
 fi
