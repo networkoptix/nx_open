@@ -41,18 +41,18 @@ TEST_F(StatisticsApi, listening_peer_list)
     std::tie(statusCode, listeningPeers) = getListeningPeers();
     ASSERT_EQ(nx_http::StatusCode::ok, statusCode);
 
-    ASSERT_EQ(1, listeningPeers.systems.size());
+    ASSERT_EQ(1U, listeningPeers.systems.size());
     const auto systemIter = listeningPeers.systems.find(system1.id);
     ASSERT_NE(listeningPeers.systems.end(), systemIter);
 
-    ASSERT_EQ(1, systemIter->second.size());
+    ASSERT_EQ(1U, systemIter->second.size());
     const auto serverIter = systemIter->second.find(server1->serverId());
     ASSERT_NE(systemIter->second.end(), serverIter);
 
-    ASSERT_EQ(1, listeningPeers.clients.size());
+    ASSERT_EQ(1U, listeningPeers.clients.size());
     const auto& boundClient = *listeningPeers.clients.begin();
     ASSERT_EQ("someClient", boundClient.first);
-    ASSERT_EQ(1, boundClient.second.tcpReverseEndpoints.size());
+    ASSERT_EQ(1U, boundClient.second.tcpReverseEndpoints.size());
     ASSERT_EQ(SocketAddress("12.34.56.78:1234"), boundClient.second.tcpReverseEndpoints.front());
 
     client->pleaseStopSync();

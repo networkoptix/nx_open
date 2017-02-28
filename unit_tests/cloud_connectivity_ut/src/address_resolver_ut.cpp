@@ -147,12 +147,12 @@ TEST_F(AddressResolverTest, FixedVsDns)
         kAddress, [&](HaInfoIterator it)
         {
             const HostAddressInfo& info = it->second;
-            ASSERT_EQ(info.fixedEntries.size(), 1);
+            ASSERT_EQ(info.fixedEntries.size(), 1U);
 
             const AddressEntry& entry = info.fixedEntries.front();
             EXPECT_EQ(entry.type, AddressType::direct);
             EXPECT_EQ(entry.host, kResult.address);
-            EXPECT_EQ(entry.attributes.size(), 1);
+            EXPECT_EQ(entry.attributes.size(), 1U);
             EXPECT_EQ(entry.attributes.front().type, AddressAttributeType::port);
             EXPECT_EQ(entry.attributes.front().value, kResult.port);
 
@@ -166,13 +166,13 @@ TEST_F(AddressResolverTest, FixedVsDns)
         kAddress, [&](HaInfoIterator it)
         {
             const HostAddressInfo& info = it->second;
-            EXPECT_EQ(info.fixedEntries.size(), 0);
+            EXPECT_EQ(info.fixedEntries.size(), 0U);
             EXPECT_EQ(info.dnsState(), HostAddressInfo::State::resolved);
             EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::unresolved);
 
             const auto entries = info.getAll();
             yandexIpCount = entries.size();
-            EXPECT_GT(yandexIpCount, 0);
+            EXPECT_GT(yandexIpCount, 0U);
             for (const auto& e : entries)
                 EXPECT_EQ(e.type, AddressType::direct);
         });
@@ -182,12 +182,12 @@ TEST_F(AddressResolverTest, FixedVsDns)
         kAddress, [&](HaInfoIterator it)
         {
             const HostAddressInfo& info = it->second;
-            ASSERT_EQ(info.fixedEntries.size(), 1);
+            ASSERT_EQ(info.fixedEntries.size(), 1U);
 
             const AddressEntry& entry = info.fixedEntries.front();
             EXPECT_EQ(entry.type, AddressType::direct);
             EXPECT_EQ(entry.host, kResult.address);
-            ASSERT_EQ(entry.attributes.size(), 1);
+            ASSERT_EQ(entry.attributes.size(), 1U);
             EXPECT_EQ(entry.attributes.front().type, AddressAttributeType::port);
             EXPECT_EQ(entry.attributes.front().value, kResult.port);
 
@@ -221,7 +221,7 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
             host, [&](HaInfoIterator it, bool isSub)
             {
                 const HostAddressInfo& info = it->second;
-                EXPECT_EQ(info.fixedEntries.size(), 0);
+                EXPECT_EQ(info.fixedEntries.size(), 0U);
                 if (!isSub)
                 {
                     EXPECT_EQ(info.dnsState(), HostAddressInfo::State::unresolved);
@@ -229,14 +229,14 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
                 EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::resolved);
 
                 const auto entries = info.getAll();
-                ASSERT_EQ(info.getAll().size(), kResolveOnMediator ? 2 : 1);
+                ASSERT_EQ(info.getAll().size(), kResolveOnMediator ? 2U : 1U);
 
                 if (kResolveOnMediator)
                 {
                     const AddressEntry entry1 = entries.front();
                     EXPECT_EQ(entry1.type, AddressType::direct);
                     EXPECT_EQ(entry1.host, kResult.address);
-                    EXPECT_EQ(entry1.attributes.size(), 1);
+                    EXPECT_EQ(entry1.attributes.size(), 1U);
                     EXPECT_EQ(entry1.attributes.front().type, AddressAttributeType::port);
                     EXPECT_EQ(entry1.attributes.front().value, kResult.port);
                 }
@@ -251,16 +251,16 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
             host, [&](HaInfoIterator it, bool isSub)
             {
                 const HostAddressInfo& info = it->second;
-                ASSERT_EQ(info.fixedEntries.size(), 1);
+                ASSERT_EQ(info.fixedEntries.size(), 1U);
 
                 const AddressEntry& entry = info.fixedEntries.front();
                 EXPECT_EQ(entry.type, AddressType::direct);
                 EXPECT_EQ(entry.host, kResult.address);
-                ASSERT_EQ(entry.attributes.size(), 1);
+                ASSERT_EQ(entry.attributes.size(), 1U);
                 EXPECT_EQ(entry.attributes.front().type, AddressAttributeType::port);
                 EXPECT_EQ(entry.attributes.front().value, kResult.port);
 
-                EXPECT_EQ(info.getAll().size(), kResolveOnMediator ? 3 : 2);
+                EXPECT_EQ(info.getAll().size(), kResolveOnMediator ? 3U : 2U);
                 if (!isSub)
                     EXPECT_EQ(info.dnsState(), HostAddressInfo::State::unresolved);
                 EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::resolved);
@@ -280,8 +280,8 @@ TEST_F(AddressResolverTest, FixedVsMediatorVsDns)
             {
                 typedef HostAddressInfo::State st;
                 const HostAddressInfo& info = it->second;
-                EXPECT_EQ(info.fixedEntries.size(), 0);
-                EXPECT_EQ(info.getAll().size(), kResolveOnMediator ? 0 : 1);
+                EXPECT_EQ(info.fixedEntries.size(), 0U);
+                EXPECT_EQ(info.getAll().size(), kResolveOnMediator ? 0U : 1U);
                 EXPECT_EQ(info.dnsState(), kResolveOnMediator ? st::resolved : st::unresolved);
                 EXPECT_EQ(info.mediatorState(), st::resolved);
             });
@@ -302,19 +302,19 @@ TEST_F(AddressResolverTest, DnsVsMediator)
         kAddressGood, [&](HaInfoIterator it)
         {
             const HostAddressInfo& info = it->second;
-            EXPECT_EQ(info.fixedEntries.size(), 0);
+            EXPECT_EQ(info.fixedEntries.size(), 0U);
             EXPECT_EQ(info.dnsState(), HostAddressInfo::State::resolved);
             EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::resolved);
 
             const auto entries = info.getAll();
-            ASSERT_EQ(info.getAll().size(), kResolveOnMediator ? 2 : 0);
+            ASSERT_EQ(info.getAll().size(), kResolveOnMediator ? 2U : 0U);
 
             if (kResolveOnMediator)
             {
                 const AddressEntry entry1 = entries.front();
                 EXPECT_EQ(entry1.type, AddressType::direct);
                 EXPECT_EQ(entry1.host, kResult.address);
-                EXPECT_EQ(entry1.attributes.size(), 1);
+                EXPECT_EQ(entry1.attributes.size(), 1U);
                 EXPECT_EQ(entry1.attributes.front().type, AddressAttributeType::port);
                 EXPECT_EQ(entry1.attributes.front().value, kResult.port);
 
@@ -328,8 +328,8 @@ TEST_F(AddressResolverTest, DnsVsMediator)
         kAddressBad, [&](HaInfoIterator it)
         {
             const HostAddressInfo& info = it->second;
-            EXPECT_EQ(info.fixedEntries.size(), 0);
-            EXPECT_EQ(info.getAll().size(), 0);
+            EXPECT_EQ(info.fixedEntries.size(), 0U);
+            EXPECT_EQ(info.getAll().size(), 0U);
             EXPECT_EQ(info.dnsState(), HostAddressInfo::State::resolved);
             EXPECT_EQ(info.mediatorState(), HostAddressInfo::State::resolved);
         });

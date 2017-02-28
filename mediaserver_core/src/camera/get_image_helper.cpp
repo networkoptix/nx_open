@@ -82,7 +82,6 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnConstCompressedVideoDataPtr video;
-    std::unique_ptr<QnConstDataPacketQueue> videoSequence;
 
     if (time == DATETIME_NOW)
     {
@@ -115,30 +114,28 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
             serverDelegate.open(res);
             serverDelegate.seek(time, true);
         }
+        // todo: getNextArchiveVideoPacket should be refactored to videoSequence interface
         video = getNextArchiveVideoPacket(serverDelegate, roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod ? time : AV_NOPTS_VALUE);
-
-        // try approx frame from GOP keeper
         if (!video && camera)
         {
-            videoSequence = camera->getFrameSequenceByTime(
+            // try approx frame from GOP keeper
+            auto videoSequence = camera->getFrameSequenceByTime(
                 useHQ,
                 time,
                 prefferedChannel,
                 roundMethod);
-        }
-
-        if (!videoSequence && camera)
-        {
-            videoSequence = camera->getFrameSequenceByTime(
-                !useHQ,
-                time,
-                prefferedChannel,
-                roundMethod);
+            if (!videoSequence)
+            {
+                videoSequence = camera->getFrameSequenceByTime(
+                    !useHQ, //< if not found try alternate quality
+                    time,
+                    prefferedChannel,
+                    roundMethod);
+            }
+            if (videoSequence && videoSequence->size() > 0)
+                return decodeFrameSequence(videoSequence, time);
         }
     }
-
-    if (videoSequence && videoSequence->size() > 0)
-        return decodeFrameSequence(videoSequence, time);
 
     if (!video)
         return CLVideoDecoderOutputPtr();

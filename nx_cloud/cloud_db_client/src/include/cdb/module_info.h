@@ -1,14 +1,6 @@
-/**********************************************************
-* Sep 10, 2015
-* NetworkOptix
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_CDB_MODULE_INFO_H
-#define NX_CDB_MODULE_INFO_H
+#pragma once
 
 #include <string>
-
 
 namespace nx {
 namespace cdb {
@@ -20,8 +12,6 @@ public:
     std::string realm;
 };
 
-}   //api
-}   //cdb
-}   //nx
-
-#endif   //NX_CDB_MODULE_INFO_H
+} // namespace api
+} // namespace cdb
+} // namespace nx

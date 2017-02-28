@@ -3,7 +3,7 @@ import Nx 1.0
 
 Text
 {
-    text: qsTr("You are not connected to any system")
+    text: qsTr("You are not connected to any System")
     verticalAlignment: Text.AlignVCenter
     horizontalAlignment: Text.AlignHCenter
     lineHeight: 20

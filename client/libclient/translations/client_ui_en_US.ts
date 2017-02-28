@@ -691,22 +691,12 @@
     </message>
     <message>
         <location/>
-        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Restore Defaults</source>
         <translation></translation>
     </message>
     <message>
         <location/>
         <source>Warning! Low quality may result in low resolution image.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -727,6 +717,16 @@
     <message>
         <location/>
         <source>Keep camera streams and profiles settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1929,11 +1929,6 @@
     </message>
     <message>
         <location/>
-        <source>The new system will have password and name from the system:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Check</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1945,6 +1940,11 @@
     <message>
         <location/>
         <source>Login:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>The new System will have password and name from System:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1998,12 +1998,12 @@
     </message>
     <message>
         <location/>
-        <source>Removing this connection option could lead to system malfunction.</source>
-        <translation></translation>
+        <source>Add</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Add</source>
+        <source>Removing this connection option could lead to System malfunction.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2026,11 +2026,6 @@
     </message>
     <message>
         <location/>
-        <source>Applying system updates at the end of the week is not recommended.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Updating to...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2042,6 +2037,11 @@
     <message>
         <location/>
         <source>You have the latest version installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applying System updates at the end of the week is not recommended.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

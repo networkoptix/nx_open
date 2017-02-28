@@ -133,7 +133,7 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getMpegVideoFrameType(
         data -= 3;
         size = end - data;
     }
-    if (size >= 5) 
+    if (size > 5)
     {
         int frameType = (data[5] >> 3) & 7;
         if (frameType == PCT_I_FRAME)

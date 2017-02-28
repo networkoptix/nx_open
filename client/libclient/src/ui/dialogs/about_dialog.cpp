@@ -135,7 +135,7 @@ void QnAboutDialog::retranslateUi()
 
     QString servers = connectedServers();
     if (servers.isEmpty())
-        servers = tr("Client is not connected to any system");
+        servers = tr("Client is not connected to any System");
 
     QString appName = lit("<b>%1&trade; %2</b>")
         .arg(QnAppInfo::organizationName())

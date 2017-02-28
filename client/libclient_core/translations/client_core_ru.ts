@@ -75,12 +75,12 @@
     <message>
         <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation>Извините, %1 служба временно недоступна. Мы делаем все возможное для ее восстановления. Пожалуйста, повторите попытку позже.</translation>
+        <translation>Извините, служба %1 временно недоступна. Мы делаем все возможное для ее восстановления. Пожалуйста, повторите попытку позже.</translation>
     </message>
     <message>
         <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation>К сожалению, %1 службе не удалось обработать ваш запрос. Повторите попытку через несколько минут.</translation>
+        <translation>К сожалению, службе %1 не удалось обработать ваш запрос. Повторите попытку через несколько минут.</translation>
     </message>
 </context>
 <context>

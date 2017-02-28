@@ -29,25 +29,15 @@
 
 class QnCommandLineParser;
 
-namespace nx_http
-{
-    class MessageDispatcher;
-}
+namespace nx_http { class MessageDispatcher; }
 
 namespace nx {
 
-namespace db {
-class AsyncSqlQueryExecutor;
-}   //db
-namespace utils {
-class TimerManager;
-}   //utils
+namespace db { class AsyncSqlQueryExecutor; }
+namespace utils { class TimerManager; }
 
 namespace cdb {
 
-namespace conf {
-class Settings;
-}   //conf
 class AbstractEmailManager;
 class StreeManager;
 class TemporaryAccountPasswordManager;
@@ -57,10 +47,11 @@ class SystemManager;
 class AuthenticationManager;
 class AuthorizationManager;
 class AuthenticationProvider;
-namespace ec2 {
-class ConnectionManager;
-}   // namespace ec2
 class MaintenanceManager;
+class CloudModuleUrlProvider;
+
+namespace conf { class Settings; }
+namespace ec2 { class ConnectionManager; }
 
 class CloudDBProcess:
     public QnStoppable
@@ -149,7 +140,8 @@ private:
         AuthenticationProvider* const authProvider,
         EventManager* const eventManager,
         ec2::ConnectionManager* const ec2ConnectionManager,
-        MaintenanceManager* const maintenanceManager);
+        MaintenanceManager* const maintenanceManager,
+        const CloudModuleUrlProvider& cloudModuleUrlProvider);
 
     /** input & output */
     template<typename ManagerType, typename InputData, typename... OutputData>

@@ -43,10 +43,10 @@ void AuthenticationDataModel::setSystemId(const QUuid& localId)
     updateData();
 }
 
-QnCredentials AuthenticationDataModel::defaultCredentials() const
+QnEncodedCredentials AuthenticationDataModel::defaultCredentials() const
 {
     if (m_credentialsList.isEmpty())
-        return QnCredentials();
+        return QnEncodedCredentials();
 
     return m_credentialsList.first();
 }

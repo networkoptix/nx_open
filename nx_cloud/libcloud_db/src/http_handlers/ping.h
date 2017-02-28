@@ -1,10 +1,4 @@
-/**********************************************************
-* Sep 10, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_CDB_PING_H
-#define NX_CDB_PING_H
+#pragma once
 
 #include <QString>
 
@@ -17,26 +11,23 @@
 #include "managers/system_manager.h"
 #include "managers/managers_types.h"
 
-
 namespace nx {
 namespace cdb {
+namespace http_handler {
 
-
-class PingHandler
-:
+class Ping:
     public AbstractFiniteMsgBodyHttpHandler<void, api::ModuleInfo>
 {
 public:
     static const QString kHandlerPath;
 
-    PingHandler(const AuthorizationManager& authorizationManager)
-    :
+    Ping(const AuthorizationManager& authorizationManager):
         AbstractFiniteMsgBodyHttpHandler<void, api::ModuleInfo>(
             EntityType::module,
             DataActionType::fetch,
             authorizationManager,
             std::bind(
-                &PingHandler::processPing, this,
+                &Ping::processPing, this,
                 std::placeholders::_1, std::placeholders::_2))
     {
     }
@@ -52,7 +43,6 @@ private:
     }
 };
 
-}   //cdb
-}   //nx
-
-#endif  //NX_CDB_PING_H
+} // namespace http_handler
+} // namespace cdb
+} // namespace nx

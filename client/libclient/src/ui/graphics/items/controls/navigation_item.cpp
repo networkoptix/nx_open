@@ -268,7 +268,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updateSyncButtonState);
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updateJumpButtonsTooltips);
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,       this,   &QnNavigationItem::updateBookButtonEnabled);
-    connect(navigator(), &QnWorkbenchNavigator::speedRangeChanged,          this,   &QnNavigationItem::updateSpeedSliderParametersFromNavigator);
     connect(navigator(), &QnWorkbenchNavigator::liveChanged,                this,   &QnNavigationItem::updateLiveButtonState);
     connect(navigator(), &QnWorkbenchNavigator::liveChanged,                this,   &QnNavigationItem::updatePlaybackButtonsEnabled);
     connect(navigator(), &QnWorkbenchNavigator::liveSupportedChanged,       this,   &QnNavigationItem::updateLiveButtonState);

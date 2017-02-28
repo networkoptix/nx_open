@@ -6,8 +6,10 @@ Item
 {
     id: root
 
+    property alias defaultWindowSize: timeline.defaultWindowSize
     property alias windowStart: timeline.windowStart
     property alias windowEnd: timeline.windowEnd
+    property alias windowSize: timeline.windowSize
     property alias position: timeline.position
     property alias positionDate: timeline.positionDate
     property alias chunkBarHeight: timeline.chunkBarHeight

@@ -21,8 +21,9 @@ public:
         registerKey<Qn::PtzTraits>(lit("ptzTraits"));
         registerKey<QStringList>(lit("vistaFocusDevices"));
         registerKey<QnIOPortDataList>(lit("ioSettings"));
-        registerKey<QList<QnCredentials>>(Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
-        registerKey<QnCredentials>(Qn::FORCED_DEFAULT_CREDENTIALS_PARAM_NAME);
+        registerKey<QList<nx::common::utils::Credentials>>(
+            Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
+        registerKey<nx::common::utils::Credentials>(Qn::FORCED_DEFAULT_CREDENTIALS_PARAM_NAME);
         registerKey<QList<QnResourceChannelMapping>>(
             Qn::VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME);
         registerKey<QnHttpConfigureRequestList>(Qn::PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME);
@@ -124,24 +125,3 @@ void QnResourceData::add(const QnResourceData &other) {
 bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceData *target) {
     return qn_resourceDataJsonSerializer_instance()->deserialize(ctx, value, target);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

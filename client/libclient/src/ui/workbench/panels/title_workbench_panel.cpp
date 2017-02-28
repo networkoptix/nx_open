@@ -41,6 +41,7 @@ TitleWorkbenchPanel::TitleWorkbenchPanel(
     item->setProperty(Qn::NoHandScrollOver, true);
     item->setWidget(new QnMainWindowTitleBarWidget(nullptr, context()));
     item->setPos(0.0, 0.0);
+    item->setVisible(false);
     item->setZValue(ControlItemZOrder);
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &TitleWorkbenchPanel::updateControlsGeometry);
@@ -210,7 +211,8 @@ void TitleWorkbenchPanel::setUsed(bool value)
         return;
 
     m_used = value;
-    setVisible(value, false);
+    setVisible(value, false); //< visibility via opacity
+    item->setVisible(value); //< true visibility on the scene
 }
 
 } //namespace NxUi

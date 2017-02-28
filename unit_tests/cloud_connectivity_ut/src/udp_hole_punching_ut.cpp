@@ -127,9 +127,9 @@ TEST_F(UdpHolePunching, loadTest)
 
     connectionsGenerator.pleaseStopSync();
 
-    ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0);
-    ASSERT_GT(connectionsGenerator.totalBytesSent(), 0);
-    ASSERT_GT(connectionsGenerator.totalConnectionsEstablished(), 0);
+    ASSERT_GT(connectionsGenerator.totalBytesReceived(), 0U);
+    ASSERT_GT(connectionsGenerator.totalBytesSent(), 0U);
+    ASSERT_GT(connectionsGenerator.totalConnectionsEstablished(), 0U);
 
     server.pleaseStopSync();
 }
