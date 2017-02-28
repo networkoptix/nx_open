@@ -48,12 +48,13 @@ TEST(CdbResultCodeTest, ToString)
 {
     ResultCode resultCode(ResultCode::ok);
 
-    /* This dummy switch should produce compiler warning (error in case of -Werror=switch) */
+    /* This dummy switch should produce compiler warning (error in case of -Werror=switch) if 
+       new enum value is added and not propagated to this test. */
     switch(resultCode)
     {
         NX_CDB_RESULT_CODE_LIST(NX_CDB_RESULT_CODE_TEST_CASE_APPLY)
     }
 
-    /* QnCloudResultInfo::toString() function result */
+    /* QnCloudResultInfo::toString() function result test */
     NX_CDB_RESULT_CODE_LIST(NX_CDB_RESULT_CODE_TEST_ASSERT_APPLY)
 }
