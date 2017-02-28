@@ -1777,6 +1777,7 @@
             "keys": [
                 "Cellinx|STH795"
             ],
+			"_comment": "Calibration for camera fw ver. 3.2.1, Build at 2016-07-28",
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -1793,7 +1794,7 @@
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [0, 1],
                         "logical": [1, 31.55],
-                        "logicalMultiplier": 35.0,
+                        "logicalMultiplier": 37.5,
                         "space": "35MmEquiv"
                     }
                 }
