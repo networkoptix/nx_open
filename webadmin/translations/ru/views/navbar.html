@@ -15,6 +15,7 @@
                 <li ng-hide="!user.hasAllResources" ng-class="{active:isActive('/info')}"><a ng-href="#/info/">Информация</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/developers')}"><a ng-href="#/developers/">Для разработчиков</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/help')}"><a ng-href="#/help/">Справка</a></li>
+                <li ><span class="btn-wrapper" language-select></span></li>
                 <li ng-hide="settings.liteClient"><a ng-click="logout()" title="Выход">Выход</a></li>
             </ul>
         </nav>
