@@ -594,7 +594,8 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
         qnClientCoreSettings->save();
     }
 
-    if (isConnectionToCloud(url))
+    const bool cloudConnection = isConnectionToCloud(url);
+    if (cloudConnection)
     {
         using namespace nx::network;
         qnCloudStatusWatcher->logSession(info.cloudSystemId);
@@ -606,6 +607,9 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
         }
         return;
     }
+
+    const bool correctHost = (!cloudConnection && !url.host().isEmpty());
+    NX_ASSERT(correctHost, "Wrong host is going to be saved to the recent connections list");
 
     // Stores connection if it is local
     storeLocalSystemConnection(
