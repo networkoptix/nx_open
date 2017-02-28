@@ -19,6 +19,7 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_app_info.h>
+#include <client/client_installations_manager.h>
 
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -76,7 +77,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
 
@@ -99,6 +99,8 @@
 #include <utils/common/uuid_pool.h>
 #include <utils/common/counter.h>
 #include <utils/unity_launcher_workaround.h>
+
+#include <nx/vms/utils/platform/autorun.h>
 
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG
@@ -255,39 +257,45 @@ const qreal defaultReviewAR = 1920.0 / 1080.0;
 
 const QnUuid uuidPoolBase("621992b6-5b8a-4197-af04-1657baab71f0");
 
-//TODO: #GDM #VW clean nonexistent videowalls sometimes
-class QnVideowallAutoStarter: public QnWorkbenchAutoStarter
+//TODO: #GDM think about code duplication
+QString toWindowsRegistryFormat(const QString& path)
 {
-public:
-    QnVideowallAutoStarter(const QnUuid &videowallUuid, QObject *parent = NULL):
-        QnWorkbenchAutoStarter(parent),
-        m_videoWallUuid(videowallUuid)
-    {
-    }
+    return L'"' + QDir::toNativeSeparators(path).toLower() + L'"';
+}
 
-protected:
-    virtual int settingsKey() const override { return -1; }
+QString binaryPath()
+{
+    const QFileInfo appLauncherFile = QnClientInstallationsManager::appLauncher();
+    if (appLauncherFile.exists())
+        return toWindowsRegistryFormat(appLauncherFile.canonicalFilePath());
 
-    virtual QString autoStartPath() const override
-    {
-        QStringList arguments;
-        arguments << lit("--videowall");
-        arguments << m_videoWallUuid.toString();
-        QUrl url = QnAppServerConnectionFactory::url();
-        url.setUserName(QString());
-        url.setPassword(QString());
-        arguments << lit("--auth");
-        arguments << QString::fromUtf8(url.toEncoded());
+    const QFileInfo miniLauncherFile = QnClientInstallationsManager::miniLauncher();
+    if (miniLauncherFile.exists())
+        return toWindowsRegistryFormat(miniLauncherFile.canonicalFilePath());
 
-        QFileInfo clientFile = QFileInfo(qApp->applicationFilePath());
-        QString result = toRegistryFormat(clientFile.canonicalFilePath()) + L' ' + arguments.join(L' ');
-        return result;
-    }
+    return QString();
+}
 
-    virtual QString autoStartKey() const override { return qApp->applicationName() + L' ' + m_videoWallUuid.toString(); }
-private:
-    QnUuid m_videoWallUuid;
-};
+//TODO: #GDM #VW clean nonexistent videowalls sometimes
+void setAutoRunEnabled(const QnUuid& videoWallUuid, bool value)
+{
+    const QString key = qApp->applicationName() + L' ' + videoWallUuid.toString();
+
+    const QString path = binaryPath();
+    if (path.isEmpty())
+        value = false; // intentionally disable autorun if all goes bad
+
+    QStringList arguments;
+    arguments << lit("--videowall");
+    arguments << videoWallUuid.toString();
+    QUrl url = QnAppServerConnectionFactory::url();
+    url.setUserName(QString());
+    url.setPassword(QString());
+    arguments << lit("--auth");
+    arguments << QString::fromUtf8(url.toEncoded());
+
+    nx::vms::utils::setAutoRunEnabled(key, path + L' ' + arguments.join(L' '), value);
+}
 
 class QnVideowallReviewLayoutResource: public QnLayoutResource
 {
@@ -1249,7 +1257,7 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
 
         NX_LOG(message.arg(m_videoWallMode.guid.toString()), cl_logERROR);
 
-        QnVideowallAutoStarter(m_videoWallMode.guid, this).setAutoStartEnabled(false);
+        setAutoRunEnabled(m_videoWallMode.guid, false);
         closeInstanceDelayed();
         return;
     }
@@ -2122,27 +2130,30 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
     if (!videoWall)
         return;
 
-    connect(videoWall, &QnVideoWallResource::autorunChanged, this, [this](const QnResourcePtr &resource)
-    {
-        QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
-        if (!videoWall || !videoWall->pcs()->hasItem(qnSettings->pcUuid()))
-            return;
-        QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(videoWall->isAutorun());
-    });
+    connect(videoWall, &QnVideoWallResource::autorunChanged, this,
+        [this](const QnResourcePtr &resource)
+        {
+            QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
+            if (!videoWall || !videoWall->pcs()->hasItem(qnSettings->pcUuid()))
+                return;
+            setAutoRunEnabled(videoWall->getId(), videoWall->isAutorun());
+        });
 
-    connect(videoWall, &QnVideoWallResource::pcAdded, this, [this](const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
-    {
-        if (pc.uuid != qnSettings->pcUuid())
-            return;
-        QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(videoWall->isAutorun());
-    });
+    connect(videoWall, &QnVideoWallResource::pcAdded, this,
+        [this](const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
+        {
+            if (pc.uuid != qnSettings->pcUuid())
+                return;
+            setAutoRunEnabled(videoWall->getId(), videoWall->isAutorun());
+        });
 
-    connect(videoWall, &QnVideoWallResource::pcRemoved, this, [this](const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
-    {
-        if (pc.uuid != qnSettings->pcUuid())
-            return;
-        QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(false);
-    });
+    connect(videoWall, &QnVideoWallResource::pcRemoved, this,
+        [this](const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
+        {
+            if (pc.uuid != qnSettings->pcUuid())
+                return;
+            setAutoRunEnabled(videoWall->getId(), false);
+        });
 
     if (m_videoWallMode.active)
     {
@@ -2150,7 +2161,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
         {
             connect(videoWall, &QnVideoWallResource::itemChanged, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_activeMode);
             connect(videoWall, &QnVideoWallResource::itemRemoved, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_activeMode);
-            QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(videoWall->isAutorun());
+            setAutoRunEnabled(videoWall->getId(), videoWall->isAutorun());
             if (m_videoWallMode.ready)
                 openVideoWallItem(videoWall);
         }

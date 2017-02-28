@@ -34,7 +34,7 @@ QnCameraThumbnailManager::ThumbnailData::ThumbnailData():
 
 QnCameraThumbnailManager::QnCameraThumbnailManager(QObject* parent) :
     base_type(parent),
-    m_thumnailSize(kDefaultThumbnailSize),
+    m_thumbnailSize(kDefaultThumbnailSize),
     m_refreshingTimer(new QTimer(this))
 {
     m_refreshingTimer->setInterval(kUpdateThumbnailsPeriodMs);
@@ -100,28 +100,28 @@ void QnCameraThumbnailManager::selectCamera(const QnVirtualCameraResourcePtr& ca
 
 QSize QnCameraThumbnailManager::thumbnailSize() const
 {
-    return m_thumnailSize;
+    return m_thumbnailSize;
 }
 
 QPixmap QnCameraThumbnailManager::scaledPixmap(const QPixmap& pixmap) const
 {
     /* Check if no scaling required. */
-    if (m_thumnailSize.isNull())
+    if (m_thumbnailSize.isNull())
         return pixmap;
 
-    if (m_thumnailSize.width() == 0)
-        return pixmap.scaledToHeight(m_thumnailSize.height(), Qt::SmoothTransformation);
-    if (m_thumnailSize.height() == 0)
-        return pixmap.scaledToWidth(m_thumnailSize.width(), Qt::SmoothTransformation);
-    return pixmap.scaled(m_thumnailSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    if (m_thumbnailSize.width() == 0)
+        return pixmap.scaledToHeight(m_thumbnailSize.height(), Qt::SmoothTransformation);
+    if (m_thumbnailSize.height() == 0)
+        return pixmap.scaledToWidth(m_thumbnailSize.width(), Qt::SmoothTransformation);
+    return pixmap.scaled(m_thumbnailSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 }
 
 void QnCameraThumbnailManager::setThumbnailSize(const QSize &size)
 {
-    if (m_thumnailSize == size)
+    if (m_thumbnailSize == size)
         return;
 
-    m_thumnailSize = size;
+    m_thumbnailSize = size;
     emit sizeHintChanged(sizeHint());
 }
 
@@ -135,26 +135,7 @@ QImage QnCameraThumbnailManager::image() const
 
 QSize QnCameraThumbnailManager::sizeHint() const
 {
-    QSize result = m_thumnailSize;
-    if (!result.isEmpty() || result.isNull())
-        return result;
-    NX_ASSERT((result.width() == 0) ^ (result.height() == 0));
-
-    qreal aspectRatio = kDefaultAspectRatio;
-    if (m_selectedCamera)
-    {
-        const auto cameraAr = m_selectedCamera->aspectRatio();
-        if (cameraAr.isValid())
-            aspectRatio = cameraAr.toFloat();
-    }
-    NX_ASSERT(!qFuzzyIsNull(aspectRatio));
-
-    if (result.height() == 0)
-        result.setHeight(static_cast<int>(result.width() / aspectRatio));
-    else if (result.width() == 0)
-        result.setWidth(static_cast<int>(result.height() * aspectRatio));
-
-    return result;
+    return sizeHintForCamera(m_selectedCamera, m_thumbnailSize);
 }
 
 Qn::ThumbnailStatus QnCameraThumbnailManager::status() const
@@ -165,6 +146,48 @@ Qn::ThumbnailStatus QnCameraThumbnailManager::status() const
     return m_thumbnailByCamera.value(m_selectedCamera).status;
 }
 
+QSize QnCameraThumbnailManager::sizeHintForCamera(const QnVirtualCameraResourcePtr& camera,
+    const QSize& limit)
+{
+    //TODO: #GDM process camera rotation?
+    qreal aspectRatio = kDefaultAspectRatio;
+    if (camera)
+    {
+        const auto cameraAr = camera->aspectRatio();
+        if (cameraAr.isValid())
+            aspectRatio = cameraAr.toFloat();
+    }
+    NX_ASSERT(!qFuzzyIsNull(aspectRatio));
+
+    QSize result(limit);
+
+    // Full-size image is requested
+    if (result.width() <= 0 && result.height() <= 0)
+    {
+        if (!camera)
+            return result;
+
+        const auto stream = camera->defaultStream();
+        result = stream.getResolution();
+    }
+    // Only height is given, calculating width by aspect ratio
+    else if (result.width() <= 0)
+    {
+        result.setWidth(static_cast<int>(result.height() * aspectRatio));
+    }
+    // Only width is given, calculating height by aspect ratio
+    else if (result.height() <= 0)
+    {
+        result.setHeight(static_cast<int>(result.width() / aspectRatio));
+    }
+    // If both width and height are set, aspect ratio is ignored.
+    else
+    {
+        NX_ASSERT(!result.isEmpty());
+    }
+    return result;
+}
+
 rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCameraResourcePtr& camera)
 {
     if (!camera || !camera->hasVideo(nullptr))
@@ -172,7 +195,7 @@ rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCam
 
     QnThumbnailRequestData request;
     request.camera = camera;
-    request.size = m_thumnailSize;
+    request.size = m_thumbnailSize;
     request.imageFormat = QnThumbnailRequestData::JpgFormat;
     request.roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
     request.format = Qn::SerializationFormat::UbjsonFormat;

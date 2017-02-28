@@ -440,7 +440,7 @@ QString QnEventLogModel::textData(Column column, const QnBusinessActionData& act
             }
             else
             {
-                result = QnBusinessStringsHelper::eventDetails(action.eventParams, lit("\n"));
+                result = QnBusinessStringsHelper::eventDetails(action.eventParams).join(L'\n');
             }
 
             if (!QnBusiness::hasToggleState(eventType))
