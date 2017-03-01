@@ -73,6 +73,8 @@
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app does not use photo library.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>This app does not use camera.</string>      
+	<string>This app does not use camera.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<true/>
 </dict>
 </plist>
