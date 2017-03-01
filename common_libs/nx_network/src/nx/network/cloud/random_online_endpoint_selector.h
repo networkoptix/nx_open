@@ -21,6 +21,7 @@ namespace cloud {
 class NX_NETWORK_API RandomOnlineEndpointSelector
 :
     public AbstractEndpointSelector
+    // TODO: #ak Inherit from aio::BasicPollable
 {
 public:
     RandomOnlineEndpointSelector();
