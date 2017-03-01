@@ -66,7 +66,7 @@ protected:
         m_selectResult = selected.get();
     }
 
-    void thenAnyOnlineHostHaveBeenSelected()
+    void thenAnyOnlineHostHasBeenSelected()
     {
         ASSERT_EQ(nx_http::StatusCode::ok, m_selectResult.first);
         ASSERT_EQ(m_onlineHostEndpoint, m_selectResult.second);
@@ -93,7 +93,7 @@ TEST_F(RandomOnlineEndpointSelector, online_endpoint_is_selected)
 {
     givenOnlineHost();
     whenSelectorIsInvoked();
-    thenAnyOnlineHostHaveBeenSelected();
+    thenAnyOnlineHostHasBeenSelected();
 }
 
 TEST_F(RandomOnlineEndpointSelector, no_online_endpoint_to_select)
