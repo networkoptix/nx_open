@@ -638,9 +638,7 @@ qreal QnWorkbenchNavigator::speed() const
 
 void QnWorkbenchNavigator::setSpeed(qreal speed)
 {
-    const auto range = speedRange();
-
-    speed = qBound(-range.reverse, speed, range.forward);
+    speed = speedRange().boundSpeed(speed);
     if (qFuzzyEquals(speed, this->speed()))
         return;
 
@@ -724,6 +722,16 @@ QnSpeedRange QnWorkbenchNavigator::speedRange() const
     return m_currentMediaWidget
         ? m_currentMediaWidget->speedRange()
         : QnSpeedRange();
+}
+
+qreal QnWorkbenchNavigator::minimalSpeed() const
+{
+    return -speedRange().backward;
+}
+
+qreal QnWorkbenchNavigator::maximalSpeed() const
+{
+    return speedRange().forward;
 }
 
 qint64 QnWorkbenchNavigator::positionUsec() const

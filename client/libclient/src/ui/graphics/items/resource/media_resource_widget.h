@@ -128,7 +128,7 @@ public:
     void setMotionSearchModeEnabled(bool enabled);
 
     QnSpeedRange speedRange() const;
-    static const QnSpeedRange& maximumSpeedRange();
+    static const QnSpeedRange& availableSpeedRange();
 
 signals:
     void motionSelectionChanged();

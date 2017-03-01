@@ -103,6 +103,8 @@ public:
     qreal speed() const;
     Q_SLOT void setSpeed(qreal speed);
     QnSpeedRange speedRange() const;
+    qreal minimalSpeed() const;
+    qreal maximalSpeed() const;
 
     qint64 positionUsec() const;
     void setPosition(qint64 positionUsec);
