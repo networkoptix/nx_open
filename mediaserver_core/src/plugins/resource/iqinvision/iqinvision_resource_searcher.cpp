@@ -28,7 +28,7 @@ static const char* requests[] =
 
 QString DEFAULT_RESOURCE_TYPE(lit("IQA32N"));
 
-static const QRegExp kCameraModelPattern("^IQ(eye )?[A-Z0-9]?[0-9]{2,4}[A-Z]?$");
+static const QRegExp kCameraModelPattern("^IQ(eye )?[A-Z0-9]?[0-9]{2,4}[A-Z]{0,2}$");
 
 } // namespace
 
