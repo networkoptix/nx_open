@@ -1,3 +1,8 @@
+'''mediaserver presentation class
+
+Allows working with servers from functional tests - start/stop, setup, configure, access rest api, storage, etc.
+'''
+
 import os.path
 import logging
 import StringIO

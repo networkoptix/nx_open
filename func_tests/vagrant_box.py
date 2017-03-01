@@ -46,11 +46,11 @@ class RemotableVagrant(vagrant.Vagrant):
 
 class Vagrant(object):
 
-    def __init__(self, vm_host, bin_dir, vagrant_dir, vagrant_private_key_fpath, ssh_config_path):
+    def __init__(self, vm_host, bin_dir, vagrant_dir, vagrant_private_key_path, ssh_config_path):
         self._vm_host = vm_host
         self._bin_dir = bin_dir
         self._vagrant_dir = vagrant_dir  # on vm_host
-        self._vagrant_private_key_fpath = vagrant_private_key_fpath  # may be None
+        self._vagrant_private_key_path = vagrant_private_key_path  # may be None
         self._ssh_config_path = ssh_config_path
         self._vagrant = RemotableVagrant(
             self._vm_host, root=self._vagrant_dir, quiet_stdout=False, quiet_stderr=False,
@@ -84,10 +84,10 @@ class Vagrant(object):
         self._vagrant.destroy()
 
     def _copy_required_files_to_vagrant_dir(self, box_config):
-        for fpath_format in box_config.required_file_list:
-            fpath = fpath_format.format(test_dir=TEST_DIR, bin_dir=self._bin_dir)
-            assert os.path.isfile(fpath), '%s is expected but is missing' % fpath
-            self._vm_host.put_file(fpath, self._vagrant_dir)
+        for file_path_format in box_config.required_file_list:
+            file_path = file_path_format.format(test_dir=TEST_DIR, bin_dir=self._bin_dir)
+            assert os.path.isfile(file_path), '%s is expected but is missing' % file_path
+            self._vm_host.put_file(file_path, self._vagrant_dir)
 
     def _init_box(self, config):
         config.ip_address = self._load_box_ip_address(config)
@@ -117,12 +117,12 @@ class Vagrant(object):
         box.timezone = box.config.timezone = timezone
 
     def _write_vagrantfile(self, boxes_config):
-        template_fpath = os.path.join(TEST_DIR, 'Vagrantfile.jinja2')
-        with open(template_fpath) as f:
+        template_file_path = os.path.join(TEST_DIR, 'Vagrantfile.jinja2')
+        with open(template_file_path) as f:
             template = jinja2.Template(f.read())
         vagrantfile = template.render(
             natnet1=DEFAULT_NATNET1,
-            template_fpath=template_fpath,
+            template_file_path=template_file_path,
             boxes=boxes_config)
         self._vm_host.write_file(os.path.join(self._vagrant_dir, 'Vagrantfile'), vagrantfile)
 
@@ -137,7 +137,7 @@ class Vagrant(object):
                 f.write(self._vagrant.ssh_config(box_name))
 
     def box_host(self, box_name, user):
-        return RemoteSshHost(box_name, user, self._vagrant_private_key_fpath, self._ssh_config_path, proxy_host=self._vm_host)
+        return RemoteSshHost(box_name, user, self._vagrant_private_key_path, self._ssh_config_path, proxy_host=self._vm_host)
 
 
 class VagrantBox(object):

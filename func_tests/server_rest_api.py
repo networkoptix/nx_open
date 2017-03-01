@@ -1,3 +1,12 @@
+'''Proxy object for accessing REST API.
+
+Allows calls to REST API using notation:
+    rest_api_object.api.manualCamera.status.get(arg1=1, arg2=2)
+which automatically translated to
+    GET /api/manualCamera/status?arg1=1&arg2=2
+But for POST method keyword parameters are translated to json request body.
+'''
+
 import json
 import logging
 import warnings

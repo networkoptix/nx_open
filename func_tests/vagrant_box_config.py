@@ -1,3 +1,8 @@
+'''Configuration for vagrant boxes.
+
+Functional tests define configuration required for them indirectly (via 'box' fixture) using BoxConfig class.
+'''
+
 import datetime
 import pytz
 
@@ -106,7 +111,11 @@ def make_vbox_netnat_command(net_idx, network):
     return VirtualBoxConfigCommand([':modifyvm', ':id', '"--natnet%d"' % net_idx, '"%s"' % network])
 
 # ip_address may end with .0 (like 1.2.3.0); this will be treated as network address, and dhcp will be used for it
-def box_config_factory(name=None, install_server=True, provision_scripts=None, ip_address_list=None, required_file_list=None):
+def box_config_factory(name=None,
+                       install_server=True,
+                       provision_scripts=None,
+                       ip_address_list=None,
+                       required_file_list=None):
     commands = []
     if not required_file_list:
         required_file_list = []
@@ -159,7 +168,7 @@ class BoxConfig(object):
                     timezone=str(self.timezone))
 
     def matches(self, box):
-        return (self.required_file_list == box.required_file_list and
+        return (sorted(self.required_file_list) == sorted(box.required_file_list) and
                 self.vagrant_config_commands == box.vagrant_config_commands)
 
     def box_name(self):

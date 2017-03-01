@@ -1,3 +1,8 @@
+'''pytest configuration file for functional tests
+
+Loaded by pytest before running all functional tests. Adds common fixtures used by tests.
+'''
+
 import sys
 import os.path
 import logging
@@ -55,7 +60,7 @@ def run_options(request):
         vm_ssh_host_config = SshHostConfig(
             host=vm_host,
             user=request.config.getoption('--vm-host-user'),
-            key_fpath=request.config.getoption('--vm-host-key'))
+            key_file_path=request.config.getoption('--vm-host-key'))
     else:
         vm_ssh_host_config = None
     return SimpleNamespace(

@@ -1,3 +1,8 @@
+'''Main utilities module for functional tests
+
+Used to create test environmant - virtual boxes, servers.
+'''
+
 import os
 import os.path
 import logging
@@ -130,7 +135,8 @@ class EnvironmentBuilder(object):
         else:
             vagrant_dir = os.path.join(self._vm_host_work_dir, 'vagrant')
 
-        vagrant = Vagrant(self._vm_host, self._bin_dir, vagrant_dir, self._test_session.vagrant_private_key_fpath, ssh_config_path)
+        vagrant = Vagrant(self._vm_host, self._bin_dir, vagrant_dir,
+                          self._test_session.vagrant_private_key_path, ssh_config_path)
         if self._test_session.must_recreate_boxes():
             # to be able to destroy all old boxes we need old boxes config to create Vagrantfile with them
             vagrant.destroy_all_boxes(self._boxes_config)
