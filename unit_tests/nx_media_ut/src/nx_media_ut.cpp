@@ -140,6 +140,13 @@ public:
         return QPoint();
     }
 
+    virtual QVector<int> getChannels() const override
+    {
+        QVector<int> result;
+        result.resize(m_channelCount, 0);
+        return result;
+    }
+
     void setChannelCount(int channelCount)
     {
         NX_CRITICAL(channelCount >= 1, "[TEST]");

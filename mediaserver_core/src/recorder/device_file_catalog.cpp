@@ -228,7 +228,7 @@ qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTime
         fileName + ".new",
         storage
     );
-    recorder.setStartOffset(startTimeMs*1000);
+    recorder.setStartOffsetMs(startTimeMs);
 
     QnAbstractMediaDataPtr packet;
     while( (packet = avi->getNextData()) )
