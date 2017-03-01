@@ -1,10 +1,12 @@
 #top {
   background-color: #f36f21; }
 
-.navbar-nav>ul>li>a {
+
+.navbar-default .navbar-nav>li>a {
   color: white; }
 
-.navbar-nav>ul>li>a:hover {
+
+.navbar-default .navbar-nav>li>a:hover {
   background-color: #ee600d; }
 
 #top a.navbar-brand:hover {
