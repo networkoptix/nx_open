@@ -2,6 +2,11 @@
 
 #include <string>
 
+#include <cdb/result_code.h>
+
+#include "access_control/auth_types.h"
+#include "data/system_data.h"
+
 namespace nx {
 namespace cdb {
 
@@ -18,6 +23,11 @@ public:
     SystemHealthInfoProvider(const ec2::ConnectionManager& ec2ConnectionManager);
 
     bool isSystemOnline(const std::string& systemId) const;
+
+    void getSystemHealthHistory(
+        const AuthorizationInfo& authzInfo,
+        data::SystemId systemId,
+        std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler);
 
 private:
     const ec2::ConnectionManager& m_ec2ConnectionManager;

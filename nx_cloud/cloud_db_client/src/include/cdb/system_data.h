@@ -257,6 +257,24 @@ public:
     std::vector<SystemDataEx> systems;
 };
 
+class SystemHealthHistoryItem
+{
+public:
+    std::chrono::system_clock::time_point timestamp;
+    SystemHealth state;
+    
+    SystemHealthHistoryItem():
+        state(SystemHealth::offline)
+    {
+    }
+};
+
+class SystemHealthHistory
+{
+public:
+    std::vector<SystemHealthHistoryItem> items;
+};
+
 /**
  * Information about newly started user session.
  */

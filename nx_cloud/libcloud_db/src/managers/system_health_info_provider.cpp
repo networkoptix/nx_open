@@ -20,5 +20,13 @@ bool SystemHealthInfoProvider::isSystemOnline(
     return m_ec2ConnectionManager.isSystemConnected(systemId);
 }
 
+void SystemHealthInfoProvider::getSystemHealthHistory(
+    const AuthorizationInfo& authzInfo,
+    data::SystemId systemId,
+    std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler)
+{
+    completionHandler(api::ResultCode::notImplemented, api::SystemHealthHistory());
+}
+
 } // namespace cdb
 } // namespace nx
