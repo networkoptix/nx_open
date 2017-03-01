@@ -40,7 +40,7 @@ static int createStringCopy(const char *source, int sourceLen, char **target)
     if (sourceLen == -1)
         sourceLen = strlen(source);
 
-    *target = (char *)malloc(sourceLen + 1);
+    *target = malloc(sourceLen + 1);
 
     if (!*target)
         return -1;
@@ -91,14 +91,14 @@ static int matchString(const char **source, const char *pattern)
 
 static int reallocObject(struct JsonVal *val)
 {
-    if (!(val->u.object.keys = (char **)realloc(
+    if (!(val->u.object.keys = realloc(
               val->u.object.keys,
               (val->u.object.len + 1) * sizeof(*val->u.object.keys))))
     {
         return -1;
     }
 
-    if (!(val->u.object.values = (struct JsonVal *)realloc(
+    if (!(val->u.object.values = realloc(
               val->u.object.values,
               (val->u.object.len + 1) * sizeof(*val->u.object.values))))
     {
@@ -111,7 +111,7 @@ static int reallocObject(struct JsonVal *val)
 
 static int reallocArray(struct JsonVal *val)
 {
-    if (!(val->u.array.values = (struct JsonVal *)realloc(
+    if (!(val->u.array.values = realloc(
               val->u.array.values,
               (val->u.array.len + 1) * sizeof(*val->u.array.values))))
     {
@@ -335,6 +335,24 @@ int JsonVal_isFalse(const struct JsonVal *val)
 int JsonVal_isNull(const struct JsonVal *val)
 {
     return val->type == jsonNullT;
+}
+
+int JsonVal_arrayLen(struct JsonVal *val)
+{
+    assert(val->type == jsonArrayT);
+    if (val->type != jsonArrayT)
+        return -1;
+
+    return val->u.array.len;
+}
+
+struct JsonVal *JsonVal_arrayAt(struct JsonVal *val, int index)
+{
+    assert(val->type == jsonArrayT);
+    if (val->type != jsonArrayT || index >= val->u.array.len)
+        return NULL;
+
+    return &val->u.array.values[index];
 }
 
 struct JsonVal *JsonVal_getObjectValueByKey(const struct JsonVal *val, const char *key)

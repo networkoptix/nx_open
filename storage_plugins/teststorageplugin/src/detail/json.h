@@ -65,6 +65,9 @@ struct JsonVal *JsonVal_arrayAddFalse(struct JsonVal *val);
 struct JsonVal *JsonVal_arrayAddNull(struct JsonVal *val);
 
 /*access functions*/
+int JsonVal_arrayLen(struct JsonVal *val);
+struct JsonVal *JsonVal_arrayAt(struct JsonVal* val, int index);
+
 struct JsonVal *JsonVal_getObjectValueByKey(const struct JsonVal *val, const char *key);
 
 void JsonVal_forEachArrayElement(
