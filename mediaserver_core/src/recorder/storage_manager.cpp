@@ -60,6 +60,8 @@ static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
 static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
 static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
 
+const qint64 kMinStorageFreeSpace = 150 * 1024 * 1024ll
+
 static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 
 const QString SCAN_ARCHIVE_NORMAL_PREFIX = lit("NORMAL_");
@@ -2209,7 +2211,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
 
     QSet<QnStorageResourcePtr> storages;
     for (const auto& storage: getUsedWritableStorages())
-        if (pred(storage) && storage->getFreeSpace() > 150 * 1024 * 1024) //< Storage should have at least 150 mb of free space
+        if (pred(storage) && storage->getFreeSpace() > kMinStorageFreeSpace)
             storages << storage;
 
 	auto getOptimalStorageRootFallback = [&storages, this]
