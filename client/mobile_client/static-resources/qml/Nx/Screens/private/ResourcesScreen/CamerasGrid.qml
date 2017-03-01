@@ -12,7 +12,7 @@ GridView
     property bool active: false
 
     cellWidth: (width - leftMargin - rightMargin) / d.thumbnailsInRow
-    cellHeight: cellWidth * 3 / 4 + 24 + 16
+    cellHeight: cellWidth * 9 / 16 + 24 + 16
 
     QtObject
     {
