@@ -46,6 +46,9 @@ Object
     QtObject
     {
         id: d
+
+        readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
+
         property bool resumeOnActivate: false
         property bool resumeOnOnline: false
         property real lastPosition: -1
@@ -56,6 +59,23 @@ Object
         {
             lastPosition = mediaPlayer.liveMode ? -1 : mediaPlayer.position
             waitForLastPosition = true
+        }
+
+        onApplicationActiveChanged:
+        {
+            if (!Utils.isMobile())
+                return
+
+            if (applicationActive)
+            {
+                if (d.resumeOnActivate)
+                    mediaPlayer.play()
+            }
+            else
+            {
+                d.resumeOnActivate = mediaPlayer.playing
+                mediaPlayer.pause()
+            }
         }
     }
 
@@ -89,27 +109,6 @@ Object
                 playerJump(mediaPlayer.position)
                 d.waitForFirstPosition = false
                 gotFirstPosition(mediaPlayer.position)
-            }
-        }
-    }
-
-    Connections
-    {
-        target: Qt.application
-        onStateChanged:
-        {
-            if (!Utils.isMobile())
-                return
-
-            if (Qt.application.state === Qt.ApplicationActive)
-            {
-                if (d.resumeOnActivate)
-                    mediaPlayer.play()
-            }
-            else
-            {
-                d.resumeOnActivate = mediaPlayer.playing
-                mediaPlayer.pause()
             }
         }
     }
