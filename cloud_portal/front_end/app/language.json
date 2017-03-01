@@ -196,7 +196,7 @@
     "appTypes": {
       "client": "Client only",
       "server": "Server only",
-      "bundle": "Client andy Server",
+      "bundle": "Client and Server",
       "servertool": "Configuration tool"
     }
   }
