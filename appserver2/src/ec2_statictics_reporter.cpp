@@ -16,17 +16,18 @@
 
 #include "ec2_connection.h"
 
-static const std::chrono::hours DEFAULT_TIME_CYCLE(30 * 24); /* about a month */
-static const std::chrono::hours SEND_AFTER_UPDATE_TIME(3);
+static const std::chrono::hours kDefaultSendCycleTime(30 * 24); //< About a month.
+static const std::chrono::hours kSendAfterUpdateTime(3);
 
-static const uint MIN_DELAY_RATIO = 30;
-static const uint RND_DELAY_RATIO = 50;    /* 50% about 15 days */
-static const uint MAX_DELAY_RATIO = MIN_DELAY_RATIO + RND_DELAY_RATIO;
+static const uint kMinDelayRatio = 30; // 30% is about 9 days.
+static const uint kRandomDelayRatio = 50; //< 50% is about 15 days.
+static const uint kMaxdelayRation = kMinDelayRatio + kRandomDelayRatio;
 
-static const uint TIMER_CYCLE = 60 * 1000; /* msecs, update state every minute */
-static const uint TIMER_CYCLE_MAX = 24 * 60 * 60 * 1000; /* msecs, once a day at least */
+static const uint kInitialTimerCycle = 60 * 1000; //< MSecs, update state every minute.
+static const uint kGrowTimerCycleRatio = 2; //< Make cycle longer in case of failure.
+static const uint kMaxTimerCycle = 24 * 60 * 60 * 1000; //< MSecs, once a day at least.
 
-static const QString SERVER_API_COMMAND = lit("statserver/api/report");
+static const QString kServerReportApi = lit("statserver/api/report");
 
 namespace ec2
 {
@@ -40,11 +41,11 @@ namespace ec2
     Ec2StaticticsReporter::Ec2StaticticsReporter(const AbstractMediaServerManagerPtr& msManager):
         m_msManager(msManager),
         m_firstTime(true),
-        m_timerCycle(TIMER_CYCLE),
+        m_timerCycle(kInitialTimerCycle),
         m_timerDisabled(false),
         m_timerId(boost::none)
     {
-        NX_CRITICAL(MAX_DELAY_RATIO <= 100);
+        NX_CRITICAL(kMaxdelayRation <= 100);
         setupTimer();
     }
 
@@ -178,7 +179,7 @@ namespace ec2
     }
 
     template<typename Duration>
-    uint durationSecs(Duration duration)
+    uint durationSeconds(Duration duration)
     {
         const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration);
         return static_cast<uint>(seconds.count());
@@ -196,12 +197,12 @@ namespace ec2
             collator.setNumericMode(true);
             if (collator.compare(currentVersion, reportedVersion) > 0)
             {
-                const uint timeCycle = durationSecs(nx::utils::parseTimerDuration(
-                    qnGlobalSettings->statisticsReportTimeCycle(), SEND_AFTER_UPDATE_TIME));
+                const uint timeCycle = durationSeconds(nx::utils::parseTimerDuration(
+                    qnGlobalSettings->statisticsReportTimeCycle(), kSendAfterUpdateTime));
 
                 m_plannedReportTime = now.addSecs(nx::utils::random::number(
-                      timeCycle * MIN_DELAY_RATIO / 100,
-                      timeCycle * MAX_DELAY_RATIO / 100));
+                      timeCycle * kMinDelayRatio / 100,
+                      timeCycle * kMaxdelayRation / 100));
 
                 NX_LOGX(lm("Last reported version is '%1' while running '%2', plan early report for %3")
                     .arg(reportedVersion).arg(currentVersion)
@@ -211,11 +212,11 @@ namespace ec2
             }
         }
 
-        const uint timeCycle = durationSecs(nx::utils::parseTimerDuration(
-            qnGlobalSettings->statisticsReportTimeCycle(), DEFAULT_TIME_CYCLE));
+        const uint timeCycle = durationSeconds(nx::utils::parseTimerDuration(
+            qnGlobalSettings->statisticsReportTimeCycle(), kDefaultSendCycleTime));
 
-        const uint minDelay = timeCycle * MIN_DELAY_RATIO / 100;
-        const uint maxDelay = timeCycle * MAX_DELAY_RATIO / 100;
+        const uint minDelay = timeCycle * kMinDelayRatio / 100;
+        const uint maxDelay = timeCycle * kMaxdelayRation / 100;
         if (!m_plannedReportTime || *m_plannedReportTime > now.addSecs(maxDelay))
         {
             const QDateTime lastTime = qnGlobalSettings->statisticsReportLastTime();
@@ -251,7 +252,7 @@ namespace ec2
 
         const QString configApi = qnGlobalSettings->statisticsReportServerApi();
         const QString serverApi = configApi.isEmpty() ? DEFAULT_SERVER_API : configApi;
-        const QUrl url = lit("%1/%2").arg(serverApi).arg(SERVER_API_COMMAND);
+        const QUrl url = lit("%1/%2").arg(serverApi).arg(kServerReportApi);
         const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
         m_httpClient->doPost(url, contentType, QJson::serialized(data));
 
@@ -268,7 +269,7 @@ namespace ec2
     {
         if (httpClient->hasRequestSuccesed())
         {
-            m_timerCycle = TIMER_CYCLE;
+            m_timerCycle = kInitialTimerCycle;
             NX_LOGX(lm("Statistics report successfully sent to %1")
                 .str(httpClient->url()), cl_logINFO);
 
@@ -283,8 +284,8 @@ namespace ec2
         }
         else
         {
-            if ((m_timerCycle *= 2) > TIMER_CYCLE_MAX)
-                m_timerCycle = TIMER_CYCLE_MAX;
+            if ((m_timerCycle *= 2) > kMaxTimerCycle)
+                m_timerCycle = kMaxTimerCycle;
 
             NX_LOGX(lm("doPost to %1 has failed, update timer cycle to %2")
                 .str(httpClient->url()).arg(m_timerCycle), cl_logWARNING);
