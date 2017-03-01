@@ -54,7 +54,7 @@ class Socket:
 {
     static_assert(
         std::is_base_of<AbstractSocket, SocketInterfaceToImplement>::value,
-        "You MUST use class derived of AbstractSocket as template argument type");
+        "You MUST use class derived of AbstractSocket as a template argument");
 
 public:
     Socket(
@@ -146,7 +146,7 @@ class CommunicatingSocket:
 {
     static_assert(
         std::is_base_of<AbstractCommunicatingSocket, SocketInterfaceToImplement>::value,
-        "You MUST use class derived of AbstractCommunicatingSocket as template argument type");
+        "You MUST use class derived of AbstractCommunicatingSocket as a template argument");
 
     typedef CommunicatingSocket<SocketInterfaceToImplement> SelfType;
 
