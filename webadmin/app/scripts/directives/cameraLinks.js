@@ -12,7 +12,7 @@ angular.module('webadminApp')
                 position: "=",
                 liveMode: "="
             },
-            templateUrl: 'views/components/cameraLinks.html',
+            templateUrl: Config.viewsDir + 'components/cameraLinks.html',
             link: function (scope, element/*, attrs*/) {
                 scope.position = 0;
                 scope.duration = 5*60;
