@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <type_traits>
 
 #include <QtCore/QString>
 
@@ -46,11 +47,15 @@ struct NX_NETWORK_API SystemSocketAddress
 /**
  * Base class representing basic communication endpoint.
  */
-template<typename InterfaceToImplement>
+template<typename SocketInterfaceToImplement>
 class Socket:
-    public InterfaceToImplement,
+    public SocketInterfaceToImplement,
     public nx::network::Pollable
 {
+    static_assert(
+        std::is_base_of<AbstractSocket, SocketInterfaceToImplement>::value,
+        "You MUST use class derived of AbstractSocket as a template argument");
+
 public:
     Socket(
         int type,
@@ -135,11 +140,15 @@ private:
 /**
  * Socket that is able to connect, send, and receive.
  */
-template<class InterfaceToImplement>
+template<class SocketInterfaceToImplement>
 class CommunicatingSocket:
-    public Socket<InterfaceToImplement>
+    public Socket<SocketInterfaceToImplement>
 {
-    typedef CommunicatingSocket<InterfaceToImplement> SelfType;
+    static_assert(
+        std::is_base_of<AbstractCommunicatingSocket, SocketInterfaceToImplement>::value,
+        "You MUST use class derived of AbstractCommunicatingSocket as a template argument");
+
+    typedef CommunicatingSocket<SocketInterfaceToImplement> SelfType;
 
 public:
     CommunicatingSocket(
