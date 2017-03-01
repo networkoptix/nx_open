@@ -170,6 +170,15 @@ void InstallationManager::updateInstalledVersionsInformation()
 #endif
     std::unique_lock<std::mutex> lk(m_mutex);
     m_installationByVersion = std::move(installations);
+
+    static int iteration = 0;
+    NX_LOG(QString::number(++iteration) + lit(">>>>>>>>>>>> "), cl_logWARNING);
+
+    for (const auto version: m_installationByVersion.keys())
+        NX_LOG(lit("%1:%2").arg(version.toString(), m_installationByVersion[version]->binaryPath()), cl_logWARNING);
+
+    NX_LOG(QString::number(iteration) + lit("<<<<<<<<<<<< "), cl_logWARNING);
+
     lk.unlock();
 
     createGhosts();
