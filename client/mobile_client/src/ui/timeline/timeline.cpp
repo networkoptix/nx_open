@@ -114,6 +114,7 @@ public:
     qint64 startBoundTime;
     qint64 endBoundTime;
     qint64 targetPosition;
+    bool autoReturnToBounds = true;
 
     qint64 windowStart;
     qint64 windowEnd;
@@ -516,13 +517,16 @@ void QnTimeline::setStickToEnd(bool stickToEnd) {
     d->setStickToEnd(stickToEnd);
 }
 
-void QnTimeline::setStartBound(qint64 startBound) {
+void QnTimeline::setStartBound(qint64 startBound)
+{
     if (d->startBoundTime == startBound)
         return;
 
     d->startBoundTime = startBound;
-
     emit startBoundChanged();
+
+    if (d->autoReturnToBounds && (startBound == -1 || position() < startBound))
+        setPositionImmediately(startBound);
 
     update();
 }
@@ -539,6 +543,20 @@ void QnTimeline::setAutoPlay(bool autoPlay) {
 
     if (d->autoPlay)
         update();
+}
+
+bool QnTimeline::isAutoReturnToBoundsEnabled() const
+{
+    return d->autoReturnToBounds;
+}
+
+void QnTimeline::setAutoReturnToBoundsEnabled(bool enabled)
+{
+    if (d->autoReturnToBounds == enabled)
+        return;
+
+    d->autoReturnToBounds = enabled;
+    emit autoReturnToBoundsEnabledChanged();
 }
 
 int QnTimeline::timeZoneShift() const {
@@ -1234,7 +1252,8 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
     stickyPointKineticHelper.update();
     justStopped = !justStopped && stickyPointKineticHelper.isStopped();
 
-    if (stickyPointKineticHelper.isStopped()) {
+    if (stickyPointKineticHelper.isStopped())
+    {
         qint64 time = parent->position();
         qint64 windowSize = windowEnd - windowStart;
         qint64 delta = windowSize * windowMovingSpeed;
@@ -1245,7 +1264,8 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
         if (stickToEnd)
             targetPosition = liveTime;
 
-        if (targetPosition != -1) {
+        if (targetPosition != -1)
+        {
             if (time < targetPosition)
                 time = qMin(targetPosition, qMax(time, targetPosition - windowSize) + delta);
             else if (time > targetPosition)
@@ -1253,17 +1273,23 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
 
             if (time == targetPosition)
                 targetPosition = -1;
-        } else if (time < startBound)
-            time = qMin(startBound, qMax(time, startBound - windowSize) + delta);
-        else if (time > endBound)
-            time = qMax(endBound, qMin(time, endBound + windowSize) - delta);
+        }
+        else if (autoReturnToBounds)
+        {
+            if (time < startBound)
+                time = qMin(startBound, qMax(time, startBound - windowSize) + delta);
+            else if (time > endBound)
+                time = qMax(endBound, qMin(time, endBound + windowSize) - delta);
+        }
 
         delta = time - parent->position();
         if (delta != 0) {
             windowStart += delta;
             windowEnd += delta;
         }
-    } else {
+    }
+    else
+    {
         qint64 time = pixelPosToTime(stickyPointKineticHelper.value());
         qint64 delta = stickyTime - time;
         windowStart += delta;
@@ -1275,7 +1301,8 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
         else if (time < endBound && delta < 0)
             setStickToEnd(false);
 
-        if (!stickyPointKineticHelper.isMeasuring() && time > endBound + (windowEnd - windowStart)) {
+        if (!stickyPointKineticHelper.isMeasuring() && time > endBound + (windowEnd - windowStart))
+        {
             stickyPointKineticHelper.stop();
             parent->moveFinished();
         }

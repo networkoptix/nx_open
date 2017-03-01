@@ -385,8 +385,16 @@ PageBase
     {
         cameraSwitchAnimation.stop()
         cameraSwitchAnimation.newResourceId = id
-        cameraSwitchAnimation.thumbnail = camerasModelAccessor.getData(
-            camerasModel.rowByResourceId(id), "thumbnail")
+        if (videoScreenController.mediaPlayer.liveMode)
+        {
+            cameraSwitchAnimation.thumbnail = camerasModelAccessor.getData(
+                camerasModel.rowByResourceId(id), "thumbnail")
+        }
+        else
+        {
+            cameraSwitchAnimation.thumbnail = ""
+        }
+
         cameraSwitchAnimation.start()
     }
 

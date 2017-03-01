@@ -41,6 +41,7 @@ Object
     property alias mediaPlayer: mediaPlayer
 
     signal playerJump(real position)
+    signal gotFirstPosition(real position)
 
     QtObject
     {
@@ -49,11 +50,12 @@ Object
         property bool resumeOnOnline: false
         property real lastPosition: -1
         property bool waitForLastPosition: false
+        property bool waitForFirstPosition: true
 
         function savePosition()
         {
             lastPosition = mediaPlayer.liveMode ? -1 : mediaPlayer.position
-            waitForLastPosition = (mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
+            waitForLastPosition = true
         }
     }
 
@@ -74,12 +76,19 @@ Object
         resourceId: resourceHelper.resourceId
         onPlayingChanged: setKeepScreenOn(playing)
         maxTextureSize: getMaxTextureSize()
-        onMediaStatusChanged:
+        onPositionChanged:
         {
-            if (d.waitForLastPosition && mediaStatus === MediaPlayer.Loaded)
+            if (d.waitForLastPosition)
             {
                 d.lastPosition = position
                 d.waitForLastPosition = false
+            }
+
+            if (d.waitForFirstPosition)
+            {
+                playerJump(mediaPlayer.position)
+                d.waitForFirstPosition = false
+                gotFirstPosition(mediaPlayer.position)
             }
         }
     }
@@ -127,6 +136,7 @@ Object
     {
         playerJump(d.lastPosition)
         mediaPlayer.position = d.lastPosition
+        d.waitForFirstPosition = true
     }
 
     Component.onCompleted:
