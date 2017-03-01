@@ -60,7 +60,7 @@ static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
 static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
 static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
 
-const qint64 kMinStorageFreeSpace = 150 * 1024 * 1024ll
+const qint64 kMinStorageFreeSpace = 150 * 1024 * 1024ll;
 
 static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 
