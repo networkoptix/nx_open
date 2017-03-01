@@ -1859,6 +1859,9 @@ void QnWorkbenchNavigator::updateTimelineRelevancy()
 
     m_timelineRelevant = value;
     emit timelineRelevancyChanged(value);
+
+    if (!m_timelineRelevant && !qFuzzyIsNull(speed()))
+        setLive(true);
 }
 
 void QnWorkbenchNavigator::updateThumbnailsLoader()
