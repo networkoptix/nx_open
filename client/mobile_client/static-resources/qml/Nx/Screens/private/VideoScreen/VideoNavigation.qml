@@ -529,6 +529,7 @@ Item
             {
                 close()
                 d.resumePosition = -1
+                timeline.jumpTo(date.getTime())
                 videoScreenController.setPosition(date.getTime(), true)
             }
         }
