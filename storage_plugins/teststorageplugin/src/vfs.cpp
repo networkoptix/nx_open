@@ -160,6 +160,7 @@ bool buildVfsFromJson(
     /* here we should already create VFS root */
     outVfsPair->root = fsStubCreateTopLevel();
 
+    /* for each camera */
     for (int i = 0; i < JsonVal_arrayLen(curVal); ++i)
     {
         cameraVal = JsonVal_arrayAt(curVal, i);
@@ -175,14 +176,14 @@ bool buildVfsFromJson(
         /* hi quality chunks for the given camera */
         const char* kHiQualityKey = "hi";
         qualityVal = JsonVal_getObjectValueByKey(cameraVal, kHiQualityKey);
-        if (!checkJsonObjValue(idVal, jsonArrayT, kHiQualityKey, jsonString))
+        if (!checkJsonObjValue(qualityVal, jsonArrayT, kHiQualityKey, jsonString))
             return false;
 
         if (!addChunks(qualityVal, 
                 &rootObj, 
                 fsJoin(fsJoin(rootPath, "hi_quality"), cameraVal->u.string)))
         {
-
+            return false;
         }
     }
 
