@@ -6,6 +6,8 @@ SRC=./dmg-folder
 TMP=tmp
 VOLUME_NAME="${display.product.name} ${release.version}"
 DMG_FILE="${artifact.name.client}.dmg"
+
+# Please do not add "Client" keyword to APP_DIR because the same name exists.
 APP_DIR="$SRC/${display.product.name}.app"
 HELP=${ClientHelpSourceDir}
 RELEASE_VERSION=${release.version}
