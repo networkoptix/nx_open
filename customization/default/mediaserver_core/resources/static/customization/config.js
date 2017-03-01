@@ -35,3 +35,5 @@ Config.helpLinks.push({
 Config.allowDebugMode = false;
 Config.productName = 'Nx Witness';
 Config.cloud.productName = 'Nx Cloud';
+
+Config.supportedLanguages = ['en_US', 'ru'];

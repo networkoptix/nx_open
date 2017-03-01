@@ -3,7 +3,7 @@ angular.module('webadminApp')
     .directive('networkSettings', ['mediaserver', function (mediaserver) {
         return {
             restrict: 'E',
-            templateUrl: 'views/components/networkSettings.html',
+            templateUrl: Config.viewsDir + 'components/networkSettings.html',
             scope:{
                 settings:'='
             },

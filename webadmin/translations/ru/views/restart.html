@@ -1,0 +1,17 @@
+<div class="modal-header">
+    <h3 class="modal-title">Перезагрузка системы...</h3>
+</div>
+
+<form class="form" role="form" id="restartDialog">
+    <div class="col-sm-12">
+        <p>Перезагрузка системы может занять некоторое время. После этого страница будет автоматически обновлена.</p>
+        <progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</progressbar>
+
+        <p>Если ничего не происходит в течение некоторого времени, необходимо обновить страницу вручную</p>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">Обновить</button>
+    </div>
+
+</form>
