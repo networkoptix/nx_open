@@ -75,6 +75,6 @@
 	<key>NSCameraUsageDescription</key>
 	<string>This app does not use camera.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
-	<true/>
+	<false/>
 </dict>
 </plist>
