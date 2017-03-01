@@ -101,6 +101,27 @@ void QnCameraPool::addCameras(int count, QStringList primaryFileList, QStringLis
             QnFileCache::instance()->getMediaData(fileName);
         m_cameras.insert(camera->getMac(), camera);
     }
+        
+    if (count < 0) 
+    { // Special case - we run one camera for each source
+        for (int i = 0; i < primaryFileList.length(); i++) 
+        {
+            QString primaryFile = primaryFileList[i];
+            QString secondaryFile = i < secondaryFileList.length() ? secondaryFileList[i] : ""; // secondary file is optional
+
+            QnTestCamera* camera = new QnTestCamera(++m_cameraNum);
+            camera->setPrimaryFileList(QStringList() << primaryFile);
+            camera->setSecondaryFileList(QStringList() << secondaryFile);
+            camera->setOfflineFreq(offlineFreq);
+
+            QnFileCache::instance()->getMediaData(primaryFile);
+            if (!secondaryFile.isEmpty()) // secondary file is optional
+            { 
+                QnFileCache::instance()->getMediaData(secondaryFile);
+            }
+            m_cameras.insert(camera->getMac(), camera);
+        }
+    }
 }
 
 QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)

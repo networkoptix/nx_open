@@ -26,7 +26,7 @@ def check_system_settings(server, **kw):
 def change_bool_setting(server, setting):
     val = str_to_bool(server.settings[setting])
     settings = { setting:  bool_to_str(not val) }
-    server.set_system_system_settings(**settings)
+    server.set_system_settings(**settings)
     check_system_settings(server, **settings)
     return val
 
@@ -60,26 +60,23 @@ def test_merge_take_local_settings(env):
     check_system_settings(env.one, **settings['systemSettings'])
 
     # On each server update some globalSettings to different values
-    exp_arecontRtspEnabled = \
-        change_bool_setting(env.one, 'arecontRtspEnabled')
-    exp_auditTrailEnabled = \
-        not change_bool_setting(env.two, 'auditTrailEnabled')
+    expected_arecontRtspEnabled = change_bool_setting(env.one, 'arecontRtspEnabled')
+    expected_auditTrailEnabled = not change_bool_setting(env.two, 'auditTrailEnabled')
     
     # Merge systems (takeRemoteSettings = false)
     env.two.merge_systems(env.one)
     wait_for_settings_merge(env)
     check_system_settings(
       env.one,
-      arecontRtspEnabled = bool_to_str(exp_arecontRtspEnabled),
-      auditTrailEnabled = bool_to_str(exp_auditTrailEnabled))
+      arecontRtspEnabled = bool_to_str(expected_arecontRtspEnabled),
+      auditTrailEnabled = bool_to_str(expected_auditTrailEnabled))
 
     # Ensure both servers are merged and sync
-    exp_arecontRtspEnabled = \
-        not change_bool_setting(env.one, 'arecontRtspEnabled')
+    expected_arecontRtspEnabled = not change_bool_setting(env.one, 'arecontRtspEnabled')
     wait_for_settings_merge(env)
     check_system_settings(
         env.two,
-        arecontRtspEnabled = bool_to_str(exp_arecontRtspEnabled))
+        arecontRtspEnabled = bool_to_str(expected_arecontRtspEnabled))
 
 def test_merge_take_remote_settings(env):
     # Start two servers without predefined systemName
@@ -89,26 +86,23 @@ def test_merge_take_remote_settings(env):
     env.two.setup_local_system()
 
     # On each server update some globalSettings to different values
-    exp_arecontRtspEnabled = \
-        not change_bool_setting(env.one, 'arecontRtspEnabled')
-    exp_auditTrailEnabled = \
-        not change_bool_setting(env.two, 'auditTrailEnabled')
+    expected_arecontRtspEnabled = not change_bool_setting(env.one, 'arecontRtspEnabled')
+    expected_auditTrailEnabled = not change_bool_setting(env.two, 'auditTrailEnabled')
 
     # Merge systems (takeRemoteSettings = true)
     env.two.merge_systems(env.one, take_remote_settings=True)
     wait_for_settings_merge(env)
     check_system_settings(
       env.one,
-      arecontRtspEnabled = bool_to_str(exp_arecontRtspEnabled),
-      auditTrailEnabled = bool_to_str(exp_auditTrailEnabled))
+      arecontRtspEnabled = bool_to_str(expected_arecontRtspEnabled),
+      auditTrailEnabled = bool_to_str(expected_auditTrailEnabled))
 
     # Ensure both servers are merged and sync
-    exp_auditTrailEnabled = \
-        not change_bool_setting(env.one, 'auditTrailEnabled')
+    expected_auditTrailEnabled = not change_bool_setting(env.one, 'auditTrailEnabled')
     wait_for_settings_merge(env)
     check_system_settings(
         env.two,
-        auditTrailEnabled = bool_to_str(exp_auditTrailEnabled))
+        auditTrailEnabled = bool_to_str(expected_auditTrailEnabled))
 
 def test_merge_cloud_with_local(env):
     # Start local server systemName
@@ -166,12 +160,11 @@ def test_cloud_merge_after_disconnect(env):
     wait_for_settings_merge(env)
     
     # Ensure both servers are merged and sync
-    exp_auditTrailEnabled = \
-        not change_bool_setting(env.one, 'auditTrailEnabled')
+    expected_auditTrailEnabled = not change_bool_setting(env.one, 'auditTrailEnabled')
     wait_for_settings_merge(env)
     check_system_settings(
         env.two,
-        auditTrailEnabled = bool_to_str(exp_auditTrailEnabled))
+        auditTrailEnabled = bool_to_str(expected_auditTrailEnabled))
 
 @pytest.fixture
 def env_merged(env_builder, server):
@@ -196,9 +189,8 @@ def test_restart_one_server(env_merged):
     env_merged.two.rest_api.ec2.getUsers.get()
 
     # Ensure both servers are merged and sync
-    exp_arecontRtspEnabled = \
-         not change_bool_setting(env_merged.one, 'arecontRtspEnabled')
+    expected_arecontRtspEnabled = not change_bool_setting(env_merged.one, 'arecontRtspEnabled')
     wait_for_settings_merge(env_merged)
     check_system_settings(
         env_merged.two,
-        arecontRtspEnabled = bool_to_str(exp_arecontRtspEnabled))
+        arecontRtspEnabled = bool_to_str(expected_arecontRtspEnabled))
