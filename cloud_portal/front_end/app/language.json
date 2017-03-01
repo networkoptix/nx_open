@@ -92,7 +92,7 @@
     "cantSharePrefix": "Cannot share System",
     "cantGetUsersListPrefix": "Users list is unavailable",
     "cantGetSystemsListPrefix": "System list is unavailable",
-    "cantRegisterPrefix": "Some error happened",
+    "cantRegisterPrefix": "Error occurred",
     "cantGetSystemInfoPrefix": "System info is unavailable",
     "cantChangeAccountPrefix": "Cannot save changes",
     "cantChangePasswordPrefix": "Cannot save password",
@@ -117,7 +117,7 @@
     "cantEditYourself": "Changing own permissions is not allowed",
     "cantEditAdmin": "This user has administrator permissions",
     "cantOpenClient": "VMS_NAME application is not detected. <a href=\"/download\">Download</a>",
-    "lostConnection": "Connection to {{systemName}} was lost"
+    "lostConnection": "Connection to {{systemName}} lost"
   },
   "passwordRequirements": {
     "minLengthMessage": "Password must contain at least 8 characters",
@@ -156,8 +156,8 @@
     "permissionsRemoved": "Permissions were removed from {Email}"
   },
   "account": {
-      "accountSavedSuccess": "Your account was successfully saved",
-      "passwordChangedSuccess": "Your account was successfully saved"
+      "accountSavedSuccess": "Your account is successfully saved",
+      "passwordChangedSuccess": "Your account is successfully saved"
   },
   "downloads": {
     "noClientDetectedTitle": "Install VMS_NAME to view your System",
