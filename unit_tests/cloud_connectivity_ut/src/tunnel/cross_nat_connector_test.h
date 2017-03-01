@@ -25,9 +25,9 @@ public:
 protected:
     struct ConnectResult
     {
-        SystemError::ErrorCode errorCode;
+        SystemError::ErrorCode errorCode = SystemError::noError;
         std::unique_ptr<AbstractOutgoingTunnelConnection> connection;
-        std::chrono::milliseconds executionTime;
+        std::chrono::milliseconds executionTime = std::chrono::milliseconds::zero();
     };
 
     ConnectResult doSimpleConnectTest(

@@ -94,6 +94,7 @@ protected:
     virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
     virtual void stopInputPortMonitoringAsync() override;
     virtual bool isInputPortMonitored() const override;
+
 private:
     void clear();
     static QRect axisRectToGridRect(const QRect& axisRect);
@@ -154,6 +155,9 @@ private:
         unsigned int* paramValue );
     CLHttpStatus readAxisParameters(const QString& rootPath, CLSimpleHTTPClient* const httpClient, QList<QPair<QByteArray,QByteArray>>& params);
     CLHttpStatus readAxisParameters(const QString& rootPath, CLSimpleHTTPClient* const httpClient, QMap<QString, QString>& params);
+
+    bool enableDuplexMode() const;
+
     bool initialize2WayAudio(CLSimpleHTTPClient* const http);
     bool initializeIOPorts( CLSimpleHTTPClient* const http );
     void notificationReceived( const nx_http::ConstBufferRefType& notification );

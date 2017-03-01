@@ -55,7 +55,8 @@ void showUsage(char* exeName)
     qDebug() << "usage:";
     qDebug() << "testCamera [options] <cameraSet1> <cameraSet2> ... <cameraSetN>";
     qDebug() << "where <cameraSetN> is camera(s) param with ';' delimiter";
-    qDebug() << "count=N";
+    qDebug() << "count=N"; 
+    qDebug() << "count=-1 - will run separate camera for each primary file";
     qDebug() << "files=\"<fileName>[,<fileName>...]\" - for primary stream";
     qDebug() << "secondary-files=\"<fileName>[,<fileName>...]\" - for low quality stream";
     qDebug() << "[offline=0..100] (optional, default value 0 - no offline)";

@@ -106,7 +106,13 @@ void QnMulticastModuleFinder::updateInterfaces()
             sock->setDestAddr(SocketAddress(m_multicastGroupAddress.toString(), m_multicastGroupPort));
             auto it = m_clientSockets.insert(address, sock.release());
             if (m_serverSocket)
-                m_serverSocket->joinGroup(m_multicastGroupAddress.toString(), address.toString());
+            {
+                if (!m_serverSocket->joinGroup(m_multicastGroupAddress.toString(), address.toString()))
+                {
+                    NX_LOGX(lm("Unable to join multicast group %1 on interface %2: %3")
+                        .strs(m_multicastGroupAddress, address), cl_logWARNING);
+                }
+            }
 
             if (!m_pollSet.add(it.value(), aio::etRead, it.value()))
             {

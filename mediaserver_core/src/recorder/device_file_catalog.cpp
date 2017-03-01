@@ -478,7 +478,8 @@ void DeviceFileCatalog::rebuildPause(void* value)
 void DeviceFileCatalog::rebuildResume(void* value)
 {
     QnMutexLocker lock( &m_rebuildMutex );
-    m_pauseList.remove(value);
+    if (!m_pauseList.remove(value))
+        return;
     if (m_pauseList.isEmpty())
         qWarning() << "Rebuild archive is allowed again (if active) due to disk performance is OK";
 }

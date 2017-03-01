@@ -18,6 +18,8 @@ public:
 
     virtual QByteArray getAdditionSDP( const std::map<QString, QString>& streamParams ) override;
 
+    void setCodecContext(const QnConstMediaContextPtr& codecContext);
+
     virtual void setDataPacket(QnConstAbstractMediaDataPtr media) override;
     virtual bool getNextPacket(QnByteArray& sendBuffer) override;
     virtual void init() override;
