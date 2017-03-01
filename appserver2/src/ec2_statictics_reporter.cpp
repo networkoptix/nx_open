@@ -16,13 +16,13 @@
 
 #include "ec2_connection.h"
 
-static const uint DEFAULT_TIME_CYCLE = 30 * 24 * 60 * 60; /* secs => about a month */
+static const std::chrono::hours DEFAULT_TIME_CYCLE(30 * 24); /* about a month */
+static const std::chrono::hours SEND_AFTER_UPDATE_TIME(3);
 
 static const uint MIN_DELAY_RATIO = 30;
 static const uint RND_DELAY_RATIO = 50;    /* 50% about 15 days */
 static const uint MAX_DELAY_RATIO = MIN_DELAY_RATIO + RND_DELAY_RATIO;
 
-static const uint SEND_AFTER_UPDATE_TIME = 3 * 60 * 60 * 1000; // 3h
 static const uint TIMER_CYCLE = 60 * 1000; /* msecs, update state every minute */
 static const uint TIMER_CYCLE_MAX = 24 * 60 * 60 * 1000; /* msecs, once a day at least */
 
@@ -177,6 +177,13 @@ namespace ec2
         setupTimer();
     }
 
+    template<typename Duration>
+    uint durationSecs(Duration duration)
+    {
+        const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration);
+        return static_cast<uint>(seconds.count());
+    }
+
     QDateTime Ec2StaticticsReporter::plannedReportTime(const QDateTime& now)
     {
         if (m_firstTime)
@@ -189,9 +196,8 @@ namespace ec2
             collator.setNumericMode(true);
             if (collator.compare(currentVersion, reportedVersion) > 0)
             {
-                const uint timeCycle = nx::utils::parseTimerDuration(
-                    qnGlobalSettings->statisticsReportTimeCycle(),
-                    std::chrono::seconds(SEND_AFTER_UPDATE_TIME)).count() / 1000;
+                const uint timeCycle = durationSecs(nx::utils::parseTimerDuration(
+                    qnGlobalSettings->statisticsReportTimeCycle(), SEND_AFTER_UPDATE_TIME));
 
                 m_plannedReportTime = now.addSecs(nx::utils::random::number(
                       timeCycle * MIN_DELAY_RATIO / 100,
@@ -205,9 +211,8 @@ namespace ec2
             }
         }
 
-        const uint timeCycle = nx::utils::parseTimerDuration(
-            qnGlobalSettings->statisticsReportTimeCycle(),
-            std::chrono::seconds(DEFAULT_TIME_CYCLE)).count() / 1000;
+        const uint timeCycle = durationSecs(nx::utils::parseTimerDuration(
+            qnGlobalSettings->statisticsReportTimeCycle(), DEFAULT_TIME_CYCLE));
 
         const uint minDelay = timeCycle * MIN_DELAY_RATIO / 100;
         const uint maxDelay = timeCycle * MAX_DELAY_RATIO / 100;

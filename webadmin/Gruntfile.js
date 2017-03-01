@@ -513,10 +513,10 @@ module.exports = function (grunt) {
                 command: 'hg parent'
             },
             generate_translation:{
-                command: 'cd translation; python generate_ts.py; python localize.py'
+                command: 'cd translation; ./language_pack.sh'
             },
             localize:{
-                command: 'cd translation; python localize.py'
+                command: 'cd translation; ./localize.sh'
             },
             run_ffmpeg:{
                 command: './ffmpeg.sh'

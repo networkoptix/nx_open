@@ -1,8 +1,3 @@
-/**********************************************************
-* Jul 31, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "settings.h"
 
 #include <thread>
@@ -76,6 +71,11 @@ const std::chrono::milliseconds kDefaultConnectionInactivityPeriod(0); //< disab
 // Event manager settings
 const QLatin1String kMediaServerConnectionIdlePeriod("eventManager/mediaServerConnectionIdlePeriod");
 const auto kDefaultMediaServerConnectionIdlePeriod = std::chrono::minutes(1);
+
+//-------------------------------------------------------------------------------------------------
+// Module finder
+const QLatin1String kCloudModuleXmlTemplatePath("moduleFinder/cloudModuleXmlTemplatePath");
+const QLatin1String kDefaultCloudModuleXmlTemplatePath(":/cloud_modules_template.xml");
 
 } // namespace
 
@@ -179,6 +179,11 @@ const ec2::Settings& Settings::p2pDb() const
 const QString& Settings::changeUser() const
 {
     return m_changeUser;
+}
+
+const ModuleFinder& Settings::moduleFinder() const
+{
+    return m_moduleFinder;
 }
 
 std::list<SocketAddress> Settings::endpointsToListen() const
@@ -306,6 +311,9 @@ void Settings::loadConfiguration()
             kDefaultMediaServerConnectionIdlePeriod));
 
     m_p2pDb.load(m_settings);
+
+    m_moduleFinder.cloudModulesXmlTemplatePath = m_settings.value(
+        kCloudModuleXmlTemplatePath, kDefaultCloudModuleXmlTemplatePath).toString();
 }
 
 } // namespace conf
