@@ -6,10 +6,13 @@
 
 #include <atomic>
 #include <limits>
+
 #include <nx/utils/random.h>
 
-#include "media_server/settings.h"
+#include <core/resource/security_cam_resource.h>
+#include <core/resource_management/resource_pool.h>
 
+#include "media_server/settings.h"
 
 StreamingChunk::SequentialReadingContext::SequentialReadingContext(StreamingChunk* chunk)
 :
@@ -34,6 +37,9 @@ StreamingChunk::StreamingChunk( const StreamingChunkCacheKey& params )
             nx_ms_conf::DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE).toUInt() ),
     m_dataOffsetAtTheFrontOfTheBuffer(0)
 {
+    m_videoCameraLocker =
+        qnCameraPool->getVideoCameraLockerByResourceId(
+            findResourceIdByAnyUniqueAttribute(params.srcResourceUniqueID()));
 }
 
 StreamingChunk::~StreamingChunk()
@@ -186,6 +192,8 @@ void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
         m_cond.wakeAll();
     }
 
+    m_videoCameraLocker.reset();
+
 #ifdef DUMP_CHUNK_TO_FILE
     m_dumpFile.close();
 #endif
@@ -222,6 +230,24 @@ void StreamingChunk::disableInternalBufferLimit()
     QnMutexLocker lk(&m_mutex);
     m_maxInternalBufferSize = 
         std::numeric_limits<decltype(m_maxInternalBufferSize)>::max();
+}
+
+QnUuid findResourceIdByAnyUniqueAttribute(const QString& str)
+{
+    QnResourcePtr resource;
+    const QnUuid uuid = QnUuid::fromStringSafe(str);
+    if (!uuid.isNull())
+        resource = qnResPool->getResourceById(uuid);
+    if (!resource)
+        resource = qnResPool->getResourceByUniqueId(str);
+    if (!resource)
+        resource = qnResPool->getResourceByMacAddress(str);
+    if (!resource)
+        resource = qnResPool->getResourceByUrl(str);
+    if (!resource)
+        return QnUuid();
+
+    return resource->getId();
 }
 
 

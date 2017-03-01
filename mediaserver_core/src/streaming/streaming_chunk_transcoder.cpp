@@ -86,28 +86,19 @@ bool StreamingChunkTranscoder::transcodeAsync(
     StreamingChunkPtr chunk )
 {
     // Searching for resource.
-    const QString& resId = transcodeParams.srcResourceUniqueID();
-    QnResourcePtr resource;
-    const QnUuid uuid = QnUuid::fromStringSafe(resId);
-    if (!uuid.isNull())
-        resource = qnResPool->getResourceById(uuid);
-    if (!resource)
-        resource = qnResPool->getResourceByUniqueId(resId);
-    if (!resource)
-        resource = qnResPool->getResourceByMacAddress(resId);
-    if (!resource)
-        resource = qnResPool->getResourceByUrl(resId);
+    QnResourcePtr resource = qnResPool->getResourceById(
+        findResourceIdByAnyUniqueAttribute(transcodeParams.srcResourceUniqueID()));
     if (!resource)
     {
         NX_LOG(lit("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 not found")
-            .arg(resId), cl_logDEBUG1);
+            .arg(transcodeParams.srcResourceUniqueID()), cl_logDEBUG1);
         return false;
     }
     QnSecurityCamResourcePtr cameraResource = resource.dynamicCast<QnSecurityCamResource>();
     if( !cameraResource )
     {
         NX_LOG(lit("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 is not a media resource")
-            .arg(resId), cl_logDEBUG1);
+            .arg(transcodeParams.srcResourceUniqueID()), cl_logDEBUG1);
         return false;
     }
 
