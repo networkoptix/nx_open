@@ -40,7 +40,7 @@ static int createStringCopy(const char *source, int sourceLen, char **target)
     if (sourceLen == -1)
         sourceLen = strlen(source);
 
-    *target = malloc(sourceLen + 1);
+    *target = (char*)malloc(sourceLen + 1);
 
     if (!*target)
         return -1;
@@ -91,14 +91,14 @@ static int matchString(const char **source, const char *pattern)
 
 static int reallocObject(struct JsonVal *val)
 {
-    if (!(val->u.object.keys = realloc(
+    if (!(val->u.object.keys = (char **)realloc(
               val->u.object.keys,
               (val->u.object.len + 1) * sizeof(*val->u.object.keys))))
     {
         return -1;
     }
 
-    if (!(val->u.object.values = realloc(
+    if (!(val->u.object.values = (struct JsonVal*)realloc(
               val->u.object.values,
               (val->u.object.len + 1) * sizeof(*val->u.object.values))))
     {
@@ -111,7 +111,7 @@ static int reallocObject(struct JsonVal *val)
 
 static int reallocArray(struct JsonVal *val)
 {
-    if (!(val->u.array.values = realloc(
+    if (!(val->u.array.values = (struct JsonVal*)realloc(
               val->u.array.values,
               (val->u.array.len + 1) * sizeof(*val->u.array.values))))
     {

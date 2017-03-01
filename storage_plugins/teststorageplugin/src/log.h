@@ -1,14 +1,17 @@
 #pragma once
 
+#define TEST_PLUGIN_LOG
+
 #if defined (TEST_PLUGIN_LOG)
 
     #if defined (__linux__) 
         #include <sys/time.h>
         #include <stdio.h>
+        #include <pthread.h>
 
         #define LOG(...) \
             do { \
-                char ___buf[1024]; \
+                char ___buf[4096]; \
                 struct timeval ___tval; \
                 gettimeofday(&___tval, NULL); \
                 strftime(___buf, sizeof(___buf), "%H:%M:%S", localtime(&___tval.tv_sec)); \

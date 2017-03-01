@@ -10,9 +10,29 @@ TEST(UrlTest, CorrectUrl)
     ASSERT_TRUE(url.valid());
     ASSERT_EQ(url.scheme(), "test");
     ASSERT_EQ(url.url(), "test://some.host/some/path");
+    ASSERT_EQ(url.hostPath(), "some.host/some/path");
+    ASSERT_EQ(url.host(), "some.host");
     ASSERT_EQ(url.params().size(), 2);
     ASSERT_EQ(url.params()["key1"], "value1");
     ASSERT_EQ(url.params()["key2"], "value2");
+
+    /* url with no path and with params*/
+    Url url1("test://some.host?key1=value1&key2=value2");
+    ASSERT_EQ(url1.scheme(), "test");
+    ASSERT_EQ(url1.url(), "test://some.host");
+    ASSERT_EQ(url1.hostPath(), "some.host");
+    ASSERT_EQ(url1.host(), "some.host");
+    ASSERT_EQ(url1.params().size(), 2);
+    ASSERT_EQ(url1.params()["key1"], "value1");
+    ASSERT_EQ(url1.params()["key2"], "value2");
+
+    /* url with no path and with no params*/
+    Url url2("test://some.host");
+    ASSERT_EQ(url2.scheme(), "test");
+    ASSERT_EQ(url2.url(), "test://some.host");
+    ASSERT_EQ(url2.hostPath(), "some.host");
+    ASSERT_EQ(url2.host(), "some.host");
+    ASSERT_EQ(url2.params().size(), 0);
 }
 
 TEST(UrlTest, NoScheme)

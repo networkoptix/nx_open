@@ -4,6 +4,9 @@
 #include <unordered_map>
 #include <algorithm>
 #include "test_storage_factory.h"
+#include "log.h"
+#include "vfs.h"
+#include "url.h"
 
 const char** STORAGE_METHOD_CALL TestStorageFactory::findAvailable() const
 {
@@ -15,17 +18,35 @@ nx_spl::Storage* STORAGE_METHOD_CALL TestStorageFactory::createStorage(
     int*        ecode
 )
 {
+    if (m_storageUrls.find(url) != m_storageUrls.cend())
+    {
+        LOG("[TestStorage, TestStorageFactory::createStorage]: storage with this url '%s' already exists\n", url);
+        if (ecode)
+            *ecode = nx_spl::error::UrlNotExists;
+        return nullptr;
+    }
 
-    // auto testStorage = std::unique_ptr<TestStorage>(new TestStorage);
-    // auto errorCode = testStorage->parseUrl(url);
-    // if (errorCode != ok)
-    // {
-    //     LOG("invalid url %s. error: %s", url, errorCodeToString(errorCode));
-    //     if (ecode)
-    //         *ecode = errorCode;
-    //     return nullptr;
-    // }
-    // return testStorage.release();
+    utils::Url parsedUrl(url);
+    if (!parsedUrl.valid())
+    {
+        LOG("[TestStorage, TestStorageFactory::createStorage]: url '%s' is invalid\n", url);
+        if (ecode)
+            *ecode = nx_spl::error::UrlNotExists;
+        return nullptr;
+    }
+
+    std::string configName;
+    const std::string kConfigParamName = "config";
+    utils::ParamsMap params = parsedUrl.params();
+
+    if (params.find(kConfigParamName) != params.cend())
+        configName = params[kConfigParamName];
+    else
+        configName = parsedUrl.host() + ".cfg";
+
+    // utils::VfsPair vfsPair;
+    // if (!utils::buildVfsFromJson())
+    // return new TestStorage();
     return nullptr;
 }
 

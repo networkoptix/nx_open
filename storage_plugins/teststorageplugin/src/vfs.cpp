@@ -1,50 +1,30 @@
 #include <string.h>
 #include <time.h>
 #include <unordered_map>
+#include <string>
+#include <algorithm>
+#include <sstream>
 #include "vfs.h"
 #include "log.h"
 #include "detail/json.h"
 
 namespace utils {
 
-void setNodeSize(void* ctx, struct FsStubNode* fsNode)
+std::string jsonTypeName(enum JsonType type)
 {
-    int64_t* fileSize = (int64_t*)ctx;
-    if (fsNode->type == file)
-        fsNode->size = *fileSize;
-}
-
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-
-const char* jsonTypeName(enum JsonType type, char* buf, int bufLen)
-{
-#define COPYNAME(name) strncpy(buf, #name, MIN(bufLen, strlen(#name) + 1)) 
     switch (type)
     {
-    case jsonStringT:
-        COPYNAME(string);
-        break;
-    case jsonNumberT:
-        COPYNAME(number);
-        break;
-    case jsonObjectT:
-        COPYNAME(object);
-        break;
-    case jsonArrayT:
-        COPYNAME(array);
-        break;
+    case jsonStringT: return "JsonString";
+    case jsonNumberT: return "JsonNumber";
+    case jsonObjectT: return "JsonObject";
+    case jsonArrayT: return "JsonArray";
     case jsonTrueT:
-    case jsonFalseT:
-        COPYNAME(boolean)
-        break;
-    case jsonNullT:
-        COPYNAME(null);
-        break;
+    case jsonFalseT: return "JsonBoolean";
+    case jsonNullT: return "JsonNull";
     }
-#undef COPYNAME
-}
 
-#undef MIN
+    return "";
+}
 
 bool checkJsonObjValue(
     const struct JsonVal* val, 
@@ -54,8 +34,6 @@ bool checkJsonObjValue(
 {
     const char* noKeyErrorStr = "[TestStorage, JSON]: no '%s' key found: json string: %s\n";
     const char* wrongTypeErrorStr = "[TestStorage, JSON]: '%s' is not of %s type, actual type is %s: json string: %s\n";
-    constexpr int kBufLen;
-    char buf[kBufLen];
 
     if (val == nullptr)
     {
@@ -65,8 +43,8 @@ bool checkJsonObjValue(
 
     if (val->type != type)
     {
-        LOG(wrongTypeErrorStr, key, jsonTypeName(type, buf, kBufLen), 
-            jsonTypeName(val->type, buf, kBufLen), originalString);
+        LOG(wrongTypeErrorStr, key, jsonTypeName(type).c_str(), 
+            jsonTypeName(val->type).c_str(), originalString);
         return false;
     }
 
@@ -76,7 +54,7 @@ bool checkJsonObjValue(
 std::string fsJoin(const std::string& subPath1, const std::string& subPath2) 
 {
     if (subPath1[subPath1.size() - 1] == '/') 
-        return subPath1 + subPath2)
+        return subPath1 + subPath2;
 
     return subPath1 + "/" + subPath2;
 }
@@ -92,105 +70,123 @@ struct JsonValAutoDestroy
     JsonVal* jsonVal;
 };
 
-}
-
-/*
-Json object should have the following structure:
+std::string pathFromTimeStamp(const std::string& timestampString)
 {
-    "sample": "/path/to/sample/file",
-    "cameras": [
-        {
-            "id": "someCameraId",
-            "chunks": {
-                "hi": [
-                    {
-                        "durationMs": "429626247",
-                        "startTimeMs": "1453550461075"
-                    },
-                    ... 
-                ],
-                "low": [
-                    {
-                        "durationMs": "429626247",
-                        "startTimeMs": "1453550461075"
-                    }, 
-                    ...
-                ]
-            }
-        }
-    ]
-}
-*/
+    std::stringstream out;
+    time_t t = (time_t)(std::stoll(timestampString) / 1000);
+    struct tm *ltime = localtime(&t);
 
-bool buildVfsFromJson(
-    const char* jsonString, 
-    const char* rootPath, 
-    GetFileSizeFunc getFileSizeFunc, 
-    VfsPair* outVfsPair)
+    out << (1900 + ltime->tm_year) << "/"
+        << (ltime->tm_mon + 1) << "/"
+        << (ltime->tm_mday) << "/"
+        << (ltime->tm_hour) << "/"
+        << timestampString << ".mkv"; 
+
+    return out.str();
+}
+
+bool addChunks(JsonVal* arrayVal, FsStubNode* root, const std::string& rootPath, const char* jsonString)
+{
+    for (int i = 0; i < JsonVal_arrayLen(arrayVal); ++i)
+    {
+        JsonVal* chunkVal = JsonVal_arrayAt(arrayVal, i);
+        if (!checkJsonObjValue(chunkVal, jsonObjectT, "chunk", jsonString))
+            return false;
+
+        const char* kDurationKey = "durationMs";
+        JsonVal* durationVal = JsonVal_getObjectValueByKey(chunkVal, kDurationKey);
+        if (!checkJsonObjValue(durationVal, jsonStringT, kDurationKey, jsonString))
+            return false;
+
+        const char* kStartTimeKey = "startTimeMs";
+        JsonVal* startTimeVal = JsonVal_getObjectValueByKey(chunkVal, kStartTimeKey);
+        if (!checkJsonObjValue(startTimeVal, jsonStringT, kStartTimeKey, jsonString))
+            return false;
+
+        FsStubNode_add(
+            root, 
+            fsJoin(rootPath, pathFromTimeStamp(startTimeVal->u.string)).c_str(),
+            file,
+            660,
+            std::stoll(durationVal->u.string));
+    }
+
+    return true;
+}
+
+}
+
+bool utils::buildVfsFromJson(const char* jsonString, const char* rootPath, VfsPair* outVfsPair)
 {
     char errorBuf[512];
-    JsonVal rootObj;
-    JsonVal* curVal, *cameraVal, *idVal, *qualityVal, *chunksVal;
-    int camerasCount;
-    int chunksCount;
-
-    rootObj = jsonParseString(jsonString, errorBuf, sizeof(errorBuf));
+    JsonVal rootObj = jsonParseString(jsonString, errorBuf, sizeof(errorBuf));
     JsonValAutoDestroy rootWrapper(&rootObj);
     (void)rootWrapper;
 
     if (*errorBuf != 0)
     {
-        LOG("%s: failed to parse json string: %s\n", __FUNCTION__, jsonString);
+        LOG("[TestStorage, JSON]: failed to parse json string: %s\n", jsonString);
         return false;
     }
 
     /* parse top level object */
     /* sample file */
     const char* kSampleKey = "sample";
-    curVal = JsonVal_getObjectValueByKey(&rootObj, kSampleKey);
-    if (!checkJsonObjValue(curVal, jsonStringT, kSampleKey, jsonString))
+    auto sampleVal = JsonVal_getObjectValueByKey(&rootObj, kSampleKey);
+    if (!checkJsonObjValue(sampleVal, jsonStringT, kSampleKey, jsonString))
         return false;
+    outVfsPair->sampleFilePath = sampleVal->u.string;
 
     /* cameras */
     const char* kCamerasKey = "cameras";
-    curVal = JsonVal_getObjectValueByKey(&rootObj, kCamerasKey);
-    if (!checkJsonObjValue(curVal, jsonArrayT, kCamerasKey, jsonString))
+    auto camerasArrayVal = JsonVal_getObjectValueByKey(&rootObj, kCamerasKey);
+    if (!checkJsonObjValue(camerasArrayVal, jsonArrayT, kCamerasKey, jsonString))
         return false;
 
     /* here we should already create VFS root */
     outVfsPair->root = fsStubCreateTopLevel();
 
     /* for each camera */
-    for (int i = 0; i < JsonVal_arrayLen(curVal); ++i)
+    for (int i = 0; i < JsonVal_arrayLen(camerasArrayVal); ++i)
     {
-        cameraVal = JsonVal_arrayAt(curVal, i);
+        auto cameraVal = JsonVal_arrayAt(camerasArrayVal, i);
         if (!checkJsonObjValue(cameraVal, jsonObjectT, "camera", jsonString))
             return false;
 
         /* camera id */
         const char* kIdKey = "id";
-        idVal = JsonVal_getObjectValueByKey(cameraVal, idKey);
+        auto idVal = JsonVal_getObjectValueByKey(cameraVal, kIdKey);
         if (!checkJsonObjValue(idVal, jsonStringT, kIdKey, jsonString))
             return false;
 
         /* hi quality chunks for the given camera */
         const char* kHiQualityKey = "hi";
-        qualityVal = JsonVal_getObjectValueByKey(cameraVal, kHiQualityKey);
+        auto qualityVal = JsonVal_getObjectValueByKey(cameraVal, kHiQualityKey);
         if (!checkJsonObjValue(qualityVal, jsonArrayT, kHiQualityKey, jsonString))
             return false;
 
         if (!addChunks(qualityVal, 
-                &rootObj, 
-                fsJoin(fsJoin(rootPath, "hi_quality"), cameraVal->u.string)))
+                outVfsPair->root, 
+                fsJoin(fsJoin(rootPath, "hi_quality"), idVal->u.string), 
+                jsonString))
+        {
+            return false;
+        }
+
+        /* low quality chunks for the given camera */
+        const char* kLowQualityKey = "low";
+        qualityVal = JsonVal_getObjectValueByKey(cameraVal, kLowQualityKey);
+        if (!checkJsonObjValue(qualityVal, jsonArrayT, kLowQualityKey, jsonString))
+            return false;
+
+        if (!addChunks(qualityVal, 
+                outVfsPair->root, 
+                fsJoin(fsJoin(rootPath, "low_quality"), idVal->u.string),
+                jsonString))
         {
             return false;
         }
     }
 
-    FsStubNode_forEach(result.vfsPair->root, &fileSize, &setNodeSize);
-
-    JsonVal_destroy(&rootObj);
     return true;
-}
-   
 }

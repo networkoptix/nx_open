@@ -27,6 +27,8 @@ public:
 
     std::string scheme() const;
     std::string url() const;
+    std::string hostPath() const;
+    std::string host() const;
 
     ParamsMap params() const;
     bool valid() const;

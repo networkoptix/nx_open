@@ -15,20 +15,6 @@ enum ErrorCode
 
 const char* errorCodeToString(ErrorCode ecode);
 
-#define _TEST_STORAGE_DEBUG
-
-#if defined (_TEST_STORAGE_DEBUG)
-#   define LOG(fmtString, ...) do { \
-        char buf[1024]; \
-        sprintf(buf, "%s ", __FUNCTION__); \
-        sprintf(buf + strlen(buf), fmtString, __VA_ARGS__); \
-        fprintf(stderr, "%s\n", buf); \
-        fflush(stderr); \
-    } while (0)
-#else
-#   define LOG(...)
-#endif
-
 template <typename P>
 class PluginRefCounter
 {

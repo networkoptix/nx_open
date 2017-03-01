@@ -12,11 +12,31 @@ struct VfsPair
     FsStubNode* root;
 };
 
-using GetFileSizeFunc = std::function<int64_t(const char*)>;
+/**
+Json object should have the following structure:
+{
+    "sample": "/path/to/sample/file",
+    "cameras": [
+        {
+            "id": "someCameraId",
+            "hi": [
+                {
+                    "durationMs": "429626247",
+                    "startTimeMs": "1453550461075"
+                },
+                ... 
+            ],
+            "low": [
+                {
+                    "durationMs": "429626247",
+                    "startTimeMs": "1453550461075"
+                }, 
+                ...
+            ]
+        }
+    ]
+}
+*/
 
-bool buildVfsFromJson(
-    const char* jsonString, 
-    const char* rootPath,
-    GetFileSizeFunc getFileSizeFunc, 
-    VfsPair* outVfsPair);
+bool buildVfsFromJson(const char* jsonString, const char* rootPath, VfsPair* outVfsPair);
 }

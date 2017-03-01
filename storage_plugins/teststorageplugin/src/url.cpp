@@ -20,6 +20,26 @@ std::string Url::url() const
     return m_scheme + "://" + m_hostPath; 
 }
 
+std::string Url::hostPath() const
+{
+    return m_hostPath;
+}
+
+std::string Url::host() const
+{
+    auto pathBeginPos = m_hostPath.find('/');
+    if (pathBeginPos == std::string::npos)
+    {
+        auto paramsBeginPos = m_hostPath.find('?');
+        if (paramsBeginPos == std::string::npos)
+            return m_hostPath;
+        else
+            return m_hostPath.substr(0, paramsBeginPos);
+    }
+
+    return m_hostPath.substr(0, pathBeginPos);
+}
+
 ParamsMap Url::params() const 
 { 
     return m_params; 
