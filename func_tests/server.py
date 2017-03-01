@@ -17,9 +17,6 @@ from server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_S
 from camera import Camera, SampleMediaFile
 
 
-# currently expected in current directory:
-MEDIASERVER_DIST_FPATH = 'networkoptix-mediaserver.deb'
-
 MEDIASERVER_CONFIG_PATH = '/opt/networkoptix/mediaserver/etc/mediaserver.conf'
 MEDIASERVER_CONFIG_PATH_INITIAL = '/opt/networkoptix/mediaserver/etc/mediaserver.conf.initial'
 MEDIASERVER_LISTEN_PORT = 7001
@@ -86,7 +83,7 @@ class Service(object):
         return 'Service(%r @ %s)' % (self.service_name, self.box)
 
     def run_action(self, action):
-        return self.box.run_ssh_command([action, self.service_name])
+        return self.box.host.run_command([action, self.service_name])
 
     def get_status(self):
         output = self.run_action('status')
@@ -253,7 +250,7 @@ class Server(object):
         self.restart()
 
     def reset_config(self, **kw):
-        self.box.run_ssh_command(['cp', MEDIASERVER_CONFIG_PATH_INITIAL, MEDIASERVER_CONFIG_PATH])
+        self.box.host.run_command(['cp', MEDIASERVER_CONFIG_PATH_INITIAL, MEDIASERVER_CONFIG_PATH])
         self.change_config(removeDbOnStartup=1, **kw)
 
     def restart(self, timeout=30):
@@ -300,13 +297,13 @@ class Server(object):
             return False
 
     def change_config(self, **kw):
-        old_config = self.box.get_file(MEDIASERVER_CONFIG_PATH)
+        old_config = self.box.host.read_file(MEDIASERVER_CONFIG_PATH)
         new_config = change_mediaserver_config(old_config, **kw)
-        self.box.put_file(MEDIASERVER_CONFIG_PATH, new_config)
+        self.box.host.write_file(MEDIASERVER_CONFIG_PATH, new_config)
 
     def patch_binary_set_cloud_host(self, new_host):
         assert not self._is_started, 'Server %s must be stopped first for patching its binaries' % self
-        data = self.box.get_file(MEDIASERVER_CLOUDHOST_FPATH)
+        data = self.box.host.read_file(MEDIASERVER_CLOUDHOST_FPATH)
         idx = data.find(MEDIASERVER_CLOUDHOST_TAG)
         assert idx != -1, ('Cloud host tag %r is missing from mediaserver binary file %r'
                            % (MEDIASERVER_CLOUDHOST_TAG, MEDIASERVER_CLOUDHOST_FPATH))
@@ -323,7 +320,7 @@ class Server(object):
         assert len(padded_str) == MEDIASERVER_CLOUDHOST_SIZE
         new_data = data[:idx] + padded_str + data[idx + MEDIASERVER_CLOUDHOST_SIZE:]
         assert len(new_data) == len(data)
-        self.box.put_file(MEDIASERVER_CLOUDHOST_FPATH, new_data)
+        self.box.host.write_file(MEDIASERVER_CLOUDHOST_FPATH, new_data)
         self.set_user_password(REST_API_USER, REST_API_PASSWORD)  # Must be reset to default onces
 
     def set_system_settings(self, **kw):
@@ -466,7 +463,9 @@ class Storage(object):
         self.dir = dir
 
     def cleanup(self):
-        self.box.run_ssh_command(['rm', '-rf', os.path.join(self.dir, 'low_quality'), os.path.join(self.dir, 'hi_quality')])
+        self.box.host.run_command(['rm', '-rf',
+                                   os.path.join(self.dir, 'low_quality'),
+                                   os.path.join(self.dir, 'hi_quality')])
 
     def save_media_sample(self, camera, start_time, sample):
         assert isinstance(camera, Camera), repr(camera)
@@ -477,8 +476,8 @@ class Storage(object):
         contents = sample.get_contents()
         lowq_fpath = self._construct_fpath(camera_mac_addr, 'low_quality', start_time, sample.duration)
         hiq_fpath  = self._construct_fpath(camera_mac_addr, 'hi_quality',  start_time, sample.duration)
-        self.box.put_file(lowq_fpath, contents)
-        self.box.put_file(hiq_fpath,  contents)
+        self.box.host.write_file(lowq_fpath, contents)
+        self.box.host.write_file(hiq_fpath,  contents)
 
     # server stores media data in this format, using local time for directory parts:
     # <data dir>/<{hi_quality,low_quality}>/<camera-mac>/<year>/<month>/<day>/<hour>/<start,unix timestamp ms>_<duration,ms>.mkv

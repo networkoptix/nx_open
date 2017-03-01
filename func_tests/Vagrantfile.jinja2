@@ -36,10 +36,11 @@ Vagrant.configure("2") do |config|
     end
 
     {%- if box.ip_address %}
-
     box.ssh.host = "{{ box.ip_address }}"
-    box.ssh.port = 22
+    {%- endif %}
 
+    {%- if box.port %}
+    box.ssh.port = "{{ box.port }}"
     {%- endif %}
 
     box.vm.hostname = "{{ box.box_name() }}"

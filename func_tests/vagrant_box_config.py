@@ -5,6 +5,7 @@ import pytz
 DEFAULT_NATNET1 = '10.0.5/24'
 DEFAULT_HOSTNET = '10.0.6.0'
 BOX_PROVISION_MEDIASERVER = 'box-provision-mediaserver.sh'
+MEDIASERVER_DIST_FNAME = 'networkoptix-mediaserver.deb'  # expected in vagrant dir
 
 
 class ConfigCommand(object):
@@ -32,6 +33,9 @@ class VirtualBoxConfigCommand(ConfigCommand):
         if not isinstance(other, VirtualBoxConfigCommand):
             return false
         return self.args == other.args
+
+    def __repr__(self):
+        return str(self.args)
 
     def to_dict(self):
         return dict(
@@ -66,6 +70,9 @@ class VmConfigCommand(ConfigCommand):
                 self.args == other.args and
                 self.kwargs == other.kwargs)
 
+    def __repr__(self):
+        return '%s %s %s' % (self.function, self.args, self.kwargs)
+
     def to_dict(self):
         return dict(
             type=self.type(),
@@ -99,17 +106,20 @@ def make_vbox_netnat_command(net_idx, network):
     return VirtualBoxConfigCommand([':modifyvm', ':id', '"--natnet%d"' % net_idx, '"%s"' % network])
 
 # ip_address may end with .0 (like 1.2.3.0); this will be treated as network address, and dhcp will be used for it
-def box_config_factory(name=None, install_server=True, provision_scripts=None, ip_address_list=None):
+def box_config_factory(name=None, install_server=True, provision_scripts=None, ip_address_list=None, required_file_list=None):
     commands = []
-    if not provision_scripts:
-        provision_scripts = []
+    if not required_file_list:
+        required_file_list = []
     for ip_address in ip_address_list or [DEFAULT_HOSTNET]:
         commands += [make_vm_config_private_network_command(ip_address)]
     if install_server:
-        provision_scripts.append(BOX_PROVISION_MEDIASERVER)
-    for script in provision_scripts:
+        commands += [make_vm_provision_command(BOX_PROVISION_MEDIASERVER)]
+        required_file_list += ['{bin_dir}/' + MEDIASERVER_DIST_FNAME,
+                               '{test_dir}/' + BOX_PROVISION_MEDIASERVER]
+    for script in provision_scripts or []:
         commands += [make_vm_provision_command(script)]
-    return BoxConfig(None, name, provision_scripts, commands)
+        required_file_list.append('{test_dir}/' + script)
+    return BoxConfig(None, name, required_file_list, commands)
 
 
 class BoxConfig(object):
@@ -118,24 +128,25 @@ class BoxConfig(object):
     def from_dict(cls, d, vm_name_prefix):
         return cls(idx=d['idx'],
                    name=d['name'],
-                   provision_scripts=d['provision_scripts'],
+                   required_file_list=d['required_file_list'],
                    vagrant_config_commands=[ConfigCommand.from_dict(command) for command in d['vagrant_config_commands']],
                    vm_name_prefix=vm_name_prefix,
                    timezone=pytz.timezone(d['timezone']))
 
-    def __init__(self, idx, name, provision_scripts, vagrant_config_commands, vm_name_prefix=None, timezone=None):
+    def __init__(self, idx, name, required_file_list, vagrant_config_commands, vm_name_prefix=None, timezone=None):
         assert timezone is None or isinstance(timezone, datetime.tzinfo), repr(timezone)
         self.idx = idx
         self.name = name
-        self.provision_scripts = provision_scripts
+        self.required_file_list = required_file_list
         self.vagrant_config_commands = vagrant_config_commands
         self.vm_name_prefix = vm_name_prefix
-        self.ip_address = None  # str
+        self.ip_address = None
+        self.port = None
         self.timezone = timezone  # str
         self.is_allocated = False
 
     def __str__(self):
-        return '%s, %r, %r, %r' % (self.idx, self.name, self.provision_scripts, self.vagrant_config_commands)
+        return '%s, %r, %r, %r' % (self.idx, self.name, self.required_file_list, self.vagrant_config_commands)
 
     def __repr__(self):
         return 'BoxConfig(%s)' % self
@@ -143,12 +154,12 @@ class BoxConfig(object):
     def to_dict(self):
         return dict(idx=self.idx,
                     name=self.name,
-                    provision_scripts=self.provision_scripts,
+                    required_file_list=self.required_file_list,
                     vagrant_config_commands=[command.to_dict() for command in self.vagrant_config_commands],
                     timezone=str(self.timezone))
 
     def matches(self, box):
-        return (self.provision_scripts == box.provision_scripts and
+        return (self.required_file_list == box.required_file_list and
                 self.vagrant_config_commands == box.vagrant_config_commands)
 
     def box_name(self):

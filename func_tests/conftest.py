@@ -3,7 +3,9 @@ import os.path
 import logging
 import pytest
 from utils import SimpleNamespace
+from session import TestSession
 from test_utils import ServerFactory, EnvironmentBuilder
+from host import SshHostConfig
 from vagrant_box_config import box_config_factory
 from server_rest_api import CloudRestApi
 from camera import MEDIA_SAMPLE_FPATH, SampleMediaFile, Camera
@@ -17,6 +19,10 @@ CLOUD_USER_NAME = 'anikitin@networkoptix.com'
 CLOUD_USER_PASSWORD ='qweasd123'
 
 DEFAULT_VM_NAME_PREFIX = 'funtest-'
+
+DEFAULT_VM_HOST_USER = 'root'
+DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
+
 
 log = logging.getLogger(__name__)
 
@@ -32,15 +38,34 @@ def pytest_addoption(parser):
                      help='destroy and create again vagrant boxes')
     parser.addoption('--vm-name-prefix', default=DEFAULT_VM_NAME_PREFIX,
                      help='prefix for virtualenv machine names')
+    parser.addoption('--vm-host',
+                     help='hostname or IP address for host with virtualbox, used to start virtual machines (by default it is local host)')
+    parser.addoption('--vm-host-user', default=DEFAULT_VM_HOST_USER,
+                     help='User to use for ssh to login to virtualbox host')
+    parser.addoption('--vm-host-key',
+                     help='Identity file to use for ssh to login to virtualbox host')
+    parser.addoption('--vm-host-dir', default=DEFAULT_VM_HOST_DIR,
+                     help='Working directory at host with virtualbox, used to store vagrant files')
 
-@pytest.fixture
+
+@pytest.fixture(scope='session')
 def run_options(request):
+    vm_host = request.config.getoption('--vm-host')
+    if vm_host:
+        vm_ssh_host_config = SshHostConfig(
+            host=vm_host,
+            user=request.config.getoption('--vm-host-user'),
+            key_fpath=request.config.getoption('--vm-host-key'))
+    else:
+        vm_ssh_host_config = None
     return SimpleNamespace(
         work_dir=request.config.getoption('--work-dir'),
         bin_dir=request.config.getoption('--bin-dir'),
         reset_servers=not request.config.getoption('--no-servers-reset'),
         recreate_boxes=request.config.getoption('--recreate-boxes'),
         vm_name_prefix=request.config.getoption('--vm-name-prefix'),
+        vm_ssh_host_config=vm_ssh_host_config,
+        vm_host_work_dir=request.config.getoption('--vm-host-dir'),
         )
 
 
@@ -74,18 +99,14 @@ def sample_media_file(run_options):
     return SampleMediaFile(fpath)
 
 
-class TestSession(object):
-
-    def __init__(self):
-        self.boxes_recreated = False
-
-
 @pytest.fixture(scope='session')
-def test_session():
+def test_session(run_options):
     #format = '%(asctime)-15s %(threadName)s %(name)s %(levelname)s  %(message)s'
     format = '%(asctime)-15s %(levelname)-7s %(message)s'
     logging.basicConfig(level=logging.DEBUG, format=format)
-    return TestSession()
+    session = TestSession(run_options.recreate_boxes)
+    session.init(run_options)
+    return session
 
 
 @pytest.fixture

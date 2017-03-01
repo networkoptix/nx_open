@@ -4,12 +4,12 @@ import logging
 import shutil
 import subprocess
 from utils import SimpleNamespace
+from host import host_from_config
 from vagrant_box_config import box_config_factory, BoxConfig
 from vagrant_box import Vagrant
 from server_rest_api import REST_API_USER, REST_API_PASSWORD
 from server import (
     MEDIASERVER_LISTEN_PORT,
-    MEDIASERVER_DIST_FPATH,
     Server,
     )
 
@@ -53,12 +53,16 @@ class EnvironmentBuilder(object):
         self._reset_servers = options.reset_servers
         self._recreate_boxes = options.recreate_boxes
         self._vm_name_prefix = options.vm_name_prefix
+        self._vm_is_local_host = options.vm_ssh_host_config is None
+        self._vm_host = host_from_config(options.vm_ssh_host_config)
+        self._vm_host_work_dir = options.vm_host_work_dir
         self._cloud_host_rest_api = cloud_host_rest_api
         self._boxes_config = []
         self._last_box_idx = 0
 
     def _load_boxes_config_from_cache(self):
-        return [BoxConfig.from_dict(d, self._vm_name_prefix) for d in self._cache.get(self.vagrant_boxes_cache_key, [])]
+        return [BoxConfig.from_dict(d, self._vm_name_prefix)
+                for d in self._cache.get(self.vagrant_boxes_cache_key, [])]
 
     def _save_boxes_config_to_cache(self):
         self._cache.set(self.vagrant_boxes_cache_key, [config.to_dict() for config in self._boxes_config])
@@ -115,23 +119,23 @@ class EnvironmentBuilder(object):
             server_1.merge_systems(server_2)
 
     def build_environment(self, http_schema=DEFAULT_HTTP_SCHEMA, boxes=None, merge_servers=None,  **kw):
-        recreate_boxes = self._recreate_boxes and not self._test_session.boxes_recreated
         if not boxes:
             boxes = []
         log.info('WORK_DIR=%r', self._work_dir)
         self._boxes_config = self._load_boxes_config_from_cache()
 
-        vagrant_dir = os.path.join(self._work_dir, 'vagrant')
-        if not os.path.isdir(vagrant_dir):
-            os.makedirs(vagrant_dir)
         ssh_config_path = os.path.join(self._work_dir, 'ssh.config')
+        if self._vm_is_local_host:
+            vagrant_dir = os.path.join(self._work_dir, 'vagrant')
+        else:
+            vagrant_dir = os.path.join(self._vm_host_work_dir, 'vagrant')
 
-        vagrant = Vagrant(vagrant_dir, ssh_config_path)
-        if recreate_boxes:
+        vagrant = Vagrant(self._vm_host, self._bin_dir, vagrant_dir, self._test_session.vagrant_private_key_fpath, ssh_config_path)
+        if self._test_session.must_recreate_boxes():
             # to be able to destroy all old boxes we need old boxes config to create Vagrantfile with them
             vagrant.destroy_all_boxes(self._boxes_config)
             self._boxes_config = []  # now we can start afresh
-            self._test_session.boxes_recreated = True  # recreate only before first test
+            self._test_session.boxes_recreated()
         
         if self._boxes_config:
             self._last_box_idx = max(box.idx for box in self._boxes_config)
@@ -144,11 +148,6 @@ class EnvironmentBuilder(object):
                 if value.box not in boxes:
                     boxes.append(value.box)
         self._allocate_boxes(boxes)
-
-        dist_fpath = os.path.abspath(os.path.join(self._bin_dir, MEDIASERVER_DIST_FPATH))
-        assert os.path.isfile(dist_fpath), \
-          '%s is expected at %s' % (os.path.basename(dist_fpath), os.path.dirname(dist_fpath))
-        shutil.copy2(dist_fpath, vagrant_dir)  # distributive is expected at working directory
 
         vagrant.init(self._boxes_config)
         self._save_boxes_config_to_cache()
