@@ -73,6 +73,7 @@ void ApplauncherProcess::processRequest(
             break;
 
         case applauncher::api::TaskType::startApplication:
+            m_installationManager->updateInstalledVersionsInformation();
             *response = new applauncher::api::Response();
             startApplication(
                 std::static_pointer_cast<applauncher::api::StartApplicationTask>(request),
