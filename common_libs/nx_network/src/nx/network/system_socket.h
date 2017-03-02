@@ -132,7 +132,6 @@ public:
 
 protected:
     const int m_ipVersion;
-
 private:
     bool m_nonBlockingMode;
 };
@@ -197,6 +196,9 @@ protected:
 
     std::unique_ptr<aio::AsyncSocketImplHelper<SelfType>> m_aioHelper;
     bool m_connected;
+#ifdef WIN32
+    WSAEVENT m_eventObject;
+#endif
 };
 
 /**
@@ -329,7 +331,7 @@ public:
         const SocketAddress& foreignAddress,
         std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) override;
     /**
-     * Actually calls UDPSocket::recvFrom and makes datagram source address/port 
+     * Actually calls UDPSocket::recvFrom and makes datagram source address/port
      *   available through UDPSocket::lastDatagramSourceAddress.
      */
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
