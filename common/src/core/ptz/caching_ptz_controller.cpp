@@ -16,7 +16,7 @@ QnCachingPtzController::QnCachingPtzController(const QnPtzControllerPtr &baseCon
          * we don't know that. Should probably be fixed by adding a signal to
          * PTZ controller. */ // TODO: #Elric
 
-        QPointer<QnCachingPtzController> guard;
+        QPointer<QnCachingPtzController> guard(this);
 
         /**
          * Prevents calling "initialize" function on removed "this". Controller could be removed
