@@ -124,6 +124,8 @@ int nodeExists(struct FsStubNode* root, const char* url, int* ecode)
 
 }
 
+TestStorage::TestStorage(const utils::VfsPair& vfsPair) : m_vfsPair(vfsPair) {}
+
 int STORAGE_METHOD_CALL TestStorage::isAvailable() const
 {
     return true;
@@ -158,7 +160,7 @@ void STORAGE_METHOD_CALL TestStorage::removeFile(
     int*        ecode
 ) 
 {
-    removeNode(m_root, url, ecode);
+    removeNode(m_vfsPair.root, url, ecode);
 }
 
 void STORAGE_METHOD_CALL TestStorage::removeDir(
@@ -166,7 +168,7 @@ void STORAGE_METHOD_CALL TestStorage::removeDir(
     int*        ecode
 )
 {
-    removeNode(m_root, url, ecode);
+    removeNode(m_vfsPair.root, url, ecode);
 } 
 
 void STORAGE_METHOD_CALL TestStorage::renameFile(
@@ -175,7 +177,7 @@ void STORAGE_METHOD_CALL TestStorage::renameFile(
     int*            ecode
 ) 
 {
-    struct FsStubNode* nodeToRename = FsStubNode_find(m_root, oldUrl);
+    struct FsStubNode* nodeToRename = FsStubNode_find(m_vfsPair.root, oldUrl);
     if (nodeToRename == nullptr)
     {
         if (ecode)
@@ -208,7 +210,7 @@ int STORAGE_METHOD_CALL TestStorage::fileExists(
     int*            ecode
 ) const 
 {
-    return nodeExists(m_root, url, ecode);
+    return nodeExists(m_vfsPair.root, url, ecode);
 }
 
 int STORAGE_METHOD_CALL TestStorage::dirExists(
@@ -216,7 +218,7 @@ int STORAGE_METHOD_CALL TestStorage::dirExists(
     int*            ecode
 ) const 
 {
-    return nodeExists(m_root, url, ecode);
+    return nodeExists(m_vfsPair.root, url, ecode);
 }
 
 uint64_t STORAGE_METHOD_CALL TestStorage::fileSize(
@@ -224,7 +226,7 @@ uint64_t STORAGE_METHOD_CALL TestStorage::fileSize(
     int*            ecode
 ) const 
 {
-    struct FsStubNode* fsNode = FsStubNode_find(m_root, url);
+    struct FsStubNode* fsNode = FsStubNode_find(m_vfsPair.root, url);
     if (fsNode == nullptr)
     {
         if (ecode)

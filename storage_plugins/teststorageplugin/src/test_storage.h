@@ -2,6 +2,7 @@
 
 #include "third_party_storage.h"
 #include "common.h"
+#include "vfs.h"
 
 /*
 
@@ -67,6 +68,8 @@ class TestStorage :
     public PluginRefCounter<TestStorage>
 {
 public:
+    TestStorage(const utils::VfsPair& vfsPair);
+
     virtual int STORAGE_METHOD_CALL isAvailable() const override;
 
     virtual nx_spl::IODevice* STORAGE_METHOD_CALL open(
@@ -124,6 +127,5 @@ public: // plugin interface implementation
     virtual unsigned int releaseRef() override;
 
 private:
-    FsStubNode* m_root;
-    std::string m_sampleFilePath;
+    utils::VfsPair m_vfsPair;
 };
