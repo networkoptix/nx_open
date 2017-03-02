@@ -21,7 +21,6 @@ TEST(TcpSocketShutdownTest, DISABLED_main)
         char buffer[1024];
         int bytesRead = socket->recv(buffer, sizeof(buffer));
         std::cout << bytesRead;
-        int gg = bytesRead;
     }
     ));
     std::this_thread::sleep_for(std::chrono::milliseconds(50)); //< wait for socket enter to a read operation
