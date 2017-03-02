@@ -97,7 +97,7 @@ private:
     QVector<int> m_indexToChannel;
     QList<QnConstMediaContextPtr> m_contexts;
 
-    qint64 m_startTime;
+    qint64 m_startTimeUsec; //microseconds
     bool m_useAbsolutePos;
     qint64 m_duration;
 
