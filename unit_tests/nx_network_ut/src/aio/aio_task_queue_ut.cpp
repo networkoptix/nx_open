@@ -19,7 +19,7 @@ namespace {
 class ScopedIncrement
 {
 public:
-    ScopedIncrement(std::atomic<int>* counter):
+    ScopedIncrement(std::atomic<std::size_t>* counter):
         m_counter(counter)
     {
         ++(*m_counter);
@@ -48,10 +48,10 @@ public:
     }
 
 private:
-    std::atomic<int>* m_counter;
+    std::atomic<std::size_t>* m_counter;
 };
 
-static constexpr int kPollableCount = 7;
+static constexpr std::size_t kPollableCount = 7;
 
 } // namespace 
 
@@ -67,7 +67,7 @@ public:
 protected:
     void givenSeveralPollables()
     {
-        for (int i = 0; i < kPollableCount; ++i)
+        for (std::size_t i = 0; i < kPollableCount; ++i)
             m_pollables.emplace_back(std::make_unique<PollableContext>());
     }
 
@@ -109,7 +109,7 @@ protected:
                     pollableCtx->cancelledTasks.size());
 
                 pollableCtx->cancelledTasks.clear();
-                ASSERT_EQ(0, pollableCtx->postedCallCounter.load());
+                ASSERT_EQ(0U, pollableCtx->postedCallCounter.load());
             }
         }
     }
@@ -118,8 +118,8 @@ private:
     struct PollableContext
     {
         Pollable pollable;
-        std::atomic<int> postedCallCounter;
-        int expectedPostedCallCounter;
+        std::atomic<std::size_t> postedCallCounter;
+        std::size_t expectedPostedCallCounter;
         std::vector<SocketAddRemoveTask> cancelledTasks;
         bool isCancelled;
 
