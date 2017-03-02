@@ -211,7 +211,7 @@ public:
 
 enum class SystemHealth
 {
-    offline,
+    offline = 0,
     online
 };
 

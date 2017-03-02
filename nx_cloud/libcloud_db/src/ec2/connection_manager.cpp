@@ -326,15 +326,27 @@ void ConnectionManager::closeConnectionsToSystem(
     }
 }
 
+ConnectionManager::SystemStatusChangedSubscription&
+    ConnectionManager::systemStatusChangedSubscription()
+{
+    return m_systemStatusChangedSubscription;
+}
+
+const ConnectionManager::SystemStatusChangedSubscription&
+    ConnectionManager::systemStatusChangedSubscription() const
+{
+    return m_systemStatusChangedSubscription;
+}
+
 bool ConnectionManager::addNewConnection(ConnectionContext context)
 {
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     removeExistingConnection<
         kConnectionByFullPeerNameIndex,
-        decltype(context.fullPeerName)>(&lk, context.fullPeerName);
+        decltype(context.fullPeerName)>(&lock, context.fullPeerName);
 
-    if (!isOneMoreConnectionFromSystemAllowed(lk, context))
+    if (!isOneMoreConnectionFromSystemAllowed(lock, context))
         return false;
 
     context.connection->setOnConnectionClosed(
@@ -351,10 +363,20 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
         .str(context.connection->commonTransportHeaderOfRemoteTransaction()),
         cl_logDEBUG1);
 
+    const auto systemConnectionCountBak = getConnectionCountBySystemId(
+        lock, context.fullPeerName.systemId);
+
     if (!m_connections.insert(std::move(context)).second)
     {
         NX_ASSERT(false);
         return false;
+    }
+
+    if (systemConnectionCountBak == 0)
+    {
+        lock.unlock();
+        m_systemStatusChangedSubscription.notify(
+            context.fullPeerName.systemId.toStdString(), api::SystemHealth::online);
     }
 
     return true;
@@ -442,6 +464,10 @@ void ConnectionManager::removeConnectionByIter(
     //  in signal handler, so have to remove it delayed.
     // TODO: #ak have to ensure somehow that no events from
     //  connectionContext.connection are delivered.
+
+    // TODO: #ak send notification if needed. With no lock!
+    //m_systemStatusChangedSubscription.notify(
+    //    context.fullPeerName.systemId.toStdString(), api::SystemHealth::offline);
 
     existingConnectionPtr->post(
         [existingConnection = std::move(existingConnection),

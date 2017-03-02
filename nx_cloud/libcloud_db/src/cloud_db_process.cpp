@@ -160,7 +160,6 @@ int CloudDBProcess::exec()
         nx_http::MessageDispatcher httpMessageDispatcher;
         m_httpMessageDispatcher = &httpMessageDispatcher;
 
-        //creating data managers
         TemporaryAccountPasswordManager tempPasswordManager(
             settings,
             dbInstanceController.queryExecutor().get());
@@ -183,7 +182,8 @@ int CloudDBProcess::exec()
             dbInstanceController.queryExecutor().get());
 
         SystemHealthInfoProvider systemHealthInfoProvider(
-            ec2SyncronizationEngine.connectionManager());
+            &ec2SyncronizationEngine.connectionManager(),
+            dbInstanceController.queryExecutor().get());
 
         SystemManager systemManager(
             settings,

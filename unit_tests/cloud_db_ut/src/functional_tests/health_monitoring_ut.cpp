@@ -27,6 +27,13 @@ public:
     }
 
 protected:
+    void givenSystemWithSomeHistory()
+    {
+        establishConnectionFromMediaserverToCloud();
+        closeConnectionFromMediaserverToCloud();
+        assertHistoryIsCorrect();
+    }
+
     void establishConnectionFromMediaserverToCloud()
     {
         appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
@@ -44,6 +51,46 @@ protected:
     void whenCdbIsRestarted()
     {
         ASSERT_TRUE(cdb()->restart());
+    }
+
+    void whenSystemIsSharedWithSomeone()
+    {
+        const std::vector<api::SystemAccessRole> accessRolesToTest = {
+            api::SystemAccessRole::custom,
+            api::SystemAccessRole::liveViewer,
+            api::SystemAccessRole::viewer,
+            api::SystemAccessRole::advancedViewer,
+            api::SystemAccessRole::localAdmin,
+            api::SystemAccessRole::cloudAdmin,
+            api::SystemAccessRole::maintenance };
+
+        const auto accessRole = nx::utils::random::choice(accessRolesToTest);
+
+        cdb()->shareSystemEx(
+            ownerAccount(),
+            registeredSystemData(),
+            m_anotherUser,
+            accessRole);
+    }
+
+    void thenSomeoneDoesNotHaveAccessToTheHistory()
+    {
+        api::SystemHealthHistory history;
+        ASSERT_EQ(
+            api::ResultCode::forbidden,
+            cdb()->getSystemHealthHistory(
+                m_anotherUser.email, m_anotherUser.password,
+                registeredSystemData().id, &history));
+    }
+
+    void thenSystemCredentialsCannotBeUsedToAccessHistory()
+    {
+        api::SystemHealthHistory history;
+        ASSERT_EQ(
+            api::ResultCode::forbidden,
+            cdb()->getSystemHealthHistory(
+                registeredSystemData().id, registeredSystemData().authKey,
+                registeredSystemData().id, &history));
     }
 
     void assertSystemOnline()
@@ -74,12 +121,15 @@ protected:
 
 private:
     api::SystemHealthHistory m_expectedHealthHistory;
+    AccountWithPassword m_anotherUser;
 
     void init()
     {
         ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
         ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
         ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
+
+        m_anotherUser = cdb()->addActivatedAccount2();
     }
 
     void assertSystemStatusIs(api::SystemHealth status)
@@ -118,29 +168,40 @@ TEST_F(HealthMonitoring, system_status_is_correct)
     }
 }
 
-TEST_F(HealthMonitoring, history_is_saved)
+TEST_F(HealthMonitoring, history_is_persistent)
 {
     establishConnectionFromMediaserverToCloud();
     closeConnectionFromMediaserverToCloud();
 
     assertHistoryIsCorrect();
-}
-
-TEST_F(HealthMonitoring, history_is_persistent)
-{
-    establishConnectionFromMediaserverToCloud();
-    closeConnectionFromMediaserverToCloud();
 
     whenCdbIsRestarted();
 
     assertHistoryIsCorrect();
 }
 
-//TEST_F(HealthMonitoring, history_is_not_reported_for_unknown_id)
+TEST_F(HealthMonitoring, history_is_not_reported_for_unknown_id)
+{
+    api::SystemHealthHistory history;
+    ASSERT_NE(
+        api::ResultCode::ok,
+        cdb()->getSystemHealthHistory(
+            ownerAccount().email, ownerAccount().password,
+            QnUuid::createUuid().toStdString(), &history));
+}
 
-//TEST_F(HealthMonitoring, history_is_available_to_system_owner_only)
+TEST_F(HealthMonitoring, history_is_available_to_system_owner_only)
+{
+    givenSystemWithSomeHistory();
+    whenSystemIsSharedWithSomeone();
+    thenSomeoneDoesNotHaveAccessToTheHistory();
+}
 
-//TEST_F(HealthMonitoring, history_is_not_available_to_system_credentials)
+TEST_F(HealthMonitoring, history_is_not_available_to_system_credentials)
+{
+    givenSystemWithSomeHistory();
+    thenSystemCredentialsCannotBeUsedToAccessHistory();
+}
 
 } // namespace cdb
 } // namespace nx
