@@ -697,7 +697,23 @@ const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
         case CustomTag:     return "IENG"; //IENG
         }
     }
-    else {
+
+    // https://wiki.multimedia.cx/index.php/FFmpeg_Metadata
+    else if (formatName == QLatin1String("mov") || formatName == QLatin1String("mp4"))
+    {
+        switch (tag)
+        {
+            case StartTimeTag:  return "episode_id";
+            case LayoutInfoTag: return "show";
+            case SoftwareTag:   return "synopsis";
+            case SignatureTag:  return "copyright";
+            case DewarpingTag:  return "description";
+            case CustomTag:     return "comment";
+        }
+    }
+
+    else
+    {
         switch(tag)
         {
         case StartTimeTag:  return "start_time"; // StartTimecode
