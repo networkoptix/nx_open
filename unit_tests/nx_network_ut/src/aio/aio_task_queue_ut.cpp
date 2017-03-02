@@ -14,6 +14,8 @@ namespace aio {
 namespace detail {
 namespace test {
 
+namespace {
+
 class ScopedIncrement
 {
 public:
@@ -49,7 +51,9 @@ private:
     std::atomic<int>* m_counter;
 };
 
-static constexpr int pollableCount = 7;
+static constexpr int kPollableCount = 7;
+
+} // namespace 
 
 class AioTaskQueue:
     public ::testing::Test
@@ -63,7 +67,7 @@ public:
 protected:
     void givenSeveralPollables()
     {
-        for (int i = 0; i < pollableCount; ++i)
+        for (int i = 0; i < kPollableCount; ++i)
             m_pollables.emplace_back(std::make_unique<PollableContext>());
     }
 
