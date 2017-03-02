@@ -1,8 +1,3 @@
-/**********************************************************
-* 21 nov 2012
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <atomic>
@@ -18,7 +13,6 @@
 #include "unified_pollset.h"
 #include "../detail/socket_sequence.h"
 
-
 namespace nx {
 namespace network {
 namespace aio {
@@ -29,28 +23,29 @@ enum class TaskType
     tAdding,
     tChangingTimeout,
     tRemoving,
-    //!Call functor in aio thread
+    /** Call functor in aio thread. */
     tCallFunc,
-    //!Cancel \a tCallFunc tasks
+    /** Cancel tCallFunc tasks. */
     tCancelPostedCalls,
     tAll
 };
 
-//!Used as userdata in PollSet. One \a AIOEventHandlingData object corresponds to pair (\a socket, \a eventType)
-class AIOEventHandlingData
+/**
+ * Used as userdata in PollSet. One AioEventHandlingData object corresponds to pair (socket, eventType).
+ */
+class AioEventHandlingData
 {
 public:
     std::atomic<int> beingProcessed;
     std::atomic<int> markedForRemoval;
     AIOEventHandler<Pollable>* eventHandler;
-    //!0 means no timeout
+    /** 0 means no timeout. */
     unsigned int timeout;
     qint64 updatedPeriodicTaskClock;
-    /** clock when timer will be triggered. 0 - no clock */
+    /** Clock when timer will be triggered. 0 - no clock. */
     qint64 nextTimeoutClock;
 
-    AIOEventHandlingData(AIOEventHandler<Pollable>* _eventHandler)
-    :
+    AioEventHandlingData(AIOEventHandler<Pollable>* _eventHandler):
         beingProcessed(0),
         markedForRemoval(0),
         eventHandler(_eventHandler),
@@ -61,205 +56,214 @@ public:
     }
 };
 
-class AIOEventHandlingDataHolder
+class AioEventHandlingDataHolder
 {
 public:
-    //!Why the fuck do we need shared_ptr inside object instanciated on heap?
-    std::shared_ptr<AIOEventHandlingData> data;
+    // TODO: #ak This shared_ptr is probably not needed. Need to review usages.
+    std::shared_ptr<AioEventHandlingData> data;
 
-    AIOEventHandlingDataHolder(AIOEventHandler<Pollable>* _eventHandler)
-    :
-        data(new AIOEventHandlingData(_eventHandler))
+    AioEventHandlingDataHolder(AIOEventHandler<Pollable>* _eventHandler):
+        data(new AioEventHandlingData(_eventHandler))
     {
     }
 };
 
-class AIOThreadImpl
+/** TODO: #ak better to split this class to multiple ones containing only desired data. */
+class SocketAddRemoveTask
 {
 public:
-    //!TODO #ak better to split this class to multiple ones containing only desired data
-    class SocketAddRemoveTask
-    {
-    public:
-        TaskType type;
-        Pollable* socket;
-        //!Socket number that is still unique after socket has been destroyed
-        SocketSequenceType socketSequence;
-        aio::EventType eventType;
-        AIOEventHandler<Pollable>* eventHandler;
-        //!0 means no timeout
-        unsigned int timeout;
-        std::atomic<int>* taskCompletionEvent;
-        nx::utils::MoveOnlyFunc<void()> postHandler;
-        nx::utils::MoveOnlyFunc<void()> taskCompletionHandler;
+    TaskType type;
+    Pollable* socket;
+    /** Socket number that is still unique after socket has been destroyed. */
+    SocketSequenceType socketSequence;
+    aio::EventType eventType;
+    AIOEventHandler<Pollable>* eventHandler;
+    /** 0 means no timeout. */
+    unsigned int timeout;
+    std::atomic<int>* taskCompletionEvent;
+    nx::utils::MoveOnlyFunc<void()> postHandler;
+    nx::utils::MoveOnlyFunc<void()> taskCompletionHandler;
 
-        /*!
-            \param taskCompletionEvent if not NULL, set to 1 after processing task
-        */
+    /**
+    * @param taskCompletionEvent if not NULL, set to 1 after processing task.
+    */
+    SocketAddRemoveTask(
+        TaskType _type,
+        Pollable* const _socket,
+        aio::EventType _eventType,
+        AIOEventHandler<Pollable>* const _eventHandler,
+        unsigned int _timeout = 0,
+        std::atomic<int>* const _taskCompletionEvent = nullptr,
+        nx::utils::MoveOnlyFunc<void()> _taskCompletionHandler = nx::utils::MoveOnlyFunc<void()>())
+        :
+        type(_type),
+        socket(_socket),
+        socketSequence(_socket ? _socket->impl()->socketSequence : 0),
+        eventType(_eventType),
+        eventHandler(_eventHandler),
+        timeout(_timeout),
+        taskCompletionEvent(_taskCompletionEvent),
+        taskCompletionHandler(std::move(_taskCompletionHandler))
+    {
+    }
+
+    SocketAddRemoveTask(SocketAddRemoveTask&&) = default;
+    SocketAddRemoveTask& operator=(SocketAddRemoveTask&&) = default;
+};
+
+class PostAsyncCallTask:
+    public SocketAddRemoveTask
+{
+public:
+    PostAsyncCallTask(
+        Pollable* const _socket,
+        nx::utils::MoveOnlyFunc<void()> _postHandler)
+        :
         SocketAddRemoveTask(
-            TaskType _type,
-            Pollable* const _socket,
-            aio::EventType _eventType,
-            AIOEventHandler<Pollable>* const _eventHandler,
-            unsigned int _timeout = 0,
-            std::atomic<int>* const _taskCompletionEvent = nullptr,
-            nx::utils::MoveOnlyFunc<void()> _taskCompletionHandler = nx::utils::MoveOnlyFunc<void()>())
-        :
-            type(_type),
-            socket(_socket),
-            socketSequence(_socket ? _socket->impl()->socketSequence : 0),
-            eventType(_eventType),
-            eventHandler(_eventHandler),
-            timeout(_timeout),
-            taskCompletionEvent(_taskCompletionEvent),
-            taskCompletionHandler(std::move(_taskCompletionHandler))
-        {
-        }
-    };
-
-    class PostAsyncCallTask
-    :
-        public SocketAddRemoveTask
+            TaskType::tCallFunc,
+            _socket,
+            aio::etNone,
+            nullptr,
+            0,
+            nullptr)
     {
-    public:
-        PostAsyncCallTask(
-            Pollable* const _socket,
-            nx::utils::MoveOnlyFunc<void()> _postHandler)
-        :
-            SocketAddRemoveTask(
-                TaskType::tCallFunc,
-                _socket,
-                aio::etNone,
-                nullptr,
-                0,
-                nullptr)
-        {
-            this->postHandler = std::move(_postHandler);
-            if (_socket)
-                this->socketSequence = _socket->impl()->socketSequence;
-        }
-    };
+        this->postHandler = std::move(_postHandler);
+        if (_socket)
+            this->socketSequence = _socket->impl()->socketSequence;
+    }
+};
 
-    class CancelPostedCallsTask
-    :
-        public SocketAddRemoveTask
+class CancelPostedCallsTask:
+    public SocketAddRemoveTask
+{
+public:
+    CancelPostedCallsTask(
+        SocketSequenceType socketSequence,
+        std::atomic<int>* const _taskCompletionEvent = nullptr)
+        :
+        SocketAddRemoveTask(
+            TaskType::tCancelPostedCalls,
+            nullptr,
+            aio::etNone,
+            nullptr,
+            0,
+            _taskCompletionEvent)
     {
-    public:
-        CancelPostedCallsTask(
-            SocketSequenceType socketSequence,
-            std::atomic<int>* const _taskCompletionEvent = nullptr)
-        :
-            SocketAddRemoveTask(
-                TaskType::tCancelPostedCalls,
-                nullptr,
-                aio::etNone,
-                nullptr,
-                0,
-                _taskCompletionEvent)
-        {
-            this->socketSequence = socketSequence;
-        }
-    };
+        this->socketSequence = socketSequence;
+    }
+};
 
-    class PeriodicTaskData
+class PeriodicTaskData
+{
+public:
+    std::shared_ptr<AioEventHandlingData> data;
+    Pollable* socket;
+    aio::EventType eventType;
+
+    PeriodicTaskData():
+        socket(NULL),
+        eventType(aio::etNone)
     {
-    public:
-        std::shared_ptr<AIOEventHandlingData> data;
-        Pollable* socket;
-        aio::EventType eventType;
+    }
 
-        PeriodicTaskData()
+    PeriodicTaskData(
+        const std::shared_ptr<AioEventHandlingData>& _data,
+        Pollable* _socket,
+        aio::EventType _eventType)
         :
-            socket(NULL),
-            eventType(aio::etNone)
-        {
-        }
+        data(_data),
+        socket(_socket),
+        eventType(_eventType)
+    {
+    }
+};
 
-        PeriodicTaskData(
-            const std::shared_ptr<AIOEventHandlingData>& _data,
-            Pollable* _socket,
-            aio::EventType _eventType)
-        :
-            data(_data),
-            socket(_socket),
-            eventType(_eventType)
-        {
-        }
-    };
-
-    //typedef typename socket_to_pollset_static_map::get<Pollable>::value UnifiedPollSet;
-
-    //TODO #ak too many mutexes here. Refactoring required
+class AioThreadImpl
+{
+public:
+    // TODO: #ak too many mutexes here. Refactoring required
 
     std::unique_ptr<AbstractPollSet> pollSet;
-    std::deque<SocketAddRemoveTask> pollSetModificationQueue;
     unsigned int newReadMonitorTaskCount;
     unsigned int newWriteMonitorTaskCount;
-    /** used to make public API thread-safe (to serialize access to internal structures) */
+    /** Used to make AIOThread public API thread-safe (to serialize access to internal structures). */
     mutable QnMutex mutex;
     mutable QnMutex socketEventProcessingMutex;
-    //TODO #ak get rid of map here to avoid undesired allocations
+    // TODO" #ak get rid of map here to avoid undesired allocations
     std::multimap<qint64, PeriodicTaskData> periodicTasksByClock;
-    //TODO #ak use cyclic array here to minimize allocations
-    /*!
-        \note This variable is accessed within aio thread only
-    */
-    std::deque<SocketAddRemoveTask> postedCalls;
     std::atomic<int> processingPostedCalls;
 
-    AIOThreadImpl(std::unique_ptr<AbstractPollSet> pollSet);
+    AioThreadImpl(std::unique_ptr<AbstractPollSet> pollSet);
 
-    //!used as clock for periodic events. Function introduced since implementation can be changed
+    /**
+     * Used as a clock for periodic events. Function introduced since implementation can be changed.
+     */
     qint64 getSystemTimerVal() const;
+
+    void addSocketTask(SocketAddRemoveTask task);
     void processPollSetModificationQueue(TaskType taskFilter);
-    void addSockToPollset(
-        Pollable* socket,
-        aio::EventType eventType,
-        int timeout,
-        AIOEventHandler<Pollable>* eventHandler);
     void removeSocketFromPollSet(Pollable* sock, aio::EventType eventType);
-    void removeSocketsFromPollSet();
-    /*!
-        This method introduced for optimization: if we fast call watchSocket then removeSocket (socket has not been added to pollset yet),
-        than removeSocket can just cancel watchSocket task. And vice versa
-        \return \a true if reverse task has been cancelled and socket is already in desired state, no futher processing is needed
-    */
+    void processScheduledRemoveSocketTasks();
+    /**
+     * This method introduced for optimization: if we fast call watchSocket then removeSocket 
+     * (socket has not been added to pollset yet), then removeSocket can just cancel 
+     * "add socket to pollset" task. And vice versa.
+     * @return true if reverse task has been cancelled and socket 
+     *   is already in desired state, no futher processing is needed.
+     */
     bool removeReverseTask(
         Pollable* const sock,
         aio::EventType eventType,
         TaskType taskType,
         AIOEventHandler<Pollable>* const eventHandler,
         unsigned int newTimeoutMS);
-    //!Processes events from \a pollSet
+    /** Processes events from pollSet. */
     void processSocketEvents(const qint64 curClock);
-    /*!
-        \return \a true, if at least one task has been processed
-    */
+    /**
+     * @return true, if at least one task has been processed.
+     */
     bool processPeriodicTasks(const qint64 curClock);
     void processPostedCalls();
-    void addPeriodicTask(
-        const qint64 taskClock,
-        const std::shared_ptr<AIOEventHandlingData>& handlingData,
-        Pollable* _socket,
-        aio::EventType eventType);
-    void addPeriodicTaskNonSafe(
-        const qint64 taskClock,
-        const std::shared_ptr<AIOEventHandlingData>& handlingData,
-        Pollable* _socket,
-        aio::EventType eventType);
-    /** Moves elements to remove to a temporary container and returns it.
-        Elements may contain functor which may contain aio objects (sockets) which will be remove
-        when removing functor. This may lead to a dead lock if we not release \a lock
+    /**
+     * Moves elements to remove to a temporary container and returns it.
+     * Elements may contain functor which may contain aio objects (sockets) which will be removed
+     * when removing functor. This may lead to a dead lock if we not release lock.
      */
-    std::vector<SocketAddRemoveTask> cancelPostedCallsInternal(
-        QnMutexLockerBase* const /*lock*/,
+    std::vector<SocketAddRemoveTask> cancelPostedCalls(
+        const QnMutexLockerBase& /*lock*/,
         SocketSequenceType socketSequence);
+
+    std::size_t postedCallCount() const;
 
 private:
     QElapsedTimer m_monotonicClock;
+    // TODO #ak: use cyclic array here to minimize allocations
+    /**
+     * @note This variable can be accessed within aio thread only.
+     */
+    std::deque<SocketAddRemoveTask> m_postedCalls;
+    std::deque<SocketAddRemoveTask> m_pollSetModificationQueue;
+
+    void addSockToPollset(
+        Pollable* socket,
+        aio::EventType eventType,
+        int timeout,
+        AIOEventHandler<Pollable>* eventHandler);
+
+    void addPeriodicTask(
+        const qint64 taskClock,
+        const std::shared_ptr<AioEventHandlingData>& handlingData,
+        Pollable* _socket,
+        aio::EventType eventType);
+
+    void addPeriodicTaskNonSafe(
+        const qint64 taskClock,
+        const std::shared_ptr<AioEventHandlingData>& handlingData,
+        Pollable* _socket,
+        aio::EventType eventType);
 };
 
-}   //detail
-}   //aio
-}   //network
-}   //nx
+} // namespace detail
+} // namespace aio
+} // namespace network
+} // namespace nx

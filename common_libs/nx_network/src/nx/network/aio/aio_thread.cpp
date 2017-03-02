@@ -22,7 +22,7 @@ namespace aio {
 
 AIOThread::AIOThread(std::unique_ptr<AbstractPollSet> pollSet):
     QnLongRunnable(false),
-    m_impl(new detail::AIOThreadImpl(std::move(pollSet)))
+    m_impl(new detail::AioThreadImpl(std::move(pollSet)))
 {
     setObjectName(QString::fromLatin1("AIOThread"));
 }
@@ -55,7 +55,7 @@ void AIOThread::watchSocket(
     if (m_impl->removeReverseTask(sock, eventToWatch, detail::TaskType::tAdding, eventHandler, timeoutMs.count()))
         return;    //ignoring task
 
-    m_impl->pollSetModificationQueue.push_back(typename detail::AIOThreadImpl::SocketAddRemoveTask(
+    m_impl->addSocketTask(detail::SocketAddRemoveTask(
         detail::TaskType::tAdding,
         sock,
         eventToWatch,
@@ -79,20 +79,8 @@ void AIOThread::changeSocketTimeout(
     std::function<void()> socketAddedToPollHandler)
 {
     QnMutexLocker lk(&m_impl->mutex);
-    //TODO #ak looks like copy-paste of previous method. Remove copy-paste nahuy!!!
 
-    //removing other timeouts from queue
-    //m_impl->removeReverseTask(
-    //    sock, aio::etTimedOut, detail::TaskType::tRemoving, nullptr, 0);
-
-    //if socket is marked for removal, not adding task 
-    //TODO #ak is it needed?
-    //void* userData = sock->impl()->eventTypeToUserData[eventToWatch];
-    //NX_ASSERT(userData != nullptr);  //socket is not polled, but someone wants to change timeout
-    //if (static_cast<AIOEventHandlingDataHolder*>(userData)->data->markedForRemoval.load(std::memory_order_relaxed) > 0)
-    //    return;   //socket marked for removal, ignoring timeout change (like, cancelling it right now)
-
-    m_impl->pollSetModificationQueue.push_back(typename detail::AIOThreadImpl::SocketAddRemoveTask(
+    m_impl->addSocketTask(detail::SocketAddRemoveTask(
         detail::TaskType::tChangingTimeout,
         sock,
         eventToWatch,
@@ -100,7 +88,8 @@ void AIOThread::changeSocketTimeout(
         timeoutMs.count(),
         nullptr,
         std::move(socketAddedToPollHandler)));
-    if (currentThreadSystemId() != systemThreadId())  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
+    // If eventTriggered call is down the stack, socket will be added to pollset before next poll call.
+    if (currentThreadSystemId() != systemThreadId())
         m_impl->pollSet->interrupt();
 }
 
@@ -118,7 +107,7 @@ void AIOThread::removeFromWatch(
 
     void*& userData = sock->impl()->eventTypeToUserData[eventType];
     NX_ASSERT(userData != NULL);   //socket is not polled. NX_ASSERT?
-    std::shared_ptr<detail::AIOEventHandlingData> handlingData = static_cast<detail::AIOEventHandlingDataHolder*>(userData)->data;
+    std::shared_ptr<detail::AioEventHandlingData> handlingData = static_cast<detail::AioEventHandlingDataHolder*>(userData)->data;
     if (handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0)
         return;   //socket already marked for removal
     ++handlingData->markedForRemoval;
@@ -139,7 +128,7 @@ void AIOThread::removeFromWatch(
     {
         std::atomic<int> taskCompletedCondition(0);
         //we MUST remove socket from pollset before returning from here
-        m_impl->pollSetModificationQueue.push_back(typename detail::AIOThreadImpl::SocketAddRemoveTask(
+        m_impl->addSocketTask(detail::SocketAddRemoveTask(
             detail::TaskType::tRemoving,
             sock,
             eventType,
@@ -172,7 +161,7 @@ void AIOThread::removeFromWatch(
     }
     else
     {
-        m_impl->pollSetModificationQueue.push_back(typename detail::AIOThreadImpl::SocketAddRemoveTask(
+        m_impl->addSocketTask(detail::SocketAddRemoveTask(
             detail::TaskType::tRemoving,
             sock,
             eventType,
@@ -188,8 +177,8 @@ void AIOThread::post( Pollable* const sock, nx::utils::MoveOnlyFunc<void()> func
 {
     QnMutexLocker lk(&m_impl->mutex);
 
-    m_impl->pollSetModificationQueue.push_back(
-        typename detail::AIOThreadImpl::PostAsyncCallTask(
+    m_impl->addSocketTask(
+        detail::PostAsyncCallTask(
             sock,
             std::move(functor)));
     //if eventTriggered is lower on stack, socket will be added to pollset before the next poll call
@@ -216,8 +205,8 @@ void AIOThread::cancelPostedCalls( Pollable* const sock, bool waitForRunningHand
     if (inAIOThread)
     {
         //removing postedCall tasks and posted calls
-        auto postedCallsToRemove = m_impl->cancelPostedCallsInternal(
-            &lk,
+        auto postedCallsToRemove = m_impl->cancelPostedCalls(
+            lk,
             sock->impl()->socketSequence);
         lk.unlock();
         //removing postedCallsToRemove with mutex unlocked since there can be indirect calls to this
@@ -227,8 +216,8 @@ void AIOThread::cancelPostedCalls( Pollable* const sock, bool waitForRunningHand
     if (waitForRunningHandlerCompletion)
     {
         //posting cancellation task
-        m_impl->pollSetModificationQueue.push_back(
-            typename detail::AIOThreadImpl::CancelPostedCallsTask(
+        m_impl->addSocketTask(
+            detail::CancelPostedCallsTask(
                 sock->impl()->socketSequence,   //not passing socket here since it is allowed to be removed
                                                 //before posted call is actually cancelled
                 nullptr));
@@ -251,8 +240,9 @@ void AIOThread::cancelPostedCalls( Pollable* const sock, bool waitForRunningHand
     }
     else
     {
-        m_impl->pollSetModificationQueue.push_back(
-            typename detail::AIOThreadImpl::CancelPostedCallsTask(sock->impl()->socketSequence));
+        m_impl->addSocketTask(
+            detail::CancelPostedCallsTask(
+                sock->impl()->socketSequence));
         m_impl->pollSet->interrupt();
     }
 }
@@ -299,7 +289,7 @@ void AIOThread::run()
             : (nextPeriodicEventClock < curClock ? 0 : nextPeriodicEventClock - curClock);
 
         //if there are posted calls, just checking sockets state in non-blocking mode
-        const int pollTimeout = m_impl->postedCalls.empty() ? millisToTheNextPeriodicEvent : 0;
+        const int pollTimeout = (m_impl->postedCallCount() == 0) ? millisToTheNextPeriodicEvent : 0;
         const int triggeredSocketCount = m_impl->pollSet->poll(pollTimeout);
 
         if (needToStop())
@@ -323,7 +313,7 @@ void AIOThread::run()
             }
         }
 
-        m_impl->removeSocketsFromPollSet();
+        m_impl->processScheduledRemoveSocketTasks();
 
         if (m_impl->processPeriodicTasks(curClock))
             continue;   //periodic task handler is allowed to delete socket what can cause undefined behavour while iterating pollset
