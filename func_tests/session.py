@@ -31,7 +31,7 @@ class TestSession(object):
     def must_recreate_boxes(self):
         return self._must_recreate_boxes and not self._boxes_recreated
 
-    def boxes_recreated(self):
+    def set_boxes_recreated_flag(self):
         self._boxes_recreated = True
 
 

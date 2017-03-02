@@ -141,7 +141,7 @@ class EnvironmentBuilder(object):
             # to be able to destroy all old boxes we need old boxes config to create Vagrantfile with them
             vagrant.destroy_all_boxes(self._boxes_config)
             self._boxes_config = []  # now we can start afresh
-            self._test_session.boxes_recreated()
+            self._test_session.set_boxes_recreated_flag()
         
         if self._boxes_config:
             self._last_box_idx = max(box.idx for box in self._boxes_config)

@@ -3,7 +3,6 @@ import os.path
 import logging
 import re
 import time
-import subprocess
 import shutil
 import pytz
 import jinja2
@@ -31,8 +30,8 @@ def log_output(name, output):
 
 class RemotableVagrant(vagrant.Vagrant):
 
-    def __init__(self, host, root=None, quiet_stdout=True, quiet_stderr=True, env=None):
-        vagrant.Vagrant.__init__(self, root, quiet_stdout, quiet_stderr, env)
+    def __init__(self, host, root=None, quiet_stdout=True, quiet_stderr=True):
+        vagrant.Vagrant.__init__(self, root, quiet_stdout, quiet_stderr)
         self._host = host
 
     def _call_vagrant_command(self, args):
@@ -41,7 +40,7 @@ class RemotableVagrant(vagrant.Vagrant):
     def _run_vagrant_command(self, args):
         cmd = ['vagrant'] + [arg for arg in args if arg is not None]
         return vagrant.compat.decode(
-            self._host.run_command(cmd, cwd=self.root, env=self.env))
+            self._host.run_command(cmd, cwd=self.root))
 
 
 class Vagrant(object):
@@ -53,8 +52,7 @@ class Vagrant(object):
         self._vagrant_private_key_path = vagrant_private_key_path  # may be None
         self._ssh_config_path = ssh_config_path
         self._vagrant = RemotableVagrant(
-            self._vm_host, root=self._vagrant_dir, quiet_stdout=False, quiet_stderr=False,
-            env=dict(os.environ, VAGRANT_NO_COLOR=''))
+            self._vm_host, root=self._vagrant_dir, quiet_stdout=False, quiet_stderr=False)
         self.boxes = {}  # box name -> VagrantBox
 
     def destroy_all_boxes(self, boxes_config):
