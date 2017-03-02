@@ -3,9 +3,9 @@
 struct QnSpeedRange
 {
     qreal forward; //< maximum forward speed (>= 0)
-    qreal reverse; //< maximum reverse speed (>= 0)
+    qreal backward; //< maximum backward speed (>= 0)
 
-    QnSpeedRange(qreal forward = 0.0, qreal reverse = 0.0);
+    QnSpeedRange(qreal forward = 0.0, qreal backward = 0.0);
 
     bool fuzzyEquals(const QnSpeedRange& other) const;
 
@@ -14,4 +14,7 @@ struct QnSpeedRange
 
     QnSpeedRange limitedBy(QnSpeedRange& other) const;
     QnSpeedRange& limitBy(QnSpeedRange& other);
+
+    /* Binds signed speed to [-backward, forward] range. */
+    qreal boundSpeed(qreal speed) const;
 };

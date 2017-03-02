@@ -85,24 +85,26 @@ QnCameraPool::~QnCameraPool()
     delete m_discoveryListener;
 }
 
-void QnCameraPool::addCameras(int count, QStringList primaryFileList, QStringList secondaryFileList, int offlineFreq)
+void QnCameraPool::addCameras(bool cameraForEachFile, int count, QStringList primaryFileList, QStringList secondaryFileList, int offlineFreq)
 {
     qDebug() << "Add" << count << "cameras from primary file(s)" << primaryFileList << " secondary file(s)" << secondaryFileList << "offlineFreq=" << offlineFreq;
     QMutexLocker lock(&m_mutex);
-    for (int i = 0; i < count; ++i)
+    if (!cameraForEachFile)
     {
-        QnTestCamera* camera = new QnTestCamera(++m_cameraNum);
-        camera->setPrimaryFileList(primaryFileList);
-        camera->setSecondaryFileList(secondaryFileList);
-        camera->setOfflineFreq(offlineFreq);
-        foreach(QString fileName, primaryFileList)
-            QnFileCache::instance()->getMediaData(fileName);
-        foreach(QString fileName, secondaryFileList)
-            QnFileCache::instance()->getMediaData(fileName);
-        m_cameras.insert(camera->getMac(), camera);
+        for (int i = 0; i < count; ++i)
+        {
+            QnTestCamera* camera = new QnTestCamera(++m_cameraNum);
+            camera->setPrimaryFileList(primaryFileList);
+            camera->setSecondaryFileList(secondaryFileList);
+            camera->setOfflineFreq(offlineFreq);
+            foreach(QString fileName, primaryFileList)
+                QnFileCache::instance()->getMediaData(fileName);
+            foreach(QString fileName, secondaryFileList)
+                QnFileCache::instance()->getMediaData(fileName);
+            m_cameras.insert(camera->getMac(), camera);
+        }
     }
-        
-    if (count < 0) 
+    else 
     { // Special case - we run one camera for each source
         for (int i = 0; i < primaryFileList.length(); i++) 
         {

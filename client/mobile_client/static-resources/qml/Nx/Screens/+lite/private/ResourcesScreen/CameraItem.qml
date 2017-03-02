@@ -226,6 +226,12 @@ Control
                                 parent.height)
                         }
                     }
+
+                    Connections
+                    {
+                        target: cameraItem
+                        onResourceIdChanged: videoOutput.clear()
+                    }
                 }
             }
 

@@ -153,6 +153,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
             timelinePlaceholder->setVisible(!isRelevant);
             m_separators->setFrameColor(palette().color(isRelevant ? QPalette::Shadow : QPalette::Midlight));
             m_separators->setFrameWidth(isRelevant ? 2.0 : 1.0);
+            updatePlaybackButtonsEnabled();
             if (reset)
                 m_timeSlider->invalidateWindow();
         });
@@ -338,9 +339,8 @@ QnNavigationItem::~QnNavigationItem()
 // -------------------------------------------------------------------------- //
 void QnNavigationItem::updateSpeedSliderParametersFromNavigator()
 {
-    const auto range = navigator()->speedRange();
-    qreal minimalSpeed = -range.reverse;
-    qreal maximalSpeed = range.forward;
+    qreal minimalSpeed = navigator()->minimalSpeed();
+    qreal maximalSpeed = navigator()->maximalSpeed();
 
     qreal speedStep, defaultSpeed;
     if (m_playButton->isChecked())
@@ -486,7 +486,7 @@ void QnNavigationItem::updatePlaybackButtonsEnabled()
      * client will be in strange state: speed slider allows only 0x and 1x, but current speed is -16x.
      * So we making the slider enabled for I/O module to do not make the situation even stranger.
      */
-    m_speedSlider->setEnabled(playable);
+    m_speedSlider->setEnabled(playable && m_timeSlider->isVisible());
 }
 
 void QnNavigationItem::updateVolumeButtonsEnabled()

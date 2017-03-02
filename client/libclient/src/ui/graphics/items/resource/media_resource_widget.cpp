@@ -98,7 +98,7 @@ static constexpr qreal kTwoWayAudioButtonSize = 44.0;
 static constexpr qreal kMotionRegionAlpha = 0.4;
 
 static constexpr qreal kMaxForwardSpeed = 16.0;
-static constexpr qreal kMaxReverseSpeed = 16.0;
+static constexpr qreal kMaxBackwardSpeed = 16.0;
 
 
 bool isSpecialDateTimeValueUsec(qint64 dateTimeUsec)
@@ -2162,15 +2162,15 @@ QnSpeedRange QnMediaResourceWidget::speedRange() const
     if (!hasVideo())
         return QnSpeedRange(kUnitSpeed, kZeroSpeed);
 
-    const qreal reverse = m_display->archiveReader()->isNegativeSpeedSupported()
-        ? maximumSpeedRange().reverse
+    const qreal backward = m_display->archiveReader()->isNegativeSpeedSupported()
+        ? availableSpeedRange().backward
         : kZeroSpeed;
 
-    return QnSpeedRange(maximumSpeedRange().forward, reverse);
+    return QnSpeedRange(availableSpeedRange().forward, backward);
 }
 
-const QnSpeedRange& QnMediaResourceWidget::maximumSpeedRange()
+const QnSpeedRange& QnMediaResourceWidget::availableSpeedRange()
 {
-    static const QnSpeedRange kMaximumSpeedRange(kMaxForwardSpeed, kMaxReverseSpeed);
-    return kMaximumSpeedRange;
+    static const QnSpeedRange kAvailableSpeedRange(kMaxForwardSpeed, kMaxBackwardSpeed);
+    return kAvailableSpeedRange;
 }

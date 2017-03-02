@@ -17,7 +17,7 @@ namespace aio {
 
 namespace detail {
 
-class AIOThreadImpl;
+class AioTaskQueue;
 
 } // namespace detail
 
@@ -103,7 +103,7 @@ protected:
     virtual void run();
 
 private:
-    detail::AIOThreadImpl* m_impl;
+    detail::AioTaskQueue* m_impl;
 };
 
 } // namespace aio
