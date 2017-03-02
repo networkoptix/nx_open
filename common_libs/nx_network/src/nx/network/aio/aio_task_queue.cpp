@@ -1,6 +1,7 @@
 #include "aio_task_queue.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/algorithm.h>
 
 #include "pollset_factory.h"
 
@@ -457,40 +458,30 @@ std::vector<SocketAddRemoveTask> AioTaskQueue::cancelPostedCalls(
     const QnMutexLockerBase& /*lock*/,
     SocketSequenceType socketSequence)
 {
+    std::vector<SocketAddRemoveTask> elementsToRemove;
+
     //detecting range of elements to remove
-    const auto tasksToRemoveRangeStart = std::remove_if(
+    const auto tasksToRemoveRangeStart = nx::utils::move_if(
         m_pollSetModificationQueue.begin(),
         m_pollSetModificationQueue.end(),
+        std::back_inserter(elementsToRemove),
         [socketSequence](const SocketAddRemoveTask& val)
         {
             return val.type == TaskType::tCallFunc
                 && val.socketSequence == socketSequence;
         });
+    m_pollSetModificationQueue.erase(
+        tasksToRemoveRangeStart,
+        m_pollSetModificationQueue.end());
 
-    const auto postedCallsRemoveRangeStart = std::remove_if(
+    const auto postedCallsRemoveRangeStart = nx::utils::move_if(
         m_postedCalls.begin(),
         m_postedCalls.end(),
+        std::back_inserter(elementsToRemove),
         [socketSequence](const SocketAddRemoveTask& val)
         {
             return val.socketSequence == socketSequence;
         });
-
-    //moving elements to remove to local container
-    std::vector<SocketAddRemoveTask> elementsToRemove;
-    elementsToRemove.reserve(
-        std::distance(tasksToRemoveRangeStart, m_pollSetModificationQueue.end())+
-        std::distance(postedCallsRemoveRangeStart, m_postedCalls.end()));
-
-    auto elementsToRemoveInserter = std::back_inserter(elementsToRemove);
-    for (auto it = tasksToRemoveRangeStart; it != m_pollSetModificationQueue.end(); ++it)
-        elementsToRemoveInserter = std::move(*it);
-    for (auto it = postedCallsRemoveRangeStart; it != m_postedCalls.end(); ++it)
-        elementsToRemoveInserter = std::move(*it);
-
-    //removing elements from source container
-    m_pollSetModificationQueue.erase(
-        tasksToRemoveRangeStart,
-        m_pollSetModificationQueue.end());
     m_postedCalls.erase(
         postedCallsRemoveRangeStart,
         m_postedCalls.end());
