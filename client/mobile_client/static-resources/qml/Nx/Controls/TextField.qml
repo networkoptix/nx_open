@@ -106,7 +106,7 @@ QnTextInput
         color: control.placeholderColor
         horizontalAlignment: control.horizontalAlignment
         verticalAlignment: control.verticalAlignment
-        visible: !control.displayText && !control.inputMethodComposing
+        visible: control.displayText === ""
         elide: Text.ElideRight
     }
 
