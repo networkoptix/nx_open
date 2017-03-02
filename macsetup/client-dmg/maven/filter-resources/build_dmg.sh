@@ -9,7 +9,7 @@ DMG_FILE="${artifact.name.client}.dmg"
 
 # Take into consideration that we have protocol handler app with name
 # ${protocol_handler_app_name} = ${display.product.name} Client.app.
-# Please do not "Client" to APP_DIR because of that.
+# Please do not add "Client" word to APP_DIR because of that.
 APP_DIR="$SRC/${display.product.name}.app"
 HELP=${ClientHelpSourceDir}
 RELEASE_VERSION=${release.version}
