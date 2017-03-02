@@ -30,19 +30,29 @@ void doTest(bool doServerDelay, bool doClientDelay)
         client->setRecvTimeout(kClientDelay);
 
         QByteArray wholeData;
-        wholeData.reserve(kBufferSize * sizeof(int) * kIterations);
+        static const int kExpectedDataSize = kBufferSize * sizeof(int) * kIterations;
+        wholeData.reserve(kExpectedDataSize);
         std::vector<char> buffer(1024 * 1024);
-        while (true)
+        int timeoutCnt = 0;
+        while (wholeData.size() < kExpectedDataSize)
         {
             auto recv = client->recv(buffer.data(), buffer.size());
             if (recv == 0 || !client->isConnected())
                 break;
             if (recv > 0)
+            {
                 wholeData.append(buffer.data(), recv);
+                timeoutCnt = 0;
+            }
+            else
+            {
+                if (++timeoutCnt > 10)
+                    break;
+            }
             if (doServerDelay)
                 std::this_thread::sleep_for(kClientDelay);
         }
-        ASSERT_EQ(wholeData.size(), kBufferSize * sizeof(int) * kIterations);
+        ASSERT_EQ(wholeData.size(), kExpectedDataSize);
         const int* testData = (const int*)wholeData.data();
         const int* endData = (const int*)(wholeData.data() + wholeData.size());
         int expectedValue = 0;
@@ -76,7 +86,6 @@ void doTest(bool doServerDelay, bool doClientDelay)
         if (doClientDelay)
             std::this_thread::sleep_for(kClientDelay);
     }
-    clientSocket->close();
     serverThread.join();
 }
 
