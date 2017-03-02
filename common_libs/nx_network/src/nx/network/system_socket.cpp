@@ -699,7 +699,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(void* buffer, unsigned
                 ::CancelIo((HANDLE) m_fd);
                 // Wait for:
                 // 1. CancelIo have been finished.
-                // 2. WSaRecv have been finished.
+                // 2. WSARecv have been finished.
                 // 3. Shutdown called.
                 WaitForSingleObject(m_eventObject, INFINITE);
                 // Check status again in case of race condition between CancelIo and other conditions
