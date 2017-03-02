@@ -6,3 +6,7 @@ unix:!mac {
 }
 
 SOURCES += ${project.build.directory}/time_server_app_info_impl.cpp
+
+linux {
+    QMAKE_CXXFLAGS += -Werror
+}
