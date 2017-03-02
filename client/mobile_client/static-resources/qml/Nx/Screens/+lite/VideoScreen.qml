@@ -181,6 +181,8 @@ PageBase
         onDoubleClicked: Workflow.popCurrentScreen()
     }
 
+    onResourceIdChanged: video.clear()
+
     onNextCameraRequested:
     {
         layoutHelper.singleCameraId = camerasModel.nextResourceId(resourceId)

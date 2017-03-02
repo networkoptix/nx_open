@@ -4,6 +4,8 @@
 #include <QtQml/QtQml>
 #include <QtQml/QQmlFileSelector>
 #include <QtQuick/QQuickWindow>
+#include <QtGui/QCursor>
+#include <QtGui/QScreen>
 
 #include <qtsingleguiapplication.h>
 
@@ -129,6 +131,11 @@ int runUi(QtSingleGuiApplication* application)
             if (context.liteMode() && !conf.disableFullScreen)
             {
                 mainWindow->showFullScreen();
+                if (const auto screen = mainWindow->screen())
+                {
+                    const auto size = screen->size();
+                    QCursor::setPos(screen, size.width() / 2, size.height() / 2);
+                }
             }
             else
             {
