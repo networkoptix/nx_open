@@ -148,9 +148,6 @@ private:
     std::unique_ptr<VideoCameraLocker> m_videoCameraLocker;
 };
 
-// TODO: #ak This function does not belong here.
-QnUuid findResourceIdByAnyUniqueAttribute(const QString& str);
-
 class AbstractInputByteStream
 {
 public:

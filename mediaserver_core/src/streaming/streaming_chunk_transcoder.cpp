@@ -6,6 +6,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
+#include <api/helpers/camera_id_helper.h>
 #include <core/dataprovider/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
@@ -86,8 +87,9 @@ bool StreamingChunkTranscoder::transcodeAsync(
     StreamingChunkPtr chunk )
 {
     // Searching for resource.
-    QnResourcePtr resource = qnResPool->getResourceById(
-        findResourceIdByAnyUniqueAttribute(transcodeParams.srcResourceUniqueID()));
+    QnResourcePtr resource =
+        qnCameraPool->getVideoCameraLockerByResourceId(
+            transcodeParams.srcResourceUniqueID());
     if (!resource)
     {
         NX_LOG(lit("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 not found")

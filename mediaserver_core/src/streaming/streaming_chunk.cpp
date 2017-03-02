@@ -9,13 +9,13 @@
 
 #include <nx/utils/random.h>
 
+#include <api/helpers/camera_id_helper.h>
 #include <core/resource/security_cam_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include "media_server/settings.h"
 
-StreamingChunk::SequentialReadingContext::SequentialReadingContext(StreamingChunk* chunk)
-:
+StreamingChunk::SequentialReadingContext::SequentialReadingContext(StreamingChunk* chunk):
     m_currentOffset( 0 ),
     m_chunk(chunk)
 {
@@ -27,8 +27,7 @@ StreamingChunk::SequentialReadingContext::~SequentialReadingContext()
     m_chunk->m_readers.erase(this);
 }
 
-StreamingChunk::StreamingChunk( const StreamingChunkCacheKey& params )
-:
+StreamingChunk::StreamingChunk( const StreamingChunkCacheKey& params ):
     m_params( params ),
     m_modificationState( State::init ),
     m_maxInternalBufferSize(
@@ -37,9 +36,9 @@ StreamingChunk::StreamingChunk( const StreamingChunkCacheKey& params )
             nx_ms_conf::DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE).toUInt() ),
     m_dataOffsetAtTheFrontOfTheBuffer(0)
 {
-    m_videoCameraLocker =
-        qnCameraPool->getVideoCameraLockerByResourceId(
-            findResourceIdByAnyUniqueAttribute(params.srcResourceUniqueID()));
+    const auto res = nx::camera_id_helper::findCameraByFlexibleId(params.srcResourceUniqueID());
+    if (res)
+        m_videoCameraLocker = qnCameraPool->getVideoCameraLockerByResourceId(res->getId());
 }
 
 StreamingChunk::~StreamingChunk()
@@ -232,31 +231,11 @@ void StreamingChunk::disableInternalBufferLimit()
         std::numeric_limits<decltype(m_maxInternalBufferSize)>::max();
 }
 
-QnUuid findResourceIdByAnyUniqueAttribute(const QString& str)
-{
-    QnResourcePtr resource;
-    const QnUuid uuid = QnUuid::fromStringSafe(str);
-    if (!uuid.isNull())
-        resource = qnResPool->getResourceById(uuid);
-    if (!resource)
-        resource = qnResPool->getResourceByUniqueId(str);
-    if (!resource)
-        resource = qnResPool->getResourceByMacAddress(str);
-    if (!resource)
-        resource = qnResPool->getResourceByUrl(str);
-    if (!resource)
-        return QnUuid();
-
-    return resource->getId();
-}
-
-
 //////////////////////////////////////////////
 //   StreamingChunkInputStream
 //////////////////////////////////////////////
 
-StreamingChunkInputStream::StreamingChunkInputStream(StreamingChunk* chunk)
-    :
+StreamingChunkInputStream::StreamingChunkInputStream(StreamingChunk* chunk):
     m_chunk(chunk),
     m_readCtx(chunk)
 {
