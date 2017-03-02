@@ -85,8 +85,8 @@ public:
     nx::utils::MoveOnlyFunc<void()> taskCompletionHandler;
 
     /**
-    * @param taskCompletionEvent if not NULL, set to 1 after processing task.
-    */
+     * @param taskCompletionEvent if not NULL, set to 1 after processing task.
+     */
     SocketAddRemoveTask(
         TaskType _type,
         Pollable* const _socket,
