@@ -87,16 +87,9 @@ bool StreamingChunkTranscoder::transcodeAsync(
     StreamingChunkPtr chunk )
 {
     // Searching for resource.
-    QnResourcePtr resource =
-        qnCameraPool->getVideoCameraLockerByResourceId(
+    QnSecurityCamResourcePtr cameraResource =
+        nx::camera_id_helper::findCameraByFlexibleId(
             transcodeParams.srcResourceUniqueID());
-    if (!resource)
-    {
-        NX_LOG(lit("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 not found")
-            .arg(transcodeParams.srcResourceUniqueID()), cl_logDEBUG1);
-        return false;
-    }
-    QnSecurityCamResourcePtr cameraResource = resource.dynamicCast<QnSecurityCamResource>();
     if( !cameraResource )
     {
         NX_LOG(lit("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 is not a media resource")
@@ -104,7 +97,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
         return false;
     }
 
-    auto camera = qnCameraPool->getVideoCamera( resource );
+    auto camera = qnCameraPool->getVideoCamera(cameraResource);
     NX_ASSERT( camera );
 
     //validating transcoding parameters
