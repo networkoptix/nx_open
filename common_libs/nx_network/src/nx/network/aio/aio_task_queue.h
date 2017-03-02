@@ -10,7 +10,7 @@
 
 #include "abstract_pollset.h" 
 #include "aio_event_handler.h"
-#include "unified_pollset.h"
+#include "pollable.h"
 #include "../detail/socket_sequence.h"
 
 namespace nx {
@@ -18,6 +18,7 @@ namespace network {
 namespace aio {
 namespace detail {
 
+// TODO: #ak Looks like a flags set, but somehow it is not.
 enum class TaskType
 {
     tAdding,
@@ -183,7 +184,7 @@ public:
  * so it contains different and unrelated data.
  * TODO: #ak Should split this class to multiple clear classes with a single responsibility.
  */
-class AioTaskQueue
+class NX_NETWORK_API AioTaskQueue
 {
 public:
     // TODO: #ak too many mutexes here. Refactoring required
@@ -205,7 +206,9 @@ public:
      */
     qint64 getSystemTimerVal() const;
 
-    void addSocketTask(SocketAddRemoveTask task);
+    void addTask(SocketAddRemoveTask task);
+    void postAsyncCall(Pollable* const pollable, nx::utils::MoveOnlyFunc<void()> func);
+    
     void processPollSetModificationQueue(TaskType taskFilter);
     void removeSocketFromPollSet(Pollable* sock, aio::EventType eventType);
     void processScheduledRemoveSocketTasks();
@@ -234,6 +237,8 @@ public:
      * Elements may contain functor which may contain aio objects (sockets) which will be removed
      * when removing functor. This may lead to a dead lock if we not release lock.
      */
+    std::vector<SocketAddRemoveTask> cancelPostedCalls(
+        SocketSequenceType socketSequence);
     std::vector<SocketAddRemoveTask> cancelPostedCalls(
         const QnMutexLockerBase& /*lock*/,
         SocketSequenceType socketSequence);

@@ -51,7 +51,7 @@ void AIOThread::watchSocket(
     if (m_impl->removeReverseTask(sock, eventToWatch, detail::TaskType::tAdding, eventHandler, timeoutMs.count()))
         return;    //ignoring task
 
-    m_impl->addSocketTask(detail::SocketAddRemoveTask(
+    m_impl->addTask(detail::SocketAddRemoveTask(
         detail::TaskType::tAdding,
         sock,
         eventToWatch,
@@ -76,7 +76,7 @@ void AIOThread::changeSocketTimeout(
 {
     QnMutexLocker lk(&m_impl->mutex);
 
-    m_impl->addSocketTask(detail::SocketAddRemoveTask(
+    m_impl->addTask(detail::SocketAddRemoveTask(
         detail::TaskType::tChangingTimeout,
         sock,
         eventToWatch,
@@ -124,7 +124,7 @@ void AIOThread::removeFromWatch(
     {
         std::atomic<int> taskCompletedCondition(0);
         //we MUST remove socket from pollset before returning from here
-        m_impl->addSocketTask(detail::SocketAddRemoveTask(
+        m_impl->addTask(detail::SocketAddRemoveTask(
             detail::TaskType::tRemoving,
             sock,
             eventType,
@@ -157,7 +157,7 @@ void AIOThread::removeFromWatch(
     }
     else
     {
-        m_impl->addSocketTask(detail::SocketAddRemoveTask(
+        m_impl->addTask(detail::SocketAddRemoveTask(
             detail::TaskType::tRemoving,
             sock,
             eventType,
@@ -173,7 +173,7 @@ void AIOThread::post( Pollable* const sock, nx::utils::MoveOnlyFunc<void()> func
 {
     QnMutexLocker lk(&m_impl->mutex);
 
-    m_impl->addSocketTask(
+    m_impl->addTask(
         detail::PostAsyncCallTask(
             sock,
             std::move(functor)));
@@ -212,7 +212,7 @@ void AIOThread::cancelPostedCalls( Pollable* const sock, bool waitForRunningHand
     if (waitForRunningHandlerCompletion)
     {
         //posting cancellation task
-        m_impl->addSocketTask(
+        m_impl->addTask(
             detail::CancelPostedCallsTask(
                 sock->impl()->socketSequence,   //not passing socket here since it is allowed to be removed
                                                 //before posted call is actually cancelled
@@ -236,7 +236,7 @@ void AIOThread::cancelPostedCalls( Pollable* const sock, bool waitForRunningHand
     }
     else
     {
-        m_impl->addSocketTask(
+        m_impl->addTask(
             detail::CancelPostedCallsTask(
                 sock->impl()->socketSequence));
         m_impl->pollSet->interrupt();

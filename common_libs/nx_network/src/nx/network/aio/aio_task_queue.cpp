@@ -27,9 +27,16 @@ qint64 AioTaskQueue::getSystemTimerVal() const
     return m_monotonicClock.elapsed();
 }
 
-void AioTaskQueue::addSocketTask(SocketAddRemoveTask task)
+void AioTaskQueue::addTask(SocketAddRemoveTask task)
 {
     m_pollSetModificationQueue.push_back(std::move(task));
+}
+
+void AioTaskQueue::postAsyncCall(
+    Pollable* const pollable,
+    nx::utils::MoveOnlyFunc<void()> func)
+{
+    addTask(PostAsyncCallTask(pollable, std::move(func)));
 }
 
 void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
@@ -437,6 +444,13 @@ void AioTaskQueue::addPeriodicTaskNonSafe(
     periodicTasksByClock.insert(std::make_pair(
         taskClock,
         PeriodicTaskData(handlingData, _socket, eventType)));
+}
+
+std::vector<SocketAddRemoveTask> AioTaskQueue::cancelPostedCalls(
+    SocketSequenceType socketSequence)
+{
+    QnMutexLocker lock(&mutex);
+    return cancelPostedCalls(lock, socketSequence);
 }
 
 std::vector<SocketAddRemoveTask> AioTaskQueue::cancelPostedCalls(
