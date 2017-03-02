@@ -41,6 +41,11 @@ protected:
         saveHistoryItem(api::SystemHealth::offline);
     }
 
+    void whenCdbIsRestarted()
+    {
+        ASSERT_TRUE(cdb()->restart());
+    }
+
     void assertSystemOnline()
     {
         assertSystemStatusIs(api::SystemHealth::online);
@@ -108,7 +113,7 @@ TEST_F(HealthMonitoring, system_status_is_correct)
         if (i == 0)
         {
             closeConnectionFromMediaserverToCloud();
-            ASSERT_TRUE(cdb()->restart());
+            whenCdbIsRestarted();
         }
     }
 }
@@ -120,6 +125,22 @@ TEST_F(HealthMonitoring, history_is_saved)
 
     assertHistoryIsCorrect();
 }
+
+TEST_F(HealthMonitoring, history_is_persistent)
+{
+    establishConnectionFromMediaserverToCloud();
+    closeConnectionFromMediaserverToCloud();
+
+    whenCdbIsRestarted();
+
+    assertHistoryIsCorrect();
+}
+
+//TEST_F(HealthMonitoring, history_is_not_reported_for_unknown_id)
+
+//TEST_F(HealthMonitoring, history_is_available_to_system_owner_only)
+
+//TEST_F(HealthMonitoring, history_is_not_available_to_system_credentials)
 
 } // namespace cdb
 } // namespace nx
