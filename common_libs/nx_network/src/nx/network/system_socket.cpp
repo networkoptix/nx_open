@@ -614,7 +614,9 @@ CommunicatingSocket<SocketInterfaceToImplement>::~CommunicatingSocket()
 {
     if (m_aioHelper)
         m_aioHelper->terminate();
+#ifdef WIN32
     ::CloseHandle(m_eventObject);
+#endif
 }
 
 template<typename SocketInterfaceToImplement>
@@ -806,7 +808,9 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::shutdown()
 {
     m_connected = false;
     bool result = Socket<SocketInterfaceToImplement>::shutdown();
+#ifdef WIN32
     ::SetEvent(m_eventObject); //< terminate current wait call
+#endif
     return result;
 }
 
