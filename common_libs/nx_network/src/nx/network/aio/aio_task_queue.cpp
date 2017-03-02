@@ -1,4 +1,4 @@
-#include "aio_thread_impl.h"
+#include "aio_task_queue.h"
 
 #include <nx/utils/log/log.h>
 
@@ -9,7 +9,7 @@ namespace network {
 namespace aio {
 namespace detail {
 
-AioThreadImpl::AioThreadImpl(std::unique_ptr<AbstractPollSet> pollSetToUse):
+AioTaskQueue::AioTaskQueue(std::unique_ptr<AbstractPollSet> pollSetToUse):
     newReadMonitorTaskCount(0),
     newWriteMonitorTaskCount(0),
     processingPostedCalls(0)
@@ -22,17 +22,17 @@ AioThreadImpl::AioThreadImpl(std::unique_ptr<AbstractPollSet> pollSetToUse):
     m_monotonicClock.restart();
 }
 
-qint64 AioThreadImpl::getSystemTimerVal() const
+qint64 AioTaskQueue::getSystemTimerVal() const
 {
     return m_monotonicClock.elapsed();
 }
 
-void AioThreadImpl::addSocketTask(SocketAddRemoveTask task)
+void AioTaskQueue::addSocketTask(SocketAddRemoveTask task)
 {
     m_pollSetModificationQueue.push_back(std::move(task));
 }
 
-void AioThreadImpl::processPollSetModificationQueue(TaskType taskFilter)
+void AioTaskQueue::processPollSetModificationQueue(TaskType taskFilter)
 {
     std::vector<SocketAddRemoveTask> elementsToRemove;
     QnMutexLocker lk(&mutex);
@@ -158,7 +158,7 @@ void AioThreadImpl::processPollSetModificationQueue(TaskType taskFilter)
     }
 }
 
-void AioThreadImpl::addSockToPollset(
+void AioTaskQueue::addSockToPollset(
     Pollable* socket,
     aio::EventType eventType,
     int timeout,
@@ -201,7 +201,7 @@ void AioThreadImpl::addSockToPollset(
     handlingData.release();
 }
 
-void AioThreadImpl::removeSocketFromPollSet(Pollable* sock, aio::EventType eventType)
+void AioTaskQueue::removeSocketFromPollSet(Pollable* sock, aio::EventType eventType)
 {
     //NX_LOG( QString::fromLatin1("removing %1, eventType %2").arg((size_t)sock, 0, 16).arg(eventType), cl_logDEBUG1 );
 
@@ -213,12 +213,12 @@ void AioThreadImpl::removeSocketFromPollSet(Pollable* sock, aio::EventType event
         pollSet->remove(sock, eventType);
 }
 
-void AioThreadImpl::processScheduledRemoveSocketTasks()
+void AioTaskQueue::processScheduledRemoveSocketTasks()
 {
     processPollSetModificationQueue(TaskType::tRemoving);
 }
 
-bool AioThreadImpl::removeReverseTask(
+bool AioTaskQueue::removeReverseTask(
     Pollable* const sock,
     aio::EventType eventType,
     TaskType taskType,
@@ -281,7 +281,7 @@ bool AioThreadImpl::removeReverseTask(
     return false;
 }
 
-void AioThreadImpl::processSocketEvents(const qint64 curClock)
+void AioTaskQueue::processSocketEvents(const qint64 curClock)
 {
     auto it = pollSet->getSocketEventsIterator();
     while (it->next())
@@ -328,7 +328,7 @@ void AioThreadImpl::processSocketEvents(const qint64 curClock)
     }
 }
 
-bool AioThreadImpl::processPeriodicTasks(const qint64 curClock)
+bool AioTaskQueue::processPeriodicTasks(const qint64 curClock)
 {
     int tasksProcessedCount = 0;
 
@@ -407,7 +407,7 @@ bool AioThreadImpl::processPeriodicTasks(const qint64 curClock)
     return tasksProcessedCount > 0;
 }
 
-void AioThreadImpl::processPostedCalls()
+void AioTaskQueue::processPostedCalls()
 {
     while (!m_postedCalls.empty())
     {
@@ -417,7 +417,7 @@ void AioThreadImpl::processPostedCalls()
     }
 }
 
-void AioThreadImpl::addPeriodicTask(
+void AioTaskQueue::addPeriodicTask(
     const qint64 taskClock,
     const std::shared_ptr<AioEventHandlingData>& handlingData,
     Pollable* _socket,
@@ -427,7 +427,7 @@ void AioThreadImpl::addPeriodicTask(
     addPeriodicTaskNonSafe(taskClock, handlingData, _socket, eventType);
 }
 
-void AioThreadImpl::addPeriodicTaskNonSafe(
+void AioTaskQueue::addPeriodicTaskNonSafe(
     const qint64 taskClock,
     const std::shared_ptr<AioEventHandlingData>& handlingData,
     Pollable* _socket,
@@ -439,7 +439,7 @@ void AioThreadImpl::addPeriodicTaskNonSafe(
         PeriodicTaskData(handlingData, _socket, eventType)));
 }
 
-std::vector<SocketAddRemoveTask> AioThreadImpl::cancelPostedCalls(
+std::vector<SocketAddRemoveTask> AioTaskQueue::cancelPostedCalls(
     const QnMutexLockerBase& /*lock*/,
     SocketSequenceType socketSequence)
 {
@@ -484,7 +484,7 @@ std::vector<SocketAddRemoveTask> AioThreadImpl::cancelPostedCalls(
     return elementsToRemove;
 }
 
-std::size_t AioThreadImpl::postedCallCount() const
+std::size_t AioTaskQueue::postedCallCount() const
 {
     return m_postedCalls.size();
 }

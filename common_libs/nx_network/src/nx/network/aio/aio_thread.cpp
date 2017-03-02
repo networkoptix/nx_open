@@ -7,14 +7,10 @@
 
 #include <nx/utils/log/log.h>
 
-#include "aio_thread_impl.h"
+#include "aio_task_queue.h"
 
 //TODO #ak memory order semantic used with std::atomic
 //TODO #ak move task queues to socket for optimization
-//TODO #ak should add some sequence which will be incremented when socket is started polling on any event
-    //this is required to distinguish tasks. E.g., socket is polled, than polling stopped asynchronously, 
-    //before async stop completion socket is polled again. In this case remove task should not remove tasks 
-    //from new polling "session"? Something needs to be done about it
 
 namespace nx {
 namespace network {
@@ -22,7 +18,7 @@ namespace aio {
 
 AIOThread::AIOThread(std::unique_ptr<AbstractPollSet> pollSet):
     QnLongRunnable(false),
-    m_impl(new detail::AioThreadImpl(std::move(pollSet)))
+    m_impl(new detail::AioTaskQueue(std::move(pollSet)))
 {
     setObjectName(QString::fromLatin1("AIOThread"));
 }

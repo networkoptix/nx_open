@@ -178,7 +178,12 @@ public:
     }
 };
 
-class AioThreadImpl
+/**
+ * This class used to be AioThread private impl class, 
+ * so it contains different and unrelated data.
+ * TODO: #ak Should split this class to multiple clear classes with a single responsibility.
+ */
+class AioTaskQueue
 {
 public:
     // TODO: #ak too many mutexes here. Refactoring required
@@ -193,7 +198,7 @@ public:
     std::multimap<qint64, PeriodicTaskData> periodicTasksByClock;
     std::atomic<int> processingPostedCalls;
 
-    AioThreadImpl(std::unique_ptr<AbstractPollSet> pollSet);
+    AioTaskQueue(std::unique_ptr<AbstractPollSet> pollSet);
 
     /**
      * Used as a clock for periodic events. Function introduced since implementation can be changed.
