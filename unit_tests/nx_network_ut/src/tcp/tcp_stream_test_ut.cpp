@@ -35,8 +35,14 @@ void doTest(bool doServerDelay, bool doClientDelay)
         while (true)
         {
             auto recv = client->recv(buffer.data(), buffer.size());
-            if (recv == 0 || !client->isConnected())
+            if (recv == 0)
                 break;
+            auto errCode = SystemError::getLastOSErrorCode();
+            if (!client->isConnected())
+            {
+                ASSERT_EQ(0, errCode);
+                ASSERT_TRUE(client->isConnected());
+            }
             if (recv > 0)
                 wholeData.append(buffer.data(), recv);
             if (doServerDelay)
