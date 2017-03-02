@@ -143,7 +143,7 @@ public:
     virtual QVector<int> getChannels() const override
     {
         QVector<int> result;
-        result.resize(m_channelCount, 0);
+        result.resize(m_channelCount);
         return result;
     }
 
