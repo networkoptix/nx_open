@@ -1,6 +1,6 @@
-# $Id$
-# Artem V. Nikitin
-# Merge test (https://networkoptix.atlassian.net/browse/TEST-177)
+'''Merge test
+   Initial task https://networkoptix.atlassian.net/browse/TEST-177
+'''
 
 import pytest, time
 from test_utils import bool_to_str, str_to_bool
@@ -15,9 +15,9 @@ def env(env_builder, server):
 
 def get_test_system_settings():
     return dict(systemSettings =
-                dict(cameraSettingsOptimization = 'false',
-                     autoDiscoveryEnabled = 'false',
-                     statisticsAllowed = 'false'))
+                dict(cameraSettingsOptimization='false',
+                     autoDiscoveryEnabled='false',
+                     statisticsAllowed='false'))
 
 def check_system_settings(server, **kw):
     settings_to_check = {k: v for k, v in server.settings.iteritems() if kw.has_key(k) }
@@ -68,15 +68,15 @@ def test_merge_take_local_settings(env):
     wait_for_settings_merge(env)
     check_system_settings(
       env.one,
-      arecontRtspEnabled = bool_to_str(expected_arecontRtspEnabled),
-      auditTrailEnabled = bool_to_str(expected_auditTrailEnabled))
+      arecontRtspEnabled=bool_to_str(expected_arecontRtspEnabled),
+      auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
 
     # Ensure both servers are merged and sync
     expected_arecontRtspEnabled = not change_bool_setting(env.one, 'arecontRtspEnabled')
     wait_for_settings_merge(env)
     check_system_settings(
         env.two,
-        arecontRtspEnabled = bool_to_str(expected_arecontRtspEnabled))
+        arecontRtspEnabled=bool_to_str(expected_arecontRtspEnabled))
 
 def test_merge_take_remote_settings(env):
     # Start two servers without predefined systemName
@@ -94,15 +94,15 @@ def test_merge_take_remote_settings(env):
     wait_for_settings_merge(env)
     check_system_settings(
       env.one,
-      arecontRtspEnabled = bool_to_str(expected_arecontRtspEnabled),
-      auditTrailEnabled = bool_to_str(expected_auditTrailEnabled))
+      arecontRtspEnabled=bool_to_str(expected_arecontRtspEnabled),
+      auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
 
     # Ensure both servers are merged and sync
     expected_auditTrailEnabled = not change_bool_setting(env.one, 'auditTrailEnabled')
     wait_for_settings_merge(env)
     check_system_settings(
         env.two,
-        auditTrailEnabled = bool_to_str(expected_auditTrailEnabled))
+        auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
 
 def test_merge_cloud_with_local(env):
     # Start local server systemName
@@ -164,7 +164,7 @@ def test_cloud_merge_after_disconnect(env):
     wait_for_settings_merge(env)
     check_system_settings(
         env.two,
-        auditTrailEnabled = bool_to_str(expected_auditTrailEnabled))
+        auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
 
 @pytest.fixture
 def env_merged(env_builder, server):
@@ -193,4 +193,4 @@ def test_restart_one_server(env_merged):
     wait_for_settings_merge(env_merged)
     check_system_settings(
         env_merged.two,
-        arecontRtspEnabled = bool_to_str(expected_arecontRtspEnabled))
+        arecontRtspEnabled=bool_to_str(expected_arecontRtspEnabled))
