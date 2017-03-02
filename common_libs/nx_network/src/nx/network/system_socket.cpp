@@ -685,7 +685,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(void* buffer, unsigned
         WSABUF wsaBuffer;
         wsaBuffer.len = bufferLen;
         wsaBuffer.buf = (char*) buffer;
-        DWORD wsaFlags = 0;
+        DWORD wsaFlags = flags;
         DWORD* wsaBytesRead = (DWORD*) &bytesRead;
 
         auto wsaResult = WSARecv(m_fd, &wsaBuffer, /* buffer count*/ 1, /* out bytes read*/ nullptr,
