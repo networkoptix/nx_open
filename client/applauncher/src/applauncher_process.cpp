@@ -102,6 +102,7 @@ void ApplauncherProcess::processRequest(
             break;
 
         case applauncher::api::TaskType::isVersionInstalled:
+            m_installationManager->updateInstalledVersionsInformation();
             *response = new applauncher::api::IsVersionInstalledResponse();
             isVersionInstalled(
                 std::static_pointer_cast<applauncher::api::IsVersionInstalledRequest>(request),
@@ -109,6 +110,7 @@ void ApplauncherProcess::processRequest(
             break;
 
         case applauncher::api::TaskType::getInstalledVersions:
+            m_installationManager->updateInstalledVersionsInformation();
             *response = new applauncher::api::GetInstalledVersionsResponse();
             getInstalledVersions(
                 std::static_pointer_cast<applauncher::api::GetInstalledVersionsRequest>(request),
