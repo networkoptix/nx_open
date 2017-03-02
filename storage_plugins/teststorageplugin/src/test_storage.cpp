@@ -1,8 +1,10 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory>
-#include "test_storage.h"
+#include <test_storage.h>
 #include <detail/fs_stub.h>
+#include <test_file_info_iterator.h>
+#include <url.h>
 
 /*
 // IODevice
@@ -81,21 +83,37 @@ unsigned int TestIODevice::releaseRef()
     return pReleaseRef();
 }
 
-// FileInfoIterator
-nx_spl::FileInfo* STORAGE_METHOD_CALL TestFileInfoIterator::next(int* ecode) const
-{
-    return nullptr;
-}
-
 */
 
 using namespace nx_spl;
 
 namespace {
-void removeNode(struct FsStubNode* root, const char* url, int* ecode)
+
+std::string urlToPath(const char* url)
+{
+    return utils::Url(url).hostPath();
+}
+
+std::string lastPathSegment(const std::string& path)
+{
+    if (path.empty())
+        return path;
+
+    auto pathCopy = path;
+    if (path[path.size() - 1] == '/')
+        pathCopy.assign(path.cbegin(), path.cend()-1);
+
+    auto lastSeparatorPos = pathCopy.rfind('/');
+    if (lastSeparatorPos == std::string::npos)
+        return path;
+
+    return pathCopy.substr(lastSeparatorPos + 1);
+}
+
+void removeNode(struct FsStubNode* root, enum FsStubEntryType type, const char* url, int* ecode)
 {
     struct FsStubNode* nodeToRemove = FsStubNode_find(root, url);
-    if (nodeToRemove == nullptr)
+    if (nodeToRemove == nullptr || nodeToRemove->type != type)
     {
         if (ecode)
             *ecode = error::UrlNotExists;
@@ -107,19 +125,19 @@ void removeNode(struct FsStubNode* root, const char* url, int* ecode)
         *ecode = error::NoError;
 }
 
-int nodeExists(struct FsStubNode* root, const char* url, int* ecode)
+bool nodeExists(struct FsStubNode* root, const char* url, int* ecode)
 {
     if (FsStubNode_find(root, url) == nullptr)
     {
         if (ecode)
             *ecode = error::UrlNotExists;
-        return 0;
+        return false;
     }
 
     if (ecode)
         *ecode = error::NoError;
 
-    return 1;
+    return true;
 }
 
 }
@@ -142,17 +160,17 @@ nx_spl::IODevice* STORAGE_METHOD_CALL TestStorage::open(
 
 uint64_t STORAGE_METHOD_CALL TestStorage::getFreeSpace(int* ecode) const 
 {
-    return 1000 * 1024 * 1024 * 1024ll;
+    return 500 * 1024 * 1024 * 1024LL;
 }
 
 uint64_t STORAGE_METHOD_CALL TestStorage::getTotalSpace(int* ecode) const 
 {
-    return 500 * 1024 * 1024 * 1024ll;
+    return 1000 * 1024 * 1024 * 1024LL;
 }
 
 int STORAGE_METHOD_CALL TestStorage::getCapabilities() const 
 {
-    return cap::ListFile | cap::RemoveFile | cap::ReadFile | cap::WriteFile;
+    return cap::ListFile | cap::RemoveFile | cap::ReadFile | cap::WriteFile | cap::DBReady;
 }
 
 void STORAGE_METHOD_CALL TestStorage::removeFile(
@@ -160,7 +178,7 @@ void STORAGE_METHOD_CALL TestStorage::removeFile(
     int*        ecode
 ) 
 {
-    removeNode(m_vfsPair.root, url, ecode);
+    removeNode(m_vfsPair.root, file, urlToPath(url).c_str(), ecode);
 }
 
 void STORAGE_METHOD_CALL TestStorage::removeDir(
@@ -168,7 +186,7 @@ void STORAGE_METHOD_CALL TestStorage::removeDir(
     int*        ecode
 )
 {
-    removeNode(m_vfsPair.root, url, ecode);
+    removeNode(m_vfsPair.root, dir, urlToPath(url).c_str(), ecode);
 } 
 
 void STORAGE_METHOD_CALL TestStorage::renameFile(
@@ -177,22 +195,36 @@ void STORAGE_METHOD_CALL TestStorage::renameFile(
     int*            ecode
 ) 
 {
-    struct FsStubNode* nodeToRename = FsStubNode_find(m_vfsPair.root, oldUrl);
-    if (nodeToRename == nullptr)
+    if (strcmp(oldUrl, newUrl) == 0)
+    {
+        if (ecode)
+            *ecode = nx_spl::error::NoError;
+        return;
+    }
+
+    struct FsStubNode* nodeToRename = FsStubNode_find(m_vfsPair.root, urlToPath(oldUrl).c_str());
+    if (nodeToRename == nullptr || nodeToRename->type != file)
     {
         if (ecode)
             *ecode = error::UrlNotExists;
         return;
     }
 
-    int result = FsStubNode_rename(nodeToRename, newUrl);
-    if (result != 0)
+    auto resultNode = FsStubNode_add(
+        m_vfsPair.root, 
+        urlToPath(newUrl).c_str(), 
+        file,
+        660,
+        nodeToRename->size);
+
+    if (resultNode == nullptr)
     {
         if (ecode)
             *ecode = error::UnknownError;
         return;
     }
 
+    FsStubNode_remove(nodeToRename);
     if (ecode)
         *ecode = error::NoError;
 }
@@ -202,7 +234,15 @@ nx_spl::FileInfoIterator* STORAGE_METHOD_CALL TestStorage::getFileIterator(
     int*            ecode
 ) const 
 {
-    return nullptr;
+    struct FsStubNode* fsNode = FsStubNode_find(m_vfsPair.root, urlToPath(dirUrl).c_str());
+    if (fsNode == nullptr)
+    {
+        if (ecode)
+            *ecode = error::UrlNotExists;
+        return nullptr;
+    }
+
+    return new TestFileInfoIterator(fsNode);
 }
 
 int STORAGE_METHOD_CALL TestStorage::fileExists(
@@ -210,7 +250,7 @@ int STORAGE_METHOD_CALL TestStorage::fileExists(
     int*            ecode
 ) const 
 {
-    return nodeExists(m_vfsPair.root, url, ecode);
+    return nodeExists(m_vfsPair.root, urlToPath(url).c_str(), ecode);
 }
 
 int STORAGE_METHOD_CALL TestStorage::dirExists(
@@ -218,7 +258,7 @@ int STORAGE_METHOD_CALL TestStorage::dirExists(
     int*            ecode
 ) const 
 {
-    return nodeExists(m_vfsPair.root, url, ecode);
+    return nodeExists(m_vfsPair.root, urlToPath(url).c_str(), ecode);
 }
 
 uint64_t STORAGE_METHOD_CALL TestStorage::fileSize(
@@ -226,7 +266,7 @@ uint64_t STORAGE_METHOD_CALL TestStorage::fileSize(
     int*            ecode
 ) const 
 {
-    struct FsStubNode* fsNode = FsStubNode_find(m_vfsPair.root, url);
+    struct FsStubNode* fsNode = FsStubNode_find(m_vfsPair.root, urlToPath(url).c_str());
     if (fsNode == nullptr)
     {
         if (ecode)

@@ -1,0 +1,26 @@
+#pragma once
+
+#include <third_party_storage.h>
+#include <common.h>
+#include <detail/fs_stub.h>
+
+class TestFileInfoIterator
+    : public nx_spl::FileInfoIterator,
+      public PluginRefCounter<TestFileInfoIterator> 
+{
+public:
+    TestFileInfoIterator(FsStubNode* node);
+public:
+    virtual nx_spl::FileInfo* STORAGE_METHOD_CALL next(int* ecode) const override;
+
+public: // plugin interface implementation
+    virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
+
+    virtual unsigned int addRef() override;
+    virtual unsigned int releaseRef() override;
+
+private:
+    mutable nx_spl::FileInfo m_fInfo;
+    mutable FsStubNode* m_cur;
+};
+

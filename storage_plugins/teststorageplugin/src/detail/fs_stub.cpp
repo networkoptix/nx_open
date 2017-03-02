@@ -251,8 +251,10 @@ void FsStubNode_remove(struct FsStubNode *fsNode)
         FsStubNode_remove(tmp);
     }
 
-    if (fsNode->parent)
-        fsNode->parent->child = NULL;
+    if (fsNode->prev)
+        fsNode->prev->next = fsNode->next;
+    else if (fsNode->parent)
+        fsNode->parent->child = fsNode->next;
 
     free(fsNode->name);
     free(fsNode);

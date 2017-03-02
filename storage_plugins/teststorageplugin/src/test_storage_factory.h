@@ -35,5 +35,5 @@ private:
     virtual bool readConfig(const std::string& path, std::string* outContent);
 
 private:
-    std::unordered_set<std::string> m_storageUrls;
+    std::unordered_set<std::string> m_storageHosts;
 };

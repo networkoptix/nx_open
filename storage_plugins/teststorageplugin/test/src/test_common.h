@@ -1,5 +1,7 @@
 #pragma once
 
+#include <test_storage_factory.h>
+
     /**
     1453550461075 - Sat Jan 23 2016 15:01:01
     */
@@ -46,3 +48,24 @@
 }
 )JSON";
 
+class TestStorageFactoryHelper : public TestStorageFactory
+{
+public:
+    TestStorageFactoryHelper(bool invalidConfig = false) : m_invalidConfig(invalidConfig) {}
+    std::string getConfigPath() const { return m_path; }
+
+private:
+    virtual bool readConfig(const std::string& path, std::string* outContent)
+    {
+        if (m_invalidConfig)
+            return false;
+
+        m_path = path;
+        outContent->assign(kTestJson);
+
+        return true;
+    }
+
+    std::string m_path;
+    bool m_invalidConfig;
+};

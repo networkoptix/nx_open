@@ -4,6 +4,7 @@
 #include <string>
 #include <algorithm>
 #include <sstream>
+#include <iomanip>
 #include "vfs.h"
 #include "log.h"
 #include "detail/json.h"
@@ -76,10 +77,11 @@ std::string pathFromTimeStamp(const std::string& timestampString)
     time_t t = (time_t)(std::stoll(timestampString) / 1000);
     struct tm *ltime = localtime(&t);
 
+    out.fill('0');
     out << (1900 + ltime->tm_year) << "/"
-        << (ltime->tm_mon + 1) << "/"
-        << (ltime->tm_mday) << "/"
-        << (ltime->tm_hour) << "/"
+        << std::setw(2) << (ltime->tm_mon + 1) << "/"
+        << std::setw(2) << (ltime->tm_mday) << "/"
+        << std::setw(2) << (ltime->tm_hour) << "/"
         << timestampString << ".mkv"; 
 
     return out.str();

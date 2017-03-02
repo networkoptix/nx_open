@@ -47,18 +47,6 @@ private:
     uint32_t m_size;
 };
 
-class TestFileInfoIterator
-    : public nx_spl::FileInfoIterator,
-      private PluginRefCounter<TestFileInfoIterator> 
-{
-public:
-    TestFileInfoIterator(const char *path);
-public:
-    virtual nx_spl::FileInfo* STORAGE_METHOD_CALL next(int* ecode) const override;
-private:
-    nx_spl::FileInfo m_fInfo;
-};
-
 */
 
 struct FsStubNode;

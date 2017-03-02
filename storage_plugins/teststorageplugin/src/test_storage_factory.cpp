@@ -72,14 +72,6 @@ nx_spl::Storage* STORAGE_METHOD_CALL TestStorageFactory::createStorage(
     int*        ecode
 )
 {
-    if (m_storageUrls.find(url) != m_storageUrls.cend())
-    {
-        LOG("[TestStorage, TestStorageFactory::createStorage]: storage with this url '%s' already exists\n", url);
-        if (ecode)
-            *ecode = nx_spl::error::UrlNotExists;
-        return nullptr;
-    }
-
     /* parse url */
     utils::Url parsedUrl(url);
     if (!parsedUrl.valid())
@@ -93,6 +85,15 @@ nx_spl::Storage* STORAGE_METHOD_CALL TestStorageFactory::createStorage(
     if (parsedUrl.scheme() != "test")
     {
         LOG("[TestStorage, TestStorageFactory::createStorage]: url '%s' is invalid (wrong scheme)\n", url);
+        if (ecode)
+            *ecode = nx_spl::error::UrlNotExists;
+        return nullptr;
+    }
+
+    /* check if already exists */
+    if (m_storageHosts.find(parsedUrl.host()) != m_storageHosts.cend())
+    {
+        LOG("[TestStorage, TestStorageFactory::createStorage]: storage with this host '%s' already exists\n", parsedUrl.host().c_str());
         if (ecode)
             *ecode = nx_spl::error::UrlNotExists;
         return nullptr;
@@ -120,7 +121,7 @@ nx_spl::Storage* STORAGE_METHOD_CALL TestStorageFactory::createStorage(
 
     /* parse config json */
     utils::VfsPair vfsPair;
-    if (!utils::buildVfsFromJson(configContent.c_str(), parsedUrl.host().c_str(), &vfsPair))
+    if (!utils::buildVfsFromJson(configContent.c_str(), parsedUrl.hostPath().c_str(), &vfsPair))
     {
         if (vfsPair.root)
             FsStubNode_remove(vfsPair.root);
@@ -130,6 +131,7 @@ nx_spl::Storage* STORAGE_METHOD_CALL TestStorageFactory::createStorage(
         return nullptr;
     }
 
+    m_storageHosts.insert(parsedUrl.host());
     if (ecode)
         *ecode = nx_spl::error::NoError;
 
