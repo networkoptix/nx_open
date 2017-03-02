@@ -688,28 +688,30 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(void* buffer, unsigned
         DWORD wsaFlags = flags;
         DWORD* wsaBytesRead = (DWORD*) &bytesRead;
 
-        auto wsaResult = WSARecv(m_fd, &wsaBuffer, /* buffer count*/ 1, /* out bytes read*/ nullptr,
+        auto wsaResult = WSARecv(m_fd, &wsaBuffer, /* buffer count*/ 1, wsaBytesRead,
             &wsaFlags, &overlapped, nullptr);
-
-        auto timeout = m_readTimeoutMS ? m_readTimeoutMS : INFINITE;
-        int waitResult = WaitForSingleObject(m_eventObject, timeout);
-        if (!WSAGetOverlappedResult(m_fd, &overlapped, wsaBytesRead, FALSE, &wsaFlags))
+        if (wsaResult == SOCKET_ERROR && SystemError::getLastOSErrorCode() == WSA_IO_PENDING)
         {
-            const auto errCode = SystemError::getLastOSErrorCode();
-            if (errCode == WSA_IO_INCOMPLETE)
+            auto timeout = m_readTimeoutMS ? m_readTimeoutMS : INFINITE;
+            int waitResult = WaitForSingleObject(m_eventObject, timeout);
+            if (!WSAGetOverlappedResult(m_fd, &overlapped, wsaBytesRead, FALSE, &wsaFlags))
             {
-                ::CancelIo((HANDLE) m_fd);
-                // Wait for:
-                // 1. CancelIo have been finished.
-                // 2. WSARecv have been finished.
-                // 3. Shutdown called.
-                WaitForSingleObject(m_eventObject, INFINITE);
-                // Check status again in case of race condition between CancelIo and other conditions
-                while (!WSAGetOverlappedResult(m_fd, &overlapped, wsaBytesRead, FALSE, &wsaFlags))
+                const auto errCode = SystemError::getLastOSErrorCode();
+                if (errCode == WSA_IO_INCOMPLETE)
                 {
-                    if (SystemError::getLastOSErrorCode() != WSA_IO_INCOMPLETE)
-                        return -1;
-                    ::Sleep(0);
+                    ::CancelIo((HANDLE)m_fd);
+                    // Wait for:
+                    // 1. CancelIo have been finished.
+                    // 2. WSARecv have been finished.
+                    // 3. Shutdown called.
+                    WaitForSingleObject(m_eventObject, INFINITE);
+                    // Check status again in case of race condition between CancelIo and other conditions
+                    while (!WSAGetOverlappedResult(m_fd, &overlapped, wsaBytesRead, FALSE, &wsaFlags))
+                    {
+                        if (SystemError::getLastOSErrorCode() != WSA_IO_INCOMPLETE)
+                            return -1;
+                        ::Sleep(0);
+                    }
                 }
             }
         }

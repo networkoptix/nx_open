@@ -6,7 +6,7 @@
 
 namespace {
 
-const int kIterations = 1000;
+const int kIterations = 100;
 const int kBufferSize = 1024 * 32;
 const std::chrono::milliseconds kClientDelay(1);
 
@@ -30,6 +30,7 @@ void doTest(bool doServerDelay, bool doClientDelay)
         client->setRecvTimeout(kClientDelay);
 
         QByteArray wholeData;
+        wholeData.reserve(kBufferSize * sizeof(int) * kIterations);
         std::vector<char> buffer(1024 * 1024);
         while (true)
         {
