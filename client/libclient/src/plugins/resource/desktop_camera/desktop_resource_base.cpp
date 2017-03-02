@@ -47,7 +47,6 @@ void QnDesktopResource::removeConnection(const QnMediaServerResourcePtr &server)
     qDebug() << "removing connection";
 
     auto connection = m_connectionPool.find(server->getId());
-    NX_ASSERT(connection != m_connectionPool.end());
     if (connection == m_connectionPool.end())
         return;
 

@@ -203,6 +203,11 @@ void QnSpeedSlider::sliderChange(SliderChange change)
 
 void QnSpeedSlider::wheelEvent(QGraphicsSceneWheelEvent *event)
 {
+    /*
+    * This logic is currently unused. Timeline speed slider mouse wheel
+    * events are handled in QnNavigationItem::at_speedSlider_wheelEvent.
+    */
+
     event->accept();
 
     if (m_wheelStuck)

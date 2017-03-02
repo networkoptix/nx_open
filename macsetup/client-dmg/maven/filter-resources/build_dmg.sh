@@ -6,9 +6,12 @@ SRC=./dmg-folder
 TMP=tmp
 VOLUME_NAME="${display.product.name} ${release.version}"
 DMG_FILE="${artifact.name.client}.dmg"
+
+# Please do not add "Client" keyword to APP_DIR because the same name exists.
 APP_DIR="$SRC/${display.product.name}.app"
 HELP=${ClientHelpSourceDir}
 RELEASE_VERSION=${release.version}
+PROTOCOL_HANDLER_APP_NAME="${protocol_handler_app_name}"
 
 AS_SRC=app-store
 PKG_FILE="${artifact.name.client}.pkg"
@@ -19,6 +22,7 @@ QT_VERSION="${qt.version}"
 ln -s /Applications $SRC/Applications
 
 mv $SRC/client.app "$APP_DIR"
+mv "$APP_DIR"/Contents/MacOS/protocol_handler.app "$APP_DIR"/Contents/MacOS/"$PROTOCOL_HANDLER_APP_NAME"
 mkdir -p "$APP_DIR/Contents/Resources"
 cp logo.icns "$APP_DIR/Contents/Resources/appIcon.icns"
 cp logo.icns $SRC/.VolumeIcon.icns

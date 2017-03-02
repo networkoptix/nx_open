@@ -76,7 +76,9 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 
         const auto message = utils::MergeSystemsStatus::getErrorMessage(
              kStatus, moduleInformation).prepend(lit("\n"));
-        QnMessageBox::critical(mainWindow(), tr("Failed to merge Systems"), message);
+        QnMessageBox::critical(mainWindow(),
+            tr("Cloud System cannot be merged to another"),
+            message);
         return;
     }
 
