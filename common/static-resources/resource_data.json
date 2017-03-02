@@ -648,7 +648,7 @@
         },
         {
             "keys": [
-                "Hikvision|DS-6716HWI"
+                "Hikvision|DS-6716HWI", "Hikvision|DS-6716HFI", "Hikvision|DS-6716*"
             ],
             "forcedOnvifParams":
             {
