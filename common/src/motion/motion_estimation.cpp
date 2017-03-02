@@ -1100,7 +1100,7 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
 #else
     if (m_totalFrames == 0) {
         for (int i = 0; i < FRAMES_BUFFER_SIZE; ++i)
-            scaleFrame(m_frames[0].data()->data[0], m_frames[0]->width, m_frames[0]->height, m_frames[0]->linesize[0], m_frameBuffer[i], m_frameBuffer[0], m_frameDeltaBuffer);
+            scaleFrame(m_frames[idx].data()->data[0], m_frames[idx]->width, m_frames[idx]->height, m_frames[idx]->linesize[0], m_frameBuffer[i], m_frameBuffer[0], m_frameDeltaBuffer);
     }
     else {
         scaleFrame(m_frames[idx].data()->data[0], m_frames[idx]->width, m_frames[idx]->height, m_frames[idx]->linesize[0], m_frameBuffer[idx], m_frameBuffer[prevIdx], m_frameDeltaBuffer);
