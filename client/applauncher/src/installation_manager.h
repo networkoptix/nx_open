@@ -27,8 +27,6 @@ class InstallationManager : public QObject {
     Q_PROPERTY( int count READ count )
 
 public:
-    void s();
-
     InstallationManager(QObject *parent = NULL );
 
     void updateInstalledVersionsInformation();
