@@ -434,7 +434,9 @@ void QnRoutingManagementWidget::at_addButton_clicked() {
     QUrl url = QUrl::fromUserInput(urlString);
     url.setScheme(lit("http"));
 
-    if (!url.isValid()) {
+    const bool validUrl = url.isValid() && !url.host().isEmpty();
+    if (!validUrl)
+    {
         reportUrlEditingError(QnServerAddressesModel::InvalidUrl);
         return;
     }
