@@ -116,5 +116,9 @@ ApplicationWindow
 
     Screen.onPrimaryOrientationChanged: updateNavigationBarPadding()
 
-    onActiveFocusItemChanged: stackView.restoreActiveFocus()
+    onActiveFocusItemChanged:
+    {
+        Nx.ensureFlickableChildVisible(activeFocusItem)
+        stackView.restoreActiveFocus()
+    }
 }

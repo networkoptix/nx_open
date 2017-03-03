@@ -3,6 +3,8 @@
 
 #include <QtCore/QSharedPointer>
 
+#include <plugins/resource/avi/avi_archive_metadata.h>
+
 #include "nx/streaming/audio_data_packet.h"
 #include "nx/streaming/video_data_packet.h"
 
@@ -28,22 +30,6 @@ class QnAviArchiveDelegate: public QnAbstractArchiveDelegate
     Q_OBJECT;
 
 public:
-    enum Tag {
-        StartTimeTag,
-        EndTimeTag,
-        LayoutInfoTag,
-        SoftwareTag,
-        SignatureTag,
-        DewarpingTag,
-        CustomTag /**< Tag for all other future values encoded in JSON object. */
-    };
-
-    /*
-    * Some containers supports only predefined tag names. So, I've introduce this function
-    */
-    static const char* getTagName(Tag tag, const QString& formatName);
-    const char* getTagValue(Tag tag);
-
     QnAviArchiveDelegate();
     virtual ~QnAviArchiveDelegate();
 
@@ -72,13 +58,14 @@ public:
 
     const char* getTagValue( const char* tagName );
 
+    QnAviArchiveMetadata metadata() const;
+
 protected:
     qint64 packetTimestamp(const AVPacket& packet);
     void packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet);
     void initLayoutStreams();
     AVFormatContext* getFormatContext();
 private:
-    bool deserializeLayout(QnCustomResourceVideoLayout* layout, const QString& layoutStr);
     QnConstMediaContextPtr getCodecContext(AVStream* stream);
     bool reopen();
 protected:
@@ -96,8 +83,9 @@ private:
     QnResourceAudioLayoutPtr m_audioLayout;
     QVector<int> m_indexToChannel;
     QList<QnConstMediaContextPtr> m_contexts;
+    QnAviArchiveMetadata m_metadata;
 
-    qint64 m_startTime;
+    qint64 m_startTimeUsec; //microseconds
     bool m_useAbsolutePos;
     qint64 m_duration;
 

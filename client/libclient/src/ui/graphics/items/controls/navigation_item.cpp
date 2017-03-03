@@ -153,6 +153,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
             timelinePlaceholder->setVisible(!isRelevant);
             m_separators->setFrameColor(palette().color(isRelevant ? QPalette::Shadow : QPalette::Midlight));
             m_separators->setFrameWidth(isRelevant ? 2.0 : 1.0);
+            updatePlaybackButtonsEnabled();
             if (reset)
                 m_timeSlider->invalidateWindow();
         });
@@ -370,7 +371,6 @@ void QnNavigationItem::updateSpeedSliderSpeedFromNavigator()
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updatingSpeedSliderFromNavigator, true);
     m_speedSlider->setSpeed(navigator()->speed());
-    updatePlaybackButtonsPressed();
     updatePlayButtonChecked();
 }
 
@@ -381,28 +381,6 @@ void QnNavigationItem::updateNavigatorSpeedFromSpeedSlider()
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updatingNavigatorFromSpeedSlider, true);
     navigator()->setSpeed(m_speedSlider->roundedSpeed());
-    updatePlaybackButtonsPressed();
-}
-
-void QnNavigationItem::updatePlaybackButtonsPressed()
-{
-    qreal speed = navigator()->speed();
-
-    if (qFuzzyCompare(speed, 1.0) || qFuzzyIsNull(speed) || (speed > 0.0 && speed < 1.0))
-    {
-        m_stepForwardButton->setPressed(false);
-        m_stepBackwardButton->setPressed(false);
-    }
-    else if (speed > 1.0)
-    {
-        m_stepForwardButton->setPressed(true);
-        m_stepBackwardButton->setPressed(false);
-    }
-    else if (speed < 0.0)
-    {
-        m_stepForwardButton->setPressed(false);
-        m_stepBackwardButton->setPressed(true);
-    }
 }
 
 void QnNavigationItem::updatePlaybackButtonsIcons()
@@ -508,7 +486,7 @@ void QnNavigationItem::updatePlaybackButtonsEnabled()
      * client will be in strange state: speed slider allows only 0x and 1x, but current speed is -16x.
      * So we making the slider enabled for I/O module to do not make the situation even stranger.
      */
-    m_speedSlider->setEnabled(playable);
+    m_speedSlider->setEnabled(playable && m_timeSlider->isVisible());
 }
 
 void QnNavigationItem::updateVolumeButtonsEnabled()

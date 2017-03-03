@@ -36,7 +36,7 @@ public:
         static const int UnknownDuration               = -1;
 
         Chunk(): startTimeMs(-1), durationMs(0), storageIndex(0), fileIndex(0),timeZone(-1), fileSizeHi(0), fileSizeLo(0) {}
-        Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration, qint16 _timeZone, quint16 fileSizeHi = 0, quint32 fileSizeLo = 0) : 
+        Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration, qint16 _timeZone, quint16 fileSizeHi = 0, quint32 fileSizeLo = 0) :
             startTimeMs(_startTime), durationMs(_duration), storageIndex(_storageIndex), fileIndex(_fileIndex), timeZone(_timeZone), fileSizeHi(fileSizeHi), fileSizeLo(fileSizeLo)
         {
             //NX_ASSERT(startTimeMs == -1 || startTimeMs > 0, Q_FUNC_INFO, "Invalid startTime value");
@@ -67,14 +67,14 @@ public:
         int64_t originalDuration;
         bool isTruncated;
 
-        TruncableChunk() 
+        TruncableChunk()
             : Chunk(),
               originalDuration(0),
               isTruncated(false)
         {}
 
-        TruncableChunk(const Chunk &other) 
-            : Chunk(other), 
+        TruncableChunk(const Chunk &other)
+            : Chunk(other),
               originalDuration(other.durationMs),
               isTruncated(false)
         {}
@@ -98,11 +98,11 @@ public:
         bool                        isBackup;
 
         UniqueChunk(
-            const TruncableChunk        &chunk, 
+            const TruncableChunk        &chunk,
             const QString               &cameraId,
             QnServer::ChunksCatalog     quality,
             bool                        isBackup
-        ) 
+        )
           : chunk(chunk),
             cameraId(cameraId),
             quality(quality),
@@ -126,8 +126,8 @@ public:
     enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};
 
     DeviceFileCatalog(
-        const QString           &cameraUniqueId, 
-        QnServer::ChunksCatalog catalog, 
+        const QString           &cameraUniqueId,
+        QnServer::ChunksCatalog catalog,
         QnServer::StoragePool   role
     );
     //void deserializeTitleFile();
@@ -137,7 +137,7 @@ public:
     qint64 lastChunkStartTime(int storageIndex) const;
     Chunk takeChunk(qint64 startTimeMs, qint64 durationMs);
 
-    Chunk deleteFirstRecord(); 
+    Chunk deleteFirstRecord();
 
     /** Delete first N records. Return deleted file timestamps */
     QVector<Chunk> deleteRecordsBefore(int idx);
@@ -218,7 +218,6 @@ private:
 
     bool csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage);
     bool addChunk(const Chunk& chunk);
-    qint64 recreateFile(const QString& fileName, qint64 startTimeMs, const QnStorageResourcePtr &storage);
     QSet<QDate> recordedMonthList();
 
     void readStorageData(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, QMap<qint64, Chunk>& allChunks, QVector<EmptyFileInfo>& emptyFileList, const ScanFilter& scanFilter);
@@ -228,7 +227,7 @@ private:
     void removeChunks(int storageIndex);
     void removeRecord(int idx);
     int detectTimeZone(qint64 startTimeMs, const QString& fileName);
-    
+
     friend class QnStorageManager;
 
     QnStorageManager *getMyStorageMan() const;
@@ -236,7 +235,7 @@ private:
 
     mutable QnMutex m_mutex;
     //QFile m_file;
-    std::deque<Chunk> m_chunks; 
+    std::deque<Chunk> m_chunks;
     QString m_cameraUniqueId;
 
     typedef QVector<QPair<int, bool> > CachedDirInfo;
@@ -267,23 +266,23 @@ bool operator < (qint64 first, const DeviceFileCatalog::Chunk& other);
 bool operator < (const DeviceFileCatalog::Chunk& other, qint64 first);
 bool operator == (const DeviceFileCatalog::Chunk &lhs, const DeviceFileCatalog::Chunk &rhs);
 
-inline bool operator == (const DeviceFileCatalog::UniqueChunk    &lhs, 
+inline bool operator == (const DeviceFileCatalog::UniqueChunk    &lhs,
                          const DeviceFileCatalog::UniqueChunk    &rhs)
 {
     return lhs.chunk.toBaseChunk().startTimeMs == rhs.chunk.toBaseChunk().startTimeMs &&
            lhs.chunk.toBaseChunk().durationMs == rhs.chunk.toBaseChunk().durationMs &&
-           lhs.cameraId == rhs.cameraId && lhs.quality == rhs.quality && 
+           lhs.cameraId == rhs.cameraId && lhs.quality == rhs.quality &&
            lhs.isBackup == rhs.isBackup;
 }
 
-inline bool operator < (const DeviceFileCatalog::UniqueChunk    &lhs, 
+inline bool operator < (const DeviceFileCatalog::UniqueChunk    &lhs,
                         const DeviceFileCatalog::UniqueChunk    &rhs)
 {
     if (lhs.cameraId != rhs.cameraId || lhs.quality != rhs.quality || lhs.isBackup != rhs.isBackup) {
         return lhs.cameraId < rhs.cameraId ?
                true : lhs.cameraId > rhs.cameraId ?
-                      false : lhs.quality < rhs.quality ? 
-                            true : lhs.quality > rhs.quality ? 
+                      false : lhs.quality < rhs.quality ?
+                            true : lhs.quality > rhs.quality ?
                                 false : lhs.isBackup < rhs.isBackup;
     } else {
         return lhs.chunk.startTimeMs < rhs.chunk.startTimeMs;

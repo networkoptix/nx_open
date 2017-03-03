@@ -73,7 +73,7 @@ Control
             id: thumbnailContainer
 
             width: parent.width
-            height: parent.width * 3 / 4
+            height: parent.width * 9 / 16
             color: d.offline ? ColorTheme.base7 : ColorTheme.base4
 
             Loader

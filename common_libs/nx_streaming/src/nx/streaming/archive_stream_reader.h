@@ -37,8 +37,6 @@ public:
     virtual QnConstResourceVideoLayoutPtr getDPVideoLayout() const;
     virtual QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
     virtual bool hasVideo() const;
-    static bool deserializeLayout(QnCustomResourceVideoLayout* layout, const QString& layoutStr);
-    static QString serializeLayout(const QnResourceVideoLayout* layout);
     void renameFileOnDestroy(const QString& newFileName);
     //void jumpWithMarker(qint64 mksec, bool findIFrame, int marker);
     void setMarker(int marker);

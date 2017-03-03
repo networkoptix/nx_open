@@ -7072,14 +7072,6 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>AVI (*.avi)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Matroska (*.mkv)</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Export Video As...</source>
         <translation></translation>
     </message>
@@ -7276,6 +7268,10 @@ to %1</source>
     </message>
     <message>
         <source>Password cannot be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cloud System cannot be merged to another</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

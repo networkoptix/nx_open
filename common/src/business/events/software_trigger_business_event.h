@@ -21,4 +21,4 @@ private:
     const QString m_triggerId;
 };
 
-typedef QSharedPointer<QnSoftwareTriggerEvent> QnSoftwareTriggerEventPtr;
+using QnSoftwareTriggerEventPtr = QSharedPointer<QnSoftwareTriggerEvent>;
