@@ -177,6 +177,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
             'handlers': ['console', 'mail_admins']
+        },
+        'notifications.tasks': {
+            'level': 'DEBUG',
+            'propagate': True,
+            'handlers': ['console', 'mail_admins']
         }
     }
 }

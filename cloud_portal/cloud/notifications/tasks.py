@@ -1,33 +1,54 @@
 from __future__ import absolute_import
 
 from celery import shared_task
-from celery.exceptions import Ignore
 
 from .engines import email_engine
 
+
+from smtplib import SMTPException
+from util.config import get_config
+from celery.exceptions import Ignore
+
+import traceback
+import logging
+logger = logging.getLogger(__name__)
+
+
+def log_error(error, user_email, type, message, customization, attempt):
+    error_formatted = '\n{}:{}\nTarget Email: {}\nType: {}\nMessage:{}\nCustomization: {}\nAttempt: {}\nCall Stack: {}'\
+        .format(error.__class__.__name__,
+                error,
+                user_email,
+                type,
+                message,
+                customization,
+                attempt,
+                traceback.format_exc())
+
+    logger.error(error_formatted)
+
+
 @shared_task
 def send_email(user_email, type, message, customization, attempt=1):
-    from smtplib import SMTPException
-    from util.config import get_config
-
-    error = ''
     try:
         email_engine.send(user_email, type, message, customization)
-    except SMTPException as error:
-        print(error)
-        print("Attempt %s failed" % str(attempt))
-        if attempt < get_config()['max_retries']:
+    except Exception as error:
+        if isinstance(error, SMTPException) and attempt < get_config()['max_retries']:
             send_email.delay(user_email, type, message, customization, attempt+1)
-            send_email.update_state(state="FAILURE", meta={'error': str(error),
-                                                           'user_email': user_email,
-                                                           'type': type,
-                                                           'message': message,
-                                                           'customization': customization,
-                                                           'attempt': attempt})
+
+        log_error(error, user_email, type, message, customization, attempt)
+
+        send_email.update_state(state="FAILURE", meta={'error': str(error),
+                                                       'user_email': user_email,
+                                                       'type': type,
+                                                       'message': message,
+                                                       'customization': customization,
+                                                       'attempt': attempt,
+                                                       })
         raise Ignore()
     else:
         return {'user_email': user_email, 'type': type, 'message': message,
-                'customization': customization, 'attempt': attempt, 'error': str(error)}
+                'customization': customization, 'attempt': attempt}
 
 
 @shared_task
