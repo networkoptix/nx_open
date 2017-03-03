@@ -1678,7 +1678,8 @@ bool UDPSocket::leaveGroup(const QString &multicastGroup, const QString& multica
             (raw_type *)&multicastRequest,
             sizeof(multicastRequest)) < 0)
     {
-        qnWarning("Multicast group leave failed (setsockopt()).");
+        qWarning() <<"Multicast group leave failed at IF" << multicastIF << "error:" <<
+            SystemError::getLastOSErrorText();
         return false;
     }
     return true;

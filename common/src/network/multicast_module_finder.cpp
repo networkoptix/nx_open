@@ -22,6 +22,7 @@
 #include "utils/common/cryptographic_hash.h"
 #include <api/global_settings.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/nettools.h>
 
 #define DEBUG_LOG(MESSAGE) do \
 { \
@@ -93,12 +94,10 @@ void QnMulticastModuleFinder::updateInterfaces()
     QList<QHostAddress> addressesToRemove = m_clientSockets.keys();
 
     /* This function only adds interfaces to the list. */
-    for (const QHostAddress &address : QNetworkInterface::allAddresses())
+    for (const QString &addressStr: getLocalIpV4AddressList())
     {
+        QHostAddress address(addressStr);
         addressesToRemove.removeOne(address);
-
-        if (address.protocol() != QAbstractSocket::IPv4Protocol)
-            continue;
 
         if (m_clientSockets.contains(address))
             continue;
