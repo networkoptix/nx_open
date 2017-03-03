@@ -4,8 +4,8 @@
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
 namespace Ui {
-    class SoftwareTriggerBusinessEventWidget;
-}
+class SoftwareTriggerBusinessEventWidget;
+} // namespace Ui
 
 //TODO: #vkutin This implementation is a stub
 // Actual implementation will be done as soon as software triggers specification is ready.

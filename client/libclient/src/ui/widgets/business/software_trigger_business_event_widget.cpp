@@ -3,12 +3,12 @@
 #include <QtCore/QScopedValueRollback>
 #include <business/business_strings_helper.h>
 
+/*
+TODO: #vkutin This implementation is a stub
+Actual implementation will be done as soon as software triggers specification is ready.
+*/
 
-//TODO: #vkutin This implementation is a stub
-// Actual implementation will be done as soon as software triggers specification is ready.
-
-
-QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(QWidget *parent) :
+QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(QWidget* parent):
     base_type(parent),
     ui(new Ui::SoftwareTriggerBusinessEventWidget)
 {
