@@ -4,17 +4,32 @@
 
 class QnQuickTextInputPrivate;
 
-class QnQuickTextInput : public QQuickTextInput
+class QnQuickTextInput: public QQuickTextInput
 {
     Q_OBJECT
 
     Q_PROPERTY(bool scrollByMouse READ scrollByMouse WRITE setScrollByMouse NOTIFY scrollByMouseChanged)
     Q_PROPERTY(QQuickItem* background READ background WRITE setBackground NOTIFY backgroundChanged FINAL)
     Q_PROPERTY(QString placeholderText READ placeholderText WRITE setPlaceholderText NOTIFY placeholderTextChanged)
+    Q_PROPERTY(EnterKeyType enterKeyType
+        READ enterKeyType WRITE setEnterKeyType NOTIFY enterKeyTypeChanged)
 
     typedef QQuickTextInput base_type;
 
 public:
+    enum EnterKeyType
+    {
+        EnterKeyDefault = Qt::EnterKeyDefault,
+        EnterKeyReturn = Qt::EnterKeyReturn,
+        EnterKeyDone = Qt::EnterKeyDone,
+        EnterKeyGo = Qt::EnterKeyGo,
+        EnterKeySend = Qt::EnterKeySend,
+        EnterKeySearch = Qt::EnterKeySearch,
+        EnterKeyNext = Qt::EnterKeyNext,
+        EnterKeyPrevious = Qt::EnterKeyPrevious
+    };
+    Q_ENUM(EnterKeyType)
+
     QnQuickTextInput(QQuickItem* parent = nullptr);
     ~QnQuickTextInput();
 
@@ -27,7 +42,14 @@ public:
     QString placeholderText() const;
     void setPlaceholderText(const QString& text);
 
+    EnterKeyType enterKeyType() const;
+    void setEnterKeyType(EnterKeyType enterKeyType);
+
     virtual QSGNode* updatePaintNode(QSGNode* oldNode, UpdatePaintNodeData* data) override;
+
+#ifndef QT_NO_IM
+    virtual QVariant inputMethodQuery(Qt::InputMethodQuery query) const override;
+#endif
 
 signals:
     void scrollByMouseChanged();
@@ -35,6 +57,7 @@ signals:
     void placeholderTextChanged();
     void clicked();
     void pressAndHold(const QPoint& pos);
+    void enterKeyTypeChanged();
 
 protected:
     virtual void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) override;
@@ -50,8 +73,9 @@ private:
 
 private:
     QPoint m_contextMenuPos;
-    int m_selectionStart;
-    int m_selectionEnd;
-    int m_cursorPosition;
-    QTimer* m_pressAndHoldTimer;
+    int m_selectionStart = -1;
+    int m_selectionEnd = -1;
+    int m_cursorPosition = -1;
+    QTimer* m_pressAndHoldTimer = nullptr;
+    EnterKeyType m_enterKeyType = EnterKeyDefault;
 };

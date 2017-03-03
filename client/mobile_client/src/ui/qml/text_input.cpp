@@ -17,21 +17,17 @@ public:
         SelectionEndHandle
     };
 
-    bool scrollByMouse;
-    qreal hscrollWhenPressed;
-    QQuickItem* background;
+    bool scrollByMouse = true;
+    qreal hscrollWhenPressed = 0.0;
+    QQuickItem* background = nullptr;
     QString placeholder;
-    bool dragStarted;
+    bool dragStarted = false;
 
     void resizeBackground();
     void updateInputMethod();
 };
 
-QnQuickTextInputPrivate::QnQuickTextInputPrivate() :
-    scrollByMouse(true),
-    hscrollWhenPressed(0),
-    background(nullptr),
-    dragStarted(false)
+QnQuickTextInputPrivate::QnQuickTextInputPrivate()
 {
 }
 
@@ -73,10 +69,6 @@ void QnQuickTextInputPrivate::updateInputMethod()
 
 QnQuickTextInput::QnQuickTextInput(QQuickItem* parent) :
     base_type(*(new QnQuickTextInputPrivate), parent),
-    m_contextMenuPos(),
-    m_selectionStart(-1),
-    m_selectionEnd(-1),
-    m_cursorPosition(-1),
     m_pressAndHoldTimer(new QTimer(this))
 {
     Q_D(QnQuickTextInput);
@@ -157,6 +149,24 @@ void QnQuickTextInput::setPlaceholderText(const QString& text)
     emit placeholderTextChanged();
 }
 
+QnQuickTextInput::EnterKeyType QnQuickTextInput::enterKeyType() const
+{
+    return m_enterKeyType;
+}
+
+void QnQuickTextInput::setEnterKeyType(EnterKeyType enterKeyType)
+{
+    if (m_enterKeyType == enterKeyType)
+        return;
+
+    m_enterKeyType = enterKeyType;
+    emit enterKeyTypeChanged();
+
+    #ifndef QT_NO_IM
+        updateInputMethod(Qt::ImEnterKeyType);
+    #endif
+}
+
 QSGNode* QnQuickTextInput::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdatePaintNodeData* data)
 {
     /* Copy paste from QQuickTextField (Qt.labs.controls) */
@@ -173,6 +183,32 @@ QSGNode* QnQuickTextInput::updatePaintNode(QSGNode* oldNode, QQuickItem::UpdateP
 
     return clipNode;
 }
+
+#ifndef QT_NO_IM
+
+QVariant QnQuickTextInput::inputMethodQuery(Qt::InputMethodQuery query) const
+{
+    switch (query)
+    {
+        case Qt::ImEnterKeyType:
+            if (m_enterKeyType == EnterKeyDefault)
+            {
+                // Seems like somebody forgot to make the getter const.
+                const auto nextItem =
+                    const_cast<QnQuickTextInput*>(this)->nextItemInFocusChain();
+                if (nextItem && nextItem->flags().testFlag(QQuickItem::ItemAcceptsInputMethod))
+                    return EnterKeyNext;
+            }
+            return m_enterKeyType;
+
+        default:
+            break;
+    }
+
+    return base_type::inputMethodQuery(query);
+}
+
+#endif
 
 void QnQuickTextInput::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
 {
