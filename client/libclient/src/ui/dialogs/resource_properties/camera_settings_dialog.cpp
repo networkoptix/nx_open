@@ -119,7 +119,7 @@ void QnCameraSettingsDialog::retranslateUi()
 
     auto cameras = m_settingsWidget->cameras();
 
-    const QString kWindowTitlePattern = lit("%1 - %2");
+    static const QString kWindowTitlePattern = lit("%1 - %2");
 
     const QString caption = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
         tr("Device Settings"), tr("Devices Settings"),
