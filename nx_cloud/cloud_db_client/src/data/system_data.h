@@ -72,7 +72,7 @@ bool deserialize(QnJsonContext*, const QJsonValue&, SystemAttributesUpdate*);
 // SystemHealthHistory
 
 #define SystemHealthHistoryItem_Fields (timestamp)(state)
-#define SystemHealthHistory_Fields (items)
+#define SystemHealthHistory_Fields (events)
 
 //-------------------------------------------------------------------------------------------------
 // System sharing data

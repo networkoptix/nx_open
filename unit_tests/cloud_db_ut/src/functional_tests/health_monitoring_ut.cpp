@@ -116,11 +116,11 @@ protected:
             cdb()->getSystemHealthHistory(
                 ownerAccount().email, ownerAccount().password,
                 registeredSystemData().id, &history));
-        ASSERT_EQ(m_expectedHealthHistory.items.size(), history.items.size());
+        ASSERT_EQ(m_expectedHealthHistory.events.size(), history.events.size());
 
-        for (size_t i = 0; i < m_expectedHealthHistory.items.size(); ++i)
+        for (size_t i = 0; i < m_expectedHealthHistory.events.size(); ++i)
         {
-            ASSERT_EQ(m_expectedHealthHistory.items[i].state, history.items[i].state);
+            ASSERT_EQ(m_expectedHealthHistory.events[i].state, history.events[i].state);
         }
     }
 
@@ -169,7 +169,7 @@ private:
         api::SystemHealthHistoryItem item;
         item.state = status;
         item.timestamp = nx::utils::utcTime();
-        m_expectedHealthHistory.items.push_back(std::move(item));
+        m_expectedHealthHistory.events.push_back(std::move(item));
     }
 };
 

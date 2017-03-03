@@ -272,7 +272,7 @@ public:
 class SystemHealthHistory
 {
 public:
-    std::vector<SystemHealthHistoryItem> items;
+    std::vector<SystemHealthHistoryItem> events;
 };
 
 /**
