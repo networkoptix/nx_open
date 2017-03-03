@@ -98,7 +98,7 @@ Page
         displayMarginBeginning: 16
         displayMarginEnd: 16 + mainWindow.bottomPadding
 
-        focus: true
+        focus: liteMode
 
         Keys.onPressed:
         {
