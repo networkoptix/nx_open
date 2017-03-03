@@ -24,7 +24,6 @@
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_auto_starter.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/local_file_cache.h>

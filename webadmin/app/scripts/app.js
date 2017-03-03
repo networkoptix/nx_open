@@ -32,80 +32,80 @@ angular.module('webadminApp', [
 
     customRouteProvider
         .when('/settings/system', {
-            templateUrl: 'views/settings.html',
+            templateUrl: Config.viewsDir + 'settings.html',
             controller: 'SettingsCtrl'
         })
         .when('/settings/server', {
-            templateUrl: 'views/settings.html',
+            templateUrl: Config.viewsDir + 'settings.html',
             controller: 'SettingsCtrl'
         })
         .when('/settings/device', {
-            templateUrl: 'views/settings.html',
+            templateUrl: Config.viewsDir + 'settings.html',
             controller: 'SettingsCtrl'
         })
         .when('/settings', {
             redirectTo: '/settings/server'
         })
         .when('/join', {
-            templateUrl: 'views/join.html',
+            templateUrl: Config.viewsDir + 'join.html',
             controller: 'SettingsCtrl'
         })
         .when('/info', {
-            templateUrl: 'views/info.html',
+            templateUrl: Config.viewsDir + 'info.html',
             controller: 'InfoCtrl'
         })
         .when('/developers/changelog', {
-            templateUrl: 'views/api_changelog.html',
+            templateUrl: Config.viewsDir + 'api_changelog.html',
             controller: 'MainCtrl'
         })
         .when('/developers', {
-            templateUrl: 'views/developers.html',
+            templateUrl: Config.viewsDir + 'developers.html',
             controller: 'MainCtrl'
         })
         .when('/support', {
-            templateUrl: 'views/support.html',
+            templateUrl: Config.viewsDir + 'support.html',
             controller: 'MainCtrl'
         })
         .when('/help', {
-            templateUrl: 'views/help.html',
+            templateUrl: Config.viewsDir + 'help.html',
             controller: 'MainCtrl'
         })
         .when('/login', {
-            templateUrl: 'views/login.html'
+            templateUrl: Config.viewsDir + 'login.html'
         })
         .when('/advanced', {
-            templateUrl: 'views/advanced.html',
+            templateUrl: Config.viewsDir + 'advanced.html',
             controller: 'AdvancedCtrl'
         })
         .when('/debug', {
-            templateUrl: 'views/debug.html',
+            templateUrl: Config.viewsDir + 'debug.html',
             controller: 'DebugCtrl'
         })
         .when('/client', {
-            templateUrl: 'views/client.html',
+            templateUrl: Config.viewsDir + 'client.html',
             controller: 'ClientCtrl',
             reloadOnSearch: false
         })
         .when('/view', {
-            templateUrl: 'views/view.html',
+            templateUrl: Config.viewsDir + 'view.html',
             controller: 'ViewCtrl',
             reloadOnSearch: false
         })
         .when('/view/:cameraId', {
-            templateUrl: 'views/view.html',
+            templateUrl: Config.viewsDir + 'view.html',
             controller: 'ViewCtrl',
             reloadOnSearch: false
         })
         .when('/sdkeula', {
-            templateUrl: 'views/sdkeula.html',
+            templateUrl: Config.viewsDir + 'sdkeula.html',
             controller: 'SdkeulaCtrl'
         })
         .when('/sdkeula/:sdkFile', {
-            templateUrl: 'views/sdkeula.html',
+            templateUrl: Config.viewsDir + 'sdkeula.html',
             controller: 'SdkeulaCtrl'
         })
         .when('/setup', {
-            templateUrl: 'views/dialogs/setup.html',
+            templateUrl: Config.viewsDir + 'dialogs/setup.html',
             controller: 'SetupCtrl'
         })
         .when('/', {

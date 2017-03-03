@@ -200,7 +200,18 @@ quint8 QnRtspFfmpegEncoder::getPayloadtype()
 
 QByteArray QnRtspFfmpegEncoder::getAdditionSDP( const std::map<QString, QString>& /*streamParams*/ )
 {
-    return QByteArray();
+    if (m_codecCtxData.isEmpty())
+        return QByteArray();
+
+    return lit("a=fmtp:%1 config=%2\r\n")
+        .arg(getPayloadtype())
+        .arg(QLatin1String(m_codecCtxData.toBase64())).toUtf8();
+}
+
+void QnRtspFfmpegEncoder::setCodecContext(const QnConstMediaContextPtr& codecContext)
+{
+    if (codecContext)
+        m_codecCtxData = codecContext->serialize();
 }
 
 QString QnRtspFfmpegEncoder::getName()

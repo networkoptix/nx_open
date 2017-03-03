@@ -123,5 +123,3 @@ if(withTests)
 endif()
 
 include(fix_qt_vars)
-
-cmake_policy(SET CMP0058 NEW)

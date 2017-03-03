@@ -72,8 +72,6 @@ public:
 
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
-    void setStartOffset(qint64 value);
-
     QnResourcePtr getResource() const { return m_device; }
 
     QString fixedFileName() const;
@@ -170,7 +168,6 @@ private:
     StreamRecorderErrorStruct m_lastError;
     qint64 m_currentChunkLen;
 
-    qint64 m_startOffset;
     int m_prebufferingUsec;
     QnUnsafeQueue<QnConstAbstractMediaDataPtr> m_prebuffer;
 

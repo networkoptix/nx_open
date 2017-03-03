@@ -36,6 +36,10 @@ protected:
     virtual void doLoadAsync() override;
 
 private:
+    void setStatus(Qn::ThumbnailStatus status);
+
+private:
     QnThumbnailRequestData m_request;
     QImage m_image;
+    Qn::ThumbnailStatus m_status;
 };

@@ -1,0 +1,64 @@
+<div class="container-fluid">
+
+    <div>
+        <h2 class="text-center">Добро пожаловать в легкий клиент</h2>
+        <p class="text-center">Облегчённая версию клиента может показать до 4 видео, <br>
+и может управляться либо клавиатуры и мыши, подключенных к устройству, 
+<br>или через мобильное приложение</p>
+    </div>
+    <div class="text-center">
+        <div class="panel panel-default panel-inline system-info">
+            <div class="panel-body">
+                <p class="text-center">
+                    <img src="images/lite_client/control_types_keyboard.png"> <img src="images/lite_client/control_types_mouse.png">
+                </p>
+                <h3 class="text-center">С Клавиатуры/мыши</h3>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>Выделение ячейку</td>
+                            <td class="text-right"><img src="images/lite_client/keyboard_asdw.png"></td>
+                            <td class="grey-text">или одинарный <img src="images/lite_client/mouse_click.png">щелчок левой кнопкой мыши</td>
+                        </tr>
+                        <tr>
+                            <td>Переключение камеры в ячейке</td>
+                            <td class="text-right"><img src="images/lite_client/keyboard_ctrlarrows.png"></td>
+                            <td class="grey-text">или <img src="images/lite_client/mouse_wheel.png"> колесо прокрутки</td>
+                        </tr>
+
+                        <tr>
+                            <td>Вход / выход из полноэкранного режима</td>
+                            <td class="text-right"><img src="images/lite_client/keyboard_enter.png"></td>
+                            <td class="grey-text">или <img src="images/lite_client/mouse_clickclick.png"> двойной щелчок</td>
+                        </tr>
+                        <tr>
+                            <td>Выход</td>
+                            <td class="text-right"><img src="images/lite_client/keyboard_esc.png"></td>
+                            <td class="grey-text"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel panel-default panel-inline system-info">
+            <div class="panel-body">
+                <p class="text-center">
+                    <img src="images/lite_client/control_mobile.png">
+                </p>
+                <h3 class="text-center">Через мобильное приложение</h3>
+                <table>
+                    <tbody>
+                        <tr><td>Установить <b>{{Config.productName}}</b> app через Google Play или App Store</td></tr>
+                        <tr><td>Подключиться к системе "{{settings.systemName}}" ({{IP}}:{{port}})</td></tr>
+                        <tr><td>Выбрать экран "{{settings.name}}" в боковом меню</td></tr>
+                        <tr><td>Включить облегченный клиента и выбрать камеры для отображения</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary btn-lg" ng-click="startCameras()" auto-focus enter-button>Запуск облегченного клиента</button>
+        <p class="grey-text">(Ввод)</p>
+    </div>
+</div>

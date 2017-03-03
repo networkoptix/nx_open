@@ -20,7 +20,7 @@ namespace hpm {
 UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     nx::String connectionID,
     const ListeningPeerData& serverPeerData,
-    std::function<void(api::ResultCode)> onFsmFinishedEventHandler,
+    std::function<void(api::NatTraversalResultCode)> onFsmFinishedEventHandler,
     const conf::Settings& settings)
 :
     m_state(State::init),
@@ -345,7 +345,7 @@ void UDPHolePunchingConnectionInitiationFsm::done(api::ResultCode result)
     m_state = State::fini;
 
     auto onFinishedHandler = std::move(m_onFsmFinishedEventHandler);
-    onFinishedHandler(result);
+    onFinishedHandler(m_sessionStatisticsInfo.resultCode);
 }
 
 const char* UDPHolePunchingConnectionInitiationFsm::toString(State state)

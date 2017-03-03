@@ -66,7 +66,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     /* NxMediaPlayer should not be used.
        It is here only to allow assignments of MediaPlyer to properties of this type. */
     qmlRegisterType<nx::media::Player>("Nx.Media", 1, 0, "NxMediaPlayer");
-    qmlRegisterType<MediaPlyer>("Nx.Media", 1, 0, "MediaPlayer");
+    qmlRegisterType<MediaPlayer>("Nx.Media", 1, 0, "MediaPlayer");
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");
     qmlRegisterType<QnThumbnailCacheAccessor>("com.networkoptix.qml", 1, 0, "QnThumbnailCacheAccessor");
     qmlRegisterType<QnQuickItemMouseTracker>("com.networkoptix.qml", 1, 0, "ItemMouseTracker");

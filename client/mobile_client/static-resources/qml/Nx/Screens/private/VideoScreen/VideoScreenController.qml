@@ -41,14 +41,42 @@ Object
     property alias mediaPlayer: mediaPlayer
 
     signal playerJump(real position)
+    signal gotFirstPosition(real position)
 
     QtObject
     {
         id: d
+
+        readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
+
         property bool resumeOnActivate: false
         property bool resumeOnOnline: false
         property real lastPosition: -1
         property bool waitForLastPosition: false
+        property bool waitForFirstPosition: true
+
+        function savePosition()
+        {
+            lastPosition = mediaPlayer.liveMode ? -1 : mediaPlayer.position
+            waitForLastPosition = true
+        }
+
+        onApplicationActiveChanged:
+        {
+            if (!Utils.isMobile())
+                return
+
+            if (applicationActive)
+            {
+                if (d.resumeOnActivate)
+                    mediaPlayer.play()
+            }
+            else
+            {
+                d.resumeOnActivate = mediaPlayer.playing
+                mediaPlayer.pause()
+            }
+        }
     }
 
     MediaResourceHelper
@@ -68,33 +96,19 @@ Object
         resourceId: resourceHelper.resourceId
         onPlayingChanged: setKeepScreenOn(playing)
         maxTextureSize: getMaxTextureSize()
-        onMediaStatusChanged:
+        onPositionChanged:
         {
-            if (d.waitForLastPosition && mediaStatus === MediaPlayer.Loaded)
+            if (d.waitForLastPosition)
             {
                 d.lastPosition = position
                 d.waitForLastPosition = false
             }
-        }
-    }
 
-    Connections
-    {
-        target: Qt.application
-        onStateChanged:
-        {
-            if (!Utils.isMobile())
-                return
-
-            if (Qt.application.state === Qt.ApplicationActive)
+            if (d.waitForFirstPosition)
             {
-                if (d.resumeOnActivate)
-                    mediaPlayer.play()
-            }
-            else
-            {
-                d.resumeOnActivate = mediaPlayer.playing
-                mediaPlayer.pause()
+                playerJump(mediaPlayer.position)
+                d.waitForFirstPosition = false
+                gotFirstPosition(mediaPlayer.position)
             }
         }
     }
@@ -121,6 +135,7 @@ Object
     {
         playerJump(d.lastPosition)
         mediaPlayer.position = d.lastPosition
+        d.waitForFirstPosition = true
     }
 
     Component.onCompleted:
@@ -135,9 +150,7 @@ Object
     function play()
     {
         mediaPlayer.play()
-
-        d.lastPosition = mediaPlayer.liveMode ? -1 : mediaPlayer.position
-        d.waitForLastPosition = (mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
+        d.savePosition()
     }
 
     function playLive()
@@ -161,8 +174,10 @@ Object
         mediaPlayer.preview()
     }
 
-    function setPosition(position)
+    function setPosition(position, savePosition)
     {
         mediaPlayer.position = position
+        if (savePosition)
+            d.savePosition()
     }
 }

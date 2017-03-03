@@ -732,6 +732,28 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(QnAbstractM
     return rez;
 }
 
+QnConstMediaContextPtr QnRtspConnectionProcessor::getAudioCodecContext(int audioTrackIndex) const
+{
+    Q_D(const QnRtspConnectionProcessor);
+
+    QnServerArchiveDelegate archive;
+    QnConstResourceAudioLayoutPtr layout;
+
+    if (d->startTime == DATETIME_NOW)
+    {
+        layout = d->mediaRes->getAudioLayout(d->liveDpHi.data()); //< Layout from live video.
+    }
+    else if (archive.open(getResource()->toResourcePtr()))
+    {
+        archive.seek(d->startTime, true);
+        layout = archive.getAudioLayout(); //< Layout from now opening archive point.
+    }
+
+    if (layout && audioTrackIndex < layout->channelCount())
+        return layout->getAudioTrackInfo(audioTrackIndex).codecContext;
+    return QnConstMediaContextPtr(); //< Not found.
+}
+
 int QnRtspConnectionProcessor::composeDescribe()
 {
     Q_D(QnRtspConnectionProcessor);
@@ -786,6 +808,11 @@ int QnRtspConnectionProcessor::composeDescribe()
         {
             bool isVideoTrack = (i < numVideo);
             QnRtspFfmpegEncoder* ffmpegEncoder = createRtspFfmpegEncoder(isVideoTrack);
+            if (!isVideoTrack)
+            {
+                const int audioTrackIndex = i - numVideo;
+                ffmpegEncoder->setCodecContext(getAudioCodecContext(audioTrackIndex));
+            }
             encoder = QnRtspEncoderPtr(ffmpegEncoder);
         }
         else {

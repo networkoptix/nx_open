@@ -580,10 +580,12 @@ TEST_F(OutgoingTunnel, connectTimeout)
 
         const std::chrono::milliseconds timeout(utils::random::number(1, 2000));
         const std::chrono::milliseconds minTimeoutCorrection(500);
-        const std::chrono::milliseconds timeoutCorrection =
-            (timeout / 5) > minTimeoutCorrection
-            ? (timeout / 5)
-            : minTimeoutCorrection;
+        #ifdef _DEBUG
+            const std::chrono::milliseconds timeoutCorrection =
+                (timeout / 5) > minTimeoutCorrection
+                ? (timeout / 5)
+                : minTimeoutCorrection;
+        #endif // _DEBUG
 
         std::vector<ConnectionContext> connectedPromises;
         connectedPromises.resize(connectionsToCreate);

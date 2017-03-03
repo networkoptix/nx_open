@@ -62,7 +62,7 @@ static const QSize kDefaultThumbnailSize(0, QnThumbnailRequestData::kMinimumSize
 /** We limit the maximal number of notification items to prevent crashes due
  * to reaching GDI resource limit. */
 static const int kMaxNotificationItems = 128;
-static const int kMultiThumbnailSpacing = 4;
+static const int kMultiThumbnailSpacing = 1;
 static const int kMaxThumbnailCount = 5;
 
 const char* kItemResourcePropertyName = "_qn_itemResource";
@@ -76,8 +76,6 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
     QnWorkbenchContextAware(context),
     m_headerWidget(new GraphicsWidget(this))
 {
-    //m_statusPixmapManager->setThumbnailSize(kDefaultThumbnailSize);
-
     int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
     auto newButton = [this, maxIconSize](QnActions::IDType actionId, int helpTopicId)
     {
@@ -242,6 +240,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     if (businessAction->getParams().useSource)
         alarmCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
     alarmCameras = accessController()->filtered(alarmCameras, Qn::ViewContentPermission);
+    alarmCameras = alarmCameras.toSet().toList();
 
     QnResourcePtr resource = qnResPool->getResourceById(params.eventResourceId);
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
