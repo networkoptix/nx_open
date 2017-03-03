@@ -690,8 +690,10 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(void* buffer, unsigned
 
         auto wsaResult = WSARecv(m_fd, &wsaBuffer, /* buffer count*/ 1, wsaBytesRead,
             &wsaFlags, &overlapped, nullptr);
-        if (wsaResult == SOCKET_ERROR && SystemError::getLastOSErrorCode() == WSA_IO_PENDING)
+        if (wsaResult == SOCKET_ERROR)
         {
+            if (SystemError::getLastOSErrorCode() != WSA_IO_PENDING)
+                return -1;
             auto timeout = m_readTimeoutMS ? m_readTimeoutMS : INFINITE;
             int waitResult = WaitForSingleObject(m_eventObject, timeout);
             if (!WSAGetOverlappedResult(m_fd, &overlapped, wsaBytesRead, FALSE, &wsaFlags))
