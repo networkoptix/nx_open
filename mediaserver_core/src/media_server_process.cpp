@@ -868,6 +868,9 @@ static const int SYSTEM_USAGE_DUMP_TIMEOUT = 7*60*1000;
 
 void MediaServerProcess::dumpSystemUsageStats()
 {
+    if (!qnPlatform->monitor())
+        return;
+
     qnPlatform->monitor()->totalCpuUsage();
     qnPlatform->monitor()->totalRamUsage();
     qnPlatform->monitor()->totalHddLoad();

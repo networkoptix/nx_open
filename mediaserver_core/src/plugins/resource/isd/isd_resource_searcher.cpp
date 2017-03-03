@@ -144,6 +144,9 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
     const QAuthenticator &authOriginal)
 {
 
+    if (shouldStop())
+        return QList<QnResourcePtr>();
+
     QAuthenticator auth( authOriginal );
 
     QString host = url.host();
@@ -178,6 +181,8 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
     if (name.isEmpty() || (vendor != kIsdFullVendorName && vendor != kDwFullVendorName))
         return QList<QnResourcePtr>();
 
+    if (shouldStop())
+        return QList<QnResourcePtr>();
 
     QString mac = QString(QLatin1String(
         downloadFile(
