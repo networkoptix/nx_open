@@ -4,6 +4,9 @@
 #include <nx/utils/std/thread.h>
 #include <nx/network/socket_common.h>
 
+#include <netinet/tcp.h>
+#include <fcntl.h>
+
 namespace {
 
 const int kIterations = 100;
@@ -68,17 +71,25 @@ void doTest(bool doServerDelay, bool doClientDelay)
     std::vector<int> buffer(kBufferSize);
     for (int i = 0; i < kBufferSize; ++i)
         buffer[i] = i;
+
     for (int i = 0; i < kIterations; ++i)
     {
         const int bufferSize = kBufferSize * sizeof(int);
         int offset = 0;
         while (offset < bufferSize)
         {
-            int bytesSent = clientSocket->send((char*) buffer.data() + offset, bufferSize - offset);
-            if (bytesSent == 0 || !clientSocket->isConnected())
-                break;
-            ASSERT_TRUE(bytesSent >= 0);
-            offset += bytesSent;
+            int bytesSent = clientSocket->send((char *) buffer.data() + offset, bufferSize - offset);
+            if (bytesSent > 0)
+                offset += bytesSent;
+            else
+            {
+                auto error = SystemError::getLastOSErrorCode();
+                if (error != SystemError::timedOut && error != SystemError::wouldBlock)
+                {
+                    ASSERT_EQ(0, error);
+                    break; //< send error
+                }
+            }
         }
         if (doClientDelay)
             std::this_thread::sleep_for(kClientDelay);
