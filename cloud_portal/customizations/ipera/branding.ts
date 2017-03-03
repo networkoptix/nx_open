@@ -3,15 +3,15 @@
   <context>
     <name>global</name>
     <message>
-      <source>PRODUCT_NAME</source>
+      <source>{{PRODUCT_NAME}}</source>
       <translation>FlyView Cloud</translation>
     </message>
     <message>
-      <source>CLIENT_PROTOCOL</source>
+      <source>{{CLIENT_PROTOCOL}}</source>
       <translation>fly-vms</translation>
     </message>
     <message>
-      <source>VMS_NAME</source>
+      <source>{{VMS_NAME}}</source>
       <translation>FlyView</translation>
     </message>
     <message>
@@ -35,15 +35,15 @@
       <translation>32NH529F85.ru.ipera.FlyView</translation>
     </message>
     <message>
-      <source>IOS_APP_LINK</source>
+      <source>{{IOS_APP_LINK}}</source>
       <translation>https://itunes.apple.com/eg/app/id1090087835</translation>
     </message>
     <message>
-      <source>ANDROID_APP_LINK</source>
+      <source>{{ANDROID_APP_LINK}}</source>
       <translation>https://play.google.com/store/apps/details?id=ru.ipera.flyviewmobile</translation>
     </message>      
     <message>
-      <source>COMPANY_NAME</source>
+      <source>{{COMPANY_NAME}}</source>
       <translation>iPera</translation>
     </message>
   </context>

@@ -3,15 +3,15 @@
   <context>
     <name>global</name>
     <message>
-      <source>PRODUCT_NAME</source>
+      <source>{{PRODUCT_NAME}}</source>
       <translation>Cox Cloud</translation>
     </message>
     <message>
-      <source>CLIENT_PROTOCOL</source>
+      <source>{{CLIENT_PROTOCOL}}</source>
       <translation>cox-vms</translation>
     </message>
     <message>
-      <source>VMS_NAME</source>
+      <source>{{VMS_NAME}}</source>
       <translation>Cox Business Security Solutions</translation>
     </message>
     <message>
@@ -35,15 +35,15 @@
       <translation>C6ZWGSKK3B.com.cox.cb.hdsec</translation>
     </message>
     <message>
-      <source>IOS_APP_LINK</source>
+      <source>{{IOS_APP_LINK}}</source>
       <translation>https://itunes.apple.com/us/app/cox-business-security/id904940952?mt=8</translation>
     </message>
     <message>
-      <source>ANDROID_APP_LINK</source>
+      <source>{{ANDROID_APP_LINK}}</source>
       <translation>https://play.google.com/store/apps/details?id=com.cox.hdsec</translation>
     </message>    
     <message>
-      <source>COMPANY_NAME</source>
+      <source>{{COMPANY_NAME}}</source>
       <translation>Cox Communications</translation>
     </message>
   </context>

@@ -234,6 +234,7 @@ hr {
 
 select.form-control{
   -webkit-appearance: none;
+  -moz-appearance: none;
   background-color: transparent;
 }
 
@@ -294,11 +295,13 @@ select.form-control{
 }
 .alert-dismissable .close, .alert-dismissible .close{
   -webkit-appearance: none !important;
+  -moz-appearance: none !important;
   outline: none !important;
   &:hover,
   &:focus,
   &:active{
     -webkit-appearance: none !important;
+    -moz-appearance: none !important;
     outline: none !important;
   }
 

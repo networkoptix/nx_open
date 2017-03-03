@@ -20,9 +20,7 @@ angular.module('cloudApp')
             return cloudApi.accountPost($scope.account).then(function(result){
                 if(L.language != account.language){
                     //Need to reload page
-                    $timeout(function(){
-                        window.location.reload(true); // reload window to catch new language
-                    },Config.alertTimeout);
+                    window.location.reload(true); // reload window to catch new language
                 }
                 return result;
             });

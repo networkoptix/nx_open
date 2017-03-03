@@ -712,6 +712,7 @@ h2.version-number{
 }
 
 @mixin kill-glyphicon{
+    top:2px;
   @include icon;
   &:before{
     content:none;
@@ -735,7 +736,7 @@ h2.version-number{
   background-position: 2px 0px;
 
   margin-left:$padding-input-horizontal/2;
-  margin-top: 2px;
+  margin-top: 4px;
   float:right;
 }
 .close-icon{

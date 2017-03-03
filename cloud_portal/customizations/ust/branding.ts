@@ -3,15 +3,15 @@
   <context>
     <name>global</name>
     <message>
-      <source>PRODUCT_NAME</source>
+      <source>{{PRODUCT_NAME}}</source>
       <translation>DTV Cloud</translation>
     </message>
     <message>
-      <source>CLIENT_PROTOCOL</source>
+      <source>{{CLIENT_PROTOCOL}}</source>
       <translation>dtv-vms</translation>
     </message>
     <message>
-      <source>VMS_NAME</source>
+      <source>{{VMS_NAME}}</source>
       <translation>VMS Smart Client</translation>
     </message>
     <message>
@@ -31,15 +31,15 @@
       <translation>http://www.ubiquitysmart.com/</translation>
     </message>
     <message>
-      <source>IOS_APP_LINK</source>
+      <source>{{IOS_APP_LINK}}</source>
       <translation>disabled</translation>
     </message>
     <message>
-      <source>ANDROID_APP_LINK</source>
+      <source>{{ANDROID_APP_LINK}}</source>
       <translation>disabled</translation>
     </message>      
     <message>
-      <source>COMPANY_NAME</source>
+      <source>{{COMPANY_NAME}}</source>
       <translation>VMS DTV</translation>
     </message>
   </context>
