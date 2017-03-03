@@ -65,7 +65,7 @@ namespace style
     const int Metrics::kCalendarHeaderFontPixelSize = 11;
 
     const qreal Hints::kDisabledItemOpacity = 0.3;
-    const qreal Hints::kDisabledBrandedButtonOpacity = 0.2;
+    const qreal Hints::kDisabledBrandedButtonOpacity = 0.1;
     const int Hints::kMinimumFormLabelWidth = 64 - Metrics::kDefaultTopLevelMargin;
     const qreal Hints::kMinimumTableRows = 3.0;
 
