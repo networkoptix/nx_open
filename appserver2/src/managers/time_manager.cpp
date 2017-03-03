@@ -1368,7 +1368,13 @@ namespace ec2
 
     void TimeSynchronizationManager::onTimeSynchronizationSettingsChanged()
     {
-        if (!qnGlobalSettings->isSynchronizingTimeWithInternet())
+        if (qnGlobalSettings->isSynchronizingTimeWithInternet())
+        {
+            QnMutexLocker lock(&m_mutex);
+            if (m_internetSynchronizationTaskID > 0)
+                TimerManager::instance()->modifyTimerDelay(m_internetSynchronizationTaskID, 0);
+        }
+        else
         {
             if ((m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer) == 0)
                 return; // Time is not synchronized with Internet, nothing to do.
