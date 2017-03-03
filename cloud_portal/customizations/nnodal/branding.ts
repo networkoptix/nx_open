@@ -3,15 +3,15 @@
   <context>
     <name>global</name>
     <message>
-      <source>PRODUCT_NAME</source>
+      <source>{{PRODUCT_NAME}}</source>
       <translation>nvision Cloud</translation>
     </message>
     <message>
-      <source>CLIENT_PROTOCOL</source>
+      <source>{{CLIENT_PROTOCOL}}</source>
       <translation>nvision-vms</translation>
     </message>
     <message>
-      <source>VMS_NAME</source>
+      <source>{{VMS_NAME}}</source>
       <translation>nvision</translation>
     </message>
     <message>
@@ -31,7 +31,7 @@
       <translation>http://nnodal.com</translation>
     </message>
     <message>
-      <source>COMPANY_NAME</source>
+      <source>{{COMPANY_NAME}}</source>
       <translation>nvision</translation>
     </message>
   </context>
