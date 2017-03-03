@@ -400,7 +400,7 @@ void QnRoutingManagementWidget::updateUi() {
     QModelIndex sourceIndex = m_sortedServerAddressesModel->mapToSource(ui->addressesView->currentIndex());
 
     ui->buttonsWidget->setVisible(ui->serversView->currentIndex().isValid() && !isReadOnly());
-    ui->removeButton->setEnabled(m_serverAddressesModel->isManualAddress(sourceIndex) && !isReadOnly());
+    ui->removeButton->setVisible(m_serverAddressesModel->isManualAddress(sourceIndex) && !isReadOnly());
 }
 
 quint16 QnRoutingManagementWidget::getCurrentServerPort()
