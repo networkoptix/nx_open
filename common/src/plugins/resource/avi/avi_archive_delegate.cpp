@@ -26,7 +26,6 @@ extern "C"
 #include <core/ptz/media_dewarping_params.h>
 
 #include <plugins/resource/avi/avi_resource.h>
-#include <plugins/resource/avi/avi_archive_custom_data.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <motion/light_motion_archive_connection.h>
@@ -378,21 +377,17 @@ void QnAviArchiveDelegate::close()
     m_lastSeekTime = AV_NOPTS_VALUE;
 }
 
-const char* QnAviArchiveDelegate::getTagValue(QnAviArchiveDelegate::Tag tag)
-{
-    if (!m_initialized)
-        return 0;
-    QString format = QString(QLatin1String(m_formatContext->iformat->name)).split(QLatin1Char(','))[0];
-    AVDictionaryEntry* entry = av_dict_get(m_formatContext->metadata, getTagName(tag, format), 0, 0);
-    return entry ? entry->value : 0;
-}
-
 const char* QnAviArchiveDelegate::getTagValue( const char* tagName )
 {
     if (!m_initialized)
         return 0;
     AVDictionaryEntry* entry = av_dict_get(m_formatContext->metadata, tagName, 0, 0);
     return entry ? entry->value : 0;
+}
+
+QnAviArchiveMetadata QnAviArchiveDelegate::metadata() const
+{
+    return m_metadata;
 }
 
 bool QnAviArchiveDelegate::hasVideo() const
@@ -403,70 +398,50 @@ bool QnAviArchiveDelegate::hasVideo() const
 }
 
 static QSharedPointer<QnDefaultResourceVideoLayout> defaultVideoLayout( new QnDefaultResourceVideoLayout() );
+
 QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
 {
     if (!m_initialized)
         return defaultVideoLayout;
 
+    //TODO: #rvasilenko why do we read metadata in the getVideoLayout() method (which must be const semantically)
     if (!m_videoLayout)
     {
         m_videoLayout.reset( new QnCustomResourceVideoLayout(QSize(1, 1)) );
 
+        m_metadata = QnAviArchiveMetadata::loadFromFile(m_formatContext);
 
-        // prevent standart tag name parsing in 'avi' format
-        QString format = QString(QLatin1String(m_formatContext->iformat->name)).split(QLatin1Char(','))[0];
+        if (QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>())
+        {
+            if (m_metadata.timeZoneOffset != Qn::InvalidUtcOffset)
+                aviRes->setTimeZoneOffset(m_metadata.timeZoneOffset);
+        }
 
-        // check time zone in the 4-th column
-        AVDictionaryEntry* sign = av_dict_get(m_formatContext->metadata, getTagName(SignatureTag, format), 0, 0);
-        if (sign && sign->value) {
-            QList<QByteArray> tmp = QByteArray(sign->value).split(QnSignHelper::getSignPatternDelim());
-            if (tmp.size() > 4) {
-                bool deserialized = false;
-                qint64 timeZoneOffset = tmp[4].trimmed().toLongLong(&deserialized);
-                QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>();
-                if (deserialized && timeZoneOffset != Qn::InvalidUtcOffset && timeZoneOffset != -1 && aviRes)
-                    aviRes->setTimeZoneOffset(timeZoneOffset);
+        if (!m_metadata.videoLayoutSize.isEmpty())
+        {
+            m_videoLayout->setSize(m_metadata.videoLayoutSize);
+            m_videoLayout->setChannels(m_metadata.videoLayoutChannels);
+        }
+
+        if (m_useAbsolutePos)
+        {
+            m_startTimeUsec = 1000ll * m_metadata.startTimeMs;
+            if (m_startTimeUsec >= UTC_TIME_DETECTION_THRESHOLD)
+            {
+                m_resource->addFlags(Qn::utc);
+                if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage))
+                    m_resource->addFlags(Qn::sync | Qn::periods | Qn::motion); // use sync for exported layout only
             }
         }
 
-        AVDictionaryEntry* software = av_dict_get(m_formatContext->metadata, getTagName(SoftwareTag, format), 0, 0);
-        bool allowTags = format != QLatin1String("avi") || (software && QString(QLatin1String(software->value)) == QLatin1String("Network Optix"));
-
-        if (allowTags)
+        if (QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>())
         {
-            AVDictionaryEntry* layoutInfo = av_dict_get(m_formatContext->metadata,getTagName(LayoutInfoTag, format), 0, 0);
-            if (layoutInfo)
-                deserializeLayout(m_videoLayout.data(), QLatin1String(layoutInfo->value));
-
-            if (m_useAbsolutePos)
-            {
-                AVDictionaryEntry* start_time = av_dict_get(m_formatContext->metadata,getTagName(StartTimeTag, format), 0, 0);
-                if (start_time) {
-                    m_startTimeUsec = QString(QLatin1String(start_time->value)).toLongLong()*1000ll;
-                    if (m_startTimeUsec >= UTC_TIME_DETECTION_THRESHOLD) {
-                        m_resource->addFlags(Qn::utc);
-                        if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage)) {
-                            m_resource->addFlags(Qn::sync | Qn::periods | Qn::motion); // use sync for exported layout only
-                        }
-                    }
-                }
-            }
-
-            QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>();
-            if (mediaRes) {
-                AVDictionaryEntry* dewarpInfo = av_dict_get(m_formatContext->metadata,getTagName(DewarpingTag, format), 0, 0);
-                if (dewarpInfo)
-                    mediaRes->setDewarpingParams(QnMediaDewarpingParams::deserialized(dewarpInfo->value));
-
-                AVDictionaryEntry* customInfo = av_dict_get(m_formatContext->metadata,getTagName(CustomTag, format), 0, 0);
-                if (customInfo) {
-                    QnAviArchiveCustomData data = QJson::deserialized<QnAviArchiveCustomData>(customInfo->value);
-                    mediaRes->setCustomAspectRatio(data.overridenAr);
-                }
-            }
-
+            mediaRes->setDewarpingParams(m_metadata.dewarpingParams);
+            mediaRes->setCustomAspectRatio(m_metadata.overridenAr);
         }
     }
+
+
     return m_videoLayout;
 }
 
@@ -608,26 +583,6 @@ void QnAviArchiveDelegate::packetTimestamp(QnCompressedVideoData* video, const A
     }
 }
 
-bool QnAviArchiveDelegate::deserializeLayout(QnCustomResourceVideoLayout* layout, const QString& layoutStr)
-{
-    QStringList info = layoutStr.split(QLatin1Char(';'));
-    for (int i = 0; i < info.size(); ++i)
-    {
-        QStringList params = info[i].split(QLatin1Char(','));
-        if (params.size() != 2) {
-            NX_LOG("Invalid layout string stored at file metadata. Ignored.", cl_logWARNING);
-            return false;
-        }
-        if (i == 0) {
-            layout->setSize(QSize(params[0].toInt(), params[1].toInt()));
-        }
-        else {
-            layout->setChannel(params[0].toInt(), params[1].toInt(), i-1);
-        }
-    }
-    return true;
-}
-
 AVCodecContext* QnAviArchiveDelegate::setAudioChannel(int num)
 {
     if (!m_formatContext)
@@ -679,53 +634,6 @@ bool QnAviArchiveDelegate::isStreamsFound() const
 void QnAviArchiveDelegate::setStorage(const QnStorageResourcePtr &storage)
 {
     m_storage = storage;
-}
-
-const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
-{
-    if (formatName == QLatin1String("avi"))
-    {
-        // list of all RIFF tag names and information about their usability can be found at http://ru.wikipedia.org/wiki/RIFF
-        switch(tag)
-        {
-        case StartTimeTag:  return "date"; // "ICRD";
-        case EndTimeTag:    return "ISRC"; // not used
-        case LayoutInfoTag: return "comment"; // "ICMT";
-        case SoftwareTag:   return "encoded_by"; // "ITCH";
-        case SignatureTag:  return "copyright"; // "ICOP";
-        case DewarpingTag:  return "title";
-        case CustomTag:     return "IENG"; //IENG
-        }
-    }
-
-    // https://wiki.multimedia.cx/index.php/FFmpeg_Metadata
-    else if (formatName == QLatin1String("mov") || formatName == QLatin1String("mp4"))
-    {
-        switch (tag)
-        {
-            case StartTimeTag:  return "episode_id";
-            case LayoutInfoTag: return "show";
-            case SoftwareTag:   return "synopsis";
-            case SignatureTag:  return "copyright";
-            case DewarpingTag:  return "description";
-            case CustomTag:     return "comment";
-        }
-    }
-
-    else
-    {
-        switch(tag)
-        {
-        case StartTimeTag:  return "start_time"; // StartTimecode
-        case EndTimeTag:    return "end_time"; // EndTimecode
-        case LayoutInfoTag: return "video_layout"; // TrackNumber
-        case SoftwareTag:   return "software";
-        case SignatureTag:  return "signature";
-        case DewarpingTag:  return "dewarp";
-        case CustomTag:     return "custom_data";
-        }
-    }
-    return "";
 }
 
 void QnAviArchiveDelegate::setFastStreamFind(bool value)
