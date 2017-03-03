@@ -651,7 +651,7 @@ template<typename SocketInterfaceToImplement>
 int CommunicatingSocket<SocketInterfaceToImplement>::recv(void* buffer, unsigned int bufferLen, int flags)
 {
 #ifdef _WIN32
-    int bytesRead;
+    int bytesRead = -1;
 
     bool isNonBlockingMode;
     if (!getNonBlockingMode(&isNonBlockingMode))
