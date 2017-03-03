@@ -1,9 +1,13 @@
+#include <chrono>
+#include <thread>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <nx/utils/random.h>
-#include <nx_ec/ec_api.h>
+#include <nx/utils/time.h>
 
+#include <nx_ec/ec_api.h>
 #include <utils/common/sync_call.h>
 
 #include "ec2/cloud_vms_synchro_test_helper.h"
@@ -12,20 +16,144 @@
 namespace nx {
 namespace cdb {
 
-#if 1
-
-class HealthMonitoring:
+class FtHealthMonitoring:
     public Ec2MserverCloudSynchronization
 {
-};
+public:
+    FtHealthMonitoring()
+    {
+        init();
+    }
 
-TEST_F(HealthMonitoring, general)
-{
-    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
-    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
+    ~FtHealthMonitoring()
+    {
+    }
 
-    for (int i = 0; i < 2; ++i)
+protected:
+    void givenSystemWithSomeHistory()
+    {
+        establishConnectionFromMediaserverToCloud();
+        closeConnectionFromMediaserverToCloud();
+        assertHistoryIsCorrect();
+    }
+
+    void establishConnectionFromMediaserverToCloud()
+    {
+        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+        waitForCloudAndVmsToSyncUsers();
+
+        waitForSystemToBecome(api::SystemHealth::online);
+        saveHistoryItem(api::SystemHealth::online);
+    }
+
+    void closeConnectionFromMediaserverToCloud()
+    {
+        appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(cdbEc2TransactionUrl());
+        saveHistoryItem(api::SystemHealth::offline);
+        waitForSystemToBecome(api::SystemHealth::offline);
+    }
+
+    void whenCdbIsRestarted()
+    {
+        ASSERT_TRUE(cdb()->restart());
+    }
+
+    void whenSystemIsSharedWithSomeone()
+    {
+        const std::vector<api::SystemAccessRole> accessRolesToTest = {
+            api::SystemAccessRole::custom,
+            api::SystemAccessRole::liveViewer,
+            api::SystemAccessRole::viewer,
+            api::SystemAccessRole::advancedViewer,
+            api::SystemAccessRole::localAdmin,
+            api::SystemAccessRole::cloudAdmin,
+            api::SystemAccessRole::maintenance };
+
+        const auto accessRole = nx::utils::random::choice(accessRolesToTest);
+
+        cdb()->shareSystemEx(
+            ownerAccount(),
+            registeredSystemData(),
+            m_anotherUser,
+            accessRole);
+    }
+
+    void thenSomeoneDoesNotHaveAccessToTheHistory()
+    {
+        api::SystemHealthHistory history;
+        ASSERT_EQ(
+            api::ResultCode::forbidden,
+            cdb()->getSystemHealthHistory(
+                m_anotherUser.email, m_anotherUser.password,
+                registeredSystemData().id, &history));
+    }
+
+    void thenSystemCredentialsCannotBeUsedToAccessHistory()
+    {
+        api::SystemHealthHistory history;
+        ASSERT_EQ(
+            api::ResultCode::forbidden,
+            cdb()->getSystemHealthHistory(
+                registeredSystemData().id, registeredSystemData().authKey,
+                registeredSystemData().id, &history));
+    }
+
+    void assertSystemOnline()
+    {
+        assertSystemStatusIs(api::SystemHealth::online);
+    }
+
+    void assertSystemOffline()
+    {
+        assertSystemStatusIs(api::SystemHealth::offline);
+    }
+
+    void assertHistoryIsCorrect()
+    {
+        api::SystemHealthHistory history;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            cdb()->getSystemHealthHistory(
+                ownerAccount().email, ownerAccount().password,
+                registeredSystemData().id, &history));
+        ASSERT_EQ(m_expectedHealthHistory.events.size(), history.events.size());
+
+        for (size_t i = 0; i < m_expectedHealthHistory.events.size(); ++i)
+        {
+            ASSERT_EQ(m_expectedHealthHistory.events[i].state, history.events[i].state);
+        }
+    }
+
+private:
+    api::SystemHealthHistory m_expectedHealthHistory;
+    AccountWithPassword m_anotherUser;
+
+    void init()
+    {
+        ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
+        ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
+        ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
+
+        m_anotherUser = cdb()->addActivatedAccount2();
+    }
+
+    void waitForSystemToBecome(api::SystemHealth status)
+    {
+        for (;;)
+        {
+            api::SystemDataEx systemData;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                cdb()->fetchSystemData(
+                    ownerAccount().email, ownerAccount().password,
+                    registeredSystemData().id, &systemData));
+            if (systemData.stateOfHealth == status)
+                break;
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+    }
+
+    void assertSystemStatusIs(api::SystemHealth status)
     {
         api::SystemDataEx systemData;
         ASSERT_EQ(
@@ -33,199 +161,68 @@ TEST_F(HealthMonitoring, general)
             cdb()->fetchSystemData(
                 ownerAccount().email, ownerAccount().password,
                 registeredSystemData().id, &systemData));
-        ASSERT_EQ(api::SystemHealth::offline, systemData.stateOfHealth);
+        ASSERT_EQ(status, systemData.stateOfHealth);
+    }
 
-        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+    void saveHistoryItem(api::SystemHealth status)
+    {
+        api::SystemHealthHistoryItem item;
+        item.state = status;
+        item.timestamp = nx::utils::utcTime();
+        m_expectedHealthHistory.events.push_back(std::move(item));
+    }
+};
 
-        waitForCloudAndVmsToSyncUsers();
-
-        ASSERT_EQ(
-            api::ResultCode::ok,
-            cdb()->fetchSystemData(
-                ownerAccount().email, ownerAccount().password,
-                registeredSystemData().id, &systemData));
-        ASSERT_EQ(api::SystemHealth::online, systemData.stateOfHealth);
+TEST_F(FtHealthMonitoring, system_status_is_correct)
+{
+    for (int i = 0; i < 2; ++i)
+    {
+        assertSystemOffline();
+        establishConnectionFromMediaserverToCloud();
+        assertSystemOnline();
 
         if (i == 0)
         {
-            appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(cdbEc2TransactionUrl());
-            ASSERT_TRUE(cdb()->restart());
+            closeConnectionFromMediaserverToCloud();
+            whenCdbIsRestarted();
         }
     }
 }
 
-
-#else
-class HealthMonitoring:
-    public CdbFunctionalTest
+TEST_F(FtHealthMonitoring, history_is_persistent)
 {
-};
+    establishConnectionFromMediaserverToCloud();
+    closeConnectionFromMediaserverToCloud();
 
-TEST_F(HealthMonitoring, general)
+    assertHistoryIsCorrect();
+
+    whenCdbIsRestarted();
+
+    assertHistoryIsCorrect();
+}
+
+TEST_F(FtHealthMonitoring, history_is_not_reported_for_unknown_id)
 {
-    constexpr const std::size_t kMediaServersToEmulateCount = 2;
-
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    api::ResultCode result = api::ResultCode::ok;
-
-    api::AccountData account1;
-    std::string account1Password;
-    result = addActivatedAccount(&account1, &account1Password);
-    ASSERT_EQ(api::ResultCode::ok, result);
-
-    //adding system1 to account1
-    api::SystemData system1;
-    result = bindRandomSystem(account1.email, account1Password, &system1);
-    ASSERT_EQ(api::ResultCode::ok, result);
-
-    //checking that cdb considers system as offline
-    api::SystemDataEx systemData;
-    ASSERT_EQ(
+    api::SystemHealthHistory history;
+    ASSERT_NE(
         api::ResultCode::ok,
-        fetchSystemData(account1.email, account1Password, system1.id, &systemData));
-    ASSERT_EQ(api::SystemHealth::offline, systemData.stateOfHealth);
-
-    std::vector<std::unique_ptr<api::EventConnection>>
-        eventConnections(kMediaServersToEmulateCount);
-
-    //creating event connection
-    for (auto& eventConnection: eventConnections)
-    {
-        eventConnection = connectionFactory()->createEventConnection(
-            system1.id,
-            system1.authKey);
-        api::SystemEventHandlers eventHandlers;
-        std::tie(result) = makeSyncCall<api::ResultCode>(
-            std::bind(
-                &nx::cdb::api::EventConnection::start,
-                eventConnection.get(),
-                std::move(eventHandlers),
-                std::placeholders::_1));
-        ASSERT_EQ(api::ResultCode::ok, result);
-
-        //checking that cdb considers system as online
-        ASSERT_EQ(
-            api::ResultCode::ok,
-            fetchSystemData(account1.email, account1Password, system1.id, &systemData));
-        ASSERT_EQ(api::SystemHealth::online, systemData.stateOfHealth);
-    }
-
-    //breaking connection
-    for (auto& eventConnection : eventConnections)
-    {
-        ASSERT_EQ(
-            api::ResultCode::ok,
-            fetchSystemData(account1.email, account1Password, system1.id, &systemData));
-        ASSERT_EQ(api::SystemHealth::online, systemData.stateOfHealth);
-        eventConnection.reset();
-    }
-
-    //checking that cdb considers system as offline
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        fetchSystemData(account1.email, account1Password, system1.id, &systemData));
-    ASSERT_EQ(api::SystemHealth::offline, systemData.stateOfHealth);
+        cdb()->getSystemHealthHistory(
+            ownerAccount().email, ownerAccount().password,
+            QnUuid::createUuid().toStdString(), &history));
 }
 
-TEST_F(HealthMonitoring, reconnect)
+TEST_F(FtHealthMonitoring, history_is_available_to_system_owner_only)
 {
-    addArg("-eventManager/mediaServerConnectionIdlePeriod");
-    addArg("3s");
-
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    api::ResultCode result = api::ResultCode::ok;
-
-    api::AccountData account1;
-    std::string account1Password;
-    result = addActivatedAccount(&account1, &account1Password);
-    ASSERT_EQ(api::ResultCode::ok, result);
-
-    //adding system1 to account1
-    api::SystemData system1;
-    result = bindRandomSystem(account1.email, account1Password, &system1);
-    ASSERT_EQ(api::ResultCode::ok, result);
-
-    auto eventConnection = connectionFactory()->createEventConnection(
-        system1.id,
-        system1.authKey);
-    api::SystemEventHandlers eventHandlers;
-    std::tie(result) = makeSyncCall<api::ResultCode>(
-        std::bind(
-            &nx::cdb::api::EventConnection::start,
-            eventConnection.get(),
-            std::move(eventHandlers),
-            std::placeholders::_1));
-    ASSERT_EQ(api::ResultCode::ok, result);
-
-    const auto t1 = std::chrono::steady_clock::now();
-    while (std::chrono::steady_clock::now() - t1
-        < std::chrono::seconds(utils::random::number(8, 10)))
-    {
-        //checking that cdb considers system as online
-        api::SystemDataEx systemData;
-        ASSERT_EQ(
-            api::ResultCode::ok,
-            fetchSystemData(account1.email, account1Password, system1.id, &systemData));
-        ASSERT_EQ(api::SystemHealth::online, systemData.stateOfHealth);
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
-
-    eventConnection.reset();
+    givenSystemWithSomeHistory();
+    whenSystemIsSharedWithSomeone();
+    thenSomeoneDoesNotHaveAccessToTheHistory();
 }
 
-TEST_F(HealthMonitoring, badCredentials)
+TEST_F(FtHealthMonitoring, history_is_not_available_to_system_credentials)
 {
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    api::ResultCode result = api::ResultCode::ok;
-
-    for (int i = 0; i < 2; ++i)
-    {
-        std::unique_ptr<nx::cdb::api::EventConnection> eventConnection;
-
-        if (i == 0)
-            eventConnection = connectionFactory()->createEventConnection(
-                "bla-bla-bla",
-                "be-be-be");
-        else
-            eventConnection = connectionFactory()->createEventConnection(
-                "",
-                "");
-
-        api::SystemEventHandlers eventHandlers;
-        std::tie(result) = makeSyncCall<api::ResultCode>(
-            std::bind(
-                &nx::cdb::api::EventConnection::start,
-                eventConnection.get(),
-                std::move(eventHandlers),
-                std::placeholders::_1));
-        ASSERT_EQ(api::ResultCode::notAuthorized, result);
-    }
-
-    //currently, events are for systems only
-
-    api::AccountData account1;
-    std::string account1Password;
-    result = addActivatedAccount(&account1, &account1Password);
-    ASSERT_EQ(api::ResultCode::ok, result);
-
-    auto eventConnection = connectionFactory()->createEventConnection(
-        account1.email,
-        account1Password);
-
-    api::SystemEventHandlers eventHandlers;
-    std::tie(result) = makeSyncCall<api::ResultCode>(
-        std::bind(
-            &nx::cdb::api::EventConnection::start,
-            eventConnection.get(),
-            std::move(eventHandlers),
-            std::placeholders::_1));
-    ASSERT_EQ(api::ResultCode::forbidden, result);
+    givenSystemWithSomeHistory();
+    thenSystemCredentialsCannotBeUsedToAccessHistory();
 }
-#endif
 
-}   //namespace cdb
-}   //namespace nx
+} // namespace cdb
+} // namespace nx

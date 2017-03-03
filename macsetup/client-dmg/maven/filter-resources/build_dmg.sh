@@ -7,7 +7,9 @@ TMP=tmp
 VOLUME_NAME="${display.product.name} ${release.version}"
 DMG_FILE="${artifact.name.client}.dmg"
 
-# Please do not add "Client" keyword to APP_DIR because the same name exists.
+# Take into consideration that we have protocol handler app with name
+# ${protocol_handler_app_name} = ${display.product.name} Client.app.
+# Please do not add "Client" word to APP_DIR because of that.
 APP_DIR="$SRC/${display.product.name}.app"
 HELP=${ClientHelpSourceDir}
 RELEASE_VERSION=${release.version}

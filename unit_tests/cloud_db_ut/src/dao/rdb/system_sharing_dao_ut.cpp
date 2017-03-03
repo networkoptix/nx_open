@@ -24,6 +24,11 @@ public:
         m_userAccount = insertRandomAccount();
     }
 
+    ~SystemSharingDataObject()
+    {
+        cleanup();
+    }
+
 protected:
     void insertSystemSharing()
     {
@@ -53,6 +58,7 @@ private:
     api::AccountData m_ownerAccount;
     api::SystemData m_system;
     api::AccountData m_userAccount;
+    std::vector<api::SystemSharingEx> m_addedSharings;
 
     void insertOrReplaceSystemSharing(api::SystemAccessRole accessRole)
     {
@@ -62,6 +68,13 @@ private:
         sharing.accountId = m_ownerAccount.id;
         sharing.accessRole = accessRole;
         BasePersistentDataTest::insertSystemSharing(sharing);
+        m_addedSharings.push_back(std::move(sharing));
+    }
+
+    void cleanup()
+    {
+        for (const auto& sharing: m_addedSharings)
+            BasePersistentDataTest::deleteSystemSharing(sharing);
     }
 };
 

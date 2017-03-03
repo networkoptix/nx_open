@@ -44,6 +44,7 @@ class TemporaryAccountPasswordManager;
 class AccountManager;
 class EventManager;
 class SystemManager;
+class SystemHealthInfoProvider;
 class AuthenticationManager;
 class AuthorizationManager;
 class AuthenticationProvider;
@@ -128,6 +129,7 @@ private:
     AccountManager* m_accountManager;
     EventManager* m_eventManager;
     SystemManager* m_systemManager;
+    SystemHealthInfoProvider* m_systemHealthInfoProvider;
     AuthenticationManager* m_authenticationManager;
     AuthorizationManager* m_authorizationManager;
     AuthenticationProvider* m_authProvider;
@@ -137,6 +139,7 @@ private:
         const AuthorizationManager& authorizationManager,
         AccountManager* const accountManager,
         SystemManager* const systemManager,
+        SystemHealthInfoProvider* const systemHealthInfoProvider,
         AuthenticationProvider* const authProvider,
         EventManager* const eventManager,
         ec2::ConnectionManager* const ec2ConnectionManager,
