@@ -19,7 +19,6 @@
 #include <ui/models/translation_list_model.h>
 #include <ui/style/custom_style.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <utils/common/app_info.h>

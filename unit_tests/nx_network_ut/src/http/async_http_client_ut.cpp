@@ -438,7 +438,7 @@ public:
         nx_http::RequestProcessedHandler completionHandler)
     {
         if (m_requestNumber > 0)
-            connection->closeConnection(SystemError::connectionReset);
+            connection->takeSocket(); //< Closing connection by destroying socket.
 
         completionHandler(
             nx_http::RequestResult(

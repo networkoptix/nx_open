@@ -252,7 +252,7 @@ void QnLicenseManagerWidget::updateLicenses()
         QnVideoWallLicenseUsageHelper vwUsageHelper;
         QList<QnLicenseUsageHelper*> helpers{ &camUsageHelper, &vwUsageHelper };
 
-        for (QnLicenseUsageHelper* helper: helpers)
+        for (auto helper: helpers)
         {
             for(Qn::LicenseType lt: helper->licenseTypes())
             {
@@ -261,29 +261,25 @@ void QnLicenseManagerWidget::updateLicenses()
             }
         }
 
-        for (QnLicenseUsageHelper* helper: helpers)
+        for (auto helper: helpers)
         {
-            if (!helper->isValid())
+            for (Qn::LicenseType lt: helper->licenseTypes())
             {
-                for (Qn::LicenseType lt: helper->licenseTypes())
+                if (helper->usedLicenses(lt) == 0)
+                    continue;
+
+                if (helper->isValid(lt))
                 {
-                    if (helper->usedLicenses(lt) > 0)
-                    {
-                        messages << setWarningStyleHtml(tr("At least %n %1 are required", "",
-                            helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt)));
-                    }
+                    messages << tr("%n %1 are currently in use", "", helper->usedLicenses(lt))
+                        .arg(QnLicense::longDisplayName(lt));
                 }
-            }
-            else
-            {
-                for (Qn::LicenseType lt: helper->licenseTypes())
+                else
                 {
-                    if (helper->usedLicenses(lt) > 0)
-                    {
-                        messages << tr("%n %1 are currently in use", "", helper->usedLicenses(lt))
-                            .arg(QnLicense::longDisplayName(lt));
-                    }
+                    messages << setWarningStyleHtml(tr("At least %n %1 are required", "",
+                        helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt)));
                 }
+
+
             }
         }
         ui->infoLabel->setText(messages.join(lit("<br/>")));

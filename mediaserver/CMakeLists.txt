@@ -4,4 +4,4 @@ if(NOT server_external_path)
 endif()
 
 nx_add_target(mediaserver EXECUTABLE
-    PUBLIC_LIBS mediaserver_core festival)
+    PUBLIC_LIBS mediaserver_core)

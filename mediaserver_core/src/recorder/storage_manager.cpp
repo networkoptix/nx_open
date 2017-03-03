@@ -328,7 +328,13 @@ public:
                     DeviceFileCatalog::ScanFilter filter;
                     filter.scanPeriod.startTimeMs = itr.value();
                     qint64 endScanTime = qnSyncTime->currentMSecsSinceEpoch();
-                    filter.scanPeriod.durationMs = qMax(1ll, endScanTime - filter.scanPeriod.startTimeMs);
+                    qint64 scanPeriodDuration = qMax(1ll, endScanTime - filter.scanPeriod.startTimeMs);
+                    NX_LOG(lit("[Scan]: Partial scan period duration for storage %1, catalog %2 = %3 ms (%4 hrs)")
+                            .arg(scanData.storage->getUrl())
+                            .arg(itr.key()->cameraUniqueId())
+                            .arg(scanPeriodDuration)
+                            .arg(scanPeriodDuration / (1000 * 60 * 60)), cl_logDEBUG2);
+                    filter.scanPeriod.durationMs = scanPeriodDuration;
                     m_owner->partialMediaScan(itr.key(), scanData.storage, filter);
                     if (needToStop() || QnResource::isStopping())
                         return;
@@ -336,6 +342,7 @@ public:
                 }
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_PartialScan, scanData.storage->getUrl(), 1.0, nextTotalProgressValue));
                 scanData.storage->removeFlags(Qn::storage_fastscan);
+                NX_LOG(lit("[Scan]: Partial scan for storage %1 has been finished").arg(scanData.storage->getUrl()), cl_logDEBUG2);
             }
             else
             {
@@ -1559,12 +1566,53 @@ void QnStorageManager::clearSpace(bool forced)
         if (!storage->hasFlags(Qn::storage_fastscan)) {
             storages << storage;
         } else {
+            NX_LOG(lit("[Cleanup]: Storage %1 is being fast scanned. Skipping")
+                    .arg(storage->getUrl()), cl_logDEBUG2);
             allStoragesReady = false;
         }
     }
 
     if (allStoragesReady && m_role == QnServer::StoragePool::Normal) {
         updateCameraHistory();
+    }
+
+    qint64 toDeleteTotal = 0;
+    std::chrono::time_point<std::chrono::steady_clock> cleanupStartTime = std::chrono::steady_clock::now(); 
+
+    if (QnLog::logs() && QnLog::logs()->get()->logLevel() >= cl_logDEBUG2)
+    {
+        NX_LOG(lit("[Cleanup, measure]: %1 storages are ready for a cleanup").arg(storages.size()), cl_logDEBUG2);
+        NX_LOG(lit("[Cleanup, measure]: Starting cleanup routine for %1 storage manager")
+                .arg((m_role == QnServer::StoragePool::Normal ? lit("main") : lit("backup"))), cl_logDEBUG2);
+
+        for (const auto& storage: storages)
+        {
+            if (storage->getSpaceLimit() == 0 || 
+                (storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile) 
+                    != QnAbstractStorageResource::cap::RemoveFile)
+            {
+                NX_LOG(lit("[Cleanup, measure]: storage: %1 spaceLimit: %2, RemoveFileCap: %3, skipping")
+                        .arg(storage->getUrl())
+                        .arg(storage->getSpaceLimit())
+                        .arg((storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile) == QnAbstractStorageResource::cap::RemoveFile), cl_logDEBUG2);
+                continue;
+            }
+
+            qint64 toDeleteForStorage = storage->getSpaceLimit() - storage->getFreeSpace();
+            NX_LOG(lit("[Cleanup, measure]: storage: %1, spaceLimit: %2, freeSpace: %3, toDelete: %4")
+                    .arg(storage->getUrl())
+                    .arg(storage->getSpaceLimit())
+                    .arg(storage->getFreeSpace())
+                    .arg(toDeleteForStorage), cl_logDEBUG2);
+
+            if (toDeleteForStorage > 0)
+                toDeleteTotal += toDeleteForStorage;
+        }
+
+        NX_LOG(lit("[Cleanup, measure]: Total bytes to cleanup: %1 (%2 Mb) (%3 Gb)")
+                .arg(toDeleteTotal)
+                .arg(toDeleteTotal / (1024 * 1024))
+                .arg(toDeleteTotal / (1024 * 1024 * 1024)), cl_logDEBUG2);
     }
 
     QnStorageResourceList delAgainList;
@@ -1574,6 +1622,28 @@ void QnStorageManager::clearSpace(bool forced)
     }
     for(const QnStorageResourcePtr& storage: delAgainList)
         clearOldestSpace(storage, false);
+
+    if (QnLog::logs() && QnLog::logs()->get()->logLevel() >= cl_logDEBUG2 && toDeleteTotal > 0)
+    {
+        QString clearSpaceLogMessage;
+        QTextStream clearSpaceLogStream(&clearSpaceLogMessage);
+        auto cleanupEndTime = std::chrono::steady_clock::now();
+        qint64 elapsedMs = 
+            std::chrono::duration_cast<std::chrono::milliseconds>
+                (cleanupEndTime - cleanupStartTime).count();
+        qint64 elapsedSecs = qMax((elapsedMs / 1000), 1ll);
+
+        clearSpaceLogStream << "[Cleanup, measure]: Cleanup routine for "
+                            << (m_role == QnServer::StoragePool::Normal ? "main " : "backup")
+                            << " storage manager has finished" << endl;
+        clearSpaceLogStream << "[Cleanup, measure]: time elapsed: " << elapsedMs << " ms " 
+                            << "(" << elapsedSecs << " secs) "
+                            << "(" << (elapsedSecs / (60 * 60)) << " hrs)" << endl;
+        clearSpaceLogStream << "[Cleanup, measure]: cleanup speed was " 
+                            << (toDeleteTotal / (1024 * 1024 * elapsedSecs)) << " Mb/s"
+                            << endl;
+        NX_LOG(clearSpaceLogMessage, cl_logDEBUG2);
+    }
 
     // 3. Remove empty dirs
     if (!m_removeEmtyDirTimer.isValid() || m_removeEmtyDirTimer.elapsed() > EMPTY_DIRS_CLEANUP_INTERVAL)
@@ -2059,6 +2129,7 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
         doMigrateCSVCatalog(fileStorage);
         migrateSqliteDatabase(fileStorage);
         addDataFromDatabase(fileStorage);
+        NX_LOG(lit("[Storage, scan]: storage %1 - finished loading data from DB. Ready for scan").arg(fileStorage->getUrl()), cl_logDEBUG2);
         m_rebuildArchiveThread->addStorageToScan(fileStorage, true);
     }
 
@@ -2138,7 +2209,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
 
     QSet<QnStorageResourcePtr> storages;
     for (const auto& storage: getUsedWritableStorages())
-        if (pred(storage))
+        if (pred(storage) && storage->getFreeSpace() > 150 * 1024 * 1024) //< Storage should have at least 150 mb of free space
             storages << storage;
 
 	auto getOptimalStorageRootFallback = [&storages, this]

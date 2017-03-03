@@ -6,7 +6,7 @@ namespace nx {
 namespace client {
 namespace mobile {
 
-class MediaPlyer: public nx::media::Player
+class MediaPlayer: public nx::media::Player
 {
     Q_OBJECT
 
@@ -18,8 +18,8 @@ class MediaPlyer: public nx::media::Player
     using base_type = nx::media::Player;
 
 public:
-    MediaPlyer(QObject* parent = nullptr);
-    ~MediaPlyer();
+    MediaPlayer(QObject* parent = nullptr);
+    ~MediaPlayer();
 
     QString resourceId() const;
     void setResourceId(const QString& resourceId);

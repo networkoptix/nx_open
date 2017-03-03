@@ -94,17 +94,21 @@
 
 namespace {
 
-static const int kMicroInMilliSeconds = 1000;
+static constexpr int kMicroInMilliSeconds = 1000;
 
 // TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
 // Note: -1 is used for invalid time
 // Now it is returned when there is no archive data and archive is played backwards.
 // Who returns it? --gdm?
-const int kNoTimeValue = 0;
+static constexpr int kNoTimeValue = 0;
 
-static const qreal kTwoWayAudioButtonSize = 44.0;
+static constexpr qreal kTwoWayAudioButtonSize = 44.0;
 
-static const qreal kMotionRegionAlpha = 0.4;
+static constexpr qreal kMotionRegionAlpha = 0.4;
+
+static constexpr qreal kMaxForwardSpeed = 16.0;
+static constexpr qreal kMaxBackwardSpeed = 16.0;
+
 
 bool isSpecialDateTimeValueUsec(qint64 dateTimeUsec)
 {
@@ -2274,4 +2278,28 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
     setOption(WindowResizingForbidden, enabled);
 
     emit motionSearchModeEnabled(enabled);
+}
+
+QnSpeedRange QnMediaResourceWidget::speedRange() const
+{
+    static constexpr qreal kUnitSpeed = 1.0;
+    static constexpr qreal kZeroSpeed = 0.0;
+
+    if (!m_display || !m_display->archiveReader())
+        return QnSpeedRange(kZeroSpeed, kZeroSpeed);
+
+    if (!hasVideo())
+        return QnSpeedRange(kUnitSpeed, kZeroSpeed);
+
+    const qreal backward = m_display->archiveReader()->isNegativeSpeedSupported()
+        ? availableSpeedRange().backward
+        : kZeroSpeed;
+
+    return QnSpeedRange(availableSpeedRange().forward, backward);
+}
+
+const QnSpeedRange& QnMediaResourceWidget::availableSpeedRange()
+{
+    static const QnSpeedRange kAvailableSpeedRange(kMaxForwardSpeed, kMaxBackwardSpeed);
+    return kAvailableSpeedRange;
 }

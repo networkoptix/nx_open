@@ -120,7 +120,7 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_selectedAudioChannel(0),
     m_audioStreamIndex(-1),
     m_firstVideoIndex(0),
-    m_startTime(0),
+    m_startTimeUsec(0),
     m_useAbsolutePos(true),
     m_duration(AV_NOPTS_VALUE),
     m_ioContext(0),
@@ -147,7 +147,7 @@ QnAviArchiveDelegate::~QnAviArchiveDelegate()
 
 qint64 QnAviArchiveDelegate::startTime() const
 {
-    return m_startTime;
+    return m_startTimeUsec;
 }
 
 qint64 QnAviArchiveDelegate::endTime() const
@@ -157,7 +157,7 @@ qint64 QnAviArchiveDelegate::endTime() const
     if (m_duration == qint64(AV_NOPTS_VALUE))
         return m_duration;
     else
-        return m_duration + m_startTime;
+        return m_duration + m_startTimeUsec;
 }
 
 QnConstMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
@@ -254,7 +254,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
     data->flags = static_cast<QnAbstractMediaData::MediaFlags>(packet.flags);
 
     while (packet.stream_index >= m_lastPacketTimes.size())
-        m_lastPacketTimes << m_startTime;
+        m_lastPacketTimes << m_startTimeUsec;
     if (data->timestamp == AV_NOPTS_VALUE) {
         /*
         AVStream* stream = m_formatContext->streams[packet.stream_index];
@@ -283,7 +283,7 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
     if (m_eofReached)
         return time;
 
-    qint64 relTime = qMax(time-m_startTime, 0ll);
+    qint64 relTime = qMax(time-m_startTimeUsec, 0ll);
     if (m_hasVideo)
         av_seek_frame(m_formatContext, -1, relTime + m_startMksec, findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
     else {
@@ -291,7 +291,7 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
         if (!reopen())
             return -1;
     }
-    m_lastSeekTime = relTime + m_startMksec + m_startTime; // file physical time to UTC time
+    m_lastSeekTime = relTime + m_startMksec + m_startTimeUsec; // file physical time to UTC time
     return time;
 }
 
@@ -442,8 +442,8 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
             {
                 AVDictionaryEntry* start_time = av_dict_get(m_formatContext->metadata,getTagName(StartTimeTag, format), 0, 0);
                 if (start_time) {
-                    m_startTime = QString(QLatin1String(start_time->value)).toLongLong()*1000ll;
-                    if (m_startTime >= UTC_TIME_DETECTION_THRESHOLD) {
+                    m_startTimeUsec = QString(QLatin1String(start_time->value)).toLongLong()*1000ll;
+                    if (m_startTimeUsec >= UTC_TIME_DETECTION_THRESHOLD) {
                         m_resource->addFlags(Qn::utc);
                         if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage)) {
                             m_resource->addFlags(Qn::sync | Qn::periods | Qn::motion); // use sync for exported layout only
@@ -588,7 +588,7 @@ qint64 QnAviArchiveDelegate::packetTimestamp(const AVPacket& packet)
     if (packetTime == qint64(AV_NOPTS_VALUE))
         return AV_NOPTS_VALUE;
     else
-        return qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTime;
+        return qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTimeUsec;
 }
 
 void QnAviArchiveDelegate::packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet)
@@ -602,9 +602,9 @@ void QnAviArchiveDelegate::packetTimestamp(QnCompressedVideoData* video, const A
     if (packetTime == qint64(AV_NOPTS_VALUE))
         video->timestamp = AV_NOPTS_VALUE;
     else
-        video->timestamp = qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTime;
+        video->timestamp = qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTimeUsec;
     if (packet.pts != AV_NOPTS_VALUE) {
-        video->pts = qMax(0ll, (qint64) (timeBase * (packet.pts - firstDts))) +  m_startTime;
+        video->pts = qMax(0ll, (qint64) (timeBase * (packet.pts - firstDts))) +  m_startTimeUsec;
     }
 }
 
@@ -697,7 +697,23 @@ const char* QnAviArchiveDelegate::getTagName(Tag tag, const QString& formatName)
         case CustomTag:     return "IENG"; //IENG
         }
     }
-    else {
+
+    // https://wiki.multimedia.cx/index.php/FFmpeg_Metadata
+    else if (formatName == QLatin1String("mov") || formatName == QLatin1String("mp4"))
+    {
+        switch (tag)
+        {
+            case StartTimeTag:  return "episode_id";
+            case LayoutInfoTag: return "show";
+            case SoftwareTag:   return "synopsis";
+            case SignatureTag:  return "copyright";
+            case DewarpingTag:  return "description";
+            case CustomTag:     return "comment";
+        }
+    }
+
+    else
+    {
         switch(tag)
         {
         case StartTimeTag:  return "start_time"; // StartTimecode

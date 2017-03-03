@@ -20,6 +20,9 @@ Popup
 
     background: null
 
+    // The dialog will try to keep this item visible (in the screen boundaries).
+    property Item activeItem: null
+
     contentItem: MouseArea
     {
         anchors.fill: parent
@@ -52,6 +55,9 @@ Popup
 
                 color: ColorTheme.contrast3
             }
+
+            onWidthChanged: ensureActiveItemVisible()
+            onHeightChanged: ensureActiveItemVisible()
         }
 
         onClicked: close()
@@ -106,4 +112,12 @@ Popup
     }
 
     onOpened: contentItem.forceActiveFocus()
+
+    onActiveItemChanged: ensureActiveItemVisible()
+
+    function ensureActiveItemVisible()
+    {
+        if (activeItem)
+            Nx.ensureFlickableChildVisible(activeItem)
+    }
 }

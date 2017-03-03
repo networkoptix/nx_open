@@ -13,7 +13,7 @@ angular.module('webadminApp')
                 ngClick: '&',
                 positionHandler: '='
             },
-            templateUrl: 'views/components/timeline.html',
+            templateUrl: Config.viewsDir + 'components/timeline.html',
             link: function (scope, element/*, attrs*/) {
 
                 var debugEventsMode = Config.debug.chunksOnTimeline && Config.allowDebugMode;

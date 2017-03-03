@@ -14,4 +14,10 @@ DialogListItem
         qualityDialog.activeQuality = quality
         qualityDialog.close()
     }
+
+    onActiveChanged:
+    {
+        if (active)
+            qualityDialog.activeItem = this
+    }
 }

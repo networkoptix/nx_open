@@ -1,5 +1,4 @@
 import QtQuick 2.6
-import QtMultimedia 5.5
 import Qt.labs.templates 1.0
 import Nx 1.0
 import Nx.Media 1.0
@@ -204,7 +203,7 @@ Control
             VideoPositioner
             {
                 anchors.fill: parent
-                customAspectRatio: resourceHelper.customAspectRatio || player.aspectRatio
+                customAspectRatio: resourceHelper.customAspectRatio || mediaPlayer.aspectRatio
                 videoRotation: resourceHelper.customRotation
                 sourceSize: Qt.size(videoOutput.sourceRect.width, videoOutput.sourceRect.height)
 
@@ -212,7 +211,7 @@ Control
                 {
                     id: videoOutput
 
-                    source: player
+                    player: mediaPlayer
                     fillMode: VideoOutput.Stretch
 
                     QnScenePositionListener
@@ -220,19 +219,25 @@ Control
                         item: parent
                         onScenePosChanged:
                         {
-                            player.videoGeometry = Qt.rect(
+                            mediaPlayer.videoGeometry = Qt.rect(
                                 scenePos.x,
                                 scenePos.y,
                                 parent.width,
                                 parent.height)
                         }
                     }
+
+                    Connections
+                    {
+                        target: cameraItem
+                        onResourceIdChanged: videoOutput.clear()
+                    }
                 }
             }
 
             MediaPlayer
             {
-                id: player
+                id: mediaPlayer
 
                 resourceId: cameraItem.resourceId
                 Component.onCompleted:
@@ -249,9 +254,9 @@ Control
                 onPausedChanged:
                 {
                     if (cameraItem.paused)
-                        player.stop()
+                        mediaPlayer.stop()
                     else
-                        player.play()
+                        mediaPlayer.play()
                 }
             }
         }

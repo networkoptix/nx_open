@@ -33,6 +33,8 @@ public:
     virtual QSize sizeHint() const override;
     virtual Qn::ThumbnailStatus status() const override;
 
+    static QSize sizeHintForCamera(const QnVirtualCameraResourcePtr& camera, const QSize& limit);
+
 signals:
     void thumbnailReady(const QnUuid& resourceId, const QPixmap& thumbnail);
 
@@ -62,6 +64,6 @@ private:
 
     QHash<QnVirtualCameraResourcePtr, ThumbnailData> m_thumbnailByCamera;
     QnVirtualCameraResourcePtr m_selectedCamera;
-    QSize m_thumnailSize;
+    QSize m_thumbnailSize;
     QTimer* m_refreshingTimer;
 };

@@ -41,7 +41,6 @@ private slots:
     void updateNavigatorSpeedFromSpeedSlider();
     void updateSpeedSliderSpeedFromNavigator();
     void updateSpeedSliderParametersFromNavigator();
-    void updatePlaybackButtonsPressed();
     void updatePlayButtonChecked();
     void updateJumpButtonsTooltips();
     void updateBookButtonEnabled();

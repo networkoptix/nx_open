@@ -13,6 +13,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             High: 'hi',
             Low: 'lo'
         };
+        $scope.Config = Config;
         $scope.session = $sessionStorage;
         $scope.storage = $localStorage;
         $scope.storage.serverStates = $scope.storage.serverStates || {};
