@@ -104,7 +104,10 @@ class Vagrant(object):
         adapter_idx = 1  # use ip address from first host network
         cmd = ['VBoxManage', '--nologo', 'guestproperty', 'get',
                config.vm_box_name(), '/VirtualBox/GuestInfo/Net/%d/V4/IP' % adapter_idx]
-        output = self._vm_host.run_command(cmd)
+        # temporary: vbox returns invalid address sometimes; try load ip address several times with delay to see what happens
+        for i in range(10):
+            output = self._vm_host.run_command(cmd)
+            time.sleep(0.5)
         l = output.strip().split()
         assert l[0] == 'Value:', repr(output)  # Does interface exist?
         return l[1]
