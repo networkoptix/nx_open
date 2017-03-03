@@ -36,4 +36,10 @@ TEST_F(TestFileInfoIteratorTest, main)
     auto fInfo = fileIterator->next(&ecode);
     ASSERT_EQ(ecode, nx_spl::error::NoError);
     ASSERT_EQ(strcmp(fInfo->url, "test://storage/some/path/hi_quality"), 0);
+    ASSERT_EQ(fInfo->size, 0);
+    ASSERT_EQ(fInfo->type, nx_spl::isDir);
+
+    fInfo = fileIterator->next(&ecode);
+    ASSERT_EQ(ecode, nx_spl::error::NoError);
+    ASSERT_EQ(strcmp(fInfo->url, "test://storage/some/path/low_quality"), 0);
 }
