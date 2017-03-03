@@ -95,6 +95,8 @@ public:
     api::VmsConnectionDataList getVmsConnections() const;
     bool isSystemConnected(const std::string& systemId) const;
 
+    unsigned int getConnectionCountBySystemId(const nx::String& systemId) const;
+
     void closeConnectionsToSystem(
         const nx::String& systemId,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
@@ -177,6 +179,8 @@ private:
         Iterator connectionIterator,
         CompletionHandler completionHandler);
     
+    void sendSystemOfflineNotificationIfNeeded(const nx::String systemId);
+
     void removeConnection(const nx::String& connectionId);
     
     void onGotTransaction(

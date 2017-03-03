@@ -303,6 +303,13 @@ bool ConnectionManager::isSystemConnected(const std::string& systemId) const
         systemIter->fullPeerName.systemId == systemId;
 }
 
+unsigned int ConnectionManager::getConnectionCountBySystemId(
+    const nx::String& systemId) const
+{
+    QnMutexLocker lock(&m_mutex);
+    return getConnectionCountBySystemId(lock, systemId);
+}
+
 void ConnectionManager::closeConnectionsToSystem(
     const nx::String& systemId,
     nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -365,6 +372,7 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
 
     const auto systemConnectionCountBak = getConnectionCountBySystemId(
         lock, context.fullPeerName.systemId);
+    const auto systemId = context.fullPeerName.systemId.toStdString();
 
     if (!m_connections.insert(std::move(context)).second)
     {
@@ -376,7 +384,7 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
     {
         lock.unlock();
         m_systemStatusChangedSubscription.notify(
-            context.fullPeerName.systemId.toStdString(), api::SystemHealth::online);
+            systemId, api::SystemHealth::online);
     }
 
     return true;
@@ -465,18 +473,26 @@ void ConnectionManager::removeConnectionByIter(
     // TODO: #ak have to ensure somehow that no events from
     //  connectionContext.connection are delivered.
 
-    // TODO: #ak send notification if needed. With no lock!
-    //m_systemStatusChangedSubscription.notify(
-    //    context.fullPeerName.systemId.toStdString(), api::SystemHealth::offline);
-
     existingConnectionPtr->post(
-        [existingConnection = std::move(existingConnection),
+        [this, existingConnection = std::move(existingConnection),
             locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)]() mutable
         {
+            sendSystemOfflineNotificationIfNeeded(
+                existingConnection->commonTransportHeaderOfRemoteTransaction().systemId);
             existingConnection.reset();
             completionHandler();
         });
+}
+
+void ConnectionManager::sendSystemOfflineNotificationIfNeeded(
+    const nx::String systemId)
+{
+    if (getConnectionCountBySystemId(systemId) > 0)
+        return;
+
+    m_systemStatusChangedSubscription.notify(
+        systemId.toStdString(), api::SystemHealth::offline);
 }
 
 void ConnectionManager::removeConnection(const nx::String& connectionId)

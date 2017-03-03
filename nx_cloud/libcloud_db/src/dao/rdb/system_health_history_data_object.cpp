@@ -20,16 +20,20 @@ nx::db::DBResult SystemHealthHistoryDataObject::insert(
     const api::SystemHealthHistoryItem& historyItem)
 {
     QSqlQuery insertHistoryItemQuery(*queryContext->connection());
-    insertHistoryItemQuery.prepare(
-        R"sql(
+    insertHistoryItemQuery.prepare(R"sql(
         INSERT INTO system_health_history(system_id, state, timestamp_utc)
         VALUES(:systemId, :state, :timestamp)
-        )sql");
+    )sql");
 
-    insertHistoryItemQuery.bindValue(":systemId", QnSql::serialized_field(systemId));
-    QnSql::bind(historyItem, &insertHistoryItemQuery);
+    insertHistoryItemQuery.bindValue(
+        ":systemId", QnSql::serialized_field(systemId));
+    insertHistoryItemQuery.bindValue(
+        ":state", QnSql::serialized_field(static_cast<int>(historyItem.state)));
+    insertHistoryItemQuery.bindValue(
+        ":timestamp", QnSql::serialized_field(historyItem.timestamp));
     if (!insertHistoryItemQuery.exec())
     {
+        const auto s = insertHistoryItemQuery.lastError().text();
         NX_LOG(lm("Could not insert system %1 history into DB. %2")
             .arg(systemId).arg(insertHistoryItemQuery.lastError().text()),
             cl_logDEBUG1);
@@ -46,12 +50,11 @@ nx::db::DBResult SystemHealthHistoryDataObject::selectHistoryBySystem(
 {
     QSqlQuery selectSystemHealthHistoryQuery(*queryContext->connection());
     selectSystemHealthHistoryQuery.setForwardOnly(true);
-    selectSystemHealthHistoryQuery.prepare(
-        R"sql(
+    selectSystemHealthHistoryQuery.prepare(R"sql(
         SELECT state, timestamp_utc as timestamp
         FROM system_health_history
         WHERE system_id=:systemId
-        )sql");
+    )sql");
     selectSystemHealthHistoryQuery.bindValue(0, QnSql::serialized_field(systemId));
     if (!selectSystemHealthHistoryQuery.exec())
     {

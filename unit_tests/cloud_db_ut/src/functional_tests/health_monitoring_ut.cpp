@@ -1,3 +1,6 @@
+#include <chrono>
+#include <thread>
+
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
@@ -13,16 +16,16 @@
 namespace nx {
 namespace cdb {
 
-class HealthMonitoring:
+class FtHealthMonitoring:
     public Ec2MserverCloudSynchronization
 {
 public:
-    HealthMonitoring()
+    FtHealthMonitoring()
     {
         init();
     }
 
-    ~HealthMonitoring()
+    ~FtHealthMonitoring()
     {
     }
 
@@ -39,6 +42,7 @@ protected:
         appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
         waitForCloudAndVmsToSyncUsers();
 
+        waitForSystemToBecome(api::SystemHealth::online);
         saveHistoryItem(api::SystemHealth::online);
     }
 
@@ -46,6 +50,7 @@ protected:
     {
         appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(cdbEc2TransactionUrl());
         saveHistoryItem(api::SystemHealth::offline);
+        waitForSystemToBecome(api::SystemHealth::offline);
     }
 
     void whenCdbIsRestarted()
@@ -132,6 +137,22 @@ private:
         m_anotherUser = cdb()->addActivatedAccount2();
     }
 
+    void waitForSystemToBecome(api::SystemHealth status)
+    {
+        for (;;)
+        {
+            api::SystemDataEx systemData;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                cdb()->fetchSystemData(
+                    ownerAccount().email, ownerAccount().password,
+                    registeredSystemData().id, &systemData));
+            if (systemData.stateOfHealth == status)
+                break;
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+    }
+
     void assertSystemStatusIs(api::SystemHealth status)
     {
         api::SystemDataEx systemData;
@@ -152,7 +173,7 @@ private:
     }
 };
 
-TEST_F(HealthMonitoring, system_status_is_correct)
+TEST_F(FtHealthMonitoring, system_status_is_correct)
 {
     for (int i = 0; i < 2; ++i)
     {
@@ -168,7 +189,7 @@ TEST_F(HealthMonitoring, system_status_is_correct)
     }
 }
 
-TEST_F(HealthMonitoring, history_is_persistent)
+TEST_F(FtHealthMonitoring, history_is_persistent)
 {
     establishConnectionFromMediaserverToCloud();
     closeConnectionFromMediaserverToCloud();
@@ -180,7 +201,7 @@ TEST_F(HealthMonitoring, history_is_persistent)
     assertHistoryIsCorrect();
 }
 
-TEST_F(HealthMonitoring, history_is_not_reported_for_unknown_id)
+TEST_F(FtHealthMonitoring, history_is_not_reported_for_unknown_id)
 {
     api::SystemHealthHistory history;
     ASSERT_NE(
@@ -190,14 +211,14 @@ TEST_F(HealthMonitoring, history_is_not_reported_for_unknown_id)
             QnUuid::createUuid().toStdString(), &history));
 }
 
-TEST_F(HealthMonitoring, history_is_available_to_system_owner_only)
+TEST_F(FtHealthMonitoring, history_is_available_to_system_owner_only)
 {
     givenSystemWithSomeHistory();
     whenSystemIsSharedWithSomeone();
     thenSomeoneDoesNotHaveAccessToTheHistory();
 }
 
-TEST_F(HealthMonitoring, history_is_not_available_to_system_credentials)
+TEST_F(FtHealthMonitoring, history_is_not_available_to_system_credentials)
 {
     givenSystemWithSomeHistory();
     thenSystemCredentialsCannotBeUsedToAccessHistory();
