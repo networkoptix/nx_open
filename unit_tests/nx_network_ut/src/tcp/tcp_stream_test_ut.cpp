@@ -74,7 +74,7 @@ void doTest(bool doServerDelay, bool doClientDelay)
         int offset = 0;
         while (offset < bufferSize)
         {
-            int bytesSent = clientSocket->send(buffer.data() + offset, bufferSize - offset);
+            int bytesSent = clientSocket->send((char*) buffer.data() + offset, bufferSize - offset);
             if (bytesSent == 0 || !clientSocket->isConnected())
                 break;
             ASSERT_TRUE(bytesSent >= 0);
