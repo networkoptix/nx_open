@@ -51,6 +51,9 @@ public:
     virtual QVariant inputMethodQuery(Qt::InputMethodQuery query) const override;
 #endif
 
+protected:
+    QQuickItem* nextInputItem() const;
+
 signals:
     void scrollByMouseChanged();
     void backgroundChanged();
@@ -64,6 +67,7 @@ protected:
     virtual void mousePressEvent(QMouseEvent* event) override;
     virtual void mouseMoveEvent(QMouseEvent* event) override;
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
+    virtual void keyPressEvent(QKeyEvent* event) override;
 
 private:
     void emitPressAndHold();

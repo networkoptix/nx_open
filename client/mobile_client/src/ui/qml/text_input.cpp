@@ -191,14 +191,9 @@ QVariant QnQuickTextInput::inputMethodQuery(Qt::InputMethodQuery query) const
     switch (query)
     {
         case Qt::ImEnterKeyType:
-            if (m_enterKeyType == EnterKeyDefault)
-            {
-                // Seems like somebody forgot to make the getter const.
-                const auto nextItem =
-                    const_cast<QnQuickTextInput*>(this)->nextItemInFocusChain();
-                if (nextItem && nextItem->flags().testFlag(QQuickItem::ItemAcceptsInputMethod))
-                    return EnterKeyNext;
-            }
+            if (m_enterKeyType == EnterKeyDefault && nextInputItem())
+                return EnterKeyNext;
+
             return m_enterKeyType;
 
         default:
@@ -209,6 +204,15 @@ QVariant QnQuickTextInput::inputMethodQuery(Qt::InputMethodQuery query) const
 }
 
 #endif
+
+QQuickItem* QnQuickTextInput::nextInputItem() const
+{
+    // Seems like somebody forgot to make the getter const.
+    const auto nextItem = const_cast<QnQuickTextInput*>(this)->nextItemInFocusChain();
+    if (nextItem && nextItem->flags().testFlag(QQuickItem::ItemAcceptsInputMethod))
+        return nextItem;
+    return nullptr;
+}
 
 void QnQuickTextInput::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
 {
@@ -312,4 +316,19 @@ void QnQuickTextInput::mouseReleaseEvent(QMouseEvent* event)
     m_pressAndHoldTimer->stop();
 
     base_type::mouseReleaseEvent(event);
+}
+
+void QnQuickTextInput::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return)
+    {
+        if (const auto item = nextInputItem())
+        {
+            item->forceActiveFocus();
+            event->ignore();
+            return;
+        }
+    }
+
+    base_type::keyPressEvent(event);
 }
