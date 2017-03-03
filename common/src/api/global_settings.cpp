@@ -47,6 +47,7 @@ namespace {
     const QString nameSupportEmail(lit("emailSupportEmail"));
     const QString nameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
     const QString nameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
+    const QString nameSynchronizeTimeWithInternet(lit("synchronizeTimeWithInternet"));
     const QString nameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
     const QString nameBackupQualities(lit("backupQualities"));
     const QString nameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
@@ -199,11 +200,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
         kServerDiscoveryPingTimeoutDefault,
         this);
     ec2Adaptors << m_serverDiscoveryPingTimeout;
-    m_timeSynchronizationEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        nameTimeSynchronizationEnabled,
-        true,
-        this);
-    ec2Adaptors << m_timeSynchronizationEnabledAdaptor;
+
     m_proxyConnectTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         kProxyConnectTimeout,
         kProxyConnectTimeoutDefault,
@@ -221,6 +218,28 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
             this, &QnGlobalSettings::ec2ConnectionSettingsChanged,
             Qt::QueuedConnection);
 
+    //---------------------------------------------------------------------------------------------
+    QList<QnAbstractResourcePropertyAdaptor*> timeSynchronizationAdaptors;
+    m_timeSynchronizationEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        nameTimeSynchronizationEnabled,
+        true,
+        this);
+    timeSynchronizationAdaptors << m_timeSynchronizationEnabledAdaptor;
+    m_synchronizeTimeWithInternetAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        nameSynchronizeTimeWithInternet,
+        true,
+        this);
+    timeSynchronizationAdaptors << m_synchronizeTimeWithInternetAdaptor;
+
+    for (auto adaptor: timeSynchronizationAdaptors)
+    {
+        connect(
+            adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+            this, &QnGlobalSettings::timeSynchronizationSettingsChanged,
+            Qt::QueuedConnection);
+    }
+
+    //---------------------------------------------------------------------------------------------
     m_arecontRtspEnabled = new QnLexicalResourcePropertyAdaptor<bool>(
         kArecontRtspEnabled,
         kArecontRtspEnabledDefault,
@@ -260,6 +279,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
         << m_statisticsAllowedAdaptor
 		<< m_crossdomainXmlEnabledAdaptor
         << ec2Adaptors
+        << timeSynchronizationAdaptors
         << m_arecontRtspEnabled
         << m_maxRecorderQueueSizeBytes
         << m_maxRecorderQueueSizePackets
@@ -489,6 +509,11 @@ std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const
 bool QnGlobalSettings::isTimeSynchronizationEnabled() const
 {
     return m_timeSynchronizationEnabledAdaptor->value();
+}
+
+bool QnGlobalSettings::isSynchronizingTimeWithInternet() const
+{
+    return m_synchronizeTimeWithInternetAdaptor->value();
 }
 
 bool QnGlobalSettings::arecontRtspEnabled() const
