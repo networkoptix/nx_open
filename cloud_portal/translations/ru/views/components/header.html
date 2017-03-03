@@ -18,14 +18,14 @@
             <ul class="nav navbar-nav navbar-right auth-hidden">
                 <li><span class="btn-wrapper"><a href="/login" class="btn btn-default"
                                                  ng-click="login();$event.preventDefault();">Войти</a></span><span
-                        class="btn-wrapper" ng-if="!isActive('register')"><a href="/register" class="btn btn-primary" >Создать учетную запись</a></span></li>
+                        class="btn-wrapper" ng-if="!isActive('register')"><a href="/register" class="btn btn-primary" >Зарегистрироваться</a></span></li>
             </ul>
             <ul class="nav navbar-nav navbar-right auth-visible hidden-collapsed">
                 <li class="vertical-bar"></li>
                 <li uib-dropdown>
                     <a uib-dropdown-toggle href="">{{account.email}} <span class="icon-caret"></span></a>
                     <ul uib-dropdown-menu>
-                        <li><a href="/account/">Настройки учётной записи</a></li>
+                        <li><a href="/account/">Настройки учетной записи</a></li>
                         <li><a href="/account/password/">Изменить пароль</a></li>
                         <li><a href="" ng-click="logout()">Выход</a></li>
                     </ul>
@@ -34,7 +34,7 @@
             </ul>
             <ul class="nav navbar-nav navbar-right hidden-expanded auth-visible ">
                 <li><a>{{account.email}}</a></li>
-                <li><a href="/account/">Настройки учётной записи</a></li>
+                <li><a href="/account/">Настройки учетной записи</a></li>
                 <li><a href="/account/password/">Изменить пароль</a></li>
                 <li><a href="" ng-click="logout()">Выход</a></li>
             </ul>
