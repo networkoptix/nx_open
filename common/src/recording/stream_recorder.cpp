@@ -633,7 +633,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         }
 
         if (isUtcOffsetAllowed())
-            metadata.startTimeMs = m_startOffsetMs + (mediaData->timestamp/1000ll);
+            metadata.startTimeMs = mediaData->timestamp/1000ll;
 
         metadata.dewarpingParams = mediaDev->getDewarpingParams();
         if (isTranscode)

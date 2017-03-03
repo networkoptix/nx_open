@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QMetaType>
+#include <QtCore/QSize>
 
 #include <common/common_globals.h>
 
@@ -8,7 +9,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-class AVFormatContext;
+struct AVFormatContext;
 
 /** Struct for adding custom fields to an exported video file. */
 struct QnAviArchiveMetadata
