@@ -7271,7 +7271,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Cloud System cannot be merged to another</source>
+        <source>Cloud Systems cannot be merged</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
