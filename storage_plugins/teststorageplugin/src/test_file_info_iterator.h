@@ -22,5 +22,6 @@ public: // plugin interface implementation
 private:
     mutable nx_spl::FileInfo m_fInfo;
     mutable FsStubNode* m_cur;
+    mutable char m_urlBuf[4096];
 };
 

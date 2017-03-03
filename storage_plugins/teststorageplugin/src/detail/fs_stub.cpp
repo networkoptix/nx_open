@@ -106,14 +106,11 @@ static struct FsStubNode *createNode(
     if (fsNode == NULL)
         return NULL;
 
-    fsNode->child = NULL;
     fsNode->mask = mask;
+    fsNode->parent = parent;
 
     if (createStringCopy(name, -1, &fsNode->name) != 0)
         return NULL;
-
-    fsNode->next = NULL;
-    fsNode->parent = parent;
 
     if (parent != NULL)
     {
@@ -256,6 +253,9 @@ void FsStubNode_remove(struct FsStubNode *fsNode)
     else if (fsNode->parent)
         fsNode->parent->child = fsNode->next;
 
+    if (fsNode->next)
+        fsNode->next->prev = NULL;
+
     free(fsNode->name);
     free(fsNode);
 }
@@ -272,4 +272,33 @@ void FsStubNode_forEach(
         FsStubNode_forEach(curNode, ctx, action);
 
     action(ctx, root);
+}
+
+int FsStubNode_fullPath(struct FsStubNode *fsNode, char *buf, int size)
+{
+    int resultSize = -1;
+    struct FsStubNode *curNode = fsNode;
+    int writePos, nameLen;
+
+    for (; curNode; curNode = curNode->parent)
+        resultSize += strlen(curNode->name) + 1;
+
+    if (resultSize > size)
+        return resultSize;
+
+    curNode = fsNode;
+    writePos = resultSize - 1;
+    for (; curNode; curNode = curNode->parent)
+    { 
+        nameLen = strlen(curNode->name);
+        if (curNode->parent)
+        {
+            memcpy(buf + writePos - nameLen, curNode->name, nameLen);
+            writePos -= nameLen + 1;
+            buf[writePos] = '/';
+        }
+    }
+    buf[resultSize] = '\0';
+
+    return resultSize;
 }

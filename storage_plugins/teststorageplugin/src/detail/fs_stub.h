@@ -34,6 +34,9 @@ void FsStubNode_forEach(
     void *ctx, 
     void (*action)(void *ctx, struct FsStubNode *node));
 
+/* places full path for the node into the buf if buf size is enough, returns buffer size needed */
+int FsStubNode_fullPath(struct FsStubNode *fsNode, char *buf, int size);
+
 struct FsStubNode *FsStubNode_find(struct FsStubNode *topLevelNode, const char *path);
 int FsStubNode_rename(struct FsStubNode *fsNode, const char *newName);
 void FsStubNode_remove(struct FsStubNode *fsNode);

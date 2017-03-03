@@ -1,6 +1,10 @@
 #include <cstring>
 #include "test_file_info_iterator.h"
 
+namespace {
+
+}
+
 TestFileInfoIterator::TestFileInfoIterator(FsStubNode* root)
     : m_cur(root->child)
 {}
@@ -11,9 +15,18 @@ nx_spl::FileInfo* STORAGE_METHOD_CALL TestFileInfoIterator::next(int* ecode) con
     if (m_cur)
         m_cur = m_cur->next;
 
-    m_fInfo.url = resultNode->name;
+    char buf[4096];
+    FsStubNode_fullPath(resultNode, buf, sizeof buf);
+    memset(m_urlBuf, '\0', sizeof m_urlBuf);
+    strcpy(m_urlBuf, "test:/");
+    strcat(m_urlBuf, buf);
+
+    m_fInfo.url = m_urlBuf;
     m_fInfo.type = resultNode->type == file ? nx_spl::isFile : nx_spl::isDir;
     m_fInfo.size = resultNode->size;
+
+    if (ecode)
+        *ecode = nx_spl::error::NoError;
 
     return &m_fInfo;
 }
