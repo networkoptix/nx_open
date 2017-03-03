@@ -60,8 +60,11 @@ void QnCameraChunkProvider::setResourceId(const QString& id)
             emit bottomBoundChanged();
             emit bottomBoundDateChanged();
 
-            m_loading = false;
-            emit loadingChanged();
+            if (m_loading)
+            {
+                m_loading = false;
+                emit loadingChanged();
+            }
         });
 
     connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged,

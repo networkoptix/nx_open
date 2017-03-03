@@ -395,6 +395,8 @@ bool QnStorageDb::vacuum(QVector<DeviceFileCatalogPtr> *data)
 
 bool QnStorageDb::vacuumInternal()
 {
+    NX_LOG("QnStorageDb::vacuumInternal begin", cl_logDEBUG1);
+
     QString tmpDbFileName = m_dbFileName + ".tmp";
     std::unique_ptr<QIODevice> tmpFile(m_storage->open(tmpDbFileName, QIODevice::ReadWrite | QIODevice::Unbuffered));
     if (!tmpFile)
@@ -500,6 +502,8 @@ bool QnStorageDb::vacuumInternal()
         NX_LOG(lit("%1 DB is not consistent after vacuum").arg(Q_FUNC_INFO), cl_logWARNING);
         return false;
     }
+
+    NX_LOG("QnStorageDb::vacuumInternal completed successfully", cl_logDEBUG1);
 
     return true;
 }

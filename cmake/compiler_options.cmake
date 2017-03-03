@@ -111,6 +111,11 @@ if(MACOSX)
     set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
 endif()
 
+option(qml_debug "Enable QML debugger" ON)
+if(qml_debug)
+    add_definitions(-DQT_QML_DEBUG)
+endif()
+
 # set(CMAKE_AUTOMOC_MOC_OPTIONS "-bstdafx.h")
 #
 # if(WIN32)

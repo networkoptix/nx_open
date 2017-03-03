@@ -89,6 +89,11 @@ public:
      */
     virtual QPoint position(int channel) const = 0;
 
+    /**
+    * \returns                          Matrix data assumed to be in row-major order.
+    */
+    virtual QVector<int> getChannels() const = 0;
+
     virtual QString toString() const { return QString(); }
 };
 
@@ -113,6 +118,11 @@ public:
 
     virtual QPoint position(int) const override {
         return QPoint(0, 0);
+    }
+
+    virtual QVector<int> getChannels() const override
+    {
+        return QVector<int>() << 0;
     }
 };
 
@@ -143,7 +153,8 @@ public:
 
     virtual QPoint position(int channel) const override;
 
-    QVector<int> getChannels() const;
+    virtual QVector<int> getChannels() const override;
+
     void setChannels(const QVector<int>& value);
 
 protected:
