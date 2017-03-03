@@ -5,7 +5,7 @@ angular.module('webadminApp')
     .directive('systemInfo', ['mediaserver','$timeout','dialogs',function (mediaserver,$timeout,dialogs) {
         return {
             restrict: 'E',
-            templateUrl: 'views/components/systemInfo.html',
+            templateUrl: Config.viewsDir + 'components/systemInfo.html',
             link:function($scope, element, attrs, ngModel){
                 $scope.Config = Config;
 

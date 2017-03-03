@@ -1,6 +1,7 @@
 #include "targetver.h"
 
 #include <vector>
+#include <map>
 #include <iostream>
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
@@ -44,7 +45,12 @@ namespace LLUtil {
         const QString kEmptyMac = lit("");
     }
 
-HRESULT GetDisabledNICS(IWbemServices* pSvc, std::vector<_bstr_t>& paths)
+	void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo);
+
+	typedef std::map<_bstr_t, QnMacAndDeviceClass> QnPathToMacAndDeviceClassMap;
+
+
+HRESULT GetDisabledNICSWithEmptyMac(IWbemServices* pSvc, std::vector<_bstr_t>& paths, const QnPathToMacAndDeviceClassMap& devices)
 {
     HRESULT hres;
 
@@ -98,6 +104,12 @@ HRESULT GetDisabledNICS(IWbemServices* pSvc, std::vector<_bstr_t>& paths)
     if (pclsObj!=NULL)
         pclsObj->Release();
 
+	auto it = std::remove_if(paths.begin(), paths.end(), [&devices](const _bstr_t& path) { 
+		auto it = devices.find(path);
+		return it != devices.end() && !it->second.mac.isEmpty();
+	 });
+	paths.erase(it, paths.end());
+
     return S_OK;
 }
 
@@ -145,7 +157,7 @@ HRESULT DisableNICSAtPaths(IWbemServices* pSvc, const std::vector<_bstr_t>& path
     return ExecuteMethodAtPaths(pSvc, _T("Disable"), paths);
 }
 
-static void findMacAddresses(IWbemServices* pSvc, QnMacAndDeviceClassList& devices)
+static void findMacAddresses(IWbemServices* pSvc, QnPathToMacAndDeviceClassMap& devices)
 {
     HRESULT hres;
     IEnumWbemClassObject* pEnumerator = NULL;
@@ -177,6 +189,7 @@ static void findMacAddresses(IWbemServices* pSvc, QnMacAndDeviceClassList& devic
         if (0 == uReturn)
             break;
 
+		_bstr_t path;
         QnMacAndDeviceClass device;
 
         VARIANT vtProp;
@@ -204,7 +217,21 @@ static void findMacAddresses(IWbemServices* pSvc, QnMacAndDeviceClassList& devic
             continue;
         }
 
-        hr = pclsObj->Get(L"MACAddress", 0, &vtProp, 0, 0);
+		hr = pclsObj->Get(L"__Path", 0, &vtProp, 0, 0);
+		if (SUCCEEDED(hr))
+		{
+			if (V_VT(&vtProp) == VT_BSTR)
+			{
+				path = vtProp.bstrVal;
+				VariantClear(&vtProp);
+			}
+		}
+		else
+		{
+			continue;
+		}
+
+		hr = pclsObj->Get(L"MACAddress", 0, &vtProp, 0, 0);
         if (SUCCEEDED(hr))
         {
             if (V_VT(&vtProp) == VT_BSTR)
@@ -217,8 +244,7 @@ static void findMacAddresses(IWbemServices* pSvc, QnMacAndDeviceClassList& devic
             continue;
         }
 
-        if (!device.mac.isEmpty())
-            devices.push_back(device);
+        devices[path] = device;
 
         pclsObj->Release();
     }
@@ -419,10 +445,6 @@ void calcHardwareIdMap(QMap<QString, QString>& hardwareIdMap, const QnHardwareIn
 
 } // namespace {}
 
-namespace LLUtil {
-    void fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo);
-}
-
 void LLUtil::fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& hardwareInfo)
 {
     bool needUninitialize = true;
@@ -551,45 +573,51 @@ void LLUtil::fillHardwareIds(HardwareIdListType& hardwareIds, QnHardwareInfo& ha
         throw HardwareIdError(os.str());
     }
 
-    bool vistaOrLater = IsWindowsVistaOrGreater();
-
     // Find disabled NICs
     std::vector<_bstr_t> paths;
 
-    if (vistaOrLater)
+	QnPathToMacAndDeviceClassMap devices;
+	findMacAddresses(pSvc, devices);
+
+	// Getting interface state can give false positives
+	// i.e. interface can be reported as disabled, however it's enabled
+	// Still we're trying to enable interfaces that's reported as disabled,
+	// but only if we can't get mac addresses from them
+    if (GetDisabledNICSWithEmptyMac(pSvc, paths, devices) == S_OK)
     {
-        if (GetDisabledNICS(pSvc, paths) == S_OK)
-        {
-            // Temporarily enable them
-            if (EnableNICSAtPaths(pSvc, paths) == S_OK)
-            {
+		if (!paths.empty())
+		{
+			// Temporarily enable them
+			if (EnableNICSAtPaths(pSvc, paths) == S_OK)
+			{
 #if 1
-                // Wait up to 10 seconds for all interfaces to be enabled
-                for (int i = 0; i < kInterfaceWaitingTries; i++)
-                {
-                    std::vector<_bstr_t> tmpPaths;
-                    GetDisabledNICS(pSvc, tmpPaths);
+				// Wait up to kInterfaceWaitingTries * kInterfaceWaitingTime milliseconds for all interfaces to be enabled
+				for (int i = 0; i < kInterfaceWaitingTries; i++)
+				{
+					findMacAddresses(pSvc, devices);
 
-                    if (tmpPaths.empty())
-                    {
-                        break;
-                    } else
-                    {
-                        Sleep(kInterfaceWaitingTime);
-                    }
-                }
+					int emptyMacs = std::count_if(devices.cbegin(), devices.cend(), [](const auto& item) { return item.second.mac.isEmpty(); });
+					if (emptyMacs == 0)
+					{
+						break;
+					}
+					else
+					{
+						Sleep(kInterfaceWaitingTime);
+					}
+				}
 #endif
-            }
-        }
+			}
+
+			// Disable enabled NICs again if were any
+			DisableNICSAtPaths(pSvc, paths);
+		}
     }
 
-    findMacAddresses(pSvc, hardwareInfo.nics);
-
-    if (vistaOrLater)
-    {
-        // Disable enabled NICs again if were any
-        DisableNICSAtPaths(pSvc, paths);
-    }
+	for (const auto& it : devices) {
+		if (!it.second.mac.isEmpty())
+			hardwareInfo.nics.push_back(it.second);
+	}
 
     HardwareIdListForVersion macHardwareIds;
 

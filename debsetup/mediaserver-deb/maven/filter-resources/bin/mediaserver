@@ -20,7 +20,9 @@ $VMS_DIR/bin/shell_utils.sh crash_gdb_bt $VMS_DIR/bin/mediaserver-bin
 lsblk -o MODEL -n | grep -v '^$' > /tmp/hddlist
 
 echo --- Set ulimits:
-ulimit -n $(cat /proc/sys/fs/file-max 2>/dev/null || echo 8192)
+FD_MAX=32000
+SYS_FD_MAX=$(cat /proc/sys/fs/file-max 2>/dev/null || echo $FD_MAX)
+ulimit -n $((SYS_FD_MAX<FD_MAX?SYS_FD_MAX:FD_MAX))
 ulimit -c unlimited
 ulimit -a
 

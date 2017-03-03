@@ -193,7 +193,7 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
             [this, &buffer, &promise](SystemError::ErrorCode code, size_t size)
             {
                 ASSERT_EQ(code, SystemError::noError);
-                ASSERT_EQ(size, buffer.size());
+                ASSERT_EQ(size, (size_t)buffer.size());
 
                 buffer.resize(0);
                 m_freeSocket->readSomeAsync(
@@ -238,7 +238,7 @@ TEST_F(IncomingTunnelConnectionTest, SynAck)
             [this, &buffer, &promise](SystemError::ErrorCode code, size_t size)
             {
                 ASSERT_EQ(code, SystemError::noError);
-                ASSERT_EQ(size, buffer.size());
+                ASSERT_EQ(size, (size_t)buffer.size());
 
                 buffer.resize(0);
                 buffer.reserve(1);
