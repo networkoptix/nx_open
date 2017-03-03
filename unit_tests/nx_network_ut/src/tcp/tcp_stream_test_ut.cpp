@@ -4,9 +4,6 @@
 #include <nx/utils/std/thread.h>
 #include <nx/network/socket_common.h>
 
-#include <netinet/tcp.h>
-#include <fcntl.h>
-
 namespace {
 
 const int kIterations = 100;
