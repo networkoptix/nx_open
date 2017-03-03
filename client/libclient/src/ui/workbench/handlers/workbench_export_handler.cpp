@@ -294,8 +294,8 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
     QStringList filters{
         lit("Matroska (*.mkv)"),
-        lit("AVI (*.avi)"),
-        lit("MP4 (*.mp4)")
+        lit("MP4 (*.mp4)"),
+        lit("AVI (*.avi)")
     };
 
     bool canUseBinaryExport = isBinaryExportSupported() && timelapseFrameStepMs == 0;

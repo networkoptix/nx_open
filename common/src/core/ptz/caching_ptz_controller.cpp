@@ -15,8 +15,22 @@ QnCachingPtzController::QnCachingPtzController(const QnPtzControllerPtr &baseCon
          * PTZ controller for an offline camera. But strictly speaking, 
          * we don't know that. Should probably be fixed by adding a signal to
          * PTZ controller. */ // TODO: #Elric
-        connect(resource(), &QnResource::statusChanged, this, &QnCachingPtzController::initialize);
-        connect(resource(), &QnResource::parentIdChanged, this, &QnCachingPtzController::initialize);
+
+        QPointer<QnCachingPtzController> guard(this);
+
+        /**
+         * Prevents calling "initialize" function on removed "this". Controller could be removed
+         * from QnPtzControllerPool after signals of resource emitted but not delivered.
+         */
+        const auto safeInitialize =
+            [guard]()
+            {
+                if (guard)
+                    guard->initialize();
+            };
+
+        connect(resource(), &QnResource::statusChanged, this, safeInitialize);
+        connect(resource(), &QnResource::parentIdChanged, this, safeInitialize);
     }
 }
 
