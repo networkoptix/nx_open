@@ -101,6 +101,13 @@ class Vagrant(object):
         self.box_host(box_name, 'vagrant').run_command(['sudo', 'cp', '-r', '/home/vagrant/.ssh', '/root/'])
 
     def _load_box_ip_address(self, config):
+        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'vms'])
+        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'hostonlyifs'])
+        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'natnets'])
+        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'intnets'])
+        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'bridgedifs'])
+        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'dhcpservers'])
+        self._vm_host.run_command(['/sbin/ifconfig'])
         adapter_idx = 1  # use ip address from first host network
         cmd = ['VBoxManage', '--nologo', 'guestproperty', 'get',
                config.vm_box_name(), '/VirtualBox/GuestInfo/Net/%d/V4/IP' % adapter_idx]
