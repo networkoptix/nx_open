@@ -130,6 +130,8 @@ private:
     QString m_rtpTransport;
 
     int m_maxRtpRetryCount;
+
+    int m_rtpFrameTimeoutMs;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

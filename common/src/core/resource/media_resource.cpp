@@ -21,6 +21,9 @@ namespace {
     const QString rotationKey                   = lit("rotation");
     const QString panicRecordingKey             = lit("panic_mode");
 
+    const QString primaryStreamValue            = lit("primary");
+    const QString secondaryStreamValue          = lit("secondary");
+
     /** Special value for absent custom aspect ratio. Should not be changed without a reason because a lot of modules check it as qFuzzyIsNull. */
     const qreal noCustomAspectRatio = 0.0;
 }
@@ -231,6 +234,16 @@ QString QnMediaResource::dynamicVideoLayoutKey() {
 
 QString QnMediaResource::motionStreamKey() {
     return ::motionStreamKey;
+}
+
+QString QnMediaResource::primaryStreamValue()
+{
+    return ::primaryStreamValue;
+}
+
+QString QnMediaResource::secondaryStreamValue()
+{
+    return ::secondaryStreamValue;
 }
 
 QString QnMediaResource::rotationKey() {

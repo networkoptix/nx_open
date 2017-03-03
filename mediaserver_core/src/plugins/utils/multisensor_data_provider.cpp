@@ -1,6 +1,7 @@
-#include "optera_data_provider.h"
-
 #ifdef ENABLE_ONVIF
+
+#include "multisensor_data_provider.h"
+#include "isolated_stream_reader_resource.h"
 
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <plugins/resource/onvif/onvif_stream_reader.h>
@@ -11,44 +12,52 @@
 
 namespace
 {
-    const int kOpteraReceiveTimout = 30;
-    const int kOpteraSendTimeout = 30;
+    const int kDefaultReceiveTimout = 30;
+    const int kDefaultSendTimeout = 30;
     const quint16 kStreamOpenWaitingTimeMs = 40000;
     const quint16 kSingleWaitingIterationMs = 20;
 }
 
-QnOpteraDataProvider::QnOpteraDataProvider(const QnResourcePtr& res) :
+namespace nx {
+namespace plugins {
+namespace utils {
+
+MultisensorDataProvider::MultisensorDataProvider(const QnResourcePtr& res) :
     CLServerPushStreamReader(res),
     m_onvifRes(res.dynamicCast<QnPlOnvifResource>())
 {
 
 }
 
-QnOpteraDataProvider::~QnOpteraDataProvider()
+MultisensorDataProvider::~MultisensorDataProvider()
 {
     m_dataSource.proxyCloseStream();
     pleaseStop();
     wait();
 }
 
-QnAbstractMediaDataPtr QnOpteraDataProvider::getNextData()
+QnAbstractMediaDataPtr MultisensorDataProvider::getNextData()
 {
-    return m_dataSource.retrieveData();
+    if (needMetaData())
+        return getMetaData();
+
+    auto data = m_dataSource.retrieveData();
+
+    return data;
 }
 
-void QnOpteraDataProvider::closeStream()
+void MultisensorDataProvider::closeStream()
 {
-    qDebug() << "Closing stream";
     m_dataSource.proxyCloseStream();
     m_dataSource.setUser(nullptr);
 }
 
-bool QnOpteraDataProvider::isStreamOpened() const
+bool MultisensorDataProvider::isStreamOpened() const
 {
     return  m_dataSource.isStreamOpened();
 }
 
-CameraDiagnostics::Result QnOpteraDataProvider::openStreamInternal(
+CameraDiagnostics::Result MultisensorDataProvider::openStreamInternal(
     bool isCameraControlRequired,
     const QnLiveStreamParams& params)
 {
@@ -70,8 +79,8 @@ CameraDiagnostics::Result QnOpteraDataProvider::openStreamInternal(
         auto resource = initSubChannelResource(
             resourceChannelMapping.resourceChannel);
 
-        resource->setOnvifRequestsRecieveTimeout(kOpteraReceiveTimout);
-        resource->setOnvifRequestsSendTimeout(kOpteraSendTimeout);
+        resource->setOnvifRequestsRecieveTimeout(kDefaultReceiveTimout);
+        resource->setOnvifRequestsSendTimeout(kDefaultSendTimeout);
 
         auto reader = new QnOnvifStreamReader(resource);
         reader->setMustNotConfigureResource(doNotConfigureCamera);
@@ -79,6 +88,8 @@ CameraDiagnostics::Result QnOpteraDataProvider::openStreamInternal(
         QnAbstractStreamDataProviderPtr source(reader);
         if (!doNotConfigureCamera)
             reader->setDesiredLiveParams(params);
+
+        reader->setRole(getRole());
 
         doNotConfigureCamera = true;
         m_dataSource.addDataSource(source);
@@ -108,18 +119,16 @@ CameraDiagnostics::Result QnOpteraDataProvider::openStreamInternal(
     return CameraDiagnostics::NoErrorResult();
 }
 
-void QnOpteraDataProvider::pleaseStop()
+void MultisensorDataProvider::pleaseStop()
 {
     closeStream();
     m_needStop = true;
 }
 
-QnPlOnvifResourcePtr QnOpteraDataProvider::initSubChannelResource(quint32 channelNumber)
+QnPlOnvifResourcePtr MultisensorDataProvider::initSubChannelResource(quint32 channelNumber)
 {
     QUrl url(m_onvifRes->getUrl());
     QUrl onvifUrl = url;
-
-    qDebug() << onvifUrl;
 
     QUrlQuery urlQuery(url);
     urlQuery.addQueryItem(
@@ -128,7 +137,8 @@ QnPlOnvifResourcePtr QnOpteraDataProvider::initSubChannelResource(quint32 channe
 
     url.setQuery(urlQuery);
 
-    QnPlOnvifResourcePtr subChannelResource(new QnPlOnvifResource());
+    QnPlOnvifResourcePtr subChannelResource(
+        new nx::plugins::utils::IsolatedStreamReaderResource());
 
     subChannelResource->setId(QnUuid::createUuid());
     subChannelResource->setTypeId(m_onvifRes->getTypeId());
@@ -146,7 +156,7 @@ QnPlOnvifResourcePtr QnOpteraDataProvider::initSubChannelResource(quint32 channe
     return subChannelResource;
 }
 
-QList<QnResourceChannelMapping> QnOpteraDataProvider::getVideoChannelMapping()
+QList<QnResourceChannelMapping> MultisensorDataProvider::getVideoChannelMapping()
 {
     auto secRes = m_resource.dynamicCast<QnSecurityCamResource>();
 
@@ -157,5 +167,9 @@ QList<QnResourceChannelMapping> QnOpteraDataProvider::getVideoChannelMapping()
     return resData.value<QList<QnResourceChannelMapping>>(
         Qn::VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME);
 }
+
+} // namespace utils
+} // namespace plugins
+} // namespace nx
 
 #endif // ENABLE_ONVIF

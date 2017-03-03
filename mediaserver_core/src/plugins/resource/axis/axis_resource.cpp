@@ -527,6 +527,9 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         if (m_resolutions[SECONDARY_ENCODER_INDEX].size.isEmpty())
             m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(QSize(480,316), 0.0); // try to get secondary resolution again (ignore aspect ratio)
     }
+    
+    enableDuplexMode();
+    
     //root.Image.MotionDetection=no
     //root.Image.I0.TriggerData.MotionDetectionEnabled=yes
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
@@ -803,6 +806,19 @@ CLHttpStatus QnPlAxisResource::readAxisParameters(
             arg(rootPath).arg(getHostAddress()).arg(::toString(status)), cl_logWARNING );
     }
     return status;
+}
+
+bool QnPlAxisResource::enableDuplexMode() const
+{
+    CLSimpleHTTPClient http (
+        getHostAddress(),
+        QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT),
+        getNetworkTimeout(),
+        getAuth());
+
+    auto status = http.doGET(lit("/axis-cgi/param.cgi?action=update&root.Audio.DuplexMode=full"));
+
+    return status == CL_HTTP_SUCCESS;
 }
 
 CLHttpStatus QnPlAxisResource::readAxisParameter(

@@ -5,11 +5,15 @@
 #include <core/dataprovider/stream_mixer.h>
 #include <core/dataprovider/spush_media_stream_provider.h>
 
-class QnOpteraDataProvider : public CLServerPushStreamReader
+namespace nx {
+namespace plugins {
+namespace utils {
+
+class MultisensorDataProvider : public CLServerPushStreamReader
 {
 public:
-    QnOpteraDataProvider(const QnResourcePtr& res);
-    virtual ~QnOpteraDataProvider();
+    MultisensorDataProvider(const QnResourcePtr& res);
+    virtual ~MultisensorDataProvider();
 
 protected:
 
@@ -36,7 +40,13 @@ private:
     QList<QnResourceChannelMapping> getVideoChannelMapping();
 };
 
-typedef std::shared_ptr<QnOpteraDataProvider> QnOpteraDataProviderPtr;
+
+} // namespace utils
+} // namespace plugins
+} // namespace nx
+
+
+typedef std::shared_ptr<nx::plugins::utils::MultisensorDataProvider> MultisensorDataProviderPtr;
 
 #endif // #ifdef ENABLE_ONVIF
 

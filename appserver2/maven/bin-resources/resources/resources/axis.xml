@@ -107,7 +107,12 @@
                 default_value = "4"/>                
             </params>
         </resource>
-        <resource name = "AXISQ1615" public = "AXISQ1602"/>     
+        <resource name = "AXISQ1615" public = "AXISQ1602">
+            <params>
+                <param name = "MaxFPS"
+                default_value = "60"/>
+            </params>
+        </resource>
         <resource name = "AXISQ1614" public = "AXISQ1602"/>         
         <resource name = "AXISM1004" public = "AXISM1011"/>        
         <resource name = "AXISM3026" public = "AXISM3004"/>
@@ -131,7 +136,12 @@
         </resource> 
         <resource name = "AXISP3905" public = "AXISP3904"/> 
         <resource name = "AXISM1025" public = "AXISM1011"/>         
-        <resource name = "AXISQ6045" public = "AXISQ6032"/>       
+        <resource name = "AXISQ6045" public = "AXISQ6032">   
+            <params>    
+		<param name = "MaxFPS"
+                default_value = "60"/>
+            </params>
+        </resource>   	
         <resource name = "AXISQ6042" public = "AXISQ6032"/>        
         <resource name = "AXISQ1932" public = "AXISQ1921"/> 
         <resource name = "AXISQ1931" public = "AXISQ1921"/>        

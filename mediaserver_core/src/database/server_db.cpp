@@ -29,6 +29,12 @@ namespace
     const char DELIMITER('$');
     const char STRING_LIST_DELIM('\n');
 
+    static const auto kBindingTemplate = lit(":cameraUniqueId%1");
+    static const auto kCamIdTemplate = lit("book.unique_id = %1");
+    static const QString filterTemplate = lit("%1*"); // The star symbol allows prefix search
+    static const QChar delimiter = L' ';
+
+
     inline int toInt(const QByteArray& ba)
     {
         const char* curPtr = ba.data();
@@ -851,7 +857,6 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
 
     const auto getCameraBindingName = [](int index)
     {
-        static const auto kBindingTemplate = lit(":cameraUniqueId%1");
         return kBindingTemplate.arg(index);
     };
 
@@ -860,7 +865,6 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
     int index = 0;
     for (auto it = cameraIds.begin(); it != cameraIds.end(); ++it, ++index)
     {
-        static const auto kCamIdTemplate = lit("book.unique_id = %1");
         const auto bindingName = getCameraBindingName(index);
         camerasList.append(kCamIdTemplate.arg(bindingName));
         bindings.append(bindingName);
@@ -924,9 +928,6 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
 
         const auto getFilterValue = [](const QString &text)
         {
-            static const QString filterTemplate = lit("%1*"); // The star symbol allows prefix search
-            static const QChar delimiter = L' ';
-
             QStringList result;
             const auto list = text.split(delimiter);
             for(const auto &item: list)

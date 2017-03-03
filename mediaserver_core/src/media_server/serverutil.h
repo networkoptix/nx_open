@@ -2,6 +2,7 @@
 #define _SERVER_UTIL_H
 
 #include <core/resource/resource_fwd.h>
+#include <utils/common/uuid.h>
 
 // TODO: #Elric this belongs together with server_settings
 
@@ -21,5 +22,10 @@ bool isLocalAppServer(const QString &host);
 * @param tranLogTime - move transaction time to position at least tranLogTime
 */
 bool changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime);
+
+/**
+* Auto detect HTTP content type based on message body
+*/
+QByteArray autoDetectHttpContentType(const QByteArray& msgBody);
 
 #endif // _SERVER_UTIL_H

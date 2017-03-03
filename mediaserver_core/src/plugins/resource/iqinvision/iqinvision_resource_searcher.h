@@ -20,6 +20,7 @@ public:
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
+    static bool isIqeModel(const QString& model);
 protected:
     virtual QList<QnNetworkResourcePtr> processPacket(
         QnResourceList& result,

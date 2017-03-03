@@ -28,8 +28,10 @@ class QnActiResource
 {
     Q_OBJECT
 
-    typedef QMap<QString, QString> ActiSystemInfo;
 public:
+
+    typedef QMap<QString, QString> ActiSystemInfo;
+
     static const QString MANUFACTURE;
     static const QString CAMERA_PARAMETER_GROUP_ENCODER;
     static const QString CAMERA_PARAMETER_GROUP_SYSTEM;
@@ -162,6 +164,8 @@ private:
 
     void extractParamValues(const QString& paramValue, const QString& mask, QMap<QString, QString>& result) const;
     QString fillMissingParams(const QString& unresolvedTemplate, const QString& valueFromCamera) const;
+
+    boost::optional<QString> tryToGetSystemInfoValue(const ActiSystemInfo& report, const QString& key) const;
 
 
 private:

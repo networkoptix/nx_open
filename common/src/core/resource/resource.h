@@ -192,8 +192,8 @@ public:
      * This is intended as this API cannot be used with QnResource anyway
      * because of threading issues. */
 
-    bool hasProperty(const QString &key) const;
-    QString getProperty(const QString &key) const;
+    virtual bool hasProperty(const QString &key) const;
+    virtual QString getProperty(const QString &key) const;
     ec2::ApiResourceParamDataList getProperties() const;
 
     enum PropertyOptions
@@ -204,10 +204,10 @@ public:
         NO_ALLOW_EMPTY      = 1 << 2,
     };
 
-    bool setProperty(const QString &key, const QString &value,
+    virtual bool setProperty(const QString &key, const QString &value,
                      PropertyOptions options = DEFAULT_OPTIONS);
 
-    bool setProperty(const QString &key, const QVariant& value,
+    virtual bool setProperty(const QString &key, const QVariant& value,
                      PropertyOptions options = DEFAULT_OPTIONS);
 
     //!Call this with proper field names to emit corresponding *changed signals. Signal can be defined in a derived class

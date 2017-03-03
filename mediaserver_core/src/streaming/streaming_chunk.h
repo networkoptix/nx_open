@@ -19,6 +19,7 @@
 #include <utils/network/buffer.h>
 #include <utils/network/http/httptypes.h>
 
+#include "camera/camera_pool.h"
 #include "streaming_chunk_cache_key.h"
 
 //#define DUMP_CHUNK_TO_FILE
@@ -144,8 +145,11 @@ private:
     */
     quint64 m_dataOffsetAtTheFrontOfTheBuffer;
     std::set<SequentialReadingContext*> m_readers;
+    std::unique_ptr<VideoCameraLocker> m_videoCameraLocker;
 };
 
+// TODO: #ak This function does not belong here.
+QnUuid findResourceIdByAnyUniqueAttribute(const QString& str);
 
 class AbstractInputByteStream
 {

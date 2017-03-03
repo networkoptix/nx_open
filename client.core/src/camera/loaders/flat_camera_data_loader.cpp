@@ -62,12 +62,13 @@ int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionM
 
     /* We need to load all data after the already loaded piece, assuming there were no periods before already loaded. */
     qint64 startTimeMs = 0;
-    if (m_loadedData && !m_loadedData->dataSource().isEmpty()) {
-        auto last = m_loadedData->dataSource().last();
-        if (last.isInfinite())
-            startTimeMs = last.startTimeMs;
+    if (m_loadedData && !m_loadedData->dataSource().isEmpty())
+    {
+        const auto last = (m_loadedData->dataSource().cend() - 1);
+        if (last->isInfinite())
+            startTimeMs = last->startTimeMs;
         else
-            startTimeMs = last.endTimeMs() - minOverlapDuration;
+            startTimeMs = last->endTimeMs() - minOverlapDuration;
 
         /* If system time were changed back, we may have periods in the future, so currently recorded chunks will not be loaded. */
         qint64 currentSystemTime = qnSyncTime->currentMSecsSinceEpoch();
