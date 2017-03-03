@@ -11,6 +11,7 @@
 
 #include <cdb/maintenance_manager.h>
 #include <cdb/result_code.h>
+#include <cdb/system_data.h>
 #include <nx/network/http/abstract_msg_body_source.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/utils/move_only_func.h>
@@ -54,6 +55,9 @@ class TransactionTransportHeader;
 class ConnectionManager
 {
 public:
+    using SystemStatusChangedSubscription = 
+        nx::utils::Subscription<std::string /*systemId*/, api::SystemHealth>;
+
     ConnectionManager(
         const QnUuid& moduleGuid,
         const Settings& settings,
@@ -91,9 +95,14 @@ public:
     api::VmsConnectionDataList getVmsConnections() const;
     bool isSystemConnected(const std::string& systemId) const;
 
+    unsigned int getConnectionCountBySystemId(const nx::String& systemId) const;
+
     void closeConnectionsToSystem(
         const nx::String& systemId,
         nx::utils::MoveOnlyFunc<void()> completionHandler);
+
+    SystemStatusChangedSubscription& systemStatusChangedSubscription();
+    const SystemStatusChangedSubscription& systemStatusChangedSubscription() const;
 
 private:
     class FullPeerName
@@ -146,6 +155,7 @@ private:
     mutable QnMutex m_mutex;
     QnCounter m_startedAsyncCallsCounter;
     nx::utils::SubscriptionId m_onNewTransactionSubscriptionId;
+    SystemStatusChangedSubscription m_systemStatusChangedSubscription;
 
     bool addNewConnection(ConnectionContext connectionContext);
     
@@ -169,6 +179,8 @@ private:
         Iterator connectionIterator,
         CompletionHandler completionHandler);
     
+    void sendSystemOfflineNotificationIfNeeded(const nx::String systemId);
+
     void removeConnection(const nx::String& connectionId);
     
     void onGotTransaction(

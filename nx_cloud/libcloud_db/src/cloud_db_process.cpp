@@ -160,7 +160,6 @@ int CloudDBProcess::exec()
         nx_http::MessageDispatcher httpMessageDispatcher;
         m_httpMessageDispatcher = &httpMessageDispatcher;
 
-        //creating data managers
         TemporaryAccountPasswordManager tempPasswordManager(
             settings,
             dbInstanceController.queryExecutor().get());
@@ -183,7 +182,8 @@ int CloudDBProcess::exec()
             dbInstanceController.queryExecutor().get());
 
         SystemHealthInfoProvider systemHealthInfoProvider(
-            ec2SyncronizationEngine.connectionManager());
+            &ec2SyncronizationEngine.connectionManager(),
+            dbInstanceController.queryExecutor().get());
 
         SystemManager systemManager(
             settings,
@@ -241,6 +241,7 @@ int CloudDBProcess::exec()
             authorizationManager,
             &accountManager,
             &systemManager,
+            &systemHealthInfoProvider,
             &authProvider,
             &eventManager,
             &ec2SyncronizationEngine.connectionManager(),
@@ -311,6 +312,7 @@ void CloudDBProcess::registerApiHandlers(
     const AuthorizationManager& authorizationManager,
     AccountManager* const accountManager,
     SystemManager* const systemManager,
+    SystemHealthInfoProvider* const systemHealthInfoProvider,
     AuthenticationProvider* const authProvider,
     EventManager* const /*eventManager*/,
     ec2::ConnectionManager* const ec2ConnectionManager,
@@ -408,6 +410,11 @@ void CloudDBProcess::registerApiHandlers(
         &SystemManager::recordUserSessionStart, systemManager,
         EntityType::account, DataActionType::update);
     //< TODO: #ak: current entity:action is not suitable for this request
+
+    registerHttpHandler(
+        kSystemHealthHistoryPath,
+        &SystemHealthInfoProvider::getSystemHealthHistory, systemHealthInfoProvider,
+        EntityType::system, DataActionType::fetch);
 
     //---------------------------------------------------------------------------------------------
     // AuthenticationProvider

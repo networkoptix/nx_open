@@ -208,6 +208,12 @@ public:
         const std::string& systemId,
         api::SystemDataEx* const systemData);
 
+    api::ResultCode getSystemHealthHistory(
+        const std::string& accountEmail,
+        const std::string& accountPassword,
+        const std::string& systemId,
+        api::SystemHealthHistory* history);
+
     api::ResultCode recordUserSessionStart(
         const AccountWithPassword& account,
         const std::string& systemId);
