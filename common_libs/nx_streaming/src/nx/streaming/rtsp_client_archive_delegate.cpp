@@ -357,7 +357,7 @@ void QnRtspClientArchiveDelegate::close()
 {
     QnMutexLocker lock( &m_mutex );
     //m_waitBOF = false;
-    m_rtspSession->stop();
+    m_rtspSession->shutdown();
     m_lastMediaFlags = -1;
     m_opened = false;
     m_audioLayout.reset();
