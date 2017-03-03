@@ -1309,11 +1309,16 @@ namespace ec2
 
     void TimeSynchronizationManager::forgetSynchronizedTimeNonSafe( QnMutexLockerBase* const lock )
     {
-        m_localSystemTimeDelta = std::numeric_limits<qint64>::min();
         m_systemTimeByPeer.clear();
         m_timeSynchronized = false;
-        m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
         ++m_localTimePriorityKey.sequence;
+        switchBackToLocalTime(lock);
+    }
+
+    void TimeSynchronizationManager::switchBackToLocalTime(QnMutexLockerBase* const lock)
+    {
+        m_localSystemTimeDelta = std::numeric_limits<qint64>::min();
+        m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
         m_usedTimeSyncInfo = TimeSyncInfo(
             m_monotonicClock.elapsed(),
             currentMSecsSinceEpoch(),
@@ -1368,6 +1373,9 @@ namespace ec2
 
     void TimeSynchronizationManager::onTimeSynchronizationSettingsChanged()
     {
+        if (m_peerType != Qn::PeerType::PT_Server)
+            return;
+
         if (qnGlobalSettings->isSynchronizingTimeWithInternet())
         {
             QnMutexLocker lock(&m_mutex);
@@ -1378,18 +1386,9 @@ namespace ec2
         }
         else
         {
-            if ((m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer) == 0)
-                return; // Time is not synchronized with Internet, nothing to do.
-            m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
-
+            // Forgetting Internet time.
             QnMutexLocker lock(&m_mutex);
-            remotePeerTimeSyncUpdate(
-                &lock,
-                qnCommon->moduleGUID(),
-                m_monotonicClock.elapsed(),
-                QDateTime::currentMSecsSinceEpoch(),
-                m_localTimePriorityKey,
-                MAX_SYNC_VS_INTERNET_TIME_DRIFT_MS);
+            switchBackToLocalTime(&lock);
         }
     }
 }

@@ -307,6 +307,7 @@ namespace ec2
             QnTransactionTransport* transport,
             const nx_http::HttpHeaders& headers);
         void forgetSynchronizedTimeNonSafe(QnMutexLockerBase* const lock);
+        void switchBackToLocalTime(QnMutexLockerBase* const /*lock*/);
         void checkSystemTimeForChange();
         void handleLocalTimePriorityKeyChange(QnMutexLockerBase* const lk);
 
