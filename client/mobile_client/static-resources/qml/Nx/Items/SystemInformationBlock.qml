@@ -12,11 +12,9 @@ Item
     property string systemName
     property string ownerDescription
     property bool cloud: false
-    property bool compatible: true
     property bool online: true
     property string address
     property string user
-    property string invalidVersion
 
     implicitHeight: column.height
 
@@ -64,7 +62,6 @@ Item
         {
             address: systemInformationBlock.address
             user: systemInformationBlock.user
-            issue: compatible ? "" : (invalidVersion || qsTr("INCOMPATIBLE"))
         }
     }
 
@@ -75,7 +72,6 @@ Item
         CloudSystemInformation
         {
             description: systemInformationBlock.ownerDescription
-            online: systemInformationBlock.online
         }
     }
 }
