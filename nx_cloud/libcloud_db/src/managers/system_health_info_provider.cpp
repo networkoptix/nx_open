@@ -40,7 +40,7 @@ bool SystemHealthInfoProvider::isSystemOnline(
 }
 
 void SystemHealthInfoProvider::getSystemHealthHistory(
-    const AuthorizationInfo& authzInfo,
+    const AuthorizationInfo& /*authzInfo*/,
     data::SystemId systemId,
     std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler)
 {
