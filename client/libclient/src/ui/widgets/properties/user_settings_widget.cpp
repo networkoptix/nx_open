@@ -266,8 +266,12 @@ QString QnUserSettingsWidget::passwordPlaceholder() const
 
 void QnUserSettingsWidget::updatePasswordPlaceholders()
 {
+    const bool mustUpdatePassword = m_model->user()
+        && ui->loginInputField->text() != m_model->user()->getName();
+
     const bool showPlaceholders = ui->passwordInputField->text().isEmpty()
-                               && ui->confirmPasswordInputField->text().isEmpty();
+        && ui->confirmPasswordInputField->text().isEmpty()
+        && !mustUpdatePassword;
 
     const QString placeholderText = showPlaceholders
             ? passwordPlaceholder()
@@ -410,6 +414,8 @@ void QnUserSettingsWidget::setupInputFields()
             /* Check if we must update password for the other user. */
             if (m_model->mode() == QnUserSettingsModel::OtherSettings && m_model->user())
             {
+                updatePasswordPlaceholders();
+
                 bool mustUpdatePassword = ui->loginInputField->text() != m_model->user()->getName();
 
                 ui->passwordInputField->setValidator(
