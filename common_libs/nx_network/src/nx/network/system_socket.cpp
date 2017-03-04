@@ -696,7 +696,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(void* buffer, unsigned
             int waitResult = WaitForSingleObject(m_eventObject, timeout);
             if (!WSAGetOverlappedResult(m_fd, &overlapped, wsaBytesRead, FALSE, &wsaFlags))
             {
-                const auto errCode = SystemError::getLastOSErrorCode();
+                auto errCode = SystemError::getLastOSErrorCode();
                 if (errCode == WSA_IO_INCOMPLETE)
                 {
                     ::CancelIo((HANDLE)m_fd);
@@ -708,8 +708,13 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(void* buffer, unsigned
                     // Check status again in case of race condition between CancelIo and other conditions
                     while (!WSAGetOverlappedResult(m_fd, &overlapped, wsaBytesRead, FALSE, &wsaFlags))
                     {
-                        if (SystemError::getLastOSErrorCode() != WSA_IO_INCOMPLETE)
+                        errCode = SystemError::getLastOSErrorCode();
+                        if (errCode != WSA_IO_INCOMPLETE)
+                        {
+                            if (errCode == WSA_OPERATION_ABORTED)
+                                SystemError::setLastErrorCode(SystemError::timedOut); //< emulate timeout code
                             return -1;
+                        }
                         ::Sleep(0);
                     }
                 }

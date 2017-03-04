@@ -35,16 +35,23 @@ void doTest(bool doServerDelay, bool doClientDelay)
         while (true)
         {
             auto recv = client->recv(buffer.data(), buffer.size());
-            if (recv == 0)
-                break;
-            auto errCode = SystemError::getLastOSErrorCode();
-            if (!client->isConnected())
-            {
-                ASSERT_EQ(0, errCode);
-                ASSERT_TRUE(client->isConnected());
-            }
             if (recv > 0)
+            {
                 wholeData.append(buffer.data(), recv);
+            }
+            else if (recv == 0)
+            {
+                break;
+            }
+            else
+            {
+                auto errCode = SystemError::getLastOSErrorCode();
+                if (errCode != SystemError::timedOut)
+                {
+                    ASSERT_EQ(0, errCode);
+                    ASSERT_TRUE(client->isConnected());
+                }
+            }
             if (doServerDelay)
                 std::this_thread::sleep_for(kClientDelay);
         }
@@ -63,7 +70,8 @@ void doTest(bool doServerDelay, bool doClientDelay)
     auto clientSocket = SocketFactory::createStreamSocket();
     SocketAddress addr("127.0.0.1", serverPort.get_future().get());
     ASSERT_TRUE(clientSocket->connect(addr));
-    clientSocket->setSendTimeout(kClientDelay);
+    if (doServerDelay)
+        clientSocket->setSendTimeout(kClientDelay);
 
     std::vector<int> buffer(kBufferSize);
     for (int i = 0; i < kBufferSize; ++i)
@@ -95,7 +103,9 @@ void doTest(bool doServerDelay, bool doClientDelay)
     serverThread.join();
 }
 
-TEST(TcpStreamTest, receiveDelay)
+// Windows 8/10 doesn't support client->server send timeout. 
+// It close connection automatically with error 10053 after client send timeout.
+TEST(TcpStreamTest, DISABLED_receiveDelay)
 {
     doTest(/*serverDelay*/ true, /*clientDelay*/ false);
 }
