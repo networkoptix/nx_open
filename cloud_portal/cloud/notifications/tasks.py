@@ -13,6 +13,7 @@ import traceback
 import logging
 logger = logging.getLogger(__name__)
 
+MAX_RETRIES = get_config()['max_retries']
 
 def log_error(error, user_email, type, message, customization, attempt):
     error_formatted = '\n{}:{}\nTarget Email: {}\nType: {}\nMessage:{}\nCustomization: {}\nAttempt: {}\nCall Stack: {}'\
@@ -33,7 +34,7 @@ def send_email(user_email, type, message, customization, attempt=1):
     try:
         email_engine.send(user_email, type, message, customization)
     except Exception as error:
-        if isinstance(error, SMTPException) and attempt < get_config()['max_retries']:
+        if isinstance(error, SMTPException) and attempt < MAX_RETRIES:
             send_email.delay(user_email, type, message, customization, attempt+1)
 
         log_error(error, user_email, type, message, customization, attempt)
