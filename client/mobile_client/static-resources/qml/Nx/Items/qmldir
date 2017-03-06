@@ -10,3 +10,4 @@ LoginButton 1.0 LoginButton.qml
 VideoPositioner 1.0 VideoPositioner.qml
 MultiVideoOutput 1.0 MultiVideoOutput.qml
 DummyMessage 1.0 DummyMessage.qml
+IssueLabel 1.0 IssueLabel.qml

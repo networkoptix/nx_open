@@ -697,8 +697,10 @@ int QnResourceWidget::visibleButtons() const
 int QnResourceWidget::calculateButtonsVisibility() const
 {
     int result = Qn::InfoButton;
+    if (qnRuntime->isVideoWallMode())
+        return result;
 
-    if (!(m_options & WindowRotationForbidden))
+    if (!m_options.testFlag(WindowRotationForbidden))
         result |= Qn::RotateButton;
 
     Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
