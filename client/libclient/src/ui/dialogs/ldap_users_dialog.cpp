@@ -201,7 +201,6 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
     sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     sortModel->setFilterKeyColumn(-1);
 
-    //ui->filterLineEdit->lineEdit()->setPlaceholderText(tr("Filter..."));
     ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
     connect(ui->filterLineEdit,  &QnSearchLineEdit::textChanged, this,
         [sortModel](const QString &text)
@@ -265,10 +264,10 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
     if (!connection)
         return;
 
-    /* Safety check */
+    // Safety check
     auto filteredUsers = filterExistingUsers(users);
 
-    //double semantic negation here to avoid checkbox name-content inconsistency
+    // Double semantic negation here to avoid checkbox name-content inconsistency
     const bool enableUsers = !ui->disableUsersCheckBox->isChecked();
     const Qn::UserRole selectedRole = ui->userRoleComboBox->itemData(
         ui->userRoleComboBox->currentIndex(), Qn::UserRoleRole).value<Qn::UserRole>();
