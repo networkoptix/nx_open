@@ -9,6 +9,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/helpers/layout_item_aggregator.h>
+#include <core/resource_access/providers/resource_access_provider.h>
 #include <utils/common/connective.h>
 #include <nx/utils/string.h>
 #include <common/common_module.h>
@@ -259,8 +260,7 @@ bool QnLayoutsModelUnsorted::isLayoutSuitable(const QnLayoutResourcePtr& layout)
     if (!m_user)
         return false;
 
-    const auto parentId = layout->getParentId();
-    return parentId.isNull() || parentId == m_user->getId();
+    return qnResourceAccessProvider->hasAccess(m_user, layout);
 }
 
 bool QnLayoutsModelUnsorted::isServerSuitable(const QnMediaServerResourcePtr& server) const
