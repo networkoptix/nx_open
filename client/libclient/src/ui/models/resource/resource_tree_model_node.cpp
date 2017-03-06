@@ -226,11 +226,19 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
            || m_type == Qn::SharedResourceNode
            || m_type == Qn::CurrentUserNode);
 
-    manager()->removeResourceNode(this);
-
-    m_resource = resource;
-
-    manager()->addResourceNode(this);
+    if (m_initialized)
+    {
+        auto nodePtr = toSharedPointer();
+        NX_EXPECT(!nodePtr.isNull());
+        manager()->removeResourceNode(nodePtr);
+        m_resource = resource;
+        manager()->addResourceNode(nodePtr);
+    }
+    else
+    {
+        /* Called from a constructor: */
+        m_resource = resource;
+    }
 
     update();
 }
@@ -356,6 +364,10 @@ void QnResourceTreeModelNode::initialize()
 {
     NX_ASSERT(!m_initialized);
     m_initialized = true;
+
+    /* If setResource was called from the constructor: */
+    if (m_resource)
+        manager()->addResourceNode(toSharedPointer());
 }
 
 void QnResourceTreeModelNode::deinitialize()
@@ -1247,6 +1259,11 @@ void QnResourceTreeModelNode::updateResourceStatus()
     m_status = m_resource->getStatus();
     m_icon = calculateIcon();
     changeInternal();
+}
+
+bool QnResourceTreeModelNode::isPrimary() const
+{
+    return m_prev.isNull();
 }
 
 QDebug operator<<(QDebug dbg, QnResourceTreeModelNode* node)

@@ -58,6 +58,8 @@ void QnResourceTreeModelLayoutNode::deinitialize()
         node->deinitialize();
 
     m_items.clear();
+    m_loadedItems = 0;
+    updateLoadedState();
 
     base_type::deinitialize();
 }
@@ -92,45 +94,13 @@ QnResourceAccessSubject QnResourceTreeModelLayoutNode::getOwner() const
     return QnResourceAccessSubject();
 }
 
-void QnResourceTreeModelLayoutNode::handleResourceAdded(const QnResourcePtr& resource)
+void QnResourceTreeModelLayoutNode::updateItem(const QnUuid& item)
 {
-    /* There is a possible situation when layout is ready before its item's resource. */
-
-    auto id = resource->getId();
-    auto uniqueId = resource->getUniqueId();
-    auto layout = this->resource().dynamicCast<QnLayoutResource>();
-    NX_ASSERT(layout);
-
-    for (auto node : m_items)
-    {
-        if (node->resource())
-            continue;
-
-        auto descriptor = layout->getItem(node->uuid()).resource;
-        bool fit = descriptor.id.isNull()
-            ? descriptor.uniqueId == uniqueId
-            : descriptor.id == id;
-
-        if (fit)
-            node->setResource(resource);
-    }
-}
-
-void QnResourceTreeModelLayoutNode::handleAccessChanged(const QnResourceAccessSubject& subject)
-{
-    if (subject != getOwner())
-        return;
-
-    update();
-}
-
-void QnResourceTreeModelLayoutNode::handlePermissionsChanged(const QnResourcePtr& resource)
-{
-    for (auto item: m_items)
-    {
-        if (item->resource() == resource)
-            item->update();
-    }
+    const auto iter = m_items.find(item);
+    if (iter != m_items.end())
+        (*iter)->update();
+    else
+        NX_ASSERT(false);
 }
 
 QIcon QnResourceTreeModelLayoutNode::calculateIcon() const
@@ -156,14 +126,64 @@ void QnResourceTreeModelLayoutNode::itemAdded(const QnLayoutItemData& item)
     node->initialize();
     node->setParent(toSharedPointer());
 
-    auto resource = qnResPool->getResourceByDescriptor(item.resource);
+    m_items.insert(item.uuid, node);
+
+    const auto resource = qnResPool->getResourceByDescriptor(item.resource);
+    if (!resource)
+        return;
+
     node->setResource(resource);
 
-    m_items.insert(item.uuid, node);
+    ++m_loadedItems;
+    updateLoadedState();
 }
 
 void QnResourceTreeModelLayoutNode::itemRemoved(const QnLayoutItemData& item)
 {
     if (auto node = m_items.take(item.uuid))
+    {
         node->deinitialize();
+        --m_loadedItems;
+        updateLoadedState();
+    }
+}
+
+void QnResourceTreeModelLayoutNode::updateItemResource(
+    const QnUuid& item,
+    const QnResourcePtr& resource)
+{
+    const auto iter = m_items.find(item);
+    if (iter == m_items.end() || !(*iter)->resource().isNull() || resource.isNull())
+    {
+        NX_ASSERT(false);
+        return;
+    }
+
+    (*iter)->setResource(resource);
+
+    ++m_loadedItems;
+    updateLoadedState();
+}
+
+bool QnResourceTreeModelLayoutNode::itemsLoaded() const
+{
+    return m_loadedItems == m_items.size();
+}
+
+void QnResourceTreeModelLayoutNode::updateLoadedState()
+{
+    NX_EXPECT(m_loadedItems >= 0 && m_loadedItems <= m_items.size());
+    const bool loaded = itemsLoaded();
+
+    if (loaded == m_loaded)
+        return;
+
+    m_loaded = loaded;
+
+    if (!isPrimary())
+        return;
+
+    auto layoutNodeManager = qobject_cast<QnResourceTreeModelLayoutNodeManager*>(manager());
+    NX_EXPECT(layoutNodeManager);
+    layoutNodeManager->loadedStateChanged(this, loaded);
 }

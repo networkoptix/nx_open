@@ -50,7 +50,7 @@ public:
      */
     QnResourceTreeModelNode(QnResourceTreeModel* model, const QnUuid &uuid, Qn::NodeType nodeType);
 
-    ~QnResourceTreeModelNode();
+    virtual ~QnResourceTreeModelNode();
 
     virtual void setResource(const QnResourcePtr &resource);
     virtual void setParent(const QnResourceTreeModelNodePtr& parent);
@@ -62,12 +62,12 @@ public:
     /** Cleanup node to make sure it can be destroyed safely. */
     virtual void deinitialize();
 
+    void update();
+
     Qn::NodeType type() const ;
     QnResourcePtr resource() const;
     Qn::ResourceFlags resourceFlags() const;
     QnUuid uuid() const;
-
-    void update();
 
     QList<QnResourceTreeModelNodePtr> children() const;
     QList<QnResourceTreeModelNodePtr> childrenRecursive() const;
@@ -88,6 +88,8 @@ public:
     bool isModified() const;
 
     void setModified(bool modified) ;
+
+    bool isPrimary() const;
 
 protected:
     QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType type, const QnUuid& uuid);
@@ -201,8 +203,8 @@ private:
     } m_editable;
 
     /* Nodes of the same resource are organized into double-linked list: */
-    QnResourceTreeModelNode* m_prev = nullptr;
-    QnResourceTreeModelNode* m_next = nullptr;
+    QnResourceTreeModelNodePtr m_prev;
+    QnResourceTreeModelNodePtr m_next;
 };
 
 QDebug operator<<(QDebug dbg, QnResourceTreeModelNode* node);

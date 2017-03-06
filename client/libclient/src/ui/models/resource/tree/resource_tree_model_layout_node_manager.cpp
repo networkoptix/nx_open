@@ -23,32 +23,18 @@ QnResourceTreeModelLayoutNodeManager::QnResourceTreeModelLayoutNodeManager(QnRes
     connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
         [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
         {
-            resourceChainCall<QnResourceTreeModelLayoutNode>(resource,
-                &QnResourceTreeModelLayoutNode::handleAccessChanged,
-                subject);
+            auto primary = nodeForResource(resource).objectCast<QnResourceTreeModelLayoutNode>();
+            if (!primary)
+                return;
+
+            if (subject != primary->getOwner())
+                return;
+
+            chainCall(primary.data(), &QnResourceTreeModelNode::update);
         });
 
     connect(qnResPool, &QnResourcePool::resourceAdded, this,
-        [this](const QnResourcePtr& resource)
-        {
-            for (const auto& primaryLayoutNode: m_primaryResourceNodes)
-            {
-                chainCall<QnResourceTreeModelLayoutNode>(primaryLayoutNode,
-                    &QnResourceTreeModelLayoutNode::handleResourceAdded,
-                    resource);
-            }
-        });
-
-    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
-        [this](const QnResourcePtr& resource)
-        {
-            for (const auto& primaryLayoutNode: m_primaryResourceNodes)
-            {
-                chainCall<QnResourceTreeModelLayoutNode>(primaryLayoutNode,
-                    &QnResourceTreeModelLayoutNode::handlePermissionsChanged,
-                    resource);
-            }
-        });
+        &QnResourceTreeModelLayoutNodeManager::handleResourceAdded);
 }
 
 QnResourceTreeModelLayoutNodeManager::~QnResourceTreeModelLayoutNodeManager()
@@ -80,4 +66,47 @@ void QnResourceTreeModelLayoutNodeManager::primaryNodeAdded(QnResourceTreeModelN
             chainCall<QnResourceTreeModelLayoutNode>(node,
                 &QnResourceTreeModelLayoutNode::itemRemoved, item);
         });
+}
+
+void QnResourceTreeModelLayoutNodeManager::handleResourceAdded(const QnResourcePtr& resource)
+{
+    /* There is a possible situation when layout is ready before its item's resource. */
+
+    auto id = resource->getId();
+    auto uniqueId = resource->getUniqueId();
+
+    for (auto node: m_loadingLayouts)
+    {
+        NX_EXPECT(!node->itemsLoaded());
+
+        const auto layout = node->resource().dynamicCast<QnLayoutResource>();
+        NX_ASSERT(layout);
+
+        for (auto item: node->m_items)
+        {
+            if (item->resource())
+                continue;
+
+            const auto descriptor = layout->getItem(item->uuid()).resource;
+            const bool fit = descriptor.id.isNull()
+                ? descriptor.uniqueId == uniqueId
+                : descriptor.id == id;
+
+            if (!fit)
+                continue;
+
+            chainCall<QnResourceTreeModelLayoutNode>(node,
+                &QnResourceTreeModelLayoutNode::updateItemResource,
+                item->uuid(), resource);
+        }
+    }
+}
+
+void QnResourceTreeModelLayoutNodeManager::loadedStateChanged(
+    QnResourceTreeModelLayoutNode* node, bool loaded)
+{
+    if (loaded)
+        m_loadingLayouts.remove(node);
+    else
+        m_loadingLayouts.insert(node);
 }

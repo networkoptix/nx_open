@@ -6,6 +6,7 @@ class QnResourceTreeModelLayoutNode;
 
 class QnResourceTreeModelLayoutNodeManager: public QnResourceTreeModelNodeManager
 {
+    Q_OBJECT
     using base_type = QnResourceTreeModelNodeManager;
 
 public:
@@ -14,4 +15,14 @@ public:
 
 protected:
     virtual void primaryNodeAdded(QnResourceTreeModelNode* node) override;
+
+private:
+    void handleResourceAdded(const QnResourcePtr& resource);
+
+    void loadedStateChanged(QnResourceTreeModelLayoutNode* node, bool loaded);
+
+private:
+    friend class QnResourceTreeModelLayoutNode;
+    QSet<QnResourceTreeModelLayoutNode*> m_loadingLayouts;
+    QHash<QnResourcePtr, QnResourceTreeModelNodePtr> m_layoutItemsByResource;
 };

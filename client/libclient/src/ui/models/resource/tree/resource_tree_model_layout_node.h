@@ -19,6 +19,8 @@ public:
     virtual void initialize() override;
     virtual void deinitialize() override;
 
+    bool itemsLoaded() const;
+
 protected:
     virtual QIcon calculateIcon() const override;
     virtual QnResourceTreeModelNodeManager* manager() const override;
@@ -26,15 +28,18 @@ protected:
 private:
     QnResourceAccessSubject getOwner() const;
 
-    void handleResourceAdded(const QnResourcePtr& resource);
-    void handlePermissionsChanged(const QnResourcePtr& resource);
-
     void itemAdded(const QnLayoutItemData& item);
     void itemRemoved(const QnLayoutItemData& item);
 
-    void handleAccessChanged(const QnResourceAccessSubject& subject);
+    void updateItem(const QnUuid& item);
+
+    void updateItemResource(const QnUuid& item, const QnResourcePtr& resource);
+
+    void updateLoadedState();
 
 private:
     friend class QnResourceTreeModelLayoutNodeManager;
     ItemHash m_items;
+    int m_loadedItems = 0;
+    bool m_loaded = true;
 };

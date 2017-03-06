@@ -7,6 +7,7 @@
 
 class QnResourceTreeModelNodeManager: public Connective<QObject>, public QnWorkbenchContextAware
 {
+    Q_OBJECT
     using base_type = Connective<QObject>;
 
 public:
@@ -17,8 +18,12 @@ protected:
     template<class Type = QnResourceTreeModelNode, class Method, class ... Args>
     static void chainCall(QnResourceTreeModelNode* from, Method method, Args ... args)
     {
-        for (auto node = from; node != nullptr; node = node->m_next)
+        for (auto node = from; node != nullptr; node = node->m_next.data())
         {
+            const QString xxx = node->m_initialized ? QString() :
+                from->resource()->getName();
+
+            NX_ASSERT(node->m_initialized);
             if (auto typedNode = qobject_cast<Type*>(node))
                 (typedNode->*method)(args...);
             else
@@ -29,19 +34,26 @@ protected:
     template<class Type = QnResourceTreeModelNode, class Method, class ... Args>
     void resourceChainCall(const QnResourcePtr& resource, Method method, Args ... args)
     {
-        chainCall<Type>(m_primaryResourceNodes[resource], method, args...);
+        chainCall<Type>(nodeForResource(resource).data(), method, args...);
     }
 
 protected:
+    using PrimaryResourceNodes = QHash<QnResourcePtr, QnResourceTreeModelNodePtr>;
+    const PrimaryResourceNodes& primaryResourceNodes() const;
+
+    QnResourceTreeModelNodePtr nodeForResource(const QnResourcePtr& resource) const;
+
     virtual void primaryNodeAdded(QnResourceTreeModelNode* node);
     virtual void primaryNodeRemoved(QnResourceTreeModelNode* node);
 
 private:
     /* Called from QnResourceTreeModelNode::setResource: */
-    void addResourceNode(QnResourceTreeModelNode* node);
-    void removeResourceNode(QnResourceTreeModelNode* node);
+    void addResourceNode(const QnResourceTreeModelNodePtr& node);
+    void removeResourceNode(const QnResourceTreeModelNodePtr& node);
 
-protected:
+private:
     friend class QnResourceTreeModelNode;
-    QHash<QnResourcePtr, QnResourceTreeModelNode*> m_primaryResourceNodes;
+
+    /* This collection contains only nodes handled by this manager instance. */
+    PrimaryResourceNodes m_primaryResourceNodes;
 };
