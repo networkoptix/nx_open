@@ -316,6 +316,9 @@ void QnLoginDialog::accept()
             {
                 case Qn::SuccessConnectionResult:
                 {
+                    // In most cases we will connect succesfully by this url. Sow we can store it.
+                    qnSettings->setLastLocalConnectionUrl(url);
+
                     const bool autoLogin = ui->autoLoginCheckBox->isChecked();
                     QnActionParameters params;
                     const bool storePassword =
@@ -325,6 +328,7 @@ void QnLoginDialog::accept()
                     params.setArgument(Qn::StorePasswordRole, storePassword);
                     params.setArgument(Qn::ForceRole, true);
                     menu()->trigger(QnActions::ConnectAction, params);
+
                     break;
                 }
                 case Qn::IncompatibleProtocolConnectionResult:
