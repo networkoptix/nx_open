@@ -286,7 +286,7 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
     const nx_http::StringType& cloudNonce)
 {
     NX_LOGX(lm("Auth data for username %1, cloudNonce %2 not found in cache. Quering cloud...")
-        .arg(cloudNonce).arg(cloudNonce), cl_logDEBUG2);
+        .arg(userid).arg(cloudNonce), cl_logDEBUG2);
 
     nx::cdb::api::AuthRequest authRequest;
     authRequest.nonce = std::string(cloudNonce.constData(), cloudNonce.size());
