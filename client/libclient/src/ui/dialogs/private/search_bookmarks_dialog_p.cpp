@@ -168,7 +168,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     header->setSectionResizeMode(QnSearchBookmarksModel::kLength, QHeaderView::ResizeToContents);
 
     header->setSectionResizeMode(QnSearchBookmarksModel::kTags, QHeaderView::Stretch);
-    m_ui->gridBookmarks->setStyleSheet(lit("QTableView::item { padding-right: 32px }"));
+    m_ui->gridBookmarks->setStyleSheet(lit("QTableView::item { padding-right: 24px }"));
     m_ui->gridBookmarks->setItemDelegateForColumn(
         QnSearchBookmarksModel::kCamera, new BoldItemDelegate(this));
 }
