@@ -10,6 +10,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <ui/style/resource_icon_cache.h>
 
 #include <utils/camera/camera_names_watcher.h>
 #include <utils/common/qtimespan.h>
@@ -232,14 +233,25 @@ int QnSearchBookmarksModel::Impl::columnCount(const QModelIndex & /* parent */) 
 QVariant QnSearchBookmarksModel::Impl::getData(const QModelIndex &index
     , int role)
 {
+    static const QSet<int> kAcceptedRolesSet =
+        { Qt::DecorationRole, Qt::DisplayRole, Qn::CameraBookmarkRole};
     const int row = index.row();
-    if ((row >= m_bookmarks.size()) || ((role != Qt::DisplayRole) && (role != Qn::CameraBookmarkRole)))
+    if ((row >= m_bookmarks.size()) || (!kAcceptedRolesSet.contains(role)))
         return QVariant();
 
     const QnCameraBookmark &bookmark = m_bookmarks.at(row);
 
     if (role == Qn::CameraBookmarkRole)
         return QVariant::fromValue(bookmark);
+
+
+    if (role == Qt::DecorationRole)
+    {
+        if (index.column() != kCamera)
+            return QVariant();
+
+        return qnResIconCache->icon(QnResourceIconCache::Camera);
+    }
 
     switch(index.column())
     {
