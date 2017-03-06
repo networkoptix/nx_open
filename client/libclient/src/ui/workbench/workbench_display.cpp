@@ -213,7 +213,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_instrumentManager(new InstrumentManager(this)),
     m_viewportAnimator(NULL),
     m_curtainAnimator(NULL),
-    m_frameOpacityAnimator(NULL),
     m_loader(NULL)
 {
     m_widgetByRole.fill(nullptr);
@@ -304,13 +303,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(m_viewportAnimator, SIGNAL(finished()), this, SIGNAL(viewportUngrabbed()));
     connect(m_viewportAnimator, SIGNAL(finished()), m_boundingInstrument, SLOT(recursiveEnable()));
     connect(m_viewportAnimator, SIGNAL(finished()), this, SLOT(at_viewportAnimator_finished()));
-
-    /* Create frame opacity animator. */
-    m_frameOpacityAnimator = new VariantAnimator(this);
-    m_frameOpacityAnimator->setTimer(animationTimer);
-    m_frameOpacityAnimator->setAccessor(new PropertyAccessor("widgetsFrameOpacity"));
-    m_frameOpacityAnimator->setTargetObject(this);
-    m_frameOpacityAnimator->setTimeLimit(500);
 
     /* Connect to context. */
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
@@ -1413,7 +1405,7 @@ void QnWorkbenchDisplay::setWidgetsFrameOpacity(qreal opacity)
 
     m_frameOpacity = opacity;
 
-    foreach(QnResourceWidget *widget, m_widgets)
+    for (auto widget: m_widgets)
         widget->setFrameOpacity(opacity);
 }
 
@@ -2325,16 +2317,13 @@ void QnWorkbenchDisplay::at_mapper_cellSizeChanged()
 void QnWorkbenchDisplay::at_mapper_spacingChanged()
 {
     synchronizeAllGeometries(false);
-
     synchronizeSceneBounds();
-
     fitInView(false);
 
-
     if (qFuzzyIsNull(workbench()->mapper()->spacing()))
-        m_frameOpacityAnimator->animateTo(0.0);
+        setWidgetsFrameOpacity(0.0);
     else
-        m_frameOpacityAnimator->animateTo(1.0);
+        setWidgetsFrameOpacity(1.0);
 }
 
 void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &resource)

@@ -8,6 +8,8 @@ namespace Ui {
     class LdapUsersDialog;
 }
 
+class QnUserRolesModel;
+
 class QnLdapUsersDialog: public QnSessionAwareButtonBoxDialog {
     Q_OBJECT
     typedef QnSessionAwareButtonBoxDialog base_type;
@@ -32,7 +34,7 @@ private:
     QnLdapUsers visibleUsers() const;
     QnLdapUsers visibleSelectedUsers() const;
 
-    
+
 
 private slots:
     void at_testLdapSettingsFinished(int status, const QnLdapUsers &users, int handle, const QString &errorString);
@@ -42,5 +44,6 @@ private:
 
     QTimer *m_timeoutTimer;
     QPushButton *m_importButton;
-    bool m_loading;
+    QnUserRolesModel* const m_rolesModel;
+    bool m_loading = true;
 };

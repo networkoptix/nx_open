@@ -54,6 +54,7 @@ DbInstanceController::DbInstanceController(const nx::db::ConnectionOptions& dbCo
          {nx::db::RdbmsDriverType::unknown, db::kRestoreSystemToAccountReferenceUniquenessSqlite}});
     dbStructureUpdater().addUpdateScript(db::kAddAccountTimestamps);
     dbStructureUpdater().addUpdateScript(db::kAddSystemRegistrationTimestamp);
+    dbStructureUpdater().addUpdateScript(db::kAddSystemHealthStateHistory);
 }
 
 } // namespace rdb

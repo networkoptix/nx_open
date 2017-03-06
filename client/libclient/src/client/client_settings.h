@@ -145,6 +145,7 @@ public:
 
         TIMELAPSE_SPEED,
 
+        LAST_LOCAL_CONNECTION_URL,
         VARIABLE_COUNT
     };
 
@@ -190,6 +191,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QnWorkbenchStateList,        workbenchStates,        setWorkbenchStates,         WORKBENCH_STATES,           QnWorkbenchStateList())
         QN_DECLARE_RW_PROPERTY(QnLicenseWarningStateHash,   licenseWarningStates,   setLicenseWarningStates,    LICENSE_WARNING_STATES,     QnLicenseWarningStateHash())
         QN_DECLARE_RW_PROPERTY(QnConnectionData,            lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData())
+        QN_DECLARE_RW_PROPERTY(QUrl,                        lastLocalConnectionUrl, setLastLocalConnectionUrl,  LAST_LOCAL_CONNECTION_URL,  QUrl())
         QN_DECLARE_RW_PROPERTY(QnConnectionDataList,        customConnections,      setCustomConnections,       CUSTOM_CONNECTIONS,         QnConnectionDataList())
         QN_DECLARE_RW_PROPERTY(QString,                     extraTranslationsPath,  setExtraTranslationsPath,   EXTRA_TRANSLATIONS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))
