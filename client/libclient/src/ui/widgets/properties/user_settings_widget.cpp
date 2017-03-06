@@ -266,12 +266,9 @@ QString QnUserSettingsWidget::passwordPlaceholder() const
 
 void QnUserSettingsWidget::updatePasswordPlaceholders()
 {
-    const bool mustUpdatePassword = m_model->user()
-        && ui->loginInputField->text() != m_model->user()->getName();
-
     const bool showPlaceholders = ui->passwordInputField->text().isEmpty()
         && ui->confirmPasswordInputField->text().isEmpty()
-        && !mustUpdatePassword;
+        && !mustUpdatePassword();
 
     const QString placeholderText = showPlaceholders
             ? passwordPlaceholder()
@@ -416,11 +413,9 @@ void QnUserSettingsWidget::setupInputFields()
             {
                 updatePasswordPlaceholders();
 
-                bool mustUpdatePassword = ui->loginInputField->text() != m_model->user()->getName();
-
                 ui->passwordInputField->setValidator(
                     Qn::defaultPasswordValidator(
-                        !mustUpdatePassword,
+                        !mustUpdatePassword(),
                         tr("User has been renamed. Password must be updated.")),
                     false);
             }
@@ -570,4 +565,9 @@ bool QnUserSettingsWidget::validMode() const
 {
     return m_model->mode() == QnUserSettingsModel::OtherSettings
         || m_model->mode() == QnUserSettingsModel::NewUser;
+}
+
+bool QnUserSettingsWidget::mustUpdatePassword() const
+{
+    return m_model->user() && ui->loginInputField->text() != m_model->user()->getName();
 }
