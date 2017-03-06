@@ -155,8 +155,10 @@ class EnvironmentBuilder(object):
                     boxes.append(value.box)
         self._allocate_boxes(boxes)
 
-        vagrant.init(self._boxes_config)
-        self._save_boxes_config_to_cache()
+        try:
+            vagrant.init(self._boxes_config)
+        finally:
+            self._save_boxes_config_to_cache()  # vagrant.init may change config, must save it after this
         for box in vagrant.boxes.values():
             log.info('BOX %s', box)
 
@@ -168,7 +170,7 @@ class EnvironmentBuilder(object):
             log.info('SERVER %s: %r at %s %s ecs_guid=%r local_system_id=%r',
                      name.upper(), server.name, server.box.name, server.url, server.ecs_guid, server.local_system_id)
         log.info('----- setup is complete; test follows ----------------------------->8 ----------------------------------------------')
-        return SimpleNamespace(**servers)
+        return SimpleNamespace(servers=servers, **servers)
 
     def __call__(self, *args, **kw):
         try:

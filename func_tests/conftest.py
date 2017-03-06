@@ -28,6 +28,8 @@ DEFAULT_VM_NAME_PREFIX = 'funtest-'
 DEFAULT_VM_HOST_USER = 'root'
 DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
 
+DEFAULT_MAX_LOG_WIDTH = 200
+
 
 log = logging.getLogger(__name__)
 
@@ -51,6 +53,8 @@ def pytest_addoption(parser):
                      help='Identity file to use for ssh to login to virtualbox host')
     parser.addoption('--vm-host-dir', default=DEFAULT_VM_HOST_DIR,
                      help='Working directory at host with virtualbox, used to store vagrant files')
+    parser.addoption('--max-log-width', default=DEFAULT_MAX_LOG_WIDTH, type=int,
+                     help='Change maximum log message width. Default is %d' % DEFAULT_MAX_LOG_WIDTH)
 
 
 @pytest.fixture(scope='session')
@@ -71,6 +75,7 @@ def run_options(request):
         vm_name_prefix=request.config.getoption('--vm-name-prefix'),
         vm_ssh_host_config=vm_ssh_host_config,
         vm_host_work_dir=request.config.getoption('--vm-host-dir'),
+        max_log_width=request.config.getoption('--max-log-width'),
         )
 
 
@@ -107,7 +112,8 @@ def sample_media_file(run_options):
 @pytest.fixture(scope='session')
 def test_session(run_options):
     #format = '%(asctime)-15s %(threadName)s %(name)s %(levelname)s  %(message)s'
-    format = '%(asctime)-15s %(levelname)-7s %(message)s'
+    # %.10s limits formatted string to 10 chars; %(text).10s makes the same for dict-style formatting
+    format = '%%(asctime)-15s %%(levelname)-7s %%(message).%ds' % run_options.max_log_width
     logging.basicConfig(level=logging.DEBUG, format=format)
     session = TestSession(run_options.recreate_boxes)
     session.init(run_options)
