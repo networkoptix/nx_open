@@ -8,6 +8,8 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 
+#include <ui/models/resource/resource_tree_model.h>
+#include <ui/models/resource/tree/resource_tree_model_layout_node_manager.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
@@ -20,32 +22,15 @@ QnResourceTreeModelLayoutNode::QnResourceTreeModelLayoutNode(
     :
     base_type(model, resource, nodeType)
 {
-    QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>();
-    NX_ASSERT(layout);
-    if (!layout)
-        return;
-
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
-        &QnResourceTreeModelLayoutNode::handleResourceAdded);
-
-    connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::flagsChanged, this,
-        &QnResourceTreeModelLayoutNode::at_snapshotManager_flagsChanged);
-
-    connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
-        &QnResourceTreeModelLayoutNode::handleAccessChanged);
-
-    connect(layout, &QnResource::parentIdChanged, this,
-        &QnResourceTreeModelLayoutNode::update);
-    connect(layout, &QnLayoutResource::itemAdded, this,
-        &QnResourceTreeModelLayoutNode::at_layout_itemAdded);
-    connect(layout, &QnLayoutResource::itemRemoved, this,
-        &QnResourceTreeModelLayoutNode::at_layout_itemRemoved);
-
-
 }
 
 QnResourceTreeModelLayoutNode::~QnResourceTreeModelLayoutNode()
 {
+}
+
+QnResourceTreeModelNodeManager* QnResourceTreeModelLayoutNode::manager() const
+{
+    return model()->layoutNodeManager();
 }
 
 void QnResourceTreeModelLayoutNode::updateRecursive()
@@ -63,18 +48,15 @@ void QnResourceTreeModelLayoutNode::initialize()
     if (!layout)
         return;
 
-    for (const auto& item : layout->getItems())
-        at_layout_itemAdded(layout, item);
+    for (const auto& item: layout->getItems())
+        itemAdded(item);
 }
 
 void QnResourceTreeModelLayoutNode::deinitialize()
 {
-    disconnect(qnResPool, nullptr, this, nullptr);
-    disconnect(snapshotManager(), nullptr, this, nullptr);
-    disconnect(qnResourceAccessProvider, nullptr, this, nullptr);
-
     for (auto node: m_items)
         node->deinitialize();
+
     m_items.clear();
 
     base_type::deinitialize();
@@ -134,12 +116,8 @@ void QnResourceTreeModelLayoutNode::handleResourceAdded(const QnResourcePtr& res
     }
 }
 
-void QnResourceTreeModelLayoutNode::handleAccessChanged(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& resource)
+void QnResourceTreeModelLayoutNode::handleAccessChanged(const QnResourceAccessSubject& subject)
 {
-    if (resource != this->resource())
-        return;
-
     if (subject != getOwner())
         return;
 
@@ -148,8 +126,7 @@ void QnResourceTreeModelLayoutNode::handleAccessChanged(const QnResourceAccessSu
 
 void QnResourceTreeModelLayoutNode::handlePermissionsChanged(const QnResourcePtr& resource)
 {
-    base_type::handlePermissionsChanged(resource);
-    for (auto item : m_items)
+    for (auto item: m_items)
     {
         if (item->resource() == resource)
             item->update();
@@ -165,8 +142,7 @@ QIcon QnResourceTreeModelLayoutNode::calculateIcon() const
     return base_type::calculateIcon();
 }
 
-void QnResourceTreeModelLayoutNode::at_layout_itemAdded(const QnLayoutResourcePtr& /*layout*/,
-    const QnLayoutItemData& item)
+void QnResourceTreeModelLayoutNode::itemAdded(const QnLayoutItemData& item)
 {
     NX_ASSERT(model());
     if (!model())
@@ -186,18 +162,8 @@ void QnResourceTreeModelLayoutNode::at_layout_itemAdded(const QnLayoutResourcePt
     m_items.insert(item.uuid, node);
 }
 
-void QnResourceTreeModelLayoutNode::at_layout_itemRemoved(const QnLayoutResourcePtr& /*layout*/,
-    const QnLayoutItemData& item)
+void QnResourceTreeModelLayoutNode::itemRemoved(const QnLayoutItemData& item)
 {
     if (auto node = m_items.take(item.uuid))
         node->deinitialize();
-}
-
-void QnResourceTreeModelLayoutNode::at_snapshotManager_flagsChanged(
-    const QnLayoutResourcePtr& layout)
-{
-    if (layout != resource())
-        return;
-
-    setModified(snapshotManager()->isModified(layout));
 }

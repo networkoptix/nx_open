@@ -62,12 +62,12 @@ public:
     /** Cleanup node to make sure it can be destroyed safely. */
     virtual void deinitialize();
 
-    void update();
-
     Qn::NodeType type() const ;
     QnResourcePtr resource() const;
     Qn::ResourceFlags resourceFlags() const;
     QnUuid uuid() const;
+
+    void update();
 
     QList<QnResourceTreeModelNodePtr> children() const;
     QList<QnResourceTreeModelNodePtr> childrenRecursive() const;
@@ -99,7 +99,6 @@ protected:
 
     QnResourceTreeModel* model() const;
 
-    virtual void handlePermissionsChanged(const QnResourcePtr& resource);
     virtual QIcon calculateIcon() const;
 
     virtual void addChildInternal(const QnResourceTreeModelNodePtr& child);
@@ -107,6 +106,8 @@ protected:
     void changeInternal();
 
     void updateResourceStatus();
+
+    virtual QnResourceTreeModelNodeManager* manager() const;
 
 private:
     void setNameInternal(const QString& name);
@@ -127,9 +128,12 @@ private:
     void childCheckStateChanged(Qt::CheckState oldState, Qt::CheckState newState, bool forceUpdate = false);
     void propagateCheckStateRecursivelyDown();
 
+    void handlePermissionsChanged();
+
 private:
-    //TODO: #GDM #Common need complete recorder nodes structure refactor to get rid of this shit
+    //TODO: #GDM #vkutin need complete recorder nodes structure refactor to get rid of this shit
     friend class QnResourceTreeModel;
+    friend class QnResourceTreeModelNodeManager;
 
     /* Node state. */
     bool m_initialized;
@@ -195,6 +199,10 @@ private:
         bool value;
         bool checked;
     } m_editable;
+
+    /* Nodes of the same resource are organized into double-linked list: */
+    QnResourceTreeModelNode* m_prev = nullptr;
+    QnResourceTreeModelNode* m_next = nullptr;
 };
 
 QDebug operator<<(QDebug dbg, QnResourceTreeModelNode* node);
