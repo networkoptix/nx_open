@@ -2749,8 +2749,12 @@ void MediaServerProcess::run()
         m_universalTcpListener,
         &QnTcpListener::portChanged,
         this,
-        &MediaServerProcess::updateAddressesList);
-
+        [this, &cloudManagerGroup]()
+        {
+            updateAddressesList();
+            cloudManagerGroup.connectionManager.setProxyVia(
+                SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
+        });
 
     m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
 
