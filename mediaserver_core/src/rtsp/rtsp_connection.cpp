@@ -745,8 +745,8 @@ QnConstMediaContextPtr QnRtspConnectionProcessor::getAudioCodecContext(int audio
     }
     else if (archive.open(getResource()->toResourcePtr()))
     {
-        archive.seek(d->startTime, true);
-        layout = archive.getAudioLayout(); //< Layout from now opening archive point.
+        archive.seek(d->startTime, /*findIFrame*/ true);
+        layout = archive.getAudioLayout(); //< Current position in archive.
     }
 
     if (layout && audioTrackIndex < layout->channelCount())
@@ -1146,7 +1146,7 @@ void QnRtspConnectionProcessor::createDataProvider()
 void QnRtspConnectionProcessor::checkQuality()
 {
     Q_D(QnRtspConnectionProcessor);
-    if (d->liveDpHi && 
+    if (d->liveDpHi &&
        (d->quality == MEDIA_Quality_Low || d->quality == MEDIA_Quality_LowIframesOnly))
     {
         if (d->liveDpLow == 0) {
@@ -1330,16 +1330,16 @@ int QnRtspConnectionProcessor::composePlay()
         QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
 
         int copySize = 0;
-        if (!getResource()->toResource()->hasFlags(Qn::foreigner) && (status == Qn::Online || status == Qn::Recording)) 
+        if (!getResource()->toResource()->hasFlags(Qn::foreigner) && (status == Qn::Online || status == Qn::Recording))
         {
-            bool usePrimaryStream = 
+            bool usePrimaryStream =
                 d->quality != MEDIA_Quality_Low && d->quality != MEDIA_Quality_LowIframesOnly;
             bool iFramesOnly = d->quality == MEDIA_Quality_LowIframesOnly;
             copySize = d->dataProcessor->copyLastGopFromCamera(
-                camera, 
-                usePrimaryStream, 
+                camera,
+                usePrimaryStream,
                 0, /* skipTime */
-                d->lastPlayCSeq, 
+                d->lastPlayCSeq,
                 iFramesOnly);
         }
 
@@ -1479,9 +1479,9 @@ int QnRtspConnectionProcessor::composeSetParameter()
                 bool usePrimaryStream = d->quality != MEDIA_Quality_Low && d->quality != MEDIA_Quality_LowIframesOnly;
                 bool iFramesOnly = d->quality == MEDIA_Quality_LowIframesOnly;
                 d->dataProcessor->copyLastGopFromCamera(
-                    camera, 
+                    camera,
                     usePrimaryStream,
-                    time, 
+                    time,
                     d->lastPlayCSeq,
                     iFramesOnly); // for fast quality switching
 
