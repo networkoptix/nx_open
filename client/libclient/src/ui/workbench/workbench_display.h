@@ -42,7 +42,6 @@ class QnResourceWidget;
 class QnResourceDisplay;
 typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
 class ViewportAnimator;
-class VariantAnimator;
 class WidgetAnimator;
 class QnCurtainAnimator;
 class QnCurtainItem;
@@ -485,9 +484,6 @@ private:
 
     /** Curtain animator. */
     QnCurtainAnimator *m_curtainAnimator;
-
-    /** Frame opacity animator. */
-    VariantAnimator *m_frameOpacityAnimator;
 
     QnThumbnailsLoader *m_loader;
 };
