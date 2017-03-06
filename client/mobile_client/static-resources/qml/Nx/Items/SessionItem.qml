@@ -15,9 +15,9 @@ Pane
     property alias systemName: informationBlock.systemName
     property alias cloudSystem: informationBlock.cloud
     property alias online: informationBlock.online
-    property alias compatible: informationBlock.compatible
     property alias ownerDescription: informationBlock.ownerDescription
-    property alias invalidVersion: informationBlock.invalidVersion
+    property bool compatible: true
+    property string invalidVersion
 
     readonly property string kMinimimVersion: "1.3.1"
 
@@ -90,6 +90,30 @@ Pane
                 informationBlock.address,
                 informationBlock.user,
                 authenticationDataModel.defaultCredentials.password)
+        }
+    }
+
+    IssueLabel
+    {
+        id: issueLabel
+        anchors
+        {
+            bottom: parent.bottom
+            bottomMargin: 12
+            right: parent.right
+            rightMargin: 12
+        }
+        color: cloudSystem ? ColorTheme.base14 : ColorTheme.red_main
+        visible: text !== ""
+        text:
+        {
+            if (cloudSystem)
+            {
+                return !online && cloudStatusWatcher.status === QnCloudStatusWatcher.Online
+                    ? qsTr("OFFLINE") : ""
+            }
+
+            return compatible ? "" : (invalidVersion || qsTr("INCOMPATIBLE"))
         }
     }
 

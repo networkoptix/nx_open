@@ -29,6 +29,7 @@ public:
     QnUserRolesModelPrivate(QnUserRolesModel* parent, QnUserRolesModel::DisplayRoleFlags flags);
 
     int rowForUser(const QnUserResourcePtr& user) const;
+    int rowForRole(Qn::UserRole role) const;
 
     void setUserRoles(ec2::ApiUserRoleDataList value);
 

@@ -35,6 +35,7 @@ ToolBarBase
             Layout.fillWidth: true
 
             placeholderText: qsTr("Search")
+            enterKeyType: TextInput.EnterKeySearch
 
             background: null
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase

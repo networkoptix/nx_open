@@ -743,7 +743,7 @@ APPLY(703, videowallControl, ApiVideowallControlMessageData, \
                        false, /* system*/ \
                        InvalidGetHashHelper(), \
                        VideowallNotificationManagerHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
+                       VideoWallControlAccess(), /* save permission checker */ \
                        AllowForAllAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \

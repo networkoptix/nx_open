@@ -132,6 +132,12 @@ void QnCheckForUpdatesPeerTask::checkUpdate()
 
 bool QnCheckForUpdatesPeerTask::checkCloudHost()
 {
+    /* Ignore cloud host for versions lower than 3.0. */
+    static const QnSoftwareVersion kCloudRequiredVersion(3, 0);
+
+    if (m_target.version < kCloudRequiredVersion)
+        return true;
+
     /* Update is allowed if either target version has the same cloud host or
        there are no servers linked to the cloud in the system. */
     if (m_cloudHost == QnAppInfo::defaultCloudHost())

@@ -190,7 +190,7 @@ protected:
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override
     {
         QnNxStyle::paintCosmeticFrame(painter, rect(), m_frameColor,
-            -m_frameWidth, m_frameWidth / 2); //< negative means outside
+            m_frameWidth, m_frameWidth / 2);
     }
 
     virtual Qn::WindowFrameSections windowFrameSectionsAt(const QRectF &region) const override {

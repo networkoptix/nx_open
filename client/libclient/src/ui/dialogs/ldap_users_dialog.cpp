@@ -5,6 +5,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 
@@ -15,26 +16,34 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/ldap_user_list_model.h>
+#include <ui/models/user_roles_model.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
 
 #include <utils/common/ldap.h>
 #include <common/common_module.h>
 
 namespace {
-    //TODO: #GDM move timeout constant to more common module
-    const int testLdapTimeoutMSec = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_MS;
+
+//TODO: #GDM move timeout constant to more common module
+const int testLdapTimeoutMSec = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_MS;
+
 }
 
-QnLdapUsersDialog::QnLdapUsersDialog(QWidget *parent)
-    : base_type(parent)
-    , ui(new Ui::LdapUsersDialog)
-    , m_timeoutTimer(new QTimer(this))
-    , m_loading(true)
+QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
+    base_type(parent),
+    ui(new Ui::LdapUsersDialog),
+    m_timeoutTimer(new QTimer(this)),
+    m_rolesModel(new QnUserRolesModel(this,
+        QnUserRolesModel::StandardRoleFlag | QnUserRolesModel::UserRoleFlag))
 {
     ui->setupUi(this);
 
     setWarningStyle(ui->errorLabel);
     ui->errorLabel->hide();
+
+    setHelpTopic(ui->selectRoleLabel, ui->userRoleComboBox, Qn::UserSettings_UserRoles_Help);
+    ui->userRoleComboBox->setModel(m_rolesModel);
+    ui->userRoleComboBox->setCurrentIndex(m_rolesModel->rowForRole(Qn::UserRole::LiveViewer)); // sensible default
 
     const QnLdapSettings &settings = QnGlobalSettings::instance()->ldapSettings();
 
@@ -248,14 +257,25 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
     /* Safety check */
     auto filteredUsers = filterExistingUsers(users);
 
+    //double semantic negation here to avoid checkbox name-content inconsistency
+    const bool enableUsers = !ui->disableUsersCheckBox->isChecked();
+    const Qn::UserRole selectedRole = ui->userRoleComboBox->itemData(
+        ui->userRoleComboBox->currentIndex(), Qn::UserRoleRole).value<Qn::UserRole>();
+    const Qn::GlobalPermissions permissions = QnUserRolesManager::userRolePermissions(selectedRole);
+    const QnUuid selectedUserRoleId = ui->userRoleComboBox->itemData(
+        ui->userRoleComboBox->currentIndex(), Qn::UuidRole).value<QnUuid>();
+
     for (const QnLdapUser &ldapUser: filteredUsers)
     {
         QnUserResourcePtr user(new QnUserResource(QnUserType::Ldap));
         user->setName(ldapUser.login);
         user->setEmail(ldapUser.email);
         user->fillId();
-        user->setRawPermissions(Qn::GlobalLiveViewerPermissionSet);
-        user->setEnabled(false);
+        user->setEnabled(enableUsers);
+        if (selectedRole == Qn::UserRole::CustomUserRole)
+            user->setUserRoleId(selectedUserRoleId);
+        else
+            user->setRawPermissions(permissions);
         user->generateHash();
 
         qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &){});
