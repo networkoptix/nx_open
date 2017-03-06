@@ -67,8 +67,8 @@ Page
         anchors.margins: -4
 
         property real spacing: 8
-        readonly property real minCellWidth: 300 + spacing
-        property int cellsInRow: Math.max(1, Math.floor(width / minCellWidth))
+        readonly property real maxCellWidth: 488 + spacing
+        property int cellsInRow: Math.max(1, Math.ceil(width / maxCellWidth))
 
         cellWidth: (width - leftMargin - rightMargin) / cellsInRow
         cellHeight: 98 + spacing
