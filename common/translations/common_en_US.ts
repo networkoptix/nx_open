@@ -83,7 +83,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>A System which is connected to %1 can be merged only with a System which is not. Password and name must be taken from the System which is connected to %1.</source>
+        <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
         <translation type="unfinished"></translation>
     </message>

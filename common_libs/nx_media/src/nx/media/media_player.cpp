@@ -388,7 +388,8 @@ void PlayerPrivate::at_gotVideoFrame()
     if (metadata.dataType == QnAbstractMediaData::EMPTY_DATA)
     {
         videoFrameToRender.reset();
-        q->setPosition(kLivePosition); //< EOF reached
+        log("at_gotVideoFrame(): EOF reached, jumping to LIVE.");
+        q->setPosition(kLivePosition);
         return;
     }
 

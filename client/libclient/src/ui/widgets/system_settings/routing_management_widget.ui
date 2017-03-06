@@ -165,9 +165,6 @@
           </item>
           <item>
            <widget class="QPushButton" name="removeButton">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
             <property name="toolTip">
              <string>Remove</string>
             </property>

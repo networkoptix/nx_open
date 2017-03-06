@@ -34,6 +34,7 @@ public:
     /* Role-specific stuff: */
 
     int rowForUser(const QnUserResourcePtr& user) const;
+    int rowForRole(Qn::UserRole role) const;
 
     void setUserRoles(const ec2::ApiUserRoleDataList& roles);
 

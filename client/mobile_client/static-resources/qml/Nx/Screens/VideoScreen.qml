@@ -78,7 +78,7 @@ PageBase
             onTriggered: d.showOfflineStatus = true
         }
 
-        onShowOfflineStatusChanged:
+        onCameraWarningVisibleChanged:
         {
             if (cameraWarningVisible)
             {
