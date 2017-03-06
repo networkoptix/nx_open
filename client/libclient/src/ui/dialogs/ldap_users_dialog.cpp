@@ -17,6 +17,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/models/ldap_user_list_model.h>
 #include <ui/models/user_roles_model.h>
+#include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/widgets/views/checkboxed_header_view.h>
 
 #include <utils/common/ldap.h>
@@ -25,7 +26,9 @@
 namespace {
 
 //TODO: #GDM move timeout constant to more common module
-const int testLdapTimeoutMSec = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_MS;
+static const int testLdapTimeoutMSec = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_MS;
+
+static const int kUpdateFilterDelayMs = 200;
 
 }
 
@@ -78,7 +81,8 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     }
 
     m_importButton = new QPushButton(this);
-    m_importButton->setText(tr("Import users"));
+    m_importButton->setText(tr("Import Selected"));
+    setAccentStyle(m_importButton);
     ui->buttonBox->addButton(m_importButton, QnDialogButtonBox::HelpRole);
     m_importButton->setVisible(false);
 
@@ -124,6 +128,9 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
     ui->stackedWidget->setCurrentWidget(ui->usersPage);
     ui->buttonBox->hideProgress();
 
+    QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
+    ui->usersTable->setVerticalScrollBar(scrollBar->proxyScrollBar());
+
     auto usersModel = new QnLdapUserListModel(this);
     usersModel->setUsers(filteredUsers);
 
@@ -137,7 +144,7 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
     });
 
     ui->usersTable->setModel(sortModel);
-    ui->usersTable->setHorizontalHeader(header);
+    ui->usersTable->setHeader(header);
 
     header->setVisible(true);
     header->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -193,10 +200,14 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
     sortModel->setDynamicSortFilter(true);
     sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
     sortModel->setFilterKeyColumn(-1);
-    connect(ui->filterLineEdit,  &QLineEdit::textChanged, this, [sortModel, updateSelection](const QString &text) {
-        sortModel->setFilterWildcard(text);
-        updateSelection();
-    });
+
+    //ui->filterLineEdit->lineEdit()->setPlaceholderText(tr("Filter..."));
+    ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
+    connect(ui->filterLineEdit,  &QnSearchLineEdit::textChanged, this,
+        [sortModel](const QString &text)
+        {
+            sortModel->setFilterWildcard(text);
+        });
 }
 
 void QnLdapUsersDialog::stopTesting(const QString &text /* = QString()*/) {
