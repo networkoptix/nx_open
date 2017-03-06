@@ -90,7 +90,10 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
     av_frame_free(&m_frameToEncode);
 
     if (m_sampleBuffers)
+    {
         av_freep(m_sampleBuffers);
+        av_freep(&m_sampleBuffers);
+    }
 
     if (m_resampleDstBuffers)
         delete[] m_resampleDstBuffers;
