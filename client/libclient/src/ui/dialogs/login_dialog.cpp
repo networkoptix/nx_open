@@ -318,6 +318,7 @@ void QnLoginDialog::accept()
                 {
                     // In most cases we will connect succesfully by this url. Sow we can store it.
                     qnSettings->setLastLocalConnectionUrl(url);
+                    qnSettings->save();
 
                     const bool autoLogin = ui->autoLoginCheckBox->isChecked();
                     QnActionParameters params;
