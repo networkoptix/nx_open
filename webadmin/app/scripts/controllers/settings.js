@@ -171,7 +171,7 @@ angular.module('webadminApp')
             } else {
                 dialogs.alert(message || L.settings.settingsSaved).finally(function(){
                     if(!message) {
-                        if ($scope.settings.port !== window.location.port) {
+                        if ($scope.settings.port != window.location.port) {
                             window.location.href = (window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port + window.location.pathname + window.location.hash);
                         } else {
                             window.location.reload();

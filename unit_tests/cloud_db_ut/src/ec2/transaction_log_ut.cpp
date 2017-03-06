@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/fusion/model_functions.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/utils.h>
@@ -333,7 +334,8 @@ private:
             queryContext.get(),
             m_systemId.c_str(),
             cdb::ec2::UbjsonSerializedTransaction<::ec2::ApiUserData>(std::move(transaction)));
-        ASSERT_TRUE(dbResult == nx::db::DBResult::ok || dbResult == nx::db::DBResult::cancelled);
+        ASSERT_TRUE(dbResult == nx::db::DBResult::ok || dbResult == nx::db::DBResult::cancelled)
+            << "Got " << QnLexical::serialized(dbResult).toStdString();
     }
 
     ::ec2::QnTransaction<::ec2::ApiUserData> getTransactionFromLog()
