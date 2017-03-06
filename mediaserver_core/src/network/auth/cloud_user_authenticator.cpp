@@ -86,21 +86,21 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     nx_http::HttpHeaders* const responseHeaders)
 {
     const QByteArray userName = authorizationHeader.userid().toLower();
-    bool isCloudUser = isValidCloudUserName(userName);
 
     auto cloudUsers = qnResPool->getResources<QnUserResource>().filtered(
         [userName](const QnUserResourcePtr& user)
-    {
-        return user->isCloud() &&
-            user->isEnabled() &&
-            user->getName().toUtf8().toLower() == userName;
-    });
+        {
+            return user->isCloud() &&
+                user->isEnabled() &&
+                user->getName().toUtf8().toLower() == userName;
+        });
+    const bool isCloudUser = !cloudUsers.isEmpty();
 
     if (authorizationHeader.authScheme != nx_http::header::AuthScheme::digest)
     {
         //supporting only digest authentication for cloud-based authentication
 
-        if (isCloudUser && !cloudUsers.empty())
+        if (isCloudUser)
         {
             NX_LOGX(lm("Refusing non-digest authentication of user %1")
                 .arg(authorizationHeader.userid()), cl_logDEBUG2);
@@ -240,12 +240,6 @@ void CloudUserAuthenticator::clear()
 {
     QnMutexLocker lk(&m_mutex);
     m_authorizationCache.clear();
-}
-
-bool CloudUserAuthenticator::isValidCloudUserName(const nx_http::StringType& userName) const
-{
-    //TODO #ak check for email
-    return userName.indexOf('@') >= 0;
 }
 
 void CloudUserAuthenticator::removeExpiredRecordsFromCache(QnMutexLockerBase* const /*lk*/)
