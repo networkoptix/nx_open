@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/fusion/serialization/sql.h>
+#include <nx/fusion/serialization/sql_functions.h>
 #include <nx/utils/test_support/utils.h>
 
 #include <test_support/business_data_generator.h>
@@ -61,6 +63,20 @@ void BasePersistentDataTest::insertSystemSharing(const api::SystemSharingEx& sha
     const auto dbResult = executeUpdateQuerySync(
         std::bind(&SystemSharingDataObject::insertOrReplaceSharing,
             &m_systemSharingController, _1, sharing));
+    ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+}
+
+void BasePersistentDataTest::deleteSystemSharing(const api::SystemSharingEx& sharing)
+{
+    const nx::db::InnerJoinFilterFields sqlFilter =
+        {{"account_id", ":accountId",
+           QnSql::serialized_field(sharing.accountId)}};
+
+    using namespace std::placeholders;
+
+    const auto dbResult = executeUpdateQuerySync(
+        std::bind(&SystemSharingDataObject::deleteSharing,
+            &m_systemSharingController, _1, sharing.systemId, sqlFilter));
     ASSERT_EQ(nx::db::DBResult::ok, dbResult);
 }
 

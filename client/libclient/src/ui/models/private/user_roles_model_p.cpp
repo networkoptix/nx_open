@@ -108,6 +108,11 @@ int QnUserRolesModelPrivate::rowForUser(const QnUserResourcePtr& user) const
     return m_standardRoles.indexOf(role);
 }
 
+int QnUserRolesModelPrivate::rowForRole(Qn::UserRole role) const
+{
+    return m_standardRoles.indexOf(role);
+}
+
 void QnUserRolesModelPrivate::setUserRoles(ec2::ApiUserRoleDataList value)
 {
     std::sort(value.begin(), value.end(), lessRoleByName);

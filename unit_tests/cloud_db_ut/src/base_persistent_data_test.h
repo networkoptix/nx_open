@@ -29,7 +29,10 @@ protected:
     const std::unique_ptr<dao::rdb::DbInstanceController>& persistentDbManager() const;
     api::AccountData insertRandomAccount();
     api::SystemData insertRandomSystem(const api::AccountData& account);
+
     void insertSystemSharing(const api::SystemSharingEx& sharing);
+    void deleteSystemSharing(const api::SystemSharingEx& sharing);
+
     const api::AccountData& getAccount(std::size_t index) const;
     const data::SystemData& getSystem(std::size_t index) const;
     const std::vector<api::AccountData>& accounts() const;

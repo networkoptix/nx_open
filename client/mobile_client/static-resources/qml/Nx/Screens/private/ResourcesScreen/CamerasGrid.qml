@@ -18,7 +18,7 @@ GridView
     {
         id: d
 
-        readonly property real maxItemWidth: 192
+        readonly property real maxItemWidth: 320
         property int thumbnailsInRow: Math.max(2, Math.floor(camerasGrid.width / maxItemWidth))
     }
 
