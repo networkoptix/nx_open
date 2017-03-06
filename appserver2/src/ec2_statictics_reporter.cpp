@@ -178,8 +178,8 @@ namespace ec2
         setupTimer();
     }
 
-    template<typename Duration>
-    uint durationSeconds(Duration duration)
+    template<typename Rep, typename Period>
+    uint convertToSeconds(const std::chrono::duration<Rep, Period>& duration)
     {
         const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration);
         return static_cast<uint>(seconds.count());
@@ -197,7 +197,7 @@ namespace ec2
             collator.setNumericMode(true);
             if (collator.compare(currentVersion, reportedVersion) > 0)
             {
-                const uint timeCycle = durationSeconds(nx::utils::parseTimerDuration(
+                const uint timeCycle = convertToSeconds(nx::utils::parseTimerDuration(
                     qnGlobalSettings->statisticsReportTimeCycle(), kSendAfterUpdateTime));
 
                 m_plannedReportTime = now.addSecs(nx::utils::random::number(
@@ -212,7 +212,7 @@ namespace ec2
             }
         }
 
-        const uint timeCycle = durationSeconds(nx::utils::parseTimerDuration(
+        const uint timeCycle = convertToSeconds(nx::utils::parseTimerDuration(
             qnGlobalSettings->statisticsReportTimeCycle(), kDefaultSendCycleTime));
 
         const uint minDelay = timeCycle * kMinDelayRatio / 100;
