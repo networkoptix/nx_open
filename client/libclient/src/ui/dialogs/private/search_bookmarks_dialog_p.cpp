@@ -1,5 +1,7 @@
 #include "search_bookmarks_dialog_p.h"
 
+#include <QtWidgets/QStyledItemDelegate>
+
 #include "ui_search_bookmarks_dialog.h"
 
 #include <client/client_settings.h>
@@ -32,6 +34,35 @@
 
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
+
+namespace {
+class BoldItemDelegate: public QStyledItemDelegate
+{
+    using base_type = QStyledItemDelegate;
+
+public:
+    BoldItemDelegate(QObject* parent);
+
+protected:
+    virtual void initStyleOption(
+        QStyleOptionViewItem *option,
+        const QModelIndex &index) const override;
+};
+
+BoldItemDelegate::BoldItemDelegate(QObject* parent):
+    base_type(parent)
+{
+}
+
+void BoldItemDelegate::initStyleOption(
+    QStyleOptionViewItem *option,
+    const QModelIndex &index) const
+{
+    base_type::initStyleOption(option, index);
+    option->font.setBold(true);
+}
+
+}
 
 QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &filterText
     , qint64 utcStartTimeMs
@@ -128,6 +159,18 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
         tr("Search"));
 
     QnItemViewAutoHider::create(m_ui->gridBookmarks, tr("No bookmarks"));
+
+    const auto header = m_ui->gridBookmarks->horizontalHeader();
+    header->setStretchLastSection(false);
+    header->setSectionResizeMode(QnSearchBookmarksModel::kName, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(QnSearchBookmarksModel::kCamera, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(QnSearchBookmarksModel::kStartTime, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(QnSearchBookmarksModel::kLength, QHeaderView::ResizeToContents);
+
+    header->setSectionResizeMode(QnSearchBookmarksModel::kTags, QHeaderView::Stretch);
+    m_ui->gridBookmarks->setStyleSheet(lit("QTableView::item { padding-right: 32px }"));
+    m_ui->gridBookmarks->setItemDelegateForColumn(
+        QnSearchBookmarksModel::kCamera, new BoldItemDelegate(this));
 }
 
 QnSearchBookmarksDialogPrivate::~QnSearchBookmarksDialogPrivate()
@@ -262,27 +305,6 @@ void QnSearchBookmarksDialogPrivate::openInNewLayout(const QnActionParameters &p
     setFirstLayoutItemPeriod(extendedWindow, Qn::ItemSliderWindowRole);
 
     menu()->trigger(QnActions::BookmarksModeAction);
-}
-
-void QnSearchBookmarksDialogPrivate::updateHeadersWidth()
-{
-    enum
-    {
-        kNamePart = 8
-        , kStartTimePart = 3
-        , kLengthPart = 3
-        , kTagsPart = 4
-        , kCameraPart = 3
-        , kPartsTotalNumber = kNamePart + kStartTimePart + kLengthPart + kTagsPart + kCameraPart
-    };
-
-    QHeaderView * const header = m_ui->gridBookmarks->horizontalHeader();
-    const int totalWidth = header->width();
-    header->resizeSection(QnSearchBookmarksModel::kName, totalWidth * kNamePart / kPartsTotalNumber);
-    header->resizeSection(QnSearchBookmarksModel::kStartTime, totalWidth * kStartTimePart / kPartsTotalNumber);
-    header->resizeSection(QnSearchBookmarksModel::kLength, totalWidth * kLengthPart / kPartsTotalNumber);
-    header->resizeSection(QnSearchBookmarksModel::kTags, totalWidth * kTagsPart / kPartsTotalNumber);
-    header->resizeSection(QnSearchBookmarksModel::kCamera, totalWidth * kCameraPart / kPartsTotalNumber);
 }
 
 void QnSearchBookmarksDialogPrivate::refresh()
