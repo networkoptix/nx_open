@@ -203,11 +203,9 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
         m_lastTimestamp = media->timestamp;
 
-        AVPacket packetToDecode;
-        av_init_packet(&packetToDecode);
-
-        packetToDecode.data = const_cast<quint8*>((const quint8*)media->data());
-        packetToDecode.size = static_cast<int>(media->dataSize());
+        QnFfmpegAvPacket packetToDecode(
+            const_cast<quint8*>((const quint8*) media->data()),
+            static_cast<int>(media->dataSize()));
 
         error = avcodec_send_packet(m_decoderCtx, &packetToDecode);
 
@@ -259,9 +257,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
                 return error;
             }
 
-            AVPacket encodedPacket;
-            av_init_packet(&encodedPacket);
-
+            QnFfmpegAvPacket encodedPacket;
             error = avcodec_receive_packet(m_encoderCtx, &encodedPacket);
 
             // Not enough data to encode packet.

@@ -285,8 +285,7 @@ int FfmpegVideoDecoder::decode(
             return -1; //< error
     }
 
-    AVPacket avpkt;
-    av_init_packet(&avpkt);
+    QnFfmpegAvPacket avpkt;
     if (compressedVideoData)
     {
         avpkt.data = (unsigned char*)compressedVideoData->data();
@@ -312,8 +311,6 @@ int FfmpegVideoDecoder::decode(
         // flushing internal buffer. So, repeat this time for the empty packet in order to avoid
         // the bug.
         avpkt.pts = avpkt.dts = d->lastPts;
-        avpkt.data = nullptr;
-        avpkt.size = 0;
     }
 
     int gotPicture = 0;
