@@ -135,12 +135,13 @@ class BoxConfig(object):
 
     @classmethod
     def from_dict(cls, d, vm_name_prefix):
+        timezone = d['timezone']
         return cls(idx=d['idx'],
                    name=d['name'],
                    required_file_list=d['required_file_list'],
                    vagrant_config_commands=[ConfigCommand.from_dict(command) for command in d['vagrant_config_commands']],
                    vm_name_prefix=vm_name_prefix,
-                   timezone=pytz.timezone(d['timezone']))
+                   timezone=pytz.timezone(timezone) if timezone else None)
 
     def __init__(self, idx, name, required_file_list, vagrant_config_commands, vm_name_prefix=None, timezone=None):
         assert timezone is None or isinstance(timezone, datetime.tzinfo), repr(timezone)
@@ -151,7 +152,7 @@ class BoxConfig(object):
         self.vm_name_prefix = vm_name_prefix
         self.ip_address = None
         self.port = None
-        self.timezone = timezone  # str
+        self.timezone = timezone  # pytz.timezone or None
         self.is_allocated = False
 
     def __str__(self):
@@ -165,7 +166,7 @@ class BoxConfig(object):
                     name=self.name,
                     required_file_list=self.required_file_list,
                     vagrant_config_commands=[command.to_dict() for command in self.vagrant_config_commands],
-                    timezone=str(self.timezone))
+                    timezone=str(self.timezone) if self.timezone else None)
 
     def matches(self, box):
         return (sorted(self.required_file_list) == sorted(box.required_file_list) and
