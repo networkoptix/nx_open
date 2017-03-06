@@ -1561,7 +1561,9 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (qnRuntime->isDevMode())
         result |= Qn::DbgScreenshotButton;
 
-    if (hasVideo && !resource()->toResource()->hasFlags(Qn::still_image))
+    const bool isVideoWall = qnRuntime->isVideoWallMode();
+
+    if (hasVideo && !isVideoWall && !resource()->toResource()->hasFlags(Qn::still_image))
         result |= Qn::ScreenshotButton;
 
     bool rgbImage = false;
@@ -1575,13 +1577,14 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         && !url.endsWith(lit(".jpeg"))
         )
         rgbImage = true;
-    if (!rgbImage && hasVideo)
+
+    if (!rgbImage && hasVideo && !isVideoWall)
         result |= Qn::EnhancementButton;
 
     if (!zoomRect().isNull())
         return result;
 
-    if (hasVideo && resource()->toResource()->hasFlags(Qn::motion))
+    if (hasVideo && !isVideoWall && resource()->toResource()->hasFlags(Qn::motion))
         result |= Qn::MotionSearchButton;
 
     bool isExportedLayout = item()
@@ -1610,13 +1613,10 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         result &= ~Qn::PtzButton;
     }
 
-    if ((resource()->toResource()->hasFlags(Qn::io_module)))
-    {
-        if (hasVideo)
-            result |= Qn::IoModuleButton;
-    }
+    if (hasVideo && !isVideoWall && resource()->toResource()->hasFlags(Qn::io_module))
+        result |= Qn::IoModuleButton;
 
-    if (hasVideo && !qnSettings->lightMode().testFlag(Qn::LightModeNoZoomWindows))
+    if (hasVideo && !isVideoWall && !qnSettings->lightMode().testFlag(Qn::LightModeNoZoomWindows))
     {
         if (item()
             && item()->layout()

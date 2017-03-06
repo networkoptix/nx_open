@@ -370,7 +370,7 @@ Item
                             return collapseTileButton.left;
 
                         if (menuButtonControl.visible)
-                            menuButtonControl.left;
+                            return menuButtonControl.left;
 
                         return (hideTileButton.visible ? hideTileButton.left : parent.right);
                     }

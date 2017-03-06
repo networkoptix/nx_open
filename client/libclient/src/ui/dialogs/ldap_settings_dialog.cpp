@@ -275,7 +275,8 @@ void QnLdapSettingsDialog::accept() {
     d->stopTesting();
 
     QnLdapSettings settings = d->settings();
-    QnGlobalSettings::instance()->setLdapSettings(settings);
+    qnGlobalSettings->setLdapSettings(settings);
+    qnGlobalSettings->synchronizeNow();
 
     base_type::accept();
 }

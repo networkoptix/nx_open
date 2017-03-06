@@ -1,4 +1,4 @@
-set(cloudGroup "dev" CACHE STRING "Cloud instance group (dev, test, demo, prod)")
+set(cloudGroup "test" CACHE STRING "Cloud instance group (dev, test, demo, prod)")
 set(customCloudHost "" CACHE STRING "Cloud host. Leave empty to fetch cloud host from server.")
 
 if("${customCloudHost}" STREQUAL "")
