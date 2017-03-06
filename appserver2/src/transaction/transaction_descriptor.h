@@ -286,6 +286,11 @@ detail::TransactionDescriptor<Param>* getTransactionDescriptorByTransaction(cons
     return getActualTransactionDescriptorByValue<Param>(tran.command);
 }
 
+/**
+* For this function to work properly all transaction descriptors for the same api data structures should have
+* same Access Rights checker functions. For example setResourceParam and getResourceParam have the same checker for
+* read access - ReadResourceParamAccess.
+*/
 template<typename Param>
 detail::TransactionDescriptor<Param>* getTransactionDescriptorByParam()
 {
