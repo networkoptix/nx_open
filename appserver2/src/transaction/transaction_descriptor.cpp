@@ -130,7 +130,7 @@ struct InvalidGetHashHelper
     template<typename Param>
     QnUuid operator ()(const Param &)
     {
-        NX_ASSERT(0, Q_FUNC_INFO, "Invalid transaction for hash!");
+        // NX_ASSERT(0, Q_FUNC_INFO, "Invalid transaction for hash!");
         return QnUuid();
     }
 };
