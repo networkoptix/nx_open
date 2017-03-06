@@ -46,7 +46,7 @@ void doTest(bool doServerDelay, bool doClientDelay)
             else
             {
                 auto errCode = SystemError::getLastOSErrorCode();
-                if (errCode != SystemError::timedOut)
+                if (errCode != SystemError::timedOut && errCode != SystemError::again)
                 {
                     ASSERT_EQ(0, errCode);
                     ASSERT_TRUE(client->isConnected());
