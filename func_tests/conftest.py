@@ -51,8 +51,6 @@ def pytest_addoption(parser):
                      help='destroy and create again vagrant boxes')
     parser.addoption('--vm-name-prefix', default=DEFAULT_VM_NAME_PREFIX,
                      help='prefix for virtualenv machine names')
-    parser.addoption('--config-file',
-                     help='config file for tests')
     parser.addoption('--vm-host',
                      help='hostname or IP address for host with virtualbox,'
                           ' used to start virtual machines (by default it is local host)')
@@ -64,6 +62,10 @@ def pytest_addoption(parser):
                      help='Working directory at host with virtualbox, used to store vagrant files')
     parser.addoption('--max-log-width', default=DEFAULT_MAX_LOG_WIDTH, type=int,
                      help='Change maximum log message width. Default is %d' % DEFAULT_MAX_LOG_WIDTH)
+    # TODO. It'll be removed after 'override' feature implementation
+    parser.addoption('--resource-synchronization-test-config-file',
+                     help='config file for resource synchronization test')
+
 
 
 @pytest.fixture(scope='session')

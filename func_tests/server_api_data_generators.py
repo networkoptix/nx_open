@@ -7,14 +7,25 @@ import uuid
 
 BASE_CAMERA_IP_ADDRESS=0xC0A80000 # 192.168.0.0
 BASE_SERVER_IP_ADDRESS=0xA0A0000  # 10.10.0.0
+CAMERA_SERVER_GUID_PREFIX="CA14E2A0-8E25-E200-0000"
+SERVER_GUID_PREFIX="8E25E200-0000-0000-0000"
+USER_GUID_PREFIX="58E20000-0000-0000-0000"
+CAMERA_MAC_PREFIX="CA:14:"
 
-def generate_guid(quoted=True):
-    guid = str(uuid.uuid4())
-    return quoted and "{%s}" % guid or guid
+def generate_camera_server_guid(id, quoted=True):
+    guid = "%s-%012d" % (CAMERA_SERVER_GUID_PREFIX, id)
+    return "{%s}" % guid if quoted else guid
+
+def generate_server_guid(id, quoted=True):
+    guid = "%s-%012d" % (SERVER_GUID_PREFIX, id)
+    return "{%s}" % guid if quoted else guid
+
+def generate_user_guid(id, quoted=True):
+    guid = "%s-%012d" % (USER_GUID_PREFIX, id)
+    return "{%s}" % guid if quoted else guid
 
 def generate_mac(id):
-    mac = id
-    return ":".join(map(lambda n: "%02X" % (mac>>n & 0xFF), [40,32,24,16,8,0]))
+    return CAMERA_MAC_PREFIX + ":".join(map(lambda n: "%02X" % (id>>n & 0xFF), [24,16,8,0]))
 
 def generate_name(prefix, id):
     return "%s_%s" % (prefix, id)
@@ -65,7 +76,7 @@ def generate_camera_data(camera_id, **kw):
        motionMask='',
        motionType='MT_Default',
        name=camera_name,
-       parentId=generate_guid(),
+       parentId=generate_camera_server_guid(camera_id),
        physicalId=mac,
        preferedServerId='{00000000-0000-0000-0000-000000000000}',
        scheduleEnabled=False,
@@ -86,7 +97,7 @@ def generate_user_data(user_id, **kw):
         digest=digest,
         email=generate_email(user_name),
         hash=generate_password_hash(password),
-        id=generate_guid(),
+        id=generate_user_guid(user_id),
         isAdmin=False,
         name=user_name,
         parentId='{00000000-0000-0000-0000-000000000000}',
@@ -105,7 +116,7 @@ def generate_mediaserver_data(server_id, **kw):
         url='rtsp://%s' % server_address,
         authKey=generate_uuid_from_string(server_name),
         flags='SF_HasPublicIP',
-        id=generate_guid(),
+        id=generate_server_guid(server_id),
         name=server_name,
         networkAddresses=server_address,
         panicMode='PM_None',

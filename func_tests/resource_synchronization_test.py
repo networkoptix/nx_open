@@ -22,11 +22,7 @@ CONFIG_USERNAME = 'username'
 CONFIG_PASSWORD = 'password'
 CONFIG_TESTSIZE = 'testCaseSize'
 CONFIG_THREADS = 'threadNumber'
-DEFAULT_SLEEP = MEDIASERVER_MERGE_TIMEOUT_SEC / 10.0 # pause between synchronization checks
-
-def read_servers(config):
-    server_list = config.get(DEFAULT_CONFIG_SECTION, 'serverList')
-    return server_list.split(",")
+DEFAULT_SLEEP_SEC = MEDIASERVER_MERGE_TIMEOUT_SEC / 10.0 # pause between synchronization checks
 
 @total_ordering
 class Timestamp(object):
@@ -51,15 +47,17 @@ class Transaction(object):
 
     @classmethod
     def from_dict(cls, d):
-        return Transaction(d['tran']['command'],
-                           d['tran']['historyAttributes']['author'],
-                           d['tran']['peerID'],
-                           d['tran']['persistentInfo']['dbID'],
-                           d['tran']['persistentInfo']['sequence'],
-                           Timestamp(d['tran']['persistentInfo']['timestamp']['sequence'],
-                                     d['tran']['persistentInfo']['timestamp']['ticks']),
-                           d['tran']['transactionType'],
-                           d['tranGuid'])
+        return Transaction(
+            command=d['tran']['command'],
+            author=d['tran']['historyAttributes']['author'],
+            peer_id=d['tran']['peerID'],
+            db_id=d['tran']['persistentInfo']['dbID'],
+            sequence=d['tran']['persistentInfo']['sequence'],
+            timestamp=Timestamp(
+                sequence=d['tran']['persistentInfo']['timestamp']['sequence'],
+                ticks=d['tran']['persistentInfo']['timestamp']['ticks']),
+            transaction_type=d['tran']['transactionType'],
+            transaction_guid=d['tranGuid'])
 
     def __init__(self, command, author, peer_id, db_id, sequence, timestamp,
                  transaction_type, transaction_guid):
@@ -115,6 +113,7 @@ class ResourceGenerator(object):
         self.gen_fn = gen_fn
 
     def get(self, seq):
+        log.info('TEST sequence: %s', seq)
         for i, v in enumerate(seq):
             yield (i, self.gen_fn(v))
 
@@ -129,7 +128,7 @@ class SeedResourceGenerator(ResourceGenerator):
        return self.__seed
 
     def get(self, seq):
-        for i, v in enumerate(seq):
+        for i, _ in enumerate(seq):
             yield (i, self.gen_fn(self.next()))
 
 @pytest.fixture(scope="module")
@@ -146,10 +145,13 @@ def gen():
 @pytest.fixture
 def env(request, env_builder, server):
     servers = []
-    config_file = request.config.getoption('--config-file')
+    config_file = request.config.getoption('--resource-synchronization-test-config-file')
     if config_file:
         config = ConfigParser()
         config.read(config_file)
+        def read_servers(config):
+            server_list = config.get(DEFAULT_CONFIG_SECTION, 'serverList')
+            return server_list.split(",")
         servers = [RemoteServer('srv-%d' % idx,
                                  'http://%s/' % srv,
                                  config.get(DEFAULT_CONFIG_SECTION, CONFIG_USERNAME),
@@ -170,9 +172,7 @@ def env(request, env_builder, server):
 def get_response(server, method, api_object, api_method):
     return server.rest_api.get_api_fn(method, api_object, api_method)()
 
-def wait_entity_merge_done(
-    servers, method, api_object,
-    api_method, timeout = MEDIASERVER_MERGE_TIMEOUT_SEC):
+def wait_entity_merge_done(servers, method, api_object, api_method):
     log.info('TEST for %s %s.%s:', method.upper(), api_object, api_method)
     start = time.time()
     while True:
@@ -185,17 +185,17 @@ def wait_entity_merge_done(
             return None
         result = check(servers[1:], result_expected)
         if not result: return
-        if time.time() - start >= timeout:
+        if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
             log.error("'%s' unsynchronized data: %s(%s) and %s(%s)" % (
                 api_method, servers[0].url, servers[0].title, result[0].url, result[0].title))
             assert result[1] == result_expected
-        time.sleep(DEFAULT_SLEEP)
+        time.sleep(DEFAULT_SLEEP_SEC)
 
 def check_api_calls(env, calls):
     for method, api_object, api_method in calls:
         wait_entity_merge_done(env.servers, method, api_object, api_method)
 
-def check_transaction_log(env, timeout = MEDIASERVER_MERGE_TIMEOUT_SEC):
+def check_transaction_log(env):
     log.info('TEST for GET ec2.getTransactionLog:')
     def servers_to_str(servers):
         return ', '.join("%s(%s)" % (s.title, s.url) for s in servers)
@@ -211,23 +211,25 @@ def check_transaction_log(env, timeout = MEDIASERVER_MERGE_TIMEOUT_SEC):
         unmatched_transactions = {t: l for t, l in srv_transactions.iteritems()
                                   if len(l) != len(env.servers)}
         if not unmatched_transactions: return
-        if time.time() - start >= timeout:
+        if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
             assert False, "Unmatched transaction:\n  %s" % transactions_to_str(unmatched_transactions)
-        time.sleep(DEFAULT_SLEEP)
+        time.sleep(DEFAULT_SLEEP_SEC)
             
 
 def server_api_post( (server_api_method, data) ):
-    if isinstance(data, dict):
-        return server_api_method(**data)
-    else:
-        return server_api_method(json=data)
+    return server_api_method(json=data)
 
 def prepare_calls_list(env, gen, api_method, sequence = None):
     data_generator_fn = gen[api_method]
     sequence = sequence or range(env.test_size)
-    return [(
-        env.servers[i % len(env.servers)].rest_api.get_api_fn('POST', 'ec2', api_method),
-        v) for i, v in data_generator_fn(sequence[:env.test_size])]
+    calls_list = []
+    for i, data in data_generator_fn(sequence[:env.test_size]):
+        log.info('TEST data: %s', data)
+        server_i = i % len(env.servers)
+        server = env.servers[server_i]
+        server_api_fn = server.rest_api.get_api_fn('POST', 'ec2', api_method)
+        calls_list.append((server_api_fn, data))
+    return calls_list
 
 def make_async_post_calls(env, calls_list):
     pool = ThreadPool(env.thread_number)
