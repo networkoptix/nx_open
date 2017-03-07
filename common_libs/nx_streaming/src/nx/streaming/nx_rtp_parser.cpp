@@ -173,7 +173,7 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
             }
             if (m_nextDataPacket->dataType == QnAbstractMediaData::AUDIO && !m_isAudioEnabled)
             {
-                ; // Skip audio packet.
+                // Skip audio packet.
             }
             else
             {
