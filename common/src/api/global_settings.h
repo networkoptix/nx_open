@@ -46,6 +46,7 @@ const QString kNameSignature(lit("emailSignature"));
 const QString kNameSupportEmail(lit("emailSupportEmail"));
 const QString kNameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
 const QString kNameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
+const QString kNameSynchronizeTimeWithInternet(lit("synchronizeTimeWithInternet"));
 const QString kNameAutoDiscoveryEnabled(lit("autoDiscoveryEnabled"));
 const QString kNameBackupQualities(lit("backupQualities"));
 const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
@@ -267,6 +268,7 @@ private:
     AdaptorList initLdapAdaptors();
     AdaptorList initStaticticsAdaptors();
     AdaptorList initConnectionAdaptors();
+    AdaptorList initTimeSynchronizationAdaptors();
     AdaptorList initCloudAdaptors();
     AdaptorList initMiscAdaptors();
 

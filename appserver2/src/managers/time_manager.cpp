@@ -1400,9 +1400,14 @@ namespace ec2
         {
             QnMutexLocker lock(&m_mutex);
             if (m_internetSynchronizationTaskID > 0)
-                TimerManager::instance()->modifyTimerDelay(m_internetSynchronizationTaskID, 0);
+            {
+                m_timerManager->modifyTimerDelay(
+                    m_internetSynchronizationTaskID, std::chrono::milliseconds::zero());
+            }
             else
+            {
                 addInternetTimeSynchronizationTask();
+            }
         }
         else
         {
