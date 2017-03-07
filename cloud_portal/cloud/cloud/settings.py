@@ -177,6 +177,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
             'handlers': ['console', 'mail_admins']
+        },
+        'notifications.tasks': {
+            'level': 'DEBUG',
+            'propagate': True,
+            'handlers': ['console', 'mail_admins']
         }
     }
 }
@@ -295,3 +300,5 @@ STATIC_LOCATION = os.path.join(BASE_DIR, "static")
 LANGUAGES = conf['languages']
 DEFAULT_LANGUAGE = conf['languages'][0]
 UPDATE_JSON = 'http://updates.networkoptix.com/updates.json'
+
+MAX_RETRIES = conf['max_retries']

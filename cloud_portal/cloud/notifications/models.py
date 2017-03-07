@@ -9,8 +9,8 @@ class Event(models.Model):
     object = models.CharField(max_length=255)
     type = models.CharField(max_length=255)
     data = JSONField()
-    created_date = models.DateField(auto_now_add=True)
-    send_date = models.DateField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    send_date = models.DateTimeField(null=True, blank=True)
 
     def send(self):
         self.save()
@@ -46,7 +46,7 @@ class Subscription(models.Model):
     type = models.CharField(max_length=255, default='', blank=True,
                             help_text="What's the event? (submitted_release, published_{{type}}, cloud_...)")
     user_email = models.CharField(max_length=255)
-    created_date = models.DateField(auto_now_add=True)
+    created_date = models.DateTimeField(auto_now_add=True)
     enabled = models.BooleanField(default=True)
 
 
@@ -56,8 +56,8 @@ class Message(models.Model):
     type = models.CharField(max_length=255)
     customization = models.CharField(max_length=255, default='default')
     message = JSONField()
-    created_date = models.DateField(auto_now_add=True)
-    send_date = models.DateField(null=True, blank=True)
+    created_date = models.DateTimeField(auto_now_add=True)
+    send_date = models.DateTimeField(null=True, blank=True)
     event = models.ForeignKey(Event, null=True)
 
     REQUIRED_FIELDS = ['user_email', 'type', 'message']
