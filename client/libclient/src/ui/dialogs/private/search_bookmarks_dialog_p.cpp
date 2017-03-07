@@ -36,6 +36,7 @@
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
+// TODO: #ynikitenkov Move to separate files with common style delegates
 class BoldItemDelegate: public QStyledItemDelegate
 {
     using base_type = QStyledItemDelegate;
@@ -158,19 +159,16 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     m_ui->filterLineEdit->lineEdit()->setPlaceholderText(
         tr("Search"));
 
-    QnItemViewAutoHider::create(m_ui->gridBookmarks, tr("No bookmarks"));
+    const auto grid = m_ui->gridBookmarks;
+    QnItemViewAutoHider::create(grid, tr("No bookmarks"));
 
-    const auto header = m_ui->gridBookmarks->horizontalHeader();
+    const auto header = grid->horizontalHeader();
     header->setStretchLastSection(false);
-    header->setSectionResizeMode(QnSearchBookmarksModel::kName, QHeaderView::ResizeToContents);
-    header->setSectionResizeMode(QnSearchBookmarksModel::kCamera, QHeaderView::ResizeToContents);
-    header->setSectionResizeMode(QnSearchBookmarksModel::kStartTime, QHeaderView::ResizeToContents);
-    header->setSectionResizeMode(QnSearchBookmarksModel::kLength, QHeaderView::ResizeToContents);
-
+    header->setSectionResizeMode(QHeaderView::ResizeToContents);
     header->setSectionResizeMode(QnSearchBookmarksModel::kTags, QHeaderView::Stretch);
-    m_ui->gridBookmarks->setStyleSheet(lit("QTableView::item { padding-right: 24px }"));
-    m_ui->gridBookmarks->setItemDelegateForColumn(
-        QnSearchBookmarksModel::kCamera, new BoldItemDelegate(this));
+
+    grid->setStyleSheet(lit("QTableView::item { padding-right: 24px }"));
+    grid->setItemDelegateForColumn(QnSearchBookmarksModel::kCamera, new BoldItemDelegate(this));
 }
 
 QnSearchBookmarksDialogPrivate::~QnSearchBookmarksDialogPrivate()

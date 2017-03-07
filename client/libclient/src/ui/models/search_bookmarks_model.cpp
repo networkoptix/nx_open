@@ -234,7 +234,7 @@ QVariant QnSearchBookmarksModel::Impl::getData(const QModelIndex &index
     , int role)
 {
     static const QSet<int> kAcceptedRolesSet =
-        { Qt::DecorationRole, Qt::DisplayRole, Qn::CameraBookmarkRole};
+        { Qt::DecorationRole, Qt::DisplayRole, Qt::ToolTipRole, Qn::CameraBookmarkRole};
     const int row = index.row();
     if ((row >= m_bookmarks.size()) || (!kAcceptedRolesSet.contains(role)))
         return QVariant();
@@ -381,8 +381,11 @@ QVariant QnSearchBookmarksModel::headerData(int section, Qt::Orientation orienta
             { kLength, tr("Length") },
             { kTags, tr("Tags") }
         };
+
+    NX_ASSERT(kColumnHeaderNames.size() == kColumnsCount,
+        "Some columns does not have string representation");
     const auto it = kColumnHeaderNames.find(static_cast<Column>(section));
     const bool found = (it != kColumnHeaderNames.end());
     NX_ASSERT(found, "Specified column not found");
-    return (found ? it.value() : tr("Unknown column"));
+    return (found ? it.value() : QString());
 }
