@@ -27,6 +27,8 @@
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
 
+#include <watchers/cloud_status_watcher.h>
+
 namespace {
 
 static const QString kCloudPromoShowOnceKey(lit("CloudPromoNotification"));
@@ -342,9 +344,13 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
         {
             const bool isOwner = context()->user()
                 && context()->user()->userRole() == Qn::UserRole::Owner;
+            const bool isLoggedIntoCloud = qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut;
+
             const bool canShow =
                 // show only to owners
                 isOwner
+                // hide if we are already in the cloud
+                && !isLoggedIntoCloud
                 // only if system is not connected to the cloud
                 && qnGlobalSettings->cloudSystemId().isNull()
                 // and if user did not close notification manually at least once

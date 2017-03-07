@@ -55,6 +55,7 @@ private:
     void updateRoleComboBox();
     void updateControlsAccess();
     bool validMode() const;
+    bool mustUpdatePassword() const;
 
 private:
     QScopedPointer<Ui::UserSettingsWidget> ui;

@@ -9,9 +9,8 @@ Item
     implicitHeight: column.implicitHeight
 
     property alias description: descriptionText.text
-    property bool online: true
     readonly property bool cloudAvailable:
-        cloudStatusWatcher.status == QnCloudStatusWatcher.Online
+        cloudStatusWatcher.status === QnCloudStatusWatcher.Online
 
     Column
     {
@@ -39,18 +38,5 @@ Item
                     ? lp("/images/cloud.png")
                     : lp("/images/cloud_disabled.png")
         }
-    }
-
-    IssueLabel
-    {
-        text: visible ? qsTr("OFFLINE") : ""
-        anchors
-        {
-            bottom: parent.bottom
-            right: parent.right
-            rightMargin: -4
-        }
-        color: ColorTheme.base14
-        visible: !online && cloudAvailable
     }
 }

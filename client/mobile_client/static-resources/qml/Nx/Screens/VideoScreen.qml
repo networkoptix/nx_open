@@ -78,7 +78,7 @@ PageBase
             onTriggered: d.showOfflineStatus = true
         }
 
-        onShowOfflineStatusChanged:
+        onCameraWarningVisibleChanged:
         {
             if (cameraWarningVisible)
             {
@@ -255,11 +255,8 @@ PageBase
         {
             anchors.verticalCenter: parent.bottom
             anchors.verticalCenterOffset: -150 - 64
-            x: 8
-            padding: 0
-            leftPadding: 0
-            rightPadding: 0
-            width: 40
+            padding: 8
+            width: 56
             height: width
             color: ColorTheme.transparent(ColorTheme.base5, 0.2)
             icon: lp("/images/previous.png")
@@ -273,11 +270,8 @@ PageBase
             anchors.verticalCenter: parent.bottom
             anchors.verticalCenterOffset: -150 - 64
             anchors.right: parent.right
-            anchors.rightMargin: 8
-            padding: 0
-            leftPadding: 0
-            rightPadding: 0
-            width: 40
+            padding: 8
+            width: 56
             height: width
             color: ColorTheme.transparent(ColorTheme.base5, 0.2)
             icon: lp("/images/next.png")
@@ -385,8 +379,16 @@ PageBase
     {
         cameraSwitchAnimation.stop()
         cameraSwitchAnimation.newResourceId = id
-        cameraSwitchAnimation.thumbnail = camerasModelAccessor.getData(
-            camerasModel.rowByResourceId(id), "thumbnail")
+        if (videoScreenController.mediaPlayer.liveMode)
+        {
+            cameraSwitchAnimation.thumbnail = camerasModelAccessor.getData(
+                camerasModel.rowByResourceId(id), "thumbnail")
+        }
+        else
+        {
+            cameraSwitchAnimation.thumbnail = ""
+        }
+
         cameraSwitchAnimation.start()
     }
 

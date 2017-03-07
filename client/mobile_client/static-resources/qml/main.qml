@@ -36,6 +36,9 @@ ApplicationWindow
             if (activeFocusItem == Window.contentItem)
                 Workflow.focusCurrentScreen()
         }
+
+        onWidthChanged: autoScrollDelayTimer.restart()
+        onHeightChanged: autoScrollDelayTimer.restart()
     }
 
     UiController {}
@@ -116,5 +119,16 @@ ApplicationWindow
 
     Screen.onPrimaryOrientationChanged: updateNavigationBarPadding()
 
-    onActiveFocusItemChanged: stackView.restoreActiveFocus()
+    onActiveFocusItemChanged:
+    {
+        autoScrollDelayTimer.restart()
+        stackView.restoreActiveFocus()
+    }
+
+    Timer
+    {
+        id: autoScrollDelayTimer
+        interval: 50
+        onTriggered: Nx.ensureFlickableChildVisible(activeFocusItem)
+    }
 }

@@ -10,7 +10,8 @@ class QnTimelinePrivate;
 class QSGGeometryNode;
 class QnCameraChunkProvider;
 
-class QnTimeline : public QQuickItem {
+class QnTimeline : public QQuickItem
+{
     Q_OBJECT
     Q_PROPERTY(qint64 defaultWindowSize READ defaultWindowSize CONSTANT)
     Q_PROPERTY(qint64 windowSize READ windowSize WRITE setWindowSize NOTIFY windowSizeChanged)
@@ -21,6 +22,9 @@ class QnTimeline : public QQuickItem {
     Q_PROPERTY(qint64 startBound READ startBound WRITE setStartBound NOTIFY startBoundChanged)
     Q_PROPERTY(bool stickToEnd READ stickToEnd WRITE setStickToEnd NOTIFY stickToEndChanged)
     Q_PROPERTY(bool autoPlay READ autoPlay WRITE setAutoPlay NOTIFY autoPlayChanged)
+    Q_PROPERTY(bool autoReturnToBounds
+        READ isAutoReturnToBoundsEnabled WRITE setAutoReturnToBoundsEnabled
+        NOTIFY autoReturnToBoundsEnabledChanged)
     Q_PROPERTY(int timeZoneShift READ timeZoneShift WRITE setTimeZoneShift NOTIFY timeZoneShiftChanged)
 
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
@@ -91,6 +95,9 @@ public:
     bool autoPlay() const;
     void setAutoPlay(bool autoPlay);
 
+    bool isAutoReturnToBoundsEnabled() const;
+    void setAutoReturnToBoundsEnabled(bool enabled);
+
     int timeZoneShift() const;
     void setTimeZoneShift(int timeZoneShift);
 
@@ -124,6 +131,7 @@ signals:
     void stickToEndChanged();
     void startBoundChanged();
     void autoPlayChanged();
+    void autoReturnToBoundsEnabledChanged();
 
     void timeZoneShiftChanged();
 

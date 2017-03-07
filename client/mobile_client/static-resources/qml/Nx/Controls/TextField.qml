@@ -2,10 +2,11 @@ import QtQuick 2.6
 import QtQuick.Window 2.2
 import com.networkoptix.qml 1.0
 import Nx 1.0
+import Nx.Controls 1.0
 
 import "private"
 
-QnTextInput
+TextInput
 {
     id: control
 
@@ -106,7 +107,7 @@ QnTextInput
         color: control.placeholderColor
         horizontalAlignment: control.horizontalAlignment
         verticalAlignment: control.verticalAlignment
-        visible: !control.displayText && !control.inputMethodComposing
+        visible: control.displayText === ""
         elide: Text.ElideRight
     }
 

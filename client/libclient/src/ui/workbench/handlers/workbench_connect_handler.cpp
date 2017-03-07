@@ -198,6 +198,7 @@ void storeLocalSystemConnection(
 
     const auto lastUsed = QnConnectionData(systemName, url, localSystemId);
     qnSettings->setLastUsedConnection(lastUsed);
+    qnSettings->setLastLocalConnectionUrl(url);
     qnSettings->setAutoLogin(autoLogin);
 
     if (storePassword)

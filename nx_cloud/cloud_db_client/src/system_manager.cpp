@@ -1,8 +1,3 @@
-/**********************************************************
-* Sep 3, 2015
-* akolesnikov
-***********************************************************/
-
 #include "system_manager.h"
 
 #include "cdb_request_path.h"
@@ -14,7 +9,9 @@ namespace nx {
 namespace cdb {
 namespace client {
 
-SystemManager::SystemManager(network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher):
+SystemManager::SystemManager(
+    network::cloud::CloudModuleUrlFetcher* const cloudModuleEndPointFetcher)
+    :
     AsyncRequestsExecutor(cloudModuleEndPointFetcher)
 {
 }
@@ -158,6 +155,17 @@ void SystemManager::recordUserSessionStart(
         completionHandler);
 }
 
-}   //client
-}   //cdb
-}   //nx
+void SystemManager::getSystemHealthHistory(
+    const std::string& systemId,
+    std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler)
+{
+    executeRequest(
+        kSystemHealthHistoryPath,
+        api::SystemId(systemId),
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::SystemHealthHistory()));
+}
+
+} // namespace client
+} // namespace cdb
+} // namespace nx

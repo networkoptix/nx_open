@@ -67,7 +67,8 @@ public:
                     "%1 is name of System")
                     .arg(moduleInformation.systemName);
             case dependentSystemBoundToCloud:
-                return tr("In this version you can only merge Systems which are not connected to %1.",
+                return tr("Cloud System can only be merged with non-Cloud. "
+                    "System name and password are taken from Cloud System.",
                     "%1 is the cloud name (like 'Nx Cloud')")
                     .arg(QnAppInfo::cloudName());
             case bothSystemBoundToCloud:

@@ -235,6 +235,14 @@ void AddressResolver::resolveAsync(
     if (info->second.isResolved(natTraversalSupport))
     {
         auto entries = info->second.getAll();
+
+        const bool cloudAddressEntryPresent =
+            std::count_if(
+                entries.begin(), entries.end(),
+                [](const AddressEntry& entry) { return entry.type == AddressType::cloud; }) > 0;
+        if (info->second.isLikelyCloudAddress && !cloudAddressEntryPresent)
+            entries.push_back(AddressEntry(AddressType::cloud, hostName));
+
         lk.unlock();
 
         DEBUG_LOG(lm("Address %1 resolved from cache: %2").str(hostName).container(entries));

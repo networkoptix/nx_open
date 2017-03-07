@@ -96,6 +96,9 @@ public:
     virtual void recordUserSessionStart(
         const std::string& systemId,
         std::function<void(api::ResultCode)> completionHandler) = 0;
+    virtual void getSystemHealthHistory(
+        const std::string& systemId,
+        std::function<void(api::ResultCode, api::SystemHealthHistory)> completionHandler) = 0;
 };
 
 } // namespace api
