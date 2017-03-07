@@ -45,16 +45,14 @@ def get_cloud_modules():
 
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
-def cloud_modules(request):
-    return render(request, 'cloud_modules.xml',
+def cloud_modules2(request):
+    return render(request, 'cloud_modules2.xml',
                     get_cloud_modules(),
                     content_type='application/xml')
 
 
 @api_view(['GET'])
 @permission_classes((AllowAny, ))
-def cloud_modules2(request):
-    return render(request, 'cloud_modules2.xml',
-                    get_cloud_modules(),
-                    content_type='application/xml')
+def cloud_modules_json(request):
+    return api_success(get_cloud_modules())
 
