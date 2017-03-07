@@ -123,8 +123,6 @@ int workaround_av_write_trailer(AVFormatContext *s)
         if (ret >= 0)
             s->streams[pkt.stream_index]->nb_frames++;
 
-        av_free_packet(&pkt);
-
         if(ret<0)
             goto fail;
         if(s->pb && s->pb->error)
