@@ -373,19 +373,20 @@ QVariant QnSearchBookmarksModel::headerData(int section, Qt::Orientation orienta
     if ((orientation != Qt::Horizontal) || (role != Qt::DisplayRole) || (section >= kColumnsCount))
         return QAbstractItemModel::headerData(section, orientation, role);
 
-    static const QHash<Column, QString> kColumnHeaderNames =
-        {
-            { kName, tr("Name") },
-            { kCamera, tr("Camera") },
-            { kStartTime, tr("Start time") },
-            { kLength, tr("Length") },
-            { kTags, tr("Tags") }
-        };
-
-    NX_ASSERT(kColumnHeaderNames.size() == kColumnsCount,
-        "Some columns does not have string representation");
-    const auto it = kColumnHeaderNames.find(static_cast<Column>(section));
-    const bool found = (it != kColumnHeaderNames.end());
-    NX_ASSERT(found, "Specified column not found");
-    return (found ? it.value() : QString());
+    switch(section)
+    {
+        case kName:
+            return tr("Name");
+        case kCamera:
+            return tr("Camera");
+        case kStartTime:
+            return tr("Start time");
+        case kLength:
+            return tr("Length");
+        case kTags:
+            return tr("Tags");
+        default:
+            NX_ASSERT(false, "Invalid column identifier");
+            return QString();
+    }
 }
