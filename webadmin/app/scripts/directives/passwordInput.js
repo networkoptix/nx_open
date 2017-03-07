@@ -5,7 +5,7 @@ angular.module('webadminApp')
     .directive('passwordInput', ['mediaserver',function (mediaserver) {
         return {
             restrict: 'E',
-            templateUrl: 'views/components/passwordInput.html',
+            templateUrl: Config.viewsDir + 'components/passwordInput.html',
             require: "ngModel",
             scope:{
                 ngModel: '=',

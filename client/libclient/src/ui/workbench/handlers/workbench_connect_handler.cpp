@@ -198,6 +198,7 @@ void storeLocalSystemConnection(
 
     const auto lastUsed = QnConnectionData(systemName, url, localSystemId);
     qnSettings->setLastUsedConnection(lastUsed);
+    qnSettings->setLastLocalConnectionUrl(url);
     qnSettings->setAutoLogin(autoLogin);
 
     if (storePassword)
@@ -587,19 +588,29 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     if (helpers::isLocalUser(url.userName()))
     {
         const auto credentials = (storePassword || autoLogin
-            ? QnCredentials(url)
-            : QnCredentials(url.userName(), QString()));
+            ? QnEncodedCredentials(url)
+            : QnEncodedCredentials(url.userName(), QString()));
 
         nx::client::core::helpers::storeCredentials(localId, credentials);
         qnClientCoreSettings->save();
     }
 
-    if (options.testFlag(IsCloudConnection))
+    const bool cloudConnection = isConnectionToCloud(url);
+    if (cloudConnection)
     {
         using namespace nx::network;
         qnCloudStatusWatcher->logSession(info.cloudSystemId);
+        if (qnCloudStatusWatcher->stayConnected())
+        {
+            qnSettings->setLastUsedConnection({info.systemName, url, localId});
+            qnSettings->setAutoLogin(true);
+            qnSettings->save();
+        }
         return;
     }
+
+    const bool correctHost = (!cloudConnection && !url.host().isEmpty());
+    NX_ASSERT(correctHost, "Wrong host is going to be saved to the recent connections list");
 
     // Stores connection if it is local
     storeLocalSystemConnection(
@@ -846,8 +857,6 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
     {
         const auto forceConnection = parameters.argument(Qn::ForceRole, false);
         ConnectionOptions options;
-        if (isConnectionToCloud(url))
-            options |= IsCloudConnection;
         if (parameters.argument(Qn::StorePasswordRole, false))
             options |= StorePassword;
         if (parameters.argument(Qn::AutoLoginRole, false))

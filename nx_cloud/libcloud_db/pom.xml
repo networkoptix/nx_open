@@ -59,15 +59,6 @@
         
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>cloud_db_client</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/nx_cloud/cloud_db_client/pom.xml</systemPath>
-        </dependency>
-        
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>appserver2</artifactId>
             <version>${project.version}</version>
             <type>pom</type>

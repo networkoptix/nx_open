@@ -441,10 +441,19 @@ namespace Qn
         Thumbnails      /**< thumbnails pane    */
     };
 
+    enum class ThumbnailStatus
+    {
+        Invalid,
+        Loading,
+        Loaded,
+        NoData,
+        Refreshing
+    };
+
 } // namespace Qn
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ItemRole)(Qn::TimeMode)(Qn::NodeType),
+    (Qn::ItemRole)(Qn::TimeMode)(Qn::NodeType)(Qn::ThumbnailStatus),
     (metatype)
     )
 

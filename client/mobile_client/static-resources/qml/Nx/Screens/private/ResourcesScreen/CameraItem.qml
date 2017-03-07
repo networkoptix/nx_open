@@ -1,6 +1,8 @@
 import QtQuick 2.6
 import Qt.labs.templates 1.0
 import Nx 1.0
+import Nx.Media 1.0
+import Nx.Core 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
 import Nx.Settings 1.0
@@ -40,7 +42,7 @@ Control
         property bool videoAllowed: false
     }
 
-    QnMediaResourceHelper
+    MediaResourceHelper
     {
         id: resourceHelper
     }
@@ -71,7 +73,7 @@ Control
             id: thumbnailContainer
 
             width: parent.width
-            height: parent.width * 3 / 4
+            height: parent.width * 9 / 16
             color: d.offline ? ColorTheme.base7 : ColorTheme.base4
 
             Loader
@@ -216,11 +218,11 @@ Control
                 sourceSize: Qt.size(videoOutput.sourceRect.width, videoOutput.sourceRect.height)
                 visible: mediaPlayer.playing
 
-                item: QnVideoOutput
+                item: VideoOutput
                 {
                     id: videoOutput
                     player: mediaPlayer
-                    fillMode: QnVideoOutput.Stretch
+                    fillMode: VideoOutput.Stretch
                 }
             }
 
@@ -245,19 +247,19 @@ Control
                 resourceId: cameraItem.resourceId
                 Component.onCompleted:
                 {
-                    if (active)
+                    if (cameraItem.active)
                         playLive()
                 }
-                videoQuality: QnPlayer.LowIframesOnlyVideoQuality
+                videoQuality: MediaPlayer.LowIframesOnlyVideoQuality
                 audioEnabled: false
             }
 
             Connections
             {
                 target: cameraItem
-                onPausedChanged:
+                onActiveChanged:
                 {
-                    if (active)
+                    if (cameraItem.active)
                         mediaPlayer.playLive()
                     else
                         mediaPlayer.stop()

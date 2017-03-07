@@ -393,10 +393,11 @@ void QnLoginDialog::resetConnectionsModel()
         m_connectionsModel->removeRow(0); //last-used-connection row
 
     QModelIndex selectedIndex;
-    const auto lastConnection = qnSettings->lastUsedConnection();
-    m_lastUsedItem = (lastConnection.url.host().isEmpty()
+
+    const auto url = qnSettings->lastLocalConnectionUrl();
+    m_lastUsedItem = (url.host().isEmpty()
         ? nullptr
-        : ::newConnectionItem(tr("* Last used connection *"), lastConnection.url));
+        : ::newConnectionItem(tr("* Last used connection *"), url));
 
     if (m_lastUsedItem != NULL)
     {

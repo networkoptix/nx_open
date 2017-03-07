@@ -900,7 +900,7 @@ struct RemoveUserRoleAccess
     }
 };
 
-struct ControlVideowallAccess
+struct VideoWallControlAccess
 {
     bool operator()(const Qn::UserAccessData& accessData, const ApiVideowallControlMessageData&)
     {

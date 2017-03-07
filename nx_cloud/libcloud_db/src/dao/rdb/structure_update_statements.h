@@ -752,6 +752,48 @@ ON system_to_account (account_id, system_id);
 
 )sql";
 
+/**
+ * #CLOUD-922. Adding account registration/activation timestamps.
+ */
+static const char kAddAccountTimestamps[] = R"sql(
+
+ALTER TABLE account ADD COLUMN registration_time_utc BIGINT;
+ALTER TABLE account ADD COLUMN activation_time_utc BIGINT;
+
+)sql";
+
+/**
+ * #CLOUD-923. Adding system registration timestamp.
+ */
+static const char kAddSystemRegistrationTimestamp[] = R"sql(
+
+ALTER TABLE system ADD COLUMN registration_time_utc BIGINT;
+
+)sql";
+
+/**
+ * CLOUD-924. Adding system state (online/offline) history
+ */
+static const char kAddSystemHealthStateHistory[] = R"sql(
+
+CREATE TABLE system_health_state(
+    code                INTEGER PRIMARY KEY,
+    description         TEXT
+);
+
+INSERT INTO system_health_state VALUES(0, 'offline');
+INSERT INTO system_health_state VALUES(1, 'online');
+
+CREATE TABLE system_health_history(
+    system_id                   VARCHAR(64) NOT NULL,
+    state                       INTEGER,
+    timestamp_utc               BIGINT,
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE,
+    FOREIGN KEY(state) REFERENCES system_health_state(code)
+);
+
+)sql";
+
 } // namespace db
 } // namespace cdb
 } // namespace nx

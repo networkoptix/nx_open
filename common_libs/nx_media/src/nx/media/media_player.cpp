@@ -377,6 +377,9 @@ void PlayerPrivate::at_gotVideoFrame()
     if (videoFrameToRender)
         return; //< We already have a frame to render. Ignore next frame (will be processed later).
 
+    if (!dataConsumer)
+        return;
+
     videoFrameToRender = dataConsumer->dequeueVideoFrame();
     if (!videoFrameToRender)
         return;
@@ -385,7 +388,8 @@ void PlayerPrivate::at_gotVideoFrame()
     if (metadata.dataType == QnAbstractMediaData::EMPTY_DATA)
     {
         videoFrameToRender.reset();
-        q->setPosition(kLivePosition); //< EOF reached
+        log("at_gotVideoFrame(): EOF reached, jumping to LIVE.");
+        q->setPosition(kLivePosition);
         return;
     }
 

@@ -94,17 +94,21 @@
 
 namespace {
 
-static const int kMicroInMilliSeconds = 1000;
+static constexpr int kMicroInMilliSeconds = 1000;
 
 // TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
 // Note: -1 is used for invalid time
 // Now it is returned when there is no archive data and archive is played backwards.
 // Who returns it? --gdm?
-const int kNoTimeValue = 0;
+static constexpr int kNoTimeValue = 0;
 
-static const qreal kTwoWayAudioButtonSize = 44.0;
+static constexpr qreal kTwoWayAudioButtonSize = 44.0;
 
-static const qreal kMotionRegionAlpha = 0.4;
+static constexpr qreal kMotionRegionAlpha = 0.4;
+
+static constexpr qreal kMaxForwardSpeed = 16.0;
+static constexpr qreal kMaxBackwardSpeed = 16.0;
+
 
 bool isSpecialDateTimeValueUsec(qint64 dateTimeUsec)
 {
@@ -1686,7 +1690,9 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (qnRuntime->isDevMode())
         result |= Qn::DbgScreenshotButton;
 
-    if (hasVideo && !resource()->toResource()->hasFlags(Qn::still_image))
+    const bool isVideoWall = qnRuntime->isVideoWallMode();
+
+    if (hasVideo && !isVideoWall && !resource()->toResource()->hasFlags(Qn::still_image))
         result |= Qn::ScreenshotButton;
 
     bool rgbImage = false;
@@ -1700,13 +1706,14 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         && !url.endsWith(lit(".jpeg"))
         )
         rgbImage = true;
-    if (!rgbImage && hasVideo)
+
+    if (!rgbImage && hasVideo && !isVideoWall)
         result |= Qn::EnhancementButton;
 
     if (!zoomRect().isNull())
         return result;
 
-    if (hasVideo && resource()->toResource()->hasFlags(Qn::motion))
+    if (hasVideo && !isVideoWall && resource()->toResource()->hasFlags(Qn::motion))
         result |= Qn::MotionSearchButton;
 
     bool isExportedLayout = item()
@@ -1735,13 +1742,10 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         result &= ~Qn::PtzButton;
     }
 
-    if ((resource()->toResource()->hasFlags(Qn::io_module)))
-    {
-        if (hasVideo)
-            result |= Qn::IoModuleButton;
-    }
+    if (hasVideo && !isVideoWall && resource()->toResource()->hasFlags(Qn::io_module))
+        result |= Qn::IoModuleButton;
 
-    if (hasVideo && !qnSettings->lightMode().testFlag(Qn::LightModeNoZoomWindows))
+    if (hasVideo && !isVideoWall && !qnSettings->lightMode().testFlag(Qn::LightModeNoZoomWindows))
     {
         if (item()
             && item()->layout()
@@ -2274,4 +2278,28 @@ void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
     setOption(WindowResizingForbidden, enabled);
 
     emit motionSearchModeEnabled(enabled);
+}
+
+QnSpeedRange QnMediaResourceWidget::speedRange() const
+{
+    static constexpr qreal kUnitSpeed = 1.0;
+    static constexpr qreal kZeroSpeed = 0.0;
+
+    if (!m_display || !m_display->archiveReader())
+        return QnSpeedRange(kZeroSpeed, kZeroSpeed);
+
+    if (!hasVideo())
+        return QnSpeedRange(kUnitSpeed, kZeroSpeed);
+
+    const qreal backward = m_display->archiveReader()->isNegativeSpeedSupported()
+        ? availableSpeedRange().backward
+        : kZeroSpeed;
+
+    return QnSpeedRange(availableSpeedRange().forward, backward);
+}
+
+const QnSpeedRange& QnMediaResourceWidget::availableSpeedRange()
+{
+    static const QnSpeedRange kAvailableSpeedRange(kMaxForwardSpeed, kMaxBackwardSpeed);
+    return kAvailableSpeedRange;
 }

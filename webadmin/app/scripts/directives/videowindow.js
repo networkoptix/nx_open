@@ -27,7 +27,7 @@ angular.module('webadminApp')
                 vgPlayerReady:"&",
                 vgSrc:"="
             },
-            templateUrl: 'views/components/videowindow.html',// ???
+            templateUrl: Config.viewsDir + 'components/videowindow.html',// ???
 
             link: function (scope, element/*, attrs*/) {
 

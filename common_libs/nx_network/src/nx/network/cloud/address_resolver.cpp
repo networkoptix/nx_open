@@ -224,7 +224,7 @@ void AddressResolver::resolveAsync(
     }
 
     if (SocketGlobals::config().isHostDisabled(hostName))
-        return handler(SystemError::noPermission, {});
+        return handler(SystemError::noPermission, std::deque<AddressEntry>());
 
     QnMutexLocker lk(&m_mutex);
     auto info = m_info.emplace(
@@ -235,6 +235,17 @@ void AddressResolver::resolveAsync(
     if (info->second.isResolved(natTraversalSupport))
     {
         auto entries = info->second.getAll();
+
+        if (info->second.isLikelyCloudAddress && isMediatorAvailable())
+        {
+            const bool cloudAddressEntryPresent =
+                std::count_if(
+                    entries.begin(), entries.end(),
+                    [](const AddressEntry& entry) { return entry.type == AddressType::cloud; }) > 0;
+            if (!cloudAddressEntryPresent)
+                entries.push_back(AddressEntry(AddressType::cloud, hostName));
+        }
+
         lk.unlock();
 
         DEBUG_LOG(lm("Address %1 resolved from cache: %2").str(hostName).container(entries));

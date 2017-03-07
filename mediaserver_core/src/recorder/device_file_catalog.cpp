@@ -209,47 +209,6 @@ bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, QnStorageResou
     */
 }
 
-qint64 DeviceFileCatalog::recreateFile(const QString& fileName, qint64 startTimeMs, const QnStorageResourcePtr &storage)
-{
-    NX_LOG(lit("recreate broken file %1").arg(fileName), cl_logWARNING);
-    QnAviResourcePtr res(new QnAviResource(fileName));
-    QnAviArchiveDelegate* avi = new QnAviArchiveDelegate();
-    avi->setStorage(storage);
-    if (!avi->open(res)) {
-        delete avi;
-        return 0;
-    }
-    QnArchiveStreamReader* reader = new QnArchiveStreamReader(res);
-    reader->setArchiveDelegate(avi);
-    QnStreamRecorder recorder(res);
-    //recorder.setFileName(fileName + ".new");
-    //recorder.setStorage(storage);
-    recorder.addRecordingContext(
-        fileName + ".new",
-        storage
-    );
-    recorder.setStartOffset(startTimeMs*1000);
-
-    QnAbstractMediaDataPtr packet;
-    while( (packet = avi->getNextData()) )
-    {
-        packet->dataProvider = reader;
-        recorder.processData(packet);
-    }
-    qint64 rez = recorder.duration()/1000;
-    recorder.close();
-    delete reader;
-
-    //qint64 oldSize = storage->getFileSize(fileName);
-    //qint64 newSize = storage->getFileSize(fileName + ".new.mkv");
-
-    if (storage->removeFile(fileName)) {
-        storage->renameFile(fileName+".new.mkv", fileName);
-        //storage->addWritedSpace(newSize - oldSize);
-    }
-    return rez;
-}
-
 void DeviceFileCatalog::removeChunks(int storageIndex)
 {
     replaceChunks(storageIndex, std::deque<Chunk>());
@@ -478,7 +437,8 @@ void DeviceFileCatalog::rebuildPause(void* value)
 void DeviceFileCatalog::rebuildResume(void* value)
 {
     QnMutexLocker lock( &m_rebuildMutex );
-    m_pauseList.remove(value);
+    if (!m_pauseList.remove(value))
+        return;
     if (m_pauseList.isEmpty())
         qWarning() << "Rebuild archive is allowed again (if active) due to disk performance is OK";
 }
@@ -1071,46 +1031,6 @@ bool DeviceFileCatalog::fromCSVFile(const QString& fileName)
         Chunk chunk(startTime, fields[1+timeZoneExist].toInt(), fields[2+timeZoneExist].toInt(), duration, timeZone);
 
         addChunk(chunk);
-
-        /*
-        QnStorageResourcePtr storage = qnStorageMan->findStorageByOldIndex(chunk.storageIndex);
-        if (fields[3+timeZoneExist].trimmed().isEmpty())
-        {
-            // duration unknown. server restart occured. Duration for chunk is unknown
-            if (qnStorageMan->isStorageAvailable(storage))
-            {
-                //chunk.durationMs = recreateFile(fullFileName(chunk), chunk.startTimeMs, storage);
-                storage->removeFile(fullFileName(chunk));
-                continue;
-            }
-            else {
-                chunk.durationMs = 0;
-            }
-        }
-
-        //qint64 chunkFileSize = 0;
-        if (!qnStorageMan->isStorageAvailable(storage))
-        {
-             addChunk(chunk);
-        }
-        else if (csvMigrationCheckFile(chunk, checkDirOnly))
-        {
-            //chunk.setFileSize(chunkFileSize);
-
-            // optimization. Since we have got first file, check dirs only. It is required to check files at begin to determine archive start point
-            checkDirOnly = true;
-
-            if (chunk.durationMs > QnRecordingManager::RECORDING_CHUNK_LEN*1000 * 2 || chunk.durationMs < 1)
-            {
-                const QString fileName = fullFileName(chunk);
-
-                qWarning() << "File " << fileName << "has invalid duration " << chunk.durationMs/1000.0 << "s and corrupted. Delete file from catalog";
-                storage->removeFile(fileName);
-                continue;
-            }
-            addChunk(chunk);
-        }
-        */
 
     } while (!line.isEmpty());
 

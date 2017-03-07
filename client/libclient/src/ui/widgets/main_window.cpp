@@ -81,6 +81,7 @@
 
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
+#include <ui/workaround/qtbug_workaround.h>
 #include <ui/workaround/vsync_workaround.h>
 
 #include <client/client_settings.h>
@@ -473,6 +474,9 @@ void QnMainWindow::showFullScreen() {
 #if defined Q_OS_MACX
     mac_showFullScreen((void*)winId(), true);
     updateDecorationsState();
+
+    // We have to disable minimize button in Mac OS for application in fullscreen mode
+    action(QnActions::MinimizeAction)->setEnabled(false);
 #else
     QnEmulatedFrameWidget::showFullScreen();
 #endif
@@ -482,6 +486,8 @@ void QnMainWindow::showNormal() {
 #if defined Q_OS_MACX
     mac_showFullScreen((void*)winId(), false);
     updateDecorationsState();
+    // We have to enable minimize button in Mac OS for application in non-fullscreen mode only
+    action(QnActions::MinimizeAction)->setEnabled(true);
 #else
     QnEmulatedFrameWidget::showNormal();
 #endif
@@ -677,6 +683,10 @@ bool QnMainWindow::event(QEvent *event) {
         // Welcome screen looses focus after window deactivation. We restore it here.
         const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
         welcomeScreen->forceActiveFocus();
+    }
+    else if (event->type() == QnEvent::WinSystemMenu)
+    {
+        action(QnActions::MainMenuAction)->trigger();
     }
 
     if(m_dwm != NULL)

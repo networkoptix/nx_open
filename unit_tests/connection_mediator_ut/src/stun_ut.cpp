@@ -211,7 +211,7 @@ IndicatinonQueue listenForClientBind(
         {
             api::ConnectionRequestedEvent event;
             EXPECT_TRUE(event.parseAttributes(message));
-            EXPECT_EQ(event.tcpReverseEndpointList.size(), 1);
+            EXPECT_EQ(event.tcpReverseEndpointList.size(), 1U);
             EXPECT_EQ(event.params, settings.connectionParameters());
             EXPECT_EQ(event.isPersistent, true);
             queue->push(

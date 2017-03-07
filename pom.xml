@@ -194,7 +194,7 @@
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
-        <cloudGroup>dev</cloudGroup>
+        <cloudGroup>test</cloudGroup>
         <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
@@ -950,6 +950,7 @@
                 <module>client/libclient_core</module>
                 <module>client/mobile_client</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>nx_cloud/cloud_connect_test_util</module>
                 <module>media_db_util</module>
                 <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>

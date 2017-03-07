@@ -7,6 +7,8 @@
 #include <transaction/transaction_message_bus.h>
 #include <cdb/ec2_request_paths.h>
 
+#include "settings.h"
+
 namespace {
     static const int kUpdateIfFailIntervalMs = 1000 * 60;
 }
@@ -54,26 +56,40 @@ void QnConnectToCloudWatcher::at_updateConnection()
         return;
     }
 
-    m_cdbEndPointFetcher->get(
-        nx_http::AuthInfo(),
-        [this](int statusCode, QUrl url)
-        {
-            if (statusCode != nx_http::StatusCode::ok)
+    const auto cdbEndpoint = 
+        MSSettings::roSettings()->value(nx_ms_conf::CDB_ENDPOINT, "").toString();
+    if (!cdbEndpoint.isEmpty())
+    {
+        addCloudPeer((QString)lm("http://%1").arg(cdbEndpoint));
+    }
+    else
+    {
+        m_cdbEndPointFetcher->get(
+            nx_http::AuthInfo(),
+            [this](int statusCode, QUrl url)
             {
-                NX_LOGX(lm("Error fetching cloud_db endpoint. HTTP result: %1")
-                    .str(statusCode), cl_logWARNING);
-                // try once more later
-                metaObject()->invokeMethod(this, "restartTimer", Qt::QueuedConnection);
-                return;
-            }
+                if (statusCode != nx_http::StatusCode::ok)
+                {
+                    NX_LOGX(lm("Error fetching cloud_db endpoint. HTTP result: %1")
+                        .str(statusCode), cl_logWARNING);
+                    // try once more later
+                    metaObject()->invokeMethod(this, "restartTimer", Qt::QueuedConnection);
+                    return;
+                }
 
-            NX_LOGX(lm("Creating transaction connection to cloud_db at %1")
-                .str(url), cl_logDEBUG1);
+                addCloudPeer(url);
+            });
+    }
+}
 
-            m_cloudUrl = url;
-            m_cloudUrl.setPath(nx::cdb::api::kEc2EventsPath);
-            m_cloudUrl.setUserName(qnGlobalSettings->cloudSystemId());
-            m_cloudUrl.setPassword(qnGlobalSettings->cloudAuthKey());
-            qnTransactionBus->addConnectionToPeer(m_cloudUrl);
-        });
+void QnConnectToCloudWatcher::addCloudPeer(QUrl url)
+{
+    NX_LOGX(lm("Creating transaction connection to cloud_db at %1")
+        .str(url), cl_logDEBUG1);
+
+    m_cloudUrl = url;
+    m_cloudUrl.setPath(nx::cdb::api::kEc2EventsPath);
+    m_cloudUrl.setUserName(qnGlobalSettings->cloudSystemId());
+    m_cloudUrl.setPassword(qnGlobalSettings->cloudAuthKey());
+    qnTransactionBus->addConnectionToPeer(m_cloudUrl);
 }

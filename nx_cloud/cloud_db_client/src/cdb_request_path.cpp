@@ -20,6 +20,7 @@ const char* const kSystemGetAccessRoleListPath = "/cdb/system/getAccessRoleList"
 const char* const kSystemRenamePath = "/cdb/system/rename";
 const char* const kSystemUpdatePath = "/cdb/system/update";
 const char* const kSystemRecordUserSessionStartPath = "/cdb/system/recordUserSessionStart";
+const char* const kSystemHealthHistoryPath = "/cdb/system/healthHistory";
 
 const char* const kAuthGetNoncePath = "/cdb/auth/getNonce";
 const char* const kAuthGetAuthenticationPath = "/cdb/auth/getAuthentication";
@@ -34,6 +35,8 @@ const char* const kDeprecatedEstablishEc2TransactionConnectionPath = "/ec2/event
 
 const char* const kMaintenanceGetVmsConnections = "/cdb/maintenance/getVmsConnections";
 const char* const kMaintenanceGetTransactionLog = "/cdb/maintenance/getTransactionLog";
+
+const char* const kCloudModuleXmlPath = "/cdb/cloud_modules.xml";
 
 } // namespace cdb
 } // namespace nx

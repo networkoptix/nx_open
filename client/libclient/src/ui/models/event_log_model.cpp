@@ -440,7 +440,7 @@ QString QnEventLogModel::textData(Column column, const QnBusinessActionData& act
             }
             else
             {
-                result = QnBusinessStringsHelper::eventDetails(action.eventParams, lit("\n"));
+                result = QnBusinessStringsHelper::eventDetails(action.eventParams).join(L'\n');
             }
 
             if (!QnBusiness::hasToggleState(eventType))
@@ -484,7 +484,7 @@ QString QnEventLogModel::tooltip(Column column, const QnBusinessActionData& acti
 
         if (userNames.size() > kMaxResourcesCount)
         {
-            const auto moreUsers = (kMaxResourcesCount - userNames.size());
+            const auto moreUsers = userNames.size() - kMaxResourcesCount;
 
             userNames = userNames.mid(0, kMaxResourcesCount);
             userNames.append(tr("and %n users more...", "", moreUsers));
@@ -509,7 +509,7 @@ QString QnEventLogModel::tooltip(Column column, const QnBusinessActionData& acti
                 disabledCameras << QnResourceDisplayInfo(camera).toString(Qn::RI_WithUrl);
         }
 
-        const auto moreCameras = kMaxResourcesCount - disabledCameras.size();
+        const auto moreCameras = disabledCameras.size() - kMaxResourcesCount;
         if (moreCameras > 0)
             disabledCameras = disabledCameras.mid(0, kMaxResourcesCount);
         NX_ASSERT(!disabledCameras.isEmpty());

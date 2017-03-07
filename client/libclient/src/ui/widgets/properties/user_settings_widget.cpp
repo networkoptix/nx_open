@@ -267,7 +267,8 @@ QString QnUserSettingsWidget::passwordPlaceholder() const
 void QnUserSettingsWidget::updatePasswordPlaceholders()
 {
     const bool showPlaceholders = ui->passwordInputField->text().isEmpty()
-                               && ui->confirmPasswordInputField->text().isEmpty();
+        && ui->confirmPasswordInputField->text().isEmpty()
+        && !mustUpdatePassword();
 
     const QString placeholderText = showPlaceholders
             ? passwordPlaceholder()
@@ -410,11 +411,11 @@ void QnUserSettingsWidget::setupInputFields()
             /* Check if we must update password for the other user. */
             if (m_model->mode() == QnUserSettingsModel::OtherSettings && m_model->user())
             {
-                bool mustUpdatePassword = ui->loginInputField->text() != m_model->user()->getName();
+                updatePasswordPlaceholders();
 
                 ui->passwordInputField->setValidator(
                     Qn::defaultPasswordValidator(
-                        !mustUpdatePassword,
+                        !mustUpdatePassword(),
                         tr("User has been renamed. Password must be updated.")),
                     false);
             }
@@ -428,7 +429,7 @@ void QnUserSettingsWidget::setupInputFields()
             {
                 bool passwordWasValid = ui->passwordInputField->lastValidationResult() != QValidator::Invalid;
                 if (ui->passwordInputField->isValid() != passwordWasValid)
-                    ui->passwordInputField->updateDisplayState();
+                    ui->passwordInputField->updateDisplayStateDelayed();
             }
         });
 
@@ -491,7 +492,7 @@ void QnUserSettingsWidget::setupInputFields()
         this, &QnUserSettingsWidget::updatePasswordPlaceholders);
 
     connect(ui->passwordInputField, &QnInputField::editingFinished,
-        ui->confirmPasswordInputField, &QnInputField::updateDisplayState);
+        ui->confirmPasswordInputField, &QnInputField::updateDisplayStateDelayed);
 
     ui->confirmPasswordInputField->setTitle(tr("Confirm Password"));
     ui->confirmPasswordInputField->setEchoMode(QLineEdit::Password);
@@ -564,4 +565,9 @@ bool QnUserSettingsWidget::validMode() const
 {
     return m_model->mode() == QnUserSettingsModel::OtherSettings
         || m_model->mode() == QnUserSettingsModel::NewUser;
+}
+
+bool QnUserSettingsWidget::mustUpdatePassword() const
+{
+    return m_model->user() && ui->loginInputField->text() != m_model->user()->getName();
 }

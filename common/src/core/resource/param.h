@@ -43,6 +43,7 @@ namespace Qn
     static const QString TRUST_TO_VIDEO_SOURCE_SIZE_PARAM_NAME = lit("trustToVideoSourceSize");
     static const QString FPS_BASE_PARAM_NAME = lit("fpsBase"); //used if we need to control fps via encoding interval (fps when encoding interval is 1)
     static const QString CONTROL_FPS_VIA_ENCODING_INTERVAL_PARAM_NAME = lit("controlFpsViaEncodingInterval");
+    static const QString FPS_BOUNDS_PARAM_NAME = lit("fpsBounds");
     static const QString USE_EXISTING_ONVIF_PROFILES_PARAM_NAME = lit("useExistingOnvifProfiles");
     static const QString CAMERA_AUDIO_CODEC_PARAM_NAME = lit("audioCodec");
     static const QString FORCED_PRIMARY_STREAM_RESOLUTION_PARAM_NAME = lit("forcedPrimaryStreamResolution");

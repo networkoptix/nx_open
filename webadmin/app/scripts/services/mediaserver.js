@@ -66,7 +66,7 @@ angular.module('webadminApp')
         function callLogin(){
             if (loginDialog === null) { //Dialog is not displayed
                 loginDialog = $modal.open({
-                    templateUrl: 'views/login.html',
+                    templateUrl: Config.viewsDir + 'login.html',
                     keyboard:false,
                     backdrop:'static'
                 });
@@ -412,8 +412,6 @@ angular.module('webadminApp')
                         url: url,
                         takeRemoteSettings: !keepMySystem
                     });
-                },function(error){
-                    return $q.reject(error);
                 });
             },
             pingSystem: function(url, remoteLogin, remotePassword){
@@ -591,6 +589,13 @@ angular.module('webadminApp')
             },
             getCommonPasswords:function(){
                 return wrapGet('commonPasswordsList.json');
+            },
+            getLanguages:function(){
+                return wrapGet('languages.json').then(function(data){
+                    return _.filter(data.data,function(language){
+                        return Config.supportedLanguages.indexOf(language.language) >= 0;
+                    });
+                });
             },
 
             networkSettings:function(settings){

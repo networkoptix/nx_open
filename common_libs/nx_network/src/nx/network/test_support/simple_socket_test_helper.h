@@ -682,18 +682,33 @@ void socketMultiConnect(
 {
     static const std::chrono::milliseconds timeout(1500);
 
-    nx::utils::TestSyncQueue< SystemError::ErrorCode > acceptResults;
-    nx::utils::TestSyncQueue< SystemError::ErrorCode > connectResults;
-
-    std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
-    std::vector<std::unique_ptr<AbstractStreamSocket>> connectedSockets;
-
     auto server = serverMaker();
+    auto serverGuard = makeScopedGuard([&server]() { server->pleaseStopSync(); });
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->setRecvTimeout(timeout.count()));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
     ASSERT_TRUE(server->listen(testClientCount())) << lastError();
+
+    nx::utils::TestSyncQueue< SystemError::ErrorCode > acceptResults;
+    nx::utils::TestSyncQueue< SystemError::ErrorCode > connectResults;
+
+    QnMutex connectedSocketsMutex;
+    bool terminated = false;
+
+    std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
+    std::vector<std::unique_ptr<AbstractStreamSocket>> connectedSockets;
+    auto connectedSocketsGuard = makeScopedGuard(
+        [&connectedSockets, &connectedSocketsMutex, &terminated]()
+        {
+            {
+                QnMutexLocker lock(&connectedSocketsMutex);
+                terminated = true;
+            }
+
+            for (auto& socket: connectedSockets)
+                socket->pleaseStopSync();
+        });
 
     auto serverAddress = server->getLocalAddress();
     NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
@@ -717,17 +732,19 @@ void socketMultiConnect(
     std::function<void(int)> connectNewClients =
         [&](int clientsToConnect)
         {
-            if (clientsToConnect == 0)
+            QnMutexLocker lock(&connectedSocketsMutex);
+
+            if (clientsToConnect == 0 || terminated)
                 return;
 
             auto testClient = clientMaker();
             ASSERT_TRUE(testClient->setNonBlockingMode(true));
             ASSERT_TRUE(testClient->setSendTimeout(timeout.count()));
-
             connectedSockets.push_back(std::move(testClient));
+
             connectedSockets.back()->connectAsync(
                 *endpointToConnectTo,
-                [&, clientsToConnect, connectNewClients]
+                [clientsToConnect, connectNewClients, &connectResults]
                     (SystemError::ErrorCode code)
                 {
                     connectResults.push(code);
@@ -743,10 +760,6 @@ void socketMultiConnect(
         ASSERT_EQ(acceptResults.pop(), SystemError::noError);
         ASSERT_EQ(connectResults.pop(), SystemError::noError);
     }
-
-    server->pleaseStopSync();
-    for (auto& socket : connectedSockets)
-        socket->pleaseStopSync();
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>

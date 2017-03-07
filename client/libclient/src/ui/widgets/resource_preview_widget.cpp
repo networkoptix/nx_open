@@ -3,6 +3,8 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QStackedWidget>
 
+#include <client/client_globals.h>
+
 #include <camera/camera_thumbnail_manager.h>
 
 #include <core/resource/resource.h>
@@ -14,59 +16,54 @@
 #include <ui/widgets/common/autoscaled_plain_text.h>
 #include <ui/widgets/common/busy_indicator.h>
 
+#include <utils/image_provider.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace {
 
-    const qreal kDefaultAspectRatio = 4.0 / 3.0;
-    const QMargins kMinIndicationMargins(4, 2, 4, 2);
+static const QMargins kMinIndicationMargins(4, 2, 4, 2);
+static const QSize kFrameSize(2, 2);
 
-    /* QnBusyIndicatorWidget draws dots snapped to the pixel grid.
-     * This descendant when it is downscaled draws dots generally not snapped. */
-    class QnAutoscaledBusyIndicatorWidget: public QnBusyIndicatorWidget
+/* QnBusyIndicatorWidget draws dots snapped to the pixel grid.
+ * This descendant when it is downscaled draws dots generally not snapped. */
+class QnAutoscaledBusyIndicatorWidget: public QnBusyIndicatorWidget
+{
+    using base_type = QnBusyIndicatorWidget;
+
+public:
+    QnAutoscaledBusyIndicatorWidget(QWidget* parent = nullptr):
+        base_type(parent)
     {
-        using base_type = QnBusyIndicatorWidget;
+    }
 
-    public:
-        QnAutoscaledBusyIndicatorWidget(QWidget* parent = nullptr):
-            base_type(parent)
+    virtual void paint(QPainter* painter) override
+    {
+        auto sourceRect = indicatorRect();
+        auto targetRect = contentsRect();
+
+        qreal scale = QnGeometry::scaleFactor(sourceRect.size(), targetRect.size(),
+            Qt::KeepAspectRatio);
+
+        QnScopedPainterTransformRollback transformRollback(painter);
+        if (scale < 1.0)
         {
+            painter->translate(targetRect.center());
+            painter->scale(scale, scale);
+            painter->translate(-targetRect.center());
         }
 
-        virtual void paint(QPainter* painter) override
-        {
-            auto sourceRect = indicatorRect();
-            auto targetRect = contentsRect();
-
-            qreal scale = QnGeometry::scaleFactor(sourceRect.size(), targetRect.size(),
-                Qt::KeepAspectRatio);
-
-            QnScopedPainterTransformRollback transformRollback(painter);
-            if (scale < 1.0)
-            {
-                painter->translate(targetRect.center());
-                painter->scale(scale, scale);
-                painter->translate(-targetRect.center());
-            }
-
-            base_type::paint(painter);
-        }
-    };
+        base_type::paint(painter);
+    }
+};
 
 } // namespace
 
 QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) :
     base_type(parent),
-    m_thumbnailManager(new QnCameraThumbnailManager()),
-    m_target(),
-    m_cachedSizeHint(),
-    m_resolutionHint(),
-    m_aspectRatio(kDefaultAspectRatio),
     m_preview(new QLabel(this)),
     m_placeholder(new QnAutoscaledPlainText(this)),
     m_indicator(new QnAutoscaledBusyIndicatorWidget(this)),
-    m_pages(new QStackedWidget(this)),
-    m_status(QnCameraThumbnailManager::None)
+    m_pages(new QStackedWidget(this))
 {
     m_pages->addWidget(m_preview);
     m_pages->addWidget(m_placeholder);
@@ -85,90 +82,48 @@ QnResourcePreviewWidget::QnResourcePreviewWidget(QWidget* parent /*= nullptr*/) 
     m_indicator->setContentsMargins(kMinIndicationMargins);
 
     m_preview->setAlignment(Qt::AlignCenter);
-
-    connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this,
-        [this](const QnUuid& resourceId, const QPixmap& thumbnail)
-        {
-            if (!m_target || m_target->getId() != resourceId)
-                return;
-
-            if (m_status != QnCameraThumbnailManager::Loaded)
-                return;
-
-            m_pages->setCurrentWidget(m_preview);
-            m_preview->setPixmap(thumbnail);
-            m_cachedSizeHint = QSize();
-            updateGeometry();
-        });
-
-    connect(m_thumbnailManager, &QnCameraThumbnailManager::statusChanged, this,
-        [this](const QnUuid& resourceId, QnCameraThumbnailManager::ThumbnailStatus status)
-        {
-            if (!m_target || m_target->getId() != resourceId)
-                return;
-
-            m_status = status;
-            switch (m_status)
-            {
-                case QnCameraThumbnailManager::Loaded:
-                    /* This is handled in thumbnailReady handler */
-                    break;
-
-                case QnCameraThumbnailManager::NoData:
-                    m_pages->setCurrentWidget(m_placeholder);
-                    break;
-
-                default:
-                    m_pages->setCurrentWidget(m_indicator);
-                    break;
-            }
-        });
 }
 
 QnResourcePreviewWidget::~QnResourcePreviewWidget()
 {
 }
 
-const QnResourcePtr& QnResourcePreviewWidget::targetResource() const
+QnImageProvider* QnResourcePreviewWidget::imageProvider() const
 {
-    return m_target;
+    return m_imageProvider.data();
 }
 
-void QnResourcePreviewWidget::setTargetResource(const QnResourcePtr& target)
+void QnResourcePreviewWidget::setImageProvider(QnImageProvider* provider)
 {
-    auto camera = target.dynamicCast<QnVirtualCameraResource>();
-
-    if (camera == m_target)
+    if (m_imageProvider == provider)
         return;
 
-    m_target = camera;
-    m_resolutionHint = QSize();
-    m_aspectRatio = kDefaultAspectRatio;
+    if (m_imageProvider)
+        m_imageProvider->disconnect(this);
 
-    if (camera)
+    m_imageProvider = provider;
+
+    if (m_imageProvider)
     {
-        m_thumbnailManager->selectResource(camera);
+        connect(m_imageProvider, &QnImageProvider::imageChanged, this,
+            &QnResourcePreviewWidget::updateThumbnailImage);
 
-        auto customAspectRatio = camera->aspectRatio();
-        if (customAspectRatio.isValid())
-            m_aspectRatio = customAspectRatio.toFloat();
+        connect(m_imageProvider, &QnImageProvider::statusChanged, this,
+            &QnResourcePreviewWidget::updateThumbnailStatus);
+
+        connect(m_imageProvider, &QnImageProvider::sizeHintChanged, this,
+            &QnResourcePreviewWidget::invalidateGeometry);
+
+        connect(m_imageProvider, &QObject::destroyed, this,
+            [this]
+            {
+                setImageProvider(nullptr);
+            });
     }
 
-    m_preview->setPixmap(QPixmap());
-    m_cachedSizeHint = QSize();
-    updateGeometry();
-}
-
-QSize QnResourcePreviewWidget::thumbnailSize() const
-{
-    return m_thumbnailManager->thumbnailSize();
-}
-
-void QnResourcePreviewWidget::setThumbnailSize(const QSize &size)
-{
-    m_thumbnailManager->setThumbnailSize(size);
-    m_cachedSizeHint = QSize();
-    updateGeometry();
+    updateThumbnailImage(m_imageProvider ? m_imageProvider->image() : QImage());
+    updateThumbnailStatus(m_imageProvider ? m_imageProvider->status() : Qn::ThumbnailStatus::Invalid);
+    invalidateGeometry();
 }
 
 QnBusyIndicatorWidget* QnResourcePreviewWidget::busyIndicator() const
@@ -176,9 +131,8 @@ QnBusyIndicatorWidget* QnResourcePreviewWidget::busyIndicator() const
     return m_indicator;
 }
 
-void QnResourcePreviewWidget::paintEvent(QPaintEvent *event)
+void QnResourcePreviewWidget::paintEvent(QPaintEvent* /*event*/)
 {
-    Q_UNUSED(event);
     QPainter painter(this);
     painter.setPen(palette().window().color());
     painter.setBrush(palette().dark());
@@ -221,21 +175,13 @@ QSize QnResourcePreviewWidget::sizeHint() const
 
         if (m_cachedSizeHint.isEmpty())
         {
-            m_cachedSizeHint = thumbnailSize();
+            if (m_imageProvider)
+                m_cachedSizeHint = m_imageProvider->sizeHint();
+
             if (m_cachedSizeHint.isNull())
-            {
                 m_cachedSizeHint = minimumSize();
-            }
-            else
-            {
-                if (m_cachedSizeHint.height() == 0)
-                    m_cachedSizeHint.setHeight(static_cast<int>(m_cachedSizeHint.width() / m_aspectRatio));
-                else if (m_cachedSizeHint.width() == 0)
-                    m_cachedSizeHint.setWidth(static_cast<int>(m_cachedSizeHint.height() * m_aspectRatio));
-            }
         }
 
-        static const QSize kFrameSize(2, 2);
         const QSize maxSize = maximumSize() - kFrameSize;
 
         qreal oversizeCoefficient = qMax(
@@ -259,4 +205,34 @@ QSize QnResourcePreviewWidget::minimumSizeHint() const
 void QnResourcePreviewWidget::retranslateUi()
 {
     m_placeholder->setText(tr("NO DATA"));
+}
+
+void QnResourcePreviewWidget::invalidateGeometry()
+{
+    m_cachedSizeHint = QSize();
+    updateGeometry();
+}
+
+void QnResourcePreviewWidget::updateThumbnailStatus(Qn::ThumbnailStatus status)
+{
+    switch (status)
+    {
+        case Qn::ThumbnailStatus::Loaded:
+            m_pages->setCurrentWidget(m_preview);
+            break;
+
+        case Qn::ThumbnailStatus::NoData:
+            m_pages->setCurrentWidget(m_placeholder);
+            break;
+
+        default:
+            m_pages->setCurrentWidget(m_indicator);
+            break;
+    }
+}
+
+void QnResourcePreviewWidget::updateThumbnailImage(const QImage& image)
+{
+    m_preview->setPixmap(QPixmap::fromImage(image));
+    invalidateGeometry();
 }

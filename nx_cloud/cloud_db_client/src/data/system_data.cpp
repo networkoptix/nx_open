@@ -295,7 +295,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (SystemDataEx)(SystemDataList)(SystemDataExList)(SystemSharingList)(SystemSharingEx) \
-        (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList),
+        (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList) \
+        (SystemHealthHistoryItem)(SystemHealthHistory),
     (json),
     _Fields/*,
     (optional, false)*/)

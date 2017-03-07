@@ -107,7 +107,7 @@ TEST_F(DbFailure, basic)
     const auto account = addActivatedAccount2();
 
     auto cdbConnection = connection(account.email, account.password);
-    api::AccountData accountData;
+    api::AccountRegistrationData accountData;
     accountData.email = generateRandomEmailAddress();
     accountData.passwordHa1 = "sdfdsfsdf";
     insertDelay = true;

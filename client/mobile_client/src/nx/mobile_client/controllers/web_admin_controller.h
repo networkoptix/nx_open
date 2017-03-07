@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 
-#include <utils/common/credentials.h>
+#include <utils/common/encoded_credentials.h>
 
 class QnMobileClientUiController;
 
@@ -30,7 +30,7 @@ public slots:
 
 private:
     QnMobileClientUiController* m_uiController = nullptr;
-    QnCredentials m_credentials;
+    QnEncodedCredentials m_credentials;
 };
 
 } // namespace controllers

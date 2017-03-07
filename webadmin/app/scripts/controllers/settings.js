@@ -98,7 +98,7 @@ angular.module('webadminApp')
 
         $scope.openJoinDialog = function () {
             $modal.open({
-                templateUrl: 'views/join.html',
+                templateUrl: Config.viewsDir + 'join.html',
                 controller: 'JoinCtrl',
                 resolve: {
                     items: function () {
@@ -135,7 +135,7 @@ angular.module('webadminApp')
 
         function restartServer(passPort){
             $modal.open({
-                templateUrl: 'views/restart.html',
+                templateUrl: Config.viewsDir + 'restart.html',
                 controller: 'RestartCtrl',
                 resolve:{
                     port:function(){
@@ -169,19 +169,26 @@ angular.module('webadminApp')
                     restartServer(true);
                 });
             } else {
-                dialogs.alert(message || L.settings.settingsSaved);
-                if(!message) {
-                    if ($scope.settings.port !== window.location.port) {
-                        window.location.href = (window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port + window.location.pathname + window.location.hash);
-                    } else {
-                        window.location.reload();
+                dialogs.alert(message || L.settings.settingsSaved).finally(function(){
+                    if(!message) {
+                        if ($scope.settings.port != window.location.port) {
+                            window.location.href = (window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port + window.location.pathname + window.location.hash);
+                        } else {
+                            window.location.reload();
+                        }
                     }
-                }
+                });
             }
         }
 
         $scope.save = function () {
-            mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
+            if($scope.settings.port <= 1024){
+                dialogs.confirm(L.settings.unsafePortConfirm).then(function(){
+                    mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
+                });
+            }else {
+                mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
+            }
         };
 
 // execute/scryptname&mode
@@ -262,7 +269,7 @@ angular.module('webadminApp')
 
         function openCloudDialog(){
             $modal.open({
-                templateUrl: 'views/dialogs/cloudDialog.html',
+                templateUrl: Config.viewsDir + 'dialogs/cloudDialog.html',
                 controller: 'CloudDialogCtrl',
                 backdrop:'static',
                 size:'sm',
