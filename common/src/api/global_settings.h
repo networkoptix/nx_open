@@ -190,6 +190,7 @@ public:
 
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
     bool isTimeSynchronizationEnabled() const;
+    bool isSynchronizingTimeWithInternet() const;
     bool takeCameraOwnershipWithoutLock() const;
 
     // -- Cloud settings
@@ -257,6 +258,7 @@ signals:
     void ec2ConnectionSettingsChanged(const QString& key);
     void cloudSettingsChanged();
     void cloudCredentialsChanged();
+    void timeSynchronizationSettingsChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -282,6 +284,7 @@ private:
     QnResourcePropertyAdaptor<bool> *m_autoDiscoveryEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_synchronizeTimeWithInternetAdaptor;
     QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor;
     QnResourcePropertyAdaptor<bool> *m_backupNewCamerasByDefaultAdaptor;
 

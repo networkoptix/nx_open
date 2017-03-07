@@ -156,45 +156,49 @@ namespace ec2
         return !(*this == right);
     }
 
-    bool TimePriorityKey::operator<( const TimePriorityKey& right ) const
+    bool TimePriorityKey::hasLessPriorityThan(
+        const TimePriorityKey& right,
+        bool takeIntoAccountInternetTime) const
     {
         const int peerIsServerSet = flags & Qn::TF_peerIsServer;
         const int right_peerIsServerSet = right.flags & Qn::TF_peerIsServer;
-        if( peerIsServerSet < right_peerIsServerSet )
+        if (peerIsServerSet < right_peerIsServerSet)
             return true;
-        if( right_peerIsServerSet < peerIsServerSet )
+        if (right_peerIsServerSet < peerIsServerSet)
             return false;
 
-        const int internetFlagSet = flags & Qn::TF_peerTimeSynchronizedWithInternetServer;
-        const int right_internetFlagSet = right.flags & Qn::TF_peerTimeSynchronizedWithInternetServer;
-        if( internetFlagSet < right_internetFlagSet )
-            return true;
-        if( right_internetFlagSet < internetFlagSet )
-            return false;
+        if (takeIntoAccountInternetTime)
+        {
+            const int internetFlagSet = flags & Qn::TF_peerTimeSynchronizedWithInternetServer;
+            const int right_internetFlagSet = right.flags & Qn::TF_peerTimeSynchronizedWithInternetServer;
+            if (internetFlagSet < right_internetFlagSet)
+                return true;
+            if (right_internetFlagSet < internetFlagSet)
+                return false;
+        }
 
         if (sequence != right.sequence)
         {
             //taking into account sequence overflow. it should be same as "sequence < right.sequence"
-                //but with respect to sequence overflow
+            //but with respect to sequence overflow
             return ((quint16)(right.sequence - sequence)) <
-                   (std::numeric_limits<decltype(sequence)>::max() / 2);
+                (std::numeric_limits<decltype(sequence)>::max() / 2);
+        }
+
+        quint16 effectiveFlags = flags;
+        quint16 right_effectiveFlags = right.flags;
+        if (!takeIntoAccountInternetTime)
+        {
+            effectiveFlags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
+            right_effectiveFlags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
         }
 
         return
-            flags < right.flags ? true :
-            flags > right.flags ? false :
+            effectiveFlags < right_effectiveFlags ? true :
+            effectiveFlags > right_effectiveFlags ? false :
             seed < right.seed;
     }
 
-    bool TimePriorityKey::operator<=( const TimePriorityKey& right ) const
-    {
-        return !(*this > right);
-    }
-
-    bool TimePriorityKey::operator>( const TimePriorityKey& right ) const
-    {
-        return right < *this;
-    }
 
     quint64 TimePriorityKey::toUInt64() const
     {
@@ -329,6 +333,8 @@ namespace ec2
 
     TimeSynchronizationManager::~TimeSynchronizationManager()
     {
+        directDisconnectAll();
+
         pleaseStop();
     }
 
@@ -396,15 +402,19 @@ namespace ec2
             m_localTimePriorityKey );
 
         if (detail::QnDbManager::instance())
+        {
             connect( detail::QnDbManager::instance(), &detail::QnDbManager::initialized,
                  this, &TimeSynchronizationManager::onDbManagerInitialized,
                  Qt::DirectConnection );
+        }
         connect( QnTransactionMessageBus::instance(), &QnTransactionMessageBus::newDirectConnectionEstablished,
                  this, &TimeSynchronizationManager::onNewConnectionEstablished,
                  Qt::DirectConnection );
         connect( QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerLost,
                  this, &TimeSynchronizationManager::onPeerLost,
                  Qt::DirectConnection );
+        Qn::directConnect(qnGlobalSettings, &QnGlobalSettings::timeSynchronizationSettingsChanged,
+            this, &TimeSynchronizationManager::onTimeSynchronizationSettingsChanged);
 
         {
             QnMutexLocker lk( &m_mutex );
@@ -489,7 +499,9 @@ namespace ec2
                 m_localTimePriorityKey.sequence = m_usedTimeSyncInfo.timePriorityKey.sequence + 1;
                 //"select primary time server" means "take its local time", so resetting internet synchronization flag
                 m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
-                if( m_localTimePriorityKey > m_usedTimeSyncInfo.timePriorityKey )
+                if (m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
+                        m_localTimePriorityKey,
+                        qnGlobalSettings->isSynchronizingTimeWithInternet()))
                 {
                     //using current server time info
                     const qint64 elapsed = m_monotonicClock.elapsed();
@@ -509,7 +521,6 @@ namespace ec2
                             &saveSyncTime,
                             0,
                             m_usedTimeSyncInfo.timePriorityKey) ) );
-
 
                     if( !synchronizingByCurrentServer )
                     {
@@ -686,14 +697,16 @@ namespace ec2
             (remotePeerID > qnCommon->moduleGUID());
 
         //if there is new maximum remotePeerTimePriorityKey then updating delta and emitting timeChanged
-        if( (remotePeerTimePriorityKey <= m_usedTimeSyncInfo.timePriorityKey) &&
+        if( !(m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
+                remotePeerTimePriorityKey, qnGlobalSettings->isSynchronizingTimeWithInternet())) &&
             !needAdjustClockDueToLargeDrift )
         {
             return; //not applying time
         }
 
         //printing sync time change reason to the log
-        if (remotePeerTimePriorityKey <= m_usedTimeSyncInfo.timePriorityKey &&
+        if (!(m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
+                remotePeerTimePriorityKey, qnGlobalSettings->isSynchronizingTimeWithInternet())) &&
             needAdjustClockDueToLargeDrift)
         {
             NX_LOGX(lm("Received sync time update from peer %1, peer's sync time (%2). "
@@ -1015,13 +1028,25 @@ namespace ec2
     {
         NX_LOGX( lit( "TimeSynchronizationManager::syncTimeWithInternet. taskID %1" ).arg( taskID ), cl_logDEBUG2 );
 
+        const bool isSynchronizingTimeWithInternet =
+            qnGlobalSettings->isSynchronizingTimeWithInternet();
+
         QnMutexLocker lk( &m_mutex );
 
         if( (taskID != m_internetSynchronizationTaskID) || m_terminated )
             return;
         m_internetSynchronizationTaskID = 0;
 
-        NX_LOGX( lit("Synchronizing time with internet"), cl_logDEBUG1 );
+        if (!isSynchronizingTimeWithInternet)
+        {
+            NX_LOG(lit("TimeSynchronizationManager. Not synchronizing time with internet"), cl_logDEBUG2);
+            m_internetTimeSynchronizationPeriod = 
+                Settings::instance()->internetSyncTimePeriodSec(INTERNET_SYNC_TIME_PERIOD_SEC);
+            addInternetTimeSynchronizationTask();
+            return;
+        }
+
+        NX_LOGX( lit("TimeSynchronizationManager. Synchronizing time with internet"), cl_logDEBUG1 );
 
         //synchronizing with some internet server
         using namespace std::placeholders;
@@ -1288,19 +1313,28 @@ namespace ec2
                 continue;
 
             QnMutexLocker lk(&m_mutex);
-            if (remotePeerTimeSyncInfo.timePriorityKey > m_usedTimeSyncInfo.timePriorityKey)
+            if (m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
+                    remotePeerTimeSyncInfo.timePriorityKey, 
+                    qnGlobalSettings->isSynchronizingTimeWithInternet()))
+            {
                 syncTimeWithAllKnownServers(&lk);
+            }
             return;
         }
     }
 
     void TimeSynchronizationManager::forgetSynchronizedTimeNonSafe( QnMutexLockerBase* const lock )
     {
-        m_localSystemTimeDelta = std::numeric_limits<qint64>::min();
         m_systemTimeByPeer.clear();
         m_timeSynchronized = false;
-        m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
         ++m_localTimePriorityKey.sequence;
+        switchBackToLocalTime(lock);
+    }
+
+    void TimeSynchronizationManager::switchBackToLocalTime(QnMutexLockerBase* const lock)
+    {
+        m_localSystemTimeDelta = std::numeric_limits<qint64>::min();
+        m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
         m_usedTimeSyncInfo = TimeSyncInfo(
             m_monotonicClock.elapsed(),
             currentMSecsSinceEpoch(),
@@ -1355,5 +1389,26 @@ namespace ec2
                 transactionLog->fillPersistentInfo(localTimeTran);
                 detail::QnDbManager::instance()->executeTransaction(localTimeTran, QByteArray());
             }));
+    }
+
+    void TimeSynchronizationManager::onTimeSynchronizationSettingsChanged()
+    {
+        if (m_peerType != Qn::PeerType::PT_Server)
+            return;
+
+        if (qnGlobalSettings->isSynchronizingTimeWithInternet())
+        {
+            QnMutexLocker lock(&m_mutex);
+            if (m_internetSynchronizationTaskID > 0)
+                TimerManager::instance()->modifyTimerDelay(m_internetSynchronizationTaskID, 0);
+            else
+                addInternetTimeSynchronizationTask();
+        }
+        else
+        {
+            // Forgetting Internet time.
+            QnMutexLocker lock(&m_mutex);
+            switchBackToLocalTime(&lock);
+        }
     }
 }
