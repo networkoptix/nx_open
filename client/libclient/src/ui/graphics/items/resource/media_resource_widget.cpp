@@ -353,7 +353,12 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         addOverlayWidget(m_ioModuleOverlayWidget, detail::OverlayParams(Visible, true, true));
 
         connect(m_ioLicenceStatusHelper, &QnSingleCamLicenceStatusHelper::licenceStatusChanged,
-            this, [this]() { updateIoModuleVisibility(true); });
+            this,
+            [this]
+            {
+                const bool animate = QnWorkbenchContextAware::display()->animationAllowed();
+                updateIoModuleVisibility(animate);
+            });
 
         updateButtonsVisibility();
         updateIoModuleVisibility(false);
@@ -378,7 +383,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         if (m_camera->hasFlags(Qn::io_module))
         {
             connect(m_camera, &QnResource::statusChanged, this,
-                [this]() { updateIoModuleVisibility(true); });
+                [this]
+                {
+                    const bool animate = QnWorkbenchContextAware::display()->animationAllowed();
+                    updateIoModuleVisibility(true);
+                });
         }
 
         connect(m_camera, &QnSecurityCamResource::scheduleTasksChanged, this,
@@ -1022,11 +1031,13 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display)
         connect(m_display->camDisplay(), SIGNAL(liveMode(bool)), this, SLOT(at_camDisplay_liveChanged()));
         connect(m_resource->toResource(), SIGNAL(videoLayoutChanged(const QnResourcePtr &)), this, SLOT(at_videoLayoutChanged()));
 
-        connect(m_display->camDisplay(), &QnCamDisplay::liveMode, this, [this](bool /* live */)
-        {
-            if (m_camera && m_camera->hasFlags(Qn::io_module))
-                updateIoModuleVisibility(true);
-        });
+        connect(m_display->camDisplay(), &QnCamDisplay::liveMode, this,
+            [this](bool /* live */)
+            {
+                const bool animate = QnWorkbenchContextAware::display()->animationAllowed();
+                if (m_camera && m_camera->hasFlags(Qn::io_module))
+                    updateIoModuleVisibility(animate);
+            });
 
         setChannelLayout(m_display->videoLayout());
         m_display->addRenderer(m_renderer);
@@ -1881,9 +1892,10 @@ void QnMediaResourceWidget::at_histogramButton_toggled(bool checked)
 
 void QnMediaResourceWidget::at_ioModuleButton_toggled(bool checked)
 {
+    const bool animate = QnWorkbenchContextAware::display()->animationAllowed();
     Q_UNUSED(checked);
     if (m_ioModuleOverlayWidget)
-        updateIoModuleVisibility(true);
+        updateIoModuleVisibility(animate);
 }
 
 void QnMediaResourceWidget::at_renderWatcher_widgetChanged(QnResourceWidget *widget)
@@ -2034,7 +2046,8 @@ void QnMediaResourceWidget::processIoEnableRequest()
             camera->setLicenseUsed(true);
         });
 
-    updateIoModuleVisibility(true);
+    const bool animate = QnWorkbenchContextAware::display()->animationAllowed();
+    updateIoModuleVisibility(animate);
 }
 
 void QnMediaResourceWidget::processSettingsRequest()
