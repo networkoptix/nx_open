@@ -1038,11 +1038,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         separator();
 
-    factory(QnActions::ShowcaseAction).
-        flags(Qn::Main).
-        text(tr("How-to Videos and FAQ...")).
-        condition(new QnShowcaseActionCondition(this));
-
     factory(QnActions::AboutAction).
         flags(Qn::Main | Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
