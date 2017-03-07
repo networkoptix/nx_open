@@ -18,8 +18,8 @@ GridView
     {
         id: d
 
-        readonly property real maxItemWidth: 192
-        property int thumbnailsInRow: Math.max(2, Math.floor(camerasGrid.width / maxItemWidth))
+        readonly property real maxItemWidth: 320 + camerasGrid.spacing
+        property int thumbnailsInRow: Math.max(2, Math.ceil(camerasGrid.width / maxItemWidth))
     }
 
     model: QnCameraListModel

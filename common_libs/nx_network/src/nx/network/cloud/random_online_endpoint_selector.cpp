@@ -9,7 +9,7 @@
 
 
 namespace {
-    const unsigned int CONNECT_TIMEOUT_MS = 3000;
+    const unsigned int CONNECT_TIMEOUT_MS = 14384;
 }
 
 namespace nx {

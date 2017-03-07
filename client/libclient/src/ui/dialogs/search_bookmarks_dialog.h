@@ -18,8 +18,6 @@ public:
         , const QString &filterText = QString());
 
 private:
-    void resizeEvent(QResizeEvent *event);
-
     void showEvent(QShowEvent *event);
 
 private:

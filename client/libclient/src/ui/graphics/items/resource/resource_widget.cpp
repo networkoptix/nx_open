@@ -145,7 +145,12 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     /* Initialize resource. */
     m_resource = qnResPool->getResourceByUniqueId(item->resourceUid());
     connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
-    connect(m_resource, &QnResource::statusChanged, this, [this] { updateStatusOverlay(true);} );
+    connect(m_resource, &QnResource::statusChanged, this,
+        [this]
+        {
+            const bool animate = display()->animationAllowed();
+            updateStatusOverlay(animate);
+        });
     connect(m_resource, &QnResource::statusChanged, this, &QnResourceWidget::updateOverlayButton);
 
     /* Set up overlay widgets. */
@@ -199,7 +204,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(videowallLicenseHelper, &QnLicenseUsageWatcher::licenseUsageChanged, this,
         [this]
         {
-            updateStatusOverlay(true);
+            const bool animate = display()->animationAllowed();
+            updateStatusOverlay(animate);
         });
 
     /* Run handlers. */
@@ -697,8 +703,10 @@ int QnResourceWidget::visibleButtons() const
 int QnResourceWidget::calculateButtonsVisibility() const
 {
     int result = Qn::InfoButton;
+    if (qnRuntime->isVideoWallMode())
+        return result;
 
-    if (!(m_options & WindowRotationForbidden))
+    if (!m_options.testFlag(WindowRotationForbidden))
         result |= Qn::RotateButton;
 
     Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
@@ -913,6 +921,8 @@ bool QnResourceWidget::isHovered() const
 // -------------------------------------------------------------------------- //
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
+    const bool animate = display()->animationAllowed();
+
     QnScopedPainterPenRollback penRollback(painter);
     QnScopedPainterBrushRollback brushRollback(painter);
     QnScopedPainterFontRollback fontRollback(painter);
@@ -943,7 +953,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     m_renderStatus = renderStatus;
     if (renderStatus == Qn::NewFrameRendered)
         m_lastNewFrameTimeMSec = QDateTime::currentMSecsSinceEpoch();
-    updateStatusOverlay(true);
+    updateStatusOverlay(animate);
 
     emit painted();
 }
@@ -952,7 +962,6 @@ void QnResourceWidget::paintChannelForeground(QPainter *, int, const QRectF &)
 {
     return;
 }
-
 
 void QnResourceWidget::updateSelectedState()
 {
@@ -1069,28 +1078,34 @@ void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     m_mouseInWidget = true;
 
-    setOverlayVisible();
-    updateHud();
+    const bool animate = display()->animationAllowed();
+
+    setOverlayVisible(true, animate);
+    updateHud(animate);
     base_type::hoverEnterEvent(event);
 }
 
 void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
-    setOverlayVisible();
+    const bool animate = display()->animationAllowed();
+
+    setOverlayVisible(true, animate);
     base_type::hoverMoveEvent(event);
 }
 
 void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     m_mouseInWidget = false;
+    const bool animate = display()->animationAllowed();
 
-    setOverlayVisible(false);
-    updateHud();
+    setOverlayVisible(false, animate);
+    updateHud(animate);
     base_type::hoverLeaveEvent(event);
 }
 
 void QnResourceWidget::optionsChangedNotify(Options changedFlags)
 {
+    const bool animate = display()->animationAllowed();
     const auto visibleButtons = buttonsOverlay()->rightButtonsBar()->visibleButtons();
     const bool infoButtonVisible = (visibleButtons & Qn::InfoButton);
     const bool updateHudWoAnimation =
@@ -1104,7 +1119,7 @@ void QnResourceWidget::optionsChangedNotify(Options changedFlags)
     }
 
     if (changedFlags.testFlag(ActivityPresence))
-        updateHud(true);
+        updateHud(animate);
 
     if (changedFlags.testFlag(DisplaySelection))
         updateSelectedState();
@@ -1119,7 +1134,9 @@ void QnResourceWidget::at_itemDataChanged(int role)
 
 void QnResourceWidget::at_infoButton_toggled(bool toggled)
 {
-    setInfoVisible(toggled);
+    const bool animate = display()->animationAllowed();
+
+    setInfoVisible(toggled, animate);
 }
 
 void QnResourceWidget::at_buttonBar_checkedButtonsChanged()
