@@ -7,7 +7,6 @@ from django.conf import settings
 import json, os
 from util.config import get_config
 from util.helpers import get_language_for_email
-from api.helpers.exceptions import handle_exceptions, APIRequestException
 
 
 titles_cache = {}
@@ -15,8 +14,6 @@ templates_cache = {}
 configs_cache = {}
 logos_cache = {}
 
-
-@handle_exceptions
 def send(email, msg_type, message, customization):
     custom_config = get_custom_config(customization)
     lang = get_language_for_email(email, custom_config['languages'])
