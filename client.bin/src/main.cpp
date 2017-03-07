@@ -446,8 +446,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Initialize sound. */
     QtvAudioDevice::instance()->setVolume(qnSettings->audioVolume());
 
-//     QnHelpHandler helpHandler;
-//     qApp->installEventFilter(&helpHandler);
+    QnHelpHandler helpHandler;
+    qApp->installEventFilter(&helpHandler);
 
     cl_log.log(qApp->applicationDisplayName(), " started", cl_logALWAYS);
     cl_log.log("Software version: ", QApplication::applicationVersion(), cl_logALWAYS);
