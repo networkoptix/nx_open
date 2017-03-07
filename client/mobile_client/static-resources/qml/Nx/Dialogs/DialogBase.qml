@@ -17,6 +17,7 @@ Popup
     y: 0
     padding: 0
     modal: true
+    closePolicy: Popup.OnEscape | Popup.OnPressOutside | Popup.OnReleaseOutside
 
     background: null
 
@@ -61,12 +62,6 @@ Popup
         }
 
         onClicked: close()
-
-        Keys.onPressed:
-        {
-            if (Utils.keyIsBack(event.key))
-                close()
-        }
     }
 
     readonly property int _animationDuration: 200
