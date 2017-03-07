@@ -336,7 +336,7 @@ public:
         }
         else
         {
-            NX_ASSERT(!nx::network::SocketGlobals::aioService().isInAnyAioThread());
+            NX_EXPECT(!nx::network::SocketGlobals::aioService().isInAnyAioThread());
             nx::utils::promise< bool > promise;
             cancelIOAsync(eventType, [&]() { promise.set_value(true); });
             promise.get_future().wait();
