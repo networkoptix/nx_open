@@ -219,7 +219,7 @@ namespace nx_http
         //TODO #ak adding necessary headers
         nx_http::insertOrReplaceHeader(
             &msg.response->headers,
-            nx_http::HttpHeader( "Server", nx_http::serverString() ) );
+            nx_http::HttpHeader(nx_http::header::kServer, nx_http::serverString() ) );
         nx_http::insertOrReplaceHeader(
             &msg.response->headers,
             nx_http::HttpHeader( "Date", dateTimeToHTTPFormat( QDateTime::currentDateTime() ) ) );
@@ -328,7 +328,7 @@ namespace nx_http
         NX_ASSERT(!m_responseQueue.empty());
         if (m_responseQueue.front().connectionEvents.onResponseHasBeenSent)
         {
-            auto handler = 
+            auto handler =
                 std::move(m_responseQueue.front().connectionEvents.onResponseHasBeenSent);
             handler(this);
         }

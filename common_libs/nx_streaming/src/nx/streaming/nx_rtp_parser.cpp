@@ -13,7 +13,8 @@ QnNxRtpParser::QnNxRtpParser()
 :
     QnRtpVideoStreamParser(),
     m_nextDataPacketBuffer(nullptr),
-    m_position(AV_NOPTS_VALUE)
+    m_position(AV_NOPTS_VALUE),
+    m_isAudioEnabled(true)
 {
 
 }
@@ -170,11 +171,23 @@ bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dat
                 else
                     m_position = m_nextDataPacket->timestamp;
             }
-            m_mediaData = m_nextDataPacket;
+            if (m_nextDataPacket->dataType == QnAbstractMediaData::AUDIO && !m_isAudioEnabled)
+            {
+                ; // Skip audio packet.
+            }
+            else
+            {
+                m_mediaData = m_nextDataPacket;
+                gotData = true;
+            }
             m_nextDataPacket.reset(); // EOF video frame reached
             m_nextDataPacketBuffer = nullptr;
-            gotData = true;
         }
     }
     return true;
+}
+
+void QnNxRtpParser::setAudioEnabled(bool value)
+{
+    m_isAudioEnabled = value;
 }

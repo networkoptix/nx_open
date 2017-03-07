@@ -456,7 +456,7 @@ void QnRtspConnectionProcessor::sendResponse(int httpStatusCode, const QByteArra
 
     nx_http::insertOrReplaceHeader(
         &d->response.headers,
-        nx_http::HttpHeader("Server", nx_http::serverString()));
+        nx_http::HttpHeader(nx_http::header::kServer, nx_http::serverString()));
     nx_http::insertOrReplaceHeader(
         &d->response.headers,
         nx_http::HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())));
