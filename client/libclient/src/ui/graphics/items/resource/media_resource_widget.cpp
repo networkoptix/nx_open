@@ -356,8 +356,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
             this,
             [this]
             {
-                const bool animate = QnWorkbenchContextAware::display()->animationAllowed();
-                updateIoModuleVisibility(animate);
+                updateIoModuleVisibility(animationAllowed());
             });
 
         updateButtonsVisibility();
@@ -385,8 +384,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
             connect(m_camera, &QnResource::statusChanged, this,
                 [this]
                 {
-                    const bool animate = QnWorkbenchContextAware::display()->animationAllowed();
-                    updateIoModuleVisibility(true);
+                    updateIoModuleVisibility(animationAllowed());
                 });
         }
 
@@ -719,6 +717,11 @@ void QnMediaResourceWidget::ensureTwoWayAudioWidget()
     overlayWidgets()->positionOverlay->setMaxFillCoeff(QSizeF(1.0, 0.8));
 }
 
+bool QnMediaResourceWidget::animationAllowed() const
+{
+    return QnWorkbenchContextAware::display()->animationAllowed();
+}
+
 void QnMediaResourceWidget::resumeHomePtzController()
 {
     if (m_homePtzController && options().testFlag(DisplayDewarped)
@@ -1034,9 +1037,8 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display)
         connect(m_display->camDisplay(), &QnCamDisplay::liveMode, this,
             [this](bool /* live */)
             {
-                const bool animate = QnWorkbenchContextAware::display()->animationAllowed();
                 if (m_camera && m_camera->hasFlags(Qn::io_module))
-                    updateIoModuleVisibility(animate);
+                    updateIoModuleVisibility(animationAllowed());
             });
 
         setChannelLayout(m_display->videoLayout());
@@ -1890,12 +1892,10 @@ void QnMediaResourceWidget::at_histogramButton_toggled(bool checked)
     setImageEnhancement(params);
 }
 
-void QnMediaResourceWidget::at_ioModuleButton_toggled(bool checked)
+void QnMediaResourceWidget::at_ioModuleButton_toggled(bool /*checked*/)
 {
-    const bool animate = QnWorkbenchContextAware::display()->animationAllowed();
-    Q_UNUSED(checked);
     if (m_ioModuleOverlayWidget)
-        updateIoModuleVisibility(animate);
+        updateIoModuleVisibility(animationAllowed());
 }
 
 void QnMediaResourceWidget::at_renderWatcher_widgetChanged(QnResourceWidget *widget)
