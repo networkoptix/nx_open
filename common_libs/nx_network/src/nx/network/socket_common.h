@@ -97,11 +97,15 @@ public:
     static boost::optional<in_addr> ipV4from(const in6_addr& addr);
     static in6_addr ipV6from(const in_addr& addr);
 
+    void swap(HostAddress& other);
+
 private:
     mutable boost::optional<QString> m_string;
     boost::optional<in_addr> m_ipV4;
     boost::optional<in6_addr> m_ipV6;
 };
+
+NX_NETWORK_API void swap(HostAddress& one, HostAddress& two);
 
 Q_DECLARE_METATYPE(HostAddress)
 

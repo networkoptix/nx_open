@@ -220,6 +220,21 @@ in6_addr HostAddress::ipV6from(const in_addr& v4)
     return v6;
 }
 
+void HostAddress::swap(HostAddress& other)
+{
+    m_string.swap(other.m_string);
+    m_ipV4.swap(other.m_ipV4);
+    m_ipV6.swap(other.m_ipV6);
+}
+
+void swap(HostAddress& one, HostAddress& two)
+{
+    one.swap(two);
+}
+
+//-------------------------------------------------------------------------------------------------
+// SocketAddress
+
 SocketAddress::SocketAddress(const HostAddress& _address, quint16 _port):
     address(_address),
     port(_port)
