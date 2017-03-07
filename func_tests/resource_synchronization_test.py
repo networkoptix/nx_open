@@ -104,10 +104,10 @@ class RemoteServer(object):
         self.settings = self.get_system_settings()
         self.local_system_id = self.settings['localSystemId']
         self.cloud_system_id = self.settings['cloudSystemID']
-        self.ecs_guid = self.rest_api.ec2.testConnection.get()['ecsGuid']
+        self.ecs_guid = self.rest_api.ec2.testConnection.GET()['ecsGuid']
 
     def get_system_settings(self):
-        response = self.rest_api.api.systemSettings.get()
+        response = self.rest_api.api.systemSettings.GET()
         return response['settings']
 
 class ResourceGenerator(object):
@@ -205,7 +205,7 @@ def check_transaction_log(env, timeout = MEDIASERVER_MERGE_TIMEOUT_SEC):
     while True:
         srv_transactions = {}
         for srv in env.servers:
-            transactions = map(Transaction.from_dict, srv.rest_api.ec2.getTransactionLog.get())
+            transactions = map(Transaction.from_dict, srv.rest_api.ec2.getTransactionLog.GET())
             for t in transactions:
                 srv_transactions.setdefault(t, []).append(srv)
         unmatched_transactions = {t: l for t, l in srv_transactions.iteritems()
@@ -226,7 +226,7 @@ def prepare_calls_list(env, gen, api_method, sequence = None):
     data_generator_fn = gen[api_method]
     sequence = sequence or range(env.test_size)
     return [(
-        env.servers[i % len(env.servers)].rest_api.get_api_fn('post', 'ec2', api_method),
+        env.servers[i % len(env.servers)].rest_api.get_api_fn('POST', 'ec2', api_method),
         v) for i, v in data_generator_fn(sequence[:env.test_size])]
 
 def make_async_post_calls(env, calls_list):
@@ -243,34 +243,34 @@ def prepare_and_make_async_post_calls(env, gen, api_method, sequence = None):
 def test_initial_merge(env):
     check_api_calls(
         env,
-        [ ('get', 'ec2', 'getResourceParams'),
-          ('get', 'ec2', 'getMediaServersEx'),
-          ('get', 'ec2', 'getCamerasEx'),
-          ('get', 'ec2', 'getUsers'),
-          ('get', 'ec2', 'getFullInfo') ])
+        [ ('GET', 'ec2', 'getResourceParams'),
+          ('GET', 'ec2', 'getMediaServersEx'),
+          ('GET', 'ec2', 'getCamerasEx'),
+          ('GET', 'ec2', 'getUsers'),
+          ('GET', 'ec2', 'getFullInfo') ])
 
     check_transaction_log(env)
 
 def test_api_get_methods(env):
     test_api_get_methods = [
-        ('get', 'ec2', 'getResourceTypes'),
-        ('get', 'ec2', 'getResourceParams'),
-        ('get', 'ec2', 'getMediaServers'),
-        ('get', 'ec2', 'getMediaServersEx'),
-        ('get', 'ec2', 'getCameras'),
-        ('get', 'ec2', 'getCamerasEx'),
-        ('get', 'ec2', 'getCameraHistoryItems'),
-        ('get', 'ec2', 'bookmarks/tags'),
-        ('get', 'ec2', 'getEventRules'),
-        ('get', 'ec2', 'getUsers'),
-        ('get', 'ec2', 'getVideowalls'),
-        ('get', 'ec2', 'getLayouts'),
-        ('get', 'ec2', 'listDirectory'),
-        ('get', 'ec2', 'getStoredFile'),
-        ('get', 'ec2', 'getSettings'),
-        ('get', 'ec2', 'getCurrentTime'),
-        ('get', 'ec2', 'getFullInfo'),
-        ('get', 'ec2', 'getLicenses')
+        ('GET', 'ec2', 'getResourceTypes'),
+        ('GET', 'ec2', 'getResourceParams'),
+        ('GET', 'ec2', 'getMediaServers'),
+        ('GET', 'ec2', 'getMediaServersEx'),
+        ('GET', 'ec2', 'getCameras'),
+        ('GET', 'ec2', 'getCamerasEx'),
+        ('GET', 'ec2', 'getCameraHistoryItems'),
+        ('GET', 'ec2', 'bookmarks/tags'),
+        ('GET', 'ec2', 'getEventRules'),
+        ('GET', 'ec2', 'getUsers'),
+        ('GET', 'ec2', 'getVideowalls'),
+        ('GET', 'ec2', 'getLayouts'),
+        ('GET', 'ec2', 'listDirectory'),
+        ('GET', 'ec2', 'getStoredFile'),
+        ('GET', 'ec2', 'getSettings'),
+        ('GET', 'ec2', 'getCurrentTime'),
+        ('GET', 'ec2', 'getFullInfo'),
+        ('GET', 'ec2', 'getLicenses')
         ]
     for srv in env.servers:
         for method, api_object, api_method in test_api_get_methods:
@@ -280,31 +280,31 @@ def test_camera_data_syncronization(env, gen):
     cameras = prepare_and_make_async_post_calls(env, gen, 'saveCamera')
     check_api_calls(
         env,
-        [ ('get', 'ec2', 'getCamerasEx') ])
+        [ ('GET', 'ec2', 'getCamerasEx') ])
     prepare_and_make_async_post_calls(env, gen, 'saveCameraUserAttributes', cameras)
     check_api_calls(
         env,
-        [ ('get', 'ec2', 'getCameraUserAttributesList'),
-          ('get', 'ec2', 'getFullInfo') ])
+        [ ('GET', 'ec2', 'getCameraUserAttributesList'),
+          ('GET', 'ec2', 'getFullInfo') ])
     check_transaction_log(env)
 
 def test_user_data_syncronization(env, gen):
     prepare_and_make_async_post_calls(env, gen, 'saveUser')
     check_api_calls(
         env,
-        [ ('get', 'ec2', 'getFullInfo') ])
+        [ ('GET', 'ec2', 'getFullInfo') ])
     check_transaction_log(env)
 
 def test_mediaserver_data_syncronization(env, gen):
     servers = prepare_and_make_async_post_calls(env, gen, 'saveMediaServer')
     check_api_calls(
         env,
-        [ ('get', 'ec2', 'getMediaServersEx') ])
+        [ ('GET', 'ec2', 'getMediaServersEx') ])
     prepare_and_make_async_post_calls(env, gen, 'saveMediaServerUserAttributes', servers)
     check_api_calls(
         env,
-        [ ('get', 'ec2', 'getMediaServersUserAttributesList'),
-          ('get', 'ec2', 'getFullInfo')])
+        [ ('GET', 'ec2', 'getMediaServersUserAttributesList'),
+          ('GET', 'ec2', 'getFullInfo')])
 
     check_transaction_log(env)
 
@@ -314,15 +314,15 @@ def test_resource_params_data_syncronization(env, gen):
     servers = prepare_and_make_async_post_calls(env, gen, 'saveMediaServer')
     check_api_calls(
         env,
-        [ ('get', 'ec2', 'getCamerasEx'),
-          ('get', 'ec2', 'getUsers'),
-          ('get', 'ec2', 'getMediaServersEx')  ])
+        [ ('GET', 'ec2', 'getCamerasEx'),
+          ('GET', 'ec2', 'getUsers'),
+          ('GET', 'ec2', 'getMediaServersEx')  ])
 
     resources = [ v[i % 3]['id'] for i, v in enumerate(zip(cameras, users, servers))]
     prepare_and_make_async_post_calls(env, gen, 'setResourceParams', resources)
     check_api_calls(
         env,
-        [ ('get', 'ec2', 'getFullInfo')])
+        [ ('GET', 'ec2', 'getFullInfo')])
 
     check_transaction_log(env)
 
@@ -332,16 +332,16 @@ def test_remove_resource_params_data_syncronization(env, gen):
     servers = prepare_and_make_async_post_calls(env, gen, 'saveMediaServer')
     check_api_calls(
         env,
-        [ ('get', 'ec2', 'getCamerasEx'),
-          ('get', 'ec2', 'getUsers'),
-          ('get', 'ec2', 'getMediaServersEx')  ])
+        [ ('GET', 'ec2', 'getCamerasEx'),
+          ('GET', 'ec2', 'getUsers'),
+          ('GET', 'ec2', 'getMediaServersEx')  ])
 
     # Need to remove different resource types (camera, user, mediaserver)
     resources = [ v[i % 3]['id'] for i, v in enumerate(zip(cameras, users, servers))]
     prepare_and_make_async_post_calls(env, gen, 'removeResource', resources)
     check_api_calls(
         env,
-        [ ('get', 'ec2', 'getFullInfo') ])
+        [ ('GET', 'ec2', 'getFullInfo') ])
 
     check_transaction_log(env)
 
@@ -351,9 +351,9 @@ def test_resource_remove_update_conflict(env, gen):
     servers = prepare_and_make_async_post_calls(env, gen, 'saveMediaServer')
     check_api_calls(
         env,
-        [ ('get', 'ec2', 'getCamerasEx'),
-          ('get', 'ec2', 'getUsers'),
-          ('get', 'ec2', 'getMediaServersEx')  ])
+        [ ('GET', 'ec2', 'getCamerasEx'),
+          ('GET', 'ec2', 'getUsers'),
+          ('GET', 'ec2', 'getMediaServersEx')  ])
 
     api_methods = ['saveCamera', 'saveUser', 'saveMediaServer' ]
     # Prepare api calls list, the list contains save.../removeResource pairs.
@@ -366,13 +366,13 @@ def test_resource_remove_update_conflict(env, gen):
         data['name'] += '_changed'
         server_1 = env.servers[i % len(env.servers)]
         server_2 = env.servers[(i+1) % len(env.servers)]
-        api_calls.append((server_1.rest_api.get_api_fn('post', 'ec2', api_method), data))
-        api_calls.append((server_2.rest_api.get_api_fn('post', 'ec2', 'removeResource'), dict(id=data['id'])))
+        api_calls.append((server_1.rest_api.get_api_fn('POST', 'ec2', api_method), data))
+        api_calls.append((server_2.rest_api.get_api_fn('POST', 'ec2', 'removeResource'), dict(id=data['id'])))
 
     make_async_post_calls(env, api_calls)
     check_api_calls(
         env,
-        [ ('get', 'ec2', 'getFullInfo') ])
+        [ ('GET', 'ec2', 'getFullInfo') ])
 
     check_transaction_log(env)
 
@@ -383,15 +383,15 @@ def test_resource_remove_update_conflict(env, gen):
 #     user_data = generator.generate_user_data(0)
 #     server_1 = env.servers[0]
 #     server_2 = env.servers[1]
-#     server_1.rest_api.get_api_fn('post', 'ec2', 'saveUser')(**user_data)
+#     server_1.rest_api.get_api_fn('POST', 'ec2', 'saveUser')(**user_data)
 #     check_api_calls(
-#         env, [ ('get', 'ec2', 'getUsers') ])
+#         env, [ ('GET', 'ec2', 'getUsers') ])
 #     user_data['name'] += '_changed'
 #     api_calls = []    
-#     api_calls.append((server_1.rest_api.get_api_fn('post', 'ec2', 'saveUser'), user_data))
-#     api_calls.append((server_2.rest_api.get_api_fn('post', 'ec2', 'removeResource'), dict(id=user_data['id'])))
+#     api_calls.append((server_1.rest_api.get_api_fn('POST', 'ec2', 'saveUser'), user_data))
+#     api_calls.append((server_2.rest_api.get_api_fn('POST', 'ec2', 'removeResource'), dict(id=user_data['id'])))
 #     make_async_post_calls(env, api_calls)
 #     check_api_calls(
 #         env,
-#         [ ('get', 'ec2', 'getFullInfo') ])
+#         [ ('GET', 'ec2', 'getFullInfo') ])
 #     check_transaction_log(env)

@@ -1,7 +1,7 @@
 '''Proxy object for accessing REST API.
 
 Allows calls to REST API using notation:
-    rest_api_object.api.manualCamera.status.get(arg1=1, arg2=2)
+    rest_api_object.api.manualCamera.status.GET(arg1=1, arg2=2)
 which automatically translated to
     GET /api/manualCamera/status?arg1=1&arg2=2
 But for POST method keyword parameters are translated to json request body.
@@ -21,6 +21,7 @@ REST_API_PASSWORD = 'admin'
 REST_API_TIMEOUT_SEC = 10
 
 log = logging.getLogger(__name__)
+
 
 class HttpError(RuntimeError):
 
@@ -49,12 +50,12 @@ class ServerRestApiProxy(object):
     def __getattr__(self, name):
         return ServerRestApiProxy(self._server_name, self._url + '/' + name, self._user, self._password)
 
-    def get(self, raise_exception=True, timeout_sec=None, headers=None, **kw):
+    def GET(self, raise_exception=True, timeout_sec=None, headers=None, **kw):
         log.debug('%s: GET %s %s', self._server_name, self._url, kw)
         params = {name: self._get_param_to_str(value) for name, value in kw.items()}
         return self._make_request(raise_exception, timeout_sec, requests.get, self._url, headers=headers, params=params)
 
-    def post(self, raise_exception=True, timeout_sec=None, headers=None, json = None, **kw):
+    def POST(self, raise_exception=True, timeout_sec=None, headers=None, json=None, **kw):
         if kw:
             assert not json, 'kw and json arguments are mutually exclusive - only one may be used at a time'
             json = kw
@@ -106,7 +107,7 @@ class RestApiBase(object):
     def get_api_fn(self, method, api_object, api_method):
         object = getattr(self, api_object)     # server.rest_api.ec2
         function = getattr(object, api_method) # server.rest_api.ec2.getUsers
-        return getattr(function, method)       # server.rest_api.ec2.getUsers.get
+        return getattr(function, method)       # server.rest_api.ec2.getUsers.GET
 
     def _make_proxy(self, path):
         return ServerRestApiProxy(self.server_name, self.url + path, self.user, self.password)

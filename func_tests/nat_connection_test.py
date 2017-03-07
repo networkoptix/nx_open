@@ -36,11 +36,11 @@ def nat_env(env_builder, box, server, http_schema):
 
 def test_merged_servers_should_return_same_results_to_certain_api_calls(env):
     test_api_calls = [
-        ('get', 'ec2', 'getStorages'),
-        ('get', 'ec2', 'getResourceParams'),
-        ('get', 'ec2', 'getMediaServersEx'),
-        ('get', 'ec2', 'getCamerasEx'),
-        ('get', 'ec2', 'getUsers'),
+        ('GET', 'ec2', 'getStorages'),
+        ('GET', 'ec2', 'getResourceParams'),
+        ('GET', 'ec2', 'getMediaServersEx'),
+        ('GET', 'ec2', 'getCamerasEx'),
+        ('GET', 'ec2', 'getUsers'),
         ]
     for method, api_object, api_method in test_api_calls:
         log.info('TEST for %s %s.%s:', method.upper(), api_object, api_method)

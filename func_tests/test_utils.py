@@ -50,9 +50,10 @@ class EnvironmentBuilder(object):
 
     vagrant_boxes_cache_key = 'nx/vagrant_boxes'
 
-    def __init__(self, test_session, options, cache, cloud_host_rest_api):
+    def __init__(self, test_session, options, cache, cloud_host_host):
         self._test_session = test_session
         self._cache = cache
+        self._cloud_host_host = cloud_host_host  # cloud host dns name, like: 'cloud-dev.hdw.mx'
         self._work_dir = options.work_dir
         self._bin_dir = options.bin_dir
         self._reset_servers = options.reset_servers
@@ -61,7 +62,6 @@ class EnvironmentBuilder(object):
         self._vm_is_local_host = options.vm_ssh_host_config is None
         self._vm_host = host_from_config(options.vm_ssh_host_config)
         self._vm_host_work_dir = options.vm_host_work_dir
-        self._cloud_host_rest_api = cloud_host_rest_api
         self._boxes_config = []
         self._last_box_idx = 0
 
@@ -106,8 +106,8 @@ class EnvironmentBuilder(object):
     def _init_server(self, vagrant, used_boxes, http_schema, config):
         box = self._find_matching_box(vagrant, used_boxes, config.box)
         url = '%s://%s:%d/' % (http_schema, box.ip_address, MEDIASERVER_LISTEN_PORT)
-        server = Server(config.name, box, url, self._cloud_host_rest_api)
-        server.init(config.start, self._reset_servers)
+        server = Server(config.name, box, url)
+        server.init(config.start, self._reset_servers, patch_for_cloud_host=self._cloud_host_host)
         if server.is_started() and not server.is_system_set_up() and config.setup == ServerConfig.SETUP_LOCAL:
             log.info('Setting up server %s:', server)
             server.setup_local_system()
@@ -169,7 +169,7 @@ class EnvironmentBuilder(object):
         for name, server in servers.items():
             log.info('SERVER %s: %r at %s %s ecs_guid=%r local_system_id=%r',
                      name.upper(), server.name, server.box.name, server.url, server.ecs_guid, server.local_system_id)
-        log.info('----- setup is complete; test follows ----------------------------->8 ----------------------------------------------')
+        log.info('----- build environment setup is complete ----------------------------->8 ----------------------------------------------')
         return SimpleNamespace(servers=servers, **servers)
 
     def __call__(self, *args, **kw):

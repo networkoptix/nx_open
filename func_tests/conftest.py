@@ -12,16 +12,15 @@ from session import TestSession
 from test_utils import ServerFactory, EnvironmentBuilder
 from host import SshHostConfig
 from vagrant_box_config import box_config_factory
-from server_rest_api import CloudRestApi
+from cloud_host import resolve_cloud_host_from_registry, create_cloud_host
 from camera import MEDIA_SAMPLE_FPATH, SampleMediaFile, Camera
-from server import MEDIASERVER_DEFAULT_CLOUDHOST
 
+
+DEFAULT_CLOUD_GROUP = 'dev'
+DEFAULT_CUSTOMIZATION = 'default'
 
 DEFAULT_WORK_DIR = os.path.expanduser('/tmp/funtest')
 DEFAULT_BIN_DIR = os.path.expanduser('/tmp/binaries')
-
-CLOUD_USER_NAME = 'anikitin@networkoptix.com'
-CLOUD_USER_PASSWORD ='qweasd123'
 
 DEFAULT_VM_NAME_PREFIX = 'funtest-'
 
@@ -35,10 +34,17 @@ log = logging.getLogger(__name__)
 
 
 def pytest_addoption(parser):
+    parser.addoption('--cloud-group', default=DEFAULT_CLOUD_GROUP,
+                     help='Cloud group; cloud host for it will be requested from ireg.hdw.mx;'
+                          ' default is %r' % DEFAULT_CLOUD_GROUP)
+    parser.addoption('--customization', default=DEFAULT_CUSTOMIZATION,
+                     help='Customization; will be used for requesting cloud host from ireg.hdw.mx;'
+                          ' default is %r' % DEFAULT_CUSTOMIZATION)
     parser.addoption('--work-dir', default=DEFAULT_WORK_DIR,
                      help='working directory for tests: all generated files will be placed there')
     parser.addoption('--bin-dir', default=DEFAULT_BIN_DIR,
-                     help='directory with binary files for tests: debian distributive and sample.mkv are expected there')
+                     help='directory with binary files for tests:'
+                          ' debian distributive and sample.mkv are expected there')
     parser.addoption('--no-servers-reset', action='store_true',
                      help='skip servers reset/cleanup on test setup')
     parser.addoption('--recreate-boxes', action='store_true',
@@ -48,7 +54,8 @@ def pytest_addoption(parser):
     parser.addoption('--config-file',
                      help='config file for tests')
     parser.addoption('--vm-host',
-                     help='hostname or IP address for host with virtualbox, used to start virtual machines (by default it is local host)')
+                     help='hostname or IP address for host with virtualbox,'
+                          ' used to start virtual machines (by default it is local host)')
     parser.addoption('--vm-host-user', default=DEFAULT_VM_HOST_USER,
                      help='User to use for ssh to login to virtualbox host')
     parser.addoption('--vm-host-key',
@@ -57,6 +64,7 @@ def pytest_addoption(parser):
                      help='Working directory at host with virtualbox, used to store vagrant files')
     parser.addoption('--max-log-width', default=DEFAULT_MAX_LOG_WIDTH, type=int,
                      help='Change maximum log message width. Default is %d' % DEFAULT_MAX_LOG_WIDTH)
+
 
 @pytest.fixture(scope='session')
 def run_options(request):
@@ -69,6 +77,8 @@ def run_options(request):
     else:
         vm_ssh_host_config = None
     return SimpleNamespace(
+        cloud_group=request.config.getoption('--cloud-group'),
+        customization=request.config.getoption('--customization'),
         work_dir=request.config.getoption('--work-dir'),
         bin_dir=request.config.getoption('--bin-dir'),
         reset_servers=not request.config.getoption('--no-servers-reset'),
@@ -93,9 +103,19 @@ def box():
 def server():
     return ServerFactory()
 
+
+# cloud host dns name, like: 'cloud-dev.hdw.mx'
 @pytest.fixture
-def cloud_host_rest_api():
-    return CloudRestApi('cloud', 'http://%s/' % MEDIASERVER_DEFAULT_CLOUDHOST, CLOUD_USER_NAME, CLOUD_USER_PASSWORD)
+def cloud_host_host(run_options):
+    return resolve_cloud_host_from_registry(run_options.cloud_group, run_options.customization)
+
+# CloudHost instance    
+@pytest.fixture
+def cloud_host(run_options, cloud_host_host):
+    cloud_host = create_cloud_host(run_options.cloud_group, run_options.customization, cloud_host_host)
+    cloud_host.check_is_ready_for_tests()
+    return cloud_host
+
 
 @pytest.fixture
 def camera():
@@ -121,5 +141,5 @@ def test_session(run_options):
 
 
 @pytest.fixture
-def env_builder(request, test_session, run_options, cloud_host_rest_api):
-    return EnvironmentBuilder(test_session, run_options, request.config.cache, cloud_host_rest_api)
+def env_builder(request, test_session, run_options, cloud_host_host):
+    return EnvironmentBuilder(test_session, run_options, request.config.cache, cloud_host_host)

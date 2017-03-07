@@ -19,7 +19,9 @@ import tzlocal
 import requests.exceptions
 import pytest
 from server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_SEC, HttpError, ServerRestApi
+from cloud_host import CloudHost
 from camera import Camera, SampleMediaFile
+
 
 MEDIASERVER_CONFIG_PATH = '/opt/networkoptix/mediaserver/etc/mediaserver.conf'
 MEDIASERVER_CONFIG_PATH_INITIAL = '/opt/networkoptix/mediaserver/etc/mediaserver.conf.initial'
@@ -28,14 +30,11 @@ MEDIASERVER_SERVICE_NAME = 'networkoptix-mediaserver'
 MEDIASERVER_UNSETUP_LOCAL_SYSTEM_ID = '{00000000-0000-0000-0000-000000000000}'  # local system id for not set up server
 
 MEDIASERVER_CLOUDHOST_TAG = 'this_is_cloud_host_name'
-MEDIASERVER_DEFAULT_CLOUDHOST = 'cloud-dev.hdw.mx'
-MEDIASERVER_CLOUDHOST_SIZE = len(MEDIASERVER_CLOUDHOST_TAG + ' ' + MEDIASERVER_DEFAULT_CLOUDHOST + '\0' * 36)
+MEDIASERVER_CLOUDHOST_SIZE = 76  # MEDIASERVER_CLOUDHOST_TAG + ' ' + cloud_host + '\0' * required paddings count to 76
 MEDIASERVER_CLOUDHOST_FPATH = '/opt/networkoptix/mediaserver/lib/libcommon.so'
 
-CLOUD_HOST_TIMEOUT_SEC = 10
 MEDIASERVER_CREDENTIALS_TIMEOUT_SEC = 60 * 5
 MEDIASERVER_MERGE_TIMEOUT_SEC = MEDIASERVER_CREDENTIALS_TIMEOUT_SEC
-DEFAULT_CUSTOMIZATION = 'default'
 
 DEFAULT_SERVER_LOG_LEVEL = 'DEBUG2'
 
@@ -74,6 +73,7 @@ def change_mediaserver_config(old_config, **kw):
     f = StringIO.StringIO()
     config.write(f)
     return f.getvalue()
+
 
 class Service(object):
 
@@ -150,12 +150,11 @@ class ServerPersistentInfo(object):
         
 class Server(object):
 
-    def __init__(self, name, box, url, cloud_host_rest_api):
+    def __init__(self, name, box, url):
         self.title = name
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
         self.box = box
         self.url = url
-        self.cloud_host_rest_api = cloud_host_rest_api
         self.service = Service(box, MEDIASERVER_SERVICE_NAME)
         self.user = REST_API_USER
         self.password = REST_API_PASSWORD
@@ -169,14 +168,15 @@ class Server(object):
     def __repr__(self):
         return 'Server%r@%s' % (self.name, self.url)
 
-    def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL):
+    def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_for_cloud_host=None):
         self._is_started = was_started = self.service.get_status()
         log.info('Service for %s %s started', self, self._is_started and 'WAS' or 'was NOT')
         if reset:
             if was_started:
                 self.stop_service()
             self.storage.cleanup()
-            self.patch_binary_set_cloud_host(MEDIASERVER_DEFAULT_CLOUDHOST)  # may be changed by previous tests...
+            if patch_for_cloud_host:
+                self.patch_binary_set_cloud_host(patch_for_cloud_host)  # may be changed by previous tests...
             self.reset_config(logLevel=log_level, tranLogLevel=log_level)
             if must_start:
                 self.start_service()
@@ -224,7 +224,7 @@ class Server(object):
         self.settings = self.get_system_settings()
         self.local_system_id = self.settings['localSystemId']
         self.cloud_system_id = self.settings['cloudSystemID']
-        self.ecs_guid = self.rest_api.ec2.testConnection.get()['ecsGuid']
+        self.ecs_guid = self.rest_api.ec2.testConnection.GET()['ecsGuid']
 
     def _safe_api_call(self, fn, *args, **kw):
         try:
@@ -233,7 +233,7 @@ class Server(object):
             return None
 
     def get_system_settings(self):
-        response = self.rest_api.api.systemSettings.get()
+        response = self.rest_api.api.systemSettings.GET()
         return response['settings']
 
     def is_system_set_up(self):
@@ -258,7 +258,7 @@ class Server(object):
     def restart(self, timeout=30):
         t = time.time()
         uptime = self.get_uptime()
-        self.rest_api.api.restart.get()
+        self.rest_api.api.restart.GET()
         while time.time() - t < timeout:
             new_uptime = self._safe_api_call(self.get_uptime)
             if new_uptime and new_uptime < uptime:
@@ -269,7 +269,7 @@ class Server(object):
         assert False, 'Server %r did not restart in %s seconds' % (self, timeout)
 
     def get_uptime(self):
-        response = self.rest_api.api.statistics.get()
+        response = self.rest_api.api.statistics.GET()
         return datetime.timedelta(seconds=int(response['uptimeMs'])/1000.)
 
     def wait_for_server_status(self, is_up):
@@ -293,7 +293,7 @@ class Server(object):
 
     def is_server_up(self):
         try:
-            self.rest_api.api.ping.get()
+            self.rest_api.api.ping.GET()
             return True
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             return False
@@ -326,34 +326,32 @@ class Server(object):
         self.set_user_password(REST_API_USER, REST_API_PASSWORD)  # Must be reset to default onces
 
     def set_system_settings(self, **kw):
-        self.rest_api.api.systemSettings.get(**kw)
+        self.rest_api.api.systemSettings.GET(**kw)
         self.load_system_settings()
 
     def setup_local_system(self, **kw):
-        self.rest_api.api.setupLocalSystem.post(systemName=self.name, password=REST_API_PASSWORD, **kw)  # leave password unchanged
+        self.rest_api.api.setupLocalSystem.POST(systemName=self.name, password=REST_API_PASSWORD, **kw)  # leave password unchanged
         self.load_system_settings()
 
-    def setup_cloud_system(self, **kw):
-        cloud_response = self.cloud_host_rest_api.cdb.system.bind.get(
-            name=self.name,
-            customization=DEFAULT_CUSTOMIZATION,
-            )
-        setup_response = self.rest_api.api.setupCloudSystem.post(
+    def setup_cloud_system(self, cloud_host, **kw):
+        assert isinstance(cloud_host, CloudHost), repr(cloud_host)
+        bind_info = cloud_host.bind_system(self.name)
+        setup_response = self.rest_api.api.setupCloudSystem.POST(
             systemName=self.name,
-            cloudAuthKey=cloud_response['authKey'],
-            cloudSystemID=cloud_response['id'],
-            cloudAccountName=self.cloud_host_rest_api.user,
+            cloudAuthKey=bind_info.auth_key,
+            cloudSystemID=bind_info.system_id,
+            cloudAccountName=cloud_host.user,
             timeout_sec=60*5,
             **kw)
         settings = setup_response['settings']
-        self.set_user_password(self.cloud_host_rest_api.user, self.cloud_host_rest_api.password)
+        self.set_user_password(cloud_host.user, cloud_host.password)
         self._init_rest_api()
         self.load_system_settings()
         assert self.settings['systemName'] == self.name
         return settings
 
     def detach_from_cloud(self, password):
-        self.rest_api.api.detachFromCloud.post(password = password)
+        self.rest_api.api.detachFromCloud.POST(password=password)
         self.set_user_password(REST_API_USER, password)
 
     def merge_systems(self, other_server, take_remote_settings=False):
@@ -367,7 +365,7 @@ class Server(object):
         def make_key(method):
             digest = generate_auth_key(method, other_server.user.lower(), other_server.password, nonce, realm)
             return urllib.quote(base64.urlsafe_b64encode(':'.join([other_server.user.lower(), nonce, digest])))
-        self.rest_api.api.mergeSystems.get(
+        self.rest_api.api.mergeSystems.GET(
             url=other_server.url,
             getKey=make_key('GET'),
             postKey=make_key('POST'),
@@ -406,7 +404,7 @@ class Server(object):
         t = time.time()
         while time.time() - t < MEDIASERVER_CREDENTIALS_TIMEOUT_SEC:
             try:
-                self.rest_api.ec2.testConnection.get()
+                self.rest_api.ec2.testConnection.GET()
                 log.info('Server accepted new credentials in %s seconds', time.time() - t)
                 return
             except HttpError as x:
@@ -417,33 +415,33 @@ class Server(object):
                     % (MEDIASERVER_CREDENTIALS_TIMEOUT_SEC, self, self.user, self.password))
 
     def get_nonce(self):
-        response = self.rest_api.api.getNonce.get()
+        response = self.rest_api.api.getNonce.GET()
         return (response['realm'], response['nonce'])
 
     def change_system_id(self, new_guid):
         old_local_system_id = self.local_system_id
-        self.rest_api.api.configure.get(localSystemId=new_guid)
+        self.rest_api.api.configure.GET(localSystemId=new_guid)
         self.load_system_settings()
         assert self.local_system_id != old_local_system_id
         assert self.local_system_id == new_guid
 
     def add_camera(self, camera):
         params = camera.get_info(parent_id=self.ecs_guid)
-        result = self.rest_api.ec2.saveCamera.post(**params)
+        result = self.rest_api.ec2.saveCamera.POST(**params)
         return result['id']
 
     # if there are more than one return first
     def _get_storage(self):
-        ## storage_records = [record for record in self.rest_api.ec2.getStorages.get() if record['parentId'] == self.ecs_guid]
+        ## storage_records = [record for record in self.rest_api.ec2.getStorages.GET() if record['parentId'] == self.ecs_guid]
         ## assert len(storage_records) >= 1, 'No storages for server with ecs guid %s is returned by %s' % (self.ecs_guid, self.url)
         ## url = storage_records[0]['url']
         url = '/opt/networkoptix/mediaserver/var/data'  # hardcoded for now
         return Storage(self.box, url)
 
     def rebuild_archive(self):
-        self.rest_api.api.rebuildArchive.get(mainPool=1, action='start')
+        self.rest_api.api.rebuildArchive.GET(mainPool=1, action='start')
         for i in range(30):
-            response = self.rest_api.api.rebuildArchive.get(mainPool=1)
+            response = self.rest_api.api.rebuildArchive.GET(mainPool=1)
             if response['state'] == 'RebuildState_None':
                 return
             time.sleep(0.3)
@@ -452,7 +450,7 @@ class Server(object):
     def get_recorded_time_periods(self, camera_id):
         periods = [TimePeriod(datetime.datetime.utcfromtimestamp(int(d['startTimeMs'])/1000.).replace(tzinfo=pytz.utc),
                     datetime.timedelta(seconds=int(d['durationMs'])/1000.))
-                    for d in self.rest_api.ec2.recordedTimePeriods.get(cameraId=camera_id, flat=True)]
+                    for d in self.rest_api.ec2.recordedTimePeriods.GET(cameraId=camera_id, flat=True)]
         log.info('Server %r returned recorded periods:', self.name)
         log.info('\t%s', '\n\t'.join(map(str, periods)))
         return periods
