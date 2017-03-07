@@ -91,6 +91,8 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
 
     if (m_sampleBuffers)
     {
+        // AllocSampleBuffers does two av_allocs: buffer for pointers and payload data.
+        // It requires two free calls.
         av_freep(m_sampleBuffers);
         av_freep(&m_sampleBuffers);
     }
