@@ -282,8 +282,6 @@ int QnUserListModel::columnCount(const QModelIndex &parent) const
 
 QVariant QnUserListModel::data(const QModelIndex& index, int role) const
 {
-    static const int kMaxLength = 30;
-
     if (!hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
 
@@ -295,17 +293,10 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
         {
             switch (index.column())
             {
-                case LoginColumn:
-                    return nx::utils::elideString(user->getName(), kMaxLength);
-
-                case FullNameColumn:
-                    return nx::utils::elideString(user->fullName(), kMaxLength);
-
-                case UserRoleColumn:
-                    return nx::utils::elideString(qnUserRolesManager->userRoleName(user), kMaxLength);
-
-                default:
-                    break;
+                case LoginColumn        : return user->getName();
+                case FullNameColumn     : return user->fullName();
+                case UserRoleColumn     : return qnUserRolesManager->userRoleName(user);
+                default                 : break;
 
             } // switch (column)
             break;
