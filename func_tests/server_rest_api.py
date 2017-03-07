@@ -22,7 +22,6 @@ REST_API_TIMEOUT_SEC = 10
 
 log = logging.getLogger(__name__)
 
-
 class HttpError(RuntimeError):
 
     def __init__(self, server_name, url, status_code, reason):
@@ -55,9 +54,12 @@ class ServerRestApiProxy(object):
         params = {name: self._get_param_to_str(value) for name, value in kw.items()}
         return self._make_request(raise_exception, timeout_sec, requests.get, self._url, headers=headers, params=params)
 
-    def post(self, raise_exception=True, timeout_sec=None, headers=None, **kw):
-        log.debug('%s: POST %s %s', self._server_name, self._url, kw)
-        return self._make_request(raise_exception, timeout_sec, requests.post, self._url, headers=headers, json=kw)
+    def post(self, raise_exception=True, timeout_sec=None, headers=None, json = None, **kw):
+        if kw:
+            assert not json, 'kw and json arguments are mutually exclusive - only one may be used at a time'
+            json = kw
+        log.debug('%s: POST %s %s', self._server_name, self._url, json)
+        return self._make_request(raise_exception, timeout_sec, requests.post, self._url, headers=headers, json=json)
 
     def _get_param_to_str(self, value):
         if type(value) is bool:
@@ -100,6 +102,11 @@ class RestApiBase(object):
         self.url = url
         self.user = user
         self.password = password
+
+    def get_api_fn(self, method, api_object, api_method):
+        object = getattr(self, api_object)     # server.rest_api.ec2
+        function = getattr(object, api_method) # server.rest_api.ec2.getUsers
+        return getattr(function, method)       # server.rest_api.ec2.getUsers.get
 
     def _make_proxy(self, path):
         return ServerRestApiProxy(self.server_name, self.url + path, self.user, self.password)

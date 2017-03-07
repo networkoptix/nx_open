@@ -45,6 +45,8 @@ def pytest_addoption(parser):
                      help='destroy and create again vagrant boxes')
     parser.addoption('--vm-name-prefix', default=DEFAULT_VM_NAME_PREFIX,
                      help='prefix for virtualenv machine names')
+    parser.addoption('--config-file',
+                     help='config file for tests')
     parser.addoption('--vm-host',
                      help='hostname or IP address for host with virtualbox, used to start virtual machines (by default it is local host)')
     parser.addoption('--vm-host-user', default=DEFAULT_VM_HOST_USER,
@@ -55,7 +57,6 @@ def pytest_addoption(parser):
                      help='Working directory at host with virtualbox, used to store vagrant files')
     parser.addoption('--max-log-width', default=DEFAULT_MAX_LOG_WIDTH, type=int,
                      help='Change maximum log message width. Default is %d' % DEFAULT_MAX_LOG_WIDTH)
-
 
 @pytest.fixture(scope='session')
 def run_options(request):
@@ -92,7 +93,6 @@ def box():
 def server():
     return ServerFactory()
 
-
 @pytest.fixture
 def cloud_host_rest_api():
     return CloudRestApi('cloud', 'http://%s/' % MEDIASERVER_DEFAULT_CLOUDHOST, CLOUD_USER_NAME, CLOUD_USER_PASSWORD)
@@ -113,7 +113,7 @@ def sample_media_file(run_options):
 def test_session(run_options):
     #format = '%(asctime)-15s %(threadName)s %(name)s %(levelname)s  %(message)s'
     # %.10s limits formatted string to 10 chars; %(text).10s makes the same for dict-style formatting
-    format = '%%(asctime)-15s %%(levelname)-7s %%(message).%ds' % run_options.max_log_width
+    format = '%%(asctime)-15s %%(threadName)-15s %%(levelname)-7s %%(message).%ds' % run_options.max_log_width
     logging.basicConfig(level=logging.DEBUG, format=format)
     session = TestSession(run_options.recreate_boxes)
     session.init(run_options)

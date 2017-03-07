@@ -21,7 +21,6 @@ import pytest
 from server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_SEC, HttpError, ServerRestApi
 from camera import Camera, SampleMediaFile
 
-
 MEDIASERVER_CONFIG_PATH = '/opt/networkoptix/mediaserver/etc/mediaserver.conf'
 MEDIASERVER_CONFIG_PATH_INITIAL = '/opt/networkoptix/mediaserver/etc/mediaserver.conf.initial'
 MEDIASERVER_LISTEN_PORT = 7001
@@ -75,8 +74,6 @@ def change_mediaserver_config(old_config, **kw):
     f = StringIO.StringIO()
     config.write(f)
     return f.getvalue()
-
-
 
 class Service(object):
 
@@ -180,7 +177,7 @@ class Server(object):
                 self.stop_service()
             self.storage.cleanup()
             self.patch_binary_set_cloud_host(MEDIASERVER_DEFAULT_CLOUDHOST)  # may be changed by previous tests...
-            self.reset_config(logLevel=log_level)
+            self.reset_config(logLevel=log_level, tranLogLevel=log_level)
             if must_start:
                 self.start_service()
         else:
