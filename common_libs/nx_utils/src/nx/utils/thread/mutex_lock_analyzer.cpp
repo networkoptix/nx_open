@@ -3,7 +3,16 @@
 * akolesnikov@networkoptix.com
 ***********************************************************/
 
-#ifdef USE_OWN_MUTEX
+#if defined(USE_OWN_MUTEX)
+
+#if defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#elif defined(__linux__)
+#include <signal.h>
+#include <sys/types.h>
+#include <unistd.h>
+#endif
 
 #include "mutex_lock_analyzer.h"
 
@@ -17,7 +26,7 @@
 #include "thread_util.h"
 #include <nx/utils/log/log.h>
 
-#ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
+#if defined(ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
     static bool kDoAnalyseForDeadlock = true;
 #else
     static bool kDoAnalyseForDeadlock = false;
@@ -357,7 +366,12 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
 
             NX_LOG( deadLockMsg, cl_logALWAYS );
             std::cerr<<deadLockMsg.toStdString()<<std::endl;
-            //NX_ASSERT( false );
+
+            #if defined(_WIN32)
+                DebugBreak();
+            #elif defined(__linux__)
+                kill(getppid(), SIGTRAP);
+            #endif
         }
     }
 
