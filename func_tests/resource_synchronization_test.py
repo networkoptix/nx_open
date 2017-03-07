@@ -11,6 +11,7 @@ from server_rest_api import ServerRestApi
 from utils import SimpleNamespace
 import server_api_data_generators as generator
 from multiprocessing.dummy import Pool as ThreadPool
+from functools import total_ordering
 
 log = logging.getLogger(__name__)
 
@@ -21,12 +22,71 @@ CONFIG_USERNAME = 'username'
 CONFIG_PASSWORD = 'password'
 CONFIG_TESTSIZE = 'testCaseSize'
 CONFIG_THREADS = 'threadNumber'
+DEFAULT_SLEEP = MEDIASERVER_MERGE_TIMEOUT_SEC / 10.0 # pause between synchronization checks
 
 def read_servers(config):
     server_list = config.get(DEFAULT_CONFIG_SECTION, 'serverList')
     return server_list.split(",")
 
-class RemoteServer:
+@total_ordering
+class Timestamp(object):
+
+    def __init__(self, sequence, ticks):
+        self.sequence = sequence
+        self.ticks = ticks
+
+    def __eq__(self, other):
+        return ((self.sequence, self.ticks) ==
+                (other.sequence, other.ticks))
+    
+    def __lt__(self, other):
+        return ((self.sequence, self.ticks) <
+                (other.sequence, other.ticks))
+
+    def __str__(self):
+        return "%s.%s" % (self.sequence, self.ticks)
+
+@total_ordering
+class Transaction(object):
+
+    @classmethod
+    def from_dict(cls, d):
+        return Transaction(d['tran']['command'],
+                           d['tran']['historyAttributes']['author'],
+                           d['tran']['peerID'],
+                           d['tran']['persistentInfo']['dbID'],
+                           d['tran']['persistentInfo']['sequence'],
+                           Timestamp(d['tran']['persistentInfo']['timestamp']['sequence'],
+                                     d['tran']['persistentInfo']['timestamp']['ticks']),
+                           d['tran']['transactionType'],
+                           d['tranGuid'])
+
+    def __init__(self, command, author, peer_id, db_id, sequence, timestamp,
+                 transaction_type, transaction_guid):
+        self.command = command
+        self.author = author
+        self.peer_id = peer_id
+        self.db_id = db_id
+        self.sequence = sequence
+        self.timestamp = timestamp
+        self.transaction_type = transaction_type
+        self.transaction_guid = transaction_guid
+
+    def __hash__(self):
+        return hash((self.peer_id, self.db_id, self.sequence))
+
+    def __eq__(self, other):
+        return ((self.peer_id, self.db_id, self.sequence) ==
+                (other.peer_id, other.db_id, other.sequence))
+    
+    def __lt__(self, other):
+        return ((self.peer_id, self.db_id, self.sequence) <
+                (other.peer_id, other.db_id, other.sequence))
+    
+    def __str__(self):
+        return "Transaction#%s timestamp: %s, command: %s" % (self.peer_id, self.timestamp, self.command)
+
+class RemoteServer(object):
 
     def __init__(self, name, url, user, password):
         self.title = name
@@ -50,7 +110,7 @@ class RemoteServer:
         response = self.rest_api.api.systemSettings.get()
         return response['settings']
 
-class ResourceGenerator:
+class ResourceGenerator(object):
     def __init__(self, gen_fn):
         self.gen_fn = gen_fn
 
@@ -64,10 +124,13 @@ class SeedResourceGenerator(ResourceGenerator):
     def __init__(self, gen_fn):
         ResourceGenerator.__init__(self, gen_fn)
 
+    def next(self):
+       self.__seed+=1
+       return self.__seed
+
     def get(self, seq):
         for i, v in enumerate(seq):
-            self.__seed+=1
-            yield (i, self.gen_fn(self.__seed))
+            yield (i, self.gen_fn(self.next()))
 
 @pytest.fixture(scope="module")
 def gen():
@@ -104,28 +167,54 @@ def env(request, env_builder, server):
         boxes_env.servers = [boxes_env.one, boxes_env.two]
         return boxes_env
 
+def get_response(server, method, api_object, api_method):
+    return server.rest_api.get_api_fn(method, api_object, api_method)()
+
 def wait_entity_merge_done(
     servers, method, api_object,
     api_method, timeout = MEDIASERVER_MERGE_TIMEOUT_SEC):
     log.info('TEST for %s %s.%s:', method.upper(), api_object, api_method)
-    t = time.time()
+    start = time.time()
     while True:
-        result_expected = servers[0].rest_api.get_api_fn(method, api_object, api_method)()
+        result_expected = get_response(servers[0], method, api_object, api_method)
         def check(servers, result_expected):
             for srv in servers:
-                result = srv.rest_api.get_api_fn(method, api_object, api_method)()
+                result = get_response(srv, method, api_object, api_method)
                 if result != result_expected:
-                    return result
+                    return (srv, result)
             return None
         result = check(servers[1:], result_expected)
         if not result: return
-        if result and time.time() - t >= timeout:
-            assert result == result_expected
-        time.sleep(2.0)
+        if time.time() - start >= timeout:
+            log.error("'%s' unsynchronized data: %s(%s) and %s(%s)" % (
+                api_method, servers[0].url, servers[0].title, result[0].url, result[0].title))
+            assert result[1] == result_expected
+        time.sleep(DEFAULT_SLEEP)
 
 def check_api_calls(env, calls):
     for method, api_object, api_method in calls:
         wait_entity_merge_done(env.servers, method, api_object, api_method)
+
+def check_transaction_log(env, timeout = MEDIASERVER_MERGE_TIMEOUT_SEC):
+    log.info('TEST for GET ec2.getTransactionLog:')
+    def servers_to_str(servers):
+        return ', '.join("%s(%s)" % (s.title, s.url) for s in servers)
+    def transactions_to_str(transactions):
+        return '\n  '.join("%s: [%s]" % (k, servers_to_str(v)) for k, v in transactions.iteritems())
+    start = time.time()
+    while True:
+        srv_transactions = {}
+        for srv in env.servers:
+            transactions = map(Transaction.from_dict, srv.rest_api.ec2.getTransactionLog.get())
+            for t in transactions:
+                srv_transactions.setdefault(t, []).append(srv)
+        unmatched_transactions = {t: l for t, l in srv_transactions.iteritems()
+                                  if len(l) != len(env.servers)}
+        if not unmatched_transactions: return
+        if time.time() - start >= timeout:
+            assert False, "Unmatched transaction:\n  %s" % transactions_to_str(unmatched_transactions)
+        time.sleep(DEFAULT_SLEEP)
+            
 
 def server_api_post( (server_api_method, data) ):
     if isinstance(data, dict):
@@ -158,7 +247,9 @@ def test_initial_merge(env):
           ('get', 'ec2', 'getMediaServersEx'),
           ('get', 'ec2', 'getCamerasEx'),
           ('get', 'ec2', 'getUsers'),
-          ('get', 'ec2', 'getTransactionLog') ])
+          ('get', 'ec2', 'getFullInfo') ])
+
+    check_transaction_log(env)
 
 def test_api_get_methods(env):
     test_api_get_methods = [
@@ -194,15 +285,15 @@ def test_camera_data_syncronization(env, gen):
     check_api_calls(
         env,
         [ ('get', 'ec2', 'getCameraUserAttributesList'),
-          ('get', 'ec2', 'getTransactionLog')])
+          ('get', 'ec2', 'getFullInfo') ])
+    check_transaction_log(env)
 
 def test_user_data_syncronization(env, gen):
     prepare_and_make_async_post_calls(env, gen, 'saveUser')
     check_api_calls(
         env,
-        [ ('get', 'ec2', 'getUsers'),
-          ('get', 'ec2', 'getTransactionLog')
-          ])
+        [ ('get', 'ec2', 'getFullInfo') ])
+    check_transaction_log(env)
 
 def test_mediaserver_data_syncronization(env, gen):
     servers = prepare_and_make_async_post_calls(env, gen, 'saveMediaServer')
@@ -213,7 +304,9 @@ def test_mediaserver_data_syncronization(env, gen):
     check_api_calls(
         env,
         [ ('get', 'ec2', 'getMediaServersUserAttributesList'),
-          ('get', 'ec2', 'getTransactionLog')])
+          ('get', 'ec2', 'getFullInfo')])
+
+    check_transaction_log(env)
 
 def test_resource_params_data_syncronization(env, gen):
     cameras = prepare_and_make_async_post_calls(env, gen, 'saveCamera')
@@ -229,9 +322,9 @@ def test_resource_params_data_syncronization(env, gen):
     prepare_and_make_async_post_calls(env, gen, 'setResourceParams', resources)
     check_api_calls(
         env,
-        [ ('get', 'ec2', 'getResourceParams'),
-          ('get', 'ec2', 'getTransactionLog')])
+        [ ('get', 'ec2', 'getFullInfo')])
 
+    check_transaction_log(env)
 
 def test_remove_resource_params_data_syncronization(env, gen):
     cameras = prepare_and_make_async_post_calls(env, gen, 'saveCamera')
@@ -248,10 +341,9 @@ def test_remove_resource_params_data_syncronization(env, gen):
     prepare_and_make_async_post_calls(env, gen, 'removeResource', resources)
     check_api_calls(
         env,
-        [ ('get', 'ec2', 'getCamerasEx'),
-          ('get', 'ec2', 'getUsers'),
-          ('get', 'ec2', 'getMediaServersEx'),
-          ('get', 'ec2', 'getTransactionLog') ])
+        [ ('get', 'ec2', 'getFullInfo') ])
+
+    check_transaction_log(env)
 
 def test_resource_remove_update_conflict(env, gen):
     cameras = prepare_and_make_async_post_calls(env, gen, 'saveCamera')
@@ -273,15 +365,33 @@ def test_resource_remove_update_conflict(env, gen):
         data = v[i % 3]
         data['name'] += '_changed'
         server_1 = env.servers[i % len(env.servers)]
-        server_2 = env.servers[i+1 % len(env.servers)]
+        server_2 = env.servers[(i+1) % len(env.servers)]
         api_calls.append((server_1.rest_api.get_api_fn('post', 'ec2', api_method), data))
         api_calls.append((server_2.rest_api.get_api_fn('post', 'ec2', 'removeResource'), dict(id=data['id'])))
 
     make_async_post_calls(env, api_calls)
     check_api_calls(
         env,
-        [ ('get', 'ec2', 'getCamerasEx'),
-          ('get', 'ec2', 'getUsers'),
-          ('get', 'ec2', 'getMediaServersEx'),
-          ('get', 'ec2', 'getFullInfo'),
-          ('get', 'ec2', 'getTransactionLog') ])
+        [ ('get', 'ec2', 'getFullInfo') ])
+
+    check_transaction_log(env)
+
+
+# Uncomment to simplify VMS-5657 reproducing
+#
+# def test_resource_remove_update_user_conflict(env, gen):
+#     user_data = generator.generate_user_data(0)
+#     server_1 = env.servers[0]
+#     server_2 = env.servers[1]
+#     server_1.rest_api.get_api_fn('post', 'ec2', 'saveUser')(**user_data)
+#     check_api_calls(
+#         env, [ ('get', 'ec2', 'getUsers') ])
+#     user_data['name'] += '_changed'
+#     api_calls = []    
+#     api_calls.append((server_1.rest_api.get_api_fn('post', 'ec2', 'saveUser'), user_data))
+#     api_calls.append((server_2.rest_api.get_api_fn('post', 'ec2', 'removeResource'), dict(id=user_data['id'])))
+#     make_async_post_calls(env, api_calls)
+#     check_api_calls(
+#         env,
+#         [ ('get', 'ec2', 'getFullInfo') ])
+#     check_transaction_log(env)
