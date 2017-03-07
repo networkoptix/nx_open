@@ -236,12 +236,15 @@ void AddressResolver::resolveAsync(
     {
         auto entries = info->second.getAll();
 
-        const bool cloudAddressEntryPresent =
-            std::count_if(
-                entries.begin(), entries.end(),
-                [](const AddressEntry& entry) { return entry.type == AddressType::cloud; }) > 0;
-        if (info->second.isLikelyCloudAddress && !cloudAddressEntryPresent)
-            entries.push_back(AddressEntry(AddressType::cloud, hostName));
+        if (info->second.isLikelyCloudAddress && isMediatorAvailable())
+        {
+            const bool cloudAddressEntryPresent =
+                std::count_if(
+                    entries.begin(), entries.end(),
+                    [](const AddressEntry& entry) { return entry.type == AddressType::cloud; }) > 0;
+            if (!cloudAddressEntryPresent)
+                entries.push_back(AddressEntry(AddressType::cloud, hostName));
+        }
 
         lk.unlock();
 
