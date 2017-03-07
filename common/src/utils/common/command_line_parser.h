@@ -110,6 +110,9 @@ public:
         addParameter(QnCommandLineParameter(target, longName, shortName, description, impliedValue));
     }
 
+    /** Add storage for all variables that were not parsed. */
+    void storeUnparsed(QStringList* unparsed);
+
     void print(QTextStream &stream) const;
 
     QVariant value(const QString &name, const QVariant &defaultValue = QVariant());
@@ -127,6 +130,7 @@ private:
     QList<QnCommandLineParameter> m_parameters;
     QList<QVariant> m_values;
     QHash<QString, int> m_indexByName;
+    QStringList* m_unparsed = nullptr;
 };
 
 #endif // QN_COMMAND_LINE_PARSER_H

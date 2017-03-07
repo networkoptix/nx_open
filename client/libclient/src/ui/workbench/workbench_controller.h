@@ -87,6 +87,7 @@ public:
     Instrument* rubberBandInstrument() const;
     Instrument* itemLeftClickInstrument() const;
     Instrument* gridAdjustmentInstrument() const;
+    Instrument* sceneClickInstrument() const;
 
     // TODO: #Elric split into menu_controller or smth like that
     bool isMenuEnabled() const {
@@ -229,6 +230,8 @@ private:
 
     /** Instrument that tracks left clicks on items. */
     ClickInstrument *m_itemLeftClickInstrument;
+
+    ClickInstrument* m_sceneClickInstrument = nullptr;
 
     ZoomWindowInstrument* m_zoomWindowInstrument;
 

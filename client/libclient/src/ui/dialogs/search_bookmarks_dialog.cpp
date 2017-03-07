@@ -28,15 +28,6 @@ void QnSearchBookmarksDialog::setParameters(qint64 utcStartTimeMs, qint64 utcFin
     d->setParameters(filterText, utcStartTimeMs, utcFinishTimeMs);
 }
 
-
-void QnSearchBookmarksDialog::resizeEvent(QResizeEvent* event)
-{
-    base_type::resizeEvent(event);
-
-    Q_D(QnSearchBookmarksDialog);
-    d->updateHeadersWidth();
-}
-
 void QnSearchBookmarksDialog::showEvent(QShowEvent* event)
 {
     base_type::showEvent(event);
