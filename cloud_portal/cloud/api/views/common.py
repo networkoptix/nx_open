@@ -58,9 +58,3 @@ def cloud_modules2(request):
                     get_cloud_modules(),
                     content_type='application/xml')
 
-
-@api_view(['GET'])
-@permission_classes((AllowAny, ))
-def cloud_modules_json(request):
-    return api_success(get_cloud_modules())
-
