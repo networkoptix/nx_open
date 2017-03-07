@@ -17,13 +17,8 @@ set(defaultWebPages "{}")
 set(freeLicenseCount "4")
 set(freeLicenseIsTrial "true")
 
-# Help and settings URLs
-set(helpUrl "http://networkoptix.com/files/help")
-set(settings.url "http://networkoptix.com/files/settings")
-set(showcase.url "http://networkoptix.com/files/showcase")
-set(update.generator.url "http://updates.hdw.mx/upcombiner/upcombine")
-
 # Update parameters
+set(update.generator.url "http://updates.hdw.mx/upcombiner/upcombine")
 set(mirrorListUrl "http://downloads.hdwitness.com/clients/mirror.xml")
 set(prodUpdateFeedUrl "http://updates.hdwitness.com/updates.json")
 set(releaseNotesUrl "http://updates.hdwitness.com/releasenotes.json")

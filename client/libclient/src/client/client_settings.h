@@ -77,11 +77,6 @@ public:
         /** Do not show update notification for the selected version. */
         IGNORED_UPDATE_VERSION,
 
-        SHOWCASE_URL,
-        SHOWCASE_ENABLED,
-
-        SETTINGS_URL,
-
         TOUR_CYCLE_TIME,
 
         /** Show extra information in tree - ip addresses, user name, videowall screen layouts. */
@@ -176,9 +171,6 @@ protected:
     virtual UpdateStatus updateValue(int id, const QVariant &value) override;
 
 private:
-    void loadFromWebsite();
-
-private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_RW_PROPERTY(int,                         maxSceneVideoItems,     setMaxSceneVideoItems,      MAX_SCENE_VIDEO_ITEMS,      24)
         QN_DECLARE_RW_PROPERTY(int,                         maxPreviewSearchItems,  setMaxPreviewSearchItems,   MAX_PREVIEW_SEARCH_ITEMS,   16)
@@ -207,9 +199,6 @@ private:
         QN_DECLARE_RW_PROPERTY(qint64,                      updateDeliveryDate,     setUpdateDeliveryDate,      UPDATE_DELIVERY_DATE,       0)
 
         QN_DECLARE_RW_PROPERTY(bool,                        isClientUpdateDisabled, setClientUpdateDisabled,    NO_CLIENT_UPDATE,           false)
-        QN_DECLARE_RW_PROPERTY(QUrl,                        showcaseUrl,            setShowcaseUrl,             SHOWCASE_URL,               QUrl())
-        QN_DECLARE_RW_PROPERTY(bool,                        isShowcaseEnabled,      setShowcaseEnabled,         SHOWCASE_ENABLED,           false)
-        QN_DECLARE_RW_PROPERTY(QUrl,                        settingsUrl,            setSettingsUrl,             SETTINGS_URL,               QUrl())
         QN_DECLARE_RW_PROPERTY(int,                         tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
         QN_DECLARE_RW_PROPERTY(Qn::ResourceInfoLevel,       extraInfoInTree,        setExtraInfoInTree,         EXTRA_INFO_IN_TREE,         Qn::RI_NameOnly)
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,                timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)

@@ -6,13 +6,16 @@
 
 #include <atomic>
 #include <limits>
+
 #include <nx/utils/random.h>
+
+#include <api/helpers/camera_id_helper.h>
+#include <core/resource/security_cam_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include "media_server/settings.h"
 
-
-StreamingChunk::SequentialReadingContext::SequentialReadingContext(StreamingChunk* chunk)
-:
+StreamingChunk::SequentialReadingContext::SequentialReadingContext(StreamingChunk* chunk):
     m_currentOffset( 0 ),
     m_chunk(chunk)
 {
@@ -24,8 +27,7 @@ StreamingChunk::SequentialReadingContext::~SequentialReadingContext()
     m_chunk->m_readers.erase(this);
 }
 
-StreamingChunk::StreamingChunk( const StreamingChunkCacheKey& params )
-:
+StreamingChunk::StreamingChunk( const StreamingChunkCacheKey& params ):
     m_params( params ),
     m_modificationState( State::init ),
     m_maxInternalBufferSize(
@@ -34,6 +36,9 @@ StreamingChunk::StreamingChunk( const StreamingChunkCacheKey& params )
             nx_ms_conf::DEFAULT_HLS_MAX_CHUNK_BUFFER_SIZE).toUInt() ),
     m_dataOffsetAtTheFrontOfTheBuffer(0)
 {
+    const auto res = nx::camera_id_helper::findCameraByFlexibleId(params.srcResourceUniqueID());
+    if (res)
+        m_videoCameraLocker = qnCameraPool->getVideoCameraLockerByResourceId(res->getId());
 }
 
 StreamingChunk::~StreamingChunk()
@@ -186,6 +191,8 @@ void StreamingChunk::doneModification( StreamingChunk::ResultCode /*result*/ )
         m_cond.wakeAll();
     }
 
+    m_videoCameraLocker.reset();
+
 #ifdef DUMP_CHUNK_TO_FILE
     m_dumpFile.close();
 #endif
@@ -224,13 +231,11 @@ void StreamingChunk::disableInternalBufferLimit()
         std::numeric_limits<decltype(m_maxInternalBufferSize)>::max();
 }
 
-
 //////////////////////////////////////////////
 //   StreamingChunkInputStream
 //////////////////////////////////////////////
 
-StreamingChunkInputStream::StreamingChunkInputStream(StreamingChunk* chunk)
-    :
+StreamingChunkInputStream::StreamingChunkInputStream(StreamingChunk* chunk):
     m_chunk(chunk),
     m_readCtx(chunk)
 {

@@ -88,6 +88,11 @@ void commonHooks(EndpointAdditionalInfo* outInfo)
         name = manufacturer;
         manufacturer = lit("ACTi");
     }
+    else if (lowerName.startsWith(lit("network optix")))
+    {
+        name = manufacturer;
+        manufacturer = lit("Network Optix");
+    }
 }
 
 void hikvisionManufacturerReplacement(EndpointAdditionalInfo* outInfo)

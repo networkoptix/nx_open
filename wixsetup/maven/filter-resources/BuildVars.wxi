@@ -25,6 +25,7 @@
 
     <?define ECRegPath="Software\${company.name}\${appserver.name}"?>    
     
+    <?define clientInternalName = "${client.name}"?>
     <?define productName = "${display.product.name}"?>
     <?define applauncherName = "${applauncher.name}"?>
     <?define minilauncherBinaryName = "${minilauncher.binary.name}"?>

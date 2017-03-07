@@ -8,6 +8,7 @@
 
         <?include ControlPanel.wxi ?>
 
+        <Property Id="CLIENT_NAME" Value="$(var.clientInternalName)"/>
         <Property Id="REINSTALLMODE" Value="dmus"/>
         <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Secure="yes" Value="1"></Property>        
 
@@ -79,6 +80,8 @@
 
         <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
 
+        <CustomAction Id="CleanAutorunRegistryKeys" BinaryKey="CustomActions.dll" DllEntry="CleanAutorunRegistryKeys" Execute="immediate" Impersonate="yes"/>
+
         <!-- Custom actions -->
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="LaunchClient" Execute="immediate" Impersonate="yes" Return="asyncNoWait" FileKey="minilauncher.exe" ExeCommand=""/>
@@ -111,6 +114,8 @@
         <InstallExecuteSequence>
             <FindRelatedProducts Before="AppSearch" />
             <AppSearch Before="LaunchConditions" />
+
+            <Custom Action="CleanAutorunRegistryKeys" Before="InstallFinalize">(NOT UPGRADINGPRODUCTCODE) AND (REMOVE="ALL")</Custom>
 
             <Custom Action="CloseAppLauncherAction_Cmd" Before="CloseAppLauncherAction">NOT $(var.VmsInstalling)</Custom>
             <Custom Action="CloseAppLauncherAction" Before="CloseAppLauncherAction2_Cmd">NOT $(var.VmsInstalling)</Custom>

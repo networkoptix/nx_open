@@ -112,8 +112,7 @@ int workaround_av_write_trailer(AVFormatContext *s)
     int ret = 0;
     /*
     for(;;){
-        AVPacket pkt;
-        av_init_packet(&pkt);
+        QnFfmpegAvPacket pkt;
         ret= interleave_packet(s, &pkt, NULL, 1);
         if(ret<0) //FIXME cleanup needed for ret<0 ?
             goto fail;
@@ -123,8 +122,6 @@ int workaround_av_write_trailer(AVFormatContext *s)
         ret= s->oformat->write_packet(s, &pkt);
         if (ret >= 0)
             s->streams[pkt.stream_index]->nb_frames++;
-
-        av_free_packet(&pkt);
 
         if(ret<0)
             goto fail;
@@ -375,9 +372,7 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
         streamIndex = 1;
 
     AVStream* stream = m_formatCtx->streams[streamIndex];
-    AVPacket packet;
-    av_init_packet(&packet);
-
+    QnFfmpegAvPacket packet;
     QnAbstractMediaDataPtr transcodedData;
 
     QnCodecTranscoderPtr transcoder;
@@ -454,12 +449,8 @@ int QnFfmpegTranscoder::finalizeInternal(QnByteArray* const /*result*/)
         QnAbstractMediaDataPtr transcodedData;
         do
         {
+            QnFfmpegAvPacket packet;
             transcodedData.reset();
-
-            AVPacket packet;
-            av_init_packet(&packet);
-            packet.data = 0;
-            packet.size = 0;
 
             // transcode media
             int errCode = transcoder->transcodePacket(QnConstAbstractMediaDataPtr(), &transcodedData);
