@@ -173,7 +173,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
 
     m_header->setVisible(true);
     m_header->setSectionResizeMode(QHeaderView::ResizeToContents);
-    m_header->setSectionResizeMode(QnUserListModel::UserRoleColumn, QHeaderView::Stretch);
+    m_header->setSectionResizeMode(QnUserListModel::FullNameColumn, QHeaderView::Stretch);
     m_header->setSectionsClickable(true);
     connect(m_header, &QnCheckBoxedHeaderView::checkStateChanged, this, &QnUserManagementWidget::at_headerCheckStateChanged);
 
