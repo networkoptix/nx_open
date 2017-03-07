@@ -15,6 +15,11 @@ QnOnlineHelpDetector::QnOnlineHelpDetector(QObject *parent) :
     QObject(parent),
     m_networkAccessManager(new QNetworkAccessManager(this))
 {
+
+    connect(m_networkAccessManager, &QNetworkAccessManager::sslErrors,
+        this, [](QNetworkReply* reply, const QList<QSslError> &){reply->ignoreSslErrors();} );
+
+    cl_log.log("Fetching online url", cl_logALWAYS);
     fetchHelpUrl();
 }
 
@@ -26,6 +31,7 @@ void QnOnlineHelpDetector::fetchHelpUrl() {
 }
 
 void QnOnlineHelpDetector::at_networkReply_finished() {
+    cl_log.log("Network reply finished", cl_logALWAYS);
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if (!reply)
         return;
@@ -47,6 +53,7 @@ void QnOnlineHelpDetector::at_networkReply_finished() {
 }
 
 void QnOnlineHelpDetector::at_networkReply_error() {
+    cl_log.log("Network reply error", cl_logALWAYS);
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     if (!reply)
         return;
