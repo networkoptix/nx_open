@@ -23,6 +23,7 @@ private:
 
 private:
     friend class QnResourceTreeModelLayoutNode;
+
+    /* Layouts that have items not yet linked to resources. */
     QSet<QnResourceTreeModelLayoutNode*> m_loadingLayouts;
-    QHash<QnResourcePtr, QnResourceTreeModelNodePtr> m_layoutItemsByResource;
 };

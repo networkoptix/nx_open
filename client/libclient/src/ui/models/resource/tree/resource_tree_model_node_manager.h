@@ -20,9 +20,6 @@ protected:
     {
         for (auto node = from; node != nullptr; node = node->m_next.data())
         {
-            const QString xxx = node->m_initialized ? QString() :
-                from->resource()->getName();
-
             NX_ASSERT(node->m_initialized);
             if (auto typedNode = qobject_cast<Type*>(node))
                 (typedNode->*method)(args...);
