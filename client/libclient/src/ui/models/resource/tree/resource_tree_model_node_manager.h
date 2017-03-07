@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ui/models/resource/resource_tree_model_fwd.h>
+#include <ui/models/resource/resource_tree_model_node.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
