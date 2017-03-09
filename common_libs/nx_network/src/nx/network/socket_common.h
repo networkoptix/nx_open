@@ -69,6 +69,8 @@ public:
     HostAddress(const QString& addrStr);
     HostAddress(const char* addrStr);
 
+    ~HostAddress();
+
     bool operator==(const HostAddress& right) const;
     bool operator!=(const HostAddress& right) const;
     bool operator<(const HostAddress& right) const;
@@ -120,6 +122,7 @@ public:
     SocketAddress(const QString& str);
     SocketAddress(const QByteArray& utf8Str);
     SocketAddress(const char* utf8Str);
+    ~SocketAddress();
 
     bool operator==(const SocketAddress& rhs) const;
     bool operator!=(const SocketAddress& rhs) const;

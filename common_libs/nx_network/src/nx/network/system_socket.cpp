@@ -1554,6 +1554,10 @@ UDPSocket::UDPSocket(int ipVersion):
     }
 }
 
+UDPSocket::~UDPSocket()
+{
+}
+
 SocketAddress UDPSocket::getForeignAddress() const
 {
     return m_destAddr;

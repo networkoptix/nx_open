@@ -7,27 +7,27 @@
 const HostAddress HostAddress::localhost(*ipV4from(lit("127.0.0.1")));
 const HostAddress HostAddress::anyHost(*ipV4from(lit("0.0.0.0")));
 
-HostAddress::HostAddress( const in_addr& addr )
-:
+HostAddress::HostAddress( const in_addr& addr ):
     m_ipV4( addr )
 {
 }
 
-HostAddress::HostAddress( const in6_addr& addr )
-:
+HostAddress::HostAddress( const in6_addr& addr ):
     m_ipV6( addr )
 {
 }
 
-HostAddress::HostAddress( const QString& addrStr )
-:
+HostAddress::HostAddress( const QString& addrStr ):
     m_string( addrStr )
 {
 }
 
-HostAddress::HostAddress( const char* addrStr )
-:
+HostAddress::HostAddress( const char* addrStr ):
     m_string( QLatin1String(addrStr) )
+{
+}
+
+HostAddress::~HostAddress()
 {
 }
 
@@ -266,6 +266,10 @@ SocketAddress::SocketAddress(const QByteArray& utf8Str):
 
 SocketAddress::SocketAddress(const char* utf8Str):
     SocketAddress(QByteArray(utf8Str))
+{
+}
+
+SocketAddress::~SocketAddress()
 {
 }
 

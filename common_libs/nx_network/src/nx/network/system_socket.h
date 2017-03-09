@@ -289,6 +289,7 @@ public:
         MAX_IP_DATAGRAM_LENGTH - IP_HEADER_MAX_LENGTH - UDP_HEADER_LENGTH;
 
     explicit UDPSocket(int ipVersion = AF_INET);
+    virtual ~UDPSocket() override;
     UDPSocket(const UDPSocket&) = delete;
     UDPSocket& operator=(const UDPSocket&) = delete;
     UDPSocket(UDPSocket&&) = delete;
