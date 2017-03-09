@@ -17,7 +17,7 @@ from server import ServerConfig
 from camera import MEDIA_SAMPLE_FPATH, SampleMediaFile, Camera
 
 
-DEFAULT_CLOUD_GROUP = 'dev'
+DEFAULT_CLOUD_GROUP = 'test'
 DEFAULT_CUSTOMIZATION = 'default'
 
 DEFAULT_WORK_DIR = os.path.expanduser('/tmp/funtest')
