@@ -1,0 +1,51 @@
+<div class="videowindow">
+
+    <div class="camera-view-informer camera-loading" ng-if="loading">
+        <div class="camera-view-preloader camera-view-message-icon"></div>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashRequired">
+        Vidéo ne peuvent pas être lus.<br>         S.V.P<a href="https://get.adobe.com/flashplayer/" target="_blank"> installer Adobe Flash</a> pour la lecture depuis un serveurs ARM.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashOrWebmRequired">
+        Vidéo ne peuvent pas être lus.<br>         S.V.P<a href="https://get.adobe.com/flashplayer/" target="_blank">installer Adobe Flash</a> ou <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">codec WebM</a> pour la lecture vidéo dans Internet Explorer.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noArmSupport">
+        Vidéo ne peuvent pas être lus.<br>         Ce navigateur ou périphérique ne supporte pas la lecture vidéo depuis un serveur ARM.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noFormat">
+        Vidéo ne peuvent pas être lus.<br>         Ce navigateur ou périphérique ne supporte pas l'archive vidéo de cette caméra.<br>
+    </div>
+
+
+    <div class="camera-view-informer" ng-if="ieNoWebm">
+        Vidéo ne peuvent pas être lus.<br>         S.V.P, installer le <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">codec WebM</a> pour Internet Explorer.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ieWin10">
+        Vidéo ne peuvent pas être lus.<br>         S.V.P, utiliser le navigateur Microsoft Edge ou Google Chrome.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ubuntuNX">
+        Vidéo ne peuvent pas être lus.<br>         Ce navigateur ne supporte pas la vidéo à partir de serveurs ARM. S.V.P, utiliser le navigateur Chromium.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="errorLoading">
+        Vidéo ne peuvent pas être lus.<br>         Erreur survenue.<br>
+    </div>
+
+
+    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}">
+        <objecter ng-id="'flashvideoembed'"
+                ng-name="'flashvideoembed'"
+                ng-source="flashSource"
+                ng-param="flashParam">
+        </objecter>
+    </div>
+
+    <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading}">
+    </div>
+</div>

@@ -1,0 +1,30 @@
+
+<div class="modal-header">
+    Text for Translation
+<button type="버튼" class="닫기" data-dismiss="modal" ng-click="취소()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+    <h3 class="modal-title" ng-bind-html="title"></h3>
+</div>
+
+<div class="col-sm-12">
+    <alert type="success" ng-if="finished && succeed" ng-bind-html="successMessage"></alert>
+
+    <alert type="danger" ng-if="finished && !succeed" ng-bind-html="errorMessage"></alert>
+
+    <alert type="info" ng-if="connecting">시스템을 연결중  ... <span class="product-name">{{Config.cloud.productName}}</span>... <br>몇분정도 지속될수있습니다.</alert>
+
+    <form name="cloudForm" disable-autocomplete>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control" ng-readonly="!connect"
+                   type="email" placeholder="클라우드 이메일" required auto-focus autocomplete="new-password">
+        </div>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
+                   type="password" required placeholder="클라우드 암호" autocomplete="new-password">
+        </div>
+    </form>
+
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()"> 취소</button>      <button class="btn btn-primary" ng-click="action()" ng-disabled="cloudForm.$invalid || succeed">{{actionLabel}}</button>
+</div>

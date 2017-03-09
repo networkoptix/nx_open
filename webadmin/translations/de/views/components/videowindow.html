@@ -1,0 +1,59 @@
+<div class="videowindow">
+
+    <div class="camera-view-informer camera-loading" ng-if="loading">
+        <div class="camera-view-preloader camera-view-message-icon"></div>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashRequired">
+        Video kann nicht abgespielt werden.<br>
+Installieren Sie bitte den <a href="https://get.adobe.com/flashplayer/" target="_blank">Adobe Flash Player</a>, um Videos von ARM-basierten Servern abzuspielen.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashOrWebmRequired">
+        Video kann nicht abgespielt werden.<br>
+Installieren Sie bitte den <a href="https://get.adobe.com/flashplayer/" target="_blank">Adobe Flash Player</a> oder <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">WebM codec</a>, um Videos im Internet Explorer abzuspielen.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noArmSupport">
+        Video kann nicht abgespielt werden.<br>
+Dieser Browser bzw. dieses Gerät unterstützt keine Videowiedergabe von ARM-basierten Servern.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noFormat">
+        Video kann nicht abgespielt werden.<br>
+Dieser Browser bzw. dieses Gerät unterstützt keine Videowiedergabe von dieser Kamera.<br>
+    </div>
+
+
+    <div class="camera-view-informer" ng-if="ieNoWebm">
+        Video kann nicht abgespielt werden.<br>
+Installieren Sie bitte <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">WebM codec</a> für den Internet Explorer.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ieWin10">
+        Video kann nicht abgespielt werden.<br>
+Verwenden Sie bitte Microsoft Edge oder Google Chrome.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ubuntuNX">
+        Video kann nicht abgespielt werden.<br>
+Dieser Browser unterstützt keine Videos von ARM-basierten Servern. Verwenden Sie bitte Chromium.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="errorLoading">
+        Video kann nicht abgespielt werden.<br>
+Ein Fehler ist aufgetreten.<br>
+    </div>
+
+
+    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}">
+        <objecter ng-id="'flashvideoembed'"
+                ng-name="'flashvideoembed'"
+                ng-source="flashSource"
+                ng-param="flashParam">
+        </objecter>
+    </div>
+
+    <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading}">
+    </div>
+</div>

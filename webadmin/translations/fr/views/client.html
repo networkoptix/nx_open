@@ -1,0 +1,62 @@
+<div class="container-fluid">
+
+    <div>
+        <h2 class="text-center">Bienvenue sur le Client Lite</h2>
+        <p class="text-center">Client lite peut afficher jusqu'à 4 vidéos en direct, <br>            et peut être contrôlé soit par le clavier/souris<br>ou via l’application mobile</p>
+    </div>
+    <div class="text-center">
+        <div class="panel panel-default panel-inline system-info">
+            <div class="panel-body">
+                <p class="text-center">
+                    <img src="images/lite_client/control_types_keyboard.png"> <img src="images/lite_client/control_types_mouse.png">
+                </p>
+                <h3 class="text-center">Par clavier/souris</h3>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>Sélectionnez la cellule</td>
+                            <td class="text-right"><img src="images/lite_client/keyboard_asdw.png"></td>
+                            <td class="grey-text">ou <img src="images/lite_client/mouse_click.png">simple clic</td>
+                        </tr>
+                        <tr>
+                            <td>Changer caméra dans la cellule</td>
+                            <td class="text-right"><img src="images/lite_client/keyboard_ctrlarrows.png"></td>
+                            <td class="grey-text">ou <img src="images/lite_client/mouse_wheel.png"> Roue</td>
+                        </tr>
+
+                        <tr>
+                            <td>Entrer / quitter le plein écran</td>
+                            <td class="text-right"><img src="images/lite_client/keyboard_enter.png"></td>
+                            <td class="grey-text">ou <img src="images/lite_client/mouse_clickclick.png"> Double clic</td>
+                        </tr>
+                        <tr>
+                            <td>Quitter Client Lite</td>
+                            <td class="text-right"><img src="images/lite_client/keyboard_esc.png"></td>
+                            <td class="grey-text"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel panel-default panel-inline system-info">
+            <div class="panel-body">
+                <p class="text-center">
+                    <img src="images/lite_client/control_mobile.png">
+                </p>
+                <h3 class="text-center">À travers l’application mobile</h3>
+                <table>
+                    <tbody>
+                        <tr><td>Installer <b>{{Config.productName}}</b> app via Google Play ou App Store</td></tr>
+                        <tr><td>Connecter au système "{{settings.systemName}}" ({{IP}}:{{port}})</td></tr>
+                        <tr><td>Sélectionner l'écran "{{settings.name}}" dans le menu latéral</td></tr>
+                        <tr><td>Activer Client Lite et sélectionner les caméras à afficher</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary btn-lg" ng-click="startCameras()" auto-focus enter-button>Lancer le Client Lite</button>
+        <p class="grey-text">(Entrer)</p>
+    </div>
+</div>

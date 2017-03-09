@@ -1,0 +1,258 @@
+<div class="container">
+    <h1>스트림 링크 생성</h1>
+    <form class="form-horizontal" novalidate ng-class="session.event.event_type">
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label"> 시스템 호스트 (ip: port)</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.system">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">nonce</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.nonce">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label"> 영역</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.realm">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label"> 방법</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.method">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label"> 로그인</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.login">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label"> 암호</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.password">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">링크</label>
+            <div class="col-sm-9"><p ng-repeat="camId in linkSettings.cameraIds" class="form-control-static">{{formatLink(camId)}}</p>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="container">
+
+    <h1>이벤트 생성 </h1>
+
+    <div class="row">
+        <div class="col-sm-6">
+
+            <form class="form-horizontal" novalidate ng-class="session.event.event_type">
+                <div class="form-group AnyEvent">
+                    <label class="col-sm-3 control-label">이벤트 </label>
+                    <div class="col-sm-5">
+                        <select ng-model="session.event.event_type" ng-options="event.event as event.label for event in Config.debugEvents.events"
+                                class="form-control"></select>
+                    </div>
+                    <div class="col-sm-4">
+                        <p class="form-control-static">
+                            {{session.event.event_type}}
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group AnyEvent">
+                    <label class="col-sm-3 control-label"> 타임 스탬프</label>
+                    <div class="col-sm-5">
+                        <input type="text" ng-model="session.event.timestamp"
+                               class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group CameraMotionEvent CameraInputEvent CameraDisconnectEvent StorageFailureEvent
+        NetworkIssueEvent CameraIpConflictEvent ServerFailureEvent ServerConflictEvent ServerStartEvent
+        LicenseIssueEvent BackupFinishedEvent">
+                    <label class="col-sm-3 control-label">자원</label>
+                    <div class="col-sm-5">
+                        <input type="text" ng-model="session.eventResource"
+                               typeahead="resource as resource.name for resource in filterResources($viewValue) | limitTo:10"
+                               typeahead-focus-on-select="false"
+                               typeahead-min-length="0"
+                               typeahead-show-hint="true"
+                               typeahead-focus-first="false"
+                               typeahead-focus
+ class="form-control">
+                    </div>
+                    <div class="col-sm-4">
+                        <p class="form-control-static">
+                            {{session.eventResource.id}}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-group UserDefinedEvent">
+                    <label class="col-sm-3 control-label"> 소스</label>
+                    <div class="col-sm-5">
+                        <input type="text" ng-model="session.event.source"
+                               class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group UserDefinedEvent CameraMotionEvent CameraInputEvent">
+                    <label class="col-sm-3 control-label"> 상태</label>
+                    <div class="col-sm-5">
+                        <select ng-model="session.event.state" ng-options="state for state in Config.debugEvents.states"
+                                class="form-control"></select>
+                    </div>
+                </div>
+
+                <div class="form-group StorageFailureEvent NetworkIssueEvent ServerFailureEvent LicenseIssueEvent BackupFinishedEvent">
+                    <label class="col-sm-3 control-label"> 이유</label>
+                    <div class="col-sm-5">
+                        <select ng-model="session.event.reasonCode" ng-options="reason for reason in Config.debugEvents.reasons"
+                                class="form-control"></select>
+                    </div>
+                </div>
+
+                <div class="form-group CameraInputEvent">
+                    <label class="col-sm-3 control-label"> 입력 포트</label>
+                    <div class="col-sm-5">
+                        <input type="number" ng-model="session.event.inputPortId"
+                               class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group UserDefinedEvent CameraIpConflictEvent">
+                    <label class="col-sm-3 control-label">표제 </label>
+                    <div class="col-sm-5">
+                        <input type="text" ng-model="session.event.caption"
+                               class="form-control">
+                    </div>
+                    <div class="col-sm-4">
+                        <p class="form-control-static">
+                            카메라 ip 충돌-충돌 IP에 대 한
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-group StorageFailureEvent
+                NetworkIssueEvent CameraIpConflictEvent ServerFailureEvent ServerConflictEvent
+                LicenseIssueEvent BackupFinishedEvent UserDefinedEvent">
+                    <label class="col-sm-3 control-label"> 설명</label>
+                    <div class="col-sm-5">
+                        <textarea ng-model="session.event.description"
+                                  class="form-control"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group UserDefinedEvent">
+                    <label class="col-sm-3 control-label">메타 데이터-JSON</label>
+                    <div class="col-sm-5">
+                        <textarea ng-model="session.event.metadata"
+                                  class="form-control">{
+                            cameraRefs:['cameraUUID']
+                            }</textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-5">
+                        <button type="submit" class="btn btn-primary" ng-click="generateEvent()">이벤트 생성</button>
+                    </div>
+                </div>
+
+
+            </form>
+        </div>
+        <div class="col-sm-6">
+            <button type="submit" class="btn btn-success" ng-click="startGeneratingEvents()" ng-if="!generatingEvents"><span class="glyphicon glyphicon-play-circle"></span> 무작위 이벤트</button>
+            <button type="submit" class="btn btn-danger"  ng-click="stopGeneratingEvents()" ng-if="generatingEvents"><span class="glyphicon glyphicon-stop"></span> 무작위 이벤트</button>
+
+            <button type="submit" class="btn btn-success" ng-click="startRepeatingEvent()" ng-if="!repeatingEvents"><span class="glyphicon glyphicon-play-circle"></span> 반복 마지막 이벤트</button>
+            <button type="submit" class="btn btn-danger"  ng-click="stopRepeatingEvent()" ng-if="repeatingEvents"><span class="glyphicon glyphicon-stop"></span> 마지막 이벤트 반복</button>
+
+            <p>이벤트 로그</p>
+            <pre><div ng-repeat="event in eventsLog">{{event.event}} ({{event.source}}): {{event.result}}</div></pre>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <h1>테스트 api 호출</h1>
+    <form class="form-horizontal" novalidate>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">방법</label>
+            <div class="col-sm-10">
+                <select ng-model="session.method.method" class="form-control">
+                    <option>POST</option>
+                    <option>GET</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label"> 기능</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" ng-model="session.method.name" placeholder="/api/methodName">
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label"> <b>얻음</b>-params (json)</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" rows="5"
+                          ng-model="session.method.params"></textarea>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">URL요청</label>
+            <div class="col-sm-10">
+                <p class="form-control-static">{{getDebugUrl()}}</p>
+            </div>
+        </div>
+
+        <div class="form-group" ng-if="session.method.method=='POST'">
+            <label class="col-sm-2 control-label"> <b>게시물</b>-params (json)</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" rows="10"
+                          ng-model="session.method.data"></textarea>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary" ng-click="testMethod()"> 테스트 메서드</button>                 <a class="btn btn-default" ng-if="session.method.method=='GET'" ng-href="{{getDebugUrl()}}" target="_blank"> 새 탭에서 열기</a>
+            </div>
+        </div>
+
+
+        <div class="form-group" ng-if="result.result">
+            <label class="col-sm-2 control-label">상태</label>
+            <div class="col-sm-10">
+                <p class="form-control-static">{{result.status}}</p>
+            </div>
+        </div>
+        <div class="form-group" ng-if="result.result">
+            <label class="col-sm-2 control-label">결과</label>
+            <div class="col-sm-10">
+                <pre>{{result.result}}</pre>
+            </div>
+        </div>
+    </form>
+
+
+</div>

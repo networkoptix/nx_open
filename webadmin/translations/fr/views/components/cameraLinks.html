@@ -1,0 +1,35 @@
+<div>
+    Caméra:
+    <ul>
+        <li>Nom: {{activeCamera.name}}</li>
+        <li>PhysicalID: {{activeCamera.physicalId}}</li>
+        <li>IP (URL): <a target="_blank" ng-href="{{activeCamera.url}}">{{activeCamera.url}}</a></li>
+        <li ng-repeat="stream in activeCamera.mediaStreams">
+            {{streamName(stream)}}:
+            <span ng-repeat="transport in stream.transports">
+                <a target="_blank" ng-href="{{formatLink(activeCamera,stream.encoderIndex,transport)}}">{{transport}}</a>&nbsp;
+            </span>
+
+        </li>
+
+        <li>
+            Téléchargement:             <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">Haut</a>&nbsp;             <a target="_blank" ng-href="{{formatLink(activeCamera, 1, 'download')}}">Bas</a>&nbsp;             <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'preview')}}">Aperçu</a>
+        </li>
+
+    </ul>
+    Paramètres du lien:
+    <ul>
+        <li>
+            <label><input type="checkbox" ng-model="useAuth">&nbsp;Utiliser clé auth</label>
+        </li>
+        <li>
+            <label title="pour le téléchargement">Durée (sec) : <input type="text" class="input-sm" ng-model="duration"></label>
+        </li>
+        <li>
+            <label title="pour le transcodage">Résolution: <input type="text" class="input-sm" ng-model="resolution"></label>
+        </li>
+        <li>
+            <label>Position de lecture: {{liveMode?'live': position}}</label>
+        </li>
+    </ul>
+</div>
