@@ -85,6 +85,7 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent) :
 
             setCamerasToBackup(qnResPool->getResources(dialog->selectedResources())
                 .filtered<QnVirtualCameraResource>());
+            m_backupNewCameras = dialog->backupNewCameras();
         });
 
     ui->qualityComboBox->addItem(tr("Lo-Res Streams", "Cameras Backup"),
