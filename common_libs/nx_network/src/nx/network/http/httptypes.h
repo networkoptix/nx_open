@@ -695,7 +695,7 @@ public:
 
 private:
     nx_http::StringType toString(const Product& product) const;
-    void readProduct(Product* product, QnByteArrayConstRef* inputStr);
+    bool readProduct(Product* product, QnByteArrayConstRef* inputStr);
     void readProductName(Product* product, QnByteArrayConstRef* inputStr);
     void readProductVersion(Product* product, QnByteArrayConstRef* inputStr);
     void readProductComment(Product* product, QnByteArrayConstRef* inputStr);

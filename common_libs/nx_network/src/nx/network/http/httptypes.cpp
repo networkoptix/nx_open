@@ -1532,10 +1532,11 @@ bool Server::parse(const nx_http::StringType& serverString)
     {
         products.push_back(Product());
         Product& product = products.back();
-        readProduct(&product, &inputStr);
+        if (!readProduct(&product, &inputStr))
+            return false;
     }
 
-    return true;
+    return !products.empty();
 }
 
 StringType Server::toString() const
@@ -1549,11 +1550,6 @@ StringType Server::toString() const
 
     // TODO: #ak Remove COMPATIBILITY_SERVER_STRING from here.
     return result + COMPATIBILITY_SERVER_STRING;
-
-
-    //return lit("%1/%2 (%3) %4")
-    //    .arg(name, version.toString(), QnAppInfo::organizationName())
-    //    .arg(COMPATIBILITY_SERVER_STRING).toUtf8();
 }
 
 nx_http::StringType Server::toString(const Server::Product& product) const
@@ -1568,17 +1564,20 @@ nx_http::StringType Server::toString(const Server::Product& product) const
     return result;
 }
 
-void Server::readProduct(Server::Product* product, QnByteArrayConstRef* inputStr)
+bool Server::readProduct(Server::Product* product, QnByteArrayConstRef* inputStr)
 {
     readProductName(product, inputStr);
     if (inputStr->isEmpty())
-        return;
+        return true;
+    if (product->name.isEmpty())
+        return false; // See [rfc2616, 3.8].
 
     readProductVersion(product, inputStr);
     if (inputStr->isEmpty())
-        return;
+        return true;
 
     readProductComment(product, inputStr);
+    return true;
 }
 
 void Server::readProductName(Server::Product* product, QnByteArrayConstRef* inputStr)
