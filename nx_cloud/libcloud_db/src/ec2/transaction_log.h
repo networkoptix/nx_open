@@ -322,7 +322,7 @@ private:
     nx::Buffer calculateTransactionHash(
         const ::ec2::QnTransaction<TransactionDataType>& tran)
     {
-        return ::ec2::transactionHash(tran.params).toSimpleByteArray();
+        return ::ec2::transactionHash(tran.command, tran.params).toSimpleByteArray();
     }
 
     int generateNewTransactionSequence(

@@ -107,7 +107,6 @@ void QnShowTextOverlayActionWidget::at_model_dataChanged(QnBusiness::Fields fiel
         if (ui->fixedDurationCheckBox->isChecked())
             ui->durationSpinBox->setValue(params.durationMs / msecPerSecond);
 
-
         const bool useCustomText = !params.text.isEmpty();
         m_lastCustomText = params.text;
         ui->customTextCheckBox->setChecked(useCustomText);

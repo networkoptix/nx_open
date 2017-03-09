@@ -61,9 +61,9 @@ QString QnPlAxisResourceSearcher::manufacture() const
 QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
 {
     if( !url.scheme().isEmpty() && isSearchAction )
-	
+
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
-		
+
     QString host = url.host();
     int port = url.port();
     if (host.isEmpty())
@@ -107,7 +107,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
 
     name = name.left(name.lastIndexOf(QLatin1Char('-')));
     name.replace(QLatin1Char('-'), QString());
-    
+
 
     if (mac.isEmpty() || name.isEmpty())
         return QList<QnResourcePtr>();
@@ -129,7 +129,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     QUrl finalUrl(url);
     finalUrl.setScheme(QLatin1String("http"));
     finalUrl.setPort(port);
-    resource->setUrl(finalUrl.toString());    
+    resource->setUrl(finalUrl.toString());
     resource->setDefaultAuth(auth);
 
     //resource->setDiscoveryAddr(iface.address);
@@ -216,7 +216,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     for(const QnResourcePtr& res: result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
-    
+
         if (net_res->getMAC().toString() == smac) {
             return local_results; // already found;
         }
@@ -267,7 +267,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     local_results.push_back(resource);
 
     addMultichannelResources(local_results);
-    
+
     return local_results;
 }
 
@@ -294,7 +294,7 @@ QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(
         return QAuthenticator();
 
     auto existingResource = qnResPool->getNetResourceByPhysicalId(resource->getPhysicalId());
-    if (existingResource && existingResource->getStatus() >= Qn::Online)
+    if (existingResource)
         return existingResource->getAuth();
 
     auto resData = qnCommon->dataPool()->data(resource->getVendor(), resource->getModel());

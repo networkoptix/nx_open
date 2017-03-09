@@ -1031,7 +1031,7 @@ bool QnDbManager::removeServerStatusFromTransactionLog()
     while (query.next()) {
         ApiResourceStatusData data;
         data.id = QnUuid::fromRfc4122(query.value(0).toByteArray());
-        QnUuid hash = transactionHash(data);
+        QnUuid hash = transactionHash(ApiCommand::removeResourceStatus, data);
         delQuery.bindValue(0, QnSql::serialized_field(hash));
         if (!delQuery.exec()) {
             qWarning() << Q_FUNC_INFO << __LINE__ << delQuery.lastError();

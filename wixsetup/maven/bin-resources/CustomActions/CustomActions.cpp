@@ -24,8 +24,6 @@ UINT __stdcall DetectIfSystemIsStandalone(MSIHANDLE hInstall)
 
     InitWinsock();
 
-    CRegKey RegKey;
-
     CAtlString appserverHost;
     CAtlStringA lappserverHost;
 
@@ -661,3 +659,58 @@ LExit:
     return WcaFinalize(er);
 }
 
+UINT __stdcall CleanAutorunRegistryKeys(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    hr = WcaInitialize(hInstall, "CleanAutorunRegistryKeys");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    {
+        CAtlString registryPath(L"Software\\Microsoft\\Windows\\CurrentVersion\\Run");
+        CAtlString keyPrefix = GetProperty(hInstall, L"CLIENT_NAME");
+        WcaLog(LOGMSG_STANDARD, "Key Prefix is: %S", (LPCWSTR)keyPrefix);
+
+        CRegKey RegKey;
+
+        if (RegKey.Open(HKEY_CURRENT_USER, registryPath, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY) != ERROR_SUCCESS) {
+            WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)registryPath);
+            goto LExit;
+        }
+
+		if (keyPrefix.GetLength() == 0) {
+			WcaLog(LOGMSG_STANDARD, "Client name is empty");
+			goto LExit;
+		}
+        DWORD dwSize = MAX_PATH, dwIndex = 0;
+        TCHAR tcsStringName[MAX_PATH];
+
+		std::vector<CAtlString> valuesToRemove;
+
+        while (RegEnumValue(RegKey.m_hKey, dwIndex, tcsStringName, &dwSize, NULL, NULL, NULL, NULL) == ERROR_SUCCESS) {
+            CAtlString stringName(tcsStringName);
+            WcaLog(LOGMSG_STANDARD, "Found key: %S", tcsStringName);
+            if (stringName.Find(keyPrefix) == 0) {
+				valuesToRemove.push_back(stringName);
+                WcaLog(LOGMSG_STANDARD, "Deleting");
+            } else {
+                WcaLog(LOGMSG_STANDARD, "Skipping");
+            }
+
+            dwIndex++;
+			dwSize = MAX_PATH;
+        }
+
+		for (const auto& value : valuesToRemove) {
+			RegKey.DeleteValue(value);
+		}
+    }
+
+LExit:
+
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}

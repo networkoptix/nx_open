@@ -145,7 +145,6 @@ protected:
     void at_dropResourcesIntoNewLayoutAction_triggered();
     void at_openFileAction_triggered();
     void at_openFolderAction_triggered();
-    void at_showcaseAction_triggered();
     void at_aboutAction_triggered();
     void at_businessEventsAction_triggered();
     void at_openBusinessRulesAction_triggered();

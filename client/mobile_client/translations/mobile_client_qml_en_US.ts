@@ -46,13 +46,6 @@
     </message>
 </context>
 <context>
-    <name>CloudSystemInformation</name>
-    <message>
-        <source>OFFLINE</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>CredentialsEditor</name>
     <message>
         <source>Email</source>
@@ -408,6 +401,14 @@
         <source>This server has too old version. Please update it to the latest version.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>OFFLINE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>INCOMPATIBLE</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SessionsScreen</name>
@@ -504,10 +505,6 @@
     <name>SystemInformationBlock</name>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>INCOMPATIBLE</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -868,6 +868,9 @@ static const int SYSTEM_USAGE_DUMP_TIMEOUT = 7*60*1000;
 
 void MediaServerProcess::dumpSystemUsageStats()
 {
+    if (!qnPlatform->monitor())
+        return;
+
     qnPlatform->monitor()->totalCpuUsage();
     qnPlatform->monitor()->totalRamUsage();
     qnPlatform->monitor()->totalHddLoad();
@@ -2746,8 +2749,12 @@ void MediaServerProcess::run()
         m_universalTcpListener,
         &QnTcpListener::portChanged,
         this,
-        &MediaServerProcess::updateAddressesList);
-
+        [this, &cloudManagerGroup]()
+        {
+            updateAddressesList();
+            cloudManagerGroup.connectionManager.setProxyVia(
+                SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
+        });
 
     m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
 

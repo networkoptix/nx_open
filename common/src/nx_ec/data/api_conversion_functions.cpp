@@ -369,8 +369,7 @@ void fromApiToResource(const ApiEmailSettingsData& src, QnEmailSettings& dst)
 
 void fromApiToResource(const ApiLayoutItemData& src, QnLayoutItemData& dst)
 {
-    // Workaround against corrupted layouts in the database
-    dst.uuid = src.id.isNull() ? QnUuid::createUuid() : src.id;
+    dst.uuid = src.id;
     dst.flags = src.flags;
     dst.combinedGeometry = QRectF(QPointF(src.left, src.top), QPointF(src.right, src.bottom));
     dst.rotation = src.rotation;

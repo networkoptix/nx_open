@@ -357,7 +357,7 @@ void QnRtspClientArchiveDelegate::close()
 {
     QnMutexLocker lock( &m_mutex );
     //m_waitBOF = false;
-    m_rtspSession->stop();
+    m_rtspSession->shutdown();
     m_lastMediaFlags = -1;
     m_opened = false;
     m_audioLayout.reset();
@@ -709,7 +709,13 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
 
     QMap<int, QnNxRtpParserPtr>::iterator itr = m_parsers.find(channelNum);
     if (itr == m_parsers.end())
-        itr = m_parsers.insert(channelNum, QnNxRtpParserPtr(new QnNxRtpParser()));
+    {
+        auto parser = new QnNxRtpParser();
+        auto serverVersion = nx_http::extractServerVersion(m_rtspSession->serverInfo());
+        if (!serverVersion.isNull() && serverVersion < nx::utils::SoftwareVersion("3.0.0.0"))
+            parser->setAudioEnabled(false);
+        itr = m_parsers.insert(channelNum, QnNxRtpParserPtr(parser));
+    }
     QnNxRtpParserPtr parser = itr.value();
     bool gotData = false;
     parser->processData(data, 0, dataSize, QnRtspStatistic(), gotData);
