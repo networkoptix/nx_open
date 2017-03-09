@@ -55,7 +55,7 @@ void doTest(bool doServerDelay, bool doClientDelay)
             if (doServerDelay)
                 std::this_thread::sleep_for(kClientDelay);
         }
-        ASSERT_EQ(wholeData.size(), kBufferSize * sizeof(int) * kIterations);
+        ASSERT_EQ((std::size_t)wholeData.size(), kBufferSize * sizeof(int) * kIterations);
         const int* testData = (const int*)wholeData.data();
         const int* endData = (const int*)(wholeData.data() + wholeData.size());
         int expectedValue = 0;

@@ -27,6 +27,6 @@ TEST(SyncQueueWithItemStayTimeout, basic)
     const auto item2 = testQueue.pop(timeout);
     ASSERT_FALSE(item2);
 
-    ASSERT_EQ(1, cancelledItems.size());
+    ASSERT_EQ(1U, cancelledItems.size());
     ASSERT_EQ(2, cancelledItems[0]);
 }
