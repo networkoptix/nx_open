@@ -4,5 +4,4 @@ if(NOT "${festival-vox_version}" STREQUAL "system")
 endif()
 
 nx_add_target(nx_speech_synthesizer LIBRARY
-    PUBLIC_LIBS common
-    PRIVATE_LIBS festival)
+    PUBLIC_LIBS common festival)
