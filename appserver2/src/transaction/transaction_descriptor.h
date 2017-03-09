@@ -286,6 +286,11 @@ detail::TransactionDescriptor<Param>* getTransactionDescriptorByTransaction(cons
     return getActualTransactionDescriptorByValue<Param>(tran.command);
 }
 
+/**
+* For this function to work properly all transaction descriptors for the same api data structures should have
+* same Access Rights checker functions. For example setResourceParam and getResourceParam have the same checker for
+* read access - ReadResourceParamAccess.
+*/
 template<typename Param>
 detail::TransactionDescriptor<Param>* getTransactionDescriptorByParam()
 {
@@ -312,17 +317,16 @@ detail::TransactionDescriptor<Param>* getTransactionDescriptorByParam()
 */
 
 template<typename Param>
-static QnUuid transactionHash(const Param &param)
+static QnUuid transactionHash(ApiCommand::Value command, const Param &param)
 {
-    for (auto it = detail::transactionDescriptors.get<0>().begin(); it != detail::transactionDescriptors.get<0>().end(); ++it)
+    auto td = ec2::getActualTransactionDescriptorByValue<Param>(command);
+    if (!td)
     {
-        auto tdBase = (*it).get();
-        auto td = dynamic_cast<detail::TransactionDescriptor<Param>*>(tdBase);
-        if (td)
-            return td->getHashFunc(param);
+        NX_ASSERT(0, "Transaction descriptor for the given param not found");
+        return QnUuid();
     }
-    NX_ASSERT(0, "Transaction descriptor for the given param not found");
-    return QnUuid();
+
+    return td->getHashFunc(param);
 }
 
 } //namespace ec2

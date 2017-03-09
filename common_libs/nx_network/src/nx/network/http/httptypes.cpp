@@ -282,7 +282,7 @@ namespace nx_http
         {
             return isSuccessCode(static_cast<int>(statusCode));
         }
-        
+
         bool isSuccessCode(int statusCode)
         {
             return statusCode >= ok && statusCode <= lastSuccessCode;
@@ -799,6 +799,7 @@ namespace nx_http
     {
         const StringType kContentType = "Content-Type";
         const StringType kUserAgent = "User-Agent";
+        const StringType kServer = "Server";
 
 
         namespace AuthScheme
@@ -1663,5 +1664,14 @@ namespace nx_http
     StringType serverString()
     {
         return defaultServerString;
+    }
+
+    nx::utils::SoftwareVersion extractServerVersion(const StringType& serverString)
+    {
+        int versionStartPos = serverString.indexOf("/") + 1;
+        int versionEndPos = serverString.indexOf(" ", versionStartPos);
+
+        return nx::utils::SoftwareVersion(
+            serverString.mid(versionStartPos, versionEndPos - versionStartPos));
     }
 }

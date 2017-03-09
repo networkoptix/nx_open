@@ -64,6 +64,7 @@ public:
         /** ??? //TODO: #dklychkov */
         ALTERNATIVE_UPDATE_SERVERS,
 
+
         /** Latest known update info. */
         LATEST_UPDATE_INFO,
 
@@ -75,11 +76,6 @@ public:
 
         /** Do not show update notification for the selected version. */
         IGNORED_UPDATE_VERSION,
-
-        SHOWCASE_URL,
-        SHOWCASE_ENABLED,
-
-        SETTINGS_URL,
 
         TOUR_CYCLE_TIME,
 
@@ -146,6 +142,7 @@ public:
         TIMELAPSE_SPEED,
 
         LAST_LOCAL_CONNECTION_URL,
+        KNOWN_SERVER_URLS,
         VARIABLE_COUNT
     };
 
@@ -172,9 +169,6 @@ protected:
     virtual void writeValueToSettings(QSettings *settings, int id, const QVariant &value) const override;
 
     virtual UpdateStatus updateValue(int id, const QVariant &value) override;
-
-private:
-    void loadFromWebsite();
 
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
@@ -205,9 +199,6 @@ private:
         QN_DECLARE_RW_PROPERTY(qint64,                      updateDeliveryDate,     setUpdateDeliveryDate,      UPDATE_DELIVERY_DATE,       0)
 
         QN_DECLARE_RW_PROPERTY(bool,                        isClientUpdateDisabled, setClientUpdateDisabled,    NO_CLIENT_UPDATE,           false)
-        QN_DECLARE_RW_PROPERTY(QUrl,                        showcaseUrl,            setShowcaseUrl,             SHOWCASE_URL,               QUrl())
-        QN_DECLARE_RW_PROPERTY(bool,                        isShowcaseEnabled,      setShowcaseEnabled,         SHOWCASE_ENABLED,           false)
-        QN_DECLARE_RW_PROPERTY(QUrl,                        settingsUrl,            setSettingsUrl,             SETTINGS_URL,               QUrl())
         QN_DECLARE_RW_PROPERTY(int,                         tourCycleTime,          setTourCycleTime,           TOUR_CYCLE_TIME,            4000)
         QN_DECLARE_RW_PROPERTY(Qn::ResourceInfoLevel,       extraInfoInTree,        setExtraInfoInTree,         EXTRA_INFO_IN_TREE,         Qn::RI_NameOnly)
         QN_DECLARE_RW_PROPERTY(Qn::TimeMode,                timeMode,               setTimeMode,                TIME_MODE,                  Qn::ServerTimeMode)
@@ -230,6 +221,7 @@ private:
         QN_DECLARE_RW_PROPERTY(Qn::LightModeFlags,          lightMode,              setLightMode,               LIGHT_MODE,                 0)
         QN_DECLARE_RW_PROPERTY(QnBackgroundImage,           backgroundImage,        setBackgroundImage,         BACKGROUND_IMAGE,           QnBackgroundImage())
         QN_DECLARE_RW_PROPERTY(QnUuid,                      pcUuid,                 setPcUuid,                  PC_UUID,                    QnUuid())
+        QN_DECLARE_RW_PROPERTY(QList<QUrl>,                 knownServerUrls,        setKnownServerUrls,         KNOWN_SERVER_URLS,          QList<QUrl>())
         QN_DECLARE_RW_PROPERTY(QString,                     logLevel,               setLogLevel,                LOG_LEVEL,                  QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(QString,                     ec2TranLogLevel,        setEc2TranLogLevel,         EC2_TRAN_LOG_LEVEL,         QLatin1String("none"))
         QN_DECLARE_RW_PROPERTY(int,                         initialLiveBufferMSecs, setInitialLiveBufferMSecs,  INITIAL_LIVE_BUFFER_MSECS,  300)

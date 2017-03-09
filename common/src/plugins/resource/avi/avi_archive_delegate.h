@@ -71,7 +71,7 @@ private:
 protected:
     AVFormatContext* m_formatContext;
     QnResourcePtr m_resource;
-    qint64 m_startMksec;
+    qint64 m_playlistOffsetUsec; // File additional offset inside playlist for DVD/BluRay
     int m_selectedAudioChannel;
     bool m_initialized;
     QnStorageResourcePtr m_storage;
