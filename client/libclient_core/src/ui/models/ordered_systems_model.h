@@ -1,14 +1,14 @@
 #pragma once
 
-#include <QtCore/QSortFilterProxyModel>
+#include <ui/models/sorting_proxy_model.h>
 #include <client/system_weights_manager.h>
 
 class QnSystemsModel;
-class QnOrderedSystemsModel: public QSortFilterProxyModel
+class QnOrderedSystemsModel: public QnSortingProxyModel
 {
     Q_OBJECT
     Q_PROPERTY(QString minimalVersion READ minimalVersion WRITE setMinimalVersion NOTIFY minimalVersionChanged)
-    typedef QSortFilterProxyModel base_type;
+    using base_type = QnSortingProxyModel;
 
 public:
     QnOrderedSystemsModel(QObject* parent = nullptr);
@@ -22,11 +22,10 @@ public:
 signals:
     void minimalVersionChanged();
 
-protected: // overrides
-    virtual bool lessThan(const QModelIndex& left,
-        const QModelIndex& right) const override;
+private: // Prediactes
+    bool lessPredicate(const QModelIndex& left, const QModelIndex& right) const;
 
-    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
+    bool filterPredicate(const QModelIndex& index) const;
 
 private:
     void handleWeightsChanged();
@@ -35,8 +34,6 @@ private:
 
     bool getWeightFromData(const QModelIndex& modelIndex,
         qreal& weight) const;
-
-    void softInvalidate();
 
 private:
     QnSystemsModel * const m_source;

@@ -288,18 +288,19 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
             {
                 emitDataChanged(systemDescription, QnSystemsModel::SystemNameRoleId);
             });
-
+/*
     data->connections
         << connect(systemDescription, &QnBaseSystemDescription::isCloudSystemChanged, this,
             [this, systemDescription]()
+
             {
                 /**
                  * Move system to right place. No data will not be preserved in case
                  * of cloud-to-system (and vice versa) state change
                  */
-                removeSystem(systemDescription->id());
-                addSystem(systemDescription);
-            });
+//               removeSystem(systemDescription->id());
+//                addSystem(systemDescription);
+//            });
 
     data->connections
         << connect(systemDescription, &QnBaseSystemDescription::ownerChanged, this,

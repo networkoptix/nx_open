@@ -20,11 +20,13 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
 
     connect(m_source, &QnSystemsModel::minimalVersionChanged,
         this, &QnOrderedSystemsModel::minimalVersionChanged);
-    setDynamicSortFilter(true);
-    sort(0);
 
     connect(qnSystemWeightsManager, &QnSystemsWeightsManager::weightsChanged,
         this, &QnOrderedSystemsModel::handleWeightsChanged);
+
+    namespace p = std::placeholders;
+   // setFilteringPred(std::bind(&QnOrderedSystemsModel::filterPredicate, this, p::_1));
+    setSortingPred(std::bind(&QnOrderedSystemsModel::lessPredicate, this, p::_1, p::_2));
 
     if (qnForgottenSystemsManager)
     {
@@ -100,8 +102,7 @@ qreal QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
     return (getWeightFromData(modelIndex, result) ? result : m_unknownSystemsWeight);
 }
 
-bool QnOrderedSystemsModel::lessThan(const QModelIndex& left,
-    const QModelIndex& right) const
+bool QnOrderedSystemsModel::lessPredicate(const QModelIndex& left, const QModelIndex& right) const
 {
     static const auto finalLess =
         [](const QModelIndex& left, const QModelIndex& right) -> bool
@@ -135,11 +136,9 @@ bool QnOrderedSystemsModel::lessThan(const QModelIndex& left,
     return (leftWeight > rightWeight);  // System with greater weight will be placed at begin
 }
 
-bool QnOrderedSystemsModel::filterAcceptsRow(
-    int sourceRow, const QModelIndex &sourceParent) const
+bool QnOrderedSystemsModel::filterPredicate(const QModelIndex &index) const
 {
     // Filters out offline non-cloud systems with last connection more than N (defined) days ago
-    const auto index = sourceModel()->index(sourceRow, 0, sourceParent);
     if (!index.isValid())
         return true;
 
@@ -173,20 +172,5 @@ void QnOrderedSystemsModel::handleWeightsChanged()
     m_unknownSystemsWeight = qnSystemWeightsManager->unknownSystemsWeight();
     m_weights = qnSystemWeightsManager->weights();
 
-    softInvalidate();
-}
-
-void QnOrderedSystemsModel::softInvalidate()
-{
-    const auto source = sourceModel();
-    if (!source)
-        return;
-
-    // Forces resort without tiles removal
-
-    const auto sourceRowCount = source->rowCount();
-    const auto start = source->index(0, 0);
-    const auto end = source->index(sourceRowCount - 1, 0);
-
-    emit source->dataChanged(start, end);
+    forceUpdate();
 }
