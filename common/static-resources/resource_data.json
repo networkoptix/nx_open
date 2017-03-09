@@ -638,7 +638,7 @@
         },
         {
             "keys": [
-                "Hikvision|DS-2CD6362F-I"
+                "Hikvision|DS-2CD6362F-I","Hikvision|HNCA12-FEA"
             ],
             "forcedOnvifParams":
             {
