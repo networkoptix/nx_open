@@ -206,7 +206,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(workbench(), SIGNAL(cellSpacingChanged()), this, SLOT(at_workbench_cellSpacingChanged()));
     connect(workbench(), SIGNAL(currentLayoutChanged()), this, SLOT(at_workbench_currentLayoutChanged()));
 
-    connect(action(QnActions::ShowcaseAction), SIGNAL(triggered()), this, SLOT(at_showcaseAction_triggered()));
     connect(action(QnActions::AboutAction), SIGNAL(triggered()), this, SLOT(at_aboutAction_triggered()));
     connect(action(QnActions::OpenFileAction), SIGNAL(triggered()), this, SLOT(at_openFileAction_triggered()));
     connect(action(QnActions::OpenFolderAction), SIGNAL(triggered()), this, SLOT(at_openFolderAction_triggered()));
@@ -1089,11 +1088,6 @@ void QnWorkbenchActionHandler::openLocalSettingsDialog(int page)
     QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindow()));
     dialog->setCurrentPage(page);
     dialog->exec();
-}
-
-void QnWorkbenchActionHandler::at_showcaseAction_triggered()
-{
-    QDesktopServices::openUrl(qnSettings->showcaseUrl());
 }
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {

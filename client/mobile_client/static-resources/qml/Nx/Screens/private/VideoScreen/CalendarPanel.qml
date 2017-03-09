@@ -21,6 +21,7 @@ Popup
 
     implicitWidth: contentItem.implicitWidth
     implicitHeight: contentItem.implicitHeight
+    y: parent.height - implicitHeight
     padding: 0
 
     background: null

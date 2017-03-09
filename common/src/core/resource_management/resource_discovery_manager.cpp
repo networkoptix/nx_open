@@ -385,7 +385,12 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     {
         if ((searcher->discoveryMode() != DiscoveryMode::disabled) && !needToStop())
         {
+            QElapsedTimer timer;
+            timer.restart();
             QnResourceList lst = searcher->search();
+            NX_LOG(lit("Discovery----: searcher %1 took %2 ms to find new resources").
+                arg(searcher->manufacture()).
+                arg(timer.elapsed()), cl_logDEBUG1);
 
             // resources can be searched by client in or server.
             // if this client in stand alone => lets add Qn::local

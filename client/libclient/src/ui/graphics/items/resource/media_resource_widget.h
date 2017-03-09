@@ -188,6 +188,7 @@ protected:
     virtual void updateHud(bool animate);
 
     void ensureTwoWayAudioWidget();
+    bool animationAllowed() const;
 
     void resetSoftwareTriggerButtons();
 

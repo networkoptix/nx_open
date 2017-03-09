@@ -19,11 +19,17 @@ public:
 
     qint64 position() const { return m_position; }
     QnConstMediaContextPtr mediaContext() const { return m_context; }
+
+    /**
+     * Don't parse incoming audio packets if value is false.
+     */
+    void setAudioEnabled(bool value);
 private:
     QnConstMediaContextPtr m_context;
     QnAbstractMediaDataPtr m_nextDataPacket;
     QnByteArray* m_nextDataPacketBuffer;
     qint64 m_position;
+    bool m_isAudioEnabled;
 };
 typedef QSharedPointer<QnNxRtpParser> QnNxRtpParserPtr;
 

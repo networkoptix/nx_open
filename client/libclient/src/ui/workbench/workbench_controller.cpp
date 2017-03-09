@@ -223,7 +223,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_itemLeftClickInstrument = new ClickInstrument(Qt::LeftButton, 300, Instrument::Item, this);
     m_itemRightClickInstrument = new ClickInstrument(Qt::RightButton, 0, Instrument::Item, this);
     ClickInstrument *itemMiddleClickInstrument = new ClickInstrument(Qt::MiddleButton, 0, Instrument::Item, this);
-    ClickInstrument *sceneClickInstrument = new ClickInstrument(Qt::LeftButton | Qt::RightButton, 0, Instrument::Scene, this);
+    m_sceneClickInstrument = new ClickInstrument(Qt::LeftButton | Qt::RightButton, 0, Instrument::Scene, this);
     m_handScrollInstrument = new HandScrollInstrument(this);
     m_wheelZoomInstrument = new WheelZoomInstrument(this);
     m_rubberBandInstrument = new RubberBandInstrument(this);
@@ -285,7 +285,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, wheelEventTypes, this));
 
     m_manager->installInstrument(new StopInstrument(Instrument::Scene, mouseEventTypes, this));
-    m_manager->installInstrument(sceneClickInstrument);
+    m_manager->installInstrument(m_sceneClickInstrument);
     m_manager->installInstrument(new StopAcceptedInstrument(Instrument::Scene, mouseEventTypes, this));
     m_manager->installInstrument(new ForwardingInstrument(Instrument::Scene, mouseEventTypes, this));
 
@@ -315,8 +315,8 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(ptzInstrument,              SIGNAL(doubleClicked(QnMediaResourceWidget *)),                                             this,                           SLOT(at_item_doubleClicked(QnMediaResourceWidget *)));
     connect(m_itemRightClickInstrument, SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_rightClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(itemMiddleClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_middleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
-    connect(sceneClickInstrument,       SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
-    connect(sceneClickInstrument,       SIGNAL(doubleClicked(QGraphicsView *, const ClickInfo &)),                                  this,                           SLOT(at_scene_doubleClicked(QGraphicsView *, const ClickInfo &)));
+    connect(m_sceneClickInstrument,     SIGNAL(clicked(QGraphicsView *, const ClickInfo &)),                                        this,                           SLOT(at_scene_clicked(QGraphicsView *, const ClickInfo &)));
+    connect(m_sceneClickInstrument,     SIGNAL(doubleClicked(QGraphicsView *, const ClickInfo &)),                                  this,                           SLOT(at_scene_doubleClicked(QGraphicsView *, const ClickInfo &)));
     connect(m_moveInstrument,           SIGNAL(moveStarted(QGraphicsView *, QList<QGraphicsItem *>)),                               this,                           SLOT(at_moveStarted(QGraphicsView *, QList<QGraphicsItem *>)));
     connect(m_moveInstrument,           SIGNAL(move(QGraphicsView *, const QPointF &)),                                             this,                           SLOT(at_move(QGraphicsView *, const QPointF &)));
     connect(m_moveInstrument,           SIGNAL(moveFinished(QGraphicsView *, QList<QGraphicsItem *>)),                              this,                           SLOT(at_moveFinished(QGraphicsView *, QList<QGraphicsItem *>)));
@@ -519,6 +519,11 @@ Instrument* QnWorkbenchController::gridAdjustmentInstrument() const
     return m_gridAdjustmentInstrument;
 }
 
+Instrument* QnWorkbenchController::sceneClickInstrument() const
+{
+    return m_sceneClickInstrument;
+}
+
 bool QnWorkbenchController::eventFilter(QObject* watched, QEvent* event)
 {
     if (event->type() == QEvent::Close)
@@ -567,9 +572,11 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
     }
 }
 
-void QnWorkbenchController::displayWidgetInfo(const QList<QnResourceWidget *> &widgets, bool display){
+void QnWorkbenchController::displayWidgetInfo(const QList<QnResourceWidget *> &widgets, bool visible)
+{
+    const bool animate = display()->animationAllowed();
     foreach(QnResourceWidget *widget, widgets)
-        widget->setInfoVisible(display);
+        widget->setInfoVisible(visible, animate);
 }
 
 void QnWorkbenchController::moveCursor(const QPoint &aAxis, const QPoint &bAxis) {
@@ -846,7 +853,7 @@ void QnWorkbenchController::at_resizingFinished(QGraphicsView *, QGraphicsWidget
             updateGeometryDelta(widget);
         }
 
-        display()->synchronize(widget->item());
+        display()->synchronize(widget->item(), display()->animationAllowed());
 
         /* Un-raise the raised item if it was the one being resized. */
         QnWorkbenchItem *raisedItem = workbench()->item(Qn::RaisedRole);
@@ -1007,7 +1014,7 @@ void QnWorkbenchController::at_moveFinished(QGraphicsView *, const QList<QGraphi
 
         /* Re-sync everything. */
         for (QnWorkbenchItem* workbenchItem: workbenchItems)
-            display()->synchronize(workbenchItem);
+            display()->synchronize(workbenchItem, display()->animationAllowed());
 
         /* Un-raise the raised item if it was among the dragged ones. */
         QnWorkbenchItem *raisedItem = workbench()->item(Qn::RaisedRole);
@@ -1263,7 +1270,7 @@ void QnWorkbenchController::at_scene_doubleClicked(QGraphicsView *, const ClickI
         return;
 
     workbench()->setItem(Qn::ZoomedRole, NULL);
-    display()->fitInView();
+    display()->fitInView(display()->animationAllowed());
 }
 
 void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
@@ -1451,7 +1458,7 @@ void QnWorkbenchController::at_tourModeLabel_finished() {
 }
 
 void QnWorkbenchController::at_fitInViewAction_triggered() {
-    display()->fitInView();
+    display()->fitInView(display()->animationAllowed());
 }
 
 void QnWorkbenchController::at_workbench_currentLayoutAboutToBeChanged() {
