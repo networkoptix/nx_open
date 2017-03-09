@@ -172,8 +172,9 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
 
 QnClientModule::~QnClientModule()
 {
-    // Stop all long runnables before deinitializing singletons
-    QnLongRunnablePool::instance()->stopAll();
+    // Stop all long runnables before deinitializing singletons. Pool may not exist in update mode.
+    if (auto longRunnablePool = QnLongRunnablePool::instance())
+        longRunnablePool->stopAll();
 
     QnResource::stopAsyncTasks();
 

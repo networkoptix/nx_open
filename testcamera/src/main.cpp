@@ -96,6 +96,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    bool cameraForEachFile = false;
     QStringList localInterfacesToListen;
     for( int i = 1; i < argc; ++i )
     {
@@ -111,17 +112,9 @@ int main(int argc, char *argv[])
             if( i >= argc )
                 continue;
             localInterfacesToListen.push_back( QString(argv[i]) );
-        }
-    }
-
-    bool cameraForEachFile = false;
-    for( int i = 1; i < argc; ++i )
-    {
-        QString param = argv[i];
-        if( param =="--camera-for-file" || param == "-S" )
+        }else if( param =="--camera-for-file" || param == "-S" )
         {
             cameraForEachFile = true;
-            break;
         }
     }
 

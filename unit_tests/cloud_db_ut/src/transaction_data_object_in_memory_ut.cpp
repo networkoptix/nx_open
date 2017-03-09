@@ -114,7 +114,7 @@ private:
     template<typename TransactionDataType>
     void saveTransaction(const ::ec2::QnTransaction<TransactionDataType>& transaction)
     {
-        const auto tranHash = ::ec2::transactionHash(transaction.params).toSimpleByteArray();
+        const auto tranHash = ::ec2::transactionHash(transaction.command, transaction.params).toSimpleByteArray();
         const auto ubjsonSerializedTransaction = QnUbjson::serialized(transaction);
         TransactionData transactionData{
             m_systemId,

@@ -282,6 +282,7 @@ void PtzInstrument::updateOverlayWidget()
 void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
 {
     bool hasCrosshair = widget->options().testFlag(QnResourceWidget::DisplayCrosshair);
+    const bool animate = display()->animationAllowed();
 
     if (hasCrosshair)
         ensureOverlayWidget(widget);
@@ -292,7 +293,7 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
 
     if (auto overlayWidget = this->overlayWidget(widget))
     {
-        widget->setOverlayWidgetVisibility(overlayWidget, visibility);
+        widget->setOverlayWidgetVisibility(overlayWidget, visibility, animate);
 
         const PtzData& data = m_dataByWidget[widget];
 

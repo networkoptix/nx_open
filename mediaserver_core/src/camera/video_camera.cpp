@@ -568,6 +568,13 @@ std::unique_ptr<QnConstDataPacketQueue> QnVideoCamera::getFrameSequenceByTime(
         auto frame = gopKeeper->getIframeByTime(time, channel, roundMethod);
         if (frame)
         {
+            if (roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod
+                && frame->timestamp < time)
+            {
+                // After frame not found. Return preceise frame instead.
+                return gopKeeper->getGopTillTime(time, channel);
+            }
+
             auto queue = std::make_unique<QnConstDataPacketQueue>();
             queue->push(frame);
 

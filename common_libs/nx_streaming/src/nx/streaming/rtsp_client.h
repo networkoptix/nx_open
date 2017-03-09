@@ -299,6 +299,10 @@ public:
 
     AbstractStreamSocket* tcpSock(); //< This method need for UT. do not delete
     void setUserAgent(const QString& value);
+
+    /** @return "Server" http header value */
+    QByteArray serverInfo() const;
+
 signals:
     void gotTextResponse(QByteArray text);
 private:
@@ -393,6 +397,7 @@ private:
 #endif
     nx_http::header::AuthScheme::Value m_defaultAuthScheme;
     mutable QnMutex m_socketMutex;
+    QByteArray m_serverInfo;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read

@@ -127,7 +127,7 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
         if (!widget)
             continue;
 
-        bool rowAdded = 0;
+        int row = gridLayout->rowCount();
         if (param.dataType != QnCameraAdvancedParameter::DataType::Button)
         {
             auto label = new QLabel(scrollAreaWidgetContents);
@@ -135,12 +135,11 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
             label->setText(lit("%1: ").arg(param.name));
             label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
             label->setBuddy(widget);
-            gridLayout->addWidget(label, gridLayout->rowCount(), 0);
+            gridLayout->addWidget(label, row, 0);
             m_paramLabelsById[param.id] = label;
-            rowAdded = 1;
         }
 
-        gridLayout->addWidget(widget, gridLayout->rowCount() - rowAdded, 1, Qt::AlignLeft | Qt::AlignVCenter);
+        gridLayout->addWidget(widget, row, 1, Qt::AlignLeft | Qt::AlignVCenter);
 		m_paramWidgetsById[param.id] = widget;
 
 		/* Widget is disabled until it receives correct value. */
@@ -154,6 +153,7 @@ QWidget* QnCameraAdvancedParamWidgetsManager::createContentsPage(const QString& 
                 &QnCameraAdvancedParamWidgetsManager::paramValueChanged);
         }
 	}
+    gridLayout->setColumnStretch(1, 1);
 
     for (const auto& param: params)
     {

@@ -31,9 +31,11 @@ void GetCloudModulesXml::processRequest(
     const auto host = nx_http::getHeaderValue(request.headers, "Host");
     // TODO: #ak in case if host is empty should use public IP address.
 
+    // Note: Host header has format host[:port].
     auto msgBody = std::make_unique<nx_http::BufferSource>(
         "text/xml",
-        m_cloudModuleUrlProvider.getCloudModulesXml(host));
+        m_cloudModuleUrlProvider.getCloudModulesXml(
+            SocketAddress(host).address.toString().toUtf8()));
 
     completionHandler(nx_http::RequestResult(nx_http::StatusCode::ok, std::move(msgBody)));
 }

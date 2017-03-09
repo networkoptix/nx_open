@@ -153,9 +153,9 @@ qint64 QnAVIPlaylistArchiveDelegate::seek(qint64 mksec, bool /*findIFrame*/)
     if (relativeMksec == (quint64)-1)
         return -1; // error seeking
 
-    m_startMksec = m_fileList[m_currentFileIndex]->m_formatContext->start_time;
-    if (m_startMksec != AV_NOPTS_VALUE)
-        relativeMksec += m_startMksec;
+    m_playlistOffsetUsec = m_fileList[m_currentFileIndex]->m_formatContext->start_time;
+    if (m_playlistOffsetUsec != AV_NOPTS_VALUE)
+        relativeMksec += m_playlistOffsetUsec;
     m_inSeek = true;
     if (directSeekToPosition(relativeMksec))
     {

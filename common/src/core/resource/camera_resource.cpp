@@ -239,8 +239,8 @@ bool isParamsCompatible(const CameraMediaStreamInfo& newParams, const CameraMedi
 }
 
 #if !defined(EDGE_SERVER) && !defined(__arm__)
-#define TRANSCODING_AVAILABLE
-static const bool transcodingAvailable = true;
+//#define TRANSCODING_AVAILABLE
+static const bool transcodingAvailable = false;
 #else
 static const bool transcodingAvailable = false;
 #endif
