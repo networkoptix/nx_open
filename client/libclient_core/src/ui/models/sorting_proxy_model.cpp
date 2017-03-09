@@ -20,7 +20,7 @@ public:
     void setSortingPred(const QnSortingProxyModel::SortingPredicate& pred);
     void setFilteringPred(const QnSortingProxyModel::FilteringPredicate& pred);
 
-    QModelIndex indexForRow(int row) const;
+    QModelIndex sourceIndexForTargetRow(int row) const;
     void invalidate();
 
     int rowCount() const;
@@ -49,10 +49,17 @@ private:
         const QModelIndex &destination,
         int row);
 
+    void handleSourceDataChanged(
+        const QModelIndex &topLeft,
+        const QModelIndex &bottomRight,
+        const QVector<int> &roles);
+
 private:
     void insertFilteredRow(int row);
 
     void removeFilteredRow(int index);
+
+    bool isFilteredOut(int row) const;
 
     typedef QList<int> RowsList;
     void shiftFilteredRows(const RowsList::iterator it, int difference);
@@ -122,6 +129,8 @@ void QnSortingProxyModelPrivate::setCurrentModel(QAbstractListModel* model)
         this, &QnSortingProxyModelPrivate::handleSourceRowsRemoved);
     connect(m_model, &QAbstractListModel::rowsMoved,
         this, &QnSortingProxyModelPrivate::handleSourceRowsMoved);
+    connect(m_model, &QAbstractListModel::dataChanged,
+        this, &QnSortingProxyModelPrivate::handleSourceDataChanged);
 }
 
 void QnSortingProxyModelPrivate::clearCurrentModel()
@@ -139,7 +148,7 @@ void QnSortingProxyModelPrivate::clearCurrentModel()
     m_model = nullptr;
 }
 
-QModelIndex QnSortingProxyModelPrivate::indexForRow(int row) const
+QModelIndex QnSortingProxyModelPrivate::sourceIndexForTargetRow(int row) const
 {
     if (!m_model || (row < 0) || (row >= m_rowsMapping.size()))
         return QModelIndex();
@@ -224,16 +233,12 @@ void  QnSortingProxyModelPrivate::applyFilter()
     if (!m_filterPred && (m_filteredRows.size() == sourceSize))
         return; // All items are presented
 
-    // Fake predicate restores all filtered out items
-    static auto const defaultPredicate = [](const QModelIndex& /*index*/) { return true; };
-
-    const auto pred = (m_filterPred ? m_filterPred : defaultPredicate);
     bool changed = false;
     for (int row = 0; row != sourceSize; ++row)
     {
         const int filteredIndex = m_filteredRows.indexOf(row);
         const bool filteredOutAlready = (filteredIndex == -1);
-        const bool filteredOut = !pred(m_model->index(row));
+        const bool filteredOut = isFilteredOut(row);
         if (filteredOutAlready == filteredOut)
             continue;
 
@@ -250,12 +255,23 @@ void  QnSortingProxyModelPrivate::applyFilter()
         applySort();
 }
 
+bool QnSortingProxyModelPrivate::isFilteredOut(int row) const
+{
+    // Fake predicate restores all filtered out items
+    static auto const defaultPredicate = [](const QModelIndex& /*index*/) { return true; };
+    const auto pred = (m_filterPred ? m_filterPred : defaultPredicate);
+    return !pred(m_model->index(row));
+}
+
 void QnSortingProxyModelPrivate::insertFilteredRow(int row)
 {
     /**
      * We don't emit insert signal because it will be emitted
      * in sorting function with correct position.
      */
+    if (isFilteredOut(row))
+        return;
+
     const auto pos = std::lower_bound(m_filteredRows.begin(), m_filteredRows.end(), row);
     m_filteredRows.insert(pos, row);
 }
@@ -300,11 +316,11 @@ void QnSortingProxyModelPrivate::handleSourceRowsInserted(
      * All other work will be done in applyFilter func
      */
     const int difference = (last - first + 1);
-    const auto pos = std::lower_bound(m_filteredRows.begin(), m_filteredRows.end(), first);
+    const auto pos = std::lower_bound(m_filteredRows.begin(), m_filteredRows.end(), last);
     shiftFilteredRows(pos, difference);
 
-    // TODO: add inserting several items
-    insertFilteredRow(first);
+    for (int row = first; row <= last; ++row)
+        insertFilteredRow(row);
     applySort();
 }
 
@@ -322,10 +338,11 @@ void QnSortingProxyModelPrivate::handleSourceRowsRemoved(
      * All other work will be done in applyFilter func
      */
     const int difference = -(last - first + 1);
-    const auto pos = std::upper_bound(m_filteredRows.begin(), m_filteredRows.end(), first);
+    const auto pos = std::upper_bound(m_filteredRows.begin(), m_filteredRows.end(), last);
     shiftFilteredRows(pos, difference);
-    // TODO: add removing of range indices
-    removeFilteredRow(first);
+    for (int row = first; row <= last; ++row)
+        removeFilteredRow(first);
+
     applySort();
 }
 
@@ -340,6 +357,41 @@ void QnSortingProxyModelPrivate::handleSourceRowsMoved(
     NX_ASSERT(!destination.isValid(), "QnSortFilterProxyModel works only with flat lists models");
     if (parent.isValid() || destination.isValid())
         return;
+
+    // TODO: #ynikitenkov support handle of moving items
+    NX_ASSERT(false, "QnSortingProxyModel does not handle moves yet");
+}
+
+void QnSortingProxyModelPrivate::handleSourceDataChanged(
+    const QModelIndex &topLeft,
+    const QModelIndex &bottomRight,
+    const QVector<int> &roles)
+{
+    if (!topLeft.isValid() || !bottomRight.isValid())
+    {
+        NX_ASSERT(false, "Invalid indicies");
+        return;
+    }
+
+    if (topLeft.column() || bottomRight.column())
+    {
+        NX_ASSERT(false, "QnSortingProxyModel supports only flat lists models");
+        return;
+    }
+
+    Q_Q(QnSortingProxyModel);
+    for(int row = topLeft.row(); row <= bottomRight.row(); ++row)
+    {
+        const int targetRow = m_rowsMapping.indexOf(row);
+        if (targetRow == -1)
+        {
+            NX_ASSERT(false, "Invalid target index");
+            continue;
+        }
+
+        const auto targetIndex = q->index(targetRow);
+        emit q->dataChanged(targetIndex, targetIndex, roles);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -393,7 +445,7 @@ int QnSortingProxyModel::rowCount(const QModelIndex& /* parent */) const
 QVariant QnSortingProxyModel::data(const QModelIndex& index, int role) const
 {
     Q_D(const QnSortingProxyModel);
-    const auto modelIndex = d->indexForRow(index.row());
+    const auto modelIndex = d->sourceIndexForTargetRow(index.row());
     return modelIndex.data(role);
 }
 
