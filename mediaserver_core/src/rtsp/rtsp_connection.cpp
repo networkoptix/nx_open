@@ -257,7 +257,6 @@ static const AVCodecID DEFAULT_VIDEO_CODEC = AV_CODEC_ID_H263P;
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket)
 {
-    Q_D(QnRtspConnectionProcessor);
     Q_UNUSED(_owner)
 }
 
@@ -456,7 +455,7 @@ void QnRtspConnectionProcessor::sendResponse(int httpStatusCode, const QByteArra
 
     nx_http::insertOrReplaceHeader(
         &d->response.headers,
-        nx_http::HttpHeader(nx_http::header::kServer, nx_http::serverString()));
+        nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString()));
     nx_http::insertOrReplaceHeader(
         &d->response.headers,
         nx_http::HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())));
