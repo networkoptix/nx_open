@@ -13,6 +13,7 @@
 #endif
 
 #include <nx/utils/log/assert.h>
+#include <nx/network/nettools.h>
 
 namespace QnMulticast
 {
@@ -103,18 +104,6 @@ bool leaveMulticastGroup(int fd, const QString &multicastGroup, const QString& m
     return true;
 }
 
-QString getIfaceIPv4Addr(const QNetworkInterface& iface)
-{
-    for (const auto& addr: iface.addressEntries())
-    {
-        if (QAbstractSocket::IPv4Protocol == addr.ip().protocol() && // if it has IPV4
-            addr.ip()!=QHostAddress::LocalHost &&// if this is not 0.0.0.0 or 127.0.0.1
-            addr.netmask().toIPv4Address()!=0) // and mask !=0
-            return addr.ip().toString();
-    }
-    return QString();
-}
-
 bool setMulticastIF(int fd, const QString& multicastIF)
 {
     struct in_addr localInterface;
@@ -202,29 +191,12 @@ Transport::Transport(const QUuid& localGuid):
     m_mutex(QnMutex::Recursive),
     m_nextSendQueued(false)
 {
-    initSockets(getLocalAddressList());
+    initSockets(getLocalIpV4AddressList());
 
     m_timer.reset(new QTimer());
     connect(m_timer.get(), &QTimer::timeout, this, &Transport::at_timer);
     m_timer->start(1000);
     m_checkInterfacesTimer.restart();
-}
-
-QSet<QString> Transport::getLocalAddressList() const
-{
-    QSet<QString> result;
-
-    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
-    for (const QNetworkInterface &iface: interfaces)
-    {
-        if (!(iface.flags() & QNetworkInterface::IsUp) || (iface.flags() & QNetworkInterface::IsLoopBack))
-            continue;
-
-        QString ipv4Addr = getIfaceIPv4Addr(iface);
-        if (!ipv4Addr.isEmpty())
-            result << ipv4Addr;
-    }
-    return result;
 }
 
 void Transport::initSockets(const QSet<QString>& addrList)
@@ -293,7 +265,7 @@ void Transport::at_timer()
     // 2. check if interface list changed
     if (m_checkInterfacesTimer.hasExpired(INTERFACE_LIST_CHECK_INTERVAL))
     {
-        QSet<QString> addrList = getLocalAddressList();
+        QSet<QString> addrList = getLocalIpV4AddressList();
         if (addrList != m_localAddressList)
             initSockets(addrList);
         m_checkInterfacesTimer.restart();

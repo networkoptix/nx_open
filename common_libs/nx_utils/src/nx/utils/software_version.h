@@ -29,7 +29,7 @@ public:
      * Creates a software version object from a string. Note that this function
      * also supports OpenGL style version strings like "2.0.6914 WinXP SSE/SSE2/SSE3/3DNow!".
      *
-     * \param versionString             Version string.
+     * @param versionString Version string. Can be empty which leads to zero version.
      */
     explicit SoftwareVersion(const QString &versionString);
     explicit SoftwareVersion(const char *versionString);

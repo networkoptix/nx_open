@@ -1008,13 +1008,14 @@ SslSocket::SslSocket(
     base_type([wrappedSocket](){ return wrappedSocket; }),
     d_ptr(priv)
 {
+    ssl::initOpenSSLGlobalLock();
+
     Q_D(SslSocket);
     d->wrappedSocket = wrappedSocket;
     d->isServerSide = isServerSide;
     d->extraBufferLen = 0;
     d->ecnryptionEnabled = encriptionEnforced;
     init();
-    ssl::initOpenSSLGlobalLock();
 
     // NOTE: Currently all IO operations are implemented over async because current SSL
     //     implementation is too twisted to support runtime mode switches.

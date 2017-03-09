@@ -100,4 +100,6 @@ static const int MAC_ADDR_LEN = 18;
 int NX_NETWORK_API getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host);
 QString NX_NETWORK_API getMacFromPrimaryIF();
 
+QSet<QString> NX_NETWORK_API getLocalIpV4AddressList();
+
 #endif //cl_net_tools_1232

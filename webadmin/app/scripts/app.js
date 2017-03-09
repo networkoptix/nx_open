@@ -119,11 +119,17 @@ angular.module('webadminApp', [
     var original = $location.path;
     $rootScope.storage = $localStorage;
     $location.path = function (path, reload) {
-        if (reload === false) {
-            var lastRoute = $route.current;
-            var un = $rootScope.$on('$locationChangeSuccess', function () {
-                $route.current = lastRoute;
-                un();
+        if(reload === false) {
+            if (original.apply($location) == path) return;
+
+            var routeToKeep = $route.current;
+            var unsubscribe = $rootScope.$on('$locationChangeSuccess', function () {
+                if (routeToKeep) {
+                    $route.current = routeToKeep;
+                    routeToKeep = null;
+                }
+                unsubscribe();
+                unsubscribe = null;
             });
         }
         return original.apply($location, [path]);

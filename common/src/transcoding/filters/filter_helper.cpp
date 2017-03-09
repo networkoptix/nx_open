@@ -91,7 +91,7 @@ QSize QnImageFilterHelper::updatedResolution(const QList<QnAbstractImageFilterPt
     return result;
 }
 
-const QSize QnImageFilterHelper::defaultResolutionLimit(8192, 8192);
+const QSize QnImageFilterHelper::defaultResolutionLimit(8192 - 16, 8192 - 16);
 
 QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSize& srcResolution, const QSize& resolutionLimit) const
 {
