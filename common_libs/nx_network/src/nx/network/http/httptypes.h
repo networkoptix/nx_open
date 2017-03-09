@@ -436,241 +436,272 @@ public:
 };
 
 //!Contains http header structures
-namespace header
+namespace header {
+
+/** common header name constants */
+extern NX_NETWORK_API const StringType kContentType;
+extern NX_NETWORK_API const StringType kUserAgent;
+
+//!Http authentication scheme enumeration
+namespace AuthScheme
 {
-    /** common header name constants */
-    extern NX_NETWORK_API const StringType kContentType;
-    extern NX_NETWORK_API const StringType kUserAgent;
-    extern NX_NETWORK_API const StringType kServer;
-
-    //!Http authentication scheme enumeration
-    namespace AuthScheme
+    enum Value
     {
-        enum Value
-        {
-            none,
-            basic,
-            digest,
-            automatic
-        };
+        none,
+        basic,
+        digest,
+        automatic
+    };
 
-        NX_NETWORK_API const char* toString( Value val );
-        NX_NETWORK_API Value fromString( const char* str );
-        NX_NETWORK_API Value fromString( const ConstBufferRefType& str );
+    NX_NETWORK_API const char* toString( Value val );
+    NX_NETWORK_API Value fromString( const char* str );
+    NX_NETWORK_API Value fromString( const ConstBufferRefType& str );
+}
+
+//!Login/password to use in http authorization
+class NX_NETWORK_API UserCredentials
+{
+public:
+    StringType userid;
+    StringType password;
+};
+
+//!rfc2617, section 2
+class NX_NETWORK_API BasicCredentials
+:
+    public UserCredentials
+{
+public:
+    bool parse( const BufferType& str );
+    void serialize( BufferType* const dstBuffer ) const;
+};
+
+//!rfc2617, section 3.2.2
+class NX_NETWORK_API DigestCredentials
+:
+    public UserCredentials
+{
+public:
+    QMap<BufferType, BufferType> params;
+
+    bool parse( const BufferType& str, char separator = ',' );
+    void serialize( BufferType* const dstBuffer ) const;
+};
+
+//!Authorization header ([rfc2616, 14.8], rfc2617)
+class NX_NETWORK_API Authorization
+{
+public:
+    static const StringType NAME;
+
+    AuthScheme::Value authScheme;
+    union
+    {
+        BasicCredentials* basic;
+        DigestCredentials* digest;
+    };
+
+    Authorization();
+    Authorization( const AuthScheme::Value& authSchemeVal );
+    Authorization( Authorization&& right );
+    Authorization(const Authorization&);
+    ~Authorization();
+
+    Authorization& operator=( Authorization&& right );
+
+    bool parse( const BufferType& str );
+    void serialize( BufferType* const dstBuffer ) const;
+    BufferType serialized() const;
+    void clear();
+
+    StringType userid() const;
+
+private:
+    const Authorization& operator=( const Authorization& );
+};
+
+//!Convenient class for generating Authorization header with Basic authentication method
+class NX_NETWORK_API BasicAuthorization
+:
+    public Authorization
+{
+public:
+    BasicAuthorization( const StringType& userName, const StringType& userPassword );
+};
+
+class NX_NETWORK_API DigestAuthorization
+:
+    public Authorization
+{
+public:
+    DigestAuthorization();
+    DigestAuthorization(DigestAuthorization&& right);
+    DigestAuthorization(const DigestAuthorization& right);
+
+    void addParam( const BufferType& name, const BufferType& value );
+};
+
+//![rfc2616, 14.47]
+class NX_NETWORK_API WWWAuthenticate
+{
+public:
+    static const StringType NAME;
+
+    AuthScheme::Value authScheme;
+    QMap<BufferType, BufferType> params;
+
+    WWWAuthenticate(AuthScheme::Value authScheme = AuthScheme::none);
+
+    bool parse( const BufferType& str );
+    void serialize( BufferType* const dstBuffer ) const;
+    BufferType serialized() const;
+};
+
+//! identity
+static const StringType IDENTITY_CODING( "identity" );
+//! *
+static const StringType ANY_CODING( "*" );
+
+//![rfc2616, 14.3]
+class NX_NETWORK_API AcceptEncodingHeader
+{
+public:
+    AcceptEncodingHeader( const nx_http::StringType& strValue );
+
+    void parse( const nx_http::StringType& str );
+    //!Returns \a true if \a encodingName is present in header and returns corresponding qvalue in \a *q (if not null)
+    bool encodingIsAllowed( const nx_http::StringType& encodingName, double* q = nullptr ) const;
+
+private:
+    //!map<coding, qvalue>
+    std::map<nx_http::StringType, double> m_codings;
+    boost::optional<double> m_anyCodingQValue;
+};
+
+/*!
+    \note Boundaries are inclusive
+*/
+class NX_NETWORK_API RangeSpec
+{
+public:
+    quint64 start;
+    boost::optional<quint64> end;
+
+    RangeSpec()
+    :
+        start( 0 )
+    {
     }
+};
 
-    //!Login/password to use in http authorization
-    class NX_NETWORK_API UserCredentials
-    {
-    public:
-        StringType userid;
-        StringType password;
-    };
-
-    //!rfc2617, section 2
-    class NX_NETWORK_API BasicCredentials
-    :
-        public UserCredentials
-    {
-    public:
-        bool parse( const BufferType& str );
-        void serialize( BufferType* const dstBuffer ) const;
-    };
-
-    //!rfc2617, section 3.2.2
-    class NX_NETWORK_API DigestCredentials
-    :
-        public UserCredentials
-    {
-    public:
-        QMap<BufferType, BufferType> params;
-
-        bool parse( const BufferType& str, char separator = ',' );
-        void serialize( BufferType* const dstBuffer ) const;
-    };
-
-    //!Authorization header ([rfc2616, 14.8], rfc2617)
-    class NX_NETWORK_API Authorization
-    {
-    public:
-        static const StringType NAME;
-
-        AuthScheme::Value authScheme;
-        union
-        {
-            BasicCredentials* basic;
-            DigestCredentials* digest;
-        };
-
-        Authorization();
-        Authorization( const AuthScheme::Value& authSchemeVal );
-        Authorization( Authorization&& right );
-        Authorization(const Authorization&);
-        ~Authorization();
-
-        Authorization& operator=( Authorization&& right );
-
-        bool parse( const BufferType& str );
-        void serialize( BufferType* const dstBuffer ) const;
-        BufferType serialized() const;
-        void clear();
-
-        StringType userid() const;
-
-    private:
-        const Authorization& operator=( const Authorization& );
-    };
-
-    //!Convenient class for generating Authorization header with Basic authentication method
-    class NX_NETWORK_API BasicAuthorization
-    :
-        public Authorization
-    {
-    public:
-        BasicAuthorization( const StringType& userName, const StringType& userPassword );
-    };
-
-    class NX_NETWORK_API DigestAuthorization
-    :
-        public Authorization
-    {
-    public:
-        DigestAuthorization();
-        DigestAuthorization(DigestAuthorization&& right);
-        DigestAuthorization(const DigestAuthorization& right);
-
-        void addParam( const BufferType& name, const BufferType& value );
-    };
-
-    //![rfc2616, 14.47]
-    class NX_NETWORK_API WWWAuthenticate
-    {
-    public:
-        static const StringType NAME;
-
-        AuthScheme::Value authScheme;
-        QMap<BufferType, BufferType> params;
-
-        WWWAuthenticate(AuthScheme::Value authScheme = AuthScheme::none);
-
-        bool parse( const BufferType& str );
-        void serialize( BufferType* const dstBuffer ) const;
-        BufferType serialized() const;
-    };
-
-    //! identity
-    static const StringType IDENTITY_CODING( "identity" );
-    //! *
-    static const StringType ANY_CODING( "*" );
-
-    //![rfc2616, 14.3]
-    class NX_NETWORK_API AcceptEncodingHeader
-    {
-    public:
-        AcceptEncodingHeader( const nx_http::StringType& strValue );
-
-        void parse( const nx_http::StringType& str );
-        //!Returns \a true if \a encodingName is present in header and returns corresponding qvalue in \a *q (if not null)
-        bool encodingIsAllowed( const nx_http::StringType& encodingName, double* q = nullptr ) const;
-
-    private:
-        //!map<coding, qvalue>
-        std::map<nx_http::StringType, double> m_codings;
-        boost::optional<double> m_anyCodingQValue;
-    };
+//![rfc2616, 14.35]
+class NX_NETWORK_API Range
+{
+public:
+    Range();
 
     /*!
-        \note Boundaries are inclusive
+        \note In case of parse error, contents of this object are undefined
     */
-    class NX_NETWORK_API RangeSpec
+    bool parse( const nx_http::StringType& strValue );
+
+    //!Returns \a true if range is satisfiable for content of size \a contentSize
+    bool validateByContentSize( size_t contentSize ) const;
+    //!\a true, if empty range (does not include any bytes of content)
+    bool empty() const;
+    //!\a true, if range is full (includes all bytes of content of size \a contentSize)
+    bool full( size_t contentSize ) const;
+    //!Returns range length for content of size \a contentSize
+    quint64 totalRangeLength( size_t contentSize ) const;
+
+    std::vector<RangeSpec> rangeSpecList;
+};
+
+//![rfc2616, 14.16]
+class NX_NETWORK_API ContentRange
+{
+public:
+    //!By default, bytes
+    StringType unitName;
+    boost::optional<quint64> instanceLength;
+    RangeSpec rangeSpec;
+
+    ContentRange();
+
+    quint64 rangeLength() const;
+    StringType toString() const;
+};
+
+//![rfc2616, 14.45]
+class NX_NETWORK_API Via
+{
+public:
+    class ProxyEntry
     {
     public:
-        quint64 start;
-        boost::optional<quint64> end;
-
-        RangeSpec()
-        :
-            start( 0 )
-        {
-        }
+        boost::optional<StringType> protoName;
+        StringType protoVersion;
+        //!( host [ ":" port ] ) | pseudonym
+        StringType receivedBy;
+        StringType comment;
     };
 
-    //![rfc2616, 14.35]
-    class NX_NETWORK_API Range
+    std::vector<ProxyEntry> entries;
+
+    /*!
+        \note In case of parse error, contents of this object are undefined
+    */
+    bool parse( const nx_http::StringType& strValue );
+    StringType toString() const;
+};
+
+class NX_NETWORK_API KeepAlive
+{
+public:
+    std::chrono::seconds timeout;
+    boost::optional<int> max;
+
+    KeepAlive();
+    KeepAlive(
+        std::chrono::seconds _timeout,
+        boost::optional<int> _max = boost::none);
+
+    bool parse(const nx_http::StringType& strValue);
+    StringType toString() const;
+};
+
+class NX_NETWORK_API Server
+{
+public:
+    struct Product
     {
-    public:
-        Range();
+        StringType name;
+        boost::optional<nx::utils::SoftwareVersion> version;
+        StringType comment;
 
-        /*!
-            \note In case of parse error, contents of this object are undefined
-        */
-        bool parse( const nx_http::StringType& strValue );
-
-        //!Returns \a true if range is satisfiable for content of size \a contentSize
-        bool validateByContentSize( size_t contentSize ) const;
-        //!\a true, if empty range (does not include any bytes of content)
-        bool empty() const;
-        //!\a true, if range is full (includes all bytes of content of size \a contentSize)
-        bool full( size_t contentSize ) const;
-        //!Returns range length for content of size \a contentSize
-        quint64 totalRangeLength( size_t contentSize ) const;
-
-        std::vector<RangeSpec> rangeSpecList;
+        bool operator==(const Product&) const;
     };
 
-    //![rfc2616, 14.16]
-    class NX_NETWORK_API ContentRange
-    {
-    public:
-        //!By default, bytes
-        StringType unitName;
-        boost::optional<quint64> instanceLength;
-        RangeSpec rangeSpec;
+    static const StringType NAME;
 
-        ContentRange();
+    std::vector<Product> products;
 
-        quint64 rangeLength() const;
-        StringType toString() const;
-    };
+    Server();
 
-    //![rfc2616, 14.45]
-    class NX_NETWORK_API Via
-    {
-    public:
-        class ProxyEntry
-        {
-        public:
-            boost::optional<StringType> protoName;
-            StringType protoVersion;
-            //!( host [ ":" port ] ) | pseudonym
-            StringType receivedBy;
-            StringType comment;
-        };
+    bool operator==(const Server&) const;
 
-        std::vector<ProxyEntry> entries;
+    bool parse(const nx_http::StringType& strValue);
+    StringType toString() const;
 
-        /*!
-            \note In case of parse error, contents of this object are undefined
-        */
-        bool parse( const nx_http::StringType& strValue );
-        StringType toString() const;
-    };
+private:
+    nx_http::StringType toString(const Product& product) const;
+    void readProduct(Product* product, QnByteArrayConstRef* inputStr);
+    void readProductName(Product* product, QnByteArrayConstRef* inputStr);
+    void readProductVersion(Product* product, QnByteArrayConstRef* inputStr);
+    void readProductComment(Product* product, QnByteArrayConstRef* inputStr);
+};
 
-    class NX_NETWORK_API KeepAlive
-    {
-    public:
-        std::chrono::seconds timeout;
-        boost::optional<int> max;
-
-        KeepAlive();
-        KeepAlive(
-            std::chrono::seconds _timeout,
-            boost::optional<int> _max = boost::none);
-
-        bool parse(const nx_http::StringType& strValue);
-        StringType toString() const;
-    };
-}
+} // namespace header
 
 typedef std::pair<StringType, StringType> ChunkExtension;
 
@@ -705,10 +736,5 @@ public:
 StringType NX_NETWORK_API userAgentString();
 //!Returns common value for Server header
 StringType NX_NETWORK_API serverString();
-
-/**
- * @return Zero version if serverString is invalid.
- */
-nx::utils::SoftwareVersion NX_NETWORK_API extractServerVersion(const StringType& serverString);
 
 } // nx_http

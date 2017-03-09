@@ -619,3 +619,61 @@ TEST(HttpHeaderTest, KeepAlive_parse)
         ASSERT_FALSE(keepAlive.parse(testData));
     }
 }
+
+//-------------------------------------------------------------------------------------------------
+// Server
+
+class HttpHeaderServer:
+    public ::testing::Test
+{
+public:
+
+protected:
+    void test(
+        bool isValid,
+        const nx_http::header::Server& serverHeader,
+        nx_http::StringType serializedValue)
+    {
+        using namespace nx_http::header;
+
+        const auto result = serverHeader.toString();
+        ASSERT_TRUE(result.startsWith(serializedValue));
+
+        Server headerToParse;
+        ASSERT_EQ(isValid, headerToParse.parse(serializedValue));
+        if (isValid)
+            ASSERT_EQ(serverHeader, headerToParse);
+    }
+};
+
+TEST_F(HttpHeaderServer, single_product_without_comment)
+{
+    nx_http::header::Server serverHeader;
+    serverHeader.products.clear();
+    serverHeader.products.push_back(
+        nx_http::header::Server::Product{
+            "ProductName", nx::utils::SoftwareVersion("1.2.3.4"), ""});
+    test(true, serverHeader, "ProductName/1.2.3.4");
+}
+
+TEST_F(HttpHeaderServer, single_product_without_version)
+{
+    nx_http::header::Server serverHeader;
+    serverHeader.products.clear();
+    serverHeader.products.push_back(
+        nx_http::header::Server::Product{"ProductName", boost::none, ""});
+    test(true, serverHeader, "ProductName");
+}
+
+TEST_F(HttpHeaderServer, multile_products)
+{
+    nx_http::header::Server serverHeader;
+    serverHeader.products.clear();
+    serverHeader.products.push_back(
+        nx_http::header::Server::Product{
+        "Product1", nx::utils::SoftwareVersion("1.2.3.4"), "" });
+    serverHeader.products.push_back(
+        nx_http::header::Server::Product{
+        "Product2", nx::utils::SoftwareVersion("5.6.7.8"), "comment2" });
+    test(true, serverHeader, "Product1/1.2.3.4 Product2/5.6.7.8 (comment2)");
+}
