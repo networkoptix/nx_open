@@ -182,8 +182,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
     if (!findStreams() || m_eofReached)
         return QnAbstractMediaDataPtr();
 
-    AVPacket packet;
-    av_init_packet(&packet);
+    QnFfmpegAvPacket packet;
     QnAbstractMediaDataPtr data;
     AVStream *stream;
     while (1)

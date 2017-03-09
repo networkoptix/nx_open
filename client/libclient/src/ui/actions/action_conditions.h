@@ -648,13 +648,6 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters& parameters) override;
 };
 
-class QnShowcaseActionCondition: public QnActionCondition
-{
-public:
-    QnShowcaseActionCondition(QObject* parent): QnActionCondition(parent) {}
-    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
-};
-
 class QnPtzActionCondition: public QnActionCondition
 {
 public:

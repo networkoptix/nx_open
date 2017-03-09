@@ -76,17 +76,14 @@ MultipleServerSocket_FORWARD_SET(bind, const SocketAddress&)
 
 SocketAddress MultipleServerSocket::getLocalAddress() const
 {
-    boost::optional<SocketAddress> first;
-    for (auto& socket : m_serverSockets)
+    for (auto& socket: m_serverSockets)
     {
-        const auto value = socket->getLocalAddress();
-        if (first)
-            NX_ASSERT(*first == value);
-        else
-            first = value;
+        const auto endpoint = socket->getLocalAddress();
+        if (endpoint.port > 0)
+            return endpoint;
     }
 
-    return *first;
+    return SocketAddress();
 }
 
 bool MultipleServerSocket::close()

@@ -47,7 +47,7 @@ QnThumbnailRequestData::QnThumbnailRequestData():
     rotation(kDefaultRotation),
     size(),
     imageFormat(JpgFormat),
-    roundMethod(KeyFrameBeforeMethod)
+    roundMethod(KeyFrameAfterMethod) //< round after is better then before by default for most situations
 {
 }
 

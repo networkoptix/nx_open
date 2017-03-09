@@ -65,7 +65,7 @@ static void printInLogNetResources(const QnResourceList& resources)
         if (!netRes)
             continue;
 
-        NX_LOG( lit("%1 %2").arg(netRes->getHostAddress()).arg(netRes->getName()), cl_logINFO);
+        NX_LOG( lit("Discovery----: %1 %2").arg(netRes->getHostAddress()).arg(netRes->getName()), cl_logINFO);
     }
 
 }
@@ -157,8 +157,8 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         QnResourcePtr rpResource = QnResourceDiscoveryManager::findSameResource(newNetRes);
         QnVirtualCameraResourcePtr newCamRes = newNetRes.dynamicCast<QnVirtualCameraResource>();
-        
-        if (!rpResource) 
+
+        if (!rpResource)
         {
             if (newCamRes && newCamRes->needCheckIpConflicts())
             {
@@ -196,7 +196,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     .arg(FL1(Q_FUNC_INFO))
                     .arg(NetResString(rpNetRes))
                     .arg(NetResString(newNetRes)));
-                    
+
             newNetRes->setPhysicalId(rpNetRes->getUniqueId());
             if (rpNetRes->mergeResourcesIfNeeded(newNetRes) || isForeign || updateTypeId)
             {
@@ -223,7 +223,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
                     const ec2::ErrorCode errorCode = connect->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
                     if( errorCode != ec2::ErrorCode::ok )
-                        NX_LOG( QString::fromLatin1("Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
+                        NX_LOG( QString::fromLatin1("Discovery----: Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
                     propertyDictionary->saveParams( existCamRes->getId() );
                 }
             }
@@ -279,7 +279,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
     if (resources.size())
     {
-        NX_LOG("Discovery---- Final result: ", cl_logINFO);
+        NX_LOG("Discovery----: Final result: ", cl_logINFO);
         printInLogNetResources(resources);
     }
     return true;
