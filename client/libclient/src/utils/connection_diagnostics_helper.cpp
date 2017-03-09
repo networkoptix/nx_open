@@ -8,6 +8,7 @@
 #include <client/client_runtime_settings.h>
 #include <client/self_updater.h>
 #include <client/client_app_info.h>
+#include <client/client_startup_parameters.h>
 
 #include <nx_ec/ec_api.h>
 
@@ -338,7 +339,11 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
                 ? lit("https")
                 : lit("http"));
         }
-        switch (applauncher::restartClient(connectionInfo.version, serverUrl.toEncoded()))
+
+        QString authString = QnStartupParameters::createAuthenticationString(serverUrl,
+            connectionInfo.version);
+
+        switch (applauncher::restartClient(connectionInfo.version, authString))
         {
             case applauncher::api::ResultType::ok:
                 return Qn::IncompatibleProtocolConnectionResult;
