@@ -331,7 +331,14 @@ Qn::ConnectionResult QnConnectionDiagnosticsHelper::handleCompatibilityMode(
         if (dialog.exec() == QDialogButtonBox::Cancel)
             return Qn::IncompatibleVersionConnectionResult;
 
-        switch (applauncher::restartClient(connectionInfo.version, connectionInfo.ecUrl.toEncoded()))
+        QUrl serverUrl = connectionInfo.ecUrl;
+        if (serverUrl.scheme().isEmpty())
+        {
+            serverUrl.setScheme(connectionInfo.allowSslConnections
+                ? lit("https")
+                : lit("http"));
+        }
+        switch (applauncher::restartClient(connectionInfo.version, serverUrl.toEncoded()))
         {
             case applauncher::api::ResultType::ok:
                 return Qn::IncompatibleProtocolConnectionResult;
