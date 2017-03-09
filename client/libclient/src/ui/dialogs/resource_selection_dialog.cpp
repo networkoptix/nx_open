@@ -15,6 +15,7 @@
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/models/resource/resource_tree_model.h>
 #include <ui/style/globals.h>
+#include <ui/style/skin.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/help/help_topic_accessor.h>
@@ -37,10 +38,30 @@ public:
 
     QVariant data(const QModelIndex &proxyIndex, int role) const override
     {
-        if (role == Qt::TextColorRole && m_delegate
-            && !m_delegate->isValid(id(proxyIndex)))
-            return QBrush(qnGlobals->errorTextColor());
-        return QIdentityProxyModel::data(proxyIndex, role);
+        if (!m_delegate || m_delegate->isValid(id(proxyIndex)))
+            return base_type::data(proxyIndex, role);
+
+        //TODO: #GDM #3.1 refactor to common delegate
+        // Handling only invalid rows here
+        switch (role)
+        {
+            case Qt::DecorationRole:
+            {
+                if (proxyIndex.column() == Qn::NameColumn)
+                {
+                    auto resource = base_type::data(proxyIndex, Qn::ResourceRole).value<QnResourcePtr>();
+                    if (resource && resource->hasFlags(Qn::user))
+                        return qnSkin->icon("tree/user_error.png");
+                }
+                break;
+            }
+            case Qt::TextColorRole:
+            {
+                return QBrush(qnGlobals->errorTextColor());
+            }
+        }
+
+        return base_type::data(proxyIndex, role);
     }
 
 private:

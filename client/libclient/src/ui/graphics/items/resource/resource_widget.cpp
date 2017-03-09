@@ -1034,6 +1034,7 @@ void QnResourceWidget::paintWindowFrame(
     if (qFuzzyIsNull(m_frameOpacity))
         return;
 
+    QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
     static const int kFramePadding = 1;
     QnNxStyle::paintCosmeticFrame(painter, rect(), calculateFrameColor(),
         -calculateFrameWidth(), -kFramePadding); //< negative values for outer frame

@@ -445,9 +445,11 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     arguments << lit("--no-single-application");
     arguments << lit("--no-version-mismatch-check");
 
-    if (context()->user()) {
+    if (context()->user())
+    {
         arguments << lit("--auth");
-        arguments << QString::fromUtf8(QnAppServerConnectionFactory::url().toEncoded());
+        arguments << QnStartupParameters::createAuthenticationString(
+            QnAppServerConnectionFactory::url());
     }
 
     if (mainWindow())
