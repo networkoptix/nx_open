@@ -116,7 +116,7 @@ private:
 
 QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_formatContext(0),
-    m_startMksec(0),
+    m_playlistOffsetUsec(0),
     m_selectedAudioChannel(0),
     m_audioStreamIndex(-1),
     m_firstVideoIndex(0),
@@ -284,13 +284,13 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
 
     qint64 relTime = qMax(time-m_startTimeUsec, 0ll);
     if (m_hasVideo)
-        av_seek_frame(m_formatContext, -1, relTime + m_startMksec, findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
+        av_seek_frame(m_formatContext, -1, relTime + m_playlistOffsetUsec, findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
     else {
         // mp3 seek is bugged in current ffmpeg version
         if (!reopen())
             return -1;
     }
-    m_lastSeekTime = relTime + m_startMksec + m_startTimeUsec; // file physical time to UTC time
+    m_lastSeekTime = relTime + m_playlistOffsetUsec + m_startTimeUsec; // file physical time to UTC time
     return time;
 }
 
@@ -371,7 +371,7 @@ void QnAviArchiveDelegate::close()
     m_formatContext = 0;
     m_initialized = false;
     m_streamsFound = false;
-    m_startMksec = 0;
+    m_playlistOffsetUsec = 0;
     m_storage.clear();
     m_lastPacketTimes.clear();
     m_lastSeekTime = AV_NOPTS_VALUE;

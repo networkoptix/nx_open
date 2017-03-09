@@ -38,7 +38,7 @@ namespace detail {
         };
 
         bool isOverlayVisible() const;
-        void setOverlayVisible(bool visible = true, bool animate = true);
+        void setOverlayVisible(bool visible, bool animate);
 
         void addOverlayWidget(QGraphicsWidget *widget
             , const OverlayParams &params);
@@ -46,10 +46,10 @@ namespace detail {
         void removeOverlayWidget(QGraphicsWidget *widget);
 
         OverlayVisibility overlayWidgetVisibility(QGraphicsWidget *widget) const;
-        void setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility, bool animate = true);
-        void updateOverlayWidgetsVisibility(bool animate = true);
+        void setOverlayWidgetVisibility(QGraphicsWidget *widget, OverlayVisibility visibility, bool animate);
+        void updateOverlayWidgetsVisibility(bool animate);
 
-        static void setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible = true, bool animate = true);
+        static void setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible, bool animate);
         static bool isOverlayWidgetVisible(QGraphicsWidget* widget);
     private:
         template<class Base>

@@ -2,6 +2,7 @@
 
 #include <QtCore/QBuffer>
 
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
@@ -86,13 +87,11 @@ void CloudModuleUrlFetcher::setUrl(QUrl endpoint)
     m_url = std::move(endpoint);
 }
 
-//!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
 void CloudModuleUrlFetcher::get(Handler handler)
 {
     get(nx_http::AuthInfo(), std::move(handler));
 }
 
-//!Retrieves endpoint if unknown. If endpoint is known, then calls \a handler directly from this method
 void CloudModuleUrlFetcher::get(nx_http::AuthInfo auth, Handler handler)
 {
     using namespace std::chrono;
@@ -120,6 +119,9 @@ void CloudModuleUrlFetcher::get(nx_http::AuthInfo auth, Handler handler)
     m_httpClient->setAuth(auth);
     m_httpClient->bindToAioThread(getAioThread());
 
+    for (const auto& header: m_additionalHttpHeadersForGetRequest)
+        m_httpClient->addAdditionalHeader(header.first, header.second);
+
     m_httpClient->setSendTimeoutMs(
         duration_cast<milliseconds>(kHttpRequestTimeout).count());
     m_httpClient->setResponseReadTimeoutMs(
@@ -129,8 +131,14 @@ void CloudModuleUrlFetcher::get(nx_http::AuthInfo auth, Handler handler)
 
     m_requestIsRunning = true;
     m_httpClient->doGet(
-        QUrl(m_modulesXmlUrl),
+        m_modulesXmlUrl,
         std::bind(&CloudModuleUrlFetcher::onHttpClientDone, this, _1));
+}
+
+void CloudModuleUrlFetcher::addAdditionalHttpHeaderForGetRequest(
+    nx::String name, nx::String value)
+{
+    m_additionalHttpHeadersForGetRequest.emplace_back(name, value);
 }
 
 void CloudModuleUrlFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr client)

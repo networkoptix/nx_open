@@ -21,7 +21,7 @@ QnAbstractCameraAdvancedParamWidget::QnAbstractCameraAdvancedParamWidget(const Q
 		setWarningStyle(readOnlyLabel);
 		m_layout->addWidget(readOnlyLabel);
 	}
-		
+
 }
 
 class QnBoolCameraAdvancedParamWidget: public QnAbstractCameraAdvancedParamWidget {
@@ -69,7 +69,7 @@ public:
             m_spinBox->setMinimum(qRound(min * 100));
             m_spinBox->setMaximum(qRound(max * 100));
         }
-        
+
 		m_spinBox->setToolTip(parameter.description);
 		setReadOnly(m_spinBox, parameter.readOnly);
 
@@ -90,7 +90,7 @@ public:
 	virtual void setValue(const QString &newValue) override	{
         if (m_isInteger)
             m_spinBox->setValue(newValue.toInt());
-        else 
+        else
             m_spinBox->setValue(qRound(newValue.toDouble() * 100));
 	}
 
@@ -170,8 +170,8 @@ public:
 		m_lineEdit->setToolTip(parameter.description);
 		setReadOnly(m_lineEdit, parameter.readOnly);
 
-		m_layout->insertWidget(0, m_lineEdit);
-		
+		m_layout->insertWidget(0, m_lineEdit, 1);
+
 		connect(m_lineEdit, &QLineEdit::textEdited, this, [this] {
 			emit valueChanged(m_id, value());
 		});
@@ -184,6 +184,12 @@ public:
 	virtual void setValue(const QString &newValue) override	{
 		m_lineEdit->setText(newValue);
 	}
+
+    virtual QSize sizeHint() const override
+    {
+        //TODO: #GDM Looks like dirty hack. Investigation is required. #low #future
+        return QSize(9999, m_lineEdit->sizeHint().height());
+    }
 
 private:
 	QLineEdit* m_lineEdit;

@@ -32,6 +32,8 @@
 
 #include <client/client_settings.h>
 
+#include <network/cloud_url_validator.h>
+
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
 #include <recording/time_period.h>
@@ -1334,4 +1336,36 @@ Qn::ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &re
             return Qn::InvisibleAction;
     }
     return found ? Qn::EnabledAction : Qn::InvisibleAction;
+}
+
+QnCloudServerActionCondition::QnCloudServerActionCondition(Qn::MatchMode matchMode, QObject* parent):
+    QnActionCondition(parent),
+    m_matchMode(matchMode)
+{
+}
+
+Qn::ActionVisibility QnCloudServerActionCondition::check(const QnResourceList& resources)
+{
+    auto isCloudServer = [](const QnResourcePtr& resource)
+        {
+            return nx::network::isCloudServer(resource.dynamicCast<QnMediaServerResource>());
+        };
+
+    bool success = false;
+    switch (m_matchMode)
+    {
+        case Qn::Any:
+            success = any_of(resources, isCloudServer);
+            break;
+        case Qn::All:
+            success = all_of(resources, isCloudServer);
+            break;
+        case Qn::ExactlyOne:
+            success = (boost::count_if(resources, isCloudServer) == 1);
+            break;
+        default:
+            break;
+    }
+
+    return success ? Qn::EnabledAction : Qn::InvisibleAction;
 }

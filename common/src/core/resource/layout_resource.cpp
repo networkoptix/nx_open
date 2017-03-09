@@ -74,8 +74,13 @@ QString QnLayoutResource::toSearchString() const
 void QnLayoutResource::setItems(const QnLayoutItemDataList& items)
 {
     QnLayoutItemDataMap map;
-    for (const QnLayoutItemData &item : items)
+    for (QnLayoutItemData item: items)
+    {
+        // Workaround against corrupted layouts in the database
+        if (item.uuid.isNull())
+            item.uuid = QnUuid::createUuid();
         map[item.uuid] = item;
+    }
     setItems(map);
 }
 

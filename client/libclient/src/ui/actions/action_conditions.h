@@ -805,4 +805,14 @@ private:
     bool m_all;
 };
 
+class QnCloudServerActionCondition: public QnActionCondition
+{
+public:
+    QnCloudServerActionCondition(Qn::MatchMode matchMode, QObject* parent = nullptr);
+
+    virtual Qn::ActionVisibility check(const QnResourceList& resources) override;
+private:
+    Qn::MatchMode m_matchMode;
+};
+
 #endif // QN_ACTION_CONDITIONS_H

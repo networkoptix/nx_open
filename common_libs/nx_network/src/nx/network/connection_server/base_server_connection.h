@@ -178,7 +178,7 @@ public:
      */
     void setInactivityTimeout(boost::optional<std::chrono::milliseconds> value)
     {
-        NX_CRITICAL(m_streamSocket->pollable()->isInSelfAioThread());
+        NX_EXPECT(m_streamSocket->pollable()->isInSelfAioThread());
         m_inactivityTimeout = value;
 
         if (value)

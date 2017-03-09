@@ -20,6 +20,14 @@ bool QnSystemHealth::isMessageLocked(MessageType message)
     {
         case QnSystemHealth::ConnectionLost:
         case QnSystemHealth::CloudPromo:
+        case QnSystemHealth::EmailIsEmpty:
+        case QnSystemHealth::NoLicenses:
+        case QnSystemHealth::SmtpIsNotSet:
+        case QnSystemHealth::UsersEmailIsEmpty:
+        case QnSystemHealth::NoPrimaryTimeServer:
+        case QnSystemHealth::SystemIsReadOnly:
+        case QnSystemHealth::StoragesNotConfigured:
+        case QnSystemHealth::StoragesAreFull:
             return true;
         default:
             break;

@@ -67,6 +67,7 @@ void QnCameraMotionMaskWidget::init()
     m_controller->handScrollInstrument()->disable();
     m_controller->wheelZoomInstrument()->disable();
     m_controller->gridAdjustmentInstrument()->disable();
+    m_controller->sceneClickInstrument()->disable();
     m_controller->setMenuEnabled(false);
 
     /* We need to listen to viewport resize events to make sure that our widget is always positioned at viewport's center. */
