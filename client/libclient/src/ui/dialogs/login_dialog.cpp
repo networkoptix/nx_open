@@ -495,7 +495,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
                 : QnSoftwareVersion::BugfixFormat;
 
             vm.title += lit(" (v%1)")
-                .arg(data.info.version.toString(QnSoftwareVersion::FullFormat));
+                .arg(data.info.version.toString(versionFormat));
         }
 
         viewModels.push_back(vm);
