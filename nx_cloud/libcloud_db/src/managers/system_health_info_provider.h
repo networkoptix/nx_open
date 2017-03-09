@@ -15,7 +15,7 @@
 namespace nx {
 namespace cdb {
 
-namespace ec2 { class ConnectionManager; } // namespace ec2
+namespace ec2 { class ConnectionManager; }
 
 /**
  * Aggregates system health information from different sources.
