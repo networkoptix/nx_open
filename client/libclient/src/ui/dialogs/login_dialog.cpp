@@ -490,7 +490,10 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
 
         if (!vm.isValid)
         {
-            auto versionFormat = compatibilityCode == Qn::IncompatibleProtocolConnectionResult
+            const bool showBuild = compatibilityCode == Qn::IncompatibleProtocolConnectionResult
+                || compatibilityCode == Qn::IncompatibleCloudHostConnectionResult;
+
+            auto versionFormat = showBuild
                 ? QnSoftwareVersion::FullFormat
                 : QnSoftwareVersion::BugfixFormat;
 
