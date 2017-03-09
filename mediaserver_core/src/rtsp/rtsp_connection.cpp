@@ -248,6 +248,7 @@ public:
     bool wasCameraControlDisabled;
     bool tcpMode;
     bool peerHasAccess;
+    QnMutex archiveDpMutex;
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
@@ -1123,7 +1124,9 @@ void QnRtspConnectionProcessor::createDataProvider()
             d->liveDpLow->startIfNotRunning();
         }
     }
-    if (!d->archiveDP) {
+    if (!d->archiveDP)
+    {
+        QnMutexLocker lock(&d->archiveDpMutex);
         d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->toResource()->createDataProvider(Qn::CR_Archive)));
         if (d->archiveDP)
             d->archiveDP->setGroupId(d->clientGuid);
@@ -1696,5 +1699,6 @@ bool QnRtspConnectionProcessor::isTcpMode() const
 QSharedPointer<QnArchiveStreamReader> QnRtspConnectionProcessor::getArchiveDP()
 {
     Q_D(QnRtspConnectionProcessor);
+    QnMutexLocker lock(&d->archiveDpMutex);
     return d->archiveDP;
 }
