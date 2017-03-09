@@ -18,7 +18,7 @@ class ViewportAnimator: public RectAnimator {
 public:
     /**
      * Constructor.
-     * 
+     *
      * \param view                      View that this viewport animator will be assigned to.
      * \param parent                    Parent object.
      */
@@ -49,17 +49,17 @@ public:
     QRectF targetRect() const;
 
     /**
-     * Starts animated move of a viewport to the given rect, taking margins and margin flags into account. 
+     * Starts animated move of a viewport to the given rect, taking margins and margin flags into account.
      * When animation finishes, viewport's bounding rect will include the given rect.
-     * 
+     *
      * Note that this function animates position and scale only. It does not
      * take rotation and more complex transformations into account.
-     * 
-     * \param rect                      Rectangle to move adjusted viewport to, 
+     *
+     * \param rect                      Rectangle to move adjusted viewport to,
      *                                  in scene coordinates.
      * \param animate                   Whether transition should be animated.
      */
-    void moveTo(const QRectF &rect, bool animate = true);
+    void moveTo(const QRectF &rect, bool animate);
 
     QRectF adjustedToReal(const QRectF &adjustedRect) const;
 

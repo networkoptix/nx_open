@@ -332,9 +332,9 @@ Item
                 enabled: d.hasArchive
                 onClicked:
                 {
-                    calendarPanelLoader.active = true
-                    calendarPanelLoader.item.date = timeline.positionDate
-                    calendarPanelLoader.item.open()
+                    calendarPanel.chunkProvider = cameraChunkProvider
+                    calendarPanel.date = timeline.positionDate
+                    calendarPanel.open()
                 }
             }
 
@@ -518,29 +518,17 @@ Item
         height: navigationPanel.height
     }
 
-    Component
+    CalendarPanel
     {
-        id: calendarPanelComponent
+        id: calendarPanel
 
-        CalendarPanel
+        onDatePicked:
         {
-            chunkProvider: cameraChunkProvider
-            onDatePicked:
-            {
-                close()
-                d.resumePosition = -1
-                timeline.jumpTo(date.getTime())
-                videoScreenController.setPosition(date.getTime(), true)
-            }
+            close()
+            d.resumePosition = -1
+            timeline.jumpTo(date.getTime())
+            videoScreenController.setPosition(date.getTime(), true)
         }
-    }
-
-    Loader
-    {
-        id: calendarPanelLoader
-        sourceComponent: calendarPanelComponent
-        active: false
-        y: parent.height - height
     }
 
     Connections

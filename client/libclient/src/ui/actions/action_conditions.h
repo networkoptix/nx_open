@@ -648,13 +648,6 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters& parameters) override;
 };
 
-class QnShowcaseActionCondition: public QnActionCondition
-{
-public:
-    QnShowcaseActionCondition(QObject* parent): QnActionCondition(parent) {}
-    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
-};
-
 class QnPtzActionCondition: public QnActionCondition
 {
 public:
@@ -810,6 +803,16 @@ public:
 
 private:
     bool m_all;
+};
+
+class QnCloudServerActionCondition: public QnActionCondition
+{
+public:
+    QnCloudServerActionCondition(Qn::MatchMode matchMode, QObject* parent = nullptr);
+
+    virtual Qn::ActionVisibility check(const QnResourceList& resources) override;
+private:
+    Qn::MatchMode m_matchMode;
 };
 
 #endif // QN_ACTION_CONDITIONS_H

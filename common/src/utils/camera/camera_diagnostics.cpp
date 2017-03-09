@@ -39,7 +39,6 @@ public:
 
         auto getParam = [&errorParams](int index)
             {
-                NX_ASSERT(errorParams.size() > index);
                 QString result;
                 if (errorParams.size() > index)
                     result = errorParams[index];

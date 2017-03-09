@@ -372,11 +372,7 @@ QnWritableCompressedAudioDataPtr QnDesktopAudioOnlyDataProvider::encodePacket(ch
     m_inputFrame->data[0] = (quint8*)buffer;
     m_inputFrame->nb_samples = ctx->frame_size;
 
-    AVPacket outputPacket;
-    av_init_packet(&outputPacket);
-    outputPacket.data = m_encoderBuffer;
-    outputPacket.size = FF_MIN_BUFFER_SIZE;
-
+    QnFfmpegAvPacket outputPacket(m_encoderBuffer, FF_MIN_BUFFER_SIZE);
     int got_packet = 0;
     if (avcodec_encode_audio2(ctx, &outputPacket, m_inputFrame, &got_packet) < 0)
         return audio;

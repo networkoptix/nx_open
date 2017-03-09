@@ -103,6 +103,7 @@ Item
                 text: qsTr("Close")
                 icon: lp("/images/close.png")
                 flat: true
+                labelPadding: 8
                 onClicked: calendar.closeClicked()
             }
         }

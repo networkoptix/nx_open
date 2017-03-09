@@ -519,7 +519,6 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
             .arg(SystemError::getLastOSErrorCode()), cl_logWARNING);
     }
 #endif
-
     return true;
 }
 
@@ -586,6 +585,9 @@ CommunicatingSocket<SocketInterfaceToImplement>::CommunicatingSocket(
         sockImpl),
     m_aioHelper(new aio::AsyncSocketImplHelper<SelfType>(this, ipVersion)),
     m_connected(false)
+#ifdef WIN32
+    , m_eventObject(::CreateEvent(0, false, false, nullptr))
+#endif
 {
 }
 
@@ -601,6 +603,9 @@ CommunicatingSocket<SocketInterfaceToImplement>::CommunicatingSocket(
         sockImpl),
     m_aioHelper(new aio::AsyncSocketImplHelper<SelfType>(this, ipVersion)),
     m_connected(true)   // This constructor is used by server socket.
+#ifdef WIN32
+    , m_eventObject(::CreateEvent(0, false, false, nullptr))
+#endif
 {
 }
 
@@ -609,6 +614,9 @@ CommunicatingSocket<SocketInterfaceToImplement>::~CommunicatingSocket()
 {
     if (m_aioHelper)
         m_aioHelper->terminate();
+#ifdef WIN32
+    ::CloseHandle(m_eventObject);
+#endif
 }
 
 template<typename SocketInterfaceToImplement>
@@ -619,7 +627,7 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connect(
         return connectToIp(remoteAddress, timeoutMs);
 
     std::deque<HostAddress> resolvedAddresses;
-    const SystemError::ErrorCode resultCode = 
+    const SystemError::ErrorCode resultCode =
         SocketGlobals::addressResolver().dnsResolver().resolveSync(
             remoteAddress.address.toString(), this->m_ipVersion, &resolvedAddresses);
     if (resultCode != SystemError::noError)
@@ -643,28 +651,75 @@ template<typename SocketInterfaceToImplement>
 int CommunicatingSocket<SocketInterfaceToImplement>::recv(void* buffer, unsigned int bufferLen, int flags)
 {
 #ifdef _WIN32
-    int bytesRead;
-    if (flags & MSG_DONTWAIT)
-    {
-        bool value;
-        if (!getNonBlockingMode(&value))
-            return -1;
+    int bytesRead = -1;
 
-        if (!setNonBlockingMode(true))
-            return -1;
+    bool isNonBlockingMode;
+    if (!getNonBlockingMode(&isNonBlockingMode))
+        return -1;
+
+    if (isNonBlockingMode || (flags & MSG_DONTWAIT))
+    {
+        if (!isNonBlockingMode)
+        {
+            if (!setNonBlockingMode(true))
+                return -1;
+        }
 
         bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags & ~MSG_DONTWAIT);
 
-        // Save error code as changing mode will drop it.
-        const auto sysErrorCodeBak = SystemError::getLastOSErrorCode();
-        if (!setNonBlockingMode(value))
-            return -1;
-
-        SystemError::setLastErrorCode(sysErrorCodeBak);
+        if (!isNonBlockingMode)
+        {
+            // Save error code as changing mode will drop it.
+            const auto sysErrorCodeBak = SystemError::getLastOSErrorCode();
+            if (!setNonBlockingMode(false))
+                return -1;
+            SystemError::setLastErrorCode(sysErrorCodeBak);
+        }
     }
     else
     {
-        bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags);
+        WSAOVERLAPPED overlapped;
+        memset(&overlapped, 0, sizeof(overlapped));
+        overlapped.hEvent = m_eventObject;
+
+        WSABUF wsaBuffer;
+        wsaBuffer.len = bufferLen;
+        wsaBuffer.buf = (char*) buffer;
+        DWORD wsaFlags = flags;
+        DWORD* wsaBytesRead = (DWORD*) &bytesRead;
+
+        auto wsaResult = WSARecv(m_fd, &wsaBuffer, /* buffer count*/ 1, wsaBytesRead,
+            &wsaFlags, &overlapped, nullptr);
+        if (wsaResult == SOCKET_ERROR && SystemError::getLastOSErrorCode() == WSA_IO_PENDING)
+        {
+            auto timeout = m_readTimeoutMS ? m_readTimeoutMS : INFINITE;
+            int waitResult = WaitForSingleObject(m_eventObject, timeout);
+            if (!WSAGetOverlappedResult(m_fd, &overlapped, wsaBytesRead, FALSE, &wsaFlags))
+            {
+                auto errCode = SystemError::getLastOSErrorCode();
+                if (errCode == WSA_IO_INCOMPLETE)
+                {
+                    ::CancelIo((HANDLE)m_fd);
+                    // Wait for:
+                    // 1. CancelIo have been finished.
+                    // 2. WSARecv have been finished.
+                    // 3. Shutdown called.
+                    WaitForSingleObject(m_eventObject, INFINITE);
+                    // Check status again in case of race condition between CancelIo and other conditions
+                    while (!WSAGetOverlappedResult(m_fd, &overlapped, wsaBytesRead, FALSE, &wsaFlags))
+                    {
+                        errCode = SystemError::getLastOSErrorCode();
+                        if (errCode != WSA_IO_INCOMPLETE)
+                        {
+                            if (errCode == WSA_OPERATION_ABORTED)
+                                SystemError::setLastErrorCode(SystemError::timedOut); //< emulate timeout code
+                            return -1;
+                        }
+                        ::Sleep(0);
+                    }
+                }
+            }
+        }
     }
 #else
     unsigned int recvTimeout = 0;
@@ -759,7 +814,11 @@ template<typename SocketInterfaceToImplement>
 bool CommunicatingSocket<SocketInterfaceToImplement>::shutdown()
 {
     m_connected = false;
-    return Socket<SocketInterfaceToImplement>::shutdown();
+    bool result = Socket<SocketInterfaceToImplement>::shutdown();
+#ifdef WIN32
+    ::SetEvent(m_eventObject); //< terminate current wait call
+#endif
+    return result;
 }
 
 template<typename SocketInterfaceToImplement>
@@ -1624,7 +1683,8 @@ bool UDPSocket::leaveGroup(const QString &multicastGroup, const QString& multica
             (raw_type *)&multicastRequest,
             sizeof(multicastRequest)) < 0)
     {
-        qnWarning("Multicast group leave failed (setsockopt()).");
+        qWarning() <<"Multicast group leave failed at IF" << multicastIF << "error:" <<
+            SystemError::getLastOSErrorText();
         return false;
     }
     return true;
@@ -1660,7 +1720,7 @@ bool UDPSocket::setDestAddr(const SocketAddress& endpoint)
     else
     {
         std::deque<HostAddress> resolvedAddresses;
-        const SystemError::ErrorCode resultCode = 
+        const SystemError::ErrorCode resultCode =
             SocketGlobals::addressResolver().dnsResolver().resolveSync(
                 endpoint.address.toString(), m_ipVersion, &resolvedAddresses);
         if (resultCode != SystemError::noError)
@@ -1803,7 +1863,7 @@ int UDPSocket::recvFrom(
     if ((rtn == SOCKET_ERROR) &&
         (SystemError::getLastOSErrorCode() == SystemError::connectionReset))
     {
-        // Win32 can return connectionReset for UDP(!) socket 
+        // Win32 can return connectionReset for UDP(!) socket
         //   sometimes on receiving ICMP error response.
         SystemError::setLastErrorCode(SystemError::again);
         return -1;

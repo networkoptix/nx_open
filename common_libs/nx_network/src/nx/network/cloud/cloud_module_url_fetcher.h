@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <map>
+#include <list>
 #include <vector>
 
 #include <boost/optional.hpp>
@@ -96,6 +97,9 @@ public:
     void get(nx_http::AuthInfo auth, Handler handler);
     void get(Handler handler);
 
+    void addAdditionalHttpHeaderForGetRequest(
+        nx::String name, nx::String value);
+
 private:
     mutable QnMutex m_mutex;
     boost::optional<QUrl> m_url;
@@ -107,6 +111,7 @@ private:
     bool m_requestIsRunning;
     QUrl m_modulesXmlUrl;
     std::map<QString, QString> m_moduleToDefaultUrlScheme;
+    std::list<std::pair<nx::String, nx::String>> m_additionalHttpHeadersForGetRequest;
 
     void onHttpClientDone(nx_http::AsyncHttpClientPtr client);
     bool findModuleUrl(

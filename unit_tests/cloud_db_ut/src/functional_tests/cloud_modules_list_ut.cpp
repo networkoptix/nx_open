@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <fstream>
+#include <list>
 
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
 #include <nx/network/http/httpclient.h>
@@ -124,6 +125,11 @@ public:
     }
 
 protected:
+    void useFullHttpHostHeader()
+    {
+        m_additionalHttpHeaders.emplace_back("Host", m_expectedHost.toUtf8() + ":80");
+    }
+
     void whenRequestedSomeModuleUrl()
     {
         whenRequestedModuleUrlWithFetcher<network::cloud::CloudDbUrlFetcher>();
@@ -140,6 +146,8 @@ protected:
 
         fetcher.setModulesXmlUrl(QUrl(lm("http://%1:%2%3")
             .arg(m_expectedHost).arg(endpoint().port).arg(kCloudModuleXmlPath)));
+        for (const auto& header: m_additionalHttpHeaders)
+            fetcher.addAdditionalHttpHeaderForGetRequest(header.first, header.second);
         nx::utils::promise<void> done;
         fetcher.get(
             [this, &done](nx_http::StatusCode::Value statusCode, QUrl moduleUrl)
@@ -170,6 +178,7 @@ protected:
 private:
     QString m_expectedHost;
     std::pair<nx_http::StatusCode::Value, QUrl> m_fetchUrlResult;
+    std::list<std::pair<nx::String, nx::String>> m_additionalHttpHeaders;
 
     void init()
     {
@@ -179,6 +188,13 @@ private:
 
 TEST_F(FtCloudModulesXml, host_is_taken_from_http_request)
 {
+    whenRequestedSomeModuleUrl();
+    assertHostHasBeenTakenFromHttpRequest();
+}
+
+TEST_F(FtCloudModulesXml, host_header_contains_port)
+{
+    useFullHttpHostHeader();
     whenRequestedSomeModuleUrl();
     assertHostHasBeenTakenFromHttpRequest();
 }

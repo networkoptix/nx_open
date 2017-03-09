@@ -13,6 +13,8 @@
 class QnResourceTreeModelOtherSystemsNode: public QnResourceTreeModelNode
 {
     using base_type = QnResourceTreeModelNode;
+
+    Q_OBJECT
 public:
     QnResourceTreeModelOtherSystemsNode(QnResourceTreeModel* model);
     virtual ~QnResourceTreeModelOtherSystemsNode();

@@ -236,7 +236,15 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
-    context->instance<QnServerAddressWatcher>();
+
+    const auto getter = []() { return qnSettings->knownServerUrls(); };
+    const auto setter =
+        [](const QnServerAddressWatcher::UrlsList& values)
+        {
+            qnSettings->setKnownServerUrls(values);
+            qnSettings->save();
+        };
+    context->instance<QnServerAddressWatcher>()->setAccessors(getter, setter);
     context->instance<QnWorkbenchResourcesChangesWatcher>();
     context->instance<QnWorkbenchServerSafemodeWatcher>();
     context->instance<QnWorkbenchBookmarkTagsWatcher>();
