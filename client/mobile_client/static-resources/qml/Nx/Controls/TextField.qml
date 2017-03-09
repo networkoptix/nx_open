@@ -326,7 +326,7 @@ TextInput
         {
             text: qsTr("Cut")
             visible: control.selectedText.length > 0
-            onTriggered: cut()
+            onTriggered: control.cut()
         }
 
         MenuItem
