@@ -1,26 +1,56 @@
 import QtQuick 2.6
-import Qt.labs.controls 1.0
+import Qt.labs.templates 1.0 as T
 import Nx 1.0
 
-Menu
+T.Menu
 {
     id: control
 
-    background: Rectangle
-    {
-        implicitWidth: 120
-        implicitHeight: 120
-        color: ColorTheme.contrast3
-    }
+    implicitWidth: contentItem ? contentItem.implicitWidth + leftPadding + rightPadding : 0
+    implicitHeight: contentItem ? contentItem.implicitHeight + topPadding + bottomPadding : 0
+
+    property int orientation: Qt.Vertical
+
+    background: Rectangle { color: ColorTheme.contrast3 }
+
     modal: true
     // TODO: #dklychkov Enable after switching to Qt 5.7
     // dim: false
 
-    Binding
+    contentItem: ListView
     {
-        target: contentItem
-        property: "implicitWidth"
-        value: Math.max(contentItem.contentItem.childrenRect.width,
-                        ApplicationWindow.window ? ApplicationWindow.window.width - 56 : 0)
+        orientation: control.orientation
+
+        implicitWidth:
+        {
+            if (T.ApplicationWindow.window)
+            {
+                return Math.max(
+                    orientation === Qt.Vertical ? 120 : 0,
+                    Math.min(contentWidth, T.ApplicationWindow.window.width - 56))
+            }
+            return contentItem.childrenRect.width
+        }
+        implicitHeight:
+        {
+            if (T.ApplicationWindow.window)
+            {
+                return Math.max(
+                    orientation === Qt.Horizontal ? 48 : 0,
+                    Math.min(contentHeight, T.ApplicationWindow.window.height - 56))
+            }
+            return contentHeight
+        }
+
+        model: control.contentModel
+
+        interactive: T.ApplicationWindow.window
+            && contentHeight > T.ApplicationWindow.window.height
+
+        clip: true
+        keyNavigationWraps: false
+        currentIndex: -1
+
+        ScrollIndicator.vertical: ScrollIndicator {}
     }
 }

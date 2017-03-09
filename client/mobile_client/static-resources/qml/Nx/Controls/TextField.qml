@@ -89,7 +89,10 @@ TextInput
             running: control.cursorVisible && !cursorHandle.pressed
             repeat: true
             onTriggered: cursor.visible = !cursor.visible
-            onRunningChanged: cursor.visible = running || cursorHandle.pressed
+            onRunningChanged:
+            {
+                cursor.visible = running || cursorHandle.pressed || contextMenu.visible
+            }
         }
     }
 
@@ -116,6 +119,7 @@ TextInput
         id: d
 
         property bool selectionHandlesVisible: false
+        property bool needRestoreContextMenu: false
 
         function showCursorHandle()
         {
@@ -136,6 +140,12 @@ TextInput
             cursorHandle.visible = false
         }
 
+        function updateCursorHandle()
+        {
+            if (!activeFocus && !contextMenu.activeFocus)
+                hideCursorHandle()
+        }
+
         function updateSelectionHandles()
         {
             if (!mobileMode)
@@ -143,8 +153,6 @@ TextInput
 
             if (cursorHandle.pressed)
                 return
-
-            console.log(control.selectionStart, control.selectionEnd, control.selectionStart == control.selectionEnd)
 
             if (control.selectionStart == control.selectionEnd)
             {
@@ -154,6 +162,10 @@ TextInput
             {
                 hideCursorHandle()
                 selectionHandlesVisible = true
+
+                if (contextMenu.visible)
+                    needRestoreContextMenu = true
+                contextMenu.close()
             }
         }
 
@@ -181,47 +193,83 @@ TextInput
         {
             ensureVisible(control[anchor])
         }
+
+        function selectWordAndOpenContextMenu(event, autoSelect)
+        {
+            var pos = positionAt(event.x, event.y)
+            if (selectionStart < selectionEnd
+                && (pos < selectionStart || pos > selectionEnd))
+            {
+                cursorPosition = pos
+            }
+            else if (autoSelect)
+            {
+                cursorPosition = pos
+                selectWord()
+            }
+
+            openContextMenu()
+        }
+
+        function openContextMenu()
+        {
+            contextMenu.x = leftPadding + positionToRectangle(
+                selectionStart == selectionEnd
+                    ? cursorPosition : selectionStart).x
+            contextMenu.y = cursorRectangle.y + cursorRectangle.height + (mobileMode ? 28 : 4)
+
+            persistentSelection = true
+            needRestoreContextMenu = false
+            contextMenu.open()
+            persistentSelection = false
+        }
     }
 
     onClicked:
     {
-        if (displayText)
+        if (event.button === Qt.RightButton)
+        {
+            d.selectWordAndOpenContextMenu(event, false)
+            return
+        }
+
+        if (displayText && selectionStart == selectionEnd)
             d.showCursorHandle()
     }
+    onPressAndHold: d.selectWordAndOpenContextMenu(event, true)
+    onDoubleClicked: d.selectWordAndOpenContextMenu(event, true)
 
-    onActiveFocusChanged:
-    {
-        if (!activeFocus)
-            d.hideCursorHandle()
-    }
+    onActiveFocusChanged: d.updateCursorHandle()
 
     onTextChanged: d.hideCursorHandle()
 
     // TODO: #dklychkov Finish implementation
-//    onSelectionStartChanged:
-//    {
-//        if (selectionStart == selectionEnd - 1 && !selectionEndHandle.insideInputBounds)
-//            d.ensureAnchorVisible("selectionEnd")
-//        else
-//            d.ensureAnchorVisible("selectionStart")
-//        d.updateSelectionHandles()
-//    }
-//    onSelectionEndChanged:
-//    {
-//        if (selectionEnd == selectionStart + 1 && !selectionStartHandle.insideInputBounds)
-//            d.ensureAnchorVisible("selectionStart")
-//        else
-//            d.ensureAnchorVisible("selectionEnd")
-//        d.updateSelectionHandles()
-//    }
+    onSelectionStartChanged:
+    {
+        if (selectionStart == selectionEnd - 1 && !selectionEndHandle.insideInputBounds)
+            d.ensureAnchorVisible("selectionEnd")
+        else
+            d.ensureAnchorVisible("selectionStart")
+        d.updateSelectionHandles()
+    }
+    onSelectionEndChanged:
+    {
+        if (selectionEnd == selectionStart + 1 && !selectionStartHandle.insideInputBounds)
+            d.ensureAnchorVisible("selectionStart")
+        else
+            d.ensureAnchorVisible("selectionEnd")
+        d.updateSelectionHandles()
+    }
+
+    onCursorPositionChanged:
+    {
+        contextMenu.close()
+    }
 
     QnScenePositionListener
     {
         id: positionListener
         item: control
-        enabled: cursorHandle.visible ||
-                 selectionStartHandle.visible ||
-                 selectionEndHandle.visible
     }
 
     InputHandle
@@ -229,9 +277,10 @@ TextInput
         id: cursorHandle
         anchor: "cursorPosition"
         input: control
+        autoHide: !contextMenu.visible
         x: positionListener.scenePos.x + localX
         y: positionListener.scenePos.y + localY
-        parent: control.activeFocus ? Window.contentItem : control
+        parent: Window.contentItem
     }
 
     InputHandle
@@ -241,7 +290,13 @@ TextInput
         input: control
         x: positionListener.scenePos.x + localX
         y: positionListener.scenePos.y + localY
-        parent: control.activeFocus ? Window.contentItem : control
+        parent: Window.contentItem
+
+        onPressedChanged:
+        {
+            if (!pressed)
+                d.openContextMenu()
+        }
     }
 
     InputHandle
@@ -251,58 +306,52 @@ TextInput
         input: control
         x: positionListener.scenePos.x + localX
         y: positionListener.scenePos.y + localY
-        parent: control.activeFocus ? Window.contentItem : control
-    }
+        parent: Window.contentItem
 
-    onPressAndHold:
-    {
-        contextMenu.x = pos.x
-        contextMenu.y = pos.y
-
-        control.persistentSelection = true
-        contextMenu.open()
-        control.persistentSelection = false
+        onPressedChanged:
+        {
+            if (!pressed)
+                d.openContextMenu()
+        }
     }
 
     Menu
     {
         id: contextMenu
 
-        /**
-         * TODO: figure out why height is not calculated correctly
-         * TODO: figure out why invisible MenuItem does not disapper from
-         * menu and draws blank space instead
-         */
-        height: 4 * cutItem.height
+        modal: false
+        focus: false
 
         MenuItem
         {
-            id: cutItem
             text: qsTr("Cut")
-            enabled: control.selectedText.length
-            onTriggered: { control.cut() }
+            visible: control.selectedText.length > 0
+            onTriggered: cut()
         }
 
         MenuItem
         {
             text: qsTr("Copy")
-            enabled: control.selectedText.length
-            onTriggered: { control.copy() }
+            visible: control.selectedText.length > 0
+            onTriggered: control.copy()
         }
 
         MenuItem
         {
             text: qsTr("Paste")
-            enabled: control.canPaste
-            onTriggered: { control.paste() }
+            visible: control.canPaste
+            onTriggered: control.paste()
         }
 
         MenuItem
         {
             text: qsTr("Select All")
-            enabled: (control.selectedText != control.text)
-            onTriggered: { control.selectAll() }
+            visible: control.text &&
+                (control.selectionStart > 0 || control.selectionEnd < control.text.length)
+            onTriggered: control.selectAll()
         }
+
+        onActiveFocusChanged: d.updateCursorHandle()
     }
 
     Component.onCompleted:
