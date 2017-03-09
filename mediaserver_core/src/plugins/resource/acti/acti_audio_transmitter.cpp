@@ -29,7 +29,7 @@ bool ActiAudioTransmitter::isCompatible(const QnAudioFormat& format) const
 
     return format.sampleSize() == kBitsPerSample
         && format.sampleRate() == kSampleRate
-        && codec == lit("pcm") || codec == kAudioMimeType;
+        && (codec == lit("pcm") || codec == kAudioMimeType);
 }
 
 void ActiAudioTransmitter::prepare()
