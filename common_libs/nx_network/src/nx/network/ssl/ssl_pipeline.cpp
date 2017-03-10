@@ -9,105 +9,16 @@ namespace network {
 namespace ssl {
 
 //-------------------------------------------------------------------------------------------------
-// Stand-alone BIO functions
-
-static int bioRead(BIO* b, char* out, int outl)
-{
-    Pipeline* sslSock = static_cast<Pipeline*>(BIO_get_app_data(b));
-    int ret = sslSock->bioRead(out, outl);
-    if (ret == -1)
-    {
-        BIO_clear_retry_flags(b);
-        BIO_set_retry_read(b);
-    }
-
-    return ret;
-}
-
-static int bioWrite(BIO* b, const char* in, int inl)
-{
-    Pipeline* sslSock = static_cast<Pipeline*>(BIO_get_app_data(b));
-    int ret = sslSock->bioWrite(in, inl);
-    if (ret == -1)
-    {
-        BIO_clear_retry_flags(b);
-        BIO_set_retry_write(b);
-    }
-
-    return ret;
-}
-
-static int bioPuts(BIO* bio, const char* str)
-{
-    return bioWrite(bio, str, strlen(str));
-}
-
-static long bioCtrl(BIO* bio, int cmd, long num, void* /*ptr*/)
-{
-    long ret = 1;
-
-    switch (cmd)
-    {
-        case BIO_C_SET_FD:
-            NX_ASSERT(false, "Invalid proxy socket use!");
-            break;
-        case BIO_C_GET_FD:
-            NX_ASSERT(false, "Invalid proxy socket use!");
-            break;
-        case BIO_CTRL_GET_CLOSE:
-            ret = bio->shutdown;
-            break;
-        case BIO_CTRL_SET_CLOSE:
-            bio->shutdown = (int)num;
-            break;
-        case BIO_CTRL_DUP:
-        case BIO_CTRL_FLUSH:
-            ret = 1;
-            break;
-        default:
-            ret = 0;
-            break;
-    }
-    return(ret);
-}
-
-static int bioNew(BIO* bio)
-{
-    bio->init = 1;
-    bio->num = 0;
-    bio->ptr = NULL;
-    bio->flags = 0;
-    return 1;
-}
-
-static int bioFree(BIO* bio)
-{
-    if (bio == NULL) return(0);
-    if (bio->shutdown)
-    {
-        if (bio->init)
-        {
-            Pipeline* sslSock = static_cast<Pipeline*>(BIO_get_app_data(bio));
-            if (sslSock)
-                sslSock->close();
-        }
-
-        bio->init = 0;
-        bio->flags = 0;
-    }
-
-    return 1;
-}
-
-//-------------------------------------------------------------------------------------------------
 // Pipeline
 
 Pipeline::Pipeline(SSL_CTX* sslContext):
     m_state(State::init),
-    m_ssl(nullptr, &SSL_free)
+    m_ssl(nullptr, &SSL_free),
+    m_readThirsty(false),
+    m_writeThirsty(false)
 {
-    initSslBio(sslContext);
     initOpenSSLGlobalLock();
+    initSslBio(sslContext);
 }
 
 Pipeline::~Pipeline()
@@ -144,18 +55,33 @@ int Pipeline::read(void* data, size_t count)
     return SSL_read(m_ssl.get(), data, count);
 }
 
+bool Pipeline::isReadThirsty() const
+{
+    return m_readThirsty;
+}
+
+bool Pipeline::isWriteThirsty() const
+{
+    return m_writeThirsty;
+}
+
 int Pipeline::bioRead(void* buffer, unsigned int bufferLen)
 {
-    return m_inputStream->read(buffer, bufferLen);
+    const auto result = m_inputStream->read(buffer, bufferLen);
+    m_readThirsty = (result == StreamIoError::wouldBlock) || (result == 0);
+    return result;
 }
 
 int Pipeline::bioWrite(const void* buffer, unsigned int bufferLen)
 {
-    return m_outputStream->write(buffer, bufferLen);
+    const auto result = m_outputStream->write(buffer, bufferLen);
+    m_writeThirsty = (result == StreamIoError::wouldBlock) || (result == 0);
+    return result;
 }
 
 void Pipeline::close()
 {
+    // TODO
 }
 
 SSL* Pipeline::ssl()
@@ -169,13 +95,13 @@ void Pipeline::initSslBio(SSL_CTX* context)
     {
         BIO_TYPE_SOCKET,
         "proxy server socket",
-        ssl::bioWrite,
-        ssl::bioRead,
-        bioPuts,
+        &Pipeline::bioWrite,
+        &Pipeline::bioRead,
+        &Pipeline::bioPuts,
         NULL, // bgets
-        bioCtrl,
-        bioNew,
-        bioFree,
+        &Pipeline::bioCtrl,
+        &Pipeline::bioNew,
+        &Pipeline::bioFree,
         NULL, // callback_ctrl
     };
 
@@ -200,11 +126,112 @@ void Pipeline::initSslBio(SSL_CTX* context)
     SSL_set_bio(m_ssl.get(), rbio, wbio);  //ssl will free bio when freed
 }
 
-int Pipeline::doHandshake()
+void Pipeline::doHandshake()
 {
-    if (SSL_do_handshake(m_ssl.get()) == 0)
+    const int ret = SSL_do_handshake(m_ssl.get());
+    if (ret == 1)
+    {
         m_state = State::handshakeDone;
-    return 0;
+    }
+    else if (ret == 0)
+    {
+        // This is most likely I/O thirst. Check SSL_get_error().
+    }
+    else if (ret < 0)
+    {
+        // Fatal error. Cannot proceed with connection. Must report error to the user.
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+// Stand-alone SSL BIO functions
+
+int Pipeline::bioRead(BIO* b, char* out, int outl)
+{
+    Pipeline* sslSock = static_cast<Pipeline*>(BIO_get_app_data(b));
+    int ret = sslSock->bioRead(out, outl);
+    if (ret == StreamIoError::osError)
+    {
+        BIO_clear_retry_flags(b);
+        BIO_set_retry_read(b);
+    }
+
+    return ret;
+}
+
+int Pipeline::bioWrite(BIO* b, const char* in, int inl)
+{
+    Pipeline* sslSock = static_cast<Pipeline*>(BIO_get_app_data(b));
+    int ret = sslSock->bioWrite(in, inl);
+    if (ret == StreamIoError::osError)
+    {
+        BIO_clear_retry_flags(b);
+        BIO_set_retry_write(b);
+    }
+
+    return ret;
+}
+
+int Pipeline::bioPuts(BIO* bio, const char* str)
+{
+    return bioWrite(bio, str, strlen(str));
+}
+
+long Pipeline::bioCtrl(BIO* bio, int cmd, long num, void* /*ptr*/)
+{
+    long ret = 1;
+
+    switch (cmd)
+    {
+        case BIO_C_SET_FD:
+            NX_ASSERT(false, "Invalid proxy socket use!");
+            break;
+        case BIO_C_GET_FD:
+            NX_ASSERT(false, "Invalid proxy socket use!");
+            break;
+        case BIO_CTRL_GET_CLOSE:
+            ret = bio->shutdown;
+            break;
+        case BIO_CTRL_SET_CLOSE:
+            bio->shutdown = (int)num;
+            break;
+        case BIO_CTRL_DUP:
+        case BIO_CTRL_FLUSH:
+            ret = 1;
+            break;
+        default:
+            ret = 0;
+            break;
+    }
+    return(ret);
+}
+
+int Pipeline::bioNew(BIO* bio)
+{
+    bio->init = 1;
+    bio->num = 0;
+    bio->ptr = NULL;
+    bio->flags = 0;
+    return 1;
+}
+
+int Pipeline::bioFree(BIO* bio)
+{
+    if (bio == NULL) return(0);
+    if (bio->shutdown)
+    {
+        if (bio->init)
+        {
+            Pipeline* sslSock = static_cast<Pipeline*>(BIO_get_app_data(bio));
+            if (sslSock)
+                sslSock->close();
+        }
+
+        bio->init = 0;
+        bio->flags = 0;
+    }
+
+    return 1;
 }
 
 //-------------------------------------------------------------------------------------------------

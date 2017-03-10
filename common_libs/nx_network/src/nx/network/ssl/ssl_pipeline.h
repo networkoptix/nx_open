@@ -63,9 +63,9 @@ public:
     virtual int write(const void* data, size_t count) override;
     virtual int read(void* data, size_t count) override;
 
-    // TODO: #ak Remove following methods from public API.
-    int bioRead(void* buffer, unsigned int bufferLen);
-    int bioWrite(const void* buffer, unsigned int bufferLen);
+    bool isReadThirsty() const;
+    bool isWriteThirsty() const;
+
     void close();
 
 protected:
@@ -82,9 +82,21 @@ private:
     std::unique_ptr<SSL, decltype(&SSL_free)> m_ssl;
     AbstractInput* m_inputStream;
     AbstractOutput* m_outputStream;
+    bool m_readThirsty;
+    bool m_writeThirsty;
 
     void initSslBio(SSL_CTX* sslContext);
-    int doHandshake();
+    void doHandshake();
+
+    int bioRead(void* buffer, unsigned int bufferLen);
+    int bioWrite(const void* buffer, unsigned int bufferLen);
+
+    static int bioRead(BIO* b, char* out, int outl);
+    static int bioWrite(BIO* b, const char* in, int inl);
+    static int bioPuts(BIO* bio, const char* str);
+    static long bioCtrl(BIO* bio, int cmd, long num, void* /*ptr*/);
+    static int bioNew(BIO* bio);
+    static int bioFree(BIO* bio);
 };
 
 class NX_NETWORK_API ConnectingPipeline:

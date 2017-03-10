@@ -39,7 +39,8 @@ public:
         std::unique_ptr<Pipeline> serverPipeline)
         :
         m_clientPipeline(std::move(clientPipeline)),
-        m_serverPipeline(std::move(serverPipeline))
+        m_serverPipeline(std::move(serverPipeline)),
+        m_maxBytesToWrite(100)
     {
         m_clientPipeline->setOutput(&m_clientToServerPipeline);
         m_serverPipeline->setInput(&m_clientToServerPipeline);
@@ -56,8 +57,10 @@ public:
 
         while (!dataToSend.isEmpty())
         {
+            const int bytesToWrite = std::min<int>(m_maxBytesToWrite, dataToSend.size());
+
             const int bytesWritten = 
-                m_clientPipeline->write(dataToSend.constData(), dataToSend.size());
+                m_clientPipeline->write(dataToSend.constData(), bytesToWrite);
             if (bytesWritten > 0)
                 dataToSend.remove(0, bytesWritten);
             else if (bytesWritten == 0)
@@ -84,6 +87,7 @@ private:
     BufferPipeline m_serverToClientPipeline;
     std::unique_ptr<Pipeline> m_clientPipeline;
     std::unique_ptr<Pipeline> m_serverPipeline;
+    const int m_maxBytesToWrite;
 };
 
 class SslPipeline:
@@ -110,9 +114,23 @@ protected:
 
 TEST_F(SslPipeline, common)
 {
+    QByteArray testData;
+    testData.resize(1024);
+    std::generate(testData.data(), testData.data() + testData.size(), rand);
+    //testData = "Hello, world";
+
     auto pipeline = createFullPipeline();
-    ASSERT_EQ("Hello, world", pipeline->transferThrough("Hello, world"));
+    ASSERT_EQ(testData, pipeline->transferThrough(testData));
 }
+
+//TEST_F(SslPipeline, partitioning_input_data)
+//TEST_F(SslPipeline, partitioning_intermediate_input_data)
+//TEST_F(SslPipeline, partitioning_every_data)
+//TEST_F(SslPipeline, handshake_error)
+//TEST_F(SslPipeline, random_error_in_data)
+//TEST_F(SslPipeline, unexpected_intermediate_input_depletion)
+//TEST_F(SslPipeline, read_thirsty_flag)
+//TEST_F(SslPipeline, write_thirsty_flag)
 
 } // namespace test
 } // namespace ssl
