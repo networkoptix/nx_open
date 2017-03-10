@@ -1443,7 +1443,8 @@ namespace ec2
             else
                 addInternetTimeSynchronizationTask();
         }
-        else if (m_usedTimeSyncInfo.timePriorityKey.isTakenFromInternet())
+        else if (m_usedTimeSyncInfo.timePriorityKey.isTakenFromInternet() ||
+            m_localTimePriorityKey.isTakenFromInternet())
         {
             // Forgetting Internet time.
             QnMutexLocker lock(&m_mutex);
