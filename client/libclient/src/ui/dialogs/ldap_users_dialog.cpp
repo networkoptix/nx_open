@@ -267,7 +267,7 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
     // Safety check
     auto filteredUsers = filterExistingUsers(users);
 
-    // Double semantic negation here to avoid checkbox name-content inconsistency
+    // Double semantic negation here to avoid checkbox name-content inconsistency.
     const bool enableUsers = !ui->disableUsersCheckBox->isChecked();
     const Qn::UserRole selectedRole = ui->userRoleComboBox->itemData(
         ui->userRoleComboBox->currentIndex(), Qn::UserRoleRole).value<Qn::UserRole>();
