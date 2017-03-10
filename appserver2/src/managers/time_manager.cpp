@@ -258,7 +258,7 @@ namespace ec2
     //   TimeSynchronizationManager
     //////////////////////////////////////////////
     static const size_t MILLIS_PER_SEC = 1000;
-    static const size_t INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC = 0;
+    static const size_t INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC = 5;
     static const size_t MIN_INTERNET_SYNC_TIME_PERIOD_SEC = 60;
     static const char* RFC868_SERVERS[] = { "instance1.rfc868server.com", "instance1.rfc868server.com"/*,"time.ien.it", "time1.ucla.edu"*/ };
 #ifdef _DEBUG
@@ -1443,7 +1443,7 @@ namespace ec2
             else
                 addInternetTimeSynchronizationTask();
         }
-        else
+        else if (m_usedTimeSyncInfo.timePriorityKey.isTakenFromInternet())
         {
             // Forgetting Internet time.
             QnMutexLocker lock(&m_mutex);
