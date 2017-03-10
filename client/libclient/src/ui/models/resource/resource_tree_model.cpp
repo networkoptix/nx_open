@@ -39,6 +39,8 @@
 #include <ui/models/resource/resource_tree_model_node_factory.h>
 #include <ui/models/resource/tree/resource_tree_model_user_nodes.h>
 #include <ui/models/resource/tree/resource_tree_model_recorder_node.h>
+#include <ui/models/resource/tree/resource_tree_model_node_manager.h>
+#include <ui/models/resource/tree/resource_tree_model_layout_node_manager.h>
 
 #include <ui/style/resource_icon_cache.h>
 #include <ui/help/help_topics.h>
@@ -101,7 +103,9 @@ QList<Qn::NodeType> rootNodeTypes()
 QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_scope(scope)
+    m_scope(scope),
+    m_nodeManager(new QnResourceTreeModelNodeManager(this)),
+    m_layoutNodeManager(new QnResourceTreeModelLayoutNodeManager(this))
 {
     /* Create top-level nodes. */
     for (Qn::NodeType t : rootNodeTypes())
@@ -942,6 +946,9 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
 
 void QnResourceTreeModel::rebuildTree()
 {
+    //TODO: #vkutin #gdm Implement "model reset" logic for the tree.
+    // Currently it's not handled, "rows inserted/removed" is handled instead.
+
     m_rootNodes[Qn::CurrentUserNode]->setResource(context()->user());
 
     for (auto nodeType : rootNodeTypes())
@@ -1159,4 +1166,14 @@ void QnResourceTreeModel::at_systemNameChanged()
 void QnResourceTreeModel::at_autoDiscoveryEnabledChanged()
 {
     m_rootNodes[Qn::OtherSystemsNode]->update();
+}
+
+QnResourceTreeModelNodeManager* QnResourceTreeModel::nodeManager() const
+{
+    return m_nodeManager;
+}
+
+QnResourceTreeModelLayoutNodeManager* QnResourceTreeModel::layoutNodeManager() const
+{
+    return m_layoutNodeManager;
 }

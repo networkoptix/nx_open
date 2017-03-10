@@ -262,8 +262,9 @@ bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& 
 {
     /* Set authentication parameters from command line. */
 
+    QUrl appServerUrl = startupParams.parseAuthenticationString();
+
     //TODO: #refactor System URI to support videowall
-    QUrl appServerUrl = QUrl::fromUserInput(startupParams.authenticationString);
     if (!startupParams.videoWallGuid.isNull())
     {
         NX_ASSERT(appServerUrl.isValid());

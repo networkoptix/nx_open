@@ -18,6 +18,8 @@
 #include <utils/common/connective.h>
 
 class QnResourceTreeModelCustomColumnDelegate;
+class QnResourceTreeModelNodeManager;
+class QnResourceTreeModelLayoutNodeManager;
 
 class QnResourceTreeModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware
 {
@@ -61,6 +63,11 @@ public:
     Scope scope() const;
 
     QnResourceTreeModelNodePtr rootNode(Qn::NodeType nodeType) const;
+
+    //TODO: #vkutin Shouldn't be public
+    QnResourceTreeModelNodeManager* nodeManager() const;
+    QnResourceTreeModelLayoutNodeManager* layoutNodeManager() const;
+
 private:
     QnResourceTreeModelNodePtr node(const QModelIndex& index) const;
 
@@ -96,6 +103,7 @@ private:
         const QMimeData *mimeData);
 
     void handlePermissionsChanged(const QnResourcePtr& resource);
+
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
@@ -122,6 +130,7 @@ private:
     std::array<QnResourceTreeModelNodePtr, Qn::NodeTypeCount> m_rootNodes;
 
     /** Mapping for resource nodes by resource. */
+    //TODO: #vkutin #GDM Remove duplication with QnResourceTreeModelNodeManager
     QHash<QnResourcePtr, QnResourceTreeModelNodePtr> m_resourceNodeByResource;
 
     /** Mapping for recorder nodes by parent node. */
@@ -141,4 +150,10 @@ private:
 
     /** Narrowed scope for displaying the limited set of nodes. */
     const Scope m_scope;
+
+    /** Node managers. */
+    //TODO: Make them registerable by type.
+    //Probably turn QnResourceTreeModelUserNodes into such manager too.
+    QnResourceTreeModelNodeManager* const m_nodeManager;
+    QnResourceTreeModelLayoutNodeManager* const m_layoutNodeManager;
 };
