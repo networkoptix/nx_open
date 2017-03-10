@@ -9,14 +9,15 @@ import logging
 import pytest
 from utils import SimpleNamespace
 from session import TestSession
-from test_utils import ServerFactory, EnvironmentBuilder
+from test_utils import EnvironmentBuilder
 from host import SshHostConfig
 from vagrant_box_config import box_config_factory
 from cloud_host import resolve_cloud_host_from_registry, create_cloud_host
+from server import ServerConfig
 from camera import MEDIA_SAMPLE_FPATH, SampleMediaFile, Camera
 
 
-DEFAULT_CLOUD_GROUP = 'dev'
+DEFAULT_CLOUD_GROUP = 'test'
 DEFAULT_CUSTOMIZATION = 'default'
 
 DEFAULT_WORK_DIR = os.path.expanduser('/tmp/funtest')
@@ -27,7 +28,7 @@ DEFAULT_VM_NAME_PREFIX = 'funtest-'
 DEFAULT_VM_HOST_USER = 'root'
 DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
 
-DEFAULT_MAX_LOG_WIDTH = 200
+DEFAULT_MAX_LOG_WIDTH = 500
 
 
 log = logging.getLogger(__name__)
@@ -103,7 +104,7 @@ def box():
 
 @pytest.fixture
 def server():
-    return ServerFactory()
+    return ServerConfig
 
 
 # cloud host dns name, like: 'cloud-dev.hdw.mx'

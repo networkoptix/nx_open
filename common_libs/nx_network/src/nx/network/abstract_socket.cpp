@@ -2,6 +2,7 @@
 
 #include <nx/network/aio/pollable.h>
 #include <nx/utils/thread/mutex_lock_analyzer.h>
+#include <nx/utils/unused.h>
 
 ////////////////////////////////////////////////////////////
 //// class AbstractSocket
@@ -86,6 +87,8 @@ void AbstractCommunicatingSocket::pleaseStopSync(bool checkForLocks)
             if (!pollablePtr || !pollablePtr->isInSelfAioThread())
                 MutexLockAnalyzer::instance()->expectNoLocks();
         }
+    #else
+        QN_UNUSED(checkForLocks);
     #endif
 
     cancelIOSync(nx::network::aio::EventType::etNone);

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/utils/test_support/utils.h>
 #include <nx/utils/url_builder.h>
 
 #include <transaction/connection_guard_shared_state.h>
@@ -18,54 +19,132 @@ class Ec2MserverCloudSynchronizationConnection:
     public CdbFunctionalTest
 {
 public:
-    test::TransactionConnectionHelper connectionHelper;
+    Ec2MserverCloudSynchronizationConnection()
+    {
+        NX_GTEST_ASSERT_TRUE(startAndWaitUntilStarted());
+
+        m_account = addActivatedAccount2();
+        m_system = addRandomSystemToAccount(m_account);
+    }
+
+protected:
+    const AccountWithPassword& account() const
+    {
+        return m_account;
+    }
+
+    const api::SystemData& system() const
+    {
+        return m_system;
+    }
+
+    void openNumberOfTransactionConnections(int count)
+    {
+        for (int i = 0; i < count; ++i)
+        {
+            m_connectionIds.push_back(
+                m_connectionHelper.establishTransactionConnection(
+                    utils::UrlBuilder().setScheme("http")
+                    .setHost(endpoint().address.toString()).setPort(endpoint().port),
+                    system().id,
+                    system().authKey));
+        }
+    }
+
+    void waitForConnectionsToMoveToACertainState(
+        const std::vector<::ec2::QnTransactionTransportBase::State>& desiredStates,
+        std::chrono::milliseconds waitTimeout)
+    {
+        for (const auto& connectionId: m_connectionIds)
+            ASSERT_TRUE(m_connectionHelper.waitForState(desiredStates, connectionId, waitTimeout));
+    }
+
+    int activeConnectionCount() const
+    {
+        int activeConnections = 0;
+        for (const auto& connectionId: m_connectionIds)
+        {
+            if (m_connectionHelper.isConnectionActive(connectionId))
+                ++activeConnections;
+        }
+
+        return activeConnections;
+    }
+
+    void waitUntilActiveConnectionCountReaches(int count)
+    {
+        waitForAtLeastNConnectionsToMoveToACertainState(
+            count,
+            {::ec2::QnTransactionTransportBase::Connected,
+                ::ec2::QnTransactionTransportBase::ReadyForStreaming});
+    }
+
+    void waitUntilClosedConnectionCountReaches(int count)
+    {
+        waitForAtLeastNConnectionsToMoveToACertainState(
+            count,
+            {::ec2::QnTransactionTransportBase::Closed,
+                ::ec2::QnTransactionTransportBase::Error});
+    }
+
+    void closeAllConnections()
+    {
+        m_connectionHelper.closeAllConnections();
+    }
+
+private:
+    AccountWithPassword m_account;
+    api::SystemData m_system;
+    test::TransactionConnectionHelper m_connectionHelper;
+    std::vector<int> m_connectionIds;
+
+    void waitForAtLeastNConnectionsToMoveToACertainState(
+        int count,
+        const std::vector<::ec2::QnTransactionTransportBase::State>& desiredStates)
+    {
+        constexpr auto kCheckStatePeriod = std::chrono::milliseconds(100);
+
+        while (numberOfConnectionsInACertainState(desiredStates) < count)
+            std::this_thread::sleep_for(kCheckStatePeriod);
+    }
+
+    int numberOfConnectionsInACertainState(
+        const std::vector<::ec2::QnTransactionTransportBase::State>& desiredStates)
+    {
+        int count = 0;
+        for (const auto& connectionId: m_connectionIds)
+        {
+            if (std::count(desiredStates.begin(), desiredStates.end(),
+                    m_connectionHelper.getConnectionStateById(connectionId)) > 0)
+            {
+                ++count;
+            }
+        }
+
+        return count;
+    }
 };
 
 TEST_F(Ec2MserverCloudSynchronizationConnection, connection_drop_after_system_removal)
 {
     constexpr static const auto kWaitTimeout = std::chrono::seconds(10);
-    // TODO: #ak static data of ConnectionLockGuard prohibits from testing with more than one connection
     constexpr static const auto kConnectionsToCreateCount = 1;
 
-    ASSERT_TRUE(startAndWaitUntilStarted());
+    openNumberOfTransactionConnections(kConnectionsToCreateCount);
 
-    const auto account = addActivatedAccount2();
-    const auto system = addRandomSystemToAccount(account);
-
-    std::vector<int> connectionIds;
-    for (int i = 0; i < kConnectionsToCreateCount; ++i)
-    {
-        connectionIds.push_back(
-            connectionHelper.establishTransactionConnection(
-                utils::UrlBuilder().setScheme("http")
-                    .setHost(endpoint().address.toString()).setPort(endpoint().port),
-                system.id,
-                system.authKey));
-    }
-
-    for (const auto& connectionId: connectionIds)
-    {
-        ASSERT_TRUE(
-            connectionHelper.waitForState(
-                {::ec2::QnTransactionTransportBase::Connected,
-                    ::ec2::QnTransactionTransportBase::ReadyForStreaming},
-                connectionId,
-                kWaitTimeout));
-    }
+    waitForConnectionsToMoveToACertainState(
+        {::ec2::QnTransactionTransportBase::Connected,
+            ::ec2::QnTransactionTransportBase::ReadyForStreaming},
+        kWaitTimeout);
 
     ASSERT_EQ(
         api::ResultCode::ok,
-        unbindSystem(account.email, account.password, system.id));
+        unbindSystem(account().email, account().password, system().id));
 
-    for (const auto& connectionId: connectionIds)
-    {
-        ASSERT_TRUE(
-            connectionHelper.waitForState(
-                {::ec2::QnTransactionTransportBase::Closed,
-                 ::ec2::QnTransactionTransportBase::Error},
-                connectionId,
-                kWaitTimeout));
-    }
+    waitForConnectionsToMoveToACertainState(
+        {::ec2::QnTransactionTransportBase::Closed,
+            ::ec2::QnTransactionTransportBase::Error},
+        kWaitTimeout);
 }
 
 TEST_F(Ec2MserverCloudSynchronizationConnection, multiple_connections)
@@ -75,33 +154,18 @@ TEST_F(Ec2MserverCloudSynchronizationConnection, multiple_connections)
     static_assert(
         maxConcurrentConnectionsToCreate > maxAllowedConcurrentConnections,
         "Check values");
-    constexpr const auto delayBeforeCheckingConnectionState = std::chrono::seconds(3);
 
-    ASSERT_TRUE(startAndWaitUntilStarted());
+    openNumberOfTransactionConnections(maxConcurrentConnectionsToCreate);
 
-    const auto account = addActivatedAccount2();
-    const auto system = addRandomSystemToAccount(account);
+    // Waiting for active connection count to reach maxAllowedConcurrentConnections
+    waitUntilActiveConnectionCountReaches(maxAllowedConcurrentConnections);
 
-    std::vector<int> connectionIds;
-    for (int i = 0; i < maxConcurrentConnectionsToCreate; ++i)
-        connectionIds.push_back(
-            connectionHelper.establishTransactionConnection(
-                utils::UrlBuilder().setScheme("http")
-                    .setHost(endpoint().address.toString()).setPort(endpoint().port),
-                system.id,
-                system.authKey));
+    // Waiting until every other connection has been rejected.
+    waitUntilClosedConnectionCountReaches(
+        maxConcurrentConnectionsToCreate - maxAllowedConcurrentConnections);
 
-    std::this_thread::sleep_for(delayBeforeCheckingConnectionState);
-
-    // Checking that exactly maxAllowedConcurrentConnections have succeeded.
-    int activeConnections = 0;
-    for (const auto& connectionId: connectionIds)
-    {
-        if (connectionHelper.isConnectionActive(connectionId))
-            ++activeConnections;
-    }
-
-    ASSERT_EQ(maxAllowedConcurrentConnections, activeConnections);
+    // Checking active connection count once again.
+    ASSERT_EQ(maxAllowedConcurrentConnections, activeConnectionCount());
 }
 
 TEST_F(Ec2MserverCloudSynchronizationConnection, checking_connection_blink_stability)
@@ -109,26 +173,14 @@ TEST_F(Ec2MserverCloudSynchronizationConnection, checking_connection_blink_stabi
     constexpr int maxConcurrentConnectionsToCreate = 50;
     constexpr auto testRunTime = std::chrono::seconds(10);
 
-    ASSERT_TRUE(startAndWaitUntilStarted());
-
-    const auto account = addActivatedAccount2();
-    const auto system = addRandomSystemToAccount(account);
-
     const auto runUntil = std::chrono::steady_clock::now() + testRunTime;
     while (std::chrono::steady_clock::now() < runUntil)
     {
-        std::vector<int> connectionIds;
-        for (int i = 0; i < maxConcurrentConnectionsToCreate; ++i)
-            connectionIds.push_back(
-                connectionHelper.establishTransactionConnection(
-                    utils::UrlBuilder().setScheme("http")
-                        .setHost(endpoint().address.toString()).setPort(endpoint().port),
-                    system.id,
-                    system.authKey));
+        openNumberOfTransactionConnections(maxConcurrentConnectionsToCreate);
 
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-        connectionHelper.closeAllConnections();
+        closeAllConnections();
     }
 }
 

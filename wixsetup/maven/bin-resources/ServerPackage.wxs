@@ -58,7 +58,7 @@
             <![CDATA[ (NOT (ServerInstalled = 5 AND IsConnectedToCloud = "yes" AND $(var.CloudHostIsDifferent))) OR WixBundleAction = 3 ]]>
         </bal:Condition>
 
-        <bal:Condition Message="!(loc.Product_ServerIsTooOld)">
+        <bal:Condition Message="!(loc.Product_ProductIsTooOld)">
             <![CDATA[ InstalledServerVersion = "0.0.0.0" OR InstalledServerVersion >= "2.3" ]]>
         </bal:Condition>
     </Fragment>
