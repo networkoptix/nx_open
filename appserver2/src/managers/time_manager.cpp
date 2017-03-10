@@ -485,6 +485,7 @@ namespace ec2
 
             if( tran.params.id == qnCommon->moduleGUID() )
             {
+                m_localTimePriorityKey.flags |= Qn::TF_peerTimeSetByUser;
                 selectLocalTimeAsSynchronized(&lk, m_usedTimeSyncInfo.timePriorityKey.sequence + 1);
             }
             else
@@ -507,7 +508,6 @@ namespace ec2
     {
         //local peer is selected by user as primary time server
         const bool synchronizingByCurrentServer = m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey;
-        m_localTimePriorityKey.flags |= Qn::TF_peerTimeSetByUser;
         //incrementing sequence 
         m_localTimePriorityKey.sequence = newTimePriorityKeySequence;
         //"select primary time server" means "take its local time", so resetting internet synchronization flag
@@ -742,9 +742,10 @@ namespace ec2
         else
         {
             NX_LOG( QString::fromLatin1("TimeSynchronizationManager. Received sync time update from peer %1, peer's sync time (%2), "
-                "peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5. Accepting peer's synchronized time").
+                "peer's time priority key 0x%3. Local peer id %4, local sync time %5, used priority key 0x%6. Accepting peer's synchronized time").
                 arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
                 arg(remotePeerTimePriorityKey.toUInt64(), 0, 16).arg(qnCommon->moduleGUID().toString()).
+                arg(QDateTime::fromMSecsSinceEpoch(getSyncTimeNonSafe()).toString(Qt::ISODate)).
                 arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logINFO );
         }
 
