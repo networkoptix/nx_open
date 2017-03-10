@@ -329,14 +329,13 @@ void QnRtspConnectionProcessor::parseRequest()
 
     const QUrlQuery urlQuery( url.query() );
 
+    d->transcodeParams.codecId = AV_CODEC_ID_NONE;
     QString codec = urlQuery.queryItemValue("codec");
     if (!codec.isEmpty())
     {
         AVOutputFormat* format = av_guess_format(codec.toLatin1().data(),NULL,NULL);
         if (format)
             d->transcodeParams.codecId = format->video_codec;
-        else
-            d->transcodeParams.codecId = AV_CODEC_ID_NONE;
     };
 
     const QString pos = urlQuery.queryItemValue( StreamingParams::START_POS_PARAM_NAME ).split('/')[0];
@@ -351,6 +350,7 @@ void QnRtspConnectionProcessor::parseRequest()
     if (!d->peerHasAccess)
         return;
 
+    d->transcodeParams.resolution = QSize();
     QByteArray resolutionStr = getParamValue("resolution", urlQuery, d->request.headers).split('/')[0];
     if (!resolutionStr.isEmpty())
     {
