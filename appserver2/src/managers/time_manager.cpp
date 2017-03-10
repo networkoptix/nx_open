@@ -828,9 +828,14 @@ namespace ec2
         QnMutexLocker lk( &m_mutex );
         if( m_terminated )
             return;
+
         auto peerIter = m_peersToSendTimeSyncTo.find( peerID );
         if( peerIter == m_peersToSendTimeSyncTo.end() )
+        {
+            NX_LOG(lm("TimeSynchronizationManager. Cannot report sync_time to peer %1. "
+                "Address not known...").arg(peerID), cl_logDEBUG2);
             return;
+        }
 
         if (!QnGlobalSettings::instance()->isTimeSynchronizationEnabled())
         {
@@ -839,6 +844,9 @@ namespace ec2
                 TIME_SYNC_SEND_TIMEOUT_SEC * MILLIS_PER_SEC);
             return;
         }
+
+        NX_LOG(lm("TimeSynchronizationManager. About to report sync_time to peer %1 (%2)")
+            .arg(peerID).arg(peerIter->second.peerAddress.toString()), cl_logDEBUG2);
 
         QUrl targetUrl;
         targetUrl.setScheme( lit("http") );
@@ -879,9 +887,11 @@ namespace ec2
         }
         clientPtr->addAdditionalHeader( Qn::PEER_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray() );
         if (peerIter->second.rttMillis)
+        {
             clientPtr->addAdditionalHeader(
                 Qn::RTT_MS_HEADER_NAME,
                 nx_http::StringType::number(peerIter->second.rttMillis.get()));
+        }
 
         clientPtr->setUserName( peerIter->second.authData.userName );
         if( peerIter->second.authData.password )
@@ -915,6 +925,10 @@ namespace ec2
         nx_http::AsyncHttpClientPtr clientPtr,
         qint64 requestRttMillis)
     {
+        NX_LOG(lm("TimeSynchronizationManager. Received (%1) response from peer %2")
+            .arg(clientPtr->response() ? clientPtr->response()->statusLine.statusCode : -1)
+            .arg(peerID), cl_logDEBUG2);
+
         if( clientPtr->response() &&
             clientPtr->response()->statusLine.statusCode == nx_http::StatusCode::ok )
         {
