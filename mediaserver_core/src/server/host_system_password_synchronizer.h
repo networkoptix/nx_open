@@ -18,6 +18,7 @@ class HostSystemPasswordSynchronizer
     public Singleton<HostSystemPasswordSynchronizer>,
     public Qn::EnableSafeDirectConnection
 {
+    Q_OBJECT
 public:
     HostSystemPasswordSynchronizer();
     virtual ~HostSystemPasswordSynchronizer() override;
