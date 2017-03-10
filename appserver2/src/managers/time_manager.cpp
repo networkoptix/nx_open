@@ -774,8 +774,6 @@ namespace ec2
                 transport->remotePeer().id,
                 SocketAddress( remoteAddr.host(), remoteAddr.port() ),
                 transport->authData() );
-
-            using namespace std::placeholders;
         }
     }
 
@@ -1281,6 +1279,8 @@ namespace ec2
     {
         for (std::pair<const QnUuid, PeerContext>& peerCtx : m_peersToSendTimeSyncTo)
         {
+            NX_LOG(lm("TimeSynchronizationManager. Scheduling time synchronization with peer %1")
+                .arg(peerCtx.first.toString()), cl_logDEBUG2);
             TimerManager::instance()->modifyTimerDelay(
                 peerCtx.second.syncTimerID.get(),
                 0);
