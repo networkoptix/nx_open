@@ -14,6 +14,7 @@
 #include <nx/utils/test_support/test_options.h>
 
 #include "common_server_socket_ut.h"
+#include "stream_socket_ut.h"
 
 namespace nx {
 namespace network {
@@ -739,6 +740,14 @@ TEST_F(UdtSocketPerformance, DISABLED_DuplexSync)
 }
 
 INSTANTIATE_TYPED_TEST_CASE_P(UdtStreamServerSocket, ServerSocketTest, UdtStreamServerSocket);
+
+struct UdtSocketTypeSet
+{
+    using ClientSocket = UdtStreamSocket;
+    using ServerSocket = UdtStreamServerSocket;
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(UdtSocketStream, StreamSocket, UdtSocketTypeSet);
 
 } // namespace test
 } // namespace network
