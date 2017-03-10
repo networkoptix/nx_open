@@ -78,7 +78,7 @@ namespace applauncher
     //    return QFile::exists(qApp->applicationDirPath() + QLatin1String("/../") + version.toString(QnSoftwareVersion::MinorFormat));
     //}
 
-    api::ResultType::Value restartClient(QnSoftwareVersion version, const QByteArray &auth) {
+    api::ResultType::Value restartClient(QnSoftwareVersion version, const QString &auth) {
         if (version.isNull())
             version = QnSoftwareVersion(qnCommon->engineVersion());
 
@@ -86,7 +86,7 @@ namespace applauncher
         arguments << QLatin1String("--no-single-application");
         if (!auth.isEmpty()) {
             arguments << QLatin1String("--auth");
-            arguments << QLatin1String(auth);
+            arguments << auth;
         }
         arguments << QnStartupParameters::kScreenKey;
         arguments << QString::number(qApp->desktop()->screenNumber(qApp->activeWindow()));

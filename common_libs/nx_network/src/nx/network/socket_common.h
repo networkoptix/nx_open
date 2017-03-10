@@ -53,7 +53,7 @@ enum InitializationFlags
     disableCloudConnect = 0x02
 };
 
-NX_NETWORK_API bool isSocketCanRecoverFromError(SystemError::ErrorCode sysErrorCode);
+NX_NETWORK_API bool socketCannotRecoverFromError(SystemError::ErrorCode sysErrorCode);
 
 } // namespace network
 } // namespace nx

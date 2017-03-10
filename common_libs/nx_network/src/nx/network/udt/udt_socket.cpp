@@ -632,7 +632,7 @@ int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
         const auto sysErrorCode =
             detail::convertToSystemError(UDT::getlasterror().getErrorCode());
 
-        if (!isSocketCanRecoverFromError(sysErrorCode))
+        if (socketCannotRecoverFromError(sysErrorCode))
             m_state = detail::SocketState::open;
 
         SystemError::setLastErrorCode(sysErrorCode);
@@ -734,7 +734,7 @@ void UdtStreamSocket::connectAsync(
         addr,
         [this, handler = std::move(handler)](SystemError::ErrorCode errorCode) mutable
         {
-            if (!isSocketCanRecoverFromError(errorCode))
+            if (socketCannotRecoverFromError(errorCode))
                 m_state = detail::SocketState::open;
             handler(errorCode);
         });
@@ -845,7 +845,7 @@ int UdtStreamSocket::handleRecvResult(int recvResult)
         const int udtErrorCode = UDT::getlasterror().getErrorCode();
         const auto sysErrorCode = detail::convertToSystemError(udtErrorCode);
 
-        if (!isSocketCanRecoverFromError(sysErrorCode))
+        if (socketCannotRecoverFromError(sysErrorCode))
             m_state = detail::SocketState::open;
 
         // UDT doesn't translate the EOF into a recv with zero return, but instead

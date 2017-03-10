@@ -20,6 +20,7 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_app_info.h>
 #include <client/client_installations_manager.h>
+#include <client/client_startup_parameters.h>
 
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -712,7 +713,7 @@ void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args)
     url.setPassword(QString());
 
     arguments << lit("--auth");
-    arguments << QString::fromUtf8(url.toEncoded());
+    arguments << QnStartupParameters::createAuthenticationString(url);
 
 #ifdef SENDER_DEBUG
     qDebug() << "arguments" << arguments;
