@@ -32,6 +32,6 @@ private:
     void setAdmin(QnUserResourcePtr admin);
 
 private slots:
-    void at_resourseFound(QnResourcePtr resource);
+    void at_resourceFound(QnResourcePtr resource);
     void at_adminHashChanged(QnResourcePtr resource);
 };
