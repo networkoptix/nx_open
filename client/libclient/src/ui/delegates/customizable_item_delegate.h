@@ -41,6 +41,10 @@ protected:
         const QModelIndex& index) const override;
 
 private:
+    void baseInitStyleOption(QStyleOptionViewItem* option,
+        const QModelIndex& index) const;
+
+private:
     CustomInitStyleOption m_initStyleOption;
     CustomSizeHint m_sizeHint;
     CustomPaint m_paint;

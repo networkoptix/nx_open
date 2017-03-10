@@ -5,7 +5,7 @@ QnCustomizableItemDelegate::QnCustomizableItemDelegate(QObject* parent):
     m_baseInitStyleOption(
         [this](QStyleOptionViewItem* option, const QModelIndex& index)
         {
-            base_type::initStyleOption(option, index);
+            baseInitStyleOption(option, index);
         }),
     m_baseSizeHint(
         [this](const QStyleOptionViewItem& option, const QModelIndex& index) -> QSize
@@ -63,4 +63,11 @@ void QnCustomizableItemDelegate::initStyleOption(
         m_initStyleOption(m_baseInitStyleOption, option, index);
     else
         m_baseInitStyleOption(option, index);
+}
+
+void QnCustomizableItemDelegate::baseInitStyleOption(
+    QStyleOptionViewItem* option,
+    const QModelIndex& index) const
+{
+    base_type::initStyleOption(option, index);
 }
