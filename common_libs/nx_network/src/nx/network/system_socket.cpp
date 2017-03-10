@@ -698,7 +698,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(
     if (bytesRead < 0)
     {
         const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
-        if (!isSocketCanRecoverFromError(errCode))
+        if (socketCannotRecoverFromError(errCode))
             m_connected = false;
     }
     else if (bytesRead == 0)
@@ -732,7 +732,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
     if (sended < 0)
     {
         const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
-        if (!isSocketCanRecoverFromError(errCode))
+        if (socketCannotRecoverFromError(errCode))
             m_connected = false;
     }
     else if (sended == 0)

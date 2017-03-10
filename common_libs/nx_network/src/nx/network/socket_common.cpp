@@ -7,14 +7,14 @@
 namespace nx {
 namespace network {
 
-bool isSocketCanRecoverFromError(SystemError::ErrorCode sysErrorCode)
+bool socketCannotRecoverFromError(SystemError::ErrorCode sysErrorCode)
 {
-    return sysErrorCode == SystemError::noError
-        || sysErrorCode == SystemError::wouldBlock
-        || sysErrorCode == SystemError::again
-        || sysErrorCode == SystemError::timedOut
-        || sysErrorCode == SystemError::interrupted
-        || sysErrorCode == SystemError::inProgress;
+    return sysErrorCode != SystemError::noError
+        && sysErrorCode != SystemError::wouldBlock
+        && sysErrorCode != SystemError::again
+        && sysErrorCode != SystemError::timedOut
+        && sysErrorCode != SystemError::interrupted
+        && sysErrorCode != SystemError::inProgress;
 }
 
 } // namespace network
