@@ -6,8 +6,8 @@ T.Menu
 {
     id: control
 
-    implicitWidth: contentItem ? contentItem.implicitWidth + leftPadding + rightPadding : 0
-    implicitHeight: contentItem ? contentItem.implicitHeight + topPadding + bottomPadding : 0
+    width: contentItem.implicitWidth + leftPadding + rightPadding
+    height: contentItem.implicitHeight + topPadding + bottomPadding
 
     property int orientation: Qt.Vertical
 
@@ -19,7 +19,23 @@ T.Menu
 
     contentItem: ListView
     {
+        id: listView
+
         orientation: control.orientation
+
+        property size maxItemSize:
+        {
+            var w = 0.0
+            var h = 0.0
+
+            for (var i = 0; i < listView.contentItem.children.length; ++i)
+            {
+                w = Math.max(w, listView.contentItem.children[i].implicitWidth)
+                h = Math.max(h, listView.contentItem.children[i].implicitHeight)
+            }
+
+            return Qt.size(w, h)
+        }
 
         implicitWidth:
         {
@@ -27,9 +43,11 @@ T.Menu
             {
                 return Math.max(
                     orientation === Qt.Vertical ? 120 : 0,
-                    Math.min(contentWidth, T.ApplicationWindow.window.width - 56))
+                    Math.min(
+                        maxItemSize.width,
+                        T.ApplicationWindow.window.width - 56))
             }
-            return contentItem.childrenRect.width
+            return maxItemSize.width
         }
         implicitHeight:
         {
@@ -37,20 +55,37 @@ T.Menu
             {
                 return Math.max(
                     orientation === Qt.Horizontal ? 48 : 0,
-                    Math.min(contentHeight, T.ApplicationWindow.window.height - 56))
+                    Math.min(
+                        listView.contentItem.childrenRect.height,
+                        T.ApplicationWindow.window.height - 56))
             }
-            return contentHeight
+            return listView.contentItem.childrenRect.height
         }
+
+        contentWidth: implicitWidth
+        contentHeight: implicitHeight
+
+        displayMarginBeginning: 256
+        displayMarginEnd: 256
 
         model: control.contentModel
 
         interactive: T.ApplicationWindow.window
-            && contentHeight > T.ApplicationWindow.window.height
+            && listView.contentHeight > T.ApplicationWindow.window.height
 
         clip: true
         keyNavigationWraps: false
         currentIndex: -1
 
         ScrollIndicator.vertical: ScrollIndicator {}
+
+        onWidthChanged:
+        {
+            if (orientation !== Qt.Vertical)
+                return
+
+            for (var i = 0; i < listView.contentItem.children.length; ++i)
+                listView.contentItem.children[i].width = width
+        }
     }
 }

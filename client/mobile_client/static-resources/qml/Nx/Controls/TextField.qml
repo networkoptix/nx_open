@@ -322,28 +322,28 @@ TextInput
         MenuItem
         {
             text: qsTr("Cut")
-            visible: control.selectedText.length > 0
+            enabled: control.selectedText.length > 0
             onTriggered: control.cut()
         }
 
         MenuItem
         {
             text: qsTr("Copy")
-            visible: control.selectedText.length > 0
+            enabled: control.selectedText.length > 0
             onTriggered: control.copy()
         }
 
         MenuItem
         {
             text: qsTr("Paste")
-            visible: control.canPaste
+            enabled: control.canPaste
             onTriggered: control.paste()
         }
 
         MenuItem
         {
             text: qsTr("Select All")
-            visible: control.text &&
+            enabled: control.text &&
                 (control.selectionStart > 0 || control.selectionEnd < control.text.length)
             onTriggered: control.selectAll()
         }
