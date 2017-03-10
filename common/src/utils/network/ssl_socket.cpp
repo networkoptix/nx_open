@@ -1132,24 +1132,26 @@ public:
 QnSSLSocket::QnSSLSocket(AbstractStreamSocket* wrappedSocket, bool isServerSide):
     d_ptr(new QnSSLSocketPrivate())
 {
+    initOpenSSLGlobalLock();
+
     Q_D(QnSSLSocket);
     d->wrappedSocket = wrappedSocket;
     d->isServerSide = isServerSide;
     d->extraBufferLen = 0;
     init();
-    initOpenSSLGlobalLock();
     d->async_ssl_ptr.reset( new AsyncSSL(d->ssl.get(),d->wrappedSocket,isServerSide) );
 }
 
 QnSSLSocket::QnSSLSocket(QnSSLSocketPrivate* priv, AbstractStreamSocket* wrappedSocket, bool isServerSide):
     d_ptr(priv)
 {
+    initOpenSSLGlobalLock();
+
     Q_D(QnSSLSocket);
     d->wrappedSocket = wrappedSocket;
     d->isServerSide = isServerSide;
     d->extraBufferLen = 0;
     init();
-    initOpenSSLGlobalLock();
 }
 
 void QnSSLSocket::init()
