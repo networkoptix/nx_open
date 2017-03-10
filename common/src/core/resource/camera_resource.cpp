@@ -579,7 +579,7 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
     const auto stream = defaultStream();
     const QSize size = stream.getResolution();
     if (!size.isEmpty())
-        return QnAspectRatio::closestStandardRatio( (qreal)size.width() / size.height() );
+        return QnAspectRatio(size.width(), size.height());
 
     return QnAspectRatio();
 }
