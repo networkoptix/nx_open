@@ -71,7 +71,7 @@ SystemSocketAddress::SystemSocketAddress(SocketAddress endpoint, int ipVersion):
         {
             const auto a = new sockaddr_in;
             memset(a, 0, sizeof(*a));
-            ptr.reset((sockaddr*) a);
+            ptr.reset((sockaddr*)a);
             size = sizeof(sockaddr_in);
 
             a->sin_family = AF_INET;
@@ -86,7 +86,7 @@ SystemSocketAddress::SystemSocketAddress(SocketAddress endpoint, int ipVersion):
         {
             const auto a = new sockaddr_in6;
             memset(a, 0, sizeof(*a));
-            ptr.reset((sockaddr*) a);
+            ptr.reset((sockaddr*)a);
             size = sizeof(sockaddr_in6);
 
             a->sin6_family = AF_INET6;
@@ -172,7 +172,7 @@ bool Socket<SocketInterfaceToImplement>::isInSelfAioThread() const
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::bind( const SocketAddress& localAddress )
+bool Socket<SocketInterfaceToImplement>::bind(const SocketAddress& localAddress)
 {
     const SystemSocketAddress addr(localAddress, m_ipVersion);
     if (!addr.ptr)
@@ -209,7 +209,7 @@ SocketAddress Socket<SocketInterfaceToImplement>::getLocalAddress() const
 template<typename SocketInterfaceToImplement>
 bool Socket<SocketInterfaceToImplement>::shutdown()
 {
-    if( m_fd == -1 )
+    if (m_fd == -1)
         return true;
 
 #ifdef _WIN32
@@ -224,7 +224,7 @@ bool Socket<SocketInterfaceToImplement>::close()
 {
     shutdown();
 
-    if( m_fd == -1 )
+    if (m_fd == -1)
         return true;
 
     NX_ASSERT(
@@ -248,11 +248,12 @@ bool Socket<SocketInterfaceToImplement>::isClosed() const
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::setReuseAddrFlag( bool reuseAddr )
+bool Socket<SocketInterfaceToImplement>::setReuseAddrFlag(bool reuseAddr)
 {
     int reuseAddrVal = reuseAddr;
 
-    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuseAddrVal, sizeof(reuseAddrVal))) {
+    if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuseAddrVal, sizeof(reuseAddrVal)))
+    {
         qnWarning("Can't set SO_REUSEADDR flag to socket: %1.", SystemError::getLastOSErrorText());
         return false;
     }
@@ -260,7 +261,7 @@ bool Socket<SocketInterfaceToImplement>::setReuseAddrFlag( bool reuseAddr )
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::getReuseAddrFlag( bool* val ) const
+bool Socket<SocketInterfaceToImplement>::getReuseAddrFlag(bool* val) const
 {
     int reuseAddrVal = 0;
     socklen_t optLen = 0;
@@ -273,11 +274,11 @@ bool Socket<SocketInterfaceToImplement>::getReuseAddrFlag( bool* val ) const
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::setNonBlockingMode( bool val )
+bool Socket<SocketInterfaceToImplement>::setNonBlockingMode(bool val)
 {
 #ifdef _WIN32
     u_long _val = val ? 1 : 0;
-    if( ioctlsocket( m_fd, FIONBIO, &_val ) == 0 )
+    if (ioctlsocket(m_fd, FIONBIO, &_val) == 0)
     {
         m_nonBlockingMode = val;
         return true;
@@ -287,14 +288,14 @@ bool Socket<SocketInterfaceToImplement>::setNonBlockingMode( bool val )
         return false;
     }
 #else
-    long currentFlags = fcntl( m_fd, F_GETFL, 0 );
-    if( currentFlags == -1 )
+    long currentFlags = fcntl(m_fd, F_GETFL, 0);
+    if (currentFlags == -1)
         return false;
-    if( val )
+    if (val)
         currentFlags |= O_NONBLOCK;
     else
         currentFlags &= ~O_NONBLOCK;
-    if( fcntl( m_fd, F_SETFL, currentFlags ) == 0 )
+    if (fcntl(m_fd, F_SETFL, currentFlags) == 0)
     {
         m_nonBlockingMode = val;
         return true;
@@ -307,14 +308,14 @@ bool Socket<SocketInterfaceToImplement>::setNonBlockingMode( bool val )
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::getNonBlockingMode( bool* val ) const
+bool Socket<SocketInterfaceToImplement>::getNonBlockingMode(bool* val) const
 {
     *val = m_nonBlockingMode;
     return true;
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::getMtu( unsigned int* mtuValue ) const
+bool Socket<SocketInterfaceToImplement>::getMtu(unsigned int* mtuValue) const
 {
 #ifdef IP_MTU
     socklen_t optLen = 0;
@@ -326,45 +327,44 @@ bool Socket<SocketInterfaceToImplement>::getMtu( unsigned int* mtuValue ) const
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::setSendBufferSize( unsigned int buff_size )
+bool Socket<SocketInterfaceToImplement>::setSendBufferSize(unsigned int buff_size)
 {
-    return ::setsockopt(m_fd, SOL_SOCKET, SO_SNDBUF, (const char*) &buff_size, sizeof(buff_size)) == 0;
+    return ::setsockopt(m_fd, SOL_SOCKET, SO_SNDBUF, (const char*)&buff_size, sizeof(buff_size)) == 0;
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::getSendBufferSize( unsigned int* buffSize ) const
+bool Socket<SocketInterfaceToImplement>::getSendBufferSize(unsigned int* buffSize) const
 {
     socklen_t optLen = sizeof(*buffSize);
     return ::getsockopt(m_fd, SOL_SOCKET, SO_SNDBUF, (char*)buffSize, &optLen) == 0;
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::setRecvBufferSize( unsigned int buff_size )
+bool Socket<SocketInterfaceToImplement>::setRecvBufferSize(unsigned int buff_size)
 {
-    return ::setsockopt(m_fd, SOL_SOCKET, SO_RCVBUF, (const char*) &buff_size, sizeof(buff_size)) == 0;
+    return ::setsockopt(m_fd, SOL_SOCKET, SO_RCVBUF, (const char*)&buff_size, sizeof(buff_size)) == 0;
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::getRecvBufferSize( unsigned int* buffSize ) const
+bool Socket<SocketInterfaceToImplement>::getRecvBufferSize(unsigned int* buffSize) const
 {
     socklen_t optLen = sizeof(*buffSize);
     return ::getsockopt(m_fd, SOL_SOCKET, SO_RCVBUF, (char*)buffSize, &optLen) == 0;
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::setRecvTimeout( unsigned int ms )
+bool Socket<SocketInterfaceToImplement>::setRecvTimeout(unsigned int ms)
 {
     timeval tv;
 
-    tv.tv_sec = ms/1000;
-    tv.tv_usec = (ms%1000) * 1000;   //1 Secs Timeout
+    tv.tv_sec = ms / 1000;
+    tv.tv_usec = (ms % 1000) * 1000;   //1 Secs Timeout
 #ifdef Q_OS_WIN32
-    if ( setsockopt (m_fd, SOL_SOCKET, SO_RCVTIMEO, ( char* )&ms,  sizeof ( ms ) ) != 0)
+    if (setsockopt(m_fd, SOL_SOCKET, SO_RCVTIMEO, (char*)&ms, sizeof(ms)) != 0)
 #else
-    if (::setsockopt(m_fd, SOL_SOCKET, SO_RCVTIMEO,(const void *)&tv,sizeof(struct timeval)) < 0)
+    if (::setsockopt(m_fd, SOL_SOCKET, SO_RCVTIMEO, (const void *)&tv, sizeof(struct timeval)) < 0)
 #endif
     {
-        qWarning()<<"handle("<<m_fd<<"). setRecvTimeout("<<ms<<") failed. "<<SystemError::getLastOSErrorText();
         return false;
     }
     m_readTimeoutMS = ms;
@@ -372,19 +372,18 @@ bool Socket<SocketInterfaceToImplement>::setRecvTimeout( unsigned int ms )
 }
 
 template<typename SocketInterfaceToImplement>
-bool Socket<SocketInterfaceToImplement>::setSendTimeout( unsigned int ms )
+bool Socket<SocketInterfaceToImplement>::setSendTimeout(unsigned int ms)
 {
     timeval tv;
 
-    tv.tv_sec = ms/1000;
-    tv.tv_usec = (ms%1000) * 1000;   //1 Secs Timeout
+    tv.tv_sec = ms / 1000;
+    tv.tv_usec = (ms % 1000) * 1000;   //1 Secs Timeout
 #ifdef Q_OS_WIN32
-    if ( setsockopt (m_fd, SOL_SOCKET, SO_SNDTIMEO, (char*)&ms, sizeof(ms) ) != 0)
+    if (setsockopt(m_fd, SOL_SOCKET, SO_SNDTIMEO, (char*)&ms, sizeof(ms)) != 0)
 #else
-    if (::setsockopt(m_fd, SOL_SOCKET, SO_SNDTIMEO,(const char *)&tv,sizeof(struct timeval)) < 0)
+    if (::setsockopt(m_fd, SOL_SOCKET, SO_SNDTIMEO, (const char *)&tv, sizeof(struct timeval)) < 0)
 #endif
     {
-        qWarning()<<"handle("<<m_fd<<"). setSendTimeout("<<ms<<") failed. "<<SystemError::getLastOSErrorText();
         return false;
     }
     m_writeTimeoutMS = ms;
@@ -416,53 +415,32 @@ void Socket<SocketInterfaceToImplement>::dispatch(nx::utils::MoveOnlyFunc<void()
 }
 
 template<typename SocketInterfaceToImplement>
-void Socket<SocketInterfaceToImplement>::cleanUp()
-{
-#ifdef _WIN32
-    WSACleanup();
-#endif
-}
-
-template<typename SocketInterfaceToImplement>
-unsigned short Socket<SocketInterfaceToImplement>::resolveService(
-    const QString &service,
-    const QString &protocol)
-{
-    struct servent *serv;        /* Structure containing service information */
-
-    if ((serv = getservbyname(service.toLatin1(), protocol.toLatin1())) == NULL)
-        return atoi(service.toLatin1());  /* Service is port number */
-    else
-        return ntohs(serv->s_port);    /* Found port (network byte order) by name */
-}
-
-template<typename SocketInterfaceToImplement>
 Socket<SocketInterfaceToImplement>::Socket(
     int type,
     int protocol,
     int ipVersion,
-    CommonSocketImpl* impl )
-:
+    CommonSocketImpl* impl)
+    :
     Pollable(
         INVALID_SOCKET,
-        std::unique_ptr<CommonSocketImpl>(impl) ),
-    m_ipVersion( ipVersion ),
-    m_nonBlockingMode( false )
+        std::unique_ptr<CommonSocketImpl>(impl)),
+    m_ipVersion(ipVersion),
+    m_nonBlockingMode(false)
 {
-    createSocket( type, protocol );
+    createSocket(type, protocol);
 }
 
 template<typename SocketInterfaceToImplement>
 Socket<SocketInterfaceToImplement>::Socket(
     int _sockDesc,
     int ipVersion,
-    CommonSocketImpl* impl )
-:
+    CommonSocketImpl* impl)
+    :
     Pollable(
         _sockDesc,
-        std::unique_ptr<CommonSocketImpl>(impl) ),
-    m_ipVersion( ipVersion ),
-    m_nonBlockingMode( false )
+        std::unique_ptr<CommonSocketImpl>(impl)),
+    m_ipVersion(ipVersion),
+    m_nonBlockingMode(false)
 {
 }
 
@@ -487,16 +465,16 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
 #endif
 
     m_fd = ::socket(m_ipVersion, type, protocol);
-    if( m_fd < 0 )
+    if (m_fd < 0)
     {
         qWarning() << strerror(errno);
         return false;
     }
 
-    if( m_ipVersion == AF_INET6 )
+    if (m_ipVersion == AF_INET6)
     {
         int off = 0;
-        if( ::setsockopt(m_fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&off, sizeof(off)) )
+        if (::setsockopt(m_fd, IPPROTO_IPV6, IPV6_V6ONLY, (const char*)&off, sizeof(off)))
             return false;
     }
 
@@ -507,13 +485,13 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
 
     // We do not want child processes created by exec() to inherit socket descriptors.
 #ifdef FD_CLOEXEC
-    int flags = fcntl( m_fd, F_GETFD, 0 );
-    if( flags < 0 )
+    int flags = fcntl(m_fd, F_GETFD, 0);
+    if (flags < 0)
     {
         NX_LOGX(lm("Can not read options by fcntl: %1")
             .arg(SystemError::getLastOSErrorCode()), cl_logWARNING);
     }
-    else if( fcntl( m_fd, F_SETFD, flags | FD_CLOEXEC ) < 0 )
+    else if (fcntl(m_fd, F_SETFD, flags | FD_CLOEXEC) < 0)
     {
         NX_LOGX(lm("Can not set FD_CLOEXEC by fcntl: %1")
             .arg(SystemError::getLastOSErrorCode()), cl_logWARNING);
@@ -526,49 +504,35 @@ bool Socket<SocketInterfaceToImplement>::createSocket(int type, int protocol)
 // class CommunicatingSocket
 
 #ifndef _WIN32
-namespace
+namespace {
+
+template<class Func>
+int doInterruptableSystemCallWithTimeout(const Func& func, unsigned int timeout)
 {
-    //static const size_t MILLIS_IN_SEC = 1000;
-    //static const size_t NSECS_IN_MS = 1000000;
+    QElapsedTimer et;
+    et.start();
 
-    template<class Func>
-    int doInterruptableSystemCallWithTimeout( const Func& func, unsigned int timeout )
+    bool waitStartTimeActual = false;
+    if (timeout > 0)
+        waitStartTimeActual = true;
+    for (;; )
     {
-        QElapsedTimer et;
-        et.start();
-
-        //struct timespec waitStartTime;
-        //memset( &waitStartTime, 0, sizeof(waitStartTime) );
-        bool waitStartTimeActual = false;
-        if( timeout > 0 )
-            waitStartTimeActual = true;  //clock_gettime( CLOCK_MONOTONIC, &waitStartTime ) == 0;
-        for( ;; )
+        int result = func();
+        if (result == -1 && errno == EINTR)
         {
-            int result = func();
-            //const int errCode = errno;
-            if( result == -1 && errno == EINTR )
+            if (timeout == 0 ||  //< No timeout
+                !waitStartTimeActual)  //< Cannot check timeout expiration
             {
-                if( timeout == 0 ||  //no timeout
-                    !waitStartTimeActual )  //cannot check timeout expiration
-                {
-                    continue;
-                }
-                //struct timespec waitStopTime;
-                //memset( &waitStopTime, 0, sizeof(waitStopTime) );
-                //if( clock_gettime( CLOCK_MONOTONIC, &waitStopTime ) != 0 )
-                //    continue;   //not updating timeout value
-                //const int millisAlreadySlept =
-                //    ((uint64_t)waitStopTime.tv_sec*MILLIS_IN_SEC + waitStopTime.tv_nsec/NSECS_IN_MS) -
-                //    ((uint64_t)waitStartTime.tv_sec*MILLIS_IN_SEC + waitStartTime.tv_nsec/NSECS_IN_MS);
-                //if( (unsigned int)millisAlreadySlept < timeout )
-                if( et.elapsed() < timeout )
-                    continue;
-                errno = ETIMEDOUT;
+                continue;
             }
-            return result;
+            if (et.elapsed() < timeout)
+                continue;
+            errno = ETIMEDOUT;
         }
+        return result;
     }
 }
+} // namespace
 #endif
 
 template<typename SocketInterfaceToImplement>
@@ -576,8 +540,8 @@ CommunicatingSocket<SocketInterfaceToImplement>::CommunicatingSocket(
     int type,
     int protocol,
     int ipVersion,
-    CommonSocketImpl* sockImpl )
-:
+    CommonSocketImpl* sockImpl)
+    :
     Socket<SocketInterfaceToImplement>(
         type,
         protocol,
@@ -595,8 +559,8 @@ template<typename SocketInterfaceToImplement>
 CommunicatingSocket<SocketInterfaceToImplement>::CommunicatingSocket(
     int newConnSD,
     int ipVersion,
-    CommonSocketImpl* sockImpl )
-:
+    CommonSocketImpl* sockImpl)
+    :
     Socket<SocketInterfaceToImplement>(
         newConnSD,
         ipVersion,
@@ -648,7 +612,8 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connect(
 }
 
 template<typename SocketInterfaceToImplement>
-int CommunicatingSocket<SocketInterfaceToImplement>::recv(void* buffer, unsigned int bufferLen, int flags)
+int CommunicatingSocket<SocketInterfaceToImplement>::recv(
+    void* buffer, unsigned int bufferLen, int flags)
 {
 #ifdef _WIN32
     int bytesRead = -1;
@@ -665,7 +630,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(void* buffer, unsigned
                 return -1;
         }
 
-        bytesRead = ::recv(m_fd, (raw_type *) buffer, bufferLen, flags & ~MSG_DONTWAIT);
+        bytesRead = ::recv(m_fd, (raw_type *)buffer, bufferLen, flags & ~MSG_DONTWAIT);
 
         if (!isNonBlockingMode)
         {
@@ -684,16 +649,16 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(void* buffer, unsigned
 
         WSABUF wsaBuffer;
         wsaBuffer.len = bufferLen;
-        wsaBuffer.buf = (char*) buffer;
+        wsaBuffer.buf = (char*)buffer;
         DWORD wsaFlags = flags;
-        DWORD* wsaBytesRead = (DWORD*) &bytesRead;
+        DWORD* wsaBytesRead = (DWORD*)&bytesRead;
 
         auto wsaResult = WSARecv(m_fd, &wsaBuffer, /* buffer count*/ 1, wsaBytesRead,
             &wsaFlags, &overlapped, nullptr);
         if (wsaResult == SOCKET_ERROR && SystemError::getLastOSErrorCode() == WSA_IO_PENDING)
         {
             auto timeout = m_readTimeoutMS ? m_readTimeoutMS : INFINITE;
-            int waitResult = WaitForSingleObject(m_eventObject, timeout);
+            WaitForSingleObject(m_eventObject, timeout);
             if (!WSAGetOverlappedResult(m_fd, &overlapped, wsaBytesRead, FALSE, &wsaFlags))
             {
                 auto errCode = SystemError::getLastOSErrorCode();
@@ -723,32 +688,35 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(void* buffer, unsigned
     }
 #else
     unsigned int recvTimeout = 0;
-    if( !this->getRecvTimeout( &recvTimeout ) )
+    if (!this->getRecvTimeout(&recvTimeout))
         return -1;
 
     int bytesRead = doInterruptableSystemCallWithTimeout<>(
         std::bind(&::recv, this->m_fd, (void*)buffer, (size_t)bufferLen, flags),
-        recvTimeout );
+        recvTimeout);
 #endif
     if (bytesRead < 0)
     {
         const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
-        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock && errCode != SystemError::again)
+        if (socketCannotRecoverFromError(errCode))
             m_connected = false;
     }
     else if (bytesRead == 0)
+    {
         m_connected = false; //connection closed by remote host
+    }
     return bytesRead;
 }
 
 template<typename SocketInterfaceToImplement>
-int CommunicatingSocket<SocketInterfaceToImplement>::send( const void* buffer, unsigned int bufferLen )
+int CommunicatingSocket<SocketInterfaceToImplement>::send(
+    const void* buffer, unsigned int bufferLen)
 {
 #ifdef _WIN32
-    int sended = ::send(m_fd, (raw_type*) buffer, bufferLen, 0);
+    int sended = ::send(m_fd, (raw_type*)buffer, bufferLen, 0);
 #else
     unsigned int sendTimeout = 0;
-    if( !this->getSendTimeout( &sendTimeout ) )
+    if (!this->getSendTimeout(&sendTimeout))
         return -1;
 
     int sended = doInterruptableSystemCallWithTimeout<>(
@@ -758,17 +726,19 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send( const void* buffer, u
 #else
             0
 #endif
-    ),
-        sendTimeout );
+        ),
+        sendTimeout);
 #endif
     if (sended < 0)
     {
         const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
-        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock && errCode != SystemError::again)
+        if (socketCannotRecoverFromError(errCode))
             m_connected = false;
     }
     else if (sended == 0)
+    {
         m_connected = false;
+    }
     return sended;
 }
 
@@ -816,7 +786,7 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::shutdown()
     m_connected = false;
     bool result = Socket<SocketInterfaceToImplement>::shutdown();
 #ifdef WIN32
-    ::SetEvent(m_eventObject); //< terminate current wait call
+    ::SetEvent(m_eventObject); //< Terminate current wait call.
 #endif
     return result;
 }
@@ -838,35 +808,38 @@ void CommunicatingSocket<SocketInterfaceToImplement>::cancelIOSync(aio::EventTyp
 template<typename SocketInterfaceToImplement>
 void CommunicatingSocket<SocketInterfaceToImplement>::connectAsync(
     const SocketAddress& addr,
-    nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler )
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
-    return m_aioHelper->connectAsync(addr, [handler = std::move(handler), this] (SystemError::ErrorCode code)
-    {
-        m_connected = (code == SystemError::noError);
-        handler(code);
-    });
+    return m_aioHelper->connectAsync(
+        addr,
+        [handler = std::move(handler), this](
+            SystemError::ErrorCode code)
+        {
+            m_connected = (code == SystemError::noError);
+            handler(code);
+        });
 }
 
 template<typename SocketInterfaceToImplement>
 void CommunicatingSocket<SocketInterfaceToImplement>::readSomeAsync(
     nx::Buffer* const buf,
-    std::function<void( SystemError::ErrorCode, size_t )> handler )
+    std::function<void(SystemError::ErrorCode, size_t)> handler)
 {
-    return m_aioHelper->readSomeAsync( buf, std::move( handler ) );
+    return m_aioHelper->readSomeAsync(buf, std::move(handler));
 }
 
 template<typename SocketInterfaceToImplement>
 void CommunicatingSocket<SocketInterfaceToImplement>::sendAsync(
     const nx::Buffer& buf,
-    std::function<void( SystemError::ErrorCode, size_t )> handler )
+    std::function<void(SystemError::ErrorCode, size_t)> handler)
 {
-    return m_aioHelper->sendAsync( buf, std::move( handler ) );
+    return m_aioHelper->sendAsync(buf, std::move(handler));
 }
 
 template<typename SocketInterfaceToImplement>
 void CommunicatingSocket<SocketInterfaceToImplement>::registerTimer(
     std::chrono::milliseconds timeoutMs,
-    nx::utils::MoveOnlyFunc<void()> handler )
+    nx::utils::MoveOnlyFunc<void()> handler)
 {
     //currently, aio considers 0 timeout as no timeout and will NOT call handler
     //NX_ASSERT(timeoutMs > std::chrono::milliseconds(0));
@@ -991,7 +964,7 @@ bool CommunicatingSocket<SocketInterfaceToImplement>::connectToIp(
             break;
         }
 
-        if (sockPollfd.revents & (POLLERR| POLLHUP))
+        if (sockPollfd.revents & (POLLERR | POLLHUP))
         {
             if (!this->getLastError(&connectErrorCode) || connectErrorCode == SystemError::noError)
                 connectErrorCode = SystemError::connectionRefused;
@@ -1038,7 +1011,7 @@ TCPSocket::TCPSocket(int ipVersion):
 #ifdef _WIN32
         , new Win32TcpSocketImpl()
 #endif
-        )
+    )
 {
 }
 
@@ -1049,7 +1022,7 @@ TCPSocket::TCPSocket(int newConnSD, int ipVersion):
 #ifdef _WIN32
         , new Win32TcpSocketImpl()
 #endif
-        )
+    )
 {
 }
 
@@ -1060,28 +1033,30 @@ TCPSocket::~TCPSocket()
 bool TCPSocket::reopen()
 {
     close();
-    return createSocket( SOCK_STREAM, IPPROTO_TCP );
+    return createSocket(SOCK_STREAM, IPPROTO_TCP);
 }
 
-bool TCPSocket::setNoDelay( bool value )
+bool TCPSocket::setNoDelay(bool value)
 {
     int flag = value ? 1 : 0;
-    return setsockopt( handle(),            // socket affected
-                      IPPROTO_TCP,     // set option at TCP level
-                      TCP_NODELAY,     // name of option
-                      (char *) &flag,  // the cast is historical cruft
-                      sizeof(int)) == 0;    // length of option value
+    return setsockopt(
+        handle(),            // socket affected
+        IPPROTO_TCP,     // set option at TCP level
+        TCP_NODELAY,     // name of option
+        (char *)&flag,  // the cast is historical cruft
+        sizeof(int)) == 0;    // length of option value
 }
 
-bool TCPSocket::getNoDelay( bool* value ) const
+bool TCPSocket::getNoDelay(bool* value) const
 {
     int flag = 0;
     socklen_t optLen = 0;
-    if( getsockopt( handle(),            // socket affected
-                      IPPROTO_TCP,      // set option at TCP level
-                      TCP_NODELAY,      // name of option
-                      (char*)&flag,     // the cast is historical cruft
-                      &optLen ) != 0 )  // length of option value
+    if (getsockopt(
+            handle(),            // socket affected
+            IPPROTO_TCP,      // set option at TCP level
+            TCP_NODELAY,      // name of option
+            (char*)&flag,     // the cast is historical cruft
+            &optLen) != 0)  // length of option value
     {
         return false;
     }
@@ -1090,47 +1065,47 @@ bool TCPSocket::getNoDelay( bool* value ) const
     return true;
 }
 
-bool TCPSocket::toggleStatisticsCollection( bool val )
+bool TCPSocket::toggleStatisticsCollection(bool val)
 {
 #ifdef _WIN32
     //dynamically resolving functions that require win >= vista we want to use here
     typedef decltype(&SetPerTcpConnectionEStats) SetPerTcpConnectionEStatsType;
     static SetPerTcpConnectionEStatsType SetPerTcpConnectionEStatsAddr =
         Win32FuncResolver::instance()->resolveFunction<SetPerTcpConnectionEStatsType>
-            ( L"Iphlpapi.dll", "SetPerTcpConnectionEStats" );
+        (L"Iphlpapi.dll", "SetPerTcpConnectionEStats");
 
-    if( SetPerTcpConnectionEStatsAddr == NULL )
+    if (SetPerTcpConnectionEStatsAddr == NULL)
         return false;
 
 
     Win32TcpSocketImpl* d = static_cast<Win32TcpSocketImpl*>(impl());
 
-    if( GetTcpRow(
+    if (GetTcpRow(
             getLocalAddress().port,
             getForeignAddress().port,
             MIB_TCP_STATE_ESTAB,
-            &d->win32TcpTableRow) != ERROR_SUCCESS )
+            &d->win32TcpTableRow) != ERROR_SUCCESS)
     {
         memset(&d->win32TcpTableRow, 0, sizeof(d->win32TcpTableRow));
         return false;
     }
 
-    auto freeLambda = [](void* ptr){ ::free(ptr); };
-    std::unique_ptr<TCP_ESTATS_PATH_RW_v0, decltype(freeLambda)> pathRW( (TCP_ESTATS_PATH_RW_v0*)malloc( sizeof(TCP_ESTATS_PATH_RW_v0) ), freeLambda );
-    if( !pathRW.get() )
+    auto freeLambda = [](void* ptr) { ::free(ptr); };
+    std::unique_ptr<TCP_ESTATS_PATH_RW_v0, decltype(freeLambda)> pathRW((TCP_ESTATS_PATH_RW_v0*)malloc(sizeof(TCP_ESTATS_PATH_RW_v0)), freeLambda);
+    if (!pathRW.get())
     {
         memset(&d->win32TcpTableRow, 0, sizeof(d->win32TcpTableRow));
         return false;
     }
 
-    memset( pathRW.get(), 0, sizeof(*pathRW) ); // zero the buffer
+    memset(pathRW.get(), 0, sizeof(*pathRW)); // zero the buffer
     pathRW->EnableCollection = val ? TRUE : FALSE;
     //enabling statistics collection
-    if( SetPerTcpConnectionEStatsAddr(
+    if (SetPerTcpConnectionEStatsAddr(
             &d->win32TcpTableRow,
             TcpConnectionEstatsPath,
             (UCHAR*)pathRW.get(), 0, sizeof(*pathRW),
-            0) != NO_ERROR )
+            0) != NO_ERROR)
     {
         memset(&d->win32TcpTableRow, 0, sizeof(d->win32TcpTableRow));
         return false;
@@ -1145,24 +1120,24 @@ bool TCPSocket::toggleStatisticsCollection( bool val )
 #endif
 }
 
-bool TCPSocket::getConnectionStatistics( StreamSocketInfo* info )
+bool TCPSocket::getConnectionStatistics(StreamSocketInfo* info)
 {
 #ifdef _WIN32
     Win32TcpSocketImpl* d = static_cast<Win32TcpSocketImpl*>(impl());
 
-    if( !d->win32TcpTableRow.dwLocalAddr &&
-        !d->win32TcpTableRow.dwLocalPort )
+    if (!d->win32TcpTableRow.dwLocalAddr &&
+        !d->win32TcpTableRow.dwLocalPort)
     {
         return false;
     }
-    return readTcpStat( &d->win32TcpTableRow, info ) == ERROR_SUCCESS;
+    return readTcpStat(&d->win32TcpTableRow, info) == ERROR_SUCCESS;
 #elif defined(__linux__)
     static const size_t USEC_PER_MSEC = 1000;
 
     struct tcp_info tcpinfo;
-    memset( &tcpinfo, 0, sizeof(tcpinfo) );
+    memset(&tcpinfo, 0, sizeof(tcpinfo));
     socklen_t tcp_info_length = sizeof(tcpinfo);
-    if( getsockopt( handle(), SOL_TCP, TCP_INFO, (void *)&tcpinfo, &tcp_info_length ) != 0 )
+    if (getsockopt(handle(), SOL_TCP, TCP_INFO, (void *)&tcpinfo, &tcp_info_length) != 0)
         return false;
     info->rttVar = tcpinfo.tcpi_rttvar / USEC_PER_MSEC;
     return true;
@@ -1177,66 +1152,68 @@ int intDuration(SourceType duration)
 {
     const auto repr = std::chrono::duration_cast<TargetType>(duration).count();
     NX_ASSERT(repr >= std::numeric_limits<int>::min() && repr <= std::numeric_limits<int>::max());
-    return (int) repr;
+    return (int)repr;
 }
 
-bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
+bool TCPSocket::setKeepAlive(boost::optional< KeepAliveOptions > info)
 {
-    #if defined( _WIN32 )
-        struct tcp_keepalive ka = { FALSE, 0, 0 };
-        if( info )
-        {
-            ka.onoff = TRUE;
-            ka.keepalivetime = intDuration<std::chrono::milliseconds>(info->time);
-            ka.keepaliveinterval = intDuration<std::chrono::milliseconds>(info->interval);
+#if defined( _WIN32 )
+    struct tcp_keepalive ka = { FALSE, 0, 0 };
+    if (info)
+    {
+        ka.onoff = TRUE;
+        ka.keepalivetime = intDuration<std::chrono::milliseconds>(info->time);
+        ka.keepaliveinterval = intDuration<std::chrono::milliseconds>(info->interval);
 
-            // the value can not be changed, 0 means default
-            info->probeCount = 0;
-        }
+        // the value can not be changed, 0 means default
+        info->probeCount = 0;
+    }
 
-        DWORD length = sizeof( ka );
-        if( WSAIoctl( handle(), SIO_KEEPALIVE_VALS,
-                      &ka, sizeof(ka), NULL, 0, &length, NULL, NULL ) )
-            return false;
+    DWORD length = sizeof(ka);
+    if (WSAIoctl(handle(), SIO_KEEPALIVE_VALS,
+            &ka, sizeof(ka), NULL, 0, &length, NULL, NULL))
+    {
+        return false;
+    }
 
-        if( info )
-            m_keepAlive = std::move( *info );
-    #else
-        int isEnabled = info ? 1 : 0;
-        if( setsockopt( handle(), SOL_SOCKET, SO_KEEPALIVE, &isEnabled, sizeof(isEnabled) ) != 0 )
-            return false;
+    if (info)
+        m_keepAlive = std::move(*info);
+#else
+    int isEnabled = info ? 1 : 0;
+    if (setsockopt(handle(), SOL_SOCKET, SO_KEEPALIVE, &isEnabled, sizeof(isEnabled)) != 0)
+        return false;
 
-        if( !info )
-            return true;
+    if (!info)
+        return true;
 
-        #if defined( Q_OS_LINUX )
-            const int time = intDuration<std::chrono::seconds>(info->time);
-            if( setsockopt( handle(), SOL_TCP, TCP_KEEPIDLE, &time, sizeof(time) ) < 0 )
-                return false;
+#if defined( Q_OS_LINUX )
+    const int time = intDuration<std::chrono::seconds>(info->time);
+    if (setsockopt(handle(), SOL_TCP, TCP_KEEPIDLE, &time, sizeof(time)) < 0)
+        return false;
 
-            const int interval = intDuration<std::chrono::seconds>(info->interval);
-            if( setsockopt( handle(), SOL_TCP, TCP_KEEPINTVL, &interval, sizeof(interval) ) < 0 )
-                return false;
+    const int interval = intDuration<std::chrono::seconds>(info->interval);
+    if (setsockopt(handle(), SOL_TCP, TCP_KEEPINTVL, &interval, sizeof(interval)) < 0)
+        return false;
 
-            const int count = (int) info->probeCount;
-            if( setsockopt( handle(), SOL_TCP, TCP_KEEPCNT, &count, sizeof(count) ) < 0 )
-                return false;
-        #elif defined( Q_OS_MACX )
-            const int time = intDuration<std::chrono::seconds>(info->time);
-            if( setsockopt( handle(), IPPROTO_TCP, TCP_KEEPALIVE, &time, sizeof(time) ) < 0 )
-                return false;
-        #endif
-    #endif
+    const int count = (int)info->probeCount;
+    if (setsockopt(handle(), SOL_TCP, TCP_KEEPCNT, &count, sizeof(count)) < 0)
+        return false;
+#elif defined( Q_OS_MACX )
+    const int time = intDuration<std::chrono::seconds>(info->time);
+    if (setsockopt(handle(), IPPROTO_TCP, TCP_KEEPALIVE, &time, sizeof(time)) < 0)
+        return false;
+#endif
+#endif
 
     return true;
 }
 
-bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result ) const
+bool TCPSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
 {
     int isEnabled = 0;
     socklen_t length = sizeof(isEnabled);
-    if( getsockopt( handle(), SOL_SOCKET, SO_KEEPALIVE,
-                    reinterpret_cast<char*>(&isEnabled), &length ) != 0 )
+    if (getsockopt(handle(), SOL_SOCKET, SO_KEEPALIVE,
+        reinterpret_cast<char*>(&isEnabled), &length) != 0)
         return false;
 
     if (!isEnabled)
@@ -1245,34 +1222,34 @@ bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result ) cons
         return true;
     }
 
-    #if defined(_WIN32)
-        *result = m_keepAlive;
-    #else
-        *result = KeepAliveOptions();
-        #if defined(Q_OS_LINUX)
-            int time;
-            if( getsockopt( handle(), SOL_TCP, TCP_KEEPIDLE, &time, &length ) < 0 )
-                return false;
+#if defined(_WIN32)
+    *result = m_keepAlive;
+#else
+    *result = KeepAliveOptions();
+#if defined(Q_OS_LINUX)
+    int time;
+    if (getsockopt(handle(), SOL_TCP, TCP_KEEPIDLE, &time, &length) < 0)
+        return false;
 
-            int interval;
-            if( getsockopt( handle(), SOL_TCP, TCP_KEEPINTVL, &interval, &length ) < 0 )
-                return false;
+    int interval;
+    if (getsockopt(handle(), SOL_TCP, TCP_KEEPINTVL, &interval, &length) < 0)
+        return false;
 
-            int count;
-            if( getsockopt( handle(), SOL_TCP, TCP_KEEPCNT, &count, &length ) < 0 )
-                return false;
+    int count;
+    if (getsockopt(handle(), SOL_TCP, TCP_KEEPCNT, &count, &length) < 0)
+        return false;
 
-            (*result)->time = std::chrono::seconds(time);
-            (*result)->interval = std::chrono::seconds(interval);
-            (*result)->probeCount = (size_t) count;
-        #elif defined( Q_OS_MACX )
-            int time;
-            if( getsockopt( handle(), IPPROTO_TCP, TCP_KEEPALIVE, &time, &length ) < 0 )
-                return false;
+    (*result)->time = std::chrono::seconds(time);
+    (*result)->interval = std::chrono::seconds(interval);
+    (*result)->probeCount = (size_t)count;
+#elif defined( Q_OS_MACX )
+    int time;
+    if (getsockopt(handle(), IPPROTO_TCP, TCP_KEEPALIVE, &time, &length) < 0)
+        return false;
 
-            (*result)->time = std::chrono::seconds(time);
-        #endif
-    #endif
+    (*result)->time = std::chrono::seconds(time);
+#endif
+#endif
 
     return true;
 }
@@ -1282,15 +1259,15 @@ bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result ) cons
 
 static const int DEFAULT_ACCEPT_TIMEOUT_MSEC = 250;
 /**
- * @return fd (>=0) on success, <0 on error (-2 if timed out)
- */
+* @return fd (>=0) on success, <0 on error (-2 if timed out)
+*/
 static int acceptWithTimeout(
     int m_fd,
     int timeoutMillis = DEFAULT_ACCEPT_TIMEOUT_MSEC,
     bool nonBlockingMode = false)
 {
     if (nonBlockingMode)
-        return ::accept( m_fd, NULL, NULL );
+        return ::accept(m_fd, NULL, NULL);
 
     int result = 0;
     if (timeoutMillis == 0)
@@ -1298,49 +1275,49 @@ static int acceptWithTimeout(
 
 #ifdef _WIN32
     struct pollfd fds[1];
-    memset( fds, 0, sizeof(fds) );
+    memset(fds, 0, sizeof(fds));
     fds[0].fd = m_fd;
     fds[0].events |= POLLIN;
-    result = poll( fds, sizeof(fds)/sizeof(*fds), timeoutMillis );
-    if( result < 0 )
+    result = poll(fds, sizeof(fds) / sizeof(*fds), timeoutMillis);
+    if (result < 0)
         return result;
-    if( result == 0 )   //timeout
+    if (result == 0)   //timeout
     {
-        ::SetLastError( SystemError::timedOut );
+        ::SetLastError(SystemError::timedOut);
         return -1;
     }
-    if( fds[0].revents & POLLERR )
+    if (fds[0].revents & POLLERR)
     {
         int errorCode = 0;
-        int errorCodeLen = sizeof( errorCode );
-        if( getsockopt( m_fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&errorCode), &errorCodeLen ) != 0 )
+        int errorCodeLen = sizeof(errorCode);
+        if (getsockopt(m_fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&errorCode), &errorCodeLen) != 0)
             return -1;
-        ::SetLastError( errorCode );
+        ::SetLastError(errorCode);
         return -1;
     }
     return ::accept(m_fd, NULL, NULL);
 #else
     struct pollfd sockPollfd;
-    memset( &sockPollfd, 0, sizeof(sockPollfd) );
+    memset(&sockPollfd, 0, sizeof(sockPollfd));
     sockPollfd.fd = m_fd;
     sockPollfd.events = POLLIN;
 #ifdef _GNU_SOURCE
     sockPollfd.events |= POLLRDHUP;
 #endif
-    result = ::poll( &sockPollfd, 1, timeoutMillis );
-    if( result < 0 )
+    result = ::poll(&sockPollfd, 1, timeoutMillis);
+    if (result < 0)
         return result;
-    if( result == 0 )   //timeout
+    if (result == 0)   //timeout
     {
         errno = SystemError::timedOut;
         return -1;
     }
-    if( sockPollfd.revents & POLLIN )
+    if (sockPollfd.revents & POLLIN)
     {
-        auto fd = ::accept( m_fd, NULL, NULL );
+        auto fd = ::accept(m_fd, NULL, NULL);
         return fd;
     }
-    if( (sockPollfd.revents & POLLHUP)
+    if ((sockPollfd.revents & POLLHUP)
 #ifdef _GNU_SOURCE
         || (sockPollfd.revents & POLLRDHUP)
 #endif
@@ -1349,11 +1326,11 @@ static int acceptWithTimeout(
         errno = ENOTCONN;
         return -1;
     }
-    if( sockPollfd.revents & POLLERR )
+    if (sockPollfd.revents & POLLERR)
     {
         int errorCode = 0;
         socklen_t errorCodeLen = sizeof(errorCode);
-        if( getsockopt( m_fd, SOL_SOCKET, SO_ERROR, &errorCode, &errorCodeLen ) != 0 )
+        if (getsockopt(m_fd, SOL_SOCKET, SO_ERROR, &errorCode, &errorCodeLen) != 0)
             return -1;
         errno = errorCode;
         return -1;
@@ -1423,14 +1400,14 @@ TCPServerSocket::~TCPServerSocket()
     NX_CRITICAL(
         !nx::network::SocketGlobals::isInitialized() ||
         !nx::network::SocketGlobals::aioService()
-            .isSocketBeingWatched(static_cast<Pollable*>(this)),
+        .isSocketBeingWatched(static_cast<Pollable*>(this)),
         "You MUST cancel running async socket operation before "
         "deleting socket if you delete socket from non-aio thread");
 }
 
 int TCPServerSocket::accept(int sockDesc)
 {
-    return acceptWithTimeout( sockDesc );
+    return acceptWithTimeout(sockDesc);
 }
 
 void TCPServerSocket::acceptAsync(
@@ -1452,7 +1429,7 @@ void TCPServerSocket::acceptAsync(
     }
 
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(impl());
-    return d->asyncServerSocketHelper.acceptAsync( std::move(handler) );
+    return d->asyncServerSocketHelper.acceptAsync(std::move(handler));
 }
 
 void TCPServerSocket::cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
@@ -1469,7 +1446,7 @@ void TCPServerSocket::cancelIOSync()
 
 bool TCPServerSocket::listen(int queueLen)
 {
-    return ::listen( handle(), queueLen ) == 0;
+    return ::listen(handle(), queueLen) == 0;
 }
 
 void TCPServerSocket::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -1512,25 +1489,25 @@ AbstractStreamSocket* TCPServerSocket::systemAccept()
     if (!acceptedSocket)
         return nullptr;
 
-    #if defined(_WIN32) || defined(Q_OS_MACX)
-        if (!nonBlockingMode)
-            return acceptedSocket;
+#if defined(_WIN32) || defined(Q_OS_MACX)
+    if (!nonBlockingMode)
+        return acceptedSocket;
 
-        // Make all platforms behave like Linux, so all new sockets are in blocking mode
-        // regardless of their origin.
-        if (!acceptedSocket->setNonBlockingMode(false))
-        {
-            delete acceptedSocket;
-            return nullptr;
-        }
-    #endif
+    // Make all platforms behave like Linux, so all new sockets are in blocking mode
+    // regardless of their origin.
+    if (!acceptedSocket->setNonBlockingMode(false))
+    {
+        delete acceptedSocket;
+        return nullptr;
+    }
+#endif
 
     return acceptedSocket;
 }
 
 bool TCPServerSocket::setListen(int queueLen)
 {
-    return ::listen( handle(), queueLen ) == 0;
+    return ::listen(handle(), queueLen) == 0;
 }
 
 void TCPServerSocket::stopWhileInAioThread()
@@ -1547,11 +1524,15 @@ UDPSocket::UDPSocket(int ipVersion):
     m_destAddr()
 {
     setBroadcast();
-    int buff_size = 1024*512;
+    int buff_size = 1024 * 512;
     if (::setsockopt(handle(), SOL_SOCKET, SO_RCVBUF, (const char*)&buff_size, sizeof(buff_size)) < 0)
     {
         //error
     }
+}
+
+UDPSocket::~UDPSocket()
+{
 }
 
 SocketAddress UDPSocket::getForeignAddress() const
@@ -1566,33 +1547,33 @@ void UDPSocket::setBroadcast()
     int broadcastPermission = 1;
     setsockopt(
         handle(), SOL_SOCKET, SO_BROADCAST,
-        (raw_type *) &broadcastPermission, sizeof(broadcastPermission));
+        (raw_type *)&broadcastPermission, sizeof(broadcastPermission));
 }
 
 bool UDPSocket::sendTo(const void *buffer, int bufferLen)
 {
     // Write out the whole buffer as a single message.
-    #ifdef _WIN32
-        return sendto(
-            handle(), (raw_type *)buffer, bufferLen, 0,
-            m_destAddr.ptr.get(), m_destAddr.size) == bufferLen;
-    #else
-        unsigned int sendTimeout = 0;
-        if (!getSendTimeout(&sendTimeout))
-            return -1;
+#ifdef _WIN32
+    return sendto(
+        handle(), (raw_type *)buffer, bufferLen, 0,
+        m_destAddr.ptr.get(), m_destAddr.size) == bufferLen;
+#else
+    unsigned int sendTimeout = 0;
+    if (!getSendTimeout(&sendTimeout))
+        return -1;
 
-        #ifdef __linux__
-            int flags = MSG_NOSIGNAL;
-        #else
-            int flags = 0;
-        #endif
+#ifdef __linux__
+    int flags = MSG_NOSIGNAL;
+#else
+    int flags = 0;
+#endif
 
-        return doInterruptableSystemCallWithTimeout<>(
-            std::bind(
-                &::sendto, handle(), (const void*)buffer, (size_t)bufferLen, flags,
-                m_destAddr.ptr.get(), m_destAddr.size),
-            sendTimeout) == bufferLen;
-    #endif
+    return doInterruptableSystemCallWithTimeout<>(
+        std::bind(
+            &::sendto, handle(), (const void*)buffer, (size_t)bufferLen, flags,
+            m_destAddr.ptr.get(), m_destAddr.size),
+        sendTimeout) == bufferLen;
+#endif
 
 }
 
@@ -1612,7 +1593,9 @@ bool UDPSocket::setMulticastIF(const QString& multicastIF)
 {
     struct in_addr localInterface;
     localInterface.s_addr = inet_addr(multicastIF.toLatin1().data());
-    if( setsockopt( handle(), IPPROTO_IP, IP_MULTICAST_IF, (raw_type *)&localInterface, sizeof( localInterface ) ) < 0 )
+    if (setsockopt(
+            handle(), IPPROTO_IP, IP_MULTICAST_IF,
+            (raw_type *)&localInterface, sizeof(localInterface)) < 0)
     {
         qnWarning("Multicast TTL set failed (setsockopt()).");
         return false;
@@ -1627,9 +1610,9 @@ bool UDPSocket::joinGroup(const QString &multicastGroup)
 
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
     multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
-    if (setsockopt(handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
-            (raw_type *)&multicastRequest,
-            sizeof(multicastRequest)) < 0)
+    if (setsockopt(
+            handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
+            (raw_type *)&multicastRequest, sizeof(multicastRequest)) < 0)
     {
         qWarning() << "failed to join multicast group" << multicastGroup;
         return false;
@@ -1644,9 +1627,9 @@ bool UDPSocket::joinGroup(const QString &multicastGroup, const QString& multicas
 
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
     multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toLatin1());
-    if (setsockopt(handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
-            (raw_type *)&multicastRequest,
-            sizeof(multicastRequest)) < 0)
+    if (setsockopt(
+            handle(), IPPROTO_IP, IP_ADD_MEMBERSHIP,
+            (raw_type *)&multicastRequest, sizeof(multicastRequest)) < 0)
     {
         qWarning() << "failed to join multicast group" << multicastGroup
             << "from IF" << multicastIF << ". " << SystemError::getLastOSErrorText();
@@ -1663,8 +1646,8 @@ bool UDPSocket::leaveGroup(const QString &multicastGroup)
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
     multicastRequest.imr_interface.s_addr = htonl(INADDR_ANY);
     if (setsockopt(handle(), IPPROTO_IP, IP_DROP_MEMBERSHIP,
-            (raw_type *)&multicastRequest,
-            sizeof(multicastRequest)) < 0)
+        (raw_type *)&multicastRequest,
+        sizeof(multicastRequest)) < 0)
     {
         qnWarning("Multicast group leave failed (setsockopt()).");
         return false;
@@ -1680,10 +1663,10 @@ bool UDPSocket::leaveGroup(const QString &multicastGroup, const QString& multica
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastGroup.toLatin1());
     multicastRequest.imr_interface.s_addr = inet_addr(multicastIF.toLatin1());
     if (setsockopt(handle(), IPPROTO_IP, IP_DROP_MEMBERSHIP,
-            (raw_type *)&multicastRequest,
-            sizeof(multicastRequest)) < 0)
+        (raw_type *)&multicastRequest,
+        sizeof(multicastRequest)) < 0)
     {
-        qWarning() <<"Multicast group leave failed at IF" << multicastIF << "error:" <<
+        qWarning() << "Multicast group leave failed at IF" << multicastIF << "error:" <<
             SystemError::getLastOSErrorText();
         return false;
     }
@@ -1692,22 +1675,22 @@ bool UDPSocket::leaveGroup(const QString &multicastGroup, const QString& multica
 
 int UDPSocket::send(const void* buffer, unsigned int bufferLen)
 {
-    #ifdef _WIN32
-        return sendto(
-            handle(), (raw_type *)buffer, bufferLen, 0,
-            m_destAddr.ptr.get(), m_destAddr.size);
-    #else
-        unsigned int sendTimeout = 0;
-        if (!getSendTimeout(&sendTimeout))
-            return -1;
+#ifdef _WIN32
+    return sendto(
+        handle(), (raw_type *)buffer, bufferLen, 0,
+        m_destAddr.ptr.get(), m_destAddr.size);
+#else
+    unsigned int sendTimeout = 0;
+    if (!getSendTimeout(&sendTimeout))
+        return -1;
 
-        return doInterruptableSystemCallWithTimeout<>(
-            std::bind(
-                &::sendto, handle(),
-                (const void*)buffer, (size_t)bufferLen, 0,
-                m_destAddr.ptr.get(), m_destAddr.size),
-            sendTimeout);
-    #endif
+    return doInterruptableSystemCallWithTimeout<>(
+        std::bind(
+            &::sendto, handle(),
+            (const void*)buffer, (size_t)bufferLen, 0,
+            m_destAddr.ptr.get(), m_destAddr.size),
+        sendTimeout);
+#endif
 
 }
 
@@ -1735,16 +1718,16 @@ bool UDPSocket::setDestAddr(const SocketAddress& endpoint)
             SocketAddress(resolvedAddresses.front(), endpoint.port), m_ipVersion);
     }
 
-    return (bool) m_destAddr.ptr;
+    return (bool)m_destAddr.ptr;
 }
 
 bool UDPSocket::sendTo(
     const void* buffer,
     unsigned int bufferLen,
-    const SocketAddress& foreignEndpoint )
+    const SocketAddress& foreignEndpoint)
 {
-    setDestAddr( foreignEndpoint );
-    return sendTo( buffer, bufferLen );
+    setDestAddr(foreignEndpoint);
+    return sendTo(buffer, bufferLen);
 }
 
 void UDPSocket::sendToAsync(
@@ -1757,7 +1740,8 @@ void UDPSocket::sendToAsync(
         setDestAddr(endpoint);
         return sendAsync(
             buffer,
-            [endpoint, handler = std::move(handler)](SystemError::ErrorCode code, size_t size)
+            [endpoint, handler = std::move(handler)](
+                SystemError::ErrorCode code, size_t size)
             {
                 handler(code, endpoint, size);
             });
@@ -1777,7 +1761,7 @@ void UDPSocket::sendToAsync(
         });
 }
 
-int UDPSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/ )
+int UDPSocket::recv(void* buffer, unsigned int bufferLen, int /*flags*/)
 {
     //TODO #ak use flags
     return recvFrom(buffer, bufferLen, &m_prevDatagramAddress.address, &m_prevDatagramAddress.port);
@@ -1786,15 +1770,15 @@ int UDPSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/ )
 int UDPSocket::recvFrom(
     void *buffer,
     unsigned int bufferLen,
-    SocketAddress* const sourceAddress )
+    SocketAddress* const sourceAddress)
 {
     int rtn = recvFrom(
         buffer,
         bufferLen,
         &m_prevDatagramAddress.address,
-        &m_prevDatagramAddress.port );
+        &m_prevDatagramAddress.port);
 
-    if( rtn >= 0 && sourceAddress )
+    if (rtn >= 0 && sourceAddress)
         *sourceAddress = m_prevDatagramAddress;
     return rtn;
 }
@@ -1823,10 +1807,10 @@ bool UDPSocket::hasData() const
     fd_set read_set;
     struct timeval timeout;
     FD_ZERO(&read_set);
-    FD_SET( handle(), &read_set );
+    FD_SET(handle(), &read_set);
     timeout.tv_sec = 0;
     timeout.tv_usec = 0;
-    switch( ::select(FD_SETSIZE, &read_set, NULL, NULL, &timeout))
+    switch (::select(FD_SETSIZE, &read_set, NULL, NULL, &timeout))
     {
         case 0:             // timeout expired
             return false;
@@ -1836,13 +1820,13 @@ bool UDPSocket::hasData() const
     return true;
 #else
     struct pollfd sockPollfd;
-    memset( &sockPollfd, 0, sizeof(sockPollfd) );
+    memset(&sockPollfd, 0, sizeof(sockPollfd));
     sockPollfd.fd = handle();
     sockPollfd.events = POLLIN;
 #ifdef _GNU_SOURCE
     sockPollfd.events |= POLLRDHUP;
 #endif
-    return (::poll( &sockPollfd, 1, 0 ) == 1) && ((sockPollfd.revents & POLLIN) != 0);
+    return (::poll(&sockPollfd, 1, 0) == 1) && ((sockPollfd.revents & POLLIN) != 0);
 #endif
 }
 
@@ -1850,7 +1834,7 @@ int UDPSocket::recvFrom(
     void* buffer,
     unsigned int bufferLen,
     HostAddress* const sourceAddress,
-    quint16* const sourcePort )
+    quint16* const sourcePort)
 {
     SystemSocketAddress address(SocketAddress(), m_ipVersion);
 
@@ -1870,7 +1854,7 @@ int UDPSocket::recvFrom(
     }
 #else
     unsigned int recvTimeout = 0;
-    if( !getRecvTimeout( &recvTimeout ) )
+    if (!getRecvTimeout(&recvTimeout))
         return -1;
 
     int rtn = doInterruptableSystemCallWithTimeout<>(

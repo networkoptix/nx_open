@@ -1,15 +1,17 @@
 #include "listen_mode.h"
 
+#include <nx/fusion/serialization/lexical.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/multiple_server_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/ssl_socket.h>
+#include <nx/utils/string.h>
 
 #include <utils/common/command_line_parser.h>
-#include <nx/utils/string.h>
-#include <nx/fusion/serialization/lexical.h>
+
+#include "dynamic_statistics.h"
 
 namespace nx {
 namespace cctu {
@@ -320,6 +322,7 @@ int printStatsAndWaitForCompletion(
     ConnectionTestStatistics baseStatisticsData = kZeroStatistics;
     boost::optional<steady_clock::time_point> sameStatisticsInterval;
     std::string prevStatToDisplayStr;
+    DynamicStatistics dynamicStatistics;
     for (;;)
     {
         if (interruptCondition && interruptCondition())
@@ -360,8 +363,11 @@ int printStatsAndWaitForCompletion(
             sameStatisticsInterval.reset();
         }
 
+        dynamicStatistics.addValue(statToDisplay);
+
         prevStatistics = data;
-        const auto statToDisplayStr = toString(statToDisplay).toStdString();
+        const auto statToDisplayStr = 
+            toString(statToDisplay).toStdString() + " " + dynamicStatistics.toStdString();
 
         std::cout << '\r';
         std::cout << statToDisplayStr;

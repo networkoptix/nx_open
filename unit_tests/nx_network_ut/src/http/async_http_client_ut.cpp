@@ -320,7 +320,7 @@ TEST_F(AsyncHttpClientTest, MultiRequestTest)
         client.get(),
         [&](nx_http::AsyncHttpClientPtr client)
         {
-            ASSERT_FALSE(client->failed());
+            ASSERT_FALSE(client->failed()) << "Response: " << client->response();
             ASSERT_EQ(client->response()->statusLine.statusCode, nx_http::StatusCode::ok);
             ASSERT_EQ(client->fetchMessageBodyBuffer(), expectedResponse);
             auto contentTypeIter = client->response()->headers.find("Content-Type");
