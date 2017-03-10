@@ -1,5 +1,6 @@
 import QtQuick 2.6
 import QtQuick.Window 2.2
+import Qt.labs.templates 1.0
 import com.networkoptix.qml 1.0
 import Nx 1.0
 import Nx.Controls 1.0
@@ -213,14 +214,10 @@ TextInput
 
         function openContextMenu()
         {
-            contextMenu.x = leftPadding + positionToRectangle(
-                selectionStart == selectionEnd
-                    ? cursorPosition : selectionStart).x
-            contextMenu.y = cursorRectangle.y + cursorRectangle.height + (mobileMode ? 28 : 4)
-
             persistentSelection = true
             needRestoreContextMenu = false
             contextMenu.open()
+            contextMenu.adjustPosition()
             persistentSelection = false
         }
     }
@@ -352,6 +349,45 @@ TextInput
         }
 
         onActiveFocusChanged: d.updateCursorHandle()
+
+
+        function adjustPosition()
+        {
+            x = leftPadding + positionToRectangle(
+                selectionStart == selectionEnd
+                    ? cursorPosition : selectionStart).x
+            var yOffset = cursorRectangle.height + (mobileMode ? 28 : 4)
+            y = cursorRectangle.y + yOffset
+
+            var window = control.ApplicationWindow.window
+            if (!window)
+                return
+
+            var rect = mapToItem(window.contentItem, x, y, implicitWidth, implicitHeight)
+
+            var dy = 0.0
+            if (rect.bottom > window.height)
+            {
+                var topSpace = rect.top - yOffset - 4.0
+                if (topSpace >= rect.height)
+                    dy = -yOffset - rect.height - 4.0
+                else
+                    dy = window.height - rect.bottom - 8.0
+            }
+            if (rect.top + dy < 0)
+                dy = -rect.top
+            y += dy
+
+            var dx = 0.0
+            if (rect.right > window.width)
+                dx = window.width - rect.right - 8.0
+            if (rect.left + dx < 0)
+                dx = -rect.left
+            x += dx
+        }
+
+        onImplicitWidthChanged: adjustPosition()
+        onImplicitHeightChanged: adjustPosition()
     }
 
     Component.onCompleted:
