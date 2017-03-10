@@ -153,6 +153,7 @@ class BoxConfig(object):
         self.ip_address = None
         self.port = None
         self.timezone = timezone  # pytz.timezone or None
+        self.must_be_recreated = False  # this test requires fresh box
         self.is_allocated = False
 
     def __str__(self):

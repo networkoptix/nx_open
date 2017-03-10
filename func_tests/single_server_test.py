@@ -14,8 +14,6 @@ def env(env_builder, server):
 
 # https://networkoptix.atlassian.net/browse/VMS-3911
 def test_server_should_pick_archive_file_with_time_after_db_time(env, camera, sample_media_file):
-    print
-    print env.server.name, env.server.url, env.server.ecs_guid
     camera_id = env.server.add_camera(camera)
     storage = env.server.storage
     sample = sample_media_file

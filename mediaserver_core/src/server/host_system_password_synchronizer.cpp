@@ -1,8 +1,3 @@
-/**********************************************************
-* Jul 10, 2015
-* a.kolesnikov@networkoptix.com
-***********************************************************/
-
 #include "host_system_password_synchronizer.h"
 
 #include <array>
@@ -23,12 +18,14 @@
 #include "platform/platform_abstraction.h"
 #include "platform/monitoring/platform_monitor.h"
 
-
 HostSystemPasswordSynchronizer::HostSystemPasswordSynchronizer()
 {
     Qn::directConnect(
-        QnResourcePool::instance(), &QnResourcePool::resourceChanged,
-        this, &HostSystemPasswordSynchronizer::at_adminUserChanged );
+        qnResPool, &QnResourcePool::resourceAdded,
+        this, &HostSystemPasswordSynchronizer::at_resourseFound);
+
+    if (QnUserResourcePtr admin = qnResPool->getAdministrator())
+        setAdmin(admin);
 }
 
 HostSystemPasswordSynchronizer::~HostSystemPasswordSynchronizer()
@@ -40,7 +37,6 @@ void HostSystemPasswordSynchronizer::syncLocalHostRootPasswordWithAdminIfNeeded(
 {
 #ifdef __linux__
     QnMutexLocker lk( &m_mutex );
-
     if( QnAppInfo::isBpi() || QnAppInfo::isNx1() )
     {
         //#5785 changing root password on nx1 only if DB is located on HDD
@@ -98,14 +94,24 @@ void HostSystemPasswordSynchronizer::syncLocalHostRootPasswordWithAdminIfNeeded(
 #endif
 }
 
-void HostSystemPasswordSynchronizer::at_adminUserChanged( const QnResourcePtr& resource )
+void HostSystemPasswordSynchronizer::setAdmin(QnUserResourcePtr admin)
 {
-    QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
-    if( !user )
-        return;
+    Qn::directConnect(
+        admin.data(), &QnUserResource::cryptSha512HashChanged,
+        this, &HostSystemPasswordSynchronizer::at_adminHashChanged);
+}
 
-    if( !user->isOwner() )
-        return;
+void HostSystemPasswordSynchronizer::at_resourseFound(QnResourcePtr resource)
+{
+    if (const auto user = resource.dynamicCast<QnUserResource>())
+    {
+        if (user->isBuiltInAdmin())
+            setAdmin(user);
+    }
+}
 
-    syncLocalHostRootPasswordWithAdminIfNeeded( user );
+void HostSystemPasswordSynchronizer::at_adminHashChanged(QnResourcePtr resource)
+{
+    if (QnUserResourcePtr admin = resource.dynamicCast<QnUserResource>())
+        syncLocalHostRootPasswordWithAdminIfNeeded(admin);
 }
