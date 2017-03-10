@@ -44,8 +44,8 @@ void SpaceInfo::storageRebuilded(int index, int64_t freeSpace, int64_t nxOccupie
 
     NX_CRITICAL(storageIndexFound);
     storageIndexIt->effectiveSpace = freeSpace + nxOccupiedSpace - spaceLimit;
-    NX_LOG(lit(R"log([Storage, SpaceInfo, Selection] Calculating effective space for storage %1. 
-Free space = %2, nxOccupiedSpace = %3, spaceLimit = %4, effectiveSpace = %5)log")
+    NX_LOG(lit("[Storage, SpaceInfo, Selection] Calculating effective space for storage %1. \
+Free space = %2, nxOccupiedSpace = %3, spaceLimit = %4, effectiveSpace = %5")
         .arg(storageIndexIt->index)
         .arg(freeSpace)
         .arg(nxOccupiedSpace)
@@ -104,7 +104,7 @@ int SpaceInfo::getOptimalStorageIndex(std::function<bool(int)> useStoragePredica
     if (hasStorageWithoutEffectiveSpace)
         return getStorageIndexImpl(filteredStorageIndexes, false);
 
-    return getStorageIndexImpl(true);
+    return getStorageIndexImpl(filteredStorageIndexes, true);
 }
 
 int SpaceInfo::getStorageIndexImpl(const SpaceInfoVector& filteredSpaceInfo, bool byEffectiveSpace) const
@@ -127,8 +127,8 @@ int SpaceInfo::getStorageIndexImpl(const SpaceInfoVector& filteredSpaceInfo, boo
     for (const auto& spaceInfo: filteredSpaceInfo)
         totalEffectiveSpace += (byEffectiveSpace ? spaceInfo.effectiveSpace : spaceInfo.totalSpace);
 
-    NX_LOG(lit(R"log([Storage, SpaceInfo, Selection] Calculating optimal storage index.
-Candidates count = %1, byEffectiveSpace = %2, totalSpace = %3, selection point = %4)log")
+    NX_LOG(lit("[Storage, SpaceInfo, Selection] Calculating optimal storage index. \
+Candidates count = %1, byEffectiveSpace = %2, totalSpace = %3, selection point = %4")
         .arg(filteredSpaceInfo.size())
         .arg(byEffectiveSpace)
         .arg(totalEffectiveSpace)
@@ -143,7 +143,7 @@ Candidates count = %1, byEffectiveSpace = %2, totalSpace = %3, selection point =
 
         NX_LOG(lit("[Storage, SpaceInfo, Selection] Storage proportion for storage %1 = %2")
             .arg(spaceInfo.index)
-            .arg(storageProportion), cl_logDEBUG2);
+            .arg((double)storageProportion), cl_logDEBUG2);
 
         if (proportionSum > randomSelectionPoint)
         {
@@ -155,6 +155,8 @@ Candidates count = %1, byEffectiveSpace = %2, totalSpace = %3, selection point =
 
     NX_ASSERT(false);
     NX_LOG(lit("[Storage, SpaceInfo, Selection] No storage index found."), cl_logDEBUG1);   
+
+    return -1;
 }
 
 }

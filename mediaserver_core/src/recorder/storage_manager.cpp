@@ -2126,7 +2126,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
         });
 
     if (optimalStorageIndex != -1)
-        result = getWritableStorageByIndex(optimalStorageIndex);
+        result = getUsedWritableStorageByIndex(optimalStorageIndex);
 
     NX_LOG(lit("[Storage, Selection] Selected storage %1").arg(result->getUrl()), cl_logDEBUG2);
     return result;

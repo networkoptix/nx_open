@@ -12,12 +12,15 @@ class SpaceInfo
 {
     struct StorageSpaceInfo
     {
-        int index = 0;
+        int index;
+        int64_t effectiveSpace;
         int64_t totalSpace;
-        int64_t effectiveSpace = 0;
 
-        StorageSpaceInfo() : index(0), effectiveSpace(0), totalSpace(0) {}
-        StorageSpaceInfo(int index, int64_t totalSpace) : index(index), totalSpace(totalSpace) {}
+        StorageSpaceInfo() : index(0), effectiveSpace(0LL), totalSpace(0LL) {}
+        StorageSpaceInfo(int index, int64_t totalSpace) : 
+            index(index), 
+            effectiveSpace(0LL),
+            totalSpace(totalSpace) {}
     };
 
     using SpaceInfoVector = std::vector<StorageSpaceInfo>;
@@ -40,8 +43,8 @@ private:
 private:
     SpaceInfoVector m_storageSpaceInfo;
     std::random_device m_rd;
-    std::mt19937 m_gen;
-    QnMutex m_mutex;
+    mutable std::mt19937 m_gen;
+    mutable QnMutex m_mutex;
 };
 
 }
