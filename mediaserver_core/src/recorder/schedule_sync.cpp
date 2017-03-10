@@ -231,17 +231,11 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             return storage->getFreeSpace() > storage->getSpaceLimit() / 2;
         };
         auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
-        auto toStorage = qnBackupStorageMan->getOptimalStorageRoot(
-            nullptr,
-            optimalRootBackupPred
-        );
+        auto toStorage = qnBackupStorageMan->getOptimalStorageRoot(optimalRootBackupPred);
 
         if (!toStorage) {
             qnBackupStorageMan->clearSpace(true);
-            toStorage = qnBackupStorageMan->getOptimalStorageRoot(
-                nullptr,
-                optimalRootBackupPred
-            );
+            toStorage = qnBackupStorageMan->getOptimalStorageRoot(optimalRootBackupPred);
             if (!toStorage)
                 return CopyError::NoBackupStorageError;
         }
@@ -378,7 +372,7 @@ template<typename NeedMoveOnCB>
 QnBusiness::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
     // Let's check if at least one target backup storage is available first.
-    if (!qnBackupStorageMan->getOptimalStorageRoot(nullptr)) {
+    if (!qnBackupStorageMan->getOptimalStorageRoot()) {
         NX_LOG("[Backup] No approprirate storages found. Bailing out.", cl_logDEBUG1);
         return QnBusiness::BackupFailedNoBackupStorageError;
     }

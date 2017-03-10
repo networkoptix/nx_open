@@ -699,7 +699,7 @@ TEST(Storage_load_balancing_algorithm_test, Main)
 		{
 			for (int i = 0; i < kWriteCount; ++i)
 			{
-				auto storage = qnNormalStorageMan->getOptimalStorageRoot(nullptr);
+				auto storage = qnNormalStorageMan->getOptimalStorageRoot();
 				storage.dynamicCast<AbstractMockStorageResource>()->freeSpace -= kWrittenBlock;
 				int storageIndex = qnStorageDbPool->getStorageIndex(storage);
 				OccupiedSpaceAccess::addSpaceInfoOccupiedValue(qnNormalStorageMan, storageIndex, kWrittenBlock);
