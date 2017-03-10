@@ -228,6 +228,8 @@ Control
 
             Image
             {
+                id: image
+
                 anchors.fill: parent
                 source: cameraItem.thumbnail
                 fillMode: Qt.KeepAspectRatio
@@ -237,7 +239,7 @@ Control
             ThreeDotBusyIndicator
             {
                 anchors.centerIn: parent
-                visible: !video.visible
+                visible: !video.visible && !image.visible
             }
 
             MediaPlayer
