@@ -10,7 +10,7 @@
 
     "logoutAuthorisedText": null,
     "logoutAuthorisedTitle": "You are already logged in",
-    "logoutAuthorisedContinueButton": "Continue with current account",
+    "logoutAuthorisedContinueButton": "Continue",
     "logoutAuthorisedLogoutButton": "Log Out"
   },
   "pageTitles": {
