@@ -487,10 +487,14 @@ bool UdtSocket<InterfaceToImplement>::open()
     //tuning udt socket
     constexpr const int kMtuSize = 1400;
     constexpr const int kMaximumUdtWindowSizePackets = 64;
-    constexpr const int kUdtSendBufSize = 48 * kMtuSize;
-    constexpr const int kUdtRecvBufSize = 48 * kMtuSize;
-    constexpr const int kUdpSendBufSize = 48 * kMtuSize;
-    constexpr const int kUdpRecvBufSize = 48 * kMtuSize;
+
+    constexpr const int kUdtBufferMultiplier = 48;
+    constexpr const int kUdtSendBufSize = kUdtBufferMultiplier * kMtuSize;
+    constexpr const int kUdtRecvBufSize = kUdtBufferMultiplier * kMtuSize;
+
+    constexpr const int kUdpBufferMultiplier = 64;
+    constexpr const int kUdpSendBufSize = kUdpBufferMultiplier * kMtuSize;
+    constexpr const int kUdpRecvBufSize = kUdpBufferMultiplier * kMtuSize;
 
     if (UDT::setsockopt(
         m_impl->udtHandle, 0, UDT_MSS,
