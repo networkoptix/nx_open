@@ -1154,6 +1154,11 @@ void QnPlOnvifResource::notificationReceived(
     if( currentPortState != newPortState )
     {
         QString portId = portSourceIter->value;
+        bool success = false;
+        int intPortId = portId.toInt(&success);
+        // Onvif device enumerates ports from 1. see 'allPorts' filling code.
+        if (success)
+            portId = QString::number(intPortId + 1);
         size_t aliasesCount = m_portAliases.size();
         if (aliasesCount && aliasesCount == m_inputPortCount)
         {
@@ -1949,7 +1954,7 @@ QString QnPlOnvifResource::getInputPortNumberFromString(const QString& portName)
         auto portNum = portIndex.toInt(&canBeConvertedToNumber);
 
         if (canBeConvertedToNumber)
-            return QString::number(portNum);
+            return QString::number(portNum + 1);
     }
 
     return QString();

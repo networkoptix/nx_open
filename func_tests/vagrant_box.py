@@ -69,8 +69,12 @@ class Vagrant(object):
         for config in boxes_config:
             if not config.is_allocated:
                 continue
+            status = box2status[config.box_name()]
             self._copy_required_files_to_vagrant_dir(config)
-            if box2status[config.box_name()] != 'running':
+            if config.must_be_recreated and status != 'not created':
+                self._vagrant.destroy(config.box_name())
+                status = 'not created'
+            if status != 'running':
                 self._start_box(config)
             self._init_box(config)
         self._write_vagrantfile(boxes_config)  # now ip_address is known for just-started boxes - write it
