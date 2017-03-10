@@ -691,9 +691,10 @@ namespace ec2
         Q_ASSERT( remotePeerTimePriorityKey.seed > 0 );
 
         NX_LOG( QString::fromLatin1("TimeSynchronizationManager. Received sync time update from peer %1, "
-            "peer's sync time (%2), peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5").
+            "peer's sync time (%2), peer's time priority key 0x%3. Local peer id %4, local sync time %5, used priority key 0x%6").
             arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
             arg(remotePeerTimePriorityKey.toUInt64(), 0, 16).arg(qnCommon->moduleGUID().toString()).
+            arg(QDateTime::fromMSecsSinceEpoch(getSyncTimeNonSafe()).toString(Qt::ISODate)).
             arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logDEBUG2 );
 
         //time difference between this server and remote one is not that great
