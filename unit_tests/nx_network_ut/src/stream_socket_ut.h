@@ -31,7 +31,7 @@ protected:
         nx::utils::thread serverThread(
             std::bind(&StreamSocket::serverMain, this, doServerDelay));
 
-        SocketTypeSet::ClientSocket clientSocket;
+        typename SocketTypeSet::ClientSocket clientSocket;
         SocketAddress addr("127.0.0.1", m_serverPort.get_future().get());
         ASSERT_TRUE(clientSocket.connect(addr));
         if (doServerDelay)
@@ -74,7 +74,7 @@ private:
 
     void serverMain(bool doServerDelay)
     {
-        const auto server = std::make_unique<SocketTypeSet::ServerSocket>(
+        const auto server = std::make_unique<typename SocketTypeSet::ServerSocket>(
             SocketFactory::tcpClientIpVersion());
 
         ASSERT_TRUE(server->bind(SocketAddress::anyAddress));
@@ -130,12 +130,12 @@ TYPED_TEST_CASE_P(StreamSocket);
 // It close connection automatically with error 10053 after client send timeout.
 TYPED_TEST_P(StreamSocket, DISABLED_receiveDelay)
 {
-    runTest(/*serverDelay*/ true, /*clientDelay*/ false);
+    this->runTest(/*serverDelay*/ true, /*clientDelay*/ false);
 }
 
 TYPED_TEST_P(StreamSocket, sendDelay)
 {
-    runTest(/*serverDelay */ false, /*clientDelay*/ true);
+    this->runTest(/*serverDelay */ false, /*clientDelay*/ true);
 }
 
 REGISTER_TYPED_TEST_CASE_P(StreamSocket, DISABLED_receiveDelay, sendDelay);
