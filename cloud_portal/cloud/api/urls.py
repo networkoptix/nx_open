@@ -32,6 +32,5 @@ urlpatterns = [
 
     url(r'^ping',                                   common.ping),
     url(r'^cloud_modules2',                         common.cloud_modules2),
-    url(r'^cloud_modules',                          common.cloud_modules),
     url(r'^modules',                                common.cloud_modules_json),
 ]
