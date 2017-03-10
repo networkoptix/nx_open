@@ -959,7 +959,7 @@ namespace ec2
 
         //TODO #ak if local time changes have to broadcast it as soon as possible
 
-        NX_LOG( lit("TimeSynchronizationManager. Broadcasting local system time. peer %1, system time time (%2), local time priority key 0x%3").
+        NX_LOG( lit("TimeSynchronizationManager. Broadcasting local system time. peer %1, system time (%2), local time priority key 0x%3").
             arg( qnCommon->moduleGUID().toString() ).arg( QDateTime::fromMSecsSinceEpoch( currentMSecsSinceEpoch() ).toString( Qt::ISODate ) ).
             arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logDEBUG2 );
 
@@ -1337,20 +1337,31 @@ namespace ec2
         const qint64 curSysTime = QDateTime::currentMSecsSinceEpoch();
         if (qAbs(getSyncTime() - curSysTime) > SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS)
         {
+            NX_LOG(lm("TimeSynchronizationManager. Local system time change has been detected"),
+                cl_logDEBUG1);
+
             //local OS time has been changed. If system time is set 
             //by local host time then updating system time
+            const bool isSystemTimeSynchronizedWithInternet =
+                qnGlobalSettings->isSynchronizingTimeWithInternet() &&
+                ((m_localTimePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer) > 0);
+
             if (m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey &&
-                !(m_localTimePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer))
+                !isSystemTimeSynchronizedWithInternet)
             {
+                NX_LOG(lm("TimeSynchronizationManager. System time is synchronized with "
+                    "this peer's local time. Updating time..."), cl_logDEBUG1);
                 forceTimeResync();
             }
 
             if (QnDbManager::instance() && QnDbManager::instance()->isInitialized())
+            {
                 Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
                     &saveSyncTime,
                     QnDbManager::instance(),
                     QDateTime::currentMSecsSinceEpoch() - getSyncTime(),
                     m_usedTimeSyncInfo.timePriorityKey)));
+            }
         }
 
         QnMutexLocker lk(&m_mutex);
@@ -1364,11 +1375,13 @@ namespace ec2
     void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(QnMutexLockerBase* const /*lk*/)
     {
         if (QnDbManager::instance() && QnDbManager::instance()->isInitialized())
+        {
             Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
                 &QnDbManager::saveMiscParam,
                 QnDbManager::instance(),
                 LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
                 QByteArray::number(m_localTimePriorityKey.toUInt64()))));
+        }
     }
 
     void TimeSynchronizationManager::onTimeSynchronizationSettingsChanged()
