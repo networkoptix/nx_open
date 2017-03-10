@@ -20,9 +20,6 @@ Module
 
     property string liteDeviceName: "Nx1"
 
-    property string helpUrl: "http://networkoptix.com/files/help"
-    property string settingsUrl: "http://networkoptix.com/files/settings"
-    property string showcaseUrl: "http://networkoptix.com/files/showcase"
     property string testUpdateFeedUrl: "http://updates.hdwitness.com/updates.json"
     property string prodUpdateFeedUrl: "http://updates.hdwitness.com/updates.json"
     property string updateGeneratorUrl: "http://updates.hdw.mx/upcombiner/upcombine"

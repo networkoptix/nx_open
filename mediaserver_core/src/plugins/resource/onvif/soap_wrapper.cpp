@@ -4,6 +4,8 @@
 
 #include "openssl/evp.h"
 
+#include <QElapsedTimer>
+
 #include "soap_wrapper.h"
 #include <onvif/Onvif.nsmap>
 #include <onvif/soapDeviceBindingProxy.h>
@@ -121,7 +123,7 @@ const int kSoapDefaultAcceptTimeoutSeconds = 5;
 
 struct SoapTimeouts
 {
-    SoapTimeouts(): 
+    SoapTimeouts():
         sendTimeoutSeconds(kSoapDefaultSendTimeoutSeconds),
         recvTimeoutSeconds(kSoapDefaultRecvTimeoutSeconds),
         connectTimeoutSeconds(kSoapDefaultConnectTimeoutSeconds),
@@ -173,7 +175,7 @@ struct SoapTimeouts
     }
 
     QString serialize()
-    { 
+    {
         return lit("%1;%2;%3;%4")
             .arg(sendTimeoutSeconds.count())
             .arg(recvTimeoutSeconds.count())
@@ -443,8 +445,6 @@ nx::common::utils::Credentials DeviceSoapWrapper::getForcedCredentials(
 
 bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QString& model)
 {
-    calcTimeDrift();
-
     auto forcedCredentials = getForcedCredentials(manufacturer, model);
 
     if (!forcedCredentials.user.isEmpty())
@@ -466,6 +466,29 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
             possibleCredentials.append(credentials);
     }
 
+    if (possibleCredentials.size() <= 1)
+    {
+        nx::common::utils::Credentials credentials;
+        if (!possibleCredentials.isEmpty())
+            credentials = possibleCredentials.first();
+        setLogin(credentials.user);
+        setPassword(credentials.password);
+        return true;
+    }
+
+    // Start logging timeouts as soon as network requests appear.
+    QElapsedTimer timer;
+    timer.restart();
+    auto logTimeout = [&](bool found)
+    {
+        NX_LOG(lit("Discovery----: autodetect credentials for camera %1 took %2 ms. Credentials found: %3").
+            arg(getEndpointUrl()).
+            arg(timer.elapsed()).
+            arg(found),
+            cl_logDEBUG1);
+    };
+
+    calcTimeDrift();
     for (const auto& credentials: possibleCredentials)
     {
         if (QnResource::isStopping())
@@ -479,20 +502,16 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
         auto soapRes = getNetworkInterfaces(request, response);
 
         if (soapRes == SOAP_OK || !isNotAuthenticated())
+        {
+            logTimeout(soapRes == SOAP_OK);
             return soapRes == SOAP_OK;
+        }
     }
+    logTimeout(false);
 
-    if (!possibleCredentials.empty())
-    {
-        const auto& credentials = possibleCredentials.first();
-        setLogin(credentials.user);
-        setPassword(credentials.password);
-    }
-    else
-    {
-        setLogin(QString());
-        setPassword(QString());
-    }
+    const auto& credentials = possibleCredentials.first();
+    setLogin(credentials.user);
+    setPassword(credentials.password);
 
     return false;
 }

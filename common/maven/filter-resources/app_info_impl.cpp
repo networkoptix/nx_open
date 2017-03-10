@@ -148,21 +148,6 @@ QString QnAppInfo::supportPhone()
     return QStringLiteral("${supportPhone}");
 }
 
-QString QnAppInfo::showcaseUrl()
-{
-    return QStringLiteral("${showcase.url}/${customization}");
-}
-
-QString QnAppInfo::settingsUrl()
-{
-    return QStringLiteral("${settings.url}/${customization}.json");
-}
-
-QString QnAppInfo::helpUrl()
-{
-    return QStringLiteral("${helpUrl}/${customization}/${parsedVersion.majorVersion}/${parsedVersion.minorVersion}/url");
-}
-
 QString QnAppInfo::updateGeneratorUrl()
 {
     return QStringLiteral("${update.generator.url}");

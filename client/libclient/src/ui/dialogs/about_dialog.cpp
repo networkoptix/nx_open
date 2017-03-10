@@ -51,13 +51,6 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 
     setHelpTopic(this, Qn::About_Help);
 
-    if(menu()->canTrigger(QnActions::ShowcaseAction)) {
-        QPushButton* showcaseButton = new QPushButton(this);
-        showcaseButton->setText(action(QnActions::ShowcaseAction)->text());
-        connect(showcaseButton, &QPushButton::clicked, action(QnActions::ShowcaseAction), &QAction::trigger);
-        ui->buttonBox->addButton(showcaseButton, QDialogButtonBox::HelpRole);
-    }
-
     m_copyButton = new QPushButton(this);
     ui->buttonBox->addButton(m_copyButton, QDialogButtonBox::HelpRole);
 

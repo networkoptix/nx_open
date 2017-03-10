@@ -1,20 +1,13 @@
-/**********************************************************
-* 28 nov 2012
-* a.kolesnikov
-***********************************************************/
-
-#ifndef QNBYTEARRAYREF_H
-#define QNBYTEARRAYREF_H
+#pragma once
 
 #include <QtCore/QByteArray>
 
-
-//!Reference to substring in \a QByteArray object
-/*!
-    Introduced to minimize memory copying by using \a QnByteArrayConstRef instead of \a QByteArray::mid
-    Provides a few methods of \a QByteArray to use it instead.
-    \note This class methods do not contain array boundary validation!
-*/
+/**
+ * Reference to substring in QByteArray object.
+ * Introduced to minimize memory copying by using QnByteArrayConstRef instead of QByteArray::mid
+ * Provides a few methods of QByteArray to use it instead.
+ * @note This class methods do not contain array boundary validation!
+ */
 class NX_UTILS_API QnByteArrayConstRef
 {
 public:
@@ -43,22 +36,26 @@ public:
     value_type front() const;
     value_type back() const;
     QList<QnByteArrayConstRef> split( char sep ) const;
-    //!Removes from front and back of the string any character of null-terminated string \a charsToTrim
+    /** Removes from front and back of the string any character of null-terminated string charsToTrim. */
     QnByteArrayConstRef trimmed( const value_type* charsToTrim = " \t" ) const;
-    //!Removes \a count elements in the front
+    /**
+     * Removes count elements in the front.
+     * @param count If npos then all elements are removed.
+     */
     void pop_front( size_type count = 1 );
+    void clear();
 
     bool isEqualCaseInsensitive( const char* str, size_t strLength = (size_t)-1 ) const;
 
     const value_type& operator[]( size_type index ) const;
-    //!Constructs new \a QByteArray object by calling \a QByteArray::mid
+    /** Constructs new QByteArray object by calling QByteArray::mid. */
     operator QByteArray() const;
 
-    //!Constructs QByteArray using \a QByteArray::fromRawData(), so returned buffer is usually NOT NULL-terminated!
+    /** Constructs QByteArray using QByteArray::fromRawData(), so returned buffer is usually NOT NULL-terminated! */
     QByteArray toByteArrayWithRawData() const;
 
 private:
-    //!Using pointer here to allow operator= to be implemented
+    /** Using pointer here to allow operator= to be implemented. */
     const QByteArray* m_src;
     size_type m_offset;
     size_type m_count;
@@ -69,9 +66,9 @@ bool NX_UTILS_API operator!=( const QnByteArrayConstRef& left, const QByteArray&
 bool NX_UTILS_API operator==( const QByteArray& left, const QnByteArrayConstRef& right );
 bool NX_UTILS_API operator!=( const QByteArray& left, const QnByteArrayConstRef& right );
 
-/*!
-    \param left 0-terminated string
-*/
+/**
+ * @param left 0-terminated string
+ */
 bool NX_UTILS_API operator==( const QnByteArrayConstRef::const_pointer& left, 
 							    const QnByteArrayConstRef& right );
 
@@ -83,5 +80,3 @@ bool NX_UTILS_API operator==( const QnByteArrayConstRef& left,
 
 bool NX_UTILS_API operator!=( const QnByteArrayConstRef& left, 
 							    const QnByteArrayConstRef::const_pointer& right );
-
-#endif  //QNBYTEARRAYREF_H

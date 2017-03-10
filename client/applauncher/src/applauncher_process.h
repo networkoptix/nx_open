@@ -43,6 +43,7 @@ public:
         QSettings* const userSettings,
         InstallationManager* const installationManager,
         Mode mode,
+        const QStringList& applicationParameters,
         const QString& mirrorListUrl);
 
     //!Implementation of \a ApplauncherProcess::pleaseStop()
@@ -83,6 +84,7 @@ private:
     std::map<unsigned int, std::shared_ptr<InstallationProcess>> m_activeInstallations;
     std::map<qint64, KillProcessTask> m_killProcessTasks;
     QString m_devModeKey;
+    QStringList m_applicationParameters;
 
     void launchNewestClient();
     bool sendTaskToRunningLauncherInstance();
