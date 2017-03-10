@@ -21,7 +21,8 @@
 #ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
 #endif
-#include "utils/common/hash.h"
+#include <utils/common/hash.h>
+#include <utils/common/systemerror.h>
 
 namespace nx {
 namespace network {
@@ -51,6 +52,8 @@ enum InitializationFlags
     disableUdt = 0x01,
     disableCloudConnect = 0x02
 };
+
+NX_NETWORK_API bool isSocketCanRecoverFromError(SystemError::ErrorCode sysErrorCode);
 
 } // namespace network
 } // namespace nx

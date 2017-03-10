@@ -733,11 +733,13 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(void* buffer, unsigned
     if (bytesRead < 0)
     {
         const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
-        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock && errCode != SystemError::again)
+        if (!isSocketCanRecoverFromError(errCode))
             m_connected = false;
     }
     else if (bytesRead == 0)
+    {
         m_connected = false; //connection closed by remote host
+    }
     return bytesRead;
 }
 
@@ -764,11 +766,13 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send( const void* buffer, u
     if (sended < 0)
     {
         const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
-        if (errCode != SystemError::timedOut && errCode != SystemError::wouldBlock && errCode != SystemError::again)
+        if (!isSocketCanRecoverFromError(errCode))
             m_connected = false;
     }
     else if (sended == 0)
+    {
         m_connected = false;
+    }
     return sended;
 }
 

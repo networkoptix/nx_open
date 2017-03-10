@@ -4,6 +4,25 @@
 
 #include "socket_global.h"
 
+namespace nx {
+namespace network {
+
+bool isSocketCanRecoverFromError(SystemError::ErrorCode sysErrorCode)
+{
+    return sysErrorCode == SystemError::noError
+        || sysErrorCode == SystemError::wouldBlock
+        || sysErrorCode == SystemError::again
+        || sysErrorCode == SystemError::timedOut
+        || sysErrorCode == SystemError::interrupted
+        || sysErrorCode == SystemError::inProgress;
+}
+
+} // namespace network
+} // namespace nx
+
+//-------------------------------------------------------------------------------------------------
+// HostAddress
+
 const HostAddress HostAddress::localhost(*ipV4from(lit("127.0.0.1")));
 const HostAddress HostAddress::anyHost(*ipV4from(lit("0.0.0.0")));
 
