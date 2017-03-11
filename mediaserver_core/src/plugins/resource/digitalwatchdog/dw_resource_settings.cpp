@@ -8,7 +8,7 @@
 #include <utils/network/http/asynchttpclient.h>
 
 namespace {
-    const QRegExp DW_RES_SETTINGS_FILTER(lit("[{},']"));
+    const QRegExp DW_RES_SETTINGS_FILTER("[{},']");
     const int kHttpReadTimeout = 1000 * 10;
 
     const int kPravisHttpPort = 10080;
@@ -63,7 +63,7 @@ bool QnWin4NetCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParamet
     {
         const QnCameraAdvancedParameter& parameter = data.first;
         const QString& value = data.second;
-        if (parameter.tag == lit("POST")) {
+        if (parameter.tag == QLatin1String("POST")) {
             bool success = setParam(parameter, value); // we can't set such parameters together
             if (success) {
                 if (result)
@@ -86,7 +86,7 @@ bool QnWin4NetCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParamet
         return true;
 
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
-    if (httpClient.doPOST(lit("cgi-bin/camerasetup.cgi"), postMsgBody) != CL_HTTP_SUCCESS)
+    if (httpClient.doPOST(QLatin1String("cgi-bin/camerasetup.cgi"), postMsgBody) != CL_HTTP_SUCCESS)
         return false;
     if (result) {
         for (const auto& value: tmpList)
@@ -104,7 +104,7 @@ QString QnWin4NetCameraProxy::toInnerValue(const QnCameraAdvancedParameter &para
             return QString();
         innerValue = QString::number(idx);
     } else if (parameter.dataType == QnCameraAdvancedParameter::DataType::Bool) {
-        int idx = value == lit("true") ? 1 : 0;
+        int idx = value == QLatin1String("true") ? 1 : 0;
         innerValue = QString::number(idx);
     }
 
@@ -130,35 +130,35 @@ QString QnWin4NetCameraProxy::fromInnerValue(const QnCameraAdvancedParameter& pa
     }
     else if (parameter.dataType == QnCameraAdvancedParameter::DataType::Bool)
     {
-        return value == lit("0") ? lit("false") : lit("true");
+        return value == QLatin1String("0") ? QLatin1String("false") : QLatin1String("true");
     }
 
     return value;
 }
 
-bool QnWin4NetCameraProxy::setParam(const QnCameraAdvancedParameter &parameter, const QString &value) 
+bool QnWin4NetCameraProxy::setParam(const QnCameraAdvancedParameter &parameter, const QString &value)
 {
     QString innerValue = toInnerValue(parameter, value);
 
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
 
-    if (parameter.tag == lit("POST")) {     
+    if (parameter.tag == QLatin1String("POST")) {
         QString paramQuery;
         QString query;
 
         if (parameter.id.startsWith(QLatin1String("/"))) {
             query = parameter.id;
-            paramQuery = lit("action=all");
+            paramQuery = QLatin1String("action=all");
         } else {
-            query = lit("/cgi-bin/systemsetup.cgi");
-            paramQuery = lit("ftp_upgrade_") + paramQuery + lit("=") + innerValue;
+            query = QLatin1String("/cgi-bin/systemsetup.cgi");
+            paramQuery = QLatin1String("ftp_upgrade_") + paramQuery + QLatin1String("=") + innerValue;
         }
 
         return httpClient.doPOST(query, paramQuery) == CL_HTTP_SUCCESS;
     } else {
         QString paramQuery = parameter.id;
         if (!parameter.id.startsWith(L'/'))
-            paramQuery = lit("cgi-bin/camerasetup.cgi?") + parameter.id;
+            paramQuery = QLatin1String("cgi-bin/camerasetup.cgi?") + parameter.id;
         if (!value.isEmpty())
             paramQuery = paramQuery + L'=' + innerValue;
         return httpClient.doGET(paramQuery) == CL_HTTP_SUCCESS;
@@ -168,7 +168,7 @@ bool QnWin4NetCameraProxy::setParam(const QnCameraAdvancedParameter &parameter, 
 QnCameraAdvancedParamValueList QnWin4NetCameraProxy::requestParamValues(const QString &request) const {
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
     CLHttpStatus status = httpClient.doGET(request);
-    if (status == CL_HTTP_SUCCESS) 
+    if (status == CL_HTTP_SUCCESS)
     {
         QByteArray body;
         httpClient.readAll(body);
@@ -180,8 +180,8 @@ QnCameraAdvancedParamValueList QnWin4NetCameraProxy::requestParamValues(const QS
 
 QnCameraAdvancedParamValueList QnWin4NetCameraProxy::getParamsList() const {
     QnCameraAdvancedParamValueList result;
-    result.append(requestParamValues(lit("cgi-bin/getconfig.cgi?action=color")));
-    result.append(requestParamValues(lit("cgi-bin/getconfig.cgi?action=ftpUpgradeInfo")));  
+    result.append(requestParamValues(QLatin1String("cgi-bin/getconfig.cgi?action=color")));
+    result.append(requestParamValues(QLatin1String("cgi-bin/getconfig.cgi?action=ftpUpgradeInfo")));
     return result;
 }
 
@@ -236,7 +236,7 @@ QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
 {
     QnCameraAdvancedParamValueList result;
     int workers = 0;
-    
+
     QnMutex waitMutex;
     QnWaitCondition waitCond;
 
@@ -248,7 +248,7 @@ QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
             continue;
         }
 
-        QUrl apiUrl = lit("http://%1:%2/cgi-bin/ne3exec.cgi/%3").arg(m_host).arg(kPravisHttpPort).arg(cameraAdvParam.readCmd);
+        QUrl apiUrl = QString("http://%1:%2/cgi-bin/ne3exec.cgi/%3").arg(m_host).arg(kPravisHttpPort).arg(cameraAdvParam.readCmd);
         apiUrl.setUserName(m_auth.user());
         apiUrl.setPassword(m_auth.password());
 
@@ -257,7 +257,7 @@ QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
             {
                 QnMutexLocker lock(&waitMutex);
                 QnCameraAdvancedParamValue param;
-                if (statusCode == nx_http::StatusCode::ok && !msgBody.isEmpty()) 
+                if (statusCode == nx_http::StatusCode::ok && !msgBody.isEmpty())
                     param.value = fromInnerValue(cameraAdvParam, parseParamFromHttpResponse(cameraAdvParam, msgBody));
                 else
                     qWarning() << "error reading param" << cameraAdvParam.id << "for camera" << m_host;
@@ -330,9 +330,9 @@ bool QnPravisCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParamete
 
         QString command = cameraAdvParam.writeCmd;
         command = command.replace("$", toInnerValue(cameraAdvParam, value));
-        QString path = lit("cgi-bin/ne3exec.cgi/%1").arg(command);
+        QString path = QString("cgi-bin/ne3exec.cgi/%1").arg(command);
 
-        QUrl apiUrl = lit("http://%1:%2/%3").arg(m_host).arg(kPravisHttpPort).arg(path);
+        QUrl apiUrl = QString("http://%1:%2/%3").arg(m_host).arg(kPravisHttpPort).arg(path);
         apiUrl.setUserName(m_auth.user());
         apiUrl.setPassword(m_auth.password());
 
