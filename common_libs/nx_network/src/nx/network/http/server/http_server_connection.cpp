@@ -219,7 +219,7 @@ namespace nx_http
         //TODO #ak adding necessary headers
         nx_http::insertOrReplaceHeader(
             &msg.response->headers,
-            nx_http::HttpHeader(nx_http::header::kServer, nx_http::serverString() ) );
+            nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString() ) );
         nx_http::insertOrReplaceHeader(
             &msg.response->headers,
             nx_http::HttpHeader( "Date", dateTimeToHTTPFormat( QDateTime::currentDateTime() ) ) );

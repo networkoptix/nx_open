@@ -172,9 +172,10 @@ protected:
     {
         m_serverSocket = cloudServerSocket();
         m_serverSocket->acceptAsync(
-            [](SystemError::ErrorCode /*errorCode*/, AbstractStreamSocket* newConnection)
+            [this](SystemError::ErrorCode /*errorCode*/, AbstractStreamSocket* newConnection)
             {
-                delete newConnection;
+                m_acceptedConnections.push_back(
+                    std::unique_ptr<AbstractStreamSocket>(newConnection));
             });
     }
 
@@ -188,7 +189,9 @@ protected:
     void openConnection()
     {
         auto clientSocket = std::make_unique<CloudStreamSocket>(AF_INET);
-        ASSERT_TRUE(clientSocket->connect(serverAddress(), 3000));
+        ASSERT_TRUE(clientSocket->connect(serverAddress(), 300000))
+            << SystemError::getLastOSErrorText().toStdString();
+        m_tunnelOpened = true;
     }
 
     void destroyServerSocketWithinAioThread()
@@ -201,6 +204,8 @@ protected:
                 removed.set_value();
             });
         removed.get_future().wait();
+
+        m_acceptedConnections.clear();
     }
 
     void waitForTunnelClosed()
@@ -228,6 +233,7 @@ private:
     QnMutex m_mutex;
     QnWaitCondition m_cond;
     bool m_tunnelOpened;
+    std::vector<std::unique_ptr<AbstractStreamSocket>> m_acceptedConnections;
 
     void onTunnelClosed(const QString& hostName)
     {
@@ -255,9 +261,9 @@ TEST_F(CloudConnectTunnel, cancellation)
     }
 }
 
-TEST_F(CloudConnectTunnel, DISABLED_reconnect)
+TEST_F(CloudConnectTunnel, reconnect)
 {
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 2; ++i)
     {
         initializeCloudServerSocket();
         openConnection();

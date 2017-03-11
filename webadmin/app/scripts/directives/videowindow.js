@@ -39,6 +39,7 @@ angular.module('webadminApp')
                     'mp4': 'video/mp4'
                 };
 
+                scope.Config = Config;
                 scope.debugMode = Config.debug.video && Config.allowDebugMode;
                 scope.debugFormat = Config.allowDebugMode && Config.debug.videoFormat;
 
