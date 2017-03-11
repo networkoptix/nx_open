@@ -1235,6 +1235,21 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     }
 }
 
+void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
+{
+    const auto hwInfo = HardwareInformation::instance();
+
+    server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
+    server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
+    server->setProperty(Qn::PHISICAL_MEMORY, QString::number(hwInfo.phisicalMemory));
+
+    server->setProperty(Qn::FULL_VERSION, QnAppInfo::applicationFullVersion());
+    server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
+    server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString());
+    server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
+
+    propertyDictionary->saveParams(server->getId());
+}
 
 void MediaServerProcess::updateStatisticsAllowedSettings() {
 
@@ -2025,22 +2040,12 @@ void MediaServerProcess::run()
         else
             m_mediaServer = server;
 
-        const auto hwInfo = HardwareInformation::instance();
-        server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
-        server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
-        server->setProperty(Qn::PHISICAL_MEMORY, QString::number(hwInfo.phisicalMemory));
-
-        server->setProperty(Qn::FULL_VERSION, QnAppInfo::applicationFullVersion());
-        server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
-        server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString());
-        server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
-
-        qnServerDb->setBookmarkCountController([server](size_t count){
-            server->setProperty(Qn::BOOKMARK_COUNT, QString::number(count));
-            propertyDictionary->saveParams(server->getId());
-        });
-
-        propertyDictionary->saveParams(server->getId());
+        #ifdef ENABLE_EXTENDED_STATISTICS
+            qnServerDb->setBookmarkCountController([server](size_t count){
+                server->setProperty(Qn::BOOKMARK_COUNT, QString::number(count));
+                propertyDictionary->saveParams(server->getId());
+            });
+        #endif
 
         if (m_mediaServer.isNull())
             QnSleep::msleep(1000);
@@ -2235,6 +2240,7 @@ void MediaServerProcess::run()
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
     loadResourcesFromECS(messageProcessor.data());
+    saveServerInfo(m_mediaServer);
     if (QnGlobalSettings::instance()->isCrossdomainXmlEnabled())
         m_httpModManager->addUrlRewriteExact( lit( "/crossdomain.xml" ), lit( "/static/crossdomain.xml" ) );
 
