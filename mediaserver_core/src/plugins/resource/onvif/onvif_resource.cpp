@@ -3718,7 +3718,8 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
 
     auto resourceId = getId();
 
-    propertyDictionary->setValue(resourceId, Qn::VIDEO_LAYOUT_PARAM_NAME, m_videoLayout->toString());
+    auto nonConstThis = const_cast<QnPlOnvifResource*>(this);
+    nonConstThis->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, m_videoLayout->toString());
     propertyDictionary->saveParams(resourceId);
 
     return m_videoLayout;
