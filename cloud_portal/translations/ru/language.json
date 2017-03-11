@@ -9,7 +9,7 @@
     "loginTitle":"Войти в {{PRODUCT_NAME}}",
     "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"Вы уже выполнили вход",
-    "logoutAuthorisedContinueButton":"Продолжить с текущей учетной записью",
+    "logoutAuthorisedContinueButton":"Продолжить",
     "logoutAuthorisedLogoutButton":"Выход"
   },
   "pageTitles":{
