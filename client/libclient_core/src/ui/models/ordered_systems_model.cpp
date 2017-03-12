@@ -25,24 +25,16 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
         this, &QnOrderedSystemsModel::handleWeightsChanged);
 
     namespace p = std::placeholders;
-   // setFilteringPred(std::bind(&QnOrderedSystemsModel::filterPredicate, this, p::_1));
+    setFilteringPred(std::bind(&QnOrderedSystemsModel::filterPredicate, this, p::_1));
     setSortingPred(std::bind(&QnOrderedSystemsModel::lessPredicate, this, p::_1, p::_2));
+    // TODO: #ynikitenkov add triggering roles list here to optimize sorting/filtering model
 
     if (qnForgottenSystemsManager)
     {
-        const auto emitSystemDataChanged =
-            [this](const QString& systemId)
-            {
-                const auto row = m_source->getRowIndex(systemId);
-                const auto index = m_source->index(row);
-                if (index.isValid())
-                    emit m_source->dataChanged(index, index, QVector<int>());
-            };
-
         connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemRemoved,
-            this, emitSystemDataChanged);
+            this, &QnOrderedSystemsModel::forceUpdate);
         connect(qnForgottenSystemsManager, &QnForgottenSystemsManager::forgottenSystemAdded,
-            this, emitSystemDataChanged);
+            this, &QnOrderedSystemsModel::forceUpdate);
     }
 
     handleWeightsChanged();

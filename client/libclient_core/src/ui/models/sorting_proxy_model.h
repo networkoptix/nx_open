@@ -29,6 +29,9 @@ public:
     typedef std::function<bool (const QModelIndex& value)> FilteringPredicate;
     void setFilteringPred(const FilteringPredicate& pred);
 
+    typedef QList<int> RolesList;
+    void setTriggeringRoles(const RolesList& roles);
+
     void forceUpdate();
 
 public: // overrides section

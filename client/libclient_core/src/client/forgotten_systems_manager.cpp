@@ -17,16 +17,26 @@ QnForgottenSystemsManager::QnForgottenSystemsManager():
 
     m_systems = qnClientCoreSettings->forgottenSystems();
 
+    const auto storeSystems =
+        [this]()
+        {
+            qnClientCoreSettings->setForgottenSystems(m_systems);
+            qnClientCoreSettings->save();
+        };
+
     const auto processSystemDiscovered =
-        [this](const QnSystemDescriptionPtr& system)
+        [this, storeSystems](const QnSystemDescriptionPtr& system)
         {
             const auto checkOnlineSystem =
-                [this, id = system->id(), localId = system->localId(), rawSystem = system.data()]()
+                [this, id = system->id(), localId = system->localId(),
+                    rawSystem = system.data(), storeSystems]()
                 {
-                    if (rawSystem->isConnectable())
+                    if (rawSystem->isConnectable() &&
+                        (isForgotten(id) || isForgotten(localId.toString())))
                     {
                         rememberSystem(id);
                         rememberSystem(localId.toString());
+                        storeSystems();
                     }
                 };
 
@@ -41,44 +51,8 @@ QnForgottenSystemsManager::QnForgottenSystemsManager():
     for (const auto& system: qnSystemsFinder->systems())
         processSystemDiscovered(system);
 
-    const auto storeSystems =
-        [this]()
-        {
-            qnClientCoreSettings->setForgottenSystems(m_systems);
-            qnClientCoreSettings->save();
-        };
 
-    const auto resetSystemWeight =
-        [](const QString& id)
-        {
-            const auto localId = QnUuid::fromStringSafe(id);
-            if (localId.isNull())
-                return;
-
-            auto localWeights = qnClientCoreSettings->localSystemWeightsData();
-            const auto itWeight = std::find_if(localWeights.begin(), localWeights.end(),
-                [localId](const WeightData& data) { return (localId == data.localId); });
-
-            if (itWeight == localWeights.end())
-                return;
-
-            auto& weightData = *itWeight;
-            weightData.lastConnectedUtcMs = QDateTime::currentMSecsSinceEpoch();
-            weightData.realConnection = true;
-            weightData.weight = 0;  //< Resets position to the last
-
-            qnClientCoreSettings->setLocalSystemWeightsData(localWeights);
-            // Caller is responsible to call QnClientCoreSettings::save()
-        };
-
-    const auto handleSystemForgotten =
-        [resetSystemWeight, storeSystems](const QString& id)
-        {
-            resetSystemWeight(id);
-            storeSystems();
-        };
-
-    connect(this, &QnForgottenSystemsManager::forgottenSystemAdded, this, handleSystemForgotten);
+    connect(this, &QnForgottenSystemsManager::forgottenSystemAdded, this, storeSystems);
     connect(this, &QnForgottenSystemsManager::forgottenSystemRemoved, this, storeSystems);
 }
 
@@ -105,6 +79,6 @@ bool QnForgottenSystemsManager::isForgotten(const QString& id) const
 
 void QnForgottenSystemsManager::rememberSystem(const QString& id)
 {
-    if (m_systems.remove(id))
+    if (!m_systems.remove(id))
         emit forgottenSystemRemoved(id);
 }

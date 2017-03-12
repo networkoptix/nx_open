@@ -19,6 +19,7 @@ public:
 
     void setSortingPred(const QnSortingProxyModel::SortingPredicate& pred);
     void setFilteringPred(const QnSortingProxyModel::FilteringPredicate& pred);
+    void setTriggeringRoles(const QnSortingProxyModel::RolesList& roles);
 
     QModelIndex sourceIndexForTargetRow(int row) const;
     void invalidate();
@@ -55,14 +56,15 @@ private:
         const QVector<int> &roles);
 
 private:
-    void insertFilteredRow(int row);
+    void insertSourceRow(int sourceRow);
 
-    void removeFilteredRow(int index);
+    void removeSourceRow(int sourceRow);
 
     bool isFilteredOut(int row) const;
 
     typedef QList<int> RowsList;
     void shiftFilteredRows(const RowsList::iterator it, int difference);
+    void shiftMappedRows(int fromSourceRow, int difference);
 
 private:
     RowsList m_filteredRows;
@@ -70,6 +72,9 @@ private:
     QAbstractListModel* m_model;
     QnSortingProxyModel::FilteringPredicate m_filterPred;
     QnSortingProxyModel::SortingPredicate m_sortingPred;
+
+    using RolesSet = QSet<int>;
+    RolesSet m_triggeringRoles;
 };
 
 QnSortingProxyModelPrivate::QnSortingProxyModelPrivate(QnSortingProxyModel* parent):
@@ -81,7 +86,8 @@ QnSortingProxyModelPrivate::QnSortingProxyModelPrivate(QnSortingProxyModel* pare
     m_rowsMapping(),
     m_model(nullptr),
     m_filterPred(),
-    m_sortingPred()
+    m_sortingPred(),
+    m_triggeringRoles()
 {
 }
 
@@ -114,6 +120,11 @@ void QnSortingProxyModelPrivate::setFilteringPred(
 {
     m_filterPred = pred;
     invalidate();
+}
+
+void QnSortingProxyModelPrivate::setTriggeringRoles(const QnSortingProxyModel::RolesList& roles)
+{
+    m_triggeringRoles = RolesSet::fromList(roles);
 }
 
 void QnSortingProxyModelPrivate::setCurrentModel(QAbstractListModel* model)
@@ -170,7 +181,7 @@ int QnSortingProxyModelPrivate::rowCount() const
 
 void QnSortingProxyModelPrivate::applySort()
 {
-    if (!m_model)
+    if (!m_model || m_filteredRows.isEmpty())
         return;
 
     static const auto defaultPred =
@@ -188,6 +199,8 @@ void QnSortingProxyModelPrivate::applySort()
 
     auto sorted = m_filteredRows;
     std::sort(sorted.begin(), sorted.end(), pred);
+    if (sorted == m_rowsMapping)
+        return; // Nothing changed
 
     int currentIndex = 0;
     for (auto sortedRow: sorted)
@@ -206,7 +219,6 @@ void QnSortingProxyModelPrivate::applySort()
             const auto position = (m_rowsMapping.begin() + index);
             m_rowsMapping.insert(position, sortedRow);
             q->endInsertRows();
-            continue;
         }
         else
         {
@@ -233,7 +245,7 @@ void  QnSortingProxyModelPrivate::applyFilter()
     if (!m_filterPred && (m_filteredRows.size() == sourceSize))
         return; // All items are presented
 
-    bool changed = false;
+    bool rowsAdded = false;
     for (int row = 0; row != sourceSize; ++row)
     {
         const int filteredIndex = m_filteredRows.indexOf(row);
@@ -243,15 +255,18 @@ void  QnSortingProxyModelPrivate::applyFilter()
             continue;
 
         // Here row is restored or removed.
-        changed = true;
 
         if (filteredOut)
-            removeFilteredRow(filteredIndex);
-        else
-            insertFilteredRow(row);
+        {
+            removeSourceRow(row);
+            continue;
+        }
+
+        rowsAdded = true;
+        insertSourceRow(row);
     }
 
-    if (changed)
+    if (rowsAdded)
         applySort();
 }
 
@@ -263,24 +278,27 @@ bool QnSortingProxyModelPrivate::isFilteredOut(int row) const
     return !pred(m_model->index(row));
 }
 
-void QnSortingProxyModelPrivate::insertFilteredRow(int row)
+void QnSortingProxyModelPrivate::insertSourceRow(int sourceRow)
 {
     /**
      * We don't emit insert signal because it will be emitted
      * in sorting function with correct position.
      */
-    if (isFilteredOut(row))
+    if (isFilteredOut(sourceRow))
         return;
 
-    const auto pos = std::lower_bound(m_filteredRows.begin(), m_filteredRows.end(), row);
-    m_filteredRows.insert(pos, row);
+    const auto pos = std::lower_bound(m_filteredRows.begin(), m_filteredRows.end(), sourceRow);
+    m_filteredRows.insert(pos, sourceRow);
 }
 
-void QnSortingProxyModelPrivate::removeFilteredRow(int index)
+void QnSortingProxyModelPrivate::removeSourceRow(int sourceRow)
 {
-    const int row = m_filteredRows.at(index);
+    const int index = m_filteredRows.indexOf(sourceRow);
+    if (index == -1)
+        return; //< Row is filtered out
+
     m_filteredRows.removeAt(index);
-    const auto mappedIndex = m_rowsMapping.indexOf(row);
+    const auto mappedIndex = m_rowsMapping.indexOf(sourceRow);
 
     if (mappedIndex == -1)
     {
@@ -302,6 +320,16 @@ void QnSortingProxyModelPrivate::shiftFilteredRows(
         [difference](RowsList::value_type& row) { row += difference; });
 }
 
+void QnSortingProxyModelPrivate::shiftMappedRows(int minSourceRow, int difference)
+{
+    std::for_each(m_rowsMapping.begin(), m_rowsMapping.end(),
+        [minSourceRow, difference](int& row)
+        {
+            if (row >= minSourceRow)
+                row += difference;
+        });
+}
+
 void QnSortingProxyModelPrivate::handleSourceRowsInserted(
     const QModelIndex &parent,
     int first,
@@ -311,16 +339,15 @@ void QnSortingProxyModelPrivate::handleSourceRowsInserted(
     if (parent.isValid())
         return;
 
-    /**
-     * We have to just increase all indicies after first by (last - first + 1) value.
-     * All other work will be done in applyFilter func
-     */
+    // We have to increase all indicies after first by (last - first + 1) value.
     const int difference = (last - first + 1);
-    const auto pos = std::lower_bound(m_filteredRows.begin(), m_filteredRows.end(), last);
+    const auto pos = std::lower_bound(m_filteredRows.begin(), m_filteredRows.end(), first);
     shiftFilteredRows(pos, difference);
+    shiftMappedRows(first, difference);
 
     for (int row = first; row <= last; ++row)
-        insertFilteredRow(row);
+        insertSourceRow(row);
+
     applySort();
 }
 
@@ -333,17 +360,15 @@ void QnSortingProxyModelPrivate::handleSourceRowsRemoved(
     if (parent.isValid())
         return;
 
-    /**
-     * We have to just decrease all indicies after first by (last - first + 1) value.
-     * All other work will be done in applyFilter func
-     */
+    for (int row = first; row <= last; ++row)
+        removeSourceRow(row);
+
+    // We have to decrease all indicies after first by (last - first + 1) value.
     const int difference = -(last - first + 1);
     const auto pos = std::upper_bound(m_filteredRows.begin(), m_filteredRows.end(), last);
     shiftFilteredRows(pos, difference);
-    for (int row = first; row <= last; ++row)
-        removeFilteredRow(first);
+    shiftMappedRows(last, difference);
 
-    applySort();
 }
 
 void QnSortingProxyModelPrivate::handleSourceRowsMoved(
@@ -385,12 +410,18 @@ void QnSortingProxyModelPrivate::handleSourceDataChanged(
         const int targetRow = m_rowsMapping.indexOf(row);
         if (targetRow == -1)
         {
-            NX_ASSERT(false, "Invalid target index");
+            //NX_ASSERT(false, "Invalid target index");
             continue;
         }
 
         const auto targetIndex = q->index(targetRow);
         emit q->dataChanged(targetIndex, targetIndex, roles);
+    }
+
+    if (m_triggeringRoles.isEmpty() ||
+        !m_triggeringRoles.intersect(RolesSet::fromList(roles.toList())).isEmpty())
+    {
+        invalidate();
     }
 }
 
@@ -428,6 +459,12 @@ void QnSortingProxyModel::setFilteringPred(const FilteringPredicate& pred)
 {
     Q_D(QnSortingProxyModel);
     d->setFilteringPred(pred);
+}
+
+void QnSortingProxyModel::setTriggeringRoles(const RolesList& roles)
+{
+    Q_D(QnSortingProxyModel);
+    d->setTriggeringRoles(roles);
 }
 
 void QnSortingProxyModel::forceUpdate()
