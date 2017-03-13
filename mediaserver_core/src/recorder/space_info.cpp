@@ -63,11 +63,10 @@ void SpaceInfo::storageRemoved(int index)
             return info.index == index;
         });
 
-    NX_ASSERT(toRemoveIt != m_storageSpaceInfo.cend());
     if (toRemoveIt == m_storageSpaceInfo.cend())
     {
-        NX_LOG(lit("[Storage, SpaceInfo, Selection] Storage index %1 removed, but had not been added"), 
-            cl_logDEBUG1);
+        NX_LOG(lit("[Storage, SpaceInfo, Selection] Storage index %1 removed, but had not been added")
+            .arg(index), cl_logDEBUG1);
         return;
     }
     NX_LOG(lit("[Storage, SpaceInfo, Selection] Removing storage index (%1)")
@@ -91,7 +90,7 @@ int SpaceInfo::getOptimalStorageIndex(std::function<bool(int)> useStoragePredica
     if(filteredStorageIndexes.empty())
     {
         NX_LOG(lit("[Storage, SpaceInfo, Selection] Failed to find approprirate storage index"), 
-            cl_logWARNING);
+            cl_logDEBUG1);
         return -1;
     }
 

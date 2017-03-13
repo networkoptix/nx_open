@@ -210,7 +210,7 @@ public:
     QnRecordingStatsData getStatistics(qint64 bitrateAnalizePeriodMs) const;
 
     QnServer::StoragePool getStoragePool() const;
-    std::unordered_map<int, qint64> calcSpaceByStorage() const;
+    int64_t getSpaceByStorageIndex(int storageIndex) const;
 
     // only for unit tests, don't use in production.
     std::deque<Chunk> &getChunksUnsafe() { return m_chunks; }

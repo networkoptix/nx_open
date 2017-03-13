@@ -496,7 +496,7 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
                     {
                         auto storageIndex = qnStorageDbPool->getStorageIndex(storage);
                         m_spaceInfo.storageRebuilded(storageIndex, storage->getFreeSpace(), 
-                            /*calculateNxOccupiedSpace(storageIndex)*/0, storage->getSpaceLimit());
+                            calculateNxOccupiedSpace(storageIndex), storage->getSpaceLimit());
                     }
                 }
             }
@@ -513,6 +513,22 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_clearMotionTimer.restart();
     m_clearBookmarksTimer.restart();
     m_removeEmtyDirTimer.invalidate();
+}
+
+int64_t QnStorageManager::calculateNxOccupiedSpace(int storageIndex) const
+{
+    auto calculateNxOccupiedSpaceByQuality = [this](int storageIndex, QnServer::ChunksCatalog catalog)
+    {
+        int64_t result = 0;
+        for (auto it = m_devFileCatalog[catalog].cbegin(); it != m_devFileCatalog[catalog].cend(); ++it)
+            result += it.value()->getSpaceByStorageIndex(storageIndex);
+
+        return result;
+    };
+
+    QnMutexLocker lock(&m_mutexCatalog);
+    return calculateNxOccupiedSpaceByQuality(storageIndex, QnServer::HiQualityCatalog) +
+        calculateNxOccupiedSpaceByQuality(storageIndex, QnServer::LowQualityCatalog);
 }
 
 void QnStorageManager::createArchiveCameras(const nx::caminfo::ArchiveCameraDataList& archiveCameras)
@@ -2125,11 +2141,17 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
             return false;
         });
 
-    if (optimalStorageIndex != -1)
-        result = getUsedWritableStorageByIndex(optimalStorageIndex);
+    if (optimalStorageIndex == -1)
+        return result;
 
+    result = getUsedWritableStorageByIndex(optimalStorageIndex);
+    if (!result)
+    {
+        NX_LOG(lit("[Storage, Selection] Failed to find storage for index %1")
+            .arg(optimalStorageIndex), cl_logDEBUG2);
+        return result;
+    }
     NX_LOG(lit("[Storage, Selection] Selected storage %1").arg(result->getUrl()), cl_logDEBUG2);
-    return result;
 
     auto hasFastScanned = [this]
     {
@@ -2157,6 +2179,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
             m_warnSended = true;
         }
     }
+
     return result;
 }
 
