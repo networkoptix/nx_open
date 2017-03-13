@@ -118,16 +118,17 @@ void QnMulticastModuleFinder::updateInterfaces()
                     NX_LOGX(lm("Unable to join multicast group %1 on interface %2: %3")
                         .strs(m_multicastGroupAddress, address), cl_logWARNING);
                 }
+                else
+                {
+                    NX_LOGX(lm("Joined multicast group %1 on interface %2").strs(
+                        m_multicastGroupAddress, address), cl_logDEBUG1);
+                }
             }
 
             if (!m_pollSet.add(it.value(), aio::etRead, it.value()))
-            {
-                const auto error = SystemError::getLastOSErrorText();
-                NX_ASSERT(false, Q_FUNC_INFO, error.toUtf8().data());
-            }
-
-            NX_LOGX(lm("Joined multicast group %1 on interface %2").strs(
-                m_multicastGroupAddress, address), cl_logDEBUG1);
+                NX_ASSERT(false, SystemError::getLastOSErrorText());
+            else
+                DEBUG_LOG(lm("PollSet(%1s): Added %2 socket").strs(m_pollSet.size(), address));
         }
         catch (const std::exception &e)
         {
@@ -140,11 +141,15 @@ void QnMulticastModuleFinder::updateInterfaces()
     {
         UDPSocket *socket = m_clientSockets.take(address);
         m_pollSet.remove(socket, aio::etRead);
-        if (m_serverSocket)
-            m_serverSocket->leaveGroup(m_multicastGroupAddress.toString(), address.toString());
+        DEBUG_LOG(lm("PollSet(%1s): Removed %2 socket").strs(
+            m_pollSet.size(), socket->getLocalAddress()));
 
-        NX_LOGX(lm("Left multicast group %1 on interface %2").strs(
-            m_multicastGroupAddress, address), cl_logDEBUG1);
+        if (m_serverSocket)
+        {
+            m_serverSocket->leaveGroup(m_multicastGroupAddress.toString(), address.toString());
+            NX_LOGX(lm("Left multicast group %1 on interface %2").strs(
+                m_multicastGroupAddress, address), cl_logDEBUG1);
+        }
     }
 }
 
@@ -158,12 +163,16 @@ void QnMulticastModuleFinder::clearInterfaces()
             m_serverSocket->leaveGroup(m_multicastGroupAddress.toString(), it.key().toString());
 
         m_pollSet.remove(m_serverSocket.get(), aio::etRead);
+        DEBUG_LOG(lm("PollSet(%1s): Removed server socket").str(m_pollSet.size()));
         m_serverSocket.reset();
     }
 
     for (UDPSocket *socket : m_clientSockets)
     {
         m_pollSet.remove(socket, aio::etRead);
+        DEBUG_LOG(lm("PollSet(%1s): Removed %2 socket").strs(
+            m_pollSet.size(), socket->getLocalAddress()));
+
         delete socket;
     }
 
@@ -302,7 +311,7 @@ void QnMulticastModuleFinder::run()
         return;
 
     initSystemThreadId();
-    NX_LOGX(lit("has started"), cl_logDEBUG1);
+    NX_LOGX(lit("Has started"), cl_logDEBUG1);
 
     QByteArray revealRequest = RevealRequest::serialize();
 
@@ -313,10 +322,9 @@ void QnMulticastModuleFinder::run()
         m_serverSocket->setReuseAddrFlag(true);
         m_serverSocket->bind(SocketAddress(HostAddress::anyHost, m_multicastGroupPort));
         if (!m_pollSet.add(m_serverSocket.get(), aio::etRead, m_serverSocket.get()))
-        {
-            const auto error = SystemError::getLastOSErrorText();
-            NX_ASSERT(false, Q_FUNC_INFO, error.toUtf8().data());
-        }
+            NX_ASSERT(false, SystemError::getLastOSErrorText());
+        else
+            DEBUG_LOG(lm("PollSet(%1s): Added server socket").str(m_pollSet.size()));
     }
 
     while (!needToStop())
@@ -350,8 +358,8 @@ void QnMulticastModuleFinder::run()
                     }
                     else
                     {
-                        DEBUG_LOG(lm("Reveal request is sent to %1")
-                            .strs(socket->getForeignAddress()));
+                        DEBUG_LOG(lm("Reveal request is sent to %1 from %2")
+                            .strs(socket->getForeignAddress(), socket->getLocalAddress()));
                     }
                 }
             }
@@ -359,11 +367,28 @@ void QnMulticastModuleFinder::run()
             m_prevPingClock = currentClock;
         }
 
-        int socketCount = m_pollSet.poll(m_pingTimeoutMillis - (currentClock - m_prevPingClock));
+        if (const auto timeout = SocketGlobals::debugConfig().multicastModuleFinderTimeout)
+        {
+            NX_LOGX(lm("Avoid using poll, use %1 ms recv timeouts instead").arg(timeout), cl_logINFO);
+            if (m_serverSocket)
+            {
+                m_serverSocket->setRecvTimeout((unsigned int) timeout);
+                processDiscoveryRequest(m_serverSocket.get());
+            }
 
+            for (auto& socket: m_clientSockets)
+            {
+                socket->setRecvTimeout((unsigned int) timeout);
+                processDiscoveryResponse(socket);
+            }
+
+            continue;
+        }
+
+        int socketCount = m_pollSet.poll(m_pingTimeoutMillis - (currentClock - m_prevPingClock));
         if (socketCount == 0)
         {
-            DEBUG_LOG("poll has timed out");
+            DEBUG_LOG(lm("PollSet(%1s): Time out").str(m_pollSet.size()));
             continue;
         }
 
@@ -373,18 +398,23 @@ void QnMulticastModuleFinder::run()
             if (prevErrorCode == SystemError::interrupted)
                 continue;
 
-            NX_LOGX(lit("poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR);
+            NX_LOGX(lit("Poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR);
             msleep(errorWaitTimeoutMs);
             continue;
         }
 
         //currentClock = QDateTime::currentMSecsSinceEpoch();
 
-        /* some sockets changed state */
+        DEBUG_LOG(lm("PollSet(%1s): %2 sockets are ready to read").args(
+            m_pollSet.size(), socketCount));
+
         for (auto it = m_pollSet.begin(); it != m_pollSet.end(); ++it)
         {
             if (!(it.eventType() & aio::etRead))
+            {
+                NX_ASSERT(false, "Not a read event on socket");
                 continue;
+            }
 
             UDPSocket* udpSocket = static_cast<UDPSocket*>(it.userData());
 
@@ -397,5 +427,5 @@ void QnMulticastModuleFinder::run()
 
     clearInterfaces();
 
-    NX_LOGX(lit("stopped"), cl_logDEBUG1);
+    NX_LOGX(lit("Stopped"), cl_logDEBUG1);
 }

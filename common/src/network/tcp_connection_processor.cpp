@@ -236,7 +236,7 @@ QByteArray QnTCPConnectionProcessor::createResponse(int httpStatusCode, const QB
         //revealing Server name to authenticated entity only
         nx_http::insertOrReplaceHeader(
             &d->response.headers,
-            nx_http::HttpHeader(nx_http::header::kServer, nx_http::serverString() ) );
+            nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString() ) );
     }
     nx_http::insertOrReplaceHeader(
         &d->response.headers,

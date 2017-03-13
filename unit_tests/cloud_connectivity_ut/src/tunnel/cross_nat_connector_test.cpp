@@ -98,6 +98,7 @@ void TunnelConnector::cancellationTest()
 
     const auto system = mediator().addRandomSystem();
     const auto server = mediator().addRandomServer(system);
+    ASSERT_NE(nullptr, server);
 
     ASSERT_EQ(nx::hpm::api::ResultCode::ok, server->listen().first);
 
