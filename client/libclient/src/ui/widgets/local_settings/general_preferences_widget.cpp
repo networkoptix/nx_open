@@ -165,6 +165,8 @@ void QnGeneralPreferencesWidget::at_addMediaFolderButton_clicked()
     if (dirName.isEmpty())
         return;
 
+    dirName = QDir::toNativeSeparators(dirName);
+
     if (mediaFolders().contains(dirName))
     {
         QnMessageBox::information(this, tr("Folder already added"));
