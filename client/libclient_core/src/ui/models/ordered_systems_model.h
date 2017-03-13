@@ -22,10 +22,14 @@ public:
 signals:
     void minimalVersionChanged();
 
-private: // Prediactes
-    bool lessPredicate(const QModelIndex& left, const QModelIndex& right) const;
+private: // overrides
+    bool lessThan(
+        const QModelIndex& left,
+        const QModelIndex& right) const override;
 
-    bool filterPredicate(const QModelIndex& index) const;
+    bool filterAcceptsRow(
+        int sourceRow,
+        const QModelIndex& sourceParent) const override;
 
 private:
     void handleWeightsChanged();

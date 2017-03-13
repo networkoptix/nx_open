@@ -34,6 +34,15 @@ public:
 
     void forceUpdate();
 
+public:
+    virtual bool lessThan(
+        const QModelIndex& sourceLeft,
+        const QModelIndex& sourceRight) const;
+
+    virtual bool filterAcceptsRow(
+        int sourceRow,
+        const QModelIndex& sourceParent) const;
+
 public: // overrides section
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;

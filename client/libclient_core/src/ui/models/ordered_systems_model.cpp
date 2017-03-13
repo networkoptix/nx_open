@@ -24,9 +24,6 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
     connect(qnSystemWeightsManager, &QnSystemsWeightsManager::weightsChanged,
         this, &QnOrderedSystemsModel::handleWeightsChanged);
 
-    namespace p = std::placeholders;
-    setFilteringPredicate(std::bind(&QnOrderedSystemsModel::filterPredicate, this, p::_1));
-    setSortingPredicate(std::bind(&QnOrderedSystemsModel::lessPredicate, this, p::_1, p::_2));
     // TODO: #ynikitenkov add triggering roles list here to optimize sorting/filtering model
 
     if (qnForgottenSystemsManager)
@@ -94,7 +91,9 @@ qreal QnOrderedSystemsModel::getWeight(const QModelIndex& modelIndex) const
     return (getWeightFromData(modelIndex, result) ? result : m_unknownSystemsWeight);
 }
 
-bool QnOrderedSystemsModel::lessPredicate(const QModelIndex& left, const QModelIndex& right) const
+bool QnOrderedSystemsModel::lessThan(
+    const QModelIndex& left,
+    const QModelIndex& right) const
 {
     static const auto finalLess =
         [](const QModelIndex& left, const QModelIndex& right) -> bool
@@ -128,24 +127,27 @@ bool QnOrderedSystemsModel::lessPredicate(const QModelIndex& left, const QModelI
     return (leftWeight > rightWeight);  // System with greater weight will be placed at begin
 }
 
-bool QnOrderedSystemsModel::filterPredicate(const QModelIndex &index) const
+bool QnOrderedSystemsModel::filterAcceptsRow(
+    int sourceRow,
+    const QModelIndex& sourceParent) const
 {
+    const auto dataIndex = index(sourceRow);
     // Filters out offline non-cloud systems with last connection more than N (defined) days ago
-    if (!index.isValid())
+    if (!dataIndex.isValid())
         return true;
 
-    if (index.data(QnSystemsModel::IsConnectableRoleId).toBool())
+    if (dataIndex.data(QnSystemsModel::IsConnectableRoleId).toBool())
         return true;    //< Skips every connectable system
 
-    const auto id = index.data(QnSystemsModel::SystemIdRoleId).toString();
+    const auto id = dataIndex.data(QnSystemsModel::SystemIdRoleId).toString();
     if (qnForgottenSystemsManager && qnForgottenSystemsManager->isForgotten(id))
         return false;
 
-    if (index.data(QnSystemsModel::IsCloudSystemRoleId).toBool())
+    if (dataIndex.data(QnSystemsModel::IsCloudSystemRoleId).toBool())
         return true;    //< Skips offline cloud systems
 
     qreal weight = 0.0;
-    if (!getWeightFromData(index, weight))
+    if (!getWeightFromData(dataIndex, weight))
         return true;
 
     static const auto kMinWeight = 0.00001;

@@ -7,7 +7,7 @@
 namespace {
 
 const auto defaultFilteringPredicate =
-    [](const QModelIndex& /* value */) -> bool
+    [](int /* value */) -> bool
     {
         return true;
     };
@@ -84,7 +84,7 @@ private:
 private:
     RowsList m_mapped;
     QPointer<QAbstractListModel> m_model = nullptr;
-    QnSortFilterListModel::FilteringPredicate m_filterPred = defaultFilteringPredicate;
+    std::function<bool (int)> m_filterPred = defaultFilteringPredicate;
     std::function<bool (int, int)> m_sortingPred = defaultSortingPredicate;
 
     using RolesSet = QSet<int>;
@@ -157,7 +157,11 @@ void QnSortFilterListModelPrivate::setSortingPred(
 void QnSortFilterListModelPrivate::setFilteringPred(
     const QnSortFilterListModel::FilteringPredicate& pred)
 {
-    m_filterPred = pred;
+    m_filterPred =
+        [this, pred](int sourceRow)
+        {
+            return (m_model && pred ? pred(m_model->index(sourceRow)) : true);
+        };
     invalidate();
 }
 
@@ -227,13 +231,19 @@ int QnSortFilterListModelPrivate::rowCount() const
 
 bool QnSortFilterListModelPrivate::isFilteredOut(int sourceRow) const
 {
-    return (m_filterPred && m_model ? !m_filterPred(m_model->index(sourceRow)) : false);
+    Q_Q(const QnSortFilterListModel);
+    return !q->filterAcceptsRow(sourceRow, QModelIndex());
 }
 
 QnSortFilterListModelPrivate::RowsList::iterator QnSortFilterListModelPrivate::positionToInsert(
     int sourceRow)
 {
-    return std::lower_bound(m_mapped.begin(), m_mapped.end(), sourceRow, m_sortingPred);
+    return std::lower_bound(m_mapped.begin(), m_mapped.end(), sourceRow,
+        [this](int left, int right)
+        {
+            Q_Q(QnSortFilterListModel);
+            return q->lessThan(m_model->index(left), m_model->index(right));
+        });
 }
 
 void QnSortFilterListModelPrivate::insertSourceRow(int sourceRow)
@@ -409,6 +419,22 @@ void QnSortFilterListModel::forceUpdate()
 {
     Q_D(QnSortFilterListModel);
     d->invalidate();
+}
+
+bool QnSortFilterListModel::lessThan(
+    const QModelIndex& sourceLeft,
+    const QModelIndex& sourceRight) const
+{
+    Q_D(const QnSortFilterListModel);
+    return d->m_sortingPred(sourceLeft.row(), sourceRight.row());
+}
+
+bool QnSortFilterListModel::filterAcceptsRow(
+    int sourceRow,
+    const QModelIndex& /* sourceParent */) const
+{
+    Q_D(const QnSortFilterListModel);
+    return d->m_filterPred(sourceRow);
 }
 
 int QnSortFilterListModel::rowCount(const QModelIndex& /* parent */) const
