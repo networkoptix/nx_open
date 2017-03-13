@@ -4,6 +4,9 @@ angular.module('webadminApp')
     .controller('SettingsCtrl', function ($scope, $rootScope, $modal, $log, mediaserver, $poll,
                                           cloudAPI, $location, $timeout, dialogs, nativeClient) {
 
+        if(mediaserver.hasProxy()){
+            $location.path("/view");
+        }
         $scope.L = L;
 
         function updateActive(){

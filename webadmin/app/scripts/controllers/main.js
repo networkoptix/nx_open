@@ -12,9 +12,17 @@ angular.module('webadminApp')
                     $location.path("/client");
                     return;
                 }
-                $location.path("/settings");
+                if(mediaserver.hasProxy()){
+                    $location.path("/view");
+                }else {
+                    $location.path("/settings");
+                }
             },function(){
-                $location.path("/settings");
+                if(mediaserver.hasProxy()){
+                    $location.path("/view");
+                }else {
+                    $location.path("/settings");
+                }
             });
         }
     });
