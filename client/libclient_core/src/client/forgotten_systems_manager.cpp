@@ -1,4 +1,4 @@
-#include "forgotten_systems_manager.h"
+]#include "forgotten_systems_manager.h"
 
 #include <nx/utils/log/assert.h>
 #include <finders/systems_finder.h>
@@ -17,26 +17,18 @@ QnForgottenSystemsManager::QnForgottenSystemsManager():
 
     m_systems = qnClientCoreSettings->forgottenSystems();
 
-    const auto storeSystems =
-        [this]()
-        {
-            qnClientCoreSettings->setForgottenSystems(m_systems);
-            qnClientCoreSettings->save();
-        };
-
     const auto processSystemDiscovered =
         [this, storeSystems](const QnSystemDescriptionPtr& system)
         {
             const auto checkOnlineSystem =
                 [this, id = system->id(), localId = system->localId(),
-                    rawSystem = system.data(), storeSystems]()
+                    rawSystem = system.data()]()
                 {
                     if (rawSystem->isConnectable() &&
                         (isForgotten(id) || isForgotten(localId.toString())))
                     {
                         rememberSystem(id);
                         rememberSystem(localId.toString());
-                        storeSystems();
                     }
                 };
 
@@ -51,6 +43,12 @@ QnForgottenSystemsManager::QnForgottenSystemsManager():
     for (const auto& system: qnSystemsFinder->systems())
         processSystemDiscovered(system);
 
+    const auto storeSystems =
+        [this]()
+        {
+            qnClientCoreSettings->setForgottenSystems(m_systems);
+            qnClientCoreSettings->save();
+        };
 
     connect(this, &QnForgottenSystemsManager::forgottenSystemAdded, this, storeSystems);
     connect(this, &QnForgottenSystemsManager::forgottenSystemRemoved, this, storeSystems);
@@ -79,6 +77,6 @@ bool QnForgottenSystemsManager::isForgotten(const QString& id) const
 
 void QnForgottenSystemsManager::rememberSystem(const QString& id)
 {
-    if (!m_systems.remove(id))
+    if (m_systems.remove(id))
         emit forgottenSystemRemoved(id);
 }

@@ -22,12 +22,12 @@ public:
     void setSourceModel(QAbstractListModel* model);
     QAbstractListModel* sourceModel() const;
 
-    typedef std::function<bool (const QModelIndex& left,
-        const QModelIndex& right)> SortingPredicate;
-    void setSortingPred(const SortingPredicate& pred);
+    using SortingPredicate = std::function<bool (const QModelIndex& left,
+        const QModelIndex& right)>;
+    void setSortingPredicate(const SortingPredicate& pred);
 
-    typedef std::function<bool (const QModelIndex& value)> FilteringPredicate;
-    void setFilteringPred(const FilteringPredicate& pred);
+    using FilteringPredicate = std::function<bool (const QModelIndex& value)>;
+    void setFilteringPredicate(const FilteringPredicate& pred);
 
     typedef QList<int> RolesList;
     void setTriggeringRoles(const RolesList& roles);

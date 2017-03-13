@@ -34,26 +34,26 @@ private:
     void applyFilter();
 
     void handleSourceRowsInserted(
-        const QModelIndex &parent,
+        const QModelIndex& parent,
         int first,
         int last);
 
     void handleSourceRowsRemoved(
-        const QModelIndex &parent,
+        const QModelIndex& parent,
         int first,
         int last);
 
     void handleSourceRowsMoved(
-        const QModelIndex &parent,
+        const QModelIndex& parent,
         int start,
         int end,
-        const QModelIndex &destination,
+        const QModelIndex& destination,
         int row);
 
     void handleSourceDataChanged(
-        const QModelIndex &topLeft,
-        const QModelIndex &bottomRight,
-        const QVector<int> &roles);
+        const QModelIndex& topLeft,
+        const QModelIndex& bottomRight,
+        const QVector<int>& roles);
 
 private:
     void insertSourceRow(int sourceRow);
@@ -133,7 +133,6 @@ void QnSortingProxyModelPrivate::setCurrentModel(QAbstractListModel* model)
     if (!m_model)
         return;
 
-    namespace p = std::placeholders;
     connect(m_model, &QAbstractListModel::rowsInserted,
         this, &QnSortingProxyModelPrivate::handleSourceRowsInserted);
     connect(m_model, &QAbstractListModel::rowsRemoved,
@@ -149,7 +148,7 @@ void QnSortingProxyModelPrivate::clearCurrentModel()
     if (!m_model)
         return;
 
-    disconnect(m_model, nullptr, this, nullptr);
+    disconnect(m_model);
 
     Q_Q(QnSortingProxyModel);
     q->beginResetModel();
@@ -272,10 +271,7 @@ void  QnSortingProxyModelPrivate::applyFilter()
 
 bool QnSortingProxyModelPrivate::isFilteredOut(int row) const
 {
-    // Fake predicate restores all filtered out items
-    static auto const defaultPredicate = [](const QModelIndex& /*index*/) { return true; };
-    const auto pred = (m_filterPred ? m_filterPred : defaultPredicate);
-    return !pred(m_model->index(row));
+    return (m_filterPred ? !m_filterPred(m_model->index(row)) : false);
 }
 
 void QnSortingProxyModelPrivate::insertSourceRow(int sourceRow)
@@ -331,7 +327,7 @@ void QnSortingProxyModelPrivate::shiftMappedRows(int minSourceRow, int differenc
 }
 
 void QnSortingProxyModelPrivate::handleSourceRowsInserted(
-    const QModelIndex &parent,
+    const QModelIndex& parent,
     int first,
     int last)
 {
@@ -352,7 +348,7 @@ void QnSortingProxyModelPrivate::handleSourceRowsInserted(
 }
 
 void QnSortingProxyModelPrivate::handleSourceRowsRemoved(
-    const QModelIndex &parent,
+    const QModelIndex& parent,
     int first,
     int last)
 {
@@ -372,10 +368,10 @@ void QnSortingProxyModelPrivate::handleSourceRowsRemoved(
 }
 
 void QnSortingProxyModelPrivate::handleSourceRowsMoved(
-    const QModelIndex &parent,
+    const QModelIndex& parent,
     int start,
     int end,
-    const QModelIndex &destination,
+    const QModelIndex& destination,
     int row)
 {
     NX_ASSERT(!parent.isValid(), "QnSortFilterProxyModel works only with flat lists models");
@@ -383,14 +379,14 @@ void QnSortingProxyModelPrivate::handleSourceRowsMoved(
     if (parent.isValid() || destination.isValid())
         return;
 
-    // TODO: #ynikitenkov support handle of moving items
+    // TODO: #ynikitenkov support handling of moving items
     NX_ASSERT(false, "QnSortingProxyModel does not handle moves yet");
 }
 
 void QnSortingProxyModelPrivate::handleSourceDataChanged(
-    const QModelIndex &topLeft,
-    const QModelIndex &bottomRight,
-    const QVector<int> &roles)
+    const QModelIndex& topLeft,
+    const QModelIndex& bottomRight,
+    const QVector<int>& roles)
 {
     if (!topLeft.isValid() || !bottomRight.isValid())
     {
@@ -409,10 +405,7 @@ void QnSortingProxyModelPrivate::handleSourceDataChanged(
     {
         const int targetRow = m_rowsMapping.indexOf(row);
         if (targetRow == -1)
-        {
-            //NX_ASSERT(false, "Invalid target index");
             continue;
-        }
 
         const auto targetIndex = q->index(targetRow);
         emit q->dataChanged(targetIndex, targetIndex, roles);
@@ -449,13 +442,13 @@ QAbstractListModel* QnSortingProxyModel::sourceModel() const
     return d->model();
 }
 
-void QnSortingProxyModel::setSortingPred(const SortingPredicate& pred)
+void QnSortingProxyModel::setSortingPredicate(const SortingPredicate& pred)
 {
     Q_D(QnSortingProxyModel);
     d->setSortingPred(pred);
 }
 
-void QnSortingProxyModel::setFilteringPred(const FilteringPredicate& pred)
+void QnSortingProxyModel::setFilteringPredicate(const FilteringPredicate& pred)
 {
     Q_D(QnSortingProxyModel);
     d->setFilteringPred(pred);

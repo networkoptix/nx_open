@@ -25,8 +25,8 @@ QnOrderedSystemsModel::QnOrderedSystemsModel(QObject* parent) :
         this, &QnOrderedSystemsModel::handleWeightsChanged);
 
     namespace p = std::placeholders;
-    setFilteringPred(std::bind(&QnOrderedSystemsModel::filterPredicate, this, p::_1));
-    setSortingPred(std::bind(&QnOrderedSystemsModel::lessPredicate, this, p::_1, p::_2));
+    setFilteringPredicate(std::bind(&QnOrderedSystemsModel::filterPredicate, this, p::_1));
+    setSortingPredicate(std::bind(&QnOrderedSystemsModel::lessPredicate, this, p::_1, p::_2));
     // TODO: #ynikitenkov add triggering roles list here to optimize sorting/filtering model
 
     if (qnForgottenSystemsManager)
