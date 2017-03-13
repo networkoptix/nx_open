@@ -1,3 +1,5 @@
+'''Vagrant wrappers classes'''
+
 import os
 import os.path
 import logging
@@ -9,6 +11,7 @@ import jinja2
 import vagrant
 import vagrant.compat
 from host import RemoteSshHost
+from vbox_manage import VBoxManage
 from vagrant_box_config import DEFAULT_NATNET1, DEFAULT_HOSTNET
 
 
@@ -47,6 +50,7 @@ class Vagrant(object):
 
     def __init__(self, vm_host, bin_dir, vagrant_dir, vagrant_private_key_path, ssh_config_path):
         self._vm_host = vm_host
+        self._vbox_manage = VBoxManage(vm_host)
         self._bin_dir = bin_dir
         self._vagrant_dir = vagrant_dir  # on vm_host
         self._vagrant_private_key_path = vagrant_private_key_path  # may be None
@@ -100,9 +104,16 @@ class Vagrant(object):
     def _start_box(self, config):
         box_name = config.box_name()
         log.info('Starting/creating box: %r, vm %r...', box_name, config.vm_box_name())
+        self._cleanup_vms(config.vm_box_name())
         self._vagrant.up(vm_name=box_name)
         self._write_box_ssh_config(box_name)
         self.box_host(box_name, 'vagrant').run_command(['sudo', 'cp', '-r', '/home/vagrant/.ssh', '/root/'])
+
+    def _cleanup_vms(self, vms_name):
+        if not self._vbox_manage.does_vms_exist(vms_name): return
+        if self._vbox_manage.get_vms_state(vms_name) != 'poweroff':
+            self._vbox_manage.poweroff_vms(vms_name)
+        self._vbox_manage.delete_vms(vms_name)
 
     def _load_box_ip_address(self, config):
         self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'vms'])

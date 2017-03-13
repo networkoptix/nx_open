@@ -121,7 +121,7 @@ class LocalHost(Host):
             pipe.stdout.close()
             pipe.stderr.close()
         retcode = pipe.wait()
-        if retcode or stderr_buffer:
+        if retcode:
             raise ProcessError(retcode, args[0], output=''.join(stderr_buffer))
         return ''.join(stdout_buffer)
 

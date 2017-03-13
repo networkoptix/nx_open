@@ -63,7 +63,7 @@ class EnvironmentBuilder(object):
         # now allocate boxes not assigned to servers
         for required_config in boxes_config:
             if required_config not in assigned_configs:
-                self._allocate_box_config(required_config)
+                unused_config = self._allocate_box_config(required_config)
 
     def _allocate_box_config(self, required_config):
         config = self._find_matching_box_config(required_config)
