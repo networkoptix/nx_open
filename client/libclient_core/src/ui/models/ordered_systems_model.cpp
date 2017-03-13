@@ -131,7 +131,7 @@ bool QnOrderedSystemsModel::filterAcceptsRow(
     int sourceRow,
     const QModelIndex& sourceParent) const
 {
-    const auto dataIndex = index(sourceRow);
+    const auto dataIndex = sourceModel()->index(sourceRow);
     // Filters out offline non-cloud systems with last connection more than N (defined) days ago
     if (!dataIndex.isValid())
         return true;

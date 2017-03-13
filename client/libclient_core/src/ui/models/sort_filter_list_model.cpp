@@ -4,22 +4,6 @@
 #include <nx/utils/math/fuzzy.h>
 #include <utils/common/connective.h>
 
-namespace {
-
-const auto defaultFilteringPredicate =
-    [](int /* value */) -> bool
-    {
-        return true;
-    };
-
-const auto defaultSortingPredicate =
-    [](int left, int right)
-    {
-        return left < right;
-    };
-
-} // unnamed namespace
-
 //////////////////////////////////////////////////////////////////////////////////////////////////
 class QnSortFilterListModelPrivate : public Connective<QObject>
 {
@@ -34,8 +18,6 @@ public:
     void setModel(QAbstractListModel* model);
     QAbstractListModel* model() const;
 
-    void setSortingPred(const QnSortFilterListModel::SortingPredicate& pred);
-    void setFilteringPred(const QnSortFilterListModel::FilteringPredicate& pred);
     void setTriggeringRoles(const QnSortFilterListModel::RolesList& roles);
 
     QModelIndex sourceIndexForTargetRow(int row) const;
@@ -84,8 +66,6 @@ private:
 private:
     RowsList m_mapped;
     QPointer<QAbstractListModel> m_model = nullptr;
-    std::function<bool (int)> m_filterPred = defaultFilteringPredicate;
-    std::function<bool (int, int)> m_sortingPred = defaultSortingPredicate;
 
     using RolesSet = QSet<int>;
     RolesSet m_triggeringRoles;
@@ -131,38 +111,6 @@ void QnSortFilterListModelPrivate::setModel(QAbstractListModel* model)
 QAbstractListModel* QnSortFilterListModelPrivate::model() const
 {
     return m_model;
-}
-
-void QnSortFilterListModelPrivate::setSortingPred(
-    const QnSortFilterListModel::SortingPredicate& pred)
-{
-
-    if (!pred)
-    {
-        m_sortingPred = defaultSortingPredicate;
-        return;
-    }
-
-    m_sortingPred =
-        [this, pred](int leftRow, int rightRow) -> bool
-        {
-            if (!m_model)
-                return (leftRow < rightRow);
-
-            return pred(m_model->index(leftRow), m_model->index(rightRow));
-        };
-    invalidate();
-}
-
-void QnSortFilterListModelPrivate::setFilteringPred(
-    const QnSortFilterListModel::FilteringPredicate& pred)
-{
-    m_filterPred =
-        [this, pred](int sourceRow)
-        {
-            return (m_model && pred ? pred(m_model->index(sourceRow)) : true);
-        };
-    invalidate();
 }
 
 void QnSortFilterListModelPrivate::setTriggeringRoles(const QnSortFilterListModel::RolesList& roles)
@@ -397,18 +345,6 @@ QAbstractListModel* QnSortFilterListModel::sourceModel() const
     return d->model();
 }
 
-void QnSortFilterListModel::setSortingPredicate(const SortingPredicate& pred)
-{
-    Q_D(QnSortFilterListModel);
-    d->setSortingPred(pred);
-}
-
-void QnSortFilterListModel::setFilteringPredicate(const FilteringPredicate& pred)
-{
-    Q_D(QnSortFilterListModel);
-    d->setFilteringPred(pred);
-}
-
 void QnSortFilterListModel::setTriggeringRoles(const RolesList& roles)
 {
     Q_D(QnSortFilterListModel);
@@ -426,15 +362,15 @@ bool QnSortFilterListModel::lessThan(
     const QModelIndex& sourceRight) const
 {
     Q_D(const QnSortFilterListModel);
-    return d->m_sortingPred(sourceLeft.row(), sourceRight.row());
+    return (sourceLeft.row() < sourceRight.row());
 }
 
 bool QnSortFilterListModel::filterAcceptsRow(
-    int sourceRow,
+    int /* sourceRow */,
     const QModelIndex& /* sourceParent */) const
 {
     Q_D(const QnSortFilterListModel);
-    return d->m_filterPred(sourceRow);
+    return true;
 }
 
 int QnSortFilterListModel::rowCount(const QModelIndex& /* parent */) const
