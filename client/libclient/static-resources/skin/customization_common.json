@@ -763,10 +763,12 @@
     },
 
     "QnNotificationWidget" : {
+        "_": "'dark' is used to paint horizontal line, 'alternateBase' - to paint More Notifications",
         "palette": {
             "default": {
                 "dark": "dark6",
-                "windowText": "light10"
+                "windowText": "light10",
+                "alternateBase": "dark17"
             }
         }
     },

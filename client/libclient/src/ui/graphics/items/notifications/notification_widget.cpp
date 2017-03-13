@@ -113,6 +113,7 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
     m_textLabel->setWordWrap(true);
     m_textLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
+
     connect(m_textLabel, &QnProxyLabel::linkActivated, this, &QnNotificationWidget::linkActivated);
 
     m_layout->setContentsMargins(kHorizontalMargin, kVerticalMargin, kHorizontalMargin, kVerticalMargin);
@@ -139,8 +140,17 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
 
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->addTargetItem(m_tooltipWidget);
-    connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered, this, [this]() { m_closeButton->show(); });
-    connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft,    this, [this]() { m_closeButton->hide(); });
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered, this,
+        [this]
+        {
+            if (m_notificationLevel != QnNotificationLevel::Value::NoNotification)
+                m_closeButton->show();
+        });
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft, this,
+        [this]
+        {
+            m_closeButton->hide();
+        });
 
     updateToolTipPosition();
     updateToolTipVisibility();
@@ -321,6 +331,20 @@ void QnNotificationWidget::clickedNotify(QGraphicsSceneMouseEvent* event)
 
     if (button == Qt::LeftButton)
         triggerDefaultAction();
+}
+
+bool QnNotificationWidget::event(QEvent* event)
+{
+    auto result = base_type::event(event);
+    if (event->type() == QnEvent::Customize)
+    {
+        auto textColorRole = m_notificationLevel == QnNotificationLevel::Value::NoNotification
+            ? QPalette::AlternateBase
+            : QPalette::WindowText;
+
+        setPaletteColor(m_textLabel, QPalette::WindowText, palette().color(textColorRole));
+    }
+    return result;
 }
 
 void QnNotificationWidget::at_loop_sound()

@@ -3,6 +3,7 @@
 #include <QtGui/QPainter>
 
 #include <ui/common/notification_levels.h>
+#include <ui/customization/customized.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
@@ -37,11 +38,11 @@ private:
     QRectF m_enclosingRect;
 };
 
-class QnNotificationWidget: public Clickable<GraphicsWidget>
+class QnNotificationWidget: public Customized<Clickable<GraphicsWidget>>
 {
     Q_OBJECT
-    typedef Clickable<GraphicsWidget> base_type;
 
+    using base_type = Customized<Clickable<GraphicsWidget>>;
 public:
     explicit QnNotificationWidget(QGraphicsItem* parent = nullptr, Qt::WindowFlags flags = 0);
     virtual ~QnNotificationWidget();
@@ -83,6 +84,7 @@ signals:
 protected:
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
     virtual void clickedNotify(QGraphicsSceneMouseEvent* event) override;
+    virtual bool event(QEvent* event) override;
 
 private:
     void hideToolTip();

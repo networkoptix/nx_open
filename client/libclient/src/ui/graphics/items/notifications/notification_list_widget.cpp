@@ -44,7 +44,7 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
     m_hoverProcessor->setHoverLeaveDelay(kHoverLeaveTimeoutMs);
 
     m_collapser.item = new QnNotificationWidget(this);
-    m_collapser.item->setNotificationLevel(m_itemNotificationLevel);
+    m_collapser.item->setNotificationLevel(QnNotificationLevel::Value::NoNotification);
     m_collapser.item->setMinimumSize(QSizeF(kWidgetWidth, kCollapserHeight));
     m_collapser.item->setMaximumSize(QSizeF(kWidgetWidth, kCollapserHeight));
     m_collapser.item->setOpacity(0.0);
