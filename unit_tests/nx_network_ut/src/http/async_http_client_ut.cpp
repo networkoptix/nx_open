@@ -22,6 +22,7 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <common/common_globals.h>
+#include <utils/common/guard.h>
 #include <utils/common/long_runnable.h>
 #include <utils/media/custom_output_stream.h>
 
@@ -635,6 +636,9 @@ TEST_F(AsyncHttpClientTest, ReusingExistingConnection)
         std::atomic<int> responseCount(0);
 
         auto httpClient = AsyncHttpClient::create();
+        auto httpClientGuard = makeScopedGuard(
+            [&httpClient]() { httpClient->pleaseStopSync(); });
+
         httpClient->setSendTimeoutMs(1000);
         QObject::connect(
             httpClient.get(), &AsyncHttpClient::done,
