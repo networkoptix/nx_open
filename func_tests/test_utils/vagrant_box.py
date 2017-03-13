@@ -10,12 +10,12 @@ import pytz
 import jinja2
 import vagrant
 import vagrant.compat
-from host import RemoteSshHost
-from vbox_manage import VBoxManage
-from vagrant_box_config import DEFAULT_NATNET1, DEFAULT_HOSTNET
+from .host import RemoteSshHost
+from .vbox_manage import VBoxManage
+from .vagrant_box_config import DEFAULT_NATNET1, DEFAULT_HOSTNET
 
 
-TEST_DIR = os.path.abspath(os.path.dirname(__file__))
+TEST_UTILS_DIR = os.path.abspath(os.path.dirname(__file__))
 
 log = logging.getLogger(__name__)
 
@@ -48,7 +48,8 @@ class RemotableVagrant(vagrant.Vagrant):
 
 class Vagrant(object):
 
-    def __init__(self, vm_host, bin_dir, vagrant_dir, vagrant_private_key_path, ssh_config_path):
+    def __init__(self, test_dir, vm_host, bin_dir, vagrant_dir, vagrant_private_key_path, ssh_config_path):
+        self._test_dir = test_dir
         self._vm_host = vm_host
         self._vbox_manage = VBoxManage(vm_host)
         self._bin_dir = bin_dir
@@ -91,7 +92,7 @@ class Vagrant(object):
 
     def _copy_required_files_to_vagrant_dir(self, box_config):
         for file_path_format in box_config.required_file_list:
-            file_path = file_path_format.format(test_dir=TEST_DIR, bin_dir=self._bin_dir)
+            file_path = file_path_format.format(test_dir=self._test_dir, bin_dir=self._bin_dir)
             assert os.path.isfile(file_path), '%s is expected but is missing' % file_path
             self._vm_host.put_file(file_path, self._vagrant_dir)
 
@@ -140,7 +141,7 @@ class Vagrant(object):
         box.timezone = box.config.timezone = timezone
 
     def _write_vagrantfile(self, boxes_config):
-        template_file_path = os.path.join(TEST_DIR, 'Vagrantfile.jinja2')
+        template_file_path = os.path.join(TEST_UTILS_DIR, 'Vagrantfile.jinja2')
         with open(template_file_path) as f:
             template = jinja2.Template(f.read())
         vagrantfile = template.render(

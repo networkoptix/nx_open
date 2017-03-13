@@ -1,6 +1,6 @@
 '''Virtual Box VBoxManage command wrapper'''
 
-from host import Host
+from .host import Host
 
 
 class VBoxManage(object):

@@ -3,7 +3,7 @@
 # Test inter-server redirects
 
 import pytest
-from test_utils import print_list
+
 
 @pytest.fixture
 def env(env_builder, server, http_schema):

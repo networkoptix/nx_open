@@ -7,14 +7,14 @@ import sys
 import os.path
 import logging
 import pytest
-from utils import SimpleNamespace
-from session import TestSession
-from test_utils import EnvironmentBuilder
-from host import SshHostConfig
-from vagrant_box_config import box_config_factory
-from cloud_host import resolve_cloud_host_from_registry, create_cloud_host
-from server import ServerConfig
-from camera import MEDIA_SAMPLE_FPATH, SampleMediaFile, Camera
+from test_utils.utils import SimpleNamespace
+from test_utils.session import TestSession
+from test_utils.environment import EnvironmentBuilder
+from test_utils.host import SshHostConfig
+from test_utils.vagrant_box_config import box_config_factory
+from test_utils.cloud_host import resolve_cloud_host_from_registry, create_cloud_host
+from test_utils.server import ServerConfig
+from test_utils.camera import MEDIA_SAMPLE_FPATH, SampleMediaFile, Camera
 
 
 DEFAULT_CLOUD_GROUP = 'test'
@@ -145,4 +145,4 @@ def test_session(run_options):
 
 @pytest.fixture
 def env_builder(request, test_session, run_options, cloud_host_host):
-    return EnvironmentBuilder(test_session, run_options, request.config.cache, cloud_host_host)
+    return EnvironmentBuilder(request.module, test_session, run_options, request.config.cache, cloud_host_host)

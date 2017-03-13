@@ -124,7 +124,7 @@ def box_config_factory(name=None,
     if install_server:
         commands += [make_vm_provision_command(BOX_PROVISION_MEDIASERVER)]
         required_file_list += ['{bin_dir}/' + MEDIASERVER_DIST_FNAME,
-                               '{test_dir}/' + BOX_PROVISION_MEDIASERVER]
+                               '{test_dir}/test_utils/' + BOX_PROVISION_MEDIASERVER]
     for script in provision_scripts or []:
         commands += [make_vm_provision_command(script)]
         required_file_list.append('{test_dir}/' + script)

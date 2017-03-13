@@ -18,10 +18,10 @@ import pytz
 import tzlocal
 import requests.exceptions
 import pytest
-from server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_SEC, HttpError, ServerRestApi
-from vagrant_box_config import box_config_factory, BoxConfig
-from cloud_host import CloudHost
-from camera import Camera, SampleMediaFile
+from .server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_SEC, HttpError, ServerRestApi
+from .vagrant_box_config import box_config_factory, BoxConfig
+from .cloud_host import CloudHost
+from .camera import Camera, SampleMediaFile
 
 
 MEDIASERVER_CONFIG_PATH = '/opt/networkoptix/mediaserver/etc/mediaserver.conf'
