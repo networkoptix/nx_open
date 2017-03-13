@@ -216,7 +216,7 @@ std::atomic< bool > SocketFactory::s_isSslEnforced(false);
 #if TARGET_OS_IPHONE
     std::atomic<int> SocketFactory::s_tcpServerIpVersion(AF_INET6);
     std::atomic<int> SocketFactory::s_tcpClientIpVersion(AF_INET6);
-    std::atomic<int> SocketFactory::s_udpIpVersion(AF_INET6);
+    std::atomic<int> SocketFactory::s_udpIpVersion(AF_INET);
 #else
     std::atomic<int> SocketFactory::s_tcpServerIpVersion(AF_INET);
     std::atomic<int> SocketFactory::s_tcpClientIpVersion(AF_INET);
