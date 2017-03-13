@@ -38,6 +38,7 @@ def send(email, msg_type, message, customization):
     email_from = custom_config["mail_from"]
 
     msg = EmailMultiAlternatives(subject, email_txt_body, email_from, to=(email,))
+    msg.content_subtype = "text"
     msg.attach_alternative(email_html_body, "text/html")
     msg.mixed_subtype = 'related'
 
