@@ -9,26 +9,46 @@ class QnCustomizableItemDelegate: public QStyledItemDelegate
     using base_type = QStyledItemDelegate;
 
 public:
-    QnCustomizableItemDelegate(QObject* parent = nullptr);
+    /* Forward constructor(s). */
+    using QStyledItemDelegate::QStyledItemDelegate;
 
+    /*
+    Custom initStyleOption.
+    Base implementation is called before user functor.
+    */
     using InitStyleOption = std::function<
         void (QStyleOptionViewItem*, const QModelIndex&)>;
-    using CustomInitStyleOption = std::function<
-        void (InitStyleOption /*base*/, QStyleOptionViewItem*, const QModelIndex&)>;
 
+    void setCustomInitStyleOption(InitStyleOption initStyleOption);
+
+    /*
+    Custom sizeHint.
+    Base implementation is not called.
+    Call QnCustomizableItemDelegate::baseSizeHint from user functor if needed.
+    */
     using SizeHint = std::function<
-        QSize (const QStyleOptionViewItem&, const QModelIndex&)>;
-    using CustomSizeHint = std::function<
-        QSize (SizeHint /*base*/, const QStyleOptionViewItem&, const QModelIndex&)>;
+        QSize(const QStyleOptionViewItem&, const QModelIndex&)>;
 
+    void setCustomSizeHint(SizeHint sizeHint);
+
+    QSize baseSizeHint(const QStyleOptionViewItem& option,
+        const QModelIndex& index) const;
+
+    /*
+    Custom paint.
+    Base implementation is not called.
+    Call QnCustomizableItemDelegate::basePaint from user functor if needed.
+    */
     using Paint = std::function<
         void (QPainter*, const QStyleOptionViewItem&, const QModelIndex&)>;
-    using CustomPaint = std::function<
-        void (Paint /*base*/, QPainter*, const QStyleOptionViewItem&, const QModelIndex&)>;
 
-    void setCustomInitStyleOption(CustomInitStyleOption initStyleOption);
-    void setCustomSizeHint(CustomSizeHint sizeHint);
-    void setCustomPaint(CustomPaint paint);
+    void setCustomPaint(Paint paint);
+
+    void basePaint(QPainter* painter, const QStyleOptionViewItem& option,
+        const QModelIndex& index) const;
+
+public:
+    /* Virtual overrides. */
 
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& option,
         const QModelIndex& index) const override;
@@ -41,15 +61,7 @@ protected:
         const QModelIndex& index) const override;
 
 private:
-    void baseInitStyleOption(QStyleOptionViewItem* option,
-        const QModelIndex& index) const;
-
-private:
-    CustomInitStyleOption m_initStyleOption;
-    CustomSizeHint m_sizeHint;
-    CustomPaint m_paint;
-
-    const InitStyleOption m_baseInitStyleOption;
-    const SizeHint m_baseSizeHint;
-    const Paint m_basePaint;
+    InitStyleOption m_initStyleOption;
+    SizeHint m_sizeHint;
+    Paint m_paint;
 };

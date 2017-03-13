@@ -141,11 +141,8 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
 
     auto boldItemDelegate = new QnCustomizableItemDelegate(this);
     boldItemDelegate->setCustomInitStyleOption(
-        [](QnCustomizableItemDelegate::InitStyleOption baseInitStyleOption,
-           QStyleOptionViewItem* option,
-           const QModelIndex& index)
+        [](QStyleOptionViewItem* option, const QModelIndex& /*index*/)
         {
-            baseInitStyleOption(option, index);
             option->font.setBold(true);
         });
 
