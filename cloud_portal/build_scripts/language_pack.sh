@@ -15,6 +15,7 @@ mkdir $DIRECTORY/templates
 echo "project_identifier: cloud-portal" >> $DIRECTORY/crowdin.yaml
 echo "api_key: faf881fc7b7d8dc757eb069e53cba4b1" >> $DIRECTORY/crowdin.yaml
 cp -rf ../cloud/notifications/static/templates/*.html  $DIRECTORY/templates/
+cp -rf ../cloud/notifications/static/templates/*.txt  $DIRECTORY/templates/
 cp -rf ../cloud/notifications/static/templates/*.json  $DIRECTORY/templates/
 
 echo "Copy views"
