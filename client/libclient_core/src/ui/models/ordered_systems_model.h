@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ui/models/sorting_proxy_model.h>
+#include <ui/models/sort_filter_list_model.h>
 #include <client/system_weights_manager.h>
 
 class QnSystemsModel;

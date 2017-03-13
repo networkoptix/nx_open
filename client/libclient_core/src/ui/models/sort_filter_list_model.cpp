@@ -1,4 +1,4 @@
-#include "sorting_proxy_model.h"
+#include "sort_filter_list_model.h"
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
