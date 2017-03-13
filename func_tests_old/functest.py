@@ -1313,7 +1313,6 @@ SimpleTestKeys = {
 
 # Tests to be run on the vargant boxes, separately or within the autotest sequence
 BoxTestKeys = OrderedDict([
-    ('--mainonly', MainFunctests),
     ('--timesync', TimeSyncTest),
     ('--ts-noinet', TimeSyncNoInetTest),
     ('--ts-inet', TimeSyncWithInetTest),
@@ -1469,7 +1468,6 @@ def parseArgs():
     parser.add_argument('--skipdbup', action="store_true", help="Skip DB upgrae test")
     parser.add_argument('--skipcamera', action="store_true", help="Skip virtual camera test")
     parser.add_argument('--skipinstance', action="store_true", help="Skip instance test")
-#    parser.add_argument('--mainonly', action="store_true", help="Execute 'main' (simple) functests only")
     parser.add_argument('--dump', action="store_true", help="Create dump files during RTSP perf tests")
 
 

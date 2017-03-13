@@ -12,6 +12,8 @@
             UpgradeCode="$(var.clientBundleUpgradeCode)"
             DisableModify="yes">
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
+        <util:ProductSearchRef Id='ClientMsiVersion' />
+        <util:ProductSearchRef Id='ServerMsiVersion2' />
 
         <Variable Name="InstallClientOnly" Type="numeric" Value="1" />
 
