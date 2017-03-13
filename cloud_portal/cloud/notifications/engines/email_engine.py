@@ -14,6 +14,7 @@ templates_cache = {}
 configs_cache = {}
 logos_cache = {}
 
+
 def send(email, msg_type, message, customization):
     custom_config = get_custom_config(customization)
     lang = get_language_for_email(email, custom_config['languages'])
@@ -29,12 +30,15 @@ def send(email, msg_type, message, customization):
     subject = custom_config["mail_prefix"] + ' ' + get_email_title(customization, lang, msg_type, templates_location)
     subject = pystache.render(subject, {"message": message, "config": config})
 
-    message_template = read_template(msg_type, templates_location)
-    email_body = pystache.render(message_template, {"message": message, "config": config})
+    message_html_template = read_template(msg_type, templates_location, True)
+    message_txt_template = read_template(msg_type, templates_location, False)
+
+    email_html_body = pystache.render(message_html_template, {"message": message, "config": config})
+    email_txt_body = pystache.render(message_txt_template, {"message": message, "config": config})
     email_from = custom_config["mail_from"]
 
-    msg = EmailMultiAlternatives(subject, email_body, email_from, to=(email,))
-    msg.attach_alternative(email_body, "text/html")
+    msg = EmailMultiAlternatives(subject, email_txt_body, email_from, to=(email,))
+    msg.attach_alternative(email_html_body, "text/html")
     msg.mixed_subtype = 'related'
 
     msg.content_subtype = 'html'  # Main content is now text/html
@@ -62,8 +66,11 @@ def get_email_title(customization, lang, event, templates_location):
     return titles_cache[customization][lang][event]["emailSubject"]
 
 
-def read_template(name, location):
-    filename = os.path.join(location, name + '.mustache')
+def read_template(name, location, html):
+    suffix = ''
+    if not html:
+        suffix = '.txt'
+    filename = os.path.join(location, name + suffix + '.mustache')
     if filename not in templates_cache:
         try:
             # filename = pkg_resources.resource_filename('relnotes', 'templates/{0}.mustache'.format(name))
