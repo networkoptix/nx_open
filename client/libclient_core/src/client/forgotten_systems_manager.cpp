@@ -1,4 +1,4 @@
-]#include "forgotten_systems_manager.h"
+#include "forgotten_systems_manager.h"
 
 #include <nx/utils/log/assert.h>
 #include <finders/systems_finder.h>
@@ -18,7 +18,7 @@ QnForgottenSystemsManager::QnForgottenSystemsManager():
     m_systems = qnClientCoreSettings->forgottenSystems();
 
     const auto processSystemDiscovered =
-        [this, storeSystems](const QnSystemDescriptionPtr& system)
+        [this](const QnSystemDescriptionPtr& system)
         {
             const auto checkOnlineSystem =
                 [this, id = system->id(), localId = system->localId(),
