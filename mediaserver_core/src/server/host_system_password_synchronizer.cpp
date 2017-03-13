@@ -22,7 +22,7 @@ HostSystemPasswordSynchronizer::HostSystemPasswordSynchronizer()
 {
     Qn::directConnect(
         qnResPool, &QnResourcePool::resourceAdded,
-        this, &HostSystemPasswordSynchronizer::at_resourseFound);
+        this, &HostSystemPasswordSynchronizer::at_resourceFound);
 
     if (QnUserResourcePtr admin = qnResPool->getAdministrator())
         setAdmin(admin);
@@ -96,12 +96,13 @@ void HostSystemPasswordSynchronizer::syncLocalHostRootPasswordWithAdminIfNeeded(
 
 void HostSystemPasswordSynchronizer::setAdmin(QnUserResourcePtr admin)
 {
+    syncLocalHostRootPasswordWithAdminIfNeeded(admin);
     Qn::directConnect(
         admin.data(), &QnUserResource::cryptSha512HashChanged,
         this, &HostSystemPasswordSynchronizer::at_adminHashChanged);
 }
 
-void HostSystemPasswordSynchronizer::at_resourseFound(QnResourcePtr resource)
+void HostSystemPasswordSynchronizer::at_resourceFound(QnResourcePtr resource)
 {
     if (const auto user = resource.dynamicCast<QnUserResource>())
     {

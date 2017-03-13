@@ -8,12 +8,12 @@ import os.path
 import logging
 import shutil
 import subprocess
-from utils import SimpleNamespace
-from host import host_from_config
-from vagrant_box_config import BoxConfig
-from vagrant_box import Vagrant
-from server_rest_api import REST_API_USER, REST_API_PASSWORD
-from server import (
+from .utils import SimpleNamespace
+from .host import host_from_config
+from .vagrant_box_config import BoxConfig
+from .vagrant_box import Vagrant
+from .server_rest_api import REST_API_USER, REST_API_PASSWORD
+from .server import (
     MEDIASERVER_LISTEN_PORT,
     ServerConfig,
     Server,
@@ -21,7 +21,6 @@ from server import (
 
 
 DEFAULT_HTTP_SCHEMA = 'http'
-TEST_DIR = os.path.abspath(os.path.dirname(__file__))
 
 log = logging.getLogger(__name__)
 
@@ -30,7 +29,8 @@ class EnvironmentBuilder(object):
 
     vagrant_boxes_cache_key = 'nx/vagrant_boxes'
 
-    def __init__(self, test_session, options, cache, cloud_host_host):
+    def __init__(self, module, test_session, options, cache, cloud_host_host):
+        self._test_dir = os.path.abspath(os.path.dirname(module.__file__))
         self._test_session = test_session
         self._cache = cache
         self._cloud_host_host = cloud_host_host  # cloud host dns name, like: 'cloud-dev.hdw.mx'
@@ -63,7 +63,7 @@ class EnvironmentBuilder(object):
         # now allocate boxes not assigned to servers
         for required_config in boxes_config:
             if required_config not in assigned_configs:
-                self._allocate_box_config(required_config)
+                unused_config = self._allocate_box_config(required_config)
 
     def _allocate_box_config(self, required_config):
         config = self._find_matching_box_config(required_config)
@@ -114,7 +114,7 @@ class EnvironmentBuilder(object):
     def build_environment(self, http_schema=DEFAULT_HTTP_SCHEMA, boxes=None, merge_servers=None,  **kw):
         if not boxes:
             boxes = []
-        log.info('WORK_DIR=%r', self._work_dir)
+        log.info('TEST_DIR=%r, WORK_DIR=%r, BIN_DIR=%r, CLOUD_HOST=%r', self._test_dir, self._work_dir, self._bin_dir, self._cloud_host_host)
         self._boxes_config = self._load_boxes_config_from_cache()
         ssh_config_path = os.path.join(self._work_dir, 'ssh.config')
 
@@ -122,7 +122,7 @@ class EnvironmentBuilder(object):
             vagrant_dir = os.path.join(self._work_dir, 'vagrant')
         else:
             vagrant_dir = os.path.join(self._vm_host_work_dir, 'vagrant')
-        vagrant = Vagrant(self._vm_host, self._bin_dir, vagrant_dir,
+        vagrant = Vagrant(self._test_dir, self._vm_host, self._bin_dir, vagrant_dir,
                           self._test_session.vagrant_private_key_path, ssh_config_path)
 
         if self._test_session.must_recreate_boxes():
@@ -170,21 +170,3 @@ class EnvironmentBuilder(object):
         except subprocess.CalledProcessError as x:
             log.error('Command %s returned status %d:\n%s', x.cmd, x.returncode, x.output)
             raise
-
-
-def print_list(name, values):
-    log.debug('%s:', name)
-    for i, value in enumerate(values):
-        log.debug('\t #%d: %s', i, value)
-
-def bool_to_str(val, false_str = 'false', true_str = 'true'):
-    if val: return true_str
-    else: return false_str
-
-def str_to_bool(val):
-    v = val.lower()
-    if val == 'false' or val == '0':
-        return False
-    elif val == 'true' or val == '1':
-        return True
-    raise Exception('Invalid boolean "%s"' % val)

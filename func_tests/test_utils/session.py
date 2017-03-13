@@ -6,7 +6,7 @@ TestObject instance are shared by all tests. This allows to run some actions onl
 import os.path
 import logging
 import subprocess
-from host import host_from_config
+from .host import host_from_config
 
 
 log = logging.getLogger(__name__)
