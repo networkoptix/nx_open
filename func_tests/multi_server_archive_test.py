@@ -1,9 +1,13 @@
 from datetime import datetime, timedelta
+import logging
 import uuid
 import pytest
 import pytz
 from test_utils import print_list
 from server import TimePeriod
+
+
+log = logging.getLogger(__name__)
 
 
 @pytest.fixture
@@ -14,15 +18,12 @@ def env(env_builder, server):
 
 
 def test_merged_archive(env, camera, sample_media_file):
-    print
-    print env.one.name, env.one.url, env.one.ecs_guid
-    print env.two.name, env.two.url, env.two.ecs_guid
-    print camera, sample_media_file
+    log.debug('camera: %r, sample media file: %r', camera, sample_media_file)
     camera_id = env.one.add_camera(camera)
     one_storage = env.one.storage
     two_storage = env.two.storage
     sample = sample_media_file
-    print 'Sample duration:', sample.duration
+    log.debug('Sample duration: %s', sample.duration)
 
     start_times_one = []
     start_times_one.append(datetime(2017, 1, 27, tzinfo=pytz.utc))

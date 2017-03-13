@@ -19,6 +19,7 @@ import tzlocal
 import requests.exceptions
 import pytest
 from server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_SEC, HttpError, ServerRestApi
+from vagrant_box_config import box_config_factory, BoxConfig
 from cloud_host import CloudHost
 from camera import Camera, SampleMediaFile
 
@@ -148,6 +149,26 @@ class ServerPersistentInfo(object):
             )
 
         
+class ServerConfig(object):
+
+    SETUP_LOCAL = 'local'
+
+    def __init__(self, start=True, setup=SETUP_LOCAL, leave_initial_cloud_host=False, box=None):
+        assert box is None or isinstance(box, BoxConfig), repr(box)
+        self.start = start
+        self.setup = setup
+        self.name = None  # set from env_builder kw keys
+        # By default, by Server's 'init' method  it's hardcoded cloud host will be patched/restored to the one
+        # deduced from --cloud-group option. With leave_initial_cloud_host=True, this step will be skipped.
+        # With leave_initial_cloud_host=True box will also be always recreated before this test to ensure
+        # server binaries has original cloud host encoded by compilation step.
+        self.leave_initial_cloud_host = leave_initial_cloud_host  # bool
+        self.box = box or box_config_factory()
+
+    def __repr__(self):
+        return 'ServerConfig(%r @ %s)' % (self.name, self.box)
+
+
 class Server(object):
 
     def __init__(self, name, box, url):
@@ -168,15 +189,15 @@ class Server(object):
     def __repr__(self):
         return 'Server%r@%s' % (self.name, self.url)
 
-    def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_for_cloud_host=None):
+    def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None):
         self._is_started = was_started = self.service.get_status()
         log.info('Service for %s %s started', self, self._is_started and 'WAS' or 'was NOT')
         if reset:
             if was_started:
                 self.stop_service()
             self.storage.cleanup()
-            if patch_for_cloud_host:
-                self.patch_binary_set_cloud_host(patch_for_cloud_host)  # may be changed by previous tests...
+            if patch_set_cloud_host:
+                self.patch_binary_set_cloud_host(patch_set_cloud_host)  # may be changed by previous tests...
             self.reset_config(logLevel=log_level, tranLogLevel=log_level)
             if must_start:
                 self.start_service()

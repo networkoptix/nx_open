@@ -811,7 +811,18 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     sqlDb.close();
     sqlDb = QSqlDatabase();
     QSqlDatabase::removeDatabase(connectionName);
-    QFile::rename(fileName, fileName + lit("_deprecated"));
+
+	QString depracatedFileName = fileName + lit("_deprecated");
+	if (!QFile::remove(depracatedFileName))
+		NX_LOG(lit("%1 Deprecated db file %2 found but remove failed. Remove it manually and restart server")
+			.arg(Q_FUNC_INFO)
+			.arg(depracatedFileName), cl_logWARNING);
+
+    if (!QFile::rename(fileName, depracatedFileName))
+		NX_LOG(lit("%1 Rename failed for deprecated db file %2. Rename (remove) it manually and restart server")
+			.arg(Q_FUNC_INFO)
+			.arg(fileName), cl_logWARNING);
+
 
     auto sdb = qnStorageDbPool->getSDB(storage);
     if (!sdb)

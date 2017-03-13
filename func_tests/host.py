@@ -201,8 +201,7 @@ class RemoteSshHost(Host):
         
     def write_file(self, to_remote_path, contents):
         remote_dir = os.path.dirname(to_remote_path)
-        self.run_command(['mkdir', '-p', remote_dir])
-        self.run_command(['cat', '>', to_remote_path], contents)
+        self.run_command(['mkdir', '-p', remote_dir, '&&', 'cat', '>', to_remote_path], contents)
 
     def make_proxy_command(self):
         return (self._make_ssh_cmd()
