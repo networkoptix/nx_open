@@ -7,16 +7,16 @@
 
 class QAbstractListModel;
 
-class QnSortingProxyModelPrivate;
-class QnSortingProxyModel: public QAbstractListModel
+class QnSortFilterListModelPrivate;
+class QnSortFilterListModel: public QAbstractListModel
 {
     Q_OBJECT
     using base_type = QAbstractListModel;
 
 public:
-    QnSortingProxyModel(QObject* parent = nullptr);
+    QnSortFilterListModel(QObject* parent = nullptr);
 
-    ~QnSortingProxyModel();
+    ~QnSortFilterListModel();
 
 public:
     void setSourceModel(QAbstractListModel* model);
@@ -40,6 +40,6 @@ public: // overrides section
     QHash<int, QByteArray> roleNames() const override;
 
 private:
-    Q_DECLARE_PRIVATE(QnSortingProxyModel)
-    const QScopedPointer<QnSortingProxyModelPrivate> d_ptr;
+    Q_DECLARE_PRIVATE(QnSortFilterListModel)
+    const QScopedPointer<QnSortFilterListModelPrivate> d_ptr;
 };

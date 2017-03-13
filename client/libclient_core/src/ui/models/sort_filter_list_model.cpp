@@ -2,6 +2,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
+#include <utils/common/connective.h>
 
 namespace {
 
@@ -20,22 +21,22 @@ const auto defaultSortingPredicate =
 } // unnamed namespace
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-class QnSortingProxyModelPrivate : public QObject
+class QnSortFilterListModelPrivate : public Connective<QObject>
 {
-    using base_type = QObject;
+    using base_type = Connective<QObject>;
 
-    Q_DECLARE_PUBLIC(QnSortingProxyModel)
-    QnSortingProxyModel *q_ptr;
+    Q_DECLARE_PUBLIC(QnSortFilterListModel)
+    QnSortFilterListModel *q_ptr;
 
 public:
-    QnSortingProxyModelPrivate(QnSortingProxyModel* parent);
+    QnSortFilterListModelPrivate(QnSortFilterListModel* parent);
 
     void setModel(QAbstractListModel* model);
     QAbstractListModel* model() const;
 
-    void setSortingPred(const QnSortingProxyModel::SortingPredicate& pred);
-    void setFilteringPred(const QnSortingProxyModel::FilteringPredicate& pred);
-    void setTriggeringRoles(const QnSortingProxyModel::RolesList& roles);
+    void setSortingPred(const QnSortFilterListModel::SortingPredicate& pred);
+    void setFilteringPred(const QnSortFilterListModel::FilteringPredicate& pred);
+    void setTriggeringRoles(const QnSortFilterListModel::RolesList& roles);
 
     QModelIndex sourceIndexForTargetRow(int row) const;
     void invalidate();
@@ -82,39 +83,58 @@ private:
 
 private:
     RowsList m_mapped;
-    QAbstractListModel* m_model = nullptr;
-    QnSortingProxyModel::FilteringPredicate m_filterPred = defaultFilteringPredicate;
+    QPointer<QAbstractListModel> m_model = nullptr;
+    QnSortFilterListModel::FilteringPredicate m_filterPred = defaultFilteringPredicate;
     std::function<bool (int, int)> m_sortingPred = defaultSortingPredicate;
 
     using RolesSet = QSet<int>;
     RolesSet m_triggeringRoles;
 };
 
-QnSortingProxyModelPrivate::QnSortingProxyModelPrivate(QnSortingProxyModel* parent):
+QnSortFilterListModelPrivate::QnSortFilterListModelPrivate(QnSortFilterListModel* parent):
     base_type(),
     q_ptr(parent)
 {
 }
 
-void QnSortingProxyModelPrivate::setModel(QAbstractListModel* model)
+void QnSortFilterListModelPrivate::setModel(QAbstractListModel* model)
 {
     if (m_model == model)
         return;
 
     if (m_model)
-        clearCurrentModel();
+    {
+        disconnect(m_model);
 
-    setCurrentModel(model);
+        Q_Q(QnSortFilterListModel);
+        q->beginResetModel();
+        m_mapped.clear();
+        q->endResetModel();
+    }
+
+    m_model = model;
+    if (!m_model)
+        return;
+
+    connect(m_model, &QAbstractListModel::rowsInserted,
+        this, &QnSortFilterListModelPrivate::handleSourceRowsInserted);
+    connect(m_model, &QAbstractListModel::rowsRemoved,
+        this, &QnSortFilterListModelPrivate::handleSourceRowsRemoved);
+    connect(m_model, &QAbstractListModel::rowsMoved,
+        this, &QnSortFilterListModelPrivate::handleSourceRowsMoved);
+    connect(m_model, &QAbstractListModel::dataChanged,
+        this, &QnSortFilterListModelPrivate::handleSourceDataChanged);
+
     invalidate();
 }
 
-QAbstractListModel* QnSortingProxyModelPrivate::model() const
+QAbstractListModel* QnSortFilterListModelPrivate::model() const
 {
     return m_model;
 }
 
-void QnSortingProxyModelPrivate::setSortingPred(
-    const QnSortingProxyModel::SortingPredicate& pred)
+void QnSortFilterListModelPrivate::setSortingPred(
+    const QnSortFilterListModel::SortingPredicate& pred)
 {
 
     if (!pred)
@@ -134,50 +154,19 @@ void QnSortingProxyModelPrivate::setSortingPred(
     invalidate();
 }
 
-void QnSortingProxyModelPrivate::setFilteringPred(
-    const QnSortingProxyModel::FilteringPredicate& pred)
+void QnSortFilterListModelPrivate::setFilteringPred(
+    const QnSortFilterListModel::FilteringPredicate& pred)
 {
     m_filterPred = pred;
     invalidate();
 }
 
-void QnSortingProxyModelPrivate::setTriggeringRoles(const QnSortingProxyModel::RolesList& roles)
+void QnSortFilterListModelPrivate::setTriggeringRoles(const QnSortFilterListModel::RolesList& roles)
 {
-    m_triggeringRoles = RolesSet::fromList(roles);
+    m_triggeringRoles = roles.toSet();
 }
 
-void QnSortingProxyModelPrivate::setCurrentModel(QAbstractListModel* model)
-{
-    m_model = model;
-    if (!m_model)
-        return;
-
-    connect(m_model, &QAbstractListModel::rowsInserted,
-        this, &QnSortingProxyModelPrivate::handleSourceRowsInserted);
-    connect(m_model, &QAbstractListModel::rowsRemoved,
-        this, &QnSortingProxyModelPrivate::handleSourceRowsRemoved);
-    connect(m_model, &QAbstractListModel::rowsMoved,
-        this, &QnSortingProxyModelPrivate::handleSourceRowsMoved);
-    connect(m_model, &QAbstractListModel::dataChanged,
-        this, &QnSortingProxyModelPrivate::handleSourceDataChanged);
-}
-
-void QnSortingProxyModelPrivate::clearCurrentModel()
-{
-    if (!m_model)
-        return;
-
-    disconnect(m_model);
-
-    Q_Q(QnSortingProxyModel);
-    q->beginResetModel();
-    m_mapped.clear();
-    q->endResetModel();
-
-    m_model = nullptr;
-}
-
-QModelIndex QnSortingProxyModelPrivate::sourceIndexForTargetRow(int row) const
+QModelIndex QnSortFilterListModelPrivate::sourceIndexForTargetRow(int row) const
 {
     if (!m_model || (row < 0) || (row >= m_mapped.size()))
         return QModelIndex();
@@ -186,7 +175,7 @@ QModelIndex QnSortingProxyModelPrivate::sourceIndexForTargetRow(int row) const
     return m_model->index(sourceRow);
 }
 
-void QnSortingProxyModelPrivate::invalidate()
+void QnSortFilterListModelPrivate::invalidate()
 {
     if (!m_model)
         return;
@@ -223,7 +212,7 @@ void QnSortingProxyModelPrivate::invalidate()
 
         const int updatedNewIndex = newIndex + (currentIndex < newIndex ? -1 : 0);
 
-        Q_Q(QnSortingProxyModel);
+        Q_Q(QnSortFilterListModel);
         q->beginMoveRows(QModelIndex(), currentIndex, currentIndex, QModelIndex(), newIndex);
         m_mapped.removeAt(currentIndex);
         m_mapped.insert(m_mapped.begin() + updatedNewIndex, sourceRow);
@@ -231,23 +220,23 @@ void QnSortingProxyModelPrivate::invalidate()
     }
 }
 
-int QnSortingProxyModelPrivate::rowCount() const
+int QnSortFilterListModelPrivate::rowCount() const
 {
     return m_mapped.size();
 }
 
-bool QnSortingProxyModelPrivate::isFilteredOut(int sourceRow) const
+bool QnSortFilterListModelPrivate::isFilteredOut(int sourceRow) const
 {
-    return (m_filterPred ? !m_filterPred(m_model->index(sourceRow)) : false);
+    return (m_filterPred && m_model ? !m_filterPred(m_model->index(sourceRow)) : false);
 }
 
-QnSortingProxyModelPrivate::RowsList::iterator QnSortingProxyModelPrivate::positionToInsert(
+QnSortFilterListModelPrivate::RowsList::iterator QnSortFilterListModelPrivate::positionToInsert(
     int sourceRow)
 {
     return std::lower_bound(m_mapped.begin(), m_mapped.end(), sourceRow, m_sortingPred);
 }
 
-void QnSortingProxyModelPrivate::insertSourceRow(int sourceRow)
+void QnSortFilterListModelPrivate::insertSourceRow(int sourceRow)
 {
     if (isFilteredOut(sourceRow))
         return;
@@ -259,7 +248,7 @@ void QnSortingProxyModelPrivate::insertSourceRow(int sourceRow)
         return;
     }
 
-    Q_Q(QnSortingProxyModel);
+    Q_Q(QnSortFilterListModel);
     const auto pos = positionToInsert(sourceRow);
     const auto index = std::distance(m_mapped.begin(), pos);
     q->beginInsertRows(QModelIndex(), index, index);
@@ -267,19 +256,19 @@ void QnSortingProxyModelPrivate::insertSourceRow(int sourceRow)
     q->endInsertRows();
 }
 
-void QnSortingProxyModelPrivate::removeSourceRow(int sourceRow)
+void QnSortFilterListModelPrivate::removeSourceRow(int sourceRow)
 {
     const int index = m_mapped.indexOf(sourceRow);
     if (index == -1)
         return; //< Row is filtered out
 
-    Q_Q(QnSortingProxyModel);
+    Q_Q(QnSortFilterListModel);
     q->beginRemoveRows(QModelIndex(), index, index);
     m_mapped.removeAt(index);
     q->endRemoveRows();
 }
 
-void QnSortingProxyModelPrivate::shiftMappedRows(int minSourceRow, int difference)
+void QnSortFilterListModelPrivate::shiftMappedRows(int minSourceRow, int difference)
 {
     std::for_each(m_mapped.begin(), m_mapped.end(),
         [minSourceRow, difference](int& row)
@@ -289,7 +278,7 @@ void QnSortingProxyModelPrivate::shiftMappedRows(int minSourceRow, int differenc
         });
 }
 
-void QnSortingProxyModelPrivate::handleSourceRowsInserted(
+void QnSortFilterListModelPrivate::handleSourceRowsInserted(
     const QModelIndex& parent,
     int first,
     int last)
@@ -306,7 +295,7 @@ void QnSortingProxyModelPrivate::handleSourceRowsInserted(
         insertSourceRow(row);
 }
 
-void QnSortingProxyModelPrivate::handleSourceRowsRemoved(
+void QnSortFilterListModelPrivate::handleSourceRowsRemoved(
     const QModelIndex& parent,
     int first,
     int last)
@@ -318,12 +307,12 @@ void QnSortingProxyModelPrivate::handleSourceRowsRemoved(
     for (int row = first; row <= last; ++row)
         removeSourceRow(row);
 
-    // We have to decrease all indicies after first by (last - first + 1) value.
+    // We have to decrease all indicies after last by (last - first + 1) value.
     const int difference = -(last - first + 1);
     shiftMappedRows(last, difference);
 }
 
-void QnSortingProxyModelPrivate::handleSourceRowsMoved(
+void QnSortFilterListModelPrivate::handleSourceRowsMoved(
     const QModelIndex& parent,
     int /* start */,
     int /* end */,
@@ -336,10 +325,10 @@ void QnSortingProxyModelPrivate::handleSourceRowsMoved(
         return;
 
     // TODO: #ynikitenkov support handling of moving items
-    NX_ASSERT(false, "QnSortingProxyModel does not handle moves yet");
+    NX_ASSERT(false, "QnSortFilterListModel does not handle moves yet");
 }
 
-void QnSortingProxyModelPrivate::handleSourceDataChanged(
+void QnSortFilterListModelPrivate::handleSourceDataChanged(
     const QModelIndex& topLeft,
     const QModelIndex& bottomRight,
     const QVector<int>& roles)
@@ -352,11 +341,11 @@ void QnSortingProxyModelPrivate::handleSourceDataChanged(
 
     if (topLeft.column() || bottomRight.column())
     {
-        NX_ASSERT(false, "QnSortingProxyModel supports only flat lists models");
+        NX_ASSERT(false, "QnSortFilterListModel supports only flat lists models");
         return;
     }
 
-    Q_Q(QnSortingProxyModel);
+    Q_Q(QnSortFilterListModel);
     for(int row = topLeft.row(); row <= bottomRight.row(); ++row)
     {
         const int targetRow = m_mapped.indexOf(row);
@@ -368,7 +357,7 @@ void QnSortingProxyModelPrivate::handleSourceDataChanged(
     }
 
     if (m_triggeringRoles.isEmpty() ||
-        !m_triggeringRoles.intersect(RolesSet::fromList(roles.toList())).isEmpty())
+        !m_triggeringRoles.intersect(roles.toList().toSet()).isEmpty())
     {
         invalidate();
     }
@@ -376,68 +365,68 @@ void QnSortingProxyModelPrivate::handleSourceDataChanged(
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-QnSortingProxyModel::QnSortingProxyModel(QObject* parent):
+QnSortFilterListModel::QnSortFilterListModel(QObject* parent):
     base_type(parent),
-    d_ptr(new QnSortingProxyModelPrivate(this))
+    d_ptr(new QnSortFilterListModelPrivate(this))
 {
 }
 
-QnSortingProxyModel::~QnSortingProxyModel()
+QnSortFilterListModel::~QnSortFilterListModel()
 {
 }
 
-void QnSortingProxyModel::setSourceModel(QAbstractListModel* model)
+void QnSortFilterListModel::setSourceModel(QAbstractListModel* model)
 {
-    Q_D(QnSortingProxyModel);
+    Q_D(QnSortFilterListModel);
     d->setModel(model);
 }
 
-QAbstractListModel* QnSortingProxyModel::sourceModel() const
+QAbstractListModel* QnSortFilterListModel::sourceModel() const
 {
-    Q_D(const QnSortingProxyModel);
+    Q_D(const QnSortFilterListModel);
     return d->model();
 }
 
-void QnSortingProxyModel::setSortingPredicate(const SortingPredicate& pred)
+void QnSortFilterListModel::setSortingPredicate(const SortingPredicate& pred)
 {
-    Q_D(QnSortingProxyModel);
+    Q_D(QnSortFilterListModel);
     d->setSortingPred(pred);
 }
 
-void QnSortingProxyModel::setFilteringPredicate(const FilteringPredicate& pred)
+void QnSortFilterListModel::setFilteringPredicate(const FilteringPredicate& pred)
 {
-    Q_D(QnSortingProxyModel);
+    Q_D(QnSortFilterListModel);
     d->setFilteringPred(pred);
 }
 
-void QnSortingProxyModel::setTriggeringRoles(const RolesList& roles)
+void QnSortFilterListModel::setTriggeringRoles(const RolesList& roles)
 {
-    Q_D(QnSortingProxyModel);
+    Q_D(QnSortFilterListModel);
     d->setTriggeringRoles(roles);
 }
 
-void QnSortingProxyModel::forceUpdate()
+void QnSortFilterListModel::forceUpdate()
 {
-    Q_D(QnSortingProxyModel);
+    Q_D(QnSortFilterListModel);
     d->invalidate();
 }
 
-int QnSortingProxyModel::rowCount(const QModelIndex& /* parent */) const
+int QnSortFilterListModel::rowCount(const QModelIndex& /* parent */) const
 {
-    Q_D(const QnSortingProxyModel);
+    Q_D(const QnSortFilterListModel);
     return d->rowCount();
 }
 
-QVariant QnSortingProxyModel::data(const QModelIndex& index, int role) const
+QVariant QnSortFilterListModel::data(const QModelIndex& index, int role) const
 {
-    Q_D(const QnSortingProxyModel);
+    Q_D(const QnSortFilterListModel);
     const auto modelIndex = d->sourceIndexForTargetRow(index.row());
     return modelIndex.data(role);
 }
 
-QHash<int, QByteArray> QnSortingProxyModel::roleNames() const
+QHash<int, QByteArray> QnSortFilterListModel::roleNames() const
 {
-    Q_D(const QnSortingProxyModel);
+    Q_D(const QnSortFilterListModel);
     const auto model = d->model();
     return (model ? model->roleNames() : QHash<int, QByteArray>());
 }

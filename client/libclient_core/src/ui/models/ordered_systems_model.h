@@ -4,11 +4,11 @@
 #include <client/system_weights_manager.h>
 
 class QnSystemsModel;
-class QnOrderedSystemsModel: public QnSortingProxyModel
+class QnOrderedSystemsModel: public QnSortFilterListModel
 {
     Q_OBJECT
     Q_PROPERTY(QString minimalVersion READ minimalVersion WRITE setMinimalVersion NOTIFY minimalVersionChanged)
-    using base_type = QnSortingProxyModel;
+    using base_type = QnSortFilterListModel;
 
 public:
     QnOrderedSystemsModel(QObject* parent = nullptr);
