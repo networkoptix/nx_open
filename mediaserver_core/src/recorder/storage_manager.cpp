@@ -2116,15 +2116,10 @@ void QnStorageManager::stopAsyncTasks()
     }
 }
 
-QnStorageResourcePtr QnStorageManager::getUsedWritableStorageByIndex(int storageIndex)
+QnStorageResourcePtr QnStorageManager::getStorageByIndex(int index) const
 {
-    for (const auto& storage: getUsedWritableStorages())
-    {
-        if (qnStorageDbPool->getStorageIndex(storage) == storageIndex)
-            return storage;
-    }
-
-    return QnStorageResourcePtr();
+    QnMutexLocker lock(&m_mutexStorages);
+    return m_storageRoots.value(index);
 }
 
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
@@ -2135,16 +2130,23 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
     auto optimalStorageIndex = m_spaceInfo.getOptimalStorageIndex(
         [pred, this](int storageIndex)
         { 
-            auto storage = getUsedWritableStorageByIndex(storageIndex);
-            if (storage && pred(storage) && storage->getFreeSpace() > kMinStorageFreeSpace)
-                return true;
+            for (const auto& storage: getUsedWritableStorages())
+            {
+                if (storage && 
+                    qnStorageDbPool->getStorageIndex(storage) == storageIndex && 
+                    pred(storage) && 
+                    storage->getFreeSpace() > kMinStorageFreeSpace)
+                {
+                    return true;
+                }
+            }
             return false;
         });
 
     if (optimalStorageIndex == -1)
         return result;
 
-    result = getUsedWritableStorageByIndex(optimalStorageIndex);
+    result = getStorageByIndex(optimalStorageIndex);
     if (!result)
     {
         NX_LOG(lit("[Storage, Selection] Failed to find storage for index %1")

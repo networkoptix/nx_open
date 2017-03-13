@@ -235,6 +235,7 @@ private:
     static void updateCameraHistory();
     static std::vector<QnUuid> getCamerasWithArchive();
     int64_t calculateNxOccupiedSpace(int storageIndex) const;
+    QnStorageResourcePtr getStorageByIndex(int index) const;
 private:
     const QnServer::StoragePool m_role;
     StorageMap                  m_storageRoots;

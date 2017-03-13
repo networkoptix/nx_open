@@ -104,14 +104,16 @@ DeviceFileCatalog::DeviceFileCatalog(
 {
 }
 
-int64_t DeviceFileCatalog::getSpaceByStorageIndex(int storageIndex) const
+qint64 DeviceFileCatalog::getSpaceByStorageIndex(int storageIndex) const
 {
-    int64_t result = 0;
+    qint64 result = 0;
     QnMutexLocker lock(&m_mutex);
 
     for (const auto& chunk: m_chunks)
+    {
         if (chunk.storageIndex == storageIndex)
             result += chunk.getFileSize();
+    }
         
     return result;
 }
