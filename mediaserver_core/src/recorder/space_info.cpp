@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <iterator>
 #include "space_info.h"
 #include <nx/utils/log/log.h>
 
@@ -80,7 +81,8 @@ int SpaceInfo::getOptimalStorageIndex(std::function<bool(int)> useStoragePredica
 
     /* get filtered by predicate storages vector */
     SpaceInfoVector filteredStorageIndexes;
-    std::copy_if(m_storageSpaceInfo.cbegin(), m_storageSpaceInfo.cend(), filteredStorageIndexes.begin(),
+    std::copy_if(m_storageSpaceInfo.cbegin(), m_storageSpaceInfo.cend(), 
+        std::back_inserter(filteredStorageIndexes),
         [useStoragePredicate](const StorageSpaceInfo& info) 
         { 
             return useStoragePredicate(info.index) && info.totalSpace > 0; 
