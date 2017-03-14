@@ -1,11 +1,11 @@
-<h1>Добро пожаловать в PRODUCT_NAME</h1>
+<h1>Добро пожаловать в {{PRODUCT_NAME}}</h1>
 
 {{#message.sharer_name}}
-<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> приглашает вас присоединиться к <a href="{{config.portal_url}}">PRODUCT_NAME</a> и предоставляет доступ к своей системе {{message.system_name}}.</p>
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> приглашает вас присоединиться к <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a> и предоставляет доступ к своей системе {{message.system_name}}.</p>
 {{/message.sharer_name}}
 
 {{^message.sharer_name}}
-<p>Приглашаем вас присоединиться к <a href="{{config.portal_url}}">PRODUCT_NAME</a>. 
+<p>Приглашаем вас присоединиться к <a href="{{config.portal_url}}">{{PRODUCT_NAME}}</a>. 
 Вам был предоставлен доступ к {{message.system_name}}.</p>
 {{/message.sharer_name}}
 

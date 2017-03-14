@@ -71,8 +71,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': (
-            '/app/www/customization/{}'.format(CUSTOMIZATION), # Looks like static files used as templates
-            '/app/www/customization/{}/templates'.format(CUSTOMIZATION),
+            '/app/app/static/{}'.format(CUSTOMIZATION), # Looks like static files used as templates
+            '/app/app/static/{}/templates'.format(CUSTOMIZATION),
         ),
         'APP_DIRS': True,
         'OPTIONS': {
@@ -177,6 +177,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': True,
             'handlers': ['console', 'mail_admins']
+        },
+        'notifications.tasks': {
+            'level': 'DEBUG',
+            'propagate': True,
+            'handlers': ['console', 'mail_admins']
         }
     }
 }
@@ -260,7 +265,7 @@ LINKS_LIVE_TIMEOUT = 300  # Five minutes
 PASSWORD_REQUIREMENTS = {
     'minLength': 8,
     'requiredRegex': re.compile("^[\x21-\x7E]|[\x21-\x7E][\x20-\x7E]*[\x21-\x7E]$"),
-    'commonList': 'static/scripts/commonPasswordsList.json'
+    'commonList': 'static/{}/static/scripts/commonPasswordsList.json'.format(CUSTOMIZATION)
 }
 
 common_list_file = PASSWORD_REQUIREMENTS['commonList']
@@ -295,3 +300,5 @@ STATIC_LOCATION = os.path.join(BASE_DIR, "static")
 LANGUAGES = conf['languages']
 DEFAULT_LANGUAGE = conf['languages'][0]
 UPDATE_JSON = 'http://updates.networkoptix.com/updates.json'
+
+MAX_RETRIES = conf['max_retries']

@@ -76,7 +76,11 @@ def language(request):
         lang = detect_language_by_request(request)
         language_file = '/static/lang_' + lang + '/language.json'
         # Return: redirect to language.json file for selected language
-        return redirect(language_file)
+        response = redirect(language_file)
+
+        request.session['language'] = lang
+        response.set_cookie('language', lang, 60 * 60 * 24 * 7)  # Cookie for one week
+        return response
     elif request.method == 'POST':
         require_params(request, ('language',))
         lang = request.data['language']

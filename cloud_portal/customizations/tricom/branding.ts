@@ -3,15 +3,15 @@
   <context>
     <name>global</name>
     <message>
-      <source>PRODUCT_NAME</source>
+      <source>{{PRODUCT_NAME}}</source>
       <translation>Tricom Cloud</translation>
     </message>
     <message>
-      <source>CLIENT_PROTOCOL</source>
+      <source>{{CLIENT_PROTOCOL}}</source>
       <translation>mvss-vms</translation>
     </message>
     <message>
-      <source>VMS_NAME</source>
+      <source>{{VMS_NAME}}</source>
       <translation>Tricom MVSS</translation>
     </message>
     <message>
@@ -35,15 +35,15 @@
       <translation>disabled</translation>
     </message>
     <message>
-      <source>IOS_APP_LINK</source>
+      <source>{{IOS_APP_LINK}}</source>
       <translation>disabled</translation>
     </message>
     <message>
-      <source>ANDROID_APP_LINK</source>
+      <source>{{ANDROID_APP_LINK}}</source>
       <translation>disabled</translation>
     </message>     
     <message>
-      <source>COMPANY_NAME</source>
+      <source>{{COMPANY_NAME}}</source>
       <translation>Tricom Research, Inc.</translation>
     </message>
   </context>
