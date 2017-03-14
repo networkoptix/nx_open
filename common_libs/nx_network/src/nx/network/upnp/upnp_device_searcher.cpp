@@ -38,7 +38,6 @@ DeviceSearcher::DeviceSearcher(
     m_globalSettings(globalSettings),
     m_discoverTryTimeoutMS( discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS ),
     m_timerID( 0 ),
-    m_readBuf( new char[READ_BUF_CAPACITY] ),
     m_terminated( false ),
     m_needToUpdateReceiveSocket(false)
 {
@@ -57,9 +56,6 @@ DeviceSearcher::DeviceSearcher(
 DeviceSearcher::~DeviceSearcher()
 {
     pleaseStop();
-
-    delete[] m_readBuf;
-    m_readBuf = NULL;
 
     UPNPDeviceSearcherInstance = nullptr;
 }
