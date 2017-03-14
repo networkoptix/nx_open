@@ -2,16 +2,16 @@
 
 #include <functional>
 
-#include <QtCore/QAbstractListModel>
+#include <QtCore/QAbstractProxyModel>
 #include <QtCore/QScopedPointer>
 
 class QAbstractListModel;
 
 class QnSortFilterListModelPrivate;
-class QnSortFilterListModel: public QAbstractListModel
+class QnSortFilterListModel: public QAbstractProxyModel
 {
     Q_OBJECT
-    using base_type = QAbstractListModel;
+    using base_type = QAbstractProxyModel;
 
 public:
     QnSortFilterListModel(QObject* parent = nullptr);
@@ -37,9 +37,19 @@ public:
         const QModelIndex& sourceParent) const;
 
 public: // overrides section
-    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
-    QHash<int, QByteArray> roleNames() const override;
+    virtual QModelIndex mapToSource(const QModelIndex& proxyIndex) const override;
+    virtual QModelIndex mapFromSource(const QModelIndex& sourceIndex) const override;
+    virtual QModelIndex index(
+        int row,
+        int column,
+        const QModelIndex& parent = QModelIndex()) const override;
+
+    virtual QModelIndex parent(const QModelIndex& child) const override;
+
+    virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+    virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    virtual QHash<int, QByteArray> roleNames() const override;
 
 private:
     Q_DECLARE_PRIVATE(QnSortFilterListModel)

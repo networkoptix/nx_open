@@ -4,6 +4,11 @@
 #include <nx/utils/math/fuzzy.h>
 #include <utils/common/connective.h>
 
+namespace {
+static constexpr int kListColumnsCount = 1;
+} // unnamed namespace
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
 class QnSortFilterListModelPrivate : public Connective<QObject>
 {
     using base_type = Connective<QObject>;
@@ -137,15 +142,6 @@ QAbstractListModel* QnSortFilterListModelPrivate::model() const
 void QnSortFilterListModelPrivate::setTriggeringRoles(const QnSortFilterListModel::RolesSet& roles)
 {
     m_triggeringRoles = roles;
-}
-
-QModelIndex QnSortFilterListModelPrivate::sourceIndexForTargetRow(int row) const
-{
-    if (!m_model || (row < 0) || (row >= m_mapped.size()))
-        return QModelIndex();
-
-    const auto sourceRow = m_mapped[row];
-    return m_model->index(sourceRow);
 }
 
 void QnSortFilterListModelPrivate::refresh()
@@ -326,6 +322,9 @@ void QnSortFilterListModelPrivate::handleSourceDataChanged(
     const QModelIndex& bottomRight,
     const QVector<int>& roles)
 {
+    if (!m_model)
+        return;
+
     if (!topLeft.isValid() || !bottomRight.isValid())
     {
         NX_ASSERT(false, "Invalid indicies");
@@ -339,14 +338,15 @@ void QnSortFilterListModelPrivate::handleSourceDataChanged(
     }
 
     Q_Q(QnSortFilterListModel);
-    for(int row = topLeft.row(); row <= bottomRight.row(); ++row)
+    for(int sourceRow = topLeft.row(); sourceRow <= bottomRight.row(); ++sourceRow)
     {
-        const int targetRow = m_mapped.indexOf(row);
-        if (targetRow == -1)
+        const auto sourceIndex = m_model->index(sourceRow, 0);
+        if (!sourceIndex.isValid())
             continue;
 
-        const auto targetIndex = q->index(targetRow);
-        emit q->dataChanged(targetIndex, targetIndex, roles);
+        const auto targetIndex = q->mapFromSource(sourceIndex);
+        if (targetIndex.isValid())
+            emit q->dataChanged(targetIndex, targetIndex, roles);
     }
 
     if (m_triggeringRoles.isEmpty() ||
@@ -426,17 +426,63 @@ bool QnSortFilterListModel::filterAcceptsRow(
     return true;
 }
 
+QModelIndex QnSortFilterListModel::mapToSource(const QModelIndex& proxyIndex) const
+{
+    Q_D(const QnSortFilterListModel);
+
+    const int row = proxyIndex.row();
+    if (!d->m_model || (row < 0) || (row >= d->m_mapped.size()))
+        return QModelIndex();
+
+    const auto sourceRow = d->m_mapped[row];
+    return d->m_model->index(sourceRow);
+}
+
+QModelIndex QnSortFilterListModel::mapFromSource(const QModelIndex& sourceIndex) const
+{
+    Q_D(const QnSortFilterListModel);
+
+    const int sourceRow = sourceIndex.row();
+    if (!d->m_model || (sourceRow < 0) || (sourceRow >= d->m_model->rowCount()))
+        return QModelIndex();
+
+    const int targetRow = d->m_mapped.indexOf(sourceRow);
+    return (targetRow == -1 ? QModelIndex() : index(targetRow, 0));
+}
+
+QModelIndex QnSortFilterListModel::index(
+    int row,
+    int column,
+    const QModelIndex& parent) const
+{
+    if (parent.isValid() || (column > kListColumnsCount))
+    {
+        NX_ASSERT(false, "QnSortFilterListModel supports is a flat list model");
+        return QModelIndex();
+    }
+
+    return createIndex(row, column, nullptr);
+}
+
+QModelIndex QnSortFilterListModel::parent(const QModelIndex& /* child */) const
+{
+    return QModelIndex(); //< for list models parent is always empty
+}
+
 int QnSortFilterListModel::rowCount(const QModelIndex& /* parent */) const
 {
     Q_D(const QnSortFilterListModel);
     return d->rowCount();
 }
 
+int QnSortFilterListModel::columnCount(const QModelIndex& /*parent */) const
+{
+    return kListColumnsCount;
+}
+
 QVariant QnSortFilterListModel::data(const QModelIndex& index, int role) const
 {
-    Q_D(const QnSortFilterListModel);
-    const auto modelIndex = d->sourceIndexForTargetRow(index.row());
-    return modelIndex.data(role);
+    return mapToSource(index).data(role);
 }
 
 QHash<int, QByteArray> QnSortFilterListModel::roleNames() const
