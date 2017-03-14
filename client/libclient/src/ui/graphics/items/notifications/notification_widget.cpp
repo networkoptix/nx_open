@@ -154,6 +154,7 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
 
     updateToolTipPosition();
     updateToolTipVisibility();
+    updateLabelPalette();
 
     setCacheMode(QGraphicsItem::ItemCoordinateCache);
 }
@@ -199,6 +200,7 @@ void QnNotificationWidget::setNotificationLevel(QnNotificationLevel::Value notif
 
     m_notificationLevel = notificationLevel;
     m_color = QnNotificationLevel::notificationColor(m_notificationLevel);
+    updateLabelPalette();
 
     emit notificationLevelChanged();
 }
@@ -303,6 +305,15 @@ void QnNotificationWidget::showToolTip()
     opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
 }
 
+void QnNotificationWidget::updateLabelPalette()
+{
+    auto textColorRole = m_notificationLevel == QnNotificationLevel::Value::NoNotification
+        ? QPalette::AlternateBase
+        : QPalette::WindowText;
+
+    setPaletteColor(m_textLabel, QPalette::WindowText, palette().color(textColorRole));
+}
+
 void QnNotificationWidget::updateToolTipVisibility()
 {
     if (m_toolTipHoverProcessor->isHovered() && !m_tooltipWidget->text().isEmpty())
@@ -333,18 +344,18 @@ void QnNotificationWidget::clickedNotify(QGraphicsSceneMouseEvent* event)
         triggerDefaultAction();
 }
 
-bool QnNotificationWidget::event(QEvent* event)
+void QnNotificationWidget::changeEvent(QEvent* event)
 {
-    auto result = base_type::event(event);
-    if (event->type() == QnEvent::Customize)
-    {
-        auto textColorRole = m_notificationLevel == QnNotificationLevel::Value::NoNotification
-            ? QPalette::AlternateBase
-            : QPalette::WindowText;
+    base_type::changeEvent(event);
 
-        setPaletteColor(m_textLabel, QPalette::WindowText, palette().color(textColorRole));
+    switch (event->type())
+    {
+        case QEvent::PaletteChange:
+            updateLabelPalette();
+            break;
+        default:
+            break;
     }
-    return result;
 }
 
 void QnNotificationWidget::at_loop_sound()
