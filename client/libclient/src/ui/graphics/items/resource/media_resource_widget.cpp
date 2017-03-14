@@ -524,6 +524,7 @@ void QnMediaResourceWidget::resetSoftwareTriggerButtons()
     for (const auto& id: m_softwareTriggers)
     {
         const auto trigger = new QnSoftwareTriggerButton(this);
+        //TODO: #vkutin Replace with user-selected icon
         trigger->setIcon(qnSkin->icon(lit("item/mic.png")));
         trigger->setFixedSize(qnSkin->maximumSize(trigger->icon()));
         trigger->setToolTip(QnBusinessStringsHelper::getSoftwareTriggerName(id));
