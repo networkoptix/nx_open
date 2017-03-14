@@ -52,7 +52,12 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
     QMap<Operation, Result> results;
     results[Operation::RegisterUriHandler] = osCheck(Operation::RegisterUriHandler, registerUriHandler());
     results[Operation::UpdateApplauncher] = osCheck(Operation::UpdateApplauncher, updateApplauncher());
-    results[Operation::UpdateMinilauncher] = osCheck(Operation::UpdateMinilauncher, updateMinilauncher());
+    #if defined(Q_OS_LINUX)
+        results[Operation::UpdateMinilauncher] = Result::Success;
+    #else
+        results[Operation::UpdateMinilauncher] =
+            osCheck(Operation::UpdateMinilauncher, updateMinilauncher());
+    #endif
 
     /* If we are already in self-update mode, just exit in any case. */
     if (startupParams.selfUpdateMode)
