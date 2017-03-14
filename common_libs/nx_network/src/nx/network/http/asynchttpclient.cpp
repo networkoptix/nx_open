@@ -1041,10 +1041,17 @@ void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
     const bool useHttp11 = true;   //TODO #ak check if we need it (e.g. we using keep-alive or requesting live capture)
 
     m_request.requestLine.method = httpMethod;
+
     if (m_proxyEndpoint)
+    {
         m_request.requestLine.url = m_contentLocationUrl;
+    }
     else    //if no proxy specified then erasing http://host:port from request url
-        m_request.requestLine.url = m_contentLocationUrl.path() + (m_contentLocationUrl.hasQuery() ? (QLatin1String("?") + m_contentLocationUrl.query()) : QString());
+    {
+        m_request.requestLine.url = m_contentLocationUrl.path();
+        m_request.requestLine.url.setQuery(m_contentLocationUrl.query());
+        m_request.requestLine.url.setFragment(m_contentLocationUrl.fragment());
+    }
     m_request.requestLine.version = useHttp11 ? nx_http::http_1_1 : nx_http::http_1_0;
 
     nx_http::insertOrReplaceHeader(
