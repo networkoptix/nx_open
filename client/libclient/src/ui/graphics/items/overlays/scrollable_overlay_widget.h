@@ -36,6 +36,9 @@ public:
     QSizeF maxFillCoeff() const;
     void setMaxFillCoeff(const QSizeF &coeff);
 
+    int itemSpacing() const;
+    void setItemSpacing(int spacing);
+
     QSizeF contentSize() const;
 
 signals:

@@ -54,6 +54,7 @@
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <ui/graphics/items/resource/software_trigger_button.h>
 #include <ui/graphics/items/resource/two_way_audio_widget.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
@@ -233,52 +234,6 @@ void clearSensitivityRegion(MotionGrid& grid, const QPoint& at)
     }
 };
 
-//TODO: #vkutin This software trigger buttons implementation is a stub
-// Actual implementation will be done as soon as software triggers specification is ready.
-
-constexpr int kTriggerButtonWidth = 232;
-constexpr qreal kTriggerButtonOpacity = 0.5;
-
-QnImageButtonWidget* createTriggerButton(const QString& text)
-{
-    const auto size = QSize(kTriggerButtonWidth, style::Metrics::kButtonHeight);
-    const auto rect = QRect(QPoint(0, 0), size);
-
-    auto button = new QnImageButtonWidget;
-    button->setFixedSize(size);
-
-    const auto pixelRatio = qApp->devicePixelRatio();
-    const auto pixmapSize = size * pixelRatio;
-
-    const auto prepareImage =
-        [&](QStyle::State state) -> QPixmap
-        {
-            QPixmap pixmap(pixmapSize);
-            pixmap.fill(Qt::transparent);
-            pixmap.setDevicePixelRatio(pixelRatio);
-
-            QStyleOptionButton option;
-            option.rect = rect;
-            option.palette = button->palette();
-            option.state = state | QStyle::State_Enabled;
-            option.text = text;
-
-            QPainter painter(&pixmap);
-            button->style()->drawControl(QStyle::CE_PushButton, &option, &painter);
-            return pixmap;
-        };
-
-    QIcon icon;
-    icon.addPixmap(prepareImage(QStyle::State_None),      QIcon::Normal);
-    icon.addPixmap(prepareImage(QStyle::State_MouseOver), QIcon::Active);
-    icon.addPixmap(prepareImage(QStyle::State_Sunken),    QnIcon::Pressed);
-
-    button->setIcon(icon);
-    button->setOpacity(kTriggerButtonOpacity);
-
-    return button;
-}
-
 } // anonymous namespace
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWorkbenchItem* item, QGraphicsItem* parent):
@@ -376,9 +331,17 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         addOverlayWidget(m_compositeTextOverlay, detail::OverlayParams(UserVisible, true, true));
         auto updateContentsMargins = [this]()
             {
-                auto positionOverlayGeometry = overlayWidgets()->positionOverlay->contentSize();
+                static constexpr int kVerticalMargin = 4;
+                static constexpr int kHorizontalMargin = 48;
+                const auto positionOverlayGeometry = overlayWidgets()->positionOverlay->contentSize();
+                const auto positionOverlayMargins = overlayWidgets()->positionOverlay->contentsMargins();
+                const bool hasTriggers = !overlayWidgets()->triggersOverlay->contentSize().isEmpty();
                 auto margins = m_compositeTextOverlay->contentsMargins();
-                margins.setBottom(positionOverlayGeometry.height() + 4);
+                margins.setBottom(positionOverlayMargins.bottom() + 1
+                    + kVerticalMargin
+                    + positionOverlayGeometry.height());
+                if (hasTriggers)
+                    margins.setRight(positionOverlayMargins.right() + 1 + kHorizontalMargin);
                 m_compositeTextOverlay->setContentsMargins(margins);
             };
 
@@ -389,7 +352,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         /* Let widgets to be displayed before updating margins. */
         executeDelayedParented(updateContentsMargins, kDefaultDelay, this);
     }
-
 
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module))
@@ -530,7 +492,7 @@ void QnMediaResourceWidget::resetSoftwareTriggerButtons()
 
     /* Delete existing buttons: */
     for (const auto& id: m_softwareTriggerIds)
-        overlayWidgets()->positionOverlay->removeItem(id);
+        overlayWidgets()->triggersOverlay->removeItem(id);
 
     m_softwareTriggers.clear();
     m_softwareTriggerIds.clear();
@@ -561,8 +523,12 @@ void QnMediaResourceWidget::resetSoftwareTriggerButtons()
     int pos = 0;
     for (const auto& id: m_softwareTriggers)
     {
-        auto trigger = createTriggerButton(QnBusinessStringsHelper::getSoftwareTriggerName(id));
-        m_softwareTriggerIds << overlayWidgets()->positionOverlay->insertItem(pos++, trigger);
+        const auto trigger = new QnSoftwareTriggerButton(this);
+        trigger->setIcon(qnSkin->icon(lit("item/mic.png")));
+        trigger->setFixedSize(qnSkin->maximumSize(trigger->icon()));
+        trigger->setToolTip(QnBusinessStringsHelper::getSoftwareTriggerName(id));
+
+        m_softwareTriggerIds << overlayWidgets()->triggersOverlay->insertItem(pos++, trigger);
 
         connect(trigger, &QnImageButtonWidget::clicked, this,
             [this, id, resourceId]()
@@ -842,8 +808,8 @@ void QnMediaResourceWidget::ensureTwoWayAudioWidget()
     context()->statisticsModule()->registerButton(lit("two_way_audio"), m_twoWayAudioWidget);
 
     /* Items are ordered left-to-right and top-to bottom, so we are inserting two-way audio item on top. */
-    overlayWidgets()->positionOverlay->insertItem(0, m_twoWayAudioWidget);
-    overlayWidgets()->positionOverlay->setMaxFillCoeff(QSizeF(1.0, 0.8));
+    overlayWidgets()->triggersOverlay->insertItem(0, m_twoWayAudioWidget);
+    overlayWidgets()->triggersOverlay->setMaxFillCoeff(QSizeF(1.0, 0.8));
 }
 
 bool QnMediaResourceWidget::animationAllowed() const

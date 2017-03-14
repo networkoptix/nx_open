@@ -8,7 +8,7 @@
 #include <utils/math/math.h>
 
 namespace {
-    const int layoutSpacing = 1;
+    const int kDefaultItemSpacing = 1;
 }
 
 QnScrollableOverlayWidgetPrivate::ItemData::ItemData() :
@@ -23,15 +23,16 @@ QnScrollableOverlayWidgetPrivate::ItemData::ItemData(const QnUuid& id, QGraphics
 {
 }
 
-QnScrollableOverlayWidgetPrivate::QnScrollableOverlayWidgetPrivate(Qt::Alignment alignment, QnScrollableOverlayWidget *parent )
-    : q_ptr(parent)
-    , m_contentWidget(new QGraphicsWidget(parent))
-    , m_scrollArea(new QnGraphicsScrollArea(parent))
-    , m_mainLayout(new QGraphicsLinearLayout(Qt::Horizontal))
-    , m_items()
-    , m_alignment(alignment)
-    , m_updating(false)
-    , m_maxFillCoeff(1.0, 1.0)
+QnScrollableOverlayWidgetPrivate::QnScrollableOverlayWidgetPrivate(Qt::Alignment alignment, QnScrollableOverlayWidget* parent):
+    q_ptr(parent),
+    m_contentWidget(new QGraphicsWidget(parent)),
+    m_scrollArea(new QnGraphicsScrollArea(parent)),
+    m_mainLayout(new QGraphicsLinearLayout(Qt::Horizontal)),
+    m_items(),
+    m_alignment(alignment),
+    m_updating(false),
+    m_maxFillCoeff(1.0, 1.0),
+    m_itemSpacing(kDefaultItemSpacing)
 {
     m_scrollArea->setContentWidget(m_contentWidget);
     m_scrollArea->setAlignment(Qt::AlignBottom | Qt::AlignRight);
@@ -126,10 +127,10 @@ void QnScrollableOverlayWidgetPrivate::updatePositions()
             left = (widht - item->size().width()) / 2;
 
         item->setPos(left, height);
-        height += item->size().height() + layoutSpacing;
+        height += item->size().height() + m_itemSpacing;
     }
 
-    m_contentWidget->resize(widht, std::max(0, height - layoutSpacing));
+    m_contentWidget->resize(widht, std::max(0, height - m_itemSpacing));
 
     Q_Q(QnScrollableOverlayWidget);
     q->updateGeometry();
