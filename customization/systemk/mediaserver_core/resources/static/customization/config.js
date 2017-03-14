@@ -1,18 +1,8 @@
 Config.helpLinks.push({
-    url: "http://support.networkoptix.com",
+    url: "marketing@systemk.co.jp",
     title: "Support",
-    target: "new" // new|frame
-});
-
-Config.helpLinks.push({
-    url: "http://networkoptix.com/calculator/#/",
-    title: "System calculator",
-    target: "new" // new|frame
-});
-
-Config.helpLinks.push({
-    url: "https://itunes.apple.com/eg/app/hd-witness/id648369716?mt=8",
-    title: "iOS Client",
+    description:"Have a question about specific features of your system?",
+    button:"get support",
     target: "new" // new|frame
 });
 
@@ -34,8 +24,7 @@ Config.helpLinks.push({
 });
 
 Config.allowDebugMode = false;
-//Config.webclientEnabled = false; // Uncomment this string to disable web client
-Config.productName = 'VMS Demo';
-Config.cloud.productName = 'VMS Demo Cloud';
+Config.productName = 'Nx Witness';
+Config.cloud.productName = 'Nx Cloud';
 
-Config.supportedLanguages = ['en_US', 'fr', 'es'];
+Config.supportedLanguages = ['en_US', 'ja'];

@@ -1,5 +1,5 @@
 Config.helpLinks.push({
-    url: "supportcn@foxmail.com",
+    url: "http://support.networkoptix.com",
     title: "Support",
     description:"Have a question about specific features of your Nx Witness system?",
     button:"get support",
@@ -7,7 +7,7 @@ Config.helpLinks.push({
 });
 
 Config.helpLinks.push({
-    url: "supportcn@foxmail.com",
+    url: "http://networkoptix.com/calculator/#/",
     title: "System calculator",
     description:"Building a new Nx Witness system or expanding your current system? Use the Nx System Calculator to calculate suggested storage and network requirements.",
     button: "Go to the calculator",
@@ -18,12 +18,12 @@ Config.helpLinks.push({
 Config.helpLinks.push({
     urls: [
         {
-            url: "supportcn@foxmail.com",
+            url: "https://itunes.apple.com/eg/app/hd-witness/id1050899754?mt=8",
             button: "iOS Client",
             class:'appstore'
         },
         {
-            url: "supportcn@foxmail.com",
+            url: "https://play.google.com/store/apps/details?id=com.networkoptix.nxwitness",
             class:'googleplay',
             button: "Android Client"
         }
@@ -33,8 +33,7 @@ Config.helpLinks.push({
 });
 
 Config.allowDebugMode = false;
-//Config.webclientEnabled = false; // Uncomment this string to disable web client
-Config.productName = 'PCMS';
-Config.cloud.productName = 'PCMS Cloud';
+Config.productName = 'Nx Witness';
+Config.cloud.productName = 'Nx Cloud';
 
 Config.supportedLanguages = ['zh_CN'];

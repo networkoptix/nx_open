@@ -2,7 +2,7 @@ Config.helpLinks.push({
     url: "http://digital-watchdog.com/support/contact-tech-support/",
     title: "Support",
     description:"Have a question about specific features of your VMS system?",
-    button:"Get support",
+    button:"get support",
     target: "new" // new|frame
 });
 
@@ -10,7 +10,7 @@ Config.helpLinks.push({
     url: "http://digital-watchdog.com/support/tools/ip-configurator/",
     title: "System calculator",
     description:"Building a new VMS system or expanding your current system? Use the System Calculator to calculate suggested storage and network requirements.",
-    button:"Go to the calculator",
+    button: "Go to the calculator",
     target: "new" // new|frame
 });
 
@@ -33,7 +33,7 @@ Config.helpLinks.push({
 
 Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
-Config.productName = 'NTN';
-Config.cloud.productName = 'NTN Cloud';
+Config.productName = 'DW Spectrum';
+Config.cloud.productName = 'DW Cloud';
 
-Config.supportedLanguages = ['en_US'];
+Config.supportedLanguages = ['en_US', 'en_GB', 'fr', 'de', 'ru', 'es', 'ja', 'ko', 'th', 'zh_CN', 'zh_TW', 'vi_VN', 'hu', 'he', 'pt_PT'];
