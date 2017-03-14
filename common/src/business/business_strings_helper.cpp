@@ -292,7 +292,8 @@ QStringList QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameter
     case ServerStartEvent:
         break;
     case UserDefinedEvent:
-        result << params.description;
+        if (!params.description.isEmpty())
+            result << params.description;
         break;
     default:
         break;
