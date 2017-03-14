@@ -51,7 +51,8 @@ QnNotificationListWidget::QnNotificationListWidget(QGraphicsItem *parent, Qt::Wi
     m_collapser.item->setVisible(true);
     m_collapser.setAnimation(0, 0, kMoveUpTimeoutMs * 0.5);
 
-    connect(this, SIGNAL(geometryChanged()), this, SLOT(at_geometry_changed()));
+    connect(this, &QGraphicsWidget::geometryChanged, this,
+        &QnNotificationListWidget::at_geometry_changed);
 }
 
 QnNotificationListWidget::~QnNotificationListWidget()
@@ -99,6 +100,7 @@ void QnNotificationListWidget::tick(int deltaMSecs)
 {
     // y-coord of the lowest item
     qreal bottomY = 0;
+    const auto maxY = geometry().height() - kCollapserHeight;
 
     bool canShowNew = true;
     foreach(QnNotificationWidget* item, m_items)
@@ -138,7 +140,7 @@ void QnNotificationListWidget::tick(int deltaMSecs)
             }
             case ItemData::Collapsed:
             {
-                if (canShowNew && (bottomY + item->geometry().height() <= geometry().height()))
+                if (canShowNew && (bottomY + item->geometry().height() <= maxY))
                 {
                     data->state = ItemData::Displaying;
 
@@ -426,6 +428,8 @@ void QnNotificationListWidget::at_item_geometryChanged()
 
 void QnNotificationListWidget::at_geometry_changed()
 {
+    const auto maxY = geometry().height() - kCollapserHeight;
+
     foreach(QnNotificationWidget *item, m_items | boost::adaptors::reversed)
     {
         ItemData* data = m_itemDataByItem[item];
@@ -435,7 +439,7 @@ void QnNotificationListWidget::at_geometry_changed()
             data->state == ItemData::Collapsing) //do not collapse item tha is already hiding
             continue;
 
-        if (item->geometry().bottom() > geometry().height())
+        if (item->geometry().bottom() > maxY)
         {
             data->state = ItemData::Collapsing;
             data->setAnimation(0.0, 90.0, kCollapseTimeoutMs / m_speedUp);
