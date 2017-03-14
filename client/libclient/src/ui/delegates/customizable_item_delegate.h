@@ -23,7 +23,7 @@ public:
 
     /*
     Custom sizeHint.
-    Base implementation is not called.
+    Base implementation is not called, but initStyleOption is already called.
     Call QnCustomizableItemDelegate::baseSizeHint from user functor if needed.
     */
     using SizeHint = std::function<
@@ -36,7 +36,7 @@ public:
 
     /*
     Custom paint.
-    Base implementation is not called.
+    Base implementation is not called, but initStyleOption is already called.
     Call QnCustomizableItemDelegate::basePaint from user functor if needed.
     */
     using Paint = std::function<
@@ -56,6 +56,7 @@ public:
     virtual QSize sizeHint(const QStyleOptionViewItem& option,
         const QModelIndex& index) const override;
 
+protected:
     virtual void initStyleOption(QStyleOptionViewItem* option,
         const QModelIndex& index) const override;
 

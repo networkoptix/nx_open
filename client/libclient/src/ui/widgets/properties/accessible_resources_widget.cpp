@@ -127,15 +127,12 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
         });
 
     indirectAccessDelegate->setCustomPaint(
-        [indirectAccessDelegate](QPainter* painter, const QStyleOptionViewItem& option,
-            const QModelIndex& index)
+        [](QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index)
         {
-            QStyleOptionViewItem viewItem(option);
-            indirectAccessDelegate->initStyleOption(&viewItem, index);
-            viewItem.widget->style()->drawPrimitive(QStyle::PE_PanelItemViewItem,
-                &viewItem, painter, viewItem.widget);
-            viewItem.icon.paint(painter, viewItem.rect, Qt::AlignCenter,
-                viewItem.state.testFlag(QStyle::State_Selected)
+            option.widget->style()->drawPrimitive(QStyle::PE_PanelItemViewItem,
+                &option, painter, option.widget);
+            option.icon.paint(painter, option.rect, Qt::AlignCenter,
+                option.state.testFlag(QStyle::State_Selected)
                     ? QIcon::Normal
                     : QIcon::Disabled);
         });

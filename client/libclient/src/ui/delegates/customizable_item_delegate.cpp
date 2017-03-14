@@ -20,10 +20,15 @@ void QnCustomizableItemDelegate::paint(
     const QStyleOptionViewItem& option,
     const QModelIndex& index) const
 {
-    if (m_paint)
-        m_paint(painter, option, index);
-    else
+    if (!m_paint)
+    {
         base_type::paint(painter, option, index);
+        return;
+    }
+
+    QStyleOptionViewItem optionCopy(option);
+    initStyleOption(&optionCopy, index);
+    m_paint(painter, optionCopy, index);
 }
 
 void QnCustomizableItemDelegate::basePaint(
@@ -38,9 +43,12 @@ QSize QnCustomizableItemDelegate::sizeHint(
     const QStyleOptionViewItem& option,
     const QModelIndex& index) const
 {
-    return m_sizeHint
-        ? m_sizeHint(option, index)
-        : base_type::sizeHint(option, index);
+    if (!m_sizeHint)
+        return base_type::sizeHint(option, index);
+
+    QStyleOptionViewItem optionCopy(option);
+    initStyleOption(&optionCopy, index);
+    return m_sizeHint(optionCopy, index);
 }
 
 QSize QnCustomizableItemDelegate::baseSizeHint(
