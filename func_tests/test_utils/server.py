@@ -19,15 +19,15 @@ import tzlocal
 import requests.exceptions
 import pytest
 from .server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_SEC, HttpError, ServerRestApi
-from .vagrant_box_config import box_config_factory, BoxConfig
+from .vagrant_box_config import BoxConfigFactory, BoxConfig
 from .cloud_host import CloudHost
 from .camera import Camera, SampleMediaFile
 
 
-MEDIASERVER_CONFIG_PATH = '/opt/networkoptix/mediaserver/etc/mediaserver.conf'
-MEDIASERVER_CONFIG_PATH_INITIAL = '/opt/networkoptix/mediaserver/etc/mediaserver.conf.initial'
+MEDIASERVER_CONFIG_PATH = '/opt/{company_name}/mediaserver/etc/mediaserver.conf'
+MEDIASERVER_CONFIG_PATH_INITIAL = '{config_path}.initial'
+MEDIASERVER_SERVICE_NAME = '{company_name}-mediaserver'
 MEDIASERVER_LISTEN_PORT = 7001
-MEDIASERVER_SERVICE_NAME = 'networkoptix-mediaserver'
 MEDIASERVER_UNSETUP_LOCAL_SYSTEM_ID = '{00000000-0000-0000-0000-000000000000}'  # local system id for not set up server
 
 MEDIASERVER_CLOUDHOST_TAG = 'this_is_cloud_host_name'
@@ -148,12 +148,22 @@ class ServerPersistentInfo(object):
             password=self.password,
             )
 
-        
+
+class ServerConfigFactory(object):
+
+    def __init__(self, box_config_factory):
+        assert isinstance(box_config_factory, BoxConfigFactory), repr(box_config_factory)
+        self._box_config_factory = box_config_factory
+
+    def __call__(self, *args, **kw):
+        return ServerConfig(self._box_config_factory, *args, **kw)
+
+
 class ServerConfig(object):
 
     SETUP_LOCAL = 'local'
 
-    def __init__(self, start=True, setup=SETUP_LOCAL, leave_initial_cloud_host=False, box=None):
+    def __init__(self, box_config_factory, start=True, setup=SETUP_LOCAL, leave_initial_cloud_host=False, box=None):
         assert box is None or isinstance(box, BoxConfig), repr(box)
         self.start = start
         self.setup = setup
@@ -171,12 +181,14 @@ class ServerConfig(object):
 
 class Server(object):
 
-    def __init__(self, name, box, url):
+    def __init__(self, company_name, name, box, url):
+        self._company_name = company_name
         self.title = name
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
         self.box = box
         self.url = url
-        self.service = Service(box, MEDIASERVER_SERVICE_NAME)
+        self._config_path = MEDIASERVER_CONFIG_PATH.format(company_name=self._company_name)
+        self.service = Service(box, MEDIASERVER_SERVICE_NAME.format(company_name=self._company_name))
         self.user = REST_API_USER
         self.password = REST_API_PASSWORD
         self._init_rest_api()
@@ -273,7 +285,9 @@ class Server(object):
         self.restart()
 
     def reset_config(self, **kw):
-        self.box.host.run_command(['cp', MEDIASERVER_CONFIG_PATH_INITIAL, MEDIASERVER_CONFIG_PATH])
+        self.box.host.run_command(['cp',
+                                   MEDIASERVER_CONFIG_PATH_INITIAL.format(config_path=self._config_path),
+                                   self._config_path])
         self.change_config(removeDbOnStartup=1, **kw)
 
     def restart(self, timeout=30):
@@ -320,9 +334,9 @@ class Server(object):
             return False
 
     def change_config(self, **kw):
-        old_config = self.box.host.read_file(MEDIASERVER_CONFIG_PATH)
+        old_config = self.box.host.read_file(self._config_path)
         new_config = change_mediaserver_config(old_config, **kw)
-        self.box.host.write_file(MEDIASERVER_CONFIG_PATH, new_config)
+        self.box.host.write_file(self._config_path, new_config)
 
     def patch_binary_set_cloud_host(self, new_host):
         assert not self._is_started, 'Server %s must be stopped first for patching its binaries' % self

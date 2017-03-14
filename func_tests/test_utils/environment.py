@@ -29,11 +29,12 @@ class EnvironmentBuilder(object):
 
     vagrant_boxes_cache_key = 'nx/vagrant_boxes'
 
-    def __init__(self, module, test_session, options, cache, cloud_host_host):
+    def __init__(self, module, test_session, options, cache, cloud_host_host, company_name):
         self._test_dir = os.path.abspath(os.path.dirname(module.__file__))
         self._test_session = test_session
         self._cache = cache
         self._cloud_host_host = cloud_host_host  # cloud host dns name, like: 'cloud-dev.hdw.mx'
+        self._company_name = company_name
         self._work_dir = options.work_dir
         self._bin_dir = options.bin_dir
         self._reset_servers = options.reset_servers
@@ -90,7 +91,7 @@ class EnvironmentBuilder(object):
     def _init_server(self, box_config_to_box, http_schema, config):
         box = box_config_to_box[config.box]
         url = '%s://%s:%d/' % (http_schema, box.ip_address, MEDIASERVER_LISTEN_PORT)
-        server = Server(config.name, box, url)
+        server = Server(self._company_name, config.name, box, url)
         if config.leave_initial_cloud_host:
             patch_set_cloud_host = None
         else:

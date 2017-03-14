@@ -10,7 +10,7 @@ import pytz
 DEFAULT_NATNET1 = '10.0.5/24'
 DEFAULT_HOSTNET = '10.0.6.0'
 BOX_PROVISION_MEDIASERVER = 'box-provision-mediaserver.sh'
-MEDIASERVER_DIST_FNAME = 'networkoptix-mediaserver.deb'  # expected in vagrant dir
+MEDIASERVER_DIST_FNAME = 'mediaserver.deb'  # expected in vagrant dir
 
 
 class ConfigCommand(object):
@@ -104,31 +104,38 @@ def make_vm_config_private_network_command(ip_address):
         kwargs['type'] = ':dhcp'
     return VmConfigCommand('network', [':private_network'], kwargs)
 
-def make_vm_provision_command(script):
-    return VmConfigCommand('provision', [':shell'], dict(path='"%s"' % script))
+def make_vm_provision_command(script, env=None):
+    kwargs = dict(path='"%s"' % script)
+    if env:
+        kwargs['env'] = '{%s}' % ', '.join('%s: %s' % (name, value) for name, value in env.items())
+    return VmConfigCommand('provision', [':shell'], kwargs)
 
 def make_vbox_netnat_command(net_idx, network):
     return VirtualBoxConfigCommand([':modifyvm', ':id', '"--natnet%d"' % net_idx, '"%s"' % network])
 
-# ip_address may end with .0 (like 1.2.3.0); this will be treated as network address, and dhcp will be used for it
-def box_config_factory(name=None,
-                       install_server=True,
-                       provision_scripts=None,
-                       ip_address_list=None,
-                       required_file_list=None):
-    commands = []
-    if not required_file_list:
-        required_file_list = []
-    for ip_address in ip_address_list or [DEFAULT_HOSTNET]:
-        commands += [make_vm_config_private_network_command(ip_address)]
-    if install_server:
-        commands += [make_vm_provision_command(BOX_PROVISION_MEDIASERVER)]
-        required_file_list += ['{bin_dir}/' + MEDIASERVER_DIST_FNAME,
-                               '{test_dir}/test_utils/' + BOX_PROVISION_MEDIASERVER]
-    for script in provision_scripts or []:
-        commands += [make_vm_provision_command(script)]
-        required_file_list.append('{test_dir}/' + script)
-    return BoxConfig(None, name, required_file_list, commands)
+
+class BoxConfigFactory(object):
+
+    def __init__(self, company_name):
+        self._company_name = company_name
+
+    # ip_address may end with .0 (like 1.2.3.0); this will be treated as network address, and dhcp will be used for it
+    def __call__(self, name=None, install_server=True, provision_scripts=None,
+                 ip_address_list=None, required_file_list=None):
+        commands = []
+        if not required_file_list:
+            required_file_list = []
+        for ip_address in ip_address_list or [DEFAULT_HOSTNET]:
+            commands += [make_vm_config_private_network_command(ip_address)]
+        if install_server:
+            commands += [make_vm_provision_command(
+                BOX_PROVISION_MEDIASERVER, env=dict(COMPANY_NAME='"%s"' % self._company_name))]
+            required_file_list += ['{bin_dir}/' + MEDIASERVER_DIST_FNAME,
+                                   '{test_dir}/test_utils/' + BOX_PROVISION_MEDIASERVER]
+        for script in provision_scripts or []:
+            commands += [make_vm_provision_command(script)]
+            required_file_list.append('{test_dir}/' + script)
+        return BoxConfig(None, name, required_file_list, commands)
 
 
 class BoxConfig(object):
