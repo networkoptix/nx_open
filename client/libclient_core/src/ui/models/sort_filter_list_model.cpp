@@ -28,6 +28,8 @@ private:
     void setCurrentModel(QAbstractListModel* model);
     void clearCurrentModel();
 
+    void resetTargetModel();
+
     void handleSourceRowsInserted(
         const QModelIndex& parent,
         int first,
@@ -55,16 +57,20 @@ private:
         const QModelIndex& bottomRight,
         const QVector<int>& roles);
 
+    void handleResetSourceModel();
+
 private:
     void insertSourceRow(int sourceRow);
 
-    void removeSourceRow(int mappedIndex);
+    void removeSourceRow(int sourceRow);
 
     bool isFilteredOut(int sourceRow) const;
 
     int indexToInsert(int sourceRow);
 
     void shiftMappedRows(int fromSourceRow, int difference);
+
+//    void checkMapping();
 
 private:
     using RowsList = QList<int>;
@@ -81,6 +87,17 @@ QnSortFilterListModelPrivate::QnSortFilterListModelPrivate(QnSortFilterListModel
 {
 }
 
+void QnSortFilterListModelPrivate::resetTargetModel()
+{
+    if (!m_model)
+        return;
+
+    Q_Q(QnSortFilterListModel);
+    q->beginResetModel();
+    m_mapped.clear();
+    q->endResetModel();
+}
+
 void QnSortFilterListModelPrivate::setModel(QAbstractListModel* model)
 {
     if (m_model == model)
@@ -89,11 +106,7 @@ void QnSortFilterListModelPrivate::setModel(QAbstractListModel* model)
     if (m_model)
     {
         m_model->disconnect(this);
-
-        Q_Q(QnSortFilterListModel);
-        q->beginResetModel();
-        m_mapped.clear();
-        q->endResetModel();
+        resetTargetModel();
     }
 
     m_model = model;
@@ -103,7 +116,6 @@ void QnSortFilterListModelPrivate::setModel(QAbstractListModel* model)
     connect(m_model, &QAbstractListModel::rowsInserted,
         this, &QnSortFilterListModelPrivate::handleSourceRowsInserted);
 
-
     connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved,
         this, &QnSortFilterListModelPrivate::handleSourceRowsAboutToBeRemoved);
     connect(m_model, &QAbstractListModel::rowsRemoved,
@@ -112,6 +124,8 @@ void QnSortFilterListModelPrivate::setModel(QAbstractListModel* model)
         this, &QnSortFilterListModelPrivate::handleSourceRowsMoved);
     connect(m_model, &QAbstractListModel::dataChanged,
         this, &QnSortFilterListModelPrivate::handleSourceDataChanged);
+    connect(m_model, &QAbstractListModel::modelReset,
+        this, &QnSortFilterListModelPrivate::handleResetSourceModel);
 
     refresh();
 }
@@ -153,14 +167,7 @@ void QnSortFilterListModelPrivate::refresh()
         if (shouldBeFilteredOut != currentFilteredOut)
         {
             if (shouldBeFilteredOut)
-            {
-                /**
-                 * Index will never be -1 here because it is not filtered out currently.
-                 * removeSourceRow checks this anyway.
-                 */
-                NX_ASSERT(currentIndex != -1, "Index can't be -1 here!");
-                removeSourceRow(currentIndex);
-            }
+                removeSourceRow(sourceRow);
             else
                 insertSourceRow(sourceRow); // Here row is placed in right position
 
@@ -226,10 +233,13 @@ void QnSortFilterListModelPrivate::insertSourceRow(int sourceRow)
     q->beginInsertRows(QModelIndex(), index, index);
     m_mapped.insert(index, sourceRow);
     q->endInsertRows();
+
+//    checkMapping();
 }
 
-void QnSortFilterListModelPrivate::removeSourceRow(int mappedIndex)
+void QnSortFilterListModelPrivate::removeSourceRow(int sourceRow)
 {
+    const auto mappedIndex = m_mapped.indexOf(sourceRow);
     if (mappedIndex == -1)
         return; //< Row is filtered out
 
@@ -279,7 +289,7 @@ void QnSortFilterListModelPrivate::handleSourceRowsAboutToBeRemoved(
         return;
 
     for (int row = first; row <= last; ++row)
-        removeSourceRow(m_mapped.indexOf(first));
+        removeSourceRow(row);
 }
 
 void QnSortFilterListModelPrivate::handleSourceRowsRemoved(
@@ -347,6 +357,25 @@ void QnSortFilterListModelPrivate::handleSourceDataChanged(
     }
 }
 
+void QnSortFilterListModelPrivate::handleResetSourceModel()
+{
+    resetTargetModel();
+    refresh();
+}
+
+/*
+void QnSortFilterListModelPrivate::checkMapping()
+{
+    int srcSize = m_model->rowCount();
+    qDebug() << ">>>" << "size =" << m_mapped.size() << "src size =" << m_model->rowCount();
+    qDebug() << m_mapped;
+    for (auto r: m_mapped)
+    {
+        if (r >= srcSize)
+            qDebug() << "!!!!!!! INVALID INDEX" << r;
+    }
+}
+*/
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 QnSortFilterListModel::QnSortFilterListModel(QObject* parent):
