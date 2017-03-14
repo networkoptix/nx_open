@@ -852,6 +852,10 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if (!resource)
         return;
 
+    // We can get here while checking event loop on application closing
+    if (!resource->resourcePool())
+        return;
+
     if (resource->hasFlags(Qn::fake))
         return;
 
