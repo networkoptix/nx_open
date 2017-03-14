@@ -208,7 +208,7 @@ void QnCompositeTextOverlay::initTextMode()
             const auto caption = QnBusinessStringsHelper::eventAtResource(runtimeParams, Qn::RI_WithUrl);
             const auto htmlCaption = htmlFormattedParagraph(caption, kCaptionPixelFontSize, true);
 
-            const auto desc = QnBusinessStringsHelper::eventDetails(runtimeParams, lit("\n"));
+            const auto desc = QnBusinessStringsHelper::eventDetails(runtimeParams).join(L'\n');
             const auto htmlDesc = htmlFormattedParagraph(desc, kDescriptionPixelFontSize);
 
             if (caption.trimmed().isEmpty() && desc.trimmed().isEmpty())  // Do not add empty text items

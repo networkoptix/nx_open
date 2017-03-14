@@ -35,6 +35,7 @@ ApplauncherProcess::ApplauncherProcess(
     QSettings* const settings,
     InstallationManager* const installationManager,
     Mode mode,
+    const QStringList& applicationParameters,
     const QString& mirrorListUrl)
     :
     m_terminated(false),
@@ -44,7 +45,8 @@ ApplauncherProcess::ApplauncherProcess(
     m_taskServer(this),
     m_settings(settings),
     m_bindTriesCount(0),
-    m_isLocalServerWasNotFound(false)
+    m_isLocalServerWasNotFound(false),
+    m_applicationParameters(applicationParameters)
 {}
 
 void ApplauncherProcess::pleaseStop()
@@ -73,6 +75,7 @@ void ApplauncherProcess::processRequest(
             break;
 
         case applauncher::api::TaskType::startApplication:
+            m_installationManager->updateInstalledVersionsInformation();
             *response = new applauncher::api::Response();
             startApplication(
                 std::static_pointer_cast<applauncher::api::StartApplicationTask>(request),
@@ -101,6 +104,7 @@ void ApplauncherProcess::processRequest(
             break;
 
         case applauncher::api::TaskType::isVersionInstalled:
+            m_installationManager->updateInstalledVersionsInformation();
             *response = new applauncher::api::IsVersionInstalledResponse();
             isVersionInstalled(
                 std::static_pointer_cast<applauncher::api::IsVersionInstalledRequest>(request),
@@ -108,6 +112,7 @@ void ApplauncherProcess::processRequest(
             break;
 
         case applauncher::api::TaskType::getInstalledVersions:
+            m_installationManager->updateInstalledVersionsInformation();
             *response = new applauncher::api::GetInstalledVersionsResponse();
             getInstalledVersions(
                 std::static_pointer_cast<applauncher::api::GetInstalledVersionsRequest>(request),
@@ -143,7 +148,8 @@ void ApplauncherProcess::launchNewestClient()
     enum { kTriesCount = 2 };
     for (int i = 0; i < kTriesCount; ++i)
     {
-        const auto startAppTask = std::make_shared<applauncher::api::StartApplicationTask>(versionToLaunch, QString());
+        const auto startAppTask = std::make_shared<applauncher::api::StartApplicationTask>(
+            versionToLaunch, m_applicationParameters);
         if (startApplication(startAppTask, &response))
             break;
 

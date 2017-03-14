@@ -66,18 +66,19 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     /* NxMediaPlayer should not be used.
        It is here only to allow assignments of MediaPlyer to properties of this type. */
     qmlRegisterType<nx::media::Player>("Nx.Media", 1, 0, "NxMediaPlayer");
-    qmlRegisterType<MediaPlyer>("Nx.Media", 1, 0, "MediaPlayer");
+    qmlRegisterType<MediaPlayer>("Nx.Media", 1, 0, "MediaPlayer");
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");
     qmlRegisterType<QnThumbnailCacheAccessor>("com.networkoptix.qml", 1, 0, "QnThumbnailCacheAccessor");
     qmlRegisterType<QnQuickItemMouseTracker>("com.networkoptix.qml", 1, 0, "ItemMouseTracker");
-    qmlRegisterType<QnQuickTextInput>("com.networkoptix.qml", 1, 0, "QnTextInput");
+    qmlRegisterType<QnQuickTextInput>("Nx.Controls", 1, 0, "TextInput");
     qmlRegisterType<QnMobileClientUiController>("com.networkoptix.qml", 1, 0, "QnMobileClientUiController");
     qmlRegisterType<QnLiteClientController>("com.networkoptix.qml", 1, 0, "QnLiteClientController");
     qmlRegisterType<QnLiteClientLayoutHelper>("com.networkoptix.qml", 1, 0, "QnLiteClientLayoutHelper");
     qmlRegisterType<utils::DeveloperSettingsHelper>(
         "com.networkoptix.qml", 1, 0, "DeveloperSettingsHelper");
 
-    qmlRegisterRevision<QQuickTextInput, 6>("com.networkoptix.qml", 1, 0);
+    qmlRegisterRevision<QQuickTextInput, 6>("Nx.Controls", 1, 0);
+    qmlRegisterRevision<QQuickItem, 1>("Nx.Controls", 1, 0);
     qmlRegisterRevision<QQuickItem, 1>("com.networkoptix.qml", 1, 0);
 
     qmlRegisterSingletonType(QUrl(lit("qrc:///qml/QnTheme.qml")), "com.networkoptix.qml", 1, 0, "QnTheme");

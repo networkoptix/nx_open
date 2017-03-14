@@ -4,7 +4,7 @@ namespace nx {
 namespace client {
 namespace mobile {
 
-MediaPlyer::MediaPlyer(QObject* parent):
+MediaPlayer::MediaPlayer(QObject* parent):
     base_type(parent)
 {
     auto updateState = [this]
@@ -34,20 +34,20 @@ MediaPlyer::MediaPlyer(QObject* parent):
             }
         };
 
-    connect(this, &MediaPlyer::playbackStateChanged, this, updateState);
-    connect(this, &MediaPlyer::mediaStatusChanged, this, updateState);
+    connect(this, &MediaPlayer::playbackStateChanged, this, updateState);
+    connect(this, &MediaPlayer::mediaStatusChanged, this, updateState);
 }
 
-MediaPlyer::~MediaPlyer()
+MediaPlayer::~MediaPlayer()
 {
 }
 
-QString MediaPlyer::resourceId() const
+QString MediaPlayer::resourceId() const
 {
     return m_resourceId;
 }
 
-void MediaPlyer::setResourceId(const QString& resourceId)
+void MediaPlayer::setResourceId(const QString& resourceId)
 {
     if (m_resourceId == resourceId)
         return;
@@ -60,23 +60,23 @@ void MediaPlyer::setResourceId(const QString& resourceId)
         : QString());
 }
 
-void MediaPlyer::playLive()
+void MediaPlayer::playLive()
 {
     setPosition(-1);
     play();
 }
 
-bool MediaPlyer::loading() const
+bool MediaPlayer::loading() const
 {
     return m_loading;
 }
 
-bool MediaPlyer::playing() const
+bool MediaPlayer::playing() const
 {
     return m_playing;
 }
 
-bool MediaPlyer::failed() const
+bool MediaPlayer::failed() const
 {
     return m_failed;
 }

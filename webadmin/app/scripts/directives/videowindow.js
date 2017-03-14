@@ -27,7 +27,7 @@ angular.module('webadminApp')
                 vgPlayerReady:"&",
                 vgSrc:"="
             },
-            templateUrl: 'views/components/videowindow.html',// ???
+            templateUrl: Config.viewsDir + 'components/videowindow.html',// ???
 
             link: function (scope, element/*, attrs*/) {
 
@@ -39,6 +39,7 @@ angular.module('webadminApp')
                     'mp4': 'video/mp4'
                 };
 
+                scope.Config = Config;
                 scope.debugMode = Config.debug.video && Config.allowDebugMode;
                 scope.debugFormat = Config.allowDebugMode && Config.debug.videoFormat;
 

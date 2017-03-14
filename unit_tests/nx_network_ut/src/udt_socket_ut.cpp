@@ -14,6 +14,7 @@
 #include <nx/utils/test_support/test_options.h>
 
 #include "common_server_socket_ut.h"
+#include "stream_socket_ut.h"
 
 namespace nx {
 namespace network {
@@ -357,6 +358,9 @@ TEST_F(SocketUdt, acceptingFirstConnection)
     for (int i = 0; i < loopLength; ++i)
     {
         UdtStreamServerSocket serverSocket(AF_INET);
+        auto serverSocketGuard = makeScopedGuard(
+            [&serverSocket]() { serverSocket.pleaseStopSync(); });
+
         ASSERT_TRUE(serverSocket.bind(SocketAddress(HostAddress::localhost, 0)));
         const auto serverAddress = serverSocket.getLocalAddress();
         ASSERT_TRUE(serverSocket.listen());
@@ -381,8 +385,6 @@ TEST_F(SocketUdt, acceptingFirstConnection)
 
         const auto result = socketAcceptedPromise.get_future().get();
         ASSERT_EQ(SystemError::noError, result.first);
-
-        serverSocket.pleaseStopSync();
     }
 }
 
@@ -738,6 +740,14 @@ TEST_F(UdtSocketPerformance, DISABLED_DuplexSync)
 }
 
 INSTANTIATE_TYPED_TEST_CASE_P(UdtStreamServerSocket, ServerSocketTest, UdtStreamServerSocket);
+
+struct UdtSocketTypeSet
+{
+    using ClientSocket = UdtStreamSocket;
+    using ServerSocket = UdtStreamServerSocket;
+};
+
+INSTANTIATE_TYPED_TEST_CASE_P(UdtSocketStream, StreamSocket, UdtSocketTypeSet);
 
 } // namespace test
 } // namespace network

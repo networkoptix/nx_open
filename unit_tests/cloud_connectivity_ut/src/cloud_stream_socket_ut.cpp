@@ -125,6 +125,7 @@ TEST_F(CloudStreamSocketTest, simple)
         bytesToSendThroughConnection,
         network::test::TestTransmissionMode::spam);
     ASSERT_TRUE(server.start());
+    auto serverGuard = makeScopedGuard([&server]() { server.pleaseStopSync(); });
 
     const auto serverAddress = server.addressBeingListened();
 
@@ -132,6 +133,13 @@ TEST_F(CloudStreamSocketTest, simple)
     nx::network::SocketGlobals::addressResolver().addFixedAddress(
         tempHostName,
         serverAddress);
+    auto tempHostNameGuard = makeScopedGuard(
+        [&tempHostName, &serverAddress]()
+        {
+            nx::network::SocketGlobals::addressResolver().removeFixedAddress(
+                tempHostName,
+                serverAddress);
+        });
 
     for (size_t i = 0; i < repeatCount; ++i)
     {
@@ -153,11 +161,6 @@ TEST_F(CloudStreamSocketTest, simple)
         const int bytesRead = cloudSocket.recv(data.data(), data.size(), MSG_WAITALL);
         ASSERT_EQ(bytesToSendThroughConnection, (size_t)bytesRead);
     }
-
-    server.pleaseStopSync();
-    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
-        tempHostName,
-        serverAddress);
 }
 
 TEST_F(CloudStreamSocketTest, multiple_connections_random_data)

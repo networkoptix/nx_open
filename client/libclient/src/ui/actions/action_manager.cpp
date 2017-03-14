@@ -1038,11 +1038,6 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Main).
         separator();
 
-    factory(QnActions::ShowcaseAction).
-        flags(Qn::Main).
-        text(tr("How-to Videos and FAQ...")).
-        condition(new QnShowcaseActionCondition(this));
-
     factory(QnActions::AboutAction).
         flags(Qn::Main | Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
@@ -1661,6 +1656,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnConjunctionActionCondition(
             new QnResourceActionCondition(hasFlags(Qn::remote_server), Qn::ExactlyOne, this),
             new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
+            new QnNegativeActionCondition(new QnCloudServerActionCondition(Qn::Any, this), this),
             this));
 
     factory(QnActions::ServerSettingsAction).
@@ -1689,7 +1685,6 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnConjunctionActionCondition(
             new QnVideoWallReviewModeCondition(true, this),
             new QnLightModeCondition(Qn::LightModeSingleItem, this),
-            new QnItemsCountActionCondition(QnItemsCountActionCondition::MultipleItems, this),
             this));
 
     factory().

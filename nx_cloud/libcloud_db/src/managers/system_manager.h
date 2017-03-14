@@ -150,11 +150,6 @@ public:
         const std::string& accountEmail,
         const std::string& systemId) const;
 
-    /** Create data view restricted by authzInfo and filter. */
-    DataView<data::SystemData> createView(
-        const AuthorizationInfo& authzInfo,
-        data::DataFilter filter);
-
     nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription();
     const nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription() const;
 

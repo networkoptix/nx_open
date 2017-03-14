@@ -2,10 +2,12 @@
 #top {
     background-color: black; }
 
-#top a {
+
+.navbar-default .navbar-nav>li>a {
     color: white; }
 
-#top a:hover {
+
+.navbar-default .navbar-nav>li>a:hover {
     background-color: black; }
 
 #top a.navbar-brand:hover {

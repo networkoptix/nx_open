@@ -51,8 +51,9 @@ MultipleServerSocket::~MultipleServerSocket()
 #define MultipleServerSocket_FORWARD_GET(NAME, TYPE)    \
     bool MultipleServerSocket::NAME(TYPE* value) const  \
     {                                                   \
-        boost::optional<TYPE> first;                    \
-        for (auto& socket : m_serverSockets)            \
+        TYPE firstValue;                                \
+        bool firstValueFilled = false;                  \
+        for (auto& socket: m_serverSockets)             \
         {                                               \
             if (!socket->NAME(value))                   \
             {                                           \
@@ -60,13 +61,16 @@ MultipleServerSocket::~MultipleServerSocket()
                 return false;                           \
             }                                           \
                                                         \
-            if (first)                                  \
-                NX_ASSERT(*first == *value,            \
-                    Q_FUNC_INFO, QString("%1 != %2")    \
-                        .arg(*first).arg(*value)        \
-                        .toStdString().c_str());        \
-            else                                        \
-                first = *value;                         \
+            if (!firstValueFilled)                      \
+            {                                           \
+                firstValue = *value;                    \
+                firstValueFilled = true;                \
+            }                                           \
+                                                        \
+            NX_ASSERT(firstValue == *value,             \
+                Q_FUNC_INFO, QString("%1 != %2")        \
+                    .arg(firstValue).arg(*value)        \
+                    .toStdString().c_str());            \
         }                                               \
                                                         \
         return true;                                    \
@@ -76,17 +80,14 @@ MultipleServerSocket_FORWARD_SET(bind, const SocketAddress&)
 
 SocketAddress MultipleServerSocket::getLocalAddress() const
 {
-    boost::optional<SocketAddress> first;
-    for (auto& socket : m_serverSockets)
+    for (auto& socket: m_serverSockets)
     {
-        const auto value = socket->getLocalAddress();
-        if (first)
-            NX_ASSERT(*first == value);
-        else
-            first = value;
+        const auto endpoint = socket->getLocalAddress();
+        if (endpoint.port > 0)
+            return endpoint;
     }
 
-    return *first;
+    return SocketAddress();
 }
 
 bool MultipleServerSocket::close()

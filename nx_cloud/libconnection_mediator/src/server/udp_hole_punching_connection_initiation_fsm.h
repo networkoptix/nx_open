@@ -45,7 +45,7 @@ public:
     UDPHolePunchingConnectionInitiationFsm(
         nx::String connectionID,
         const ListeningPeerData& serverPeerData,
-        std::function<void(api::ResultCode)> onFsmFinishedEventHandler,
+        std::function<void(api::NatTraversalResultCode)> onFsmFinishedEventHandler,
         const conf::Settings& settings);
     virtual ~UDPHolePunchingConnectionInitiationFsm() override;
 
@@ -78,7 +78,7 @@ private:
 
     State m_state;
     nx::String m_connectionID;
-    std::function<void(api::ResultCode)> m_onFsmFinishedEventHandler;
+    std::function<void(api::NatTraversalResultCode)> m_onFsmFinishedEventHandler;
     const conf::Settings& m_settings;
     nx::network::aio::Timer m_timer;
     ConnectionWeakRef m_serverConnectionWeakRef;

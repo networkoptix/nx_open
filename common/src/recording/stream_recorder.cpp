@@ -93,7 +93,6 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_forceDefaultCtx(true),
     m_packetWrited(false),
     m_currentChunkLen(0),
-    m_startOffset(0),
     m_prebufferingUsec(0),
     m_EofDateTime(AV_NOPTS_VALUE),
     m_endOfData(false),
@@ -475,9 +474,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
 
         NX_ASSERT(md->timestamp >= 0);
 
-        AVPacket avPkt;
-        av_init_packet(&avPkt);
-
+        QnFfmpegAvPacket avPkt;
         qint64 dts = av_rescale_q(getPacketTimeUsec(md), srcRate, stream->time_base);
         if (stream->cur_dts > 0)
             avPkt.dts = qMax((qint64)stream->cur_dts+1, dts);
@@ -556,11 +553,9 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 {
     m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
     NX_ASSERT(m_mediaProvider);
-    //NX_ASSERT(mediaData->flags & AV_PKT_FLAG_KEY);
 
     m_endDateTime = m_startDateTime = mediaData->timestamp;
 
-    //QnResourcePtr resource = mediaData->dataProvider->getResource();
     // allocate container
     AVOutputFormat * outputCtx = av_guess_format(m_container.toLatin1().data(), NULL, NULL);
     if (outputCtx == 0)
@@ -633,14 +628,14 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
             if (isUtcOffsetAllowed())
             {
-                qint64 startTime = m_startOffset+mediaData->timestamp/1000;
+                qint64 startTimeMs = mediaData->timestamp/1000;
                 av_dict_set(
                     &m_recordingContextVector[i].formatCtx->metadata,
                     QnAviArchiveDelegate::getTagName(
                         QnAviArchiveDelegate::StartTimeTag,
                         fileExt
                     ),
-                    QString::number(startTime).toLatin1().data(),
+                    QString::number(startTimeMs).toLatin1().data(),
                     0
                 );
             }
@@ -948,11 +943,6 @@ void QnStreamRecorder::setMotionFileList(QSharedPointer<QBuffer> motionFileList[
         m_motionFileList[i] = motionFileList[i];
 }
 
-void QnStreamRecorder::setStartOffset(qint64 value)
-{
-    m_startOffset = value;
-}
-
 void QnStreamRecorder::setPrebufferingUsec(int value)
 {
     m_prebufferingUsec = value;
@@ -985,7 +975,13 @@ void QnStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataProvider
 
 QString QnStreamRecorder::fixedFileName() const
 {
-    return m_fixedFileName ? m_recordingContextVector[0].fileName : lit("");
+    if (m_fixedFileName)
+    {
+        Q_ASSERT(!m_recordingContextVector.empty());
+        if (!m_recordingContextVector.empty())
+            return m_recordingContextVector[0].fileName;
+    }
+    return QString();
 }
 
 void QnStreamRecorder::setEofDateTime(qint64 value)

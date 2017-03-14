@@ -316,6 +316,10 @@ void QnLoginDialog::accept()
             {
                 case Qn::SuccessConnectionResult:
                 {
+                    // In most cases we will connect succesfully by this url. Sow we can store it.
+                    qnSettings->setLastLocalConnectionUrl(url);
+                    qnSettings->save();
+
                     const bool autoLogin = ui->autoLoginCheckBox->isChecked();
                     QnActionParameters params;
                     const bool storePassword =
@@ -325,6 +329,7 @@ void QnLoginDialog::accept()
                     params.setArgument(Qn::StorePasswordRole, storePassword);
                     params.setArgument(Qn::ForceRole, true);
                     menu()->trigger(QnActions::ConnectAction, params);
+
                     break;
                 }
                 case Qn::IncompatibleProtocolConnectionResult:
@@ -393,10 +398,11 @@ void QnLoginDialog::resetConnectionsModel()
         m_connectionsModel->removeRow(0); //last-used-connection row
 
     QModelIndex selectedIndex;
-    const auto lastConnection = qnSettings->lastUsedConnection();
-    m_lastUsedItem = (lastConnection.url.host().isEmpty()
+
+    const auto url = qnSettings->lastLocalConnectionUrl();
+    m_lastUsedItem = (url.host().isEmpty()
         ? nullptr
-        : ::newConnectionItem(tr("* Last used connection *"), lastConnection.url));
+        : ::newConnectionItem(tr("* Last used connection *"), url));
 
     if (m_lastUsedItem != NULL)
     {
@@ -484,8 +490,15 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
 
         if (!vm.isValid)
         {
+            const bool showBuild = compatibilityCode == Qn::IncompatibleProtocolConnectionResult
+                || compatibilityCode == Qn::IncompatibleCloudHostConnectionResult;
+
+            auto versionFormat = showBuild
+                ? QnSoftwareVersion::FullFormat
+                : QnSoftwareVersion::BugfixFormat;
+
             vm.title += lit(" (v%1)")
-                .arg(data.info.version.toString(QnSoftwareVersion::BugfixFormat));
+                .arg(data.info.version.toString(versionFormat));
         }
 
         viewModels.push_back(vm);

@@ -86,21 +86,21 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     nx_http::HttpHeaders* const responseHeaders)
 {
     const QByteArray userName = authorizationHeader.userid().toLower();
-    bool isCloudUser = isValidCloudUserName(userName);
 
     auto cloudUsers = qnResPool->getResources<QnUserResource>().filtered(
         [userName](const QnUserResourcePtr& user)
-    {
-        return user->isCloud() &&
-            user->isEnabled() &&
-            user->getName().toUtf8().toLower() == userName;
-    });
+        {
+            return user->isCloud() &&
+                user->isEnabled() &&
+                user->getName().toUtf8().toLower() == userName;
+        });
+    const bool isCloudUser = !cloudUsers.isEmpty();
 
     if (authorizationHeader.authScheme != nx_http::header::AuthScheme::digest)
     {
         //supporting only digest authentication for cloud-based authentication
 
-        if (isCloudUser && !cloudUsers.empty())
+        if (isCloudUser)
         {
             NX_LOGX(lm("Refusing non-digest authentication of user %1")
                 .arg(authorizationHeader.userid()), cl_logDEBUG2);
@@ -146,7 +146,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
                 responseHeaders);
         if (std::get<0>(authResult) == Qn::Auth_OK)
         {
-            NX_LOGX(lm("User %1 has been authentication successully by default authenticator")
+            NX_LOGX(lm("User %1 has been authenticated successully by default authenticator. Nonce %2")
                 .arg(authorizationHeader.userid()).arg(nonce), cl_logDEBUG2);
 
             const auto authResource = std::get<1>(authResult).dynamicCast<QnUserResource>();
@@ -242,12 +242,6 @@ void CloudUserAuthenticator::clear()
     m_authorizationCache.clear();
 }
 
-bool CloudUserAuthenticator::isValidCloudUserName(const nx_http::StringType& userName) const
-{
-    //TODO #ak check for email
-    return userName.indexOf('@') >= 0;
-}
-
 void CloudUserAuthenticator::removeExpiredRecordsFromCache(QnMutexLockerBase* const /*lk*/)
 {
     const auto curClock = m_monotonicClock.elapsed();
@@ -286,7 +280,7 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
     const nx_http::StringType& cloudNonce)
 {
     NX_LOGX(lm("Auth data for username %1, cloudNonce %2 not found in cache. Quering cloud...")
-        .arg(cloudNonce).arg(cloudNonce), cl_logDEBUG2);
+        .arg(userid).arg(cloudNonce), cl_logDEBUG2);
 
     nx::cdb::api::AuthRequest authRequest;
     authRequest.nonce = std::string(cloudNonce.constData(), cloudNonce.size());

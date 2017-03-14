@@ -20,6 +20,7 @@ extern const char* const kSystemGetAccessRoleListPath;
 extern const char* const kSystemRenamePath;
 extern const char* const kSystemUpdatePath;
 extern const char* const kSystemRecordUserSessionStartPath;
+extern const char* const kSystemHealthHistoryPath;
 
 extern const char* const kAuthGetNoncePath;
 extern const char* const kAuthGetAuthenticationPath;
@@ -34,6 +35,8 @@ extern const char* const kDeprecatedEstablishEc2TransactionConnectionPath;
 // Maintenance.
 extern const char* const kMaintenanceGetVmsConnections;
 extern const char* const kMaintenanceGetTransactionLog;
+
+extern const char* const kCloudModuleXmlPath;
 
 } // namespace cdb
 } // namespace nx

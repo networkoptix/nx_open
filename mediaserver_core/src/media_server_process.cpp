@@ -868,6 +868,9 @@ static const int SYSTEM_USAGE_DUMP_TIMEOUT = 7*60*1000;
 
 void MediaServerProcess::dumpSystemUsageStats()
 {
+    if (!qnPlatform->monitor())
+        return;
+
     qnPlatform->monitor()->totalCpuUsage();
     qnPlatform->monitor()->totalRamUsage();
     qnPlatform->monitor()->totalHddLoad();
@@ -1558,6 +1561,22 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     auto connection = QnAppServerConnectionFactory::getConnection2();
     auto processor = dynamic_cast<QnServerMessageProcessor*> (QnServerMessageProcessor::instance());
     processor->startReceivingLocalNotifications(connection);
+}
+
+void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
+{
+    const auto hwInfo = HardwareInformation::instance();
+    server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
+    server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
+    server->setProperty(Qn::PHYSICAL_MEMORY, QString::number(hwInfo.physicalMemory));
+
+    server->setProperty(Qn::PRODUCT_NAME_SHORT, QnAppInfo::productNameShort());
+    server->setProperty(Qn::FULL_VERSION, nx::utils::AppInfo::applicationFullVersion());
+    server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
+    server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
+    server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
+
+    propertyDictionary->saveParams(server->getId());
 }
 
 void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
@@ -2514,21 +2533,12 @@ void MediaServerProcess::run()
             m_mediaServer = server;
         }
 
-        const auto hwInfo = HardwareInformation::instance();
-        server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
-        server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
-        server->setProperty(Qn::PHYSICAL_MEMORY, QString::number(hwInfo.physicalMemory));
-
-        server->setProperty(Qn::PRODUCT_NAME_SHORT, QnAppInfo::productNameShort());
-        server->setProperty(Qn::FULL_VERSION, nx::utils::AppInfo::applicationFullVersion());
-        server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
-        server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
-        server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
-
-        qnServerDb->setBookmarkCountController([server](size_t count){
-            server->setProperty(Qn::BOOKMARK_COUNT, QString::number(count));
-            propertyDictionary->saveParams(server->getId());
-        });
+        #ifdef ENABLE_EXTENDED_STATISTICS
+            qnServerDb->setBookmarkCountController([server](size_t count){
+                server->setProperty(Qn::BOOKMARK_COUNT, QString::number(count));
+                propertyDictionary->saveParams(server->getId());
+            });
+        #endif
 
         QFile hddList(Qn::HDD_LIST_FILE);
         if (hddList.open(QFile::ReadOnly))
@@ -2646,6 +2656,7 @@ void MediaServerProcess::run()
     qnResourceAccessManager->beginUpdate();
     qnResourceAccessProvider->beginUpdate();
     loadResourcesFromECS(messageProcessor.data());
+    saveServerInfo(m_mediaServer);
     m_mediaServer->setStatus(Qn::Online);
     qDebug() << "resources loaded for" << tt.elapsed();
     qnResourceAccessProvider->endUpdate();
@@ -2746,8 +2757,12 @@ void MediaServerProcess::run()
         m_universalTcpListener,
         &QnTcpListener::portChanged,
         this,
-        &MediaServerProcess::updateAddressesList);
-
+        [this, &cloudManagerGroup]()
+        {
+            updateAddressesList();
+            cloudManagerGroup.connectionManager.setProxyVia(
+                SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
+        });
 
     m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
 

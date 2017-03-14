@@ -3,6 +3,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
+#include <utils/crypt/encoded_string.h>
 
 #include <nx/vms/utils/app_info.h>
 #include <nx/utils/log/log.h>
@@ -40,6 +41,10 @@ namespace
     {
         parser.addParameter(valuePtr, longName, nullptr, QString(), defaultParam);
     };
+
+    static const QString kEncodeAuthMagic = lit("@@");
+    static const QnSoftwareVersion kEncodeSupportVersion(3, 0, 0, 14350);
+
 }
 
 const QString QnStartupParameters::kScreenKey(lit("--screen"));
@@ -98,7 +103,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.lightMode, "--light-mode", lit("full"));
     addParserParam(commandLineParser, &result.enforceSocketType, "--enforce-socket");
     addParserParam(commandLineParser, &result.enforceMediatorEndpoint, "--enforce-mediator");
-     
+
     commandLineParser.parse(argc, (const char**) argv, stderr);
 
     if (!strCustomUri.isEmpty())
@@ -113,6 +118,33 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
 
     return result;
+}
+
+QString QnStartupParameters::createAuthenticationString(const QUrl& url,
+    const QnSoftwareVersion& version)
+{
+    // For old clients use compatible format
+    if (!version.isNull() && version < kEncodeSupportVersion)
+        return QString::fromUtf8(url.toEncoded());
+
+    QnEncodedString encoded(QString::fromUtf8(url.toEncoded()));
+    return kEncodeAuthMagic + encoded.encoded();
+}
+
+QUrl QnStartupParameters::parseAuthenticationString(QString string)
+{
+    if (string.startsWith(kEncodeAuthMagic))
+    {
+        string = string.mid(kEncodeAuthMagic.length());
+        string = QnEncodedString::fromEncoded(string).value();
+    }
+
+    return QUrl::fromUserInput(string);
+}
+
+QUrl QnStartupParameters::parseAuthenticationString() const
+{
+    return parseAuthenticationString(authenticationString);
 }
 
 QnStartupParameters::QnStartupParameters():

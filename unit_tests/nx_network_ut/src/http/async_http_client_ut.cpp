@@ -320,7 +320,7 @@ TEST_F(AsyncHttpClientTest, MultiRequestTest)
         client.get(),
         [&](nx_http::AsyncHttpClientPtr client)
         {
-            ASSERT_FALSE(client->failed());
+            ASSERT_FALSE(client->failed()) << "Response: " << client->response();
             ASSERT_EQ(client->response()->statusLine.statusCode, nx_http::StatusCode::ok);
             ASSERT_EQ(client->fetchMessageBodyBuffer(), expectedResponse);
             auto contentTypeIter = client->response()->headers.find("Content-Type");
@@ -440,7 +440,7 @@ public:
         nx_http::RequestProcessedHandler completionHandler)
     {
         if (m_requestNumber > 0)
-            connection->closeConnection(SystemError::connectionReset);
+            connection->takeSocket(); //< Closing connection by destroying socket.
 
         completionHandler(
             nx_http::RequestResult(

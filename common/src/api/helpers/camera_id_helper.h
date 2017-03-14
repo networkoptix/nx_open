@@ -33,12 +33,11 @@ public:
         const QnRequestParams& params,
         const QStringList& flexibleIdParamNames);
 
-private:
-    camera_id_helper() = delete;
-
     /** @return Camera, or null if not found. */
     static QnSecurityCamResourcePtr findCameraByFlexibleId(const QString& flexibleId);
 
+private:
+    camera_id_helper() = delete;
 };
 
 } // namespace nx

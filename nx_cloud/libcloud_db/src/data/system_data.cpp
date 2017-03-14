@@ -1,14 +1,8 @@
-/**********************************************************
-* Aug 26, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "system_data.h"
 
 #include <nx/fusion/model_functions.h>
 
 #include "stree/cdb_ns.h"
-
 
 namespace nx {
 namespace cdb {
@@ -16,7 +10,7 @@ namespace cdb {
 namespace api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemSharingEx),
+    (SystemSharingEx)(SystemHealthHistoryItem)(SystemHealthHistory),
     (sql_record),
     _Fields);
 
@@ -24,9 +18,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 namespace data {
 
-////////////////////////////////////////////////////////////
-//// class SystemRegistrationData
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class SystemRegistrationData
 
 bool SystemRegistrationData::getAsVariant( int /*resID*/, QVariant* const /*value*/ ) const
 {
@@ -34,9 +27,9 @@ bool SystemRegistrationData::getAsVariant( int /*resID*/, QVariant* const /*valu
 }
 
 
-////////////////////////////////////////////////////////////
-//// class SystemData
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class SystemData
+
 SystemData::SystemData():
     expirationTimeUtc(0)
 {
@@ -61,9 +54,8 @@ bool SystemData::getAsVariant( int resID, QVariant* const value ) const
 }
 
 
-////////////////////////////////////////////////////////////
-//// class SystemSharing
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class SystemSharing
 
 bool SystemSharing::getAsVariant(int resID, QVariant* const value) const
 {
@@ -96,9 +88,8 @@ bool loadFromUrlQuery(
 }
 
 
-////////////////////////////////////////////////////////////
-//// class SystemId
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class SystemId
 
 bool SystemId::getAsVariant(int resID, QVariant* const value) const
 {
@@ -113,9 +104,8 @@ bool SystemId::getAsVariant(int resID, QVariant* const value) const
 }
 
 
-////////////////////////////////////////////////////////////
-//// class SystemAttributesUpdate
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class SystemAttributesUpdate
 
 bool SystemAttributesUpdate::getAsVariant(int resID, QVariant* const value) const
 {
@@ -159,11 +149,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (sql_record),
     _Fields);
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemData),
-    (sql_record),
-    _FieldsEx);
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemSharing),
+    (SystemData)(SystemSharing),
     (sql_record),
     _FieldsEx);
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
@@ -171,6 +157,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json),
     _Fields);
 
-}   //data
-}   //cdb
-}   //nx
+} // namespace data
+} // namespace cdb
+} // namespace nx

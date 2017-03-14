@@ -75,7 +75,7 @@ QVariant QnLdapUserListModel::headerData(int section, Qt::Orientation orientatio
     case LoginColumn:
         return tr("Login");
     case FullNameColumn:
-        return tr("Full Name");
+        return tr("Name");
     case EmailColumn:
         return tr("Email");
     case DnColumn:

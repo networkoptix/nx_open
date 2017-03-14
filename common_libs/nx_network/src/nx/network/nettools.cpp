@@ -256,6 +256,35 @@ QList<QNetworkAddressEntry> getAllIPv4AddressEntries()
     return ipv4_enty_list;
 }
 
+QString getIfaceIPv4Addr(const QNetworkInterface& iface)
+{
+    for (const auto& addr : iface.addressEntries())
+    {
+        if (QAbstractSocket::IPv4Protocol == addr.ip().protocol() && // if it has IPV4
+            addr.ip() != QHostAddress::LocalHost &&// if this is not 0.0.0.0 or 127.0.0.1
+            addr.netmask().toIPv4Address() != 0) // and mask !=0
+            return addr.ip().toString();
+    }
+    return QString();
+}
+
+QSet<QString> getLocalIpV4AddressList()
+{
+    QSet<QString> result;
+
+    QList<QNetworkInterface> interfaces = QNetworkInterface::allInterfaces();
+    for (const QNetworkInterface &iface : interfaces)
+    {
+        if (!(iface.flags() & QNetworkInterface::IsUp) || (iface.flags() & QNetworkInterface::IsLoopBack))
+            continue;
+
+        QString ipv4Addr = getIfaceIPv4Addr(iface);
+        if (!ipv4Addr.isEmpty())
+            result << ipv4Addr;
+    }
+    return result;
+}
+
 bool isInIPV4Subnet(QHostAddress addr, const QList<QNetworkAddressEntry>& ipv4_enty_list)
 {
 

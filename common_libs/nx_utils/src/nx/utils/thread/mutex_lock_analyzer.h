@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <deque>
 #include <map>
+#include <mutex>
 
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QString>
@@ -154,6 +155,42 @@ public:
     bool connectedTo( const LockGraphEdgeData& rhs ) const;
 };
 
+struct ThreadContext
+{
+    std::deque<MutexLockKey> currentLockPath;
+};
+
+class NX_UTILS_API ThreadContextPool
+{
+public:
+    ThreadContext& currentThreadContext();
+    void removeCurrentThreadContext();
+
+private:
+    //!map<threadId, stack<mutex lock position>>
+    std::map<std::uintptr_t, ThreadContext> m_threadIdToContext;
+    std::mutex m_mutex;
+};
+
+class NX_UTILS_API ThreadContextGuard
+{
+public:
+    ThreadContextGuard(ThreadContextPool*);
+    ~ThreadContextGuard();
+
+    ThreadContextGuard(const ThreadContextGuard&) = delete;
+    ThreadContextGuard& operator=(const ThreadContextGuard&) = delete;
+    ThreadContextGuard(ThreadContextGuard&&) = default;
+    ThreadContextGuard& operator=(ThreadContextGuard&&) = default;
+
+    ThreadContext* operator->();
+    const ThreadContext* operator->() const;
+
+private:
+    ThreadContextPool* m_threadContextPool;
+    ThreadContext& m_threadContext;
+};
+
 class NX_UTILS_API MutexLockAnalyzer
 {
 public:
@@ -173,39 +210,11 @@ public:
     static MutexLockAnalyzer* instance();
 
 private:
-    struct ThreadContext
-    {
-        std::deque<MutexLockKey> currentLockPath;
-    };
-
-    class ThreadContextGuard
-    {
-    public:
-        ThreadContextGuard(MutexLockAnalyzer*);
-        ~ThreadContextGuard();
-
-        ThreadContextGuard(const ThreadContextGuard&) = delete;
-        ThreadContextGuard& operator=(const ThreadContextGuard&) = delete;
-        ThreadContextGuard(ThreadContextGuard&&) = default;
-        ThreadContextGuard& operator=(ThreadContextGuard&&) = default;
-
-        ThreadContext* operator->();
-        const ThreadContext* operator->() const;
-
-    private:
-        MutexLockAnalyzer* m_analyzer;
-        ThreadContext& m_threadContext;
-    };
-
-    ThreadContext& currentThreadContext();
-    void removeCurrentThreadContext();
-
     typedef Digraph<QnMutex*, LockGraphEdgeData> MutexLockDigraph;
 
     mutable QReadWriteLock m_mutex;
     MutexLockDigraph m_lockDigraph;
-    //!map<threadId, stack<mutex lock position>>
-    std::map<std::uintptr_t, ThreadContext> m_threadContext;
+    ThreadContextPool m_threadContextPool;
 
     template<class _Iter>
     QString pathToString( const _Iter& pathStart, const _Iter& pathEnd )

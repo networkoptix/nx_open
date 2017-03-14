@@ -25,7 +25,17 @@ Item
     {
         id: d
 
-        property real controlsOpacity: videoNavigation.controlsOpacity
+        property bool playbackStarted: false
+        property bool controlsNeeded:
+            !cameraChunkProvider.loading || (playbackStarted
+                && videoScreenController.mediaPlayer.mediaStatus === MediaPlayer.Loaded)
+
+        property real controlsOpacity:
+            Math.min(videoNavigation.controlsOpacity, controlsOpacityInternal)
+
+        property real controlsOpacityInternal: controlsNeeded ? 1.0 : 0.0
+        Behavior on controlsOpacityInternal { NumberAnimation { duration: 200 } }
+
         property real timelineOpacity: cameraChunkProvider.loading ? 0.0 : 1.0
         Behavior on timelineOpacity
         {
@@ -41,7 +51,7 @@ Item
 
         function updateNavigatorPosition()
         {
-            if (Screen.primaryOrientation == Qt.PortraitOrientation)
+            if (Screen.primaryOrientation === Qt.PortraitOrientation)
             {
                 navigator.y = 0
                 navigatorMouseArea.drag.target = undefined
@@ -192,17 +202,18 @@ Item
             {
                 if (!moving)
                 {
-                    videoScreenController.setPosition(position)
+                    videoScreenController.setPosition(position, true)
                     if (resumeWhenDragFinished)
                         videoScreenController.play()
                     else
                         videoScreenController.pause()
+                    timeline.autoReturnToBounds = true
                 }
             }
             onPositionTapped:
             {
                 d.resumePosition = -1
-                videoScreenController.setPosition(position)
+                videoScreenController.setPosition(position, true)
             }
             onPositionChanged:
             {
@@ -222,12 +233,20 @@ Item
                 }
             }
 
-            Binding
+            Connections
             {
-                target: timeline
-                property: "position"
-                value: videoScreenController.mediaPlayer.position
-                when: !timeline.moving && !d.liveMode
+                target: videoScreenController.mediaPlayer
+                onPositionChanged:
+                {
+                    if (videoScreenController.mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
+                        return
+
+                    if (!timeline.moving && !d.liveMode)
+                    {
+                        timeline.autoReturnToBounds = false
+                        timeline.position = videoScreenController.mediaPlayer.position
+                    }
+                }
             }
         }
 
@@ -313,9 +332,9 @@ Item
                 enabled: d.hasArchive
                 onClicked:
                 {
-                    calendarPanelLoader.active = true
-                    calendarPanelLoader.item.date = timeline.positionDate
-                    calendarPanelLoader.item.open()
+                    calendarPanel.chunkProvider = cameraChunkProvider
+                    calendarPanel.date = timeline.positionDate
+                    calendarPanel.open()
                 }
             }
 
@@ -475,6 +494,7 @@ Item
             width: 2
             height: 8
             visible: d.hasArchive
+            opacity: timelineOpactiyMask.opacity
         }
 
         Rectangle
@@ -485,6 +505,7 @@ Item
             width: 2
             height: timeline.chunkBarHeight + 8
             visible: d.hasArchive
+            opacity: timelineOpactiyMask.opacity
         }
     }
 
@@ -497,35 +518,36 @@ Item
         height: navigationPanel.height
     }
 
-    Component
+    CalendarPanel
     {
-        id: calendarPanelComponent
+        id: calendarPanel
 
-        CalendarPanel
+        onDatePicked:
         {
-            chunkProvider: cameraChunkProvider
-            onDatePicked:
-            {
-                close()
-                d.resumePosition = -1
-                videoScreenController.setPosition(date.getTime())
-            }
+            close()
+            d.resumePosition = -1
+            timeline.jumpTo(date.getTime())
+            videoScreenController.setPosition(date.getTime(), true)
         }
     }
-
-    Loader
-    {
-        id: calendarPanelLoader
-        sourceComponent: calendarPanelComponent
-        active: false
-        y: parent.height - height
-    }
-
-    Component.onCompleted: d.updateNavigatorPosition()
 
     Connections
     {
         target: videoScreenController
-        onPlayerJump: timeline.jumpTo(position)
+        onPlayerJump:
+        {
+            timeline.autoReturnToBounds = false
+            timeline.jumpTo(position)
+        }
+        onGotFirstPosition:
+        {
+            timeline.autoReturnToBounds = false
+            timeline.jumpTo(position)
+            d.playbackStarted = true
+        }
     }
+
+    onResourceIdChanged: d.playbackStarted = false
+
+    Component.onCompleted: d.updateNavigatorPosition()
 }

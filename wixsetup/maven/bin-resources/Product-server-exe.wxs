@@ -14,6 +14,7 @@
             DisableModify="yes">
         <util:RegistrySearchRef Id='SearchForIsConnectedToCloud' />
         <util:RegistrySearchRef Id='ArchRegistrySearch' />
+        <util:ProductSearchRef Id='ServerMsiVersion' />
 
         <Variable Name="InstallServerOnly" Type="numeric" Value="1" />
 

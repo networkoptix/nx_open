@@ -80,11 +80,7 @@ bool QnFfmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& r
 
     while (size > 0)
     {
-        AVPacket avpkt;
-        av_init_packet(&avpkt);
-        avpkt.data = (quint8*)inbuf_ptr;
-        avpkt.size = size;
-
+        QnFfmpegAvPacket avpkt((quint8*) inbuf_ptr, size);
         int got_frame = 0;
         // todo: ffmpeg-test
         // TODO: #dmishin get rid of deprecated functions

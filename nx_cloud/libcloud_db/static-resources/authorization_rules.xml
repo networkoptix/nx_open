@@ -180,6 +180,13 @@
                             <set value="true" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>
+                    <sequence value="/cdb/system/healthHistory">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="auth.accountRightsOnSystem">
+                            <set value="owner" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+
                     <sequence value="/cdb/auth/getAuthentication">
                         <set resName="authorized" resValue="false"/>
                         <condition resName="auth.systemId" matchType="presence">

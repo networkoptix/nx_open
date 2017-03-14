@@ -60,6 +60,8 @@ static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
 static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
 static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
 
+const qint64 kMinStorageFreeSpace = 150 * 1024 * 1024LL;
+
 static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 
 const QString SCAN_ARCHIVE_NORMAL_PREFIX = lit("NORMAL_");
@@ -809,7 +811,18 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     sqlDb.close();
     sqlDb = QSqlDatabase();
     QSqlDatabase::removeDatabase(connectionName);
-    QFile::rename(fileName, fileName + lit("_deprecated"));
+
+	QString depracatedFileName = fileName + lit("_deprecated");
+	if (!QFile::remove(depracatedFileName))
+		NX_LOG(lit("%1 Deprecated db file %2 found but remove failed. Remove it manually and restart server")
+			.arg(Q_FUNC_INFO)
+			.arg(depracatedFileName), cl_logWARNING);
+
+    if (!QFile::rename(fileName, depracatedFileName))
+		NX_LOG(lit("%1 Rename failed for deprecated db file %2. Rename (remove) it manually and restart server")
+			.arg(Q_FUNC_INFO)
+			.arg(fileName), cl_logWARNING);
+
 
     auto sdb = qnStorageDbPool->getSDB(storage);
     if (!sdb)
@@ -2209,7 +2222,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
 
     QSet<QnStorageResourcePtr> storages;
     for (const auto& storage: getUsedWritableStorages())
-        if (pred(storage) && storage->getFreeSpace() > 150 * 1024 * 1024) //< Storage should have at least 150 mb of free space
+        if (pred(storage) && storage->getFreeSpace() > kMinStorageFreeSpace)
             storages << storage;
 
 	auto getOptimalStorageRootFallback = [&storages, this]

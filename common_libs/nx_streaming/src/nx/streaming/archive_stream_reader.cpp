@@ -552,7 +552,11 @@ begin_label:
     }
 
     if (m_outOfPlaybackMask)
-        return createEmptyPacket(reverseMode); // EOF reached
+    {
+        auto result = createEmptyPacket(reverseMode); // EOF reached
+        result->flags |= QnAbstractMediaData::MediaFlags_AfterEOF;
+        return result;
+    }
 
     if (m_afterMotionData)
     {

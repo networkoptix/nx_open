@@ -84,6 +84,7 @@ Item
                 bottomMargin: 6
             }
 
+            labelPadding: 8
             text: qsTr("Close")
             icon: lp("/images/close.png")
             flat: true

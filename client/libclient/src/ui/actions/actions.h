@@ -335,11 +335,6 @@ enum IDType
     AboutAction,
 
     /**
-     * Open Showcase page in default browser
-     */
-    ShowcaseAction,
-
-    /**
      * Closes the client.
      */
     ExitAction,

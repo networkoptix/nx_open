@@ -28,7 +28,7 @@ struct EndpointAdditionalInfo
         const QString& newName,
         const QString& newManufacturer,
         const QString& newLocation,
-        const QString& newMac, 
+        const QString& newMac,
         const QString& newUniqId,
         const QString& newDiscoveryIp):
 
@@ -103,6 +103,11 @@ private:
     QString fetchSerial(const DeviceInfoResp& response) const;
     static bool isAnalogOnvifResource(const QString& vendor, const QString& model);
     static bool isModelContainVendor(const QString& vendor, const QString& model);
+
+    static bool needIgnoreCamera(
+        const QString& host,
+        const QString& manufacturer,
+        const QString& model);
 private:
     static const char *ONVIF_RT;
     QnUuid onvifTypeId;

@@ -88,14 +88,6 @@ public:
     {
     }
 
-    template<class _Func>
-    const MoveOnlyFunc& operator=(_Func func)
-    {
-        auto x = MoveOnlyFuncWrapper<_Func>(std::move(func));
-        std::function<F>::operator=(std::move(x));
-        return *this;
-    }
-
     MoveOnlyFunc& operator=(std::nullptr_t val)
     {
         std::function<F>::operator=(val);
