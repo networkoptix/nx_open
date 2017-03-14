@@ -17,6 +17,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>
+#include <ui/delegates/customizable_item_delegate.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/models/resource/resource_list_sorted_model.h>
 #include <ui/style/helper.h>
@@ -105,15 +106,29 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     auto setupTreeView = [itemDelegate](QnTreeView* treeView)
         {
             const QnIndents kIndents(1, 0);
-            treeView->setItemDelegate(itemDelegate);
+            treeView->setItemDelegateForColumn(QnAccessibleResourcesModel::NameColumn,
+                itemDelegate);
+            treeView->header()->setMinimumSectionSize(0);
             treeView->header()->setStretchLastSection(false);
             treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-            treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+            treeView->header()->setSectionResizeMode(QnAccessibleResourcesModel::NameColumn,
+                QHeaderView::Stretch);
             treeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(kIndents));
             treeView->setIgnoreDefaultSpace(true);
         };
     setupTreeView(ui->resourcesTreeView);
     setupTreeView(ui->controlsTreeView);
+
+    auto indirectAccessDelegate = new QnCustomizableItemDelegate(this);
+    indirectAccessDelegate->setCustomInitStyleOption(
+        [](QStyleOptionViewItem* option, const QModelIndex& /*index*/)
+        {
+            option->state &= ~QStyle::State_Enabled;
+        });
+
+    ui->resourcesTreeView->setItemDelegateForColumn(
+        QnAccessibleResourcesModel::IndirectAccessColumn,
+        indirectAccessDelegate);
 
     ui->resourcesTreeView->setMouseTracking(true);
 

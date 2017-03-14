@@ -140,7 +140,7 @@ QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) co
                     switch (source)
                     {
                         case QnAbstractResourceAccessProvider::Source::layout:
-                            return qnResIconCache->icon(QnResourceIconCache::Layout);
+                            return qnResIconCache->icon(QnResourceIconCache::SharedLayout);
                         case QnAbstractResourceAccessProvider::Source::videowall:
                             return qnResIconCache->icon(QnResourceIconCache::VideoWall);
                         default:
