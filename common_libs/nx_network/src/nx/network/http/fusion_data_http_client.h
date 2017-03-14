@@ -1,10 +1,4 @@
-/**********************************************************
-* Sep 3, 2015
-* akolesnikov
-***********************************************************/
-
-#ifndef NX_FUSION_DATA_HTTP_CLIENT_H
-#define NX_FUSION_DATA_HTTP_CLIENT_H
+#pragma once 
 
 #include <functional>
 
@@ -16,7 +10,6 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical_functions.h>
-
 
 namespace nx_http {
 namespace detail {
@@ -121,7 +114,7 @@ private:
     nx_http::AsyncHttpClientPtr m_httpClient;
 };
 
-}   //detail
+} // namespace detail
 
 //!HTTP client that uses \a fusion to serialize/deserialize input/output data
 /*!
@@ -261,6 +254,4 @@ private:
     }
 };
 
-}   //nx_http
-
-#endif  //NX_FUSION_DATA_HTTP_CLIENT_H
+} // namespace nx_http
