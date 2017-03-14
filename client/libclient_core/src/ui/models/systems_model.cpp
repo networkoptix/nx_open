@@ -436,13 +436,11 @@ void QnSystemsModelPrivate::resetModel()
     Q_Q(QnSystemsModel);
 
     q->beginResetModel();
-
     internalData.clear();
+    q->endResetModel();
 
     for (const auto system : qnSystemsFinder->systems())
         addSystem(system);
-
-    q->endResetModel();
 }
 
 QnSoftwareVersion QnSystemsModelPrivate::getCompatibleVersion(
