@@ -115,7 +115,8 @@ class EnvironmentBuilder(object):
     def build_environment(self, http_schema=DEFAULT_HTTP_SCHEMA, boxes=None, merge_servers=None,  **kw):
         if not boxes:
             boxes = []
-        log.info('TEST_DIR=%r, WORK_DIR=%r, BIN_DIR=%r, CLOUD_HOST=%r', self._test_dir, self._work_dir, self._bin_dir, self._cloud_host_host)
+        log.info('TEST_DIR=%r, WORK_DIR=%r, BIN_DIR=%r, CLOUD_HOST=%r, COMPANY_NAME=%r',
+                 self._test_dir, self._work_dir, self._bin_dir, self._cloud_host_host, self._company_name)
         self._boxes_config = self._load_boxes_config_from_cache()
         ssh_config_path = os.path.join(self._work_dir, 'ssh.config')
 

@@ -32,7 +32,8 @@ MEDIASERVER_UNSETUP_LOCAL_SYSTEM_ID = '{00000000-0000-0000-0000-000000000000}'  
 
 MEDIASERVER_CLOUDHOST_TAG = 'this_is_cloud_host_name'
 MEDIASERVER_CLOUDHOST_SIZE = 76  # MEDIASERVER_CLOUDHOST_TAG + ' ' + cloud_host + '\0' * required paddings count to 76
-MEDIASERVER_CLOUDHOST_FPATH = '/opt/networkoptix/mediaserver/lib/libcommon.so'
+MEDIASERVER_CLOUDHOST_FPATH = '/opt/{company_name}/mediaserver/lib/libcommon.so'
+MEDIASERVER_STORAGE_FPATH = '/opt/{company_name}/mediaserver/var/data'  # hardcoded for now
 
 MEDIASERVER_CREDENTIALS_TIMEOUT_SEC = 60 * 5
 MEDIASERVER_MERGE_TIMEOUT_SEC = MEDIASERVER_CREDENTIALS_TIMEOUT_SEC
@@ -340,24 +341,25 @@ class Server(object):
 
     def patch_binary_set_cloud_host(self, new_host):
         assert not self._is_started, 'Server %s must be stopped first for patching its binaries' % self
-        data = self.box.host.read_file(MEDIASERVER_CLOUDHOST_FPATH)
+        path_to_patch = MEDIASERVER_CLOUDHOST_FPATH.format(company_name=self._company_name)
+        data = self.box.host.read_file(path_to_patch)
         idx = data.find(MEDIASERVER_CLOUDHOST_TAG)
         assert idx != -1, ('Cloud host tag %r is missing from mediaserver binary file %r'
-                           % (MEDIASERVER_CLOUDHOST_TAG, MEDIASERVER_CLOUDHOST_FPATH))
+                           % (MEDIASERVER_CLOUDHOST_TAG, path_to_patch))
         eidx = data.find('\0', idx)
         assert eidx != -1
         old_host = data[idx + len(MEDIASERVER_CLOUDHOST_TAG) + 1 : eidx]
         if new_host == old_host:
-            log.debug('Server binary %s at %s already has %r in it', MEDIASERVER_CLOUDHOST_FPATH, self.box, new_host)
+            log.debug('Server binary %s at %s already has %r in it', path_to_patch, self.box, new_host)
             return
-        log.info('Patching %s at %s with new cloud host %r (was: %r)...', MEDIASERVER_CLOUDHOST_FPATH, self.box, new_host, old_host)
+        log.info('Patching %s at %s with new cloud host %r (was: %r)...', path_to_patch, self.box, new_host, old_host)
         new_str = MEDIASERVER_CLOUDHOST_TAG + ' ' + new_host
         assert len(new_str) < MEDIASERVER_CLOUDHOST_SIZE, 'Cloud host name is too long: %r' % new_host
         padded_str = new_str + '\0' * (MEDIASERVER_CLOUDHOST_SIZE - len(new_str))
         assert len(padded_str) == MEDIASERVER_CLOUDHOST_SIZE
         new_data = data[:idx] + padded_str + data[idx + MEDIASERVER_CLOUDHOST_SIZE:]
         assert len(new_data) == len(data)
-        self.box.host.write_file(MEDIASERVER_CLOUDHOST_FPATH, new_data)
+        self.box.host.write_file(path_to_patch, new_data)
         self.set_user_password(REST_API_USER, REST_API_PASSWORD)  # Must be reset to default onces
 
     def set_system_settings(self, **kw):
@@ -467,11 +469,13 @@ class Server(object):
 
     # if there are more than one return first
     def _get_storage(self):
+        ## # following code requires server is started, which is not always the case;
+        ## #  so was commented-out and replaced with hardcoded one
         ## storage_records = [record for record in self.rest_api.ec2.getStorages.GET() if record['parentId'] == self.ecs_guid]
         ## assert len(storage_records) >= 1, 'No storages for server with ecs guid %s is returned by %s' % (self.ecs_guid, self.url)
-        ## url = storage_records[0]['url']
-        url = '/opt/networkoptix/mediaserver/var/data'  # hardcoded for now
-        return Storage(self.box, url)
+        ## storage_path = storage_records[0]['url']
+        storage_path = MEDIASERVER_STORAGE_FPATH.format(company_name=self._company_name)
+        return Storage(self.box, storage_path)
 
     def rebuild_archive(self):
         self.rest_api.api.rebuildArchive.GET(mainPool=1, action='start')

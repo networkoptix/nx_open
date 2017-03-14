@@ -1,7 +1,5 @@
 #!/bin/bash -xe
 
-echo "COMPANY_NAME=[$COMPANY_NAME]"
-
 MEDIASERVER_CONF=/opt/$COMPANY_NAME/mediaserver/etc/mediaserver.conf
 MEDIASERVER_CONF_INITIAL=$MEDIASERVER_CONF.initial
 export DEBIAN_FRONTEND=noninteractive
