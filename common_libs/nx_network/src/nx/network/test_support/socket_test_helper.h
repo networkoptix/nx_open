@@ -30,14 +30,14 @@ enum class TestTransmissionMode
     spam, // sends random data as fast as possible, receive always
     ping, // sends random data and verifies if it comes back
     pong, // reads 4K buffer, sends same buffer back, waits for futher data...
+    receiveOnly,
 };
 
 QString NX_NETWORK_API toString(TestTrafficLimitType type);
 QString NX_NETWORK_API toString(TestTransmissionMode type);
 
 //!Reads/writes random data to/from connection
-class NX_NETWORK_API TestConnection
-:
+class NX_NETWORK_API TestConnection:
     public QnStoppableAsync
 {
 public:
@@ -102,6 +102,7 @@ private:
     void startSpamIO();
     void startEchoIO();
     void startEchoTestIO();
+    void startReceiveOnlyTestIO();
     void onDataReceived( SystemError::ErrorCode errorCode, size_t bytesRead );
     void onDataSent( SystemError::ErrorCode errorCode, size_t bytesWritten );
     void readAllAsync( std::function<void()> handler );
@@ -145,8 +146,7 @@ public:
 /*!
     \note This class is not thread-safe
 */
-class NX_NETWORK_API RandomDataTcpServer
-:
+class NX_NETWORK_API RandomDataTcpServer:
     public QnStoppableAsync,
     public ConnectionPool
 {
@@ -309,8 +309,7 @@ private:
 /**
  * A TCPSocket modification which randomly connects to different ports according to @p kShift.
  */
-class NX_NETWORK_API MultipleClientSocketTester
-:
+class NX_NETWORK_API MultipleClientSocketTester:
     public TCPSocket
 {
 public:

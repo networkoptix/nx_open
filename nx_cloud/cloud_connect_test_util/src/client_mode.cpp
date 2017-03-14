@@ -108,6 +108,8 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
     auto transmissionMode = nx::network::test::TestTransmissionMode::spam;
     if (args.get("ping"))
         transmissionMode = nx::network::test::TestTransmissionMode::ping;
+    if (args.get("receive-only"))
+        transmissionMode = nx::network::test::TestTransmissionMode::receiveOnly;
 
     if (args.get("forward-address"))
     {

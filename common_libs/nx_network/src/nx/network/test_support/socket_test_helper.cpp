@@ -52,6 +52,7 @@ QString NX_NETWORK_API toString(TestTransmissionMode type)
         case TestTransmissionMode::spam: return lit("spam");
         case TestTransmissionMode::ping: return lit("ping");
         case TestTransmissionMode::pong: return lit("pong");
+        case TestTransmissionMode::receiveOnly: return lit("receiveOnly");
     }
 
     NX_CRITICAL(false, lm("Unexpected value: %1").arg(static_cast<int>(type)));
@@ -235,6 +236,7 @@ void TestConnection::startIO()
         case TestTransmissionMode::spam: return startSpamIO();
         case TestTransmissionMode::pong: return startEchoIO();
         case TestTransmissionMode::ping: return startEchoTestIO();
+        case TestTransmissionMode::receiveOnly: return startReceiveOnlyTestIO();
     };
 
     NX_ASSERT(false);
@@ -298,6 +300,14 @@ void TestConnection::startEchoTestIO()
                     reportFinish( SystemError::invalidData );
                 });
         });
+}
+
+void TestConnection::startReceiveOnlyTestIO()
+{
+    using namespace std::placeholders;
+    m_socket->readSomeAsync(
+        &m_readBuffer,
+        std::bind(&TestConnection::onDataReceived, this, _1, _2));
 }
 
 void TestConnection::readAllAsync( std::function<void()> handler )
