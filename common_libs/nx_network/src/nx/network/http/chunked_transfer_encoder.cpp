@@ -1,4 +1,3 @@
-
 #include "chunked_transfer_encoder.h"
 
 #ifdef Q_OS_WIN
@@ -53,4 +52,4 @@ QByteArray QnChunkedTransferEncoder::serializeSingleChunk(
     return result;
 }
 
-}   //namespace nx_http
+} // namespace nx_http
