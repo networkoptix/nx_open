@@ -466,7 +466,7 @@ namespace nx_http
     void AsyncHttpClient::asyncConnectDone(SystemError::ErrorCode errorCode)
     {
         NX_LOGX(lm("Opened connection to url %1. Result code %2")
-            .str(m_contentLocationUrl).str(errorCode), cl_logDEBUG2);
+            .arg(m_contentLocationUrl).str(errorCode), cl_logDEBUG2);
 
         std::shared_ptr<AsyncHttpClient> sharedThis(shared_from_this());
 
@@ -487,14 +487,14 @@ namespace nx_http
             m_state = sSendingRequest;
             emit tcpConnectionEstablished(sharedThis);
             using namespace std::placeholders;
-            NX_LOGX(lm("Sending request to url %1").str(m_contentLocationUrl), cl_logDEBUG2);
+            NX_LOGX(lm("Sending request to url %1").arg(m_contentLocationUrl), cl_logDEBUG2);
 
             m_socket->sendAsync(m_requestBuffer, std::bind(&AsyncHttpClient::asyncSendDone, this, _1, _2));
             return;
         }
 
-        NX_LOGX(lit("Failed to establish tcp connection to %1. %2").
-            arg(m_contentLocationUrl.toString(QUrl::RemovePassword)).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+        NX_LOGX(lm("Failed to establish tcp connection to %1. %2")
+            .arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
         m_lastSysErrorCode = errorCode;
 
         m_state = sFailed;
@@ -521,7 +521,8 @@ namespace nx_http
         {
             if (reconnectIfAppropriate())
                 return;
-            NX_LOGX(lit("Error sending (1) http request to %1. %2").arg(m_contentLocationUrl.toString(QUrl::RemovePassword)).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+            NX_LOGX(lm("Error sending (1) http request to %1. %2")
+                .arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)), cl_logDEBUG1);
             m_state = sFailed;
             m_lastSysErrorCode = errorCode;
             const auto requestSequenceBak = m_requestSequence;
@@ -542,9 +543,10 @@ namespace nx_http
             return;
         }
 
-        NX_LOGX(lm("Request has been successfully sent to %1: %2").strs(
-            m_contentLocationUrl.toString(QUrl::RemovePassword),
-            logTraffic() ? request().toString() : request().requestLine.toString()), cl_logDEBUG2);
+        NX_LOGX(lm("Request has been successfully sent to %1: %2")
+            .arg(m_contentLocationUrl)
+            .strs(logTraffic() ? request().toString() : request().requestLine.toString()),
+            cl_logDEBUG2);
 
         const auto requestSequenceBak = m_requestSequence;
         emit requestHasBeenSent(sharedThis, m_authorizationTried);
@@ -558,7 +560,8 @@ namespace nx_http
         m_responseBuffer.resize(0);
         if (!m_socket->setRecvTimeout(m_responseReadTimeoutMs))
         {
-            NX_LOGX(lit("Error reading (1) http response from %1. %2").arg(m_contentLocationUrl.toString(QUrl::RemovePassword)).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
+            NX_LOGX(lm("Error reading (1) http response from %1. %2")
+                .arg(m_contentLocationUrl).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
             m_state = sFailed;
             const auto requestSequenceBak = m_requestSequence;
             emit done(sharedThis);
@@ -599,9 +602,8 @@ namespace nx_http
                 m_state = sFailed;
             }
 
-            NX_LOGX(lit("Error reading (state %1) http response from %2. %3")
-                .arg(stateBak).arg(m_contentLocationUrl.toString(QUrl::RemovePassword))
-                .arg(SystemError::toString(errorCode)),
+            NX_LOGX(lm("Error reading (state %1) http response from %2. %3")
+                .arg(stateBak).arg(m_contentLocationUrl).arg(SystemError::toString(errorCode)),
                 cl_logDEBUG1);
             m_lastSysErrorCode = errorCode;
             const auto requestSequenceBak = m_requestSequence;
@@ -664,7 +666,7 @@ namespace nx_http
 
                     serializeRequest();
                     m_state = sSendingRequest;
-                    NX_LOGX(lm("Sending request to url %1").str(m_contentLocationUrl), cl_logDEBUG2);
+                    NX_LOGX(lm("Sending request to url %1").arg(m_contentLocationUrl), cl_logDEBUG2);
                     m_socket->sendAsync(
                         m_requestBuffer,
                         std::bind(&AsyncHttpClient::asyncSendDone, this, _1, _2));
@@ -688,9 +690,10 @@ namespace nx_http
 
         m_state = sInit;
 
-        m_socket = SocketFactory::createStreamSocket(m_contentLocationUrl.scheme() == lit("https"));
+        m_socket = SocketFactory::createStreamSocket(m_contentLocationUrl.scheme() == lm("https"));
 
-        NX_LOGX(lm("Opening connection to %1. url %2, socket %3").str(remoteAddress).str(m_contentLocationUrl).arg(m_socket->handle()), cl_logDEBUG2);
+        NX_LOGX(lm("Opening connection to %1. url %2, socket %3")
+            .str(remoteAddress).arg(m_contentLocationUrl).arg(m_socket->handle()), cl_logDEBUG2);
 
         m_socket->bindToAioThread(m_aioThreadBinder.getAioThread());
         m_connectionClosed = false;
@@ -746,8 +749,8 @@ namespace nx_http
         std::size_t bytesProcessed = 0;
         if (!m_httpStreamReader.parseBytes(m_responseBuffer, bytesRead, &bytesProcessed))
         {
-            NX_LOGX(lit("Error parsing http response from %1. %2").
-                arg(m_contentLocationUrl.toString(QUrl::RemovePassword)).arg(m_httpStreamReader.errorText()), cl_logDEBUG1);
+            NX_LOGX(lm("Error parsing http response from %1. %2")
+                .arg(m_contentLocationUrl).arg(m_httpStreamReader.errorText()), cl_logDEBUG1);
             m_state = sFailed;
             return -1;
         }
@@ -856,8 +859,8 @@ namespace nx_http
                 if (reconnectIfAppropriate())
                     return;
 
-                NX_LOGX(lit("Failed to read (1) response from %1. %2").
-                    arg(m_contentLocationUrl.toString(QUrl::RemovePassword)).arg(SystemError::connectionReset), cl_logDEBUG1);
+                NX_LOGX(lm("Failed to read (1) response from %1. %2")
+                    .arg(m_contentLocationUrl).arg(SystemError::connectionReset), cl_logDEBUG1);
                 m_state = sFailed;
                 emit done(sharedThis);
                 return;
@@ -869,16 +872,16 @@ namespace nx_http
         //read http message headers
         if (m_httpStreamReader.message().type != nx_http::MessageType::response)
         {
-            NX_LOGX(lit("Unexpectedly received request from %1:%2 while expecting response! Ignoring...").
-                arg(m_contentLocationUrl.host()).arg(m_contentLocationUrl.port()), cl_logDEBUG1);
+            NX_LOGX(lm("Unexpectedly received request from %1:%2 while expecting response! Ignoring...")
+                .arg(m_contentLocationUrl.host()).arg(m_contentLocationUrl.port()), cl_logDEBUG1);
             m_state = sFailed;
             emit done(sharedThis);
             return;
         }
 
-        NX_LOGX(lm("Response from %1 has been successfully read: %2").strs(
-            m_contentLocationUrl.toString(QUrl::RemovePassword),
-            logTraffic() ? response()->toString() : response()->statusLine.toString()),
+        NX_LOGX(lm("Response from %1 has been successfully read: %2")
+            .arg(m_contentLocationUrl)
+            .str(logTraffic() ? response()->toString() : response()->statusLine.toString()),
             cl_logDEBUG2);
 
         if (repeatRequestIfNeeded(*m_httpStreamReader.message().response))
@@ -931,9 +934,8 @@ namespace nx_http
             m_responseBuffer.resize(0);
             if (!m_socket->setRecvTimeout(m_msgBodyReadTimeoutMs))
             {
-                NX_LOGX(lit("Failed to read (1) response from %1. %2")
-                    .arg(m_contentLocationUrl.toString(QUrl::RemovePassword))
-                    .arg(SystemError::getLastOSErrorText()),
+                NX_LOGX(lm("Failed to read (1) response from %1. %2")
+                    .arg(m_contentLocationUrl).arg(SystemError::getLastOSErrorText()),
                     cl_logDEBUG1);
 
                 m_state = sFailed;
@@ -1186,7 +1188,7 @@ namespace nx_http
 
     QString AsyncHttpClient::endpointWithProtocol(const QUrl& url)
     {
-        return lit("%1://%2:%3")
+        return lm("%1://%2:%3")
             .arg(url.scheme())
             .arg(url.host())
             .arg(url.port(nx_http::defaultPortForScheme(url.scheme().toLatin1())));
