@@ -408,7 +408,7 @@
                 "Pelco|NET5516",
                 "Samsung*|SPE-100",
                 "Samsung*|SPE-101",
-                "Samsung*|SPE-1600*",
+                "Samsung*|SPE-1600*"
             ],
             "analogEncoder": true
         },
