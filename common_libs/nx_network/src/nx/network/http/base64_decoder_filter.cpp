@@ -1,10 +1,4 @@
-/**********************************************************
-* 8 may 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "base64_decoder_filter.h"
-
 
 Base64DecoderFilter::Base64DecoderFilter()
 {

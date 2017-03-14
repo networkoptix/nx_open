@@ -121,6 +121,9 @@ public: // internal API
     void setIsClosing(bool val);
     bool isClosing() const;
 
+    void setIsBroken(bool val);
+    bool isBroken() const;
+
 private:
     // Functionality:
     //    initialize a UDT entity and bind to a local address.

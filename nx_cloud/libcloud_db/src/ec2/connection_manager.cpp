@@ -370,8 +370,8 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
         .str(context.connection->commonTransportHeaderOfRemoteTransaction()),
         cl_logDEBUG1);
 
-    const auto systemConnectionCountBak = getConnectionCountBySystemId(
-        lock, context.fullPeerName.systemId);
+    const auto systemWasOffline = getConnectionCountBySystemId(
+        lock, context.fullPeerName.systemId) == 0;
     const auto systemId = context.fullPeerName.systemId.toStdString();
 
     if (!m_connections.insert(std::move(context)).second)
@@ -380,7 +380,7 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
         return false;
     }
 
-    if (systemConnectionCountBak == 0)
+    if (systemWasOffline)
     {
         lock.unlock();
         m_systemStatusChangedSubscription.notify(

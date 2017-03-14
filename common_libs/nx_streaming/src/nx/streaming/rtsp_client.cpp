@@ -1970,7 +1970,7 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx_http::Request&& request, QB
                 break;
 
             default:
-                m_serverInfo = nx_http::getHeaderValue(response.headers, nx_http::header::kServer);
+                m_serverInfo = nx_http::getHeaderValue(response.headers, nx_http::header::Server::NAME);
                 return true;
         }
 
