@@ -131,7 +131,9 @@ void QnSortFilterListModelPrivate::setModel(QAbstractListModel* model)
     connect(m_model, &QAbstractListModel::modelReset,
         this, &QnSortFilterListModelPrivate::handleResetSourceModel);
 
+    //TODO: #ynikitenkov Make filling of model with data in reset model mode.
     refresh();
+
 }
 
 QAbstractListModel* QnSortFilterListModelPrivate::model() const
