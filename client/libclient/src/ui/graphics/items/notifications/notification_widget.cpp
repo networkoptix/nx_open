@@ -61,18 +61,35 @@ void QnNotificationToolTipWidget::updateTailPos()
     QRectF rect = this->rect();
     QGraphicsItem* list = parentItem()->parentItem();
 
-    // half of the tooltip height in coordinates of enclosing rect
-    qreal halfHeight = mapRectToItem(list, rect).height() / 2;
+    const auto parentY = parentItem()->mapToItem(list, m_pointTo).y();
+    const auto tailX = qRound(rect.right() + tailLength());
 
-    qreal parentPos = parentItem()->mapToItem(list, m_pointTo).y();
+    const auto toolTipHeight = rect.height();
+    const auto halfHeight = toolTipHeight / 2;
 
-    if (parentPos - halfHeight < m_enclosingRect.top())
-        setTailPos(QPointF(qRound(rect.right() + tailLength()), qRound(rect.top() + tailWidth())));
+    const auto spaceToTop = parentY - m_enclosingRect.top();
+    const auto spaceToBottom = m_enclosingRect.bottom() - parentY;
+
+    static const int kOffset = tailWidth() / 2;
+
+    // Check if we are too close to the top (or there is not enough space in any case)
+    if (spaceToTop < halfHeight || m_enclosingRect.height() < toolTipHeight)
+    {
+        const auto tailY = qRound(rect.top() + spaceToTop - kOffset);
+        setTailPos(QPointF(tailX, tailY));
+    }
+    // Check if we are too close to the bottom
+    else if (spaceToBottom < halfHeight)
+    {
+        const auto tailY = qRound(rect.bottom() - spaceToBottom + kOffset);
+        setTailPos(QPointF(tailX, tailY));
+    }
+    // Optimal position
     else
-    if (parentPos + halfHeight > m_enclosingRect.bottom())
-        setTailPos(QPointF(qRound(rect.right() + tailLength()), qRound(rect.bottom() - tailWidth())));
-    else
-        setTailPos(QPointF(qRound(rect.right() + tailLength()), qRound((rect.top() + rect.bottom()) / 2)));
+    {
+        const auto tailY = qRound((rect.top() + rect.bottom()) / 2);
+        setTailPos(QPointF(tailX, tailY));
+    }
 
     // cannot call base_type as it is reimplemented
     QnToolTipWidget::pointTo(m_pointTo);
