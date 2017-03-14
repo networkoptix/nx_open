@@ -228,12 +228,11 @@ void QnSortFilterListModelPrivate::removeSourceRow(int sourceRow)
 
 void QnSortFilterListModelPrivate::shiftMappedRows(int minSourceRow, int difference)
 {
-    std::for_each(m_mapped.begin(), m_mapped.end(),
-        [minSourceRow, difference](int& row)
-        {
-            if (row >= minSourceRow)
-                row += difference;
-        });
+    for(auto& row: m_mapped)
+    {
+        if (row >= minSourceRow)
+            row += difference;
+    };
 }
 
 void QnSortFilterListModelPrivate::handleSourceRowsInserted(
@@ -245,12 +244,12 @@ void QnSortFilterListModelPrivate::handleSourceRowsInserted(
     if (parent.isValid())
         return;
 
-    // We have to increase all indicies after first by (last - first + 1) value.
-    const int difference = (last - first + 1);
-    shiftMappedRows(first, difference);
-
+    static const auto kInsertDifference = 1;
     for (int row = first; row <= last; ++row)
+    {
+        shiftMappedRows(row, kInsertDifference);
         insertSourceRow(row);
+    }
 }
 
 void QnSortFilterListModelPrivate::handleSourceRowsRemoved(
@@ -262,12 +261,12 @@ void QnSortFilterListModelPrivate::handleSourceRowsRemoved(
     if (parent.isValid())
         return;
 
+    static const auto kRemoveDifference = -1;
     for (int row = first; row <= last; ++row)
-        removeSourceRow(row);
-
-    // We have to decrease all indicies after last by (last - first + 1) value.
-    const int difference = -(last - first + 1);
-    shiftMappedRows(last, difference);
+    {
+        shiftMappedRows(first + 1, kRemoveDifference);
+        removeSourceRow(first);
+    }
 }
 
 void QnSortFilterListModelPrivate::handleSourceRowsMoved(
@@ -315,7 +314,7 @@ void QnSortFilterListModelPrivate::handleSourceDataChanged(
     }
 
     if (m_triggeringRoles.isEmpty() ||
-        !m_triggeringRoles.intersect(roles.toList().toSet()).isEmpty())
+        !RolesSet(m_triggeringRoles).intersect(roles.toList().toSet()).isEmpty())
     {
         invalidate();
     }
