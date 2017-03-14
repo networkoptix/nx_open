@@ -1,8 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('MainCtrl', function ($scope, $location, nativeClient) {
-
+    .controller('MainCtrl', function ($scope, $location, nativeClient, mediaserver) {
         $scope.config = Config;
 
         if($location.path() == '/'){ // Do redirects

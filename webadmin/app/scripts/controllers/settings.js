@@ -6,6 +6,7 @@ angular.module('webadminApp')
 
         if(mediaserver.hasProxy()){
             $location.path("/view");
+            return;
         }
         $scope.L = L;
 
