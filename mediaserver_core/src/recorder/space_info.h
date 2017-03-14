@@ -34,7 +34,7 @@ public:
     /**
     * Returns optimal storage index or -1 if this index can't be determined
     */
-    int getOptimalStorageIndex(std::function<bool(int)> useStoragePredicate) const;
+    int getOptimalStorageIndex(const std::vector<int>& allowedIndexes) const;
 
 private:
     SpaceInfoVector::iterator storageByIndex(int storageIndex);

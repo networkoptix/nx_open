@@ -370,11 +370,11 @@ using namespace nx::recorder;
 StorageDistributionMap getStorageDistribution(
     const SpaceInfo& spaceInfo, 
     int iterations,
-    std::function<bool(int)> pred = [](int) { return true; })
+    const std::vector<int>& allowedIndexes)
 {
     StorageSelectionsMap selectionsData;
     for (int i = 0; i < iterations; ++i)
-        ++selectionsData.emplace(spaceInfo.getOptimalStorageIndex(pred), 0).first->second;
+        ++selectionsData.emplace(spaceInfo.getOptimalStorageIndex(allowedIndexes), 0).first->second;
 
     StorageDistributionMap result;
     for (const auto& p: selectionsData)
@@ -404,7 +404,7 @@ TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceNotKnown)
     /* no storage rebulded call for the third storage. getOptimalStorageIndex() should be 
     *  equally distributed 
     */
-    auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000);
+    auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000, {0, 1, 2});
     ASSERT_LT(storageDistribution[0] - 0.33, 0.05);
     ASSERT_LT(storageDistribution[1] - 0.33, 0.05);
     ASSERT_LT(storageDistribution[2] - 0.33, 0.05);
@@ -418,7 +418,7 @@ TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown)
 
     /* Total Es = 160 => 0 - 0.4375, 1 - 0.3125, 2 - 0.25 */
 
-    auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000);
+    auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000, {0, 1, 2});
     ASSERT_LT(storageDistribution[0] - 0.4375, 0.05);
     ASSERT_LT(storageDistribution[1] - 0.3125, 0.05);
     ASSERT_LT(storageDistribution[2] - 0.25, 0.05);
@@ -434,28 +434,21 @@ TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown_OneRemoved)
 
     spaceInfo.storageRemoved(2);
 
-    auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000);
+    auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000, {0, 1, 2});
     ASSERT_EQ(storageDistribution.find(2), storageDistribution.cend());
     ASSERT_LT(storageDistribution[0] - 0.5833, 0.05);
     ASSERT_LT(storageDistribution[1] - 0.4166, 0.05);
 }
 
 
-TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown_FalsePredicate)
+TEST_F(StorageBalancingAlgorithmTest, EqualStorages_NxSpaceKnown_NotAllAllowed)
 {
     spaceInfo.storageRebuilded(0, 50, 20, 10); // Es = 70
     spaceInfo.storageRebuilded(1, 30, 20, 10); // Es = 50
-    spaceInfo.storageRebuilded(2, 10, 30, 10); // Es = 40. This will be ignored because of predicate
-
+    spaceInfo.storageRebuilded(2, 10, 30, 10); // Es = 40. This won't be allowed
     /* Total Es = 120 => 0 - 0.5833, 1 - 0.4166 */
 
-    auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000,
-        [](int index)
-        {
-            if (index == 2)
-                return false;
-            return true;
-        });
+    auto storageDistribution = getStorageDistribution(spaceInfo, 100 * 1000, {0, 1});
     ASSERT_EQ(storageDistribution.find(2), storageDistribution.cend());
     ASSERT_LT(storageDistribution[0] - 0.5833, 0.05);
     ASSERT_LT(storageDistribution[1] - 0.4166, 0.05);

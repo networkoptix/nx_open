@@ -2126,23 +2126,18 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
     std::function<bool(const QnStorageResourcePtr &)> pred)
 {
     QnStorageResourcePtr result;
+    std::vector<int> allowedIndexes;
 
-    auto optimalStorageIndex = m_spaceInfo.getOptimalStorageIndex(
-        [pred, this](int storageIndex)
-        { 
-            for (const auto& storage: getUsedWritableStorages())
-            {
-                if (storage && 
-                    qnStorageDbPool->getStorageIndex(storage) == storageIndex && 
-                    pred(storage) && 
-                    storage->getFreeSpace() > kMinStorageFreeSpace)
-                {
-                    return true;
-                }
-            }
-            return false;
-        });
+    for (const auto& storage: getUsedWritableStorages())
+    {
+        if (pred(storage) && 
+            storage->getFreeSpace() > kMinStorageFreeSpace)
+        {
+            allowedIndexes.push_back(qnStorageDbPool->getStorageIndex(storage));
+        }
+    }
 
+    auto optimalStorageIndex = m_spaceInfo.getOptimalStorageIndex(allowedIndexes);
     if (optimalStorageIndex == -1)
         return result;
 

@@ -11,10 +11,7 @@ SpaceInfo::SpaceInfo() : m_gen(m_rd()) {}
 SpaceInfo::SpaceInfoVector::iterator SpaceInfo::storageByIndex(int index)
 {
     return std::find_if(m_storageSpaceInfo.begin(), m_storageSpaceInfo.end(),
-        [index](const StorageSpaceInfo& info)
-        {
-            return info.index == index;
-        });
+                        [index](const StorageSpaceInfo& info) { return info.index == index; });
 }
 
 void SpaceInfo::storageAdded(int index, int64_t totalSpace)
@@ -66,7 +63,7 @@ void SpaceInfo::storageRemoved(int index)
     if (toRemoveIt == m_storageSpaceInfo.cend())
     {
         NX_LOG(lit("[Storage, SpaceInfo, Selection] Storage index %1 removed, but had not been added")
-            .arg(index), cl_logDEBUG1);
+                .arg(index), cl_logDEBUG1);
         return;
     }
     NX_LOG(lit("[Storage, SpaceInfo, Selection] Removing storage index (%1)")
@@ -74,20 +71,24 @@ void SpaceInfo::storageRemoved(int index)
     m_storageSpaceInfo.erase(toRemoveIt);
 }
 
-int SpaceInfo::getOptimalStorageIndex(std::function<bool(int)> useStoragePredicate) const
+int SpaceInfo::getOptimalStorageIndex(const std::vector<int>& allowedIndexes) const
 {
     QnMutexLocker lock(&m_mutex);
 
     /* get filtered by predicate storages vector */
-    SpaceInfoVector filteredStorageIndexes;
-    std::copy_if(m_storageSpaceInfo.cbegin(), m_storageSpaceInfo.cend(), 
-        std::back_inserter(filteredStorageIndexes),
-        [useStoragePredicate](const StorageSpaceInfo& info) 
-        { 
-            return useStoragePredicate(info.index) && info.totalSpace > 0; 
-        });
+    SpaceInfoVector filteredSpaceInfo;
+    for (const auto& spaceInfo: m_storageSpaceInfo)
+    {
+        if (std::find_if(
+                allowedIndexes.cbegin(), 
+                allowedIndexes.cend(), 
+                [&spaceInfo](int index) { return index == spaceInfo.index; }) != allowedIndexes.cend())
+        {
+            filteredSpaceInfo.emplace_back(spaceInfo);
+        }
+    }
 
-    if(filteredStorageIndexes.empty())
+    if(filteredSpaceInfo.empty())
     {
         NX_LOG(lit("[Storage, SpaceInfo, Selection] Failed to find approprirate storage index"), 
             cl_logDEBUG1);
@@ -95,17 +96,17 @@ int SpaceInfo::getOptimalStorageIndex(std::function<bool(int)> useStoragePredica
     }
 
     /* use totalSpace based algorithm if effective space is unknown for any of the storages */
-    bool hasStorageWithoutEffectiveSpace = std::any_of(filteredStorageIndexes.cbegin(), 
-        filteredStorageIndexes.cend(), 
+    bool hasStorageWithoutEffectiveSpace = std::any_of(filteredSpaceInfo.cbegin(), 
+        filteredSpaceInfo.cend(), 
         [](const StorageSpaceInfo& info)
         {
             return info.effectiveSpace == 0;
         });
 
     if (hasStorageWithoutEffectiveSpace)
-        return getStorageIndexImpl(filteredStorageIndexes, false);
+        return getStorageIndexImpl(filteredSpaceInfo, false);
 
-    return getStorageIndexImpl(filteredStorageIndexes, true);
+    return getStorageIndexImpl(filteredSpaceInfo, true);
 }
 
 int SpaceInfo::getStorageIndexImpl(const SpaceInfoVector& filteredSpaceInfo, bool byEffectiveSpace) const
