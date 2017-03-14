@@ -1,6 +1,6 @@
 import logging
 import pytest
-from vagrant_box_config import DEFAULT_HOSTNET
+from test_utils.vagrant_box_config import DEFAULT_HOSTNET
 
 
 log = logging.getLogger(__name__)

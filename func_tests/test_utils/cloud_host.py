@@ -1,6 +1,6 @@
 import logging
 import requests
-from server_rest_api import CloudRestApi
+from .server_rest_api import CloudRestApi
 
 
 log = logging.getLogger(__name__)

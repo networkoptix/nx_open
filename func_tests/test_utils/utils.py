@@ -1,3 +1,8 @@
+import logging
+
+
+log = logging.getLogger(__name__)
+
 
 class SimpleNamespace:
 
@@ -20,3 +25,20 @@ def is_list_inst(l, cls):
         if not isinstance(val, cls):
             return False
     return True
+
+def log_list(name, values):
+    log.debug('%s:', name)
+    for i, value in enumerate(values):
+        log.debug('\t #%d: %s', i, value)
+
+def bool_to_str(val, false_str = 'false', true_str = 'true'):
+    if val: return true_str
+    else: return false_str
+
+def str_to_bool(val):
+    v = val.lower()
+    if val == 'false' or val == '0':
+        return False
+    elif val == 'true' or val == '1':
+        return True
+    raise Exception('Invalid boolean "%s"' % val)
