@@ -120,10 +120,24 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     setupTreeView(ui->controlsTreeView);
 
     auto indirectAccessDelegate = new QnCustomizableItemDelegate(this);
-    indirectAccessDelegate->setCustomInitStyleOption(
-        [](QStyleOptionViewItem* option, const QModelIndex& /*index*/)
+    indirectAccessDelegate->setCustomSizeHint(
+        [](const QStyleOptionViewItem& option, const QModelIndex& index)
         {
-            option->state &= ~QStyle::State_Enabled;
+            return qnSkin->maximumSize(option.icon);
+        });
+
+    indirectAccessDelegate->setCustomPaint(
+        [indirectAccessDelegate](QPainter* painter, const QStyleOptionViewItem& option,
+            const QModelIndex& index)
+        {
+            QStyleOptionViewItem viewItem(option);
+            indirectAccessDelegate->initStyleOption(&viewItem, index);
+            viewItem.widget->style()->drawPrimitive(QStyle::PE_PanelItemViewItem,
+                &viewItem, painter, viewItem.widget);
+            viewItem.icon.paint(painter, viewItem.rect, Qt::AlignCenter,
+                viewItem.state.testFlag(QStyle::State_Selected)
+                    ? QIcon::Normal
+                    : QIcon::Disabled);
         });
 
     ui->resourcesTreeView->setItemDelegateForColumn(
