@@ -49,6 +49,9 @@
     <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}" ng-include="Config.viewsDir + 'components/flashls.html'">
     </div>
 
-    <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading}">
+    <div class="videoplayer" ng-if="native" ng-class="{'invisible': loading}">
     </div>
+
+    <video class="videoplayer" autoplay ng-if="hls" ng-class="{'invisible': loading}">
+    </video>
 </div>

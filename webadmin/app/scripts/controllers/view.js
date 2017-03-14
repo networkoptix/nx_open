@@ -271,7 +271,6 @@ angular.module('webadminApp').controller('ViewCtrl',
                 resolutionHls = channels.High;
             }
 
-
             $scope.acitveVideoSource = _.filter([
                 { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + resolutionHls + positionMedia + authParam ), type: mimeTypes.hls, transport:'hls'},
                 { src: ( serverUrl + '/media/' + cameraId + '.webm?rt&resolution=' + resolution + positionMedia + authParam ), type: mimeTypes.webm, transport:'webm' },
@@ -344,6 +343,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         };
 
         $scope.switchPlaying = function(play){
+            console.log($scope.playerAPI);
             if($scope.playerAPI) {
                 if (play) {
                     $scope.playerAPI.play();
@@ -367,6 +367,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             //var playing = $scope.positionProvider.checkPlayingDate(val);
 
             //if(playing === false) {
+                console.log("Switch Position: ", val);
                 updateVideoSource(val);//We have nothing more to do with it.
             /*}else{
                 $scope.playerAPI.seekTime(playing); // Jump to buffered video
@@ -382,6 +383,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             /*if(resolution === 'auto' || resolution === 'Auto' || resolution === 'AUTO'){
                 resolution = '320p'; //TODO: detect better resolution here
             }*/
+            console.log("Resolution: ", resolution);
 
             if($scope.activeResolution === resolution){
                 return;

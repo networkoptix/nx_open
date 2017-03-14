@@ -1,7 +1,6 @@
 'use strict';
 
 importScripts('./lib/require.js');
-
 require.config({
 	paths: {
 		jdataview: '//jdataview.github.io/dist/jdataview',
@@ -22,7 +21,7 @@ require.config({
 	}
 });
 
-require(['async', 'jbinary', './mpegts_to_mp4/mpegts', './mpegts_to_mp4/index', 'consoleTime', 'consoleWorker'],
+require(['async', 'jbinary', './mpegts_to_mp4/mpegts', './mpegts_to_mp4/index', './mpegts_to_mp4/h264', 'consoleTime', 'consoleWorker'],
 	function (async, jBinary, MPEGTS, mpegts_to_mp4) {
 		addEventListener('message', function (event) {
 			// processing received sources one by one
@@ -31,10 +30,10 @@ require(['async', 'jbinary', './mpegts_to_mp4/mpegts', './mpegts_to_mp4/index', 
 					// tell async we can load next one
 					callback(err);
 					if (err) return;
-
-					console.time('convert');
+					//console.time('convert');
 					var mp4 = mpegts_to_mp4(mpegts);
-					console.timeEnd('convert');
+					console.log('Done with mpegts');
+					//console.timeEnd('convert');
 					
 					postMessage({
 						type: 'video',

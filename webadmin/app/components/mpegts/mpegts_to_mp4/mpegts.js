@@ -1,4 +1,7 @@
 (function (root, factory) {
+	console.log(define);
+	console.log(root);
+	console.log(factory);
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
         define(['jbinary'], factory);

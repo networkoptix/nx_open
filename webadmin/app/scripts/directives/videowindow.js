@@ -38,7 +38,7 @@ angular.module('webadminApp')
                     'flv': 'video/x-flv',
                     'mp4': 'video/mp4'
                 };
-
+                scope.Config = Config;
                 scope.debugMode = Config.debug.video && Config.allowDebugMode;
                 scope.debugFormat = Config.allowDebugMode && Config.debug.videoFormat;
 
@@ -128,14 +128,12 @@ angular.module('webadminApp')
                     switch(window.jscd.browser){
                         case 'Microsoft Internet Explorer':
                             // Check version here
-
-                            if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
+                            if(window.jscd.browserMajorVersion>=10 && weHaveHls){
+                                return "jshls";
+                            }
+                            if(window.jscd.flashVersion){ // We have flash - try to play using flash
                                 return "flashls";
                             }
-
-                            /*if(window.jscd.browserMajorVersion>=10 && weHaveHls){
-                                return "jshls";
-                            }*/
 
                             if(weHaveHls && weHaveWebm && (window.jscd.osVersion < 10)){
                                 scope.flashOrWebmRequired = true;
@@ -177,20 +175,20 @@ angular.module('webadminApp')
                         case "Opera":
                         case "Webkit":
                         default:
-                            if(weHaveHls && window.jscd.flashVersion ){ // We have flash - try to play using flash
+                            if(weHaveHls && 0) {
+                                return "jshls";// We are hoping that we have some good browser
+                            }
+                            if(window.jscd.flashVersion){ // We have flash - try to play using flash
                                 return "flashls";
                             }
-                            /*if(weHaveHls) {
-                                return "jshls";// We are hoping that we have some good browser
-                            }*/
-                            if(weHaveRtsp && window.jscd.flashVersion){
+                            if(weHaveRtsp){
                                 return "rtsp";
                             }
-                            if(weHaveHls) {
-                                scope.flashRequired = true;
-                                return false;
+                            if(weHaveWebm){
+                                return "webm";
                             }
 
+                            scope.flashRequired = true;
                             scope.noFormat = true;
                             return false; // IE9 - No supported formats
                     }
@@ -227,6 +225,7 @@ angular.module('webadminApp')
 
                     scope.native = true;
                     scope.flashls = false;
+                    scope.hls = false;
 
                     var autoshow = null;
                     nativePlayer.init(element.find(".videoplayer"), function (api) {
@@ -274,6 +273,7 @@ angular.module('webadminApp')
                 function initFlashls() {
                     scope.flashls = true;
                     scope.native = false;
+                    scope.hls = false;
                     scope.flashSource = "components/flashlsChromeless.swf";
 
                     if(scope.debugMode && scope.debugFormat){
@@ -288,7 +288,6 @@ angular.module('webadminApp')
                         $timeout(function () {// Force DOM to refresh here
                             flashlsAPI.init("videowindow", function (api) {
                                 scope.vgApi = api;
-
                                 if (scope.vgSrc) {
                                     $timeout(function () {
                                         scope.loading = !!format;
@@ -316,22 +315,23 @@ angular.module('webadminApp')
                 }
 
                 function initJsHls(){
-                    jshlsAPI.init( element.find(".videoplayer"), function (api) {
-                        scope.vgApi = api;
+                    scope.flasels = false;
+                    scope.native = false;
+                    scope.hls = true;
+                    hlsAPI.init( element.find(".videoplayer"), function (api) {
+                            scope.vgApi = api;
+                            if (scope.vgSrc) {
 
-                        if (scope.vgSrc) {
-
-                            $timeout(function(){
-                                scope.loading = !!format;
-                            });
-                            scope.vgApi.load(getFormatSrc('hls'));
-                        }
-
-                        scope.vgPlayerReady({$API:api});
-                    }, function (api) {
-                        console.error("some error");
+                                $timeout(function(){
+                                    scope.loading = false;
+                                });
+                                scope.vgApi.load(getFormatSrc('hls'));
+                            }
+                            scope.vgPlayerReady({$API:api});
+                        },  function (api) {
+                                console.log(api);
+                                console.error("some error");
                     });
-
                 }
 
                 function initRtsp(){
@@ -387,9 +387,9 @@ angular.module('webadminApp')
                         if(!format){
                             scope.native = false;
                             scope.flashls = false;
+                            scope.hls = false;
                             return;
                         }
-
                         switch(format){
                             case "flashls":
                                 initFlashls();
@@ -413,9 +413,6 @@ angular.module('webadminApp')
                                 break;
                         }
                     }
-                    //if(scope.vgApi && scope.vgSrc ) {
-                    //    scope.vgApi.load(scope.vgSrc[0].src);
-                    //}
                 }
 
                 scope.$watch("vgSrc",srcChanged);
