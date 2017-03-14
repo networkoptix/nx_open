@@ -4,6 +4,16 @@
 #include <nx/utils/math/fuzzy.h>
 #include <utils/common/connective.h>
 
+namespace {
+
+struct RemoveOperationData
+{
+    int startIndex;
+    int offset;
+};
+
+} // unnamed namespace
+
 //////////////////////////////////////////////////////////////////////////////////////////////////
 class QnSortFilterListModelPrivate : public Connective<QObject>
 {
@@ -34,7 +44,7 @@ private:
         int first,
         int last);
 
-    void handleSourceRowsRemoved(
+    void handleSourceRowsAboutToBeRemoved(
         const QModelIndex& parent,
         int first,
         int last);
@@ -54,21 +64,23 @@ private:
 private:
     void insertSourceRow(int sourceRow);
 
-    void removeSourceRow(int sourceRow);
+    void removeSourceRow(int mappedIndex);
 
     bool isFilteredOut(int sourceRow) const;
 
-    typedef QList<int> RowsList;
-    RowsList::iterator positionToInsert(int sourceRow);
+    int indexToInsert(int sourceRow);
 
     void shiftMappedRows(int fromSourceRow, int difference);
 
 private:
-    RowsList m_mapped;
-    QPointer<QAbstractListModel> m_model = nullptr;
-
+    using RowsList = QList<int>;
     using RolesSet = QSet<int>;
+    using RemoveOperationDataPtr = QScopedPointer<RemoveOperationData>;
+
+    QPointer<QAbstractListModel> m_model;
+    RowsList m_mapped;
     RolesSet m_triggeringRoles;
+    RemoveOperationDataPtr m_removeOperationData;
 };
 
 QnSortFilterListModelPrivate::QnSortFilterListModelPrivate(QnSortFilterListModel* parent):
@@ -96,10 +108,17 @@ void QnSortFilterListModelPrivate::setModel(QAbstractListModel* model)
     if (!m_model)
         return;
 
+    const auto resetShiftingOperation = [this]() { m_removeOperationData.reset(); };
+
     connect(m_model, &QAbstractListModel::rowsInserted,
         this, &QnSortFilterListModelPrivate::handleSourceRowsInserted);
-    connect(m_model, &QAbstractListModel::rowsRemoved,
-        this, &QnSortFilterListModelPrivate::handleSourceRowsRemoved);
+
+
+    connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved,
+        this, &QnSortFilterListModelPrivate::handleSourceRowsAboutToBeRemoved);
+    connect(m_model, &QAbstractListModel::rowsRemoved, this, resetShiftingOperation);
+
+
     connect(m_model, &QAbstractListModel::rowsMoved,
         this, &QnSortFilterListModelPrivate::handleSourceRowsMoved);
     connect(m_model, &QAbstractListModel::dataChanged,
@@ -123,6 +142,8 @@ QModelIndex QnSortFilterListModelPrivate::sourceIndexForTargetRow(int row) const
     if (!m_model || (row < 0) || (row >= m_mapped.size()))
         return QModelIndex();
 
+    if (m_removeOperationData && (row >= m_removeOperationData->startIndex))
+        row += m_removeOperationData->offset;
     const auto sourceRow = m_mapped[row];
     return m_model->index(sourceRow);
 }
@@ -145,7 +166,14 @@ void QnSortFilterListModelPrivate::invalidate()
         if (shouldBeFilteredOut != currentFilteredOut)
         {
             if (shouldBeFilteredOut)
-                removeSourceRow(sourceRow);
+            {
+                /**
+                 * Index will never be -1 here because it is not filtered out currently.
+                 * removeSourceRow checks this anyway.
+                 */
+                NX_ASSERT(currentIndex != -1, "Index can't be -1 here!");
+                removeSourceRow(currentIndex);
+            }
             else
                 insertSourceRow(sourceRow); // Here row is placed in right position
 
@@ -157,8 +185,7 @@ void QnSortFilterListModelPrivate::invalidate()
             continue;
         }
 
-        const auto newPosition = positionToInsert(sourceRow);
-        const int newIndex = std::distance(m_mapped.begin(), newPosition);
+        const int newIndex = indexToInsert(sourceRow);
         if (newIndex == currentIndex)
             continue; //< Row is in right place
 
@@ -183,15 +210,16 @@ bool QnSortFilterListModelPrivate::isFilteredOut(int sourceRow) const
     return !q->filterAcceptsRow(sourceRow, QModelIndex());
 }
 
-QnSortFilterListModelPrivate::RowsList::iterator QnSortFilterListModelPrivate::positionToInsert(
+int QnSortFilterListModelPrivate::indexToInsert(
     int sourceRow)
 {
-    return std::lower_bound(m_mapped.begin(), m_mapped.end(), sourceRow,
+    const auto it = std::lower_bound(m_mapped.begin(), m_mapped.end(), sourceRow,
         [this](int left, int right)
         {
             Q_Q(QnSortFilterListModel);
             return q->lessThan(m_model->index(left), m_model->index(right));
         });
+    return std::distance(m_mapped.begin(), it);
 }
 
 void QnSortFilterListModelPrivate::insertSourceRow(int sourceRow)
@@ -207,22 +235,20 @@ void QnSortFilterListModelPrivate::insertSourceRow(int sourceRow)
     }
 
     Q_Q(QnSortFilterListModel);
-    const auto pos = positionToInsert(sourceRow);
-    const auto index = std::distance(m_mapped.begin(), pos);
+    const auto index = indexToInsert(sourceRow);
     q->beginInsertRows(QModelIndex(), index, index);
-    m_mapped.insert(pos, sourceRow);
+    m_mapped.insert(index, sourceRow);
     q->endInsertRows();
 }
 
-void QnSortFilterListModelPrivate::removeSourceRow(int sourceRow)
+void QnSortFilterListModelPrivate::removeSourceRow(int mappedIndex)
 {
-    const int index = m_mapped.indexOf(sourceRow);
-    if (index == -1)
+    if (mappedIndex == -1)
         return; //< Row is filtered out
 
     Q_Q(QnSortFilterListModel);
-    q->beginRemoveRows(QModelIndex(), index, index);
-    m_mapped.removeAt(index);
+    q->beginRemoveRows(QModelIndex(), mappedIndex, mappedIndex);
+    m_mapped.removeAt(mappedIndex);
     q->endRemoveRows();
 }
 
@@ -244,15 +270,19 @@ void QnSortFilterListModelPrivate::handleSourceRowsInserted(
     if (parent.isValid())
         return;
 
-    static const auto kInsertDifference = 1;
+
+    /**
+     * Since we have new rows in the source model, we have to increase all indicies
+     * after first by (last - first + 1) value.
+     */
+    const int difference = (last - first + 1);
+    shiftMappedRows(first, difference);
+
     for (int row = first; row <= last; ++row)
-    {
-        shiftMappedRows(row, kInsertDifference);
         insertSourceRow(row);
-    }
 }
 
-void QnSortFilterListModelPrivate::handleSourceRowsRemoved(
+void QnSortFilterListModelPrivate::handleSourceRowsAboutToBeRemoved(
     const QModelIndex& parent,
     int first,
     int last)
@@ -261,11 +291,17 @@ void QnSortFilterListModelPrivate::handleSourceRowsRemoved(
     if (parent.isValid())
         return;
 
+    NX_ASSERT(m_removeOperationData.isNull(), "Overlapped remove rows opertaion");
+
     static const auto kRemoveDifference = -1;
     for (int row = first; row <= last; ++row)
-    {
+    {        
+        const int indicesOffset = row - first + 1;
+        m_removeOperationData.reset(new RemoveOperationData({first, indicesOffset}));
+
+        const int mappedIndex = m_mapped.indexOf(first);
         shiftMappedRows(first + 1, kRemoveDifference);
-        removeSourceRow(first);
+        removeSourceRow(mappedIndex);
     }
 }
 
