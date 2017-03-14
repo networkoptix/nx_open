@@ -663,6 +663,7 @@ module.exports = function (grunt) {
         }
     });
 
+    // Example: grunt testportal:login:default
     grunt.registerTask('testportal', function (specsuit, brand) {
         var specsuit = specsuit || 'all';
         var customizationsArr = JSON.parse(grunt.file.read('./test-customizations.json'));
