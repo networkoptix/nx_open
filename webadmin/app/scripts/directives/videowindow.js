@@ -175,7 +175,7 @@ angular.module('webadminApp')
                         case "Opera":
                         case "Webkit":
                         default:
-                            if(weHaveHls && 0) {
+                            if(weHaveHls) {
                                 return "jshls";// We are hoping that we have some good browser
                             }
                             if(window.jscd.flashVersion){ // We have flash - try to play using flash
