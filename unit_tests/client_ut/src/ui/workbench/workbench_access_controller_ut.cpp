@@ -2,7 +2,7 @@
 
 #include <common/common_module.h>
 
-#include <client/client_module.h>
+#include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
@@ -30,7 +30,8 @@ protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
-        m_module.reset(new QnClientModule());
+        m_module.reset(new QnCommonModule());
+        m_runtime.reset(new QnClientRuntimeSettings());
         m_accessController.reset(new QnWorkbenchAccessController());
     }
 
@@ -38,6 +39,7 @@ protected:
     virtual void TearDown()
     {
         m_currentUser.clear();
+        m_runtime.clear();
         m_module.clear();
         m_accessController.clear();
     }
@@ -108,8 +110,9 @@ protected:
     }
 
     // Declares the variables your tests want to use.
-    QSharedPointer<QnClientModule> m_module;
+    QSharedPointer<QnCommonModule> m_module;
     QSharedPointer<QnWorkbenchAccessController> m_accessController;
+    QSharedPointer<QnClientRuntimeSettings> m_runtime;
     QnUserResourcePtr m_currentUser;
 };
 
