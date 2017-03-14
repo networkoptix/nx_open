@@ -27,7 +27,7 @@ TEST_F(TestFileInfoIteratorTest, invalidPath)
     ASSERT_FALSE(fileIterator);
 }
 
-TEST_F(TestFileInfoIteratorTest, main)
+TEST_F(TestFileInfoIteratorTest, Folders)
 {
     auto fileIterator = storage->getFileIterator("test://storage/some/path", nullptr);
     ASSERT_TRUE(fileIterator);
@@ -42,4 +42,30 @@ TEST_F(TestFileInfoIteratorTest, main)
     fInfo = fileIterator->next(&ecode);
     ASSERT_EQ(ecode, nx_spl::error::NoError);
     ASSERT_EQ(strcmp(fInfo->url, "test://storage/some/path/low_quality"), 0);
+
+    fileIterator->releaseRef();
+}
+
+TEST_F(TestFileInfoIteratorTest, Files)
+{
+    auto fileIterator = storage->getFileIterator(
+        "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/", 
+        nullptr);
+    ASSERT_TRUE(fileIterator);
+
+    int ecode;
+    auto fInfo = fileIterator->next(&ecode);
+    ASSERT_EQ(ecode, nx_spl::error::NoError);
+    ASSERT_EQ(strcmp(
+        fInfo->url, 
+        "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461075.mkv"), 0);
+    ASSERT_EQ(fInfo->type, nx_spl::isFile);
+
+    fInfo = fileIterator->next(&ecode);
+    ASSERT_EQ(ecode, nx_spl::error::NoError);
+    ASSERT_EQ(strcmp(
+        fInfo->url, 
+        "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076.mkv"), 0);
+
+    fileIterator->releaseRef();
 }
