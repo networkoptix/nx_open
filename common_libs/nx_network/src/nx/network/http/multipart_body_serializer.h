@@ -1,14 +1,8 @@
-/**********************************************************
-* May 12, 2016
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <utils/media/abstract_byte_stream_filter.h>
 
 #include "httptypes.h"
-
 
 namespace nx_http {
 
@@ -61,4 +55,4 @@ private:
         boost::optional<std::uint64_t> contentLength);
 };
 
-}   //namespace nx_http
+} // namespace nx_http

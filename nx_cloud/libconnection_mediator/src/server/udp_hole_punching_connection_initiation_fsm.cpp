@@ -309,6 +309,10 @@ void UDPHolePunchingConnectionInitiationFsm::sendConnectResponse(
     api::ResultCode resultCode,
     api::ConnectResponse connectResponse)
 {
+    NX_LOGX(lm("Connection %1. Sending connect response (%2) while in state %3")
+        .arg(m_connectionID).arg(QnLexical::serialized(resultCode)).arg(toString(m_state)),
+        cl_logDEBUG2);
+
     NX_CRITICAL(m_connectResponseSender);
     decltype(m_connectResponseSender) connectResponseSender;
     connectResponseSender.swap(m_connectResponseSender);

@@ -1,21 +1,13 @@
-/**********************************************************
-* 8 may 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef BASE64_DECODER_FILTER_H
-#define BASE64_DECODER_FILTER_H
+#pragma once 
 
 #include <utils/media/abstract_byte_stream_filter.h>
 
-
-/*!
-    Input: base64 string
-    Output: decoded string
-    \note Currently, all source buffers are decoded independently. //TODO #ak make stream decoder of this
-*/
-class NX_NETWORK_API Base64DecoderFilter
-:
+/**
+ * Input: base64 string
+ * Output: decoded string
+ * @note Currently, all source buffers are decoded independently.
+ */
+class NX_NETWORK_API Base64DecoderFilter:
     public AbstractByteStreamFilter
 {
 public:
@@ -27,5 +19,3 @@ public:
     //!Implementation of AbstractByteStreamFilter::flush
     virtual size_t flush() override;
 };
-
-#endif  //BASE64_DECODER_FILTER_H
