@@ -30,8 +30,6 @@ namespace
 }
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
-QHash<QnUuid, QnResourcePtr> QnEventLogModel::m_resourcesHash;
-
 // -------------------------------------------------------------------------- //
 // QnEventLogModel::DataIndex
 // -------------------------------------------------------------------------- //
@@ -184,8 +182,6 @@ QnEventLogModel::QnEventLogModel(QObject *parent)
     , m_index(new DataIndex(this))
 {
     m_linkFont.setUnderline(true);
-
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnEventLogModel::at_resource_removed);
 }
 
 QnEventLogModel::~QnEventLogModel() {
@@ -283,18 +279,7 @@ QnResourcePtr QnEventLogModel::getResource(const Column &column, const QnBusines
 }
 
 QnResourcePtr QnEventLogModel::getResourceById(const QnUuid &id) {
-    if (id.isNull())
-        return QnResourcePtr();
-
-    QnResourcePtr resource = m_resourcesHash.value(id);
-    if (resource)
-        return resource;
-
-    resource = qnResPool->getResourceById(id);
-    if (resource)
-        m_resourcesHash.insert(id, resource);
-
-    return resource;
+    return qnResPool->getResourceById(id);
 }
 
 QString QnEventLogModel::getUserNameById(const QnUuid &id)
@@ -637,8 +622,4 @@ qint64 QnEventLogModel::eventTimestamp(int row) const {
         return action.eventParams.eventTimestampUsec;
     }
     return AV_NOPTS_VALUE;
-}
-
-void QnEventLogModel::at_resource_removed(const QnResourcePtr &resource) {
-    m_resourcesHash.remove(resource->getId());
 }
