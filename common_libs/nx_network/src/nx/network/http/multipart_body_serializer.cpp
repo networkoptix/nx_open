@@ -1,10 +1,4 @@
-/**********************************************************
-* May 12, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include "multipart_body_serializer.h"
-
 
 namespace nx_http {
 
@@ -97,4 +91,4 @@ void MultipartBodySerializer::startBodyPartInternal(
     m_outputStream->processData(std::move(serializedData));
 }
 
-}   //namespace nx_http
+} // namespace nx_http

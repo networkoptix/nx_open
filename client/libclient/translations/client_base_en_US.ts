@@ -3733,15 +3733,15 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Full Name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Email</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>DN</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3760,10 +3760,6 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Import users</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Error while loading users.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3773,6 +3769,10 @@ to %1</source>
     </message>
     <message>
         <source>Timed Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Import Selected</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5046,6 +5046,13 @@ to %1</source>
     </message>
     <message>
         <source>Local Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QnResourceTreeModelOtherSystemsNode</name>
+    <message>
+        <source>New System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -1,5 +1,6 @@
-
 #pragma once
+
+#include <utils/common/software_version.h>
 
 #include <nx/utils/uuid.h>
 #include <nx/vms/utils/system_uri.h>
@@ -11,6 +12,13 @@ struct QnStartupParameters
     QnStartupParameters();
 
     static QnStartupParameters fromCommandLineArg(int argc, char **argv);
+
+    static QString createAuthenticationString(const QUrl& url,
+        const QnSoftwareVersion& version = QnSoftwareVersion());
+
+    static QUrl parseAuthenticationString(QString string);
+
+    QUrl parseAuthenticationString() const;
 
     int screen;
     const static QString kScreenKey;

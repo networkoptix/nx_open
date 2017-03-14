@@ -384,6 +384,9 @@
                 "DW|DW-CPUHDE04",
                 "DW|DW-CPUHDE08",
                 "DW|DW-CPUHDE16",
+                "DW|DW-CPUHD4",
+                "DW|DW-CPUHD8",
+                "DW|DW-CPUHD16",
                 "DW|VMAX A1",
                 "Pravis Systems Co., Ltd.|VMAX A1"                
             ],
@@ -635,7 +638,7 @@
         },
         {
             "keys": [
-                "Hikvision|DS-2CD6362F-I"
+                "Hikvision|DS-2CD6362F-I","Hikvision|HNCA12-FEA"
             ],
             "forcedOnvifParams":
             {
@@ -654,7 +657,7 @@
         },
         {
             "keys": [
-                "Hikvision|DS-6716HWI"
+                "Hikvision|DS-6716HWI", "Hikvision|DS-6716HFI", "Hikvision|DS-6716*"
             ],
             "forcedOnvifParams":
             {

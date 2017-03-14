@@ -83,7 +83,7 @@ namespace QnMulticast
             int timeoutMs;
             QElapsedTimer timer;
         };
-        
+
         QLinkedList<TransportConnection> m_requests;
         QUuid m_localGuid;
 
@@ -106,7 +106,6 @@ namespace QnMulticast
         void putPacketToTransport(TransportConnection& transportConnection, const Packet& packet);
         void eraseRequest(const QUuid& id);
         void queueNextSendData(int delay);
-        QSet<QString> getLocalAddressList() const;
     };
 
 }

@@ -535,12 +535,13 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
     {
         if (frame)
         {
+            ++d->frameNumber; //< put input frames in range [1..N]
             d->frameNumToPtsCache.push_back(AndroidVideoDecoderPrivate::PtsData(d->frameNumber, frame->timestamp));
             outFrameNum = d->javaDecoder.callMethod<jlong>(
                 "decodeFrame", "(JIJ)J",
                 (jlong) frame->data(),
                 (jint) frame->dataSize(),
-                (jlong) ++d->frameNumber); //< put input frames in range [1..N]
+                (jlong) d->frameNumber);
             if (outFrameNum == kNoInputBuffers)
             {
                 if (d->javaDecoder.callMethod<jlong>("flushFrame", "(J)J", (jlong) kDecodeOneFrameTimeout) <= 0)

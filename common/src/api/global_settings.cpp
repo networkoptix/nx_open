@@ -78,6 +78,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << initLdapAdaptors()
         << initStaticticsAdaptors()
         << initConnectionAdaptors()
+        << initTimeSynchronizationAdaptors()
         << initCloudAdaptors()
         << initMiscAdaptors()
         ;
@@ -219,11 +220,6 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initConnectionAdaptors()
         kServerDiscoveryPingTimeoutDefault,
         this);
     ec2Adaptors << m_serverDiscoveryPingTimeoutAdaptor;
-    m_timeSynchronizationEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        kNameTimeSynchronizationEnabled,
-        true,
-        this);
-    ec2Adaptors << m_timeSynchronizationEnabledAdaptor;
     m_proxyConnectTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         kProxyConnectTimeout,
         kProxyConnectTimeoutDefault,
@@ -245,6 +241,32 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initConnectionAdaptors()
     }
 
     return ec2Adaptors;
+}
+
+QnGlobalSettings::AdaptorList QnGlobalSettings::initTimeSynchronizationAdaptors()
+{
+    QList<QnAbstractResourcePropertyAdaptor*> timeSynchronizationAdaptors;
+    m_timeSynchronizationEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        kNameTimeSynchronizationEnabled,
+        true,
+        this);
+    timeSynchronizationAdaptors << m_timeSynchronizationEnabledAdaptor;
+
+    m_synchronizeTimeWithInternetAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        kNameSynchronizeTimeWithInternet,
+        true,
+        this);
+    timeSynchronizationAdaptors << m_synchronizeTimeWithInternetAdaptor;
+
+    for (auto adaptor: timeSynchronizationAdaptors)
+    {
+        connect(
+            adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+            this, &QnGlobalSettings::timeSynchronizationSettingsChanged,
+            Qt::QueuedConnection);
+    }
+
+    return timeSynchronizationAdaptors;
 }
 
 QnGlobalSettings::AdaptorList QnGlobalSettings::initCloudAdaptors()
@@ -781,6 +803,11 @@ std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const
 bool QnGlobalSettings::isTimeSynchronizationEnabled() const
 {
     return m_timeSynchronizationEnabledAdaptor->value();
+}
+
+bool QnGlobalSettings::isSynchronizingTimeWithInternet() const
+{
+    return m_synchronizeTimeWithInternetAdaptor->value();
 }
 
 QString QnGlobalSettings::cloudAccountName() const

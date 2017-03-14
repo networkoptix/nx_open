@@ -7,7 +7,7 @@
 #include <memory>
 
 #include <festival/festival.h>
-#include <festival/EST_wave_aux.h>
+#include <EST_wave_aux.h>
 
 #ifdef QN_USE_VLD
 #include <vld.h>

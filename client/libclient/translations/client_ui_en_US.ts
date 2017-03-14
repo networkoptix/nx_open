@@ -1357,22 +1357,22 @@
     </message>
     <message>
         <location/>
-        <source>Select users to import</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Filter...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Loading...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Connection error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Role to assign to imported users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable imported users</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

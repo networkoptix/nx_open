@@ -23,8 +23,6 @@ public:
 
     ~QnSearchBookmarksDialogPrivate();
 
-    void updateHeadersWidth();
-
     void refresh();
 
     void setParameters(const QString &filterText

@@ -6,6 +6,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
+#include <api/helpers/camera_id_helper.h>
 #include <core/dataprovider/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
@@ -86,32 +87,17 @@ bool StreamingChunkTranscoder::transcodeAsync(
     StreamingChunkPtr chunk )
 {
     // Searching for resource.
-    const QString& resId = transcodeParams.srcResourceUniqueID();
-    QnResourcePtr resource;
-    const QnUuid uuid = QnUuid::fromStringSafe(resId);
-    if (!uuid.isNull())
-        resource = qnResPool->getResourceById(uuid);
-    if (!resource)
-        resource = qnResPool->getResourceByUniqueId(resId);
-    if (!resource)
-        resource = qnResPool->getResourceByMacAddress(resId);
-    if (!resource)
-        resource = qnResPool->getResourceByUrl(resId);
-    if (!resource)
-    {
-        NX_LOG(lit("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 not found")
-            .arg(resId), cl_logDEBUG1);
-        return false;
-    }
-    QnSecurityCamResourcePtr cameraResource = resource.dynamicCast<QnSecurityCamResource>();
+    QnSecurityCamResourcePtr cameraResource =
+        nx::camera_id_helper::findCameraByFlexibleId(
+            transcodeParams.srcResourceUniqueID());
     if( !cameraResource )
     {
         NX_LOG(lit("StreamingChunkTranscoder::transcodeAsync. Requested resource %1 is not a media resource")
-            .arg(resId), cl_logDEBUG1);
+            .arg(transcodeParams.srcResourceUniqueID()), cl_logDEBUG1);
         return false;
     }
 
-    auto camera = qnCameraPool->getVideoCamera( resource );
+    auto camera = qnCameraPool->getVideoCamera(cameraResource);
     NX_ASSERT( camera );
 
     //validating transcoding parameters

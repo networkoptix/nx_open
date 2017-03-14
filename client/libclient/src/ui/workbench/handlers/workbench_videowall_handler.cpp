@@ -20,6 +20,7 @@
 #include <client/client_runtime_settings.h>
 #include <client/client_app_info.h>
 #include <client/client_installations_manager.h>
+#include <client/client_startup_parameters.h>
 
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -426,6 +427,11 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     {
         if (info.data.peer.peerType != Qn::PT_VideowallClient)
             continue;
+
+        /* Master node, will run other clients and exit. */
+        if (info.data.videoWallInstanceGuid.isNull())
+            continue;
+
         setItemOnline(info.data.videoWallInstanceGuid, true);
     }
 
@@ -707,7 +713,7 @@ void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args)
     url.setPassword(QString());
 
     arguments << lit("--auth");
-    arguments << QString::fromUtf8(url.toEncoded());
+    arguments << QnStartupParameters::createAuthenticationString(url);
 
 #ifdef SENDER_DEBUG
     qDebug() << "arguments" << arguments;

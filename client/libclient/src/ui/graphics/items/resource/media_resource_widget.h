@@ -187,6 +187,7 @@ protected:
     virtual void updateHud(bool animate);
 
     void ensureTwoWayAudioWidget();
+    bool animationAllowed() const;
 
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);

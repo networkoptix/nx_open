@@ -3,7 +3,16 @@
 * akolesnikov@networkoptix.com
 ***********************************************************/
 
-#ifdef USE_OWN_MUTEX
+#if defined(USE_OWN_MUTEX)
+
+#if defined(_WIN32)
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#elif defined(__linux__)
+#include <signal.h>
+#include <sys/types.h>
+#include <unistd.h>
+#endif
 
 #include "mutex_lock_analyzer.h"
 
@@ -17,15 +26,14 @@
 #include "thread_util.h"
 #include <nx/utils/log/log.h>
 
-#ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
+#if defined(ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
     static bool kDoAnalyseForDeadlock = true;
 #else
     static bool kDoAnalyseForDeadlock = false;
 #endif
 
-////////////////////////////////////////////////////////////
-//// class MutexLockKey
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class MutexLockKey
 
 MutexLockKey::MutexLockKey()
 :
@@ -95,9 +103,9 @@ QString MutexLockKey::toString() const
         arg(QLatin1String(sourceFile)).arg(line).arg((size_t)mutexPtr, 0, 16).arg(lockID);
 }
 
-////////////////////////////////////////////////////////////
-//// class LockGraphEdgeData
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class LockGraphEdgeData
+
 LockGraphEdgeData::TwoMutexLockData::TwoMutexLockData()
 :
     threadID( 0 )
@@ -192,23 +200,71 @@ bool LockGraphEdgeData::connectedTo( const LockGraphEdgeData& rhs ) const
         } );
 }
 
+//-------------------------------------------------------------------------------------------------
+// class ThreadContextPool
 
-////////////////////////////////////////////////////////////
-//// class MutexLockAnalyzer
-////////////////////////////////////////////////////////////
+ThreadContext& ThreadContextPool::currentThreadContext()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    const std::uintptr_t curThreadId = ::currentThreadSystemId();
+    auto iter = m_threadIdToContext.find(curThreadId);
+    if (iter != m_threadIdToContext.end())
+        return iter->second;
+
+    iter = m_threadIdToContext.emplace(curThreadId, ThreadContext()).first;
+    return iter->second;
+}
+
+void ThreadContextPool::removeCurrentThreadContext()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    const std::uintptr_t curThreadId = ::currentThreadSystemId();
+    m_threadIdToContext.erase(curThreadId);
+}
+
+//-------------------------------------------------------------------------------------------------
+// class ThreadContextGuard
+
+ThreadContextGuard::ThreadContextGuard(
+    ThreadContextPool* threadContextPool)
+    :
+    m_threadContextPool(threadContextPool),
+    m_threadContext(threadContextPool->currentThreadContext())
+{
+}
+
+ThreadContextGuard::~ThreadContextGuard()
+{
+    if (m_threadContext.currentLockPath.empty())
+        m_threadContextPool->removeCurrentThreadContext();
+
+    m_threadContextPool = nullptr;
+}
+
+ThreadContext* ThreadContextGuard::operator->()
+{
+    return &m_threadContext;
+}
+
+const ThreadContext* ThreadContextGuard::operator->() const
+{
+    return &m_threadContext;
+}
+
+//-------------------------------------------------------------------------------------------------
+// class MutexLockAnalyzer
 
 void MutexLockAnalyzer::mutexCreated( QnMutex* const /*mutex*/ )
 {
 }
-
-static std::uintptr_t lockedThread = 0;
 
 void MutexLockAnalyzer::beforeMutexDestruction( QnMutex* const mutex )
 {
     if (kDoAnalyseForDeadlock)
     {
         QWriteLocker lk( &m_mutex );
-        lockedThread = ::currentThreadSystemId();
         m_lockDigraph.removeVertice( mutex );
     }
 }
@@ -216,7 +272,7 @@ void MutexLockAnalyzer::beforeMutexDestruction( QnMutex* const mutex )
 void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition )
 {
     const auto curThreadId = ::currentThreadSystemId();
-    ThreadContextGuard threadContext(this);
+    ThreadContextGuard threadContext(&m_threadContextPool);
 
     if( threadContext->currentLockPath.empty() )
     {
@@ -249,7 +305,6 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
         return;
 
     QReadLocker readLock( &m_mutex );
-    lockedThread = curThreadId;
 
     LockGraphEdgeData::TwoMutexLockData curMutexLockData(
         curThreadId,
@@ -311,7 +366,12 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
 
             NX_LOG( deadLockMsg, cl_logALWAYS );
             std::cerr<<deadLockMsg.toStdString()<<std::endl;
-            //NX_ASSERT( false );
+
+            #if defined(_WIN32)
+                DebugBreak();
+            #elif defined(__linux__)
+                kill(getppid(), SIGTRAP);
+            #endif
         }
     }
 
@@ -327,7 +387,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
 
 void MutexLockAnalyzer::expectNoLocks()
 {
-    ThreadContextGuard threadContext(this);
+    ThreadContextGuard threadContext(&m_threadContextPool);
 
     std::vector<MutexLockKey> path;
     for (const auto& key: threadContext->currentLockPath)
@@ -342,13 +402,7 @@ void MutexLockAnalyzer::expectNoLocks()
 
 void MutexLockAnalyzer::beforeMutexUnlocked( const MutexLockKey& mutexLockPosition )
 {
-    ThreadContextGuard threadContext(this);
-
-    if( kDoAnalyseForDeadlock )
-    {
-        QWriteLocker lk( &m_mutex );
-        lockedThread = ::currentThreadSystemId();
-    }
+    ThreadContextGuard threadContext(&m_threadContextPool);
 
     NX_CRITICAL( !threadContext->currentLockPath.empty() );
     if( threadContext->currentLockPath.front().lockRecursionDepth > 0 )
@@ -376,33 +430,6 @@ Q_GLOBAL_STATIC( MutexLockAnalyzer, MutexLockAnalyzer_instance )
 MutexLockAnalyzer* MutexLockAnalyzer::instance()
 {
     return MutexLockAnalyzer_instance();
-}
-
-MutexLockAnalyzer::ThreadContext& MutexLockAnalyzer::currentThreadContext()
-{
-    QReadLocker readLock(&m_mutex);
-
-    const std::uintptr_t curThreadId = ::currentThreadSystemId();
-    auto iter = m_threadContext.find(curThreadId);
-    if (iter != m_threadContext.end())
-        return iter->second;
-
-    // Inserting new record.
-    readLock.unlock();
-    {
-        QWriteLocker writeLock(&m_mutex);
-        iter = m_threadContext.emplace(curThreadId, ThreadContext()).first;
-    }
-    readLock.relock();
-
-    return iter->second;
-}
-
-void MutexLockAnalyzer::removeCurrentThreadContext()
-{
-    QWriteLocker writeLock(&m_mutex);
-    const std::uintptr_t curThreadId = ::currentThreadSystemId();
-    m_threadContext.erase(curThreadId);
 }
 
 QString MutexLockAnalyzer::pathToString( const std::list<LockGraphEdgeData>& edgesTravelled )
@@ -457,32 +484,6 @@ bool MutexLockAnalyzer::pathConnected( const std::list<LockGraphEdgeData>& edges
     }
 
     return true;
-}
-
-MutexLockAnalyzer::ThreadContextGuard::ThreadContextGuard(
-    MutexLockAnalyzer* analyzer)
-    :
-    m_analyzer(analyzer),
-    m_threadContext(analyzer->currentThreadContext())
-{
-}
-
-MutexLockAnalyzer::ThreadContextGuard::~ThreadContextGuard()
-{
-    if (m_threadContext.currentLockPath.empty())
-        m_analyzer->removeCurrentThreadContext();
-
-    m_analyzer = nullptr;
-}
-
-MutexLockAnalyzer::ThreadContext* MutexLockAnalyzer::ThreadContextGuard::operator->()
-{
-    return &m_threadContext;
-}
-
-const MutexLockAnalyzer::ThreadContext* MutexLockAnalyzer::ThreadContextGuard::operator->() const
-{
-    return &m_threadContext;
 }
 
 #endif  //USE_OWN_MUTEX

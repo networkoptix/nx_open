@@ -147,6 +147,7 @@ private:
     void parseCommandLineParameters(int argc, char* argv[]);
     void updateAllowedInterfaces();
     void addCommandLineParametersFromConfig();
+    void saveServerInfo(const QnMediaServerResourcePtr& server);
 private:
     int m_argc;
     char** m_argv;

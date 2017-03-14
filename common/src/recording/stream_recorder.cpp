@@ -474,9 +474,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
 
         NX_ASSERT(md->timestamp >= 0);
 
-        AVPacket avPkt;
-        av_init_packet(&avPkt);
-
+        QnFfmpegAvPacket avPkt;
         qint64 dts = av_rescale_q(getPacketTimeUsec(md), srcRate, stream->time_base);
         if (stream->cur_dts > 0)
             avPkt.dts = qMax((qint64)stream->cur_dts+1, dts);
@@ -977,7 +975,13 @@ void QnStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataProvider
 
 QString QnStreamRecorder::fixedFileName() const
 {
-    return m_fixedFileName ? m_recordingContextVector[0].fileName : lit("");
+    if (m_fixedFileName)
+    {
+        Q_ASSERT(!m_recordingContextVector.empty());
+        if (!m_recordingContextVector.empty())
+            return m_recordingContextVector[0].fileName;
+    }
+    return QString();
 }
 
 void QnStreamRecorder::setEofDateTime(qint64 value)

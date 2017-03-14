@@ -470,7 +470,11 @@ bool CLH264RtpParser::processData(
         return false;
 
     if (rtpHeader->padding)
+    {
         bufferEnd -= bufferEnd[-1];
+        if (curPtr >= bufferEnd)
+            return clearInternalBuffer();
+    }
 
     if (isPacketStartsNewFrame(curPtr, bufferEnd))
     {

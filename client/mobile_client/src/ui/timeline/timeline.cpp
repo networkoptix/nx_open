@@ -11,6 +11,8 @@
 #include <QtQuick/QQuickWindow>
 #include <QtCore/qmath.h>
 #include <QtCore/QElapsedTimer>
+#include <QtGui/QFontMetricsF>
+#include <QtGui/QPainter>
 
 #include "timeline_text_helper.h"
 #include "timeline_zoom_level.h"
@@ -46,14 +48,16 @@ namespace {
         int zoomIndex;
     };
 
-    int cFloor(qreal x) {
+    int cFloor(qreal x)
+    {
         int result = qFloor(x);
         if (x - result > 0.9)
             ++result;
         return result;
     }
 
-    QImage makeStripesImage(int size, const QColor &color, const QColor &background) {
+    QImage makeStripesImage(int size, const QColor& color, const QColor& background)
+    {
         if ((size - 1) & size) // not power of 2
             size = qNextPowerOfTwo(size);
 
@@ -77,7 +81,8 @@ namespace {
         polygon.append(QPoint(size, 0));
         polygon.append(QPoint(0, size));
 
-        while (polygon[0].x() < size) {
+        while (polygon[0].x() < size)
+        {
             p.drawPolygon(polygon);
             polygon.translate(stripeWidth * 2, 0);
         }
@@ -87,102 +92,77 @@ namespace {
 
 } // anonymous namespace
 
-class QnTimelinePrivate {
+class QnTimelinePrivate
+{
 public:
-    QnTimeline *parent;
+    QnTimeline* parent = nullptr;
 
-    QColor textColor;
-    QColor chunkBarColor;
-    QColor chunkColor;
+    QColor textColor = QColor("#727272");
+    QColor chunkBarColor = QColor("#223925");
+    QColor chunkColor = QColor("#3a911e");
 
-    int chunkBarHeight;
-    int textY;
+    int chunkBarHeight = 48;
+    int textY = -1;
 
-    bool showLive;
-    QSGTexture *stripesDarkTexture;
-    QSGTexture *stripesLightTexture;
-    qreal activeLiveOpacity;
-    qreal liveOpacity;
-    qreal stripesPosition;
-    bool stickToEnd;
-    bool autoPlay;
-    qreal autoPlaySpeed;
-    qreal playSpeedCorrection;
-    qint64 previousCorrectionTime;
-    qint64 previousCorrectedPosition;
+    bool showLive = true;
+    QSGTexture* stripesDarkTexture = nullptr;
+    QSGTexture* stripesLightTexture = nullptr;
+    qreal activeLiveOpacity = 0.0;
+    qreal liveOpacity = 0.0;
+    qreal stripesPosition = 0.0;
+    bool stickToEnd = false;
+    bool autoPlay = false;
+    qreal autoPlaySpeed = 1.0;
+    qreal playSpeedCorrection = 1.0;
+    qint64 previousCorrectionTime = -1;
+    qint64 previousCorrectedPosition = 0;
 
-    qint64 startBoundTime;
-    qint64 endBoundTime;
-    qint64 targetPosition;
+    qint64 startBoundTime = -1;
+    qint64 endBoundTime = -1;
+    qint64 targetPosition = -1;
     bool autoReturnToBounds = true;
 
-    qint64 windowStart;
-    qint64 windowEnd;
+    qint64 windowStart = 0;
+    qint64 windowEnd = 0;
 
     QFont textFont;
-    QSGTexture *textTexture;
+    QSGTexture* textTexture = nullptr;
     QScopedPointer<QnTimelineTextHelper> textHelper;
 
-    int prevZoomIndex;
-    qreal zoomLevel;
-    qreal targetZoomLevel;
-    qreal textLevel;
-    qreal targetTextLevel;
-    qreal textOpacity;
+    int prevZoomIndex = -1;
+    qreal zoomLevel = 1.0;
+    qreal targetZoomLevel = 1.0;
+    qreal textLevel = 1.0;
+    qreal targetTextLevel = 1.0;
+    qreal textOpacity = 1.0;
 
-    qint64 stickyTime;
+    qint64 stickyTime = -1;
     QnKineticHelper<qreal> stickyPointKineticHelper;
-    qreal startZoom;
-    qint64 startWindowSize;
+    qreal startZoom = 1.0;
+    qint64 startWindowSize = 0;
     QnKineticHelper<qreal> zoomKineticHelper;
-    bool dragWasInterruptedByZoom;
+    bool dragWasInterruptedByZoom = false;
 
     QVector<QnTimelineZoomLevel> zoomLevels;
     QVector<qreal> maxZoomLevelTextLength;
 
     QnTimePeriodList timePeriods[Qn::TimePeriodContentCount];
 
-    int timeZoneShift;
+    int timeZoneShift = 0;
 
     QElapsedTimer animationTimer;
-    qint64 prevAnimationMs;
+    qint64 prevAnimationMs = 0;
 
     QStringList suffixList;
 
-    QnCameraChunkProvider *chunkProvider;
+    QnCameraChunkProvider* chunkProvider = nullptr;
 
-    QnTimelinePrivate(QnTimeline *parent):
+public:
+    QnTimelinePrivate(QnTimeline* parent):
         parent(parent),
-        textColor("#727272"),
-        chunkBarColor("#223925"),
-        chunkColor("#3a911e"),
-        showLive(true),
-        stripesDarkTexture(0),
-        stripesLightTexture(0),
-        activeLiveOpacity(0.0),
-        liveOpacity(0.0),
-        stripesPosition(0.0),
-        stickToEnd(false),
-        autoPlay(false),
-        autoPlaySpeed(1.0),
-        playSpeedCorrection(1.0),
-        previousCorrectionTime(-1),
-        startBoundTime(-1),
-        endBoundTime(-1),
-        targetPosition(-1),
         windowStart(QDateTime::currentMSecsSinceEpoch() - kDefaultWindowSize / 2),
-        windowEnd(windowStart + kDefaultWindowSize),
-        textTexture(0),
-        textLevel(1.0),
-        targetTextLevel(1.0),
-        textOpacity(1.0),
-        dragWasInterruptedByZoom(false),
-        timeZoneShift(0),
-        chunkProvider(nullptr)
+        windowEnd(windowStart + kDefaultWindowSize)
     {
-        chunkBarHeight = 48;
-        textY = -1;
-
         const int sec = 1000;
         const int min = 60 * sec;
         const int hour = 60 * min;
@@ -214,21 +194,19 @@ public:
         zoomLevels.append(QnTimelineZoomLevel(QnTimelineZoomLevel::Years,           10));
         targetZoomLevel = zoomLevel = zoomLevels.size() - zoomLevelsVisible;
 
-        prevZoomIndex = -1;
+        static constexpr int kMaxStickyPointSpeed = 15;
 
-        enum { maxStickyPointSpeed = 15 };
-
-        stickyPointKineticHelper.setMaxSpeed(maxStickyPointSpeed);
-        stickyPointKineticHelper.setMinSpeed(-maxStickyPointSpeed);
+        stickyPointKineticHelper.setMaxSpeed(kMaxStickyPointSpeed);
+        stickyPointKineticHelper.setMinSpeed(-kMaxStickyPointSpeed);
         zoomKineticHelper.setMinSpeed(-4.0);
         zoomKineticHelper.setMaxSpeed(50);
         zoomKineticHelper.setMinimum(0);
 
         animationTimer.start();
-        prevAnimationMs = 0;
     }
 
-    ~QnTimelinePrivate() {
+    ~QnTimelinePrivate()
+    {
         if (stripesDarkTexture)
             delete stripesDarkTexture;
         if (stripesLightTexture)
@@ -237,20 +215,26 @@ public:
             delete textTexture;
     }
 
-    void updateZoomLevel() {
+    void updateZoomLevel()
+    {
         int index = (prevZoomIndex == -1) ? zoomLevels.size() - 1 : qMax(prevZoomIndex, 0);
         int tickCount = zoomLevels[index].tickCount(windowStart, windowEnd);
         qreal width = parent->width();
         qreal tickSize = width / tickCount;
 
-        if (tickSize < minTickDps) {
-            while (tickSize < minTickDps && index < zoomLevels.size() - zoomLevelsVisible) {
+        if (tickSize < minTickDps)
+        {
+            while (tickSize < minTickDps && index < zoomLevels.size() - zoomLevelsVisible)
+            {
                 ++index;
                 tickCount = zoomLevels[index].tickCount(windowStart, windowEnd);
                 tickSize = width / tickCount;
             }
-        } else {
-            while (index > 0) {
+        }
+        else
+        {
+            while (index > 0)
+            {
                 tickCount = zoomLevels[index - 1].tickCount(windowStart, windowEnd);
                 tickSize = width / tickCount;
                 if (tickSize >= minTickDps)
@@ -260,12 +244,14 @@ public:
             }
         }
 
-        if (prevZoomIndex == -1) {
+        if (prevZoomIndex == -1)
+        {
             prevZoomIndex = index;
             targetZoomLevel = zoomLevel = index;
         }
 
-        if (prevZoomIndex != index) {
+        if (prevZoomIndex != index)
+        {
             targetZoomLevel = index;
             parent->update();
         }
@@ -281,19 +267,24 @@ public:
         return 0;
     }
 
-    qint64 pixelPosToTime(qreal x) const {
-        return windowStart + x / parent->width() * (windowEnd - windowStart);
+    qint64 pixelPosToTime(qreal x) const
+    {
+        return windowStart + static_cast<qint64>(x / parent->width() * (windowEnd - windowStart));
     }
 
-    qreal timeToPixelPos(qint64 time) const {
-        return parent->width() * (static_cast<qreal>(time - windowStart) / (windowEnd - windowStart));
+    qreal timeToPixelPos(qint64 time) const
+    {
+        return parent->width() *
+            (static_cast<qreal>(time - windowStart) / (windowEnd - windowStart));
     }
 
-    qint64 stickPoint() const {
+    qint64 stickPoint() const
+    {
         return windowStart;
     }
 
-    int maxSiblingLevel(int zoomLevel) const {
+    int maxSiblingLevel(int zoomLevel) const
+    {
         if (zoomLevel <= 3)
             return 3;
         else if (zoomLevel <= 7)
@@ -310,12 +301,14 @@ public:
             return 19;
     }
 
-    qint64 adjustTime(qint64 time) const {
+    qint64 adjustTime(qint64 time) const
+    {
         return time + timeZoneShift;
     }
 
-    void updateTextHelper() {
-        QQuickWindow *window = parent->window();
+    void updateTextHelper()
+    {
+        auto window = parent->window();
         if (!window)
             return;
 
@@ -329,7 +322,7 @@ public:
 
     void updateStripesTextures();
 
-    void animateProperties(qint64 dt);
+    void animateProperties();
     void zoomWindow(qreal factor);
 
     void setStickToEnd(bool stickToEnd);
@@ -337,8 +330,8 @@ public:
     int calculateTargetTextLevel() const;
     QVector<TextMarkInfo> calculateVisibleTextMarks() const;
 
-    void placeDigit(qreal x, qreal y, int digit, QSGGeometry::TexturedPoint2D *points);
-    int placeText(const TextMarkInfo &textMark, int textLevel, QSGGeometry::TexturedPoint2D *points);
+    void placeDigit(qreal x, qreal y, int digit, QSGGeometry::TexturedPoint2D* points);
+    int placeText(const TextMarkInfo& textMark, int textLevel, QSGGeometry::TexturedPoint2D* points);
 
     bool hasArchive() const;
 };
@@ -369,11 +362,13 @@ QnTimeline::~QnTimeline()
 {
 }
 
-qint64 QnTimeline::windowStart() const {
+qint64 QnTimeline::windowStart() const
+{
     return d->windowStart;
 }
 
-void QnTimeline::setWindowStart(qint64 windowStart) {
+void QnTimeline::setWindowStart(qint64 windowStart)
+{
     if (d->windowStart == windowStart)
         return;
 
@@ -385,11 +380,13 @@ void QnTimeline::setWindowStart(qint64 windowStart) {
     emit windowSizeChanged();
 }
 
-qint64 QnTimeline::windowEnd() const {
+qint64 QnTimeline::windowEnd() const
+{
     return d->windowEnd;
 }
 
-void QnTimeline::setWindowEnd(qint64 windowEnd) {
+void QnTimeline::setWindowEnd(qint64 windowEnd)
+{
     if (d->windowEnd == windowEnd)
         return;
 
@@ -437,7 +434,8 @@ void QnTimeline::setWindowSize(qint64 windowSize)
     setWindow(windowStart, windowStart + windowSize);
 }
 
-qint64 QnTimeline::position() const {
+qint64 QnTimeline::position() const
+{
     return windowStart() + windowSize() / 2;
 }
 
@@ -491,24 +489,30 @@ void QnTimeline::setPositionImmediately(qint64 position)
     setWindow(newWindowEnd - windowSize, newWindowEnd);
 }
 
-QDateTime QnTimeline::positionDate() const {
+QDateTime QnTimeline::positionDate() const
+{
     return QDateTime::fromMSecsSinceEpoch(position(), Qt::UTC);
 }
 
-void QnTimeline::setPositionDate(const QDateTime &dateTime) {
+void QnTimeline::setPositionDate(const QDateTime& dateTime)
+{
     setPosition(dateTime.isValid() ? dateTime.toMSecsSinceEpoch() : -1);
 }
 
-bool QnTimeline::stickToEnd() const {
+bool QnTimeline::stickToEnd() const
+{
     return d->stickToEnd;
 }
 
-void QnTimeline::setStickToEnd(bool stickToEnd) {
+void QnTimeline::setStickToEnd(bool stickToEnd)
+{
     if (d->stickToEnd == stickToEnd)
         return;
 
-    if (stickToEnd) {
-        if (!d->stickyPointKineticHelper.isStopped()) {
+    if (stickToEnd)
+    {
+        if (!d->stickyPointKineticHelper.isStopped())
+        {
             d->stickyPointKineticHelper.stop();
             emit moveFinished();
         }
@@ -531,11 +535,13 @@ void QnTimeline::setStartBound(qint64 startBound)
     update();
 }
 
-bool QnTimeline::autoPlay() const {
+bool QnTimeline::autoPlay() const
+{
     return d->autoPlay;
 }
 
-void QnTimeline::setAutoPlay(bool autoPlay) {
+void QnTimeline::setAutoPlay(bool autoPlay)
+{
     if (d->autoPlay == autoPlay)
         return;
 
@@ -559,11 +565,13 @@ void QnTimeline::setAutoReturnToBoundsEnabled(bool enabled)
     emit autoReturnToBoundsEnabledChanged();
 }
 
-int QnTimeline::timeZoneShift() const {
+int QnTimeline::timeZoneShift() const
+{
     return d->timeZoneShift;
 }
 
-void QnTimeline::setTimeZoneShift(int timeZoneShift) {
+void QnTimeline::setTimeZoneShift(int timeZoneShift)
+{
     if (d->timeZoneShift == timeZoneShift)
         return;
 
@@ -574,22 +582,27 @@ void QnTimeline::setTimeZoneShift(int timeZoneShift) {
     update();
 }
 
-qint64 QnTimeline::startBound() const {
+qint64 QnTimeline::startBound() const
+{
     return d->startBoundTime;
 }
 
-void QnTimeline::zoomIn() {
+void QnTimeline::zoomIn()
+{
     d->zoomWindow(zoomMultiplier);
 }
 
-void QnTimeline::zoomOut() {
+void QnTimeline::zoomOut()
+{
     d->zoomWindow(1.0 / zoomMultiplier);
 }
 
-void QnTimeline::startZoom(qreal scale) {
+void QnTimeline::startZoom(qreal scale)
+{
     Q_UNUSED(scale)
 
-    if (!d->stickyPointKineticHelper.isStopped()) {
+    if (!d->stickyPointKineticHelper.isStopped())
+    {
         d->stickyPointKineticHelper.stop();
         d->dragWasInterruptedByZoom = true;
     }
@@ -600,15 +613,18 @@ void QnTimeline::startZoom(qreal scale) {
     update();
 }
 
-void QnTimeline::updateZoom(qreal scale) {
+void QnTimeline::updateZoom(qreal scale)
+{
     d->zoomKineticHelper.move(d->startZoom * scale);
     update();
 }
 
-void QnTimeline::finishZoom(qreal scale) {
+void QnTimeline::finishZoom(qreal scale)
+{
     d->zoomKineticHelper.finish(d->startZoom * scale);
 
-    if (d->dragWasInterruptedByZoom) {
+    if (d->dragWasInterruptedByZoom)
+    {
         d->dragWasInterruptedByZoom = false;
         emit moveFinished();
     }
@@ -616,85 +632,104 @@ void QnTimeline::finishZoom(qreal scale) {
     update();
 }
 
-void QnTimeline::startDrag(int x) {
+void QnTimeline::startDrag(int x)
+{
     d->zoomKineticHelper.stop();
     d->stickyTime = d->pixelPosToTime(x);
     d->stickyPointKineticHelper.start(x);
 }
 
-void QnTimeline::updateDrag(int x) {
+void QnTimeline::updateDrag(int x)
+{
     d->stickyPointKineticHelper.move(x);
     update();
 }
 
-void QnTimeline::finishDrag(int x) {
+void QnTimeline::finishDrag(int x)
+{
     d->stickyPointKineticHelper.finish(x);
     if (d->stickyPointKineticHelper.isStopped())
         emit moveFinished();
     update();
 }
 
-void QnTimeline::clearCorrection() {
+void QnTimeline::clearCorrection()
+{
     d->previousCorrectionTime = -1;
     d->previousCorrectedPosition = -1;
     d->playSpeedCorrection = 1.0;
 }
 
-void QnTimeline::correctPosition(qint64 position) {
-    if (position < 0) {
+void QnTimeline::correctPosition(qint64 position)
+{
+    if (position < 0)
+    {
         setPosition(position);
         return;
     }
 
     qint64 time = d->animationTimer.elapsed();
-    if (d->previousCorrectionTime >= 0) {
+    if (d->previousCorrectionTime >= 0)
+    {
         qint64 dt = time - d->previousCorrectionTime;
-        qint64 prognosed = d->previousCorrectedPosition + dt * d->autoPlaySpeed * d->playSpeedCorrection;
+        qint64 prognosed = d->previousCorrectedPosition
+            + static_cast<qint64>(dt * d->autoPlaySpeed * d->playSpeedCorrection);
 
         qint64 diff = prognosed - position;
 
-        if (qAbs(diff) > correctionThreshold * d->autoPlaySpeed) {
+        if (qAbs(diff) > correctionThreshold * d->autoPlaySpeed)
+        {
             setPosition(position);
             return;
         }
 
-        qint64 dp = d->previousCorrectedPosition + (position - d->previousCorrectedPosition) * 2 - prognosed;
+        qint64 dp = d->previousCorrectedPosition
+            + (position - d->previousCorrectedPosition) * 2 - prognosed;
         qreal correction = dp / (dt * d->autoPlaySpeed);
-        d->playSpeedCorrection = (d->playSpeedCorrection + correction) / 2; /* take middle value to stabilize correction coefficient */
+        // Take middle value to stabilize correction coefficient.
+        d->playSpeedCorrection = (d->playSpeedCorrection + correction) / 2;
     }
 
     d->previousCorrectionTime = time;
     d->previousCorrectedPosition = position;
 }
 
-qint64 QnTimeline::positionAtX(qreal x) const {
+qint64 QnTimeline::positionAtX(qreal x) const
+{
     return d->pixelPosToTime(x);
 }
 
-QnCameraChunkProvider *QnTimeline::chunkProvider() const {
+QnCameraChunkProvider* QnTimeline::chunkProvider() const
+{
     return d->chunkProvider;
 }
 
-void QnTimeline::setChunkProvider(QnCameraChunkProvider *chunkProvider) {
+void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
+{
     if (d->chunkProvider == chunkProvider)
         return;
 
     if (d->chunkProvider)
-        disconnect(d->chunkProvider, nullptr, this, nullptr);
+        d->chunkProvider->disconnect(this);
 
     d->chunkProvider = chunkProvider;
 
-    if (d->chunkProvider) {
-        connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated, this, [this]() {
-            d->timePeriods[Qn::RecordingContent] = d->chunkProvider->timePeriods();
-            update();
-        });
+    if (d->chunkProvider)
+    {
+        connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated, this,
+            [this]()
+            {
+                d->timePeriods[Qn::RecordingContent] = d->chunkProvider->timePeriods();
+                update();
+            });
     }
 
     emit chunkProviderChanged();
 }
 
-QSGNode *QnTimeline::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeData *updatePaintNodeData) {
+QSGNode* QnTimeline::updatePaintNode(
+    QSGNode* node, QQuickItem::UpdatePaintNodeData* updatePaintNodeData)
+{
     Q_UNUSED(updatePaintNodeData)
 
     if (!d->stripesDarkTexture || !d->stripesLightTexture)
@@ -703,17 +738,17 @@ QSGNode *QnTimeline::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeD
     if (!d->textTexture)
         d->updateTextHelper();
 
-    qint64 time = d->animationTimer.elapsed();
+    d->animateProperties();
 
-    d->animateProperties(time - d->prevAnimationMs);
-    d->prevAnimationMs = time;
-
-    if (!node) {
+    if (!node)
+    {
         node = new QSGNode();
 
         node->appendChildNode(updateTextNode(nullptr));
         node->appendChildNode(updateChunksNode(nullptr));
-    } else {
+    }
+    else
+    {
         updateTextNode(node->childAtIndex(0));
         updateChunksNode(static_cast<QSGGeometryNode*>(node->childAtIndex(1)));
     }
@@ -721,11 +756,13 @@ QSGNode *QnTimeline::updatePaintNode(QSGNode *node, QQuickItem::UpdatePaintNodeD
     return node;
 }
 
-QColor QnTimeline::textColor() const {
+QColor QnTimeline::textColor() const
+{
     return d->textColor;
 }
 
-void QnTimeline::setTextColor(const QColor &color) {
+void QnTimeline::setTextColor(const QColor& color)
+{
     if (d->textColor == color)
         return;
 
@@ -737,11 +774,13 @@ void QnTimeline::setTextColor(const QColor &color) {
     update();
 }
 
-QFont QnTimeline::font() const {
+QFont QnTimeline::font() const
+{
     return d->textFont;
 }
 
-void QnTimeline::setFont(const QFont &font) {
+void QnTimeline::setFont(const QFont& font)
+{
     if (d->textFont == font)
         return;
 
@@ -750,11 +789,13 @@ void QnTimeline::setFont(const QFont &font) {
     emit fontChanged();
 }
 
-QColor QnTimeline::chunkColor() const {
+QColor QnTimeline::chunkColor() const
+{
     return d->chunkColor;
 }
 
-void QnTimeline::setChunkColor(const QColor &color) {
+void QnTimeline::setChunkColor(const QColor& color)
+{
     if (d->chunkColor == color)
         return;
 
@@ -766,11 +807,13 @@ void QnTimeline::setChunkColor(const QColor &color) {
     update();
 }
 
-QColor QnTimeline::chunkBarColor() const {
+QColor QnTimeline::chunkBarColor() const
+{
     return d->chunkBarColor;
 }
 
-void QnTimeline::setChunkBarColor(const QColor &color) {
+void QnTimeline::setChunkBarColor(const QColor& color)
+{
     if (d->chunkBarColor == color)
         return;
 
@@ -782,11 +825,13 @@ void QnTimeline::setChunkBarColor(const QColor &color) {
     update();
 }
 
-int QnTimeline::chunkBarHeight() const {
+int QnTimeline::chunkBarHeight() const
+{
     return d->chunkBarHeight;
 }
 
-void QnTimeline::setChunkBarHeight(int chunkBarHeight) {
+void QnTimeline::setChunkBarHeight(int chunkBarHeight)
+{
     if (d->chunkBarHeight == chunkBarHeight)
         return;
 
@@ -798,11 +843,13 @@ void QnTimeline::setChunkBarHeight(int chunkBarHeight) {
     update();
 }
 
-int QnTimeline::textY() const {
+int QnTimeline::textY() const
+{
     return d->textY;
 }
 
-void QnTimeline::setTextY(int textY) {
+void QnTimeline::setTextY(int textY)
+{
     if (d->textY == textY)
         return;
 
@@ -819,15 +866,15 @@ qint64 QnTimeline::defaultWindowSize() const
 
 QSGNode* QnTimeline::updateTextNode(QSGNode* rootNode)
 {
-    QSGGeometryNode *textNode;
-    QSGGeometry *textGeometry;
-    QSGOpacityNode *textOpacityNode;
-    QSGGeometryNode *lowerTextNode;
-    QSGGeometry *lowerTextGeometry;
-    QSGOpacityNode *lowerTextOpacityNode;
+    QSGGeometryNode* textNode;
+    QSGGeometry* textGeometry;
+    QSGOpacityNode* textOpacityNode;
+    QSGGeometryNode* lowerTextNode;
+    QSGGeometry* lowerTextGeometry;
+    QSGOpacityNode* lowerTextOpacityNode;
 
-    QSGGeometry *ticksGeometry = nullptr;
-    QSGGeometryNode *ticksNode = nullptr;
+    QSGGeometry* ticksGeometry = nullptr;
+    QSGGeometryNode* ticksNode = nullptr;
 
     if (!rootNode)
     {
@@ -945,7 +992,7 @@ QSGNode* QnTimeline::updateTextNode(QSGNode* rootNode)
         }
     }
 
-    /* update text */
+    // Update text.
     textGeometry->allocate(textCount * 6);
     auto textPoints = textGeometry->vertexDataAsTexturedPoint2D();
     lowerTextGeometry->allocate(lowerTextCount * 6);
@@ -983,15 +1030,17 @@ QSGNode* QnTimeline::updateTextNode(QSGNode* rootNode)
     return rootNode;
 }
 
-QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
-    QSGGeometry *geometry;
-    QSGGeometry *stripesGeometry;
-    QSGOpacityNode *stripesOpacityNode;
-    QSGOpacityNode *lightStripesOpacityNode;
-    QSGGeometryNode *stripesNode;
-    QSGGeometryNode *lightStripesNode;
+QSGGeometryNode* QnTimeline::updateChunksNode(QSGGeometryNode* chunksNode)
+{
+    QSGGeometry* geometry;
+    QSGGeometry* stripesGeometry;
+    QSGOpacityNode* stripesOpacityNode;
+    QSGOpacityNode* lightStripesOpacityNode;
+    QSGGeometryNode* stripesNode;
+    QSGGeometryNode* lightStripesNode;
 
-    if (!chunksNode) {
+    if (!chunksNode)
+    {
         chunksNode = new QSGGeometryNode();
 
         geometry = new QSGGeometry(QSGGeometry::defaultAttributes_ColoredPoint2D(), 0);
@@ -999,18 +1048,18 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
         chunksNode->setGeometry(geometry);
         chunksNode->setFlag(QSGNode::OwnsGeometry);
 
-        QSGVertexColorMaterial *material = new QSGVertexColorMaterial();
+        const auto material = new QSGVertexColorMaterial();
         chunksNode->setMaterial(material);
         chunksNode->setFlag(QSGNode::OwnsMaterial);
 
         stripesGeometry = new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4);
         stripesGeometry->setDrawingMode(GL_TRIANGLE_STRIP);
 
-        QSGTextureMaterial *stripesDarkMaterial = new QSGTextureMaterial();
+        const auto stripesDarkMaterial = new QSGTextureMaterial();
         stripesDarkMaterial->setTexture(d->stripesDarkTexture);
         stripesDarkMaterial->setHorizontalWrapMode(QSGTexture::Repeat);
 
-        QSGTextureMaterial *stripesLightMaterial = new QSGTextureMaterial();
+        const auto stripesLightMaterial = new QSGTextureMaterial();
         stripesLightMaterial->setTexture(d->stripesLightTexture);
         stripesLightMaterial->setHorizontalWrapMode(QSGTexture::Repeat);
 
@@ -1033,7 +1082,9 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
         stripesOpacityNode->appendChildNode(stripesNode);
         stripesNode->appendChildNode(lightStripesOpacityNode);
         lightStripesOpacityNode->appendChildNode(lightStripesNode);
-    } else {
+    }
+    else
+    {
         geometry = chunksNode->geometry();
 
         stripesOpacityNode = static_cast<QSGOpacityNode*>(chunksNode->childAtIndex(0));
@@ -1042,8 +1093,9 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
         lightStripesNode = static_cast<QSGGeometryNode*>(lightStripesOpacityNode->childAtIndex(0));
         stripesGeometry = stripesNode->geometry();
 
-        QSGTextureMaterial *material = static_cast<QSGTextureMaterial*>(stripesNode->material());
-        if (material->texture() != d->stripesDarkTexture) {
+        auto material = static_cast<QSGTextureMaterial*>(stripesNode->material());
+        if (material->texture() != d->stripesDarkTexture)
+        {
             delete material->texture();
             material->setTexture(d->stripesDarkTexture);
             material = static_cast<QSGTextureMaterial*>(lightStripesNode->material());
@@ -1065,7 +1117,8 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
     QnTimePeriodList::const_iterator pos[Qn::TimePeriodContentCount];
     QnTimePeriodList::const_iterator end[Qn::TimePeriodContentCount];
     int chunkCount = 0;
-    for (int i = 0; i < Qn::TimePeriodContentCount; i++) {
+    for (int i = 0; i < Qn::TimePeriodContentCount; i++)
+    {
          pos[i] = d->timePeriods[i].findNearestPeriod(minimumValue, true);
          end[i] = d->timePeriods[i].findNearestPeriod(maximumValue, true);
          if (end[i] != d->timePeriods[i].end() && end[i]->contains(maximumValue))
@@ -1082,33 +1135,40 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
     qreal y = height() - d->chunkBarHeight;
 
     QnTimelineChunkPainter chunkPainter(geometry);
-    std::array<QColor, Qn::TimePeriodContentCount + 1> colors = chunkPainter.colors();
+    auto colors = chunkPainter.colors();
     colors[Qn::RecordingContent] = d->chunkColor;
     colors[Qn::TimePeriodContentCount] = d->chunkBarColor;
     chunkPainter.setColors(colors);
-    chunkPainter.start(value, QRectF(0, y, width(), height() - y),
-                       chunkCount, minimumValue, maximumValue);
+    chunkPainter.start(
+        value, QRectF(0, y, width(), height() - y),
+        chunkCount, minimumValue, maximumValue);
 
-    while (value < kRightChunksBound) {
+    while (value < kRightChunksBound)
+    {
         qint64 nextValue[Qn::TimePeriodContentCount] = { maximumValue, maximumValue };
-        for (int i = 0; i < Qn::TimePeriodContentCount; i++) {
+        for (int i = 0; i < Qn::TimePeriodContentCount; i++)
+        {
             if (pos[i] == end[i])
                 continue;
 
-            if (pos[i] != d->timePeriods[i].begin()) {
+            if (pos[i] != d->timePeriods[i].begin())
+            {
                 const auto prev = pos[i] - 1;
-                if (pos[i]->startTimeMs < prev->startTimeMs) {
+                if (pos[i]->startTimeMs < prev->startTimeMs)
+                {
                     // TODO: Check Time periods merging and prevent this warning from appearing.
-                    qWarning() << "Invalid period order!"
-                               << "Current is:" << pos[i]->startTimeMs << pos[i]->endTimeMs()
-                               << "Previous was:" << prev->startTimeMs << prev->endTimeMs();
+                    qWarning()
+                        << "Invalid period order!"
+                        << "Current is:" << pos[i]->startTimeMs << pos[i]->endTimeMs()
+                        << "Previous was:" << prev->startTimeMs << prev->endTimeMs();
                     pos[i]++;
                     inside[i] = pos[i] != end[i];
                     continue;
                 }
             }
 
-            if (!inside[i]) {
+            if (!inside[i])
+            {
                 nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs);
                 continue;
             }
@@ -1120,20 +1180,20 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
         qint64 bestValue = qMin(nextValue[Qn::RecordingContent], nextValue[Qn::MotionContent]);
 
         Qn::TimePeriodContent content;
-        if (inside[Qn::MotionContent]) {
+        if (inside[Qn::MotionContent])
             content = Qn::MotionContent;
-        } else if (inside[Qn::RecordingContent]) {
+        else if (inside[Qn::RecordingContent])
             content = Qn::RecordingContent;
-        } else {
+        else
             content = Qn::TimePeriodContentCount;
-        }
 
         if (bestValue > kRightChunksBound)
             bestValue = kRightChunksBound;
 
         chunkPainter.paintChunk(bestValue - value, content);
 
-        for (int i = 0; i < Qn::TimePeriodContentCount; i++) {
+        for (int i = 0; i < Qn::TimePeriodContentCount; i++)
+        {
             if (bestValue != nextValue[i])
                 continue;
 
@@ -1157,7 +1217,7 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
 
     qreal liveX = qMin(width(), d->timeToPixelPos(liveMs));
     qreal textureX = (width() - liveX) / d->chunkBarHeight;
-    QSGGeometry::TexturedPoint2D *stripesPoints = stripesGeometry->vertexDataAsTexturedPoint2D();
+    const auto stripesPoints = stripesGeometry->vertexDataAsTexturedPoint2D();
     stripesPoints[0].set(liveX, y, d->stripesPosition, 0);
     stripesPoints[1].set(width(), y, textureX + d->stripesPosition, 0.0);
     stripesPoints[2].set(liveX, height(), d->stripesPosition, 1.0);
@@ -1201,28 +1261,43 @@ void QnTimelinePrivate::updateMaxZoomLevelTextLengths()
     }
 }
 
-void QnTimelinePrivate::updateStripesTextures() {
-    QQuickWindow *window = parent->window();
+void QnTimelinePrivate::updateStripesTextures()
+{
+    auto window = parent->window();
     if (!window)
         return;
 
-    enum { tintAmount = 106 };
-    QImage stripesDark = makeStripesImage(chunkBarHeight, chunkBarColor, chunkBarColor.lighter(tintAmount));
-    QImage stripesLight = makeStripesImage(chunkBarHeight, chunkColor, chunkColor.darker(tintAmount));
+    static constexpr int kTintAmount = 106;
+    const auto stripesDark = makeStripesImage(
+        chunkBarHeight, chunkBarColor, chunkBarColor.lighter(kTintAmount));
+    const auto stripesLight = makeStripesImage(
+        chunkBarHeight, chunkColor, chunkColor.darker(kTintAmount));
 
-    stripesDarkTexture = parent->window()->createTextureFromImage(stripesDark);
-    stripesLightTexture = parent->window()->createTextureFromImage(stripesLight);
+    stripesDarkTexture = window->createTextureFromImage(stripesDark);
+    stripesLightTexture = window->createTextureFromImage(stripesLight);
 }
 
-void QnTimelinePrivate::animateProperties(qint64 dt) {
+void QnTimelinePrivate::animateProperties()
+{
+    qint64 dt = 10;
+
+    {
+        auto time = animationTimer.elapsed();
+        if (prevAnimationMs > 0)
+            dt = time - prevAnimationMs;
+        prevAnimationMs = time;
+    }
+
     const auto originalWindowStart = windowStart;
     const auto originalWindowEnd = windowEnd;
-    const auto originalWindowPosition = originalWindowStart + (originalWindowEnd - originalWindowStart) / 2;
+    const auto originalWindowPosition =
+        originalWindowStart + (originalWindowEnd - originalWindowStart) / 2;
 
     bool updateRequired = false;
 
-    if (!stickToEnd && autoPlay) {
-        qint64 shift = dt * autoPlaySpeed * playSpeedCorrection;
+    if (!stickToEnd && autoPlay)
+    {
+        qint64 shift = static_cast<qint64>(dt * autoPlaySpeed * playSpeedCorrection);
         windowStart += shift;
         windowEnd += shift;
     }
@@ -1233,7 +1308,8 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
     qint64 endBound = endBoundTime == -1 ? liveTime : endBoundTime;
 
     zoomKineticHelper.update();
-    if (!zoomKineticHelper.isStopped()) {
+    if (!zoomKineticHelper.isStopped())
+    {
         qint64 maxSize = (liveTime - startBound) * 2;
         qint64 minSize = startBoundTime == -1 ? maxSize : parent->width();
         qreal factor = startZoom / zoomKineticHelper.value();
@@ -1254,36 +1330,49 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
 
     if (stickyPointKineticHelper.isStopped())
     {
-        qint64 time = parent->position();
-        qint64 windowSize = windowEnd - windowStart;
-        qint64 delta = windowSize * windowMovingSpeed;
-
         if (justStopped)
             setStickToEnd(qMax(startBound, parent->position()) >= endBound);
 
         if (stickToEnd)
             targetPosition = liveTime;
 
+        auto position = parent->position();
+
+        auto calculateNewPosition = [&](qint64 pos, qint64 targetPos)
+            {
+                const auto windowSize = windowEnd - windowStart;
+                auto distance = std::min(windowSize, std::abs(pos - targetPos));
+
+                auto multiplier = std::max(0.003, std::pow(
+                    std::min(1.0, static_cast<qreal>(distance) / windowSize + 0.15), 2.0));
+                auto delta = static_cast<qint64>(windowSize * windowMovingSpeed * dt * multiplier);
+                distance = std::max<qint64>(0, distance - delta);
+
+                if (pos < targetPos)
+                    pos = targetPos - distance;
+                else
+                    pos = targetPos + distance;
+                return pos;
+            };
+
         if (targetPosition != -1)
         {
-            if (time < targetPosition)
-                time = qMin(targetPosition, qMax(time, targetPosition - windowSize) + delta);
-            else if (time > targetPosition)
-                time = qMax(targetPosition, qMin(time, targetPosition + windowSize) - delta);
-
-            if (time == targetPosition)
+            if (position != targetPosition)
+                position = calculateNewPosition(position, targetPosition);
+            else
                 targetPosition = -1;
         }
-        else if (autoReturnToBounds)
+        else
         {
-            if (time < startBound)
-                time = qMin(startBound, qMax(time, startBound - windowSize) + delta);
-            else if (time > endBound)
-                time = qMax(endBound, qMin(time, endBound + windowSize) - delta);
+            if (position < startBound)
+                position = calculateNewPosition(position, startBound);
+            else if (position > endBound)
+                position = calculateNewPosition(position, endBound);
         }
 
-        delta = time - parent->position();
-        if (delta != 0) {
+        const auto delta = position - parent->position();
+        if (delta != 0)
+        {
             windowStart += delta;
             windowEnd += delta;
         }
@@ -1308,8 +1397,10 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
         }
     }
 
-    if (!qFuzzyEquals(zoomLevel, targetZoomLevel)) {
-        if (targetZoomLevel > zoomLevel) {
+    if (!qFuzzyEquals(zoomLevel, targetZoomLevel))
+    {
+        if (targetZoomLevel > zoomLevel)
+        {
             if (targetZoomLevel - zoomLevel > maxZoomLevelDiff)
                 zoomLevel = targetZoomLevel - maxZoomLevelDiff;
             else
@@ -1324,13 +1415,16 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
         updateRequired = true;
     }
 
-    if (!qFuzzyEquals(textLevel, targetTextLevel)) {
+    if (!qFuzzyEquals(textLevel, targetTextLevel))
+    {
         if (targetTextLevel > textLevel) {
             if (targetTextLevel - textLevel > maxZoomLevelDiff)
                 textLevel = targetTextLevel - maxZoomLevelDiff;
             else
                 textLevel = qMin(targetTextLevel, textLevel + textOpacityAnimationSpeed * dt);
-        } else {
+        }
+        else
+        {
             if (textLevel - targetTextLevel > maxZoomLevelDiff)
                 textLevel = targetTextLevel + maxZoomLevelDiff;
             else
@@ -1364,7 +1458,8 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
     updateRequired = (updateRequired || windowUpdateRequired);
 
     qreal targetTextOpacity = hasArchive() ? 1.0 : 0.0;
-    if (!qFuzzyEquals(textOpacity, targetTextOpacity)) {
+    if (!qFuzzyEquals(textOpacity, targetTextOpacity))
+    {
         if (textOpacity < targetTextOpacity)
             textOpacity = qMin(targetTextOpacity, textOpacity + textOpacityAnimationSpeed * dt);
         else
@@ -1376,7 +1471,8 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
     bool live = parent->position() + 1000 >= QDateTime::currentMSecsSinceEpoch();
 
     qreal targetLiveOpacity = hasArchive() ? 1.0 : 0.0;
-    if (!qFuzzyEquals(liveOpacity, targetLiveOpacity)) {
+    if (!qFuzzyEquals(liveOpacity, targetLiveOpacity))
+    {
         if (liveOpacity < targetLiveOpacity)
             liveOpacity = qMin(targetLiveOpacity, liveOpacity + liveOpacityAnimationSpeed * dt);
         else
@@ -1386,16 +1482,24 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
     }
 
     qreal targetActiveLiveOpacity = live ? 1.0 : 0.0;
-    if (!qFuzzyEquals(activeLiveOpacity, targetActiveLiveOpacity)) {
+    if (!qFuzzyEquals(activeLiveOpacity, targetActiveLiveOpacity))
+    {
         if (activeLiveOpacity < targetActiveLiveOpacity)
-            activeLiveOpacity = qMin(targetActiveLiveOpacity, activeLiveOpacity + liveOpacityAnimationSpeed * dt);
+        {
+            activeLiveOpacity = qMin(
+                targetActiveLiveOpacity, activeLiveOpacity + liveOpacityAnimationSpeed * dt);
+        }
         else
-            activeLiveOpacity = qMax(targetActiveLiveOpacity, activeLiveOpacity - liveOpacityAnimationSpeed * dt);
+        {
+            activeLiveOpacity = qMax(
+                targetActiveLiveOpacity, activeLiveOpacity - liveOpacityAnimationSpeed * dt);
+        }
 
         updateRequired = true;
     }
 
-    if (live) {
+    if (live)
+    {
         stripesPosition += dt * stripesMovingSpeed;
         while (stripesPosition > 1.0)
             stripesPosition -= 1.0;
@@ -1408,10 +1512,14 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
 
     if (updateRequired)
         parent->update();
+    else
+        prevAnimationMs = -1;
 }
 
-void QnTimelinePrivate::zoomWindow(qreal factor) {
-    qreal speed = qSqrt(2 * zoomKineticHelper.deceleration() * parent->width() * qAbs(factor - 1));
+void QnTimelinePrivate::zoomWindow(qreal factor)
+{
+    qreal speed = qSqrt(
+        2 * zoomKineticHelper.deceleration() * parent->width() * qAbs(factor - 1));
     if (factor < 1)
         speed = -speed;
 
@@ -1422,7 +1530,8 @@ void QnTimelinePrivate::zoomWindow(qreal factor) {
     parent->update();
 }
 
-void QnTimelinePrivate::setStickToEnd(bool stickToEnd) {
+void QnTimelinePrivate::setStickToEnd(bool stickToEnd)
+{
     if (this->stickToEnd == stickToEnd)
         return;
 
@@ -1452,7 +1561,7 @@ int QnTimelinePrivate::calculateTargetTextLevel() const
         const auto upperLevelTickIntervalMs = upperLevel.averageTickLength();
 
         const int ticksBetweenTwoUpperLevelTicks =
-            upperLevelTickIntervalMs / currentLevelTickIntervalMs - 1;
+            static_cast<int>(upperLevelTickIntervalMs / currentLevelTickIntervalMs - 1);
 
         const auto upperLevelTickLength = width / windowSize * upperLevelTickIntervalMs;
 
@@ -1523,7 +1632,9 @@ QVector<TextMarkInfo> QnTimelinePrivate::calculateVisibleTextMarks() const
     return result;
 }
 
-void QnTimelinePrivate::placeDigit(qreal x, qreal y, int digit, QSGGeometry::TexturedPoint2D *points) {
+void QnTimelinePrivate::placeDigit(
+    qreal x, qreal y, int digit, QSGGeometry::TexturedPoint2D* points)
+{
     QSize digitSize = textHelper->digitSize();
 
     QRectF texCoord = textHelper->digitCoordinates(digit);
@@ -1535,7 +1646,9 @@ void QnTimelinePrivate::placeDigit(qreal x, qreal y, int digit, QSGGeometry::Tex
     points[5].set(x, y + digitSize.height(), texCoord.left(), texCoord.bottom());
 }
 
-int QnTimelinePrivate::placeText(const TextMarkInfo &textMark, int textLevel, QSGGeometry::TexturedPoint2D *points) {
+int QnTimelinePrivate::placeText(
+    const TextMarkInfo& textMark, int textLevel, QSGGeometry::TexturedPoint2D* points)
+{
     QString baseValue = zoomLevels[textLevel].baseValue(textMark.tick);
     QString subValue = zoomLevels[textLevel].subValue(textMark.tick);
     QString suffix = zoomLevels[textLevel].suffix(textMark.tick);
@@ -1548,10 +1661,13 @@ int QnTimelinePrivate::placeText(const TextMarkInfo &textMark, int textLevel, QS
         tw += textHelper->spaceWidth() * 2;
 
     qreal x = qFloor(textMark.x - tw / 2);
-    qreal y = textY >= 0 ? textY : qFloor((parent->height() - chunkBarHeight - textHelper->lineHeight()) / 2);
+    qreal y = textY >= 0
+        ? textY
+        : qFloor((parent->height() - chunkBarHeight - textHelper->lineHeight()) / 2);
     int shift = 0;
 
-    for (int i = 0; i < baseValue.size(); ++i) {
+    for (int i = 0; i < baseValue.size(); ++i)
+    {
         placeDigit(x, y, baseValue.mid(i, 1).toInt(), points);
         points += 6;
         shift += 6;
@@ -1561,11 +1677,13 @@ int QnTimelinePrivate::placeText(const TextMarkInfo &textMark, int textLevel, QS
     if (subValue.isEmpty())
         x += textHelper->spaceWidth();
 
-    if (!suffix.isEmpty()) {
+    if (!suffix.isEmpty())
+    {
         QRectF texCoord = textHelper->stringCoordinates(suffix);
         points[0].set(x, y, texCoord.left(), texCoord.top());
         points[1].set(x + suffixSize.width(), y, texCoord.right(), texCoord.top());
-        points[2].set(x + suffixSize.width(), y + suffixSize.height(), texCoord.right(), texCoord.bottom());
+        points[2].set(x + suffixSize.width(), y + suffixSize.height(),
+            texCoord.right(), texCoord.bottom());
         points[3] = points[0];
         points[4] = points[2];
         points[5].set(x, y + suffixSize.height(), texCoord.left(), texCoord.bottom());
@@ -1574,7 +1692,8 @@ int QnTimelinePrivate::placeText(const TextMarkInfo &textMark, int textLevel, QS
         x += suffixSize.width();
     }
 
-    for (int i = 0; i < subValue.size(); ++i) {
+    for (int i = 0; i < subValue.size(); ++i)
+    {
         placeDigit(x, y, subValue.mid(i, 1).toInt(), points);
         points += 6;
         shift += 6;
@@ -1584,6 +1703,7 @@ int QnTimelinePrivate::placeText(const TextMarkInfo &textMark, int textLevel, QS
     return shift;
 }
 
-bool QnTimelinePrivate::hasArchive() const {
+bool QnTimelinePrivate::hasArchive() const
+{
     return startBoundTime > 0;
 }
