@@ -17,7 +17,7 @@ public:
     void setModel(QAbstractListModel* model);
     QAbstractListModel* model() const;
 
-    void setTriggeringRoles(const QnSortFilterListModel::RolesList& roles);
+    void setTriggeringRoles(const QnSortFilterListModel::RolesSet& roles);
 
     QModelIndex sourceIndexForTargetRow(int row) const;
     void refresh();
@@ -74,11 +74,10 @@ private:
 
 private:
     using RowsList = QList<int>;
-    using RolesSet = QSet<int>;
 
     QPointer<QAbstractListModel> m_model;
     RowsList m_mapped;
-    RolesSet m_triggeringRoles;
+    QnSortFilterListModel::RolesSet m_triggeringRoles;
 };
 
 QnSortFilterListModelPrivate::QnSortFilterListModelPrivate(QnSortFilterListModel* parent):
@@ -135,9 +134,9 @@ QAbstractListModel* QnSortFilterListModelPrivate::model() const
     return m_model;
 }
 
-void QnSortFilterListModelPrivate::setTriggeringRoles(const QnSortFilterListModel::RolesList& roles)
+void QnSortFilterListModelPrivate::setTriggeringRoles(const QnSortFilterListModel::RolesSet& roles)
 {
-    m_triggeringRoles = roles.toSet();
+    m_triggeringRoles = roles;
 }
 
 QModelIndex QnSortFilterListModelPrivate::sourceIndexForTargetRow(int row) const
@@ -351,7 +350,8 @@ void QnSortFilterListModelPrivate::handleSourceDataChanged(
     }
 
     if (m_triggeringRoles.isEmpty() ||
-        !RolesSet(m_triggeringRoles).intersect(roles.toList().toSet()).isEmpty())
+        !QnSortFilterListModel::RolesSet(m_triggeringRoles)
+            .intersect(roles.toList().toSet()).isEmpty())
     {
         refresh();
     }
@@ -400,7 +400,7 @@ QAbstractListModel* QnSortFilterListModel::sourceModel() const
     return d->model();
 }
 
-void QnSortFilterListModel::setTriggeringRoles(const RolesList& roles)
+void QnSortFilterListModel::setTriggeringRoles(const RolesSet& roles)
 {
     Q_D(QnSortFilterListModel);
     d->setTriggeringRoles(roles);

@@ -22,8 +22,8 @@ public:
     void setSourceModel(QAbstractListModel* model);
     QAbstractListModel* sourceModel() const;
 
-    typedef QList<int> RolesList;
-    void setTriggeringRoles(const RolesList& roles);
+    using RolesSet = QSet<int>;
+    void setTriggeringRoles(const RolesSet& roles);
 
     void forceUpdate();
 
