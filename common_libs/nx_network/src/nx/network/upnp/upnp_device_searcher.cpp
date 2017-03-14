@@ -41,6 +41,7 @@ DeviceSearcher::DeviceSearcher(
     m_terminated( false ),
     m_needToUpdateReceiveSocket(false)
 {
+    m_receiveBuffer.reserve(READ_BUF_CAPACITY);
     {
         QnMutexLocker lk(&m_mutex);
         m_timerID = nx::utils::TimerManager::instance()->addTimer(
@@ -336,8 +337,6 @@ bool DeviceSearcher::needToUpdateReceiveSocket() const
 
 nx::utils::AtomicUniquePtr<AbstractDatagramSocket> DeviceSearcher::updateReceiveSocketUnsafe()
 {
-    m_receiveBuffer.reserve(READ_BUF_CAPACITY);
-
     auto oldSock = std::move(m_receiveSocket);
 
     m_receiveSocket.reset(new UDPSocket(AF_INET));
