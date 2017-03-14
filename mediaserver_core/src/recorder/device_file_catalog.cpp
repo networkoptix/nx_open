@@ -104,19 +104,17 @@ DeviceFileCatalog::DeviceFileCatalog(
 {
 }
 
-std::unordered_map<int, qint64> DeviceFileCatalog::calcSpaceByStorage() const
+qint64 DeviceFileCatalog::getSpaceByStorageIndex(int storageIndex) const
 {
-    std::unordered_map<int, qint64> result;
+    qint64 result = 0;
     QnMutexLocker lock(&m_mutex);
 
-    for (auto catalogIt = m_chunks.cbegin(); catalogIt != m_chunks.cend(); ++catalogIt)
+    for (const auto& chunk: m_chunks)
     {
-        std::unordered_map<int, qint64>::iterator resultIt;
-        bool emplaceResult = false;
-
-        std::tie(resultIt, emplaceResult) = result.emplace(catalogIt->storageIndex, 0);
-        resultIt->second += catalogIt->getFileSize();
+        if (chunk.storageIndex == storageIndex)
+            result += chunk.getFileSize();
     }
+        
     return result;
 }
 
