@@ -199,6 +199,11 @@ namespace ec2
         seed = val & 0xFFFFFFFF;
     }
 
+    bool TimePriorityKey::isTakenFromInternet() const
+    {
+        return (flags & Qn::TF_peerTimeSynchronizedWithInternetServer) > 0;
+    }
+
 
     //////////////////////////////////////////////
     //   TimeSyncInfo
@@ -253,7 +258,7 @@ namespace ec2
     //   TimeSynchronizationManager
     //////////////////////////////////////////////
     static const size_t MILLIS_PER_SEC = 1000;
-    static const size_t INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC = 0;
+    static const size_t INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC = 5;
     static const size_t MIN_INTERNET_SYNC_TIME_PERIOD_SEC = 60;
     static const char* RFC868_SERVERS[] = { "instance1.rfc868server.com", "instance1.rfc868server.com"/*,"time.ien.it", "time1.ucla.edu"*/ };
 #ifdef _DEBUG
@@ -480,48 +485,8 @@ namespace ec2
 
             if( tran.params.id == qnCommon->moduleGUID() )
             {
-                //local peer is selected by user as primary time server
-                const bool synchronizingByCurrentServer = m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey;
                 m_localTimePriorityKey.flags |= Qn::TF_peerTimeSetByUser;
-                //incrementing sequence 
-                m_localTimePriorityKey.sequence = m_usedTimeSyncInfo.timePriorityKey.sequence + 1;
-                //"select primary time server" means "take its local time", so resetting internet synchronization flag
-                m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
-                if (m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
-                        m_localTimePriorityKey,
-                        qnGlobalSettings->isSynchronizingTimeWithInternet()))
-                {
-                    //using current server time info
-                    const qint64 elapsed = m_monotonicClock.elapsed();
-                    //selection of peer as primary time server means it's local system time is to be used as synchronized time 
-                        //in case of internet connection absence
-                    m_usedTimeSyncInfo = TimeSyncInfo(
-                        elapsed,
-                        currentMSecsSinceEpoch(),
-                        m_localTimePriorityKey );
-                    //resetting "synchronized with internet" flag
-                    NX_LOG( lit("TimeSynchronizationManager. Received primary time server change transaction. New synchronized time %1, new priority key 0x%2").
-                        arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logINFO );
-                    m_timeSynchronized = true;
-                    //saving synchronized time to DB
-                    if( QnDbManager::instance() && QnDbManager::instance()->isInitialized() )
-                        Ec2ThreadPool::instance()->start( make_custom_runnable( std::bind(
-                            &saveSyncTime,
-                            QnDbManager::instance(),
-                            0,
-                            m_usedTimeSyncInfo.timePriorityKey) ) );
-
-                    if( !synchronizingByCurrentServer )
-                    {
-                        const qint64 curSyncTime = m_usedTimeSyncInfo.syncTime;
-                        lk.unlock();
-                        WhileExecutingDirectCall callGuard( this );
-                        emit timeChanged( curSyncTime );
-                    }
-
-                    //reporting new sync time to everyone we know
-                    syncTimeWithAllKnownServers(&lk);
-                }
+                selectLocalTimeAsSynchronized(&lk, m_usedTimeSyncInfo.timePriorityKey.sequence + 1);
             }
             else
             {
@@ -535,6 +500,58 @@ namespace ec2
         /* Can cause signal, going out of mutex locker. */
         if( newLocalTimePriority != localTimePriorityBak )
             updateRuntimeInfoPriority(newLocalTimePriority);
+    }
+
+    void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
+        QnMutexLockerBase* const lk,
+        quint16 newTimePriorityKeySequence)
+    {
+        //local peer is selected by user as primary time server
+        const bool synchronizingByCurrentServer = m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey;
+        //incrementing sequence 
+        m_localTimePriorityKey.sequence = newTimePriorityKeySequence;
+        //"select primary time server" means "take its local time", so resetting internet synchronization flag
+        m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
+        if (!m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
+            m_localTimePriorityKey,
+            qnGlobalSettings->isSynchronizingTimeWithInternet()))
+        {
+            return;
+        }
+
+        //using current server time info
+        const qint64 elapsed = m_monotonicClock.elapsed();
+        //selection of peer as primary time server means it's local system time is to be used as synchronized time 
+        //in case of internet connection absence
+        m_usedTimeSyncInfo = TimeSyncInfo(
+            elapsed,
+            currentMSecsSinceEpoch(),
+            m_localTimePriorityKey);
+        //resetting "synchronized with internet" flag
+        NX_LOG(lit("TimeSynchronizationManager. Received primary time server change transaction. New synchronized time %1, new priority key 0x%2").
+            arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logINFO);
+        m_timeSynchronized = true;
+        //saving synchronized time to DB
+        if (QnDbManager::instance() && QnDbManager::instance()->isInitialized())
+        {
+            Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
+                &saveSyncTime,
+                QnDbManager::instance(),
+                0,
+                m_usedTimeSyncInfo.timePriorityKey)));
+        }
+
+        if (!synchronizingByCurrentServer)
+        {
+            const qint64 curSyncTime = m_usedTimeSyncInfo.syncTime;
+            lk->unlock();
+            WhileExecutingDirectCall callGuard(this);
+            emit timeChanged(curSyncTime);
+            lk->relock();
+        }
+
+        //reporting new sync time to everyone we know
+        syncTimeWithAllKnownServers(lk);
     }
 
     void TimeSynchronizationManager::peerSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeData>& tran )
@@ -674,9 +691,10 @@ namespace ec2
         Q_ASSERT( remotePeerTimePriorityKey.seed > 0 );
 
         NX_LOG( QString::fromLatin1("TimeSynchronizationManager. Received sync time update from peer %1, "
-            "peer's sync time (%2), peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5").
+            "peer's sync time (%2), peer's time priority key 0x%3. Local peer id %4, local sync time %5, used priority key 0x%6").
             arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
             arg(remotePeerTimePriorityKey.toUInt64(), 0, 16).arg(qnCommon->moduleGUID().toString()).
+            arg(QDateTime::fromMSecsSinceEpoch(getSyncTimeNonSafe()).toString(Qt::ISODate)).
             arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logDEBUG2 );
 
         //time difference between this server and remote one is not that great
@@ -698,6 +716,19 @@ namespace ec2
             return; //not applying time
         }
 
+        // If Internet time has been reported and synchronizing with local peer, then taking local time once again.
+        if (remotePeerTimePriorityKey.isTakenFromInternet() &&
+            !qnGlobalSettings->isSynchronizingTimeWithInternet() &&
+            ((m_localTimePriorityKey.flags & Qn::TF_peerTimeSetByUser) > 0))
+        {
+            // Sending back local time with increased sequence.
+            NX_LOG(lm("TimeSynchronizationManager. Received Internet time "
+                "while user enabled synchronization with local peer. "
+                "Increasing local time priority"), cl_logDEBUG1);
+            selectLocalTimeAsSynchronized(lock, remotePeerTimePriorityKey.sequence + 1);
+            return;
+        }
+
         //printing sync time change reason to the log
         if (!(m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
                 remotePeerTimePriorityKey, qnGlobalSettings->isSynchronizingTimeWithInternet())) &&
@@ -711,9 +742,10 @@ namespace ec2
         else
         {
             NX_LOG( QString::fromLatin1("TimeSynchronizationManager. Received sync time update from peer %1, peer's sync time (%2), "
-                "peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5. Accepting peer's synchronized time").
+                "peer's time priority key 0x%3. Local peer id %4, local sync time %5, used priority key 0x%6. Accepting peer's synchronized time").
                 arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
                 arg(remotePeerTimePriorityKey.toUInt64(), 0, 16).arg(qnCommon->moduleGUID().toString()).
+                arg(QDateTime::fromMSecsSinceEpoch(getSyncTimeNonSafe()).toString(Qt::ISODate)).
                 arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logINFO );
         }
 
@@ -774,8 +806,6 @@ namespace ec2
                 transport->remotePeer().id,
                 SocketAddress( remoteAddr.host(), remoteAddr.port() ),
                 transport->authData() );
-
-            using namespace std::placeholders;
         }
     }
 
@@ -828,9 +858,14 @@ namespace ec2
         QnMutexLocker lk( &m_mutex );
         if( m_terminated )
             return;
+
         auto peerIter = m_peersToSendTimeSyncTo.find( peerID );
         if( peerIter == m_peersToSendTimeSyncTo.end() )
+        {
+            NX_LOG(lm("TimeSynchronizationManager. Cannot report sync_time to peer %1. "
+                "Address not known...").arg(peerID), cl_logDEBUG2);
             return;
+        }
 
         if (!QnGlobalSettings::instance()->isTimeSynchronizationEnabled())
         {
@@ -839,6 +874,9 @@ namespace ec2
                 TIME_SYNC_SEND_TIMEOUT_SEC * MILLIS_PER_SEC);
             return;
         }
+
+        NX_LOG(lm("TimeSynchronizationManager. About to report sync_time to peer %1 (%2)")
+            .arg(peerID).arg(peerIter->second.peerAddress.toString()), cl_logDEBUG2);
 
         QUrl targetUrl;
         targetUrl.setScheme( lit("http") );
@@ -879,9 +917,11 @@ namespace ec2
         }
         clientPtr->addAdditionalHeader( Qn::PEER_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray() );
         if (peerIter->second.rttMillis)
+        {
             clientPtr->addAdditionalHeader(
                 Qn::RTT_MS_HEADER_NAME,
                 nx_http::StringType::number(peerIter->second.rttMillis.get()));
+        }
 
         clientPtr->setUserName( peerIter->second.authData.userName );
         if( peerIter->second.authData.password )
@@ -915,6 +955,10 @@ namespace ec2
         nx_http::AsyncHttpClientPtr clientPtr,
         qint64 requestRttMillis)
     {
+        NX_LOG(lm("TimeSynchronizationManager. Received (%1) response from peer %2")
+            .arg(clientPtr->response() ? clientPtr->response()->statusLine.statusCode : -1)
+            .arg(peerID), cl_logDEBUG2);
+
         if( clientPtr->response() &&
             clientPtr->response()->statusLine.statusCode == nx_http::StatusCode::ok )
         {
@@ -959,7 +1003,7 @@ namespace ec2
 
         //TODO #ak if local time changes have to broadcast it as soon as possible
 
-        NX_LOG( lit("TimeSynchronizationManager. Broadcasting local system time. peer %1, system time time (%2), local time priority key 0x%3").
+        NX_LOG( lit("TimeSynchronizationManager. Broadcasting local system time. peer %1, system time (%2), local time priority key 0x%3").
             arg( qnCommon->moduleGUID().toString() ).arg( QDateTime::fromMSecsSinceEpoch( currentMSecsSinceEpoch() ).toString( Qt::ISODate ) ).
             arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logDEBUG2 );
 
@@ -1099,8 +1143,9 @@ namespace ec2
             }
             else
             {
-                NX_LOG( lit("TimeSynchronizationManager. Failed to get time from the internet. %1").arg(SystemError::toString(errorCode)), cl_logDEBUG1 );
-                //failure
+                NX_LOG( lit("TimeSynchronizationManager. Failed to get time from the internet. %1")
+                    .arg(SystemError::toString(errorCode)), cl_logDEBUG1 );
+
                 m_internetTimeSynchronizationPeriod = std::min<>(
                     MIN_INTERNET_SYNC_TIME_PERIOD_SEC + m_internetTimeSynchronizationPeriod * INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF,
                     Settings::instance()->maxInternetTimeSyncRetryPeriodSec(MAX_INTERNET_SYNC_TIME_PERIOD_SEC));
@@ -1267,6 +1312,8 @@ namespace ec2
     {
         for (std::pair<const QnUuid, PeerContext>& peerCtx : m_peersToSendTimeSyncTo)
         {
+            NX_LOG(lm("TimeSynchronizationManager. Scheduling time synchronization with peer %1")
+                .arg(peerCtx.first.toString()), cl_logDEBUG2);
             TimerManager::instance()->modifyTimerDelay(
                 peerCtx.second.syncTimerID.get(),
                 0);
@@ -1337,20 +1384,31 @@ namespace ec2
         const qint64 curSysTime = QDateTime::currentMSecsSinceEpoch();
         if (qAbs(getSyncTime() - curSysTime) > SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS)
         {
+            NX_LOG(lm("TimeSynchronizationManager. Local system time change has been detected"),
+                cl_logDEBUG1);
+
             //local OS time has been changed. If system time is set 
             //by local host time then updating system time
+            const bool isSystemTimeSynchronizedWithInternet =
+                qnGlobalSettings->isSynchronizingTimeWithInternet() &&
+                ((m_localTimePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer) > 0);
+
             if (m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey &&
-                !(m_localTimePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer))
+                !isSystemTimeSynchronizedWithInternet)
             {
+                NX_LOG(lm("TimeSynchronizationManager. System time is synchronized with "
+                    "this peer's local time. Updating time..."), cl_logDEBUG1);
                 forceTimeResync();
             }
 
             if (QnDbManager::instance() && QnDbManager::instance()->isInitialized())
+            {
                 Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
                     &saveSyncTime,
                     QnDbManager::instance(),
                     QDateTime::currentMSecsSinceEpoch() - getSyncTime(),
                     m_usedTimeSyncInfo.timePriorityKey)));
+            }
         }
 
         QnMutexLocker lk(&m_mutex);
@@ -1364,11 +1422,13 @@ namespace ec2
     void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(QnMutexLockerBase* const /*lk*/)
     {
         if (QnDbManager::instance() && QnDbManager::instance()->isInitialized())
+        {
             Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
                 &QnDbManager::saveMiscParam,
                 QnDbManager::instance(),
                 LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
                 QByteArray::number(m_localTimePriorityKey.toUInt64()))));
+        }
     }
 
     void TimeSynchronizationManager::onTimeSynchronizationSettingsChanged()
@@ -1384,7 +1444,8 @@ namespace ec2
             else
                 addInternetTimeSynchronizationTask();
         }
-        else
+        else if (m_usedTimeSyncInfo.timePriorityKey.isTakenFromInternet() ||
+            m_localTimePriorityKey.isTakenFromInternet())
         {
             // Forgetting Internet time.
             QnMutexLocker lock(&m_mutex);
