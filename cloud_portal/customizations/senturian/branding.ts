@@ -36,7 +36,7 @@
     </message>
     <message>
       <source>{{IOS_APP_LINK}}</source>
-      <translation>disabled</translation>
+      <translation>https://itunes.apple.com/us/app/sentry-matrix/id1209154241?ls=1&mt=8</translation>
     </message>
     <message>
       <source>{{ANDROID_APP_LINK}}</source>

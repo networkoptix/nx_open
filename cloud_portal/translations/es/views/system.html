@@ -1,0 +1,27 @@
+<div class="auth-visible" process-loading="gettingSystem">
+    <div ng-if="systemNoAccess" class="text-center">
+        <h1>Error al acceder al sistema</h1>
+        <p>Este enlace está roto,<br>
+            Sistema podriá estar desconectado de {{PRODUCT_NAME}},<br>
+            El acceso a este Sistema puede ser revocado, <br>
+            o puede que haya iniciado sesión en una cuenta diferente</p>
+        <p>
+            <a href="/systems" class="btn btn-default">Lista de Sistemas disponible</a>
+        </p>
+    </div>
+
+    <ng-include ng-if="gettingSystem.success" src="$root.C.viewsDir + 'components/system-header.html'"></ng-include>
+    <div class="row"  ng-if="gettingSystem.success">
+        <div class="col-md-4 col-md-push-8">
+            <ng-include src="$root.C.viewsDir + 'components/system-card.html'"></ng-include>
+        </div>
+        <div class="col-md-8 col-md-pull-4">
+            <div class="no-data-panel light-color border-top border-bottom" ng-if="!system.permissions.editUsers" >
+                <span class="no-data-panel-body">
+                    Usted no tiene acceso a la información del sistema.
+                </span>
+            </div>
+            <ng-include src="$root.C.viewsDir + 'components/system-users.html'" ng-if="system.permissions.editUsers" ></ng-include>
+        </div>
+    </div>
+</div>
