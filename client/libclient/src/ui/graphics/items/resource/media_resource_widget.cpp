@@ -503,6 +503,9 @@ void QnMediaResourceWidget::resetSoftwareTriggerButtons()
     /* Obtain camera id: */
     const auto resourceId = m_resource->toResource()->getId();
 
+    /* Obtain current user id: */
+    const auto currentUserId = accessController()->user()->getId();
+
     /* Gather software trigger ids relevant to this camera from all business rules: */
     const auto rules = QnCommonMessageProcessor::instance()->businessRules();
     for (auto iter = rules.begin(); iter != rules.end(); ++iter)
@@ -510,6 +513,10 @@ void QnMediaResourceWidget::resetSoftwareTriggerButtons()
         const auto& rule = iter.value();
 
         if (rule->eventType() != QnBusiness::SoftwareTriggerEvent)
+            continue;
+
+        const auto users = rule->eventParams().metadata.instigators;
+        if (!users.empty() && std::find(users.cbegin(), users.cend(), currentUserId) == users.end())
             continue;
 
         if (!rule->eventResources().empty() && !rule->eventResources().contains(resourceId))

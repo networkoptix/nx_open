@@ -19,6 +19,7 @@ namespace Ui {
 
 class QStateMachine;
 class QStandardItemModel;
+class QnAligner;
 
 class QnBusinessRuleWidget : public Connective<QWidget>, public QnWorkbenchContextAware
 {
@@ -75,4 +76,7 @@ private:
     QnResourceList m_dropResources;
 
     bool m_updating;
+
+    QnAligner* const m_eventAligner;
+    QnAligner* const m_actionAligner;
 };

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1000</width>
-    <height>400</height>
+    <height>399</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -116,7 +116,7 @@
               <bool>true</bool>
              </property>
              <property name="text">
-              <string>at</string>
+              <string>At</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -255,7 +255,7 @@
            <item>
             <widget class="QLabel" name="actionAtLabel">
              <property name="text">
-              <string>at</string>
+              <string>At</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
