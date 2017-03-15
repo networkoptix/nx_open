@@ -14,8 +14,6 @@ class QnSortFilterListModelPrivate: public Connective<QObject>
 public:
     QnSortFilterListModelPrivate(QnSortFilterListModel* parent);
 
-    void setModel(QAbstractItemModel* model);
-
     void setTriggeringRoles(const QnSortFilterListModel::RolesSet& roles);
 
     QModelIndex sourceIndexForTargetRow(int row) const;
@@ -85,42 +83,6 @@ void QnSortFilterListModelPrivate::resetTargetModel()
     q->beginResetModel();
     m_mapped.clear();
     q->endResetModel();
-}
-
-void QnSortFilterListModelPrivate::setModel(QAbstractItemModel* sourceModel)
-{
-    Q_Q(QnSortFilterListModel);
-    const auto currentModel = q->sourceModel();
-    if (sourceModel == currentModel)
-        return;
-
-    if (currentModel)
-    {
-        currentModel->disconnect(this);
-        resetTargetModel();
-    }
-
-    q->base_type::setSourceModel(sourceModel);
-
-    if (!sourceModel)
-        return;
-
-    connect(sourceModel, &QAbstractListModel::rowsInserted,
-        this, &QnSortFilterListModelPrivate::handleSourceRowsInserted);
-
-    connect(sourceModel, &QAbstractListModel::rowsAboutToBeRemoved,
-        this, &QnSortFilterListModelPrivate::handleSourceRowsAboutToBeRemoved);
-    connect(sourceModel, &QAbstractListModel::rowsRemoved,
-        this, &QnSortFilterListModelPrivate::handleSourceRowsRemoved);
-    connect(sourceModel, &QAbstractListModel::rowsMoved,
-        this, &QnSortFilterListModelPrivate::handleSourceRowsMoved);
-    connect(sourceModel, &QAbstractListModel::dataChanged,
-        this, &QnSortFilterListModelPrivate::handleSourceDataChanged);
-    connect(sourceModel, &QAbstractListModel::modelReset,
-        this, &QnSortFilterListModelPrivate::handleResetSourceModel);
-
-    //TODO: #ynikitenkov Make filling of model with data in reset model mode.
-    refresh();
 }
 
 void QnSortFilterListModelPrivate::setTriggeringRoles(const QnSortFilterListModel::RolesSet& roles)
@@ -358,8 +320,38 @@ QnSortFilterListModel::~QnSortFilterListModel()
 
 void QnSortFilterListModel::setSourceModel(QAbstractItemModel* model)
 {
+    const auto currentModel = sourceModel();
+    if (model == currentModel)
+        return;
+
     Q_D(QnSortFilterListModel);
-    d->setModel(model);
+    if (currentModel)
+    {
+        currentModel->disconnect(this);
+        d->resetTargetModel();
+    }
+
+    base_type::setSourceModel(model);
+
+    if (!model)
+        return;
+
+    connect(model, &QAbstractListModel::rowsInserted,
+        d, &QnSortFilterListModelPrivate::handleSourceRowsInserted);
+
+    connect(model, &QAbstractListModel::rowsAboutToBeRemoved,
+        d, &QnSortFilterListModelPrivate::handleSourceRowsAboutToBeRemoved);
+    connect(model, &QAbstractListModel::rowsRemoved,
+        d, &QnSortFilterListModelPrivate::handleSourceRowsRemoved);
+    connect(model, &QAbstractListModel::rowsMoved,
+        d, &QnSortFilterListModelPrivate::handleSourceRowsMoved);
+    connect(model, &QAbstractListModel::dataChanged,
+        d, &QnSortFilterListModelPrivate::handleSourceDataChanged);
+    connect(model, &QAbstractListModel::modelReset,
+        d, &QnSortFilterListModelPrivate::handleResetSourceModel);
+
+    //TODO: #ynikitenkov Make filling of model with data in reset model mode.
+    d->refresh();
 }
 
 void QnSortFilterListModel::setTriggeringRoles(const RolesSet& roles)
