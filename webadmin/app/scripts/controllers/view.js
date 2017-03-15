@@ -19,7 +19,6 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.storage.serverStates = $scope.storage.serverStates || {};
         
         $scope.playerApi = false;
-        $scope.player = null;
         $scope.cameras = {};
         $scope.liveOnly = true;
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
@@ -282,6 +281,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 // Require plugin
                 { src: ( rtspUrl + '/' + cameraId + '?' + positionMedia + rstpAuthPararm  + '&stream=' + ($scope.activeResolution === 'Low'?1:0)), type: mimeTypes.rtsp, transport:'rtsp'}
             ],function(src){
+                $scope.transport = src.transport;
                 return formatSupported(src.transport,false) && $scope.activeFormat === 'Auto'|| $scope.activeFormat === src.type;
             });
         }

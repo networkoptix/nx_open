@@ -12,7 +12,8 @@ angular.module('webadminApp')
                 position: "=",
                 liveMode: "=",
                 activeResolution: "=",
-                player: "="
+                player: "=",
+                transport: "="
             },
             templateUrl: Config.viewsDir + 'components/cameraLinks.html',
             link: function (scope, element/*, attrs*/) {
