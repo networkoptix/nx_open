@@ -1,0 +1,9 @@
+
+files:
+  -
+    source: '/**/*.*'
+    translation: '%original_file_name%'
+    ignore:
+      - /crowdin.yaml
+      - /views/debug.html
+      - /views/sdkeula.html
