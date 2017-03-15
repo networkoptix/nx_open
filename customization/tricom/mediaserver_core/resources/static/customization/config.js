@@ -10,3 +10,5 @@ Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
 Config.productName = 'Tricom MVSS';
 Config.cloud.productName = 'Tricom Cloud';
+
+Config.supportedLanguages = ['en_US', 'en_GB', 'fr', 'de', 'ru', 'es', 'ja', 'ko', 'th', 'zh_CN', 'zh_TW', 'vi_VN', 'hu', 'he', 'pt_PT'];
