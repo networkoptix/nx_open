@@ -1,0 +1,54 @@
+<div class="videowindow">
+
+    <div class="camera-view-informer camera-loading" ng-if="loading">
+        <div class="camera-view-preloader camera-view-message-icon"></div>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashRequired">
+        Video oynatılamadı<br>
+        Lütfen<a href="https://get.adobe.com/flashplayer/" target="_blank">Adobe flası yükleyin</a>Arm-based sunucular için.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashOrWebmRequired">
+        Video oynatılamaz<br>
+        lütfen<a href="https://get.adobe.com/flashplayer/" target="_blank">adobe flash yükleyin</a>yada<a href="https://tools.google.com/dlpage/webmmf/" target="_blank">internet explorer için</a>WebM code yükleyin.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noArmSupport">
+        Video oynatılamadı<br>
+        BU tarayıcı yada cihaz arm-based cihazları desteklimiyor.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noFormat">
+        Vidyo oynatılamıyor.<br>
+        Tarayıcı veya cihaz bu kameradan vidyo oynatmayı desteklemiyor.<br>
+    </div>
+
+
+    <div class="camera-view-informer" ng-if="ieNoWebm">
+        Video oynatılamadı<br>
+        lütfen yükleyin<a href="https://tools.google.com/dlpage/webmmf/" target="_blank">WebM codec</a>internet explorer için.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ieWin10">
+        Vidyo oynatılamıyor.<br>
+        Lütfen Mirosoft Edge veya Google Chrome kullanın.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ubuntuNX">
+        Video oynatılamıyor.<br>
+        Bu taryıcı ARM-based sunucuları desteklemiyor. LÜtfen Chromium tarayıcısını kullanın.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="errorLoading">
+        Vidyo oynatılamadı<br>
+        Hata oluştu.<br>
+    </div>
+
+
+    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}" ng-include="Config.viewsDir + 'components/flashls.html'">
+    </div>
+
+    <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading}">
+    </div>
+</div>

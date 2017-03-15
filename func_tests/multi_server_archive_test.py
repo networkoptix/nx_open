@@ -3,8 +3,8 @@ import logging
 import uuid
 import pytest
 import pytz
-from test_utils import print_list
-from server import TimePeriod
+from test_utils.utils import log_list
+from test_utils.server import TimePeriod
 
 
 log = logging.getLogger(__name__)
@@ -32,8 +32,8 @@ def test_merged_archive(env, camera, sample_media_file):
     start_times_two = []
     start_times_two.append(start_times_one[-1] + sample.duration + timedelta(minutes=1))   # separate from previous
     start_times_two.append(start_times_two[-1] + sample.duration)                          # adjacent to previous
-    print_list('Start times for server one', start_times_one)
-    print_list('Start times for server two', start_times_two)
+    log_list('Start times for server one', start_times_one)
+    log_list('Start times for server two', start_times_two)
     expected_periods_one = [
         TimePeriod(start_times_one[0], sample.duration * 2 - timedelta(seconds=10)),  # overlapped must be joined together
         TimePeriod(start_times_one[2], sample.duration),
@@ -42,8 +42,8 @@ def test_merged_archive(env, camera, sample_media_file):
         TimePeriod(start_times_two[0], sample.duration * 2),  # adjacent must be joined together
         ]
     all_expected_periods = expected_periods_one + expected_periods_two
-    print_list('Expected periods for server one', expected_periods_one)
-    print_list('Expected periods for server two', expected_periods_two)
+    log_list('Expected periods for server one', expected_periods_one)
+    log_list('Expected periods for server two', expected_periods_two)
 
     for st in start_times_one:
         one_storage.save_media_sample(camera, st, sample)

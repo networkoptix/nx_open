@@ -38,10 +38,10 @@ DeviceSearcher::DeviceSearcher(
     m_globalSettings(globalSettings),
     m_discoverTryTimeoutMS( discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS ),
     m_timerID( 0 ),
-    m_readBuf( new char[READ_BUF_CAPACITY] ),
     m_terminated( false ),
     m_needToUpdateReceiveSocket(false)
 {
+    m_receiveBuffer.reserve(READ_BUF_CAPACITY);
     {
         QnMutexLocker lk(&m_mutex);
         m_timerID = nx::utils::TimerManager::instance()->addTimer(
@@ -57,9 +57,6 @@ DeviceSearcher::DeviceSearcher(
 DeviceSearcher::~DeviceSearcher()
 {
     pleaseStop();
-
-    delete[] m_readBuf;
-    m_readBuf = NULL;
 
     UPNPDeviceSearcherInstance = nullptr;
 }
@@ -340,8 +337,6 @@ bool DeviceSearcher::needToUpdateReceiveSocket() const
 
 nx::utils::AtomicUniquePtr<AbstractDatagramSocket> DeviceSearcher::updateReceiveSocketUnsafe()
 {
-    m_receiveBuffer.reserve(READ_BUF_CAPACITY);
-
     auto oldSock = std::move(m_receiveSocket);
 
     m_receiveSocket.reset(new UDPSocket(AF_INET));
@@ -354,15 +349,6 @@ nx::utils::AtomicUniquePtr<AbstractDatagramSocket> DeviceSearcher::updateReceive
     for(const auto iface: getAllIPv4Interfaces())
         m_receiveSocket->joinGroup( groupAddress.toString(), iface.address.toString() );
 
-    m_receiveSocket->readSomeAsync(
-        &m_receiveBuffer,
-        [this, sock = m_receiveSocket.get(), buf = &m_receiveBuffer](
-            SystemError::ErrorCode errorCode,
-            std::size_t bytesRead)
-        {
-            onSomeBytesRead(sock, errorCode, buf, bytesRead);
-        });
-
     m_needToUpdateReceiveSocket = false;
 
     return oldSock;
@@ -372,15 +358,28 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf( const QnI
 {
 
     nx::utils::AtomicUniquePtr<AbstractDatagramSocket> oldSock;
-
+    bool isReceiveSocketUpdated = false;
     {
         QnMutexLocker lock(&m_mutex);
-        if(needToUpdateReceiveSocket())
+        isReceiveSocketUpdated = needToUpdateReceiveSocket();
+        if(isReceiveSocketUpdated)
             oldSock = updateReceiveSocketUnsafe();
     }
 
     if (oldSock)
         oldSock->pleaseStopSync(true);
+    if (isReceiveSocketUpdated)
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_receiveSocket->readSomeAsync(
+            &m_receiveBuffer,
+            [this, sock = m_receiveSocket.get(), buf = &m_receiveBuffer](
+                SystemError::ErrorCode errorCode,
+                std::size_t bytesRead)
+        {
+            onSomeBytesRead(sock, errorCode, buf, bytesRead);
+        });
+    }
 
     const QString& localAddress = iface.address.toString();
 

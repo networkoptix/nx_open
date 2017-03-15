@@ -236,6 +236,7 @@ void AddressResolver::resolveAsync(
     {
         auto entries = info->second.getAll();
 
+        // TODO: #mux This is ugly fix for VMS-5777, should be properly fixed in 3.1.
         if (info->second.isLikelyCloudAddress && isMediatorAvailable())
         {
             const bool cloudAddressEntryPresent =

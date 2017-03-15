@@ -26,3 +26,5 @@ Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
 Config.productName = 'FlyView';
 Config.cloud.productName = 'FlyView Cloud';
+
+Config.supportedLanguages = ['ru'];

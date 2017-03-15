@@ -1,8 +1,3 @@
-/**********************************************************
-* Apr 13, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <memory>
@@ -14,17 +9,16 @@
 #include "nx/network/udt/udt_socket.h"
 #include "nx/network/system_socket.h"
 
-
 namespace nx {
 namespace network {
 namespace cloud {
 namespace udp {
 
-/** Initiates rendezvous connection with given remote address.
-    \note Instance can be safely freed within its aio thread (e.g., within completion handler)
-*/
-class RendezvousConnector
-:
+/**
+ * Initiates rendezvous connection with given remote address.
+ * @note Instance can be safely freed within its aio thread (e.g., within completion handler).
+ */
+class RendezvousConnector:
     public aio::AbstractPollable
 {
 public:
@@ -32,8 +26,8 @@ public:
         ConnectCompletionHandler;
 
     /**
-        @param udpSocket If not empty, this socket is passed to udt socket
-    */
+     * @param udpSocket If not empty, this socket is passed to udt socket.
+     */
     RendezvousConnector(
         nx::String connectSessionId,
         SocketAddress remotePeerAddress,
@@ -54,7 +48,9 @@ public:
     virtual void connect(
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler completionHandler);
-    /** moves connection out of this */
+    /**
+     * Moves connection out of this.
+     */
     virtual std::unique_ptr<nx::network::UdtStreamSocket> takeConnection();
 
     const nx::String& connectSessionId() const;
@@ -71,6 +67,9 @@ private:
     ConnectCompletionHandler m_completionHandler;
     boost::optional<SocketAddress> m_localAddressToBindTo;
 
+    bool initializeUdtConnection(
+        UdtStreamSocket* udtConnection,
+        std::chrono::milliseconds timeout);
     void onUdtConnectFinished(SystemError::ErrorCode errorCode);
 };
 
