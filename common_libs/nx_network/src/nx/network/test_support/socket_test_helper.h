@@ -96,18 +96,29 @@ private:
     int m_id;
     boost::optional<SocketAddress> m_localAddress;
     const bool m_accepted;
+    uint64_t m_dataSequence;
 
-    void onConnected( SystemError::ErrorCode code );
+    TestConnection(
+        std::unique_ptr<AbstractStreamSocket> socket,
+        const SocketAddress& remoteAddress,
+        TestTrafficLimitType limitType,
+        size_t trafficLimit,
+        TestTransmissionMode transmissionMode,
+        bool isConnected,
+        bool isAccepted);
+
+    void onConnected(SystemError::ErrorCode code);
     void startIO();
     void startSpamIO();
     void startEchoIO();
     void startEchoTestIO();
     void startReceiveOnlyTestIO();
-    void onDataReceived( SystemError::ErrorCode errorCode, size_t bytesRead );
-    void onDataSent( SystemError::ErrorCode errorCode, size_t bytesWritten );
-    void readAllAsync( std::function<void()> handler );
-    void sendAllAsync( std::function<void()> handler );
-    void reportFinish( SystemError::ErrorCode code );
+    void onDataReceived(SystemError::ErrorCode errorCode, size_t bytesRead);
+    void onDataSent(SystemError::ErrorCode errorCode, size_t bytesWritten);
+    void readAllAsync(std::function<void()> handler);
+    void sendAllAsync(std::function<void()> handler);
+    void reportFinish(SystemError::ErrorCode code);
+    void prepareConsequentDataToSend(QByteArray* buf);
 
     TestConnection(const TestConnection&);
     TestConnection& operator=(const TestConnection&);
