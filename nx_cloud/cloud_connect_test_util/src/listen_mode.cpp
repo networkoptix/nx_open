@@ -192,6 +192,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
     SocketAddress localAddress(HostAddress::localhost);
     if (const auto address = args.get("local-address"))
         localAddress = SocketAddress(*address);
+
     {
         std::unique_ptr<AbstractStreamServerSocket> localServer;
         if (args.get("udt"))
@@ -199,7 +200,8 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
         else
             localServer = std::make_unique<TCPServerSocket>(AF_INET);
 
-        if (!localServer->bind(localAddress))
+        if (!localServer->setReuseAddrFlag(true) ||
+            !localServer->bind(localAddress))
         {
             std::cout << "Error: Unable to bind to " << localAddress.toString().toStdString() << std::endl;
             return 1;
