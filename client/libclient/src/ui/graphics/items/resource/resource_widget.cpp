@@ -449,6 +449,11 @@ QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) cons
     return calculateGeometry(enclosingGeometry, this->rotation());
 }
 
+QnResourceWidget::Options QnResourceWidget::options() const
+{
+    return m_options;
+}
+
 QString QnResourceWidget::titleText() const
 {
     return m_overlayWidgets->buttonsOverlay->titleLabel()->text();
@@ -745,6 +750,8 @@ void QnResourceWidget::ensureAboutToBeDestroyedEmitted()
 
 void QnResourceWidget::setOption(Option option, bool value /*= true*/)
 {
+    if (option == DisplayMotion)
+        qDebug() << "DisplayMotion set to" << value;
     setOptions(value ? m_options | option : m_options & ~option);
 }
 
@@ -755,6 +762,9 @@ void QnResourceWidget::setOptions(Options options)
 
     Options changedOptions = m_options ^ options;
     m_options = options;
+
+    if (changedOptions.testFlag(DisplayMotion))
+        qDebug() << "DisplayMotion batch set to" << options.testFlag(DisplayMotion);
 
     optionsChangedNotify(changedOptions);
     emit optionsChanged();
