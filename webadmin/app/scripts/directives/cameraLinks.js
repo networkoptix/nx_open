@@ -12,8 +12,7 @@ angular.module('webadminApp')
                 position: "=",
                 liveMode: "=",
                 activeResolution: "=",
-                player: "=",
-                transport: "="
+                player: "="
             },
             templateUrl: Config.viewsDir + 'components/cameraLinks.html',
             link: function (scope, element/*, attrs*/) {
@@ -35,6 +34,7 @@ angular.module('webadminApp')
                 };
 
                 scope.formatLink = function(camera, stream,transport){
+                    scope.transport = transport;
                     var linkTemplates = {
                         'preview': 'http://{{host}}/api/image?physicalId={{physicalId}}{{previewPosition}}{{auth}}',
                         'rtsp':'rtsp://{{host}}/{{physicalId}}?stream={{streamIndex}}{{position}}{{auth}}',
