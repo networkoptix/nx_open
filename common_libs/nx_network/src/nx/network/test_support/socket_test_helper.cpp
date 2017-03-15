@@ -371,8 +371,6 @@ void TestConnection::sendAllAsync( std::function<void()> handler )
         });
 }
 
-static std::atomic<int> count = 0;
-
 void TestConnection::onDataReceived(
     SystemError::ErrorCode errorCode,
     size_t bytesRead)
