@@ -731,13 +731,16 @@ h2.version-number{
     @include kill-glyphicon;
     background-position: -80px -16px;
 }
+button .icon-caret{
+  float:right;
+}
 .icon-caret{
   @include icon;
+  display: inline-block;
   background-position: 2px 0px;
 
   margin-left:$padding-input-horizontal/2;
-  margin-top: 4px;
-  float:right;
+  margin-top: 2px;
 }
 .close-icon{
   @include icon;
