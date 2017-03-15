@@ -75,10 +75,10 @@
                         </div>
                     </div>
 
-                    <div>
+                    <div ng-if="canMerge" >
                         <form class="form-horizontal" >
                             <h3>시스템 병합</h3>
-                            <p><button type="button" ng-if="canMerge" class="btn btn-default" ng-click="openJoinDialog()">병합 시스템</button></p>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">병합 시스템</button></p>
                         </form>
                     </div>
 

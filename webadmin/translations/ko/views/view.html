@@ -84,7 +84,7 @@
                                         <li ng-repeat="camera in cameras[server.id]"
                                             ng-class="{active:activeCamera===camera}"
                                             ng-if="camera.visible"
-                                            ng-include="camera.isGroup?'views/components/camerasGroupNode.html':'views/components/cameraNode.html'" >
+                                            ng-include="Config.viewsDir + (camera.isGroup?'components/camerasGroupNode.html':'components/cameraNode.html')" >
                                         </li>
                                     </ul>
                                 </li>
@@ -165,7 +165,8 @@
                                 </div>
 
                                 <div class="camera-view-informer" ng-if="iOSVideoTooLarge">
-                                    비디오를 재생할 수 없습니다. <br>iOS는 fullHD 보다 큰 비디오를 지원 하지 않습니다 (2MP: 1920 x 1080).<br>
+                                    비디오를 재생할 수 없습니다. <br>
+                                    iOS는 fullHD 보다 큰 비디오를 지원 하지 않습니다 (2MP: 1920 x 1080).<br>
                                 </div>
 
                                 <videowindow ng-class="{invisible: iOSVideoTooLarge || !positionSelected && (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"

@@ -1,6 +1,6 @@
 {
-  "language": "ru",
-  "language_name": "Русский",
+  "language":"ru",
+  "language_name":"Русский",
   "dialogs":{
     "okButton":"Ok",
     "openLink":"Посетите эту ссылку",
@@ -38,6 +38,7 @@
     "confirmRestoreSettings":"Восстановить все настройки сервера? Архив будет сохранен, но сетевые настройки будут сброшены.",
     "confirmRestoreSettingsNotNetwork":"Вы хотите, чтобы сбросить все настройки сервера? Архив и сетевые настройки будут сохранены.",
     "unavailable":"Нет доступа",
+    "unsafePortConfirm":"Номер порта менее 1025 использовать небезопасно. Сервер может быть недоступен. Продолжить?",
     "confirmDisconnectFromCloud":"Отключить систему от {{CLOUD_NAME}}",
     "confirmDisconnectFromCloudTitle":"<span class='warning-label'>Все облачные пользователи будут удалены.</span> <br><br>Система будет доступна через локальную сеть с учётной записью локального администратора.",
     "confirmDisconnectFromCloudAction":"Отключить",

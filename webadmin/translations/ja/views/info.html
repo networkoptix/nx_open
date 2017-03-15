@@ -8,7 +8,7 @@
             <tabset>
                 <tab heading="{{L.info.tabs.healthMonitoring}}" ng-if="user.hasAllResources">
                     <br>
-                    <ng-include src="'views/components/health.html'"></ng-include>
+                    <ng-include src="Config.viewsDir + 'components/health.html'"></ng-include>
                 </tab>
                 <tab heading="{{L.info.tabs.storage}}" ng-if="user.isAdmin">
                     <br>

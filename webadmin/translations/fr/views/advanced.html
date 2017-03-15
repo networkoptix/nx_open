@@ -1,12 +1,12 @@
 <div class="container">
-    <h1>Paramètres serveur avancés</h1>
+    <h1>Erweiterte Servereinstellungen</h1>
 
     <div class="alert alert-danger" role="alert">
-        <b>Attention!</b> Toutes modifications sur cette page peut provoquer un mauvais fonctionnement du serveur.
+        <b>Warnung!</b> Änderungen auf dieser Seite können dazu führen, dass der Server nicht richtig arbeitet.
     </div>
 
 
-    <h2>Stockage</h2>
+    <h2>Speicherung</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
@@ -16,10 +16,10 @@
                         URL
                     </th>
                     <th width="200">
-                        Espace libre
+                        Freier Speicherplatz
                     </th>
                     <th width="150">
-                        Espace réservé
+                        Reservierter Speicher
                     </th>
                     <th >
                     </th>
@@ -31,7 +31,7 @@
             <tbody>
                 <tr ng-repeat="storage in storages" ng-form="storageForm">
 
-                    <td><span class="storage-URL" title="{{storage.URL}}">{{storage.URL}}</span></td>
+                    <td><span class="storage-URL" title="{{storage.url}}">{{storage.url}}</span></td>
                     <td>
                         <div class="progress" style="margin-top:5px;"  ng-if="storage.accessible"
                              title="{{formatTotalSpace(storage)}}">
@@ -40,7 +40,7 @@
                                  ng-style="{width: storage.reservedSpace*100/storage.totalSpace+ '%'}">
                             </div>
 
-                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} de {{formatSpace(storage.totalSpace)}}</div>
+                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} von {{formatSpace(storage.totalSpace)}}</div>
 
 
                             <div class="progress-bar progress-bar-success" role="progressbar"
@@ -54,7 +54,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Inaccessible
+                                Unzugänglich
                             </div>
                         </div>
                     </td>
@@ -67,15 +67,15 @@
                                    min="1"
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
- placeholder="Espace réservé"/>
-                            <div class="input-group-addon">Go</div>
+ placeholder="Reservierter Speicher"/>
+                            <div class="input-group-addon">GB</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Espace réservé"/>
-                            <div class="input-group-addon">Go</div>
+ placeholder="Reservierter Speicher"/>
+                            <div class="input-group-addon">GB</div>
                         </div>
                     </td>
                     <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
@@ -86,7 +86,7 @@
                                    ng-model="storage.isUsedForWriting"
                                    ng-disabled="!storage.isWritable"
                                    name="isUsedForWriting"
-                                   placeholder="Utilisation pour l’écriture"/>
+                                   placeholder="Benutzen zum Schreiben"/>
                                 </span>
                                 <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"></icon>
                                 <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"></icon>
@@ -103,68 +103,68 @@
             </tbody>
         </table>
         <div id="selectWritableStorageAlert" class="alert alert-warning"  ng-class="{hidden:someSelected}">
-            Aucun disque de stockage principal a été sélectionné pour l’écriture - vidéo ne sera pas entrgistré sur ce serveur.
+            Es wurde kein Hauptspeicher für das Schreiben ausgewählt - Video wird nicht auf diesem Server aufgezeichnet.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Espace réservé est supérieur à l’espace libre. Séquences vidéo actuel peuvent être retiré afin de libérer de l’espace.
+            Der reservierte Speicherplatz ist größer als der freie Speicherplatz. Videomaterial kann entfernt werden, um Speicherplatz freizugeben.
         </div>
-        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Corrigez tous les paramètres en surbrillance pour l’enregistrer</div>
+        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Beheben Sie alle markierten Einstellungen, um abspeichern zu können</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Sauvegarder</button>
-        <button class="btn btn-warning" ng-click="cancel()">Annuler</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Speichern</button>
+        <button class="btn btn-warning" ng-click="cancel()">Abbrechen</button>
     </form>
 
-    <h2>Paramètres journal</h2>
+    <h2>Logeinstellungen</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div class="form-group">
-            <label class="col-sm-4">Niveau journal principal</label>
+            <label class="col-sm-4">Hauptlog-Level</label>
             <div class="col-sm-8">
 
                 <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">Auncun: Journal désactivée.</option>
-                    <option value="ALWAYS">Toujours: Journal d'erreurs, avertissements et messages plus importants.</option>
-                    <option value="ERROR">Erreur: Erreurs dans le journal seulement.</option>
-                    <option value="WARNING">Attention: Journal d'avertissements et d'erreurs.</option>
-                    <option value="INFO">Toujours: Journal d'erreurs, avertissements et tous les messages.</option>
-                    <option value="DEBUG">Debug: Journal tous message système et information débogage.</option>
-                    <option value="DEBUG2">Debug2: Journal tous message système et information débogage étendues.</option>
+                    <option value="NONE">Keine: Log deaktiviert.</option>
+                    <option value="ALWAYS">Immer: Fehler, Warnungen und die wichtigsten Nachrichten werden protokolliert.</option>
+                    <option value="ERROR">Fehler: Nur Fehler protokollieren.</option>
+                    <option value="WARNING">Warnung: Warnungen und Fehler werden protokolliert.</option>
+                    <option value="INFO">Immer: Fehler, Warnungen und alle Nachrichten werden protokolliert.</option>
+                    <option value="DEBUG">Debug: Jede Systemnachricht und Debuginformationen protokollieren.</option>
+                    <option value="DEBUG2">Debug2: Jede Systemnachricht und erweiterte Debuginformationen protokollieren.</option>
                 </select>
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-4">Niveau journal de transaction</label>
+            <label class="col-sm-4">Transaktionslog-Level</label>
             <div class="col-sm-8">
                 <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Auncun: Journal désactivée.</option>
-                    <option value="ALWAYS">Toujours: Journal d'erreurs, avertissements et messages plus importants.</option>
-                    <option value="ERROR">Erreur: Erreurs dans le journal seulement.</option>
-                    <option value="WARNING">Attention: Journal d'avertissements et d'erreurs.</option>
-                    <option value="INFO">Toujours: Journal d'erreurs, avertissements et tous les messages.</option>
-                    <option value="DEBUG">Debug: Journal tous message système et information débogage.</option>
-                    <option value="DEBUG2">Debug2: Journal tous message système et information débogage étendues.</option>
+                    <option value="NONE">Keine: Log deaktiviert.</option>
+                    <option value="ALWAYS">Immer: Fehler, Warnungen und die wichtigsten Nachrichten werden protokolliert.</option>
+                    <option value="ERROR">Fehler: Nur Fehler protokollieren.</option>
+                    <option value="WARNING">Warnung: Warnungen und Fehler werden protokolliert.</option>
+                    <option value="INFO">Immer: Fehler, Warnungen und alle Nachrichten werden protokolliert.</option>
+                    <option value="DEBUG">Debug: Jede Systemnachricht und Debuginformationen protokollieren.</option>
+                    <option value="DEBUG2">Debug2: Jede Systemnachricht und erweiterte Debuginformationen protokollieren.</option>
                 </select>
             </div>
         </div>
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >Sauvegarder</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >Speichern</button>
         </div>
     </form>
 
-    <h2>Mise à jour manuelle</h2>
+    <h2>Manuelles Update</h2>
     <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
         <div class="form-group">
-            <label class="col-sm-4">Envoyer l'installateur</label>
+            <label class="col-sm-4">Installer hochladen</label>
             <div class="col-sm-8">
                 <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">Veuillez vous assurer que la configuration est correcte.</p>
+                <p class="help-block">Bitte stellen Sie sicher, dass die Konfiguration richtig ist.</p>
             </div>
         </div>
     </form>
 
-    <h1>Paramètres système avancés</h1>
+    <h1>Erweiterte Systemeinstellungen</h1>
     <div class="alert alert-danger" role="alert">
-        <b>Attention!</b> Toutes modifications sur cette page peut provoquer un mauvais fonctionnement du serveur.
+        <b>Warnung!</b> Änderungen auf dieser Seite können dazu führen, dass der Server nicht richtig arbeitet.
     </div>
 
     <form class="form row" role="form" name="systemSettings" novalidate>
@@ -191,7 +191,7 @@
                        ng-model="systemSettings[setting]"
                        class="form-control input-sm"/>
 
-                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'empty'}}</p>
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'leer'}}</p>
 
                 <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
                     <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
@@ -202,15 +202,15 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Sauvegarder</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Speichern</button>
         </div>
 
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Attention!</b> Certains changements nécessitent un redémarrage <b>tous</b> les serveurs dans le système.<br><br>
+        <b>Warnung!</b> Einige Änderungen erfordern einen Neustart <b>alle</b> die Server im System.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="restartServer()" >Redémarrer le serveur actuel</button>
+            <button class="btn btn-primary" ng-click="restartServer()" >Aktuellen Server neu starten</button>
         </div>
     </div>
 </div>

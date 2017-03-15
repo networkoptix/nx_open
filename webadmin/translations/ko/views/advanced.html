@@ -31,7 +31,7 @@
             <tbody>
                 <tr ng-repeat="storage in storages" ng-form="storageForm">
 
-                    <td><span class="storage-URL" title="{{storage.URL}}">{{storage.URL}}</span></td>
+                    <td><span class="storage-URL" title="{{storage.url}}">{{storage.url}}</span></td>
                     <td>
                         <div class="progress" style="margin-top:5px;"  ng-if="storage.accessible"
                              title="{{formatTotalSpace(storage)}}">

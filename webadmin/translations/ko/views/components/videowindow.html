@@ -38,12 +38,7 @@
     </div>
 
 
-    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}">
-        <objecter ng-id="'flashvideoembed'"
-                ng-name="'flashvideoembed'"
-                ng-source="flashSource"
-                ng-param="flashParam">
-        </objecter>
+    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}" ng-include="Config.viewsDir + 'components/flashls.html'">
     </div>
 
     <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading}">

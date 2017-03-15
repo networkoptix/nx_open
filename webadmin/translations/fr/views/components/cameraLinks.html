@@ -1,7 +1,7 @@
 <div>
-    Caméra:
+    Kamera:
     <ul>
-        <li>Nom: {{activeCamera.name}}</li>
+        <li>Name: {{activeCamera.name}}</li>
         <li>PhysicalID: {{activeCamera.physicalId}}</li>
         <li>IP (URL): <a target="_blank" ng-href="{{activeCamera.url}}">{{activeCamera.url}}</a></li>
         <li ng-repeat="stream in activeCamera.mediaStreams">
@@ -13,23 +13,26 @@
         </li>
 
         <li>
-            Téléchargement:             <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">Haut</a>&nbsp;             <a target="_blank" ng-href="{{formatLink(activeCamera, 1, 'download')}}">Bas</a>&nbsp;             <a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'preview')}}">Aperçu</a>
+            Download:
+<a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">hoch</a>&nbsp;
+<a target="_blank" ng-href="{{formatLink(activeCamera, 1, 'download')}}">niedrig</a>&nbsp;
+<a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'preview')}}">Vorschau</a>
         </li>
 
     </ul>
-    Paramètres du lien:
+    Linkeinstellungen:
     <ul>
         <li>
-            <label><input type="checkbox" ng-model="useAuth">&nbsp;Utiliser clé auth</label>
+            <label><input type="checkbox" ng-model="useAuth">&nbsp;Authentifizierungsschlüssel verwenden</label>
         </li>
         <li>
-            <label title="pour le téléchargement">Durée (sec) : <input type="text" class="input-sm" ng-model="duration"></label>
+            <label title="zum Download">Dauer (sek): <input type="text" class="input-sm" ng-model="duration"></label>
         </li>
         <li>
-            <label title="pour le transcodage">Résolution: <input type="text" class="input-sm" ng-model="resolution"></label>
+            <label title="zur Umkodierung">Auflösung: <input type="text" class="input-sm" ng-model="resolution"></label>
         </li>
         <li>
-            <label>Position de lecture: {{liveMode?'live': position}}</label>
+            <label>Position: {{liveMode?'live': position}}</label>
         </li>
     </ul>
 </div>

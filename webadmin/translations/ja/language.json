@@ -1,4 +1,6 @@
 {
+  "language":"ja",
+  "language_name":"言語",
   "dialogs":{
     "okButton":"Ok",
     "openLink":"このリンクをご覧ください",
@@ -36,6 +38,7 @@
     "confirmRestoreSettings":"すべてのサーバー設定を復元しますか?　アーカイブは保存されますが、ネットワーク設定がリセットされます",
     "confirmRestoreSettingsNotNetwork":"サーバーの構成をリセットしますか？ アーカイブとネットワーク設定は保存されます",
     "unavailable":"利用できません",
+    "unsafePortConfirm":"1025以下のポート番号は安全ではありません　サーバーはアクセスできない可能性があります　続行しますか？",
     "confirmDisconnectFromCloud":"{{CLOUD_NAME}} からシステムを切断します",
     "confirmDisconnectFromCloudTitle":"<span class='warning-label'> クラウドのすべてのユーザーが削除されます</span><br><br>システムはローカル管理者アカウントとローカル ネットワーク経由でアクセスされます",
     "confirmDisconnectFromCloudAction":"切断",
