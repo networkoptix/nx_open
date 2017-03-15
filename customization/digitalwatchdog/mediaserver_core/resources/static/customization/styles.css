@@ -2,11 +2,11 @@
   background-color: #f36f21; }
 
 
-.navbar-default .navbar-nav>li>a {
+#top.navbar-default .navbar-nav>li>a {
   color: white; }
 
 
-.navbar-default .navbar-nav>li>a:hover {
+#top.navbar-default .navbar-nav>li>a:hover {
   background-color: #ee600d; }
 
 #top a.navbar-brand:hover {
