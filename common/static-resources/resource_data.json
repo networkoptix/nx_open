@@ -378,6 +378,9 @@
                 "DW|DW-CPUHDE04",
                 "DW|DW-CPUHDE08",
                 "DW|DW-CPUHDE16",
+                "DW|DW-CPUHD4",
+                "DW|DW-CPUHD8",
+                "DW|DW-CPUHD16",
                 "DW|VMAX A1",
                 "Pravis Systems Co., Ltd.|VMAX A1"                
             ],
@@ -540,7 +543,8 @@
                 "General|IP Camera",
                 "H264|N51820L",
                 "TRUEN Co., Ltd.|TN-P4230CSLXIR",
-                "TRUEN Co. Ltd.|*"
+                "TRUEN Co. Ltd.|*",
+				"Vista|VK2-3MPEFEDre"
             ],
             "ptzTraits": "FourWayPtz"
         },
@@ -574,7 +578,9 @@
             "keys": [
                 "VISTA|VK2-600PTZ",
                 "VISTA|VK2-1080PTZ",
-                "VISTA|VK2-ENCODER"
+                "VISTA|VK2-ENCODER",
+		"Pelco|D5220",
+                "Pelco|PelcoD5220"
             ],
             "ptzCapabilities": "ContinuousPanCapability|ContinuousTiltCapability|ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability|PresetsPtzCapability"
         },
@@ -626,7 +632,26 @@
         },
         {
             "keys": [
-                "Hikvision|DS-6716HWI"
+                "Hikvision|DS-2CD6362F-I","Hikvision|HNCA12-FEA"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders":
+                [
+                    "VideoEncoderToken_101,VideoEncoderToken_102",
+                    "VideoEncoderToken_201",
+                    "VideoEncoderToken_301",
+                    "VideoEncoderToken_401"
+                ]
+            },
+            "fpsBounds": {
+                "max": 15,
+                "min": 1
+            }
+        },
+        {
+            "keys": [
+                "Hikvision|DS-6716HWI", "Hikvision|DS-6716HFI", "Hikvision|DS-6716*"
             ],
             "forcedOnvifParams":
             {
@@ -652,7 +677,7 @@
             }
         },
         {
-            "keys": ["Hikvision|DS-2CD63CDF-IS"],
+            "keys": ["Hikvision|DS-2CD63C2F-IS"],
             "parseOnvifNotificationsWithHttpReader": true
         },
         {
@@ -1755,6 +1780,7 @@
             "keys": [
                 "Cellinx|STH795"
             ],
+			"_comment": "Calibration for camera fw ver. 3.2.1, Build at 2016-07-28",
             "ptzMapper": {
                 "fromCamera": {
                     "x": {
@@ -1771,7 +1797,7 @@
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [0, 1],
                         "logical": [1, 31.55],
-                        "logicalMultiplier": 35.0,
+                        "logicalMultiplier": 37.5,
                         "space": "35MmEquiv"
                     }
                 }

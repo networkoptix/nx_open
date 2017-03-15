@@ -6,6 +6,8 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
 
+#include <utils/common/connective.h>
+
 class QnAbstractArchiveReader;
 class QnAbstractMediaStreamDataProvider;
 class QnAbstractStreamDataProvider;
@@ -16,19 +18,21 @@ class QnAbstractRenderer;
 class QnClientVideoCamera;
 class QnCounter;
 
-class QnResourceDisplay: public QObject, protected QnResourceConsumer {
+class QnResourceDisplay: public Connective<QObject>, protected QnResourceConsumer {
     Q_OBJECT
+
+    typedef Connective<QObject> base_type;
 public:
     /**
      * Constructor.
-     * 
+     *
      * \param resource                  Resource that this display is associated with. Must not be NULL.
-     * \param parent                    Parent of this display.                
+     * \param parent                    Parent of this display.
      */
     QnResourceDisplay(const QnResourcePtr &resource, QObject *parent);
 
     /**
-     * Virtual destructor. 
+     * Virtual destructor.
      */
     virtual ~QnResourceDisplay();
 
@@ -50,30 +54,22 @@ public:
     /**
      * \returns                         Data provider associated with this display.
      */
-    QnAbstractStreamDataProvider *dataProvider() const {
-        return m_dataProvider;
-    }
+    QnAbstractStreamDataProvider *dataProvider() const;
 
     /**
      * \returns                         Media data provider associated with this display, if any.
      */
-    QnAbstractMediaStreamDataProvider *mediaProvider() const {
-        return m_mediaProvider;
-    }
+    QnAbstractMediaStreamDataProvider *mediaProvider() const;
 
     /**
      * \returns                         Archive reader associated with this display, if any.
      */
-    QnAbstractArchiveReader *archiveReader() const {
-        return m_archiveReader;
-    }
+    QnAbstractArchiveReader *archiveReader() const;
 
     /**
      * \returns                         Video camera associated with this display, if any.
      */
-    QnClientVideoCamera *camera() const {
-        return m_camera;
-    }
+    QnClientVideoCamera *camera() const;
 
     /**
      * \returns                         Camdisplay for this display, if any.
@@ -81,7 +77,7 @@ public:
     QnCamDisplay *camDisplay() const;
 
     /**
-     * \returns                         Video resource layout, if any, 
+     * \returns                         Video resource layout, if any,
      */
     QnConstResourceVideoLayoutPtr videoLayout() const;
 
@@ -96,7 +92,7 @@ public:
     qint64 currentTimeUSec() const;
 
     /**
-     * \returns                         Whether this display is paused. 
+     * \returns                         Whether this display is paused.
      */
     bool isPaused();
 
@@ -109,7 +105,7 @@ public:
     bool isStillImage() const;
 
     /**
-     * \param renderer                  Renderer to assign to this display. Ownership of the renderer is transferred to this display. 
+     * \param renderer                  Renderer to assign to this display. Ownership of the renderer is transferred to this display.
      */
     void addRenderer(QnAbstractRenderer *renderer);
     void removeRenderer(QnAbstractRenderer *renderer);
@@ -127,21 +123,21 @@ private:
     QnMediaResourcePtr m_mediaResource;
 
     /** Data provider for the associated resource. */
-    QnAbstractStreamDataProvider *m_dataProvider;
+    QPointer<QnAbstractStreamDataProvider> m_dataProvider;
 
     /** Media data provider. */
-    QnAbstractMediaStreamDataProvider *m_mediaProvider;
+    QPointer<QnAbstractMediaStreamDataProvider> m_mediaProvider;
 
     /** Archive data provider. */
-    QnAbstractArchiveReader *m_archiveReader;
+    QPointer<QnAbstractArchiveReader> m_archiveReader;
 
     /** Video camera. */
-    QnClientVideoCamera *m_camera; // TODO: #Elric Compatibility layer. Remove.
+    QPointer<QnClientVideoCamera> m_camera; // TODO: #Elric Compatibility layer. Remove.
 
     /** Whether this display was started. */
     bool m_started;
 
-    QnCounter *m_counter;
+    QPointer<QnCounter> m_counter;
 };
 
 typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;

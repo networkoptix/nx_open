@@ -570,8 +570,6 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     std::unique_ptr<QnAbstractPtzController> ptzController(
         createPtzControllerInternal());
 
-    setPtzCapabilities(ptzController->getCapabilities());
-
     fetchAndSetAdvancedParameters();
 
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0);

@@ -19,6 +19,7 @@
 #include <utils/common/enable_multi_thread_direct_connection.h>
 #include <utils/common/id.h>
 #include <utils/common/timermanager.h>
+#include <utils/common/safe_direct_connection.h>
 #include <utils/common/singleton.h>
 #include <utils/network/time/abstract_accurate_time_fetcher.h>
 #include <utils/network/http/httptypes.h>
@@ -62,8 +63,9 @@ namespace ec2
     /*!
         \note \a sequence has less priority than \a TimeSynchronizationManager::peerIsServer and \a TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer flags
     */
-    struct TimePriorityKey
+    class TimePriorityKey
     {
+    public:
         //!sequence number. Incremented with each peer selection by user
         quint16 sequence;
         //!bitset of flags from \a TimeSynchronizationManager class
@@ -73,13 +75,14 @@ namespace ec2
 
         TimePriorityKey();
 
-        bool operator==( const TimePriorityKey& right ) const;
-        bool operator!=( const TimePriorityKey& right ) const;
-        bool operator<( const TimePriorityKey& right ) const;
-        bool operator<=( const TimePriorityKey& right ) const;
-        bool operator>( const TimePriorityKey& right ) const;
+        bool operator==(const TimePriorityKey& right) const;
+        bool operator!=(const TimePriorityKey& right) const;
+
+        bool hasLessPriorityThan(
+            const TimePriorityKey& right,
+            bool takeIntoAccountInternetTime) const;
         quint64 toUInt64() const;
-        void fromUInt64( quint64 val );
+        void fromUInt64(quint64 val);
     };
 
     class TimeSyncInfo
@@ -112,7 +115,8 @@ namespace ec2
         public QObject,
         public QnStoppable,
         public EnableMultiThreadDirectConnection<TimeSynchronizationManager>,
-        public Singleton<TimeSynchronizationManager>
+        public Singleton<TimeSynchronizationManager>,
+        public Qn::EnableSafeDirectConnection
     {
         Q_OBJECT
 
@@ -303,6 +307,7 @@ namespace ec2
             QnTransactionTransport* transport,
             const nx_http::HttpHeaders& headers);
         void forgetSynchronizedTimeNonSafe(QnMutexLockerBase* const lock);
+        void switchBackToLocalTime(QnMutexLockerBase* const /*lock*/);
         void checkSystemTimeForChange();
         void handleLocalTimePriorityKeyChange(QnMutexLockerBase* const lk);
 
@@ -310,6 +315,7 @@ namespace ec2
         void onNewConnectionEstablished(QnTransactionTransport* transport );
         void onPeerLost( ApiPeerAliveData data );
         void onDbManagerInitialized();
+        void onTimeSynchronizationSettingsChanged();
     };
 }
 

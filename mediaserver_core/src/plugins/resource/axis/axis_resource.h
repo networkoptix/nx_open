@@ -144,6 +144,7 @@ private:
         const QString& paramName,
         unsigned int* paramValue );
     CLHttpStatus readAxisParameters(const QString& rootPath, CLSimpleHTTPClient* const httpClient, QList<QPair<QByteArray,QByteArray>>& params);
+    bool enableDuplexMode() const;
     bool initialize2WayAudio(CLSimpleHTTPClient* const http);
     bool initializeIOPorts( CLSimpleHTTPClient* const http );
     void notificationReceived( const nx_http::ConstBufferRefType& notification );

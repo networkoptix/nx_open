@@ -124,8 +124,8 @@ static bool resolutionGreaterThan(const QSize &s1, const QSize &s2)
 class VideoOptionsLocal
 {
 public:
-    VideoOptionsLocal(): isH264(false), minQ(-1), maxQ(-1), frameRateMax(-1), govMin(-1), govMax(-1), usedInProfiles(false) {}
-    VideoOptionsLocal(const QString& _id, const VideoOptionsResp& resp, bool isH264Allowed)
+    VideoOptionsLocal(): isH264(false), minQ(-1), maxQ(-1), frameRateMin(-1), frameRateMax(-1), govMin(-1), govMax(-1), usedInProfiles(false) {}
+    VideoOptionsLocal(const QString& _id, const VideoOptionsResp& resp, bool isH264Allowed, QnBounds frameRateBounds = QnBounds())
     {
         usedInProfiles = false;
         id = _id;
@@ -146,7 +146,11 @@ public:
             qSort(h264Profiles);
 
             if (resp.Options->H264->FrameRateRange)
-                frameRateMax = resp.Options->H264->FrameRateRange->Max;
+            {
+                frameRateMax = restrictFrameRate(resp.Options->H264->FrameRateRange->Max, frameRateBounds);
+                frameRateMin = restrictFrameRate(resp.Options->H264->FrameRateRange->Min, frameRateBounds);
+            }
+
             if (resp.Options->H264->GovLengthRange) {
                 govMin = resp.Options->H264->GovLengthRange->Min;
                 govMax = resp.Options->H264->GovLengthRange->Max;
@@ -154,7 +158,10 @@ public:
         }
         else if (resp.Options->JPEG) {
             if (resp.Options->JPEG->FrameRateRange)
-                frameRateMax = resp.Options->JPEG->FrameRateRange->Max;
+            {
+                frameRateMax = restrictFrameRate(resp.Options->JPEG->FrameRateRange->Max, frameRateBounds);
+                frameRateMin = restrictFrameRate(resp.Options->JPEG->FrameRateRange->Min, frameRateBounds);
+            }
         }
         if (resp.Options->QualityRange) {
             minQ = resp.Options->QualityRange->Min;
@@ -167,10 +174,20 @@ public:
     bool isH264;
     int minQ;
     int maxQ;
+    int frameRateMin;
     int frameRateMax;
     int govMin;
     int govMax;
     bool usedInProfiles;
+
+private:
+    int restrictFrameRate(int frameRate, QnBounds frameRateBounds) const
+    {
+        if (frameRateBounds.isNull())
+            return frameRate;
+
+        return qBound((int)frameRateBounds.min, frameRate, (int)frameRateBounds.max);
+    }
 };
 
 bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2)
@@ -1916,6 +1933,8 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     QStringList videoEncodersTokens;
     VideoConfigsResp confResponse;
 
+    auto frameRateBounds = resourceData.value<QnBounds>(Qn::FPS_BOUNDS_PARAM_NAME, QnBounds());
+
     if (forcedParams && forcedParams->videoEncoders.size() >= getChannel()) 
     {
         videoEncodersTokens = forcedParams->videoEncoders[getChannel()].split(L',');
@@ -1965,7 +1984,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
 
             if (optResp.Options->H264 || optResp.Options->JPEG)
             {
-                optionsList << VideoOptionsLocal(encoderToken, optResp, isH264Allowed());
+                optionsList << VideoOptionsLocal(encoderToken, optResp, isH264Allowed(), frameRateBounds);
             }
 #ifdef PL_ONVIF_DEBUG
             else
@@ -2962,8 +2981,9 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
     VideoEncoder* vEncoder = 0;
     for (uint i = 0; i < response.Configurations.size(); ++i)
     {
-        if (QString::fromStdString(response.Configurations[i]->token) == encoderId)
-            vEncoder = response.Configurations[i];
+        auto configuration = response.Configurations[i];
+        if (configuration && QString::fromStdString(configuration->token) == encoderId)
+            vEncoder = configuration;
     }
     if (!vEncoder || !vEncoder->RateControl)
         return;
@@ -3699,7 +3719,8 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
 
     auto resourceId = getId();
 
-    propertyDictionary->setValue(resourceId, Qn::VIDEO_LAYOUT_PARAM_NAME, m_videoLayout->toString());
+    auto nonConstThis = const_cast<QnPlOnvifResource*>(this);
+    nonConstThis->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, m_videoLayout->toString());
     propertyDictionary->saveParams(resourceId);
 
     return m_videoLayout;

@@ -4,12 +4,29 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #ifdef Q_OS_WIN
 #   include "plugins/storage/dts/vmax480/vmax480_stream_fetcher.h"
 #endif
 
 #include <utils/common/app_info.h>
+
+//-------------------------------------------------------------------------------------------------
+// VideoCameraLocker
+VideoCameraLocker::VideoCameraLocker(QnVideoCameraPtr camera):
+    m_camera(camera)
+{
+    m_camera->inUse(this);
+}
+
+VideoCameraLocker::~VideoCameraLocker()
+{
+    m_camera->notInUse(this);
+}
+
+//-------------------------------------------------------------------------------------------------
+// QnVideoCameraPool
 
 QnMutex QnVideoCameraPool::m_staticMtx;
 
@@ -73,4 +90,22 @@ void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)
 {
     QnMutexLocker lock( &m_staticMtx );
     m_cameras.remove( res );
+}
+
+std::unique_ptr<VideoCameraLocker> 
+    QnVideoCameraPool::getVideoCameraLockerByResourceId(const QnUuid& id)
+{
+    QnResourcePtr resource = qnResPool->getResourceById(id);
+    if (!resource)
+        return nullptr;
+
+    QnSecurityCamResourcePtr cameraResource = resource.dynamicCast<QnSecurityCamResource>();
+    if (!cameraResource)
+        return nullptr;
+
+    auto camera = getVideoCamera(resource);
+    if (!camera)
+        return nullptr;
+
+    return std::unique_ptr<VideoCameraLocker>(new VideoCameraLocker(camera));
 }

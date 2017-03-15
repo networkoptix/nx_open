@@ -69,7 +69,8 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_role(Qn::CR_Default),
     m_gotData(false),
     m_rtpStarted(false),
-    m_prefferedAuthScheme(nx_http::header::AuthScheme::basic)
+    m_prefferedAuthScheme(nx_http::header::AuthScheme::basic),
+    m_rtpFrameTimeoutMs(QnGlobalSettings::instance()->rtpFrameTimeoutMs()) 
 {
     auto globalSettings = QnGlobalSettings::instance();
     m_maxRtpRetryCount = globalSettings->maxRtpRetryCount();
@@ -145,11 +146,11 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     bool isRtpFail = !m_RtpSession.isOpened() && m_rtpStarted;
     int elapsed = m_dataTimer.elapsed();
-    if (isRtpFail || elapsed > MAX_FRAME_DURATION*2)
+    if (isRtpFail || elapsed > m_rtpFrameTimeoutMs)
     {
         QString reasonParamsEncoded;
         QnBusiness::EventReason reason;
-        if (elapsed > MAX_FRAME_DURATION*2) {
+        if (elapsed > m_rtpFrameTimeoutMs) {
             reason = QnBusiness::NetworkNoFrameReason;
             reasonParamsEncoded = QnNetworkIssueBusinessEvent::encodeTimeoutMsecs(elapsed);
             NX_LOG(QString(lit("RTP read timeout for camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
@@ -230,7 +231,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
 
     m_dataTimer.restart();
 
-    while (m_RtpSession.isOpened() && !m_pleaseStop && m_dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
+    while (m_RtpSession.isOpened() && !m_pleaseStop && m_dataTimer.elapsed() <= m_rtpFrameTimeoutMs)
     {
         while (m_gotData)
         {
@@ -302,7 +303,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
 
     m_dataTimer.restart();
 
-    while (m_RtpSession.isOpened() && !m_pleaseStop && m_dataTimer.elapsed() <= MAX_FRAME_DURATION*2)
+    while (m_RtpSession.isOpened() && !m_pleaseStop && m_dataTimer.elapsed() <= m_rtpFrameTimeoutMs)
     {
         while (m_gotData)
         {

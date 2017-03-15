@@ -22,7 +22,7 @@
 	<string>${project.version.code}</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSAppTransportSecurity</key>
+	<key>NSAppTransportSecurity</key>  
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
@@ -70,5 +70,11 @@
 			</array>
 		</dict>
 	</dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app does not use photo library.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>This app does not use camera.</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 </dict>
 </plist>

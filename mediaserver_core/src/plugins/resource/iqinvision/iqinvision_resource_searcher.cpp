@@ -12,6 +12,8 @@
 #include <arpa/inet.h>
 #endif
 
+namespace {
+
 static quint16 NATIVE_DISCOVERY_REQUEST_PORT = 43282;
 static quint16 NATIVE_DISCOVERY_RESPONSE_PORT = 43283;
 
@@ -25,6 +27,8 @@ static const char* requests[] =
 };
 
 QString DEFAULT_RESOURCE_TYPE(lit("IQA32N"));
+
+} // namespace
 
 
 QnPlIqResourceSearcher::QnPlIqResourceSearcher()
@@ -66,6 +70,11 @@ QString QnPlIqResourceSearcher::manufacture() const
     return QnPlIqResource::MANUFACTURE;
 }
 
+bool QnPlIqResourceSearcher::isIqeModel(const QString& model)
+{
+    static const QRegExp kCameraModelPattern("^IQ(eye)?[A-Z0-9]?[0-9]{2,4}[A-Z]{0,2}$");
+    return kCameraModelPattern.exactMatch(model);
+}
 
 QList<QnResourcePtr> QnPlIqResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
 {
@@ -106,11 +115,12 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
         name += QLatin1Char(responseData[i]);
     }
 
+
     name.replace(QLatin1Char(' '), QString()); // remove spaces
     name.replace(QLatin1Char('-'), QString()); // remove spaces
     name.replace(QLatin1Char('\t'), QString()); // remove tabs
-    if (!name.toLower().startsWith(lit("iq")))
-        return local_results; // any IQA camera MUST contain IQ prefix in the name
+    if (!isIqeModel(name.trimmed()))
+        return local_results; //< not an IQ camera
 
     if (macpos+12 > responseData.size())
         return local_results;

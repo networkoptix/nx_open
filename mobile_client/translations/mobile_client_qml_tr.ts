@@ -5,12 +5,12 @@
     <name>QnCameraFlow</name>
     <message>
         <source>Hidden cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Gizlenmiş Kameralar</translation>
     </message>
     <message numerus="yes">
         <source>%n cameras are hidden</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Kameralar Gizlenmiş</numerusform>
         </translation>
     </message>
 </context>
@@ -19,109 +19,110 @@
     <message>
         <source>Authentication
 required</source>
-        <translation type="unfinished"></translation>
+        <translation>Kimlik Doğrulama
+gerekli</translation>
     </message>
     <message>
         <source>Offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Çevrimdışı</translation>
     </message>
 </context>
 <context>
     <name>QnCameraMenu</name>
     <message>
         <source>Quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalite</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Otomatik</translation>
     </message>
 </context>
 <context>
     <name>QnDiscoveredSessionItem</name>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilinmeyen</translation>
     </message>
     <message>
         <source>incompatible server version</source>
-        <translation type="unfinished"></translation>
+        <translation>Uyumsuz Sunucu Versiyonu</translation>
     </message>
 </context>
 <context>
     <name>QnHiddenCameraItem</name>
     <message>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation>Göster</translation>
     </message>
 </context>
 <context>
     <name>QnHorizontalCalendarLayout</name>
     <message>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Kapat</translation>
     </message>
 </context>
 <context>
     <name>QnLiveVideoNavigation</name>
     <message>
         <source>LIVE</source>
-        <translation type="unfinished"></translation>
+        <translation>CANLI</translation>
     </message>
 </context>
 <context>
     <name>QnLoginPage</name>
     <message>
         <source>New Connection</source>
-        <translation type="unfinished"></translation>
+        <translation>Yeni Bağlantı</translation>
     </message>
     <message>
         <source>Host</source>
-        <translation type="unfinished"></translation>
+        <translation>Yönetici</translation>
     </message>
     <message>
         <source>Port (optional)</source>
-        <translation type="unfinished"></translation>
+        <translation>Port (İsteğe Bağlı)</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="unfinished"></translation>
+        <translation>Giriş</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Şifre</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaydet</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Sil</translation>
     </message>
     <message>
         <source>Connect</source>
-        <translation type="unfinished"></translation>
+        <translation>Bağlan</translation>
     </message>
     <message>
         <source>Auto-discovered systems</source>
-        <translation type="unfinished"></translation>
+        <translation>Otomatik Bulunan Sistemler</translation>
     </message>
     <message>
         <source>Incorrect login or password</source>
-        <translation type="unfinished"></translation>
+        <translation>Hatalı Giriş veya Şifre</translation>
     </message>
     <message>
         <source>Server or network is not available</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunucu veya Ağ Kullanılamıyor</translation>
     </message>
     <message>
         <source>Incompatible server</source>
-        <translation type="unfinished"></translation>
+        <translation>Uyumsuz Sunucu</translation>
     </message>
     <message>
         <source>Incompatible server version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Uyumsuz Sunucu Versiyonu</translation>
     </message>
 </context>
 <context>
@@ -129,126 +130,126 @@ required</source>
     <message>
         <source>To connect to old servers please download the legacy application from Google Play.</source>
         <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-        <translation type="unfinished"></translation>
+        <translation>Eski Sunuculara Bağlanmak İçin Lütfen Eski Uygulamayı Google Play&apos;dan İndirin.</translation>
     </message>
     <message>
         <source>To connect to old servers please download the legacy application from the App Store.</source>
         <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-        <translation type="unfinished"></translation>
+        <translation>Eski Sunuculara Bağlanmak İçin Lütfen Eski Uygulamayı App Store&apos;dan İndirin.</translation>
     </message>
     <message>
         <source>To connect to old servers please download the legacy application from the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Eski Sunuculara Bağlanmak İçin Lütfen Eski Uygulamayı İnternetten İndirin.</translation>
     </message>
     <message>
         <source>Download</source>
-        <translation type="unfinished"></translation>
+        <translation>İndir</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>İptal</translation>
     </message>
 </context>
 <context>
     <name>QnQualityDialog</name>
     <message>
         <source>Video quality</source>
-        <translation type="unfinished"></translation>
+        <translation>Görüntü Kalitesi</translation>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished"></translation>
+        <translation>Otomatik</translation>
     </message>
 </context>
 <context>
     <name>QnResourcesPage</name>
     <message>
         <source>Server offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunucu Çevrimdışı</translation>
     </message>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished"></translation>
+        <translation>Yükleniyor...</translation>
     </message>
     <message>
         <source>Connecting...</source>
-        <translation type="unfinished"></translation>
+        <translation>Bağlanıyor...</translation>
     </message>
 </context>
 <context>
     <name>QnSearchItem</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Ara</translation>
     </message>
 </context>
 <context>
     <name>QnSettingsPage</name>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ayarlar</translation>
     </message>
     <message>
         <source>Show offline cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Çevrimdışı Kameraları Göster</translation>
     </message>
 </context>
 <context>
     <name>QnSideNavigation</name>
     <message>
         <source>Saved connections</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaydedilmiş Bağlantılar</translation>
     </message>
     <message>
         <source>New connection</source>
-        <translation type="unfinished"></translation>
+        <translation>Yeni Bağlantı</translation>
     </message>
     <message>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ayarlar</translation>
     </message>
 </context>
 <context>
     <name>QnVerticalCalendarLayout</name>
     <message>
         <source>Close</source>
-        <translation type="unfinished"></translation>
+        <translation>Kapat</translation>
     </message>
 </context>
 <context>
     <name>QnVideoNavigation</name>
     <message>
         <source>No Archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Arşiv Yok</translation>
     </message>
     <message>
         <source>LIVE</source>
-        <translation type="unfinished"></translation>
+        <translation>CANLI</translation>
     </message>
     <message>
         <source>d MMMM yyyy</source>
         <comment>DO NOT TRANSLATE THIS STRING!</comment>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
     <name>QnVideoPage</name>
     <message>
         <source>Server offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunucu Çevrimdışı</translation>
     </message>
     <message>
         <source>Authentication
 required</source>
-        <translation type="unfinished"></translation>
+        <translation>Kimlik Doğrulama Gerekli</translation>
     </message>
     <message>
         <source>Camera offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Kamera Çevrimdışı</translation>
     </message>
     <message>
         <source>Can&apos;t load video</source>
-        <translation type="unfinished"></translation>
+        <translation>Video Yüklenemiyor</translation>
     </message>
 </context>
 </TS>

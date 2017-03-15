@@ -208,6 +208,7 @@ public:
     bool wasCameraControlDisabled;
     bool tcpMode;
     QSize transcodedVideoSize;
+    QnMutex archiveDpMutex;
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
@@ -1042,7 +1043,9 @@ void QnRtspConnectionProcessor::createDataProvider()
             d->liveDpLow->startIfNotRunning();
         }
     }
-    if (!d->archiveDP) {
+    if (!d->archiveDP)
+    {
+        QnMutexLocker lock(&d->archiveDpMutex);
         d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (d->mediaRes->toResource()->createDataProvider(Qn::CR_Archive)));
         if (d->archiveDP)
             d->archiveDP->setGroupId(d->clientGuid);
@@ -1207,8 +1210,10 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->liveMode == Mode_Live)
     {
         auto camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
-        QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
+        if (!camera)
+            return CODE_NOT_FOUND;
 
+        QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
         int copySize = 0;
         if (!getResource()->toResource()->hasFlags(Qn::foreigner) && (status == Qn::Online || status == Qn::Recording)) {
             copySize = d->dataProcessor->copyLastGopFromCamera(camera, d->quality != MEDIA_Quality_Low, 0, d->lastPlayCSeq);
@@ -1580,5 +1585,6 @@ bool QnRtspConnectionProcessor::isTcpMode() const
 QSharedPointer<QnArchiveStreamReader> QnRtspConnectionProcessor::getArchiveDP()
 {
     Q_D(QnRtspConnectionProcessor);
+    QnMutexLocker lock(&d->archiveDpMutex);
     return d->archiveDP;
 }
