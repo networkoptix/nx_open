@@ -327,7 +327,7 @@ void QnSortFilterListModel::setSourceModel(QAbstractItemModel* model)
     Q_D(QnSortFilterListModel);
     if (currentModel)
     {
-        currentModel->disconnect(this);
+        currentModel->disconnect(d);
         d->resetTargetModel();
     }
 
