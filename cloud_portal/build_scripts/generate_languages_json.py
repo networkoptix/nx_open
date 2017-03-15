@@ -53,6 +53,8 @@ def generate_languages_files(languages, template_filename):
         all_strings = {}
         merge(template, all_strings)
         language_json_filename = os.path.join("../../..", "translations", lang, 'language.json')
+
+        print ("Load: " + language_json_filename)
         with codecs.open(language_json_filename, 'r', 'utf-8') as file_descriptor:
             data = json.load(file_descriptor)
             data["language"] = lang

@@ -1,0 +1,11 @@
+<h1>Sistema fue compartido con usted</h1>
+
+{{#message.sharer_name}}
+<p><a href="mailto:{{message.sharer_email}}">{{message.sharer_name}}</a> sistema compartido {{message.system_name}} con usted.</p>
+{{/mensaje.nombre_de_compartidor}}
+
+{{^mensaje.nombre_de_compartidor}}
+<p>Sistema de video {{message.system_name}} fue compartido con usted.</p>
+{{/mensaje.nombre_de_compartidor}}
+
+<a class="btn" href="{{config.portal_url}}/sistemas/{{message.system_id}}">Abra el sistema</a>
