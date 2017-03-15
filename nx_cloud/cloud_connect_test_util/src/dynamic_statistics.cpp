@@ -14,14 +14,15 @@ DynamicStatistics::DynamicStatistics():
 void DynamicStatistics::addValue(
     const nx::network::test::ConnectionTestStatistics& value)
 {
+    const auto currentTime = std::chrono::steady_clock::now();
+
     if (!m_prevValue)
         m_prevValue = value;
     if (!m_prevValueTime)
-        m_prevValueTime = std::chrono::steady_clock::now();
+        m_prevValueTime = currentTime;
 
     const auto timePassed = 
-        std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::steady_clock::now() - *m_prevValueTime);
+        std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - *m_prevValueTime);
     if (timePassed <= std::chrono::milliseconds::zero())
         return;
 
@@ -30,6 +31,9 @@ void DynamicStatistics::addValue(
 
     m_outputBandwidth = calcBandwidth(
         m_outputBandwidth, value.bytesSent, m_prevValue->bytesSent, timePassed);
+
+    m_prevValue = value;
+    m_prevValueTime = currentTime;
 }
 
 std::string DynamicStatistics::toStdString() const
@@ -50,6 +54,9 @@ size_t DynamicStatistics::calcBandwidth(
     size_t prevBytesTransferred,
     std::chrono::milliseconds timePassed)
 {
+    if (bytesTransferred < prevBytesTransferred)
+        return prevCalculatedBytesPerSecond;
+
     const auto bandwidthSincePrevMark =
         ((bytesTransferred - prevBytesTransferred) * 1000) / timePassed.count();
     return (prevCalculatedBytesPerSecond * 0.7) + (bandwidthSincePrevMark * 0.3);

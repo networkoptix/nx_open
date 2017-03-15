@@ -484,17 +484,23 @@ bool UdtSocket<InterfaceToImplement>::open()
         return false;
     }
 
+#if 1
     //tuning udt socket
+    constexpr const int kPacketsCoeff = 2;
+    constexpr const int kBytesCoeff = 6;
+
     constexpr const int kMtuSize = 1400;
-    constexpr const int kMaximumUdtWindowSizePackets = 64;
+    constexpr const int kMaximumUdtWindowSizePacketsBase = 64;
+    constexpr const int kMaximumUdtWindowSizePackets = 
+        kMaximumUdtWindowSizePacketsBase * kPacketsCoeff;
 
     constexpr const int kUdtBufferMultiplier = 48;
-    constexpr const int kUdtSendBufSize = kUdtBufferMultiplier * kMtuSize;
-    constexpr const int kUdtRecvBufSize = kUdtBufferMultiplier * kMtuSize;
+    constexpr const int kUdtSendBufSize = kUdtBufferMultiplier * kMtuSize * kBytesCoeff;
+    constexpr const int kUdtRecvBufSize = kUdtBufferMultiplier * kMtuSize * kBytesCoeff;
 
     constexpr const int kUdpBufferMultiplier = 64;
-    constexpr const int kUdpSendBufSize = kUdpBufferMultiplier * kMtuSize;
-    constexpr const int kUdpRecvBufSize = kUdpBufferMultiplier * kMtuSize;
+    constexpr const int kUdpSendBufSize = kUdpBufferMultiplier * kMtuSize * kBytesCoeff;
+    constexpr const int kUdpRecvBufSize = kUdpBufferMultiplier * kMtuSize * kBytesCoeff;
 
     if (UDT::setsockopt(
         m_impl->udtHandle, 0, UDT_MSS,
@@ -526,6 +532,7 @@ bool UdtSocket<InterfaceToImplement>::open()
         UDT::close(m_impl->udtHandle);
         return false;
     }
+#endif
 
     m_state = detail::SocketState::open;
     return true;

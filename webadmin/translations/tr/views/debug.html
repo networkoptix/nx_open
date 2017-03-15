@@ -1,0 +1,259 @@
+<div class="container">
+    <h1>Akış linkleri oluştur</h1>
+    <form class="form-horizontal" novalidate ng-class="session.event.event_type">
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">System host (IP:port)</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.system">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">nonce</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.nonce">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">Yetki Alanı</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.realm">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">Yöntemı</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.method">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">Giriş</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.login">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">parola</label>
+            <div class="col-sm-9">
+                <input type="text" class="form-control"
+                       ng-model="linkSettings.password">
+            </div>
+        </div>
+        <div class="form-group AnyEvent">
+            <label class="col-sm-3 control-label">link</label>
+            <div class="col-sm-9"><p ng-repeat="camId in linkSettings.cameraIds" class="form-control-static">{{formatLink(camId)}}</p>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="container">
+
+    <h1>Olay oluştur </h1>
+
+    <div class="row">
+        <div class="col-sm-6">
+
+            <form class="form-horizontal" novalidate ng-class="session.event.event_type">
+                <div class="form-group AnyEvent">
+                    <label class="col-sm-3 control-label">Olay </label>
+                    <div class="col-sm-5">
+                        <select ng-model="session.event.event_type" ng-options="event.event as event.label for event in Config.debugEvents.events"
+                                class="form-control"></select>
+                    </div>
+                    <div class="col-sm-4">
+                        <p class="form-control-static">
+                            {{session.event.event_type}}
+                        </p>
+                    </div>
+                </div>
+                <div class="form-group AnyEvent">
+                    <label class="col-sm-3 control-label">Zaman Damgası</label>
+                    <div class="col-sm-5">
+                        <input type="text" ng-model="session.event.timestamp"
+                               class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group CameraMotionEvent CameraInputEvent CameraDisconnectEvent StorageFailureEvent
+        NetworkIssueEvent CameraIpConflictEvent ServerFailureEvent ServerConflictEvent ServerStartEvent
+        LicenseIssueEvent BackupFinishedEvent">
+                    <label class="col-sm-3 control-label">Kaynak</label>
+                    <div class="col-sm-5">
+                        <input type="text" ng-model="session.eventResource"
+                               typeahead="resource as resource.name for resource in filterResources($viewValue) | limitTo:10"
+                               typeahead-focus-on-select="false"
+                               typeahead-min-length="0"
+                               typeahead-show-hint="true"
+                               typeahead-focus-first="false"
+                               typeahead-focus
+ class="form-control">
+                    </div>
+                    <div class="col-sm-4">
+                        <p class="form-control-static">
+                            {{session.eventResource.id}}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-group UserDefinedEvent">
+                    <label class="col-sm-3 control-label ">Kaynak</label>
+                    <div class="col-sm-5">
+                        <input type="text" ng-model="session.event.source"
+                               class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group UserDefinedEvent CameraMotionEvent CameraInputEvent">
+                    <label class="col-sm-3 control-label">Durum</label>
+                    <div class="col-sm-5">
+                        <select ng-model="session.event.state" ng-options="state for state in Config.debugEvents.states"
+                                class="form-control"></select>
+                    </div>
+                </div>
+
+                <div class="form-group StorageFailureEvent NetworkIssueEvent ServerFailureEvent LicenseIssueEvent BackupFinishedEvent">
+                    <label class="col-sm-3 control-label">Sebep</label>
+                    <div class="col-sm-5">
+                        <select ng-model="session.event.reasonCode" ng-options="reason for reason in Config.debugEvents.reasons"
+                                class="form-control"></select>
+                    </div>
+                </div>
+
+                <div class="form-group CameraInputEvent">
+                    <label class="col-sm-3 control-label">Giriş Portu</label>
+                    <div class="col-sm-5">
+                        <input type="number" ng-model="session.event.inputPortId"
+                               class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group UserDefinedEvent CameraIpConflictEvent">
+                    <label class="col-sm-3 control-label">Başlık </label>
+                    <div class="col-sm-5">
+                        <input type="text" ng-model="session.event.caption"
+                               class="form-control">
+                    </div>
+                    <div class="col-sm-4">
+                        <p class="form-control-static">
+                            kamera IP çakışması-Çakışan IP
+                        </p>
+                    </div>
+                </div>
+
+                <div class="form-group StorageFailureEvent
+                NetworkIssueEvent CameraIpConflictEvent ServerFailureEvent ServerConflictEvent
+                LicenseIssueEvent BackupFinishedEvent UserDefinedEvent">
+                    <label class="col-sm-3 control-label">Açıklama</label>
+                    <div class="col-sm-5">
+                        <textarea ng-model="session.event.description"
+                                  class="form-control"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group UserDefinedEvent">
+                    <label class="col-sm-3 control-label">Metadata - JSON</label>
+                    <div class="col-sm-5">
+                        <textarea ng-model="session.event.metadata"
+                                  class="form-control">{
+                            cameraRefs:['cameraUUID']
+                            }</textarea>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-3 col-sm-5">
+                        <button type="submit" class="btn btn-primary" ng-click="generateEvent()">Olay oluştur</button>
+                    </div>
+                </div>
+
+
+            </form>
+        </div>
+        <div class="col-sm-6">
+            <button type="submit" class="btn btn-success" ng-click="startGeneratingEvents()" ng-if="!generatingEvents"><span class="glyphicon glyphicon-play-circle"></span> rastgele olaylar</button>
+            <button type="submit" class="btn btn-danger"  ng-click="stopGeneratingEvents()" ng-if="generatingEvents"><span class="glyphicon glyphicon-stop"></span> rastgele olaylar</button>
+
+            <button type="submit" class="btn btn-success" ng-click="startRepeatingEvent()" ng-if="!repeatingEvents"><span class="glyphicon glyphicon-play-circle"></span> son olayı tekrar et</button>
+            <button type="submit" class="btn btn-danger"  ng-click="stopRepeatingEvent()" ng-if="repeatingEvents"><span class="glyphicon glyphicon-stop"></span> son olayı tekrar et</button>
+
+            <p>Olay Günlükleri:</p>
+            <pre><div ng-repeat="event in eventsLog">{{event.event}} ({{event.source}}): {{event.result}}</div></pre>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <h1>Test api calls</h1>
+    <form class="form-horizontal" novalidate>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Metot</label>
+            <div class="col-sm-10">
+                <select ng-model="session.method.method" class="form-control">
+                    <option>POST</option>
+                    <option>GET</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Fonksiyon</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" ng-model="session.method.name" placeholder="/api/methodName">
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label"><b>GET</b>-params (json)</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" rows="5"
+                          ng-model="session.method.params"></textarea>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">URL isteniyor</label>
+            <div class="col-sm-10">
+                <p class="form-control-static">{{getDebugUrl()}}</p>
+            </div>
+        </div>
+
+        <div class="form-group" ng-if="session.method.method=='POST'">
+            <label class="col-sm-2 control-label"><b>POST</b>-params (json)</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" rows="10"
+                          ng-model="session.method.data"></textarea>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary" ng-click="testMethod()">Test metodu</button>
+                <a class="btn btn-default" ng-if="session.method.method=='GET'" ng-href="{{getDebugUrl()}}" target="_blank">Yeni sekmekede aç</a>
+            </div>
+        </div>
+
+
+        <div class="form-group" ng-if="result.result">
+            <label class="col-sm-2 control-label">Durum</label>
+            <div class="col-sm-10">
+                <p class="form-control-static">{{result.status}}</p>
+            </div>
+        </div>
+        <div class="form-group" ng-if="result.result">
+            <label class="col-sm-2 control-label">Sonuç</label>
+            <div class="col-sm-10">
+                <pre>{{result.result}}</pre>
+            </div>
+        </div>
+    </form>
+
+
+</div>
