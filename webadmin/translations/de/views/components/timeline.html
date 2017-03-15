@@ -19,7 +19,7 @@
                 <span class="glyphicon glyphicon-plus"></span>
             </span>
             <span ng-if="emptyArchive" class="caption-row no-archive-message">
-                Il n’y a aucune archive pour cette caméra
+                Es gibt kein Archiv für diese Kamera
             </span>
 
             <div ng-if="!liveOnly && playbackNotSupported && !positionProvider.liveMode" class="webclient-panel">
@@ -40,7 +40,7 @@
         </div><div class="text-right" >
             <span class="webclient-button caption-row live-button"
                   ng-class="{active:positionProvider.liveMode && canPlayLive,disabled:!canPlayLive}"
-                  ng-click="goToLive()">DIRECT</span>
+                  ng-click="goToLive()">LIVE</span>
         </div></div>
 
     <div
@@ -57,7 +57,7 @@
 
     <div ng-if="!liveOnly && playbackNotSupported" class="webclient-panel">
         <span class="caption-row no-archive-message">
-             Archive n’est pas pris en charge dans les navigateurs mobiles
+             Wiedergabe wird in mobilen Browsern nicht unterstützt
         </span>
     </div>
 
