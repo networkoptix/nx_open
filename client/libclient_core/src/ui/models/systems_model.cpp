@@ -346,6 +346,13 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
                 emitDataChanged(systemDescription, QnSystemsModel::IsConnectableRoleId);
             });
 
+    data->connections
+        << connect(systemDescription, &QnBaseSystemDescription::isCloudSystemChanged, this,
+            [this, systemDescription]()
+            {
+                emitDataChanged(systemDescription, QnSystemsModel::IsCloudSystemRoleId);
+            });
+
     q->beginInsertRows(QModelIndex(), internalData.size(), internalData.size());
     internalData.append(data);
     q->endInsertRows();
