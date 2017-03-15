@@ -1,3 +1,5 @@
+'''Vagrant wrappers classes'''
+
 import os
 import os.path
 import logging
@@ -8,11 +10,12 @@ import pytz
 import jinja2
 import vagrant
 import vagrant.compat
-from host import RemoteSshHost
-from vagrant_box_config import DEFAULT_NATNET1, DEFAULT_HOSTNET
+from .host import RemoteSshHost
+from .vbox_manage import VBoxManage
+from .vagrant_box_config import DEFAULT_NATNET1, DEFAULT_HOSTNET
 
 
-TEST_DIR = os.path.abspath(os.path.dirname(__file__))
+TEST_UTILS_DIR = os.path.abspath(os.path.dirname(__file__))
 
 log = logging.getLogger(__name__)
 
@@ -45,8 +48,10 @@ class RemotableVagrant(vagrant.Vagrant):
 
 class Vagrant(object):
 
-    def __init__(self, vm_host, bin_dir, vagrant_dir, vagrant_private_key_path, ssh_config_path):
+    def __init__(self, test_dir, vm_host, bin_dir, vagrant_dir, vagrant_private_key_path, ssh_config_path):
+        self._test_dir = test_dir
         self._vm_host = vm_host
+        self._vbox_manage = VBoxManage(vm_host)
         self._bin_dir = bin_dir
         self._vagrant_dir = vagrant_dir  # on vm_host
         self._vagrant_private_key_path = vagrant_private_key_path  # may be None
@@ -87,7 +92,7 @@ class Vagrant(object):
 
     def _copy_required_files_to_vagrant_dir(self, box_config):
         for file_path_format in box_config.required_file_list:
-            file_path = file_path_format.format(test_dir=TEST_DIR, bin_dir=self._bin_dir)
+            file_path = file_path_format.format(test_dir=self._test_dir, bin_dir=self._bin_dir)
             assert os.path.isfile(file_path), '%s is expected but is missing' % file_path
             self._vm_host.put_file(file_path, self._vagrant_dir)
 
@@ -100,9 +105,16 @@ class Vagrant(object):
     def _start_box(self, config):
         box_name = config.box_name()
         log.info('Starting/creating box: %r, vm %r...', box_name, config.vm_box_name())
+        self._cleanup_vms(config.vm_box_name())
         self._vagrant.up(vm_name=box_name)
         self._write_box_ssh_config(box_name)
         self.box_host(box_name, 'vagrant').run_command(['sudo', 'cp', '-r', '/home/vagrant/.ssh', '/root/'])
+
+    def _cleanup_vms(self, vms_name):
+        if not self._vbox_manage.does_vms_exist(vms_name): return
+        if self._vbox_manage.get_vms_state(vms_name) != 'poweroff':
+            self._vbox_manage.poweroff_vms(vms_name)
+        self._vbox_manage.delete_vms(vms_name)
 
     def _load_box_ip_address(self, config):
         self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'vms'])
@@ -129,7 +141,7 @@ class Vagrant(object):
         box.timezone = box.config.timezone = timezone
 
     def _write_vagrantfile(self, boxes_config):
-        template_file_path = os.path.join(TEST_DIR, 'Vagrantfile.jinja2')
+        template_file_path = os.path.join(TEST_UTILS_DIR, 'Vagrantfile.jinja2')
         with open(template_file_path) as f:
             template = jinja2.Template(f.read())
         vagrantfile = template.render(

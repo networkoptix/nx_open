@@ -1,50 +1,50 @@
 <div class="container">
-    <h1>Streamlinks generieren</h1>
+    <h1>Générer des liens de flux</h1>
     <form class="form-horizontal" novalidate ng-class="session.event.event_type">
         <div class="form-group AnyEvent">
-            <label class="col-sm-3 control-label">Systemhost (IP:Port)</label>
+            <label class="col-sm-3 control-label">Hôte Système (IP:port)</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control"
                        ng-model="linkSettings.system">
             </div>
         </div>
         <div class="form-group AnyEvent">
-            <label class="col-sm-3 control-label">Nonce</label>
+            <label class="col-sm-3 control-label">nonce</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control"
                        ng-model="linkSettings.nonce">
             </div>
         </div>
         <div class="form-group AnyEvent">
-            <label class="col-sm-3 control-label">Bereich</label>
+            <label class="col-sm-3 control-label">realm</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control"
                        ng-model="linkSettings.realm">
             </div>
         </div>
         <div class="form-group AnyEvent">
-            <label class="col-sm-3 control-label">Methode</label>
+            <label class="col-sm-3 control-label">méthode</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control"
                        ng-model="linkSettings.method">
             </div>
         </div>
         <div class="form-group AnyEvent">
-            <label class="col-sm-3 control-label">Login</label>
+            <label class="col-sm-3 control-label">Identifiant</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control"
                        ng-model="linkSettings.login">
             </div>
         </div>
         <div class="form-group AnyEvent">
-            <label class="col-sm-3 control-label">Passwort</label>
+            <label class="col-sm-3 control-label">mot de passe</label>
             <div class="col-sm-9">
                 <input type="text" class="form-control"
                        ng-model="linkSettings.password">
             </div>
         </div>
         <div class="form-group AnyEvent">
-            <label class="col-sm-3 control-label">Link</label>
+            <label class="col-sm-3 control-label">lien</label>
             <div class="col-sm-9"><p ng-repeat="camId in linkSettings.cameraIds" class="form-control-static">{{formatLink(camId)}}</p>
             </div>
         </div>
@@ -53,14 +53,14 @@
 
 <div class="container">
 
-    <h1>Ereignisse generieren </h1>
+    <h1>Générer événements </h1>
 
     <div class="row">
         <div class="col-sm-6">
 
             <form class="form-horizontal" novalidate ng-class="session.event.event_type">
                 <div class="form-group AnyEvent">
-                    <label class="col-sm-3 control-label">Ereignis </label>
+                    <label class="col-sm-3 control-label">Événement </label>
                     <div class="col-sm-5">
                         <select ng-model="session.event.event_type" ng-options="event.event as event.label for event in Config.debugEvents.events"
                                 class="form-control"></select>
@@ -72,7 +72,7 @@
                     </div>
                 </div>
                 <div class="form-group AnyEvent">
-                    <label class="col-sm-3 control-label">Zeitstempel</label>
+                    <label class="col-sm-3 control-label">Timestamp</label>
                     <div class="col-sm-5">
                         <input type="text" ng-model="session.event.timestamp"
                                class="form-control">
@@ -101,7 +101,7 @@
                 </div>
 
                 <div class="form-group UserDefinedEvent">
-                    <label class="col-sm-3 control-label ">Quelle</label>
+                    <label class="col-sm-3 control-label ">Source</label>
                     <div class="col-sm-5">
                         <input type="text" ng-model="session.event.source"
                                class="form-control">
@@ -109,7 +109,7 @@
                 </div>
 
                 <div class="form-group UserDefinedEvent CameraMotionEvent CameraInputEvent">
-                    <label class="col-sm-3 control-label">Zustand</label>
+                    <label class="col-sm-3 control-label">État</label>
                     <div class="col-sm-5">
                         <select ng-model="session.event.state" ng-options="state for state in Config.debugEvents.states"
                                 class="form-control"></select>
@@ -117,7 +117,7 @@
                 </div>
 
                 <div class="form-group StorageFailureEvent NetworkIssueEvent ServerFailureEvent LicenseIssueEvent BackupFinishedEvent">
-                    <label class="col-sm-3 control-label">Grund</label>
+                    <label class="col-sm-3 control-label">Raison</label>
                     <div class="col-sm-5">
                         <select ng-model="session.event.reasonCode" ng-options="reason for reason in Config.debugEvents.reasons"
                                 class="form-control"></select>
@@ -125,7 +125,7 @@
                 </div>
 
                 <div class="form-group CameraInputEvent">
-                    <label class="col-sm-3 control-label">Input Port</label>
+                    <label class="col-sm-3 control-label">Port d’entrée</label>
                     <div class="col-sm-5">
                         <input type="number" ng-model="session.event.inputPortId"
                                class="form-control">
@@ -133,14 +133,14 @@
                 </div>
 
                 <div class="form-group UserDefinedEvent CameraIpConflictEvent">
-                    <label class="col-sm-3 control-label">Überschrift </label>
+                    <label class="col-sm-3 control-label">Légende </label>
                     <div class="col-sm-5">
                         <input type="text" ng-model="session.event.caption"
                                class="form-control">
                     </div>
                     <div class="col-sm-4">
                         <p class="form-control-static">
-                            für Kamera IP-Konflikt - widersprüchliche IP
+                            pour conflit de caméra ip - IP en conflit
                         </p>
                     </div>
                 </div>
@@ -148,7 +148,7 @@
                 <div class="form-group StorageFailureEvent
                 NetworkIssueEvent CameraIpConflictEvent ServerFailureEvent ServerConflictEvent
                 LicenseIssueEvent BackupFinishedEvent UserDefinedEvent">
-                    <label class="col-sm-3 control-label">Beschreibung</label>
+                    <label class="col-sm-3 control-label">Description</label>
                     <div class="col-sm-5">
                         <textarea ng-model="session.event.description"
                                   class="form-control"></textarea>
@@ -156,7 +156,7 @@
                 </div>
 
                 <div class="form-group UserDefinedEvent">
-                    <label class="col-sm-3 control-label">Metadata - JSON</label>
+                    <label class="col-sm-3 control-label">Métadonnées - JSON</label>
                     <div class="col-sm-5">
                         <textarea ng-model="session.event.metadata"
                                   class="form-control">{
@@ -167,7 +167,7 @@
 
                 <div class="form-group">
                     <div class="col-sm-offset-3 col-sm-5">
-                        <button type="submit" class="btn btn-primary" ng-click="generateEvent()">Ereignis generieren</button>
+                        <button type="submit" class="btn btn-primary" ng-click="generateEvent()">Générer événement</button>
                     </div>
                 </div>
 
@@ -175,23 +175,23 @@
             </form>
         </div>
         <div class="col-sm-6">
-            <button type="submit" class="btn btn-success" ng-click="startGeneratingEvents()" ng-if="!generatingEvents"><span class="glyphicon glyphicon-play-circle"></span> zufällige Ereignisse</button>
-            <button type="submit" class="btn btn-danger"  ng-click="stopGeneratingEvents()" ng-if="generatingEvents"><span class="glyphicon glyphicon-stop"></span> zufällige Ereignisse</button>
+            <button type="submit" class="btn btn-success" ng-click="startGeneratingEvents()" ng-if="!generatingEvents"><span class="glyphicon glyphicon-play-circle"></span> événements aléatoires</button>
+            <button type="submit" class="btn btn-danger"  ng-click="stopGeneratingEvents()" ng-if="generatingEvents"><span class="glyphicon glyphicon-stop"></span> événements aléatoires</button>
 
-            <button type="submit" class="btn btn-success" ng-click="startRepeatingEvent()" ng-if="!repeatingEvents"><span class="glyphicon glyphicon-play-circle"></span> letztes Ereignis wiederholen</button>
-            <button type="submit" class="btn btn-danger"  ng-click="stopRepeatingEvent()" ng-if="repeatingEvents"><span class="glyphicon glyphicon-stop"></span> letztes Ereignis wiederholen</button>
+            <button type="submit" class="btn btn-success" ng-click="startRepeatingEvent()" ng-if="!repeatingEvents"><span class="glyphicon glyphicon-play-circle"></span> répéter le dernier événement</button>
+            <button type="submit" class="btn btn-danger"  ng-click="stopRepeatingEvent()" ng-if="repeatingEvents"><span class="glyphicon glyphicon-stop"></span> répéter le dernier événement</button>
 
-            <p>Ereignislog:</p>
+            <p>Journal d'événements:</p>
             <pre><div ng-repeat="event in eventsLog">{{event.event}} ({{event.source}}): {{event.result}}</div></pre>
         </div>
     </div>
 </div>
 
 <div class="container">
-    <h1>API-Aufrufe testen</h1>
+    <h1>Test d'appels api</h1>
     <form class="form-horizontal" novalidate>
         <div class="form-group">
-            <label class="col-sm-2 control-label">Methode</label>
+            <label class="col-sm-2 control-label">Méthode</label>
             <div class="col-sm-10">
                 <select ng-model="session.method.method" class="form-control">
                     <option>POST</option>
@@ -201,7 +201,7 @@
         </div>
 
         <div class="form-group">
-            <label class="col-sm-2 control-label">Funktion</label>
+            <label class="col-sm-2 control-label">Fonction</label>
             <div class="col-sm-10">
                 <input type="text" class="form-control" ng-model="session.method.name" placeholder="/api/methodName">
             </div>
@@ -209,7 +209,7 @@
 
 
         <div class="form-group">
-            <label class="col-sm-2 control-label"><b>GET</b>-Parameter (JSON)</label>
+            <label class="col-sm-2 control-label"><b>GET</b>-params (json)</label>
             <div class="col-sm-10">
                 <textarea class="form-control" rows="5"
                           ng-model="session.method.params"></textarea>
@@ -218,14 +218,14 @@
 
 
         <div class="form-group">
-            <label class="col-sm-2 control-label">URL anfordern</label>
+            <label class="col-sm-2 control-label">Requête URL</label>
             <div class="col-sm-10">
                 <p class="form-control-static">{{getDebugUrl()}}</p>
             </div>
         </div>
 
         <div class="form-group" ng-if="session.method.method=='POST'">
-            <label class="col-sm-2 control-label"><b>POST</b>-Parameter (JSON)</label>
+            <label class="col-sm-2 control-label"><b>POST</b>-params (json)</label>
             <div class="col-sm-10">
                 <textarea class="form-control" rows="10"
                           ng-model="session.method.data"></textarea>
@@ -235,20 +235,20 @@
 
         <div class="form-group">
             <div class="col-sm-offset-2 col-sm-10">
-                <button type="submit" class="btn btn-primary" ng-click="testMethod()">Testverfahren</button>
-<a class="btn btn-default" ng-if="session.method.method=='GET'" ng-href="{{getDebugUrl()}}" target="_blank">In einem neuen Tab öffnen</a>
+                <button type="submit" class="btn btn-primary" ng-click="testMethod()">Testé Méthode</button>
+                <a class="btn btn-default" ng-if="session.method.method=='GET'" ng-href="{{getDebugUrl()}}" target="_blank">Ouvrir dans un autre onglet</a>
             </div>
         </div>
 
 
         <div class="form-group" ng-if="result.result">
-            <label class="col-sm-2 control-label">Status</label>
+            <label class="col-sm-2 control-label">État</label>
             <div class="col-sm-10">
                 <p class="form-control-static">{{result.status}}</p>
             </div>
         </div>
         <div class="form-group" ng-if="result.result">
-            <label class="col-sm-2 control-label">Ergebnis</label>
+            <label class="col-sm-2 control-label">Resultat</label>
             <div class="col-sm-10">
                 <pre>{{result.result}}</pre>
             </div>

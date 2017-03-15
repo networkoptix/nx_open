@@ -3,9 +3,9 @@
 '''
 
 import pytest, time, logging
-from test_utils import bool_to_str, str_to_bool
-from server import MEDIASERVER_MERGE_TIMEOUT_SEC
-from server_rest_api import ServerRestApiError, HttpError
+from test_utils.utils import bool_to_str, str_to_bool
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT_SEC
+from test_utils.server_rest_api import ServerRestApiError, HttpError
 import server_api_data_generators as generator
 
 log = logging.getLogger(__name__)

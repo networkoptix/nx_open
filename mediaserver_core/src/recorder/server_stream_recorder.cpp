@@ -667,11 +667,11 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
         NX_ASSERT(netResource != 0, Q_FUNC_INFO, "Only network resources can be used with storage manager!");
         m_recordingContextVector.clear();
 
-        auto normalStorage = qnNormalStorageMan->getOptimalStorageRoot(provider);
+        auto normalStorage = qnNormalStorageMan->getOptimalStorageRoot();
         QnStorageResourcePtr backupStorage;
 
         if (isRedundantSyncOn())
-            backupStorage = qnBackupStorageMan->getOptimalStorageRoot(provider);
+            backupStorage = qnBackupStorageMan->getOptimalStorageRoot();
 
         if (normalStorage || backupStorage)
             setTruncateInterval(

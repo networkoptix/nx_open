@@ -20,7 +20,11 @@
                 <li ng-hide="!user.hasAllResources" ng-class="{active:isActive('/info')}"><a ng-href="#/info/">Informationen</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/developers')}"><a ng-href="#/developers/">Für Entwickler</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/help')}"><a ng-href="#/help/">Hilfe</a></li>
-                <li ng-hide="settings.liteClient"><a ng-click="logout()" title="Logout">Abmelden</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li ng-hide="settings.liteClient"><a ng-click="logout()" title="Logout">Log Out</a></li>
+                <li language-select dropdown></li>
             </ul>
         </nav>
     </div>

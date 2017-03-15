@@ -12,7 +12,7 @@
                 </tab>
                 <tab heading="{{L.info.tabs.storage}}" ng-if="user.isAdmin">
                     <br>
-                    <p>Unten ist eine Liste der verfügbaren Speicherorte auf diesem Server aufgeführt</p>
+                    <p>Voici une liste des emplacements de stockage disponibles sur ce serveur</p>
                     <table class="table">
                         <thead>
                         <tr>
@@ -20,7 +20,7 @@
                                 URL
                             </th>
                             <th >
-                                Speicherplatz
+                                Espace
                             </th>
                             <th width="54">
                                 &nbsp;
@@ -43,8 +43,8 @@
                 <tab heading="{{L.info.tabs.log}}" ng-if="user.isAdmin">
                     <br>
                     <iframe class="log-frame" name="log-frame" ng-src="{{logUrl + '?lines=1000'}}"></iframe>
-                    <a ng-href="{{logUrl +'?lines=1000'}}"  target="log-frame" id="refresh-log" class="btn btn-primary">Aktualisieren</a>
-<a ng-if="!mode.liteClient" ng-href="{{logUrl + '?lines=1000'}}" target="_blank" id="open-log" class="btn btn-default">In neuem Fenster öffnen</a>
+                    <a ng-href="{{logUrl +'?lines=1000'}}"  target="log-frame" id="refresh-log" class="btn btn-primary">Actualiser</a>
+                     <a ng-if="!mode.liteClient" ng-href="{{logUrl + '?lines=1000'}}" target="_blank" id="open-log" class="btn btn-default">Ouvrir dans une nouvelle fenêtre</a>
                 </tab>
             </tabset>
         </div>

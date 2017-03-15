@@ -153,7 +153,6 @@ private:
     mutable QSet<QnInterfaceAndAddr> m_interfacesCache;
     //map<local interface ip, socket>
     std::map<QString, SocketReadCtx> m_socketList;
-    char* m_readBuf;
     HttpClientsDict m_httpClients;
     //!map<device host address, device info>
     std::map<HostAddress, DiscoveredDeviceInfo> m_discoveredDevices;

@@ -5,15 +5,17 @@
 import logging
 import pytest
 import time
-from ConfigParser import ConfigParser
-from server import MEDIASERVER_MERGE_TIMEOUT_SEC
-from server_rest_api import ServerRestApi
-from utils import SimpleNamespace
-import server_api_data_generators as generator
 from multiprocessing.dummy import Pool as ThreadPool
 from functools import total_ordering
+from ConfigParser import ConfigParser
+from test_utils.utils import SimpleNamespace
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT_SEC
+from test_utils.server_rest_api import ServerRestApi
+import server_api_data_generators as generator
+
 
 log = logging.getLogger(__name__)
+
 
 DEFAULT_CONFIG_SECTION = 'General'
 DEFAULT_TEST_SIZE = 10
@@ -23,6 +25,7 @@ CONFIG_PASSWORD = 'password'
 CONFIG_TESTSIZE = 'testCaseSize'
 CONFIG_THREADS = 'threadNumber'
 DEFAULT_SLEEP_SEC = MEDIASERVER_MERGE_TIMEOUT_SEC / 10.0 # pause between synchronization checks
+
 
 @total_ordering
 class Timestamp(object):
