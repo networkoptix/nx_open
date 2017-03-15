@@ -540,15 +540,14 @@ namespace ec2
             currentMSecsSinceEpoch(),
             m_localTimePriorityKey);
         //resetting "synchronized with internet" flag
-        NX_LOG(lit("TimeSynchronizationManager. Received primary time server change transaction. New synchronized time %1, new priority key 0x%2").
+        NX_LOGX(lit("Received primary time server change transaction. New synchronized time %1, new priority key 0x%2").
             arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logINFO);
         m_timeSynchronized = true;
         //saving synchronized time to DB
-        if (QnDbManager::instance() && QnDbManager::instance()->isInitialized())
+        if (detail::QnDbManager::instance() && detail::QnDbManager::instance()->isInitialized())
         {
             Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
                 &saveSyncTime,
-                QnDbManager::instance(),
                 0,
                 m_usedTimeSyncInfo.timePriorityKey)));
         }
