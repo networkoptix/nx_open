@@ -10,6 +10,7 @@ dir=../customizations/$CUSTOMIZATION/
 
     echo "============================================================"
     echo "Building customization: $CUSTOMIZATION $dir"
+    rm -rf $TARGET_DIR/$CUSTOMIZATION || true
     mkdir $TARGET_DIR/$CUSTOMIZATION
 
     echo "------------------------------"
