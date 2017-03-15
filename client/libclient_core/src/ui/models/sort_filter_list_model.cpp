@@ -9,12 +9,12 @@ static constexpr int kListColumnsCount = 1;
 } // unnamed namespace
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
-class QnSortFilterListModelPrivate : public Connective<QObject>
+class QnSortFilterListModelPrivate: public Connective<QObject>
 {
     using base_type = Connective<QObject>;
 
     Q_DECLARE_PUBLIC(QnSortFilterListModel)
-    QnSortFilterListModel *q_ptr;
+    QnSortFilterListModel* q_ptr;
 
 public:
     QnSortFilterListModelPrivate(QnSortFilterListModel* parent);
@@ -30,9 +30,6 @@ public:
     int rowCount() const;
 
 private:
-    void setCurrentModel(QAbstractListModel* model);
-    void clearCurrentModel();
-
     void resetTargetModel();
 
     void handleSourceRowsInserted(
@@ -74,8 +71,6 @@ private:
     int indexToInsert(int sourceRow);
 
     void shiftMappedRows(int fromSourceRow, int difference);
-
-//    void checkMapping();
 
 private:
     using RowsList = QList<int>;
@@ -133,7 +128,6 @@ void QnSortFilterListModelPrivate::setModel(QAbstractListModel* model)
 
     //TODO: #ynikitenkov Make filling of model with data in reset model mode.
     refresh();
-
 }
 
 QAbstractListModel* QnSortFilterListModelPrivate::model() const
@@ -166,11 +160,11 @@ void QnSortFilterListModelPrivate::refresh()
             if (shouldBeFilteredOut)
                 removeSourceRow(sourceRow);
             else
-                insertSourceRow(sourceRow); // Here row is placed in right position
+                insertSourceRow(sourceRow); // Here row is placed in right position.
 
             continue;
         }
-        else if (currentIndex == -1) //< It is new row
+        else if (currentIndex == -1) //< It is new row.
         {
             insertSourceRow(sourceRow);
             continue;
@@ -178,7 +172,7 @@ void QnSortFilterListModelPrivate::refresh()
 
         const int newIndex = indexToInsert(sourceRow);
         if (newIndex == currentIndex)
-            continue; //< Row is in right place
+            continue; //< Row is in right place.
 
         const int updatedNewIndex = newIndex + (currentIndex < newIndex ? -1 : 0);
 
@@ -230,15 +224,13 @@ void QnSortFilterListModelPrivate::insertSourceRow(int sourceRow)
     q->beginInsertRows(QModelIndex(), index, index);
     m_mapped.insert(index, sourceRow);
     q->endInsertRows();
-
-//    checkMapping();
 }
 
 void QnSortFilterListModelPrivate::removeSourceRow(int sourceRow)
 {
     const auto mappedIndex = m_mapped.indexOf(sourceRow);
     if (mappedIndex == -1)
-        return; //< Row is filtered out
+        return; //< Row is filtered out.
 
     Q_Q(QnSortFilterListModel);
     q->beginRemoveRows(QModelIndex(), mappedIndex, mappedIndex);
@@ -252,7 +244,7 @@ void QnSortFilterListModelPrivate::shiftMappedRows(int minSourceRow, int differe
     {
         if (row >= minSourceRow)
             row += difference;
-    };
+    }
 }
 
 void QnSortFilterListModelPrivate::handleSourceRowsInserted(
@@ -263,7 +255,6 @@ void QnSortFilterListModelPrivate::handleSourceRowsInserted(
     NX_ASSERT(!parent.isValid(), "QnSortFilterProxyModel works only with flat lists models");
     if (parent.isValid())
         return;
-
 
     /**
      * Since we have new rows in the source model, we have to increase all indicies
@@ -298,9 +289,8 @@ void QnSortFilterListModelPrivate::handleSourceRowsRemoved(
     if (parent.isValid())
         return;
 
-    static const auto kRemoveDifference = -1;
-    for (int row = first; row <= last; ++row)
-        shiftMappedRows(first + 1, kRemoveDifference);
+    const auto kRemoveDifference = -(first - last + 1);
+    shiftMappedRows(last + 1, kRemoveDifference);
 }
 
 void QnSortFilterListModelPrivate::handleSourceRowsMoved(
@@ -310,8 +300,8 @@ void QnSortFilterListModelPrivate::handleSourceRowsMoved(
     const QModelIndex& destination,
     int /* row */)
 {
-    NX_ASSERT(!parent.isValid(), "QnSortFilterProxyModel works only with flat lists models");
-    NX_ASSERT(!destination.isValid(), "QnSortFilterProxyModel works only with flat lists models");
+    NX_ASSERT(!parent.isValid() && !destination.isValid(),
+        "QnSortFilterListModel works only with flat lists models");
     if (parent.isValid() || destination.isValid())
         return;
 
@@ -351,9 +341,8 @@ void QnSortFilterListModelPrivate::handleSourceDataChanged(
             emit q->dataChanged(targetIndex, targetIndex, roles);
     }
 
-    if (m_triggeringRoles.isEmpty() ||
-        !QnSortFilterListModel::RolesSet(m_triggeringRoles)
-            .intersect(roles.toList().toSet()).isEmpty())
+    if (m_triggeringRoles.isEmpty()
+        || m_triggeringRoles.intersects(roles.toList().toSet()))
     {
         refresh();
     }
@@ -365,19 +354,6 @@ void QnSortFilterListModelPrivate::handleResetSourceModel()
     refresh();
 }
 
-/*
-void QnSortFilterListModelPrivate::checkMapping()
-{
-    int srcSize = m_model->rowCount();
-    qDebug() << ">>>" << "size =" << m_mapped.size() << "src size =" << m_model->rowCount();
-    qDebug() << m_mapped;
-    for (auto r: m_mapped)
-    {
-        if (r >= srcSize)
-            qDebug() << "!!!!!!! INVALID INDEX" << r;
-    }
-}
-*/
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 QnSortFilterListModel::QnSortFilterListModel(QObject* parent):
@@ -390,16 +366,20 @@ QnSortFilterListModel::~QnSortFilterListModel()
 {
 }
 
-void QnSortFilterListModel::setSourceModel(QAbstractListModel* model)
+void QnSortFilterListModel::setSourceModel(QAbstractItemModel* model)
 {
-    Q_D(QnSortFilterListModel);
-    d->setModel(model);
-}
+    auto listModel = qobject_cast<QAbstractListModel*>(model);
+    if (!listModel)
+    {
+        NX_ASSERT(false, "We support only flat list models");
+        return;
+    }
 
-QAbstractListModel* QnSortFilterListModel::sourceModel() const
-{
-    Q_D(const QnSortFilterListModel);
-    return d->model();
+    base_type::setSourceModel(model);
+
+    Q_D(QnSortFilterListModel);
+    d->setModel(listModel);
+
 }
 
 void QnSortFilterListModel::setTriggeringRoles(const RolesSet& roles)
@@ -468,7 +448,7 @@ QModelIndex QnSortFilterListModel::index(
 
 QModelIndex QnSortFilterListModel::parent(const QModelIndex& /* child */) const
 {
-    return QModelIndex(); //< for list models parent is always empty
+    return QModelIndex(); //< For list models parent is always empty.
 }
 
 int QnSortFilterListModel::rowCount(const QModelIndex& /* parent */) const

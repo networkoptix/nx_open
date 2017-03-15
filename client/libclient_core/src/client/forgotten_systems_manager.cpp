@@ -24,8 +24,8 @@ QnForgottenSystemsManager::QnForgottenSystemsManager():
                 [this, id = system->id(), localId = system->localId(),
                     rawSystem = system.data()]()
                 {
-                    if (rawSystem->isConnectable() &&
-                        (isForgotten(id) || isForgotten(localId.toString())))
+                    if (rawSystem->isConnectable()
+                        && (isForgotten(id) || isForgotten(localId.toString())))
                     {
                         rememberSystem(id);
                         rememberSystem(localId.toString());

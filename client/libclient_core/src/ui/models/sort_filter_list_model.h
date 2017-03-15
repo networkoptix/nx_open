@@ -19,9 +19,6 @@ public:
     ~QnSortFilterListModel();
 
 public:
-    void setSourceModel(QAbstractListModel* model);
-    QAbstractListModel* sourceModel() const;
-
     using RolesSet = QSet<int>;
     void setTriggeringRoles(const RolesSet& roles);
 
@@ -37,6 +34,8 @@ public:
         const QModelIndex& sourceParent) const;
 
 public: // overrides section
+    virtual void setSourceModel(QAbstractItemModel* model);
+
     virtual QModelIndex mapToSource(const QModelIndex& proxyIndex) const override;
     virtual QModelIndex mapFromSource(const QModelIndex& sourceIndex) const override;
     virtual QModelIndex index(
