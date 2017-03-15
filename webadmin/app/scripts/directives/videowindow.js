@@ -308,7 +308,7 @@ angular.module('webadminApp')
                             }, function (position, duration) {
                                 if (position != 0) {
                                     scope.loading = false;
-                                    scope.vgUpdateTime({$currentTime: position/1000, $duration: duration});
+                                    scope.vgUpdateTime({$currentTime: position, $duration: duration});
                                 }
                             });
                         });
