@@ -10,7 +10,7 @@
 namespace
 {
     //TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
-    const qreal kBytesInGB = 1000.0 * 1000.0 * 1000.0;
+    const qreal kBytesInGB = 1024.0 * 1024.0 * 1024.0;
 
     int storageIndex(const QnStorageModelInfoList& list, const QnStorageModelInfo& storage)
     {
