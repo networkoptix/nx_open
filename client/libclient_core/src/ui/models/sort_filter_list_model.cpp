@@ -4,11 +4,6 @@
 #include <nx/utils/math/fuzzy.h>
 #include <utils/common/connective.h>
 
-namespace {
-static constexpr int kListColumnsCount = 1;
-} // unnamed namespace
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
 class QnSortFilterListModelPrivate: public Connective<QObject>
 {
     using base_type = Connective<QObject>;
@@ -19,8 +14,7 @@ class QnSortFilterListModelPrivate: public Connective<QObject>
 public:
     QnSortFilterListModelPrivate(QnSortFilterListModel* parent);
 
-    void setModel(QAbstractListModel* model);
-    QAbstractListModel* model() const;
+    void setModel(QAbstractItemModel* model);
 
     void setTriggeringRoles(const QnSortFilterListModel::RolesSet& roles);
 
@@ -75,7 +69,6 @@ private:
 private:
     using RowsList = QList<int>;
 
-    QPointer<QAbstractListModel> m_model;
     RowsList m_mapped;
     QnSortFilterListModel::RolesSet m_triggeringRoles;
 };
@@ -88,51 +81,46 @@ QnSortFilterListModelPrivate::QnSortFilterListModelPrivate(QnSortFilterListModel
 
 void QnSortFilterListModelPrivate::resetTargetModel()
 {
-    if (!m_model)
-        return;
-
     Q_Q(QnSortFilterListModel);
     q->beginResetModel();
     m_mapped.clear();
     q->endResetModel();
 }
 
-void QnSortFilterListModelPrivate::setModel(QAbstractListModel* model)
+void QnSortFilterListModelPrivate::setModel(QAbstractItemModel* sourceModel)
 {
-    if (m_model == model)
+    Q_Q(QnSortFilterListModel);
+    const auto currentModel = q->sourceModel();
+    if (sourceModel == currentModel)
         return;
 
-    if (m_model)
+    if (currentModel)
     {
-        m_model->disconnect(this);
+        currentModel->disconnect(this);
         resetTargetModel();
     }
 
-    m_model = model;
-    if (!m_model)
+    q->base_type::setSourceModel(sourceModel);
+
+    if (!sourceModel)
         return;
 
-    connect(m_model, &QAbstractListModel::rowsInserted,
+    connect(sourceModel, &QAbstractListModel::rowsInserted,
         this, &QnSortFilterListModelPrivate::handleSourceRowsInserted);
 
-    connect(m_model, &QAbstractListModel::rowsAboutToBeRemoved,
+    connect(sourceModel, &QAbstractListModel::rowsAboutToBeRemoved,
         this, &QnSortFilterListModelPrivate::handleSourceRowsAboutToBeRemoved);
-    connect(m_model, &QAbstractListModel::rowsRemoved,
+    connect(sourceModel, &QAbstractListModel::rowsRemoved,
         this, &QnSortFilterListModelPrivate::handleSourceRowsRemoved);
-    connect(m_model, &QAbstractListModel::rowsMoved,
+    connect(sourceModel, &QAbstractListModel::rowsMoved,
         this, &QnSortFilterListModelPrivate::handleSourceRowsMoved);
-    connect(m_model, &QAbstractListModel::dataChanged,
+    connect(sourceModel, &QAbstractListModel::dataChanged,
         this, &QnSortFilterListModelPrivate::handleSourceDataChanged);
-    connect(m_model, &QAbstractListModel::modelReset,
+    connect(sourceModel, &QAbstractListModel::modelReset,
         this, &QnSortFilterListModelPrivate::handleResetSourceModel);
 
     //TODO: #ynikitenkov Make filling of model with data in reset model mode.
     refresh();
-}
-
-QAbstractListModel* QnSortFilterListModelPrivate::model() const
-{
-    return m_model;
 }
 
 void QnSortFilterListModelPrivate::setTriggeringRoles(const QnSortFilterListModel::RolesSet& roles)
@@ -142,10 +130,9 @@ void QnSortFilterListModelPrivate::setTriggeringRoles(const QnSortFilterListMode
 
 void QnSortFilterListModelPrivate::refresh()
 {
-    if (!m_model)
-        return;
+    Q_Q(QnSortFilterListModel);
 
-    const auto sourceSize = m_model->rowCount();
+    const auto sourceSize = q->sourceModel()->rowCount();
     if (!sourceSize)
         return;
 
@@ -195,14 +182,16 @@ bool QnSortFilterListModelPrivate::isFilteredOut(int sourceRow) const
     return !q->filterAcceptsRow(sourceRow, QModelIndex());
 }
 
-int QnSortFilterListModelPrivate::indexToInsert(
-    int sourceRow)
+int QnSortFilterListModelPrivate::indexToInsert(int sourceRow)
 {
     const auto it = std::lower_bound(m_mapped.begin(), m_mapped.end(), sourceRow,
         [this](int left, int right)
         {
             Q_Q(QnSortFilterListModel);
-            return q->lessThan(m_model->index(left), m_model->index(right));
+            const auto model = q->sourceModel();
+            return (model
+                ? q->lessThan(model->index(left, 0), model->index(right, 0))
+                : left < right);
         });
     return std::distance(m_mapped.begin(), it);
 }
@@ -314,7 +303,9 @@ void QnSortFilterListModelPrivate::handleSourceDataChanged(
     const QModelIndex& bottomRight,
     const QVector<int>& roles)
 {
-    if (!m_model)
+    Q_Q(QnSortFilterListModel);
+    const auto model = q->sourceModel();
+    if (!model)
         return;
 
     if (!topLeft.isValid() || !bottomRight.isValid())
@@ -329,10 +320,9 @@ void QnSortFilterListModelPrivate::handleSourceDataChanged(
         return;
     }
 
-    Q_Q(QnSortFilterListModel);
     for(int sourceRow = topLeft.row(); sourceRow <= bottomRight.row(); ++sourceRow)
     {
-        const auto sourceIndex = m_model->index(sourceRow, 0);
+        const auto sourceIndex = model->index(sourceRow, 0);
         if (!sourceIndex.isValid())
             continue;
 
@@ -368,18 +358,8 @@ QnSortFilterListModel::~QnSortFilterListModel()
 
 void QnSortFilterListModel::setSourceModel(QAbstractItemModel* model)
 {
-    auto listModel = qobject_cast<QAbstractListModel*>(model);
-    if (!listModel)
-    {
-        NX_ASSERT(false, "We support only flat list models");
-        return;
-    }
-
-    base_type::setSourceModel(model);
-
     Q_D(QnSortFilterListModel);
-    d->setModel(listModel);
-
+    d->setModel(model);
 }
 
 void QnSortFilterListModel::setTriggeringRoles(const RolesSet& roles)
@@ -413,11 +393,12 @@ QModelIndex QnSortFilterListModel::mapToSource(const QModelIndex& proxyIndex) co
     Q_D(const QnSortFilterListModel);
 
     const int row = proxyIndex.row();
-    if (!d->m_model || (row < 0) || (row >= d->m_mapped.size()))
+    const auto model = sourceModel();
+    if (!model || (row < 0) || (row >= d->m_mapped.size()))
         return QModelIndex();
 
     const auto sourceRow = d->m_mapped[row];
-    return d->m_model->index(sourceRow);
+    return model->index(sourceRow, 0);
 }
 
 QModelIndex QnSortFilterListModel::mapFromSource(const QModelIndex& sourceIndex) const
@@ -425,7 +406,8 @@ QModelIndex QnSortFilterListModel::mapFromSource(const QModelIndex& sourceIndex)
     Q_D(const QnSortFilterListModel);
 
     const int sourceRow = sourceIndex.row();
-    if (!d->m_model || (sourceRow < 0) || (sourceRow >= d->m_model->rowCount()))
+    const auto model = sourceModel();
+    if (!model || (sourceRow < 0) || (sourceRow >= model->rowCount()))
         return QModelIndex();
 
     const int targetRow = d->m_mapped.indexOf(sourceRow);
@@ -437,7 +419,7 @@ QModelIndex QnSortFilterListModel::index(
     int column,
     const QModelIndex& parent) const
 {
-    if (parent.isValid() || (column > kListColumnsCount))
+    if (parent.isValid() || (column > 1))
     {
         NX_ASSERT(false, "QnSortFilterListModel supports is a flat list model");
         return QModelIndex();
@@ -459,17 +441,11 @@ int QnSortFilterListModel::rowCount(const QModelIndex& /* parent */) const
 
 int QnSortFilterListModel::columnCount(const QModelIndex& /*parent */) const
 {
-    return kListColumnsCount;
-}
-
-QVariant QnSortFilterListModel::data(const QModelIndex& index, int role) const
-{
-    return mapToSource(index).data(role);
+    return 1;
 }
 
 QHash<int, QByteArray> QnSortFilterListModel::roleNames() const
 {
-    Q_D(const QnSortFilterListModel);
-    const auto model = d->model();
+    const auto model = sourceModel();
     return (model ? model->roleNames() : QHash<int, QByteArray>());
 }

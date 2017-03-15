@@ -129,13 +129,9 @@ bool QnOrderedSystemsModel::lessThan(
 
 bool QnOrderedSystemsModel::filterAcceptsRow(
     int sourceRow,
-    const QModelIndex& sourceParent) const
+    const QModelIndex& /* sourceParent */) const
 {
-    const auto listModel = qobject_cast<QAbstractListModel*>(sourceModel());
-    if (!listModel)
-        return true;
-
-    const auto dataIndex = listModel->index(sourceRow);
+    const auto dataIndex = sourceModel()->index(sourceRow, 0);
     // Filters out offline non-cloud systems with last connection more than N (defined) days ago
     if (!dataIndex.isValid())
         return true;
