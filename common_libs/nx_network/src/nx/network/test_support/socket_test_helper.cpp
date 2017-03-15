@@ -10,10 +10,10 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
-
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 
+#include <utils/math/math.h>
 
 namespace nx {
 namespace network {
