@@ -33,6 +33,7 @@ admins:
         - 'cloud-portal-admins@networkoptix.com'
 
 languages:
-    - ja
+    - en_US
+    - zh_CN
 
 queue_name: '$INSTANCE_NAME'
