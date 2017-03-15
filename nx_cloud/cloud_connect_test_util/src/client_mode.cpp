@@ -97,10 +97,11 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
     args.read("max-concurrent-connections", &maxConcurrentConnections);
 
     nx::network::test::TestTrafficLimitType
-        trafficLimitType = nx::network::test::TestTrafficLimitType::incoming;
+        trafficLimitType = nx::network::test::TestTrafficLimitType::none;
 
     QString trafficLimit = nx::utils::bytesToString(kDefaultBytesToReceive);
-    args.read("bytes-to-receive", &trafficLimit);
+    if (args.read("bytes-to-receive", &trafficLimit))
+        trafficLimitType = nx::network::test::TestTrafficLimitType::incoming;
 
     if (args.read("bytes-to-send", &trafficLimit))
         trafficLimitType = nx::network::test::TestTrafficLimitType::outgoing; 
