@@ -5,14 +5,21 @@
 #include <detail/fs_stub.h>
 
 
+enum class FileCategory
+{
+    media,
+    db,
+    infoTxt
+};
+
 class TestIODevice 
     : public nx_spl::IODevice,
-      private PluginRefCounter<TestIODevice>
+      public PluginRefCounter<TestIODevice>
 {
-    friend class PluginRefCounter<TestIODevice>;
-    ~TestIODevice();
 public:
-    TestIODevice(const char *path, nx_spl::io::mode_t mode);
+    TestIODevice(FsStubNode* fileNode, FileCategory category, 
+                 int mode, int64_t size = 0, FILE* f = nullptr);
+    ~TestIODevice();
 public:
     virtual uint32_t STORAGE_METHOD_CALL write(
         const void*     src,
@@ -40,8 +47,11 @@ public: // plugin interface implementation
 
     virtual unsigned int addRef() override;
     virtual unsigned int releaseRef() override;
+
 private:
+    FsStubNode* m_fileNode;
+    FileCategory m_category;
+    int m_mode;
+    int64_t m_size;
     FILE* m_file;
-    nx_spl::io::mode_t m_mode;
-    uint32_t m_size;
 };
