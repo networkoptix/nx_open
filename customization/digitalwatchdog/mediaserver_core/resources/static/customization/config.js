@@ -35,3 +35,5 @@ Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
 Config.productName = 'DW Spectrum';
 Config.cloud.productName = 'DW Cloud';
+
+Config.supportedLanguages = ['en_US', 'fr', 'es'];

@@ -727,10 +727,10 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     if (itr == m_parsers.end())
     {
         auto parser = new QnNxRtpParser();
-        // TODO: Use nx_http::header::Server here 
+        // TODO: Use nx_http::header::Server here
         // to get RFC2616-conformant Server header parsing function.
         auto serverVersion = extractServerVersion(m_rtspSession->serverInfo());
-        if (!serverVersion.isNull() && serverVersion < nx::utils::SoftwareVersion("3.0.0.0"))
+        if (!serverVersion.isNull() && serverVersion < nx::utils::SoftwareVersion(3, 0))
             parser->setAudioEnabled(false);
         itr = m_parsers.insert(channelNum, QnNxRtpParserPtr(parser));
     }

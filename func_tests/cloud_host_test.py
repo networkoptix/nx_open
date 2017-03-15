@@ -3,12 +3,10 @@ import time
 import pprint
 import pytest
 import pytz
-from server_rest_api import ServerRestApiError
-from test_utils import print_list
+from test_utils.server_rest_api import ServerRestApiError
 
 
 log = logging.getLogger(__name__)
-
 
 
 def check_user_exists(server, is_cloud):

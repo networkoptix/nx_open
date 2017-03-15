@@ -143,6 +143,7 @@ webadmin/external.dat
 webadmin/.tmp
 webadmin/.idea
 webadmin/.sass-cache
+webadmin/translation/language_pack
 app/bower_components
 
 plugins/acs/Paxton/packages
