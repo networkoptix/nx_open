@@ -20,26 +20,24 @@
 
 namespace {
 
-auto isMotionAllowed = [](QGraphicsItem* item)
-{
-    if (!(item->acceptedMouseButtons() & Qt::LeftButton))
-        return false; /* Skip to next item. */
-
-    if (item->isWidget() && dynamic_cast<QnMediaResourceWidget*>(item))
+auto motionSelectionEnabled = [](QnMediaResourceWidget* widget)
     {
-        auto target = dynamic_cast<QnMediaResourceWidget*>(item);
-        const auto options = target->options();
-        bool motionSelectionAllowed = options.testFlag(QnMediaResourceWidget::DisplayMotion)
+        NX_ASSERT(widget);
+        if (!widget)
+            return false;
+
+        const auto options = widget->options();
+        return options.testFlag(QnMediaResourceWidget::DisplayMotion)
             || options.testFlag(QnMediaResourceWidget::DisplayMotionSensitivity);
+    };
 
-        return motionSelectionAllowed && target->resource()->toResource()->hasFlags(Qn::motion);
-    }
-
-    if (item->toGraphicsObject() && item->toGraphicsObject()->property(Qn::NoBlockMotionSelection).toBool())
+// This way we detect widget that can possibly have DisplayMotion enabled
+auto widgetWithMotion = [](QGraphicsItem* item)
+    {
+        if (auto widget = dynamic_cast<QnMediaResourceWidget*>(item))
+            return widget->resource()->toResource()->hasFlags(Qn::motion);
         return false;
-
-    return true;
-};
+    };
 
 } // namespace
 
@@ -110,11 +108,7 @@ void MotionSelectionInstrument::installedNotify() {
 
 void MotionSelectionInstrument::aboutToBeDisabledNotify() {
     m_isClick = false;
-    if (m_target)
-    {
-        m_target->unsetCursor();
-        m_target = nullptr;
-    }
+    setWidget(nullptr);
 
     base_type::aboutToBeDisabledNotify();
 }
@@ -139,7 +133,48 @@ void MotionSelectionInstrument::ensureSelectionItem() {
         scene()->addItem(selectionItem());
 }
 
-Qt::KeyboardModifiers MotionSelectionInstrument::selectionModifiers(QnMediaResourceWidget *target) const {
+void MotionSelectionInstrument::updateCursor()
+{
+    if (!m_itemUnderMouse)
+        return;
+
+    if (m_widget && motionSelectionEnabled(m_widget))
+        m_itemUnderMouse->setCursor(Qt::CrossCursor);
+    else
+        m_itemUnderMouse->unsetCursor();
+}
+
+void MotionSelectionInstrument::setWidget(QnMediaResourceWidget* widget)
+{
+    if (m_widget == widget)
+        return;
+
+    if (m_widget)
+        m_widget->disconnect(this);
+
+    m_widget = widget;
+
+    if (m_widget)
+        connect(m_widget, &QnResourceWidget::optionsChanged, this, &MotionSelectionInstrument::updateCursor);
+
+    updateCursor();
+}
+
+void MotionSelectionInstrument::setItemUnderMouse(QGraphicsItem* item)
+{
+    if (m_itemUnderMouse == item)
+        return;
+
+    if (m_itemUnderMouse)
+        m_itemUnderMouse->unsetCursor();
+
+    m_itemUnderMouse = item;
+
+    updateCursor();
+}
+
+Qt::KeyboardModifiers MotionSelectionInstrument::selectionModifiers(QnMediaResourceWidget *target) const
+{
     if(!target)
         return m_selectionModifiers;
 
@@ -148,20 +183,15 @@ Qt::KeyboardModifiers MotionSelectionInstrument::selectionModifiers(QnMediaResou
 
 bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *event)
 {
-    if(event->button() != Qt::LeftButton)
+    if (event->button() != Qt::LeftButton)
         return false;
 
-    auto view = this->view(viewport);
-    auto target = dynamic_cast<QnMediaResourceWidget*>(
-        this->item(view, event->pos(), isMotionAllowed));
-    if (!target)
+    if (!m_widget)
         return false;
 
-    Qt::KeyboardModifiers selectionModifiers = this->selectionModifiers(target);
-    if((event->modifiers() & selectionModifiers) != selectionModifiers)
+    Qt::KeyboardModifiers selectionModifiers = this->selectionModifiers(m_widget);
+    if ((event->modifiers() & selectionModifiers) != selectionModifiers)
         return false;
-
-    m_target = target;
 
     dragProcessor()->mousePressEvent(viewport, event);
 
@@ -172,25 +202,13 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
 bool MotionSelectionInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
 {
     auto view = this->view(viewport);
-    auto target = dynamic_cast<QnMediaResourceWidget*>(
-        this->item(view, event->pos(), isMotionAllowed));
 
-    if (!event->buttons().testFlag(Qt::LeftButton))
-    {
-        if (m_target && m_target != target)
-        {
-            m_target->unsetCursor();
-            m_target = nullptr;
-        }
-    }
+    auto widget = dynamic_cast<QnMediaResourceWidget*>(
+        this->item(view, event->pos(), widgetWithMotion));
+    setWidget(widget);
 
-    if (!target)
-        return false;
-
-    if (!m_target)
-        m_target = target;
-
-    m_target->setCursor(Qt::CrossCursor);
+    // Really UiElementsWidget always getting here
+    setItemUnderMouse(this->item(view, event->pos()));
 
     event->accept();
     return false;
@@ -307,6 +325,6 @@ SelectionItem *MotionSelectionInstrument::selectionItem() const {
 }
 
 QnMediaResourceWidget *MotionSelectionInstrument::target() const {
-    return m_target.data();
+    return m_widget.data();
 }
 

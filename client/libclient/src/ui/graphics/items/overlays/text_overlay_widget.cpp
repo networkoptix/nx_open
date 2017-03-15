@@ -6,7 +6,6 @@
 #include <core/resource/camera_bookmark.h>
 
 #include <ui/graphics/items/generic/graphics_scroll_area.h>
-#include <ui/graphics/instruments/motion_selection_instrument.h>
 
 #include <utils/common/delayed.h>
 #include <nx/fusion/model_functions.h>
@@ -47,7 +46,6 @@ void QnTextOverlayWidget::addTextItem(const QnOverlayTextItemData &data)
 
     removeTextItem(id);  // In case of update we should remove data (and cancel timer event, if any)
     QnHtmlTextItem* textItem = new QnHtmlTextItem(data.text, data.itemOptions);
-    textItem->setProperty(Qn::NoBlockMotionSelection, true);
 
     m_textItems.insert(id, data);
     addItem(textItem, id);
