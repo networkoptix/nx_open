@@ -20,32 +20,28 @@
 
 namespace {
 
-    struct BlocksMotionSelection {
-    public:
-        BlocksMotionSelection(bool *blockMotionClearing): m_blockMotionClearing(blockMotionClearing) {
-            *m_blockMotionClearing = false;
-        }
+auto isMotionAllowed = [](QGraphicsItem* item)
+{
+    if (!(item->acceptedMouseButtons() & Qt::LeftButton))
+        return false; /* Skip to next item. */
 
-        bool operator()(QGraphicsItem *item) const {
-            if(!(item->acceptedMouseButtons() & Qt::LeftButton))
-                return false; /* Skip to next item. */
-                
-            if(item->isWidget() && dynamic_cast<QnMediaResourceWidget *>(item))
-                return true;
+    if (item->isWidget() && dynamic_cast<QnMediaResourceWidget*>(item))
+    {
+        auto target = dynamic_cast<QnMediaResourceWidget*>(item);
+        const auto options = target->options();
+        bool motionSelectionAllowed = options.testFlag(QnMediaResourceWidget::DisplayMotion)
+            || options.testFlag(QnMediaResourceWidget::DisplayMotionSensitivity);
 
-            if(item->toGraphicsObject() && item->toGraphicsObject()->property(Qn::NoBlockMotionSelection).toBool()) {
-                *m_blockMotionClearing = true; 
-                return false;
-            }
+        return motionSelectionAllowed && target->resource()->toResource()->hasFlags(Qn::motion);
+    }
 
-            return true;
-        }
+    if (item->toGraphicsObject() && item->toGraphicsObject()->property(Qn::NoBlockMotionSelection).toBool())
+        return false;
 
-    private:
-        bool *m_blockMotionClearing;
-    };
+    return true;
+};
 
-} // anonymous namespace
+} // namespace
 
 
 MotionSelectionInstrument::MotionSelectionInstrument(QObject *parent):
@@ -157,11 +153,8 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
 
     auto view = this->view(viewport);
     auto target = dynamic_cast<QnMediaResourceWidget*>(
-        this->item(view, event->pos(), BlocksMotionSelection(&m_clearingBlocked)));
+        this->item(view, event->pos(), isMotionAllowed));
     if (!target)
-        return false;
-
-    if (!target->resource()->toResource()->hasFlags(Qn::motion))
         return false;
 
     Qt::KeyboardModifiers selectionModifiers = this->selectionModifiers(target);
@@ -169,9 +162,9 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
         return false;
 
     m_target = target;
-    
+
     dragProcessor()->mousePressEvent(viewport, event);
-    
+
     event->accept();
     return false;
 }
@@ -180,7 +173,7 @@ bool MotionSelectionInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* e
 {
     auto view = this->view(viewport);
     auto target = dynamic_cast<QnMediaResourceWidget*>(
-        this->item(view, event->pos(), BlocksMotionSelection(&m_clearingBlocked)));
+        this->item(view, event->pos(), isMotionAllowed));
 
     if (!event->buttons().testFlag(Qt::LeftButton))
     {
@@ -192,14 +185,6 @@ bool MotionSelectionInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* e
     }
 
     if (!target)
-        return false;
-
-    const auto options = target->options();
-    bool motionSelectionAllowed =
-        options.testFlag(QnMediaResourceWidget::DisplayMotion)
-        || options.testFlag(QnMediaResourceWidget::DisplayMotionSensitivity);
-
-    if (!motionSelectionAllowed)
         return false;
 
     if (!m_target)
@@ -266,7 +251,7 @@ void MotionSelectionInstrument::dragMove(DragInfo *info) {
         m_gridRect = QRect();
     } else {
         QPoint gridOrigin = target()->mapToMotionGrid(mouseOrigin);
-        QPoint gridCorner = target()->mapToMotionGrid(mouseCorner) + QPoint(1, 1); 
+        QPoint gridCorner = target()->mapToMotionGrid(mouseCorner) + QPoint(1, 1);
 
         if (gridCorner.x() <= gridOrigin.x()) {
             gridCorner -= QPoint(1, 0);
@@ -290,8 +275,8 @@ void MotionSelectionInstrument::finishDrag(DragInfo *info) {
     ensureSelectionItem();
     if(target() != NULL) {
         emit motionRegionSelected(
-            info->view(), 
-            target(), 
+            info->view(),
+            target(),
             m_gridRect
         );
     }

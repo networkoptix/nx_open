@@ -24,7 +24,7 @@ public:
     QBrush brush() const;
 
     /**
-     * \param selectionModifiers        Keyboard modifiers that must be pressed for the 
+     * \param selectionModifiers        Keyboard modifiers that must be pressed for the
      *                                  selection process to start. Defaults to 0.
      */
     void setSelectionModifiers(Qt::KeyboardModifiers selectionModifiers);
@@ -76,7 +76,6 @@ private:
     QPointer<QnMediaResourceWidget> m_target;
     bool m_selectionStartedEmitted;
     bool m_isClick;
-    bool m_clearingBlocked;
     Qt::KeyboardModifiers m_selectionModifiers;
     Qt::KeyboardModifiers m_multiSelectionModifiers;
     QRect m_gridRect;
