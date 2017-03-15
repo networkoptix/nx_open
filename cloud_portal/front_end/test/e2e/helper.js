@@ -19,7 +19,7 @@ var Helper = function () {
     var h = this;
 
     this.basePassword = 'qweasd123';
-    this.systemLink = '/b28cdf85-8d69-4180-a123-99acce63cb70';
+    this.systemLink = '/fbe3ada7-85d0-4b4f-9d7b-4857aab0954f';
     this.systemName = 'ek-U16';
 
     this.get = function (opt_url) {
@@ -27,6 +27,12 @@ var Helper = function () {
         browser.get(url);
         browser.waitForAngular();
     };
+
+    this.refresh = function () {
+        browser.refresh();
+        browser.waitForAngular();
+    };
+
     this.urls = {
         homepage: '/',
         account: '/account',
@@ -50,13 +56,13 @@ var Helper = function () {
 
     this.forms = {
         login: {
-            openLink: element(by.linkText('Log in')),
+            openLink: element(by.linkText('Log In')),
             dialog: element(by.css('.modal-dialog')),
             emailInput: element(by.css('.modal-dialog')).element(by.model('auth.email')),
             passwordInput: element(by.css('.modal-dialog')).element(by.model('auth.password')),
-            submitButton: element(by.css('.modal-dialog')).element(by.buttonText('Log in')),
+            submitButton: element(by.css('.modal-dialog')).element(by.buttonText('Log In')),
             forgotPasswordLink: element(by.css('.modal-dialog')).element(by.linkText('Forgot password?')),
-            messageLoginLink: element(by.css('h1')).element(by.linkText('Log in'))
+            messageLoginLink: element(by.css('h1')).element(by.linkText('Log In'))
         },
         register: {
             triggerRegisterButton: element(by.linkText('Create Account')),
@@ -72,6 +78,11 @@ var Helper = function () {
             lastNameInput: element(by.model('account.last_name')),
             submitButton: element(by.css('[form=accountForm]')).element(by.buttonText('Save'))
         },
+        password: {
+            currentPasswordInput: element(by.model('pass.password')),
+            passwordInput: element(by.model('pass.newPassword')).element(by.css('input[type=password]')),
+            submitButton: element(by.css('[form=passwordForm]')).element(by.buttonText('Change Password'))
+        },
         share: {
             shareButton: element(by.partialButtonText('Share')),
             emailField: element(by.model('user.email')),
@@ -82,9 +93,9 @@ var Helper = function () {
             navbar: element(by.css('header')).element(by.css('.navbar')),
             dropdownToggle: element(by.css('header')).element(by.css('.navbar')).element(by.css('.dropdown-toggle')),
             dropdownMenu: element(by.css('header')).element(by.css('.navbar')).element(by.css('[uib-dropdown-menu]')),
-            logoutLink: element(by.css('header')).element(by.css('.navbar')).element(by.linkText('Log out')),
+            logoutLink: element(by.css('header')).element(by.css('.navbar')).element(by.linkText('Log Out')),
             alreadyLoggedIn: element(by.cssContainingText('.modal-dialog', 'You are already logged in')),
-            logOut: element(by.buttonText('Log out'))
+            logOut: element(by.buttonText('Log Out'))
         },
         restorePassEmail: {
             emailInput: element(by.model('data.email')),
@@ -94,7 +105,7 @@ var Helper = function () {
         restorePassPassword: {
             passwordInput: element(by.model('data.newPassword')).element(by.css('input[type=password]')),
             submitButton: element(by.buttonText('Save password')),
-            messageLoginLink: element(by.css('h1')).element(by.linkText('Log in'))
+            messageLoginLink: element(by.css('h1')).element(by.linkText('Log In'))
         }
     };
 
@@ -160,7 +171,7 @@ var Helper = function () {
     this.userPasswordWrong = 'qweqwe123';
 
     this.loginSuccessElement = element(by.cssContainingText('a','Systems')); // some element on page, that is only visible when user is authenticated
-    this.loginNoSysSuccessElement = element(by.cssContainingText('span','You have no systems connected to')); // some element on page, that is only visible when user is authenticated
+    this.loginNoSysSuccessElement = element(by.cssContainingText('span','You have no Systems connected to')); // some element on page, that is only visible when user is authenticated
     this.loginSysPageSuccessElement = element(by.cssContainingText('h2','Users')); // some element on page, that is only visible when user is authenticated
     this.loginSysPageClosedSuccessElement = element(by.cssContainingText('.no-data-panel-body','You do not have access to the system information.')); // some element on page, that is only visible when user is authenticated
     //this.loggedOutElement = element(by.css('.container.ng-scope')).all(by.css('.auth-hidden')).first(); // some element on page visible to not auth user
@@ -175,7 +186,6 @@ var Helper = function () {
 
         h.get(h.urls.homepage);
         browser.sleep(500);
-
         loginButton.click();
 
         this.loginFromCurrPage(email, password);
@@ -243,6 +253,12 @@ var Helper = function () {
         browser.ignoreSynchronization = false;
     };
 
+    this.doInIgnoredSync = function(callback) {
+        browser.ignoreSynchronization = true;
+        callback();
+        browser.ignoreSynchronization = false;
+    };
+
     this.fillRegisterForm = function(firstName, lastName, email, password) {
         var userFistName = firstName || this.userFirstName;
         var userLastName = lastName || this.userLastName;
@@ -262,9 +278,31 @@ var Helper = function () {
         h.forms.register.submitButton.click();
     };
 
+    this.fillRegisterFormWithEmail = function(firstName, lastName, password) {
+        var userFistName = firstName || this.userFirstName;
+        var userLastName = lastName || this.userLastName;
+        var userPassword = password || this.userPassword;
+
+        h.sleepInIgnoredSync(2000);
+
+        // Log out if logged in
+        h.checkPresent(h.forms.logout.alreadyLoggedIn).then( function () {
+            h.forms.logout.logOut.click();
+        }, function () {});
+
+        // h.sleepInIgnoredSync(2000);
+        browser.sleep(2000);
+
+        h.forms.register.firstNameInput.sendKeys(userFistName);
+        h.forms.register.lastNameInput.sendKeys(userLastName);
+        h.forms.register.passwordInput.sendKeys(userPassword);
+
+        h.forms.register.submitButton.click();
+    };
+
     this.register = function(firstName, lastName, email, password) {
         var deferred = protractor.promise.defer();
-        var alreadyRegisteredText = 'This email address has been already registered in';
+        var alreadyRegisteredText = 'This Email has been already registered in';
         var alreadyRegisteredElement = element(by.cssContainingText('.help-block', alreadyRegisteredText));
 
         h.get(h.urls.register);
@@ -278,7 +316,6 @@ var Helper = function () {
             else {
                 alreadyRegisteredElement.isDisplayed().then( function (isDisplayed) {
                     if (isDisplayed) {
-                        //console.log('Registration failed: user is already registered. Continue without failing test.');
                         deferred.reject('Registration failed: user is already registered. Continue without failing test.');
                     }
                     else deferred.reject('Registration failed, or wrong success message is shown');
@@ -383,18 +420,50 @@ var Helper = function () {
         var roleOption = h.forms.share.roleField.element(by.cssContainingText('option', sharedRole));
 
         this.getSysPage(systemLinkCode);
+        browser.waitForAngular();
         h.forms.share.shareButton.click();
         h.forms.share.emailField.sendKeys(email);
         h.forms.share.roleField.click();
         roleOption.click();
+        browser.waitForAngular();
+
         h.forms.share.submitButton.click();
         expect(element(by.cssContainingText('td', email)).isPresent()).toBe(true);
     };
 
+    this.registerByInvite = function (firstName, lastName, email, password) {
+        // var deferred = protractor.promise.defer();
+        var userEmail = email || h.getRandomEmail();
+        var password = password || h.password;
+
+        h.shareSystemWith(userEmail);
+        h.getEmailedLink(userEmail, h.emailSubjects.invite, 'register').then( function(url) {
+            h.get(url);
+        });
+
+        h.fillRegisterFormWithEmail(firstName, lastName, password);
+        browser.sleep(1000);
+
+        // h.alert.successMessageElem.isPresent().then(function (isPresent) {
+        //     browser.pause();
+        //
+        //     if(isPresent) {
+        //         expect(h.alert.successMessageElem.getText()).toContain(h.alert.alertMessages.registerSuccess);
+        //         deferred.fulfill();
+        //     }
+        //     else {
+        //         deferred.reject('Registration failed, or wrong success message is shown');
+        //     }
+        // });
+
+        // return deferred.promise;
+    };
+
     this.emailSubjects = {
         register: "Confirm your account",
+        invite: " was shared with you",
         restorePass: "Restore your password",
-        share: ""
+        share: " was shared with you"
     };
 
     this.readPrevEmails = function() {
@@ -476,11 +545,12 @@ var Helper = function () {
         return deferred.promise;
     };
 
-    this.waitIfNotPresent = function(element, timeout) {
-        var timeoutUsed = timeout || 1000;
+    this.waitIfNotPresent = function(element, checkInterval) {
+        var checkInterval = checkInterval || 1000;
         element.isPresent().then( function(isPresent) {
             if(!isPresent) {
-                browser.sleep(timeoutUsed);
+                browser.sleep(checkInterval);
+                h.waitIfNotPresent(element, checkInterval);
             }
         })
     };
