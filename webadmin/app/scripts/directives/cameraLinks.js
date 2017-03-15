@@ -10,7 +10,9 @@ angular.module('webadminApp')
             scope: {
                 activeCamera: "=",
                 position: "=",
-                liveMode: "="
+                liveMode: "=",
+                activeResolution: "=",
+                player: "="
             },
             templateUrl: Config.viewsDir + 'components/cameraLinks.html',
             link: function (scope, element/*, attrs*/) {

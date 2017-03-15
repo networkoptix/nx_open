@@ -370,26 +370,19 @@ var hlsAPI = new (function(){
         video.addEventListener('loadedmetadata', handleVideoEvent);
         video.addEventListener('loadeddata', handleVideoEvent);
         video.addEventListener('durationchange', handleVideoEvent);
-
-        this.video = video;
-        readyHandler(this);
+        this.readyHandler = readyHandler;
+        this.readyHandler(this);
     };
     this.play = function(offset){
-        //this.playerPlay(offset || -1);
+        video.play();
     };
     this.pause = function(){
-        //this.playerPause();
+        video.pause();
     };
     this.load = function(url){
         hls.loadSource(url);
         hls.autoLevelCapping = levelCapping;
         hls.attachMedia(video);
-    };
-
-    this.getPosition = function(){
-        console.log("GetPosition");
-        console.log(this.video.getPosition());
-        return this.getPosition();
     };
 
     var lastSeekingIdx, lastStartPosition,lastDuration, lastAudioTrackSwitchingIdx;
@@ -479,7 +472,7 @@ var hlsAPI = new (function(){
     function checkBuffer() {
         var v = video.buffered;
         if (v) {
-            events.buffer.push(event);
+            events.buffer.push();
         }
     }
 })();

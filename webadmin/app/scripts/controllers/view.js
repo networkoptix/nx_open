@@ -19,6 +19,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.storage.serverStates = $scope.storage.serverStates || {};
         
         $scope.playerApi = false;
+        $scope.player = null;
         $scope.cameras = {};
         $scope.liveOnly = true;
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
@@ -343,7 +344,6 @@ angular.module('webadminApp').controller('ViewCtrl',
         };
 
         $scope.switchPlaying = function(play){
-            console.log($scope.playerAPI);
             if($scope.playerAPI) {
                 if (play) {
                     $scope.playerAPI.play();
@@ -367,7 +367,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             //var playing = $scope.positionProvider.checkPlayingDate(val);
 
             //if(playing === false) {
-                console.log("Switch Position: ", val);
                 updateVideoSource(val);//We have nothing more to do with it.
             /*}else{
                 $scope.playerAPI.seekTime(playing); // Jump to buffered video
@@ -383,7 +382,6 @@ angular.module('webadminApp').controller('ViewCtrl',
             /*if(resolution === 'auto' || resolution === 'Auto' || resolution === 'AUTO'){
                 resolution = '320p'; //TODO: detect better resolution here
             }*/
-            console.log("Resolution: ", resolution);
 
             if($scope.activeResolution === resolution){
                 return;

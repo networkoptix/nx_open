@@ -25,7 +25,8 @@ angular.module('webadminApp')
             scope: {
                 vgUpdateTime:"&",
                 vgPlayerReady:"&",
-                vgSrc:"="
+                vgSrc:"=",
+                player:"="
             },
             templateUrl: Config.viewsDir + 'components/videowindow.html',// ???
 
@@ -378,7 +379,6 @@ angular.module('webadminApp')
                     scope.errorLoading = false;
                     if(/*!scope.vgApi && */scope.vgSrc ) {
                         format = detectBestFormat();
-
                         if(!recyclePlayer(format)){ // Remove or recycle old player.
                             // Some problem happened. We must reload video here
                             $timeout(srcChanged);
@@ -390,6 +390,7 @@ angular.module('webadminApp')
                             scope.hls = false;
                             return;
                         }
+                        scope.player = format;
                         switch(format){
                             case "flashls":
                                 initFlashls();
