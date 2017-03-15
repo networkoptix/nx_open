@@ -270,6 +270,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             if(resolutionHls === channels.Low && $scope.availableResolutions.indexOf('Low')<0){
                 resolutionHls = channels.High;
             }
+            $scope.resolutionHls = resolutionHls;
 
             $scope.acitveVideoSource = _.filter([
                 { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + resolutionHls + positionMedia + authParam ), type: mimeTypes.hls, transport:'hls'},
