@@ -12,7 +12,7 @@
                 </tab>
                 <tab heading="{{L.info.tabs.storage}}" ng-if="user.isAdmin">
                     <br>
-                    <p>Ниже приводится список мест расположения хранилищ на этом сервере</p>
+                    <p>以下はこのサーバーで利用可能な記憶域の場所のリスト</p>
                     <table class="table">
                         <thead>
                         <tr>
@@ -20,7 +20,7 @@
                                 URL
                             </th>
                             <th >
-                                Емкость
+                                スペース
                             </th>
                             <th width="54">
                                 &nbsp;
@@ -43,7 +43,8 @@
                 <tab heading="{{L.info.tabs.log}}" ng-if="user.isAdmin">
                     <br>
                     <iframe class="log-frame" name="log-frame" ng-src="{{logUrl + '?lines=1000'}}"></iframe>
-                    <a ng-href="{{logUrl +'?lines=1000'}}"  target="log-frame" id="refresh-log" class="btn btn-primary">Обновить</a>                     <a ng-if="!mode.liteClient" ng-href="{{logUrl + '?lines=1000'}}" target="_blank" id="open-log" class="btn btn-default">Открыть в новом окне</a>
+                    <a ng-href="{{logUrl +'?lines=1000'}}"  target="log-frame" id="refresh-log" class="btn btn-primary">更新</a>                   
+<a ng-if="!mode.liteClient" ng-href="{{logUrl + '?lines=1000'}}" target="_blank" id="open-log" class="btn btn-default">新規ウィンドウで開く</a>
                 </tab>
             </tabset>
         </div>

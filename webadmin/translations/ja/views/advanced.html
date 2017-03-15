@@ -1,12 +1,12 @@
 <div class="container">
-    <h1>Дополнительные настройки сервера</h1>
+    <h1>詳細設定</h1>
 
     <div class="alert alert-danger" role="alert">
-        <b>Предупреждение!</b> Любые изменения на этой странице могут привести к неправильной работе сервера.
+        <b>警告!</b>このページのすべての変更は、サーバーが正しく動作しなくなる可能性があります
     </div>
 
 
-    <h2>Хранилища</h2>
+    <h2>ストレージ</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
@@ -16,10 +16,10 @@
                         URL
                     </th>
                     <th width="200">
-                        Свободное место
+                        空き容量
                     </th>
                     <th width="150">
-                        Зарезервированное место
+                        予約済み領域
                     </th>
                     <th >
                     </th>
@@ -40,7 +40,7 @@
                                  ng-style="{width: storage.reservedSpace*100/storage.totalSpace+ '%'}">
                             </div>
 
-                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} из {{formatSpace(storage.totalSpace)}}</div>
+                            <div class="progress-label">{{formatSpace(storage.totalSpace)}} の {{formatSpace(storage.freeSpace)}}</div>
 
 
                             <div class="progress-bar progress-bar-success" role="progressbar"
@@ -54,7 +54,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Недоступно
+                                アクセス不可
                             </div>
                         </div>
                     </td>
@@ -67,15 +67,15 @@
                                    min="1"
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
- placeholder="Зарезервированное место"/>
-                            <div class="input-group-addon">ГБ</div>
+ placeholder="予約済み領域"/>
+                            <div class="input-group-addon">GB</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Зарезервированное место"/>
-                            <div class="input-group-addon">ГБ</div>
+ placeholder="予約済み領域"/>
+                            <div class="input-group-addon">ギガバイト</div>
                         </div>
                     </td>
                     <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
@@ -86,7 +86,7 @@
                                    ng-model="storage.isUsedForWriting"
                                    ng-disabled="!storage.isWritable"
                                    name="isUsedForWriting"
-                                   placeholder="Использовать для записи"/>
+                                   placeholder="書き込み用"/>
                                 </span>
                                 <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"></icon>
                                 <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"></icon>
@@ -103,68 +103,68 @@
             </tbody>
         </table>
         <div id="selectWritableStorageAlert" class="alert alert-warning"  ng-class="{hidden:someSelected}">
-            Основной накопитель не был выбран для записи - видео не будет записываться на этом сервере.
+            書き込みのための主記憶装置ドライブが選択されていません - ビデオはこのサーバーに記録されません。
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Объем зарезервированного пространства больше, чем свободного места на диске. Текущий видео архив может быть удален чтобы освободить требуемое пространство.
+            予約済み領域の容量が空き領域を超えています。現在のビデオ映像は領域確保の為に削除される可能性があります
         </div>
-        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Для сохранения необходимо исправить все отмеченные настройки</div>
+        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">すべての強調表示されている設定を修正して保存します</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Сохранить</button>
-        <button class="btn btn-warning" ng-click="cancel()">Отмена</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >保存</button>
+        <button class="btn btn-warning" ng-click="cancel()">キャンセル</button>
     </form>
 
-    <h2>Настройки журнала</h2>
+    <h2>ログ設定</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div class="form-group">
-            <label class="col-sm-4">Уровень детализации основного журнала</label>
+            <label class="col-sm-4">メイン ログ レベル</label>
             <div class="col-sm-8">
 
                 <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
-                    <option value="NONE">Нет: Журнал отключён.</option>
-                    <option value="ALWAYS">Всегда: Записывать ошибки, предупреждения и самые важные сообщения.</option>
-                    <option value="ERROR">Ошибки: Записывать ошибки.</option>
-                    <option value="WARNING">Предупреждение: Записывать ошибки и предупреждения.</option>
-                    <option value="INFO">Всегда: Записывать ошибки, предупреждения и самые важные сообщения.</option>
-                    <option value="DEBUG">Отладка: Записывать все системные сообщения и отладочную информацию.</option>
-                    <option value="DEBUG2">Отладка2: Записывать все системные сообщения и расширенную отладочную информацию.</option>
+                    <option value="NONE">[なし]: ログを無効にします</option>
+                    <option value="ALWAYS">常に: エラー、警告および最も重要なメッセージをログに記録します</option>
+                    <option value="ERROR">エラー: ログ エラーのみ</option>
+                    <option value="WARNING">警告: 警告およびエラーをログに記録します</option>
+                    <option value="INFO">常に: エラー、警告、およびすべてのメッセージをログに記録します</option>
+                    <option value="DEBUG">デバッグ: システム メッセージとデバッグ情報のすべてをログに記録します</option>
+                    <option value="DEBUG2">Debug2: すべてのシステム メッセージと拡張デバッグ情報をログに記録します</option>
                 </select>
             </div>
         </div>
         <div class="form-group">
-            <label class="col-sm-4">Уровень журнала транзакций</label>
+            <label class="col-sm-4">トランザクション ログ レベル</label>
             <div class="col-sm-8">
                 <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Нет: Журнал отключён.</option>
-                    <option value="ALWAYS">Всегда: Записывать ошибки, предупреждения и самые важные сообщения.</option>
-                    <option value="ERROR">Ошибки: Записывать ошибки.</option>
-                    <option value="WARNING">Предупреждение: Записывать ошибки и предупреждения.</option>
-                    <option value="INFO">Всегда: Записывать ошибки, предупреждения и самые важные сообщения.</option>
-                    <option value="DEBUG">Отладка: Записывать все системные сообщения и отладочную информацию.</option>
-                    <option value="DEBUG2">Отладка2: Записывать все системные сообщения и расширенную отладочную информацию.</option>
+                    <option value="NONE">[なし]: ログを無効にします</option>
+                    <option value="ALWAYS">常に: エラー、警告および最も重要なメッセージをログに記録します</option>
+                    <option value="ERROR">エラー: ログ エラーのみ</option>
+                    <option value="WARNING">警告: 警告およびエラーをログに記録します</option>
+                    <option value="INFO">常に: エラー、警告、およびすべてのメッセージをログに記録します</option>
+                    <option value="DEBUG">デバッグ: システム メッセージとデバッグ情報をログに記録します</option>
+                    <option value="DEBUG2">Debug2: すべてのシステム メッセージと拡張デバッグ情報をログに記録します</option>
                 </select>
             </div>
         </div>
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >Сохранить</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >保存</button>
         </div>
     </form>
 
-    <h2>Ручное обновление</h2>
+    <h2>手動更新</h2>
     <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
         <div class="form-group">
-            <label class="col-sm-4">Загрузить установщик</label>
+            <label class="col-sm-4">インストーラーをアップロード</label>
             <div class="col-sm-8">
                 <fileupload text="Select server update archive (zip)"></fileupload>
-                <p class="help-block">Пожалуйста, убедитесь, в правильности конфигурации.</p>
+                <p class="help-block">正しく構成されているか確認してください</p>
             </div>
         </div>
     </form>
 
-    <h1>Дополнительные настройки системы</h1>
+    <h1>詳細設定</h1>
     <div class="alert alert-danger" role="alert">
-        <b>Предупреждение!</b> Любые изменения на этой странице могут привести к неправильной работе сервера.
+        <b>警告!</b>このページのすべての変更は、サーバーが正しく動作しなくなる可能性があります
     </div>
 
     <form class="form row" role="form" name="systemSettings" novalidate>
@@ -191,7 +191,7 @@
                        ng-model="systemSettings[setting]"
                        class="form-control input-sm"/>
 
-                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting] ||'пусто'}}</p>
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting] | | '空 '}}</p>
 
                 <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
                     <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
@@ -202,15 +202,15 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Сохранить</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >保存</button>
         </div>
 
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Внимание!</b> Некоторые изменения требуют перезапуска всех серверов в системе <b>всех</b> серверов в системе.<br><br>
+        <b>警告 ！</b> いくつかの変更は、再起動を必要とします <b>すべて</b> システム内のサーバー<br><br>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="restartServer()" >Перезапуск текущего сервера</button>
+            <button class="btn btn-primary" ng-click="restartServer()" >現在のサーバーを再起動</button>
         </div>
     </div>
 </div>
