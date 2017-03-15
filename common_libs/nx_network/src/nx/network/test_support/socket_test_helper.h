@@ -97,6 +97,8 @@ private:
     boost::optional<SocketAddress> m_localAddress;
     const bool m_accepted;
     uint64_t m_dataSequence;
+    uint64_t m_curStreamPos;
+    uint64_t m_lastSequenceReceived;
 
     TestConnection(
         std::unique_ptr<AbstractStreamSocket> socket,
@@ -119,6 +121,7 @@ private:
     void sendAllAsync(std::function<void()> handler);
     void reportFinish(SystemError::ErrorCode code);
     void prepareConsequentDataToSend(QByteArray* buf);
+    void verifyDataReceived(const QByteArray& buf, size_t bytesRead);
 
     TestConnection(const TestConnection&);
     TestConnection& operator=(const TestConnection&);

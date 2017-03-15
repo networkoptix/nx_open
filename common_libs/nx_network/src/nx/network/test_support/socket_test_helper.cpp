@@ -219,7 +219,9 @@ TestConnection::TestConnection(
     m_timeoutsInARow(0),
     m_id(++TestConnectionIDCounter),
     m_accepted(isAccepted),
-    m_dataSequence(0)
+    m_dataSequence(0),
+    m_curStreamPos(0),
+    m_lastSequenceReceived(0)
 {
     m_readBuffer.reserve(kReadBufferSize);
     m_outData = nx::utils::random::generate(kReadBufferSize);
@@ -392,6 +394,8 @@ void TestConnection::onDataReceived(
         return reportFinish( errorCode );
     }
 
+    verifyDataReceived(m_readBuffer, bytesRead);
+
     m_totalBytesReceived += bytesRead;
     m_readBuffer.clear();
     m_readBuffer.reserve( kReadBufferSize );
@@ -459,6 +463,24 @@ void TestConnection::prepareConsequentDataToSend(QByteArray* buf)
         memcpy(pos, &x, sizeof(x));
         ++m_dataSequence;
     }
+}
+
+void TestConnection::verifyDataReceived(const QByteArray& buf, size_t bytesRead)
+{
+    const auto sequenceOffset = sizeof(m_dataSequence) - (m_curStreamPos % sizeof(m_dataSequence));
+
+    if (bytesRead < (sequenceOffset + sizeof(m_dataSequence)))
+    {
+        m_curStreamPos += bytesRead;
+        return;
+    }
+
+    uint64_t x = 0;
+    memcpy(&x, buf.data() + sequenceOffset, sizeof(x));
+    m_lastSequenceReceived = ntohll(x);
+    //std::cout << "Received sequence " << m_lastSequenceReceived << std::endl;
+
+    m_curStreamPos += bytesRead;
 }
 
 
