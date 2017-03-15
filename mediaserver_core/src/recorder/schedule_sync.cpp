@@ -16,6 +16,7 @@
 #include <core/resource/storage_resource.h>
 
 #include <numeric>
+#include <utils/common/sleep.h>
 
 QnScheduleSync::QnScheduleSync()
     : m_backupSyncOn(false),
@@ -304,9 +305,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
                 fileSize -= writeSize;
                 qint64 now = qnSyncTime->currentMSecsSinceEpoch();
                 if (now - startTime < timeOnChunk)
-                    std::this_thread::sleep_for(
-                        std::chrono::milliseconds(timeOnChunk - (now - startTime))
-                    );
+                    QnSleep::msleep(timeOnChunk - (now - startTime));
             }
         }
 
@@ -534,15 +533,12 @@ void QnScheduleSync::renewSchedule()
 
 void QnScheduleSync::run()
 {
-    static const auto 
-    REDUNDANT_SYNC_TIMEOUT = std::chrono::seconds(5);
+    static const int kRedundantSyncTimeoutMs = 5000;
     m_backupSyncOn = true;
 
     while (m_backupSyncOn)
     {
-        std::this_thread::sleep_for(
-            REDUNDANT_SYNC_TIMEOUT
-        );
+        QnSleep::msleep(kRedundantSyncTimeoutMs);
 
         if (!m_backupSyncOn.load())
             return;
@@ -614,7 +610,7 @@ void QnScheduleSync::run()
                 }
                 else if (!hasRebuildingStorages || m_interrupted)
                     break;
-                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+                QnSleep::msleep(500);
             }
 
             if (m_interrupted)

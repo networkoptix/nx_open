@@ -73,14 +73,12 @@ private:
     static QString getResourceNameString(const QnUuid &id);
     static QString getUserGroupString(QnBusiness::UserGroup value);
 
-    void at_resource_removed(const QnResourcePtr &resource);
     static bool hasVideoLink(const QnBusinessActionData &action);
 private:
     QList<Column> m_columns;
     QBrush m_linkBrush;
     QFont m_linkFont;
     QScopedPointer<DataIndex> m_index;
-    static QHash<QnUuid, QnResourcePtr> m_resourcesHash;
 };
 
 #endif // QN_EVENT_LOG_MODEL_H

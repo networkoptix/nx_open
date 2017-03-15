@@ -89,6 +89,7 @@ private:
      * Note that installer value will override the existing one.
      */
     void updateStatisticsAllowedSettings();
+    void saveServerInfo(const QnMediaServerResourcePtr& server);
 private:
     int m_argc;
     char** m_argv;
