@@ -10,7 +10,7 @@
 
 #include <set>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 namespace nx {
 namespace client {
@@ -19,12 +19,12 @@ namespace io_device {
 namespace joystick {
 namespace driver {
 
-class MmWinDriver: 
+class MmWinDriver:
     public AbstractJoystickDriver,
     public Singleton<MmWinDriver>
 {
-    
-public: 
+
+public:
     MmWinDriver(HWND windowId);
     virtual ~MmWinDriver() override;
 

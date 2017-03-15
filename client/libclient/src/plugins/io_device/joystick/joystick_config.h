@@ -4,7 +4,7 @@
 
 #include <ui/actions/action.h>
 #include <plugins/io_device/joystick/joystick_common.h>
-#include <utils/common/model_functions_fwd.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 namespace nx {
 namespace client {
@@ -13,7 +13,7 @@ namespace io_device {
 namespace joystick {
 namespace config {
 
-struct Rule 
+struct Rule
 {
     Rule() {};
     Rule(
@@ -21,7 +21,7 @@ struct Rule
         EventType evtType,
         QnActions::IDType actType,
         std::map<QString, QString> actParameters):
-        
+
         ruleId(id),
         eventType(evtType),
         actionType(actType),
@@ -38,7 +38,7 @@ struct Rule
 QN_FUSION_DECLARE_FUNCTIONS(
     nx::client::plugins::io_device::joystick::config::Rule, (json));
 
-struct Configuration 
+struct Configuration
 {
     typedef QString ControlIdType;
     typedef QString OverrideNameType;

@@ -6,7 +6,7 @@
 #include <plugins/io_device/joystick/generic_joystick.h>
 #include <plugins/io_device/joystick/controls/joystick_button_control.h>
 #include <plugins/io_device/joystick/controls/joystick_stick_control.h>
-#include <utils/common/timermanager.h>
+#include <nx/utils/timer_manager.h>
 
 namespace {
 
@@ -17,9 +17,9 @@ const QString kJoystickObjectType = lit("joystick");
 const QString kButtonObjectType = lit("button");
 const QString kStickObjectType = lit("stick");
 const int kDefaultStickLogicalRangeMin = -100;
-const int kDefaultStickLogicalRangeMax = 100; 
+const int kDefaultStickLogicalRangeMax = 100;
 
-} // namespace 
+} // namespace
 
 namespace nx {
 namespace client {
@@ -67,7 +67,7 @@ std::vector<JoystickPtr> MmWinDriver::enumerateJoysticks()
 
         m_joysticks.push_back(joy);
     }
-    
+
     return m_joysticks;
 }
 
@@ -91,7 +91,7 @@ bool MmWinDriver::captureJoystick(JoystickPtr& joystickToCapture)
     {
         return false;
     }
-    
+
     m_capturedJoysticks.insert(joystickIndex.get());
 
     return true;
@@ -130,7 +130,7 @@ void MmWinDriver::notifyJoystickStateChanged(const JOYINFOEX& info, uint joystic
 
     if (!joy)
         return;
-    
+
     notifyJoystickButtonsStateChanged(joy, info.dwButtons);
     notifyJoystickSticksStateChanged(joy, info);
 }
@@ -222,7 +222,7 @@ JoystickPtr MmWinDriver::createJoystick(
     joy->setSticks(sticks);
     joy->setDriver(this);
 
-    return joy; 
+    return joy;
 }
 
 void MmWinDriver::notifyJoystickButtonsStateChanged(JoystickPtr& joy, DWORD buttonStates)

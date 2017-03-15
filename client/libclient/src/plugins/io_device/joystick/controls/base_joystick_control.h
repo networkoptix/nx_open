@@ -4,7 +4,7 @@
 
 #include <set>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <plugins/io_device/joystick/joystick_common.h>
 
 namespace nx {
@@ -23,9 +23,9 @@ struct Range
     static const int kDefaultMinRangeValue = 100;
     static const int kDefaultMaxRangeValue = -100;
 
-    Range(): 
+    Range():
         min(kDefaultMinRangeValue),
-        max(kDefaultMaxRangeValue) 
+        max(kDefaultMaxRangeValue)
     {};
 
     Range(StateElement minimum, StateElement maximum):
@@ -68,7 +68,7 @@ public:
 
 protected:
     typedef std::map<EventType, std::vector<EventHandler>> EventHandlerMap;
-    typedef std::set<EventType> EventSet; 
+    typedef std::set<EventType> EventSet;
 
     virtual bool isEventTypeSupported(EventType eventType) const;
     virtual EventSet checkForEventsUnsafe() const;
@@ -85,9 +85,9 @@ protected:
     AbstractJoystick* m_parentDevice;
     ControlCapabilities m_capabilities;
     State m_state;
-    
+
     EventHandlerMap m_eventHandlers;
-   
+
     mutable QnMutex m_mutex;
 };
 

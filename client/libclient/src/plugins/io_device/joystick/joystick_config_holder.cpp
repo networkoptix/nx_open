@@ -1,6 +1,6 @@
 #include "joystick_config_holder.h"
 
-#include <utils/common/model_functions.h>
+#include <nx/fusion/model_functions.h>
 
 namespace nx {
 namespace client {

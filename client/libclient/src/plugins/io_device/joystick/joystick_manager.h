@@ -7,7 +7,7 @@
 #include "joystick_config_holder.h"
 
 #include <plugins/io_device/joystick/drivers/abstract_joystick_driver.h>
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/widgets/main_window.h>
 
