@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <nx/utils/thread/sync_queue.h>
+
 #include <ec2/compatible_ec2_protocol_version.h>
 
 #include "mserver_cloud_synchronization_connection_fixture.h"
@@ -27,22 +29,33 @@ protected:
 private:
     void openConnectionAndWaitForItToMoveToState(int version, bool isActive)
     {
-        nx::utils::promise<bool> connectionStateChanged;
-        setOnConnectionBecomesActive(
-            [&connectionStateChanged](
+        nx::utils::SyncQueue<bool> connectionStateChangeQueue;
+
+        nx::utils::SubscriptionId onConnectionBecomesActiveSubscriptionId = -1;
+        onConnectionBecomesActiveSubscription().subscribe(
+            [this, &connectionStateChangeQueue](
                 ::ec2::QnTransactionTransportBase::State /*state*/)
             {
-                connectionStateChanged.set_value(true);
-            });
-        setOnConnectionFailure(
-            [&connectionStateChanged](
+                connectionStateChangeQueue.push(true);
+            },
+            &onConnectionBecomesActiveSubscriptionId);
+
+        nx::utils::SubscriptionId onConnectionFailureSubscriptionId = -1;
+        onConnectionFailureSubscription().subscribe(
+            [this, &connectionStateChangeQueue](
                 ::ec2::QnTransactionTransportBase::State /*state*/)
             {
-                connectionStateChanged.set_value(false);
-            });
+                connectionStateChangeQueue.push(false);
+            },
+            &onConnectionFailureSubscriptionId);
 
         openTransactionConnectionsOfSpecifiedVersion(1, version);
-        ASSERT_EQ(isActive, connectionStateChanged.get_future().get());
+        ASSERT_EQ(isActive, connectionStateChangeQueue.pop());
+
+        onConnectionBecomesActiveSubscription().removeSubscription(
+            onConnectionBecomesActiveSubscriptionId);
+        onConnectionFailureSubscription().removeSubscription(
+            onConnectionFailureSubscriptionId);
     }
 };
 

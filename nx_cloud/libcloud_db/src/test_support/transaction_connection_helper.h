@@ -5,6 +5,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <transaction/transaction_transport_base.h>
+#include <utils/common/subscription.h>
 
 #include "test_transaction_transport.h"
 
@@ -18,6 +19,11 @@ enum class KeepAlivePolicy
     noKeepAlive,
 };
 
+using OnConnectionBecomesActiveSubscription =
+    utils::Subscription<::ec2::QnTransactionTransportBase::State>;
+using OnConnectionFailureSubscription =
+    utils::Subscription<::ec2::QnTransactionTransportBase::State>;
+
 /**
  * Helps to establish transaction connection to appserver2 peer and monitor its state.
  */
@@ -25,8 +31,6 @@ class TransactionConnectionHelper
 {
 public:
     using ConnectionId = int;
-    using ConnectionStateChangeHandler = 
-        nx::utils::MoveOnlyFunc<void(::ec2::QnTransactionTransportBase::State)>;
 
     TransactionConnectionHelper();
     ~TransactionConnectionHelper();
@@ -65,8 +69,8 @@ public:
 
     std::size_t activeConnectionCount() const;
 
-    void setOnConnectionBecomesActive(ConnectionStateChangeHandler handler);
-    void setOnConnectionFailure(ConnectionStateChangeHandler handler);
+    OnConnectionBecomesActiveSubscription& onConnectionBecomesActiveSubscription();
+    OnConnectionFailureSubscription& onConnectionFailureSubscription();
 
 private:
     struct ConnectionContext
@@ -87,8 +91,8 @@ private:
     std::atomic<ConnectionId> m_transactionConnectionIdSequence;
     nx::network::aio::Timer m_aioTimer;
     bool m_removeConnectionAfterClosure;
-    ConnectionStateChangeHandler m_onConnectionBecomesActive;
-    ConnectionStateChangeHandler m_onConnectionFailure;
+    OnConnectionBecomesActiveSubscription m_onConnectionBecomesActiveSubscription;
+    OnConnectionFailureSubscription m_onConnectionFailureSubscription;
 
     ::ec2::ApiPeerData localPeer() const;
 

@@ -30,10 +30,8 @@ public:
     void waitUntilClosedConnectionCountReaches(int count);
     void closeAllConnections();
 
-    void setOnConnectionBecomesActive(
-        test::TransactionConnectionHelper::ConnectionStateChangeHandler handler);
-    void setOnConnectionFailure(
-        test::TransactionConnectionHelper::ConnectionStateChangeHandler handler);
+    OnConnectionBecomesActiveSubscription& onConnectionBecomesActiveSubscription();
+    OnConnectionFailureSubscription& onConnectionFailureSubscription();
 
 private:
     AccountWithPassword m_account;

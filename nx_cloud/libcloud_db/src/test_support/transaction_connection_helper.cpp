@@ -159,16 +159,16 @@ std::size_t TransactionConnectionHelper::activeConnectionCount() const
     return m_connections.size();
 }
 
-void TransactionConnectionHelper::setOnConnectionBecomesActive(
-    ConnectionStateChangeHandler handler)
+OnConnectionBecomesActiveSubscription& 
+    TransactionConnectionHelper::onConnectionBecomesActiveSubscription()
 {
-    m_onConnectionBecomesActive = std::move(handler);
+    return m_onConnectionBecomesActiveSubscription;
 }
 
-void TransactionConnectionHelper::setOnConnectionFailure(
-    ConnectionStateChangeHandler handler)
+OnConnectionFailureSubscription&
+    TransactionConnectionHelper::onConnectionFailureSubscription()
 {
-    m_onConnectionFailure = std::move(handler);
+    return m_onConnectionFailureSubscription;
 }
 
 ec2::ApiPeerData TransactionConnectionHelper::localPeer() const
@@ -190,16 +190,14 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
 
         case ec2::QnTransactionTransportBase::NeedStartStreaming:
         case ec2::QnTransactionTransportBase::ReadyForStreaming:
-            if (m_onConnectionBecomesActive)
-                m_onConnectionBecomesActive(newState);
+            m_onConnectionBecomesActiveSubscription.notify(newState);
             break;
 
         case ec2::QnTransactionTransportBase::Error:
         case ec2::QnTransactionTransportBase::Closed:
             if (m_removeConnectionAfterClosure)
                 removeConnection(connection);
-            if (m_onConnectionFailure)
-                m_onConnectionFailure(newState);
+            m_onConnectionFailureSubscription.notify(newState);
             break;
 
         default:

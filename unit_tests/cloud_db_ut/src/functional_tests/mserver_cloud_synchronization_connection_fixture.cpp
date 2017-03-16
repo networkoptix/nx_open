@@ -89,16 +89,16 @@ void Ec2MserverCloudSynchronizationConnection::closeAllConnections()
     m_connectionHelper.closeAllConnections();
 }
 
-void Ec2MserverCloudSynchronizationConnection::setOnConnectionBecomesActive(
-    test::TransactionConnectionHelper::ConnectionStateChangeHandler handler)
+OnConnectionBecomesActiveSubscription& 
+    Ec2MserverCloudSynchronizationConnection::onConnectionBecomesActiveSubscription()
 {
-    m_connectionHelper.setOnConnectionBecomesActive(std::move(handler));
+    return m_connectionHelper.onConnectionBecomesActiveSubscription();
 }
 
-void Ec2MserverCloudSynchronizationConnection::setOnConnectionFailure(
-    test::TransactionConnectionHelper::ConnectionStateChangeHandler handler)
+OnConnectionFailureSubscription& 
+    Ec2MserverCloudSynchronizationConnection::onConnectionFailureSubscription()
 {
-    m_connectionHelper.setOnConnectionFailure(std::move(handler));
+    return m_connectionHelper.onConnectionFailureSubscription();
 }
 
 void Ec2MserverCloudSynchronizationConnection::waitForAtLeastNConnectionsToMoveToACertainState(
