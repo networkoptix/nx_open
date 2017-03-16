@@ -164,7 +164,8 @@ class ServerConfig(object):
 
     SETUP_LOCAL = 'local'
 
-    def __init__(self, box_config_factory, start=True, setup=SETUP_LOCAL, leave_initial_cloud_host=False, box=None):
+    def __init__(self, box_config_factory, start=True, setup=SETUP_LOCAL, leave_initial_cloud_host=False,
+                 box=None, config_file_params=None):
         assert box is None or isinstance(box, BoxConfig), repr(box)
         self.start = start
         self.setup = setup
@@ -175,6 +176,8 @@ class ServerConfig(object):
         # server binaries has original cloud host encoded by compilation step.
         self.leave_initial_cloud_host = leave_initial_cloud_host  # bool
         self.box = box or box_config_factory()
+        self.config_file_params = config_file_params  # dict or None
+
 
     def __repr__(self):
         return 'ServerConfig(%r @ %s)' % (self.name, self.box)
@@ -202,7 +205,7 @@ class Server(object):
     def __repr__(self):
         return 'Server%r@%s' % (self.name, self.url)
 
-    def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None):
+    def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None, config_file_params=None):
         self._is_started = was_started = self.service.get_status()
         log.info('Service for %s %s started', self, self._is_started and 'WAS' or 'was NOT')
         if reset:
@@ -211,7 +214,7 @@ class Server(object):
             self.storage.cleanup()
             if patch_set_cloud_host:
                 self.patch_binary_set_cloud_host(patch_set_cloud_host)  # may be changed by previous tests...
-            self.reset_config(logLevel=log_level, tranLogLevel=log_level)
+            self.reset_config(logLevel=log_level, tranLogLevel=log_level, **(config_file_params or {}))
             if must_start:
                 self.start_service()
         else:
