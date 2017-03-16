@@ -19,6 +19,7 @@ do
     ./build_customization.sh $CUSTOMIZATION 2>&1 &
 done
 
+wait
 echo "Done!"
 
 # say "Cloud portal build is finished"
