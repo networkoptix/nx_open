@@ -24,7 +24,9 @@ enum class KeepAlivePolicy
 class TransactionConnectionHelper
 {
 public:
-    typedef int ConnectionId;
+    using ConnectionId = int;
+    using ConnectionStateChangeHandler = 
+        nx::utils::MoveOnlyFunc<void(::ec2::QnTransactionTransportBase::State)>;
 
     TransactionConnectionHelper();
     ~TransactionConnectionHelper();
@@ -38,7 +40,8 @@ public:
         const QUrl& appserver2BaseUrl,
         const std::string& login,
         const std::string& password,
-        KeepAlivePolicy keepAlivePolicy = KeepAlivePolicy::enableKeepAlive);
+        KeepAlivePolicy keepAlivePolicy,
+        int protocolVersion);
     
     bool waitForState(
         const std::vector<::ec2::QnTransactionTransportBase::State> desiredStates,
@@ -62,6 +65,9 @@ public:
 
     std::size_t activeConnectionCount() const;
 
+    void setOnConnectionBecomesActive(ConnectionStateChangeHandler handler);
+    void setOnConnectionFailure(ConnectionStateChangeHandler handler);
+
 private:
     struct ConnectionContext
     {
@@ -81,6 +87,8 @@ private:
     std::atomic<ConnectionId> m_transactionConnectionIdSequence;
     nx::network::aio::Timer m_aioTimer;
     bool m_removeConnectionAfterClosure;
+    ConnectionStateChangeHandler m_onConnectionBecomesActive;
+    ConnectionStateChangeHandler m_onConnectionFailure;
 
     ::ec2::ApiPeerData localPeer() const;
 
@@ -89,9 +97,9 @@ private:
         ::ec2::QnTransactionTransportBase::State /*newState*/);
 
     void moveConnectionToReadyForStreamingState(
-        ec2::QnTransactionTransportBase* connection);
-    void removeConnection(ec2::QnTransactionTransportBase* connection);
-    ConnectionId getConnectionId(ec2::QnTransactionTransportBase* connection) const;
+        ::ec2::QnTransactionTransportBase* connection);
+    void removeConnection(::ec2::QnTransactionTransportBase* connection);
+    ConnectionId getConnectionId(::ec2::QnTransactionTransportBase* connection) const;
 };
 
 } // namespace test

@@ -2,6 +2,7 @@
 
 #include <nx/utils/url_builder.h>
 
+#include <nx_ec/ec_proto_version.h>
 #include <test_support/transaction_connection_helper.h>
 
 #include "ec2/cloud_vms_synchro_test_helper.h"
@@ -67,7 +68,8 @@ void Ec2MserverCloudSynchronizationKeepAlive::testTransactionConnectionKeepAlive
                 .setHost(cdb()->endpoint().address.toString()).setPort(cdb()->endpoint().port),
             registeredSystemData().id,
             registeredSystemData().authKey,
-            keepAlivePolicy);
+            keepAlivePolicy,
+            nx_ec::EC2_PROTO_VERSION);
 
     m_transactionConnectionHelper.getAccessToConnectionById(
         m_connectionId,

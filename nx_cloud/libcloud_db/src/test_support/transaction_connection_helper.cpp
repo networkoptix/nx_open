@@ -33,7 +33,8 @@ TransactionConnectionHelper::ConnectionId
         const QUrl& appserver2BaseUrl,
         const std::string& login,
         const std::string& password,
-        KeepAlivePolicy keepAlivePolicy)
+        KeepAlivePolicy keepAlivePolicy,
+        int protocolVersion)
 {
     auto localPeerInfo = localPeer();
     localPeerInfo.id = QnUuid::createUuid();
@@ -46,7 +47,9 @@ TransactionConnectionHelper::ConnectionId
             connectionContext.connectionGuardSharedState.get(),
             localPeerInfo,
             login,
-            password);
+            password,
+            protocolVersion);
+    connectionContext.connection->bindToAioThread(m_aioTimer.getAioThread());
     if (keepAlivePolicy == KeepAlivePolicy::noKeepAlive)
         connectionContext.connection->setKeepAliveEnabled(false);
     QObject::connect(
@@ -156,6 +159,18 @@ std::size_t TransactionConnectionHelper::activeConnectionCount() const
     return m_connections.size();
 }
 
+void TransactionConnectionHelper::setOnConnectionBecomesActive(
+    ConnectionStateChangeHandler handler)
+{
+    m_onConnectionBecomesActive = std::move(handler);
+}
+
+void TransactionConnectionHelper::setOnConnectionFailure(
+    ConnectionStateChangeHandler handler)
+{
+    m_onConnectionFailure = std::move(handler);
+}
+
 ec2::ApiPeerData TransactionConnectionHelper::localPeer() const
 {
     return ec2::ApiPeerData(
@@ -172,12 +187,19 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
     {
         case ec2::QnTransactionTransportBase::Connected:
             moveConnectionToReadyForStreamingState(connection);
+
+        case ec2::QnTransactionTransportBase::NeedStartStreaming:
+        case ec2::QnTransactionTransportBase::ReadyForStreaming:
+            if (m_onConnectionBecomesActive)
+                m_onConnectionBecomesActive(newState);
             break;
 
         case ec2::QnTransactionTransportBase::Error:
         case ec2::QnTransactionTransportBase::Closed:
             if (m_removeConnectionAfterClosure)
                 removeConnection(connection);
+            if (m_onConnectionFailure)
+                m_onConnectionFailure(newState);
             break;
 
         default:
