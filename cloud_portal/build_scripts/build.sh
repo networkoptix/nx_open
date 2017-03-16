@@ -16,10 +16,9 @@ do
     dir=${dir%*/}
     CUSTOMIZATION=${dir/..\/customizations\//}
 
-    ./build_customization.sh $CUSTOMIZATION 2>&1 &
+    ./build_customization.sh $CUSTOMIZATION
 done
 
-wait
 echo "Done!"
 
 # say "Cloud portal build is finished"
