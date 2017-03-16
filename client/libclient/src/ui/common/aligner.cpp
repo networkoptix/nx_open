@@ -76,6 +76,7 @@ void QnAligner::addAligner(QnAligner* aligner)
 void QnAligner::clear()
 {
     m_widgets.clear();
+    m_aligners.clear();
 }
 
 void QnAligner::registerTypeAccessor(const QLatin1String& className, AbstractAccessor* accessor)
@@ -122,7 +123,7 @@ void QnAligner::enforceWidth(int width)
 
 void QnAligner::align()
 {
-    if (m_widgets.isEmpty())
+    if (m_widgets.isEmpty() && m_aligners.isEmpty())
         return;
 
     enforceWidth(maxWidth());
