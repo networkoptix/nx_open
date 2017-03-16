@@ -97,17 +97,6 @@ angular.module('webadminApp')
                         return "native-hls";
                     }
 
-                    // Test native support. Native is always better choice
-                    if(weHaveWebm && canPlayNatively("webm")){ // webm is our best format for now
-                        if(window.jscd.browser == 'Microsoft Internet Explorer' && window.jscd.osVersion >= 10) {
-                            // This is hack to prevent using webm codec in Windows 10.
-                            // Pretend we do not support webm in Windows 10
-                            // TODO: remove this hack in happy future
-                        }else{
-                            return "webm";
-                        }
-                    }
-
                     // Hardcode native support
                     if(window.jscd.os == "Android" ){
                         if(weHaveWebm){
@@ -134,6 +123,9 @@ angular.module('webadminApp')
                             }
                             if(window.jscd.flashVersion){ // We have flash - try to play using flash
                                 return "flashls";
+                            }
+                            if (weHaveWebm){
+                                return 'webm';
                             }
 
                             if(weHaveHls && weHaveWebm && (window.jscd.osVersion < 10)){
