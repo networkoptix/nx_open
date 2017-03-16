@@ -16,7 +16,7 @@ do
     dir=${dir%*/}
     CUSTOMIZATION=${dir/..\/customizations\//}
 
-    ./build_customization.sh $CUSTOMIZATION
+    ./build_customization.sh $CUSTOMIZATION 2>&1 &
 done
 
 echo "Done!"
