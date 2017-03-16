@@ -140,11 +140,11 @@ install -m 644 debian/templates $STAGE/DEBIAN
 
 (cd $STAGEBASE; fakeroot dpkg-deb -b $FINALNAME)
 
-mkdir -p $STAGETARGET/share/icons
-cp -r $ICONSTAGE/* $STAGETARGET/share/icons
-cp -r bin/update.json $STAGETARGET
+mkdir -p "$STAGETARGET/share/icons"
+cp "$ICONSTAGE/hicolor/scalable/apps"/* "$STAGETARGET/share/icons"
+cp "bin/update.json" "$STAGETARGET"
 echo "client.finalName=$FINALNAME" >> finalname-client.properties
 echo "zip -y -r $UPDATE_NAME $STAGETARGET"
-cd $STAGETARGET
-zip -y -r $UPDATE_NAME ./*
-mv -f $UPDATE_NAME ${project.build.directory}
+cd "$STAGETARGET"
+zip -y -r "$UPDATE_NAME" ./*
+mv -f "$UPDATE_NAME" "${project.build.directory}"
