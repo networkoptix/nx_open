@@ -80,7 +80,14 @@ typedef HttpHeaders::value_type HttpHeader;
     This is convinient method for simplify transition from QHttp
     \return Value of header \a headerName (if found), empty string otherwise
 */
-StringType NX_NETWORK_API getHeaderValue( const HttpHeaders& headers, const StringType& headerName );
+StringType NX_NETWORK_API getHeaderValue(const HttpHeaders& headers, const StringType& headerName);
+/**
+ * @return false if requested header was not found.
+ */
+bool NX_NETWORK_API readHeader(
+    const HttpHeaders& headers,
+    const StringType& headerName,
+    int* value);
 
 //!convenient function for inserting or replacing header
 /*!
