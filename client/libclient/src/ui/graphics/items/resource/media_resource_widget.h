@@ -192,6 +192,8 @@ protected:
 
     void resetSoftwareTriggerButtons();
 
+    void invokeTrigger(const QString& id, const QnUuid& resourceId);
+
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
     void at_screenshotButton_clicked();
@@ -311,8 +313,8 @@ private:
 
     QnTwoWayAudioWidget* m_twoWayAudioWidget;
 
-    std::set<QString> m_softwareTriggers;
-    QList<QnUuid> m_softwareTriggerIds; // IDs of overlay items. Will be refactored ASAP.
+    QMap<QString, QString> m_softwareTriggers; //< ID -> icon name
+    QList<QnUuid> m_softwareTriggerIds; // UUIDs of overlay items
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

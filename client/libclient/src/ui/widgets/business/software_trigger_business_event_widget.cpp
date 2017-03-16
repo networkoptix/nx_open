@@ -8,28 +8,29 @@
 #include <core/resource/user_resource.h>
 #include <ui/common/aligner.h>
 #include <ui/dialogs/resource_selection_dialog.h>
+#include <ui/graphics/items/overlays/software_trigger_icons.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 
-/*
-TODO: #vkutin This implementation is a stub
-Actual implementation will be done as soon as software triggers specification is ready.
-*/
 
-QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(QWidget* parent):
+QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(QWidget* parent) :
     base_type(parent),
     ui(new Ui::SoftwareTriggerBusinessEventWidget)
 {
     ui->setupUi(this);
 
     ui->usersButton->setMaximumWidth(QWIDGETSIZE_MAX);
-
     ui->triggerIdLineEdit->setPlaceholderText(QnBusinessStringsHelper::defaultSoftwareTriggerName());
 
     connect(ui->triggerIdLineEdit, &QLineEdit::textChanged, this,
         &QnSoftwareTriggerBusinessEventWidget::paramsChanged);
-    connect(ui->iconComboBox, &QComboBox::currentTextChanged, this,
+    connect(ui->iconComboBox, QnComboboxCurrentIndexChanged, this,
         &QnSoftwareTriggerBusinessEventWidget::paramsChanged);
     connect(ui->usersButton, &QPushButton::clicked, this,
         &QnSoftwareTriggerBusinessEventWidget::at_usersButton_clicked);
+
+    ui->iconComboBox->setIcons(
+        QnSoftwareTriggerIcons::iconsPath(),
+        QnSoftwareTriggerIcons::iconNames());
 
     auto aligner = new QnAligner(this);
     aligner->addWidget(ui->nameLabel);
@@ -43,8 +44,8 @@ QnSoftwareTriggerBusinessEventWidget::~QnSoftwareTriggerBusinessEventWidget()
 
 void QnSoftwareTriggerBusinessEventWidget::updateTabOrder(QWidget* before, QWidget* after)
 {
-    setTabOrder(before, ui->triggerIdLineEdit);
-    setTabOrder(ui->triggerIdLineEdit, after);
+    setTabOrder(before, ui->usersButton);
+    setTabOrder(ui->iconComboBox, after);
 }
 
 void QnSoftwareTriggerBusinessEventWidget::at_model_dataChanged(QnBusiness::Fields fields)
@@ -59,7 +60,7 @@ void QnSoftwareTriggerBusinessEventWidget::at_model_dataChanged(QnBusiness::Fiel
         const auto params = model()->eventParams();
         const auto text = params.inputPortId.trimmed();
         ui->triggerIdLineEdit->setText(text);
-        ui->iconComboBox->setCurrentText(params.caption);
+        ui->iconComboBox->setCurrentIcon(params.caption);
 
         if (params.metadata.instigators.empty())
         {
@@ -83,7 +84,7 @@ void QnSoftwareTriggerBusinessEventWidget::paramsChanged()
     auto eventParams = model()->eventParams();
 
     eventParams.inputPortId = ui->triggerIdLineEdit->text().trimmed();
-    eventParams.caption = ui->iconComboBox->currentText();
+    eventParams.caption = ui->iconComboBox->currentIcon();
 
     model()->setEventParams(eventParams);
 }

@@ -61,6 +61,7 @@
 #include <ui/graphics/items/overlays/composite_text_overlay.h>
 #include <ui/graphics/items/overlays/buttons_overlay.h>
 #include <ui/graphics/items/overlays/status_overlay_controller.h>
+#include <ui/graphics/items/overlays/software_trigger_icons.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
@@ -487,9 +488,6 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
 
 void QnMediaResourceWidget::resetSoftwareTriggerButtons()
 {
-    //TODO: #vkutin This implementation is a stub
-    // Actual implementation will be done as soon as software triggers specification is ready.
-
     /* Delete existing buttons: */
     for (const auto& id: m_softwareTriggerIds)
         overlayWidgets()->triggersOverlay->removeItem(id);
@@ -523,42 +521,47 @@ void QnMediaResourceWidget::resetSoftwareTriggerButtons()
             continue;
 
         const auto triggerName = rule->eventParams().inputPortId.trimmed();
-        m_softwareTriggers.insert(triggerName);
+        m_softwareTriggers.insert(triggerName, rule->eventParams().caption);
     }
 
-    /* Create buttons (sorted by std::set with default QString comparison): */
+    /* Create buttons (sorted by QMap with default QString comparison): */
     int pos = 0;
-    for (const auto& id: m_softwareTriggers)
+    for (auto iter = m_softwareTriggers.cbegin(); iter != m_softwareTriggers.cend(); ++iter)
     {
         const auto trigger = new QnSoftwareTriggerButton(this);
-        //TODO: #vkutin Replace with user-selected icon
-        trigger->setIcon(qnSkin->icon(lit("item/mic.png")));
+        trigger->setIcon(QnSoftwareTriggerIcons::iconByName(iter.value()));
         trigger->setFixedSize(qnSkin->maximumSize(trigger->icon()));
-        trigger->setToolTip(QnBusinessStringsHelper::getSoftwareTriggerName(id));
+        trigger->setToolTip(QnBusinessStringsHelper::getSoftwareTriggerName(iter.key()));
 
         m_softwareTriggerIds << overlayWidgets()->triggersOverlay->insertItem(pos++, trigger);
 
         connect(trigger, &QnImageButtonWidget::clicked, this,
-            [this, id, resourceId]()
+            [this, id = iter.key(), resourceId]()
             {
-                if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
-                    return;
-
-                qnCommon->currentServer()->restConnection()->softwareTriggerCommand(
-                    resourceId, id,
-                    [this](bool success, rest::Handle id, const QnJsonRestResult& result)
-                    {
-                        Q_UNUSED(id);
-                        if (success && result.error == QnRestResult::NoError)
-                            return;
-
-                        QnMessageBox::warning(mainWindow(),
-                            tr("Failed to invoke Software Trigger"),
-                            result.errorString);
-                    },
-                    QThread::currentThread());
+                invokeTrigger(id, resourceId);
             });
     }
+}
+
+void QnMediaResourceWidget::invokeTrigger(const QString& id, const QnUuid& resourceId)
+{
+    if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
+        return;
+
+    const auto responseHandler =
+        [this, id](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        {
+            Q_UNUSED(handle);
+            if (success && result.error == QnRestResult::NoError)
+                return;
+
+            QnMessageBox::warning(mainWindow(),
+                tr("Failed to invoke trigger %1").arg(id),
+                result.errorString);
+        };
+
+    qnCommon->currentServer()->restConnection()->softwareTriggerCommand(
+        resourceId, id, responseHandler, QThread::currentThread());
 }
 
 void QnMediaResourceWidget::createButtons()

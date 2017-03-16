@@ -47,7 +47,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>PushButton</string>
+        <string notr="true">&lt;All Users&gt;</string>
        </property>
       </widget>
      </item>
@@ -83,7 +83,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="iconComboBox"/>
+      <widget class="QnIconSelectionComboBox" name="iconComboBox"/>
      </item>
      <item>
       <spacer name="horizontalSpacer">
@@ -107,6 +107,11 @@
    <class>QnSelectUsersButton</class>
    <extends>QPushButton</extends>
    <header location="global">ui/widgets/select_resources_button.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QnIconSelectionComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">ui/widgets/common/icon_selection_combo_box.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
