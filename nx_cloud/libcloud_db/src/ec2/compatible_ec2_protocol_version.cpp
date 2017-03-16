@@ -6,8 +6,8 @@ namespace ec2 {
 
 bool isProtocolVersionCompatible(int version)
 {
-    return (version >= kMinSupportProtocolVersion)
-        && (version <= kMaxSupportProtocolVersion);
+    return (version >= kMinSupportedProtocolVersion)
+        && (version <= kMaxSupportedProtocolVersion);
 }
 
 } // namespace ec2

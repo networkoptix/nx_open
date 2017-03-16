@@ -48,14 +48,14 @@ private:
 
 TEST_F(Ec2MserverCloudCompability, compatible_protocol_range_is_meaningful)
 {
-    ASSERT_LE(ec2::kMinSupportProtocolVersion, ec2::kMaxSupportProtocolVersion);
+    ASSERT_LE(ec2::kMinSupportedProtocolVersion, ec2::kMaxSupportedProtocolVersion);
 }
 
 TEST_F(Ec2MserverCloudCompability, any_compatible_proto_version_is_accepted_by_cloud)
 {
     for (int
-        version = ec2::kMinSupportProtocolVersion;
-        version <= ec2::kMaxSupportProtocolVersion;
+        version = ec2::kMinSupportedProtocolVersion;
+        version <= ec2::kMaxSupportedProtocolVersion;
         ++version)
     {
         assertCdbAcceptsConnectionOfVersion(version);
@@ -64,12 +64,12 @@ TEST_F(Ec2MserverCloudCompability, any_compatible_proto_version_is_accepted_by_c
 
 TEST_F(Ec2MserverCloudCompability, version_left_of_compatibility_range_is_rejected)
 {
-    assertCdbDoesNotAcceptConnectionOfVersion(ec2::kMinSupportProtocolVersion - 1);
+    assertCdbDoesNotAcceptConnectionOfVersion(ec2::kMinSupportedProtocolVersion - 1);
 }
 
 TEST_F(Ec2MserverCloudCompability, version_right_of_compatibility_range_is_rejected)
 {
-    assertCdbDoesNotAcceptConnectionOfVersion(ec2::kMaxSupportProtocolVersion + 1);
+    assertCdbDoesNotAcceptConnectionOfVersion(ec2::kMaxSupportedProtocolVersion + 1);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -77,8 +77,8 @@ TEST_F(Ec2MserverCloudCompability, version_right_of_compatibility_range_is_rejec
 TEST(Ec2MserverCloudCompabilityCheckRoutine, compatible_versions)
 {
     for (int
-        version = ec2::kMinSupportProtocolVersion;
-        version <= ec2::kMaxSupportProtocolVersion;
+        version = ec2::kMinSupportedProtocolVersion;
+        version <= ec2::kMaxSupportedProtocolVersion;
         ++version)
     {
         ASSERT_TRUE(ec2::isProtocolVersionCompatible(version));
@@ -87,8 +87,8 @@ TEST(Ec2MserverCloudCompabilityCheckRoutine, compatible_versions)
 
 TEST(Ec2MserverCloudCompabilityCheckRoutine, incompatible_versions)
 {
-    ASSERT_FALSE(ec2::isProtocolVersionCompatible(ec2::kMinSupportProtocolVersion - 1));
-    ASSERT_FALSE(ec2::isProtocolVersionCompatible(ec2::kMaxSupportProtocolVersion + 1));
+    ASSERT_FALSE(ec2::isProtocolVersionCompatible(ec2::kMinSupportedProtocolVersion - 1));
+    ASSERT_FALSE(ec2::isProtocolVersionCompatible(ec2::kMaxSupportedProtocolVersion + 1));
 }
 
 } // namespace test 

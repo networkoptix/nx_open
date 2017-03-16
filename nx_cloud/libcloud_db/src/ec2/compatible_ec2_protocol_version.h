@@ -6,8 +6,8 @@ namespace nx {
 namespace cdb {
 namespace ec2 {
 
-static const int kMinSupportProtocolVersion = 3024;
-static const int kMaxSupportProtocolVersion = nx_ec::EC2_PROTO_VERSION;
+static const int kMinSupportedProtocolVersion = 3024;
+static const int kMaxSupportedProtocolVersion = nx_ec::EC2_PROTO_VERSION;
 
 bool isProtocolVersionCompatible(int version);
 

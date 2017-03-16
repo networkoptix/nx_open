@@ -257,8 +257,8 @@ void TransactionTransport::onSomeDataReceivedFromRemotePeer()
 
 int TransactionTransport::highestProtocolVersionCompatibleWithRemotePeer() const
 {
-    return remotePeerProtocolVersion() >= kMinSupportProtocolVersion
-        ? kMaxSupportProtocolVersion
+    return remotePeerProtocolVersion() >= kMinSupportedProtocolVersion
+        ? kMaxSupportedProtocolVersion
         : remotePeerProtocolVersion();
 }
 
