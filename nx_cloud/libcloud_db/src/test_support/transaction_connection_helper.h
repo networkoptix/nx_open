@@ -5,6 +5,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <transaction/transaction_transport_base.h>
+#include <utils/common/subscription.h>
 
 #include "test_transaction_transport.h"
 
@@ -18,13 +19,18 @@ enum class KeepAlivePolicy
     noKeepAlive,
 };
 
+using OnConnectionBecomesActiveSubscription =
+    utils::Subscription<::ec2::QnTransactionTransportBase::State>;
+using OnConnectionFailureSubscription =
+    utils::Subscription<::ec2::QnTransactionTransportBase::State>;
+
 /**
  * Helps to establish transaction connection to appserver2 peer and monitor its state.
  */
 class TransactionConnectionHelper
 {
 public:
-    typedef int ConnectionId;
+    using ConnectionId = int;
 
     TransactionConnectionHelper();
     ~TransactionConnectionHelper();
@@ -38,7 +44,8 @@ public:
         const QUrl& appserver2BaseUrl,
         const std::string& login,
         const std::string& password,
-        KeepAlivePolicy keepAlivePolicy = KeepAlivePolicy::enableKeepAlive);
+        KeepAlivePolicy keepAlivePolicy,
+        int protocolVersion);
     
     bool waitForState(
         const std::vector<::ec2::QnTransactionTransportBase::State> desiredStates,
@@ -62,6 +69,9 @@ public:
 
     std::size_t activeConnectionCount() const;
 
+    OnConnectionBecomesActiveSubscription& onConnectionBecomesActiveSubscription();
+    OnConnectionFailureSubscription& onConnectionFailureSubscription();
+
 private:
     struct ConnectionContext
     {
@@ -81,6 +91,8 @@ private:
     std::atomic<ConnectionId> m_transactionConnectionIdSequence;
     nx::network::aio::Timer m_aioTimer;
     bool m_removeConnectionAfterClosure;
+    OnConnectionBecomesActiveSubscription m_onConnectionBecomesActiveSubscription;
+    OnConnectionFailureSubscription m_onConnectionFailureSubscription;
 
     ::ec2::ApiPeerData localPeer() const;
 
@@ -89,9 +101,9 @@ private:
         ::ec2::QnTransactionTransportBase::State /*newState*/);
 
     void moveConnectionToReadyForStreamingState(
-        ec2::QnTransactionTransportBase* connection);
-    void removeConnection(ec2::QnTransactionTransportBase* connection);
-    ConnectionId getConnectionId(ec2::QnTransactionTransportBase* connection) const;
+        ::ec2::QnTransactionTransportBase* connection);
+    void removeConnection(::ec2::QnTransactionTransportBase* connection);
+    ConnectionId getConnectionId(::ec2::QnTransactionTransportBase* connection) const;
 };
 
 } // namespace test
