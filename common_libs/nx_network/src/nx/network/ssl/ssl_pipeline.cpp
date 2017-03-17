@@ -6,16 +6,19 @@
 
 namespace nx {
 namespace network {
-namespace ssl {
 
 //-------------------------------------------------------------------------------------------------
-// Pipeline
+// ssl::Pipeline
+
+namespace ssl {
 
 Pipeline::Pipeline(SSL_CTX* sslContext):
     m_state(State::init),
     m_ssl(nullptr, &SSL_free),
     m_readThirsty(false),
-    m_writeThirsty(false)
+    m_writeThirsty(false),
+    m_eof(false),
+    m_failed(false)
 {
     initOpenSSLGlobalLock();
     initSslBio(sslContext);
@@ -25,24 +28,15 @@ Pipeline::~Pipeline()
 {
 }
 
-void Pipeline::setInput(AbstractInput* inputStream)
-{
-    m_inputStream = inputStream;
-}
-
-void Pipeline::setOutput(AbstractOutput* outputStream)
-{
-    m_outputStream = outputStream;
-}
-
 int Pipeline::write(const void* data, size_t count)
 {
     if (m_state < State::handshakeDone)
         doHandshake();
     if (m_state < State::handshakeDone)
-        return StreamIoError::wouldBlock;
+        return utils::pipeline::StreamIoError::wouldBlock;
 
-    return SSL_write(m_ssl.get(), data, count);
+    const int ret = SSL_write(m_ssl.get(), data, count);
+    return handleSslIoResult(ret);
 }
 
 int Pipeline::read(void* data, size_t count)
@@ -50,9 +44,10 @@ int Pipeline::read(void* data, size_t count)
     if (m_state < State::handshakeDone)
         doHandshake();
     if (m_state < State::handshakeDone)
-        return StreamIoError::wouldBlock;
+        return utils::pipeline::StreamIoError::wouldBlock;
 
-    return SSL_read(m_ssl.get(), data, count);
+    const int ret = SSL_read(m_ssl.get(), data, count);
+    return handleSslIoResult(ret);
 }
 
 bool Pipeline::isReadThirsty() const
@@ -65,17 +60,27 @@ bool Pipeline::isWriteThirsty() const
     return m_writeThirsty;
 }
 
+bool Pipeline::eof() const
+{
+    return m_eof;
+}
+
+bool Pipeline::failed() const
+{
+    return m_failed;
+}
+
 int Pipeline::bioRead(void* buffer, unsigned int bufferLen)
 {
     const auto result = m_inputStream->read(buffer, bufferLen);
-    m_readThirsty = (result == StreamIoError::wouldBlock) || (result == 0);
+    m_readThirsty = (result == utils::pipeline::StreamIoError::wouldBlock) || (result == 0);
     return result;
 }
 
 int Pipeline::bioWrite(const void* buffer, unsigned int bufferLen)
 {
     const auto result = m_outputStream->write(buffer, bufferLen);
-    m_writeThirsty = (result == StreamIoError::wouldBlock) || (result == 0);
+    m_writeThirsty = (result == utils::pipeline::StreamIoError::wouldBlock) || (result == 0);
     return result;
 }
 
@@ -143,6 +148,31 @@ void Pipeline::doHandshake()
     }
 }
 
+int Pipeline::handleSslIoResult(int result)
+{
+    switch (SSL_get_error(m_ssl.get(), result))
+    {
+        case SSL_ERROR_NONE:
+            return result;
+
+        case SSL_ERROR_ZERO_RETURN:
+            m_eof = true;
+            return 0;
+
+        case SSL_ERROR_WANT_READ:
+        case SSL_ERROR_WANT_WRITE:
+            // TODO
+            break;
+
+        case SSL_ERROR_SSL:
+            m_eof = true;
+            m_failed = true;
+            return utils::pipeline::StreamIoError::nonRecoverableError;
+    }
+
+    return result;
+}
+
 //-------------------------------------------------------------------------------------------------
 // Stand-alone SSL BIO functions
 
@@ -150,7 +180,7 @@ int Pipeline::bioRead(BIO* b, char* out, int outl)
 {
     Pipeline* sslSock = static_cast<Pipeline*>(BIO_get_app_data(b));
     int ret = sslSock->bioRead(out, outl);
-    if (ret == StreamIoError::osError)
+    if (ret == utils::pipeline::StreamIoError::osError)
     {
         BIO_clear_retry_flags(b);
         BIO_set_retry_read(b);
@@ -163,7 +193,7 @@ int Pipeline::bioWrite(BIO* b, const char* in, int inl)
 {
     Pipeline* sslSock = static_cast<Pipeline*>(BIO_get_app_data(b));
     int ret = sslSock->bioWrite(in, inl);
-    if (ret == StreamIoError::osError)
+    if (ret == utils::pipeline::StreamIoError::osError)
     {
         BIO_clear_retry_flags(b);
         BIO_set_retry_write(b);
