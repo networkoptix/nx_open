@@ -25,7 +25,7 @@
     <Text X="12" Y="174" Width="-12" Height="40" FontId="1" DisablePrefix="yes" Center="yes">${display.product.name} ${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</Text>
     <Text X="12" Y="214" Width="-12" Height="24" FontId="8" DisablePrefix="yes" Center="yes">#(loc.Components)</Text>
     <Text X="12" Y="-64" Width="-12" Height="16" FontId="7" DisablePrefix="yes" Center="yes">#(loc.InstallLicenseText)</Text>
-    <Hypertext Name="EulaHyperlink" X="190" Y="-48" Width="-12" Height="16" TabStop="no" FontId="7" HideWhenDisabled="yes">#(loc.InstallLicenseLinkText)</Hypertext>
+    <Hypertext Name="EulaHyperlink" X="190" Y="-48" Width="-12" Height="16" TabStop="no" FontId="7" HideWhenDisabled="yes">&lt;a href="#"&gt;#(loc.InstallLicenseLinkText)&lt;/a&gt;</Hypertext>
     <Button Name="OptionsButton" X="12" Y="-12" Width="75" Height="28" TabStop="yes" FontId="0" HideWhenDisabled="yes">#(loc.InstallOptionsButton)</Button>
     <Button Name="InstallButton" X="-12" Y="-12" Width="150" Height="28" TabStop="yes" FontId="0">#(loc.InstallInstallButton)</Button>
   </Page>

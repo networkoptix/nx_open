@@ -1,0 +1,54 @@
+<div class="videowindow">
+
+    <div class="camera-view-informer camera-loading" ng-if="loading">
+        <div class="camera-view-preloader camera-view-message-icon"></div>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashRequired">
+        ビデオを再生することはできません<br>
+ARMベースサーバーに<a href="https://get.adobe.com/flashplayer/" target="_blank">Adobe Flash</a>をインストールして下さい<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashOrWebmRequired">
+        ビデオを再生することはできません<br>
+IEで再生するには<a href="https://get.adobe.com/flashplayer/" target="_blank">Adobe Flash</a> または <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">WebM codec</a>をインストールして下さい<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noArmSupport">
+        ビデオを再生することはできません<br>
+このブラウザまたはデバイスはARMベースサーバーからのビデオ再生をサポートしていません<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noFormat">
+        このビデオを再生することはできません<br>
+このブラウザまたはデバイスはこのカメラからのビデオ再生をサポートしていません<br>
+    </div>
+
+
+    <div class="camera-view-informer" ng-if="ieNoWebm">
+        ビデオを再生することはできません<br>
+IEに <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">WebM codec</a>をインストールして下さい<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ieWin10">
+        ビデオを再生することはできません<br>
+Microsoft Edge または Google Chrome を使用して下さい<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ubuntuNX">
+        ビデオを再生することはできません<br>
+このブラウザはARMベースサーバーからのビデオがサポートされていません。代わりにChromium ブラウザを使用して下さい<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="errorLoading">
+        ビデオを再生することはできません<br>
+エラーが発生しました<br>
+    </div>
+
+
+    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}" ng-include="Config.viewsDir + 'components/flashls.html'">
+    </div>
+
+    <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading}">
+    </div>
+</div>
