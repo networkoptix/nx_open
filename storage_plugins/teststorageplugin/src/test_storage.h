@@ -74,7 +74,8 @@ private:
         const std::string& name, 
         int category, 
         int flags, 
-        int size) const;
+        int size,
+        int* ecode) const;
 
 private:
     utils::VfsPair m_vfsPair;

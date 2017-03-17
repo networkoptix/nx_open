@@ -83,27 +83,34 @@ nx_spl::IODevice* STORAGE_METHOD_CALL TestStorage::open(const char* url, int fla
 
     auto filePath = urlToPath(url);
     FsStubNode* fileNode = FsStubNode_find(m_vfsPair.root, filePath.c_str());
-    if (flags | nx_spl::io::WriteOnly && fileNode == nullptr)
+    if ((flags & nx_spl::io::WriteOnly) && fileNode == nullptr)
     {
         fileNode = FsStubNode_add(m_vfsPair.root, filePath.c_str(), file, 660, 1);
         if (fileNode == nullptr)
         {
             LOG("[TestStorage, Open, IODevice] failed to add node with url %s\n", url);
+            if (ecode)
+                *ecode = nx_spl::error::UnknownError;
             return nullptr;
         }
     }
 
     if (fileNode == nullptr)
+    {
+        if (ecode)
+            *ecode = nx_spl::error::UrlNotExists;
         return nullptr;
+    }
 
-    return createIODevice(fileNode->name, (int)category, flags, 1);
+    return createIODevice(m_vfsPair.sampleFilePath, (int)category, flags, 1, ecode);
 }
 
 nx_spl::IODevice* TestStorage::createIODevice(
     const std::string& name, 
     int category, 
     int flags, 
-    int size) const
+    int size,
+    int* ecode) const
 {
     FILE* f = nullptr;
     if ((FileCategory)category == FileCategory::media)
@@ -113,9 +120,14 @@ nx_spl::IODevice* TestStorage::createIODevice(
         {
             LOG("[TestStorage, Open, IODevice] failed to open sample file %s for read\n", 
                 m_vfsPair.sampleFilePath.c_str());
+            if (ecode)
+                *ecode = nx_spl::error::UrlNotExists;
             return nullptr;
         }
     }
+
+    if (ecode)
+        *ecode = nx_spl::error::NoError;
 
     return new TestIODevice(name, (FileCategory)category, flags, size, f);
 }

@@ -47,6 +47,13 @@ unsigned int TestIODevice::releaseRef()
 
 uint32_t TestIODevice::write(const void* /*src*/, const uint32_t size, int* ecode) 
 {
+    if (!(m_mode & nx_spl::io::WriteOnly))
+    {
+        if (ecode)
+            *ecode = nx_spl::error::WriteNotSupported;
+        return 0;
+    }
+
     if (ecode)
         *ecode = nx_spl::error::NoError;
     return size;
@@ -58,7 +65,7 @@ uint32_t TestIODevice::read(void* dst, const uint32_t size, int* ecode) const
     {
     case FileCategory::db:
         LOG("[TestStorage, IODevice, read] attempt to read from DB file %s. "
-            " That shouldn't happen\n", m_name.c_str());
+            " That shouldn't happen\n", m_sampleFileName.c_str());
         setEcode(ecode, nx_spl::error::UnknownError);
         return 0;
     case FileCategory::infoTxt:
@@ -70,13 +77,13 @@ uint32_t TestIODevice::read(void* dst, const uint32_t size, int* ecode) const
         return bytesToRead;
     }
     case FileCategory::media:
-        return readFileImpl(dst, size, ecode);
+        return readImpl(dst, size, ecode);
     }
 
     return 0;
 }
 
-uint32_t TestIODevice::readFileImpl(void* dst, uint32_t size, int* ecode) const
+uint32_t TestIODevice::readImpl(void* dst, uint32_t size, int* ecode) const
 {
     if (!m_file)
     {
@@ -112,25 +119,30 @@ int TestIODevice::seek(uint64_t pos, int* ecode)
         m_camInfoPos = pos;
         break;
     case FileCategory::media:
-    {
-        if (m_file == nullptr)
-        {
-            setEcode(ecode, nx_spl::error::UnknownError);
+        if (seekImpl(pos, ecode) == 0)
             return 0;
-        }
-
-        int result = fseek(m_file, pos, 0);
-        if (result != 0)
-        {
-            setEcode(ecode, nx_spl::error::UnknownError);
-            return 0;
-        }
         break;
     }
 
+    setEcode(ecode, nx_spl::error::NoError);
+    return 1;
+}
+
+int TestIODevice::seekImpl(uint64_t pos, int* ecode)
+{
+    if (m_file == nullptr)
+    {
+        setEcode(ecode, nx_spl::error::UnknownError);
+        return 0;
     }
 
-    setEcode(ecode, nx_spl::error::NoError);
+    int result = fseek(m_file, pos, 0);
+    if (result != 0)
+    {
+        setEcode(ecode, nx_spl::error::UnknownError);
+        return 0;
+    }
+
     return 1;
 }
 
@@ -142,7 +154,7 @@ TestIODevice::~TestIODevice()
 
 TestIODevice::TestIODevice(const std::string& name, FileCategory category, int mode, 
                            int64_t size, FILE* f) :
-    m_name(name),
+    m_sampleFileName(name),
     m_category(category),
     m_mode(mode),
     m_size(size),

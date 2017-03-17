@@ -49,10 +49,11 @@ public: // plugin interface implementation
     virtual unsigned int releaseRef() override;
 
 private:
-    virtual uint32_t readFileImpl(void* dst, uint32_t size, int* ecode) const;
+    virtual uint32_t readImpl(void* dst, uint32_t size, int* ecode) const;
+    virtual int seekImpl(uint64_t pos, int* ecode);
 
 protected:
-    const std::string m_name;
+    const std::string m_sampleFileName;
 
 private:
     FileCategory m_category;

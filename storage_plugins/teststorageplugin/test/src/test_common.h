@@ -60,16 +60,29 @@ class TestIODeviceHelper : public TestIODevice
 public:
     using TestIODevice::TestIODevice;
 
-    virtual uint32_t readFileImpl(void* dst, uint32_t size, int* ecode) const override
+    virtual uint32_t readImpl(void* dst, uint32_t size, int* ecode) const override
     {
-        if (m_name != "/path/to/sample/file.mkv")
+        if (m_sampleFileName != "/path/to/sample/file.mkv")
             return 0;
 
         uint32_t bytesToRead = std::min((int)size, (int)strlen(kTestMediaFileContent) - (int)m_pos);
-        memcpy(dst, kTestMediaFileContent + bytesToRead, bytesToRead);
+        memcpy(dst, kTestMediaFileContent + m_pos, bytesToRead);
         m_pos += bytesToRead;
 
         return bytesToRead;
+    }
+
+    virtual int seekImpl(uint64_t pos, int* ecode)
+    {
+        if (pos < 0ULL || pos >= strlen(kTestMediaFileContent))
+        {
+            if (ecode)
+                *ecode = nx_spl::error::UnknownError;
+            return 0;
+        }
+        m_pos = pos;
+
+        return 1;
     }
 
 private:
@@ -93,8 +106,12 @@ public:
         const std::string& name, 
         int category, 
         int flags, 
-        int size) const override
+        int size,
+        int* ecode) const override
     {
+        if (ecode)
+            *ecode = nx_spl::error::NoError;
+
         return new TestIODeviceHelper(name, (FileCategory)category, flags, size, nullptr);
     }
 };
