@@ -362,6 +362,9 @@ void QnBusinessRulesDialog::showEvent( QShowEvent *event )
     base_type::showEvent(event);
     if (SortRulesProxyModel* sortModel = dynamic_cast<SortRulesProxyModel*>(ui->tableView->model()))
         sortModel->sort(ui->tableView->horizontalHeader()->sortIndicatorSection(), ui->tableView->horizontalHeader()->sortIndicatorOrder());
+
+    ui->tableView->setCurrentIndex(QModelIndex());
+    ui->filterLineEdit->setFocus();
 }
 
 
