@@ -135,6 +135,11 @@ nx_spl::Storage* STORAGE_METHOD_CALL TestStorageFactory::createStorage(
     if (ecode)
         *ecode = nx_spl::error::NoError;
 
+    return createStorageImpl(vfsPair);
+}
+
+nx_spl::Storage* TestStorageFactory::createStorageImpl(const utils::VfsPair& vfsPair)
+{
     return new TestStorage(vfsPair);
 }
 

@@ -2,24 +2,6 @@
 #include <test_storage.h>
 #include "test_common.h"
 
-class TestStorageTest : public ::testing::Test
-{
-protected:
-    virtual void SetUp() override
-    {
-        storage = factory.createStorage("test://storage/some/path", nullptr);
-        ASSERT_TRUE(storage);
-    }
-
-    virtual void TearDown() override
-    {
-        storage->releaseRef();
-    }
-
-    TestStorageFactoryHelper factory;
-    nx_spl::Storage* storage;
-};
-
 TEST_F(TestStorageTest, permanentGetters)
 {
     ASSERT_TRUE(storage->isAvailable());

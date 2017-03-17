@@ -17,7 +17,7 @@ class TestIODevice
       public PluginRefCounter<TestIODevice>
 {
 public:
-    TestIODevice(FsStubNode* fileNode, FileCategory category, 
+    TestIODevice(const std::string& name, FileCategory category, 
                  int mode, int64_t size = 0, FILE* f = nullptr);
     ~TestIODevice();
 public:
@@ -49,9 +49,15 @@ public: // plugin interface implementation
     virtual unsigned int releaseRef() override;
 
 private:
-    FsStubNode* m_fileNode;
+    virtual uint32_t readFileImpl(void* dst, uint32_t size, int* ecode) const;
+
+protected:
+    const std::string m_name;
+
+private:
     FileCategory m_category;
     int m_mode;
     int64_t m_size;
     FILE* m_file;
+    mutable int m_camInfoPos;
 };

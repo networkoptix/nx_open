@@ -1,6 +1,24 @@
+#include <algorithm>
 #include <string.h>
 #include <stdio.h>
-#include "test_io_device.h"
+#include <test_io_device.h>
+#include <log.h>
+
+namespace {
+
+const char* const kCamInfo = 
+    "\"cameraName\"=\"TestStorageCamera\"\n"
+    "\"cameraModel\"=\"TestStorageCamera\"\n"
+    "\"groupId\"=\"\"\n"
+    "\"groupName\"=\"\"\n";
+
+auto setEcode = [](int* ecode, nx_spl::error::code_t codeToSet)
+{
+    if (ecode)
+        *ecode = codeToSet;
+};
+
+}
 
 void* TestIODevice::queryInterface(const nxpl::NX_GUID& interfaceID)
 {
@@ -30,18 +48,42 @@ unsigned int TestIODevice::releaseRef()
 uint32_t TestIODevice::write(const void* /*src*/, const uint32_t size, int* ecode) 
 {
     if (ecode)
-        *ecode = error::NoError;
+        *ecode = nx_spl::error::NoError;
     return size;
 }
 
 uint32_t TestIODevice::read(void* dst, const uint32_t size, int* ecode) const
 {
+    switch (m_category)
+    {
+    case FileCategory::db:
+        LOG("[TestStorage, IODevice, read] attempt to read from DB file %s. "
+            " That shouldn't happen\n", m_name.c_str());
+        setEcode(ecode, nx_spl::error::UnknownError);
+        return 0;
+    case FileCategory::infoTxt:
+    {
+        int bytesToRead = std::min(size, (uint32_t)strlen(kCamInfo) - m_camInfoPos);
+        memcpy(dst, kCamInfo + m_camInfoPos, bytesToRead);
+        m_camInfoPos += bytesToRead;
+        setEcode(ecode, nx_spl::error::NoError);
+        return bytesToRead;
+    }
+    case FileCategory::media:
+        return readFileImpl(dst, size, ecode);
+    }
+
+    return 0;
+}
+
+uint32_t TestIODevice::readFileImpl(void* dst, uint32_t size, int* ecode) const
+{
     if (!m_file)
     {
-        if (ecode)
-            *ecode = error::UrlNotExists;
+        setEcode(ecode, nx_spl::error::UrlNotExists);
         return 0;
     }
+    setEcode(ecode, nx_spl::error::NoError);
     return fread(dst, size, 1, m_file);
 }
 
@@ -52,20 +94,44 @@ int TestIODevice::getMode() const
 
 uint32_t TestIODevice::size(int* ecode) const
 {
-    return 0;
+    return m_size;
 }
 
 int TestIODevice::seek(uint64_t pos, int* ecode)
 {
-    int result = fseek(m_file, pos, 0);
-    if (result != 0)
+    switch (m_category)
     {
-        if (ecode)
-            *ecode = error::UnknownError;
-        return 0;
+    case FileCategory::db:
+        break;
+    case FileCategory::infoTxt:
+        if (pos < 0ULL || pos >= strlen(kCamInfo))
+        {
+            setEcode(ecode, nx_spl::error::UnknownError);
+            return 0;
+        }
+        m_camInfoPos = pos;
+        break;
+    case FileCategory::media:
+    {
+        if (m_file == nullptr)
+        {
+            setEcode(ecode, nx_spl::error::UnknownError);
+            return 0;
+        }
+
+        int result = fseek(m_file, pos, 0);
+        if (result != 0)
+        {
+            setEcode(ecode, nx_spl::error::UnknownError);
+            return 0;
+        }
+        break;
     }
 
-    return 1
+    }
+
+    setEcode(ecode, nx_spl::error::NoError);
+    return 1;
 }
 
 TestIODevice::~TestIODevice()
@@ -74,12 +140,13 @@ TestIODevice::~TestIODevice()
         fclose(m_file);
 }
 
-TestIODevice::TestIODevice(FsStubNode* fileNode, FileCategory category, 
-                           int mode, int64_t size, FILE* f) :
-    m_fileNode(fileNode),
+TestIODevice::TestIODevice(const std::string& name, FileCategory category, int mode, 
+                           int64_t size, FILE* f) :
+    m_name(name),
     m_category(category),
     m_mode(mode),
     m_size(size),
-    m_file(file)
+    m_file(f),
+    m_camInfoPos(0)
 {
 }

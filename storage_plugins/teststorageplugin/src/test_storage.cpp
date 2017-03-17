@@ -5,6 +5,8 @@
 #include <detail/fs_stub.h>
 #include <test_file_info_iterator.h>
 #include <url.h>
+#include <test_io_device.h>
+#include <log.h>
 
 
 using namespace nx_spl;
@@ -71,23 +73,61 @@ int STORAGE_METHOD_CALL TestStorage::isAvailable() const
     return true;
 }
 
-nx_spl::IODevice* STORAGE_METHOD_CALL TestStorage::open(
-    const char*     url,
-    int             flags,
-    int*            ecode
-) const 
+nx_spl::IODevice* STORAGE_METHOD_CALL TestStorage::open(const char* url, int flags, int* ecode) const 
 {
-    return nullptr;
+    FileCategory category = FileCategory::media;
+    if (strstr(url, ".nxdb") != nullptr)
+        category = FileCategory::db;
+    else if (strstr(url, "info.txt") != nullptr)
+        category = FileCategory::infoTxt;
+
+    auto filePath = urlToPath(url);
+    FsStubNode* fileNode = FsStubNode_find(m_vfsPair.root, filePath.c_str());
+    if (flags | nx_spl::io::WriteOnly && fileNode == nullptr)
+    {
+        fileNode = FsStubNode_add(m_vfsPair.root, filePath.c_str(), file, 660, 1);
+        if (fileNode == nullptr)
+        {
+            LOG("[TestStorage, Open, IODevice] failed to add node with url %s\n", url);
+            return nullptr;
+        }
+    }
+
+    if (fileNode == nullptr)
+        return nullptr;
+
+    return createIODevice(fileNode->name, (int)category, flags, 1);
+}
+
+nx_spl::IODevice* TestStorage::createIODevice(
+    const std::string& name, 
+    int category, 
+    int flags, 
+    int size) const
+{
+    FILE* f = nullptr;
+    if ((FileCategory)category == FileCategory::media)
+    {
+        f = fopen(m_vfsPair.sampleFilePath.c_str(), "rb");
+        if (f == nullptr)
+        {
+            LOG("[TestStorage, Open, IODevice] failed to open sample file %s for read\n", 
+                m_vfsPair.sampleFilePath.c_str());
+            return nullptr;
+        }
+    }
+
+    return new TestIODevice(name, (FileCategory)category, flags, size, f);
 }
 
 uint64_t STORAGE_METHOD_CALL TestStorage::getFreeSpace(int* ecode) const 
 {
-    return 500 * 1024 * 1024 * 1024LL;
+    return 5000LL * 1024 * 1024 * 1024;
 }
 
 uint64_t STORAGE_METHOD_CALL TestStorage::getTotalSpace(int* ecode) const 
 {
-    return 1000 * 1024 * 1024 * 1024LL;
+    return 10000LL * 1024 * 1024 * 1024;
 }
 
 int STORAGE_METHOD_CALL TestStorage::getCapabilities() const 
