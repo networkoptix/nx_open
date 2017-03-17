@@ -133,7 +133,7 @@ angular.module('cloudApp')
                     $scope.unsharing = process.init(function(){
                         return $scope.system.deleteUser(user);
                     },{
-                        successMessage: L.system.permissionsRemoved.replace('{email}',user.email),
+                        successMessage: L.system.permissionsRemoved.replace('{Email}',user.email),
                         errorPrefix: L.errorCodes.cantSharePrefix
                     });
                     $scope.unsharing.run();
