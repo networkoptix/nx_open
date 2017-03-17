@@ -69,14 +69,14 @@ void QnIconSelectionComboBox::setColumnCount(int count)
     m_columnCount = count;
 }
 
-int QnIconSelectionComboBox::maxRowCount() const
+int QnIconSelectionComboBox::maxVisibleRows() const
 {
-    return m_maxRowCount;
+    return m_maxVisibleRows;
 }
 
-void QnIconSelectionComboBox::setMaxRowCount(int count)
+void QnIconSelectionComboBox::setMaxVisibleRows(int count)
 {
-    m_maxRowCount = count;
+    m_maxVisibleRows = count;
 }
 
 QString QnIconSelectionComboBox::currentIcon() const
@@ -111,9 +111,9 @@ void QnIconSelectionComboBox::adjustPopupParameters()
     listView->setIconSize(iconSize());
     listView->setGridSize(iconSize());
 
-    setMaxVisibleItems(qMin(m_maxRowCount, rows));
+    setMaxVisibleItems(qMin(m_maxVisibleRows, rows));
 
-    const bool showScrollBar = rows > m_maxRowCount;
+    const bool showScrollBar = rows > m_maxVisibleRows;
     const int scrollBarExtra = showScrollBar
         ? listView->style()->pixelMetric(QStyle::PM_ScrollBarExtent, nullptr, this)
         : 0;
