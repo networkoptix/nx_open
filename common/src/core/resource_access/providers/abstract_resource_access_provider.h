@@ -50,3 +50,8 @@ signals:
     void accessChanged(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource, Source value);
 };
+
+inline uint qHash(QnAbstractResourceAccessProvider::Source value, uint seed)
+{
+    return qHash(static_cast<int>(value), seed);
+}

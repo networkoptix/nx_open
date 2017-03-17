@@ -194,5 +194,6 @@ Item
     {
         d.initialLogin = cloudStatusWatcher.effectiveUserName
         emailField.text = d.initialLogin
+        emailField.forceActiveFocus()
     }
 }

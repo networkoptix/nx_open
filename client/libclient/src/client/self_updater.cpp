@@ -52,7 +52,12 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
     QMap<Operation, Result> results;
     results[Operation::RegisterUriHandler] = osCheck(Operation::RegisterUriHandler, registerUriHandler());
     results[Operation::UpdateApplauncher] = osCheck(Operation::UpdateApplauncher, updateApplauncher());
-    results[Operation::UpdateMinilauncher] = osCheck(Operation::UpdateMinilauncher, updateMinilauncher());
+    #if defined(Q_OS_LINUX)
+        results[Operation::UpdateMinilauncher] = Result::Success;
+    #else
+        results[Operation::UpdateMinilauncher] =
+            osCheck(Operation::UpdateMinilauncher, updateMinilauncher());
+    #endif
 
     /* If we are already in self-update mode, just exit in any case. */
     if (startupParams.selfUpdateMode)
@@ -555,22 +560,38 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
         if (dataLocation.isEmpty())
             return false;
 
-        const auto iconsPath = QDir(QApplication::applicationDirPath()).absoluteFilePath(
-            lit("../share/icons"));
-        file_system::copy(iconsPath, dataLocation, file_system::OverwriteExisting);
+        const auto applauncherPath =
+            QDir(dataLocation).absoluteFilePath(lit("%1/applauncher/%2")
+                .arg(QnAppInfo::organizationName(), QnAppInfo::customizationName()));
+
+        auto iconName = AppInfo::iconFileName();
+
+        const auto iconPath =
+            QDir(QApplication::applicationDirPath()).absoluteFilePath(
+                lit("../share/icons/%1").arg(iconName));
+
+        if (QFile::exists(iconPath))
+        {
+            const auto targetIconPath =
+                QDir(applauncherPath).absoluteFilePath(lit("share/icons/%1").arg(iconName));
+
+            if (file_system::copy(iconPath, targetIconPath,
+                file_system::OverwriteExisting | file_system::CreateTargetPath))
+            {
+                iconName = targetIconPath;
+            }
+        }
 
         const auto appsLocation =
             QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation);
         if (appsLocation.isEmpty())
             return false;
 
-        const auto filePath = QDir(appsLocation).filePath(AppInfo::iconFileName());
+        const auto filePath = QDir(appsLocation).filePath(AppInfo::desktopFileName());
 
         const auto applauncherBinaryPath =
-            QDir(dataLocation).absoluteFilePath(lit("%1/applauncher/%2/bin/%3")
-                .arg(QnAppInfo::organizationName(),
-                    QnAppInfo::customizationName(),
-                    QnAppInfo::applauncherExecutableName()));
+            QDir(applauncherPath).absoluteFilePath(lit("bin/%1")
+                .arg(QnAppInfo::applauncherExecutableName()));
 
         if (!QFile::exists(applauncherBinaryPath))
             return false;
@@ -580,7 +601,7 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
             applauncherBinaryPath,
             QnAppInfo::productNameLong(),
             QnClientAppInfo::applicationDisplayName(),
-            QnAppInfo::customizationName(),
+            iconName,
             SoftwareVersion(QnAppInfo::engineVersion()));
     #endif // defined(Q_OS_LINUX)
 
