@@ -1,0 +1,38 @@
+<div>
+    Kamera:
+    <ul>
+        <li>Adı: {{activeCamera.name}}</li>
+        <li>PhysicalID: {{activeCamera.physicalId}}</li>
+        <li>IP (URL): <a target="_blank" ng-href="{{activeCamera.url}}">{{activeCamera.url}}</a></li>
+        <li ng-repeat="stream in activeCamera.mediaStreams">
+            {{streamName(stream)}}:
+            <span ng-repeat="transport in stream.transports">
+                <a target="_blank" ng-href="{{formatLink(activeCamera,stream.encoderIndex,transport)}}">{{transport}}</a>&nbsp;
+            </span>
+
+        </li>
+
+        <li>
+            İndir:
+<a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'download')}}">yüksek</a>&nbsp;
+<a target="_blank" ng-href="{{formatLink(activeCamera, 1, 'download')}}">düşük</a>&nbsp;
+<a target="_blank" ng-href="{{formatLink(activeCamera, 0, 'preview')}}">önizleme</a>
+        </li>
+
+    </ul>
+    Bağlantı ayarları:
+    <ul>
+        <li>
+            <label><input type="checkbox" ng-model="useAuth">&nbsp;Kimlik doğrulama anahtarı kullan</label>
+        </li>
+        <li>
+            <label title="indirmek için">Süre (sn): <input type="text" class="input-sm" ng-model="duration"></label>
+        </li>
+        <li>
+            <label title="dönüşüm için">Çözünürlük: <input type="text" class="input-sm" ng-model="resolution"></label>
+        </li>
+        <li>
+            <label>Oynatma pozisyonu: {{liveMode?'live': position}}</label>
+        </li>
+    </ul>
+</div>

@@ -22,8 +22,7 @@ namespace ec2 {
 
 class TransactionLog;
 
-class TransactionTransport
-:
+class TransactionTransport:
     public ::ec2::QnTransactionTransportBase
 {
     typedef ::ec2::QnTransactionTransportBase ParentType;
@@ -106,6 +105,8 @@ private:
     bool m_haveToSendSyncDone;
     bool m_closed;
     std::unique_ptr<network::aio::Timer> m_inactivityTimer;
+
+    int highestProtocolVersionCompatibleWithRemotePeer() const;
 
     void onGotTransaction(
         Qn::SerializationFormat tranFormat,

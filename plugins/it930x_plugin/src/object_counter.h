@@ -101,7 +101,7 @@ private:
 
 extern Logger logger;
 
-#ifdef _DEBUG
+#if 0
 #   define NO_LOG 0
 #else
 #   define NO_LOG 1

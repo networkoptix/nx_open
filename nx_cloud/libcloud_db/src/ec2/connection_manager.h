@@ -126,6 +126,14 @@ private:
         FullPeerName fullPeerName;
     };
 
+    struct ConnectionRequestAttributes
+    {
+        nx::String connectionId;
+        ::ec2::ApiPeerData remotePeer;
+        nx::String contentEncoding;
+        int remotePeerProtocolVersion = 0;
+    };
+
     typedef boost::multi_index::multi_index_container<
         ConnectionContext,
         boost::multi_index::indexed_by<
@@ -193,9 +201,7 @@ private:
     
     bool fetchDataFromConnectRequest(
         const nx_http::Request& request,
-        nx::String* const connectionId,
-        ::ec2::ApiPeerData* const remotePeer,
-        nx::String* const contentEncoding);
+        ConnectionRequestAttributes* connectionRequestAttributes);
 
     template<typename TransactionDataType>
     void processSpecialTransaction(
@@ -205,8 +211,7 @@ private:
         TransactionProcessedHandler handler);
 
     nx_http::RequestResult prepareOkResponseToCreateTransactionConnection(
-        const nx::String& connectionId,
-        const nx::String& contentEncoding,
+        const ConnectionRequestAttributes& connectionRequestAttributes,
         nx_http::Response* const response);
 };
 

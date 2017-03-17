@@ -25,7 +25,7 @@ bool QnSoftwareTriggerEvent::checkEventParams(const QnBusinessEventParameters& p
 }
 
 bool QnSoftwareTriggerEvent::isEventStateMatched(QnBusiness::EventState state,
-    QnBusiness::ActionType actionType) const
+    QnBusiness::ActionType /*actionType*/) const
 {
     return state == QnBusiness::UndefinedState;
 }

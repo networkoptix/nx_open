@@ -680,13 +680,10 @@ void socketMultiConnect(
     const ClientSocketMaker& clientMaker,
     boost::optional<SocketAddress> endpointToConnectTo = boost::none)
 {
-    static const std::chrono::milliseconds timeout(1500);
-
     auto server = serverMaker();
     auto serverGuard = makeScopedGuard([&server]() { server->pleaseStopSync(); });
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
-    ASSERT_TRUE(server->setRecvTimeout(timeout.count()));
     ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
     ASSERT_TRUE(server->listen(testClientCount())) << lastError();
 
@@ -739,7 +736,6 @@ void socketMultiConnect(
 
             auto testClient = clientMaker();
             ASSERT_TRUE(testClient->setNonBlockingMode(true));
-            ASSERT_TRUE(testClient->setSendTimeout(timeout.count()));
             connectedSockets.push_back(std::move(testClient));
 
             connectedSockets.back()->connectAsync(

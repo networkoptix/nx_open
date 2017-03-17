@@ -99,7 +99,8 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_keepAliveProbeCount(keepAliveProbeCount),
     m_idleConnectionTimeout(tcpKeepAliveTimeout * keepAliveProbeCount),
     m_timer(std::make_unique<nx::network::aio::Timer>()),
-    m_remotePeerEcProtoVersion(nx_ec::INITIAL_EC2_PROTO_VERSION)
+    m_remotePeerEcProtoVersion(nx_ec::INITIAL_EC2_PROTO_VERSION),
+    m_localPeerProtocolVersion(nx_ec::EC2_PROTO_VERSION)
 {
     m_timer->bindToAioThread(getAioThread());
 
@@ -295,6 +296,11 @@ void QnTransactionTransportBase::stopWhileInAioThread()
     m_outgoingTranClient.reset();
     m_outgoingDataSocket.reset();
     m_incomingDataSocket.reset();
+}
+
+void QnTransactionTransportBase::setLocalPeerProtocolVersion(int version)
+{
+    m_localPeerProtocolVersion = version;
 }
 
 void QnTransactionTransportBase::setOutgoingConnection(
@@ -571,7 +577,7 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
         m_localPeer.instanceId.toByteArray() );
     m_httpClient->addAdditionalHeader(
         Qn::EC2_PROTO_VERSION_HEADER_NAME,
-        QByteArray::number(nx_ec::EC2_PROTO_VERSION));
+        QByteArray::number(m_localPeerProtocolVersion));
 
     q.addQueryItem("peerType", QnLexical::serialized(m_localPeer.peerType));
 
@@ -1209,12 +1215,12 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
             ? nx_ec::INITIAL_EC2_PROTO_VERSION
             : ec2ProtoVersionIter->second.toInt();
 
-        if (nx_ec::EC2_PROTO_VERSION != m_remotePeerEcProtoVersion)
+        if (m_localPeerProtocolVersion != m_remotePeerEcProtoVersion)
         {
             NX_LOG( QString::fromLatin1("Cannot connect to server %1 because of different EC2 proto version. "
                 "Local peer version: %2, remote peer version: %3")
                 .arg(client->url().toString(QUrl::RemovePassword))
-                .arg(nx_ec::EC2_PROTO_VERSION).arg(m_remotePeerEcProtoVersion),
+                .arg(m_localPeerProtocolVersion).arg(m_remotePeerEcProtoVersion),
                 cl_logWARNING );
             cancelConnecting();
             return;

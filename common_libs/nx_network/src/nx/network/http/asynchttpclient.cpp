@@ -770,7 +770,7 @@ void AsyncHttpClient::processReceivedBytes(
         const size_t bytesParsed = parseReceivedBytes(bytesRead);
         QByteArray receivedBytesLeft;
         if (bytesParsed != (std::size_t)-1)
-            receivedBytesLeft = m_responseBuffer.mid(bytesParsed);
+            receivedBytesLeft = m_responseBuffer.mid((int)bytesParsed);
         m_responseBuffer.resize(0);
 
         bool continueReceiving = false;
