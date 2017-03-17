@@ -8,7 +8,7 @@
 #include <core/resource/user_resource.h>
 #include <ui/common/aligner.h>
 #include <ui/dialogs/resource_selection_dialog.h>
-#include <ui/graphics/items/overlays/software_trigger_icons.h>
+#include <ui/style/software_trigger_icons.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 

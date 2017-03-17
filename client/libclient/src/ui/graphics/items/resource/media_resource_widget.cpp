@@ -61,7 +61,6 @@
 #include <ui/graphics/items/overlays/composite_text_overlay.h>
 #include <ui/graphics/items/overlays/buttons_overlay.h>
 #include <ui/graphics/items/overlays/status_overlay_controller.h>
-#include <ui/graphics/items/overlays/software_trigger_icons.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
@@ -69,6 +68,7 @@
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/style/nx_style.h>
+#include <ui/style/software_trigger_icons.h>
 #include <ui/widgets/properties/camera_settings_tab.h>
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workbench/workbench_context.h>
