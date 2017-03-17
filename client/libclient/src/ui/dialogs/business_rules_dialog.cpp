@@ -177,6 +177,10 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     ui->setupUi(this);
     retranslateUi();
 
+    setWindowFlags(windowFlags()
+        | Qt::WindowMaximizeButtonHint
+        | Qt::MaximizeUsingFullscreenGeometryHint);
+
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
     ui->tableView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
