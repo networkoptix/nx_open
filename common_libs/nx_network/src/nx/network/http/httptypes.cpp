@@ -44,6 +44,18 @@ StringType getHeaderValue( const HttpHeaders& headers, const StringType& headerN
     return it == headers.end() ? StringType() : it->second;
 }
 
+bool readHeader(
+    const HttpHeaders& headers,
+    const StringType& headerName,
+    int* value)
+{
+    auto it = headers.find(headerName);
+    if (it == headers.end())
+        return false;
+    *value = it->second.toInt();
+    return true;
+}
+
 HttpHeaders::iterator insertOrReplaceHeader( HttpHeaders* const headers, const HttpHeader& newHeader )
 {
     HttpHeaders::iterator existingHeaderIter = headers->lower_bound( newHeader.first );
