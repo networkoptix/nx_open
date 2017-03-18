@@ -91,7 +91,6 @@ angular.module('webadminApp')
                     }
                     var weHaveWebm = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['webm'];});
                     var weHaveHls = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['hls'];});
-                    var weHaveRtsp = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['rtsp'];});
 
                     if(weHaveHls && canPlayNatively("hls")){
                         return "native-hls";
@@ -173,9 +172,6 @@ angular.module('webadminApp')
                             }
                             if(window.jscd.flashVersion){ // We have flash - try to play using flash
                                 return "flashls";
-                            }
-                            if(weHaveRtsp){
-                                return "rtsp";
                             }
                             if(weHaveWebm){
                                 return "webm";
@@ -324,42 +320,6 @@ angular.module('webadminApp')
                         },  function (api) {
                                 console.log(api);
                                 console.error("some error");
-                    });
-                }
-
-                function initRtsp(){
-                    var locomote = new Locomote('videowindow', /*'bower_components/locomote/dist/Player.swf'/**/'components/Player.swf'/**/);
-                    locomote.on('apiReady', function() {
-                        scope.vgApi = locomote;
-
-                        /* Tell Locomote to play the specified media */
-                        if(!scope.vgApi.load ) {
-
-                            $timeout(function(){
-                                scope.loading = !!format;
-                            });
-
-                            scope.vgApi.load = scope.vgApi.play;
-                            scope.vgApi.play = function(){
-                                scope.vgApi.load(getFormatSrc('rtsp'));
-                            }
-                        }
-
-                        /* Start listening for streamStarted event */
-                        locomote.on('streamStarted', function() {
-                            //console.log('stream has started');
-                        });
-
-                        /* If any error occurs, we should take action */
-                        locomote.on('error', function(err) {
-                            console.error(err);
-                        });
-
-                        if (scope.vgSrc) {
-                            scope.vgApi.play(scope.vgSrc[2].src);
-                        }
-
-                        scope.vgPlayerReady({$API:api});
                     });
                 }
 

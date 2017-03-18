@@ -5,7 +5,9 @@ var hlsAPI = new (function(){
     enableWorker = true,
     levelCapping = -1,
     defaultAudioCodec = undefined,
-    dumpfMP4 = false;
+    dumpfMP4 = false,
+    readyToPlay = false,
+    urlToPlay;
     this.init = function(element, readyHandler, errorHandler){
         video = element[0];
         if(Hls.isSupported()) {
@@ -370,20 +372,31 @@ var hlsAPI = new (function(){
         video.addEventListener('loadedmetadata', handleVideoEvent);
         video.addEventListener('loadeddata', handleVideoEvent);
         video.addEventListener('durationchange', handleVideoEvent);
+        
         this.readyHandler = readyHandler;
         this.readyHandler(this);
     };
     this.play = function(offset){
+        if(!readyToPlay)
+            return;
         video.play();
     };
     this.pause = function(){
         video.pause();
     };
     this.load = function(url){
+        readyToPlay = false;
+        urlToPlay = url;
         hls.loadSource(url);
         hls.autoLevelCapping = levelCapping;
         hls.attachMedia(video);
     };
+
+    this.readyToPlay = function(){
+        readyToPlay = true;
+        if(urlToPlay)
+            this.play();
+    }
 
     var lastSeekingIdx, lastStartPosition,lastDuration, lastAudioTrackSwitchingIdx;
     function handleVideoEvent(evt) {
