@@ -1,9 +1,7 @@
 #ifndef QN_IMAGE_BUTTON_WIDGET_H
 #define QN_IMAGE_BUTTON_WIDGET_H
 
-#ifndef Q_MOC_RUN
-#include <boost/array.hpp>
-#endif
+#include <array>
 
 #include <QtGui/QPixmap>
 #include <QtGui/QOpenGLFunctions>
@@ -136,7 +134,7 @@ protected:
 private:
     friend class QnImageButtonHoverProgressAccessor;
 
-    boost::array<QPixmap, MaxState + 1> m_pixmaps;
+    std::array<QPixmap, MaxState + 1> m_pixmaps;
 
     StateFlags m_state;
     bool m_checkable;

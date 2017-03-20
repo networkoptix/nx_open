@@ -5,8 +5,6 @@
 #include <limits>
 #include <array>
 
-#include <boost/array.hpp>
-
 #include <client/client_runtime_settings.h>
 
 #include <QtCore/QDateTime>
@@ -374,7 +372,7 @@ private:
         std::fill(m_weights.begin(), m_weights.end(), 0);
     }
 
-    QColor currentColor(const boost::array<QColor, Qn::TimePeriodContentCount + 1>& colors) const
+    QColor currentColor(const std::array<QColor, Qn::TimePeriodContentCount + 1>& colors) const
     {
         qreal rc = m_weights[Qn::RecordingContent];
         qreal mc = m_weights[Qn::MotionContent];
@@ -413,9 +411,9 @@ private:
     qint64 m_pendingLength;
     qint64 m_pendingPosition;
 
-    boost::array<qint64, Qn::TimePeriodContentCount + 1> m_weights;
-    boost::array<QColor, Qn::TimePeriodContentCount + 1> m_pastColor;
-    boost::array<QColor, Qn::TimePeriodContentCount + 1> m_futureColor;
+    std::array<qint64, Qn::TimePeriodContentCount + 1> m_weights;
+    std::array<QColor, Qn::TimePeriodContentCount + 1> m_pastColor;
+    std::array<QColor, Qn::TimePeriodContentCount + 1> m_futureColor;
 };
 
 
