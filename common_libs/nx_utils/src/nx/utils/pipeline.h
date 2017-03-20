@@ -97,6 +97,8 @@ public:
      */
     std::size_t totalBytesThrough() const;
 
+    const QByteArray& internalBuffer() const;
+
 private:
     QByteArray m_buffer;
     std::size_t m_totalBytesThrough;

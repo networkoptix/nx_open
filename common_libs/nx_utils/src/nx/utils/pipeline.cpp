@@ -75,6 +75,11 @@ std::size_t ReflectingPipeline::totalBytesThrough() const
     return m_totalBytesThrough;
 }
 
+const QByteArray& ReflectingPipeline::internalBuffer() const
+{
+    return m_buffer;
+}
+
 } // namespace pipeline
 } // namespace utils
 } // namespace nx
