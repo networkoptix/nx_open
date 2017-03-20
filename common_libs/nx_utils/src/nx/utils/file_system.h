@@ -37,6 +37,7 @@ enum Option
     FollowSymLinks = 0x08
 };
 Q_DECLARE_FLAGS(Options, Option)
+Q_DECLARE_OPERATORS_FOR_FLAGS(Options)
 
 QString NX_UTILS_API symLinkTarget(const QString& linkPath);
 

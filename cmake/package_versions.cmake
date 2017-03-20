@@ -19,6 +19,7 @@ function(detect_package_versions)
 
     if(MACOSX)
         set(_quazip_version "0.7.2")
+        set(_festival_version "2.1")
     endif()
 
     if(ANDROID)

@@ -370,6 +370,10 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         {
             if (info.data.peer.peerType == Qn::PT_VideowallClient)
             {
+                /* Master node, will run other clients and exit. */
+                if (info.data.videoWallInstanceGuid.isNull())
+                    return;
+
                 setItemOnline(info.data.videoWallInstanceGuid, true);
             }
             else if (!info.data.videoWallControlSession.isNull())

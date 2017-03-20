@@ -30,6 +30,7 @@ Pane
     {
         id: hostsModel
         systemId: control.systemId
+        localSystemId: control.localId
     }
     AuthenticationDataModel
     {

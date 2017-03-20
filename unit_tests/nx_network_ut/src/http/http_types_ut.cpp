@@ -712,3 +712,25 @@ TEST_F(HttpHeaderServer, empty_product_not_first)
     nx_http::header::Server serverHeader;
     test(false, serverHeader, "Product1/1.2.3.4 /5.6.7.8 (comment2)");
 }
+
+TEST(Http_readHeader, int_value)
+{
+    nx_http::HttpHeaders headers;
+    headers.emplace("Header1", "str");
+    headers.emplace("Header2", "777");
+
+    int value = 0;
+    
+    ASSERT_TRUE(nx_http::readHeader(headers, "Header2", &value));
+    ASSERT_EQ(777, value);
+
+    ASSERT_TRUE(nx_http::readHeader(headers, "Header1", &value));
+    ASSERT_EQ(0, value);
+}
+
+TEST(Http_readHeader, missing_header)
+{
+    nx_http::HttpHeaders headers;
+    int value = 0;
+    ASSERT_FALSE(nx_http::readHeader(headers, "Header3", &value));
+}

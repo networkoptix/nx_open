@@ -1041,6 +1041,7 @@ void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
     const bool useHttp11 = true;   //TODO #ak check if we need it (e.g. we using keep-alive or requesting live capture)
 
     m_request.requestLine.method = httpMethod;
+
     if (m_proxyEndpoint)
     {
         m_request.requestLine.url = m_contentLocationUrl;

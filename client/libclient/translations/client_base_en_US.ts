@@ -632,10 +632,6 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>How-to Videos and FAQ...</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>About...</source>
         <translation></translation>
     </message>
@@ -3502,13 +3498,6 @@ to %1</source>
     </message>
     <message>
         <source>%1 may not work properly.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnHelpHandler</name>
-    <message>
-        <source>Help page not found</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

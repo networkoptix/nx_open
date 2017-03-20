@@ -290,18 +290,6 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
             });
 
     data->connections
-        << connect(systemDescription, &QnBaseSystemDescription::isCloudSystemChanged, this,
-            [this, systemDescription]()
-            {
-                /**
-                 * Move system to right place. No data will not be preserved in case
-                 * of cloud-to-system (and vice versa) state change
-                 */
-                removeSystem(systemDescription->id());
-                addSystem(systemDescription);
-            });
-
-    data->connections
         << connect(systemDescription, &QnBaseSystemDescription::ownerChanged, this,
             [this, systemDescription]()
             {
@@ -356,6 +344,13 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
             [this, systemDescription]()
             {
                 emitDataChanged(systemDescription, QnSystemsModel::IsConnectableRoleId);
+            });
+
+    data->connections
+        << connect(systemDescription, &QnBaseSystemDescription::isCloudSystemChanged, this,
+            [this, systemDescription]()
+            {
+                emitDataChanged(systemDescription, QnSystemsModel::IsCloudSystemRoleId);
             });
 
     q->beginInsertRows(QModelIndex(), internalData.size(), internalData.size());
@@ -448,13 +443,11 @@ void QnSystemsModelPrivate::resetModel()
     Q_Q(QnSystemsModel);
 
     q->beginResetModel();
-
     internalData.clear();
+    q->endResetModel();
 
     for (const auto system : qnSystemsFinder->systems())
         addSystem(system);
-
-    q->endResetModel();
 }
 
 QnSoftwareVersion QnSystemsModelPrivate::getCompatibleVersion(
