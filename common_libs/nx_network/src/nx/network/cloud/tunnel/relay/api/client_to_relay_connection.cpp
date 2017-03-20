@@ -25,7 +25,7 @@ void ClientToRelayConnection::startSession(
     // TODO
 }
 
-void ClientToRelayConnection::upgradeToRelayConnection(
+void ClientToRelayConnection::openConnectionToTheTargetHost(
     nx::String& sessionId,
     nx::utils::MoveOnlyFunc<void(ResultCode, std::unique_ptr<AbstractStreamSocket>)> handler)
 {

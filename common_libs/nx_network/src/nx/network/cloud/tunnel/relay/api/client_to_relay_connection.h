@@ -25,7 +25,7 @@ public:
     /**
      * After successful call socket provided represents connection to the requested peer.
      */
-    void upgradeToRelayConnection(
+    void openConnectionToTheTargetHost(
         nx::String& sessionId,
         nx::utils::MoveOnlyFunc<void(ResultCode, std::unique_ptr<AbstractStreamSocket>)> handler);
 
