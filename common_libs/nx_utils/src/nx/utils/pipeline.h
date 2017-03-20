@@ -82,14 +82,22 @@ class NX_UTILS_API ReflectingPipeline:
     public TwoWayPipeline
 {
 public:
+    ReflectingPipeline();
+
     virtual int write(const void* data, size_t count) override;
     /**
      * Reads data that has previously been written with ReflectingPipeline::write.
      */
     virtual int read(void* data, size_t count) override;
 
+    /**
+     * Total of bytes written and read.
+     */
+    std::size_t totalBytesThrough() const;
+
 private:
     QByteArray m_buffer;
+    std::size_t m_totalBytesThrough;
 };
 
 //-------------------------------------------------------------------------------------------------

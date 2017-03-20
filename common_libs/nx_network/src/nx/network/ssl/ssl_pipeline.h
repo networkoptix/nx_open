@@ -54,11 +54,14 @@ private:
     bool m_failed;
 
     void initSslBio(SSL_CTX* sslContext);
-    void doHandshake();
-    int handleSslIoResult(int result);
 
+    template<typename Func, typename Data>
+        int performSslIoOperation(Func sslFunc, Data* data, size_t count);
+    int doHandshake();
     int bioRead(void* buffer, unsigned int bufferLen);
     int bioWrite(const void* buffer, unsigned int bufferLen);
+
+    int handleSslIoResult(int result);
 
     static int bioRead(BIO* b, char* out, int outl);
     static int bioWrite(BIO* b, const char* in, int inl);

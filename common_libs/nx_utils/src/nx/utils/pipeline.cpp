@@ -46,18 +46,33 @@ int ProxyPipeline::write(const void* data, size_t count)
 //-------------------------------------------------------------------------------------------------
 // ReflectingPipeline
 
+ReflectingPipeline::ReflectingPipeline():
+    m_totalBytesThrough(0)
+{
+}
+
 int ReflectingPipeline::write(const void* data, size_t count)
 {
     m_buffer.append(static_cast<const char*>(data), count);
+    m_totalBytesThrough += count;
     return count;
 }
 
 int ReflectingPipeline::read(void* data, size_t count)
 {
+    if (m_buffer.isEmpty())
+        return StreamIoError::wouldBlock;
+
     const auto bytesToRead = std::min<size_t>(count, m_buffer.size());
     memcpy(data, m_buffer.data(), bytesToRead);
     m_buffer.remove(0, bytesToRead);
+    m_totalBytesThrough += bytesToRead;
     return bytesToRead;
+}
+
+std::size_t ReflectingPipeline::totalBytesThrough() const
+{
+    return m_totalBytesThrough;
 }
 
 } // namespace pipeline
