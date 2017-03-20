@@ -8,7 +8,6 @@
 #include "test_storage.h"
 #include "log.h"
 #include "vfs.h"
-#include "url.h"
 
 namespace {
 
@@ -122,7 +121,9 @@ nx_spl::Storage* STORAGE_METHOD_CALL TestStorageFactory::createStorage(
 
     /* parse config json */
     utils::VfsPair vfsPair;
-    if (!utils::buildVfsFromJson(configContent.c_str(), parsedUrl.hostPath().c_str(), &vfsPair))
+    if (!utils::buildVfsFromJson(configContent.c_str(), 
+                                 parsedUrl.path().empty() ? "/" : parsedUrl.path().c_str(), 
+                                 &vfsPair))
     {
         if (vfsPair.root)
             FsStubNode_remove(vfsPair.root);
@@ -136,18 +137,18 @@ nx_spl::Storage* STORAGE_METHOD_CALL TestStorageFactory::createStorage(
     if (ecode)
         *ecode = nx_spl::error::NoError;
 
-    return createStorageImpl(vfsPair, parsedUrl.host());
+    return createStorageImpl(vfsPair, parsedUrl);
 }
 
 nx_spl::Storage* TestStorageFactory::createStorageImpl(
     const utils::VfsPair& vfsPair, 
-    const std::string& host)
+    const utils::Url& url)
 {
-    return new TestStorage(vfsPair,
-        [this, host]()
+    return new TestStorage(vfsPair, url.scheme() + "://" + url.host(),
+        [this, url]()
         {
             std::lock_guard<std::mutex> lock(m_storageHostsMutex);
-            m_storageHosts.erase(host);
+            m_storageHosts.erase(url.host());
         });
 }
 

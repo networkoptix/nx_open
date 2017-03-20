@@ -12,7 +12,9 @@ class TestStorage :
     public PluginRefCounter<TestStorage>
 {
 public:
-    TestStorage(const utils::VfsPair& vfsPair, std::function<void()> onDestroyCb);
+    TestStorage(const utils::VfsPair& vfsPair, 
+                const std::string& prefix,
+                std::function<void()> onDestroyCb);
     virtual ~TestStorage();
 
     virtual int STORAGE_METHOD_CALL isAvailable() const override;
@@ -81,5 +83,6 @@ private:
 
 private:
     utils::VfsPair m_vfsPair;
+    const std::string m_prefix;
     std::function<void()> m_onDestroyCb;
 };

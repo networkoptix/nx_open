@@ -9,6 +9,7 @@ protected:
     virtual void SetUp() override
     {
         storage = factory.createStorage("test://storage/some/path", nullptr);
+        ASSERT_TRUE(storage);
     }
 
     virtual void TearDown() override
@@ -42,6 +43,9 @@ TEST_F(TestFileInfoIteratorTest, Folders)
     fInfo = fileIterator->next(&ecode);
     ASSERT_EQ(ecode, nx_spl::error::NoError);
     ASSERT_EQ(strcmp(fInfo->url, "test://storage/some/path/low_quality"), 0);
+
+    fInfo = fileIterator->next(&ecode);
+    ASSERT_EQ(fInfo, nullptr);
 
     fileIterator->releaseRef();
 }

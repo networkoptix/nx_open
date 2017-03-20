@@ -5,12 +5,16 @@ namespace {
 
 }
 
-TestFileInfoIterator::TestFileInfoIterator(FsStubNode* root)
-    : m_cur(root->child)
+TestFileInfoIterator::TestFileInfoIterator(FsStubNode* root, const std::string& prefix)
+    : m_cur(root->child),
+      m_prefix(prefix)
 {}
 
 nx_spl::FileInfo* STORAGE_METHOD_CALL TestFileInfoIterator::next(int* ecode) const
 {
+    if (m_cur == nullptr)
+        return nullptr;
+
     auto resultNode = m_cur;
     if (m_cur)
         m_cur = m_cur->next;
@@ -18,7 +22,7 @@ nx_spl::FileInfo* STORAGE_METHOD_CALL TestFileInfoIterator::next(int* ecode) con
     char buf[4096];
     FsStubNode_fullPath(resultNode, buf, sizeof buf);
     memset(m_urlBuf, '\0', sizeof m_urlBuf);
-    strcpy(m_urlBuf, "test:/");
+    strcpy(m_urlBuf, m_prefix.data());
     strcat(m_urlBuf, buf);
 
     m_fInfo.url = m_urlBuf;

@@ -29,6 +29,7 @@ public:
     std::string url() const;
     std::string hostPath() const;
     std::string host() const;
+    std::string path() const;
 
     ParamsMap params() const;
     bool valid() const;
@@ -47,7 +48,8 @@ private:
 private:
     const std::string& m_url;
     std::string m_scheme;
-    std::string m_hostPath;
+    std::string m_host;
+    std::string m_path;
     ParamsMap m_params;
     size_t m_index;
     ParseState m_state;

@@ -17,27 +17,22 @@ std::string Url::scheme() const
 
 std::string Url::url() const 
 { 
-    return m_scheme + "://" + m_hostPath; 
+    return m_scheme + "://" + m_host + m_path; 
 }
 
 std::string Url::hostPath() const
 {
-    return m_hostPath;
+    return m_host + m_path;
+}
+
+std::string Url::path() const
+{
+    return m_path;
 }
 
 std::string Url::host() const
 {
-    auto pathBeginPos = m_hostPath.find('/');
-    if (pathBeginPos == std::string::npos)
-    {
-        auto paramsBeginPos = m_hostPath.find('?');
-        if (paramsBeginPos == std::string::npos)
-            return m_hostPath;
-        else
-            return m_hostPath.substr(0, paramsBeginPos);
-    }
-
-    return m_hostPath.substr(0, pathBeginPos);
+    return m_host;
 }
 
 ParamsMap Url::params() const 
@@ -82,17 +77,38 @@ Url::ParseState Url::parseHostPath()
     if (m_url[m_index] == '/')
         return ParseState::error;
 
-    auto questionMarkIndex = m_url.find('?', m_index);
-    if (questionMarkIndex == m_index)
+    auto pathBeginIndex = m_url.find('/', m_index);
+    if (pathBeginIndex == m_index)
         return ParseState::error;
 
-    if (questionMarkIndex == std::string::npos)
+    if (pathBeginIndex == std::string::npos)
     {
-        copyAndAdvance(&m_hostPath, m_url.size());
-        return ParseState::ok;
-    }
+        pathBeginIndex = m_url.find('?', m_index);
+        if (pathBeginIndex == std::string::npos)
+        {
+            copyAndAdvance(&m_host, m_url.size());
+            return ParseState::ok;
+        }
+        if (pathBeginIndex == m_index)
+            return ParseState::error;
 
-    copyAndAdvance(&m_hostPath, questionMarkIndex);
+        copyAndAdvance(&m_host, pathBeginIndex);
+    }
+    else
+    {
+        copyAndAdvance(&m_host, pathBeginIndex);
+        auto paramsBeginIndex = m_url.find('?', m_index);
+        if (paramsBeginIndex == m_index)
+            return ParseState::error;
+
+        if (paramsBeginIndex == std::string::npos)
+        {
+            copyAndAdvance(&m_path, m_url.size());
+            return ParseState::ok;
+        }
+
+        copyAndAdvance(&m_path, paramsBeginIndex);
+    }
 
     return checkAndAdvance("?", ParseState::params);
 }

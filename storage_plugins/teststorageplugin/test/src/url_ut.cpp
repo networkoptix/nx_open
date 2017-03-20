@@ -11,6 +11,7 @@ TEST(UrlTest, CorrectUrl)
     ASSERT_EQ(url.scheme(), "test");
     ASSERT_EQ(url.url(), "test://some.host/some/path");
     ASSERT_EQ(url.hostPath(), "some.host/some/path");
+    ASSERT_EQ(url.path(), "/some/path");
     ASSERT_EQ(url.host(), "some.host");
     ASSERT_EQ(url.params().size(), 2);
     ASSERT_EQ(url.params()["key1"], "value1");
@@ -54,6 +55,10 @@ TEST(UrlTest, WrongSchemeHostSeparator)
 
     Url url2("test.some.host/some/path?key1=value1&key2=value2");
     ASSERT_FALSE(url2.valid());
+
+    Url url3("test://some.host/?key1=value1&key2=value2");
+    ASSERT_TRUE(url3.valid());
+    ASSERT_EQ(url3.path(), "/");
 }
 
 TEST(UrlTest, NullHost)

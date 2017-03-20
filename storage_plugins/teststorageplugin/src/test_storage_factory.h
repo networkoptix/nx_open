@@ -6,6 +6,7 @@
 #include <third_party_storage.h>
 #include <common.h>
 #include <vfs.h>
+#include <url.h>
 
 // {2E2C7A3D-256D-4018-B40E-512D72510BEC}
 static const nxpl::NX_GUID IID_StorageFactory =
@@ -35,7 +36,7 @@ public: // plugin interface implementation
 
 private:
     virtual bool readConfig(const std::string& path, std::string* outContent);
-    virtual nx_spl::Storage* createStorageImpl(const utils::VfsPair& vfsPair, const std::string&);
+    virtual nx_spl::Storage* createStorageImpl(const utils::VfsPair& vfsPair, const utils::Url&);
 
 protected:
     std::unordered_set<std::string> m_storageHosts;

@@ -16,7 +16,7 @@ namespace {
 std::string urlToPath(const char* url)
 {
     if (strstr(url, "test://"))
-        return utils::Url(url).hostPath();
+        return utils::Url(url).path();
     return url;
 }
 
@@ -68,8 +68,11 @@ bool nodeExists(struct FsStubNode* root, const char* url, int* ecode)
 
 }
 
-TestStorage::TestStorage(const utils::VfsPair& vfsPair, std::function<void()> onDestroyCb):
+TestStorage::TestStorage(const utils::VfsPair& vfsPair, 
+                         const std::string& prefix,
+                         std::function<void()> onDestroyCb):
     m_vfsPair(vfsPair),
+    m_prefix(prefix),
     m_onDestroyCb(onDestroyCb)
 {}
 
@@ -246,7 +249,10 @@ nx_spl::FileInfoIterator* STORAGE_METHOD_CALL TestStorage::getFileIterator(
         return nullptr;
     }
 
-    return new TestFileInfoIterator(fsNode);
+    if (ecode)
+        *ecode = error::NoError;
+
+    return new TestFileInfoIterator(fsNode, m_prefix);
 }
 
 int STORAGE_METHOD_CALL TestStorage::fileExists(
