@@ -60,6 +60,23 @@ void MaintenanceManager::getTransactionLog(
             _1, _2, _3, std::move(completionHandler)));
 }
 
+void MaintenanceManager::getStatistics(
+    const AuthorizationInfo& authzInfo,
+    std::function<void(api::ResultCode, api::Statistics)> completionHandler)
+{
+    m_timer.post(
+        [this,
+            lock = m_startedAsyncCallsCounter.getScopedIncrement(),
+            completionHandler = std::move(completionHandler)]()
+        {
+            api::Statistics statistics;
+            statistics.onlineServerCount = 
+                (int)m_syncronizationEngine->connectionManager().getVmsConnectionCount();
+
+            completionHandler(api::ResultCode::ok, std::move(statistics));
+        });
+}
+
 void MaintenanceManager::onTransactionLogRead(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     const std::string& systemId,
