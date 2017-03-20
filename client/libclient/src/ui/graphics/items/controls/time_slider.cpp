@@ -591,7 +591,7 @@ QnBookmarksViewer* QnTimeSlider::createBookmarksViewer()
         }
         else
         {
-            if (location < m_windowStart || location > m_windowEnd)
+            if (!windowContains(location))
                 return QnBookmarksViewer::PosAndBoundsPair();   /// Out of window
         }
 
@@ -1569,9 +1569,7 @@ void QnTimeSlider::updateKineticProcessor()
 
 void QnTimeSlider::updateToolTipVisibilityInternal(bool animated)
 {
-    qint64 pos = sliderPosition();
-    bool canBeVisible = pos >= m_windowStart
-        && pos <= m_windowEnd
+    bool canBeVisible = windowContains(sliderPosition())
         && positionMarkerVisible()
         && isVisible();
 
@@ -2292,7 +2290,7 @@ void QnTimeSlider::drawSelection(QPainter* painter)
 
 void QnTimeSlider::drawMarker(QPainter* painter, qint64 pos, const QColor& color, qreal width)
 {
-    if (pos < m_windowStart || pos > m_windowEnd)
+    if (!windowContains(pos))
         return;
 
     QPen pen(color, width);
