@@ -1154,6 +1154,11 @@ void QnPlOnvifResource::notificationReceived(
     if( currentPortState != newPortState )
     {
         QString portId = portSourceIter->value;
+        bool success = false;
+        int intPortId = portId.toInt(&success);
+        // Onvif device enumerates ports from 1. see 'allPorts' filling code.
+        if (success)
+            portId = QString::number(intPortId + 1);
         size_t aliasesCount = m_portAliases.size();
         if (aliasesCount && aliasesCount == m_inputPortCount)
         {
@@ -1949,7 +1954,7 @@ QString QnPlOnvifResource::getInputPortNumberFromString(const QString& portName)
         auto portNum = portIndex.toInt(&canBeConvertedToNumber);
 
         if (canBeConvertedToNumber)
-            return QString::number(portNum);
+            return QString::number(portNum + 1);
     }
 
     return QString();
@@ -3012,8 +3017,9 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
     VideoEncoder* vEncoder = 0;
     for (uint i = 0; i < response.Configurations.size(); ++i)
     {
-        if (QString::fromStdString(response.Configurations[i]->token) == encoderId)
-            vEncoder = response.Configurations[i];
+        auto configuration = response.Configurations[i];
+        if (configuration && QString::fromStdString(configuration->token) == encoderId)
+            vEncoder = configuration;
     }
     if (!vEncoder || !vEncoder->RateControl)
         return;
@@ -3525,6 +3531,8 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
 
 void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode)
 {
+    using namespace std::placeholders;
+
     auto SCOPED_GUARD_FUNC = [this]( QnPlOnvifResource* ){
         m_asyncPullMessagesCallWrapper.clear();
     };
@@ -3554,20 +3562,7 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
         }
 
         m_renewSubscriptionTimerID = nx::utils::TimerManager::instance()->addTimer(
-            [this]( quint64 timerID )
-            {
-                QnMutexLocker lk( &m_ioPortMutex );
-                if( timerID != m_renewSubscriptionTimerID )
-                    return;
-                m_renewSubscriptionTimerID = 0;
-                if( !m_inputMonitored )
-                    return;
-                lk.unlock();
-                //TODO #ak make removePullPointSubscription and createPullPointSubscription asynchronous, so that it does not block timer thread
-                removePullPointSubscription();
-                createPullPointSubscription();
-                lk.relock();
-            },
+            std::bind(&QnPlOnvifResource::renewPullPointSubscriptionFallback, this, _1),
             std::chrono::milliseconds::zero() );
         return;
     }
@@ -3585,6 +3580,21 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
         m_nextPullMessagesTimerID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::pullMessages, this, _1),
             std::chrono::milliseconds(PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND));
+}
+
+void QnPlOnvifResource::renewPullPointSubscriptionFallback(quint64 timerId)
+{
+    QnMutexLocker lk(&m_ioPortMutex);
+    if (timerId != m_renewSubscriptionTimerID)
+        return;
+    if (!m_inputMonitored)
+        return;
+    lk.unlock();
+    //TODO #ak make removePullPointSubscription and createPullPointSubscription asynchronous, so that it does not block timer thread
+    removePullPointSubscription();
+    createPullPointSubscription();
+    lk.relock();
+    m_renewSubscriptionTimerID = 0;
 }
 
 void QnPlOnvifResource::onPullMessagesResponseReceived(
@@ -3739,7 +3749,8 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
 
     auto resourceId = getId();
 
-    propertyDictionary->setValue(resourceId, Qn::VIDEO_LAYOUT_PARAM_NAME, m_videoLayout->toString());
+    auto nonConstThis = const_cast<QnPlOnvifResource*>(this);
+    nonConstThis->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, m_videoLayout->toString());
     propertyDictionary->saveParams(resourceId);
 
     return m_videoLayout;

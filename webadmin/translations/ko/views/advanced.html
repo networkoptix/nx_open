@@ -1,0 +1,216 @@
+<div class="container">
+    <h1>고급 서버 설정</h1>
+
+    <div class="alert alert-danger" role="alert">
+        <b>경고!</b> 변경사항으로 인해 시스템 오동작 될 수있습니다.
+    </div>
+
+
+    <h2>저장공간</h2>
+    <form class="form" role="form" name="form" novalidate>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th >
+                        URL
+                    </th>
+                    <th width="200">
+                        여유 공간:
+                    </th>
+                    <th width="150">
+                        예약 된 공간
+                    </th>
+                    <th >
+                    </th>
+                    <th width="70">
+                        &nbsp;
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="storage in storages" ng-form="storageForm">
+
+                    <td><span class="storage-URL" title="{{storage.url}}">{{storage.url}}</span></td>
+                    <td>
+                        <div class="progress" style="margin-top:5px;"  ng-if="storage.accessible"
+                             title="{{formatTotalSpace(storage)}}">
+
+                            <div class="progress-overlay progress-bar progress-bar-warning progress-bar-striped" role="progressbar"
+                                 ng-style="{width: storage.reservedSpace*100/storage.totalSpace+ '%'}">
+                            </div>
+
+                            <div class="progress-label">{{formatSpace(storage.totalSpace)}}의 {{formatSpace(storage.freeSpace)}}</div>
+
+
+                            <div class="progress-bar progress-bar-success" role="progressbar"
+                                 ng-style="{width: (storage.freeSpace)*100/storage.totalSpace + '%'}">
+                            </div>
+
+                            <div class="progress-bar progress-bar-danger"
+                                 ng-style="{width: 100-storage.freeSpace*100/storage.totalSpace +'%'}">
+                            </div>
+                        </div>
+
+                        <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
+                            <div class="progress-bar progress-bar-danger" style="width:100%">
+                                접속불가
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="input-group" ng-if="storage.isWritable"
+                             ng-class="{'has-error':!storageForm.reservedSpaceGb.$valid,'has-warning':storage.reservedSpace >= storage.freeSpace}">
+                            <input type="number"  class="form-control input-sm"
+                                   ng-model="storage.reservedSpaceGb"
+                                   name="reservedSpaceGb"
+                                   min="1"
+                                   max="{{toGBs(storage.totalSpace)}}"
+                                   required
+ placeholder="예약 된 공간"/>
+                            <div class="input-group-addon">GB</div>
+                        </div>
+                        <div class="input-group" ng-if="!storage.isWritable">
+                            <input type="number" class="form-control input-sm"
+                                   ng-value="storage.reservedSpaceGb"
+                                   disabled
+ placeholder="예약 된 공간"/>
+                            <div class="input-group-addon">GB</div>
+                        </div>
+                    </td>
+                    <td ng-class="{'has-error':!storageForm.isUsedForWriting.$valid}">
+                           <label class="read-container">
+                               <span class="checkbox-wrapper">
+                                <input type="checkbox"
+                                       class="isUsedForWriting"
+                                   ng-model="storage.isUsedForWriting"
+                                   ng-disabled="!storage.isWritable"
+                                   name="isUsedForWriting"
+                                   placeholder="쓰기에 사용함"/>
+                                </span>
+                                <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"></icon>
+                                <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"></icon>
+
+                           </label>
+                    </td>
+                    <td>
+                        <span class="read-container">
+                            <icon for="storage.isExternal" on-true="globe" on-false="hdd" title-true="External" title-false="Internal" ></icon>
+                            <icon for="storage.isBackup" on-true="floppy-save" on-false="empty" title-true="Backup storage" ></icon>
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div id="selectWritableStorageAlert" class="alert alert-warning"  ng-class="{hidden:someSelected}">
+            메인 녹화 장치가 설정되지 않았습니다-영상이 녹화 되지않습니다.
+        </div>
+        <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
+            예약 공간은 사용하지 않은 공간 보다 커야 합니다. 녹화데이터 일부가 공간 생성을 위해 지워집니다.
+        </div>
+        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">모든 강조 표시 된 설정을 저장 수정</div>
+
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >저장</button>
+        <button class="btn btn-warning" ng-click="cancel()">취소</button>
+    </form>
+
+    <h2>로그 설정</h2>
+    <form class="form" role="form" name="logLevels" novalidate>
+        <div class="form-group">
+            <label class="col-sm-4">기본 로그 수준</label>
+            <div class="col-sm-8">
+
+                <select class="form-control" name="mainLogLevel" id="mainLogLevel" ng-model="mainLogLevel">
+                    <option value="NONE">없음: 로그 사용할 수 없습니다.</option>
+                    <option value="ALWAYS">항상: 오류, 경고 및 모든 메시지를 로그기록합니다.</option>
+                    <option value="ERROR">오류: 로그 오류만.</option>
+                    <option value="WARNING">경고: 경고 및 오류 로그.</option>
+                    <option value="INFO">항상: 오류, 경고 및 모든 메시지를 로그기록합니다.</option>
+                    <option value="DEBUG">디버그: 모든 시스템 메시지 및 디버그 정보를 로그기록 합니다.</option>
+                    <option value="DEBUG2">디버그: 모든 시스템 메시지 및 디버그 정보를 로그기록 합니다.</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-4">트랜잭션 로그 수준</label>
+            <div class="col-sm-8">
+                <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
+                    <option value="NONE">없음: 로그 사용할 수 없습니다.</option>
+                    <option value="ALWAYS">항상: 오류, 경고 및 모든 메시지를 로그기록합니다.</option>
+                    <option value="ERROR">오류: 로그 오류만.</option>
+                    <option value="WARNING">경고: 경고 및 오류 로그.</option>
+                    <option value="INFO">항상: 오류, 경고 및 모든 메시지를 로그기록합니다.</option>
+                    <option value="DEBUG">디버그: 모든 시스템 메시지 및 디버그 정보를 로그기록 합니다.</option>
+                    <option value="DEBUG2">디버그: 모든 시스템 메시지 및 디버그 정보를 로그기록 합니다.</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-sm-offset-4  col-sm-8">
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >저장</button>
+        </div>
+    </form>
+
+    <h2>"수동 업데이트"</h2>
+    <form class="form-horizontal" enctype="multipart/form-data" target="_blank" action="/api/installUpdate" method="post">
+        <div class="form-group">
+            <label class="col-sm-4">설치 프로그램을 업로드</label>
+            <div class="col-sm-8">
+                <fileupload text="Select server update archive (zip)"></fileupload>
+                <p class="help-block">구성이 올바른지 확인 하십시오.</p>
+            </div>
+        </div>
+    </form>
+
+    <h1>고급 시스템 설정</h1>
+    <div class="alert alert-danger" role="alert">
+        <b>경고!</b> 변경사항으로 인해 시스템 오동작 될 수있습니다.
+    </div>
+
+    <form class="form row" role="form" name="systemSettings" novalidate>
+        <div class="form-group" ng-repeat="(setting, value) in systemSettings">
+            <label class="col-sm-6" for="{{setting}}">{{Config.settingsConfig[setting].label}}</label>
+            <div class="col-sm-6">
+                <input ng-if="Config.settingsConfig[setting].type == 'checkbox' " type="checkbox"
+                       style="height: 22px"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"/>
+
+                <input ng-if="Config.settingsConfig[setting].type == 'number' " type="number"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"
+                       class="form-control input-sm"/>
+
+                <input ng-if="Config.settingsConfig[setting].type == 'text'" type="text"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"
+                       class="form-control input-sm"/>
+
+                <input ng-if="Config.settingsConfig[setting].type == 'password'" type="password"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"
+                       class="form-control input-sm"/>
+
+                <p ng-if="Config.settingsConfig[setting].type == 'static'" class="form-control-static input-sm" >{{systemSettings[setting]||'empty'}}</p>
+
+                <div class="has-error" ng-if="Config.settingsConfig[setting].alert">
+                    <div class="help-block" ng-bind-html="Config.settingsConfig[setting].alert">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-sm-offset-4  col-sm-8">
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >저장</button>
+        </div>
+
+    </form>
+    <br>
+    <div class="alert alert-danger row" role="alert">
+        <b>경고!</b> 일부 변경 내용은 시스템을 재시작 해야합니다. <b>모든</b> 서버가 시스템에 존재 합니다.<br><br>
+        <div class="col-sm-offset-4  col-sm-8">
+            <button class="btn btn-primary" ng-click="restartServer()" >현재 서버 다시 시작</button>
+        </div>
+    </div>
+</div>

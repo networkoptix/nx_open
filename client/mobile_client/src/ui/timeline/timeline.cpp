@@ -40,6 +40,7 @@ namespace {
     const qint64 correctionThreshold = 5000;
     const auto kDefaultWindowSize = std::chrono::milliseconds(std::chrono::hours(24)).count();
     const qint64 kMSecsInMinute = 60 * 1000;
+    const qint64 kMinimumAnimationTickMs = 10;
 
     struct TextMarkInfo
     {
@@ -322,7 +323,7 @@ public:
 
     void updateStripesTextures();
 
-    void animateProperties(qint64 dt);
+    void animateProperties();
     void zoomWindow(qreal factor);
 
     void setStickToEnd(bool stickToEnd);
@@ -738,10 +739,7 @@ QSGNode* QnTimeline::updatePaintNode(
     if (!d->textTexture)
         d->updateTextHelper();
 
-    qint64 time = d->animationTimer.elapsed();
-
-    d->animateProperties(time - d->prevAnimationMs);
-    d->prevAnimationMs = time;
+    d->animateProperties();
 
     if (!node)
     {
@@ -1280,8 +1278,17 @@ void QnTimelinePrivate::updateStripesTextures()
     stripesLightTexture = window->createTextureFromImage(stripesLight);
 }
 
-void QnTimelinePrivate::animateProperties(qint64 dt)
+void QnTimelinePrivate::animateProperties()
 {
+    qint64 dt = kMinimumAnimationTickMs;
+
+    {
+        auto time = animationTimer.elapsed();
+        if (prevAnimationMs > 0)
+            dt = time - prevAnimationMs;
+        prevAnimationMs = time;
+    }
+
     const auto originalWindowStart = windowStart;
     const auto originalWindowEnd = windowEnd;
     const auto originalWindowPosition =
@@ -1324,36 +1331,49 @@ void QnTimelinePrivate::animateProperties(qint64 dt)
 
     if (stickyPointKineticHelper.isStopped())
     {
-        auto time = parent->position();
-        auto windowSize = windowEnd - windowStart;
-        auto delta = static_cast<qint64>(windowSize * windowMovingSpeed);
-
         if (justStopped)
             setStickToEnd(qMax(startBound, parent->position()) >= endBound);
 
         if (stickToEnd)
             targetPosition = liveTime;
 
+        auto position = parent->position();
+
+        auto calculateNewPosition = [&](qint64 pos, qint64 targetPos)
+            {
+                const auto windowSize = windowEnd - windowStart;
+                auto distance = std::min(windowSize, std::abs(pos - targetPos));
+
+                auto multiplier = std::max(0.003, std::pow(
+                    std::min(1.0, static_cast<qreal>(distance) / windowSize + 0.15), 2.0));
+                auto delta = static_cast<qint64>(windowSize * windowMovingSpeed * dt * multiplier);
+                distance = std::max<qint64>(0, distance - delta);
+
+                if (pos < targetPos)
+                    pos = targetPos - distance;
+                else
+                    pos = targetPos + distance;
+                return pos;
+            };
+
         if (targetPosition != -1)
         {
-            if (time < targetPosition)
-                time = qMin(targetPosition, qMax(time, targetPosition - windowSize) + delta);
-            else if (time > targetPosition)
-                time = qMax(targetPosition, qMin(time, targetPosition + windowSize) - delta);
-
-            if (time == targetPosition)
+            if (position != targetPosition)
+                position = calculateNewPosition(position, targetPosition);
+            else
                 targetPosition = -1;
         }
-        else if (autoReturnToBounds)
+        else
         {
-            if (time < startBound)
-                time = qMin(startBound, qMax(time, startBound - windowSize) + delta);
-            else if (time > endBound)
-                time = qMax(endBound, qMin(time, endBound + windowSize) - delta);
+            if (position < startBound)
+                position = calculateNewPosition(position, startBound);
+            else if (position > endBound)
+                position = calculateNewPosition(position, endBound);
         }
 
-        delta = time - parent->position();
-        if (delta != 0) {
+        const auto delta = position - parent->position();
+        if (delta != 0)
+        {
             windowStart += delta;
             windowEnd += delta;
         }
@@ -1493,6 +1513,8 @@ void QnTimelinePrivate::animateProperties(qint64 dt)
 
     if (updateRequired)
         parent->update();
+    else
+        prevAnimationMs = -1;
 }
 
 void QnTimelinePrivate::zoomWindow(qreal factor)

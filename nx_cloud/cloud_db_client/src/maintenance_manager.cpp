@@ -23,6 +23,15 @@ void MaintenanceManager::getConnectionsFromVms(
         std::bind(completionHandler, std::placeholders::_1, api::VmsConnectionDataList()));
 }
 
+void MaintenanceManager::getStatistics(
+    std::function<void(api::ResultCode, api::Statistics)> completionHandler)
+{
+    executeRequest(
+        kMaintenanceGetStatistics,
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::Statistics()));
+}
+
 } // namespace client
 } // namespace cdb
 } // namespace nx

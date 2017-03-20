@@ -36,6 +36,7 @@ QnResourceDetailsWidget::QnResourceDetailsWidget(QWidget* parent) :
     font.setPixelSize(kNoDataFontPixelSize);
     font.setWeight(kNoDataFontWeight);
     m_preview->setFont(font);
+    m_preview->setImageProvider(m_thumbnailManager.data());
     m_preview->setProperty(style::Properties::kDontPolishFontProperty, true);
     m_preview->setMaximumHeight(kCameraPreviewSize.height());
     m_preview->hide();

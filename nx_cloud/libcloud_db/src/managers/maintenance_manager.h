@@ -45,6 +45,10 @@ public:
             api::ResultCode,
             ::ec2::ApiTransactionDataList)> completionHandler);
 
+    void getStatistics(
+        const AuthorizationInfo& authzInfo,
+        std::function<void(api::ResultCode, api::Statistics)> completionHandler);
+
 private:
     const QnUuid m_moduleGuid;
     ec2::SyncronizationEngine* const m_syncronizationEngine;

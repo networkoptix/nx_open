@@ -66,12 +66,13 @@ Page
         anchors.fill: parent
         anchors.margins: -4
 
-        property real spacing: 8
-        readonly property real maxCellWidth: 488 + spacing
+        property real horizontalSpacing: 8
+        property real verticalSpacing: cellsInRow > 1 ? 8 : 1
+        readonly property real maxCellWidth: 488 + horizontalSpacing
         property int cellsInRow: Math.max(1, Math.ceil(width / maxCellWidth))
 
         cellWidth: (width - leftMargin - rightMargin) / cellsInRow
-        cellHeight: 98 + spacing
+        cellHeight: 98 + verticalSpacing
 
         model: OrderedSystemsModel
         {
@@ -87,7 +88,10 @@ Page
             SessionItem
             {
                 anchors.fill: parent
-                anchors.margins: sessionsList.spacing / 2
+                anchors.leftMargin: sessionsList.horizontalSpacing / 2
+                anchors.rightMargin: sessionsList.horizontalSpacing / 2
+                anchors.topMargin: Math.floor(sessionsList.verticalSpacing / 2)
+                anchors.bottomMargin: sessionsList.verticalSpacing - anchors.topMargin
 
                 systemName: model.systemName
                 systemId: model.systemId

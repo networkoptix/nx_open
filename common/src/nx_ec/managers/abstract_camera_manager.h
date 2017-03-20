@@ -68,6 +68,14 @@ typedef std::shared_ptr<AbstractCameraNotificationManager> AbstractCameraNotific
             });
         }
 
+        ErrorCode addCamerasSync(const ec2::ApiCameraDataList& cameras)
+        {
+            return impl::doSyncCall<impl::SimpleHandler>([this, cameras](impl::SimpleHandlerPtr handler)
+            {
+                this->save(cameras, handler);
+            });
+        }
+
         /*!
         \param handler Functor with params: (ErrorCode)
         */

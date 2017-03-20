@@ -61,18 +61,35 @@ void QnNotificationToolTipWidget::updateTailPos()
     QRectF rect = this->rect();
     QGraphicsItem* list = parentItem()->parentItem();
 
-    // half of the tooltip height in coordinates of enclosing rect
-    qreal halfHeight = mapRectToItem(list, rect).height() / 2;
+    const auto parentY = parentItem()->mapToItem(list, m_pointTo).y();
+    const auto tailX = qRound(rect.right() + tailLength());
 
-    qreal parentPos = parentItem()->mapToItem(list, m_pointTo).y();
+    const auto toolTipHeight = rect.height();
+    const auto halfHeight = toolTipHeight / 2;
 
-    if (parentPos - halfHeight < m_enclosingRect.top())
-        setTailPos(QPointF(qRound(rect.right() + tailLength()), qRound(rect.top() + tailWidth())));
+    const auto spaceToTop = parentY - m_enclosingRect.top();
+    const auto spaceToBottom = m_enclosingRect.bottom() - parentY;
+
+    static const int kOffset = tailWidth() / 2;
+
+    // Check if we are too close to the top (or there is not enough space in any case)
+    if (spaceToTop < halfHeight || m_enclosingRect.height() < toolTipHeight)
+    {
+        const auto tailY = qRound(rect.top() + spaceToTop - kOffset);
+        setTailPos(QPointF(tailX, tailY));
+    }
+    // Check if we are too close to the bottom
+    else if (spaceToBottom < halfHeight)
+    {
+        const auto tailY = qRound(rect.bottom() - spaceToBottom + kOffset);
+        setTailPos(QPointF(tailX, tailY));
+    }
+    // Optimal position
     else
-    if (parentPos + halfHeight > m_enclosingRect.bottom())
-        setTailPos(QPointF(qRound(rect.right() + tailLength()), qRound(rect.bottom() - tailWidth())));
-    else
-        setTailPos(QPointF(qRound(rect.right() + tailLength()), qRound((rect.top() + rect.bottom()) / 2)));
+    {
+        const auto tailY = qRound((rect.top() + rect.bottom()) / 2);
+        setTailPos(QPointF(tailX, tailY));
+    }
 
     // cannot call base_type as it is reimplemented
     QnToolTipWidget::pointTo(m_pointTo);
@@ -113,6 +130,7 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
     m_textLabel->setWordWrap(true);
     m_textLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     setPaletteColor(m_textLabel, QPalette::Window, Qt::transparent);
+
     connect(m_textLabel, &QnProxyLabel::linkActivated, this, &QnNotificationWidget::linkActivated);
 
     m_layout->setContentsMargins(kHorizontalMargin, kVerticalMargin, kHorizontalMargin, kVerticalMargin);
@@ -139,11 +157,21 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
 
     m_hoverProcessor->addTargetItem(this);
     m_hoverProcessor->addTargetItem(m_tooltipWidget);
-    connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered, this, [this]() { m_closeButton->show(); });
-    connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft,    this, [this]() { m_closeButton->hide(); });
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverEntered, this,
+        [this]
+        {
+            if (m_notificationLevel != QnNotificationLevel::Value::NoNotification)
+                m_closeButton->show();
+        });
+    connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft, this,
+        [this]
+        {
+            m_closeButton->hide();
+        });
 
     updateToolTipPosition();
     updateToolTipVisibility();
+    updateLabelPalette();
 
     setCacheMode(QGraphicsItem::ItemCoordinateCache);
 }
@@ -189,6 +217,7 @@ void QnNotificationWidget::setNotificationLevel(QnNotificationLevel::Value notif
 
     m_notificationLevel = notificationLevel;
     m_color = QnNotificationLevel::notificationColor(m_notificationLevel);
+    updateLabelPalette();
 
     emit notificationLevelChanged();
 }
@@ -293,6 +322,15 @@ void QnNotificationWidget::showToolTip()
     opacityAnimator(m_tooltipWidget, 2.0)->animateTo(1.0);
 }
 
+void QnNotificationWidget::updateLabelPalette()
+{
+    auto textColorRole = m_notificationLevel == QnNotificationLevel::Value::NoNotification
+        ? QPalette::AlternateBase
+        : QPalette::WindowText;
+
+    setPaletteColor(m_textLabel, QPalette::WindowText, palette().color(textColorRole));
+}
+
 void QnNotificationWidget::updateToolTipVisibility()
 {
     if (m_toolTipHoverProcessor->isHovered() && !m_tooltipWidget->text().isEmpty())
@@ -321,6 +359,20 @@ void QnNotificationWidget::clickedNotify(QGraphicsSceneMouseEvent* event)
 
     if (button == Qt::LeftButton)
         triggerDefaultAction();
+}
+
+void QnNotificationWidget::changeEvent(QEvent* event)
+{
+    base_type::changeEvent(event);
+
+    switch (event->type())
+    {
+        case QEvent::PaletteChange:
+            updateLabelPalette();
+            break;
+        default:
+            break;
+    }
 }
 
 void QnNotificationWidget::at_loop_sound()

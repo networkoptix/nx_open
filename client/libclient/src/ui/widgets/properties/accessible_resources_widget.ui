@@ -91,21 +91,8 @@
        </widget>
       </item>
       <item>
-       <widget class="Line" name="line">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>10</height>
-         </size>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QWidget" name="filter" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
          <property name="spacing">
           <number>0</number>
          </property>
@@ -113,7 +100,7 @@
           <number>0</number>
          </property>
          <property name="topMargin">
-          <number>8</number>
+          <number>0</number>
          </property>
          <property name="rightMargin">
           <number>6</number>
@@ -121,6 +108,19 @@
          <property name="bottomMargin">
           <number>8</number>
          </property>
+         <item>
+          <widget class="Line" name="line">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>10</height>
+            </size>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="QLineEdit" name="filterLineEdit">
            <property name="placeholderText">

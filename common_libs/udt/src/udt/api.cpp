@@ -785,7 +785,7 @@ int CUDTUnited::close(const UDTSOCKET u)
             return 0;
 
         s->m_TimeStamp = CTimer::getTime();
-        s->m_pUDT->m_bBroken = true;
+        s->m_pUDT->setIsBroken(true);
 
         // broadcast all "accept" waiting
         {
@@ -1263,7 +1263,7 @@ void CUDTUnited::removeSocket(
         // if it is a listener, close all un-accepted sockets in its queue and remove them later
         for (set<UDTSOCKET>::iterator q = i->second->m_pQueuedSockets->begin(); q != i->second->m_pQueuedSockets->end(); ++q)
         {
-            m_Sockets[*q]->m_pUDT->m_bBroken = true;
+            m_Sockets[*q]->m_pUDT->setIsBroken(true);
             m_Sockets[*q]->m_pUDT->close();
             m_Sockets[*q]->m_TimeStamp = CTimer::getTime();
             m_Sockets[*q]->m_Status = CLOSED;
@@ -1483,7 +1483,7 @@ DWORD WINAPI CUDTUnited::garbageCollect(LPVOID p)
         CGuard controlLocker(self->m_ControlLock);
         for (map<UDTSOCKET, CUDTSocket*>::iterator i = self->m_Sockets.begin(); i != self->m_Sockets.end(); ++i)
         {
-            i->second->m_pUDT->m_bBroken = true;
+            i->second->m_pUDT->setIsBroken(true);
             i->second->m_pUDT->close();
             i->second->m_Status = CLOSED;
             i->second->m_TimeStamp = CTimer::getTime();

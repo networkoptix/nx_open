@@ -5,7 +5,9 @@ Item
     id: handle
 
     property string anchor: "cursorPosition"
-    property TextInput input
+    property TextInput input: null
+
+    property bool autoHide: false
 
     readonly property alias pressed: mouseArea.pressed
 
@@ -24,7 +26,7 @@ Item
 
     property real anchorX:
     {
-        if (!input || !input.cursorVisible)
+        if (!input)
             return 0
 
         var rect = input.positionToRectangle(input[anchor])
@@ -75,12 +77,9 @@ Item
 
     Timer
     {
-        running: visible && opacity > 0 && !pressed
+        running: autoHide && visible && opacity > 0 && !pressed
         interval: 5000
-        onTriggered:
-        {
-            opacity = 0.0
-        }
+        onTriggered: opacity = 0.0
     }
 
     states:

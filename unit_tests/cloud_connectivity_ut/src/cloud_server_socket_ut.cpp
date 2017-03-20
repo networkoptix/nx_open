@@ -96,10 +96,9 @@ private:
 };
 
 /**
- * Creates several \class FakeTcpTunnelConnection
+ * Creates several FakeTcpTunnelConnection.
  */
-struct FakeTcpTunnelAcceptor
-:
+struct FakeTcpTunnelAcceptor:
     public AbstractTunnelAcceptor
 {
     FakeTcpTunnelAcceptor(
@@ -274,7 +273,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     server->moveToListeningState();
 
     // there is no tunnels yet
-    ASSERT_EQ(addressBinder.get(addressManager.key).size(), 0U);
+    ASSERT_EQ(0U, addressBinder.get(addressManager.key).size());
 
     hpm::api::ConnectionRequestedEvent event;
     event.connectSessionId = String("someSessionId");
@@ -290,18 +289,17 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     auto list = addressBinder.get(addressManager.key);
-    ASSERT_EQ(list.size(), 1U);
+    ASSERT_EQ(1U, list.size());
 
     auto client = std::make_unique<TCPSocket>(AF_INET);
     ASSERT_TRUE(client->setNonBlockingMode(true));
-    ASSERT_TRUE(client->setSendTimeout(500));
 
     nx::utils::promise<SystemError::ErrorCode> result;
     client->connectAsync(
         *list.begin(),
         [&](SystemError::ErrorCode c){ result.set_value(c); });
 
-    EXPECT_EQ(result.get_future().get(), SystemError::noError);
+    ASSERT_EQ(SystemError::noError, result.get_future().get());
     client->pleaseStopSync();
     server->pleaseStopSync();
 }
@@ -314,8 +312,7 @@ static const size_t kPeerCount = 3;
 static const size_t kQueueLimit = 10;
 static const size_t kRetryDelay = 100;
 
-class CloudServerSocketStressTcpTest
-:
+class CloudServerSocketStressTcpTest:
     public ::testing::Test
 {
 protected:

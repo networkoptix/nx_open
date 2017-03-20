@@ -543,6 +543,16 @@ bool CUDT::isClosing() const
     return m_bClosing;
 }
 
+void CUDT::setIsBroken(bool val)
+{
+    m_bBroken = val;
+}
+
+bool CUDT::isBroken() const
+{
+    return m_bBroken;
+}
+
 void CUDT::open()
 {
     CGuard cg(m_ConnectionLock);
@@ -2047,7 +2057,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             if (CSeqNo::seqcmp(ack, CSeqNo::incseq(m_iSndCurrSeqNo)) > 0)
             {
                 //this should not happen: attack or bug
-                m_bBroken = true;
+                setIsBroken(true);
                 m_iBrokenCounter = 0;
                 break;
             }
@@ -2207,7 +2217,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
             if (!secure)
             {
                 //this should not happen: attack or bug
-                m_bBroken = true;
+                setIsBroken(true);
                 m_iBrokenCounter = 0;
                 break;
             }
@@ -2263,7 +2273,7 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
         case ControlPacketType::Shutdown:
             m_bShutdown = true;
             setIsClosing(true);
-            m_bBroken = true;
+            setIsBroken(true);
             m_iBrokenCounter = 60;
 
             //performing ACK on existing data to provide data already-in-buffer to recv
@@ -2654,7 +2664,7 @@ void CUDT::checkTimers(bool forceAck)
             // Application will detect this when it calls any UDT methods next time.
             //
             setIsClosing(true);
-            m_bBroken = true;
+            setIsBroken(true);
             m_iBrokenCounter = 30;
             m_bShutdown = false;
 

@@ -107,7 +107,7 @@ public:
             socket = std::move(m_socket);
         }
         if( socket )
-            socket->pleaseStopSync();
+            socket->pleaseStopSync(false);
     }
 
     template<class GSoapAsyncCallWrapperType>

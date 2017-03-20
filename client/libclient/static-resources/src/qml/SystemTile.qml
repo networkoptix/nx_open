@@ -257,7 +257,12 @@ BaseTile
 
     property QtObject impl: QtObject
     {
-        property var hostsModel: SystemHostsModel { systemId: control.systemId; }
+        property var hostsModel: SystemHostsModel
+        {
+            systemId: control.systemId;
+            localSystemId: control.localId;
+        }
+
         property var hostsModelAccessor: ModelDataAccessor { model: control.impl.hostsModel; }
         property var authenticationDataModel: AuthenticationDataModel
         {
