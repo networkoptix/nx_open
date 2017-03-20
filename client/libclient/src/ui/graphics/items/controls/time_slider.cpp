@@ -493,7 +493,8 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent
     m_liveSupported(false),
     m_selectionInitiated(false),
     m_tooltipLine1(new GraphicsLabel(this)),
-    m_tooltipLine2(new GraphicsLabel(this))
+    m_tooltipLine2(new GraphicsLabel(this)),
+    m_updatingValue(false)
 {
     setAutoHideToolTip(false);
 
@@ -969,24 +970,24 @@ void QnTimeSlider::setSliderPosition(qint64 position, bool keepInWindow)
 
 void QnTimeSlider::setValue(qint64 value, bool keepInWindow)
 {
-    if (m_options.testFlag(StillPosition))
     {
+        QScopedValueRollback<bool> updateRollback(m_updatingValue);
+        m_updatingValue = true; //< to not change tooltip visibility in setValue or setWindow
+
         qint64 oldValue = this->value();
         setValue(value);
 
         if (keepInWindow && windowContains(oldValue))
-            shiftWindow(this->value() - oldValue);
+        {
+            if (m_options.testFlag(StillPosition))
+                shiftWindow(this->value() - oldValue);
+            else
+                ensureWindowContains(this->value());
+        }
     }
-    else
-    {
-        if (!keepInWindow)
-            return setValue(value);
 
-        bool inWindow = windowContains(this->value());
-        setValue(value);
-        if (inWindow)
-            ensureWindowContains(this->value());
-    }
+    /* Update tooltip visibility after both setValue and setWindow: */
+    updateToolTipVisibilityInternal(true);
 }
 
 qint64 QnTimeSlider::selectionStart() const
@@ -1569,6 +1570,9 @@ void QnTimeSlider::updateKineticProcessor()
 
 void QnTimeSlider::updateToolTipVisibilityInternal(bool animated)
 {
+    if (m_updatingValue)
+        return;
+
     bool canBeVisible = windowContains(sliderPosition())
         && positionMarkerVisible()
         && isVisible();
