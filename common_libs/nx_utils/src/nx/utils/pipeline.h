@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <nx/utils/std/cpp14.h>
+
 namespace nx {
 namespace utils {
 namespace pipeline {
@@ -142,7 +144,7 @@ public:
     {
     }
 
-    virtual int write(const void* data, size_t count) override
+    virtual int read(void* data, size_t count) override;
     {
         return m_func(data, count);
     }
@@ -151,11 +153,11 @@ private:
     WriteFunc m_func;
 };
 
-template<typename WriteFunc>
-std::unique_ptr<CustomInputPipeline<WriteFunc>>
-    makeCustomInputPipeline(WriteFunc func)
+template<typename ReadFunc>
+std::unique_ptr<CustomInputPipeline<ReadFunc>>
+    makeCustomInputPipeline(ReadFunc func)
 {
-    return std::make_unique<CustomInputPipeline<WriteFunc>>(std::move(func));
+    return std::make_unique<CustomInputPipeline<ReadFunc>>(std::move(func));
 }
 
 } // namespace pipeline
