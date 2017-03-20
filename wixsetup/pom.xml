@@ -22,6 +22,7 @@
         <nxtool>false</nxtool>
         <final.artifact.name>${installer.name}</final.artifact.name>
         <NxtoolQuickControlsDir>${root.dir}\nxtool\${arch}\bin\${build.configuration}\qml\QtQuick\Controls</NxtoolQuickControlsDir>
+        <VC12RedistPath>${environment.dir}/wix/vcredist-2012</VC12RedistPath>
     </properties>
 
     <dependencies>
@@ -59,8 +60,8 @@
             <type>pom</type> 
             <scope>system</scope>
             <systemPath>${root.dir}/nxtool/pom.xml</systemPath>            
-        </dependency>					
-    </dependencies>		
+        </dependency>                   
+    </dependencies>     
 
     <build>
         <directory>${arch}</directory>
@@ -135,8 +136,8 @@
                             <encoding>utf-8</encoding>
                             <file>${project.build.directory}/CustomActions/CustomActions-${arch}.vcxproj</file>
                             <!-- <excludes>
-										<exclude>**/vmaxproxy-x64.vcproj</exclude>
-									</excludes> -->	
+                                        <exclude>**/vmaxproxy-x64.vcproj</exclude>
+                                    </excludes> --> 
                             <ignoreMissingFile>true</ignoreMissingFile>                                    
                             <replacements>
                                 <replacement>
@@ -148,7 +149,7 @@
                                     </value>
                                 </replacement>           
                             </replacements>
-                        </configuration>								
+                        </configuration>                                
                     </execution>
                 </executions>
             </plugin>                     
@@ -256,9 +257,9 @@
                                 <descriptor>${project.build.directory}/assembly-update-client.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-                            <finalName>client-update</finalName>							
+                            <finalName>client-update</finalName>                            
                         </configuration>
-                    </execution>	
+                    </execution>    
                     <execution>
                         <id>pack-debug-all</id>
                         <phase>post-integration-test</phase>
@@ -297,11 +298,11 @@
                                 <descriptor>${project.build.directory}/assembly-update-server.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>                            
-                            <finalName>server-update</finalName>							
+                            <finalName>server-update</finalName>                            
                         </configuration>
-                    </execution>	                    
-                </executions>				
-            </plugin> 	            
+                    </execution>                        
+                </executions>               
+            </plugin>               
         </plugins>
     </build>       
     <profiles>
