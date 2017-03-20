@@ -17,18 +17,6 @@
 #include <QtCore/QStringList>
 #include <QtCore/QList>
 #include <QtCore/QMap>
-#include <QtCore/QPair>
-#include <QtCore/QQueue>
-#include <QtCore/QSet>
-#include <QtCore/QDateTime>
-#include <QtCore/QTime>
-#include <QtCore/QTimer>
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtCore/QRect>
-#include <QtCore/QRectF>
-#include <QtCore/QSize>
-#include <QtCore/QtDebug>
 
 #endif
 
