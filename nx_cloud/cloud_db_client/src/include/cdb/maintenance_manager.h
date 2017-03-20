@@ -22,6 +22,17 @@ public:
     std::vector<VmsConnectionData> connections;
 };
 
+class Statistics
+{
+public:
+    int onlineServerCount;
+
+    Statistics():
+        onlineServerCount(0)
+    {
+    }
+};
+
 /**
  * Maintenance manager is for accessing cloud internal data for maintenance/debug purposes.
  * \note Available only in debug environment.
@@ -36,6 +47,8 @@ public:
      */
     virtual void getConnectionsFromVms(
         std::function<void(api::ResultCode, api::VmsConnectionDataList)> completionHandler) = 0;
+    virtual void getStatistics(
+        std::function<void(api::ResultCode, api::Statistics)> completionHandler) = 0;
 };
 
 } // namespace api

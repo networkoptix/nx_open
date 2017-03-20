@@ -484,7 +484,6 @@ bool UdtSocket<InterfaceToImplement>::open()
         return false;
     }
 
-#if 1
     //tuning udt socket
     constexpr const int kPacketsCoeff = 2;
     constexpr const int kBytesCoeff = 6;
@@ -532,7 +531,6 @@ bool UdtSocket<InterfaceToImplement>::open()
         UDT::close(m_impl->udtHandle);
         return false;
     }
-#endif
 
     m_state = detail::SocketState::open;
     return true;
