@@ -69,10 +69,10 @@ private:
 };
 
 template<typename LeftFile, typename RightFile>
-std::unique_ptr<typename AsyncPipeline<LeftFile, RightFile>> makeAsyncPipeline(
+std::unique_ptr<AsyncPipeline<LeftFile, RightFile>> makeAsyncPipeline(
     LeftFile leftFile, RightFile rightFile)
 {
-    return std::make_unique<typename AsyncPipeline<LeftFile, RightFile>>(
+    return std::make_unique<AsyncPipeline<LeftFile, RightFile>>(
         std::move(leftFile),
         std::move(rightFile));
 }
