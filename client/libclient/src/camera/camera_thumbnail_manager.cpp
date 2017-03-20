@@ -67,8 +67,8 @@ void QnCameraThumbnailManager::selectCamera(const QnVirtualCameraResourcePtr& ca
     if (!camera)
     {
         emit statusChanged(Qn::ThumbnailStatus::Invalid);
-        emit imageChanged(QImage());
         emit sizeHintChanged(sizeHint());
+        emit imageChanged(QImage());
         return;
     }
 
@@ -95,6 +95,7 @@ void QnCameraThumbnailManager::selectCamera(const QnVirtualCameraResourcePtr& ca
         }, kDefaultDelay, this);
 
     emit statusChanged(data.status);
+    emit sizeHintChanged(sizeHint());
     emit imageChanged(data.thumbnail);
 }
 
@@ -135,6 +136,10 @@ QImage QnCameraThumbnailManager::image() const
 
 QSize QnCameraThumbnailManager::sizeHint() const
 {
+    QSize imageSize = image().size();
+    if (!imageSize.isEmpty())
+        return imageSize;
+
     return sizeHintForCamera(m_selectedCamera, m_thumbnailSize);
 }
 

@@ -2010,6 +2010,22 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Notifications | Qn::NoTarget).
         text(tr("Pin Notifications")).
         toggledText(tr("Unpin Notifications"));
+
+    factory(QnActions::GoToNextItemAction)
+        .flags(Qn::NoTarget);
+
+    factory(QnActions::GoToPreviousItemAction)
+        .flags(Qn::NoTarget);
+
+    factory(QnActions::ToggleCurrentItemMaximizationStateAction)
+        .flags(Qn::NoTarget);
+
+    factory(QnActions::PtzContinuousMoveAction)
+        .flags(Qn::NoTarget);
+
+    factory(QnActions::PtzActivatePresetByIndexAction)
+        .flags(Qn::NoTarget);
+
 }
 
 QnActionManager::~QnActionManager()

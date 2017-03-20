@@ -53,6 +53,7 @@ Page
                 hostsModel: SystemHostsModel
                 {
                     id: systemHostsModel
+                    localSystemId: control.localSystemId
                 }
 
                 authenticationDataModel: AuthenticationDataModel

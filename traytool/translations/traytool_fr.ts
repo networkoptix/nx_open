@@ -5,7 +5,7 @@
     <name>QObject</name>
     <message>
         <source>System Tray</source>
-        <translation>Zone de notifications </translation>
+        <translation>Zone de notifications</translation>
     </message>
     <message>
         <source>There is no system tray on this system.</source>
@@ -30,14 +30,6 @@
 <context>
     <name>QnSystrayWindow</name>
     <message>
-        <source>No %1 services installed</source>
-        <translation>Aucun %1 service installé</translation>
-    </message>
-    <message>
-        <source>&amp;Quit</source>
-        <translation>&amp;Quitter</translation>
-    </message>
-    <message>
         <source>Access denied.</source>
         <translation>Accès refusé.</translation>
     </message>
@@ -54,64 +46,72 @@
         <translation>Ne peut pas accéder les services installés</translation>
     </message>
     <message>
+        <source>No %1 services installed</source>
+        <translation>Aucun %1 service installé</translation>
+    </message>
+    <message>
+        <source>&amp;Quit</source>
+        <translation>&amp;Quitter</translation>
+    </message>
+    <message>
         <source>An error has occurred while trying to access installed services:</source>
         <translation>Une erreur est survenue en essayant d&apos;accéder aux services installés:</translation>
     </message>
     <message>
         <source>Server has been stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur a été arrêté</translation>
     </message>
     <message>
         <source>Server has been started</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur a été démarré</translation>
     </message>
     <message>
         <source>Server will be stopped. Continue?</source>
-        <translation type="unfinished">Le service &apos;Media Serveur&apos; va s&apos;arrêter. Continuer ?</translation>
+        <translation>Le service &apos;Media Serveur&apos; va s&apos;arrêter. Continuer ?</translation>
     </message>
     <message>
         <source>Show Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher Journal Serveur</translation>
     </message>
     <message>
         <source>Start Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Démarrer le serveur</translation>
     </message>
     <message>
         <source>Stop Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrêter le serveur</translation>
     </message>
     <message>
         <source>Server Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Page Web Serveur</translation>
     </message>
     <message>
         <source>stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>arrêté</translation>
     </message>
     <message>
         <source>starting</source>
-        <translation type="unfinished"></translation>
+        <translation>démarrage</translation>
     </message>
     <message>
         <source>stopping</source>
-        <translation type="unfinished"></translation>
+        <translation>arrêt</translation>
     </message>
     <message>
         <source>started</source>
-        <translation type="unfinished"></translation>
+        <translation>démarré</translation>
     </message>
     <message>
         <source>resuming</source>
-        <translation type="unfinished"></translation>
+        <translation>reprendre</translation>
     </message>
     <message>
         <source>paused</source>
-        <translation type="unfinished"></translation>
+        <translation>en pause</translation>
     </message>
     <message>
         <source>pausing</source>
-        <translation type="unfinished"></translation>
+        <translation>pause</translation>
     </message>
 </context>
 </TS>

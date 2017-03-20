@@ -169,6 +169,8 @@ common/src/plugins/resource/avi/filetypes.h
 customization/*.html
 
 .sources_cache
+plugins/acs/paxton-plugin/packages/*
+plugins/acs/paxton-plugin/CustomProperties.cs
 syntax: regexp
 ^core$
 ^Makefile$

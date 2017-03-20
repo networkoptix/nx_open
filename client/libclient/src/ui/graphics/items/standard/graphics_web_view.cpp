@@ -39,11 +39,6 @@ QnGraphicsWebView::QnGraphicsWebView(const QUrl &url
 {
     setRenderHints(0);
     setAcceptDrops(false);
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
-
-    // Static strings cannot be passed due to static initialization order hell. Copying to local variable.
-    QString storagePath = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    QWebSettings::globalSettings()->enablePersistentStorage(storagePath);
 
     settings()->setAttribute(QWebSettings::PluginsEnabled, true);
     settings()->setAttribute(QWebSettings::TiledBackingStoreEnabled, true);
