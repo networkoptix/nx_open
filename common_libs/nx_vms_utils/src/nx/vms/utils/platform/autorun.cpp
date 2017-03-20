@@ -21,14 +21,19 @@ bool isAutoRunSupported()
     return nx::utils::AppInfo::isWindows();
 }
 
-bool isAutoRunEnabled(const QString& key, const QString& path)
+QString autoRunPath(const QString& key)
 {
     if (!isAutoRunSupported())
-        return false;
+        return QString();
 
     NX_EXPECT(nx::utils::AppInfo::isWindows());
     QSettings settings(kWindowsRegistryPath, QSettings::NativeFormat);
-    return path == settings.value(key).toString();
+    return settings.value(key).toString();
+}
+
+bool isAutoRunEnabled(const QString& key)
+{
+    return !autoRunPath(key).isEmpty();
 }
 
 void setAutoRunEnabled(const QString& key, const QString& path, bool value)

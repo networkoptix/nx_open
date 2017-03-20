@@ -297,7 +297,8 @@ QStringList QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameter
     case ServerStartEvent:
         break;
     case UserDefinedEvent:
-        result << params.description;
+        if (!params.description.isEmpty())
+            result << params.description;
         break;
     case SoftwareTriggerEvent:
         result << tr("Trigger: %1").arg(getSoftwareTriggerName(params));
