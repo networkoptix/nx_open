@@ -30,7 +30,6 @@ private:
         size_t bytesTransferred,
         size_t prevBytesTransferred,
         std::chrono::milliseconds timePassed);
-    static void printBandwidth(std::ostream& statisticsStringStream, size_t bandwidth);
 };
 
 } // namespace cctu

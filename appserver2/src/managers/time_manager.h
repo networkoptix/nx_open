@@ -81,6 +81,8 @@ namespace ec2
             bool takeIntoAccountInternetTime) const;
         quint64 toUInt64() const;
         void fromUInt64(quint64 val);
+
+        bool isTakenFromInternet() const;
     };
 
     class TimeSyncInfo
@@ -260,6 +262,9 @@ namespace ec2
         int m_internetSynchronizationFailureCount;
         std::map<QnUuid, PeerContext> m_peersToSendTimeSyncTo;
 
+        void selectLocalTimeAsSynchronized(
+            QnMutexLockerBase* const lk,
+            quint16 newTimePriorityKeySequence);
         /*!
             \param lock Locked \a m_mutex. This method will unlock it to emit \a TimeSynchronizationManager::timeChanged signal
             \param remotePeerID

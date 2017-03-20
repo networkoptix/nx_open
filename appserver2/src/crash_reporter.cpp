@@ -91,6 +91,8 @@ CrashReporter::~CrashReporter()
         QnMutexLocker lock(&m_mutex);
         std::swap(httpClient, m_activeHttpClient);
     }
+    if (httpClient)
+        httpClient->pleaseStopSync();
 }
 
 bool CrashReporter::scanAndReport(QSettings* settings)

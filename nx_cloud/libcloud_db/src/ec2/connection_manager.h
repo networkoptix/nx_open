@@ -93,6 +93,7 @@ public:
         std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer);
 
     api::VmsConnectionDataList getVmsConnections() const;
+    std::size_t getVmsConnectionCount() const;
     bool isSystemConnected(const std::string& systemId) const;
 
     unsigned int getConnectionCountBySystemId(const nx::String& systemId) const;

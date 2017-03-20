@@ -299,6 +299,12 @@ api::VmsConnectionDataList ConnectionManager::getVmsConnections() const
     return result;
 }
 
+std::size_t ConnectionManager::getVmsConnectionCount() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_connections.size();
+}
+
 bool ConnectionManager::isSystemConnected(const std::string& systemId) const
 {
     QnMutexLocker lk(&m_mutex);

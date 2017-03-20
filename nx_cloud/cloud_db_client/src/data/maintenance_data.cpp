@@ -7,10 +7,9 @@ namespace cdb {
 namespace api {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (VmsConnectionData)(VmsConnectionDataList),
+    (VmsConnectionData)(VmsConnectionDataList)(Statistics),
     (json),
-    _Fields/*,
-    (optional, false)*/)
+    _Fields)
 
 } // namespace api
 } // namespace cdb
