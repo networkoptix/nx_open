@@ -24,6 +24,7 @@ public:
 private slots:
     void at_updateConnection();
     void restartTimer();
+    void addCloudPeer(QUrl url);
 private:
     QUrl m_cloudUrl;
     QTimer m_timer;

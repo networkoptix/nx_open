@@ -4,7 +4,7 @@ angular.module('webadminApp')
     .directive('navbar', function () {
         return {
             restrict: 'E',
-            templateUrl: 'views/navbar.html',
+            templateUrl: Config.viewsDir + 'navbar.html',
             controller: 'NavigationCtrl'
         };
     });

@@ -15,6 +15,153 @@ namespace ec2 {
 namespace database {
 namespace api {
 
+namespace {
+
+bool deleteLayoutInternal(const QSqlDatabase& database, int internalId)
+{
+    const QString queryStr(R"sql(
+        DELETE FROM vms_layout WHERE resource_ptr_id = ?
+    )sql");
+
+    QSqlQuery query(database);
+    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return false;
+
+    query.addBindValue(internalId);
+    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+}
+
+bool insertOrReplaceLayout(const QSqlDatabase& database, const ApiLayoutData& layout, qint32 internalId)
+{
+    QSqlQuery query(database);
+    const QString queryStr(R"sql(
+        INSERT OR REPLACE
+        INTO vms_layout
+        (
+            resource_ptr_id,
+            locked,
+            cell_aspect_ratio,
+            cell_spacing_width,
+            cell_spacing_height,
+            background_width,
+            background_height,
+            background_image_filename,
+            background_opacity
+        ) VALUES (
+            :internalId,
+            :locked,
+            :cellAspectRatio,
+            :horizontalSpacing,
+            :verticalSpacing,
+            :backgroundWidth,
+            :backgroundHeight,
+            :backgroundImageFilename,
+            :backgroundOpacity
+        )
+    )sql");
+
+    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return false;
+
+    QnSql::bind(layout, &query);
+    query.bindValue(":internalId", internalId);
+    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+}
+
+bool removeItems(const QSqlDatabase& database, qint32 internalId)
+{
+    const QString queryStr(R"sql(
+        DELETE FROM vms_layoutitem WHERE layout_id = ?
+    )sql");
+
+    QSqlQuery query(database);
+    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return false;
+
+    query.addBindValue(internalId);
+    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+}
+
+bool cleanupVideoWalls(const QSqlDatabase& database, const QnUuid &layoutId)
+{
+    const QString queryStr(R"sql(
+        UPDATE vms_videowall_item set layout_guid = :empty_id WHERE layout_guid = :layout_id
+    )sql");
+
+    QByteArray emptyId = QnUuid().toRfc4122();
+
+    QSqlQuery query(database);
+    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return false;
+
+    query.bindValue(":empty_id", emptyId);
+    query.bindValue(":layout_id", layoutId.toRfc4122());
+    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+}
+
+bool updateItems(const QSqlDatabase& database, const ApiLayoutData& layout, qint32 internalId)
+{
+    if (!removeItems(database, internalId))
+        return false;
+
+    QSqlQuery query(database);
+    const QString queryStr(R"sql(
+        INSERT INTO vms_layoutitem (
+            uuid,
+            resource_guid,
+            layout_id,
+            left,
+            right,
+            top,
+            bottom,
+            zoom_left,
+            zoom_right,
+            zoom_top,
+            zoom_bottom,
+            zoom_target_uuid,
+            flags,
+            rotation,
+            contrast_params,
+            dewarping_params,
+            display_info
+        ) VALUES (
+            :id,
+            :resourceId,
+            :layoutId,
+            :left,
+            :right,
+            :top,
+            :bottom,
+            :zoomLeft,
+            :zoomRight,
+            :zoomTop,
+            :zoomBottom,
+            :zoomTargetId,
+            :flags,
+            :rotation,
+            :contrastParams,
+            :dewarpingParams,
+            :displayInfo
+        )
+    )sql");
+
+    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        return false;
+
+    for (const ApiLayoutItemData& item : layout.items)
+    {
+        NX_ASSERT(!item.id.isNull(), "Invalid null id item inserting");
+        QnSql::bind(item, &query);
+        query.bindValue(":layoutId", internalId);
+        if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
+            return false;
+    }
+
+    return true;
+}
+
+} // namespace
+
 bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataList& layouts)
 {
     QSqlQuery query(database);
@@ -93,109 +240,6 @@ bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataL
     return true;
 }
 
-bool insertOrReplaceLayout(
-    const QSqlDatabase& database,
-    const ApiLayoutData& layout,
-    qint32 internalId)
-{
-    QSqlQuery query(database);
-    const QString queryStr(R"sql(
-        INSERT OR REPLACE
-        INTO vms_layout
-        (
-            resource_ptr_id,
-            locked,
-            cell_aspect_ratio,
-            cell_spacing_width,
-            cell_spacing_height,
-            background_width,
-            background_height,
-            background_image_filename,
-            background_opacity
-        ) VALUES (
-            :internalId,
-            :locked,
-            :cellAspectRatio,
-            :horizontalSpacing,
-            :verticalSpacing,
-            :backgroundWidth,
-            :backgroundHeight,
-            :backgroundImageFilename,
-            :backgroundOpacity
-        )
-    )sql");
-
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
-        return false;
-
-    QnSql::bind(layout, &query);
-    query.bindValue(":internalId", internalId);
-    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
-}
-
-bool updateLayoutItems(
-    const QSqlDatabase& database,
-    const ApiLayoutData& layout,
-    qint32 internalId)
-{
-    if (!removeLayoutItems(database, internalId))
-        return false;
-
-    QSqlQuery query(database);
-    const QString queryStr(R"sql(
-        INSERT INTO vms_layoutitem (
-            uuid,
-            resource_guid,
-            layout_id,
-            left,
-            right,
-            top,
-            bottom,
-            zoom_left,
-            zoom_right,
-            zoom_top,
-            zoom_bottom,
-            zoom_target_uuid,
-            flags,
-            rotation,
-            contrast_params,
-            dewarping_params,
-            display_info
-        ) VALUES (
-            :id,
-            :resourceId,
-            :layoutId,
-            :left,
-            :right,
-            :top,
-            :bottom,
-            :zoomLeft,
-            :zoomRight,
-            :zoomTop,
-            :zoomBottom,
-            :zoomTargetId,
-            :flags,
-            :rotation,
-            :contrastParams,
-            :dewarpingParams,
-            :displayInfo
-        )
-    )sql");
-
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
-        return false;
-
-    for (const ApiLayoutItemData& item: layout.items)
-    {
-        QnSql::bind(item, &query);
-        query.bindValue(":layoutId", internalId);
-        if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
-            return false;
-    }
-
-    return true;
-}
-
 bool saveLayout(const QSqlDatabase& database, const ApiLayoutData& layout)
 {
     qint32 internalId;
@@ -205,21 +249,25 @@ bool saveLayout(const QSqlDatabase& database, const ApiLayoutData& layout)
     if (!insertOrReplaceLayout(database, layout, internalId))
         return false;
 
-    return updateLayoutItems(database, layout, internalId);
+    return updateItems(database, layout, internalId);
 }
 
-bool removeLayoutItems(const QSqlDatabase& database, qint32 internalId)
+bool removeLayout(const QSqlDatabase& database, const QnUuid& id)
 {
-    const QString queryStr(R"sql(
-        DELETE FROM vms_layoutitem WHERE layout_id = ?
-    )sql");
-
-    QSqlQuery query(database);
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    int internalId = api::getResourceInternalId(database, id);
+    if (internalId == 0)
         return false;
 
-    query.addBindValue(internalId);
-    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    if (!removeItems(database, internalId))
+        return false;
+
+    if (!cleanupVideoWalls(database, id))
+        return false;
+
+    if (!deleteLayoutInternal(database, internalId))
+        return false;
+
+    return deleteResourceInternal(database, internalId);
 }
 
 } // namespace api

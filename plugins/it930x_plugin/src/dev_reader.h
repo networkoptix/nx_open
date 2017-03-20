@@ -456,7 +456,7 @@ namespace ite
         std::map<uint16_t, PacketsQueue> m_packetQueues;
 
         DevReadThread * m_threadObject;
-        std::thread m_readThread;
+        nx::utils::thread m_readThread;
         std::atomic_bool m_hasThread;
 
         void dumpPacket(uint16_t pid);

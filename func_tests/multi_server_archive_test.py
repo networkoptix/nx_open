@@ -1,29 +1,29 @@
-import pprint
 from datetime import datetime, timedelta
+import logging
 import uuid
 import pytest
 import pytz
-from test_utils import print_list
-from server import TimePeriod
+from test_utils.utils import log_list
+from test_utils.server import TimePeriod
+
+
+log = logging.getLogger(__name__)
 
 
 @pytest.fixture
 def env(env_builder, server):
     one = server()
     two = server()
-    return env_builder(merge_servers=['one', 'two'], one=one, two=two)
+    return env_builder(merge_servers=[one, two], one=one, two=two)
 
 
 def test_merged_archive(env, camera, sample_media_file):
-    print
-    print env.one.name, env.one.url, env.one.ecs_guid
-    print env.two.name, env.two.url, env.two.ecs_guid
-    print camera, sample_media_file
+    log.debug('camera: %r, sample media file: %r', camera, sample_media_file)
     camera_id = env.one.add_camera(camera)
-    one_storage = env.one.get_storage()
-    two_storage = env.two.get_storage()
+    one_storage = env.one.storage
+    two_storage = env.two.storage
     sample = sample_media_file
-    print 'Sample duration:', sample.duration
+    log.debug('Sample duration: %s', sample.duration)
 
     start_times_one = []
     start_times_one.append(datetime(2017, 1, 27, tzinfo=pytz.utc))
@@ -32,8 +32,8 @@ def test_merged_archive(env, camera, sample_media_file):
     start_times_two = []
     start_times_two.append(start_times_one[-1] + sample.duration + timedelta(minutes=1))   # separate from previous
     start_times_two.append(start_times_two[-1] + sample.duration)                          # adjacent to previous
-    print_list('Start times for server one', start_times_one)
-    print_list('Start times for server two', start_times_two)
+    log_list('Start times for server one', start_times_one)
+    log_list('Start times for server two', start_times_two)
     expected_periods_one = [
         TimePeriod(start_times_one[0], sample.duration * 2 - timedelta(seconds=10)),  # overlapped must be joined together
         TimePeriod(start_times_one[2], sample.duration),
@@ -42,8 +42,8 @@ def test_merged_archive(env, camera, sample_media_file):
         TimePeriod(start_times_two[0], sample.duration * 2),  # adjacent must be joined together
         ]
     all_expected_periods = expected_periods_one + expected_periods_two
-    print_list('Expected periods for server one', expected_periods_one)
-    print_list('Expected periods for server two', expected_periods_two)
+    log_list('Expected periods for server one', expected_periods_one)
+    log_list('Expected periods for server two', expected_periods_two)
 
     for st in start_times_one:
         one_storage.save_media_sample(camera, st, sample)

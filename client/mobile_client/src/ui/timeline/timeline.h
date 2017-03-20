@@ -1,5 +1,4 @@
-#ifndef QNTIMELINE_H
-#define QNTIMELINE_H
+#pragma once
 
 #include <QtCore/QDateTime>
 #include <QtQuick/QQuickItem>
@@ -10,50 +9,65 @@ class QnTimelinePrivate;
 class QSGGeometryNode;
 class QnCameraChunkProvider;
 
-class QnTimeline : public QQuickItem {
+class QnTimeline: public QQuickItem
+{
     Q_OBJECT
+
+    Q_PROPERTY(qint64 defaultWindowSize READ defaultWindowSize CONSTANT)
+    Q_PROPERTY(qint64 windowSize READ windowSize WRITE setWindowSize NOTIFY windowSizeChanged)
     Q_PROPERTY(qint64 windowStart READ windowStart WRITE setWindowStart NOTIFY windowStartChanged)
     Q_PROPERTY(qint64 windowEnd READ windowEnd WRITE setWindowEnd NOTIFY windowEndChanged)
     Q_PROPERTY(qint64 position READ position WRITE setPosition NOTIFY positionChanged)
-    Q_PROPERTY(QDateTime positionDate READ positionDate WRITE setPositionDate NOTIFY positionDateChanged)
+    Q_PROPERTY(QDateTime positionDate
+        READ positionDate WRITE setPositionDate NOTIFY positionDateChanged)
     Q_PROPERTY(qint64 startBound READ startBound WRITE setStartBound NOTIFY startBoundChanged)
     Q_PROPERTY(bool stickToEnd READ stickToEnd WRITE setStickToEnd NOTIFY stickToEndChanged)
     Q_PROPERTY(bool autoPlay READ autoPlay WRITE setAutoPlay NOTIFY autoPlayChanged)
-    Q_PROPERTY(int timeZoneShift READ timeZoneShift WRITE setTimeZoneShift NOTIFY timeZoneShiftChanged)
+    Q_PROPERTY(bool autoReturnToBounds
+        READ isAutoReturnToBoundsEnabled WRITE setAutoReturnToBoundsEnabled
+        NOTIFY autoReturnToBoundsEnabledChanged)
+    Q_PROPERTY(int timeZoneShift
+        READ timeZoneShift WRITE setTimeZoneShift NOTIFY timeZoneShiftChanged)
 
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
-    Q_PROPERTY(QColor chunkBarColor READ chunkBarColor WRITE setChunkBarColor NOTIFY chunkBarColorChanged)
+    Q_PROPERTY(QColor chunkBarColor
+        READ chunkBarColor WRITE setChunkBarColor NOTIFY chunkBarColorChanged)
     Q_PROPERTY(QColor chunkColor READ chunkColor WRITE setChunkColor NOTIFY chunkColorChanged)
     Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
 
-    Q_PROPERTY(int chunkBarHeight READ chunkBarHeight WRITE setChunkBarHeight NOTIFY chunkBarHeightChanged)
+    Q_PROPERTY(int chunkBarHeight
+        READ chunkBarHeight WRITE setChunkBarHeight NOTIFY chunkBarHeightChanged)
     Q_PROPERTY(int textY READ textY WRITE setTextY NOTIFY textYChanged)
 
-    Q_PROPERTY(QnCameraChunkProvider* chunkProvider READ chunkProvider WRITE setChunkProvider NOTIFY chunkProviderChanged)
+    Q_PROPERTY(QnCameraChunkProvider* chunkProvider
+        READ chunkProvider WRITE setChunkProvider NOTIFY chunkProviderChanged)
 
 public:
-    QnTimeline(QQuickItem *parent = 0);
+    explicit QnTimeline(QQuickItem* parent = nullptr);
     ~QnTimeline();
 
-    virtual QSGNode *updatePaintNode(QSGNode *node, UpdatePaintNodeData *updatePaintNodeData) override;
+    virtual QSGNode* updatePaintNode(
+        QSGNode* node, UpdatePaintNodeData* updatePaintNodeData) override;
 
     QColor textColor() const;
-    void setTextColor(const QColor &color);
+    void setTextColor(const QColor& color);
 
     QFont font() const;
-    void setFont(const QFont &font);
+    void setFont(const QFont& font);
 
     QColor chunkColor() const;
-    void setChunkColor(const QColor &color);
+    void setChunkColor(const QColor& color);
 
     QColor chunkBarColor() const;
-    void setChunkBarColor(const QColor &color);
+    void setChunkBarColor(const QColor& color);
 
     int chunkBarHeight() const;
     void setChunkBarHeight(int chunkBarHeight);
 
     int textY() const;
     void setTextY(int textY);
+
+    qint64 defaultWindowSize() const;
 
     qint64 windowStart() const;
     void setWindowStart(qint64 windowStart);
@@ -64,7 +78,9 @@ public:
     QDateTime windowEndDate() const;
     void setWindowEndDate(const QDateTime &dateTime);
 
-    void setWindow(qint64 windowStart, qint64 windowEnd);
+    Q_INVOKABLE void setWindow(qint64 windowStart, qint64 windowEnd);
+    qint64 windowSize() const;
+    void setWindowSize(qint64 windowSize);
 
     qint64 position() const;
     void setPosition(qint64 position);
@@ -74,7 +90,7 @@ public:
     void setPositionDate(const QDateTime &dateTime);
 
     QnTimePeriodList timePeriods(Qn::TimePeriodContent type) const;
-    void setTimePeriods(Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods);
+    void setTimePeriods(Qn::TimePeriodContent type, const QnTimePeriodList& timePeriods);
 
     bool stickToEnd() const;
     void setStickToEnd(bool stickToEnd);
@@ -84,6 +100,9 @@ public:
 
     bool autoPlay() const;
     void setAutoPlay(bool autoPlay);
+
+    bool isAutoReturnToBoundsEnabled() const;
+    void setAutoReturnToBoundsEnabled(bool enabled);
 
     int timeZoneShift() const;
     void setTimeZoneShift(int timeZoneShift);
@@ -104,12 +123,13 @@ public:
 
     Q_INVOKABLE qint64 positionAtX(qreal x) const;
 
-    QnCameraChunkProvider *chunkProvider() const;
-    void setChunkProvider(QnCameraChunkProvider *chunkProvider);
+    QnCameraChunkProvider* chunkProvider() const;
+    void setChunkProvider(QnCameraChunkProvider* chunkProvider);
 
 signals:
     void zoomLevelChanged();
     void lowerTextOpacityChanged();
+    void windowSizeChanged();
     void windowStartChanged();
     void windowEndChanged();
     void positionChanged();
@@ -117,6 +137,7 @@ signals:
     void stickToEndChanged();
     void startBoundChanged();
     void autoPlayChanged();
+    void autoReturnToBoundsEnabledChanged();
 
     void timeZoneShiftChanged();
 
@@ -133,11 +154,9 @@ signals:
     void moveFinished();
 
 private:
-    QSGNode *updateTextNode(QSGNode *textRootNode);
-    QSGGeometryNode *updateChunksNode(QSGGeometryNode *chunksNode);
+    QSGNode* updateTextNode(QSGNode* textRootNode);
+    QSGGeometryNode* updateChunksNode(QSGGeometryNode* chunksNode);
 
 private:
     QScopedPointer<QnTimelinePrivate> d;
 };
-
-#endif // QNTIMELINE_H

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <nx/utils/log/log.h>
 #include <common/common_module.h>
 
 #include "test_api_requests.h"
@@ -13,6 +14,7 @@ namespace {
  * Assert that the list contains the storage with the specified name, retrieve this storage and
  * check its id and parentId if specified.
  */
+#define NX_FIND_STORAGE_BY_NAME(...) ASSERT_NO_FATAL_FAILURE(findStorageByName(__VA_ARGS__))
 static void findStorageByName(
     const ec2::ApiStorageDataList& storages,
     ec2::ApiStorageData* outStorage,
@@ -46,43 +48,39 @@ TEST(GetStorages, saveAndMerge)
 
     ec2::ApiStorageDataList storages;
     ec2::ApiStorageData storage;
-    ec2::ApiStorageDataList::const_iterator foundStorage;
 
     NX_LOG("[TEST] Create a new storage with auto-generated id.", cl_logINFO);
     storage.name = "original name";
     storage.parentId = qnCommon->moduleGUID();
     storage.spaceLimit = 113326;
     storage.storageType = "local";
-    ASSERT_NO_FATAL_FAILURE(testApiPost(launcher,
-        lit("/ec2/saveStorage"), storage, removeJsonFields({"id"})));
+    NX_TEST_API_POST(&launcher,
+        lit("/ec2/saveStorage"), storage, removeJsonFields({"id"}));
 
     NX_LOG("[TEST] Retrieve the created storage.", cl_logINFO);
-    ASSERT_NO_FATAL_FAILURE(testApiGet(launcher, lit("/ec2/getStorages"), &storages));
-    ASSERT_NO_FATAL_FAILURE(findStorageByName(
-        storages, &storage, storage.name, storage.parentId));
+    NX_TEST_API_GET(&launcher, lit("/ec2/getStorages"), &storages);
+    NX_FIND_STORAGE_BY_NAME(storages, &storage, storage.name, storage.parentId);
     ASSERT_EQ(1, storages.size());
 
     NX_LOG("[TEST] Rename the storage via Merge.", cl_logINFO);
     storage.name = "new name";
-    ASSERT_NO_FATAL_FAILURE(testApiPost(launcher,
-        lit("/ec2/saveStorage"), storage, keepOnlyJsonFields({"id", "name"})));
+    NX_TEST_API_POST(&launcher,
+        lit("/ec2/saveStorage"), storage, keepOnlyJsonFields({"id", "name"}));
 
     NX_LOG("[TEST] Check that the storage is renamed.", cl_logINFO);
-    ASSERT_NO_FATAL_FAILURE(testApiGet(launcher, lit("/ec2/getStorages"), &storages));
-    ASSERT_NO_FATAL_FAILURE(findStorageByName(
-        storages, &storage, storage.name, storage.parentId, storage.id));
+    NX_TEST_API_GET(&launcher, lit("/ec2/getStorages"), &storages);
+    NX_FIND_STORAGE_BY_NAME(storages, &storage, storage.name, storage.parentId, storage.id);
     ASSERT_EQ(1, storages.size());
 
     NX_LOG("[TEST] Check the storage can be found by its parent server id.", cl_logINFO);
-    ASSERT_NO_FATAL_FAILURE(testApiGet(launcher,
-        lit("/ec2/getStorages?id=%1").arg(storage.parentId.toString()), &storages));
-    ASSERT_NO_FATAL_FAILURE(findStorageByName(
-        storages, &storage, storage.name, storage.parentId, storage.id));
+    NX_TEST_API_GET(&launcher,
+        lit("/ec2/getStorages?id=%1").arg(storage.parentId.toString()), &storages);
+    NX_FIND_STORAGE_BY_NAME(storages, &storage, storage.name, storage.parentId, storage.id);
     ASSERT_EQ(1, storages.size());
 
     NX_LOG("[TEST] Check that no storages are found by another (non-existing) parent server id.", cl_logINFO);
-    ASSERT_NO_FATAL_FAILURE(testApiGet(launcher,
-        lit("/ec2/getStorages?id=%1").arg(QnUuid::createUuid().toString()), &storages));
+    NX_TEST_API_GET(&launcher,
+        lit("/ec2/getStorages?id=%1").arg(QnUuid::createUuid().toString()), &storages);
     ASSERT_TRUE(storages.empty());
 }
 

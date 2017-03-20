@@ -177,13 +177,10 @@ void QnDirectSystemsFinder::updateServer(const SystemsHash::iterator systemIt
 
     auto systemDescription = systemIt.value();
     const auto changes = systemDescription->updateServer(moduleInformation);
-    if (!changes.testFlag(QnServerField::SystemName)
-        && !changes.testFlag(QnServerField::CloudId))
-    {
+    if (!changes.testFlag(QnServerField::CloudId))
         return;
-    }
 
-    // System name or factory status has changed. We have to
+    // Factory status has changed. We have to
     // remove server from current system and add to new
     const auto serverHost = systemDescription->getServerHost(moduleInformation.id);
     removeServer(moduleInformation);

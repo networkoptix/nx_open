@@ -24,7 +24,7 @@ SERVER_SYNC_TIMEOUT = 10 # seconds
 MINOR_SLEEP = 1 # seconds
 SYSTEM_TIME_SYNC_SLEEP = 10.5 # seconds, a bit greater than server's systime check period (10 seconds)
 SYSTEM_TIME_NOTSYNC_SURE = 30 # seconds, how long wait to shure server hasn't synced with system time
-INET_SYNC_TIMEOUT = 15 * 2 # twice as bigger than the value in ctl.sh in prepare_isync case
+INET_SYNC_TIMEOUT = 15 * 4 # bigger than the value in ctl.sh in prepare_isync case
 
 IF_EXT = 'eth0'
 
@@ -519,7 +519,7 @@ class TimeSyncTest(FuncTestCase):
         """
         primary = self._primary # save it
         self.shift_box_time(self.hosts[self._primary], 5000)
-        time.sleep(SYSTEM_TIME_SYNC_SLEEP)
+        time.sleep(SYSTEM_TIME_SYNC_SLEEP * 4)
         self._check_time_sync()
         self.assertEqual(primary, self._primary, "The primary server changed after the previous primary's system time changed.")
 

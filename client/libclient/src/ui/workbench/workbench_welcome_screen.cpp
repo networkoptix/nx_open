@@ -198,21 +198,21 @@ void QnWorkbenchWelcomeScreen::handleStartupTileAction(const QString& systemId, 
         const auto credentialsList =
             qnClientCoreSettings->systemAuthenticationData()[system->localId()];
 
-        if (credentialsList.isEmpty() || credentialsList.first().password.isEmpty())
+        if (!credentialsList.isEmpty() && !credentialsList.first().password.isEmpty())
+        {
+            static const bool kNeverAutologin = false;
+            static const bool kAlwaysStorePassword = true;
+
+            const auto credentials = credentialsList.first();
+            const auto firstServerId = system->servers().first().id;
+            const auto serverHost = system->getServerHost(firstServerId);
+
+            connectToLocalSystem(system->id(), serverHost.toString(),
+                credentials.user, credentials.password.value(),
+                kAlwaysStorePassword, kNeverAutologin);
+
             return;
-
-        static const bool kNeverAutologin = false;
-        static const bool kAlwaysStorePassword = true;
-
-        const auto credentials = credentialsList.first();
-        const auto firstServerId = system->servers().first().id;
-        const auto serverHost = system->getServerHost(firstServerId);
-
-        connectToLocalSystem(system->id(), serverHost.toString(),
-            credentials.user, credentials.password.value(),
-            kAlwaysStorePassword, kNeverAutologin);
-
-        return;
+        }
     }
 
     // Just expand online local tile
@@ -375,7 +375,8 @@ void QnWorkbenchWelcomeScreen::makeDrop(const QList<QUrl>& urls)
     if (resources.isEmpty())
         return;
 
-    menu()->triggerIfPossible(QnActions::DropResourcesAction, QnActionParameters(resources));
+    if (menu()->triggerIfPossible(QnActions::DropResourcesAction, QnActionParameters(resources)))
+        action(QnActions::ResourcesModeAction)->setChecked(true);
 }
 
 void QnWorkbenchWelcomeScreen::connectToLocalSystem(
@@ -389,7 +390,7 @@ void QnWorkbenchWelcomeScreen::connectToLocalSystem(
     connectToSystemInternal(
         systemId,
         urlFromUserInput(serverUrl),
-        QnCredentials(userName, password),
+        QnEncodedCredentials(userName, password),
         storePassword,
         autoLogin);
 }
@@ -405,7 +406,7 @@ void QnWorkbenchWelcomeScreen::forgetPassword(
     const auto callback = [localId, userName]()
         {
             nx::client::core::helpers::storeCredentials(
-                localId, QnCredentials(userName, QString()));
+                localId, QnEncodedCredentials(userName, QString()));
         };
 
     executeDelayedParented(callback, 0, this);
@@ -419,7 +420,7 @@ void QnWorkbenchWelcomeScreen::forceActiveFocus()
 void QnWorkbenchWelcomeScreen::connectToSystemInternal(
     const QString& systemId,
     const QUrl& serverUrl,
-    const QnCredentials& credentials,
+    const QnEncodedCredentials& credentials,
     bool storePassword,
     bool autoLogin,
     const QnRaiiGuardPtr& completionTracker)

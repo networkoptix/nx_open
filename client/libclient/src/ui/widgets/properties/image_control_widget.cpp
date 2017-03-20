@@ -164,7 +164,7 @@ void QnImageControlWidget::updateAspectRatioFromResources(
     }
     else
     {
-        ui->aspectRatioComboBox->insertItem(0, tr("<multiple values>"));
+        ui->aspectRatioComboBox->insertItem(0, L'<' + tr("multiple values") + L'>');
         ui->aspectRatioComboBox->setCurrentIndex(0);
     }
 }
@@ -204,7 +204,7 @@ void QnImageControlWidget::updateRotationFromResources(
     }
     else
     {
-        ui->rotationComboBox->insertItem(0, tr("<multiple values>"));
+        ui->rotationComboBox->insertItem(0, L'<' + tr("multiple values") + L'>');
         ui->rotationComboBox->setCurrentIndex(0);
     }
 }

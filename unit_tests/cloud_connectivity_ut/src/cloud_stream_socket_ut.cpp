@@ -22,9 +22,9 @@ NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
     []() { return std::make_unique<TCPServerSocket>(AF_INET); },
     []() { return std::make_unique<CloudStreamSocket>(AF_INET); });
 
-TEST(CloudStreamSocketTcpByIp, SimpleSyncSsl)
+TEST(CloudStreamSocketTcpByIp, TransferSyncSsl)
 {
-    network::test::socketSimpleSync(
+    network::test::socketTransferSync(
         [&]() { return std::make_unique<SslServerSocket>(new TCPServerSocket(AF_INET), false); },
         []() { return std::make_unique<SslSocket>(new CloudStreamSocket(AF_INET), false); });
 }
@@ -79,9 +79,9 @@ NX_NETWORK_CLIENT_SOCKET_TEST_CASE_EX(
     [&]() { return std::make_unique<CloudStreamSocket>(AF_INET); },
     SocketAddress(testHost));
 
-TEST_F(CloudStreamSocketTcpByHost, SimpleSyncSsl)
+TEST_F(CloudStreamSocketTcpByHost, TransferSyncSsl)
 {
-    network::test::socketSimpleSync(
+    network::test::socketTransferSync(
         [&]() { return std::make_unique<SslServerSocket>(new TestTcpServerSocket(testHost), false); },
         []() { return std::make_unique<SslSocket>(new CloudStreamSocket(AF_INET), false); },
         SocketAddress(testHost));
@@ -125,6 +125,7 @@ TEST_F(CloudStreamSocketTest, simple)
         bytesToSendThroughConnection,
         network::test::TestTransmissionMode::spam);
     ASSERT_TRUE(server.start());
+    auto serverGuard = makeScopedGuard([&server]() { server.pleaseStopSync(); });
 
     const auto serverAddress = server.addressBeingListened();
 
@@ -132,6 +133,13 @@ TEST_F(CloudStreamSocketTest, simple)
     nx::network::SocketGlobals::addressResolver().addFixedAddress(
         tempHostName,
         serverAddress);
+    auto tempHostNameGuard = makeScopedGuard(
+        [&tempHostName, &serverAddress]()
+        {
+            nx::network::SocketGlobals::addressResolver().removeFixedAddress(
+                tempHostName,
+                serverAddress);
+        });
 
     for (size_t i = 0; i < repeatCount; ++i)
     {
@@ -153,11 +161,6 @@ TEST_F(CloudStreamSocketTest, simple)
         const int bytesRead = cloudSocket.recv(data.data(), data.size(), MSG_WAITALL);
         ASSERT_EQ(bytesToSendThroughConnection, (size_t)bytesRead);
     }
-
-    server.pleaseStopSync();
-    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
-        tempHostName,
-        serverAddress);
 }
 
 TEST_F(CloudStreamSocketTest, multiple_connections_random_data)

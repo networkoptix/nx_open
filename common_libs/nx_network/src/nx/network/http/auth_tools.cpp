@@ -4,7 +4,6 @@
 
 #include <QtCore/QCryptographicHash>
 
-
 namespace nx_http {
 
 bool addAuthorization(

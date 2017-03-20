@@ -35,7 +35,7 @@ QString QnCloudResultInfo::toString(ResultCode code)
 
         case ResultCode::dbError:
             return tr("Internal %1 error. Please contact support team.",
-                "%1 is name of cloud (like 'Nx Cloud')")
+                "%1 is the cloud name (like 'Nx Cloud')")
                 .arg(QnAppInfo::cloudName());
 
         case ResultCode::networkError:
@@ -45,16 +45,16 @@ QString QnCloudResultInfo::toString(ResultCode code)
             return tr("Invalid login.");
 
         case ResultCode::serviceUnavailable:
-            return tr("Sorry, %1 Service is temporary unavailable. We're doing our best to restore it. Please try again later.",
-                "%1 is name of cloud (like 'Nx Cloud')")
+            return tr("Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.",
+                "%1 is the cloud name (like 'Nx Cloud')")
                 .arg(QnAppInfo::cloudName());
 
         case ResultCode::credentialsRemovedPermanently:
             return tr("Credentials are no longer valid.");
 
         case ResultCode::retryLater:
-            return tr("Sorry, %1 Service couldn't process your request. Please try again in a few moments.",
-                "%1 is name of cloud (like 'Nx Cloud')")
+            return tr("Sorry, %1 Service could not process your request. Please try again in a few moments.",
+                "%1 is the cloud name (like 'Nx Cloud')")
                 .arg(QnAppInfo::cloudName());
 
         /* Internal result codes: */

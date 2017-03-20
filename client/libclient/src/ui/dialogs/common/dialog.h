@@ -26,6 +26,17 @@ public:
     Qt::Orientations resizeToContentsMode() const;
     void setResizeToContentsMode(Qt::Orientations mode);
 
+    virtual QSize sizeHint() const override;
+    virtual QSize minimumSizeHint() const override;
+
+    /* Safe minimum size which wont override minimumSizeHint(): */
+    void setSafeMinimumWidth(int width);
+    int safeMinimumWidth() const;
+    void setSafeMinimumHeight(int height);
+    int safeMinimumHeight() const;
+    void setSafeMinimumSize(const QSize& size);
+    QSize safeMinimumSize() const;
+
 protected:
     virtual bool event(QEvent* event) override;
     virtual void afterLayout();
@@ -35,4 +46,5 @@ private:
 
 private:
     Qt::Orientations m_resizeToContentsMode;
+    QSize m_safeMinimumSize;
 };

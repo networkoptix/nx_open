@@ -84,7 +84,7 @@ int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
     using namespace std::placeholders;
     m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
         ApiCommand::markLicenseOverflow, params,
-        [handler, reqId, &params](ErrorCode errorCode)
+        [handler, reqId, params](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);
             if (errorCode == ErrorCode::ok)

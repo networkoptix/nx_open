@@ -556,6 +556,8 @@ private:
                             .toIdList(),
                         transactionsPostProcessList),
                     lit("Remove videowall child resources failed"));
+
+                break;
             }
 
             default:

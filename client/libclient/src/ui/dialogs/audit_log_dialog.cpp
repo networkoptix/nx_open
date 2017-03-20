@@ -702,26 +702,41 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 
 }
 
-void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDType ActionId,
+void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDType actionId,
     int selectedPage)
 {
-    QnResourceList resList;
-    for (const auto& id: record->resources)
-    {
-        if (QnResourcePtr res = qnResPool->getResourceById(id))
-            resList << res;
-    }
-
-    QnActionParameters params(resList);
+    const QnResourceList resList = qnResPool->getResources(record->resources);
     if (resList.isEmpty())
     {
-        QnMessageBox::warning(this, tr("These devices are removed from the System"));
+        const auto count = static_cast<int>(record->resources.size());
+        switch (actionId)
+        {
+            case QnActions::CameraSettingsAction:
+                QnMessageBox::warning(this, QnDeviceDependentStrings::getDefaultNameFromSet(
+                    tr("These devices are removed from System", "", count),
+                    tr("These cameras are removed from System", "", count)));
+                break;
+            case QnActions::ServerSettingsAction:
+                QnMessageBox::warning(this, tr("These servers are removed from System",
+                    "", count));
+                break;
+            case QnActions::UserSettingsAction:
+                QnMessageBox::warning(this, tr("These users are removed from System",
+                    "", count));
+                break;
+            default:
+                QnMessageBox::warning(this, tr("These resources are removed from System",
+                    "", count));
+                break;
+        }
+
         return;
     }
 
+    QnActionParameters params(resList);
     params.setArgument(Qn::ItemTimeRole, record->rangeStartSec * 1000ll);
     params.setArgument(Qn::FocusTabRole, selectedPage);
-    context()->menu()->trigger(ActionId, params);
+    context()->menu()->trigger(actionId, params);
 }
 
 void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)

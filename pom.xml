@@ -194,7 +194,7 @@
 
         <!-- Set parent (parent.customization) and child (customization) customizations here -->
         <customization>default</customization>
-        <cloudGroup>dev</cloudGroup>
+        <cloudGroup>test</cloudGroup>
         <static.customization.dir>${environment.dir}/customization/${customization}</static.customization.dir>
         <customization.dir>${root.dir}/customization/${customization}</customization.dir>
         <parent.customization.dir>${root.dir}/customization/${parent.customization}</parent.customization.dir>
@@ -266,6 +266,7 @@
         <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
         <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
+        <nxcloud.version>1.0.119</nxcloud.version>
     </properties>
 
     <build>
@@ -323,11 +324,11 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>${root.dir}/build_variables/target/cloud_instance.properties</file>
+                                <file>${root.dir}/.cloudHost.properties</file>
                             </files>
                             <quiet>true</quiet>
                         </configuration>
-                    </execution>                    
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -790,12 +791,14 @@
                 <module>testcamera</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
+                <module>nx_cloud/time_server</module>
                 <module>plugins/it930x_plugin</module>
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
             </modules>
             <properties>
                 <modification>ubuntu</modification>
+                <qt.version>5.6.2</qt.version>
             </properties>
         </profile>
 
@@ -949,6 +952,7 @@
                 <module>client/libclient_core</module>
                 <module>client/mobile_client</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>nx_cloud/cloud_connect_test_util</module>
                 <module>media_db_util</module>
                 <!-- <module>nx_cloud/cloud_connect_test_util</module> -->
             </modules>

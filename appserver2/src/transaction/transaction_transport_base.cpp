@@ -7,6 +7,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QUrlQuery>
 
+#include <cdb/ec2_request_paths.h>
 #include <nx_ec/ec_proto_version.h>
 #include <nx/network/http/base64_decoder_filter.h>
 #include <nx/network/socket_factory.h>
@@ -22,7 +23,6 @@
 #include <utils/common/systemerror.h>
 #include <http/custom_headers.h>
 #include <api/global_settings.h>
-
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
 //!if not defined, ubjson is used
@@ -99,7 +99,8 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_keepAliveProbeCount(keepAliveProbeCount),
     m_idleConnectionTimeout(tcpKeepAliveTimeout * keepAliveProbeCount),
     m_timer(std::make_unique<nx::network::aio::Timer>()),
-    m_remotePeerEcProtoVersion(nx_ec::INITIAL_EC2_PROTO_VERSION)
+    m_remotePeerEcProtoVersion(nx_ec::INITIAL_EC2_PROTO_VERSION),
+    m_localPeerProtocolVersion(nx_ec::EC2_PROTO_VERSION)
 {
     m_timer->bindToAioThread(getAioThread());
 
@@ -295,6 +296,11 @@ void QnTransactionTransportBase::stopWhileInAioThread()
     m_outgoingTranClient.reset();
     m_outgoingDataSocket.reset();
     m_incomingDataSocket.reset();
+}
+
+void QnTransactionTransportBase::setLocalPeerProtocolVersion(int version)
+{
+    m_localPeerProtocolVersion = version;
 }
 
 void QnTransactionTransportBase::setOutgoingConnection(
@@ -571,7 +577,7 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
         m_localPeer.instanceId.toByteArray() );
     m_httpClient->addAdditionalHeader(
         Qn::EC2_PROTO_VERSION_HEADER_NAME,
-        QByteArray::number(nx_ec::EC2_PROTO_VERSION));
+        QByteArray::number(m_localPeerProtocolVersion));
 
     q.addQueryItem("peerType", QnLexical::serialized(m_localPeer.peerType));
 
@@ -784,22 +790,26 @@ void QnTransactionTransportBase::receivedTransaction(
 
 void QnTransactionTransportBase::transactionProcessed()
 {
-    QnMutexLocker lock( &m_mutex );
+    post(
+        [this]()
+        {
+            QnMutexLocker lock(&m_mutex);
 
-    --m_postedTranCount;
-    if( m_postedTranCount < MAX_TRANS_TO_POST_AT_A_TIME )
-        m_cond.wakeAll();   //signalling waiters that we are ready for new transactions once again
-    if( m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME ||     //not reading futher while that much transactions are not processed yet
-        m_asyncReadScheduled ||      //async read is ongoing already, overlapping reads are not supported by sockets api
-        m_state > ReadyForStreaming )
-    {
-        return;
-    }
+            --m_postedTranCount;
+            if (m_postedTranCount < MAX_TRANS_TO_POST_AT_A_TIME)
+                m_cond.wakeAll();   //signalling waiters that we are ready for new transactions once again
+            if (m_postedTranCount >= MAX_TRANS_TO_POST_AT_A_TIME ||     //not reading futher while that much transactions are not processed yet
+                m_asyncReadScheduled ||      //async read is ongoing already, overlapping reads are not supported by sockets api
+                m_state > ReadyForStreaming)
+            {
+                return;
+            }
 
-    NX_ASSERT( m_incomingDataSocket || m_outgoingDataSocket );
+            NX_ASSERT(m_incomingDataSocket || m_outgoingDataSocket);
 
-    m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
-    scheduleAsyncRead();
+            m_readBuffer.reserve(m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE);
+            scheduleAsyncRead();
+        });
 }
 
 QnUuid QnTransactionTransportBase::connectionGuid() const
@@ -1086,7 +1096,10 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
             }
 
             m_postTranBaseUrl = m_remoteAddr;
-            m_postTranBaseUrl.setPath(lit("/ec2/forward_events"));
+            if (m_remotePeer.peerType == Qn::PT_CloudServer)
+                m_postTranBaseUrl.setPath(nx::cdb::api::kPushEc2TransactionPath);
+            else
+                m_postTranBaseUrl.setPath(lit("/ec2/forward_events"));
             m_postTranBaseUrl.setQuery( QString() );
         }
 
@@ -1202,12 +1215,12 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
             ? nx_ec::INITIAL_EC2_PROTO_VERSION
             : ec2ProtoVersionIter->second.toInt();
 
-        if (nx_ec::EC2_PROTO_VERSION != m_remotePeerEcProtoVersion)
+        if (m_localPeerProtocolVersion != m_remotePeerEcProtoVersion)
         {
             NX_LOG( QString::fromLatin1("Cannot connect to server %1 because of different EC2 proto version. "
                 "Local peer version: %2, remote peer version: %3")
                 .arg(client->url().toString(QUrl::RemovePassword))
-                .arg(nx_ec::EC2_PROTO_VERSION).arg(m_remotePeerEcProtoVersion),
+                .arg(m_localPeerProtocolVersion).arg(m_remotePeerEcProtoVersion),
                 cl_logWARNING );
             cancelConnecting();
             return;
@@ -1522,13 +1535,16 @@ bool QnTransactionTransportBase::skipTransactionForMobileClient(ApiCommand::Valu
 
 void QnTransactionTransportBase::scheduleAsyncRead()
 {
-    if( !m_incomingDataSocket )
+    if (!m_incomingDataSocket)
         return;
+
+    NX_EXPECT(isInSelfAioThread());
+    NX_ASSERT(!m_asyncReadScheduled);
 
     using namespace std::placeholders;
     m_incomingDataSocket->readSomeAsync(
         &m_readBuffer,
-        std::bind( &QnTransactionTransportBase::onSomeBytesRead, this, _1, _2 ) );
+        std::bind(&QnTransactionTransportBase::onSomeBytesRead, this, _1, _2));
     m_asyncReadScheduled = true;
     m_lastReceiveTimer.restart();
 }
@@ -1538,20 +1554,23 @@ void QnTransactionTransportBase::startListeningNonSafe()
     NX_ASSERT( m_incomingDataSocket || m_outgoingDataSocket );
     m_httpStreamReader.resetState();
 
-    if( m_incomingDataSocket )
-    {
-        using namespace std::chrono;
-        m_incomingDataSocket->setRecvTimeout(SOCKET_TIMEOUT);
-        m_incomingDataSocket->setSendTimeout(
-            duration_cast<milliseconds>(kSocketSendTimeout).count());
-        m_incomingDataSocket->setNonBlockingMode(true);
-        using namespace std::placeholders;
-        m_lastReceiveTimer.restart();
-        m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
-        m_incomingDataSocket->readSomeAsync(
-            &m_readBuffer,
-            std::bind( &QnTransactionTransportBase::onSomeBytesRead, this, _1, _2 ) );
-    }
+    post(
+        [this]()
+        {
+            using namespace std::chrono;
+            using namespace std::placeholders;
+
+            if (!m_incomingDataSocket)
+                return;
+
+            m_incomingDataSocket->setRecvTimeout(SOCKET_TIMEOUT);
+            m_incomingDataSocket->setSendTimeout(
+                duration_cast<milliseconds>(kSocketSendTimeout).count());
+            m_incomingDataSocket->setNonBlockingMode(true);
+            m_readBuffer.reserve( m_readBuffer.size() + DEFAULT_READ_BUFFER_SIZE );
+
+            scheduleAsyncRead();
+        });
 }
 
 void QnTransactionTransportBase::postTransactionDone( const nx_http::AsyncHttpClientPtr& client )

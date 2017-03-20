@@ -165,6 +165,7 @@ void QnAdjustVideoDialog::at_buttonClicked(QAbstractButton* button)
         case QDialogButtonBox::RejectRole:
             if (m_widget)
                 m_widget->setImageEnhancement(m_backupParams);
+            setWidget(0);
         case QDialogButtonBox::AcceptRole:
             setWidget(0);
             hide();

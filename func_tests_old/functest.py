@@ -33,8 +33,6 @@ from stortest import BackupStorageTest, MultiserverArchiveTest
 from streaming_test import StreamingTest, HlsOnlyTest
 from natcon_test import NatConnectionTest
 from dbtest import DBTest
-from proxytest import ServerProxyTest
-from mergetest import MergeSystemTest
 from cameratest import VirtualCameraTest
 from instancetest import InstanceTest
 from stresst import HTTPStressTest
@@ -1205,7 +1203,6 @@ class MainFunctests(FuncTestCase):
         "BasicClusterTest",
         "MergeTest",
         "SysnameTest",
-        "ProxyTest"
     ]),)
     _need_rollback = True
     _basicTestOk = False
@@ -1278,11 +1275,6 @@ class MainFunctests(FuncTestCase):
         SystemIdTest(testMaster.getConfig()).run()
         testMaster.checkServerListStates()
 
-    def ProxyTest(self):
-        ""
-        ServerProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
-
-
 def RunByAutotest():
     """
     Used when this script is called by the autotesting script auto.py
@@ -1300,8 +1292,6 @@ def RunByAutotest():
             CallTest(StreamingTest)
         if not testMaster.args.skipdbup:
             CallTest(DBTest)
-        if not testMaster.args.skipmerge:
-          CallTest(MergeSystemTest)
         if not testMaster.args.skipinstance:
           CallTest(InstanceTest)
         if not testMaster.args.skipcamera:
@@ -1323,8 +1313,6 @@ SimpleTestKeys = {
 
 # Tests to be run on the vargant boxes, separately or within the autotest sequence
 BoxTestKeys = OrderedDict([
-    ('--mainonly', MainFunctests),
-    ('--timesync', TimeSyncTest),
     ('--ts-noinet', TimeSyncNoInetTest),
     ('--ts-inet', TimeSyncWithInetTest),
     ('--bstorage', BackupStorageTest),
@@ -1336,7 +1324,6 @@ BoxTestKeys = OrderedDict([
     ('--htstress', HTTPStressTest),
     ('--natcon', NatConnectionTest),
     ('--instance', InstanceTest),
-    ('--merge', MergeSystemTest),
     ('--boxtests', None),
 ])
 KeysSkipList = ('--boxtests', '--ts-noinet', '--ts-inet', '--hlso')
@@ -1352,7 +1339,6 @@ def BoxTestsRun(name):
         if not CallTest(MultiserverArchiveTest): ok = False
         if not CallTest(StreamingTest): ok = False
         if not CallTest(DBTest): ok = False
-        if not CallTest(MergeSystemTest): ok = False
         if not CallTest(InstanceTest): ok = False
         if not CallTest(VirtualCameraTest): ok = False
         if not CallTest(HTTPStressTest): ok = False
@@ -1406,18 +1392,12 @@ def DoTests(argv):
         return True # done here, since we just need to test whether
                # all the servers are on the same page
 
-    if argc == 1 and argv[0] == '--proxy':
-        ServerProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
-        #FIXME no result code returning!
-
     elif argc >= 1 and argv[0] == '--legacy':
         LegacyTestsRun(argv[1] == '--only' if argc >= 2 else False, argv)
         #FIXME no result code returning!
 
     elif argc == 1 and argv[0] == '--main':
         rc = LegacyTestsRun()
-        time.sleep(3)
-        ServerProxyTest(*testMaster.getConfig().rtget('ServerList')[0:2]).run()
 
         log(LOGLEVEL.INFO, "\nALL AUTOMATIC TEST ARE DONE\n")
         #FIXME no result code returning!
@@ -1485,10 +1465,8 @@ def parseArgs():
     parser.add_argument('--skipmsa', action="store_true", help="Skip multi-server archive tests")
     parser.add_argument('--skipstrm', action="store_true", help="Skip streaming tests")
     parser.add_argument('--skipdbup', action="store_true", help="Skip DB upgrae test")
-    parser.add_argument('--skipmerge', action="store_true", help="Skip merge system test")
     parser.add_argument('--skipcamera', action="store_true", help="Skip virtual camera test")
     parser.add_argument('--skipinstance', action="store_true", help="Skip instance test")
-#    parser.add_argument('--mainonly', action="store_true", help="Execute 'main' (simple) functests only")
     parser.add_argument('--dump', action="store_true", help="Create dump files during RTSP perf tests")
 
 

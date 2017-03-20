@@ -10,17 +10,11 @@
     <height>400</height>
    </rect>
   </property>
-  <property name="minimumSize">
-   <size>
-    <width>1000</width>
-    <height>400</height>
-   </size>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>16777215</width>
-    <height>400</height>
-   </size>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="acceptDrops">
    <bool>true</bool>
@@ -45,7 +39,13 @@
     <number>16</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,0,1">
+    <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="1,1">
+     <property name="spacing">
+      <number>16</number>
+     </property>
+     <property name="topMargin">
+      <number>8</number>
+     </property>
      <item>
       <widget class="QGroupBox" name="eventDefinitionGroupBox">
        <property name="acceptDrops">
@@ -193,19 +193,6 @@
       </widget>
      </item>
      <item>
-      <widget class="Line" name="line">
-       <property name="lineWidth">
-        <number>4</number>
-       </property>
-       <property name="midLineWidth">
-        <number>2</number>
-       </property>
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QGroupBox" name="actionDefinitionGroupBox">
        <property name="acceptDrops">
         <bool>true</bool>
@@ -329,7 +316,7 @@
           <property name="sizeHint" stdset="0">
            <size>
             <width>20</width>
-            <height>40</height>
+            <height>1</height>
            </size>
           </property>
          </spacer>

@@ -462,7 +462,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
         dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
     }
 
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction);
+    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
 
     MSSettings::roSettings()->remove(lit("NORMAL_SCAN_ARCHIVE_FROM"));
     MSSettings::roSettings()->remove(lit("BACKUP_SCAN_ARCHIVE_FROM"));

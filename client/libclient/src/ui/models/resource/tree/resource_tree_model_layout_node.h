@@ -6,7 +6,9 @@
 
 class QnResourceTreeModelLayoutNode: public QnResourceTreeModelNode
 {
+    Q_OBJECT
     using base_type = QnResourceTreeModelNode;
+
 public:
     QnResourceTreeModelLayoutNode(QnResourceTreeModel* model, const QnResourcePtr& resource,
         Qn::NodeType nodeType = Qn::ResourceNode);
@@ -17,23 +19,27 @@ public:
     virtual void initialize() override;
     virtual void deinitialize() override;
 
+    bool itemsLoaded() const;
+
 protected:
-    void handleAccessChanged(const QnResourceAccessSubject& subject,
-        const QnResourcePtr& resource);
-    virtual void handlePermissionsChanged(const QnResourcePtr& resource) override;
     virtual QIcon calculateIcon() const override;
+    virtual QnResourceTreeModelNodeManager* manager() const override;
 
 private:
     QnResourceAccessSubject getOwner() const;
 
-    void handleResourceAdded(const QnResourcePtr& resource);
+    void itemAdded(const QnLayoutItemData& item);
+    void itemRemoved(const QnLayoutItemData& item);
 
-    void at_layout_itemAdded(const QnLayoutResourcePtr& layout, const QnLayoutItemData& item);
-    void at_layout_itemRemoved(const QnLayoutResourcePtr& layout, const QnLayoutItemData& item);
+    void updateItem(const QnUuid& item);
 
-    void at_snapshotManager_flagsChanged(const QnLayoutResourcePtr& layout);
+    void updateItemResource(const QnUuid& item, const QnResourcePtr& resource);
 
+    void updateLoadedState();
 
 private:
+    friend class QnResourceTreeModelLayoutNodeManager;
     ItemHash m_items;
+    int m_loadedItems = 0;
+    bool m_loaded = true;
 };

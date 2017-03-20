@@ -76,7 +76,9 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 
         const auto message = utils::MergeSystemsStatus::getErrorMessage(
              kStatus, moduleInformation).prepend(lit("\n"));
-        QnMessageBox::critical(mainWindow(), tr("Failed to merge Systems"), message);
+        QnMessageBox::warning(mainWindow(),
+            tr("Cloud Systems cannot be merged"),
+            message);
         return;
     }
 
@@ -137,8 +139,8 @@ void QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggere
     }
 
     m_mergeDialog = new QnSessionAware<QnMergeSystemsDialog>(mainWindow());
-    m_mergeDialog->exec();
-    delete m_mergeDialog;
+    m_mergeDialog->setAttribute(Qt::WA_DeleteOnClose);
+    m_mergeDialog->open();
 }
 
 void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int errorCode)
@@ -149,7 +151,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
     switch (errorCode)
     {
         case QnConnectToCurrentSystemTool::NoError:
-            QnMessageBox::success(mainWindow(), tr("Server connected to the System"));
+            QnMessageBox::success(mainWindow(), tr("Server connected to System"));
             break;
 
         case QnConnectToCurrentSystemTool::UpdateFailed:
@@ -228,7 +230,7 @@ QString QnWorkbenchIncompatibleServersActionHandler::requestPassword() const
 
         if (password.isEmpty())
         {
-            QnMessageBox::warning(mainWindow(), tr("Password cannot be empty!"));
+            QnMessageBox::warning(mainWindow(), tr("Password cannot be empty."));
             continue;
         }
 

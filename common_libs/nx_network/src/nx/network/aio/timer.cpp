@@ -14,6 +14,7 @@ namespace aio {
 
 Timer::Timer(aio::AbstractAioThread* aioThread):
     BasicPollable(aioThread),
+    m_timeout(0),
     m_aioService(SocketGlobals::aioService()),
     m_internalTimerId(0)
 {

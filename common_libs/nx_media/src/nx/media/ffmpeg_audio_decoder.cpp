@@ -31,7 +31,7 @@ public:
     ~FfmpegAudioDecoderPrivate()
     {
         closeCodecContext();
-        av_free(frame);
+        av_frame_free(&frame);
     }
 
     void initContext(const QnConstCompressedAudioDataPtr& frame);
@@ -99,8 +99,7 @@ bool FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame, Audi
             return false;
     }
 
-    AVPacket avpkt;
-    av_init_packet(&avpkt);
+    QnFfmpegAvPacket avpkt;
     if (frame)
     {
         avpkt.data = (unsigned char*)frame->data();
@@ -122,8 +121,6 @@ bool FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame, Audi
         // flushing the internal buffer. So, repeat this time for the empty packet in order to
         // avoid the bug.
         avpkt.pts = avpkt.dts = d->lastPts;
-        avpkt.data = nullptr;
-        avpkt.size = 0;
     }
 
     int gotData = 0;

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtWidgets/QWidget>
+#include <client/client_globals_fwd.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -10,7 +10,7 @@ class QLabel;
 class QStackedWidget;
 class QnBusyIndicatorWidget;
 class QnAutoscaledPlainText;
-class QnCameraThumbnailManager;
+class QnImageProvider;
 
 class QnResourcePreviewWidget : public Connective<QWidget>
 {
@@ -21,11 +21,8 @@ public:
     explicit QnResourcePreviewWidget(QWidget* parent = nullptr);
     virtual ~QnResourcePreviewWidget();
 
-    const QnResourcePtr& targetResource() const;
-    void setTargetResource(const QnResourcePtr& target);
-
-    QSize thumbnailSize() const;
-    void setThumbnailSize(const QSize& size);
+    QnImageProvider* imageProvider() const;
+    void setImageProvider(QnImageProvider* provider);
 
     QnBusyIndicatorWidget* busyIndicator() const;
 
@@ -38,16 +35,17 @@ protected:
 
 private:
     void retranslateUi();
+    void invalidateGeometry();
+
+    void updateThumbnailStatus(Qn::ThumbnailStatus status);
+    void updateThumbnailImage(const QImage& image);
+
 
 private:
-    QScopedPointer<QnCameraThumbnailManager> m_thumbnailManager;
-    QnResourcePtr m_target;
     mutable QSize m_cachedSizeHint;
-    QSize m_resolutionHint;
-    qreal m_aspectRatio; //TODO: Refactor to QnAspectRatio
-    QLabel* m_preview;
-    QnAutoscaledPlainText* m_placeholder;
-    QnBusyIndicatorWidget* m_indicator;
-    QStackedWidget* m_pages;
-    int m_status;
+    QLabel* m_preview = nullptr;
+    QnAutoscaledPlainText* m_placeholder = nullptr;
+    QnBusyIndicatorWidget* m_indicator = nullptr;
+    QStackedWidget* m_pages = nullptr;
+    QPointer<QnImageProvider> m_imageProvider;
 };

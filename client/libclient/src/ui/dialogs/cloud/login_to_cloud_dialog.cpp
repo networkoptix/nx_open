@@ -52,7 +52,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     Q_D(QnLoginToCloudDialog);
 
-    setWindowTitle(tr("Log in to %1", "%1 is name of cloud (like 'Nx Cloud')")
+    setWindowTitle(tr("Log in to %1", "%1 is the cloud name (like 'Nx Cloud')")
         .arg(QnAppInfo::cloudName()));
 
     ui->loginInputField->setTitle(tr("Email"));
@@ -77,9 +77,9 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
     ui->restorePasswordLabel->setText(makeHref(tr("Forgot password?"), urlHelper.restorePasswordUrl()));
     ui->learnMoreLabel->setText(makeHref(tr("Learn more about"), urlHelper.aboutUrl()));
 
-    ui->cloudWelcomeLabel->setText(tr("Welcome to %1!", "%1 is name of cloud (like 'Nx Cloud')")
+    ui->cloudWelcomeLabel->setText(tr("Welcome to %1!", "%1 is the cloud name (like 'Nx Cloud')")
         .arg(QnAppInfo::cloudName()));
-    ui->cloudImageLabel->setPixmap(qnSkin->pixmap("promo/cloud.png",
+    ui->cloudImageLabel->setPixmap(qnSkin->pixmap("cloud/cloud_64.png",
         QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
 
     QFont welcomeFont(ui->cloudWelcomeLabel->font());
@@ -187,7 +187,7 @@ void QnLoginToCloudDialogPrivate::at_loginButton_clicked()
     connect(qnCloudStatusWatcher, &QnCloudStatusWatcher::errorChanged,
         this, &QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error);
 
-    qnCloudStatusWatcher->setCredentials(QnCredentials(
+    qnCloudStatusWatcher->setCredentials(QnEncodedCredentials(
         q->ui->loginInputField->text().trimmed(),
         q->ui->passwordInputField->text().trimmed()));
 }
@@ -210,6 +210,7 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_statusChanged(QnCloudSta
     qnClientCoreSettings->setCloudPassword(stayLoggedIn
         ? q->ui->passwordInputField->text().trimmed()
         : QString());
+    qnClientCoreSettings->save();
 
     q->accept();
 }
@@ -234,7 +235,7 @@ void QnLoginToCloudDialogPrivate::at_cloudStatusWatcher_error()
             Q_Q(QnLoginToCloudDialog);
 
             QnMessageBox::critical(q, tr("Failed to login to %1",
-                "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
+                "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName()));
             break;
         }
     }

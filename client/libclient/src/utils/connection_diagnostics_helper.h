@@ -68,7 +68,8 @@ private:
     enum class ErrorStrings
     {
         ContactAdministrator,
-        UnableConnect
+        UnableConnect,
+        CloudIsNotReady
     };
 
     static QString getErrorString(ErrorStrings id);

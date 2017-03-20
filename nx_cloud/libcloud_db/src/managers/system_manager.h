@@ -150,11 +150,6 @@ public:
         const std::string& accountEmail,
         const std::string& systemId) const;
 
-    /** Create data view restricted by authzInfo and filter. */
-    DataView<data::SystemData> createView(
-        const AuthorizationInfo& authzInfo,
-        data::DataFilter filter);
-
     nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription();
     const nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription() const;
 
@@ -294,6 +289,14 @@ private:
         const data::SystemSharing& sharing,
         NotificationCommand notificationCommand,
         data::AccountData* const inviteeAccount);
+    nx::db::DBResult addNewSharing(
+        nx::db::QueryContext* const queryContext,
+        const data::AccountData& inviteeAccount,
+        const data::SystemSharing& sharing);
+    nx::db::DBResult deleteSharing(
+        nx::db::QueryContext* const queryContext,
+        const std::string& systemId,
+        const data::AccountData& inviteeAccount);
 
     nx::db::DBResult insertOrReplaceSharing(
         nx::db::QueryContext* const queryContext,
@@ -307,9 +310,10 @@ private:
         const std::string& inviteeEmail,
         Notification* const notification);
 
-    nx::db::DBResult scheduleSystemHasBeenSharedNotification(
+    nx::db::DBResult notifyUserAboutNewSystem(
         nx::db::QueryContext* const queryContext,
         const std::string& grantorEmail,
+        const data::AccountData& inviteeAccount,
         const api::SystemSharing& sharing);
 
     /**
@@ -455,11 +459,6 @@ private:
     void onEc2RemoveResourceParamDone(
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult);
-
-    nx::db::DBResult deleteSharing(
-        nx::db::QueryContext* const queryContext,
-        const std::string& systemId,
-        const data::AccountData& inviteeAccount);
 };
 
 } // namespace cdb

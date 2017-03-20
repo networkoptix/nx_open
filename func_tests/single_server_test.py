@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
+import time
 import pytest
 import pytz
-from test_utils import print_list
-from server import TimePeriod
+from test_utils.utils import log_list
+from test_utils.server import TimePeriod
 
 
 @pytest.fixture
@@ -13,10 +14,8 @@ def env(env_builder, server):
 
 # https://networkoptix.atlassian.net/browse/VMS-3911
 def test_server_should_pick_archive_file_with_time_after_db_time(env, camera, sample_media_file):
-    print
-    print env.server.name, env.server.url, env.server.ecs_guid
     camera_id = env.server.add_camera(camera)
-    storage = env.server.get_storage()
+    storage = env.server.storage
     sample = sample_media_file
 
     start_times_1 = []
@@ -33,10 +32,10 @@ def test_server_should_pick_archive_file_with_time_after_db_time(env, camera, sa
         TimePeriod(start_times_2[0], sample.duration),
         TimePeriod(start_times_2[1], sample.duration),
         ]
-    print_list('Start times 1', start_times_1)
-    print_list('Start times 2', start_times_2)
-    print_list('Expected periods 1', expected_periods_1)
-    print_list('Expected periods 2', expected_periods_2)
+    log_list('Start times 1', start_times_1)
+    log_list('Start times 2', start_times_2)
+    log_list('Expected periods 1', expected_periods_1)
+    log_list('Expected periods 2', expected_periods_2)
 
     for st in start_times_1:
         storage.save_media_sample(camera, st, sample)
@@ -49,6 +48,7 @@ def test_server_should_pick_archive_file_with_time_after_db_time(env, camera, sa
         storage.save_media_sample(camera, st, sample)
     env.server.start_service()
 
+    time.sleep(10)  # servers still need some time to settle down; hope this time will be enough
     # after restart new periods must be picked:
     recorded_periods = env.server.get_recorded_time_periods(camera_id)
     assert recorded_periods != expected_periods_1, 'Server did not pick up new media archive files'

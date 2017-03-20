@@ -6,5 +6,6 @@ Icon=vmsclient-${customization}.png
 Terminal=false
 Type=Application
 StartupNotify=true
+StartupWMClass=${product.name.short}
 NoDisplay=true
 MimeType=x-scheme-handler/${uri.protocol}

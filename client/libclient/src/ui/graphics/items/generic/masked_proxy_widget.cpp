@@ -265,6 +265,13 @@ void QnMaskedProxyWidget::syncDirtyRect()
     if (m_fullRepaintPending || !widget())
         return;
 
+    /*
+    * IF YOU DO NOT RECEIVE EMBEDDED WIDGET UPDATES WHEN THE WIDGET IS VISIBLE,
+    * it is most probably caused by it not having WA_Mapped attribute set due to Qt bug.
+    * Try to avoid changing visibility of embedded widget or its children while
+    * the proxy is invisible.
+    */
+
     QWidgetPrivate::get(widget())->syncBackingStore();
 
     const auto d = QGraphicsItemPrivate::get(this);

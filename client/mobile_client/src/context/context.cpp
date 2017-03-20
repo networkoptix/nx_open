@@ -60,9 +60,10 @@ QnContext::QnContext(QObject* parent) :
     connect(m_connectionManager, &QnConnectionManager::connectionVersionChanged,
             this, [this]()
     {
-        const bool useLayouts = m_connectionManager->connectionVersion() < kUserRightsRefactoredVersion;
-        auto camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
-        camerasWatcher->setUseLayouts(useLayouts);
+        const bool compatibilityMode =
+            m_connectionManager->connectionVersion() < kUserRightsRefactoredVersion;
+        const auto camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
+        camerasWatcher->setCompatiblityMode(compatibilityMode);
     });
 
     connect(qnSettings, &QnMobileClientSettings::valueChanged, this,
@@ -246,7 +247,7 @@ void QnContext::setCloudCredentials(const QString& login, const QString& passwor
     //TODO: #GDM do we need store temporary credentials here?
     qnClientCoreSettings->setCloudLogin(login);
     qnClientCoreSettings->setCloudPassword(password);
-    cloudStatusWatcher()->setCredentials(QnCredentials(login, password));
+    cloudStatusWatcher()->setCredentials(QnEncodedCredentials(login, password));
     qnClientCoreSettings->save();
 }
 

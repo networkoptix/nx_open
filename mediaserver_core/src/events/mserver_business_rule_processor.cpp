@@ -122,7 +122,7 @@ namespace {
     static const unsigned int MS_PER_SEC = 1000;
     static const unsigned int emailAggregationPeriodMS = 30 * MS_PER_SEC;
 
-    static const int kEmailSendDelay = 500;
+    static const int kEmailSendDelay = 0;
 
     static const QChar kOldEmailDelimiter(L';');
     static const QChar kNewEmailDelimiter(L' ');
@@ -500,7 +500,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     bookmark.durationMs += recordBeforeMs + recordAfterMs;
     bookmark.cameraId = camera->getId();
     bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
-    bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams(), lit("\n"));
+    bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams()).join(L'\n');
     bookmark.tags = action->getParams().tags.split(L',', QString::SkipEmptyParts).toSet();
 
     return qnServerDb->addBookmark(bookmark);

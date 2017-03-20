@@ -13,7 +13,8 @@ public:
     QnProxyConnectionProcessorPrivate():
         QnTCPConnectionProcessorPrivate(),
         connectTimeout(5000),
-        messageBus(nullptr)
+        messageBus(nullptr),
+        lastIoTimePoint(std::chrono::steady_clock::now())
     {
     }
     virtual ~QnProxyConnectionProcessorPrivate()
@@ -25,4 +26,5 @@ public:
     QUrl lastConnectedUrl;
     std::chrono::milliseconds connectTimeout;
     ec2::QnTransactionMessageBus* messageBus;
+	std::chrono::steady_clock::time_point lastIoTimePoint;
 };

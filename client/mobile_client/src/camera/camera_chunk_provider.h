@@ -12,6 +12,7 @@ class QnCameraChunkProvider: public QObject
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(QDateTime bottomBoundDate READ bottomBoundDate NOTIFY bottomBoundDateChanged)
     Q_PROPERTY(qint64 bottomBound READ bottomBound NOTIFY bottomBoundChanged)
+    Q_PROPERTY(bool loading READ isLoading NOTIFY loadingChanged)
 
 public:
     QnCameraChunkProvider(QObject* parent = nullptr);
@@ -24,6 +25,8 @@ public:
     qint64 bottomBound() const;
     QDateTime bottomBoundDate() const;
 
+    bool isLoading() const;
+
     Q_INVOKABLE QDateTime closestChunkStartDate(const QDateTime& dateTime, bool forward) const;
     Q_INVOKABLE qint64 closestChunkStartMs(qint64 position, bool forward) const;
     Q_INVOKABLE QDateTime closestChunkEndDate(const QDateTime& dateTime, bool forward) const;
@@ -31,16 +34,17 @@ public:
     Q_INVOKABLE QDateTime nextChunkStartDate(const QDateTime& dateTime, bool forward) const;
     Q_INVOKABLE qint64 nextChunkStartMs(qint64 position, bool forward) const;
 
-  public slots:
-    void update();
+    Q_INVOKABLE void update();
 
 signals:
     void timePeriodsUpdated();
     void resourceIdChanged();
     void bottomBoundChanged();
     void bottomBoundDateChanged();
+    void loadingChanged();
 
 private:
     QnFlatCameraDataLoader* m_loader = nullptr;
     QnTimePeriodList m_periodList;
+    bool m_loading = false;
 };

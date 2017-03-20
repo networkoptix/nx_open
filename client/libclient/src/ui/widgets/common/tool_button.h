@@ -14,6 +14,8 @@ public:
     void adjustIconSize();
 
 protected:
+    virtual QSize calculateIconSize() const;
+
     virtual void mousePressEvent(QMouseEvent* event) override;
 
 signals:

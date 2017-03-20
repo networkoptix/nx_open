@@ -224,7 +224,7 @@ void QnDisconnectFromCloudDialogPrivate::showFailure(const QString &message)
     Q_Q(QnDisconnectFromCloudDialog);
 
     QnMessageBox::critical(q,
-        tr("Failed to disconnect the System from %1", "%1 is name of cloud (like 'Nx Cloud')")
+        tr("Failed to disconnect System from %1", "%1 is the cloud name (like 'Nx Cloud')")
             .arg(QnAppInfo::cloudName()),
         message);
 
@@ -250,6 +250,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
 {
     Q_Q(QnDisconnectFromCloudDialog);
     q->setFixedWidth(kDialogWidth);
+    q->setStandardButtons(QDialogButtonBox::Cancel);
 
     okButton = new QnBusyIndicatorButton(q);
     okButton->setText(tr("Disconnect"));
@@ -303,7 +304,7 @@ void QnDisconnectFromCloudDialogPrivate::setupUi()
         default:
             NX_ASSERT(false, "Invalid scenario");
             q->setIcon(QnMessageBoxIcon::Warning);
-            q->setText(tr("Internal system error"));
+            q->setText(lit("Internal system error"));
             q->setStandardButtons(QDialogButtonBox::NoButton);
             q->setDefaultButton(okButton, QnButtonAccent::Warning);
             break;
@@ -319,13 +320,13 @@ bool QnDisconnectFromCloudDialogPrivate::validateAuth()
 
 QString QnDisconnectFromCloudDialogPrivate::disconnectQuestionMessage() const
 {
-    return tr("Disconnect the System from %1?",
-        "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName());
+    return tr("Disconnect System from %1?",
+        "%1 is the cloud name (like 'Nx Cloud')").arg(QnAppInfo::cloudName());
 }
 
 QString QnDisconnectFromCloudDialogPrivate::allUsersDisabledMessage() const
 {
-    return tr("All cloud features will be disabled, cloud users will be deleted from the System.");
+    return setWarningStyleHtml(tr("All cloud users will be deleted."));
 }
 
 QString QnDisconnectFromCloudDialogPrivate::enterPasswordMessage() const
@@ -335,7 +336,7 @@ QString QnDisconnectFromCloudDialogPrivate::enterPasswordMessage() const
 
 QString QnDisconnectFromCloudDialogPrivate::disconnectWarnMessage() const
 {
-    return tr("You will be disconnected from this system and able to login again through local network with local account");
+    return tr("You will be disconnected from this System and able to login again through local network with local account");
 }
 
 void QnDisconnectFromCloudDialogPrivate::validateCloudPassword()
@@ -395,8 +396,8 @@ void QnDisconnectFromCloudDialogPrivate::setupResetPasswordPage()
 
     q->setText(tr("Set local owner password"));
     q->setInformativeText(
-        tr("You wont be able to connect to this system with your %1 account after you disconnect this system from %1.",
-            "%1 is name of cloud (like 'Nx Cloud')")
+        tr("You will not be able to connect to this System with your %1 account after you disconnect this System from %1.",
+            "%1 is the cloud name (like 'Nx Cloud')")
             .arg(QnAppInfo::cloudName()));
 
     authorizeWidget->hide(); /*< we are still parent of this widget to make sure it won't leak */

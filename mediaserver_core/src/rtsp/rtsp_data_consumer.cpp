@@ -42,11 +42,6 @@ static const int MAX_PACKETS_AT_SINGLE_SHOT = 3;
 //static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between high quality switching attempts
 static const int MAX_CLIENT_BUFFER_SIZE_MS = 1000*2;
 
-QHash<QHostAddress, qint64> QnRtspDataConsumer::m_lastSwitchTime;
-QSet<QnRtspDataConsumer*> QnRtspDataConsumer::m_allConsumers;
-QnMutex QnRtspDataConsumer::m_allConsumersMutex(QnMutex::Recursive);
-
-
 QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     QnAbstractDataConsumer(MAX_QUEUE_SIZE),
     m_owner(owner),
@@ -81,8 +76,6 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_videoChannels(1)
 {
     m_timer.start();
-    QnMutexLocker lock( &m_allConsumersMutex );
-    m_allConsumers << this;
     m_needKeyData.fill(false);
 }
 
@@ -101,10 +94,6 @@ void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
 
 QnRtspDataConsumer::~QnRtspDataConsumer()
 {
-    {
-        QnMutexLocker lock( &m_allConsumersMutex );
-        m_allConsumers.remove(this);
-    }
     stop();
 }
 
@@ -558,13 +547,13 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             QnMutexLocker lock( &m_qualityChangeMutex );
             if (isKeyFrame && isVideo && m_newLiveQuality != MEDIA_Quality_None)
             {
-                if (needSecondaryStream(m_newLiveQuality) && isSecondaryProvider) 
+                if (needSecondaryStream(m_newLiveQuality) && isSecondaryProvider)
                 {
                     setLiveQualityInternal(m_newLiveQuality); // slow network. Reduce quality
                     m_newLiveQuality = MEDIA_Quality_None;
                     setNeedKeyData();
                 }
-                else if (!needSecondaryStream(m_newLiveQuality) && !isSecondaryProvider) 
+                else if (!needSecondaryStream(m_newLiveQuality) && !isSecondaryProvider)
                 {
                     setLiveQualityInternal(m_newLiveQuality);
                     m_newLiveQuality = MEDIA_Quality_None;
@@ -585,7 +574,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
                 {
                     m_needKeyData[media->channelNumber] = false;
                 }
-                else if (m_needKeyData[media->channelNumber] || 
+                else if (m_needKeyData[media->channelNumber] ||
                     m_liveQuality == MEDIA_Quality_LowIframesOnly)
                 {
                     return true; // wait for I frame for this channel
@@ -735,9 +724,9 @@ void QnRtspDataConsumer::addData(const QnAbstractMediaDataPtr& data)
 }
 
 int QnRtspDataConsumer::copyLastGopFromCamera(
-    QnVideoCameraPtr camera, 
-    bool usePrimaryStream, 
-    qint64 skipTime, 
+    QnVideoCameraPtr camera,
+    bool usePrimaryStream,
+    qint64 skipTime,
     quint32 cseq,
     bool iFramesOnly)
 {
@@ -804,7 +793,5 @@ void QnRtspDataConsumer::setLiveQualityInternal(MediaQuality quality)
 {
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
     QHostAddress clientAddress = m_owner->getPeerAddress();
-    QnMutexLocker lock( &m_allConsumersMutex );
-    m_lastSwitchTime[clientAddress] = currentTime;
     m_liveQuality = quality;
 }

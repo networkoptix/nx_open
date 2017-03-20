@@ -6,6 +6,7 @@
 #include <nx/network/system_socket.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
+#include <nx/utils/std/thread.h>
 
 namespace nx {
 namespace network {
@@ -47,7 +48,7 @@ static Buffer httpJoin(std::vector<Buffer> lines, Buffer append = {})
 TEST(TcpReverseConnector, General)
 {
     utils::promise<SocketAddress> serverAddress;
-    std::thread serverThread(
+    nx::utils::thread serverThread(
         [this, &serverAddress]()
         {
             const auto server = std::make_unique<TCPServerSocket>(

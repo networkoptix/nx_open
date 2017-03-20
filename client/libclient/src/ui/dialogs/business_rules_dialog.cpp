@@ -32,6 +32,7 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/delegates/business_rule_item_delegate.h>
+#include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
@@ -227,6 +228,9 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 
     ui->tableView->installEventFilter(this);
 
+    ui->tableView->setMinimumHeight(style::Metrics::kHeaderSize
+        + style::Metrics::kButtonHeight * style::Hints::kMinimumTableRows);
+
     ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate(this));
 
     connect(m_rulesViewModel, &QAbstractItemModel::dataChanged, this, &QnBusinessRulesDialog::at_model_dataChanged);
@@ -392,7 +396,7 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
 
     QnMessageBox dialog(QnMessageBoxIcon::Question,
         tr("Reset all rules to default?"),
-        tr("This action can't be undone."),
+        tr("This action cannot be undone."),
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 

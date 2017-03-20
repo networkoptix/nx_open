@@ -59,7 +59,7 @@ public:
                 Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
                 QJson::serialized(restResult));
 
-        handler({nx_http::StatusCode::ok, std::move(bodySource)});
+        handler(nx_http::RequestResult{nx_http::StatusCode::ok, std::move(bodySource)});
     }
 
 private:
@@ -249,7 +249,10 @@ nx::hpm::api::ResultCode MediaServerEmulator::updateTcpAddresses(
     utils::promise<nx::hpm::api::ResultCode> promise;
     m_mediatorAddressPublisher->updateAddresses(
         std::move(addresses),
-        [&promise](nx::hpm::api::ResultCode success) { promise.set_value(success); });
+        [&promise](nx::hpm::api::ResultCode resultCode)
+        {
+            promise.set_value(resultCode);
+        });
 
     return promise.get_future().get();
 }

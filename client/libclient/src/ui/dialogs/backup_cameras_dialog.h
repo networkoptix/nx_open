@@ -11,7 +11,4 @@ public:
 
     bool backupNewCameras() const;
     void setBackupNewCameras(bool value);
-
-private:
-    void updateQualitiesForSelectedCameras(Qn::CameraBackupQualities qualities);
 };

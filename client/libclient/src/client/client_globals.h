@@ -147,6 +147,7 @@ namespace Qn
         LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */
         LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QnUuid>. */
         LayoutBookmarksModeRole,                    /**< Role for layout's bookmarks mode state. */
+        LayoutActiveItemRole,                       /**< Role for layout active item. Value of type QnUuid. */
 
         /* Item-based. */
         ItemUuidRole,                               /**< Role for item's UUID. Value of type QnUuid. */
@@ -172,7 +173,6 @@ namespace Qn
         ItemCheckedButtonsRole,                     /**< Role for buttons that are checked in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemDisabledButtonsRole,                    /**< Role for buttons that are not to be displayed in item's titlebar. Value of type int (QnResourceWidget::Buttons). */
         ItemHealthMonitoringButtonsRole,            /**< Role for buttons that are checked on each line of Health Monitoring widget. Value of type QnServerResourceWidget::HealthMonitoringButtons. */
-        ItemVideowallReviewButtonsRole,             /**< Role for buttons that are checked on each sub-item of the videowall screen widget. Value of type QnVideowallScreenWidget::ReviewButtons. */
 
         ItemWidgetOptions,                          /**< Role for widget-specific options that should be set before the widget is placed on the scene. */
 
@@ -182,6 +182,8 @@ namespace Qn
         PtzObjectIdRole,                            /**< Role for PTZ tour/preset id. Value of type QString. */
         PtzObjectNameRole,                          /**< Role for PTZ tour/preset name. Value of type QString. */
         PtzTourSpotRole,                            /**< Role for PTZ tour spot. Value of type QnPtzTourSpot. */
+        PtzSpeedRole,                               /**< Role for PTZ speed. Value of type QVector3D */
+        PtzPresetIndexRole,                         /**< Role for PTZ preset index. Value of type int */
 
         /* Context-based. */
         CurrentLayoutResourceRole,
@@ -287,6 +289,14 @@ namespace Qn
     };
     Q_DECLARE_FLAGS(ResourceSavingFlags, ResourceSavingFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceSavingFlags)
+
+    enum class CellSpacing
+    {
+        None,
+        Small,
+        Medium,
+        Large
+    };
 
     /**
      * Time display mode.
@@ -433,10 +443,19 @@ namespace Qn
         Thumbnails      /**< thumbnails pane    */
     };
 
+    enum class ThumbnailStatus
+    {
+        Invalid,
+        Loading,
+        Loaded,
+        NoData,
+        Refreshing
+    };
+
 } // namespace Qn
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::ItemRole)(Qn::TimeMode)(Qn::NodeType),
+    (Qn::ItemRole)(Qn::TimeMode)(Qn::NodeType)(Qn::ThumbnailStatus),
     (metatype)
     )
 

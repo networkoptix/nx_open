@@ -51,7 +51,14 @@ QString QnVirtualCameraResource::getUniqueId() const
 QString QnVirtualCameraResource::toSearchString() const
 {
     QString result;
-    QTextStream(&result) << QnNetworkResource::toSearchString() << " " << getModel() << " " << getFirmware() << " " << getVendor(); //TODO: #Elric evil!
+    QTextStream(&result)
+        << QnNetworkResource::toSearchString()
+        << " "
+        << getModel()
+        << " "
+        << getFirmware()
+        << " "
+        << getVendor(); //TODO: #Elric evil!
     return result;
 }
 
@@ -549,57 +556,30 @@ CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
     return supportedMediaStreams;
 }
 
+CameraMediaStreamInfo QnVirtualCameraResource::defaultStream() const
+{
+    const auto streams = mediaStreams().streams;
+    auto defaultStream = std::find_if(streams.cbegin(), streams.cend(),
+        [](const CameraMediaStreamInfo& stream)
+        {
+            return stream.encoderIndex == CameraMediaStreamInfo::PRIMARY_STREAM_INDEX;
+        });
+    if (defaultStream != streams.cend())
+        return *defaultStream;
+
+    return CameraMediaStreamInfo();
+}
+
 QnAspectRatio QnVirtualCameraResource::aspectRatio() const
 {
     qreal customAr = customAspectRatio();
     if (!qFuzzyIsNull(customAr))
         return QnAspectRatio::closestStandardRatio(customAr);
 
-    const auto s = mediaStreams();
-    if (!s.streams.empty())
-    {
-        const QSize size = s.streams[0].getResolution();
-        return QnAspectRatio::closestStandardRatio(static_cast<qreal>(size.width()) / size.height());
-    }
+    const auto stream = defaultStream();
+    const QSize size = stream.getResolution();
+    if (!size.isEmpty())
+        return QnAspectRatio(size.width(), size.height());
 
     return QnAspectRatio();
 }
-
-const QLatin1String CameraMediaStreamInfo::anyResolution("*");
-
-QString CameraMediaStreamInfo::resolutionToString( const QSize& resolution )
-{
-    if ( !resolution.isValid() )
-        return anyResolution;
-
-    return QString::fromLatin1("%1x%2").arg(resolution.width()).arg(resolution.height());
-}
-
-bool CameraMediaStreamInfo::operator==( const CameraMediaStreamInfo& rhs ) const
-{
-    return transcodingRequired == rhs.transcodingRequired
-        && codec == rhs.codec
-        && encoderIndex == rhs.encoderIndex
-        && resolution == rhs.resolution
-        && transports == rhs.transports
-        && customStreamParams == rhs.customStreamParams;
-}
-
-bool CameraMediaStreamInfo::operator!=( const CameraMediaStreamInfo& rhs ) const
-{
-    return !( *this == rhs );
-}
-
-QSize CameraMediaStreamInfo::getResolution() const
-{
-    QStringList tmp = resolution.split(L'x');
-    if (tmp.size() == 2)
-        return QSize(tmp[0].toInt(), tmp[1].toInt());
-    else
-        return QSize();
-}
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (CameraMediaStreamInfo)(CameraMediaStreams)(CameraBitrateInfo)(CameraBitrates),
-    (json),
-    _Fields)

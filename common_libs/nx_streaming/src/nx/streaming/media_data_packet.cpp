@@ -188,12 +188,13 @@ void QnMetaDataV1::addMotion(QnMetaDataV1Ptr data)
     addMotion((const quint8*) data->m_data.data(), data->timestamp);
 }
 
-void QnMetaDataV1::removeMotion(const simd128i* image, int startIndex, int endIndex)
+void QnMetaDataV1::removeMotion(const simd128i* image)
 {
+    const int endIndex = Qn::kMotionGridWidth*Qn::kMotionGridHeight / 128 - 1;
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
     __m128i* dst = (__m128i*) m_data.data();
     __m128i* src = (__m128i*) image;
-    for (int i = startIndex; i <= endIndex; ++i)
+    for (int i = 0; i <= endIndex; ++i)
     {
         *dst = _mm_andnot_si128(*src, *dst); /* SSE2. */
         dst++;
@@ -204,7 +205,7 @@ void QnMetaDataV1::removeMotion(const simd128i* image, int startIndex, int endIn
     // remove without SIMD
     int64_t* dst = (int64_t*) m_data.data();
     int64_t* src = (int64_t*) image;
-    for (int i = startIndex; i <= endIndex; ++i)
+    for (int i = 0; i <= endIndex; ++i)
     {
         *dst &= ~(*src);
         ++dst;
@@ -294,14 +295,13 @@ void QnMetaDataV1::addMotion(const quint8* image, qint64 timestamp)
     }
 #else
     // remove without SIMD
-    memcpy( m_data.data(), image, Qn::kMotionGridWidth*Qn::kMotionGridHeight/CHAR_BIT );
-    //int64_t* dst = (int64_t*) m_data.data();
-    //int64_t* src = (int64_t*) image;
-    //for (int i = 0; i < Qn::kMotionGridWidth*Qn::kMotionGridHeight/128; ++i)
-    //{
-    //    *dst++ |= *src++;
-    //    *dst++ |= *src++;
-    //}
+    int64_t* dst = (int64_t*) m_data.data();
+    int64_t* src = (int64_t*) image;
+    for (int i = 0; i < Qn::kMotionGridWidth*Qn::kMotionGridHeight/128; ++i)
+    {
+        *dst++ |= *src++;
+        *dst++ |= *src++;
+    }
 #endif
 }
 

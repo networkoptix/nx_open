@@ -365,18 +365,21 @@ void QnServerUpdatesWidget::updateDownloadButton()
         && !m_latestVersion.isNull()
         && m_updatesModel->lowestInstalledVersion() >= m_latestVersion;
 
-    bool showButton = m_mode == QnServerUpdatesWidget::Mode::LatestVersion
+    bool showButton = m_mode != QnServerUpdatesWidget::Mode::LocalFile
         && !hasLatestVersion;
 
     ui->downloadButton->setVisible(showButton);
-    ui->downloadButton->setText(ui->targetVersionLabel->text() == kNoVersionNumberText
+    ui->downloadButton->setText(m_mode == Mode::LatestVersion
         ? tr("Download the Latest Version Update File")
         : tr("Download Update File"));
 }
 
 void QnServerUpdatesWidget::updateVersionPage()
 {
-    bool hasLatestVersion = m_mode == Mode::LatestVersion
+    if (isUpdating())
+        return;
+
+    const bool hasLatestVersion = m_mode == Mode::LatestVersion
         && !m_latestVersion.isNull()
         && m_updatesModel->lowestInstalledVersion() >= m_latestVersion;
 
@@ -453,8 +456,8 @@ void QnServerUpdatesWidget::discardChanges()
     else
     {
         QnMessageBox::warning(this,
-            tr("Update can't be canceled at this stage"),
-            tr("Please wait until it's finished."));
+            tr("Update cannot be canceled at this stage"),
+            tr("Please wait until it is finished."));
     }
 }
 
@@ -553,12 +556,13 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
         case QnCheckForUpdateResult::NoNewerVersion:
             setPaletteColor(ui->errorLabel, QPalette::WindowText, qnGlobals->successTextColor());
             detail = m_targetVersion.isNull()
-                ? tr("All components in your system are up to date.")
-                : tr("All components in your system are up to this version.");
+                ? tr("All components in your System are up to date.")
+                : tr("All components in your System are up to this version.");
             break;
 
         case QnCheckForUpdateResult::InternetProblem:
-            versionText = kNoVersionNumberText;
+            if (m_mode == Mode::LatestVersion)
+                versionText = kNoVersionNumberText;
             detail = tr("Unable to check updates on the Internet.");
             break;
 
@@ -591,7 +595,7 @@ void QnServerUpdatesWidget::endChecking(const QnCheckForUpdateResult& result)
             break;
 
         case QnCheckForUpdateResult::IncompatibleCloudHost:
-            detail = tr("Incompatible %1 instance. To update disconnect system from %1 first.",
+            detail = tr("Incompatible %1 instance. To update disconnect System from %1 first.",
                 "%1 here will be substituted with cloud name e.g. 'Nx Cloud'.")
                 .arg(QnAppInfo::cloudName());
             break;
@@ -789,13 +793,14 @@ void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& l
         QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         this);
 
-    dialog.addCustomWidget(new QnResourceListView(failedServers, true));
+    dialog.addCustomWidget(new QnResourceListView(failedServers, false, &dialog));
     dialog.addButton(tr("Force Update"), QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
 
     const auto result = dialog.exec();
-    lowFreeSpaceWarning.ignore = true;
     if (result == QDialogButtonBox::Cancel)
-        m_updateTool->cancelUpdate();
+        return;
+
+    lowFreeSpaceWarning.ignore = true;
 }
 
 void QnServerUpdatesWidget::at_tool_updatesCheckCanceled()
@@ -822,6 +827,8 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
 {
     ui->updateProgess->setValue(100);
     ui->updateProgess->setFormat(tr("Update Finished...") + lit("\t100%"));
+
+    updateVersionPage();
 
     if (isVisible())
     {
@@ -878,6 +885,9 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
 
             case QnUpdateResult::Cancelled:
                 QnMessageBox::information(this, tr("Update canceled"));
+                break;
+
+            case QnUpdateResult::CancelledSilently:
                 break;
 
             case QnUpdateResult::AlreadyUpdated:

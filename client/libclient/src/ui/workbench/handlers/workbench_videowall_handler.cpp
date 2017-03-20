@@ -11,6 +11,7 @@
 
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/range/adaptor/reversed.hpp>
+#include <boost/algorithm/cxx11/copy_if.hpp>
 
 #include <common/common_module.h>
 
@@ -18,6 +19,8 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_app_info.h>
+#include <client/client_installations_manager.h>
+#include <client/client_startup_parameters.h>
 
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -75,7 +78,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/workbench_auto_starter.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/workbench/extensions/workbench_layout_change_validator.h>
 
@@ -98,6 +100,8 @@
 #include <utils/common/uuid_pool.h>
 #include <utils/common/counter.h>
 #include <utils/unity_launcher_workaround.h>
+
+#include <nx/vms/utils/platform/autorun.h>
 
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG
@@ -254,39 +258,45 @@ const qreal defaultReviewAR = 1920.0 / 1080.0;
 
 const QnUuid uuidPoolBase("621992b6-5b8a-4197-af04-1657baab71f0");
 
-//TODO: #GDM #VW clean nonexistent videowalls sometimes
-class QnVideowallAutoStarter: public QnWorkbenchAutoStarter
+//TODO: #GDM think about code duplication
+QString toWindowsRegistryFormat(const QString& path)
 {
-public:
-    QnVideowallAutoStarter(const QnUuid &videowallUuid, QObject *parent = NULL):
-        QnWorkbenchAutoStarter(parent),
-        m_videoWallUuid(videowallUuid)
-    {
-    }
+    return L'"' + QDir::toNativeSeparators(path).toLower() + L'"';
+}
 
-protected:
-    virtual int settingsKey() const override { return -1; }
+QString binaryPath()
+{
+    const QFileInfo appLauncherFile = QnClientInstallationsManager::appLauncher();
+    if (appLauncherFile.exists())
+        return toWindowsRegistryFormat(appLauncherFile.canonicalFilePath());
 
-    virtual QString autoStartPath() const override
-    {
-        QStringList arguments;
-        arguments << lit("--videowall");
-        arguments << m_videoWallUuid.toString();
-        QUrl url = QnAppServerConnectionFactory::url();
-        url.setUserName(QString());
-        url.setPassword(QString());
-        arguments << lit("--auth");
-        arguments << QString::fromUtf8(url.toEncoded());
+    const QFileInfo miniLauncherFile = QnClientInstallationsManager::miniLauncher();
+    if (miniLauncherFile.exists())
+        return toWindowsRegistryFormat(miniLauncherFile.canonicalFilePath());
 
-        QFileInfo clientFile = QFileInfo(qApp->applicationFilePath());
-        QString result = toRegistryFormat(clientFile.canonicalFilePath()) + L' ' + arguments.join(L' ');
-        return result;
-    }
+    return QString();
+}
 
-    virtual QString autoStartKey() const override { return qApp->applicationName() + L' ' + m_videoWallUuid.toString(); }
-private:
-    QnUuid m_videoWallUuid;
-};
+//TODO: #GDM #VW clean nonexistent videowalls sometimes
+void setAutoRunEnabled(const QnUuid& videoWallUuid, bool value)
+{
+    const QString key = qApp->applicationName() + L' ' + videoWallUuid.toString();
+
+    const QString path = binaryPath();
+    if (path.isEmpty())
+        value = false; // intentionally disable autorun if all goes bad
+
+    QStringList arguments;
+    arguments << lit("--videowall");
+    arguments << videoWallUuid.toString();
+    QUrl url = QnAppServerConnectionFactory::url();
+    url.setUserName(QString());
+    url.setPassword(QString());
+    arguments << lit("--auth");
+    arguments << QString::fromUtf8(url.toEncoded());
+
+    nx::vms::utils::setAutoRunEnabled(key, path + L' ' + arguments.join(L' '), value);
+}
 
 class QnVideowallReviewLayoutResource: public QnLayoutResource
 {
@@ -304,6 +314,16 @@ public:
         connect(videowall.data(), &QnResource::nameChanged, this, [this](const QnResourcePtr &resource) { setName(resource->getName()); });
     }
 };
+
+auto offlineItemOnThisPc = []
+    {
+        QnUuid pcUuid = qnSettings->pcUuid();
+        NX_ASSERT(!pcUuid.isNull(), "Invalid pc state.");
+        return [pcUuid](const QnVideoWallItem& item)
+            {
+                return !pcUuid.isNull() && item.pcUuid == pcUuid && !item.runtimeStatus.online;
+            };
+    };
 
 } /* anonymous namespace */
 
@@ -325,7 +345,8 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     m_controlMode.sequence = 0;
     m_controlMode.cacheTimer = new QTimer(this);
     m_controlMode.cacheTimer->setInterval(cacheMessagesTimeoutMs);
-    connect(m_controlMode.cacheTimer, &QTimer::timeout, this, &QnWorkbenchVideoWallHandler::at_controlModeCacheTimer_timeout);
+    connect(m_controlMode.cacheTimer, &QTimer::timeout, this,
+        &QnWorkbenchVideoWallHandler::at_controlModeCacheTimer_timeout);
 
     QnUuid pcUuid = qnSettings->pcUuid();
     if (pcUuid.isNull())
@@ -337,87 +358,98 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     m_controlMode.pcUuid = pcUuid.toString();
 
     /* Common connections */
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnWorkbenchVideoWallHandler::at_resPool_resourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved);
-    foreach(const QnResourcePtr &resource, qnResPool->getResources())
+    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        &QnWorkbenchVideoWallHandler::at_resPool_resourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        &QnWorkbenchVideoWallHandler::at_resPool_resourceRemoved);
+    for (const QnResourcePtr& resource: qnResPool->getResources())
         at_resPool_resourceAdded(resource);
 
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, [this](const QnPeerRuntimeInfo &info)
-    {
-        if (info.data.peer.peerType == Qn::PT_VideowallClient)
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
+        [this](const QnPeerRuntimeInfo &info)
         {
-            setItemOnline(info.data.videoWallInstanceGuid, true);
-        }
-        else if (!info.data.videoWallControlSession.isNull())
-        {
-            setItemControlledBy(info.data.videoWallControlSession, info.uuid, true);
-        }
-    });
+            if (info.data.peer.peerType == Qn::PT_VideowallClient)
+            {
+                /* Master node, will run other clients and exit. */
+                if (info.data.videoWallInstanceGuid.isNull())
+                    return;
 
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoRemoved, this, [this](const QnPeerRuntimeInfo &info)
-    {
-        if (info.data.peer.peerType == Qn::PT_VideowallClient)
+                setItemOnline(info.data.videoWallInstanceGuid, true);
+            }
+            else if (!info.data.videoWallControlSession.isNull())
+            {
+                setItemControlledBy(info.data.videoWallControlSession, info.uuid, true);
+            }
+        });
+
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
+        [this](const QnPeerRuntimeInfo &info)
         {
-            setItemOnline(info.data.videoWallInstanceGuid, false);
-        }
-        else if (!info.data.videoWallControlSession.isNull())
-        {
-            setItemControlledBy(info.data.videoWallControlSession, info.uuid, false);
-        }
-    });
+            if (info.data.peer.peerType == Qn::PT_VideowallClient)
+            {
+                setItemOnline(info.data.videoWallInstanceGuid, false);
+            }
+            else if (!info.data.videoWallControlSession.isNull())
+            {
+                setItemControlledBy(info.data.videoWallControlSession, info.uuid, false);
+            }
+        });
 
     /* Handle simultaneous control mode enter. */
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, [this](const QnPeerRuntimeInfo &info)
-    {
-        /* Ignore own info change. */
-        if (info.uuid == qnCommon->moduleGUID())
-            return;
-
-        if (info.data.videoWallControlSession.isNull())
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
+        [this](const QnPeerRuntimeInfo &info)
         {
-            setItemControlledBy(info.data.videoWallControlSession, info.uuid, false);
-        }
-        else
-        {
-            setItemControlledBy(info.data.videoWallControlSession, info.uuid, true);
-        }
+            /* Ignore own info change. */
+            if (info.uuid == qnCommon->moduleGUID())
+                return;
 
-        /* Skip if we are not controlling videowall now. */
-        if (!m_controlMode.active)
-            return;
+            bool isControlled = !info.data.videoWallControlSession.isNull();
+            setItemControlledBy(info.data.videoWallControlSession, info.uuid, isControlled);
 
-        auto layout = workbench()->currentLayout()->resource();
+            /* Skip if we are not controlling videowall now. */
+            if (!m_controlMode.active)
+                return;
 
-        /* Check the conflict. */
-        if (info.data.videoWallControlSession.isNull() ||
-            (layout && info.data.videoWallControlSession != layout->getId()))
-            return;
+            auto layout = workbench()->currentLayout()->resource();
 
-        /* Order by guid. */
-        if (info.uuid < qnCommon->moduleGUID())
-        {
-            setControlMode(false);
-            showControlledByAnotherUserMessage();
-        }
+            /* Check the conflict. */
+            if (info.data.videoWallControlSession.isNull() ||
+                (layout && info.data.videoWallControlSession != layout->getId()))
+                return;
 
-    });
+            /* Order by guid. */
+            if (info.uuid < qnCommon->moduleGUID())
+            {
+                setControlMode(false);
+                showControlledByAnotherUserMessage();
+            }
+
+        });
 
 
     foreach(const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
     {
         if (info.data.peer.peerType != Qn::PT_VideowallClient)
             continue;
+
+        /* Master node, will run other clients and exit. */
+        if (info.data.videoWallInstanceGuid.isNull())
+            continue;
+
         setItemOnline(info.data.videoWallInstanceGuid, true);
     }
 
+    const auto clientMessageProcessor = QnClientMessageProcessor::instance();
+    connect(clientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
+        &QnWorkbenchVideoWallHandler::cleanupUnusedLayouts);
 
     if (m_videoWallMode.active)
     {
         /* Videowall reaction actions */
 
-        connect(action(QnActions::DelayedOpenVideoWallItemAction), &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered);
+        connect(action(QnActions::DelayedOpenVideoWallItemAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_delayedOpenVideoWallItemAction_triggered);
 
-        QnCommonMessageProcessor* clientMessageProcessor = QnClientMessageProcessor::instance();
         connect(clientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
             [this]
             {
@@ -435,39 +467,66 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
 
         /* Control videowall actions */
 
-        connect(action(QnActions::NewVideoWallAction),              &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered);
-        connect(action(QnActions::AttachToVideoWallAction),         &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered);
-        connect(action(QnActions::DetachFromVideoWallAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered);
-        connect(action(QnActions::DeleteVideoWallItemAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered);
-        connect(action(QnActions::StartVideoWallAction),            &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered);
-        connect(action(QnActions::StopVideoWallAction),             &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered);
-        connect(action(QnActions::RenameVideowallEntityAction),     &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_renameAction_triggered);
-        connect(action(QnActions::IdentifyVideoWallAction),         &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered);
-        connect(action(QnActions::StartVideoWallControlAction),     &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered);
-        connect(action(QnActions::OpenVideoWallsReviewAction),      &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered);
-        connect(action(QnActions::SaveCurrentVideoWallReviewAction),&QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_saveCurrentVideoWallReviewAction_triggered);
-        connect(action(QnActions::SaveVideoWallReviewAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered);
-        connect(action(QnActions::DropOnVideoWallItemAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered);
-        connect(action(QnActions::PushMyScreenToVideowallAction),   &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered);
-        connect(action(QnActions::VideowallSettingsAction),         &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered);
-        connect(action(QnActions::SaveVideowallMatrixAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered);
-        connect(action(QnActions::LoadVideowallMatrixAction),       &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered);
-        connect(action(QnActions::DeleteVideowallMatrixAction),     &QAction::triggered, this, &QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered);
+        connect(action(QnActions::NewVideoWallAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered);
+        connect(action(QnActions::AttachToVideoWallAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_attachToVideoWallAction_triggered);
+        connect(action(QnActions::ClearVideoWallScreen), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_detachFromVideoWallAction_triggered);
+        connect(action(QnActions::DeleteVideoWallItemAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered);
+        connect(action(QnActions::StartVideoWallAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered);
+        connect(action(QnActions::StopVideoWallAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_stopVideoWallAction_triggered);
+        connect(action(QnActions::RenameVideowallEntityAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_renameAction_triggered);
+        connect(action(QnActions::IdentifyVideoWallAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_identifyVideoWallAction_triggered);
+        connect(action(QnActions::StartVideoWallControlAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered);
+        connect(action(QnActions::OpenVideoWallsReviewAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered);
+        connect(action(QnActions::SaveCurrentVideoWallReviewAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_saveCurrentVideoWallReviewAction_triggered);
+        connect(action(QnActions::SaveVideoWallReviewAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_saveVideoWallReviewAction_triggered);
+        connect(action(QnActions::DropOnVideoWallItemAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered);
+        connect(action(QnActions::PushMyScreenToVideowallAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered);
+        connect(action(QnActions::VideowallSettingsAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_videowallSettingsAction_triggered);
+        connect(action(QnActions::SaveVideowallMatrixAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered);
+        connect(action(QnActions::LoadVideowallMatrixAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_loadVideowallMatrixAction_triggered);
+        connect(action(QnActions::DeleteVideowallMatrixAction), &QAction::triggered, this,
+            &QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered);
 
-        connect(display(), &QnWorkbenchDisplay::widgetAdded, this, &QnWorkbenchVideoWallHandler::at_display_widgetAdded);
-        connect(display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved, this, &QnWorkbenchVideoWallHandler::at_display_widgetAboutToBeRemoved);
+        connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
+            &QnWorkbenchVideoWallHandler::at_display_widgetAdded);
+        connect(display(), &QnWorkbenchDisplay::widgetAboutToBeRemoved, this,
+            &QnWorkbenchVideoWallHandler::at_display_widgetAboutToBeRemoved);
 
-        connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this, &QnWorkbenchVideoWallHandler::at_workbench_currentLayoutAboutToBeChanged);
-        connect(workbench(), &QnWorkbench::currentLayoutChanged, this, &QnWorkbenchVideoWallHandler::at_workbench_currentLayoutChanged);
+        connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this,
+            &QnWorkbenchVideoWallHandler::at_workbench_currentLayoutAboutToBeChanged);
+        connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
+            &QnWorkbenchVideoWallHandler::at_workbench_currentLayoutChanged);
 
-        connect(navigator(), &QnWorkbenchNavigator::positionChanged, this, &QnWorkbenchVideoWallHandler::at_navigator_positionChanged);
-        connect(navigator(), &QnWorkbenchNavigator::playingChanged, this, &QnWorkbenchVideoWallHandler::at_navigator_playingChanged);
-        connect(navigator(), &QnWorkbenchNavigator::speedChanged, this, &QnWorkbenchVideoWallHandler::at_navigator_speedChanged);
+        connect(navigator(), &QnWorkbenchNavigator::positionChanged, this,
+            &QnWorkbenchVideoWallHandler::at_navigator_positionChanged);
+        connect(navigator(), &QnWorkbenchNavigator::playingChanged, this,
+            &QnWorkbenchVideoWallHandler::at_navigator_playingChanged);
+        connect(navigator(), &QnWorkbenchNavigator::speedChanged, this,
+            &QnWorkbenchVideoWallHandler::at_navigator_speedChanged);
 
-        connect(context()->instance<QnWorkbenchStreamSynchronizer>(), &QnWorkbenchStreamSynchronizer::runningChanged,
-            this, &QnWorkbenchVideoWallHandler::at_workbenchStreamSynchronizer_runningChanged);
+        connect(context()->instance<QnWorkbenchStreamSynchronizer>(),
+            &QnWorkbenchStreamSynchronizer::runningChanged,
+            this,
+            &QnWorkbenchVideoWallHandler::at_workbenchStreamSynchronizer_runningChanged);
 
-        foreach(QnResourceWidget *widget, display()->widgets())
+        for (auto widget: display()->widgets())
             at_display_widgetAdded(widget);
     }
 }
@@ -618,38 +677,15 @@ bool QnWorkbenchVideoWallHandler::canStartVideowall(const QnVideoWallResourcePtr
     if (!videowall)
         return false;
 
-    QnUuid pcUuid = qnSettings->pcUuid();
-    if (pcUuid.isNull())
-    {
-        NX_LOG(lit("Warning: pc UUID is null, cannot start videowall %1 on this pc")
-            .arg(videowall->getId().toString()), cl_logERROR);
-
-        return false;
-    }
-
-    foreach(const QnVideoWallItem &item, videowall->items()->getItems())
-    {
-        if (item.pcUuid != pcUuid || item.runtimeStatus.online)
-            continue;
-        return true;
-    }
-    return false;
+    return boost::algorithm::any_of(videowall->items()->getItems().values(), offlineItemOnThisPc());
 }
 
 void QnWorkbenchVideoWallHandler::switchToVideoWallMode(const QnVideoWallResourcePtr& videoWall)
 {
-    QnUuid pcUuid = qnSettings->pcUuid();
-    NX_ASSERT(!pcUuid.isNull(), "Action condition must not allow us to get here.");
-    if (pcUuid.isNull())
-        return;
-
     QList<QnVideoWallItem> items;
-    for (const auto& item: videoWall->items()->getItems())
-    {
-        if (item.pcUuid != pcUuid || item.runtimeStatus.online)
-            continue;
-        items.append(item);
-    }
+    boost::algorithm::copy_if(videoWall->items()->getItems().values(), std::back_inserter(items),
+        offlineItemOnThisPc());
+
     NX_ASSERT(!items.isEmpty(), "Action condition must not allow us to get here.");
     if (items.isEmpty())
         return;
@@ -681,7 +717,7 @@ void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args)
     url.setPassword(QString());
 
     arguments << lit("--auth");
-    arguments << QString::fromUtf8(url.toEncoded());
+    arguments << QnStartupParameters::createAuthenticationString(url);
 
 #ifdef SENDER_DEBUG
     qDebug() << "arguments" << arguments;
@@ -1074,7 +1110,7 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
 
 
     QnVideoWallLicenseUsageProposer proposer(m_licensesHelper.data(), 0, 1);
-    if (!validateLicenses(tr("Activate one more license to start the Video Wall control session.")))
+    if (!validateLicenses(tr("Activate one more license to start Video Wall control session.")))
         return false;
 
     auto layout = workbench()->currentLayout()->resource();
@@ -1106,8 +1142,8 @@ void QnWorkbenchVideoWallHandler::showFailedToApplyChanges() const
 void QnWorkbenchVideoWallHandler::showControlledByAnotherUserMessage() const
 {
     QnMessageBox::warning(mainWindow(),
-        tr("Screen controlled by another user"),
-        tr("Control session can't be started."));
+        tr("Screen is being controlled by another user"),
+        tr("Control session cannot be started."));
 }
 
 void QnWorkbenchVideoWallHandler::setControlMode(bool active)
@@ -1231,7 +1267,7 @@ void QnWorkbenchVideoWallHandler::submitDelayedItemOpen()
 
         NX_LOG(message.arg(m_videoWallMode.guid.toString()), cl_logERROR);
 
-        QnVideowallAutoStarter(m_videoWallMode.guid, this).setAutoStartEnabled(false);
+        setAutoRunEnabled(m_videoWallMode.guid, false);
         closeInstanceDelayed();
         return;
     }
@@ -1349,17 +1385,7 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
     qnResPool->markLayoutAutoGenerated(layout);
     layout->addFlags(Qn::local); // TODO: #Elric #EC2
 
-    if (sourceLayout)
-    {
-        layout->setCellSpacing(sourceLayout->cellSpacing());
-        layout->setCellAspectRatio(sourceLayout->cellAspectRatio());
-        layout->setItems(sourceLayout->getItems());
-        layout->setBackgroundImageFilename(sourceLayout->backgroundImageFilename());
-        layout->setBackgroundOpacity(sourceLayout->backgroundOpacity());
-        layout->setBackgroundSize(sourceLayout->backgroundSize());
-        layout->setLocked(sourceLayout->locked());
-    }
-    else
+    if (!sourceLayout)
     {
         qreal desiredAspectRatio = defaultAr;
         for (qreal ar : aspectRatios.keys())
@@ -1393,24 +1419,35 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
 
 void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts()
 {
-    QHash<QnUuid, QnLayoutResourcePtr> autoGeneratedLayouts;
-    for (const auto& layout: qnResPool->getResources<QnLayoutResource>())
-    {
-        if (qnResPool->isAutoGeneratedLayout(layout))
-            autoGeneratedLayouts.insert(layout->getId(), layout);
-    }
+    QnLayoutResourceList layoutsToDelete;
 
     for (const auto& videowall: qnResPool->getResources<QnVideoWallResource>())
     {
+        QSet<QnUuid> used;
         for (const QnVideoWallItem& item: videowall->items()->getItems())
-            autoGeneratedLayouts.remove(item.layout);
-        if (autoGeneratedLayouts.isEmpty())
-            break;
+            used << item.layout;
+
+        QnUuid videoWallId = videowall->getId();
+        QnLayoutResourceList unused = qnResPool->getResourcesByParentId(videoWallId)
+            .filtered<QnLayoutResource>(
+            [used](const QnLayoutResourcePtr& layout)
+            {
+                // this may be new just-set layout waiting for save
+                if (layout->hasFlags(Qn::local))
+                    return false;
+
+                return !used.contains(layout->getId());
+            });
+        layoutsToDelete.append(unused);
     }
 
-    QnResourceList layoutsToDelete(autoGeneratedLayouts.values());
-    if (!layoutsToDelete.isEmpty())
-        menu()->trigger(QnActions::RemoveFromServerAction, layoutsToDelete);
+    if (layoutsToDelete.isEmpty())
+        return;
+
+    // Deleting one-by-one to avoid invalid layouts which cannot be deleted for whatever reason
+    NX_ASSERT(menu()->canTrigger(QnActions::RemoveFromServerAction, layoutsToDelete));
+    for (auto layout: layoutsToDelete)
+        menu()->trigger(QnActions::RemoveFromServerAction, layout);
 }
 
 /*------------------------------------ HANDLERS ------------------------------------------*/
@@ -1436,7 +1473,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
     dialog->setWindowTitle(tr("New Video Wall..."));
-    dialog->setText(tr("Enter the name of the Video Wall to create:"));
+    dialog->setText(tr("Enter the name of Video Wall to create:"));
     dialog->setName(proposedName);
     dialog->setWindowModality(Qt::ApplicationModal);
 
@@ -1546,7 +1583,7 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
         mainWindow());
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources));
+    messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
     auto result = messageBox.exec();
 
     if (result == QDialogButtonBox::Cancel)
@@ -1571,7 +1608,7 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallAction_triggered()
     if (videoWall.isNull())
         return;
 
-    if (!validateLicenses(tr("Activate one more license to start the Video Wall.")))
+    if (!validateLicenses(tr("Activate one more license to start Video Wall.")))
         return;
 
     switchToVideoWallMode(videoWall);
@@ -1775,6 +1812,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallsReviewAction_triggered()
             layout->setParentId(context()->user()->getId());
         if (accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission))
             layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission));
+        qnResPool->markLayoutAutoGenerated(layout);
 
         QMap<ScreenWidgetKey, QnVideoWallItemIndexList> itemGroups;
 
@@ -1931,18 +1969,15 @@ void QnWorkbenchVideoWallHandler::at_dropOnVideoWallItemAction_triggered()
         case Action::SetAction:
             if (checkLocalFiles(targetIndex, targetLayout))
                 resetLayout(QnVideoWallItemIndexList() << targetIndex, targetLayout);
-            else
-                cleanupUnusedLayouts();
             break;
         case Action::SwapAction:
             if (checkLocalFiles(targetIndex, targetLayout) && checkLocalFiles(sourceIndex, currentLayout))
                 swapLayouts(targetIndex, targetLayout, sourceIndex, currentLayout);
-            else
-                cleanupUnusedLayouts();
             break;
         default:
             break;
     }
+    cleanupUnusedLayouts();
 }
 
 void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered()
@@ -2000,7 +2035,7 @@ void QnWorkbenchVideoWallHandler::at_saveVideowallMatrixAction_triggered()
 
     if (matrix.layoutByItem.isEmpty())
     {
-        QnMessageBox::warning(mainWindow(), tr("Can't save empty matrix"));
+        QnMessageBox::warning(mainWindow(), tr("Cannot save empty matrix"));
         return;
     }
 
@@ -2073,14 +2108,14 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
 
     QnMessageBox messageBox(QnMessageBoxIcon::Question,
         tr("Delete %n matrices?", "", resources.size()), QString(),
-        QDialogButtonBox::Cancel, QDialogButtonBox::Yes,
+        QDialogButtonBox::Cancel, QDialogButtonBox::NoButton,
         mainWindow());
 
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources));
-    const auto result = messageBox.exec();
-    if (result != QDialogButtonBox::Yes)
+    messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
+
+    if (messageBox.exec() == QDialogButtonBox::Cancel)
         return;
 
     QSet<QnVideoWallResourcePtr> videoWalls;
@@ -2105,27 +2140,30 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
     if (!videoWall)
         return;
 
-    connect(videoWall, &QnVideoWallResource::autorunChanged, this, [this](const QnResourcePtr &resource)
-    {
-        QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
-        if (!videoWall || !videoWall->pcs()->hasItem(qnSettings->pcUuid()))
-            return;
-        QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(videoWall->isAutorun());
-    });
+    connect(videoWall, &QnVideoWallResource::autorunChanged, this,
+        [this](const QnResourcePtr &resource)
+        {
+            QnVideoWallResourcePtr videoWall = resource.dynamicCast<QnVideoWallResource>();
+            if (!videoWall || !videoWall->pcs()->hasItem(qnSettings->pcUuid()))
+                return;
+            setAutoRunEnabled(videoWall->getId(), videoWall->isAutorun());
+        });
 
-    connect(videoWall, &QnVideoWallResource::pcAdded, this, [this](const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
-    {
-        if (pc.uuid != qnSettings->pcUuid())
-            return;
-        QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(videoWall->isAutorun());
-    });
+    connect(videoWall, &QnVideoWallResource::pcAdded, this,
+        [this](const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
+        {
+            if (pc.uuid != qnSettings->pcUuid())
+                return;
+            setAutoRunEnabled(videoWall->getId(), videoWall->isAutorun());
+        });
 
-    connect(videoWall, &QnVideoWallResource::pcRemoved, this, [this](const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
-    {
-        if (pc.uuid != qnSettings->pcUuid())
-            return;
-        QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(false);
-    });
+    connect(videoWall, &QnVideoWallResource::pcRemoved, this,
+        [this](const QnVideoWallResourcePtr &videoWall, const QnVideoWallPcData &pc)
+        {
+            if (pc.uuid != qnSettings->pcUuid())
+                return;
+            setAutoRunEnabled(videoWall->getId(), false);
+        });
 
     if (m_videoWallMode.active)
     {
@@ -2133,7 +2171,7 @@ void QnWorkbenchVideoWallHandler::at_resPool_resourceAdded(const QnResourcePtr &
         {
             connect(videoWall, &QnVideoWallResource::itemChanged, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemChanged_activeMode);
             connect(videoWall, &QnVideoWallResource::itemRemoved, this, &QnWorkbenchVideoWallHandler::at_videoWall_itemRemoved_activeMode);
-            QnVideowallAutoStarter(videoWall->getId(), this).setAutoStartEnabled(videoWall->isAutorun());
+            setAutoRunEnabled(videoWall->getId(), videoWall->isAutorun());
             if (m_videoWallMode.ready)
                 openVideoWallItem(videoWall);
         }

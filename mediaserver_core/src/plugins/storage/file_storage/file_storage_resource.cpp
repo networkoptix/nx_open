@@ -836,6 +836,8 @@ bool QnFileStorageResource::testWriteCapInternal() const
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
 {
+    NX_LOG("QnFileStorageResource::initOrUpdate begin", cl_logDEBUG1);
+
     Qn::StorageInitResult result;
     {
         QnMutexLocker lock(&m_mutexCheckStorage);
@@ -862,6 +864,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
     }
     QString localPath = getLocalPathSafe();
     m_cachedTotalSpace = getDiskTotalSpace(localPath.isEmpty() ? getPath() : localPath); // update cached value periodically
+    NX_LOG("QnFileStorageResource::initOrUpdate completed", cl_logDEBUG1);
 
     return Qn::StorageInit_Ok;
 }

@@ -5,6 +5,7 @@
 
 class QnResourceTreeModel;
 class QnResourceTreeModelNode;
+class QnResourceTreeModelNodeManager;
 
 typedef QnSharedResourcePointer<QnResourceTreeModelNode> QnResourceTreeModelNodePtr;
 

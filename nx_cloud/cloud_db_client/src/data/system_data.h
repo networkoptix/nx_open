@@ -34,7 +34,7 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 
 #define SystemData_Fields (id)(name)(customization)(authKey)(ownerAccountEmail) \
                           (status)(cloudConnectionSubscriptionStatus)(systemSequence) \
-                          (opaque)
+                          (opaque)(registrationTime)
 #define SystemDataList_Fields (systems)
 
 //!for requests passing just system id
@@ -68,11 +68,14 @@ void serializeToUrlQuery(const SystemAttributesUpdate& data, QUrlQuery* const ur
 void serialize(QnJsonContext*, const SystemAttributesUpdate&, QJsonValue*);
 bool deserialize(QnJsonContext*, const QJsonValue&, SystemAttributesUpdate*);
 
+//-------------------------------------------------------------------------------------------------
+// SystemHealthHistory
 
+#define SystemHealthHistoryItem_Fields (timestamp)(state)
+#define SystemHealthHistory_Fields (events)
 
-////////////////////////////////////////////////////////////
-//// system sharing data
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// System sharing data
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemSharing);
 void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
@@ -110,7 +113,8 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (SystemDataEx)(SystemDataList)(SystemDataExList)(SystemSharingList)(SystemSharingEx) \
-        (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList),
+        (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList) \
+        (SystemHealthHistoryItem)(SystemHealthHistory),
     (json));
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::cdb::api::SystemStatus)

@@ -76,6 +76,7 @@ private:
     bool saveHomePosition();
     void enableDewarping();
     void clear();
+    void setupTableChangesConfirmation();
 
 private:
     QScopedPointer<Ui::PtzManageDialog> ui;

@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <libconnection_mediator/src/test_support/mediator_functional_test.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl_socket.h>
@@ -12,6 +11,10 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/test_options.h>
+
+#include <libconnection_mediator/src/listening_peer_pool.h>
+#include <libconnection_mediator/src/mediator_service.h>
+#include <libconnection_mediator/src/test_support/mediator_functional_test.h>
 
 namespace nx {
 namespace network {
@@ -158,48 +161,6 @@ struct FakeTcpTunnelAcceptor
     size_t m_clientsLimit;
 };
 
-class CloudServerSocketTest:
-    public ::testing::Test
-{
-public:
-    CloudServerSocketTest()
-    {
-        stun::AbstractAsyncClient::Settings stunClientSettings;
-        stunClientSettings.reconnectPolicy =
-            nx::network::RetryPolicy(
-                nx::network::RetryPolicy::kInfiniteRetries,
-                std::chrono::milliseconds(0),
-                nx::network::RetryPolicy::kDefaultDelayMultiplier,
-                std::chrono::minutes(1));
-        nx::hpm::api::MediatorConnector::setStunClientSettings(stunClientSettings);
-
-        SocketGlobalsHolder::instance()->reinitialize();
-        init();
-    }
-
-protected:
-    hpm::MediatorFunctionalTest m_mediator;
-
-private:
-    void init()
-    {
-        ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
-        auto system = m_mediator.addRandomSystem();
-        auto server = m_mediator.addRandomServer(
-                system, boost::none, hpm::ServerTweak::noBindEndpoint);
-
-        ASSERT_NE(nullptr, server);
-        SocketGlobals::mediatorConnector().setSystemCredentials(
-            nx::hpm::api::SystemCredentials(
-                system.id,
-                server->serverId(),
-                system.authKey));
-
-        SocketGlobals::mediatorConnector().mockupAddress(m_mediator.stunEndpoint());
-        SocketGlobals::mediatorConnector().enable(true);
-    }
-};
-
 class CloudServerSocketTcpTester:
     public CloudServerSocket
 {
@@ -251,6 +212,8 @@ private:
     network::test::AddressBinder::Manager m_addressManager;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 class CloudServerSocketTcpTest:
     public ::testing::Test
 {
@@ -275,9 +238,9 @@ NX_NETWORK_SERVER_SOCKET_TEST_CASE(
     [this](){ return makeServerTester(); },
     [this](){ return makeClientTester(); });
 
-TEST_F(CloudServerSocketTcpTest, SimpleSyncSsl)
+TEST_F(CloudServerSocketTcpTest, TransferSyncSsl)
 {
-    network::test::socketSimpleSync(
+    network::test::socketTransferSync(
         [&]() { return std::make_unique<SslServerSocket>(makeServerTester().release(), false); },
         [&]() { return std::make_unique<SslSocket>(makeClientTester().release(), false); });
 }
@@ -311,7 +274,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     server->moveToListeningState();
 
     // there is no tunnels yet
-    ASSERT_EQ(addressBinder.get(addressManager.key).size(), 0);
+    ASSERT_EQ(addressBinder.get(addressManager.key).size(), 0U);
 
     hpm::api::ConnectionRequestedEvent event;
     event.connectSessionId = String("someSessionId");
@@ -327,7 +290,7 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     auto list = addressBinder.get(addressManager.key);
-    ASSERT_EQ(list.size(), 1);
+    ASSERT_EQ(list.size(), 1U);
 
     auto client = std::make_unique<TCPSocket>(AF_INET);
     ASSERT_TRUE(client->setNonBlockingMode(true));
@@ -342,6 +305,8 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
     client->pleaseStopSync();
     server->pleaseStopSync();
 }
+
+//-------------------------------------------------------------------------------------------------
 
 static const size_t kThreadCount = 5;
 static const size_t kClientCount = 15;
@@ -410,7 +375,7 @@ protected:
                             cl_logDEBUG2);
 
                         ASSERT_EQ(code, SystemError::noError);
-                        ASSERT_EQ(size, network::test::kTestMessage.size());
+                        ASSERT_EQ(size, (size_t)network::test::kTestMessage.size());
                     });
 
                 {
@@ -574,19 +539,64 @@ TEST_F(CloudServerSocketStressTcpTest, MultiThread)
         startClientThread(kClientCount);
 }
 
+//-------------------------------------------------------------------------------------------------
+
+class CloudServerSocketTest:
+    public ::testing::Test
+{
+public:
+    CloudServerSocketTest()
+    {
+        stun::AbstractAsyncClient::Settings stunClientSettings;
+        stunClientSettings.reconnectPolicy =
+            nx::network::RetryPolicy(
+                nx::network::RetryPolicy::kInfiniteRetries,
+                std::chrono::milliseconds(0),
+                nx::network::RetryPolicy::kDefaultDelayMultiplier,
+                std::chrono::minutes(1));
+        nx::hpm::api::MediatorConnector::setStunClientSettings(stunClientSettings);
+
+        SocketGlobalsHolder::instance()->reinitialize();
+    }
+
+protected:
+    hpm::MediatorFunctionalTest m_mediator;
+    hpm::AbstractCloudDataProvider::System system;
+    std::unique_ptr<hpm::MediaServerEmulator> server;
+
+    void startMediatorAndRegister()
+    {
+        ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
+        system = m_mediator.addRandomSystem();
+        server = m_mediator.addRandomServer(
+                system, boost::none, hpm::ServerTweak::noBindEndpoint);
+
+        ASSERT_NE(nullptr, server);
+        SocketGlobals::mediatorConnector().setSystemCredentials(
+            nx::hpm::api::SystemCredentials(
+                system.id,
+                server->serverId(),
+                system.authKey));
+
+        SocketGlobals::mediatorConnector().mockupAddress(m_mediator.stunEndpoint());
+        SocketGlobals::mediatorConnector().enable(true);
+    }
+};
+
 TEST_F(CloudServerSocketTest, reconnect)
 {
+    startMediatorAndRegister();
     hpm::api::SystemCredentials currentCredentials =
         *nx::network::SocketGlobals::mediatorConnector().getSystemCredentials();
 
-    auto system = m_mediator.addRandomSystem();
-    auto server = m_mediator.addRandomServer(
+    auto system2 = m_mediator.addRandomSystem();
+    auto server2 = m_mediator.addRandomServer(
         system, boost::none, hpm::ServerTweak::noBindEndpoint);
 
     hpm::api::SystemCredentials otherCredentials;
-    otherCredentials.systemId = system.id;
-    otherCredentials.key = system.authKey;
-    otherCredentials.serverId = server->serverId();
+    otherCredentials.systemId = system2.id;
+    otherCredentials.key = system2.authKey;
+    otherCredentials.serverId = server2->serverId();
 
     for (int i = 0; i < 17; ++i)
     {
@@ -609,6 +619,39 @@ TEST_F(CloudServerSocketTest, reconnect)
             });
         cloudCredentialsModified.get_future().wait();
         std::swap(currentCredentials, otherCredentials);
+    }
+}
+
+TEST_F(CloudServerSocketTest, serverChecksConnectionState)
+{
+    const KeepAliveOptions kKeepAliveOptions(1, 1, 1);
+    m_mediator.addArg("-general/cloudConnectOptions", "serverChecksConnectionState");
+    m_mediator.addArg("-stun/keepAliveOptions", kKeepAliveOptions.toString().toStdString().c_str());
+    startMediatorAndRegister();
+
+    CloudServerSocket cloudServerSocket(
+        nx::network::SocketGlobals::mediatorConnector().systemConnection());
+    ASSERT_EQ(hpm::api::ResultCode::ok, cloudServerSocket.registerOnMediatorSync());
+    ASSERT_TRUE(cloudServerSocket.listen(128));
+    cloudServerSocket.moveToListeningState();
+
+    const auto peerPool = m_mediator.moduleInstance()->impl()->listeningPeerPool();
+    {
+        const auto peer = peerPool->findAndLockPeerDataByHostName(server->fullName());
+        ASSERT_TRUE((bool) peer);
+        ASSERT_TRUE(peer->value().isListening);
+
+        // Drop listening state, e.g. because of some bug.
+        const auto peerData = const_cast<hpm::ListeningPeerData*>(&peer->value());
+        peerData->isListening = false;
+    }
+
+    // After some time server is supposed to detect an error and restore listening state.
+    std::this_thread::sleep_for(kKeepAliveOptions.maxDelay() * 2);
+    {
+        const auto peer = peerPool->findAndLockPeerDataByHostName(server->fullName());
+        ASSERT_TRUE((bool) peer);
+        ASSERT_TRUE(peer->value().isListening);
     }
 }
 

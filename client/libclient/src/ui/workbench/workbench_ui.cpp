@@ -170,7 +170,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Windowed title shadow. */
     auto windowedTitleShadow = new QnEdgeShadowWidget(m_controlsWidget,
-        Qt::TopEdge, NxUi::kShadowThickness, true);
+        m_controlsWidget, Qt::TopEdge, NxUi::kShadowThickness, QnEdgeShadowWidget::kInner);
     windowedTitleShadow->setZValue(NxUi::ShadowItemZOrder);
 
 #ifdef QN_DEBUG_WIDGET
@@ -617,13 +617,14 @@ void QnWorkbenchUi::at_activityStopped()
 {
     m_inactive = true;
 
-    updateControlsVisibility(true);
+    const bool animate = display()->animationAllowed();
+    updateControlsVisibility(animate);
 
     foreach(QnResourceWidget *widget, display()->widgets())
     {
         widget->setOption(QnResourceWidget::ActivityPresence, false);
         if (!(widget->options() & QnResourceWidget::DisplayInfo))
-            widget->setOverlayVisible(false);
+            widget->setOverlayVisible(false, animate);
     }
     updateCursor();
 }
@@ -632,13 +633,14 @@ void QnWorkbenchUi::at_activityStarted()
 {
     m_inactive = false;
 
-    updateControlsVisibility(true);
+    const bool animate = display()->animationAllowed();
+    updateControlsVisibility(animate);
 
     foreach(QnResourceWidget *widget, display()->widgets())
     {
         widget->setOption(QnResourceWidget::ActivityPresence, true);
         if (widget->isInfoVisible()) // TODO: #Elric wrong place?
-            widget->setOverlayVisible(true);
+            widget->setOverlayVisible(true, animate);
     }
     updateCursor();
 }
@@ -669,7 +671,7 @@ void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role)
             setOpenedPanels(m_unzoomedOpenedPanels | openedPanels(), true);
 
             /* Viewport margins have changed, force fit-in-view. */
-            display()->fitInView();
+            display()->fitInView(display()->animationAllowed());
         }
 
         qreal masterOpacity = newWidget ? kZoomedTimelineOpacity : NxUi::kOpaque;

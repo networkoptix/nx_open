@@ -8,6 +8,7 @@
 #include "../aio/event_type.h"
 #include "../socket_common.h"
 #include "../system_socket.h"
+#include "../aio/event_type.h"
 
 namespace nx {
 namespace network {
@@ -75,6 +76,7 @@ public:
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
     virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+    virtual bool isInSelfAioThread() const override;
     virtual Pollable* pollable() override;
     virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
@@ -186,6 +188,8 @@ public:
 
 private:
     std::unique_ptr<aio::AsyncServerSocketHelper<UdtStreamServerSocket>> m_aioHelper;
+
+    void stopWhileInAioThread();
 
     Q_DISABLE_COPY(UdtStreamServerSocket)
 };

@@ -1,5 +1,8 @@
-#ifndef INSTALL_UPDATES_PEER_TASK_H
-#define INSTALL_UPDATES_PEER_TASK_H
+#pragma once
+
+#include <map>
+
+#include <QtCore/QSet>
 
 #include <core/resource/resource_fwd.h>
 #include <update/task/network_peer_task.h>
@@ -9,18 +12,24 @@
 class QTimer;
 struct QnUploadUpdateReply;
 
-class QnInstallUpdatesPeerTask : public QnNetworkPeerTask {
+class QnInstallUpdatesPeerTask: public QnNetworkPeerTask
+{
     Q_OBJECT
+
 public:
-    enum ErrorCode {
+    // This map is used to get the peers sorted by distance in descending order.
+    using PeersToQueryMap = std::multimap<int, QnUuid, std::greater<int>>;
+
+    enum ErrorCode
+    {
         NoError = 0,
         InstallationFailed
     };
 
-    explicit QnInstallUpdatesPeerTask(QObject *parent = 0);
+    explicit QnInstallUpdatesPeerTask(QObject* parent = nullptr);
 
-    void setUpdateId(const QString &updateId);
-    void setVersion(const QnSoftwareVersion &version);
+    void setUpdateId(const QString& updateId);
+    void setVersion(const QnSoftwareVersion& version);
 
 signals:
     void protocolProblemDetected();
@@ -29,14 +38,19 @@ protected:
     virtual void doStart() override;
 
 private slots:
-    void at_resourceChanged(const QnResourcePtr &resource);
+    void at_resourceChanged(const QnResourcePtr& resource);
     void at_checkTimer_timeout();
     void at_pingTimer_timeout();
-    void at_gotModuleInformation(int status, const QList<QnModuleInformation> &modules, int handle);
-    void at_installUpdateResponse(int status, const QnUploadUpdateReply &reply, int handle);
+    void at_gotModuleInformation(
+        int status, const QList<QnModuleInformation>& modules, int handle);
+    void at_installUpdateResponse(
+        int status, const QnUploadUpdateReply& reply, int handle);
 
 private:
-    void finish(int errorCode, const QSet<QnUuid> &failedPeers = QSet<QnUuid>());
+    void queryNextGroup();
+    void startWaiting();
+    void removeWaitingPeer(const QnUuid& id);
+    void finish(int errorCode, const QSet<QnUuid>& failedPeers = QSet<QnUuid>());
 
 private:
     QString m_updateId;
@@ -46,10 +60,9 @@ private:
     QSet<QnUuid> m_stoppingPeers;
     QSet<QnUuid> m_restartingPeers;
     QSet<QnUuid> m_pendingPeers;
-    QTimer *m_checkTimer;
-    QTimer *m_pingTimer;
-    bool m_protoProblemDetected;
+    QTimer* m_checkTimer = nullptr;
+    QTimer* m_pingTimer = nullptr;
+    bool m_protoProblemDetected = false;
     QHash<int, QnMediaServerResourcePtr> m_serverByRequest;
+    PeersToQueryMap m_peersToQuery;
 };
-
-#endif // INSTALL_UPDATES_PEER_TASK_H

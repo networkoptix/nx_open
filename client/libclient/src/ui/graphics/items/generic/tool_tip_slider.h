@@ -44,6 +44,9 @@ public:
 
     void setToolTipEnabled(bool enabled);
 
+    int toolTipHideDelayMs() const;
+    void setToolTipHideDelayMs(int delayMs);
+
 protected :
     virtual void sliderChange(SliderChange change) override;
     virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
@@ -78,6 +81,7 @@ private:
     QPointF m_dragOffset;
     qreal m_tooltipMargin;
     bool m_toolTipEnabled;
+    int m_toolTipHideDelayMs;
 };
 
 #endif // QN_TOOL_TIP_SLIDER_H

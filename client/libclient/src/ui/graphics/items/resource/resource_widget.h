@@ -191,9 +191,7 @@ public:
     /**
      * \returns                         Options for this widget.
      */
-    Options options() const {
-        return m_options;
-    }
+    Options options() const;
 
     /**
      * \param option                    Affected option.
@@ -235,7 +233,7 @@ public:
     void setTitleTextFormat(const QString &titleTextFormat);
 
     bool isInfoVisible() const;
-    Q_SLOT void setInfoVisible(bool visible, bool animate = true);
+    Q_SLOT void setInfoVisible(bool visible, bool animate);
 
     bool isLocalActive() const;
     void setLocalActive(bool localActive);
@@ -285,7 +283,7 @@ protected:
     void setChannelScreenSize(const QSize &size);
     virtual void channelScreenSizeChangedNotify() {}
 
-    virtual void updateHud(bool animate = true);
+    virtual void updateHud(bool animate);
 
     virtual bool isHovered() const;
 

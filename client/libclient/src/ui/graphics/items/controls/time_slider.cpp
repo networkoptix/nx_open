@@ -643,7 +643,7 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
     QString moSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Months);
     QString ySuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Years);
 
-    bool ampm = QLocale::system().timeFormat().contains(lit("ap"), Qt::CaseInsensitive);
+    bool ampm = QLocale().timeFormat().contains(lit("ap"), Qt::CaseInsensitive);
 
     const QString& hFormat = ampm ? hApFormat : hmFormat;
     const QString& mFormat = ampm ? hmApFormat : hmFormat;
@@ -2562,6 +2562,9 @@ void QnTimeSlider::drawThumbnails(QPainter* painter, const QRectF& rect)
 
     qint64 step = thumbnailsLoader()->timeStep();
     if (thumbnailsLoader()->timeStep() <= 0)
+        return;
+
+    if (thumbnailsLoader()->thumbnailSize().isEmpty())
         return;
 
     qreal aspectRatio = QnGeometry::aspectRatio(thumbnailsLoader()->thumbnailSize());

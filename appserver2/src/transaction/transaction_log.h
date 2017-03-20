@@ -90,7 +90,7 @@ namespace ec2
         friend class detail::QnDbManager;
 
         template <class T>
-        ContainsReason contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.params)); }
+        ContainsReason contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.command, tran.params)); }
         ContainsReason contains(const QnAbstractTransaction& tran, const QnUuid& hash) const;
 
         int currentSequenceNoLock() const;

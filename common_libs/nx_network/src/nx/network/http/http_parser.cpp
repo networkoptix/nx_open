@@ -1,15 +1,8 @@
-/**********************************************************
-* 23 dec 2013
-* a.kolesnikov
-***********************************************************/
-
 #include "http_parser.h"
-
 
 namespace nx_http {
 
-MessageParser::MessageParser()
-:
+MessageParser::MessageParser():
     m_msg(nullptr)
 {
 }
@@ -60,4 +53,4 @@ void MessageParser::reset()
     m_httpStreamReader.resetState();
 }
 
-}   // namespace nx_http
+} // namespace nx_http

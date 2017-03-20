@@ -17,7 +17,7 @@ namespace messages {
 void Ptz::failedToGetPosition(QWidget* parent, const QString& cameraName)
 {
     const auto extras =
-        tr("Can't get the current position from camera \"%1\"").arg(cameraName)
+        tr("Cannot get the current position from camera \"%1\"").arg(cameraName)
         + L'\n' + tr("Please wait for the camera to go online.");
     QnMessageBox::critical(parent, tr("Failed to get current position"), extras);
 }
@@ -25,7 +25,7 @@ void Ptz::failedToGetPosition(QWidget* parent, const QString& cameraName)
 void Ptz::failedToSetPosition(QWidget* parent, const QString& cameraName)
 {
     const auto extras =
-        tr("Can't set the current position for camera \"%1\"").arg(cameraName)
+        tr("Cannot set the current position for camera \"%1\"").arg(cameraName)
         + L'\n' + tr("Please wait for the camera to go online.");
     QnMessageBox::critical(parent, tr("Failed to set current position"), extras);
 }

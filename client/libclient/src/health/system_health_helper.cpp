@@ -4,6 +4,8 @@
 
 #include <utils/common/app_info.h>
 
+#include <nx/utils/string.h>
+
 QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType messageType)
 {
     switch (messageType)
@@ -15,7 +17,7 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         case QnSystemHealth::SmtpIsNotSet:
             return tr("Email server is not set");
         case QnSystemHealth::UsersEmailIsEmpty:
-            return tr("Some users have not set their email addresses");
+            return tr("Some users have not set their Email addresses");
         case QnSystemHealth::ConnectionLost:
             return tr("Connection to server lost");
         case QnSystemHealth::NoPrimaryTimeServer:
@@ -23,7 +25,7 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
         case QnSystemHealth::SystemIsReadOnly:
             return tr("System is in safe mode");
         case QnSystemHealth::EmailSendError:
-            return tr("Error while sending email");
+            return tr("Error while sending Email");
         case QnSystemHealth::StoragesAreFull:
             return tr("Storage is full");
         case QnSystemHealth::StoragesNotConfigured:
@@ -43,16 +45,22 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
 QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType messageType,
     const QString& resourceName)
 {
+    //TODO: #GDM #3.1 elide on the widget level
+    static const int kMaxNameLength = 30;
+
     switch (messageType)
     {
         case QnSystemHealth::UsersEmailIsEmpty:
-            return tr("Email address is not set for user %1").arg(resourceName);
+            return tr("Email address is not set for user %1")
+                .arg(nx::utils::elideString(resourceName, kMaxNameLength));
+
         case QnSystemHealth::CloudPromo:
         {
             const QString kLearnMoreText = tr("Learn more");
-            const QString kMessage = tr("Check out <b>%1</b> Beta "
-                                        "&mdash; connect to your servers from anywhere",
-                "%1 is name of cloud (like 'Nx Cloud')").arg(QnAppInfo::cloudName());
+            const QString kCloudBeta = lit("<b>%1</b> Beta").arg(QnAppInfo::cloudName());
+
+            const QString kMessage = tr("Check out %1 &mdash; connect to your servers from anywhere",
+                "%1 is the cloud name (like 'Nx Cloud')").arg(kCloudBeta);
 
             const QString kTemplate = lit("<p>%1</p><p><a href=\"settings\">%2</a></p>");
             return kTemplate.arg(kMessage, kLearnMoreText);
@@ -74,19 +82,19 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             return QString();
 
         case QnSystemHealth::EmailIsEmpty:
-            messageParts << tr("Email address is not set.") << tr("You cannot receive system notifications via email.");
+            messageParts << tr("Email address is not set.") << tr("You cannot receive System notifications by Email.");
             break;
         case QnSystemHealth::SmtpIsNotSet:
-            messageParts << tr("Email server is not set.") << tr("You cannot receive system notifications via email.");
+            messageParts << tr("Email server is not set.") << tr("You cannot receive System notifications by Email.");
             break;
         case QnSystemHealth::UsersEmailIsEmpty:
-            messageParts << tr("Some users have not set their email addresses.") << tr("They cannot receive system notifications via email.");
+            messageParts << tr("Some users have not set their Email addresses.") << tr("They cannot receive System notifications by Email.");
             break;
         case QnSystemHealth::NoPrimaryTimeServer:
             messageParts << tr("Server times are not synchronized and a common time could not be detected automatically.");
             break;
         case QnSystemHealth::SystemIsReadOnly:
-            messageParts << tr("The system is running in safe mode.") << tr("Any configuration changes except license activation are impossible.");
+            messageParts << tr("System is running in safe mode.") << tr("Any configuration changes except license activation are impossible.");
             break;
         case QnSystemHealth::StoragesAreFull:
             messageParts << tr("Storage is full on the following Server:") << resourceName;

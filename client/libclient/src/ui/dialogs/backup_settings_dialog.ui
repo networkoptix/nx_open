@@ -127,7 +127,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>&lt;Cameras...&gt; </string>
+            <string notr="true">&lt;Cameras...&gt; </string>
            </property>
           </widget>
          </item>

@@ -46,13 +46,6 @@
     </message>
 </context>
 <context>
-    <name>CloudSystemInformation</name>
-    <message>
-        <source>OFFLINE</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>CredentialsEditor</name>
     <message>
         <source>Email</source>
@@ -75,15 +68,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid email or password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cannot connect to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Email and password cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -102,7 +99,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All fields must be filled</source>
+        <source>Delete login &quot;%1&quot;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete connection?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -206,27 +219,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hi-res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low-res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low-res key-frames</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Custom-res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1 fps</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hi-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyfr + Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom-Res</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -287,7 +300,7 @@
 <context>
     <name>OfflineDummy</name>
     <message>
-        <source>You are not connected to any system</source>
+        <source>You are not connected to any System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -383,6 +396,21 @@
     </message>
 </context>
 <context>
+    <name>SessionItem</name>
+    <message>
+        <source>This server has too old version. Please update it to the latest version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>OFFLINE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>INCOMPATIBLE</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SessionsScreen</name>
     <message>
         <source>Log in to %1</source>
@@ -393,19 +421,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No systems found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot connect to the system &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot connect to the server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -418,6 +434,18 @@
     </message>
     <message>
         <source>Connect to Another Server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Systems found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to System &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to Server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -479,10 +507,6 @@
         <source>Unknown</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>INCOMPATIBLE</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>TestSelectionDialog</name>
@@ -532,7 +556,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Can&apos;t load video</source>
+        <source>Cannot load video</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

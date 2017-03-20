@@ -6,6 +6,8 @@
 
 #include <client/client_globals.h>
 
+#include <nx/fusion/model_functions_fwd.h>
+
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
 #endif
@@ -331,11 +333,6 @@ enum IDType
      * Opens about dialog.
      */
     AboutAction,
-
-    /**
-     * Open Showcase page in default browser
-     */
-    ShowcaseAction,
 
     /**
      * Closes the client.
@@ -775,6 +772,15 @@ enum IDType
      */
     PtzCalibrateFisheyeAction,
 
+    /**
+     * Performs continuous move with given speed.
+     */
+    PtzContinuousMoveAction,
+
+    /**
+     * Activates preset by index
+     */
+    PtzActivatePresetByIndexAction, 
 
     /* Layout actions. */
 
@@ -842,7 +848,7 @@ enum IDType
     /**
      * Detaches selected layout(s) from the videowall.
      */
-    DetachFromVideoWallAction,
+    ClearVideoWallScreen,
 
     /**
      * Deletes selected videowall item(s).
@@ -890,24 +896,24 @@ enum IDType
     NewUserLayoutAction,
 
     /**
-     * Sets spacing of current layout's cells to 0%.
+     * Sets spacing of current layout's cells to None.
      */
-    SetCurrentLayoutItemSpacing0Action,
+    SetCurrentLayoutItemSpacingNoneAction,
 
     /**
-     * Sets spacing of current layout's cells to 10%.
+     * Sets spacing of current layout's cells to Small.
      */
-    SetCurrentLayoutItemSpacing10Action,
+    SetCurrentLayoutItemSpacingSmallAction,
 
     /**
-     * Sets spacing of current layout's cells to 20%.
+     * Sets spacing of current layout's cells to Medium.
      */
-    SetCurrentLayoutItemSpacing20Action,
+    SetCurrentLayoutItemSpacingMediumAction,
 
     /**
-     * Sets spacing of current layout's cells to 30%.
+     * Sets spacing of current layout's cells to Large.
      */
-    SetCurrentLayoutItemSpacing30Action,
+    SetCurrentLayoutItemSpacingLargeAction,
 
     /**
      * Toggles panic recording.
@@ -1102,6 +1108,22 @@ enum IDType
 
     /** Hide cloud promo */
     HideCloudPromoAction,
+	
+    /**
+     * Go to the next item on layout.
+     */
+    GoToNextItemAction,
+
+    /**
+     * Go to the previous item on layout
+     */
+    GoToPreviousItemAction,
+
+    /**
+     * Maximizes/Unmaximizes current item
+     **/
+    ToggleCurrentItemMaximizationStateAction,
+	
 
     ActionCount,
 

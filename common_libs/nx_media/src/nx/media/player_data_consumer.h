@@ -149,11 +149,10 @@ private:
     std::deque<QVideoFramePtr> m_decodedVideo;
     QnWaitCondition m_queueWaitCond;
     mutable QnMutex m_queueMutex; //< sync with player thread
-    mutable QnMutex m_dataProviderMutex; //< sync with dataProvider thread
+    mutable QnMutex m_jumpMutex; //< sync jump related logic
     mutable QnMutex m_decoderMutex; //< sync with create/destroy decoder
 
-    int m_awaitJumpCounter; //< how many jump requests are queued
-    int m_buffering; //< reserved for future use for panoramic cameras
+    int m_awaitingJumpCounter; //< how many jump requests are queued
 
     struct BofFrameInfo
     {
@@ -162,20 +161,12 @@ private:
         int videoChannel;
         int frameNumber;
     };
-    BofFrameInfo m_hurryUpToFrame; //< display all data with no delay till this frame number at specified video channel
 
     std::atomic<qint64> m_lastMediaTimeUsec; //< UTC usec timestamp for the very last packet
 
     // Delay video decoding. Used for AV sync.
     std::deque<QnCompressedVideoDataPtr> m_predecodeQueue;
 
-    enum class NoDelayState
-    {
-        Disabled, //< noDelay state isn't used
-        Activated, //< noDelay state is activated
-        WaitForNextBOF //< noDelay will be disabled as soon as next BOF frame is received
-    };
-    NoDelayState m_noDelayState;
     int m_sequence;
 
     VideoGeometryAccessor m_videoGeometryAccessor;

@@ -75,15 +75,19 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid email or password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Cannot connect to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Email and password cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log in</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Incorrect Email or password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -102,7 +106,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>All fields must be filled</source>
+        <source>Delete login &quot;%1&quot;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete connection?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Login cannot be empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Password cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -206,27 +226,27 @@
         <translation type="unfinished">desconocido</translation>
     </message>
     <message>
-        <source>Hi-res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low-res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low-res key-frames</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Custom-res</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>%1 fps</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>%1 Mbps</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hi-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keyfr + Lo-Res</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom-Res</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -383,6 +403,13 @@
     </message>
 </context>
 <context>
+    <name>SessionItem</name>
+    <message>
+        <source>This server has too old version. Please update it to the latest version.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SessionsScreen</name>
     <message>
         <source>Log in to %1</source>
@@ -532,8 +559,8 @@
         <translation type="unfinished">Cámara fuera de línea</translation>
     </message>
     <message>
-        <source>Can&apos;t load video</source>
-        <translation type="unfinished">No puede cargar el vídeo</translation>
+        <source>Cannot load video</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

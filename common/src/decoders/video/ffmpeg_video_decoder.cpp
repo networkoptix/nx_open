@@ -35,6 +35,21 @@ static const int MAX_DECODE_THREAD = 4;
 bool QnFfmpegVideoDecoder::m_first_instance = true;
 int QnFfmpegVideoDecoder::hwcounter = 0;
 
+namespace {
+
+    static bool isImageCanBeDecodedViaQt(AVCodecID compressionType)
+    {
+        switch (compressionType)
+        {
+            case AV_CODEC_ID_PNG:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+} // namespace
+
 // ================================================
 
 struct FffmpegLog
@@ -112,10 +127,7 @@ void QnFfmpegVideoDecoder::flush()
 {
     //avcodec_flush_buffers(c); // does not flushing output frames
     int got_picture = 0;
-    AVPacket avpkt;
-    av_init_packet(&avpkt);
-    avpkt.data = 0;
-    avpkt.size = 0;
+    QnFfmpegAvPacket avpkt;
     while (avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt) > 0);
 }
 
@@ -361,6 +373,13 @@ void QnFfmpegVideoDecoder::forceMtDecoding(bool value)
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
 bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
 {
+    bool isImage = false;
+    if (data)
+    {
+        isImage = data->flags.testFlag(QnAbstractMediaData::MediaFlags_StillImage)
+            || isImageCanBeDecodedViaQt(data->compressionType);
+    }
+
     if (data && m_codecId!= data->compressionType) {
         if (m_codecId != AV_CODEC_ID_NONE && data->context)
             resetDecoder(data);
@@ -375,7 +394,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
     {
         if (m_codec==0)
         {
-            if (!(data->flags & QnAbstractMediaData::MediaFlags_StillImage)) {
+            if (!isImage) {
                 // try to decode in QT for still image
                 NX_LOG(QLatin1String("decoder not found: m_codec = 0"), cl_logWARNING);
                 return false;
@@ -429,10 +448,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             resetDecoder(data);
         }
 
-        AVPacket avpkt;
-        av_init_packet(&avpkt);
-        avpkt.data = (unsigned char*)data->data();
-        avpkt.size = static_cast<int>(data->dataSize());
+        QnFfmpegAvPacket avpkt((unsigned char*) data->data(), (int) data->dataSize());
         avpkt.dts = avpkt.pts = data->timestamp;
         // HACK for CorePNG to decode as normal PNG by default
         avpkt.flags = AV_PKT_FLAG_KEY;
@@ -518,7 +534,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
 
         // sometimes ffmpeg can't decode image files. Try to decode in QT
         m_usedQtImage = false;
-        if (!got_picture && (data->flags & QnAbstractMediaData::MediaFlags_StillImage))
+        if (!got_picture && isImage)
         {
             m_tmpImg.loadFromData(avpkt.data, avpkt.size);
             if (m_tmpImg.width() > 0 && m_tmpImg.height() > 0) {
@@ -542,10 +558,7 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         }
     }
     else {
-        AVPacket avpkt;
-        av_init_packet(&avpkt);
-        avpkt.data = 0;
-        avpkt.size = 0;
+        QnFfmpegAvPacket avpkt;
         avpkt.pts = avpkt.dts = m_prevTimestamp;
         avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt); // flush
     }

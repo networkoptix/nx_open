@@ -257,6 +257,7 @@ linux*:!android {
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
 
   equals(TEMPLATE, app): QMAKE_RPATHDIR += $ORIGIN/../lib
+  contains(TEMPLATE, "lib"): LIBS += "-Wl,--allow-shlib-undefined"
 }
 
 ## MAC OS

@@ -98,7 +98,7 @@
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Warning: file with same name already exists!</string>
+            <string>Warning: file with the same name already exists!</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

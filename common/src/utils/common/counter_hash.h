@@ -61,6 +61,11 @@ public:
         return m_hash.keys();
     }
 
+    void clear()
+    {
+        m_hash.clear();
+    }
+
 private:
     QHash<T, int> m_hash;
 };

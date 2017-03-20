@@ -135,9 +135,14 @@ QString htmlFormattedParagraph(const QString &text, int pixelSize, bool isBold /
     return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, newFormattedText);
 }
 
-QString makeHref(const QString &text, const QUrl &url)
+QString makeHref(const QString& text, const QUrl& url)
 {
-    return lit("<a href=\"%2\">%1</a>").arg(text, url.toString());
+    return makeHref(text, url.toString());
+}
+
+QString makeHref(const QString& text, const QString& link)
+{
+    return lit("<a href=\"%2\">%1</a>").arg(text, link);
 }
 
 QString escapeHtml(const QString& input)

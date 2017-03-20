@@ -22,21 +22,6 @@ using namespace nx::hpm;
 
 namespace {
 
-api::NatTraversalResultCode mediatorResultToHolePunchingResult(
-    api::ResultCode resultCode)
-{
-    switch (resultCode)
-    {
-        case api::ResultCode::ok:
-            return api::NatTraversalResultCode::ok;
-        case api::ResultCode::networkError:
-        case api::ResultCode::timedOut:
-            return api::NatTraversalResultCode::noResponseFromMediator;
-        default:
-            return api::NatTraversalResultCode::mediatorReportedError;
-    }
-}
-
 SystemError::ErrorCode mediatorResultToSysErrorCode(api::ResultCode resultCode)
 {
     switch (resultCode)
@@ -228,6 +213,18 @@ void CrossNatConnector::onConnectResponse(
     const auto effectiveConnectTimeout = calculateTimeLeftForConnect();
     m_connectionParameters = response.params;
 
+    m_connectors = ConnectorFactory::createCloudConnectors(
+        m_targetPeerAddress,
+        m_connectSessionId,
+        response,
+        std::move(m_mediatorUdpClient->takeSocket()));
+    if (m_connectors.empty())
+    {
+        m_mediatorUdpClient.reset();
+        auto completionHandler = std::move(m_completionHandler);
+        return completionHandler(SystemError::hostUnreach, nullptr);
+    }
+
     startNatTraversing(
         effectiveConnectTimeout,
         std::move(response));
@@ -254,12 +251,6 @@ void CrossNatConnector::startNatTraversing(
     std::chrono::milliseconds connectTimeout,
     api::ConnectResponse response)
 {
-    // Creating corresponding connectors.
-    m_connectors = ConnectorFactory::createCloudConnectors(
-        m_targetPeerAddress,
-        m_connectSessionId,
-        response,
-        std::move(m_mediatorUdpClient->takeSocket()));
     NX_ASSERT(!m_connectors.empty());
     // TODO: #ak sorting connectors by priority
     m_mediatorUdpClient.reset();

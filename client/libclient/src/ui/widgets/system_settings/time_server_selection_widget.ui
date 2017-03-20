@@ -168,8 +168,8 @@
    <item>
     <widget class="QLabel" name="descriptionLabel">
      <property name="text">
-      <string>System time is synchronized with the Internet and is independent from server's local time.
-Selected server will be used as a time server if the system has no Internet access.</string>
+      <string>System time is synchronized with the Internet and is independent from server local time.
+Selected server will be used as a time server if System has no Internet access.</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

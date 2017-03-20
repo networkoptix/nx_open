@@ -256,7 +256,7 @@ std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>
 
 void HolePunchingProcessor::connectSessionFinished(
     ConnectSessionsDictionary::iterator sessionIter,
-    api::ResultCode connectionResult)
+    api::NatTraversalResultCode connectionResult)
 {
     QnMutexLocker lk(&m_mutex);
 

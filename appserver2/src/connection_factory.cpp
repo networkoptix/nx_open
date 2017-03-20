@@ -1642,6 +1642,44 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
         connectionInfo->effectiveUserName =
             nx_http::getHeaderValue(response->headers, Qn::EFFECTIVE_USER_NAME_HEADER_NAME);
     }
+
+    #ifdef ENABLE_EXTENDED_STATISTICS
+        if (!loginInfo.clientInfo.id.isNull())
+        {
+            auto clientInfo = loginInfo.clientInfo;
+            clientInfo.parentId = qnCommon->moduleGUID();
+
+            ApiClientInfoDataList infoList;
+            auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infoList);
+            if (result != ErrorCode::ok)
+                return result;
+
+            if (infoList.size() > 0
+                && QJson::serialized(clientInfo) == QJson::serialized(infoList.front()))
+            {
+                NX_LOG(lit("Ec2DirectConnectionFactory: New client had already been registered with the same params"),
+                    cl_logDEBUG2);
+                return ErrorCode::ok;
+            }
+
+            m_serverQueryProcessor.getAccess(Qn::kSystemAccess).processUpdateAsync(
+                ApiCommand::saveClientInfo, clientInfo,
+                [&](ErrorCode result)
+                {
+                    if (result == ErrorCode::ok)
+                    {
+                        NX_LOG(lit("Ec2DirectConnectionFactory: New client has been registered"),
+                            cl_logINFO);
+                    }
+                    else
+                    {
+                        NX_LOG(lit("Ec2DirectConnectionFactory: New client transaction has failed %1")
+                            .arg(toString(result)), cl_logERROR);
+                    }
+                });
+        }
+    #endif
+
     return ErrorCode::ok;
 }
 

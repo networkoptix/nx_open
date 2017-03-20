@@ -1,7 +1,7 @@
 $icon-font-path: "../fonts/";
 
 @import '../bower_components/sass-bootstrap/lib/_variables.scss';
-
+@import '_languages';
 
 @mixin icon{
   display: inline-block;
@@ -142,7 +142,9 @@ body {
         border-bottom: 0;
     }
 }
-
+.warning-label{
+  color: $brand-danger;
+}
 /* For API Documentation */
 .group {
   background: yellow;
@@ -556,7 +558,7 @@ h3 {
   table-layout: fixed;
   width:100%;
   td:first-child{
-    width: 85px;
+    width: 100px;
   }
   td{
     text-overflow: ellipsis;
@@ -600,5 +602,15 @@ h3 {
     transition-duration: 0s !important;
     transition-timing-function: linear !important;
     opacity: 1 !important;
+  }
+}
+
+.btn-wrapper {
+  display: inline-block;
+  padding-top: 8px;
+  padding-left: 8px;
+
+  .btn-default{
+    background-color: transparent;
   }
 }

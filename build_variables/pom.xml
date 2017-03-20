@@ -121,26 +121,6 @@
                             <workingDirectory>${root.dir}/build_environment</workingDirectory>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>get-cloud-url</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>${init.python.dir}/${python.executable}</executable>
-                            <arguments>
-                                <argument>get_cloud_url.py</argument>
-                                <argument>--target=${project.build.directory}/cloud_instance.properties</argument>
-                                <argument>--instance=${cloudGroup}</argument>
-                                <argument>--customization=${customization}</argument>
-                                <argument>--host=${cloudHost}</argument>
-                                <argument>--verbose</argument>
-                                <argument>--timeout=10</argument>
-                            </arguments>
-                            <workingDirectory>${root.dir}/build_utils/python</workingDirectory>
-                        </configuration>
-                    </execution>                    
                 </executions>
             </plugin>
             <plugin>
@@ -159,7 +139,7 @@
                                 <file>target/rebuild.properties</file>
                             </files>
                         </configuration>
-                    </execution>                  
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -168,12 +148,26 @@
                 <version>2.0</version>
                 <executions>
                     <execution>
+                        <id>generate_pro_file</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>execute</goal>
                         </goals>
                         <configuration>
                             <source>${project.basedir}/generate_pro_file.groovy</source>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>get_cloud_host</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>execute</goal>
+                        </goals>
+                        <configuration>
+                            <properties>
+                                <targetPropertiesFile>${root.dir}/.cloudHost.properties</targetPropertiesFile>
+                            </properties>
+                            <source>${project.basedir}/get_cloud_host.groovy</source>
                         </configuration>
                     </execution>
                 </executions>

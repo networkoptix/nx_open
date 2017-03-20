@@ -716,7 +716,7 @@ void QnCameraAdditionDialog::at_searchRequestReply(int status, const QVariant &r
         {
             setState(CamerasFound);
             if (newCameras == 0)
-                QnMessageBox::information(this, tr("Selected devices already added"));
+                QnMessageBox::information(this, tr("All devices already added"));
         }
         else
         {

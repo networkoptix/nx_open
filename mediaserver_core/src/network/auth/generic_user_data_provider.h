@@ -9,12 +9,14 @@
 #include <QtCore/QObject>
 
 #include "abstract_user_data_provider.h"
+#include <utils/common/safe_direct_connection.h>
 
 
 class GenericUserDataProvider
 :
     public QObject,
-    public AbstractUserDataProvider
+    public AbstractUserDataProvider,
+    public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
 

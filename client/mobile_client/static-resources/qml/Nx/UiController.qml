@@ -10,8 +10,8 @@ Object
         onConnectRequested:
         {
             sideNavigation.close()
-            connectionManager.connectToServer(url)
             Workflow.openResourcesScreen()
+            connectionManager.connectToServer(url)
         }
 
         onDisconnectRequested:

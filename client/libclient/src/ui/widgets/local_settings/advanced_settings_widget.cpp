@@ -14,6 +14,8 @@
 
 #include <core/resource/resource_directory_browser.h>
 
+#include <text/time_strings.h>
+
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_dialog.h>
 #include <ui/help/help_topic_accessor.h>
@@ -22,7 +24,6 @@
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_auto_starter.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/local_file_cache.h>
@@ -33,6 +34,8 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     ui(new Ui::AdvancedSettingsWidget)
 {
     ui->setupUi(this);
+
+    ui->maximumLiveBufferLengthSpinBox->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Milliseconds));
 
     setHelpTopic(ui->browseLogsButton,          Qn::SystemSettings_General_Logs_Help);
     setHelpTopic(ui->doubleBufferCheckbox,      Qn::SystemSettings_General_DoubleBuffering_Help);

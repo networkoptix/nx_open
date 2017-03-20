@@ -1,5 +1,7 @@
 #ifdef ENABLE_ONVIF
 
+#include <array>
+
 #include "onvif_resource_searcher.h"
 
 #include <QtCore/QUrlQuery>
@@ -16,6 +18,23 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
+
+namespace {
+
+/*
+ *  Port list used for manual camera add
+ */
+const static std::array<int, 5> kOnvifDeviceAltPorts =
+{
+    8081, //FLIR default port
+    8032, // DW default port
+    50080, // NEW DW cam default port
+    9988 // Dahui default port
+};
+static const int kDefaultOnvifPort = 80;
+static const std::chrono::milliseconds kManualDiscoveryConnectTimeout(3000);
+
+} // namespace
 
 bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
 {
@@ -38,18 +57,6 @@ bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
     return rez;
 }
 
-/*
-*   Port list used for manual camera add
-*/
-static const int ONVIF_SERVICE_DEFAULT_PORTS[] =
-{
-    80,
-    8081, //FLIR default port
-    8032, // DW default port
-    50080, // NEW DW cam default port
-    9988 // Dahui default port
-};
-
 OnvifResourceSearcher::OnvifResourceSearcher()
 {
 }
@@ -69,27 +76,56 @@ QString OnvifResourceSearcher::manufacture() const
     return QnPlOnvifResource::MANUFACTURE;
 }
 
-
-QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool isSearchAction)
+int OnvifResourceSearcher::autoDetectDevicePort(const QUrl& url)
 {
+    std::vector<std::unique_ptr<AbstractStreamSocket>> socketList;
+    int result = -1;
+
+    QnMutex mutex;
+
+    QnWaitCondition waitCond;
+    QnMutexLocker lock(&mutex);
+
+    int workers = kOnvifDeviceAltPorts.size();
+    for (auto port: kOnvifDeviceAltPorts)
+    {
+        std::unique_ptr<AbstractStreamSocket> sock(SocketFactory::createStreamSocket());
+        sock->setNonBlockingMode(true);
+        sock->setSendTimeout(kManualDiscoveryConnectTimeout);
+        SocketAddress addr(url.host(), port);
+        sock->connectAsync(addr,
+            [&, port = addr.port](SystemError::ErrorCode errorCode)
+            {
+                QnMutexLocker lock(&mutex);
+                if (errorCode == SystemError::noError && result == -1)
+                    result = port;
+                --workers;
+                waitCond.wakeAll();
+            }
+        );
+        socketList.push_back(std::move(sock));
+    }
+
+    while (workers > 0 && result == -1)
+        waitCond.wait(&mutex);
+
+    lock.unlock();
+    for (const auto& socket: socketList)
+        socket->pleaseStopSync();
+    return result > 0 ? result : kDefaultOnvifPort;
+}
+
+QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddr(const QUrl& _url, const QAuthenticator& auth, bool isSearchAction)
+{
+    QUrl url(_url);
+
     if( !url.scheme().isEmpty() && isSearchAction)
         return QList<QnResourcePtr>();  //searching if only host is present, not specific protocol
 
     if (url.port() == -1)
-    {
-        for (uint i = 0; i < sizeof(ONVIF_SERVICE_DEFAULT_PORTS)/sizeof(int); ++i)
-        {
-            QUrl newUrl(url);
-            newUrl.setPort(ONVIF_SERVICE_DEFAULT_PORTS[i]);
-            QList<QnResourcePtr> result = checkHostAddrInternal(newUrl, auth, isSearchAction);
-            if (!result.isEmpty())
-                return result;
-        }
-        return QList<QnResourcePtr>();
-    }
-    else {
-        return checkHostAddrInternal(url, auth, isSearchAction);
-    }
+        url.setPort(autoDetectDevicePort(url));
+
+    return checkHostAddrInternal(url, auth, isSearchAction);
 }
 
 QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck)
@@ -150,7 +186,11 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         return resList;
     }
 
-    resource->calcTimeDrift();
+    int soapRes = 0;
+    resource->calcTimeDrift(&soapRes);
+    if (soapRes == SOAP_TCP_ERROR)
+        return QList<QnResourcePtr>();
+
     if (shouldStop())
         return QList<QnResourcePtr>();
 

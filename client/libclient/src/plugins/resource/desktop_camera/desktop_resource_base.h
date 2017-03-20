@@ -1,7 +1,9 @@
 #pragma once
 
-#include <QtCore/QtGlobal>
+#include <map>
+
 #include <core/resource/resource.h>
+
 #include <nx/streaming/abstract_archive_resource.h>
 #include <core/resource/resource_fwd.h>
 #include <plugins/resource/desktop_camera/desktop_camera_connection.h>
@@ -16,8 +18,6 @@ public:
 
     static QnUuid getDesktopResourceUuid();
 
-    virtual QString toString() const override;
-
     virtual void addConnection(const QnMediaServerResourcePtr& server);
     virtual void removeConnection(const QnMediaServerResourcePtr& server);
 
@@ -29,7 +29,6 @@ protected:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(
         Qn::ConnectionRole role) = 0;
 
-    QMap<QnUuid, QnDesktopCameraConnectionPtr> m_connectionPool;
-
+    std::map<QnUuid, QnDesktopCameraConnectionPtr> m_connectionPool;
 };
 

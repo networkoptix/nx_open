@@ -194,6 +194,8 @@ bool QnRecordingManager::startForcedRecording(const QnSecurityCamResourcePtr& ca
     if (itrRec == m_recordMap.constEnd())
         return false;
 
+    m_delayedStop.remove(camRes);
+
     // update current schedule task
     const Recorders& recorders = itrRec.value();
     if (recorders.recorderHiRes)

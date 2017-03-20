@@ -28,7 +28,7 @@ public:
         setMouseTracking(true);
         setProperty(style::Properties::kSliderLength, 0);
 
-        setTextFormat(QLatin1String("%1"));
+        setTextFormat(lit("%1"));
 
         connect(this, SIGNAL(sliderPressed()), this, SLOT(update()));
         connect(this, SIGNAL(sliderReleased()), this, SLOT(update()));
@@ -43,6 +43,7 @@ public:
     }
 
     QString text() const {
+        //TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
         const qint64 bytesInMiB = 1024 * 1024;
 
         if(!m_textFormatHasPlaceholder) {
@@ -51,7 +52,7 @@ public:
             if(isSliderDown()) {
                 return formatSize(sliderPosition() * bytesInMiB);
             } else {
-                return tr("%1%").arg(static_cast<int>(relativePosition() * 100));
+                return lit("%1%").arg(static_cast<int>(relativePosition() * 100));
             }
         }
     }

@@ -571,20 +571,18 @@ void QnNxStylePrivate::updateScrollAreaHover(QScrollBar* scrollBar) const
     if (!area)
         return;
 
-    auto viewport = area->viewport();
+    const auto viewport = area->viewport();
     if (!viewport->underMouse())
         return;
 
-    auto globalPos = QCursor::pos(); //< relative to the primary screen
-    auto localPos = mapFromGlobal(viewport, globalPos);
+    const auto globalPos = QCursor::pos(); //< relative to the primary screen
+    const auto localPos = mapFromGlobal(viewport, globalPos);
 
-    QMouseEvent mouseMove(
-        QEvent::MouseMove,
-        localPos,
-        globalPos,
-        Qt::NoButton,
-        qApp->mouseButtons(),
+    QHoverEvent hoverMove(
+        QEvent::HoverMove,
+        localPos, //< current position
+        localPos, //< old position
         qApp->keyboardModifiers());
 
-    qApp->notify(viewport, &mouseMove);
+    qApp->notify(viewport, &hoverMove);
 }

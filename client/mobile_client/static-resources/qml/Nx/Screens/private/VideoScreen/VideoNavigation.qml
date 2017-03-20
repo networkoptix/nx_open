@@ -3,6 +3,7 @@ import QtGraphicalEffects 1.0
 import QtQuick.Window 2.2
 import Qt.labs.controls 1.0
 import Nx 1.0
+import Nx.Media 1.0
 import Nx.Controls 1.0
 import com.networkoptix.qml 1.0
 
@@ -11,10 +12,10 @@ Item
     id: videoNavigation
 
     property string resourceId
-
     property var videoScreenController
+    property bool paused: videoScreenController.mediaPlayer.playbackState !== MediaPlayer.Playing
 
-    property bool paused: videoScreenController.mediaPlayer.playbackState !== QnPlayer.Playing
+    property real controlsOpacity: 1.0
 
     implicitWidth: parent ? parent.width : 0
     implicitHeight: navigator.height + navigationPanel.height
@@ -24,13 +25,33 @@ Item
     {
         id: d
 
+        property bool playbackStarted: false
+        property bool controlsNeeded:
+            !cameraChunkProvider.loading || (playbackStarted
+                && videoScreenController.mediaPlayer.mediaStatus === MediaPlayer.Loaded)
+
+        property real controlsOpacity:
+            Math.min(videoNavigation.controlsOpacity, controlsOpacityInternal)
+
+        property real controlsOpacityInternal: controlsNeeded ? 1.0 : 0.0
+        Behavior on controlsOpacityInternal { NumberAnimation { duration: 200 } }
+
+        property real timelineOpacity: cameraChunkProvider.loading ? 0.0 : 1.0
+        Behavior on timelineOpacity
+        {
+            NumberAnimation { duration: d.timelineOpacity > 0 ? 0 : 200 }
+        }
+
         readonly property bool hasArchive: timeline.startBound > 0
         readonly property bool liveMode:
-            videoScreenController && videoScreenController.mediaPlayer.liveMode
+            videoScreenController
+                && videoScreenController.mediaPlayer.liveMode
+                && !playbackController.paused
+        property real resumePosition: -1
 
         function updateNavigatorPosition()
         {
-            if (Screen.primaryOrientation == Qt.PortraitOrientation)
+            if (Screen.primaryOrientation === Qt.PortraitOrientation)
             {
                 navigator.y = 0
                 navigatorMouseArea.drag.target = undefined
@@ -49,6 +70,21 @@ Item
     {
         id: cameraChunkProvider
         resourceId: videoScreenController.resourceId
+
+        onLoadingChanged:
+        {
+            if (loading)
+                return
+
+            var liveMs = (new Date()).getTime()
+            var lastChunkEndMs = closestChunkEndMs(liveMs, false)
+
+            if (lastChunkEndMs <= 0)
+                lastChunkEndMs = liveMs
+
+            timeline.windowSize =
+                Math.max((liveMs - lastChunkEndMs) / 0.4, timeline.defaultWindowSize)
+        }
     }
 
     Timer
@@ -124,6 +160,16 @@ Item
 
         Image
         {
+            width: parent.width
+            anchors.bottom: timeline.bottom
+            height: timeline.chunkBarHeight
+            source: lp("/images/timeline_chunkbar_preloader.png")
+            sourceSize: Qt.size(timeline.chunkBarHeight, timeline.chunkBarHeight)
+            fillMode: Image.Tile
+        }
+
+        Image
+        {
             width: timeline.width
             height: sourceSize.height
             anchors.bottom: timeline.bottom
@@ -156,12 +202,19 @@ Item
             {
                 if (!moving)
                 {
-                    videoScreenController.setPosition(position)
+                    videoScreenController.setPosition(position, true)
                     if (resumeWhenDragFinished)
                         videoScreenController.play()
+                    else
+                        videoScreenController.pause()
+                    timeline.autoReturnToBounds = true
                 }
             }
-            onPositionTapped: videoScreenController.setPosition(position)
+            onPositionTapped:
+            {
+                d.resumePosition = -1
+                videoScreenController.setPosition(position, true)
+            }
             onPositionChanged:
             {
                 if (!dragging)
@@ -175,16 +228,25 @@ Item
                 if (dragging)
                 {
                     resumeWhenDragFinished = !videoNavigation.paused
-                    videoScreenController.pause()
+                    videoScreenController.preview()
+                    d.resumePosition = -1
                 }
             }
 
-            Binding
+            Connections
             {
-                target: timeline
-                property: "position"
-                value: videoScreenController.mediaPlayer.position
-                when: !timeline.moving && !d.liveMode
+                target: videoScreenController.mediaPlayer
+                onPositionChanged:
+                {
+                    if (videoScreenController.mediaPlayer.mediaStatus !== MediaPlayer.Loaded)
+                        return
+
+                    if (!timeline.moving && !d.liveMode)
+                    {
+                        timeline.autoReturnToBounds = false
+                        timeline.position = videoScreenController.mediaPlayer.position
+                    }
+                }
             }
         }
 
@@ -230,9 +292,12 @@ Item
 
         OpacityMask
         {
+            id: timelineOpactiyMask
+
             anchors.fill: timeline
             source: timeline.timelineView
             maskSource: timelineMask
+            opacity: Math.min(d.controlsOpacity, d.timelineOpacity)
 
             Component.onCompleted: timeline.timelineView.visible = false
         }
@@ -247,7 +312,7 @@ Item
             anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2
             color: ColorTheme.windowText
             visible: !d.hasArchive
-            opacity: 0.5
+            opacity: 0.5 * timelineOpactiyMask.opacity
         }
 
         Pane
@@ -267,9 +332,9 @@ Item
                 enabled: d.hasArchive
                 onClicked:
                 {
-                    calendarPanelLoader.active = true
-                    calendarPanelLoader.item.date = timeline.positionDate
-                    calendarPanelLoader.item.open()
+                    calendarPanel.chunkProvider = cameraChunkProvider
+                    calendarPanel.date = timeline.positionDate
+                    calendarPanel.open()
                 }
             }
 
@@ -335,6 +400,7 @@ Item
             width: parent.width
             anchors.bottom: timeline.bottom
             anchors.bottomMargin: timeline.chunkBarHeight + 16
+            opacity: d.controlsOpacity
 
             Text
             {
@@ -397,12 +463,26 @@ Item
 
             loading: !paused && (videoScreenController.mediaPlayer.loading || timeline.dragging)
             paused: videoNavigation.paused
+
+            opacity: d.controlsOpacity
+
             onClicked:
             {
                 if (paused)
+                {
+                    if (d.resumePosition > 0)
+                    {
+                        videoScreenController.setPosition(d.resumePosition)
+                        d.resumePosition = -1
+                    }
                     videoScreenController.play()
+                }
                 else
+                {
+                    if (d.liveMode)
+                        d.resumePosition = videoScreenController.mediaPlayer.position
                     videoScreenController.pause()
+                }
             }
         }
 
@@ -414,6 +494,7 @@ Item
             width: 2
             height: 8
             visible: d.hasArchive
+            opacity: timelineOpactiyMask.opacity
         }
 
         Rectangle
@@ -424,6 +505,7 @@ Item
             width: 2
             height: timeline.chunkBarHeight + 8
             visible: d.hasArchive
+            opacity: timelineOpactiyMask.opacity
         }
     }
 
@@ -436,34 +518,36 @@ Item
         height: navigationPanel.height
     }
 
-    Component
+    CalendarPanel
     {
-        id: calendarPanelComponent
+        id: calendarPanel
 
-        CalendarPanel
+        onDatePicked:
         {
-            chunkProvider: cameraChunkProvider
-            onDatePicked:
-            {
-                close()
-                videoScreenController.setPosition(date.getTime())
-            }
+            close()
+            d.resumePosition = -1
+            timeline.jumpTo(date.getTime())
+            videoScreenController.setPosition(date.getTime(), true)
         }
     }
-
-    Loader
-    {
-        id: calendarPanelLoader
-        sourceComponent: calendarPanelComponent
-        active: false
-        y: parent.height - height
-    }
-
-    Component.onCompleted: d.updateNavigatorPosition()
 
     Connections
     {
         target: videoScreenController
-        onPlayerJump: timeline.jumpTo(position)
+        onPlayerJump:
+        {
+            timeline.autoReturnToBounds = false
+            timeline.jumpTo(position)
+        }
+        onGotFirstPosition:
+        {
+            timeline.autoReturnToBounds = false
+            timeline.jumpTo(position)
+            d.playbackStarted = true
+        }
     }
+
+    onResourceIdChanged: d.playbackStarted = false
+
+    Component.onCompleted: d.updateNavigatorPosition()
 }

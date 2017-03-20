@@ -85,12 +85,17 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
 
     QnFfmpegHelper::deleteAvCodecContext(m_encoderCtx);
     QnFfmpegHelper::deleteAvCodecContext(m_decoderCtx);
-    
+
     av_frame_free(&m_frameDecodeTo);
     av_frame_free(&m_frameToEncode);
 
     if (m_sampleBuffers)
+    {
+        // AllocSampleBuffers does two av_allocs: buffer for pointers and payload data.
+        // It requires two free calls.
         av_freep(m_sampleBuffers);
+        av_freep(&m_sampleBuffers);
+    }
 
     if (m_resampleDstBuffers)
         delete[] m_resampleDstBuffers;
@@ -203,11 +208,9 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
         m_lastTimestamp = media->timestamp;
 
-        AVPacket packetToDecode;
-        av_init_packet(&packetToDecode);
-
-        packetToDecode.data = const_cast<quint8*>((const quint8*)media->data());
-        packetToDecode.size = static_cast<int>(media->dataSize());
+        QnFfmpegAvPacket packetToDecode(
+            const_cast<quint8*>((const quint8*) media->data()),
+            static_cast<int>(media->dataSize()));
 
         error = avcodec_send_packet(m_decoderCtx, &packetToDecode);
 
@@ -223,7 +226,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
     if (error)
     {
-        m_lastErrMessage = tr("Couldn't initialize resampling context, error code: %1")
+        m_lastErrMessage = tr("Could not initialize resampling context, error code: %1")
             .arg(error);
         return error;
     }
@@ -231,7 +234,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
     error = allocSampleBuffers(m_decoderCtx, m_encoderCtx, m_resampleCtx);
     if (error)
     {
-        m_lastErrMessage = tr("Couldn't allocate sample buffers, error code: %1")
+        m_lastErrMessage = tr("Could not allocate sample buffers, error code: %1")
             .arg(error);
         return error;
     }
@@ -254,14 +257,12 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
             if (error)
             {
-                m_lastErrMessage = tr("Couldn't send audio frame to encoder, Error code: %1.")
+                m_lastErrMessage = tr("Could not send audio frame to encoder, Error code: %1.")
                     .arg(error);
                 return error;
             }
 
-            AVPacket encodedPacket;
-            av_init_packet(&encodedPacket);
-
+            QnFfmpegAvPacket encodedPacket;
             error = avcodec_receive_packet(m_encoderCtx, &encodedPacket);
 
             // Not enough data to encode packet.
@@ -270,7 +271,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
             if (error)
             {
-                m_lastErrMessage = tr("Couldn't receive audio packet from encoder, Error code: %1.")
+                m_lastErrMessage = tr("Could not receive audio packet from encoder, Error code: %1.")
                     .arg(error);
                 return error;
             }
@@ -295,7 +296,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
         if (error)
         {
-            m_lastErrMessage = tr("Couldn't receive audio frame from decoder, Error code: %1.")
+            m_lastErrMessage = tr("Could not receive audio frame from decoder, Error code: %1.")
                 .arg(error);
             return error;
         }
@@ -396,7 +397,7 @@ int QnFfmpegAudioTranscoder::allocSampleBuffers(
         inCtx->sample_rate,
         AV_ROUND_UP);
 
-    std::size_t bufferSize = outSampleCount + outCtx->frame_size;    
+    std::size_t bufferSize = outSampleCount + outCtx->frame_size;
 
     int linesize = 0;
     const int kDefaultAlign = 0;
@@ -487,7 +488,7 @@ int QnFfmpegAudioTranscoder::doResample()
 
     for (std::size_t bufferNum = 0; bufferNum < buffersCount; ++bufferNum)
     {
-        m_resampleDstBuffers[bufferNum] += outSamplesPerChannel 
+        m_resampleDstBuffers[bufferNum] += outSamplesPerChannel
             * getSampleMultiplyCoefficient(m_encoderCtx);
     }
 

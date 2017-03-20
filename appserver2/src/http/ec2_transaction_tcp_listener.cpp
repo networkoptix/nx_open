@@ -265,6 +265,9 @@ void QnTransactionTcpProcessor::run()
     if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(remotePeer.id) && !remotePeer.isClient())
         fail = true; // accept only allowed peers
 
+    if (remotePeer.id == qnCommon->moduleGUID())
+        fail = true; //< Rejecting connect from ourselves.
+
     d->chunkedMode = false;
     //d->response.headers.emplace( "Connection", "close" );
     if( fail )

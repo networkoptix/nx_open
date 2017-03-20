@@ -811,18 +811,10 @@ QByteArray QnRtspClient::calcDefaultNonce() const
 #if 1
 void QnRtspClient::addAuth( nx_http::Request* const request )
 {
-    if(m_defaultAuthScheme != nx_http::header::AuthScheme::automatic)
-    {
-        QnClientAuthHelper::addAuthorizationToRequest(
-            m_auth,
-            request,
-            &m_rtspAuthCtx );   //ignoring result
-    }
-    else
-    {
-        m_defaultAuthScheme = nx_http::header::AuthScheme::basic;
-        m_rtspAuthCtx.authenticateHeader = nx_http::header::WWWAuthenticate(m_defaultAuthScheme);
-    }
+    QnClientAuthHelper::addAuthorizationToRequest(
+        m_auth,
+        request,
+        &m_rtspAuthCtx );   //ignoring result
 }
 #else
 void QnRtspClient::addAuth(QByteArray& request)
@@ -1970,6 +1962,7 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx_http::Request&& request, QB
                 break;
 
             default:
+                m_serverInfo = nx_http::getHeaderValue(response.headers, nx_http::header::Server::NAME);
                 return true;
         }
 
@@ -1982,6 +1975,11 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx_http::Request&& request, QB
     }
 
     return false;
+}
+
+QByteArray QnRtspClient::serverInfo() const
+{
+    return m_serverInfo;
 }
 
 QnRtspClient::TrackMap QnRtspClient::getTrackInfo() const

@@ -206,14 +206,17 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(workbench(), SIGNAL(cellSpacingChanged()), this, SLOT(at_workbench_cellSpacingChanged()));
     connect(workbench(), SIGNAL(currentLayoutChanged()), this, SLOT(at_workbench_currentLayoutChanged()));
 
-    connect(action(QnActions::ShowcaseAction), SIGNAL(triggered()), this, SLOT(at_showcaseAction_triggered()));
     connect(action(QnActions::AboutAction), SIGNAL(triggered()), this, SLOT(at_aboutAction_triggered()));
     connect(action(QnActions::OpenFileAction), SIGNAL(triggered()), this, SLOT(at_openFileAction_triggered()));
     connect(action(QnActions::OpenFolderAction), SIGNAL(triggered()), this, SLOT(at_openFolderAction_triggered()));
 
     // local settings
-    connect(action(QnActions::PreferencesGeneralTabAction), SIGNAL(triggered()), this, SLOT(at_preferencesGeneralTabAction_triggered()));
-    connect(action(QnActions::PreferencesNotificationTabAction), SIGNAL(triggered()), this, SLOT(at_preferencesNotificationTabAction_triggered()));
+    connect(action(QnActions::PreferencesGeneralTabAction), &QAction::triggered, this,
+        [this] { openLocalSettingsDialog(QnLocalSettingsDialog::GeneralPage); },
+        Qt::QueuedConnection);
+    connect(action(QnActions::PreferencesNotificationTabAction), &QAction::triggered, this,
+        [this] { openLocalSettingsDialog(QnLocalSettingsDialog::NotificationsPage); },
+        Qt::QueuedConnection);
 
     // system administration
     connect(action(QnActions::SystemAdministrationAction), &QAction::triggered, this,
@@ -277,11 +280,32 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent) :
     connect(action(QnActions::AdjustVideoAction), SIGNAL(triggered()), this, SLOT(at_adjustVideoAction_triggered()));
     connect(action(QnActions::ExitAction), &QAction::triggered, this, &QnWorkbenchActionHandler::closeApplication);
     connect(action(QnActions::ThumbnailsSearchAction), SIGNAL(triggered()), this, SLOT(at_thumbnailsSearchAction_triggered()));
-    connect(action(QnActions::SetCurrentLayoutItemSpacing0Action), SIGNAL(triggered()), this, SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
-    connect(action(QnActions::SetCurrentLayoutItemSpacing10Action), SIGNAL(triggered()), this, SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
-    connect(action(QnActions::SetCurrentLayoutItemSpacing20Action), SIGNAL(triggered()), this, SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
-    connect(action(QnActions::SetCurrentLayoutItemSpacing30Action), SIGNAL(triggered()), this, SLOT(at_setCurrentLayoutItemSpacing30Action_triggered()));
     connect(action(QnActions::CreateZoomWindowAction), SIGNAL(triggered()), this, SLOT(at_createZoomWindowAction_triggered()));
+
+    connect(action(QnActions::SetCurrentLayoutItemSpacingNoneAction), &QAction::triggered, this,
+        [this]
+        {
+            setCurrentLayoutCellSpacing(Qn::CellSpacing::None);
+        });
+
+    connect(action(QnActions::SetCurrentLayoutItemSpacingSmallAction), &QAction::triggered, this,
+        [this]
+        {
+            setCurrentLayoutCellSpacing(Qn::CellSpacing::Small);
+        });
+
+    connect(action(QnActions::SetCurrentLayoutItemSpacingMediumAction), &QAction::triggered, this,
+        [this]
+        {
+            setCurrentLayoutCellSpacing(Qn::CellSpacing::Medium);
+        });
+
+    connect(action(QnActions::SetCurrentLayoutItemSpacingLargeAction), &QAction::triggered, this,
+        [this]
+        {
+            setCurrentLayoutCellSpacing(Qn::CellSpacing::Large);
+        });
+
     connect(action(QnActions::Rotate0Action), &QAction::triggered, this, [this] { rotateItems(0); });
     connect(action(QnActions::Rotate90Action), &QAction::triggered, this, [this] { rotateItems(90); });
     connect(action(QnActions::Rotate180Action), &QAction::triggered, this, [this] { rotateItems(180); });
@@ -421,9 +445,11 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     arguments << lit("--no-single-application");
     arguments << lit("--no-version-mismatch-check");
 
-    if (context()->user()) {
+    if (context()->user())
+    {
         arguments << lit("--auth");
-        arguments << QString::fromUtf8(QnAppServerConnectionFactory::url().toEncoded());
+        arguments << QnStartupParameters::createAuthenticationString(
+            QnAppServerConnectionFactory::url());
     }
 
     if (mainWindow())
@@ -455,7 +481,36 @@ void QnWorkbenchActionHandler::setResolutionMode(Qn::ResolutionMode resolutionMo
         qnRedAssController->setMode(resolutionMode);
 }
 
-QnBusinessRulesDialog *QnWorkbenchActionHandler::businessRulesDialog() const {
+void QnWorkbenchActionHandler::setCurrentLayoutCellSpacing(Qn::CellSpacing spacing)
+{
+    //TODO: #GDM #3.1 move out these actions to separate CurrentLayoutHandler
+    // There at_workbench_cellSpacingChanged will also use this method
+    auto actionId = [spacing]
+        {
+            switch (spacing)
+            {
+                case Qn::CellSpacing::None:
+                    return QnActions::SetCurrentLayoutItemSpacingNoneAction;
+                case Qn::CellSpacing::Small:
+                    return QnActions::SetCurrentLayoutItemSpacingSmallAction;
+                case Qn::CellSpacing::Medium:
+                    return QnActions::SetCurrentLayoutItemSpacingMediumAction;
+                case Qn::CellSpacing::Large:
+                    return QnActions::SetCurrentLayoutItemSpacingLargeAction;
+            }
+            NX_ASSERT(false);
+            return QnActions::SetCurrentLayoutItemSpacingSmallAction;
+        };
+
+    if (auto layout = workbench()->currentLayout()->resource())
+    {
+        layout->setCellSpacing(QnWorkbenchLayout::cellSpacingValue(spacing));
+        action(actionId())->setChecked(true);
+    }
+}
+
+QnBusinessRulesDialog *QnWorkbenchActionHandler::businessRulesDialog() const
+{
     return m_businessRulesDialog.data();
 }
 
@@ -580,13 +635,13 @@ void QnWorkbenchActionHandler::at_workbench_cellSpacingChanged()
     qreal value = workbench()->currentLayout()->cellSpacing();
 
     if (qFuzzyIsNull(value))
-        action(QnActions::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
-    else if (qFuzzyCompare(0.1, value))
-        action(QnActions::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
-    else if (qFuzzyCompare(0.15, value))
-        action(QnActions::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
+        action(QnActions::SetCurrentLayoutItemSpacingNoneAction)->setChecked(true);
+    else if (qFuzzyCompare(QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Medium), value))
+        action(QnActions::SetCurrentLayoutItemSpacingMediumAction)->setChecked(true);
+    else if (qFuzzyCompare(QnWorkbenchLayout::cellSpacingValue(Qn::CellSpacing::Large), value))
+        action(QnActions::SetCurrentLayoutItemSpacingLargeAction)->setChecked(true);
     else
-        action(QnActions::SetCurrentLayoutItemSpacing10Action)->setChecked(true); //default value
+        action(QnActions::SetCurrentLayoutItemSpacingSmallAction)->setChecked(true); //default value
 }
 
 void QnWorkbenchActionHandler::at_workbench_currentLayoutChanged() {
@@ -659,7 +714,10 @@ void QnWorkbenchActionHandler::at_openInLayoutAction_triggered()
             AddToLayoutParams addParams;
             addParams.usePosition = !position.isNull();
             addParams.position = position;
-            addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
+
+            // Live viewers must not open items on archive position
+            if (accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission))
+                addParams.time = parameters.argument<qint64>(Qn::ItemTimeRole, -1);
             addToLayout(layout, resources, addParams);
         }
     }
@@ -813,7 +871,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
             text, extras, QDialogButtonBox::Ok, QDialogButtonBox::Ok,
             mainWindow());
 
-        messageBox.addCustomWidget(new QnResourceListView(modifiedResources));
+        messageBox.addCustomWidget(new QnResourceListView(modifiedResources, &messageBox));
         messageBox.exec();
         return;
     }
@@ -836,11 +894,11 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
     {
         const auto text = QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
-                tr("Server \"%1\" can't access %n devices. Move them anyway?",
+                tr("Server \"%1\" cannot access %n devices. Move them anyway?",
                     "", errorResources.size()),
-                tr("Server \"%1\" can't access %n cameras. Move them anyway?",
+                tr("Server \"%1\" cannot access %n cameras. Move them anyway?",
                     "", errorResources.size()),
-                tr("Server \"%1\" can't access %n I/O modules. Move them anyway?",
+                tr("Server \"%1\" cannot access %n I/O modules. Move them anyway?",
                     "", errorResources.size())),
             errorResources).arg(server->getName());
 
@@ -852,7 +910,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
         messageBox.addButton(tr("Move"), QDialogButtonBox::YesRole, QnButtonAccent::Standard);
         const auto skipButton = messageBox.addCustomButton(QnMessageBoxCustomButton::Skip,
             QDialogButtonBox::NoRole);
-        messageBox.addCustomWidget(new QnResourceListView(errorResources));
+        messageBox.addCustomWidget(new QnResourceListView(errorResources, &messageBox));
 
         const auto result = messageBox.exec();
         if (result == QDialogButtonBox::Cancel)
@@ -1027,9 +1085,11 @@ void QnWorkbenchActionHandler::openSystemAdministrationDialog(int page)
     systemAdministrationDialog()->setCurrentPage(page);
 }
 
-void QnWorkbenchActionHandler::at_showcaseAction_triggered()
+void QnWorkbenchActionHandler::openLocalSettingsDialog(int page)
 {
-    QDesktopServices::openUrl(qnSettings->showcaseUrl());
+    QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindow()));
+    dialog->setCurrentPage(page);
+    dialog->exec();
 }
 
 void QnWorkbenchActionHandler::at_aboutAction_triggered() {
@@ -1038,36 +1098,24 @@ void QnWorkbenchActionHandler::at_aboutAction_triggered() {
     dialog->exec();
 }
 
-void QnWorkbenchActionHandler::at_preferencesGeneralTabAction_triggered() {
-    QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindow()));
-    dialog->setCurrentPage(QnLocalSettingsDialog::GeneralPage);
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
-void QnWorkbenchActionHandler::at_preferencesNotificationTabAction_triggered() {
-    QScopedPointer<QnLocalSettingsDialog> dialog(new QnLocalSettingsDialog(mainWindow()));
-    dialog->setCurrentPage(QnLocalSettingsDialog::NotificationsPage);
-    dialog->setWindowModality(Qt::ApplicationModal);
-    dialog->exec();
-}
-
 void QnWorkbenchActionHandler::at_businessEventsAction_triggered() {
     menu()->trigger(QnActions::OpenBusinessRulesAction);
 }
 
-void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered() {
+void QnWorkbenchActionHandler::at_openBusinessRulesAction_triggered()
+{
     QnNonModalDialogConstructor<QnBusinessRulesDialog> dialogConstructor(m_businessRulesDialog, mainWindow());
 
-    QString filter;
+    QStringList filter;
     QnActionParameters parameters = menu()->currentParameters(sender());
     QnVirtualCameraResourceList cameras = parameters.resources().filtered<QnVirtualCameraResource>();
-    if (!cameras.isEmpty()) {
-        foreach(const QnVirtualCameraResourcePtr &camera, cameras) {
-            filter += camera->getPhysicalId(); //getUniqueId() cannot be used here --gdm
-        }
+    if (!cameras.isEmpty())
+    {
+        NX_ASSERT(cameras.size() == 1); // currently filter is not implemented for several cameras
+        for (const auto& camera: cameras)
+            filter.append(camera->getId().toSimpleString());
     }
-    businessRulesDialog()->setFilter(filter);
+    businessRulesDialog()->setFilter(filter.join(L' '));
 }
 
 void QnWorkbenchActionHandler::at_webClientAction_triggered()
@@ -1262,7 +1310,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered()
     {
         QnMessageBox::warning(mainWindow(),
             tr("Too short period selected"),
-            tr("Can't perform Preview Search. Please select a period of 15 seconds or longer."));
+            tr("Cannot perform Preview Search. Please select a period of 15 seconds or longer."));
         return;
     }
 
@@ -1525,7 +1573,7 @@ void QnWorkbenchActionHandler::at_deleteFromDiskAction_triggered()
         QDialogButtonBox::Yes | QDialogButtonBox::No, QDialogButtonBox::Yes,
         mainWindow());
 
-    messageBox.addCustomWidget(new QnResourceListView(resources));
+    messageBox.addCustomWidget(new QnResourceListView(resources, &messageBox));
     auto result = messageBox.exec();
     if (result != QDialogButtonBox::Yes)
         return;
@@ -1701,43 +1749,6 @@ void QnWorkbenchActionHandler::at_adjustVideoAction_triggered()
     adjustVideoDialog()->setWidget(widget);
 }
 
-
-void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing0Action_triggered()
-{
-    if (auto layout = workbench()->currentLayout()->resource())
-    {
-        layout->setCellSpacing(0.0);
-        action(QnActions::SetCurrentLayoutItemSpacing0Action)->setChecked(true);
-    }
-}
-
-void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing10Action_triggered()
-{
-    if (auto layout = workbench()->currentLayout()->resource())
-    {
-        layout->setCellSpacing(0.05);
-        action(QnActions::SetCurrentLayoutItemSpacing10Action)->setChecked(true);
-    }
-}
-
-void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing20Action_triggered()
-{
-    if (auto layout = workbench()->currentLayout()->resource())
-    {
-        layout->setCellSpacing(0.1);
-        action(QnActions::SetCurrentLayoutItemSpacing20Action)->setChecked(true);
-    }
-}
-
-void QnWorkbenchActionHandler::at_setCurrentLayoutItemSpacing30Action_triggered()
-{
-    if (auto layout = workbench()->currentLayout()->resource())
-    {
-        layout->setCellSpacing(0.15);
-        action(QnActions::SetCurrentLayoutItemSpacing30Action)->setChecked(true);
-    }
-}
-
 void QnWorkbenchActionHandler::at_createZoomWindowAction_triggered() {
     QnActionParameters params = menu()->currentParameters(sender());
 
@@ -1794,6 +1805,8 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
 
         if (status == QnAppServerFileCache::OperationResult::sizeLimitExceeded)
         {
+            //TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
+            //Important: maximumFileSize() is hardcoded in 1024-base
             const auto maxFileSize = QnAppServerFileCache::maximumFileSize() / (1024 * 1024);
             QnMessageBox::warning(mainWindow(),
                 tr("Image too big"),
@@ -2038,7 +2051,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered()
     QScopedPointer<QnSessionAwareMessageBox> messageBox(
         new QnSessionAwareMessageBox(mainWindow()));
     messageBox->setIcon(QnMessageBoxIcon::Warning);
-    messageBox->setText(tr("Components of the System have different versions:"));
+    messageBox->setText(tr("Components of System have different versions:"));
     messageBox->setInformativeText(extras);
     messageBox->setCheckBoxEnabled();
 
@@ -2100,9 +2113,9 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
         return;
 
     QnMessageBox::information(mainWindow(),
-        tr("The System sends anonymous usage statistics"),
+        tr("System sends anonymous usage statistics"),
         tr("It will be used by software development team to improve your user experience.")
-            + L'\n' + tr("To disable it, go to the System Administration dialog."));
+            + L'\n' + tr("To disable it, go to System Administration dialog."));
 
     qnGlobalSettings->setStatisticsAllowed(true);
     qnGlobalSettings->synchronizeNow();

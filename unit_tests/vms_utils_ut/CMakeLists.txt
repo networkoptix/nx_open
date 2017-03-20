@@ -1,0 +1,1 @@
+nx_add_target(nx_vms_utils_ut EXECUTABLE PUBLIC_LIBS nx_vms_utils GTest GMock)

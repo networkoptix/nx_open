@@ -98,7 +98,15 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    m_exportLicensesButton = new QPushButton(ui->groupBox);
+    QString alertText = tr("You do not have a valid license installed.") + L' ';
+    alertText += QnAppInfo::freeLicenseCount() > 0
+        ? tr("Please activate your commercial or trial license.")
+        : tr("Please activate your commercial license.");
+    ui->alertBar->setText(alertText);
+    ui->alertBar->setReservedSpace(false);
+    ui->alertBar->setVisible(false);
+
+    m_exportLicensesButton = new QPushButton(ui->licensesGroupBox);
     auto anchor = new QnWidgetAnchor(m_exportLicensesButton);
     anchor->setEdges(Qt::TopEdge | Qt::RightEdge);
     static const int kButtonTopAdjustment = -4;
@@ -230,6 +238,8 @@ void QnLicenseManagerWidget::updateLicenses()
 
     /* Update grid. */
     m_model->updateLicenses(m_licenses);
+    ui->licensesGroupBox->setVisible(!m_licenses.isEmpty());
+    ui->alertBar->setVisible(m_licenses.isEmpty());
 
     /* Update info label. */
     if (!m_licenses.isEmpty())
@@ -242,7 +252,7 @@ void QnLicenseManagerWidget::updateLicenses()
         QnVideoWallLicenseUsageHelper vwUsageHelper;
         QList<QnLicenseUsageHelper*> helpers{ &camUsageHelper, &vwUsageHelper };
 
-        for (QnLicenseUsageHelper* helper: helpers)
+        for (auto helper: helpers)
         {
             for(Qn::LicenseType lt: helper->licenseTypes())
             {
@@ -251,46 +261,28 @@ void QnLicenseManagerWidget::updateLicenses()
             }
         }
 
-        for (QnLicenseUsageHelper* helper: helpers)
+        for (auto helper: helpers)
         {
-            if (!helper->isValid())
+            for (Qn::LicenseType lt: helper->licenseTypes())
             {
-                for (Qn::LicenseType lt: helper->licenseTypes())
+                if (helper->usedLicenses(lt) == 0)
+                    continue;
+
+                if (helper->isValid(lt))
                 {
-                    if (helper->usedLicenses(lt) > 0)
-                    {
-                        messages << setWarningStyleHtml(tr("At least %n %2 are required", "",
-                            helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt)));
-                    }
+                    messages << tr("%n %1 are currently in use", "", helper->usedLicenses(lt))
+                        .arg(QnLicense::longDisplayName(lt));
                 }
-            }
-            else
-            {
-                for (Qn::LicenseType lt: helper->licenseTypes())
+                else
                 {
-                    if (helper->usedLicenses(lt) > 0)
-                    {
-                        messages << tr("%n %2 are currently in use", "", helper->usedLicenses(lt))
-                            .arg(QnLicense::longDisplayName(lt));
-                    }
+                    messages << setWarningStyleHtml(tr("At least %n %1 are required", "",
+                        helper->usedLicenses(lt)).arg(QnLicense::longDisplayName(lt)));
                 }
+
+
             }
         }
         ui->infoLabel->setText(messages.join(lit("<br/>")));
-    }
-    else
-    {
-        if (qnLicensePool->currentHardwareId().isEmpty())
-        {
-            ui->infoLabel->setText(tr("Obtaining licenses from server..."));
-        }
-        else
-        {
-            QString text = (QnAppInfo::freeLicenseCount() > 0)
-                ? tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial or trial license.")
-                : tr("You do not have a valid license installed.") + L'\n' + tr("Please activate your commercial license.");
-            ui->infoLabel->setText(setWarningStyleHtml(text));
-        }
     }
 
     updateButtons();
@@ -320,6 +312,7 @@ void QnLicenseManagerWidget::showMessage(
     QScopedPointer<QnSessionAwareMessageBox> messageBox(new QnSessionAwareMessageBox(this));
     messageBox->setIcon(icon);
     messageBox->setText(text);
+    messageBox->setInformativeText(extras);
 
     if (button == CopyToClipboardButton::Show)
     {
@@ -328,6 +321,7 @@ void QnLicenseManagerWidget::showMessage(
         connect(button, &QPushButton::clicked, this,
             [this, extras] { qApp->clipboard()->setText(extras); });
     }
+
     messageBox->setStandardButtons(QDialogButtonBox::Ok);
     messageBox->setEscapeButton(QDialogButtonBox::Ok);
     messageBox->setDefaultButton(QDialogButtonBox::Ok);
@@ -723,9 +717,9 @@ void QnLicenseManagerWidget::showActivationMessageLater(const QJsonObject& error
     }
     else if (messageId == lit("InvalidKey"))
     {
-        showMessageLater(QnMessageBoxIcon::Critical,
+        showMessageLater(QnMessageBoxIcon::Warning,
             tr("Invalid license key"),
-            tr("Please make sure it is entered correctly. ")
+            tr("Please make sure it is entered correctly.")
             + L'\n' + getProblemPersistMessage(),
             CopyToClipboardButton::Hide);
     }
@@ -773,9 +767,11 @@ void QnLicenseManagerWidget::showAlreadyActivatedLater(
     const QString& hwid,
     const QString& time)
 {
+
+    //TODO: #GDM #tr almost the same as in QnLicenseUsageHelper::activationMessage
     auto extras = (time.isEmpty()
-        ? tr("This license is already activated and linked to hardware id %1").arg(hwid)
-        : tr("This license is already activated and linked to hardware id %1 on %2")
+        ? tr("This license is already activated and linked to hardware ID %1").arg(hwid)
+        : tr("This license is already activated and linked to hardware ID %1 on %2")
             .arg(hwid).arg(time));
 
     extras += L'\n' + getContactSupportMessage();

@@ -27,100 +27,111 @@ Page
         property bool connecting: false
     }
 
-    Column
+    Flickable
     {
-        width: parent.width
-        leftPadding: 8
-        rightPadding: 8
-        spacing: 8
-        enabled: !d.connecting
+        anchors.fill: parent
+        contentWidth: contentColumn.width
+        contentHeight: contentColumn.height
+        bottomMargin: 16
 
-        property real availableWidth: width - leftPadding - rightPadding
-
-        SessionCredentialsEditor
+        Column
         {
-            id: credentialsEditor
+            id: contentColumn
 
-            hostsModel: SystemHostsModel
+            width: customConnectionScreen.width
+            leftPadding: 8
+            rightPadding: 8
+            spacing: 8
+            enabled: !d.connecting
+
+            property real availableWidth: width - leftPadding - rightPadding
+
+            SessionCredentialsEditor
             {
-                id: systemHostsModel
-            }
+                id: credentialsEditor
 
-            authenticationDataModel: AuthenticationDataModel
-            {
-                id: authenticationDataModel
-            }
-
-            width: parent.availableWidth
-            onAccepted: customConnectionScreen.connect()
-        }
-
-        Item
-        {
-            width: 1
-            height: 8
-        }
-
-        LoginButton
-        {
-            id: connectButton
-
-            width: parent.availableWidth
-            showProgress: d.connecting
-            onClicked: customConnectionScreen.connect()
-        }
-
-        Button
-        {
-            width: parent.availableWidth
-            text: qsTr("Delete")
-            visible: saved
-
-            onClicked:
-            {
-                var title
-                var message
-
-                var lastCredentials = authenticationDataAccessor.count <= 1
-
-                if (!lastCredentials)
+                hostsModel: SystemHostsModel
                 {
-                    title = qsTr("Delete login \"%1\"?").arg(credentialsEditor.login)
-                    message = qsTr(
-                        "Server addresses and other logins will remain saved. "
-                            + "To delete all connection information "
-                            + "you should delete all saved logins.")
-                }
-                else
-                {
-                    title = qsTr("Delete connection?")
+                    id: systemHostsModel
+                    localSystemId: control.localSystemId
                 }
 
-                var dialog = Workflow.openStandardDialog(
-                    title, message,
-                    [
-                        { "id": "DELETE", "text": qsTr("Delete") },
-                        "CANCEL"
-                    ])
+                authenticationDataModel: AuthenticationDataModel
+                {
+                    id: authenticationDataModel
+                }
 
-                dialog.buttonClicked.connect(
-                    function(buttonId)
+                width: parent.availableWidth
+                onAccepted: customConnectionScreen.connect()
+            }
+
+            Item
+            {
+                width: 1
+                height: 8
+            }
+
+            LoginButton
+            {
+                id: connectButton
+
+                width: parent.availableWidth
+                showProgress: d.connecting
+                onClicked: customConnectionScreen.connect()
+            }
+
+            Button
+            {
+                width: parent.availableWidth
+                text: qsTr("Delete")
+                visible: saved
+
+                onClicked:
+                {
+                    var title
+                    var message
+
+                    var lastCredentials = authenticationDataAccessor.count <= 1
+
+                    if (!lastCredentials)
                     {
-                        if (buttonId !== "DELETE")
-                            return
+                        title = qsTr("Delete login \"%1\"?").arg(credentialsEditor.login)
+                        message = qsTr(
+                            "Server addresses and other logins will remain saved. "
+                                + "To delete all connection information "
+                                + "you should delete all saved logins.")
+                    }
+                    else
+                    {
+                        title = qsTr("Delete connection?")
+                    }
 
-                        removeSavedConnection(localSystemId, credentialsEditor.login)
+                    var dialog = Workflow.openStandardDialog(
+                        title, message,
+                        [
+                            { "id": "DELETE", "text": qsTr("Delete") },
+                            "CANCEL"
+                        ])
 
-                        if (lastCredentials)
+                    dialog.buttonClicked.connect(
+                        function(buttonId)
                         {
-                            Workflow.popCurrentScreen()
-                            return
-                        }
+                            if (buttonId !== "DELETE")
+                                return
 
-                        var credentials = authenticationDataModel.defaultCredentials
-                        credentialsEditor.login = credentials.user
-                        credentialsEditor.password = credentials.password
-                    })
+                            removeSavedConnection(localSystemId, credentialsEditor.login)
+
+                            if (lastCredentials)
+                            {
+                                Workflow.popCurrentScreen()
+                                return
+                            }
+
+                            var credentials = authenticationDataModel.defaultCredentials
+                            credentialsEditor.login = credentials.user
+                            credentialsEditor.password = credentials.password
+                        })
+                }
             }
         }
     }
@@ -138,7 +149,7 @@ Page
         onConnectionStateChanged:
         {
             if (connectionManager.connectionState === QnConnectionManager.Connected)
-                Workflow.openResourcesScreen(connectionManager.systemName)
+                Workflow.openResourcesScreen(connectionManager.systemName || systemName)
         }
 
         onConnectionFailed:
@@ -152,17 +163,22 @@ Page
     {
         hideWarning()
 
-        if (credentialsEditor.address.trim().length == 0)
+        if (credentialsEditor.address.trim().length === 0)
         {
             credentialsEditor.addressErrorText = qsTr("Enter server address")
             credentialsEditor.displayAddressError = true
             return false
         }
-        else if ((credentialsEditor.login.trim().length == 0)
-            || (credentialsEditor.password.trim().length == 0))
+        else if (credentialsEditor.login.trim().length === 0)
         {
-            credentialsEditor.credentialsErrorText = qsTr("All fields must be filled")
-            credentialsEditor.displayUserCredentialsError = true
+            credentialsEditor.loginErrorText = qsTr("Login cannot be empty")
+            credentialsEditor.displayLoginError = true
+            return false
+        }
+        else if (credentialsEditor.password.trim().length === 0)
+        {
+            credentialsEditor.passwordErrorText = qsTr("Password cannot be empty")
+            credentialsEditor.displayPasswordError = true
             return false
         }
         return true
@@ -180,11 +196,13 @@ Page
 
     function showWarning(status, info)
     {
-        if (status == QnConnectionManager.UnauthorizedConnectionResult)
+        if (status === QnConnectionManager.UnauthorizedConnectionResult)
         {
-            credentialsEditor.credentialsErrorText =
+            credentialsEditor.loginErrorText = ""
+            credentialsEditor.passwordErrorText =
                 LoginUtils.connectionErrorText(QnConnectionManager.UnauthorizedConnectionResult)
-            credentialsEditor.displayUserCredentialsError = true
+            credentialsEditor.displayLoginError = true
+            credentialsEditor.displayPasswordError = true
         }
         else
         {
@@ -192,13 +210,14 @@ Page
             credentialsEditor.displayAddressError = true
         }
 
-        if (status == QnConnectionManager.IncompatibleVersionConnectionResult)
+        if (status === QnConnectionManager.IncompatibleVersionConnectionResult)
             Workflow.openOldClientDownloadSuggestion()
     }
 
     function hideWarning()
     {
-        credentialsEditor.displayUserCredentialsError = false
+        credentialsEditor.displayLoginError = false
+        credentialsEditor.displayPasswordError = false
         credentialsEditor.displayAddressError = false
     }
 

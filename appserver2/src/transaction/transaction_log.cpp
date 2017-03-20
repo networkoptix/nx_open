@@ -343,8 +343,8 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
     NX_ASSERT(tran.persistentInfo.sequence != 0);
     if (m_state.values.value(key) >= tran.persistentInfo.sequence) {
         NX_LOG( QnLog::EC2_TRAN_LOG,
-            lit("Transaction log contains transaction %1 because of precessed seq: %2 >= %3").
-            arg(tran.toString()).arg(m_state.values.value(key)).arg(tran.persistentInfo.sequence), cl_logDEBUG1 );
+            lit("Transaction log contains transaction %1, hash=%2 because of precessed seq: %3 >= %4").
+            arg(tran.toString()).arg(hash.toString()).arg(m_state.values.value(key)).arg(tran.persistentInfo.sequence), cl_logDEBUG1 );
         return Reason_Sequence;
     }
     const auto itr = m_updateHistory.find(hash);
@@ -357,8 +357,8 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
         rez = key < itr.value().updatedBy;
     if (rez) {
         NX_LOG( QnLog::EC2_TRAN_LOG,
-            lm("Transaction log contains transaction %1 because of timestamp: %2 >= %3").
-            arg(tran.toString()).str(lastTime).str(tran.persistentInfo.timestamp), cl_logDEBUG1 );
+            lm("Transaction log contains transaction %1, hash=%2 because of timestamp: %3 >= %4").
+            arg(tran.toString()).arg(hash.toString()).str(lastTime).str(tran.persistentInfo.timestamp), cl_logDEBUG1 );
         return Reason_Timestamp;
     }
     else {

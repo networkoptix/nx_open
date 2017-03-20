@@ -207,7 +207,7 @@
       <item row="1" column="0">
        <widget class="QCheckBox" name="autoStartCheckBox">
         <property name="text">
-         <string>Run application when PC Boots</string>
+         <string>Run Application when PC Boots up</string>
         </property>
        </widget>
       </item>

@@ -17,10 +17,33 @@ namespace nx_http {
 static const nx::Buffer kPlayMessage("PLAY\r\n");
 static const nx::Buffer kTeardownMessage("TEARDOWN\r\n");
 
+class ThreadStorage
+{
+public:
+    ~ThreadStorage()
+    {
+        for (auto& thread: m_threads)
+            thread.join();
+    }
+
+    void add(nx::utils::thread thread)
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_threads.emplace_back(std::move(thread));
+    }
+
+private:
+    QnMutex m_mutex;
+    std::vector<nx::utils::thread> m_threads;
+};
+
 class TakingSocketRestHandler: public nx_http::AbstractHttpRequestHandler
 {
-    
 public:
+    TakingSocketRestHandler(ThreadStorage* threadStorage)
+        : m_threadStorage(threadStorage)
+    {
+    }
 
     virtual void processRequest(
         nx_http::HttpServerConnection* const /*connection*/,
@@ -31,11 +54,10 @@ public:
     {
         nx_http::ConnectionEvents events;
         events.onResponseHasBeenSent = 
-            [](nx_http::HttpServerConnection* connection)
+            [threadStorage = m_threadStorage](nx_http::HttpServerConnection* connection)
             {
-                auto socket = connection->takeSocket();
-                std::thread serverThread(
-                    [sock = std::move(socket)]()
+                threadStorage->add(nx::utils::thread(
+                    [sock = connection->takeSocket()]()
                     {
                         int result = 0;
                         sock->setNonBlockingMode(false);
@@ -49,9 +71,7 @@ public:
 
                         ASSERT_GT(result, 0);
                         std::this_thread::sleep_for(std::chrono::seconds(1));   
-                    });
-                
-                serverThread.detach();
+                    }));
             };
 
         completionHandler(
@@ -60,6 +80,9 @@ public:
                 std::make_unique<nx_http::EmptyMessageBodySource>(nx::String(), boost::none),
                 std::move(events)));
     }
+
+private:
+    ThreadStorage* m_threadStorage;
 };
 
 class TakingHttpSocketTest: public ::testing::Test
@@ -145,8 +168,11 @@ protected:
         for (int i = 0; i < 3; ++i)
         {
             httpServer = testHttpServer();
-            ASSERT_TRUE(httpServer->registerRequestProcessor<TakingSocketRestHandler>(kRestHandlerPath))
-                << "Failed to register request processor";
+            ASSERT_TRUE(httpServer->registerRequestProcessor<TakingSocketRestHandler>(
+                kRestHandlerPath, [this]()
+                {
+                    return std::make_unique<TakingSocketRestHandler>(&m_threadStorage);
+                })) << "Failed to register request processor";
 
             ASSERT_TRUE(httpServer->bindAndListen())
                 << "Failed to start test http server";
@@ -243,6 +269,7 @@ private:
     nx::Buffer m_buffer;
     std::queue<nx::Buffer> m_messages;
     mutable QnMutex m_mutex;
+    ThreadStorage m_threadStorage;
 };
 
 TEST_F(TakingHttpSocketTest, SslSocket)

@@ -55,7 +55,7 @@ void showUsage(char* exeName)
     qDebug() << "usage:";
     qDebug() << "testCamera [options] <cameraSet1> <cameraSet2> ... <cameraSetN>";
     qDebug() << "where <cameraSetN> is camera(s) param with ';' delimiter";
-    qDebug() << "count=N";
+    qDebug() << "count=N"; 
     qDebug() << "files=\"<fileName>[,<fileName>...]\" - for primary stream";
     qDebug() << "secondary-files=\"<fileName>[,<fileName>...]\" - for low quality stream";
     qDebug() << "[offline=0..100] (optional, default value 0 - no offline)";
@@ -65,6 +65,7 @@ void showUsage(char* exeName)
     qDebug() << str;
     qDebug() << "\n[options]: ";
     qDebug() << "-I, --local-interface=     Local interface to listen. By default, all interfaces are listened";
+    qDebug() << "-S, --camera-for-file      Run separate camera for each primary file, count parameter must be empty or 0";
 }
 
 
@@ -95,6 +96,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    bool cameraForEachFile = false;
     QStringList localInterfacesToListen;
     for( int i = 1; i < argc; ++i )
     {
@@ -110,14 +112,17 @@ int main(int argc, char *argv[])
             if( i >= argc )
                 continue;
             localInterfacesToListen.push_back( QString(argv[i]) );
+        }else if( param =="--camera-for-file" || param == "-S" )
+        {
+            cameraForEachFile = true;
         }
     }
 
     QnCameraPool::initGlobalInstance( new QnCameraPool( localInterfacesToListen ) );
     QnCameraPool::instance()->start();
     QnResourceStatusDictionary statusDictionary;
-	QnResourcePropertyDictionary dictionary;
-	std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
+    QnResourcePropertyDictionary dictionary;
+    std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     for (int i = 1; i < argc; ++i)
     {
         QString param = argv[i];
@@ -159,8 +164,12 @@ int main(int argc, char *argv[])
             else if (data[0] == "secondary-files")
                 secondaryFileNames = doUnquote(data[1]);
         }
-        if (count == 0) {
+        if (!cameraForEachFile && count == 0) {
             qWarning() << "Parameter 'count' must be specified";
+            continue;
+        }
+        if (cameraForEachFile && count != 0) {
+            qWarning() << "Parameter 'count' must not be specified when creating separate camera for each file";
             continue;
         }
         if (primaryFileNames.isEmpty()) {
@@ -179,7 +188,7 @@ int main(int argc, char *argv[])
         if (secondaryFiles.isEmpty())
             secondaryFiles = primaryFiles;
 
-        QnCameraPool::instance()->addCameras(count, primaryFiles, secondaryFiles, offlineFreq);
+        QnCameraPool::instance()->addCameras(cameraForEachFile, count, primaryFiles, secondaryFiles, offlineFreq);
     }
 
     int appResult = app.exec();

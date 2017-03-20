@@ -18,6 +18,7 @@
 
 #include <media_server/settings.h>
 #include <streaming/hls/hls_types.h>
+#include <api/global_settings.h>
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
 static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
@@ -57,9 +58,7 @@ public:
         int channel,
         QnThumbnailRequestData::RoundMethod roundMethod) const;
 
-    std::unique_ptr<QnDataPacketQueue> getIframeOrGopByTime(
-        qint64 time,
-        int channel);
+    std::unique_ptr<QnConstDataPacketQueue> getGopTillTime(qint64 time, int channel) const;
 
     void updateCameraActivity();
     virtual bool needConfigureProvider() const override { return false; }
@@ -254,30 +253,29 @@ QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::getIframeByTime(
     return getIframeByTimeUnsafe(time, channel, roundMethod);
 }
 
-std::unique_ptr<QnDataPacketQueue> QnVideoCameraGopKeeper::getIframeOrGopByTime(
-    qint64 time,
-    int channel)
+std::unique_ptr<QnConstDataPacketQueue> QnVideoCameraGopKeeper::getGopTillTime(qint64 time, int channel) const
 {
     QnMutexLocker lock(&m_queueMtx);
-    auto iframe = getIframeByTimeUnsafe(
-        time,
-        channel,
-        QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod);
 
-    if (!iframe)
-        return nullptr;
-
-    auto frameSequence = std::make_unique<QnDataPacketQueue>();
-
-    if (iframe->timestamp < time)
+    auto frameSequence = std::make_unique<QnConstDataPacketQueue>();
+    auto randomAccess = m_dataQueue.lock();
+    for (int i = 0; i < randomAccess.size(); ++i)
     {
-        copyLastGop(0, *(frameSequence), 0, false);
+        const QnConstAbstractDataPacketPtr& data = randomAccess.at(i);
+        auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(data);
+        if (video && video->timestamp <= time && video->channelNumber == channel)
+            frameSequence->push(video);
     }
-    else
-    {
-        frameSequence->push(
-            std::const_pointer_cast<QnCompressedVideoData>(iframe));
-    }
+
+	if (frameSequence->isEmpty())
+	{
+        auto iframe = getIframeByTimeUnsafe(
+            time,
+            channel,
+            QnThumbnailRequestData::RoundMethod::KeyFrameAfterMethod);
+       if (iframe)
+	       frameSequence->push(iframe);
+	}
 
     return frameSequence;
 }
@@ -304,7 +302,8 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
             lastKeyTime = m_lastKeyFrame[0]->timestamp;
     }
     if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() &&
-       (lastKeyTime == (qint64)AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL))
+       (lastKeyTime == (qint64)AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL) &&
+        qnGlobalSettings->isAutoUpdateThumbnailsEnabled())
     {
         if (m_nextMinTryTime == 0) // get first screenshot after minor delay
             m_nextMinTryTime = usecTime + nx::utils::random::number(5000, 10000) * 1000ll;
@@ -551,7 +550,7 @@ QnMediaContextPtr QnVideoCamera::getAudioCodecContext(bool primaryLiveStream)
 }
 */
 
-std::unique_ptr<QnDataPacketQueue> QnVideoCamera::getFrameSequenceByTime(
+std::unique_ptr<QnConstDataPacketQueue> QnVideoCamera::getFrameSequenceByTime(
     bool primaryLiveStream,
     qint64 time,
     int channel,
@@ -564,13 +563,20 @@ std::unique_ptr<QnDataPacketQueue> QnVideoCamera::getFrameSequenceByTime(
     if (gopKeeper)
     {
         if (roundMethod == QnThumbnailRequestData::RoundMethod::PreciseMethod)
-            return gopKeeper->getIframeOrGopByTime(time, channel);
+            return gopKeeper->getGopTillTime(time, channel);
 
         auto frame = gopKeeper->getIframeByTime(time, channel, roundMethod);
         if (frame)
         {
-            auto queue = std::make_unique<QnDataPacketQueue>();
-            queue->push(std::const_pointer_cast<QnCompressedVideoData>(frame));
+            if (roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod
+                && frame->timestamp < time)
+            {
+                // After frame not found. Return preceise frame instead.
+                return gopKeeper->getGopTillTime(time, channel);
+            }
+
+            auto queue = std::make_unique<QnConstDataPacketQueue>();
+            queue->push(frame);
 
             return queue;
         }

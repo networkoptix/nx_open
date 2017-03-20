@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <type_traits>
 
 #include <QtCore/QString>
 
@@ -24,8 +25,6 @@
 namespace nx {
 namespace network {
 
-typedef CommonSocketImpl PollableSystemSocketImpl;
-
 namespace aio {
 template<class SocketType> class BaseAsyncSocketImplHelper;
 template<class SocketType> class AsyncSocketImplHelper;
@@ -46,24 +45,27 @@ struct NX_NETWORK_API SystemSocketAddress
 };
 
 /**
- * Base class representing basic communication endpoint
+ * Base class representing basic communication endpoint.
  */
-template<typename InterfaceToImplement>
-class Socket
-:
-    public InterfaceToImplement,
+template<typename SocketInterfaceToImplement>
+class Socket:
+    public SocketInterfaceToImplement,
     public nx::network::Pollable
 {
+    static_assert(
+        std::is_base_of<AbstractSocket, SocketInterfaceToImplement>::value,
+        "You MUST use class derived of AbstractSocket as a template argument");
+
 public:
     Socket(
         int type,
         int protocol,
         int ipVersion,
-        PollableSystemSocketImpl* impl = nullptr );
+        CommonSocketImpl* impl = nullptr);
     Socket(
         int sockDesc,
         int ipVersion,
-        PollableSystemSocketImpl* impl = nullptr );
+        CommonSocketImpl* impl = nullptr);
 
     Socket(const Socket&) = delete;
     Socket& operator=(const Socket&) = delete;
@@ -78,55 +80,31 @@ public:
     virtual bool getSendTimeout(unsigned int* millis) const override;
     virtual nx::network::aio::AbstractAioThread* getAioThread() const override;
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
+    virtual bool isInSelfAioThread() const override;
 
-    virtual bool bind( const SocketAddress& localAddress ) override;
+    virtual bool bind(const SocketAddress& localAddress) override;
     virtual SocketAddress getLocalAddress() const override;
     virtual bool close() override;
     virtual bool shutdown() override;
 
     virtual bool isClosed() const override;
-    virtual bool setReuseAddrFlag( bool reuseAddr ) override;
-    virtual bool getReuseAddrFlag( bool* val ) const override;
-    virtual bool setNonBlockingMode( bool val ) override;
-    virtual bool getNonBlockingMode( bool* val ) const override;
-    virtual bool getMtu( unsigned int* mtuValue ) const override;
-    virtual bool setSendBufferSize( unsigned int buffSize ) override;
-    virtual bool getSendBufferSize( unsigned int* buffSize ) const override;
-    virtual bool setRecvBufferSize( unsigned int buffSize ) override;
-    virtual bool getRecvBufferSize( unsigned int* buffSize ) const override;
-    virtual bool setRecvTimeout( unsigned int ms ) override;
-    virtual bool setSendTimeout( unsigned int ms ) override;
+    virtual bool setReuseAddrFlag(bool reuseAddr) override;
+    virtual bool getReuseAddrFlag(bool* val) const override;
+    virtual bool setNonBlockingMode(bool val) override;
+    virtual bool getNonBlockingMode(bool* val) const override;
+    virtual bool getMtu(unsigned int* mtuValue) const override;
+    virtual bool setSendBufferSize(unsigned int buffSize) override;
+    virtual bool getSendBufferSize(unsigned int* buffSize) const override;
+    virtual bool setRecvBufferSize(unsigned int buffSize) override;
+    virtual bool getRecvBufferSize(unsigned int* buffSize) const override;
+    virtual bool setRecvTimeout(unsigned int ms) override;
+    virtual bool setSendTimeout(unsigned int ms) override;
 
     virtual Pollable* pollable() override;
-    virtual void post( nx::utils::MoveOnlyFunc<void()> handler ) override;
-    virtual void dispatch( nx::utils::MoveOnlyFunc<void()> handler ) override;
+    virtual void post(nx::utils::MoveOnlyFunc<void()> handler) override;
+    virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
 
-
-    /**
-     * If WinSock, unload the WinSock DLLs; otherwise do nothing.  We ignore
-     * this in our sample client code but include it in the library for
-     * completeness.  If you are running on Windows and you are concerned
-     * about DLL resource consumption, call this after you are done with all
-     * Socket instances.  If you execute this on Windows while some instance of
-     * Socket exists, you are toast.  For portability of client code, this is
-     * an empty function on non-Windows platforms so you can always include it.
-     * @param buffer buffer to receive the data
-     * @param bufferLen maximum number of bytes to read into buffer
-     * @return number of bytes read, 0 for EOF, and -1 for error
-     */
-    static void cleanUp() ;
-
-    /**
-     * Resolve the specified service for the specified protocol to the
-     * corresponding port number in host byte order
-     * @param service service to resolve (e.g., "http")
-     * @param protocol protocol of service to resolve.  Default is "tcp".
-     */
-    static unsigned short resolveService(
-        const QString &service,
-        const QString &protocol = QLatin1String("tcp"));
-
-    bool createSocket( int type, int protocol );
+    bool createSocket(int type, int protocol);
 
 protected:
     const int m_ipVersion;
@@ -136,25 +114,29 @@ private:
 };
 
 /**
- * Socket which is able to connect, send, and receive.
+ * Socket that is able to connect, send, and receive.
  */
-template<class InterfaceToImplement>
+template<class SocketInterfaceToImplement>
 class CommunicatingSocket:
-    public Socket<InterfaceToImplement>
+    public Socket<SocketInterfaceToImplement>
 {
-    typedef CommunicatingSocket<InterfaceToImplement> SelfType;
+    static_assert(
+        std::is_base_of<AbstractCommunicatingSocket, SocketInterfaceToImplement>::value,
+        "You MUST use class derived of AbstractCommunicatingSocket as a template argument");
+
+    typedef CommunicatingSocket<SocketInterfaceToImplement> SelfType;
 
 public:
     CommunicatingSocket(
         int type,
         int protocol,
         int ipVersion,
-        PollableSystemSocketImpl* sockImpl = nullptr );
+        CommonSocketImpl* sockImpl = nullptr);
 
     CommunicatingSocket(
         int newConnSD,
         int ipVersion,
-        PollableSystemSocketImpl* sockImpl = nullptr );
+        CommonSocketImpl* sockImpl = nullptr);
 
     virtual ~CommunicatingSocket();
 
@@ -162,22 +144,22 @@ public:
         const SocketAddress& remoteAddress,
         unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override;
 
-    virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
-    virtual int send( const void* buffer, unsigned int bufferLen ) override;
+    virtual int recv(void* buffer, unsigned int bufferLen, int flags) override;
+    virtual int send(const void* buffer, unsigned int bufferLen) override;
     virtual SocketAddress getForeignAddress() const override;
     virtual bool isConnected() const override;
     virtual void connectAsync(
         const SocketAddress& addr,
-        nx::utils::MoveOnlyFunc<void( SystemError::ErrorCode )> handler ) override;
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
     virtual void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
     virtual void sendAsync(
         const nx::Buffer& buf,
-        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
     virtual void registerTimer(
         std::chrono::milliseconds timeoutMs,
-        nx::utils::MoveOnlyFunc<void()> handler ) override;
+        nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
         nx::utils::MoveOnlyFunc<void()> cancellationDoneHandler) override;
@@ -191,6 +173,9 @@ protected:
 
     std::unique_ptr<aio::AsyncSocketImplHelper<SelfType>> m_aioHelper;
     bool m_connected;
+#ifdef WIN32
+    WSAEVENT m_eventObject;
+#endif
 };
 
 /**
@@ -211,12 +196,12 @@ public:
     TCPSocket& operator=(TCPSocket&&) = delete;
 
     virtual bool reopen() override;
-    virtual bool setNoDelay( bool value ) override;
-    virtual bool getNoDelay( bool* value ) const override;
-    virtual bool toggleStatisticsCollection( bool val ) override;
-    virtual bool getConnectionStatistics( StreamSocketInfo* info ) override;
-    virtual bool setKeepAlive( boost::optional< KeepAliveOptions > info ) override;
-    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) const override;
+    virtual bool setNoDelay(bool value) override;
+    virtual bool getNoDelay(bool* value) const override;
+    virtual bool toggleStatisticsCollection(bool val) override;
+    virtual bool getConnectionStatistics(StreamSocketInfo* info) override;
+    virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override;
+    virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override;
 
 private:
     friend class TCPServerSocketPrivate;
@@ -265,6 +250,7 @@ public:
 
 private:
     bool setListen(int queueLen);
+    void stopWhileInAioThread();
 };
 
 class NX_NETWORK_API UDPSocket:
@@ -273,9 +259,14 @@ class NX_NETWORK_API UDPSocket:
     typedef CommunicatingSocket<AbstractDatagramSocket> base_type;
 
 public:
-    static const unsigned int MAX_PACKET_SIZE = 64*1024 - 24 - 8;   //maximum ip datagram size - ip header length - udp header length
+    static const unsigned int MAX_IP_DATAGRAM_LENGTH = 64 * 1024;
+    static const unsigned int IP_HEADER_MAX_LENGTH = 24;
+    static const unsigned int UDP_HEADER_LENGTH = 8;
+    static const unsigned int MAX_PACKET_SIZE =
+        MAX_IP_DATAGRAM_LENGTH - IP_HEADER_MAX_LENGTH - UDP_HEADER_LENGTH;
 
     explicit UDPSocket(int ipVersion = AF_INET);
+    virtual ~UDPSocket() override;
     UDPSocket(const UDPSocket&) = delete;
     UDPSocket& operator=(const UDPSocket&) = delete;
     UDPSocket(UDPSocket&&) = delete;
@@ -318,8 +309,8 @@ public:
         const SocketAddress& foreignAddress,
         std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) override;
     /**
-     * Implementation of AbstractCommunicatingSocket::recv.
-     * Actually calls UDPSocket::recvFrom and saves datagram source address/port
+     * Actually calls UDPSocket::recvFrom and makes datagram source address/port
+     *   available through UDPSocket::lastDatagramSourceAddress.
      */
     virtual int recv( void* buffer, unsigned int bufferLen, int flags ) override;
     virtual int recvFrom(
@@ -332,9 +323,8 @@ public:
     virtual SocketAddress lastDatagramSourceAddress() const override;
     virtual bool hasData() const override;
     /**
-     * Implementation of AbstractDatagramSocket::setMulticastIF.
-     * Set the multicast send interface
-     * @param multicastIF multicast interface for sending packets
+     * Sets the multicast send interface.
+     * @param multicastIF multicast interface for sending packets.
      */
     virtual bool setMulticastIF( const QString& multicastIF ) override;
 

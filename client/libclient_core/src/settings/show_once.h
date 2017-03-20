@@ -14,7 +14,15 @@ class ShowOnce: public QObject
     Q_OBJECT
     using base_type = QObject;
 public:
-    ShowOnce(const QString& id, QObject* parent = nullptr);
+    enum class StorageFormat
+    {
+        Section,
+        File
+    };
+
+    ShowOnce(const QString& id,
+        StorageFormat format = StorageFormat::Section,
+        QObject* parent = nullptr);
     virtual ~ShowOnce();
 
     bool testFlag(const QString& key) const;

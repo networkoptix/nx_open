@@ -13,7 +13,7 @@ angular.module('webadminApp')
             // Check 401 against offline
             var modalInstance = $modal.open({
                 controller: 'DialogCtrl',
-                templateUrl: 'views/components/dialog.html',
+                templateUrl: Config.viewsDir + 'components/dialog.html',
                 animation: !isInline(),
                 keyboard:false,
                 backdrop:settings.cancellable?true:'static',

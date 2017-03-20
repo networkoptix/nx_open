@@ -61,6 +61,7 @@ auto weeks(int count)
     return days(count * kDaysPerWeek);
 }
 
+//TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
 const qint64 kBytesInGB = 1024ll * 1024 * 1024;
 const qint64 kBytesInTB = 1024ll * kBytesInGB;
 const qint64 kFinalStepSeconds = 1000000000ll * 10;
@@ -224,6 +225,11 @@ QnStorageAnalyticsWidget::QnStorageAnalyticsWidget(QWidget* parent):
         this, [this]() { currentTable()->selectAll(); });
 
     setHelpTopic(this, Qn::ServerSettings_StorageAnalitycs_Help);
+
+    //TODO: #GDM move to std texts
+    ui->extraSizeSpinBox->setSuffix(L' ' + tr("TB", "TB - terabytes"));
+    ui->maxSizeLabel->setText(tr("%n TB", "TB - terabytes"
+        , qRound(ui->extraSizeSpinBox->maximum())));
 }
 
 QnStorageAnalyticsWidget::~QnStorageAnalyticsWidget()
@@ -244,7 +250,8 @@ void QnStorageAnalyticsWidget::setupTableView(QnTableView* table, QAbstractItemM
     table->setModel(sortModel);
     table->setItemDelegate(new QnRecordingStatsItemDelegate(this));
 
-    table->verticalHeader()->setDefaultSectionSize(kTableRowHeight);
+    table->verticalHeader()->setMinimumSectionSize(kTableRowHeight);
+    table->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     CustomHorizontalHeader* header = new CustomHorizontalHeader(this);
     table->setHorizontalHeader(header);

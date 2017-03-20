@@ -1,6 +1,7 @@
 import QtQuick 2.6
 import Qt.labs.controls 1.0
 import Nx 1.0
+import Nx.Media 1.0
 import com.networkoptix.qml 1.0
 
 Pane
@@ -60,14 +61,14 @@ Pane
             codec = statistics.codec
 
             var quality = player.actualVideoQuality()
-            if (quality === QnPlayer.HighVideoQuality)
-                d.quality = qsTr("Hi-res")
-            else if (quality === QnPlayer.LowVideoQuality)
-                d.quality = qsTr("Low-res")
-            else if (quality === QnPlayer.LowIframesOnlyVideoQuality)
-                d.quality = qsTr("Low-res key-frames")
-            else if (quality === QnPlayer.CustomVideoQuality)
-                d.quality = qsTr("Custom-res")
+            if (quality === MediaPlayer.HighVideoQuality)
+                d.quality = qsTr("Hi-Res")
+            else if (quality === MediaPlayer.LowVideoQuality)
+                d.quality = qsTr("Lo-Res")
+            else if (quality === MediaPlayer.LowIframesOnlyVideoQuality)
+                d.quality = qsTr("Keyfr + Lo-Res")
+            else if (quality === MediaPlayer.CustomVideoQuality)
+                d.quality = qsTr("Custom-Res")
             else
                 d.quality = ""
         }

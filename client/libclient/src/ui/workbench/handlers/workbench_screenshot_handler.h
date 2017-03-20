@@ -35,6 +35,7 @@ struct QnScreenshotParameters
     QString timeString() const;
 };
 
+/* Proxy class, that starts loading instantly after base provider is set and notifies only once. */
 class QnScreenshotLoader: public QnImageProvider {
     Q_OBJECT
 public:
@@ -44,6 +45,8 @@ public:
     void setBaseProvider(QnImageProvider* imageProvider);
 
     virtual QImage image() const override;
+    virtual QSize sizeHint() const override;
+    virtual Qn::ThumbnailStatus status() const override;
 
     QnScreenshotParameters parameters() const;
     void setParameters(const QnScreenshotParameters &parameters);

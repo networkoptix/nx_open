@@ -20,6 +20,15 @@
 
 #include <utils/common/app_info.h>
 #include "utils/common/cryptographic_hash.h"
+#include <api/global_settings.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/nettools.h>
+
+#define DEBUG_LOG(MESSAGE) do \
+{ \
+    if (nx::network::SocketGlobals::debugConfig().moduleFinders) \
+        NX_LOGX(MESSAGE, cl_logDEBUG1); \
+} while (0)
 
 static const int MAX_CACHE_SIZE_BYTES = 1024 * 64;
 
@@ -85,12 +94,10 @@ void QnMulticastModuleFinder::updateInterfaces()
     QList<QHostAddress> addressesToRemove = m_clientSockets.keys();
 
     /* This function only adds interfaces to the list. */
-    for (const QHostAddress &address : QNetworkInterface::allAddresses())
+    for (const QString &addressStr: getLocalIpV4AddressList())
     {
+        QHostAddress address(addressStr);
         addressesToRemove.removeOne(address);
-
-        if (address.protocol() != QAbstractSocket::IPv4Protocol)
-            continue;
 
         if (m_clientSockets.contains(address))
             continue;
@@ -105,20 +112,28 @@ void QnMulticastModuleFinder::updateInterfaces()
             sock->setDestAddr(SocketAddress(m_multicastGroupAddress.toString(), m_multicastGroupPort));
             auto it = m_clientSockets.insert(address, sock.release());
             if (m_serverSocket)
-                m_serverSocket->joinGroup(m_multicastGroupAddress.toString(), address.toString());
+            {
+                if (!m_serverSocket->joinGroup(m_multicastGroupAddress.toString(), address.toString()))
+                {
+                    NX_LOGX(lm("Unable to join multicast group %1 on interface %2: %3")
+                        .strs(m_multicastGroupAddress, address), cl_logWARNING);
+                }
+                else
+                {
+                    NX_LOGX(lm("Joined multicast group %1 on interface %2").strs(
+                        m_multicastGroupAddress, address), cl_logDEBUG1);
+                }
+            }
 
             if (!m_pollSet.add(it.value(), aio::etRead, it.value()))
-            {
-                const auto error = SystemError::getLastOSErrorText();
-                NX_ASSERT(false, Q_FUNC_INFO, error.toUtf8().data());
-            }
+                NX_ASSERT(false, SystemError::getLastOSErrorText());
+            else
+                DEBUG_LOG(lm("PollSet(%1s): Added %2 socket").strs(m_pollSet.size(), address));
         }
         catch (const std::exception &e)
         {
-            NX_LOGX(lit("Failed to create socket on local address %1. %2")
-                .arg(address.toString())
-                .arg(QString::fromLatin1(e.what())),
-                cl_logERROR);
+            NX_LOGX(lm("Failed to create socket on local address %1. %2")
+                .strs(address, e.what()), cl_logERROR);
         }
     }
 
@@ -126,8 +141,15 @@ void QnMulticastModuleFinder::updateInterfaces()
     {
         UDPSocket *socket = m_clientSockets.take(address);
         m_pollSet.remove(socket, aio::etRead);
+        DEBUG_LOG(lm("PollSet(%1s): Removed %2 socket").strs(
+            m_pollSet.size(), socket->getLocalAddress()));
+
         if (m_serverSocket)
+        {
             m_serverSocket->leaveGroup(m_multicastGroupAddress.toString(), address.toString());
+            NX_LOGX(lm("Left multicast group %1 on interface %2").strs(
+                m_multicastGroupAddress, address), cl_logDEBUG1);
+        }
     }
 }
 
@@ -141,15 +163,21 @@ void QnMulticastModuleFinder::clearInterfaces()
             m_serverSocket->leaveGroup(m_multicastGroupAddress.toString(), it.key().toString());
 
         m_pollSet.remove(m_serverSocket.get(), aio::etRead);
+        DEBUG_LOG(lm("PollSet(%1s): Removed server socket").str(m_pollSet.size()));
         m_serverSocket.reset();
     }
 
     for (UDPSocket *socket : m_clientSockets)
     {
         m_pollSet.remove(socket, aio::etRead);
+        DEBUG_LOG(lm("PollSet(%1s): Removed %2 socket").strs(
+            m_pollSet.size(), socket->getLocalAddress()));
+
         delete socket;
     }
+
     m_clientSockets.clear();
+    NX_LOGX("Interfaces are cleared", cl_logDEBUG1);
 }
 
 void QnMulticastModuleFinder::pleaseStop()
@@ -168,17 +196,15 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket)
     if (bytesRead == -1)
     {
         SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOGX(lit("Failed to read socket on local address (%1). %2").
-            arg(udpSocket->getLocalAddress().toString()).arg(SystemError::toString(prevErrorCode)), cl_logERROR);
+        NX_LOGX(lm("Failed to read socket on local address (%1). %2").strs(
+            udpSocket->getLocalAddress(), SystemError::toString(prevErrorCode)), cl_logERROR);
         return false;
     }
 
-    //parsing received request
     if (!RevealRequest::isValid(readBuffer, readBuffer + bytesRead))
     {
-        //invalid response
-        NX_LOGX(lit("Received invalid response from (%1) on local address %2").
-            arg(remoteEndpoint.toString()).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG1);
+        NX_LOGX(lm("Received invalid request from (%1) on local address %2").strs(
+            remoteEndpoint, udpSocket->getLocalAddress()), cl_logDEBUG1);
         return false;
     }
 
@@ -190,11 +216,11 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket)
     }
     if (!udpSocket->sendTo(m_serializedModuleInfo.data(), m_serializedModuleInfo.size(), remoteEndpoint))
     {
-        NX_LOGX(lit("Can't send response to address (%1)").
-            arg(remoteEndpoint.toString()), cl_logDEBUG1);
+        NX_LOGX(lm("Can't send response to address (%1)").str(remoteEndpoint), cl_logDEBUG1);
         return false;
     };
 
+    DEBUG_LOG(lm("Reveal respose is sent to address (%1)").str(remoteEndpoint));
     return true;
 }
 
@@ -233,45 +259,49 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket)
     if (bytesRead == -1)
     {
         SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOGX(lit("Failed to read socket on local address (%1). %2")
-            .arg(udpSocket->getLocalAddress().toString())
-            .arg(SystemError::toString(prevErrorCode)),
-            cl_logERROR);
+        NX_LOGX(lm("Failed to read response on local address (%1). %2").strs(
+            udpSocket->getLocalAddress(), SystemError::toString(prevErrorCode)), cl_logERROR);
         return false;
     }
 
     RevealResponse *response = getCachedValue(readBuffer, readBuffer + bytesRead);
     if (!response)
     {
-        //invalid response
-        NX_LOGX(lit("Received invalid response from (%1) on local address %2")
-            .arg(remoteEndpoint.toString())
-            .arg(udpSocket->getLocalAddress().toString()),
-            cl_logDEBUG1);
+        NX_LOGX(lm("Received invalid response from (%1) on local address %2").strs(
+            remoteEndpoint, udpSocket->getLocalAddress()), cl_logDEBUG1);
         return false;
     }
 
     if (response->type != QnModuleInformation::nxMediaServerId()
         && response->type != QnModuleInformation::nxECId())
+    {
+        DEBUG_LOG(lm("Ignoring %1 (%2) with id %3 on local address %4").strs(
+            response->type, remoteEndpoint, response->id, udpSocket->getLocalAddress()));
         return true;
+    }
 
     auto connectionResult = QnConnectionValidator::validateConnection(*response);
     if (connectionResult == Qn::IncompatibleInternalConnectionResult)
     {
-        NX_LOGX(lit("Ignoring %1 (%2) with different customization %3 on local address %4")
-            .arg(response->type)
-            .arg(remoteEndpoint.toString())
-            .arg(response->customization)
-            .arg(udpSocket->getLocalAddress().toString()),
-            cl_logDEBUG2);
+        DEBUG_LOG(lm("Ignoring %1 (%2) with different customization %3 on local address %4").strs(
+            response->type, remoteEndpoint, response->customization, udpSocket->getLocalAddress()));
         return false;
     }
 
     if (response->port == 0)
+    {
+        DEBUG_LOG(lm("Ignoring %1 (%2) with zero port on local address %3").strs(
+            response->type, remoteEndpoint, udpSocket->getLocalAddress()));
         return true;
+    }
 
-    emit responseReceived(*response, SocketAddress(remoteEndpoint.address.toString(), response->port));
+    DEBUG_LOG(lm("Accepting %1 (%2) with id %3 on local address %4").strs(
+        response->type, remoteEndpoint, response->id, udpSocket->getLocalAddress()));
 
+    emit responseReceived(
+        *response,
+        SocketAddress(remoteEndpoint.address.toString(), response->port),
+        remoteEndpoint.address);
     return true;
 }
 
@@ -281,24 +311,20 @@ void QnMulticastModuleFinder::run()
         return;
 
     initSystemThreadId();
-    NX_LOGX(lit("has started"), cl_logDEBUG1);
+    NX_LOGX(lit("Has started"), cl_logDEBUG1);
 
     QByteArray revealRequest = RevealRequest::serialize();
 
     if (!m_clientMode)
     {
         QnMutexLocker lk(&m_mutex);
-
         m_serverSocket.reset(new UDPSocket(AF_INET));
         m_serverSocket->setReuseAddrFlag(true);
         m_serverSocket->bind(SocketAddress(HostAddress::anyHost, m_multicastGroupPort));
-
-        //TODO #ak currently PollSet is designed for internal usage in aio, that's why we have to use socket->implementationDelegate()
         if (!m_pollSet.add(m_serverSocket.get(), aio::etRead, m_serverSocket.get()))
-        {
-            const auto error = SystemError::getLastOSErrorText();
-            NX_ASSERT(false, Q_FUNC_INFO, error.toUtf8().data());
-        }
+            NX_ASSERT(false, SystemError::getLastOSErrorText());
+        else
+            DEBUG_LOG(lm("PollSet(%1s): Added server socket").str(m_pollSet.size()));
     }
 
     while (!needToStop())
@@ -315,28 +341,56 @@ void QnMulticastModuleFinder::run()
 
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis)
         {
-            QnMutexLocker lk(&m_mutex);
-
-            for (UDPSocket *socket : m_clientSockets)
+            if (m_clientMode ||
+                (!qnGlobalSettings->isNewSystem() && qnGlobalSettings->isAutoDiscoveryEnabled()))
             {
-                if (!socket->send(revealRequest.data(), revealRequest.size()))
+                QnMutexLocker lk(&m_mutex);
+                for (UDPSocket *socket : m_clientSockets)
                 {
-                    //failed to send packet ???
-                    SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
-                    NX_LOGX(lit("Failed to send packet to %1. %2")
-                        .arg(socket->getForeignAddress().toString())
-                        .arg(SystemError::toString(prevErrorCode)),
-                        cl_logDEBUG1);
-                    //TODO #ak if corresponding interface is down, should remove socket from set
+                    if (!socket->send(revealRequest.data(), revealRequest.size()))
+                    {
+                        SystemError::ErrorCode prevErrorCode = SystemError::getLastOSErrorCode();
+                        NX_LOGX(lm("Failed to send reveal request to %1. %2").strs(
+                            socket->getForeignAddress(), SystemError::toString(prevErrorCode)),
+                            cl_logDEBUG1);
+
+                        //TODO #ak if corresponding interface is down, should remove socket from set
+                    }
+                    else
+                    {
+                        DEBUG_LOG(lm("Reveal request is sent to %1 from %2")
+                            .strs(socket->getForeignAddress(), socket->getLocalAddress()));
+                    }
                 }
             }
+
             m_prevPingClock = currentClock;
         }
 
-        int socketCount = m_pollSet.poll(m_pingTimeoutMillis - (currentClock - m_prevPingClock));
+        if (const auto timeout = SocketGlobals::debugConfig().multicastModuleFinderTimeout)
+        {
+            NX_LOGX(lm("Avoid using poll, use %1 ms recv timeouts instead").arg(timeout), cl_logINFO);
+            if (m_serverSocket)
+            {
+                m_serverSocket->setRecvTimeout((unsigned int) timeout);
+                processDiscoveryRequest(m_serverSocket.get());
+            }
 
+            for (auto& socket: m_clientSockets)
+            {
+                socket->setRecvTimeout((unsigned int) timeout);
+                processDiscoveryResponse(socket);
+            }
+
+            continue;
+        }
+
+        int socketCount = m_pollSet.poll(m_pingTimeoutMillis - (currentClock - m_prevPingClock));
         if (socketCount == 0)
-            continue;    //timeout
+        {
+            DEBUG_LOG(lm("PollSet(%1s): Time out").str(m_pollSet.size()));
+            continue;
+        }
 
         if (socketCount < 0)
         {
@@ -344,18 +398,23 @@ void QnMulticastModuleFinder::run()
             if (prevErrorCode == SystemError::interrupted)
                 continue;
 
-            NX_LOGX(lit("poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR);
+            NX_LOGX(lit("Poll failed. %1").arg(SystemError::toString(prevErrorCode)), cl_logERROR);
             msleep(errorWaitTimeoutMs);
             continue;
         }
 
         //currentClock = QDateTime::currentMSecsSinceEpoch();
 
-        /* some sockets changed state */
+        DEBUG_LOG(lm("PollSet(%1s): %2 sockets are ready to read").args(
+            m_pollSet.size(), socketCount));
+
         for (auto it = m_pollSet.begin(); it != m_pollSet.end(); ++it)
         {
             if (!(it.eventType() & aio::etRead))
+            {
+                NX_ASSERT(false, "Not a read event on socket");
                 continue;
+            }
 
             UDPSocket* udpSocket = static_cast<UDPSocket*>(it.userData());
 
@@ -368,5 +427,5 @@ void QnMulticastModuleFinder::run()
 
     clearInterfaces();
 
-    NX_LOGX(lit("stopped"), cl_logDEBUG1);
+    NX_LOGX(lit("Stopped"), cl_logDEBUG1);
 }

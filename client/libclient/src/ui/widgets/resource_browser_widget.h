@@ -36,54 +36,13 @@ class QnResourceTreeModel;
 class QnResourceSearchProxyModel;
 class QnResourceSearchSynchronizer;
 class QnResourceTreeWidget;
-class QnCameraThumbnailManager;
 class QnTextEditLabel;
+class QnGraphicsToolTipWidget;
+class QnCameraThumbnailManager;
 
 namespace Ui {
     class ResourceBrowserWidget;
 }
-
-class QnResourceBrowserToolTipWidget: public QnStyledTooltipWidget
-{
-    Q_OBJECT
-    using base_type = QnStyledTooltipWidget;
-
-public:
-    QnResourceBrowserToolTipWidget(QGraphicsItem* parent = nullptr);
-
-    /**
-     * Set tooltip text.
-     * \param text                      New text for this tool tip's label.
-     * \reimp
-     */
-    void setText(const QString& text);
-
-    void setThumbnailVisible(bool visible);
-
-    void setResource(const QnResourcePtr& resource);
-    const QnResourcePtr& resource() const;
-
-    //reimp
-    void pointTo(const QPointF& pos);
-    virtual void updateTailPos() override;
-
-signals:
-    void thumbnailClicked();
-
-protected:
-    virtual bool sceneEventFilter(QGraphicsItem* watched, QEvent* event) override;
-
-private:
-    void forceLayoutUpdate();
-
-private:
-    QGraphicsProxyWidget* m_proxyWidget;
-    QWidget* m_embeddedWidget;
-    QnTextEditLabel* m_textLabel;
-    QnResourcePreviewWidget* m_previewWidget;
-    QPointF m_pointTo;
-};
-
 
 class QnResourceBrowserWidget: public QWidget, public QnWorkbenchContextAware, public QnActionTargetProvider, public ToolTipQueryable {
     Q_OBJECT
@@ -124,6 +83,7 @@ public:
     void hideToolTip();
     void showToolTip();
 
+    void clearSelection();
 signals:
     void currentTabChanged();
     void selectionChanged();
@@ -160,6 +120,8 @@ private:
 
     void handleItemActivated(const QModelIndex& index, bool withMouse);
 
+    void setTooltipResource(const QnResourcePtr& camera);
+
 private slots:
     void updateFilter(bool force = false);
     void updateToolTipPosition();
@@ -171,7 +133,7 @@ private slots:
     void at_workbench_currentLayoutAboutToBeChanged();
     void at_workbench_currentLayoutChanged();
 
-    void at_workbench_itemChanged(Qn::ItemRole role);
+    void at_workbench_itemChange(Qn::ItemRole role);
     void at_layout_itemAdded(QnWorkbenchItem* item);
     void at_layout_itemRemoved(QnWorkbenchItem* item);
 
@@ -184,11 +146,14 @@ private:
     int m_filterTimerId;
 
     QnResourceTreeModel* m_resourceModel;
-    QnResourceBrowserToolTipWidget* m_tooltipWidget;
+    QnGraphicsToolTipWidget* m_tooltipWidget;
     HoverFocusProcessor* m_hoverProcessor;
 
     QMap<QnActions::IDType, QAction*> m_renameActions;
     QnDisconnectHelperPtr m_disconnectHelper;
+
+    QScopedPointer<QnCameraThumbnailManager> m_thumbnailManager;
+    QnResourcePtr m_tooltipResource;
 };
 
 #endif // QN_RESOURCE_BROWSER_WIDGET_H

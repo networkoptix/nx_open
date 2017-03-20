@@ -145,6 +145,7 @@
 #include <rest/handlers/test_email_rest_handler.h>
 #include <rest/handlers/test_ldap_rest_handler.h>
 #include <rest/handlers/update_rest_handler.h>
+#include <rest/handlers/update_unauthenticated_rest_handler.h>
 #include <rest/handlers/update_information_rest_handler.h>
 #include <rest/handlers/restart_rest_handler.h>
 #include <rest/handlers/module_information_rest_handler.h>
@@ -247,6 +248,7 @@
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
+#include <nx/utils/file_system.h>
 #endif
 
 #include <streaming/audio_streamer_pool.h>
@@ -866,6 +868,9 @@ static const int SYSTEM_USAGE_DUMP_TIMEOUT = 7*60*1000;
 
 void MediaServerProcess::dumpSystemUsageStats()
 {
+    if (!qnPlatform->monitor())
+        return;
+
     qnPlatform->monitor()->totalCpuUsage();
     qnPlatform->monitor()->totalRamUsage();
     qnPlatform->monitor()->totalHddLoad();
@@ -1005,7 +1010,6 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[])
     m_dumpSystemResourceUsageTaskID(0),
     m_stopping(false)
 {
-    m_platform.reset(new QnPlatformAbstraction());
     serviceMainInstance = this;
 
     parseCommandLineParameters(argc, argv);
@@ -1021,6 +1025,12 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[])
         MSSettings::initializeRunTimeSettings();
 
     addCommandLineParametersFromConfig();
+
+    const bool isStatisticsDisabled =
+        MSSettings::roSettings()->value(QnServer::kNoMonitorStatistics, false).toBool();
+
+    m_platform.reset(new QnPlatformAbstraction(
+        isStatisticsDisabled ? 0 : QnGlobalMonitor::kDefaultUpdatePeridMs));
 }
 
 void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
@@ -1066,6 +1076,11 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
         lit("Deletes resources with NULL ids, "
             "cleans dangling cameras' and servers' user attributes, "
             "kvpairs and resourceStatuses, also cleans and rebuilds transaction log"), true);
+
+    commandLineParser.addParameter(&m_cmdLineArguments.moveHandlingCameras, "--move-handling-cameras", NULL,
+        lit("Move handling cameras to itself, "
+            "In some rare scenarios cameras can be assigned to removed server, "
+            "This startup parameter force server to move these cameras to itself"), true);
 
     commandLineParser.parse(argc, (const char**) argv, stderr);
     if (m_cmdLineArguments.showHelp)
@@ -1553,6 +1568,22 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     processor->startReceivingLocalNotifications(connection);
 }
 
+void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
+{
+    const auto hwInfo = HardwareInformation::instance();
+    server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
+    server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
+    server->setProperty(Qn::PHYSICAL_MEMORY, QString::number(hwInfo.physicalMemory));
+
+    server->setProperty(Qn::PRODUCT_NAME_SHORT, QnAppInfo::productNameShort());
+    server->setProperty(Qn::FULL_VERSION, nx::utils::AppInfo::applicationFullVersion());
+    server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
+    server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
+    server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
+
+    propertyDictionary->saveParams(server->getId());
+}
+
 void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
 {
     if (isStopping())
@@ -1757,6 +1788,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/getSystemId", new QnGetSystemIdRestHandler());
     reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
     reg("api/installUpdate", new QnUpdateRestHandler());
+    reg("api/installUpdateUnauthenticated", new QnUpdateUnauthenticatedRestHandler());
     reg("api/restart", new QnRestartRestHandler(), kAdmin);
     reg("api/connect", new QnOldClientConnectRestHandler());
     reg("api/moduleInformation", new QnModuleInformationRestHandler());
@@ -1883,29 +1915,17 @@ bool MediaServerProcess::initTcpListener(
 
 std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
 {
-    auto mapper = std::make_unique<nx_upnp::PortMapper>();
-
-    const auto configValue = MSSettings::roSettings()->value(
-        nx::settings_names::kNameUpnpPortMappingEnabled);
-
-    if (!configValue.isNull())
-    {
-        // config value prevail
-        mapper->setIsEnabled(configValue.toBool());
-    }
-    else
-    {
-        // otherwise it's controlled by qnGlobalSettings
-        auto updateEnabled = [mapper = mapper.get()]()
+    auto mapper = std::make_unique<nx_upnp::PortMapper>(/*isEnabled*/ false);
+    auto updateEnabled =
+        [mapper = mapper.get()]()
         {
-            mapper->setIsEnabled(qnGlobalSettings->isUpnpPortMappingEnabled());
+            const auto isCloudSystem = !qnGlobalSettings->cloudSystemId().isEmpty();
+            mapper->setIsEnabled(isCloudSystem && qnGlobalSettings->isUpnpPortMappingEnabled());
         };
 
-        updateEnabled();
-        connect(
-            qnGlobalSettings, &QnGlobalSettings::upnpPortMappingEnabledChanged,
-            std::move(updateEnabled));
-    }
+    connect(qnGlobalSettings, &QnGlobalSettings::upnpPortMappingEnabledChanged, updateEnabled);
+    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, updateEnabled);
+    updateEnabled();
 
     mapper->enableMapping(
         m_mediaServer->getPort(), nx_upnp::PortMapper::Protocol::TCP,
@@ -2053,6 +2073,31 @@ void MediaServerProcess::performActionsOnExit()
     }
 }
 
+void MediaServerProcess::moveHandlingCameras()
+{
+    QSet<QnUuid> servers;
+    for (const auto& server : qnResPool->getResources<QnMediaServerResource>())
+        servers << server->getId();
+    ec2::ApiCameraDataList camerasToUpdate;
+    for (const auto& camera: qnResPool->getAllCameras(/*all*/ QnResourcePtr()))
+    {
+        if (!servers.contains(camera->getParentId()))
+        {
+            ec2::ApiCameraData apiCameraData;
+            fromResourceToApi(camera, apiCameraData);
+            apiCameraData.parentId = qnCommon->moduleGUID(); //< move camera
+            camerasToUpdate.push_back(apiCameraData);
+        }
+    }
+
+    auto errCode = QnAppServerConnectionFactory::getConnection2()
+        ->getCameraManager(Qn::kSystemAccess)
+        ->addCamerasSync(camerasToUpdate);
+
+    if (errCode != ec2::ErrorCode::ok)
+        qWarning() << "Failed to move handling cameras due to database error. errCode=" << toString(errCode);
+}
+
 void MediaServerProcess::updateAllowedInterfaces()
 {
     // check registry
@@ -2128,6 +2173,11 @@ void MediaServerProcess::run()
         nx_ms_conf::DEFAULT_CREATE_FULL_CRASH_DUMP ).toBool() );
 #endif
 
+    const auto allowedSslVersions = MSSettings::roSettings()->value(
+        nx_ms_conf::ALLOWED_SSL_VERSIONS, QString()).toString();
+    if (!allowedSslVersions.isEmpty())
+        nx::network::SslEngine::setAllowedServerVersions(allowedSslVersions.toUtf8());
+
     nx::network::SslEngine::useOrCreateCertificate(
         MSSettings::roSettings()->value(
             nx_ms_conf::SSL_CERTIFICATE_PATH,
@@ -2164,6 +2214,9 @@ void MediaServerProcess::run()
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/static/*"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("/crossdomain.xml"), AuthMethod::noAuth);
     QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/startLiteClient"), AuthMethod::noAuth);
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdate"), AuthMethod::noAuth);
+    // TODO: #3.1 Remove this method and use /api/installUpdate in client when offline cloud authentication is implemented.
+    QnAuthHelper::instance()->restrictionList()->allow(lit("*/api/installUpdateUnauthenticated"), AuthMethod::noAuth);
 
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), AuthMethod::noAuth );
@@ -2513,21 +2566,12 @@ void MediaServerProcess::run()
             m_mediaServer = server;
         }
 
-        const auto hwInfo = HardwareInformation::instance();
-        server->setProperty(Qn::CPU_ARCHITECTURE, hwInfo.cpuArchitecture);
-        server->setProperty(Qn::CPU_MODEL_NAME, hwInfo.cpuModelName);
-        server->setProperty(Qn::PHYSICAL_MEMORY, QString::number(hwInfo.physicalMemory));
-
-        server->setProperty(Qn::PRODUCT_NAME_SHORT, QnAppInfo::productNameShort());
-        server->setProperty(Qn::FULL_VERSION, nx::utils::AppInfo::applicationFullVersion());
-        server->setProperty(Qn::BETA, QString::number(QnAppInfo::beta() ? 1 : 0));
-        server->setProperty(Qn::PUBLIC_IP, m_ipDiscovery->publicIP().toString());
-        server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
-
-        qnServerDb->setBookmarkCountController([server](size_t count){
-            server->setProperty(Qn::BOOKMARK_COUNT, QString::number(count));
-            propertyDictionary->saveParams(server->getId());
-        });
+        #ifdef ENABLE_EXTENDED_STATISTICS
+            qnServerDb->setBookmarkCountController([server](size_t count){
+                server->setProperty(Qn::BOOKMARK_COUNT, QString::number(count));
+                propertyDictionary->saveParams(server->getId());
+            });
+        #endif
 
         QFile hddList(Qn::HDD_LIST_FILE);
         if (hddList.open(QFile::ReadOnly))
@@ -2608,16 +2652,16 @@ void MediaServerProcess::run()
     QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder));
 
     QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
+    serverUpdateTool->removeUpdateFiles(m_mediaServer->getVersion().toString());
 
     // ===========================================================================
     QnResource::initAsyncPoolInstance()->setMaxThreadCount( MSSettings::roSettings()->value(
         nx_ms_conf::RESOURCE_INIT_THREADS_COUNT,
         nx_ms_conf::DEFAULT_RESOURCE_INIT_THREADS_COUNT ).toInt() );
-    QnResource::initAsyncPoolInstance()->setExpiryTimeout(-1); // default expiration timeout is 30 second. But it has a bug in QT < v.5.3
-    QThreadPool::globalInstance()->setExpiryTimeout(-1);
+    QnResource::initAsyncPoolInstance();
 
     // ============================
-    std::unique_ptr<nx_upnp::DeviceSearcher> upnpDeviceSearcher(new nx_upnp::DeviceSearcher());
+    std::unique_ptr<nx_upnp::DeviceSearcher> upnpDeviceSearcher(new nx_upnp::DeviceSearcher(qnGlobalSettings));
     std::unique_ptr<QnMdnsListener> mdnsListener(new QnMdnsListener());
 
     std::unique_ptr<QnAppserverResourceProcessor> serverResourceProcessor( new QnAppserverResourceProcessor(
@@ -2637,15 +2681,9 @@ void MediaServerProcess::run()
     /* Searchers must be initialized before the resources are loaded as resources instances are created by searchers. */
     QnMediaServerResourceSearchers searchers;
 
-#if !defined(EDGE_SERVER)
-    std::unique_ptr<TextToWaveServer> speechSynthesizer(new TextToWaveServer());
-    speechSynthesizer->start();
-#endif
-
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool());
 
     auto upnpPortMapper = initializeUpnpPortMapper();
-    updateAddressesList();
 
     qDebug() << "start loading resources";
     QElapsedTimer tt;
@@ -2653,7 +2691,12 @@ void MediaServerProcess::run()
     qnResourceAccessManager->beginUpdate();
     qnResourceAccessProvider->beginUpdate();
     loadResourcesFromECS(messageProcessor.data());
+    saveServerInfo(m_mediaServer);
     m_mediaServer->setStatus(Qn::Online);
+
+    if (m_cmdLineArguments.moveHandlingCameras)
+        moveHandlingCameras();
+
     qDebug() << "resources loaded for" << tt.elapsed();
     qnResourceAccessProvider->endUpdate();
     qDebug() << "access ready" << tt.elapsed();
@@ -2661,6 +2704,8 @@ void MediaServerProcess::run()
     qDebug() << "permissions ready" << tt.elapsed();
 
     qnGlobalSettings->initialize();
+
+    updateAddressesList();
 
     auto settingsProxy = nx::mserver_aux::createServerSettingsProxy();
     auto systemNameProxy = nx::mserver_aux::createServerSystemNameProxy();
@@ -2733,7 +2778,9 @@ void MediaServerProcess::run()
 
 
     QnResourceDiscoveryManager::instance()->setReady(true);
-    if( !ec2Connection->connectionInfo().ecDbReadOnly )
+    const bool isDiscoveryDisabled =
+        MSSettings::roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
+    if( !ec2Connection->connectionInfo().ecDbReadOnly && !isDiscoveryDisabled)
         QnResourceDiscoveryManager::instance()->start();
     //else
     //    we are not able to add cameras to DB anyway, so no sense to do discover
@@ -2749,8 +2796,12 @@ void MediaServerProcess::run()
         m_universalTcpListener,
         &QnTcpListener::portChanged,
         this,
-        &MediaServerProcess::updateAddressesList);
-
+        [this, &cloudManagerGroup]()
+        {
+            updateAddressesList();
+            cloudManagerGroup.connectionManager.setProxyVia(
+                SocketAddress(HostAddress::localhost, m_universalTcpListener->getPort()));
+        });
 
     m_firstRunningTime = MSSettings::runTimeSettings()->value("lastRunningTime").toLongLong();
 
@@ -2769,14 +2820,16 @@ void MediaServerProcess::run()
         std::chrono::milliseconds(SYSTEM_USAGE_DUMP_TIMEOUT));
 
     QnRecordingManager::instance()->start();
-    QnMServerResourceSearcher::instance()->start();
+    if (!isDiscoveryDisabled)
+        QnMServerResourceSearcher::instance()->start();
     m_universalTcpListener->start();
     serverConnector->start();
 #if 1
     if (ec2Connection->connectionInfo().ecUrl.scheme() == "file") {
         // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
         qnCommon->setCloudMode(true);
-        m_moduleFinder->start();
+        if (!isDiscoveryDisabled)
+            m_moduleFinder->start();
     }
 #endif
     qnBackupStorageMan->scheduleSync()->start();
@@ -3216,6 +3269,15 @@ int MediaServerProcess::main(int argc, char* argv[])
 
 #ifdef __linux__
     signal( SIGUSR1, SIGUSR1_handler );
+#endif
+
+
+#ifndef EDGE_SERVER
+    std::unique_ptr<TextToWaveServer> textToWaveServer = std::make_unique<TextToWaveServer>(
+        nx::utils::file_system::applicationDirPath(argc, argv));
+
+    textToWaveServer->start();
+    textToWaveServer->waitForStarted();
 #endif
 
     QnVideoService service( argc, argv );

@@ -87,6 +87,7 @@ public:
     Instrument* rubberBandInstrument() const;
     Instrument* itemLeftClickInstrument() const;
     Instrument* gridAdjustmentInstrument() const;
+    Instrument* sceneClickInstrument() const;
 
     // TODO: #Elric split into menu_controller or smth like that
     bool isMenuEnabled() const {
@@ -170,6 +171,9 @@ protected slots:
     void at_toggleTourModeAction_triggered(bool checked);
     void at_fitInViewAction_triggered();
     void at_checkFileSignatureAction_triggered();
+    void at_nextItemAction_triggered();
+    void at_previousItemAction_triggered();
+    void at_toggleCurrentItemMaximizationState_triggered();
 
     void at_zoomedToggle_activated();
     void at_zoomedToggle_deactivated();
@@ -179,6 +183,10 @@ protected slots:
     void updateLayoutInstruments(const QnLayoutResourcePtr &layout);
 
     void at_ptzProcessStarted(QnMediaResourceWidget *widget);
+
+private: 
+    void toggleCurrentItemMaximizationState();
+
 private:
     /* Global state. */
 
@@ -229,6 +237,8 @@ private:
 
     /** Instrument that tracks left clicks on items. */
     ClickInstrument *m_itemLeftClickInstrument;
+
+    ClickInstrument* m_sceneClickInstrument = nullptr;
 
     ZoomWindowInstrument* m_zoomWindowInstrument;
 

@@ -20,7 +20,7 @@
         <buildLib>sharedlib</buildLib>
 
         <qt.libs>core gui network xml sql concurrent</qt.libs>
-        <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_fusion -lnx_utils -lcloud_db_client</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
 
@@ -38,7 +38,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
-		
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_network</artifactId>
@@ -65,6 +65,15 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
         </dependency>         
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cloud_db_client</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/cloud_db_client/pom.xml</systemPath>
+        </dependency>
     </dependencies>    
 
     <profiles>
@@ -106,34 +115,6 @@
                 <buildLib>staticlib</buildLib>
             </properties>
         </profile>
-
-        <profile>
-            <!-- Common Profile for Linux, Mac, Arm -->
-            <id>unix</id>
-            <activation>
-                <os>
-                    <family>unix</family>
-                </os> 
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>common</artifactId>
-                    <version>${project.version}</version>
-                    <type>pom</type> 
-                    <scope>system</scope>
-                    <systemPath>${root.dir}/common/pom.xml</systemPath>            
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>nx_streaming</artifactId>
-                    <version>${project.version}</version>
-                    <type>pom</type> 
-                    <scope>system</scope>
-                    <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-                </dependency>           
-            </dependencies>
-        </profile>        
 
         <profile>
             <id>bpi</id>

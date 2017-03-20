@@ -2,6 +2,7 @@
 
 #include <nx/network/aio/pollable.h>
 #include <nx/utils/thread/mutex_lock_analyzer.h>
+#include <nx/utils/unused.h>
 
 ////////////////////////////////////////////////////////////
 //// class AbstractSocket
@@ -11,6 +12,13 @@ bool AbstractSocket::bind(const QString& localAddress, unsigned short localPort)
     return bind(SocketAddress(localAddress, localPort));
 }
 
+bool AbstractSocket::isInSelfAioThread() const
+{
+    // AbstractSocket does not provide const pollable() just to simplify implementation, so it is
+    // safe to perform a const_cast.
+    const nx::network::Pollable* p = const_cast<AbstractSocket*>(this)->pollable();
+    return p->isInSelfAioThread();
+}
 
 ////////////////////////////////////////////////////////////
 //// class AbstractCommunicatingSocket
@@ -79,6 +87,8 @@ void AbstractCommunicatingSocket::pleaseStopSync(bool checkForLocks)
             if (!pollablePtr || !pollablePtr->isInSelfAioThread())
                 MutexLockAnalyzer::instance()->expectNoLocks();
         }
+    #else
+        QN_UNUSED(checkForLocks);
     #endif
 
     cancelIOSync(nx::network::aio::EventType::etNone);

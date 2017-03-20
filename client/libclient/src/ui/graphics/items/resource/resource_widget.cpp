@@ -31,7 +31,6 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
-#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/controls/html_text_item.h>
 #include <ui/graphics/items/standard/graphics_label.h>
@@ -72,6 +71,8 @@ const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION * 3;
 const QColor infoBackgroundColor = QColor(0, 0, 0, 127); // TODO: #gdm #customization
 
 const QColor overlayTextColor = QColor(255, 255, 255); // TODO: #gdm #customization
+
+const qreal kSelectionOpacity = 0.2;
 
 const float noAspectRatio = -1.0;
 
@@ -143,7 +144,12 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     /* Initialize resource. */
     m_resource = qnResPool->getResourceByUniqueId(item->resourceUid());
     connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
-    connect(m_resource, &QnResource::statusChanged, this, [this] { updateStatusOverlay(true);} );
+    connect(m_resource, &QnResource::statusChanged, this,
+        [this]
+        {
+            const bool animate = display()->animationAllowed();
+            updateStatusOverlay(animate);
+        });
     connect(m_resource, &QnResource::statusChanged, this, &QnResourceWidget::updateOverlayButton);
 
     /* Set up overlay widgets. */
@@ -197,7 +203,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(videowallLicenseHelper, &QnLicenseUsageWatcher::licenseUsageChanged, this,
         [this]
         {
-            updateStatusOverlay(true);
+            const bool animate = display()->animationAllowed();
+            updateStatusOverlay(animate);
         });
 
     /* Run handlers. */
@@ -228,9 +235,7 @@ void QnResourceWidget::addInfoOverlay()
     enum { kMargin = 2 };
 
     m_overlayWidgets->detailsItem->setOptions(infoOptions);
-    m_overlayWidgets->detailsItem->setProperty(Qn::NoBlockMotionSelection, true);
     auto detailsOverlay = new QnScrollableOverlayWidget(Qt::AlignLeft, this);
-    detailsOverlay->setProperty(Qn::NoBlockMotionSelection, true);
     detailsOverlay->setContentsMargins(kMargin, 0, 0, kMargin);
     detailsOverlay->addItem(m_overlayWidgets->detailsItem);
     detailsOverlay->setMaxFillCoeff(QSizeF(0.3, 0.8));
@@ -241,9 +246,7 @@ void QnResourceWidget::addInfoOverlay()
 
 
     m_overlayWidgets->positionItem->setOptions(infoOptions);
-    m_overlayWidgets->positionItem->setProperty(Qn::NoBlockMotionSelection, true);
     auto positionOverlay = new QnScrollableOverlayWidget(Qt::AlignRight, this);
-    positionOverlay->setProperty(Qn::NoBlockMotionSelection, true);
     positionOverlay->setContentsMargins(0, 0, kMargin, kMargin);
     positionOverlay->addItem(m_overlayWidgets->positionItem);
     positionOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
@@ -267,7 +270,6 @@ void QnResourceWidget::createButtons()
 {
     QnImageButtonWidget *closeButton = createStatisticAwareButton(lit("res_widget_close"));
     closeButton->setIcon(qnSkin->icon("item/close.png"));
-    closeButton->setProperty(Qn::NoBlockMotionSelection, true);
     closeButton->setToolTip(tr("Close"));
     connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close);
 
@@ -275,13 +277,11 @@ void QnResourceWidget::createButtons()
     infoButton->setIcon(qnSkin->icon("item/info.png"));
     infoButton->setCheckable(true);
     infoButton->setChecked(item()->displayInfo());
-    infoButton->setProperty(Qn::NoBlockMotionSelection, true);
     infoButton->setToolTip(tr("Information"));
     connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
 
     QnImageButtonWidget *rotateButton = createStatisticAwareButton(lit("res_widget_rotate"));
     rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
-    rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
     rotateButton->setToolTip(tr("Rotate"));
     setHelpTopic(rotateButton, Qn::MainWindow_MediaItem_Rotate_Help);
     connect(rotateButton, &QnImageButtonWidget::pressed, this, &QnResourceWidget::rotationStartRequested);
@@ -439,6 +439,11 @@ QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry, qrea
 QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) const
 {
     return calculateGeometry(enclosingGeometry, this->rotation());
+}
+
+QnResourceWidget::Options QnResourceWidget::options() const
+{
+    return m_options;
 }
 
 QString QnResourceWidget::titleText() const
@@ -695,8 +700,10 @@ int QnResourceWidget::visibleButtons() const
 int QnResourceWidget::calculateButtonsVisibility() const
 {
     int result = Qn::InfoButton;
+    if (qnRuntime->isVideoWallMode())
+        return result;
 
-    if (!(m_options & WindowRotationForbidden))
+    if (!m_options.testFlag(WindowRotationForbidden))
         result |= Qn::RotateButton;
 
     Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
@@ -911,6 +918,8 @@ bool QnResourceWidget::isHovered() const
 // -------------------------------------------------------------------------- //
 void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem * /*option*/, QWidget * /*widget*/)
 {
+    const bool animate = display()->animationAllowed();
+
     QnScopedPainterPenRollback penRollback(painter);
     QnScopedPainterBrushRollback brushRollback(painter);
     QnScopedPainterFontRollback fontRollback(painter);
@@ -941,7 +950,7 @@ void QnResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     m_renderStatus = renderStatus;
     if (renderStatus == Qn::NewFrameRendered)
         m_lastNewFrameTimeMSec = QDateTime::currentMSecsSinceEpoch();
-    updateStatusOverlay(true);
+    updateStatusOverlay(animate);
 
     emit painted();
 }
@@ -950,7 +959,6 @@ void QnResourceWidget::paintChannelForeground(QPainter *, int, const QRectF &)
 {
     return;
 }
-
 
 void QnResourceWidget::updateSelectedState()
 {
@@ -1023,6 +1031,7 @@ void QnResourceWidget::paintWindowFrame(
     if (qFuzzyIsNull(m_frameOpacity))
         return;
 
+    QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
     static const int kFramePadding = 1;
     QnNxStyle::paintCosmeticFrame(painter, rect(), calculateFrameColor(),
         -calculateFrameWidth(), -kFramePadding); //< negative values for outer frame
@@ -1044,7 +1053,7 @@ void QnResourceWidget::paintSelection(QPainter *painter, const QRectF &rect)
         return;
 
     painter->fillRect(rect,
-        toTransparent(qnNxStyle->mainColor(QnNxStyle::Colors::kBrand), 0.1));
+        toTransparent(qnNxStyle->mainColor(QnNxStyle::Colors::kBrand), kSelectionOpacity));
 }
 
 float QnResourceWidget::defaultAspectRatio() const
@@ -1067,28 +1076,34 @@ void QnResourceWidget::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     m_mouseInWidget = true;
 
-    setOverlayVisible();
-    updateHud();
+    const bool animate = display()->animationAllowed();
+
+    setOverlayVisible(true, animate);
+    updateHud(animate);
     base_type::hoverEnterEvent(event);
 }
 
 void QnResourceWidget::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
 {
-    setOverlayVisible();
+    const bool animate = display()->animationAllowed();
+
+    setOverlayVisible(true, animate);
     base_type::hoverMoveEvent(event);
 }
 
 void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     m_mouseInWidget = false;
+    const bool animate = display()->animationAllowed();
 
-    setOverlayVisible(false);
-    updateHud();
+    setOverlayVisible(false, animate);
+    updateHud(animate);
     base_type::hoverLeaveEvent(event);
 }
 
 void QnResourceWidget::optionsChangedNotify(Options changedFlags)
 {
+    const bool animate = display()->animationAllowed();
     const auto visibleButtons = buttonsOverlay()->rightButtonsBar()->visibleButtons();
     const bool infoButtonVisible = (visibleButtons & Qn::InfoButton);
     const bool updateHudWoAnimation =
@@ -1102,7 +1117,7 @@ void QnResourceWidget::optionsChangedNotify(Options changedFlags)
     }
 
     if (changedFlags.testFlag(ActivityPresence))
-        updateHud(true);
+        updateHud(animate);
 
     if (changedFlags.testFlag(DisplaySelection))
         updateSelectedState();
@@ -1117,7 +1132,9 @@ void QnResourceWidget::at_itemDataChanged(int role)
 
 void QnResourceWidget::at_infoButton_toggled(bool toggled)
 {
-    setInfoVisible(toggled);
+    const bool animate = display()->animationAllowed();
+
+    setInfoVisible(toggled, animate);
 }
 
 void QnResourceWidget::at_buttonBar_checkedButtonsChanged()

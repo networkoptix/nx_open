@@ -30,8 +30,10 @@ namespace settings_names {
 
 const QString kNameDisabledVendors(lit("disabledVendors"));
 const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
+const QString kNameAutoUpdateThumbnails(lit("autoUpdateThumbnails"));
 const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
 const QString kAuditTrailPeriodDaysName(lit("auditTrailPeriodDays"));
+const QString kEventLogPeriodDaysName(lit("eventLogPeriodDays"));
 const QString kNameHost(lit("smtpHost"));
 const QString kNamePort(lit("smtpPort"));
 const QString kNameUser(lit("smtpUser"));
@@ -44,6 +46,7 @@ const QString kNameSignature(lit("emailSignature"));
 const QString kNameSupportEmail(lit("emailSupportEmail"));
 const QString kNameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
 const QString kNameTimeSynchronizationEnabled(lit("timeSynchronizationEnabled"));
+const QString kNameSynchronizeTimeWithInternet(lit("synchronizeTimeWithInternet"));
 const QString kNameAutoDiscoveryEnabled(lit("autoDiscoveryEnabled"));
 const QString kNameBackupQualities(lit("backupQualities"));
 const QString kNameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
@@ -112,9 +115,16 @@ public:
     bool isCameraSettingsOptimizationEnabled() const;
     void setCameraSettingsOptimizationEnabled(bool cameraSettingsOptimizationEnabled);
 
+    /**
+     * Allow server auto open streams to cameras sometimes to update camera thumbnail
+     */
+    bool isAutoUpdateThumbnailsEnabled() const;
+    void setAutoUpdateThumbnailsEnabled(bool value);
+
     bool isAuditTrailEnabled() const;
     void setAuditTrailEnabled(bool value);
     int auditTrailPeriodDays() const;
+    int eventLogPeriodDays() const;
 
     bool isAutoDiscoveryEnabled() const;
     void setAutoDiscoveryEnabled(bool enabled);
@@ -181,6 +191,7 @@ public:
 
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
     bool isTimeSynchronizationEnabled() const;
+    bool isSynchronizingTimeWithInternet() const;
     bool takeCameraOwnershipWithoutLock() const;
 
     // -- Cloud settings
@@ -212,6 +223,9 @@ public:
     int maxRtpRetryCount() const;
     void setMaxRtpRetryCount(int newVal);
 
+    int rtpFrameTimeoutMs() const;
+    void setRtpFrameTimeoutMs(int newValue);
+
     std::chrono::seconds proxyConnectTimeout() const;
 
     /*!
@@ -233,7 +247,9 @@ signals:
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
     void auditTrailPeriodDaysChanged();
+    void eventLogPeriodDaysChanged();
     void cameraSettingsOptimizationChanged();
+    void autoUpdateThumbnailsChanged();
     void autoDiscoveryChanged();
     void emailSettingsChanged();
     void ldapSettingsChanged();
@@ -242,6 +258,8 @@ signals:
     void upnpPortMappingEnabledChanged();
     void ec2ConnectionSettingsChanged(const QString& key);
     void cloudSettingsChanged();
+    void cloudCredentialsChanged();
+    void timeSynchronizationSettingsChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -250,6 +268,7 @@ private:
     AdaptorList initLdapAdaptors();
     AdaptorList initStaticticsAdaptors();
     AdaptorList initConnectionAdaptors();
+    AdaptorList initTimeSynchronizationAdaptors();
     AdaptorList initCloudAdaptors();
     AdaptorList initMiscAdaptors();
 
@@ -258,13 +277,16 @@ private:
 
 private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_autoUpdateThumbnailsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
     QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor;
+    QnResourcePropertyAdaptor<int>* m_eventLogPeriodDaysAdaptor;
 
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_autoDiscoveryEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_synchronizeTimeWithInternetAdaptor;
     QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor;
     QnResourcePropertyAdaptor<bool> *m_backupNewCamerasByDefaultAdaptor;
 
@@ -322,6 +344,8 @@ private:
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizePackets;
 
     QnResourcePropertyAdaptor<int>* m_maxRtpRetryCount;
+
+    QnResourcePropertyAdaptor<int>* m_rtpFrameTimeoutMs;
 
     AdaptorList m_allAdaptors;
 

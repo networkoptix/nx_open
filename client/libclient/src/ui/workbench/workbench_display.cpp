@@ -213,7 +213,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_instrumentManager(new InstrumentManager(this)),
     m_viewportAnimator(NULL),
     m_curtainAnimator(NULL),
-    m_frameOpacityAnimator(NULL),
     m_loader(NULL)
 {
     m_widgetByRole.fill(nullptr);
@@ -304,13 +303,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     connect(m_viewportAnimator, SIGNAL(finished()), this, SIGNAL(viewportUngrabbed()));
     connect(m_viewportAnimator, SIGNAL(finished()), m_boundingInstrument, SLOT(recursiveEnable()));
     connect(m_viewportAnimator, SIGNAL(finished()), this, SLOT(at_viewportAnimator_finished()));
-
-    /* Create frame opacity animator. */
-    m_frameOpacityAnimator = new VariantAnimator(this);
-    m_frameOpacityAnimator->setTimer(animationTimer);
-    m_frameOpacityAnimator->setAccessor(new PropertyAccessor("widgetsFrameOpacity"));
-    m_frameOpacityAnimator->setTargetObject(this);
-    m_frameOpacityAnimator->setTimeLimit(500);
 
     /* Connect to context. */
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
@@ -493,6 +485,11 @@ void QnWorkbenchDisplay::setDraggedItems(const QSet<QnWorkbenchItem*>& value)
             continue;
         synchronizeGeometry(item, true);
     }
+}
+
+bool QnWorkbenchDisplay::animationAllowed() const
+{
+    return !m_lightMode.testFlag(Qn::LightModeNoAnimation);
 }
 
 void QnWorkbenchDisplay::initSceneView()
@@ -760,6 +757,8 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
         return;
     }
 
+    const bool animate = animationAllowed();
+
     QnResourceWidget *oldWidget = m_widgetByRole[role];
     QnResourceWidget *newWidget = widget;
     if (oldWidget == newWidget)
@@ -773,13 +772,13 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
             /* Sync new & old geometry. */
             if (oldWidget != NULL)
             {
-                synchronize(oldWidget, true);
+                synchronize(oldWidget, animate);
             }
 
             if (newWidget != NULL)
             {
                 bringToFront(newWidget);
-                synchronize(newWidget, true);
+                synchronize(newWidget, animate);
             }
             break;
         }
@@ -787,22 +786,22 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
         {
             /* Sync new & old items. */
             if (oldWidget != NULL)
-                synchronize(oldWidget, true);
+                synchronize(oldWidget, animate);
 
             m_viewportAnimator->stop();
             if (newWidget != NULL)
             {
                 bringToFront(newWidget);
-                synchronize(newWidget, true);
+                synchronize(newWidget, animate);
 
                 qnWorkbenchAnimations->setupAnimator(m_viewportAnimator, Animations::Id::SceneZoomIn);
-                m_viewportAnimator->moveTo(itemGeometry(newWidget->item()));
+                m_viewportAnimator->moveTo(itemGeometry(newWidget->item()), animate);
                 m_curtainAnimator->curtain(newWidget);
             }
             else
             {
                 qnWorkbenchAnimations->setupAnimator(m_viewportAnimator, Animations::Id::SceneZoomOut);
-                m_viewportAnimator->moveTo(fitInViewGeometry());
+                m_viewportAnimator->moveTo(fitInViewGeometry(), animate);
                 m_curtainAnimator->uncurtain();
             }
 
@@ -837,6 +836,34 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
             {
                 newWidget->setOption(QnResourceWidget::FullScreenMode, true);
                 newWidget->setOption(QnResourceWidget::ActivityPresence, true);
+            }
+
+            /* Hide / show other items when zoomed. */
+            static const qreal kOpaque = 1.0;
+            static const qreal kTransparent = 0.0;
+
+            auto setOpacity = [animate](QGraphicsObject* item, qreal value)
+                {
+                    if (animate)
+                    {
+                        opacityAnimator(item)->animateTo(value);
+                    }
+                    else
+                    {
+                        if (hasOpacityAnimator(item))
+                            opacityAnimator(item)->stop();
+                        item->setOpacity(value);
+                    }
+                };
+
+            if (newWidget)
+                setOpacity(newWidget, kOpaque);
+
+            const auto opacity = (newWidget ? kTransparent : kOpaque);
+            for(auto widget: m_widgets)
+            {
+                if (widget != newWidget)
+                    setOpacity(widget, opacity);
             }
 
             /* Update margin flags. */
@@ -978,7 +1005,7 @@ void QnWorkbenchDisplay::fitInView(bool animate)
 
     if (animate)
     {
-        m_viewportAnimator->moveTo(targetGeometry);
+        m_viewportAnimator->moveTo(targetGeometry, true);
     }
     else
     {
@@ -1399,7 +1426,7 @@ void QnWorkbenchDisplay::setWidgetsFrameOpacity(qreal opacity)
 
     m_frameOpacity = opacity;
 
-    foreach(QnResourceWidget *widget, m_widgets)
+    for (auto widget: m_widgets)
         widget->setFrameOpacity(opacity);
 }
 
@@ -1615,8 +1642,8 @@ void QnWorkbenchDisplay::synchronize(QnResourceWidget *widget, bool animate)
         return;
     }
 
-    synchronizeGeometry(widget, animate);
     synchronizeZoomRect(widget);
+    synchronizeGeometry(widget, animate);
     synchronizeLayer(widget);
 }
 
@@ -1891,10 +1918,12 @@ void QnWorkbenchDisplay::at_viewportAnimator_finished()
 
 void QnWorkbenchDisplay::at_layout_itemAdded(QnWorkbenchItem *item)
 {
-    if (addItemInternal(item, true))
+    const bool animate = animationAllowed();
+    static const bool kStartDisplay = true;
+    if (addItemInternal(item, animate, kStartDisplay))
     {
         synchronizeSceneBounds();
-        fitInView();
+        fitInView(animate);
 
         workbench()->setItem(Qn::ZoomedRole, NULL); /* Unzoom & fit in view on item addition. */
     }
@@ -1902,7 +1931,9 @@ void QnWorkbenchDisplay::at_layout_itemAdded(QnWorkbenchItem *item)
 
 void QnWorkbenchDisplay::at_layout_itemRemoved(QnWorkbenchItem *item)
 {
-    if (removeItemInternal(item, true, false))
+    static const bool kDestroyWidget = true;
+    static const bool kDestroyItem = false;
+    if (removeItemInternal(item, kDestroyWidget, kDestroyItem))
         synchronizeSceneBounds();
 }
 
@@ -1927,7 +1958,7 @@ void QnWorkbenchDisplay::at_layout_boundingRectChanged(const QRect &oldRect, con
         ? newRect
         : newRect.united(backgroundBoundingRect);
     if (oldBoundingRect != newBoundingRect)
-        fitInView();
+        fitInView(animationAllowed());
 }
 
 void QnWorkbenchDisplay::at_workbench_itemChanged(Qn::ItemRole role, QnWorkbenchItem *item)
@@ -2220,8 +2251,9 @@ void QnWorkbenchDisplay::at_item_flagChanged(Qn::ItemFlag flag, bool value)
             synchronizeLayer(static_cast<QnWorkbenchItem *>(sender()));
             break;
         case Qn::PendingGeometryAdjustment:
+            /* Changing item flags here may confuse the callee, so we do it through the event loop. */
             if (value)
-                adjustGeometryLater(static_cast<QnWorkbenchItem *>(sender())); /* Changing item flags here may confuse the callee, so we do it through the event loop. */
+                adjustGeometryLater(static_cast<QnWorkbenchItem *>(sender()), animationAllowed());
             break;
         default:
             qnWarning("Invalid item flag '%1'.", static_cast<int>(flag));
@@ -2243,7 +2275,8 @@ void QnWorkbenchDisplay::at_widgetActivityInstrument_activityStarted()
 
 void QnWorkbenchDisplay::at_widget_aspectRatioChanged()
 {
-    synchronizeGeometry(static_cast<QnResourceWidget*>(sender()), true);
+    const bool animate = animationAllowed();
+    synchronizeGeometry(static_cast<QnResourceWidget*>(sender()), animate);
 }
 
 void QnWorkbenchDisplay::at_widget_aboutToBeDestroyed()
@@ -2292,35 +2325,32 @@ void QnWorkbenchDisplay::at_view_destroyed()
 
 void QnWorkbenchDisplay::at_mapper_originChanged()
 {
-    synchronizeAllGeometries(true);
+    const bool animate = animationAllowed();
 
+    synchronizeAllGeometries(animate);
     synchronizeSceneBounds();
-
-    fitInView();
+    fitInView(animate);
 }
 
 void QnWorkbenchDisplay::at_mapper_cellSizeChanged()
 {
-    synchronizeAllGeometries(true);
+    const bool animate = animationAllowed();
 
+    synchronizeAllGeometries(animate);
     synchronizeSceneBounds();
-
-    fitInView();
+    fitInView(animate);
 }
 
 void QnWorkbenchDisplay::at_mapper_spacingChanged()
 {
     synchronizeAllGeometries(false);
-
     synchronizeSceneBounds();
-
     fitInView(false);
 
-
     if (qFuzzyIsNull(workbench()->mapper()->spacing()))
-        m_frameOpacityAnimator->animateTo(0.0);
+        setWidgetsFrameOpacity(0.0);
     else
-        m_frameOpacityAnimator->animateTo(1.0);
+        setWidgetsFrameOpacity(1.0);
 }
 
 void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &resource)

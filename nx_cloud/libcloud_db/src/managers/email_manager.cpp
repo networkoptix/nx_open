@@ -1,8 +1,3 @@
-/**********************************************************
-* Aug 12, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "email_manager.h"
 
 #include <future>
@@ -19,14 +14,12 @@
 
 #include "notification.h"
 
-
 namespace nx {
 namespace cdb {
 
-EMailManager::EMailManager( const conf::Settings& settings )
-:
-    m_settings( settings ),
-    m_terminated( false )
+EMailManager::EMailManager(const conf::Settings& settings):
+    m_settings(settings),
+    m_terminated(false)
 {
     m_notificationModuleUrl = m_settings.notification().url;
 }
@@ -48,9 +41,10 @@ void EMailManager::sendAsync(
         if (completionHandler)
         {
             nx::network::SocketGlobals::aioService().post(
-                [asyncOperationLocker, completionHandler]() {
-                completionHandler(false);
-            });
+                [asyncOperationLocker, completionHandler]()
+                {
+                    completionHandler(false);
+                });
         }
         return;
     }
@@ -68,6 +62,7 @@ void EMailManager::sendAsync(
                 std::move(completionHandler));
         },
         Qt::DirectConnection);
+
     {
         QnMutexLocker lk(&m_mutex);
         m_ongoingRequests.insert(httpClient);
@@ -97,33 +92,34 @@ void EMailManager::onSendNotificationRequestDone(
     }
 
     if (completionHandler)
+    {
         completionHandler(
             client->response() &&
-            (client->response()->statusLine.statusCode / 100 == nx_http::StatusCode::ok / 100));
-
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_ongoingRequests.erase(client);
+            nx_http::StatusCode::isSuccessCode(client->response()->statusLine.statusCode));
     }
+
+    QnMutexLocker lk(&m_mutex);
+    m_ongoingRequests.erase(client);
 }
 
+//-------------------------------------------------------------------------------------------------
+// EMailManagerFactory
 
-static std::function<std::unique_ptr<AbstractEmailManager>(
-    const conf::Settings& settings)> kEMailManagerFactoryFunc;
+static EMailManagerFactory::FactoryFunc eMailManagerFactoryFunc;
 
 std::unique_ptr<AbstractEmailManager> EMailManagerFactory::create(const conf::Settings& settings)
 {
-    return kEMailManagerFactoryFunc
-        ? kEMailManagerFactoryFunc(settings)
+    return eMailManagerFactoryFunc
+        ? eMailManagerFactoryFunc(settings)
         : std::make_unique<EMailManager>(settings);
 }
 
-void EMailManagerFactory::setFactory(
-    std::function<std::unique_ptr<AbstractEmailManager>(
-        const conf::Settings& settings)> factoryFunc)
+EMailManagerFactory::FactoryFunc EMailManagerFactory::setFactory(FactoryFunc factoryFunc)
 {
-    kEMailManagerFactoryFunc = std::move(factoryFunc);
+    auto previousFunc = std::move(eMailManagerFactoryFunc);
+    eMailManagerFactoryFunc = std::move(factoryFunc);
+    return previousFunc;
 }
 
-}   //cdb
-}   //nx
+} // namespace cdb
+} // namespace nx

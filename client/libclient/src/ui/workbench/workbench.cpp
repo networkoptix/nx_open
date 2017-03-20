@@ -195,6 +195,11 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
         oldCellAspectRatio = m_currentLayout->cellAspectRatio();
         oldCellSpacing = m_currentLayout->cellSpacing();
 
+        const auto activeItem = m_itemByRole[Qn::ActiveRole];
+        m_currentLayout->setData(Qn::LayoutActiveItemRole, activeItem
+            ? QVariant::fromValue(activeItem->uuid())
+            : QVariant());
+
         for(int i = 0; i < Qn::ItemRoleCount; i++)
             setItem(static_cast<Qn::ItemRole>(i), NULL);
 
@@ -218,7 +223,9 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
     if(m_currentLayout == NULL)
         return;
 
-    emit currentLayoutChanged();
+    const auto activeItemUuid = m_currentLayout->data(Qn::LayoutActiveItemRole).value<QnUuid>();
+    if (!activeItemUuid.isNull())
+        setItem(Qn::ActiveRole, m_currentLayout->item(activeItemUuid));
 
     connect(m_currentLayout,    SIGNAL(itemAdded(QnWorkbenchItem *)),           this, SLOT(at_layout_itemAdded(QnWorkbenchItem *)));
     connect(m_currentLayout,    SIGNAL(itemRemoved(QnWorkbenchItem *)),         this, SLOT(at_layout_itemRemoved(QnWorkbenchItem *)));
@@ -237,6 +244,8 @@ void QnWorkbench::setCurrentLayout(QnWorkbenchLayout *layout) {
     updateActiveRoleItem();
 
     m_inLayoutChangeProcess = false;
+
+    emit currentLayoutChanged();
     emit layoutChangeProcessFinished();
 }
 
@@ -257,6 +266,7 @@ void QnWorkbench::setItem(Qn::ItemRole role, QnWorkbenchItem *item)
     if (!validLayout)
         return;
 
+    emit itemAboutToBeChanged(role);
     m_itemByRole[role] = item;
     emit itemChanged(role);
 

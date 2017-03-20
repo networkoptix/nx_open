@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "mediaserver_launcher.h"
 #include <api/app_server_connection.h>
+#include <nx/network/http/auth_tools.h>
 #include <nx/network/http/httpclient.h>
 #include <http/custom_headers.h>
 
@@ -32,89 +33,144 @@ public:
 
     virtual void SetUp() override
     {
+        auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
+
         userData.id = QnUuid::createUuid();
         userData.name = "Vasja pupkin@gmail.com";
         userData.email = userData.name;
         userData.isEnabled = true;
         userData.isCloud = true;
-        {
-            auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
-            ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
-            ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(userData));
-        }
+        ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(userData));
+
+        ldapUserWithEmptyDigest.id = QnUuid::createUuid();
+        ldapUserWithEmptyDigest.name = "ldap user 1";
+        ldapUserWithEmptyDigest.isEnabled = true;
+        ldapUserWithEmptyDigest.isLdap = true;
+        ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(ldapUserWithEmptyDigest));
+
+        ldapUserWithFilledDigest.id = QnUuid::createUuid();
+        ldapUserWithFilledDigest.name = "ldap user 2";
+        ldapUserWithFilledDigest.isEnabled = true;
+        ldapUserWithFilledDigest.isLdap = true;
+        ldapUserWithFilledDigest.digest = "some digest";
+        ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(ldapUserWithFilledDigest));
+    }
+
+    void addLocalUser(QString userName, QString password)
+    {
+        auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
+
+        userData.id = QnUuid::createUuid();
+        userData.name = userName;
+        userData.digest = nx_http::calcHa1(userName, QnAppInfo::realm(), password);
+        userData.isEnabled = true;
+        userData.isCloud = false;
+        ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(userData));
+    }
+
+    void assertServerAcceptsUserCredentials(QString userName, QString password)
+    {
+        testServerReturnCode(
+            userName,
+            password,
+            nx_http::AsyncHttpClient::authDigest,
+            nx_http::StatusCode::ok,
+            boost::none);
+    }
+
+    void testServerReturnCode(
+        const ec2::ApiUserData& userDataToUse,
+        nx_http::AsyncHttpClient::AuthType authType,
+        int expectedStatusCode,
+        Qn::AuthResult expectedAuthResult)
+    {
+        testServerReturnCode(
+            userDataToUse.name,
+            "invalid password",
+            authType,
+            expectedStatusCode,
+            expectedAuthResult);
+    }
+
+    void testCookieAuth(
+        const QString& login,
+        const QString& password,
+        QnRestResult::Error expectedError)
+    {
+        QnCookieData cookieLogin;
+        cookieLogin.auth = createHttpQueryAuthParam(
+            login,
+            password,
+            QnAppInfo::realm().toUtf8(),
+            nx_http::Method::GET,
+            QnAuthHelper::instance()->generateNonce());
+
+        auto msgBody = QJson::serialized(cookieLogin);
+        QUrl url = mediaServerLauncher->apiUrl();
+        url.setPath("/api/cookieLogin");
+        nx_http::HttpClient httpClient;
+        httpClient.doPost(url, "application/json", msgBody);
+        ASSERT_TRUE(httpClient.response());
+
+        QByteArray response;
+        while (!httpClient.eof())
+            response += httpClient.fetchMessageBodyBuffer();
+        QnJsonRestResult jsonResult = QJson::deserialized<QnJsonRestResult>(response);
+        ASSERT_EQ(expectedError, jsonResult.error);
     }
 
     ec2::ApiUserData userData;
+    ec2::ApiUserData ldapUserWithEmptyDigest;
+    ec2::ApiUserData ldapUserWithFilledDigest;
+
     static std::unique_ptr<MediaServerLauncher> mediaServerLauncher;
-};
-std::unique_ptr<MediaServerLauncher> AuthReturnCodeTest::mediaServerLauncher;
 
-void testServerReturnCode(
-    const ec2::ApiUserData& userData,
-    const MediaServerLauncher* mediaServerLauncher,
-    nx_http::AsyncHttpClient::AuthType authType,
-    int expectedStatusCode,
-    Qn::AuthResult expectedAuthResult)
-{
-    // Waiting for server to come up
-
-    nx_http::HttpClient httpClient;
-    httpClient.setUserName(userData.name);
-    httpClient.setUserPassword("invalid password");
-    httpClient.setAuthType(authType);
-    const auto startTime = std::chrono::steady_clock::now();
-    constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
-    while (std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart)
+private:
+    void testServerReturnCode(
+        const QString& login,
+        const QString& password,
+        nx_http::AsyncHttpClient::AuthType authType,
+        int expectedStatusCode,
+        boost::optional<Qn::AuthResult> expectedAuthResult)
     {
-        if (mediaServerLauncher->port() == 0)
+        // Waiting for server to come up
+
+        nx_http::HttpClient httpClient;
+        httpClient.setUserName(login);
+        httpClient.setUserPassword(password);
+        httpClient.setAuthType(authType);
+        const auto startTime = std::chrono::steady_clock::now();
+        constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
+        while (std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart)
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            continue;
+            if (mediaServerLauncher->port() == 0)
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                continue;
+            }
+            QUrl url = mediaServerLauncher->apiUrl();
+            url.setPath("/ec2/getUsers");
+            if (httpClient.doGet(url))
+                break;  //< Server is alive
         }
-        QUrl url = mediaServerLauncher->apiUrl();
-        url.setPath("/ec2/getUsers");
-        if (httpClient.doGet(url))
-            break;  //< Server is alive
+        ASSERT_TRUE(httpClient.response());
+        auto statusCode = httpClient.response()->statusLine.statusCode;
+        ASSERT_EQ(expectedStatusCode, statusCode);
+
+        if (expectedAuthResult)
+        {
+            QString authResultStr = nx_http::getHeaderValue(httpClient.response()->headers, Qn::AUTH_RESULT_HEADER_NAME);
+            ASSERT_FALSE(authResultStr.isEmpty());
+
+            Qn::AuthResult authResult = QnLexical::deserialized<Qn::AuthResult>(authResultStr);
+            ASSERT_EQ(expectedAuthResult, authResult);
+        }
     }
-    ASSERT_TRUE(httpClient.response());
-    auto statusCode = httpClient.response()->statusLine.statusCode;
-    ASSERT_EQ(expectedStatusCode, statusCode);
+};
 
-    QString authResultStr = nx_http::getHeaderValue(httpClient.response()->headers, Qn::AUTH_RESULT_HEADER_NAME);
-    ASSERT_FALSE(authResultStr.isEmpty());
-
-    Qn::AuthResult authResult = QnLexical::deserialized<Qn::AuthResult>(authResultStr);
-    ASSERT_EQ(expectedAuthResult, authResult);
-}
-
-void testCookieAuth(
-    const QString& login,
-    const QString& password,
-    const MediaServerLauncher* mediaServerLauncher,
-    QnRestResult::Error expectedError)
-{
-    QnCookieData cookieLogin;
-    cookieLogin.auth = createHttpQueryAuthParam(
-        login,
-        password,
-        QnAppInfo::realm().toUtf8(),
-        nx_http::Method::GET,
-        QnAuthHelper::instance()->generateNonce());
-
-    auto msgBody = QJson::serialized(cookieLogin);
-    QUrl url = mediaServerLauncher->apiUrl();
-    url.setPath("/api/cookieLogin");
-    nx_http::HttpClient httpClient;
-    httpClient.doPost(url, "application/json", msgBody);
-    ASSERT_TRUE(httpClient.response());
-    auto statusCode = httpClient.response()->statusLine.statusCode;
-
-    QByteArray response;
-    while (!httpClient.eof())
-        response += httpClient.fetchMessageBodyBuffer();
-    QnJsonRestResult jsonResult = QJson::deserialized<QnJsonRestResult>(response);
-    ASSERT_EQ(expectedError, jsonResult.error);
-}
+std::unique_ptr<MediaServerLauncher> AuthReturnCodeTest::mediaServerLauncher;
 
 TEST_F(AuthReturnCodeTest, authWhileRestart)
 {
@@ -124,7 +180,6 @@ TEST_F(AuthReturnCodeTest, authWhileRestart)
     mediaServerLauncher->startAsync();
     testServerReturnCode(
         userData,
-        mediaServerLauncher.get(),
         nx_http::AsyncHttpClient::authBasic,
         nx_http::StatusCode::forbidden,
         Qn::Auth_Forbidden);
@@ -135,7 +190,6 @@ TEST_F(AuthReturnCodeTest, noCloudConnect)
     // We have cloud user but not connected to cloud yet.
     testServerReturnCode(
         userData,
-        mediaServerLauncher.get(),
         nx_http::AsyncHttpClient::authDigest,
         nx_http::StatusCode::unauthorized,
         Qn::Auth_CloudConnectError);
@@ -147,7 +201,6 @@ TEST_F(AuthReturnCodeTest, cookieNoCloudConnect)
     // We have cloud user but not connected to cloud yet.
     testCookieAuth(
         userData.name, "invalid password",
-        mediaServerLauncher.get(),
         QnRestResult::CantProcessRequest);
 }
 
@@ -156,7 +209,6 @@ TEST_F(AuthReturnCodeTest, cookieWrongPassword)
     // Check return code for wrong password
     testCookieAuth(
         "admin", "invalid password",
-        mediaServerLauncher.get(),
         QnRestResult::InvalidParameter);
 }
 
@@ -165,6 +217,30 @@ TEST_F(AuthReturnCodeTest, cookieCorrectPassword)
     // Check success auth
     testCookieAuth(
         "admin", "admin",
-        mediaServerLauncher.get(),
         QnRestResult::NoError);
+}
+
+TEST_F(AuthReturnCodeTest, localUserWithCloudLikeName)
+{
+    const QString userCredentials[] = {"username@", "password"};
+
+    addLocalUser(userCredentials[0], userCredentials[1]);
+    assertServerAcceptsUserCredentials(userCredentials[0], userCredentials[1]);
+}
+
+TEST_F(AuthReturnCodeTest, noLdapConnect)
+{
+    // We have cloud user but not connected to cloud yet.
+    testServerReturnCode(
+        ldapUserWithEmptyDigest,
+        nx_http::AsyncHttpClient::authBasicAndDigest,
+        nx_http::StatusCode::unauthorized,
+        Qn::Auth_LDAPConnectError);
+
+    // We have cloud user but not connected to cloud yet.
+    testServerReturnCode(
+        ldapUserWithFilledDigest,
+        nx_http::AsyncHttpClient::authDigest,
+        nx_http::StatusCode::unauthorized,
+        Qn::Auth_LDAPConnectError);
 }

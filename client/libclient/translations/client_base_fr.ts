@@ -33,10 +33,9 @@
     <message>
         <source>Zoom timeline
 to view more bookmarks</source>
-        <comment>Use &apos;
-&apos; to split message in two lines (required)</comment>
-        <translation>Zoom Ligne de temps
-pour voir plus de signets</translation>
+        <comment>It is highly recommended to split message in two lines</comment>
+        <translation>Zoom sur chronologie 
+pour afficher plus de signets</translation>
     </message>
 </context>
 <context>
@@ -92,20 +91,36 @@ pour voir plus de signets</translation>
         <translation>Mois</translation>
     </message>
     <message>
-        <source>All Data</source>
-        <translation>Toutes Données</translation>
+        <source>For the last 5 min</source>
+        <translation>Pour les 5 dernières minutes</translation>
+    </message>
+    <message>
+        <source>For the last hour</source>
+        <translation>Pour la dernière heure</translation>
+    </message>
+    <message>
+        <source>For the last day</source>
+        <translation>Pour le dernier jour</translation>
+    </message>
+    <message>
+        <source>For the last week</source>
+        <translation>Pour la dernière semaine</translation>
+    </message>
+    <message>
+        <source>For the last month</source>
+        <translation>Pour le dernier mois</translation>
+    </message>
+    <message>
+        <source>All data</source>
+        <translation>Toutes les données</translation>
+    </message>
+    <message>
+        <source>For all data</source>
+        <translation>Pour toutes les données</translation>
     </message>
 </context>
 <context>
     <name>GraphicsScrollBar</name>
-    <message>
-        <source>Top</source>
-        <translation>Haut</translation>
-    </message>
-    <message>
-        <source>Bottom</source>
-        <translation>Bas</translation>
-    </message>
     <message>
         <source>Scroll Here</source>
         <translation>Défilez ici</translation>
@@ -115,8 +130,16 @@ pour voir plus de signets</translation>
         <translation>Bordure Gauche</translation>
     </message>
     <message>
+        <source>Top</source>
+        <translation>Haut</translation>
+    </message>
+    <message>
         <source>Right Edge</source>
         <translation>Bordure Droite</translation>
+    </message>
+    <message>
+        <source>Bottom</source>
+        <translation>Bas</translation>
     </message>
     <message>
         <source>Page Left</source>
@@ -155,62 +178,93 @@ pour voir plus de signets</translation>
     <name>PasswordInformation</name>
     <message>
         <source>Good</source>
-        <translation type="unfinished"></translation>
+        <translation>Bon</translation>
     </message>
     <message>
         <source>Fair</source>
-        <translation type="unfinished"></translation>
+        <translation>Juste</translation>
     </message>
     <message>
         <source>Weak</source>
-        <translation type="unfinished"></translation>
+        <translation>Faible</translation>
     </message>
     <message>
         <source>Password should contain different types of symbols.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe doit contenir différents types de symboles.</translation>
     </message>
     <message>
         <source>Short</source>
-        <translation type="unfinished"></translation>
+        <translation>Court</translation>
     </message>
     <message>
         <source>Password must be at least 8 characters long.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe doit avoir au moins 8 caractères.</translation>
     </message>
     <message>
         <source>Common</source>
-        <translation type="unfinished"></translation>
+        <translation>Commune</translation>
     </message>
     <message>
         <source>This password is in list of the most popular passwords.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce mot de passe est dans la liste des mots de passe plus populaires.</translation>
     </message>
     <message>
         <source>Incorrect</source>
-        <translation type="unfinished"></translation>
+        <translation>Incorrecte</translation>
     </message>
     <message>
         <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uniquement lettres latin, chiffres et symboles clavier sont autorisés.</translation>
     </message>
 </context>
 <context>
     <name>PermissionsInfoTable</name>
     <message>
         <source>Cameras &amp; Resources</source>
-        <translation type="unfinished"></translation>
+        <translation>Caméras &amp; ressources</translation>
     </message>
     <message>
         <source>Shared Layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Mises en page partagées</translation>
     </message>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Tous</translation>
     </message>
     <message>
         <source>Permissions</source>
-        <translation type="unfinished">Autorisations</translation>
+        <translation>Autorisations</translation>
+    </message>
+</context>
+<context>
+    <name>Ptz</name>
+    <message>
+        <source>Please wait for the camera to go online.</source>
+        <translation>S.V.P. attendez que la caméra soit en ligne.</translation>
+    </message>
+    <message>
+        <source>Failed to get current position</source>
+        <translation>Impossible d’obtenir la position actuelle</translation>
+    </message>
+    <message>
+        <source>Failed to set current position</source>
+        <translation>Impossible de définir la position actuelle</translation>
+    </message>
+    <message>
+        <source>Preset used by some tours. Delete it anyway?</source>
+        <translation>Préréglage utilisé par quelques tours. Supprimer quand même ?</translation>
+    </message>
+    <message>
+        <source>These tours will become invalid.</source>
+        <translation>Ces tours deviendront invalides.</translation>
+    </message>
+    <message>
+        <source>Cannot get the current position from camera &quot;%1&quot;</source>
+        <translation>Impossible d’obtenir la position actuelle de la caméra &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>Cannot set the current position for camera &quot;%1&quot;</source>
+        <translation>Impossible de définir la position actuelle de la caméra &quot;%1&quot;</translation>
     </message>
 </context>
 <context>
@@ -233,7 +287,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Auto Focus</source>
-        <translation>Auto Focus</translation>
+        <translation>Focus automatique</translation>
     </message>
     <message>
         <source>Change Dewarping Mode</source>
@@ -243,19 +297,19 @@ pour voir plus de signets</translation>
 <context>
     <name>QObject</name>
     <message>
-        <source>None</source>
-        <translation>Aucun</translation>
-    </message>
-    <message>
         <source>Parameter 1 is null.</source>
         <translation>Paramètre 1 est nul.</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Aucun</translation>
     </message>
 </context>
 <context>
     <name>QPlatformTheme</name>
     <message>
         <source>OK</source>
-        <translation type="unfinished">OK</translation>
+        <translation>OK</translation>
     </message>
 </context>
 <context>
@@ -293,12 +347,12 @@ pour voir plus de signets</translation>
         <translation>Construit pour %1-%2 avec %3.</translation>
     </message>
     <message>
-        <source>Client is not connected to any system</source>
-        <translation type="unfinished"></translation>
+        <source>Customer Support</source>
+        <translation>Soutien à la clientèle</translation>
     </message>
     <message>
-        <source>Customer Support</source>
-        <translation type="unfinished"></translation>
+        <source>Client is not connected to any System</source>
+        <translation>Client n&apos;est pas connecté à un système</translation>
     </message>
 </context>
 <context>
@@ -323,13 +377,13 @@ pour voir plus de signets</translation>
     <name>QnAccessibleResourcesModel</name>
     <message>
         <source>Access granted by:</source>
-        <translation type="unfinished"></translation>
+        <translation>Accès accordé par:</translation>
     </message>
     <message numerus="yes">
         <source>...and %n more</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>...et %n de plus</numerusform>
+            <numerusform>...et %n de plus</numerusform>
         </translation>
     </message>
 </context>
@@ -337,11 +391,11 @@ pour voir plus de signets</translation>
     <name>QnAccessibleResourcesWidget</name>
     <message>
         <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-        <translation type="unfinished"></translation>
+        <translation>Donner accès à certaines mises en page, vous donnez accès à toutes les caméras sur elles. Aussi, l&apos;usager aura accès à toutes nouvelles caméra sur ces mises en page.</translation>
     </message>
     <message>
         <source>All Cameras &amp; Resources</source>
-        <translation type="unfinished"></translation>
+        <translation>Toutes caméras &amp; ressources</translation>
     </message>
 </context>
 <context>
@@ -359,8 +413,20 @@ pour voir plus de signets</translation>
         <translation>Déposer ressources</translation>
     </message>
     <message>
+        <source>Drop Resources into New Layout</source>
+        <translation>Déposer ressources dans une nouvelle mise en page</translation>
+    </message>
+    <message>
+        <source>Delayed Open Video Wall</source>
+        <translation>Delayer l&apos;ouverture Mur Vidéo</translation>
+    </message>
+    <message>
         <source>Delayed Drop Resources</source>
         <translation>Délais de dépôt de ressources</translation>
+    </message>
+    <message>
+        <source>Instant Drop Resources</source>
+        <translation>Dépôt de ressources instantané</translation>
     </message>
     <message>
         <source>Next Layout</source>
@@ -379,8 +445,16 @@ pour voir plus de signets</translation>
         <translation>Sélection modifiée</translation>
     </message>
     <message>
+        <source>Filter...</source>
+        <translation>Filtre...</translation>
+    </message>
+    <message>
         <source>Go to Freespace Mode</source>
         <translation>Passer en mode espace libre</translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation>Aide</translation>
     </message>
     <message>
         <source>Event Log...</source>
@@ -395,6 +469,26 @@ pour voir plus de signets</translation>
         <translation>Poussez mon écran</translation>
     </message>
     <message>
+        <source>Restart application</source>
+        <translation>Redémarrer l&apos;application</translation>
+    </message>
+    <message>
+        <source>Select Time Server</source>
+        <translation>Sélectionner l&apos;heure serveur</translation>
+    </message>
+    <message>
+        <source>Go To Saved Position</source>
+        <translation>Aller à la position sauvegardée</translation>
+    </message>
+    <message>
+        <source>Activate PTZ Tour</source>
+        <translation>Activer le tour PTZ</translation>
+    </message>
+    <message>
+        <source>Activate PTZ Object</source>
+        <translation>Activer l&apos;élément PTZ</translation>
+    </message>
+    <message>
         <source>Fit in View</source>
         <translation>Ajustement de vue</translation>
     </message>
@@ -405,6 +499,14 @@ pour voir plus de signets</translation>
     <message>
         <source>Connect to Server...</source>
         <translation>Connexion au serveur...</translation>
+    </message>
+    <message>
+        <source>Start Panic Recording</source>
+        <translation>Démarrer l&apos;enregistrement panique</translation>
+    </message>
+    <message>
+        <source>Stop Panic Recording</source>
+        <translation>Arrêter l&apos;enregistrement panique</translation>
     </message>
     <message>
         <source>New...</source>
@@ -447,6 +549,10 @@ pour voir plus de signets</translation>
         <translation>Nouveau Mur Vidéo...</translation>
     </message>
     <message>
+        <source>Open Layout...</source>
+        <translation>Ouvrir la mise en page...</translation>
+    </message>
+    <message>
         <source>Open...</source>
         <translation>Ouvrir...</translation>
     </message>
@@ -479,6 +585,10 @@ pour voir plus de signets</translation>
         <translation>Arrêter l&apos;enregistrement d&apos;écran</translation>
     </message>
     <message>
+        <source>Stop current action</source>
+        <translation>Arrêter l&apos;action en cours</translation>
+    </message>
+    <message>
         <source>Go to Fullscreen</source>
         <translation>Aller en plein écran</translation>
     </message>
@@ -495,48 +605,20 @@ pour voir plus de signets</translation>
         <translation>Maximiser</translation>
     </message>
     <message>
-        <source>About...</source>
-        <translation>À propos...</translation>
+        <source>Restore Down</source>
+        <translation>Rétablir le bas</translation>
     </message>
     <message>
-        <source>Exit</source>
-        <translation>Quitter</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>Fermer</translation>
-    </message>
-    <message>
-        <source>Close All But This</source>
-        <translation>Fermer tous sauf ceci</translation>
-    </message>
-    <message>
-        <source>Open in Layout</source>
-        <translation>Ouvrir dans la mise en page</translation>
-    </message>
-    <message>
-        <source>Open</source>
-        <translation>Ouvrir</translation>
-    </message>
-    <message>
-        <source>Open Containing Folder</source>
-        <translation>Ouvrir le dossier contenant</translation>
-    </message>
-    <message>
-        <source>Open Layouts</source>
-        <translation>Ouvrir les mises en page</translation>
-    </message>
-    <message>
-        <source>Delayed Open Video Wall</source>
-        <translation>Delayer l&apos;ouverture Mur Vidéo</translation>
-    </message>
-    <message>
-        <source>Filter...</source>
-        <translation>Filtre...</translation>
+        <source>Open in Browser...</source>
+        <translation>Ouvrir dans le navigateur...</translation>
     </message>
     <message>
         <source>System Administration...</source>
         <translation>Administration Système...</translation>
+    </message>
+    <message>
+        <source>Open Web Client...</source>
+        <translation>Ouvrir le client web...</translation>
     </message>
     <message>
         <source>System Update...</source>
@@ -551,8 +633,40 @@ pour voir plus de signets</translation>
         <translation>Unifier Systèmes...</translation>
     </message>
     <message>
+        <source>About...</source>
+        <translation>À propos...</translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation>Quitter</translation>
+    </message>
+    <message>
         <source>Server...</source>
         <translation>Serveur...</translation>
+    </message>
+    <message>
+        <source>Open in Layout</source>
+        <translation>Ouvrir dans la mise en page</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>Ouvrir</translation>
+    </message>
+    <message>
+        <source>Monitor</source>
+        <translation>Surveiller</translation>
+    </message>
+    <message>
+        <source>Open in New Tab</source>
+        <translation>Ouvrir dans un nouvel onglet</translation>
+    </message>
+    <message>
+        <source>Open in New Window</source>
+        <translation>Ouvrir dans une nouvelle fenêtre</translation>
+    </message>
+    <message>
+        <source>Open Layouts</source>
+        <translation>Ouvrir les mises en page</translation>
     </message>
     <message>
         <source>Open Layout(s)</source>
@@ -561,6 +675,10 @@ pour voir plus de signets</translation>
     <message>
         <source>Open Video Wall(s)</source>
         <translation>Ouvrir Mur Vidéo(s)</translation>
+    </message>
+    <message>
+        <source>Open Containing Folder</source>
+        <translation>Ouvrir le dossier contenant</translation>
     </message>
     <message>
         <source>Identify</source>
@@ -583,12 +701,12 @@ pour voir plus de signets</translation>
         <translation>Charger Matrice</translation>
     </message>
     <message>
-        <source>Stop Video Wall</source>
-        <translation>Arrêter Mur Vidéo</translation>
+        <source>Delete</source>
+        <translation>Supprimer</translation>
     </message>
     <message>
-        <source>Detach Layout</source>
-        <translation>Détacher Mise en page</translation>
+        <source>Stop Video Wall</source>
+        <translation>Arrêter Mur Vidéo</translation>
     </message>
     <message>
         <source>Save Layout</source>
@@ -607,16 +725,68 @@ pour voir plus de signets</translation>
         <translation>Restaurer l&apos;élément</translation>
     </message>
     <message>
+        <source>Show Info</source>
+        <translation>Afficher les infos</translation>
+    </message>
+    <message>
+        <source>Hide Info</source>
+        <translation>Cacher les infos</translation>
+    </message>
+    <message>
+        <source>Toggle Info</source>
+        <translation>Basculer Infos</translation>
+    </message>
+    <message>
+        <source>Change Resolution...</source>
+        <translation>Modifier la résolution...</translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation>Auto</translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation>Bas</translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation>Haut</translation>
+    </message>
+    <message>
+        <source>PTZ...</source>
+        <translation>PTZ...</translation>
+    </message>
+    <message>
+        <source>Save Current Position...</source>
+        <translation>Enregistrer la position actuelle...</translation>
+    </message>
+    <message>
         <source>Manage...</source>
         <translation>Gérer...</translation>
+    </message>
+    <message>
+        <source>Calibrate Fisheye</source>
+        <translation>Calibrer le &apos;fisheye&apos;</translation>
+    </message>
+    <message>
+        <source>Toggle Resolution Mode</source>
+        <translation>Basculer Mode Résolution</translation>
     </message>
     <message>
         <source>Show Motion/Smart Search</source>
         <translation>Afficher la recherche Mouvement/Intelligente</translation>
     </message>
     <message>
+        <source>Show Motion</source>
+        <translation>Afficher les mouvements</translation>
+    </message>
+    <message>
         <source>Hide Motion/Smart Search</source>
         <translation>Cacher la recherche Mouvement/Intelligente</translation>
+    </message>
+    <message>
+        <source>Hide Motion</source>
+        <translation>Cacher les mouvements</translation>
     </message>
     <message>
         <source>Clear Motion Selection</source>
@@ -633,6 +803,14 @@ pour voir plus de signets</translation>
     <message>
         <source>Take Screenshot</source>
         <translation>Prendre une capture d&apos;écran</translation>
+    </message>
+    <message>
+        <source>Image Enhancement...</source>
+        <translation>Amélioration de l&apos;image...</translation>
+    </message>
+    <message>
+        <source>Create Zoom Window</source>
+        <translation>Créer une fenêtre zoom</translation>
     </message>
     <message>
         <source>Rotate to...</source>
@@ -659,10 +837,6 @@ pour voir plus de signets</translation>
         <translation>Retirer de la mise en page</translation>
     </message>
     <message>
-        <source>Delete</source>
-        <translation>Supprimer</translation>
-    </message>
-    <message>
         <source>Rename</source>
         <translation>Renommer</translation>
     </message>
@@ -671,16 +845,48 @@ pour voir plus de signets</translation>
         <translation>Supprimer du disque</translation>
     </message>
     <message>
+        <source>Set as Layout Background</source>
+        <translation>Définir comme mise en page d&apos;arrière plan</translation>
+    </message>
+    <message>
         <source>User Settings...</source>
         <translation>Paramètres Usager...</translation>
+    </message>
+    <message>
+        <source>Layout Settings...</source>
+        <translation>Paramètres de la mise en page...</translation>
     </message>
     <message>
         <source>Video Wall Settings...</source>
         <translation>Paramètres Mur Vidéo...</translation>
     </message>
     <message>
+        <source>Ping...</source>
+        <translation>Ping...</translation>
+    </message>
+    <message>
+        <source>Server Logs...</source>
+        <translation>Journals Serveur...</translation>
+    </message>
+    <message>
+        <source>Server Diagnostics...</source>
+        <translation>Diagnostics Serveur...</translation>
+    </message>
+    <message>
         <source>Server Settings...</source>
         <translation>Paramètres Serveur...</translation>
+    </message>
+    <message>
+        <source>Merge to Currently Connected System...</source>
+        <translation>Unifier au Système Actuellement Connecté...</translation>
+    </message>
+    <message>
+        <source>Change Cell Aspect Ratio...</source>
+        <translation>Modifier le format de la cellule...</translation>
+    </message>
+    <message>
+        <source>Change Cell Spacing...</source>
+        <translation>Modifier l&apos;espacement des cellules...</translation>
     </message>
     <message>
         <source>None</source>
@@ -699,6 +905,22 @@ pour voir plus de signets</translation>
         <translation>Grand</translation>
     </message>
     <message>
+        <source>Start Tour</source>
+        <translation>Démarrer le tour</translation>
+    </message>
+    <message>
+        <source>Stop Tour</source>
+        <translation>Arrêter le tour</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>Close All But This</source>
+        <translation>Fermer tous sauf ceci</translation>
+    </message>
+    <message>
         <source>Mark Selection Start</source>
         <translation>Marquer la sélection de début</translation>
     </message>
@@ -711,6 +933,10 @@ pour voir plus de signets</translation>
         <translation>Effacer la sélection</translation>
     </message>
     <message>
+        <source>Zoom to Selection</source>
+        <translation>Zoom sur la sélection</translation>
+    </message>
+    <message>
         <source>Edit Bookmark...</source>
         <translation>Éditer Signet...</translation>
     </message>
@@ -719,40 +945,24 @@ pour voir plus de signets</translation>
         <translation>Enlever Signet...</translation>
     </message>
     <message>
-        <source>Show Thumbnails</source>
-        <translation>Afficher les miniatures</translation>
+        <source>Export Selected Area...</source>
+        <translation>Exporter la zone sélectionnée...</translation>
     </message>
     <message>
-        <source>Hide Thumbnails</source>
-        <translation>Cacher les miniatures</translation>
+        <source>Export Multi-Video...</source>
+        <translation>Exporter Multi-Vidéo...</translation>
     </message>
     <message>
-        <source>Monitor</source>
-        <translation>Surveiller</translation>
+        <source>Preview Search...</source>
+        <translation>Recherche d&apos;aperçu...</translation>
     </message>
     <message>
-        <source>Start Panic Recording</source>
-        <translation>Démarrer l&apos;enregistrement panique</translation>
+        <source>Play</source>
+        <translation>Lecture</translation>
     </message>
     <message>
-        <source>Stop Panic Recording</source>
-        <translation>Arrêter l&apos;enregistrement panique</translation>
-    </message>
-    <message>
-        <source>Show Calendar</source>
-        <translation>Afficher le Calendrier</translation>
-    </message>
-    <message>
-        <source>Hide Calendar</source>
-        <translation>Cacher le Calendrier</translation>
-    </message>
-    <message>
-        <source>Start Tour</source>
-        <translation>Démarrer le tour</translation>
-    </message>
-    <message>
-        <source>Stop Tour</source>
-        <translation>Arrêter le tour</translation>
+        <source>Pause</source>
+        <translation>Pause</translation>
     </message>
     <message>
         <source>Previous Frame</source>
@@ -787,14 +997,6 @@ pour voir plus de signets</translation>
         <translation>Aller en direct</translation>
     </message>
     <message>
-        <source>Play</source>
-        <translation>Lecture</translation>
-    </message>
-    <message>
-        <source>Pause</source>
-        <translation>Pause</translation>
-    </message>
-    <message>
         <source>Synchronize Streams</source>
         <translation>Synchroniser les flux</translation>
     </message>
@@ -803,52 +1005,20 @@ pour voir plus de signets</translation>
         <translation>Désactiver la synchronisation de flux</translation>
     </message>
     <message>
-        <source>Instant Drop Resources</source>
-        <translation>Dépôt de ressources instantané</translation>
+        <source>Show Thumbnails</source>
+        <translation>Afficher les miniatures</translation>
     </message>
     <message>
-        <source>Help</source>
-        <translation>Aide</translation>
+        <source>Hide Thumbnails</source>
+        <translation>Cacher les miniatures</translation>
     </message>
     <message>
-        <source>Open Layout...</source>
-        <translation>Ouvrir la mise en page...</translation>
+        <source>Show Calendar</source>
+        <translation>Afficher le Calendrier</translation>
     </message>
     <message>
-        <source>Restore Down</source>
-        <translation>Rétablir le bas</translation>
-    </message>
-    <message>
-        <source>Show Info</source>
-        <translation>Afficher les infos</translation>
-    </message>
-    <message>
-        <source>Hide Info</source>
-        <translation>Cacher les infos</translation>
-    </message>
-    <message>
-        <source>Toggle Info</source>
-        <translation>Basculer Infos</translation>
-    </message>
-    <message>
-        <source>Show Motion</source>
-        <translation>Afficher les mouvements</translation>
-    </message>
-    <message>
-        <source>Hide Motion</source>
-        <translation>Cacher les mouvements</translation>
-    </message>
-    <message>
-        <source>Merge to Currently Connected System...</source>
-        <translation>Unifier au Système Actuellement Connecté...</translation>
-    </message>
-    <message>
-        <source>Export Selected Area...</source>
-        <translation>Exporter la zone sélectionnée...</translation>
-    </message>
-    <message>
-        <source>Export Multi-Video...</source>
-        <translation>Exporter Multi-Vidéo...</translation>
+        <source>Hide Calendar</source>
+        <translation>Cacher le Calendrier</translation>
     </message>
     <message>
         <source>Show Title Bar</source>
@@ -883,74 +1053,6 @@ pour voir plus de signets</translation>
         <translation>Cacher la chronologie</translation>
     </message>
     <message>
-        <source>Preview Search...</source>
-        <translation>Recherche d&apos;aperçu...</translation>
-    </message>
-    <message>
-        <source>Stop current action</source>
-        <translation>Arrêter l&apos;action en cours</translation>
-    </message>
-    <message>
-        <source>Change Resolution...</source>
-        <translation>Modifier la résolution...</translation>
-    </message>
-    <message>
-        <source>Auto</source>
-        <translation>Auto</translation>
-    </message>
-    <message>
-        <source>Low</source>
-        <translation>Bas</translation>
-    </message>
-    <message>
-        <source>High</source>
-        <translation>Haut</translation>
-    </message>
-    <message>
-        <source>PTZ...</source>
-        <translation>PTZ...</translation>
-    </message>
-    <message>
-        <source>Save Current Position...</source>
-        <translation>Enregistrer la position actuelle...</translation>
-    </message>
-    <message>
-        <source>Go To Saved Position</source>
-        <translation>Aller à la position sauvegardée</translation>
-    </message>
-    <message>
-        <source>Toggle Resolution Mode</source>
-        <translation>Basculer Mode Résolution</translation>
-    </message>
-    <message>
-        <source>Change Cell Aspect Ratio...</source>
-        <translation>Modifier le format de la cellule...</translation>
-    </message>
-    <message>
-        <source>Change Cell Spacing...</source>
-        <translation>Modifier l&apos;espacement des cellules...</translation>
-    </message>
-    <message>
-        <source>Layout Settings...</source>
-        <translation>Paramètres de la mise en page...</translation>
-    </message>
-    <message>
-        <source>Create Zoom Window</source>
-        <translation>Créer une fenêtre zoom</translation>
-    </message>
-    <message>
-        <source>Set as Layout Background</source>
-        <translation>Définir comme mise en page d&apos;arrière plan</translation>
-    </message>
-    <message>
-        <source>Ping...</source>
-        <translation>Ping...</translation>
-    </message>
-    <message>
-        <source>Server Diagnostics...</source>
-        <translation>Diagnostics Serveur...</translation>
-    </message>
-    <message>
         <source>Pin Notifications</source>
         <translation>Attacher les notifications</translation>
     </message>
@@ -959,65 +1061,8 @@ pour voir plus de signets</translation>
         <translation>Détacher les notifications</translation>
     </message>
     <message>
-        <source>Open in Browser...</source>
-        <translation>Ouvrir dans le navigateur...</translation>
-    </message>
-    <message>
-        <source>Open in New Tab</source>
-        <translation>Ouvrir dans un nouvel onglet</translation>
-    </message>
-    <message>
-        <source>Open in New Window</source>
-        <translation>Ouvrir dans une nouvelle fenêtre</translation>
-    </message>
-    <message>
-        <source>Open Web Client...</source>
-        <translation>Ouvrir le client web...</translation>
-    </message>
-    <message>
-        <source>Image Enhancement...</source>
-        <translation>Amélioration de l&apos;image...</translation>
-    </message>
-    <message>
-        <source>Server Logs...</source>
-        <translation>Journals Serveur...</translation>
-    </message>
-    <message>
-        <source>How-to Videos and FAQ...</source>
-        <translatorcomment>Added a note saying to french speaking that these video/faq are in english</translatorcomment>
-        <translation>(Anglais)Vidéo &apos;Comment faire...&apos; et FAQ...</translation>
-    </message>
-    <message>
-        <source>Restart application</source>
-        <translation>Redémarrer l&apos;application</translation>
-    </message>
-    <message>
-        <source>Activate PTZ Tour</source>
-        <translation>Activer le tour PTZ</translation>
-    </message>
-    <message>
-        <source>Calibrate Fisheye</source>
-        <translation>Calibrer le &apos;fisheye&apos;</translation>
-    </message>
-    <message>
-        <source>Zoom to Selection</source>
-        <translation>Zoom sur la sélection</translation>
-    </message>
-    <message>
         <source>File Settings...</source>
         <translation>Paramètres Fichier...</translation>
-    </message>
-    <message>
-        <source>Drop Resources into New Layout</source>
-        <translation>Déposer ressources dans une nouvelle mise en page</translation>
-    </message>
-    <message>
-        <source>Select Time Server</source>
-        <translation>Sélectionner l&apos;heure serveur</translation>
-    </message>
-    <message>
-        <source>Activate PTZ Object</source>
-        <translation>Activer l&apos;élément PTZ</translation>
     </message>
     <message>
         <source>User Management...</source>
@@ -1205,100 +1250,104 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Event Rules...</source>
-        <translation type="unfinished"></translation>
+        <translation>Règles d&apos;événement...</translation>
     </message>
     <message>
         <source>Disconnect from Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Déconnecter du serveur</translation>
     </message>
     <message>
         <source>Browse Local Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Parcourir les fichiers locaux</translation>
     </message>
     <message>
         <source>Show Welcome Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher l’écran d’accueil</translation>
     </message>
     <message>
         <source>Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Page Web...</translation>
     </message>
     <message>
         <source>New Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouvelle Page Web...</translation>
     </message>
     <message>
         <source>Log in to %1...</source>
         <comment>Log in to Nx Cloud</comment>
-        <translation type="unfinished"></translation>
+        <translation>Connecter à %1...</translation>
     </message>
     <message>
         <source>Log out from %1</source>
         <comment>Log out from Nx Cloud</comment>
-        <translation type="unfinished"></translation>
+        <translation>Deconnecter de %1</translation>
     </message>
     <message>
         <source>Open %1 Portal...</source>
         <comment>Open Nx Cloud Portal</comment>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir Portail %1...</translation>
     </message>
     <message>
         <source>Stop Sharing Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrêter partage de mise en page</translation>
     </message>
     <message>
         <source>User Roles...</source>
-        <translation type="unfinished"></translation>
+        <translation>Rôles Usager...</translation>
     </message>
     <message>
         <source>Role Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Rôle...</translation>
     </message>
     <message>
         <source>Show Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher notifications</translation>
     </message>
     <message>
         <source>Hide Notifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Cacher Notifications</translation>
     </message>
     <message>
         <source>Connect to System</source>
-        <translation type="unfinished"></translation>
+        <translation>Connecter au système</translation>
     </message>
     <message>
         <source>Account Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres compte...</translation>
     </message>
     <message>
         <source>Create Account...</source>
-        <translation type="unfinished"></translation>
+        <translation>Créer Compte...</translation>
     </message>
     <message>
         <source>Server Web Page...</source>
-        <translation type="unfinished"></translation>
+        <translation>Page Web du serveur...</translation>
     </message>
     <message>
         <source>Add Device...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter Périphérique...</translation>
+    </message>
+    <message>
+        <source>Clear Screen</source>
+        <translation>Efface l’écran</translation>
     </message>
 </context>
 <context>
     <name>QnAdjustVideoDialog</name>
     <message>
-        <source>Image Enhancement - %1</source>
-        <translation>Amélioration de l&apos;image - %1</translation>
-    </message>
-    <message>
         <source>Image Enhancement</source>
         <translation>Amélioration de l&apos;image</translation>
+    </message>
+    <message>
+        <source>Image Enhancement - %1</source>
+        <translation>Amélioration de l&apos;image - %1</translation>
     </message>
 </context>
 <context>
     <name>QnAdvancedSettingsWidget</name>
     <message>
         <source>Folder not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Dossier non trouvé</translation>
     </message>
 </context>
 <context>
@@ -1312,19 +1361,19 @@ pour voir plus de signets</translation>
     <name>QnAuditItemDelegate</name>
     <message>
         <source>Play</source>
-        <translation type="unfinished">Lecture</translation>
+        <translation>Lecture</translation>
     </message>
     <message>
         <source>User settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Usager...</translation>
     </message>
     <message>
         <source>Server settings...</source>
-        <translation type="unfinished">Paramètres Serveur...</translation>
+        <translation>Paramètres Serveur...</translation>
     </message>
     <message>
         <source>Camera settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Caméra...</translation>
     </message>
 </context>
 <context>
@@ -1367,51 +1416,70 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Details for %1 session(s) of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Détails pour %1 session(s) de %2</translation>
     </message>
     <message>
         <source>Details for %1 camera(s) of %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Détails pour %1 caméra(s) de %2</translation>
     </message>
     <message>
         <source>No sessions</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune session</translation>
     </message>
     <message>
         <source>No cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune caméra</translation>
     </message>
     <message>
         <source>Select sessions to see their details</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner les sessions pour les détails</translation>
     </message>
     <message>
         <source>Select cameras to see their details</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner les caméras pour les détails</translation>
     </message>
     <message>
         <source>No archive for this position</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune archive pour cette position</translation>
     </message>
-    <message>
-        <source>These devices are removed from the System</source>
-        <translation type="unfinished"></translation>
+    <message numerus="yes">
+        <source>These devices are removed from System</source>
+        <translation>
+            <numerusform>Ce périphérique est retiré du système</numerusform>
+            <numerusform>Ces périphériques sont retirés du système</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These cameras are removed from System</source>
+        <translation>
+            <numerusform>Cette caméra est retirée du système</numerusform>
+            <numerusform>Ces caméras sont retirées du système</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These servers are removed from System</source>
+        <translation>
+            <numerusform>Ce serveur est retiré du système</numerusform>
+            <numerusform>Ces serveurs sont retirés du système</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These users are removed from System</source>
+        <translation>
+            <numerusform>Cet usager est retiré du système</numerusform>
+            <numerusform>Ces usagers sont retirés du système</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These resources are removed from System</source>
+        <translation>
+            <numerusform>Cette ressource est retiré du système</numerusform>
+            <numerusform>Ces ressources sont retirés du système</numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>QnAuditLogModel</name>
-    <message>
-        <source>%1d </source>
-        <translation>%1j</translation>
-    </message>
-    <message>
-        <source>%1h </source>
-        <translation>%1h</translation>
-    </message>
-    <message>
-        <source>%1m </source>
-        <translation>%1m</translation>
-    </message>
     <message>
         <source>Unknown</source>
         <translation>Inconnue</translation>
@@ -1480,10 +1548,6 @@ pour voir plus de signets</translation>
         <source>Database restored</source>
         <translation>Base de données restaurée</translation>
     </message>
-    <message>
-        <source>%1 - %2, </source>
-        <translation>%1 - %2, </translation>
-    </message>
     <message numerus="yes">
         <source>%n action(s)</source>
         <translation>
@@ -1501,7 +1565,7 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Duration</source>
-        <translation>Duration</translation>
+        <translation>Durée</translation>
     </message>
     <message>
         <source>User</source>
@@ -1565,11 +1629,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation type="unfinished">Paramètres courriel changé</translation>
+        <translation>Paramètres courriel changé</translation>
     </message>
     <message>
         <source>Filled circle mark means the archive is still available</source>
-        <translation type="unfinished"></translation>
+        <translation>Marque cercle plein signifie que l’archive est toujours disponible</translation>
     </message>
 </context>
 <context>
@@ -1593,35 +1657,40 @@ pour voir plus de signets</translation>
 <context>
     <name>QnBackupSettingsDialog</name>
     <message>
-        <source>Global Settings	(affect all servers in the system)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>By Schedule</source>
-        <translation type="unfinished">Par Horaire</translation>
+        <translation>Par Horaire</translation>
     </message>
     <message>
         <source>Realtime</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps réel</translation>
     </message>
     <message>
         <source>On Demand</source>
-        <translation type="unfinished">Sur demande</translation>
-    </message>
-    <message>
-        <source>Low-Res Streams</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished">Flux Basse-Rés</translation>
+        <translation>Sur demande</translation>
     </message>
     <message>
         <source>Hi-Res Streams</source>
         <comment>Cameras Backup</comment>
-        <translation type="unfinished">Flux Haute-Res</translation>
+        <translation>Flux Haute-Res</translation>
     </message>
     <message>
         <source>All Streams</source>
         <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
+        <translation>Tous les flux</translation>
+    </message>
+    <message>
+        <source>Global Settings</source>
+        <translation>Paramètres globaux</translation>
+    </message>
+    <message>
+        <source>Lo-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation>Flux Basse-Res</translation>
+    </message>
+    <message>
+        <source>affect all servers in System</source>
+        <comment>Relates to &apos;Global Settings&apos; subject</comment>
+        <translation>affecte tous les serveurs dans le système</translation>
     </message>
 </context>
 <context>
@@ -1658,30 +1727,30 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Name cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom ne peut pas être vide.</translation>
     </message>
 </context>
 <context>
     <name>QnBuildNumberDialog</name>
     <message>
         <source>Build Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Numéro de version</translation>
     </message>
     <message>
         <source>Invalid build number</source>
-        <translation type="unfinished"></translation>
+        <translation>Numéro de version invalide</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished">Mot de passe</translation>
+        <translation>Mot de passe</translation>
     </message>
     <message>
         <source>The password is incorrect.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe incorrect.</translation>
     </message>
     <message>
         <source>Select Build</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner Version</translation>
     </message>
 </context>
 <context>
@@ -1701,14 +1770,6 @@ pour voir plus de signets</translation>
         </translation>
     </message>
     <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Tous Périphérique&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Toute Caméra&gt;</translation>
-    </message>
-    <message>
         <source>Select at least one device</source>
         <translation>Sélectionner au moins un périphérique</translation>
     </message>
@@ -1719,9 +1780,17 @@ pour voir plus de signets</translation>
     <message numerus="yes">
         <source>%1 of %n I/O modules</source>
         <translation>
-            <numerusform>%1 de %n module IO</numerusform>
-            <numerusform>%1 de %n modules IO</numerusform>
+            <numerusform>%1 de %n module I/O</numerusform>
+            <numerusform>%1 de %n modules I/O</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation>N’importe quel périphérique</translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation>N’importe quelle caméra</translation>
     </message>
 </context>
 <context>
@@ -1732,20 +1801,11 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>For Users</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour Usagers</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRuleViewModel</name>
-    <message>
-        <source>&lt;System&gt;</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;System&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Server&gt;</source>
-        <translation>&lt;Tous Serveur&gt;</translation>
-    </message>
     <message numerus="yes">
         <source>%n Server(s)</source>
         <translation>
@@ -1754,12 +1814,12 @@ pour voir plus de signets</translation>
         </translation>
     </message>
     <message>
-        <source>Instant</source>
-        <translation>immédiat</translation>
-    </message>
-    <message>
         <source>Error: %1</source>
         <translation>Erreur: %1</translation>
+    </message>
+    <message>
+        <source>Instant</source>
+        <translation>Immédiat</translation>
     </message>
     <message>
         <source>Stops</source>
@@ -1774,20 +1834,12 @@ pour voir plus de signets</translation>
         <translation>Administrateurs Seulement</translation>
     </message>
     <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Tous Périphérique&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Toute Caméra&gt;</translation>
-    </message>
-    <message>
         <source>Select at least one device</source>
-        <translation>&lt;Sélectionner au moins un périphérique&gt;</translation>
+        <translation>Sélectionner au moins un périphérique</translation>
     </message>
     <message>
         <source>Select at least one camera</source>
-        <translation>&lt;Sélectionner au moins une caméra&gt;</translation>
+        <translation>Sélectionner au moins une caméra</translation>
     </message>
     <message>
         <source>Occurs</source>
@@ -1810,34 +1862,40 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Users</source>
-        <translation type="unfinished">Usagers</translation>
+        <translation>Usagers</translation>
     </message>
     <message>
         <source>Every %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Tout %1</translation>
+    </message>
+    <message>
+        <source>System</source>
+        <translation>Système</translation>
+    </message>
+    <message>
+        <source>Any Server</source>
+        <translation>N’importe quel serveur</translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation>N’importe quel périphérique</translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation>N’importe quelle caméra</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
     <message>
-        <source>at</source>
-        <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-        <translatorcomment>? au- de - en - dans ?</translatorcomment>
-        <translation>à</translation>
-    </message>
-    <message>
         <source>to</source>
         <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
-        <translatorcomment>? au- de - en - dans ?</translatorcomment>
         <translation>à</translation>
     </message>
     <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation>&lt;Tous Périphérique&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation>&lt;Toute Caméra&gt;</translation>
+        <source>at</source>
+        <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
+        <translation>à</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1854,6 +1912,14 @@ pour voir plus de signets</translation>
     <message>
         <source>Cameras</source>
         <translation>Caméras</translation>
+    </message>
+    <message>
+        <source>Any Device</source>
+        <translation>N’importe quel périphérique</translation>
+    </message>
+    <message>
+        <source>Any Camera</source>
+        <translation>N’importe quelle caméra</translation>
     </message>
 </context>
 <context>
@@ -1872,54 +1938,49 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Restore All Rules to Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Restaurer toutes les règles par défaut</translation>
     </message>
     <message>
         <source>No event rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune règle d’événement</translation>
     </message>
     <message>
         <source>Filter by devices...</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrer par périphérique...</translation>
     </message>
     <message>
         <source>Filter by cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrer par caméra...</translation>
     </message>
     <message>
         <source>Reset all rules to default?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This action can&apos;t be undone.</source>
-        <translation type="unfinished"></translation>
+        <translation>Réinitialiser toutes les règles par défaut?</translation>
     </message>
     <message>
         <source>Failed to retrieve rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de récupérer les règles</translation>
     </message>
     <message>
         <source>Failed to save rule</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec d’enregistrer de règle</translation>
     </message>
     <message>
         <source>Some rules are not valid. Disable them?</source>
-        <translation type="unfinished"></translation>
+        <translation>Certaines règles ne sont pas valides. Les désactiver ?</translation>
     </message>
     <message>
         <source>Apply changes before exit?</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer modifications avant la sortie?</translation>
+    </message>
+    <message>
+        <source>This action cannot be undone.</source>
+        <translation>Cette action est irréversible.</translation>
     </message>
 </context>
 <context>
     <name>QnBusinessRulesViewModel</name>
     <message>
-        <source>#</source>
-        <translation>#</translation>
-    </message>
-    <message>
         <source>On</source>
-        <translatorcomment>?</translatorcomment>
         <translation>Sur</translation>
     </message>
     <message>
@@ -1929,10 +1990,6 @@ pour voir plus de signets</translation>
     <message>
         <source>Source</source>
         <translation>Source</translation>
-    </message>
-    <message>
-        <source>-&gt;</source>
-        <translation>-&gt;</translation>
     </message>
     <message>
         <source>Action</source>
@@ -1954,16 +2011,16 @@ pour voir plus de signets</translation>
         <translation>Initialisation de balayage ...</translation>
     </message>
     <message>
+        <source>First address in range is greater than the last one.</source>
+        <translation>La première adresse de la plage est plus grande que la dernière.</translation>
+    </message>
+    <message>
         <source>Scanning online hosts...</source>
         <translation>Balayage des hôtes en ligne...</translation>
     </message>
     <message>
         <source>Select target server...</source>
         <translation>Sélectionner serveur cible...</translation>
-    </message>
-    <message>
-        <source>First address in range is greater than the last one.</source>
-        <translation>La première adresse de la plage est plus grande que la dernière.</translation>
     </message>
     <message>
         <source>Examples:</source>
@@ -2022,50 +2079,50 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Scanning hosts...</source>
-        <translation type="unfinished"></translation>
+        <translation>Analyse d&apos;hôtes...</translation>
     </message>
     <message>
         <source>Scanning host...</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Analyse d&apos;hôte...</translation>
     </message>
     <message>
         <source>Server offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur Hors ligne</translation>
     </message>
     <message>
         <source>Device adding is possible for online servers only.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajout de périphérique est seulement possible pour les serveurs en ligne.</translation>
     </message>
     <message numerus="yes">
         <source>%n devices added.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n périphérique ajouté.</numerusform>
+            <numerusform>%n périphériques ajoutés.</numerusform>
         </translation>
     </message>
     <message>
         <source>It might take them a few moments to appear.</source>
-        <translation type="unfinished"></translation>
+        <translation>Il pourrait prendre quelques instants à apparaître.</translation>
     </message>
     <message numerus="yes">
         <source>Failed to add %n devices</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Échec d&apos;ajout de %n périphérique</numerusform>
+            <numerusform>Échec d&apos;ajout de %n périphériques</numerusform>
         </translation>
     </message>
     <message>
         <source>Device search failed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Selected devices already added</source>
-        <translation type="unfinished"></translation>
+        <translation>Recherche périphérique échoué</translation>
     </message>
     <message>
         <source>No devices found</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun périphérique trouvé</translation>
+    </message>
+    <message>
+        <source>All devices already added</source>
+        <translation>Tous périphériques déjà ajoutés</translation>
     </message>
 </context>
 <context>
@@ -2083,51 +2140,51 @@ pour voir plus de signets</translation>
     <name>QnCameraAdvancedSettingsWidget</name>
     <message>
         <source>Loading...</source>
-        <translation type="unfinished">Chargement...</translation>
+        <translation>Chargement...</translation>
     </message>
     <message>
         <source>Camera ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID Caméra</translation>
     </message>
     <message>
         <source>Primary Stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Flux primaire</translation>
     </message>
     <message>
         <source>Secondary Stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Flux secondaire</translation>
     </message>
     <message>
         <source>Camera has no secondary stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Caméra n’a aucun flux secondaire</translation>
     </message>
     <message>
         <source>I/O Module ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID Modules I/O</translation>
     </message>
     <message>
         <source>This I/O module has no advanced settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce module I/O n’a aucun paramètres avancés</translation>
     </message>
     <message>
         <source>This camera has no advanced settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette caméra n’a aucun paramètres avancés</translation>
     </message>
     <message>
         <source>Audio Stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Flux audio</translation>
     </message>
     <message>
         <source>URL is not available. Open stream and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>URL indisponible. Ouvrez le flux et réessayez.</translation>
     </message>
     <message>
         <source>URL is not available. Open video stream and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>URL indisponible. Ouvrez le flux vidéo et réessayez.</translation>
     </message>
     <message>
         <source>I/O module has no audio stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Module I/O n’a aucun flux audio</translation>
     </message>
 </context>
 <context>
@@ -2136,16 +2193,16 @@ pour voir plus de signets</translation>
         <source>Select device</source>
         <translation>Sélectionner Périphérique</translation>
     </message>
+    <message>
+        <source>Select camera</source>
+        <translation>Sélectionner caméra</translation>
+    </message>
     <message numerus="yes">
-        <source>%1 doesn&apos;t support two-way audio</source>
+        <source>%1 does not support two-way audio</source>
         <translation>
             <numerusform>%1 ne supporte pas l&apos;audio bidirectionnelle</numerusform>
             <numerusform>%1 ne supporte pas l&apos;audio bidirectionnelle</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Select camera</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2169,10 +2226,6 @@ pour voir plus de signets</translation>
     <message>
         <source>Evaluating media stream for errors.</source>
         <translation>Évaluation d&apos;erreurs du flux média.</translation>
-    </message>
-    <message>
-        <source>Diagnostics complete!</source>
-        <translation>Diagnostics complèté!</translation>
     </message>
     <message>
         <source>Diagnostics for device %1</source>
@@ -2222,20 +2275,33 @@ pour voir plus de signets</translation>
         <source>Confirming target I/O module provides media stream.</source>
         <translation>Confirmation que le module I/O cible fournit un flux média.</translation>
     </message>
+    <message>
+        <source>Diagnostics complete</source>
+        <translation>Diagnostic complet</translation>
+    </message>
+</context>
+<context>
+    <name>QnCameraExpertSettingsWidget</name>
+    <message>
+        <source>Primary</source>
+        <translation>Primaire</translation>
+    </message>
+    <message>
+        <source>Secondary</source>
+        <translation>Secondaire</translation>
+    </message>
 </context>
 <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;automatic&gt;</translation>
+        <source>automatic</source>
+        <translation>automatique</translation>
     </message>
 </context>
 <context>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
         <source>%1 have no input ports</source>
-        <translatorcomment>Wrong warning ? should be %n ?</translatorcomment>
         <translation>
             <numerusform>%1 n&apos;a auncun port d&apos;entrée</numerusform>
             <numerusform>%1 n&apos;a aucun ports d&apos;entrées</numerusform>
@@ -2249,12 +2315,12 @@ pour voir plus de signets</translation>
         <translation>Copier la sélection dans le presse-papier</translation>
     </message>
     <message>
-        <source>Select All</source>
-        <translation>Sélectionner tous</translation>
-    </message>
-    <message>
         <source>Export Selection to File...</source>
         <translation>Exporter la sélection vers un fichier...</translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation>Sélectionner tous</translation>
     </message>
     <message>
         <source>Devices List for %1</source>
@@ -2300,12 +2366,12 @@ pour voir plus de signets</translation>
         <source>%n I/O modules found</source>
         <translation>
             <numerusform>%n module I/O trouvé</numerusform>
-            <numerusform>%n modules IO trouvés</numerusform>
+            <numerusform>%n modules I/O trouvés</numerusform>
         </translation>
     </message>
     <message>
         <source>No cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune caméra</translation>
     </message>
 </context>
 <context>
@@ -2319,12 +2385,12 @@ pour voir plus de signets</translation>
         <translation>Nom</translation>
     </message>
     <message>
-        <source>Model</source>
-        <translation>Modèle</translation>
-    </message>
-    <message>
         <source>Vendor</source>
         <translation>Vendeur</translation>
+    </message>
+    <message>
+        <source>Model</source>
+        <translation>Modèle</translation>
     </message>
     <message>
         <source>Firmware</source>
@@ -2351,30 +2417,29 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Maximum number of motion windows for the current camera is %1, and %2 motion windows are currently selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre maximal de fenêtres mouvement pour la caméra actuelle est %1, et %2 fenêtres mouvement sont actuellement sélectionnés.</translation>
     </message>
     <message>
         <source>Too many motion sensitivity settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Trop de réglages de sensibilité de mouvement</translation>
     </message>
     <message>
         <source>Maximum number of motion sensitivity settings for the current camera is %1, and %2 settings are currently selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre maximal de paramètres sensibilité de mouvement pour la caméra actuelle est %1, et %2 paramètres sont actuellement sélectionnés.</translation>
     </message>
     <message>
         <source>Too many motion areas</source>
-        <translation type="unfinished"></translation>
+        <translation>Trop de zones de mouvement</translation>
     </message>
     <message>
         <source>Maximum number of motion areas for the current camera is %1, and %2 motion areas are currently selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre maximal de zones mouvement pour la caméra actuelle est %1, et %2 zones mouvement sont actuellement sélectionnés.</translation>
     </message>
 </context>
 <context>
     <name>QnCameraMotionPolicy</name>
     <message numerus="yes">
         <source>Recording or motion detection is disabled for %1</source>
-        <translatorcomment>?? %n ??</translatorcomment>
         <translation>
             <numerusform>L&apos;enreg. ou la détection de mouv. sont désactivés pour %1</numerusform>
             <numerusform>L&apos;enreg. ou la détection de mouv. sont désactivés pour %1</numerusform>
@@ -2384,16 +2449,14 @@ pour voir plus de signets</translation>
 <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
-        <source>&lt;automatic&gt;</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;automatic&gt;</translation>
+        <source>automatic</source>
+        <translation>automatique</translation>
     </message>
 </context>
 <context>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
         <source>%1 have no output relays</source>
-        <translatorcomment>False warning ? should be %n ?</translatorcomment>
         <translation>
             <numerusform>%1 n&apos;a auncun relais de sortie</numerusform>
             <numerusform>%1 n&apos;a auncun relais de sortie</numerusform>
@@ -2404,7 +2467,6 @@ pour voir plus de signets</translation>
     <name>QnCameraRecordingPolicy</name>
     <message numerus="yes">
         <source>Recording is disabled for %1</source>
-        <translatorcomment>Warning ? Should be %n ?</translatorcomment>
         <translation>
             <numerusform>L&apos;enreg.est désactivé pour %1</numerusform>
             <numerusform>L&apos;enreg. est désactivé pour %1</numerusform>
@@ -2423,63 +2485,63 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Recording Schedule</source>
-        <translation type="unfinished"></translation>
+        <translation>Horaire d&apos;enregistrement</translation>
     </message>
     <message>
         <source>based on server time</source>
-        <translation type="unfinished"></translation>
+        <translation>basé sur l’heure serveur</translation>
     </message>
     <message>
         <source>High minimum value can lead to archive length decrease on other devices.</source>
-        <translation type="unfinished"></translation>
+        <translation>Haute valeur minimale peut conduire à la diminution de la longueur d&apos;archive sur d&apos;autre périphériques.</translation>
     </message>
     <message>
         <source>High minimum value can lead to archive length decrease on other cameras.</source>
-        <translation type="unfinished"></translation>
+        <translation>Haute valeur minimale peut conduire à la diminution de la longueur d&apos;archive sur d&apos;autre caméras.</translation>
     </message>
     <message>
         <source>Not enough licenses to enable recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Pas assez de licences pour activer l’enregistrement</translation>
     </message>
     <message>
         <source>License limit exceeded, recording will not be enabled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Limite de licence dépassée, l&apos;enregistrement ne sera pas activée.</translation>
     </message>
     <message>
         <source>Turn on selector at the top of the window to enable recording.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tournez le sélecteur en haut de la fenêtre pour activer l’enregistrement.</translation>
     </message>
     <message>
         <source>Select areas on the schedule to apply chosen parameters to.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionnez les zones sur l&apos;horaire pour appliquer les paramètres choisis.</translation>
     </message>
     <message>
         <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-        <translation type="unfinished"></translation>
+        <translation>Définir les paramètres d’enregistrement et sélectionner zones sur l&apos;horaire pour les appliquer.</translation>
     </message>
     <message>
         <source>Motion detection disabled or not supported</source>
-        <translation type="unfinished"></translation>
+        <translation>Détection de mouvement désactivé ou non pris en charge</translation>
     </message>
     <message>
         <source>To ensure it is supported and to enable it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour s’assurer que cela fonctionne et l&apos;activer, allez dans l’onglet &quot;Mouvement&quot; dans les réglages de caméra.</translation>
     </message>
     <message>
         <source>Dual-Streaming not supported for this camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Flux-Dual non pris en charge pour cette caméra</translation>
     </message>
     <message>
         <source>Dual-Streaming and motion detection not supported for this camera</source>
-        <translation type="unfinished"></translation>
+        <translation>Flux-Dual et détection de mouvement non pris en charge pour cette caméra</translation>
     </message>
     <message>
         <source>Motion detection disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Détection de mouvement désactivée</translation>
     </message>
     <message>
         <source>To enable or adjust it, go to the &quot;Motion&quot; tab in Camera Settings.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour activer ou ajuster, allez dans l’onglet &quot;Mouvement dans les paramètres caméra.</translation>
     </message>
 </context>
 <context>
@@ -2510,60 +2572,60 @@ pour voir plus de signets</translation>
     </message>
     <message>
         <source>Show on Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher sur mise en page</translation>
     </message>
     <message>
         <source>Event Log...</source>
-        <translation type="unfinished">Journal d&apos;événement...</translation>
+        <translation>Journal d&apos;événement...</translation>
     </message>
     <message>
         <source>Device Rules...</source>
-        <translation type="unfinished">Règles Périphérique...</translation>
+        <translation>Règles Périphérique...</translation>
     </message>
     <message>
         <source>Devices Rules...</source>
-        <translation type="unfinished">Règles Périphériques...</translation>
+        <translation>Règles Périphériques...</translation>
     </message>
     <message>
         <source>Camera Rules...</source>
-        <translation type="unfinished">Règles Caméra...</translation>
+        <translation>Règles Caméra...</translation>
     </message>
     <message>
         <source>Cameras Rules...</source>
-        <translation type="unfinished">Règles Caméras...</translation>
+        <translation>Règles Caméras...</translation>
     </message>
     <message>
         <source>I/O Module Rules...</source>
-        <translation type="unfinished">Règles Module I/O...</translation>
+        <translation>Règles Module I/O...</translation>
     </message>
     <message>
         <source>I/O Modules Rules...</source>
-        <translation type="unfinished">Règles Modules I/O...</translation>
+        <translation>Règles Modules I/O...</translation>
     </message>
     <message numerus="yes">
         <source>Changes to the following %n devices are not saved:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Changements sur les périphériques %n ne sont pas enregistrés:</numerusform>
+            <numerusform>Changements sur les périphériques %n ne sont pas enregistrés:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Changes to the following %n cameras are not saved:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Changements sur les caméras %n ne sont pas enregistrés:</numerusform>
+            <numerusform>Changements sur les caméras %n ne sont pas enregistrés:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Changes to the following %n I/O Modules are not saved:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Changements sur les modules I/O %n ne sont pas enregistrés:</numerusform>
+            <numerusform>Changements sur les modules I/O %n ne sont pas enregistrés:</numerusform>
         </translation>
     </message>
     <message>
         <source>Apply changes before switching to another camera?</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer les changements avant d&apos;aller à une autre caméra?</translation>
     </message>
 </context>
 <context>
@@ -2581,27 +2643,27 @@ pour voir plus de signets</translation>
     <name>QnChangeUserPasswordDialog</name>
     <message>
         <source>New Password</source>
-        <translation type="unfinished">Nouveau mot de passe</translation>
+        <translation>Nouveau mot de passe</translation>
     </message>
     <message>
         <source>Confirm Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmer mot de passe</translation>
     </message>
     <message>
         <source>Passwords do not match.</source>
-        <translation type="unfinished">Le mot de passe ne correspond pas.</translation>
+        <translation>Le mot de passe ne correspond pas.</translation>
     </message>
     <message>
         <source>Current Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe actuel</translation>
     </message>
     <message>
         <source>To modify your password please enter the existing one.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour modifier votre mot de passe, veuillez entrer l’existant.</translation>
     </message>
     <message>
         <source>Invalid current password.</source>
-        <translation type="unfinished">Mot de passe actuel invalide.</translation>
+        <translation>Mot de passe actuel invalide.</translation>
     </message>
 </context>
 <context>
@@ -2618,141 +2680,140 @@ pour voir plus de signets</translation>
 <context>
     <name>QnCloudManagementWidget</name>
     <message>
+        <source>Connect to your Systems
+from anywhere with any
+devices</source>
+        <translation>Connecter à vos systèmes 
+de n’importe où avec tout
+périphériques</translation>
+    </message>
+    <message>
+        <source>Known limitations</source>
+        <translation>Limitations connues</translation>
+    </message>
+    <message>
         <source>Disconnect System from %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Déconnecter le système de %1</translation>
     </message>
     <message>
         <source>Open %1 Portal</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Ouvrir Portail %1</translation>
     </message>
     <message>
         <source>Create %1 Account</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Créer compte %1</translation>
     </message>
     <message>
         <source>Connect System to %1...</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Connecter système à %1...</translation>
     </message>
     <message>
         <source>Create %1
 account</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Créer %1
+compte</translation>
     </message>
     <message>
         <source>Connect System
 to %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Connecter Système 
+à %1</translation>
     </message>
     <message>
-        <source>Connect to your Systems
-from anywhere with any
-devices</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>known issues</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 is in Beta yet. See %2</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;), %2 is a link to known issues</comment>
-        <translation type="unfinished"></translation>
+        <source>%1 is in Beta.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>%1 est en bêta.</translation>
     </message>
     <message>
         <source>Learn more about %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>En savoir plus sur %1</translation>
     </message>
 </context>
 <context>
     <name>QnCloudStatusPanel</name>
     <message>
         <source>Logging in...</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion...</translation>
     </message>
     <message>
         <source>Connect to Server...</source>
-        <translation type="unfinished">Connexion au serveur...</translation>
+        <translation>Connexion au serveur...</translation>
     </message>
     <message>
         <source>Cannot connect to %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Log in to %1...</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Impossible de connecter à %1</translation>
     </message>
 </context>
 <context>
     <name>QnCloudUserPanelWidget</name>
     <message>
         <source>Account Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres compte</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCloudDialog</name>
     <message>
         <source>Email</source>
-        <translation type="unfinished">Courriel</translation>
+        <translation>Courriel</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished">Mot de passe</translation>
+        <translation>Mot de passe</translation>
     </message>
     <message>
         <source>Create account</source>
-        <translation type="unfinished"></translation>
+        <translation>Créer compte</translation>
     </message>
     <message>
         <source>Forgot password?</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe oublié ?</translation>
     </message>
     <message>
         <source>Connect to %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Connecter à %1</translation>
     </message>
     <message>
         <source>Enter %1 Account</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Entrer compte %1</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCloudDialogPrivate</name>
     <message>
         <source>None of your servers is connected to the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun de vos serveurs est connecté à Internet.</translation>
     </message>
     <message>
-        <source>The System connected to %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>System connected to %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Système connecté à %1</translation>
     </message>
     <message>
-        <source>Failed to connect the System to %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>Failed to connect System to %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Impossible de connecter le système à %1</translation>
     </message>
 </context>
 <context>
     <name>QnConnectToCurrentSystemTool</name>
     <message>
         <source>Configuring Server</source>
-        <translation type="unfinished">Configuration Serveur(s)</translation>
+        <translation>Configuration Serveur</translation>
     </message>
     <message>
         <source>Updating Server</source>
-        <translation type="unfinished">Mise à jour Serveur(s)</translation>
+        <translation>Mise à jour Serveur</translation>
     </message>
 </context>
 <context>
@@ -2762,24 +2823,12 @@ devices</source>
         <translation>Vous essayez de vous connecter sur un serveur incompatible.</translation>
     </message>
     <message>
-        <source>Connection to the Server could not be established.</source>
-        <translation>La connexion au serveur ne peut pas être établie.</translation>
-    </message>
-    <message>
         <source>Connection details that you have entered are incorrect, please try again.</source>
         <translation>Les détails de connexion entrés sont incorrects, S.V.P. essayez à nouveau.</translation>
     </message>
     <message>
         <source>If this error persists, please contact your VMS administrator.</source>
         <translation>Si l&apos;erreur persiste, S.V.P. contactez votre administrateur VMS.</translation>
-    </message>
-    <message>
-        <source> - Client version: %1.</source>
-        <translation> - Version Client: %1.</translation>
-    </message>
-    <message>
-        <source> - Server version: %1.</source>
-        <translation> - Version Serveur: %1.</translation>
     </message>
     <message>
         <source>Compatibility mode for versions lower than %1 is not supported.</source>
@@ -2810,104 +2859,107 @@ devices</source>
         <translation>Connexion au serveur LDAP a expiré.</translation>
     </message>
     <message>
-        <source>Operation is not permitted now. It could happen due to media server is restarting now. Please try again later.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connection to the %1 is not ready yet. Check media server internet connection or try again later.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Failed to connect to Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec de connexion au Serveur</translation>
     </message>
     <message>
         <source>Incorrect username or password</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connection to %1 is not established.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Check Server internet connection or try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom d&apos;usager ou mot de passe incorrect</translation>
     </message>
     <message>
         <source>Server may be restarting now. Please try again later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur redémarre peut être maintenant. Veuillez réessayer plus tard.</translation>
     </message>
     <message>
         <source>Please check access credentials and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez vérifier les informations d’accès puis réessayez.</translation>
     </message>
     <message>
         <source>Incompatible Server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Restart %1 Client in compatibility mode will be required.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to restart %1 Client in compatibility mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please close %1 Client and start it again using the shortcut in the start menu.</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur incompatible</translation>
     </message>
     <message>
         <source>Client and Server have different versions</source>
-        <translation type="unfinished"></translation>
+        <translation>Client et Serveur ont des versions différentes</translation>
     </message>
     <message>
         <source>Client - %1</source>
         <comment>%1 is version</comment>
-        <translation type="unfinished"></translation>
+        <translation>Client - %1</translation>
     </message>
     <message>
         <source>Server - %1</source>
         <comment>%1 is version</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You have to download another version of %1 Client to connect to this Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur - %1</translation>
     </message>
     <message>
         <source>Download Client version %1?</source>
-        <translation type="unfinished"></translation>
+        <translation>Télécharger Client version %1 ?</translation>
     </message>
     <message>
         <source>Download</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You have to restart %1 Client in compatibility mode to connect to this Server.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Restart %1 Client in compatibility mode?</source>
-        <translation type="unfinished"></translation>
+        <translation>Télécharger</translation>
     </message>
     <message>
         <source>Restart</source>
-        <translation type="unfinished"></translation>
+        <translation>Redémarrer</translation>
     </message>
     <message>
         <source>Failed to download and launch version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de télécharger et de lancer la version %1</translation>
     </message>
     <message>
         <source>Try Again</source>
-        <translation type="unfinished"></translation>
+        <translation>Réessayer</translation>
     </message>
     <message>
-        <source>Failed to restart %1 Client</source>
-        <translation type="unfinished"></translation>
+        <source>Restart %1 in compatibility mode will be required.</source>
+        <translation>Redémarrer %1 en mode compatible va être requis.</translation>
+    </message>
+    <message>
+        <source>Failed to restart %1 in compatibility mode</source>
+        <translation>Échec de redémarrage %1 en mode compatible</translation>
+    </message>
+    <message>
+        <source>Please close %1 and start it again using the shortcut in the start menu.</source>
+        <translation>S.V.P. fermer %1 et démarrer à nouveau avec le raccourci du menu démarrer.</translation>
+    </message>
+    <message>
+        <source>You have to download another version of %1 to connect to this Server.</source>
+        <translation>Vous devez télécharger une autre version de %1 pour se connecter à ce serveur.</translation>
+    </message>
+    <message>
+        <source>You have to restart %1 in compatibility mode to connect to this Server.</source>
+        <translation>Vous devrez redémarrer %1 en mode de compatibilite pour connecter à ce serveur.</translation>
+    </message>
+    <message>
+        <source>Restart %1 in compatibility mode?</source>
+        <translation>Redémarrer %1 en mode compatibilite?</translation>
+    </message>
+    <message>
+        <source>Failed to restart %1</source>
+        <translation>Échec redémarrage %1</translation>
+    </message>
+    <message>
+        <source>Client version: %1.</source>
+        <translation>Version Client : %1.</translation>
+    </message>
+    <message>
+        <source>Server version: %1.</source>
+        <translation>Version Serveur : %1.</translation>
+    </message>
+    <message>
+        <source>Operation is not permitted now. It could happen due to server is restarting now. Please try again later.</source>
+        <translation>Opération non autorisée présentement. Cela peut arriver si le serveur redémarre. Veuillez réessayer plus tard.</translation>
+    </message>
+    <message>
+        <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Connexion à %1 n’est pas prête. Vérifiez la connexion au serveur Internet ou réessayez plus tard.</translation>
+    </message>
+    <message>
+        <source>Connection to Server could not be established.</source>
+        <translation>Connexion au serveur n’a pu être établie.</translation>
     </message>
 </context>
 <context>
@@ -2947,10 +2999,6 @@ devices</source>
 <context>
     <name>QnDatabaseManagementWidget</name>
     <message>
-        <source>You can create a backup for system configurations that can be restored in case of failure.</source>
-        <translation>Vous pouvez créer une sauvegarde des paramètres système, que vous pourrez restaurer en cas de défaillance.</translation>
-    </message>
-    <message>
         <source>Save Database Backup...</source>
         <translation>Enregistrer la sauvegarde de la base de données...</translation>
     </message>
@@ -2960,7 +3008,7 @@ devices</source>
     </message>
     <message>
         <source>Downloading Database Backup</source>
-        <translation>Téléchargement de la sauvegarde de la  base de données</translation>
+        <translation>Téléchargement de la sauvegarde de la base de données</translation>
     </message>
     <message>
         <source>Database backup is being downloaded from the server. Please wait.</source>
@@ -2984,62 +3032,62 @@ devices</source>
     </message>
     <message>
         <source>Failed to back up database</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec sauvegarde Base de données</translation>
     </message>
     <message>
         <source>Database backed up to file</source>
-        <translation type="unfinished"></translation>
+        <translation>Base de données sauvegardée sur fichier</translation>
     </message>
     <message>
         <source>Failed to open file</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec d&apos;ouverture du fichier</translation>
     </message>
     <message>
         <source>Restore database?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The System configuration will be restored from backup, Server application will be restarted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Restaurer base de données?</translation>
     </message>
     <message>
         <source>Database successfully restored</source>
-        <translation type="unfinished"></translation>
+        <translation>Base de données restaurée avec succès</translation>
     </message>
     <message>
         <source>Server application will restart shortly.</source>
-        <translation type="unfinished"></translation>
+        <translation>Application serveur va redémarrer bientôt.</translation>
     </message>
     <message>
         <source>Failed to restore database</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec restauration Base de données</translation>
+    </message>
+    <message>
+        <source>System configuration will be restored from backup, Server application will be restarted.</source>
+        <translation>Configuration système va être restaurée à partir de la sauvegarde, application serveur sera redémarrée.</translation>
+    </message>
+    <message>
+        <source>You can create a backup for System configurations that can be restored in case of failure.</source>
+        <translation>Vous pouvez créer une sauvegarde des paramètres système, que vous pourrez restaurer en cas de défaillance.</translation>
     </message>
 </context>
 <context>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>Ne peut pas trouver l&apos;encodeur audio &apos;%1&apos;.</translation>
-    </message>
-    <message>
         <source>Could not initialize audio encoder.</source>
         <translation>Ne peut pas initialiser l&apos;encodeur audio.</translation>
-    </message>
-    <message>
-        <source>Primary audio device isn&apos;t selected.</source>
-        <translation>Périphérique audio primaire non sélectionné.</translation>
     </message>
     <message>
         <source>Sample format of input device %1 is not supported.</source>
         <translation>Format d&apos;échantillon du périphérique d&apos;entré %1 n&apos;est pas supporté.</translation>
     </message>
+    <message>
+        <source>Could not find audio encoder &quot;%1&quot;.</source>
+        <translation>Encodeur audio &quot;%1&quot; introuvable.</translation>
+    </message>
+    <message>
+        <source>Primary audio device is not selected.</source>
+        <translation>Périphérique audio principal non sélectionné.</translation>
+    </message>
 </context>
 <context>
     <name>QnDesktopDataProvider</name>
-    <message>
-        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device! Please select other audio device or &apos;none&apos; value in screen recording settings</source>
-        <translation>Les formats audios 44.1Khz et 48Khz ne sont pas supportés par le périphérique de capture audio! S.V.P, sélectionnez un autre périphérique audio ou &apos;Aucun&apos; comme valeur dans les paramètres d&apos;enregistrement</translation>
-    </message>
     <message>
         <source>Could not find video encoder %1.</source>
         <translation>Ne peut pas trouver l&apos;encodeur vidéo %1.</translation>
@@ -3049,16 +3097,8 @@ devices</source>
         <translation>Ne peut pas initialiser l&apos;encodeur vidéo.</translation>
     </message>
     <message>
-        <source>Could not find audio encoder &apos;%1&apos;.</source>
-        <translation>Ne peut pas trouver l&apos;encodeur audio %1.</translation>
-    </message>
-    <message>
         <source>Could not initialize audio encoder.</source>
         <translation>Ne peut pas initialiser l&apos;encodeur audio.</translation>
-    </message>
-    <message>
-        <source>Could not initialize audio device &apos;%1&apos;.</source>
-        <translation>Ne peut pas initialiser le périphérique audio %1.</translation>
     </message>
     <message>
         <source>Could not start primary audio device.</source>
@@ -3068,75 +3108,83 @@ devices</source>
         <source>Screen width must be a multiple of 8.</source>
         <translation>La largeur de l&apos;écran doit être un multiplicateur de 8.</translation>
     </message>
+    <message>
+        <source>Could not find audio encoder &quot;%1&quot;.</source>
+        <translation>Encodeur audio &quot;%1&quot; introuvable.</translation>
+    </message>
+    <message>
+        <source>Could not initialize audio device &quot;%1&quot;.</source>
+        <translation>Impossible d&apos;initialiser l&apos;encodeur audio &quot;%1&quot;.</translation>
+    </message>
+    <message>
+        <source>44.1Khz and 48Khz audio formats are not supported by audio capturing device. Please select other audio device or &quot;none&quot; in the Screen Recording settings</source>
+        <translation>Formats audio de 44,1Khz et 48Khz non pris en charge par le périphérique de capture audio. S.V.P, choisir un autre appareil audio ou &quot;aucun&quot; dans les paramètres d’enregistrement d’écran</translation>
+    </message>
 </context>
 <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
     <message>
         <source>Next</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Internal system error</source>
-        <translation type="unfinished"></translation>
+        <translation>Suivant</translation>
     </message>
     <message>
         <source>Enter password to continue.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You will be disconnected from this system and able to login again through local network with local account</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrez mot de passe pour continuer.</translation>
     </message>
     <message>
         <source>Set local owner password</source>
-        <translation type="unfinished"></translation>
+        <translation>Configurer mot de passe du propriétaire local</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="unfinished">Identifiant</translation>
+        <translation>Identifiant</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished">Mot de passe</translation>
+        <translation>Mot de passe</translation>
     </message>
     <message>
         <source>Internal Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur interne</translation>
     </message>
     <message>
         <source>Wrong Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Mauvais mot de passe</translation>
     </message>
     <message>
         <source>Confirm Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmer mot de passe</translation>
     </message>
     <message>
         <source>Passwords do not match.</source>
-        <translation type="unfinished">Le mot de passe ne correspond pas.</translation>
-    </message>
-    <message>
-        <source>Failed to disconnect the System from %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <translation>Le mot de passe ne correspond pas.</translation>
     </message>
     <message>
         <source>Disconnect</source>
-        <translation type="unfinished"></translation>
+        <translation>Déconnecter</translation>
     </message>
     <message>
-        <source>Disconnect the System from %1?</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>All cloud users will be deleted.</source>
+        <translation>Tous les usagers de nuages seront supprimés.</translation>
     </message>
     <message>
-        <source>All cloud features will be disabled, cloud users will be deleted from the System.</source>
-        <translation type="unfinished"></translation>
+        <source>Failed to disconnect System from %1</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Impossible de déconnecter le système de %1</translation>
     </message>
     <message>
-        <source>You wont be able to connect to this system with your %1 account after you disconnect this system from %1.</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>Disconnect System from %1?</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Déconnecter le système de %1 ?</translation>
+    </message>
+    <message>
+        <source>You will be disconnected from this System and able to login again through local network with local account</source>
+        <translation>Vous serez déconnecté de ce système et capable de connecter à nouveau sur un réseau local avec le compte local</translation>
+    </message>
+    <message>
+        <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Vous ne serez pas capable de connecter à ce système avec votre compte %1 , après que vous déconnectez ce système de %1.</translation>
     </message>
 </context>
 <context>
@@ -3150,16 +3198,16 @@ devices</source>
         <translation>Copier la sélection dans le presse-papier</translation>
     </message>
     <message>
+        <source>Export Selection to File...</source>
+        <translation>Exporter la sélection vers un fichier...</translation>
+    </message>
+    <message>
         <source>Select All</source>
         <translation>Sélectionner tous</translation>
     </message>
     <message>
         <source>Clear Filter</source>
         <translation>Effacer le filtre</translation>
-    </message>
-    <message>
-        <source>Export Selection to File...</source>
-        <translation>Exporter la sélection vers un fichier...</translation>
     </message>
     <message numerus="yes">
         <source>Event log for period from %1 to %2 - %n event(s) found</source>
@@ -3185,11 +3233,15 @@ devices</source>
     </message>
     <message>
         <source>No events</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun événement</translation>
     </message>
 </context>
 <context>
     <name>QnEventLogModel</name>
+    <message>
+        <source>Administrators Only</source>
+        <translation>Administrateurs Seulement</translation>
+    </message>
     <message>
         <source>Motion video</source>
         <translation>Mouvement Vidéo</translation>
@@ -3219,20 +3271,8 @@ devices</source>
         <translation>Description</translation>
     </message>
     <message>
-        <source>Administrators Only</source>
-        <translation>Administrateurs Seulement</translation>
-    </message>
-    <message>
-        <source>&lt;User removed&gt;</source>
-        <translation>&lt;Usager retiré&gt;</translation>
-    </message>
-    <message>
         <source>All users</source>
         <translation>Tous les usagers</translation>
-    </message>
-    <message>
-        <source>%1 users</source>
-        <translation>%1 Usagers</translation>
     </message>
     <message numerus="yes">
         <source>%1 (%n times)</source>
@@ -3242,16 +3282,45 @@ devices</source>
             <numerusform>%1 (%n fois)</numerusform>
         </translation>
     </message>
+    <message>
+        <source>Users</source>
+        <translation>Usagers</translation>
+    </message>
+    <message>
+        <source>Open camera</source>
+        <translation>Ouvrir caméra</translation>
+    </message>
     <message numerus="yes">
-        <source>and %1 user(s) more...</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <source>%n users</source>
+        <translation>
+            <numerusform>%n usager</numerusform>
+            <numerusform>%n usagers</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>and %n users more...</source>
+        <translation>
+            <numerusform>et %n usager de plus...</numerusform>
+            <numerusform>et %n usagers de plus...</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>and %n more...</source>
+        <translation>
+            <numerusform>et %n de plus...</numerusform>
+            <numerusform>et %n de plus...</numerusform>
         </translation>
     </message>
     <message>
-        <source>Users</source>
-        <translation type="unfinished">Usagers</translation>
+        <source>User removed</source>
+        <translation>Usager retiré</translation>
+    </message>
+</context>
+<context>
+    <name>QnExecHttpRequestActionWidget</name>
+    <message>
+        <source>Auto</source>
+        <translation>Auto</translation>
     </message>
 </context>
 <context>
@@ -3261,8 +3330,8 @@ devices</source>
         <translation>Sélectionner exactement une caméra</translation>
     </message>
     <message>
-        <source>%1 has no ptz presets</source>
-        <translation>%1 na pas de préréglages PTZ</translation>
+        <source>%1 has no PTZ presets</source>
+        <translation>%1 n’a aucun préréglages PTZ</translation>
     </message>
 </context>
 <context>
@@ -3330,30 +3399,30 @@ devices</source>
     <name>QnFileMessages</name>
     <message>
         <source>Overwrite existing file?</source>
-        <translation type="unfinished"></translation>
+        <translation>Remplacer le fichier existant?</translation>
     </message>
     <message>
         <source>Failed to overwrite file</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec du remplacement de fichier</translation>
     </message>
 </context>
 <context>
     <name>QnFisheyeCalibrationWidget</name>
     <message>
         <source>Loading preview, please wait...</source>
-        <translation>Charge l&apos;apercu, S.V.P. patientez...</translation>
+        <translation>Chargement d&apos;apercu, S.V.P. patientez...</translation>
     </message>
     <message>
         <source>Auto calibration failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec calibrage auto</translation>
     </message>
     <message>
         <source>Image is not round.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;image n’est pas rond.</translation>
     </message>
     <message>
         <source>Image might be too dim.</source>
-        <translation type="unfinished"></translation>
+        <translation>Image peut être trop sombre.</translation>
     </message>
 </context>
 <context>
@@ -3364,7 +3433,7 @@ devices</source>
     </message>
     <message>
         <source>Folder already added</source>
-        <translation type="unfinished"></translation>
+        <translation>Dossier déjà ajouté</translation>
     </message>
 </context>
 <context>
@@ -3379,69 +3448,62 @@ devices</source>
     </message>
     <message>
         <source>Event Rules</source>
-        <translation type="unfinished"></translation>
+        <translation>Règles d&apos;événement</translation>
     </message>
     <message>
         <source>Event Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Journal d&apos;événement</translation>
     </message>
     <message>
         <source>Audit Trail</source>
-        <translation type="unfinished"></translation>
+        <translation>Piste d’audit</translation>
     </message>
     <message>
         <source>Health Monitoring</source>
-        <translation type="unfinished"></translation>
+        <translation>Moniteur de santé</translation>
     </message>
     <message>
         <source>Bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Signets</translation>
     </message>
     <message>
         <source>Device List</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste Périphérique</translation>
     </message>
     <message>
         <source>Camera List</source>
-        <translation type="unfinished"></translation>
+        <translation>Liste Caméra</translation>
     </message>
     <message>
         <source>Open Event Rules Management</source>
-        <translation type="unfinished">Ouvrir Règles de Gestion Alarme/Événement</translation>
+        <translation>Ouvrir Règles de Gestion Alarme/Événement</translation>
     </message>
     <message>
         <source>Open Audit Trail Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir journal de trace d&apos;audit</translation>
     </message>
     <message>
         <source>Monitor All Servers on a Single Layout</source>
-        <translation type="unfinished"></translation>
+        <translation>Surveiller tous les serveurs sur même mise en page</translation>
     </message>
     <message>
         <source>Open Device List</source>
-        <translation type="unfinished">Ouvrir Liste Périphériques</translation>
+        <translation>Ouvrir Liste Périphériques</translation>
     </message>
     <message>
         <source>Open Camera List</source>
-        <translation type="unfinished">Ouvrir Liste Caméras</translation>
+        <translation>Ouvrir Liste Caméras</translation>
     </message>
 </context>
 <context>
     <name>QnGlHardwareChecker</name>
     <message>
         <source>Video card drivers are outdated or not installed</source>
-        <translation type="unfinished"></translation>
+        <translation>Pilotes de carte vidéo sont obsolètes ou non installés</translation>
     </message>
     <message>
-        <source>%1 Client may not work properly.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnHelpHandler</name>
-    <message>
-        <source>Help page not found</source>
-        <translation type="unfinished"></translation>
+        <source>%1 may not work properly.</source>
+        <translation>%1 peut ne pas fonctionner correctement.</translation>
     </message>
 </context>
 <context>
@@ -3502,30 +3564,30 @@ devices</source>
     </message>
     <message>
         <source>ID</source>
-        <translation type="unfinished"></translation>
+        <translation>ID</translation>
     </message>
     <message>
         <source>On click</source>
-        <translation type="unfinished"></translation>
+        <translation>Sur clic</translation>
     </message>
     <message>
         <source>Duration</source>
-        <translation type="unfinished">Duration</translation>
+        <translation>Durée</translation>
     </message>
     <message>
         <source>Open circuit</source>
         <comment>IO Port State</comment>
-        <translation type="unfinished">Circuit ouvert</translation>
+        <translation>Circuit ouvert</translation>
     </message>
     <message>
         <source>Toggle state</source>
         <comment>IO Output Port Action</comment>
-        <translation type="unfinished"></translation>
+        <translation>Bascule État</translation>
     </message>
     <message>
         <source>Impulse</source>
         <comment>IO Output Port Action</comment>
-        <translation type="unfinished"></translation>
+        <translation>Impulsion</translation>
     </message>
 </context>
 <context>
@@ -3536,30 +3598,26 @@ devices</source>
     </message>
     <message>
         <source>Auto</source>
-        <translation type="unfinished">Auto</translation>
+        <translation>Auto</translation>
     </message>
     <message>
-        <source>&lt;multiple values&gt;</source>
-        <translation type="unfinished">&lt;multiple values&gt;</translation>
+        <source>multiple values</source>
+        <translation>valeurs multiples</translation>
     </message>
 </context>
 <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
         <source>Failed to turn off I/O port %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d’éteindre port I/O %1</translation>
     </message>
     <message>
         <source>Failed to turn on I/O port %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d’activer port I/O %1</translation>
     </message>
 </context>
 <context>
     <name>QnLayoutExportTool</name>
-    <message>
-        <source>File &apos;%1&apos; is used by another process. Please try another name.</source>
-        <translation>Fichier &apos;%1 &apos;est utilisé par un autre processus. S.V.P, essayez un autre nom.</translation>
-    </message>
     <message>
         <source>Exporting to &quot;%1&quot;...</source>
         <translation>Exportation vers &quot;%1&quot;...</translation>
@@ -3585,6 +3643,10 @@ devices</source>
         <source>Could not create output file %1...</source>
         <translation>Ne peut pas céer le fichier de sortie %1...</translation>
     </message>
+    <message>
+        <source>File &quot;%1&quot; is used by another process. Please try another name.</source>
+        <translation>Fichier &quot;%1&quot; utilisé par un autre processus. S.V.P essayer un autre nom.</translation>
+    </message>
 </context>
 <context>
     <name>QnLayoutSettingsDialog</name>
@@ -3597,124 +3659,32 @@ devices</source>
         <translation>Images %1</translation>
     </message>
     <message>
-        <source>&lt;No picture&gt;</source>
-        <translation>&lt;No picture&gt;</translation>
+        <source>No picture</source>
+        <translation>Aucune image</translation>
     </message>
     <message>
-        <source>&lt;Error while loading picture&gt;</source>
-        <translation>&lt;Error while loading picture&gt;</translation>
+        <source>Error while loading picture</source>
+        <translation>Erreur lors du chargement d’image</translation>
     </message>
     <message>
-        <source>&lt;Error while uploading picture&gt;</source>
-        <translation>&lt;Error while uploading picture&gt;</translation>
+        <source>Error while uploading picture</source>
+        <translation>Erreur lors d&apos;envoie d&apos;image</translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be read&gt;</source>
-        <translation>&lt;Picture cannot be read&gt;</translation>
+        <source>Picture cannot be read</source>
+        <translation>Image ne peut pas être lu</translation>
     </message>
     <message>
-        <source>&lt;Picture is too big. Maximum size is %1 Mb&gt;</source>
-        <translation>&lt;Picture is too big. Maximum size is %1 Mb&gt;</translation>
+        <source>Picture cannot be loaded</source>
+        <translation>Impossible de charger l’image</translation>
     </message>
     <message>
-        <source>&lt;Picture cannot be loaded&gt;</source>
-        <translation>&lt;Picture cannot be loaded&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>QnLayoutsHandlerMessages</name>
-    <message>
-        <source>You will lose access to following resources:</source>
-        <translation type="unfinished"></translation>
+        <source>cells</source>
+        <translation>cellules</translation>
     </message>
     <message>
-        <source>There is another layout with the same name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You don&apos;t have permission to overwrite it.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Overwrite existing layout?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There is another layout with the same name.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Don&apos;t show this message again</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>User will still have access to %n removed resources:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>To remove access, please go to User Settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>All users with this role will get access to %n resources:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>To remove access, please go to Role Settings.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>All users with this role will still have access to %n removed resources:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Changes will affect other users</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This layout is shared with other users, so you change it for them too.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>User will lose access to %n resources:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>All users with this role will lose access to %n resources:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n shared layouts?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>You are going to delete some resources to which you have access from Video Wall only. You won&apos;t see them in your resource list after it and won&apos;t be able to add them to Video Wall again.</source>
-        <translation type="unfinished"></translation>
+        <source>Picture is too big. Maximum size is %1 MB</source>
+        <translation>Image trop grande. Taille maximale est de %1 MB</translation>
     </message>
 </context>
 <context>
@@ -3757,16 +3727,16 @@ devices</source>
         <translation>Identifiant</translation>
     </message>
     <message>
-        <source>Full Name</source>
-        <translation>Nom complet</translation>
-    </message>
-    <message>
         <source>Email</source>
         <translation>Courriel</translation>
     </message>
     <message>
         <source>DN</source>
         <translation>DN</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Nom</translation>
     </message>
 </context>
 <context>
@@ -3784,10 +3754,6 @@ devices</source>
         <translation>Ne peut pas charger les usagers.</translation>
     </message>
     <message>
-        <source>Import users</source>
-        <translation>Importer usagers</translation>
-    </message>
-    <message>
         <source>Error while loading users.</source>
         <translation>Erreur lors du chargement d&apos;usagers.</translation>
     </message>
@@ -3798,6 +3764,10 @@ devices</source>
     <message>
         <source>Timed Out</source>
         <translation>Délai expiré</translation>
+    </message>
+    <message>
+        <source>Import Selected</source>
+        <translation>Importer la sélection</translation>
     </message>
 </context>
 <context>
@@ -3871,64 +3841,50 @@ devices</source>
     </message>
     <message>
         <source>Error</source>
-        <translation type="unfinished">Erreur</translation>
+        <translation>Erreur</translation>
     </message>
     <message>
         <source>Server not found</source>
-        <translation type="unfinished">&lt;Server non disponible&gt;</translation>
-    </message>
-    <message>
-        <source>Qnt.</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur introuvable</translation>
     </message>
     <message>
         <source>Expires</source>
-        <translation type="unfinished"></translation>
+        <translation>Expire</translation>
     </message>
     <message>
         <source>License is active</source>
-        <translation type="unfinished"></translation>
+        <translation>Licence active</translation>
     </message>
     <message>
         <source>License is expired</source>
-        <translation type="unfinished"></translation>
+        <translation>Licence expirée</translation>
     </message>
     <message>
         <source>Expires soon</source>
-        <translation type="unfinished"></translation>
+        <translation>Expire bientôt</translation>
     </message>
     <message>
         <source>License expires today</source>
-        <translation type="unfinished"></translation>
+        <translation>Licence expire aujourd&apos;hui</translation>
     </message>
     <message>
         <source>License expires tomorrow</source>
-        <translation type="unfinished"></translation>
+        <translation>Licence expire demain</translation>
     </message>
     <message numerus="yes">
         <source>License expires in %n days</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Licence expire dans %n jour</numerusform>
+            <numerusform>Licence expire dans %n jours</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Qty</source>
+        <translation>Qté</translation>
     </message>
 </context>
 <context>
     <name>QnLicenseManagerWidget</name>
-    <message numerus="yes">
-        <source>At least %n %2 are required</source>
-        <translation>
-            <numerusform>Au moins %n %2 est requis</numerusform>
-            <numerusform>Au moins %n %2 sont requis</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n %2 are currently in use</source>
-        <translation>
-            <numerusform>%n %2 est en utilisation</numerusform>
-            <numerusform>%n %2 sont en utilisations</numerusform>
-        </translation>
-    </message>
     <message>
         <source>You do not have a valid license installed.</source>
         <translation>Vous n&apos;avez pas de licence valide installée.</translation>
@@ -3942,116 +3898,118 @@ devices</source>
         <translation>S.V.P. activez votre licence commerciale.</translation>
     </message>
     <message>
-        <source>Obtaining licenses from server...</source>
-        <translation>Obtention de licences du Serveur...</translation>
-    </message>
-    <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter</translation>
     </message>
     <message>
         <source>Export licenses to a file</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter licence vers un fichier</translation>
     </message>
     <message>
         <source>Copy To Clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier vers Presse-Papier</translation>
     </message>
     <message>
         <source>Incompatible license</source>
-        <translation type="unfinished"></translation>
+        <translation>Licence incompatible</translation>
     </message>
     <message>
         <source>License you are trying to activate is incompatible with your software.</source>
-        <translation type="unfinished"></translation>
+        <translation>Licence que vous tentez d’activer est incompatible avec votre logiciel.</translation>
     </message>
     <message>
         <source>Please contact Customer Support to get a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P contacter le Support client pour obtenir une clé de licence valide.</translation>
     </message>
     <message>
         <source>You already activated this license</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous avez déjà activé cette licence</translation>
     </message>
     <message>
         <source>License activated</source>
-        <translation type="unfinished"></translation>
+        <translation>Licence activée</translation>
     </message>
     <message>
         <source>Failed to remove license from Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec de suppression de licence du serveur</translation>
     </message>
     <message>
         <source>Invalid activation key file</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier clé d’activation invalide</translation>
     </message>
     <message>
         <source>Select a valid activation key file to continue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionnez un fichier de clé d’activation valide pour continuer.</translation>
     </message>
     <message>
         <source>This device accepts single channel license only</source>
-        <translation type="unfinished"></translation>
+        <translation>Ce périphérique accepte seulement un licence simple canal</translation>
     </message>
     <message>
         <source>Database error occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur de base de données s’est produite.</translation>
     </message>
     <message>
         <source>Invalid data received. Please contact Customer Support to report the issue.</source>
-        <translation type="unfinished"></translation>
+        <translation>Données invalides reçues. Veuillez contacter le Support client pour signaler le problème.</translation>
     </message>
     <message>
         <source>Invalid license key</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please make sure it is entered correctly. </source>
-        <translation type="unfinished"></translation>
+        <translation>Clé de licence invalide</translation>
     </message>
     <message>
         <source>Failed to activate license</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec d’activation de la licence</translation>
     </message>
     <message>
         <source>Please contact Customer Support to obtain a valid license key.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P contacter le Support client pour obtenir une clé de licence valide.</translation>
     </message>
     <message>
         <source>Network error</source>
-        <translation type="unfinished">Erreur Réseau.</translation>
+        <translation>Erreur Réseau</translation>
     </message>
     <message>
         <source>Please contact Customer Support to activate license key manually.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P contacter le Support client pour activer la clé de licence manuellement.</translation>
     </message>
     <message>
         <source>If the problem persists, please contact Customer Support.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This license is already activated and linked to hardware id %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This license is already activated and linked to hardware id %1 on %2</source>
-        <translation type="unfinished"></translation>
+        <translation>Si le problème persiste, contactez le support client.</translation>
     </message>
     <message>
         <source>License already activated on another server</source>
-        <translation type="unfinished"></translation>
+        <translation>Licence déjà activé sur un autre serveur</translation>
+    </message>
+    <message numerus="yes">
+        <source>At least %n %1 are required</source>
+        <translation>
+            <numerusform>Au moins %n %1 est nécessaire</numerusform>
+            <numerusform>Au moins %n %1 sont nécessaires</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n %1 are currently in use</source>
+        <translation>
+            <numerusform>%n %1 est actuellement en cours d’utilisation</numerusform>
+            <numerusform>%n %1 sont actuellement en cours d’utilisation</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Please make sure it is entered correctly.</source>
+        <translation>S.V.P, assurez-vous qu&apos;elle soit entrée correctement.</translation>
+    </message>
+    <message>
+        <source>This license is already activated and linked to hardware ID %1</source>
+        <translation>Cette licence est déjà activée et liée au ID Matériel %1</translation>
+    </message>
+    <message>
+        <source>This license is already activated and linked to hardware ID %1 on %2</source>
+        <translation>Cette licence est déjà activée et liée au ID Matériel %1 sur %2</translation>
     </message>
 </context>
 <context>
     <name>QnLicenseWidget</name>
-    <message>
-        <source>Open License File</source>
-        <translation>Ouvrir Fichier de licence</translation>
-    </message>
-    <message>
-        <source>All files (*.*)</source>
-        <translation>Tous les fichiers (*.*)</translation>
-    </message>
     <message>
         <source>Activate Trial License</source>
         <translation>Activer une licence d&apos;essai</translation>
@@ -4061,16 +4019,28 @@ devices</source>
         <translation>Activer une licence gratuite</translation>
     </message>
     <message>
-        <source>Please send email with the License Key and the Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation type="unfinished">S.V.P. envoyez un courriel avec le numéro de série et l&apos;ID matériel fournis à %1 pour obtenir une clé d&apos;activation.</translation>
+        <source>Open License File</source>
+        <translation>Ouvrir Fichier de licence</translation>
     </message>
     <message>
-        <source>Hardware id copied to clipboard</source>
-        <translation type="unfinished"></translation>
+        <source>All files (*.*)</source>
+        <translation>Tous les fichiers (*.*)</translation>
     </message>
     <message>
         <source>Failed to open file</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec d&apos;ouverture du fichier</translation>
+    </message>
+    <message>
+        <source>Hardware ID copied to clipboard</source>
+        <translation>ID Matériel copié dans le presse-papiers</translation>
+    </message>
+    <message>
+        <source>Please send Email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+        <translation>S.V.P envoyer courriel avec clé de licence et ID matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
+    </message>
+    <message>
+        <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
+        <translation>S.V.P envoyer clé de licence et ID matériel fourni à %1 pour obtenir un fichier de clé d’activation.</translation>
     </message>
 </context>
 <context>
@@ -4108,68 +4078,59 @@ devices</source>
     <name>QnLinkToCloudDialogPrivate</name>
     <message>
         <source>Failed to login to %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Impossible de connecter à %1</translation>
     </message>
 </context>
 <context>
     <name>QnLocalSettingsDialog</name>
     <message>
         <source>General</source>
-        <translation type="unfinished">Général</translation>
+        <translation>Général</translation>
     </message>
     <message>
         <source>Look and Feel</source>
-        <translation type="unfinished">Affichage</translation>
+        <translation>Affichage</translation>
     </message>
     <message>
         <source>Screen Recording</source>
-        <translation type="unfinished">Enregistrement d&apos;écran</translation>
+        <translation>Enregistrement d&apos;écran</translation>
     </message>
     <message>
         <source>Notifications</source>
-        <translation type="unfinished">Notifications</translation>
+        <translation>Notifications</translation>
     </message>
     <message>
         <source>Advanced</source>
-        <translation type="unfinished"></translation>
+        <translation>Avancée</translation>
     </message>
     <message>
         <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier de paramètres est en lecture seule. S.V.P contactez votre administrateur système. Toutes les modifications seront perdues après la sortie du programme.</translation>
     </message>
     <message>
         <source>Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres ne peuvent être sauvegardés. S.V.P contactez votre administrateur système. Toutes les modifications seront perdues après la sortie du programme.</translation>
     </message>
     <message>
         <source>Restart required</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Some changes will take effect only after %1 Client restart</source>
-        <translation type="unfinished"></translation>
+        <translation>Redémarrage requis</translation>
     </message>
     <message>
         <source>Restart Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Redémarrer maintenant</translation>
     </message>
     <message>
         <source>Restart Later</source>
-        <translation type="unfinished"></translation>
+        <translation>Redémarrer plus tard</translation>
+    </message>
+    <message>
+        <source>Some changes will take effect only after %1 restart</source>
+        <translation>Certaines modifications prendront effet qu’après le redémarrage de %1</translation>
     </message>
 </context>
 <context>
     <name>QnLoginDialog</name>
-    <message>
-        <source>Saved Sessions</source>
-        <translation>Sessions sauvegardées</translation>
-    </message>
-    <message>
-        <source>&lt;none&gt;</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;none&gt;</translation>
-    </message>
     <message>
         <source>Connect to Server...</source>
         <translation>Connexion au serveur...</translation>
@@ -4179,61 +4140,69 @@ devices</source>
         <translation>Version %1</translation>
     </message>
     <message>
-        <source>Auto-Discovered Servers</source>
-        <translation>Auto-Découverte Serveurs</translation>
+        <source>Saved Sessions</source>
+        <translation>Sessions sauvegardées</translation>
     </message>
     <message>
-        <source>%1 at %2</source>
-        <translation>%1 à %2</translation>
+        <source>Auto-Discovered Servers</source>
+        <translation>Auto-Découverte Serveurs</translation>
     </message>
     <message>
         <source>* Last used connection *</source>
         <translation>* Dernière connexion utilisée *</translation>
     </message>
     <message>
-        <source>Overwrite existing connection?</source>
-        <translation type="unfinished"></translation>
+        <source>%1 at %2</source>
+        <translation>%1 à %2</translation>
     </message>
     <message>
-        <source>There is an another connection with the same name.</source>
-        <translation type="unfinished"></translation>
+        <source>Overwrite existing connection?</source>
+        <translation>Remplacer la connexion existante?</translation>
     </message>
     <message>
         <source>Delete connection?</source>
-        <translation type="unfinished">Effacer Connexions</translation>
+        <translation>Effacer Connexion?</translation>
+    </message>
+    <message>
+        <source>There is another connection with the same name.</source>
+        <translation>Il existe une autre connexion du même nom.</translation>
+    </message>
+    <message>
+        <source>none</source>
+        <translation>aucun</translation>
     </message>
 </context>
 <context>
     <name>QnLoginToCloudDialog</name>
     <message>
         <source>Email</source>
-        <translation type="unfinished">Courriel</translation>
+        <translation>Courriel</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished">Mot de passe</translation>
+        <translation>Mot de passe</translation>
     </message>
     <message>
         <source>Create account</source>
-        <translation type="unfinished"></translation>
+        <translation>Créer compte</translation>
     </message>
     <message>
         <source>Forgot password?</source>
-        <translation type="unfinished"></translation>
+        <translation>Mot de passe oublié ?</translation>
     </message>
     <message>
         <source>Learn more about</source>
-        <translation type="unfinished"></translation>
+        <translation>En savoir plus</translation>
     </message>
     <message>
         <source>Log in to %1</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Connexion à %1</translation>
     </message>
     <message>
         <source>Welcome to %1!</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Bienvenue sur %1!</translation>
     </message>
 </context>
 <context>
@@ -4278,9 +4247,17 @@ devices</source>
         <source>Select File...</source>
         <translation>Sélectionner fichier...</translation>
     </message>
+    <message>
+        <source>No image</source>
+        <translation>Aucune image</translation>
+    </message>
 </context>
 <context>
     <name>QnMediaResourceWidget</name>
+    <message>
+        <source>Screenshot</source>
+        <translation>Prendre une capture d&apos;écran</translation>
+    </message>
     <message>
         <source>Smart Search</source>
         <translation>Recherche intelligente</translation>
@@ -4290,12 +4267,8 @@ devices</source>
         <translation>PTZ</translation>
     </message>
     <message>
-        <source>%1 (Tour &quot;%2&quot; is active)</source>
-        <translation>%1 (Tour &quot;%2&quot; est actif)</translation>
-    </message>
-    <message>
-        <source>LIVE</source>
-        <translation>DIRECT</translation>
+        <source>Dewarping</source>
+        <translation>Dérouler</translation>
     </message>
     <message>
         <source>Create Zoom Window</source>
@@ -4310,24 +4283,24 @@ devices</source>
         <translation>Haute-Res</translation>
     </message>
     <message>
-        <source>Dewarping</source>
-        <translation>Dérouler</translation>
+        <source>LIVE</source>
+        <translation>DIRECT</translation>
     </message>
     <message>
-        <source>Screenshot</source>
-        <translation>Prendre une capture d&apos;écran</translation>
+        <source>%1 (Tour &quot;%2&quot; is active)</source>
+        <translation>%1 (Tour &quot;%2&quot; est actif)</translation>
     </message>
     <message>
         <source>Zoom Window</source>
         <translation>Fenêtre de zoom</translation>
     </message>
     <message>
-        <source>Low-Res</source>
-        <translation>Basse-Rés</translation>
-    </message>
-    <message>
         <source>I/O Module</source>
         <translation>Module I/O</translation>
+    </message>
+    <message>
+        <source>Lo-Res</source>
+        <translation>Basse-Res</translation>
     </message>
 </context>
 <context>
@@ -4337,24 +4310,12 @@ devices</source>
         <translation>http(s)://hôte:port</translation>
     </message>
     <message>
-        <source>You are about to merge the current system %1 with the system</source>
-        <translation>Vous êtes sur le point d&apos;unir le système actuel %1 avec le système</translation>
-    </message>
-    <message>
         <source>%1 (current)</source>
         <translation>%1 (actuel)</translation>
     </message>
     <message>
-        <source>The URL is invalid.</source>
-        <translation>Le URL est invalide.</translation>
-    </message>
-    <message>
         <source>Use a specific hostname or IP address rather than %1.</source>
         <translation>Utiliser un nom d&apos;hôte précis ou l&apos;adresse IP plutôt que %1.</translation>
-    </message>
-    <message>
-        <source>This is the current system URL.</source>
-        <translation>Ceci est l&apos;URL actuelle du système.</translation>
     </message>
     <message>
         <source>Merge with %1</source>
@@ -4363,14 +4324,6 @@ devices</source>
     <message>
         <source>Success!</source>
         <translation>Succès!</translation>
-    </message>
-    <message>
-        <source>The system was configured successfully.</source>
-        <translation>Le système a été configuré avec succès.</translation>
-    </message>
-    <message>
-        <source>The servers from the remote system should appear in your system soon.</source>
-        <translation>Les serveurs des systèmes distants devraient apparaitre dans votre système sous peu.</translation>
     </message>
     <message>
         <source>Testing...</source>
@@ -4382,65 +4335,77 @@ devices</source>
     </message>
     <message>
         <source>The login cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>L’identifiant ne peut pas être vide.</translation>
     </message>
     <message>
         <source>New Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouveau serveur</translation>
     </message>
     <message>
         <source>Failed to merge Systems</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de fusionner les systèmes</translation>
+    </message>
+    <message>
+        <source>System was configured successfully.</source>
+        <translation>Système configuré avec succès.</translation>
+    </message>
+    <message>
+        <source>URL is invalid.</source>
+        <translation>URL invalide.</translation>
+    </message>
+    <message>
+        <source>The servers from the remote System should appear in your System soon.</source>
+        <translation>Serveurs du système distant devraient apparaître bientôt dans votre système.</translation>
+    </message>
+    <message>
+        <source>You are about to merge the current System %1 with System</source>
+        <translation>Vous êtes sur le point d&apos;unir le système actuel %1 avec le système</translation>
+    </message>
+    <message>
+        <source>This is the current System URL.</source>
+        <translation>Ceci est l&apos;URL actuelle du système.</translation>
     </message>
 </context>
 <context>
     <name>QnMessageBox</name>
     <message>
         <source>Overwrite</source>
-        <translation type="unfinished"></translation>
+        <translation>Remplacer</translation>
     </message>
     <message>
         <source>Delete</source>
-        <translation type="unfinished">Supprimer</translation>
+        <translation>Supprimer</translation>
     </message>
     <message>
         <source>Reset</source>
-        <translation type="unfinished"></translation>
+        <translation>Réinitialiser</translation>
     </message>
     <message>
         <source>Skip</source>
-        <translation type="unfinished"></translation>
+        <translation>Passer</translation>
     </message>
 </context>
 <context>
     <name>QnMultipleCameraSettingsWidget</name>
     <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>LoginEdit</comment>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;multiple values&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;multiple values&gt;</source>
-        <comment>PasswordEdit</comment>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;multiple values&gt;</translation>
-    </message>
-    <message>
         <source>Secondary stream disabled for these cameras</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&quot;Motion + Low - Res&quot; recording option can&apos;t be set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Flux secondaire désactivé pour ces caméras</translation>
     </message>
     <message>
         <source>Set Recording to &quot;Always&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Fixé enregistrement à &quot;Toujours&quot;</translation>
     </message>
     <message>
         <source>Enable Secondary Stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer flux secondaire</translation>
+    </message>
+    <message>
+        <source>multiple values</source>
+        <translation>valeurs multiples</translation>
+    </message>
+    <message>
+        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
+        <translation>Enregistrement &quot;Mouv. + Basse-Res.&quot; ne peut pas être définie.</translation>
     </message>
 </context>
 <context>
@@ -4475,7 +4440,7 @@ devices</source>
     </message>
     <message>
         <source>Previous Chunk</source>
-        <translation type="unfinished">Morceau précédent</translation>
+        <translation>Morceau précédent</translation>
     </message>
 </context>
 <context>
@@ -4497,21 +4462,21 @@ devices</source>
     <name>QnNotificationListWidget</name>
     <message numerus="yes">
         <source>%n more notifications</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n notification de plus</numerusform>
+            <numerusform>%n notifications de plus</numerusform>
         </translation>
     </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
-        <source>Rename sound</source>
-        <translation>Renommer le son</translation>
-    </message>
-    <message>
         <source>Clip sound up to %1 seconds</source>
         <translation>Le Clip de son jusqu&apos;à %1 secondes</translation>
+    </message>
+    <message>
+        <source>Rename sound</source>
+        <translation>Renommer le son</translation>
     </message>
     <message>
         <source>Custom title:</source>
@@ -4531,38 +4496,34 @@ devices</source>
     </message>
     <message>
         <source>Failed to add file</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d’ajouter le fichier</translation>
     </message>
     <message>
         <source>Failed to set new title</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de définir le nouveau titre</translation>
     </message>
     <message>
         <source>Delete sound?</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer son?</translation>
     </message>
 </context>
 <context>
     <name>QnNotificationSoundModel</name>
     <message>
-        <source>&lt;Downloading sound list...&gt;</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;Downloading sound list...&gt;</translation>
+        <source>Downloading sound list...</source>
+        <translation>Téléchargement liste son...</translation>
     </message>
     <message>
-        <source>&lt;No Sound&gt;</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;No Sound&gt;</translation>
+        <source>No Sound</source>
+        <translation>Aucun son</translation>
     </message>
     <message>
-        <source>&lt;Downloading sound...&gt;</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;Downloading sound...&gt;</translation>
+        <source>Downloading sound...</source>
+        <translation>Téléchargement son...</translation>
     </message>
     <message>
-        <source>&lt;Uploading sound...&gt;</source>
-        <translatorcomment>?</translatorcomment>
-        <translation>&lt;Uploading sound...&gt;</translation>
+        <source>Uploading sound...</source>
+        <translation>Envoie son...</translation>
     </message>
 </context>
 <context>
@@ -4575,59 +4536,59 @@ devices</source>
 <context>
     <name>QnPerformanceTest</name>
     <message>
-        <source>%1 Client can work in configuration mode only</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Performance of this computer allows running %1 Client in configuration mode only.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>For full - featured mode, please use another computer</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour Tout - mode recommandé. S.V.P utiliser un autre PC</translation>
+    </message>
+    <message>
+        <source>%1 can work in configuration mode only</source>
+        <translation>%1 peut seulement fonctionner en mode de configuration</translation>
+    </message>
+    <message>
+        <source>Performance of this computer allows running %1 in configuration mode only.</source>
+        <translation>Performances de cet ordinateur permet seulement de lancer %1 en mode de configuration.</translation>
     </message>
 </context>
 <context>
     <name>QnPermissionsWidget</name>
     <message>
         <source>Edit camera settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Éditer paramètres caméra</translation>
     </message>
     <message>
         <source>This is also required to create/edit PTZ presets and tours.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aussi pour créer/modifier des préréglages PTZ et tours.</translation>
     </message>
     <message>
         <source>Control video walls</source>
-        <translation type="unfinished"></translation>
+        <translation>Contrôle Mur Vidéo</translation>
     </message>
     <message>
         <source>View event log</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher le journal d’événement</translation>
     </message>
     <message>
         <source>View archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Voir Archive</translation>
     </message>
     <message>
         <source>Export archive</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter archive</translation>
     </message>
     <message>
         <source>View bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Affichage signets</translation>
     </message>
     <message>
         <source>Modify bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifier signets</translation>
     </message>
     <message>
         <source>User Input</source>
-        <translation type="unfinished"></translation>
+        <translation>Entrée usager</translation>
     </message>
     <message>
         <source>PTZ, Device Output, 2-way Audio</source>
-        <translation type="unfinished"></translation>
+        <translation>PTZ. sortie périphérique, Audio bidirectionnel</translation>
     </message>
 </context>
 <context>
@@ -4645,15 +4606,11 @@ devices</source>
     </message>
     <message>
         <source>Apply changes before exit?</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer modifications avant la sortie?</translation>
     </message>
 </context>
 <context>
     <name>QnPtzManageModel</name>
-    <message>
-        <source>#</source>
-        <translation>#</translation>
-    </message>
     <message>
         <source>Name</source>
         <translation>Nom</translation>
@@ -4678,6 +4635,17 @@ devices</source>
         <source>Positions</source>
         <translation>Positions</translation>
     </message>
+    <message>
+        <source>None</source>
+        <translation>Aucun</translation>
+    </message>
+    <message numerus="yes">
+        <source>This preset will be activated after %n minutes of inactivity</source>
+        <translation>
+            <numerusform>Le préréglage sera activé après %n minute d&apos;inactivité</numerusform>
+            <numerusform>Le préréglage sera activé après %n minutes d&apos;inactivités</numerusform>
+        </translation>
+    </message>
     <message numerus="yes">
         <source>Tour has %n identical positions</source>
         <translation>
@@ -4693,23 +4661,12 @@ devices</source>
         </translation>
     </message>
     <message>
+        <source>less than a minute</source>
+        <translation>moins d&apos;une minute</translation>
+    </message>
+    <message>
         <source>Invalid tour</source>
         <translation>Tour invalide</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation>Aucun</translation>
-    </message>
-    <message numerus="yes">
-        <source>This preset will be activated after %n minutes of inactivity</source>
-        <translation>
-            <numerusform>Le préréglage sera activé après %n minute d&apos;inactivité</numerusform>
-            <numerusform>Le préréglage sera activé après %n minutes d&apos;inactivités</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>less than a minute</source>
-        <translation>Moins d&apos;une minute</translation>
     </message>
     <message>
         <source>New Tour %1</source>
@@ -4729,49 +4686,14 @@ devices</source>
     </message>
 </context>
 <context>
-    <name>QnPtzMessages</name>
-    <message>
-        <source>Can&apos;t get the current position from camera &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please wait for the camera to go online.</source>
-        <translation type="unfinished">S.V.P. attendez que la caméra soit en ligne.</translation>
-    </message>
-    <message>
-        <source>Failed to get current position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Can&apos;t set the current position for camera &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to set current position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Preset used by some tours. Delete it anyway?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>These tours will become invalid.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Don&apos;t show this message again</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnPtzPresetDialog</name>
-    <message>
-        <source>None</source>
-        <translation>Aucun</translation>
-    </message>
     <message>
         <source>Saved Position %1</source>
         <translation>Enregistrer la position %1</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>Aucun</translation>
     </message>
 </context>
 <context>
@@ -4786,11 +4708,11 @@ devices</source>
     </message>
     <message>
         <source>Hotkey used by preset &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Raccourci utilisé par préréglage &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Hotkey used by tour &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Raccourci utilisé par tour &quot;%1&quot;</translation>
     </message>
 </context>
 <context>
@@ -4833,10 +4755,6 @@ devices</source>
         <translation>Immédiat</translation>
     </message>
     <message>
-        <source>&lt;Invalid&gt;</source>
-        <translation>&lt;Invalide&gt;</translation>
-    </message>
-    <message>
         <source>Position</source>
         <translation>Position</translation>
     </message>
@@ -4847,6 +4765,10 @@ devices</source>
     <message>
         <source>Speed</source>
         <translation>Vitesse</translation>
+    </message>
+    <message>
+        <source>Invalid</source>
+        <translation>Invalide</translation>
     </message>
 </context>
 <context>
@@ -4865,39 +4787,39 @@ devices</source>
     </message>
     <message>
         <source>Best</source>
-        <translation type="unfinished"></translation>
+        <translation>Meilleure</translation>
     </message>
     <message>
         <source>Average</source>
-        <translation type="unfinished"></translation>
+        <translation>Moyenne</translation>
     </message>
     <message>
         <source>Performance</source>
-        <translation type="unfinished"></translation>
+        <translation>Performance</translation>
     </message>
     <message>
         <source>Native</source>
-        <translation type="unfinished"></translation>
+        <translation>Native</translation>
     </message>
     <message>
         <source>Quarter Native</source>
-        <translation type="unfinished"></translation>
+        <translation>Quart Natif</translation>
     </message>
     <message>
         <source>1920x1080</source>
-        <translation type="unfinished"></translation>
+        <translation>1920x1080</translation>
     </message>
     <message>
         <source>1280x720</source>
-        <translation type="unfinished"></translation>
+        <translation>1280x720</translation>
     </message>
     <message>
         <source>640x480</source>
-        <translation type="unfinished"></translation>
+        <translation>640x480</translation>
     </message>
     <message>
         <source>320x240</source>
-        <translation type="unfinished"></translation>
+        <translation>320x240</translation>
     </message>
 </context>
 <context>
@@ -4916,7 +4838,7 @@ devices</source>
     </message>
     <message>
         <source>less than an hour</source>
-        <translation>Moins d&apos;une heure</translation>
+        <translation>moins d&apos;une heure</translation>
     </message>
     <message>
         <source>%1 Mbps</source>
@@ -4925,20 +4847,6 @@ devices</source>
     <message>
         <source>empty</source>
         <translation>vide</translation>
-    </message>
-    <message numerus="yes">
-        <source>Total %n devices</source>
-        <translation>
-            <numerusform>%n Périphérique Total</numerusform>
-            <numerusform>%n Périphériques Totals</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Total %n cameras</source>
-        <translation>
-            <numerusform>%n Caméra Totale</numerusform>
-            <numerusform>%n Caméras Totales</numerusform>
-        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4964,32 +4872,49 @@ devices</source>
         <source>Camera</source>
         <translation>Caméra</translation>
     </message>
-    <message numerus="yes">
-        <source>Total %n I/O modules</source>
-        <translation>
-            <numerusform>%n Module IO Total</numerusform>
-            <numerusform>%n Modules IO Totals</numerusform>
-        </translation>
-    </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
         <translation>La durée d&apos;archive dans le calendrier depuis la première enregistrement</translation>
     </message>
     <message>
         <source>Cameras from other servers and removed cameras</source>
-        <translation type="unfinished">&lt;Cameras des autres serveurs et caméras retirées&gt;</translation>
-    </message>
-    <message>
-        <source>Bitrate for</source>
-        <translation type="unfinished"></translation>
+        <translation>Cameras des autres serveurs et caméras retirées</translation>
     </message>
     <message>
         <source>%1 TB</source>
-        <translation type="unfinished">%1 Tb</translation>
+        <translation>%1 Tb</translation>
     </message>
     <message>
         <source>%1 GB</source>
-        <translation type="unfinished">%1 Gb</translation>
+        <translation>%1 Gb</translation>
+    </message>
+    <message numerus="yes">
+        <source>Total %1 %n devices</source>
+        <comment>%1 is long dash, do not replace</comment>
+        <translation>
+            <numerusform>Périphériques %1 %n total</numerusform>
+            <numerusform>Périphériques %1 %n total</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Total %1 %n cameras</source>
+        <comment>%1 is long dash, do not replace</comment>
+        <translation>
+            <numerusform>Caméras %1 %n total</numerusform>
+            <numerusform>Caméras %1 %n total</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Total %1 %n I/O modules</source>
+        <comment>%1 is long dash, do not replace</comment>
+        <translation>
+            <numerusform>Modules I/O %1 %n total</numerusform>
+            <numerusform>Modules I/O %1 %n total</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Bitrate</source>
+        <translation>Débit</translation>
     </message>
 </context>
 <context>
@@ -5050,14 +4975,14 @@ devices</source>
     <name>QnResourceItemDelegate</name>
     <message>
         <source>Health Monitor</source>
-        <translation type="unfinished"></translation>
+        <translation>Moniteur de santé</translation>
     </message>
 </context>
 <context>
     <name>QnResourcePreviewWidget</name>
     <message>
         <source>NO DATA</source>
-        <translation type="unfinished">AUCUNE DONNÉE</translation>
+        <translation>AUCUNE DONNÉE</translation>
     </message>
 </context>
 <context>
@@ -5072,54 +4997,57 @@ devices</source>
     </message>
     <message>
         <source>Select users...</source>
-        <translation type="unfinished">Sélectionner Utlisateurs...</translation>
+        <translation>Sélectionner Utlisateurs...</translation>
     </message>
 </context>
 <context>
     <name>QnResourceTreeModelNode</name>
     <message>
         <source>Servers</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveurs</translation>
     </message>
     <message>
         <source>Other Systems</source>
-        <translation type="unfinished">Autre Systèmes</translation>
+        <translation>Autre Systèmes</translation>
     </message>
     <message>
         <source>Users</source>
-        <translation type="unfinished">Usagers</translation>
+        <translation>Usagers</translation>
     </message>
     <message>
         <source>Web Pages</source>
-        <translation type="unfinished"></translation>
+        <translation>Pages Web</translation>
     </message>
     <message>
         <source>Cameras &amp; Resources</source>
-        <translation type="unfinished"></translation>
+        <translation>Caméras &amp; ressources</translation>
     </message>
     <message>
         <source>Layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Mises en page</translation>
     </message>
     <message>
         <source>All Cameras &amp; Resources</source>
-        <translation type="unfinished"></translation>
+        <translation>Toutes caméras &amp; ressources</translation>
     </message>
     <message>
         <source>All Shared Layouts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Unnamed system&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Toutes mises en page partagées</translation>
     </message>
     <message>
         <source>Shared Layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Mises en page partagées</translation>
     </message>
     <message>
         <source>Local Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichiers locaux</translation>
+    </message>
+</context>
+<context>
+    <name>QnResourceTreeModelOtherSystemsNode</name>
+    <message>
+        <source>New System</source>
+        <translation>Nouveau Système</translation>
     </message>
 </context>
 <context>
@@ -5149,22 +5077,22 @@ devices</source>
     </message>
     <message>
         <source>Server</source>
-        <translation type="unfinished">Serveur</translation>
+        <translation>Serveur</translation>
     </message>
     <message>
         <source>Invalid URL</source>
-        <translation type="unfinished"></translation>
+        <translation>URL invalide</translation>
     </message>
     <message>
         <source>URL already added</source>
-        <translation type="unfinished"></translation>
+        <translation>URL déjà ajouté</translation>
     </message>
 </context>
 <context>
     <name>QnScheduleGridWidget</name>
     <message>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>Tout</translation>
     </message>
 </context>
 <context>
@@ -5175,11 +5103,11 @@ devices</source>
     </message>
     <message>
         <source>No bookmarks</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun signet</translation>
     </message>
     <message>
         <source>Search</source>
-        <translation type="unfinished">Recherche</translation>
+        <translation>Recherche</translation>
     </message>
 </context>
 <context>
@@ -5216,48 +5144,48 @@ devices</source>
     <name>QnSelectDevicesButton</name>
     <message>
         <source>Any Device</source>
-        <translation type="unfinished"></translation>
+        <translation>N’importe quel périphérique</translation>
     </message>
     <message>
         <source>Any Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>N’importe quelle caméra</translation>
     </message>
     <message>
         <source>All Devices</source>
-        <translation type="unfinished">Tous Périphériques</translation>
+        <translation>Tous Périphériques</translation>
     </message>
     <message>
         <source>All Cameras</source>
-        <translation type="unfinished">Toutes Caméras</translation>
+        <translation>Toutes Caméras</translation>
     </message>
     <message>
         <source>Select devices...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner Périphériques...</translation>
     </message>
     <message>
         <source>Select cameras...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner Caméras...</translation>
     </message>
 </context>
 <context>
     <name>QnSelectServersButton</name>
     <message>
         <source>Any Server</source>
-        <translation type="unfinished"></translation>
+        <translation>N’importe quel serveur</translation>
     </message>
     <message>
         <source>All Servers</source>
-        <translation type="unfinished"></translation>
+        <translation>Tous serveurs</translation>
     </message>
     <message>
         <source>Select Servers...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner Serveurs...</translation>
     </message>
     <message numerus="yes">
         <source>%n Servers</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Serveur</numerusform>
+            <numerusform>%n Serveurs</numerusform>
         </translation>
     </message>
 </context>
@@ -5265,21 +5193,21 @@ devices</source>
     <name>QnSelectUsersButton</name>
     <message>
         <source>Any User</source>
-        <translation type="unfinished"></translation>
+        <translation>N’importe quel usager</translation>
     </message>
     <message>
         <source>All Users</source>
-        <translation type="unfinished">Tous les usagers</translation>
+        <translation>Tous les usagers</translation>
     </message>
     <message>
         <source>Select Users...</source>
-        <translation type="unfinished">Sélectionner Utlisateurs...</translation>
+        <translation>Sélectionner Utlisateurs...</translation>
     </message>
     <message numerus="yes">
         <source>%n Users</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n usager</numerusform>
+            <numerusform>%n usagers</numerusform>
         </translation>
     </message>
 </context>
@@ -5287,54 +5215,54 @@ devices</source>
     <name>QnSendEmailActionDelegate</name>
     <message>
         <source>Select at least one user</source>
-        <translation type="unfinished">Sélectionner au moins un usager</translation>
-    </message>
-    <message>
-        <source>User %1 has invalid email address</source>
-        <translation type="unfinished">L&apos;usager %1 a une adresse courriel invalide</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 users have invalid email address</source>
-        <translation type="unfinished">
-            <numerusform>%n de %1 usager a un adresse courriel invalide</numerusform>
-            <numerusform>%n de %1 usagesr ont un adresse courriel invalide</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Invalid email address %1</source>
-        <translation type="unfinished">Adresse courriel %1 invalide</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 additional email addresses are invalid</source>
-        <translation type="unfinished">
-            <numerusform>%n de %1 courriel additionnel est invalide</numerusform>
-            <numerusform>%n de %1 courriels additionnels sont invalides</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Send email to %1</source>
-        <translation type="unfinished">Envoyer courriel à %1</translation>
+        <translation>Sélectionner au moins un usager</translation>
     </message>
     <message numerus="yes">
         <source>%n Users</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Usager</numerusform>
+            <numerusform>%n Usagers</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Roles</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n Rôle</numerusform>
+            <numerusform>%n Rôles</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n additional</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n additionnel</numerusform>
+            <numerusform>%n additionnels</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>User %1 has invalid Email address</source>
+        <translation>Usager %1 a un courriel invalide</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 users have invalid Email address</source>
+        <translation>
+            <numerusform>%n de %1 usager a un courriel invalide</numerusform>
+            <numerusform>%n de %1 usagers ont un courriel invalide</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Invalid Email address %1</source>
+        <translation>Adresse courriel invalide %1</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 additional Email addresses are invalid</source>
+        <translation>
+            <numerusform>%n de %1 courriel supplémentaire est invalide</numerusform>
+            <numerusform>%n de %1 des courriels supplémentaires sont invalides</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Send Email to %1</source>
+        <translation>Envoyer courriel à %1</translation>
     </message>
 </context>
 <context>
@@ -5387,7 +5315,11 @@ devices</source>
     </message>
     <message>
         <source>Apply changes before switching to another server?</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer les changements avant d&apos;aller à un autre serveur?</translation>
+    </message>
+    <message>
+        <source>Server Web Page</source>
+        <translation>Page Web Serveur</translation>
     </message>
 </context>
 <context>
@@ -5422,15 +5354,15 @@ devices</source>
     </message>
     <message>
         <source>server will take devices automatically from offline servers</source>
-        <translation type="unfinished"></translation>
+        <translation>serveur prendra automatiquement les périphériques des serveurs hors ligne</translation>
     </message>
     <message>
         <source>server will take cameras automatically from offline servers</source>
-        <translation type="unfinished"></translation>
+        <translation>serveur prendra automatiquement les caméras des serveurs hors ligne</translation>
     </message>
     <message>
         <source>Failover</source>
-        <translation type="unfinished"></translation>
+        <translation>Basculement</translation>
     </message>
 </context>
 <context>
@@ -5463,212 +5395,212 @@ devices</source>
         <translation>Vous devrez mettre à jour le client manuellement avec un installeur.</translation>
     </message>
     <message>
-        <source>All components in your system are up to date.</source>
-        <translation>Toutes les composantes du système sont à jour.</translation>
-    </message>
-    <message>
         <source>Cannot update from this file.</source>
         <translation>MàJ impossible depuis ce fichier.</translation>
     </message>
     <message>
         <source>Latest Available Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Dernière mise à jour disponible</translation>
     </message>
     <message>
         <source>Download the Latest Version Update File</source>
-        <translation type="unfinished"></translation>
+        <translation>Télécharger la dernière version de MaJ</translation>
     </message>
     <message>
         <source>Selected Version</source>
-        <translation type="unfinished"></translation>
+        <translation>Version sélectionnée</translation>
     </message>
     <message>
         <source>Download Update File</source>
-        <translation type="unfinished"></translation>
+        <translation>Télécharger le fichier de MaJ</translation>
     </message>
     <message>
         <source>Browse for Update File...</source>
-        <translation type="unfinished"></translation>
+        <translation>Parcourir pour fichier de MaJ...</translation>
     </message>
     <message>
         <source>Selected Update File</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier MaJ sélectionné</translation>
     </message>
     <message>
         <source>Download in External Browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Télécharger dans un navigateur externe</translation>
     </message>
     <message>
         <source>Copy Link to Clipboard</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All components in your system are up to this version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Copier lien dans presse-papier</translation>
     </message>
     <message>
         <source>Unable to check updates on the Internet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de vérifier les mises à jour sur Internet.</translation>
     </message>
     <message>
         <source>Unknown build number.</source>
-        <translation type="unfinished"></translation>
+        <translation>Numéro de version inconnu.</translation>
     </message>
     <message>
         <source>Downgrade to an earlier version is prohibited.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rétrograder vers une version antérieure est interdite.</translation>
     </message>
     <message>
         <source>Updates for one or more servers were not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mise à jour pour un ou plusieurs serveurs introuvables.</translation>
     </message>
     <message>
         <source>Client update was not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mise à jour client non trouvée.</translation>
     </message>
     <message>
         <source>Unable to extract update file. No free space left on the disk.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Incompatible %1 instance. To update disconnect system from %1 first.</source>
-        <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d’extraire le fichier de mise à jour. Aucun espace libre restant sur le disque.</translation>
     </message>
     <message>
         <source>Update Finished...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mise à jour terminée...</translation>
     </message>
     <message>
         <source>Checking for updates...</source>
-        <translation type="unfinished"></translation>
+        <translation>Vérification des mises à jour...</translation>
     </message>
     <message>
         <source>Downloading updates...</source>
-        <translation type="unfinished"></translation>
+        <translation>Téléchargement des mises à jour...</translation>
     </message>
     <message>
         <source>Installing client update...</source>
-        <translation type="unfinished"></translation>
+        <translation>Installation de mise à jour client...</translation>
     </message>
     <message>
         <source>Installing updates to incompatible servers...</source>
-        <translation type="unfinished"></translation>
+        <translation>Installation de mises à jour aux serveurs incompatibles...</translation>
     </message>
     <message>
         <source>Pushing updates to servers...</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoie des mises à jour aux serveurs...</translation>
     </message>
     <message>
         <source>Installing updates...</source>
-        <translation type="unfinished"></translation>
+        <translation>Installation des mises à jour...</translation>
     </message>
     <message>
         <source>Specific Build...</source>
-        <translation type="unfinished"></translation>
+        <translation>Version spécifique...</translation>
     </message>
     <message>
         <source>Update to Specific Build</source>
-        <translation type="unfinished"></translation>
+        <translation>Mise à jour vers version spécifique</translation>
     </message>
     <message>
         <source>Update System</source>
-        <translation type="unfinished"></translation>
+        <translation>Mise à jour système</translation>
     </message>
     <message>
         <source>System update in process</source>
-        <translation type="unfinished"></translation>
+        <translation>Mise à jour système en progression</translation>
     </message>
     <message>
         <source>Cancel Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler la mise à jour</translation>
     </message>
     <message>
         <source>Continue in Background</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Update can&apos;t be canceled at this stage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please wait until it&apos;s finished.</source>
-        <translation type="unfinished"></translation>
+        <translation>Continuer en arrière-plan</translation>
     </message>
     <message numerus="yes">
         <source>Not enough free space at %n Servers:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Pas assez d’espace libre sur %n serveur:</numerusform>
+            <numerusform>Pas assez d’espace libre sur %n serveurs:</numerusform>
         </translation>
     </message>
     <message>
         <source>Attempt to update may fail or cause Server malfunction.</source>
-        <translation type="unfinished"></translation>
+        <translation>Essayer de mettre à jour peut échouer ou entraîner un mauvais fonctionnement du serveur.</translation>
     </message>
     <message>
         <source>Force Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Forcer la mise à jour</translation>
     </message>
     <message>
         <source>Server update completed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please update %1 Client manually using an installation package.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mise à jour serveur terminée</translation>
     </message>
     <message>
         <source>Update completed</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>%1 Client will be restarted to the updated version.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mise à jour terminée</translation>
     </message>
     <message>
         <source>Update canceled</source>
-        <translation type="unfinished"></translation>
+        <translation>Mise à jour annulée</translation>
     </message>
     <message>
         <source>All Servers already updated</source>
-        <translation type="unfinished"></translation>
+        <translation>Tous les serveurs sont déjà à jour</translation>
     </message>
     <message>
         <source>Update failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec de mise à jour</translation>
+    </message>
+    <message>
+        <source>Please update %1 manually using an installation package.</source>
+        <translation>Veuillez mettre à jour %1 manuellement à l’aide d’un paquet d&apos;installation.</translation>
+    </message>
+    <message>
+        <source>%1 will be restarted to the updated version.</source>
+        <translation>%1 sera redémarré à la version mise à jour.</translation>
+    </message>
+    <message>
+        <source>Update cannot be canceled at this stage</source>
+        <translation>Mise à jour ne peut être annulée à ce stade</translation>
+    </message>
+    <message>
+        <source>Please wait until it is finished.</source>
+        <translation>Veuillez patienter jusqu&apos;à ce que ce soit fini.</translation>
+    </message>
+    <message>
+        <source>All components in your System are up to date.</source>
+        <translation>Tous les composants de votre système sont à jour.</translation>
+    </message>
+    <message>
+        <source>All components in your System are up to this version.</source>
+        <translation>Tous les composants de votre système sont à cette version.</translation>
+    </message>
+    <message>
+        <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
+        <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
+        <translation>Instance %1 incompatibles. Pour mettre à jour, d&apos;abord débranchez le système de %1.</translation>
     </message>
 </context>
 <context>
     <name>QnSessionAwareTabbedDialog</name>
     <message>
         <source>Unsaved changes:</source>
-        <translation type="unfinished"></translation>
+        <translation>Changements non enregistrés:</translation>
     </message>
     <message>
         <source>Save changes before exit?</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer les changements avant la sortie ?</translation>
     </message>
 </context>
 <context>
     <name>QnShowOnAlarmLayoutActionWidget</name>
-    <message>
-        <source>&lt;All Users&gt;</source>
-        <translation>&lt;Tous usagers&gt;</translation>
-    </message>
     <message numerus="yes">
         <source>%n Users</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n utilisateur</numerusform>
+            <numerusform>%n utilisateurs</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Roles</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n rôle</numerusform>
+            <numerusform>%n rôles</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>All Users</source>
+        <translation>Tous les usagers</translation>
     </message>
 </context>
 <context>
@@ -5717,47 +5649,47 @@ devices</source>
     </message>
     <message>
         <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Détection de mouvement fonctionne uniquement lorsque la caméra est visualiser. Activer l’enregistrement pour la faire fonctionner en tout le temps.</translation>
     </message>
     <message>
         <source>FPS too high</source>
-        <translation type="unfinished"></translation>
+        <translation>IPS trop élevé</translation>
     </message>
     <message>
         <source>FPS in the schedule was lowered from %1 to %2, which is the maximum for this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>IPS dans l’horaire a été diminuée de %1 à %2, qui est le maximum pour cette caméra.</translation>
     </message>
     <message>
         <source>For software motion detection, 2 FPS are reserved for the secondary stream.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour la détection de mouvement logiciel, 2IPS sont réservés pour le flux secondaire.</translation>
     </message>
     <message>
         <source>FPS in the schedule was lowered from %1 to %2.</source>
-        <translation type="unfinished"></translation>
+        <translation>IPS dans l’horaire a été diminuée de %1 à %2.</translation>
     </message>
     <message>
         <source>Secondary stream disabled for this camera</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&quot;Motion + Low - Res&quot; recording option can&apos;t be set.</source>
-        <translation type="unfinished"></translation>
+        <translation>Flux secondaire désactivé pour cette caméra</translation>
     </message>
     <message>
         <source>Set Recording to &quot;Always&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Fixé enregistrement à &quot;Toujours&quot;</translation>
     </message>
     <message>
         <source>Enable Secondary Stream</source>
-        <translation type="unfinished"></translation>
+        <translation>Activer flux secondaire</translation>
     </message>
     <message>
         <source>Reset motion regions to default?</source>
-        <translation type="unfinished"></translation>
+        <translation>Réinitialiser les régions de mouvement par défaut?</translation>
     </message>
     <message>
-        <source>This action can&apos;t be undone.</source>
-        <translation type="unfinished"></translation>
+        <source>This action cannot be undone.</source>
+        <translation>Cette action est irréversible.</translation>
+    </message>
+    <message>
+        <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
+        <translation>Enregistrement &quot;Mouv. + Basse-Res.&quot; ne peut pas être définie.</translation>
     </message>
 </context>
 <context>
@@ -5768,70 +5700,70 @@ devices</source>
     </message>
     <message>
         <source>Email</source>
-        <translation type="unfinished">Courriel</translation>
+        <translation>Courriel</translation>
     </message>
     <message>
         <source>SMTP Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur SMTP</translation>
     </message>
     <message>
         <source>Server cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur ne peut pas être vide.</translation>
     </message>
     <message>
         <source>User</source>
-        <translation type="unfinished">Usager</translation>
+        <translation>Usager</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished">Mot de passe</translation>
+        <translation>Mot de passe</translation>
     </message>
     <message>
         <source>System Signature</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enter a short system description here.</source>
-        <translation type="unfinished"></translation>
+        <translation>Signature Système</translation>
     </message>
     <message>
         <source>Support Signature</source>
-        <translation type="unfinished"></translation>
+        <translation>Signature Support</translation>
+    </message>
+    <message>
+        <source>Enter a short System description here.</source>
+        <translation>Entrez une courte description du système ici.</translation>
     </message>
 </context>
 <context>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
-        <source>No preset found. Use &apos;Advanced&apos; option.</source>
-        <translation>Aucun préréglage trouvé. Utiliser l&apos;option &apos;Avancée&apos;.</translation>
-    </message>
-    <message>
         <source>Email</source>
-        <translation type="unfinished">Courriel</translation>
+        <translation>Courriel</translation>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished">Courriel invalide</translation>
+        <translation>Courriel invalide.</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished">Mot de passe</translation>
+        <translation>Mot de passe</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
-        <translation type="unfinished">Le mot de passe ne peut pas être vide.</translation>
+        <translation>Le mot de passe ne peut pas être vide.</translation>
     </message>
     <message>
         <source>System Signature</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enter a short system description here.</source>
-        <translation type="unfinished"></translation>
+        <translation>Signature Système</translation>
     </message>
     <message>
         <source>Support Signature</source>
-        <translation type="unfinished"></translation>
+        <translation>Signature Support</translation>
+    </message>
+    <message>
+        <source>No preset found. Use &quot;Advanced&quot; option.</source>
+        <translation>Aucune préréglage trouvée. Utilisez l’option « Avancée ».</translation>
+    </message>
+    <message>
+        <source>Enter a short System description here.</source>
+        <translation>Entrez une courte description du système ici.</translation>
     </message>
 </context>
 <context>
@@ -5862,31 +5794,31 @@ devices</source>
     </message>
     <message>
         <source>Connection timed out</source>
-        <translation type="unfinished"></translation>
+        <translation>Connexion expirée</translation>
     </message>
     <message>
         <source>Authentication failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec d&apos;authentification</translation>
     </message>
     <message>
         <source>SMTP Error %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreur SMTP %1</translation>
     </message>
     <message>
         <source>Network error</source>
-        <translation type="unfinished">Erreur Réseau.</translation>
+        <translation>Erreur Réseau</translation>
     </message>
     <message>
         <source>Invalid parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres invalides</translation>
     </message>
     <message>
-        <source>Can&apos;t perform the test.</source>
-        <translation type="unfinished"></translation>
+        <source>Cannot perform the test.</source>
+        <translation>Impossible d’effectuer le test.</translation>
     </message>
     <message>
-        <source>No Servers connected to internet</source>
-        <translation type="unfinished"></translation>
+        <source>No Servers connected to Internet</source>
+        <translation>Aucun serveur connecté à Internet</translation>
     </message>
 </context>
 <context>
@@ -5904,82 +5836,95 @@ devices</source>
     <name>QnStatusOverlayController</name>
     <message>
         <source>NOT ENOUGH LICENCES</source>
-        <translation type="unfinished"></translation>
+        <translation>PAS ASSEZ DE LICENCES</translation>
     </message>
     <message>
         <source>NO DATA</source>
-        <translation type="unfinished">AUCUNE DONNÉE</translation>
+        <translation>AUCUNE DONNÉE</translation>
     </message>
     <message>
         <source>UNAUTHORIZED</source>
-        <translation type="unfinished"></translation>
+        <translation>NON AUTORISÉ</translation>
     </message>
     <message>
         <source>NO SIGNAL</source>
-        <translation type="unfinished">AUCUN SIGNAL</translation>
+        <translation>AUCUN SIGNAL</translation>
     </message>
     <message>
         <source>SERVER UNAVAILABLE</source>
-        <translation type="unfinished"></translation>
+        <translation>SERVEUR NON DISPONIBLE</translation>
     </message>
     <message>
         <source>NO ACCESS</source>
-        <translation type="unfinished"></translation>
+        <translation>AUCUN ACCÈS</translation>
     </message>
     <message>
         <source>DEVICE DISABLED</source>
-        <translation type="unfinished"></translation>
+        <translation>PÉRIPHÉRIQUE DÉSACTIVÉ</translation>
     </message>
     <message>
         <source>Device Settings</source>
-        <translation type="unfinished">Paramètres Périphérique</translation>
+        <translation>Paramètres Périphérique</translation>
     </message>
     <message>
         <source>Camera Settings</source>
-        <translation type="unfinished">Paramètres Caméra</translation>
+        <translation>Paramètres Caméra</translation>
     </message>
     <message>
         <source>I/O Module Settings</source>
-        <translation type="unfinished">Paramètres Module I/O</translation>
+        <translation>Paramètres Module I/O</translation>
     </message>
     <message>
         <source>Diagnostics</source>
-        <translation type="unfinished"></translation>
+        <translation>Diagnostics</translation>
     </message>
     <message>
         <source>Enable</source>
-        <translation type="unfinished">Activer</translation>
+        <translation>Activer</translation>
     </message>
     <message>
         <source>Activate License</source>
-        <translation type="unfinished">Activer Licence</translation>
+        <translation>Activer Licence</translation>
     </message>
     <message>
         <source>Please check authentication information</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P vérifier les informations d’authentification</translation>
     </message>
 </context>
 <context>
     <name>QnStorageAnalyticsWidget</name>
     <message>
         <source>Select All</source>
-        <translation type="unfinished">Sélectionner tous</translation>
+        <translation>Sélectionner tous</translation>
     </message>
     <message>
         <source>Export Selection to File...</source>
-        <translation type="unfinished">Exporter la sélection vers un fichier...</translation>
+        <translation>Exporter la sélection vers un fichier...</translation>
     </message>
     <message>
         <source>Copy Selection to Clipboard</source>
-        <translation type="unfinished">Copier la sélection dans le presse-papier</translation>
+        <translation>Copier la sélection dans le presse-papier</translation>
     </message>
     <message>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Actualiser</translation>
     </message>
     <message>
         <source>Export selected events to file</source>
-        <translation type="unfinished">Exporter les événements sélectionnés vers un fichier</translation>
+        <translation>Exporter les événements sélectionnés vers un fichier</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n TB</source>
+        <comment>TB - terabytes</comment>
+        <translation>
+            <numerusform>%n TB</numerusform>
+            <numerusform>%n TB</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>TB</source>
+        <comment>TB - terabytes</comment>
+        <translation>TB</translation>
     </message>
 </context>
 <context>
@@ -5994,99 +5939,99 @@ devices</source>
     </message>
     <message>
         <source>Backup is in progress...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde en cours...</translation>
     </message>
     <message>
         <source>Main</source>
-        <translation type="unfinished"></translation>
+        <translation>Principal</translation>
     </message>
     <message>
         <source>Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde</translation>
     </message>
     <message>
         <source>Add more drives to use them as backup storage.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter plus de disques pour les utilisers comme stockage de sauvegarde.</translation>
     </message>
     <message>
         <source>Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</source>
-        <translation type="unfinished"></translation>
+        <translation>Changer &quot;Principal&quot; pour &quot;Sauvegarde&quot; pour certains stockage ci-dessus pour activer la sauvegarde.</translation>
     </message>
     <message>
         <source>Apply changes to start backup.</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer les changements pour démarrer la sauvegarde.</translation>
     </message>
     <message>
         <source>in %1</source>
-        <translation type="unfinished"></translation>
+        <translation>dans %1</translation>
     </message>
     <message>
         <source>%1 before now</source>
-        <translation type="unfinished">(%1 avant maintenant)</translation>
+        <translation>%1 avant maintenant</translation>
     </message>
     <message>
         <source>Realtime backup is active...</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde en temps réel actif...</translation>
     </message>
     <message>
         <source>Realtime backup is set up.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde en temps réel mis en place.</translation>
     </message>
     <message>
         <source>There is no backup yet.</source>
-        <translation type="unfinished"></translation>
+        <translation>Il n’existe aucune sauvegarde.</translation>
     </message>
     <message>
         <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde d’archive est terminé jusqu&apos;à &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde suivante prévue pour &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Next backup is not scheduled.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde suivante n’est pas prévue.</translation>
     </message>
     <message>
         <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
-        <translation type="unfinished"></translation>
+        <translation>Selon la taille totale de l’archive, la réindexation peut prendre plusieurs heures.</translation>
     </message>
     <message>
         <source>Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Réindexation n’est nécessaire que si votre dossiers d’archivage ont été déplacés, renommés ou supprimés.</translation>
     </message>
     <message>
         <source>You can cancel this operation at any moment without data loss.</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous pouvez annuler cette opération à tout moment sans perte de données.</translation>
     </message>
     <message>
         <source>Continue anyway?</source>
-        <translation type="unfinished"></translation>
+        <translation>Continuer quand même?</translation>
     </message>
     <message>
         <source>Hard disk load will increase significantly</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;utilisation du disque dur augmentera de manière significative</translation>
     </message>
     <message>
         <source>Select at least one device in the Backup Settings to start backup.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionnez au moins un périphérique dans les paramètres de sauvegarde pour démarrer la sauvegarde.</translation>
     </message>
     <message>
         <source>Select at least one camera in the Backup Settings to start backup.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionnez au moins une caméra dans les paramètres de sauvegarde pour démarrer la sauvegarde.</translation>
     </message>
     <message>
         <source>Archive reindexing completed</source>
-        <translation type="unfinished"></translation>
+        <translation>Réindexation d&apos;archive terminée</translation>
     </message>
     <message>
         <source>Backup reindexing completed</source>
-        <translation type="unfinished"></translation>
+        <translation>Réindexation de sauvegarde terminée</translation>
     </message>
     <message>
         <source>Backup completed</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde terminée</translation>
     </message>
 </context>
 <context>
@@ -6094,10 +6039,6 @@ devices</source>
     <message>
         <source>Invalid storage</source>
         <translation>Stockage invalide</translation>
-    </message>
-    <message>
-        <source>%1 Gb</source>
-        <translation>%1 Gb</translation>
     </message>
     <message>
         <source>Remove</source>
@@ -6125,41 +6066,34 @@ devices</source>
     </message>
     <message>
         <source>Backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Sauvegarde</translation>
     </message>
     <message>
         <source>Main</source>
-        <translation type="unfinished"></translation>
+        <translation>Principal</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 Gb</translation>
     </message>
 </context>
 <context>
     <name>QnStorageRebuildWidget</name>
     <message>
-        <source>Fast Backup Scan... 	%p%</source>
-        <comment>%p is a placeholder for percent value, must be kept.</comment>
-        <translation type="unfinished"></translation>
+        <source>Fast Backup Scan...</source>
+        <translation>Balayage rapide de sauvegarde...</translation>
     </message>
     <message>
-        <source>Fast Archive Scan... 	%p%</source>
-        <comment>%p is a placeholder for percent value, must be kept.</comment>
-        <translation type="unfinished"></translation>
+        <source>Fast Archive Scan...</source>
+        <translation>Balayage rapide d&apos;archive...</translation>
     </message>
     <message>
-        <source>Reindexing Backup... 	%p%</source>
-        <comment>%p is a placeholder for percent value, must be kept.</comment>
-        <translation type="unfinished"></translation>
+        <source>Reindexing Backup...</source>
+        <translation>Réindexation de sauvegarde...</translation>
     </message>
     <message>
-        <source>Reindexing Archive... 	%p%</source>
-        <comment>%p is a placeholder for percent value, must be kept.</comment>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnStorageSpaceSlider</name>
-    <message>
-        <source>%1%</source>
-        <translation>%1%</translation>
+        <source>Reindexing Archive...</source>
+        <translation>Réindexation d&apos;archive...</translation>
     </message>
 </context>
 <context>
@@ -6174,27 +6108,27 @@ devices</source>
     </message>
     <message>
         <source>Invalid credentials for external storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Informations d’identification invalides pour le stockage externe</translation>
     </message>
     <message>
         <source>Invalid storage path</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>It&apos;s not recommended to use one recording location for different servers.</source>
-        <translation type="unfinished"></translation>
+        <translation>Chemin de stockage invalide</translation>
     </message>
     <message>
         <source>Add this storage anyway?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter ce stockage quand même?</translation>
     </message>
     <message>
         <source>Storage path used by another server</source>
-        <translation type="unfinished"></translation>
+        <translation>Chemin de stockage utilisé par un autre serveur</translation>
     </message>
     <message>
         <source>Add Storage</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter Stockage</translation>
+    </message>
+    <message>
+        <source>It is not recommended to use one recording location for different servers.</source>
+        <translation>Il n’est pas recommandé d’utiliser un seul emplacement d’enregistrement pour les différents serveurs.</translation>
     </message>
 </context>
 <context>
@@ -6243,10 +6177,6 @@ devices</source>
         <translation>Serveur courriel non configuré</translation>
     </message>
     <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>Certains usagers n&apos;ont pas leurs adresse courriel configuré</translation>
-    </message>
-    <message>
         <source>Connection to server lost</source>
         <translation>Connexion au serveur perdue</translation>
     </message>
@@ -6257,10 +6187,6 @@ devices</source>
     <message>
         <source>System is in safe mode</source>
         <translation>Système est en mode sans échec</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>Erreur lors de l&apos;envoie de courriel</translation>
     </message>
     <message>
         <source>Storage is full</source>
@@ -6287,28 +6213,12 @@ devices</source>
         <translation>Adresse courriel non configuré.</translation>
     </message>
     <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>Vous ne pouvez pas recevoir des notifications système par courriel.</translation>
-    </message>
-    <message>
         <source>Email server is not set.</source>
         <translation>Serveur courriel non configuré.</translation>
     </message>
     <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>Certains usagers n&apos;ont pas leurs adresse courriel configuré.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>Ils ne peuvent pas recevoir des notifications système par courriel.</translation>
-    </message>
-    <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
         <translation>Le serveur temps n&apos;est pas synchronisé et un temps commun n&apos;a pas été détecté automatiquement.</translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation>Système fonctionne en mode sans échec.</translation>
     </message>
     <message>
         <source>Any configuration changes except license activation are impossible.</source>
@@ -6340,12 +6250,36 @@ devices</source>
     </message>
     <message>
         <source>Learn more</source>
-        <translation type="unfinished"></translation>
+        <translation>En savoir plus</translation>
     </message>
     <message>
-        <source>Check out &lt;b&gt;%1&lt;/b&gt; Beta &amp;mdash; connect to your servers from anywhere</source>
-        <comment>%1 is name of cloud (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <source>Some users have not set their Email addresses</source>
+        <translation>Certains usagers n’ont pas mis leurs courriel</translation>
+    </message>
+    <message>
+        <source>Error while sending Email</source>
+        <translation>Erreur lors de l’envoi courriel</translation>
+    </message>
+    <message>
+        <source>Some users have not set their Email addresses.</source>
+        <translation>Certains usagers n’ont pas mis leurs courriel.</translation>
+    </message>
+    <message>
+        <source>System is running in safe mode.</source>
+        <translation>Système s’exécute en mode sans échec.</translation>
+    </message>
+    <message>
+        <source>Check out %1 &amp;mdash; connect to your servers from anywhere</source>
+        <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+        <translation>Découvrez %1 &amp;mdash; connecter à vos serveurs depuis n’importe où</translation>
+    </message>
+    <message>
+        <source>You cannot receive System notifications by Email.</source>
+        <translation>Vous ne pouvez pas recevoir les notifications système par courriel.</translation>
+    </message>
+    <message>
+        <source>They cannot receive System notifications by Email.</source>
+        <translation>Ils ne peuvent pas recevoir les notifications système par courriel.</translation>
     </message>
 </context>
 <context>
@@ -6359,27 +6293,27 @@ devices</source>
         <translation>Activer découverte automatique caméras et serveurs</translation>
     </message>
     <message>
-        <source>Allow system to optimize device settings</source>
-        <translation type="unfinished">Laisser le système optimiser les paramètres périphérique</translation>
+        <source>Allow System to optimize device settings</source>
+        <translation>Laisser le système optimiser les paramètres périphérique</translation>
     </message>
     <message>
-        <source>Allow system to optimize camera settings</source>
-        <translation type="unfinished">Laisser le système optimiser les paramètres caméras</translation>
+        <source>Allow System to optimize camera settings</source>
+        <translation>Laisser le système optimiser les paramètres caméra</translation>
     </message>
 </context>
 <context>
     <name>QnTableExportHelper</name>
     <message>
         <source>HTML file (*.html);;Spread Sheet (CSV) File (*.csv)</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier HTML (*.html);;Feuille de Calcule(Tableur)(*.csv)</translation>
     </message>
     <message>
         <source>Close all programs which may use this file and try again</source>
-        <translation type="unfinished"></translation>
+        <translation>Fermez tous les programmes qui peuvent utiliser ce fichier et essayez à nouveau</translation>
     </message>
     <message>
         <source>File used by another process</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier utilisé par un autre processus</translation>
     </message>
 </context>
 <context>
@@ -6390,19 +6324,19 @@ devices</source>
     </message>
     <message>
         <source>Offset</source>
-        <translation></translation>
+        <translation>Décalage</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation type="unfinished">Date</translation>
+        <translation>Date</translation>
     </message>
     <message>
         <source>Timezone</source>
-        <translation type="unfinished"></translation>
+        <translation>Fuseau horaire</translation>
     </message>
     <message>
         <source>Time</source>
-        <translation type="unfinished">Temps</translation>
+        <translation>Temps</translation>
     </message>
 </context>
 <context>
@@ -6420,11 +6354,11 @@ devices</source>
     <name>QnTimeSlider</name>
     <message>
         <source>Live</source>
-        <translation type="unfinished">Direct</translation>
+        <translation>Direct</translation>
     </message>
     <message>
         <source>No thumbnails available</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucune miniature disponible</translation>
     </message>
 </context>
 <context>
@@ -6446,89 +6380,89 @@ devices</source>
     </message>
     <message>
         <source>Input device is not selected</source>
-        <translation type="unfinished">Périphérique d&apos;entré non sélectionné.</translation>
+        <translation>Périphérique d&apos;entré non sélectionné</translation>
     </message>
     <message>
         <source>Streaming is not ready yet</source>
-        <translation type="unfinished"></translation>
+        <translation>La diffusion n’est pas encore prêt</translation>
     </message>
     <message>
         <source>Network error</source>
-        <translation type="unfinished">Erreur Réseau.</translation>
+        <translation>Erreur Réseau</translation>
     </message>
 </context>
 <context>
     <name>QnUpdateResult</name>
     <message>
         <source>Update has been successfully finished.</source>
-        <translation type="unfinished">Mise à jour  terminée avec succès.</translation>
+        <translation>Mise à jour terminée avec succès.</translation>
     </message>
     <message>
         <source>Update has been cancelled.</source>
-        <translation type="unfinished">Mise en jour annulée.</translation>
+        <translation>Mise en jour annulée.</translation>
     </message>
     <message>
         <source>Another user has already started an update.</source>
-        <translation type="unfinished">Quelqu&apos;un a déjà commencé une MàJ.</translation>
+        <translation>Quelqu&apos;un a déjà commencé une MàJ.</translation>
     </message>
     <message>
         <source>All servers are already updated.</source>
-        <translation type="unfinished">Tous les serveurs sont déjà à jour.</translation>
+        <translation>Tous les serveurs sont déjà à jour.</translation>
     </message>
     <message>
         <source>Could not download updates.</source>
-        <translation type="unfinished">Impossible de télécharger les MàJ.</translation>
+        <translation>Impossible de télécharger les MàJ.</translation>
     </message>
     <message>
         <source>No free space left on the disk.</source>
-        <translation type="unfinished">Aucun espace libre sur le disque.</translation>
+        <translation>Aucun espace libre sur le disque.</translation>
     </message>
     <message>
         <source>Could not push updates to servers.</source>
-        <translation type="unfinished">Impossible d&apos;envoyer les MàJ aux serveurs.</translation>
+        <translation>Impossible d&apos;envoyer les MàJ aux serveurs.</translation>
     </message>
     <message numerus="yes">
         <source>The problem is caused by %n servers:</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Le problème est causé par%n serveur:</numerusform>
             <numerusform>Le problème est causé par%n serveurs:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>No free space left on %n servers:</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Aucun espace libre sur %n serveur:</numerusform>
             <numerusform>Aucun espace libre sur %n serveurs:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n servers are not responding:</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n serveur ne répond pas:</numerusform>
             <numerusform>%n serveurs ne répondent pas:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n servers have gone offline:</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>%n serveur est hors-ligne:</numerusform>
             <numerusform>%n serveurs sont hors-ligne:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Authentication failed for %n servers:</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform>Échec d&apos;authentification pour %n serveur:</numerusform>
             <numerusform>Échec d&apos;authentification pour %n serveurs:</numerusform>
         </translation>
     </message>
     <message>
         <source>Could not install an update to the client.</source>
-        <translation type="unfinished">Impossible d&apos;installer les mises à jour client.</translation>
+        <translation>Impossible d&apos;installer les mises à jour client.</translation>
     </message>
     <message>
         <source>Could not install updates on one or more servers.</source>
-        <translation type="unfinished">Impossible d&apos;installer les MàJ sur un ou plusieurs serveurs.</translation>
+        <translation>Impossible d&apos;installer les MàJ sur un ou plusieurs serveurs.</translation>
     </message>
 </context>
 <context>
@@ -6551,19 +6485,19 @@ devices</source>
     </message>
     <message>
         <source>Local user</source>
-        <translation type="unfinished"></translation>
+        <translation>Usager local</translation>
     </message>
     <message>
         <source>Cloud user</source>
-        <translation type="unfinished"></translation>
+        <translation>Usager Nuage</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="unfinished">Identifiant</translation>
+        <translation>Identifiant</translation>
     </message>
     <message>
         <source>Role</source>
-        <translation type="unfinished"></translation>
+        <translation>Rôle</translation>
     </message>
 </context>
 <context>
@@ -6602,240 +6536,222 @@ devices</source>
     </message>
     <message>
         <source>Control Video Walls</source>
-        <translation type="unfinished"></translation>
+        <translation>Contrôle Mur Vidéo</translation>
     </message>
 </context>
 <context>
     <name>QnUserManagementWidget</name>
     <message>
         <source>Edit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n users?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Don&apos;t show this message again</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifier</translation>
     </message>
 </context>
 <context>
     <name>QnUserProfileWidget</name>
     <message>
         <source>Login</source>
-        <translation type="unfinished">Identifiant</translation>
+        <translation>Identifiant</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation>Nom</translation>
     </message>
     <message>
         <source>Role</source>
-        <translation type="unfinished"></translation>
+        <translation>Rôle</translation>
     </message>
     <message>
         <source>Email</source>
-        <translation type="unfinished">Courriel</translation>
+        <translation>Courriel</translation>
     </message>
 </context>
 <context>
     <name>QnUserRoleSettingsWidget</name>
     <message>
         <source>Role name cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom de rôle ne peut pas être vide.</translation>
     </message>
     <message>
         <source>Role with same name already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>Rôle avec le même nom existe déjà.</translation>
     </message>
 </context>
 <context>
     <name>QnUserRoleSettingsWidgetPrivate</name>
     <message>
         <source>No users have this role</source>
-        <translation type="unfinished"></translation>
+        <translation>Aucun usager n’a ce rôle</translation>
     </message>
     <message>
         <source>Custom with no permissions</source>
-        <translation type="unfinished"></translation>
+        <translation>Personaliser avec aucune autorisation</translation>
     </message>
     <message>
         <source>Users will have no permissions unless changed later.</source>
-        <translation type="unfinished"></translation>
+        <translation>Usagers n’auront aucune autorisation sauf si changé plus tard.</translation>
     </message>
     <message>
         <source>Assign a new role</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>What to do with %1 users with this role?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+        <translation>Assigner un nouveau rôle</translation>
     </message>
     <message>
         <source>Delete such users</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer ces usagers</translation>
+    </message>
+    <message numerus="yes">
+        <source>Please select an action to perform on %n users with this role</source>
+        <translation>
+            <numerusform>Veuillez sélectionner une action à exécuter sur %n usager avec ce rôle</numerusform>
+            <numerusform>Veuillez sélectionner une action à exécuter sur %n usagers avec ce rôle</numerusform>
+        </translation>
     </message>
 </context>
 <context>
     <name>QnUserRolesDialog</name>
     <message>
         <source>Role Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Info Rôle</translation>
     </message>
     <message>
         <source>Permissions</source>
-        <translation type="unfinished">Autorisations</translation>
+        <translation>Autorisations</translation>
     </message>
     <message>
         <source>Cameras &amp;&amp; Resources</source>
-        <translation type="unfinished"></translation>
+        <translation>Caméras &amp;&amp; Ressources</translation>
     </message>
     <message>
         <source>Layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Mises en page</translation>
     </message>
     <message>
         <source>New Role</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouveau rôle</translation>
     </message>
     <message>
         <source>New Role %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouveau rôle %1</translation>
     </message>
 </context>
 <context>
     <name>QnUserSettingsDialog</name>
     <message>
         <source>User Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Information usager</translation>
     </message>
     <message>
         <source>Permissions</source>
-        <translation type="unfinished">Autorisations</translation>
+        <translation>Autorisations</translation>
     </message>
     <message>
         <source>Cameras &amp;&amp; Resources</source>
-        <translation type="unfinished"></translation>
+        <translation>Caméras &amp;&amp; Ressources</translation>
     </message>
     <message>
         <source>Layouts</source>
-        <translation type="unfinished"></translation>
+        <translation>Mises en page</translation>
     </message>
     <message>
         <source>Send Invite</source>
-        <translation type="unfinished"></translation>
+        <translation>Envoyer invitation</translation>
     </message>
     <message>
         <source>New User...</source>
-        <translation type="unfinished">Nouveau Usager...</translation>
+        <translation>Nouveau Usager...</translation>
     </message>
     <message>
         <source>User Settings - %1 (readonly)</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres usager - %1 (lecture seule.)</translation>
     </message>
     <message>
         <source>User Settings - %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Paramètres Usager - %1</translation>
     </message>
     <message>
         <source>Enabled</source>
-        <translation type="unfinished">Activé</translation>
+        <translation>Activé</translation>
     </message>
     <message>
         <source>User is disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Usager désactivé</translation>
     </message>
     <message>
         <source>Apply changes before switching to another user?</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer les changements avant d&apos;aller à un autre usager?</translation>
     </message>
 </context>
 <context>
     <name>QnUserSettingsWidget</name>
     <message>
         <source>Local</source>
-        <translation type="unfinished">Locale</translation>
+        <translation>Locale</translation>
     </message>
     <message>
         <source>Cloud</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuage</translation>
     </message>
     <message>
         <source>Login</source>
-        <translation type="unfinished">Identifiant</translation>
+        <translation>Identifiant</translation>
     </message>
     <message>
         <source>Login cannot be empty.</source>
-        <translation type="unfinished">L’identifiant ne peut pas être vide.</translation>
+        <translation>L’identifiant ne peut pas être vide.</translation>
     </message>
     <message>
         <source>User with specified login already exists.</source>
-        <translation type="unfinished">Un usager avec l&apos;identifiant spécifié existe déjà.</translation>
+        <translation>Un usager avec l&apos;identifiant spécifié existe déjà.</translation>
     </message>
     <message>
         <source>User has been renamed. Password must be updated.</source>
-        <translation type="unfinished">Usager renommé. Mot de passe doit être MàJ.</translation>
+        <translation>Usager renommé. Mot de passe doit être MàJ.</translation>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation>Nom</translation>
     </message>
     <message>
         <source>Email</source>
-        <translation type="unfinished">Courriel</translation>
+        <translation>Courriel</translation>
     </message>
     <message>
         <source>Email cannot be empty.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cloud user with specified email already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>Courriel ne peut pas être vide.</translation>
     </message>
     <message>
         <source>Password</source>
-        <translation type="unfinished">Mot de passe</translation>
+        <translation>Mot de passe</translation>
     </message>
     <message>
         <source>Confirm Password</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmer mot de passe</translation>
     </message>
     <message>
         <source>Passwords do not match.</source>
-        <translation type="unfinished">Le mot de passe ne correspond pas.</translation>
+        <translation>Le mot de passe ne correspond pas.</translation>
+    </message>
+    <message>
+        <source>Cloud user with specified Email already exists.</source>
+        <translation>Usager nuage avec courriel spécifié existe déjà.</translation>
     </message>
 </context>
 <context>
     <name>QnValidatorStrings</name>
     <message>
         <source>Email cannot be empty.</source>
-        <translation type="unfinished"></translation>
+        <translation>Courriel ne peut pas être vide.</translation>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation type="unfinished">Courriel invalide</translation>
+        <translation>Courriel invalide.</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
-        <translation type="unfinished">Le mot de passe ne peut pas être vide.</translation>
+        <translation>Le mot de passe ne peut pas être vide.</translation>
     </message>
     <message>
         <source>Avoid leading and trailing spaces.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnVideowallItemWidget</name>
-    <message>
-        <source>Information</source>
-        <translation>Informations</translation>
+        <translation>Éviter les espaces de début et de fin.</translation>
     </message>
 </context>
 <context>
@@ -6850,33 +6766,33 @@ devices</source>
     </message>
     <message>
         <source>New Item</source>
-        <translation></translation>
+        <translation>Nouvel Objet</translation>
     </message>
     <message>
         <source>Display %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Affichage %1</translation>
     </message>
     <message>
         <source>Delete &quot;%1&quot;?</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer &quot;%1&quot; ?</translation>
     </message>
 </context>
 <context>
     <name>QnVideowallScreenWidget</name>
     <message>
         <source>PC %1</source>
-        <translation type="unfinished">PC %1</translation>
+        <translation>PC %1</translation>
     </message>
     <message>
         <source>PC %1 - Display %2</source>
-        <translation type="unfinished"></translation>
+        <translation>PC %1 - Affichage %2</translation>
     </message>
     <message numerus="yes">
         <source>PC %1 - Displays %2</source>
         <comment>%2 will be substituted by _list_ of displays</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>PC %1 - Affichage %2</numerusform>
+            <numerusform>PC %1 - Affichage %2</numerusform>
         </translation>
     </message>
 </context>
@@ -6886,35 +6802,19 @@ devices</source>
         <source>Muted</source>
         <translation>En sourdine</translation>
     </message>
-    <message>
-        <source>%1%</source>
-        <translation>%1%</translation>
-    </message>
 </context>
 <context>
     <name>QnWebResourceWidget</name>
     <message>
         <source>Fullscreen mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Mode plein écran</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchActionHandler</name>
     <message>
-        <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
-        <translation>Images (*.jpg *.png *.gif *.bmp *.tiff)</translation>
-    </message>
-    <message>
-        <source>All files (*.*)</source>
-        <translation>Tous les fichiers (*.*)</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation>Renommer</translation>
-    </message>
-    <message>
-        <source>Enter new name for the selected item:</source>
-        <translation>Entrer un nouveau nom pour les éléments sélectionnés:</translation>
+        <source>Layout is locked and cannot be changed.</source>
+        <translation>La mise en page est verrouillée et ne peut être changée.</translation>
     </message>
     <message>
         <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
@@ -6925,16 +6825,28 @@ devices</source>
         <translation>Vidéo (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
     </message>
     <message>
-        <source>Preview Search for %1</source>
-        <translation>Recherche d&apos;aperçu pour %1</translation>
+        <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
+        <translation>Images (*.jpg *.png *.gif *.bmp *.tiff)</translation>
     </message>
     <message>
-        <source>Layout is locked and cannot be changed.</source>
-        <translation>La mise en page est verrouillée et ne peut être changée.</translation>
+        <source>All files (*.*)</source>
+        <translation>Tous les fichiers (*.*)</translation>
     </message>
     <message>
         <source>Select folder...</source>
         <translation>Sélectionner le dossier...</translation>
+    </message>
+    <message>
+        <source>Preview Search for %1</source>
+        <translation>Recherche d&apos;aperçu pour %1</translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation>Renommer</translation>
+    </message>
+    <message>
+        <source>Enter new name for the selected item:</source>
+        <translation>Entrer un nouveau nom pour les éléments sélectionnés:</translation>
     </message>
     <message>
         <source>Update...</source>
@@ -6965,178 +6877,125 @@ devices</source>
     </message>
     <message>
         <source>Confirm files deleting</source>
-        <translation type="unfinished"></translation>
+        <translation>Confirmer la suppression de fichiers</translation>
     </message>
     <message>
         <source>Client</source>
-        <translation type="unfinished">Client</translation>
+        <translation>Client</translation>
     </message>
     <message>
         <source>Server</source>
-        <translation type="unfinished">Serveur</translation>
+        <translation>Serveur</translation>
     </message>
     <message numerus="yes">
         <source>Failed to move %n devices</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Déplacement impossible sur %n périphérique</numerusform>
+            <numerusform>Déplacement impossible sur %n périphériques</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Failed to move %n cameras</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Déplacement impossible sur %n caméra</numerusform>
+            <numerusform>Déplacement impossible sur %n caméras</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Failed to move %n I/O Modules</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Déplacement impossible sur %n Module I/O</numerusform>
+            <numerusform>Déplacement impossible sur %n Modules I/O</numerusform>
         </translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; is not responding.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Server &quot;%1&quot; can&apos;t access %n devices. Move them anyway?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Server &quot;%1&quot; can&apos;t access %n cameras. Move them anyway?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Server &quot;%1&quot; can&apos;t access %n I/O modules. Move them anyway?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
+        <translation>Serveur &quot;%1&quot; ne répond pas.</translation>
     </message>
     <message>
         <source>Move</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n devices?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n cameras?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n I/O Modules?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Delete %n items?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of them are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n cameras are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n I/O modules are auto-discovered.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>They may be auto-discovered again after removing.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Don&apos;t show this message again</source>
-        <translation type="unfinished"></translation>
+        <translation>Déplacer</translation>
     </message>
     <message>
         <source>Too short period selected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Can&apos;t perform Preview Search. Please select a period of 15 seconds or longer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Période trop courte choisie</translation>
     </message>
     <message>
         <source>Cancel device adding?</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler l’ajout de périphérique ?</translation>
     </message>
     <message>
         <source>There is another user with the same name</source>
-        <translation type="unfinished"></translation>
+        <translation>Il y a un autre usager du même nom</translation>
     </message>
     <message>
         <source>Image too big</source>
-        <translation type="unfinished"></translation>
+        <translation>Image trop grande</translation>
     </message>
     <message>
         <source>Maximum size is %1 MB.</source>
-        <translation type="unfinished"></translation>
+        <translation>Taille maximale est de %1 MB.</translation>
     </message>
     <message>
         <source>Failed to upload image</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec d&apos;envoie d&apos;image</translation>
     </message>
     <message>
         <source>Please update all components to the version %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Components of the System have different versions:</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P mettre à jour tous les composants à la version %1</translation>
     </message>
     <message>
         <source>Some functionality may be unavailable or not working properly.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The System sends anonymous usage statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>Certaines fonctionnalités peuvent être indisponibles ou ne fonctionne pas correctement.</translation>
     </message>
     <message>
         <source>It will be used by software development team to improve your user experience.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>To disable it, go to the System Administration dialog.</source>
-        <translation type="unfinished"></translation>
+        <translation>Il servira à l’équipe de développement du logiciels pour améliorer votre expérience d’utilisateur.</translation>
     </message>
     <message>
         <source>Failed to open server web page</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d’ouvrir la page web server</translation>
+    </message>
+    <message>
+        <source>Skip</source>
+        <translation>Passer</translation>
+    </message>
+    <message>
+        <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
+        <translation>Impossible d’exécuter recherche aperçu. Veuillez sélectionner une période de 15 secondes ou plus.</translation>
+    </message>
+    <message numerus="yes">
+        <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
+        <translation>
+            <numerusform>Serveur &quot;%1&quot; ne peut pas accéder à %n périphérique. Déplacez-le quand même?</numerusform>
+            <numerusform>Serveur &quot;%1&quot; ne peut pas accéder à %n périphériques. Déplacez-les quand même?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
+        <translation>
+            <numerusform>Serveur &quot;%1&quot; ne peut pas accéder à %n caméra. Déplacez-la quand même?</numerusform>
+            <numerusform>Serveur &quot;%1&quot; ne peut pas accéder à %n caméras. Déplacez-les quand même?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
+        <translation>
+            <numerusform>Serveur &quot;%1&quot; ne peut pas accéder à %n module I/O. Déplacez-le quand même?</numerusform>
+            <numerusform>Serveur &quot;%1&quot; ne peut pas accéder à %n modules I/O. Déplacez-les quand même?</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Components of System have different versions:</source>
+        <translation>Composants du système ont des versions différentes:</translation>
+    </message>
+    <message>
+        <source>System sends anonymous usage statistics</source>
+        <translation>Système envoie des statistiques d’utilisation anonymes</translation>
+    </message>
+    <message>
+        <source>To disable it, go to System Administration dialog.</source>
+        <translation>Pour le désactiver, allez à la boîte de dialogue Administration système.</translation>
     </message>
 </context>
 <context>
@@ -7155,21 +7014,21 @@ devices</source>
     </message>
     <message>
         <source>Server offline</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveur Hors ligne</translation>
     </message>
     <message>
         <source>Bookmarks can only be edited on an online Server.</source>
-        <translation type="unfinished"></translation>
+        <translation>Les signets peuvent seulement être éditées sur un serveur en ligne.</translation>
     </message>
     <message>
         <source>Delete bookmark?</source>
-        <translation type="unfinished"></translation>
+        <translation>Supprimer signet?</translation>
     </message>
     <message numerus="yes">
         <source>Delete %n bookmarks?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Supprimer %n signet?</numerusform>
+            <numerusform>Supprimer %n signets?</numerusform>
         </translation>
     </message>
 </context>
@@ -7186,11 +7045,11 @@ devices</source>
     <message>
         <source>%1 in %2</source>
         <comment>%1 is user name, %2 is name of system</comment>
-        <translation type="unfinished"></translation>
+        <translation>%1 en %2</translation>
     </message>
     <message>
         <source>Could not connect to server. Video Wall will be closed.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de se connecter au serveur. Mur vidéo sera fermé.</translation>
     </message>
 </context>
 <context>
@@ -7213,14 +7072,6 @@ devices</source>
     <message>
         <source>Exporting Layout</source>
         <translation>Exportation de la mise en page</translation>
-    </message>
-    <message>
-        <source>AVI (*.avi)</source>
-        <translation>AVI (*.avi)</translation>
-    </message>
-    <message>
-        <source>Matroska (*.mkv)</source>
-        <translation>Matroska (*.mkv)</translation>
     </message>
     <message>
         <source>Export Video As...</source>
@@ -7252,7 +7103,7 @@ devices</source>
     </message>
     <message>
         <source>exported</source>
-        <translation>Exporté</translation>
+        <translation>exporté</translation>
     </message>
     <message>
         <source>No Timestamp</source>
@@ -7284,99 +7135,99 @@ devices</source>
     </message>
     <message>
         <source>File already used for recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier déjà utilisé pour l’enregistrement</translation>
     </message>
     <message>
         <source>Please choose another name or wait until recording is finished.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P choisissez un autre nom ou attendez que l’enregistrement soit terminé.</translation>
     </message>
     <message>
         <source>You are about to export a long video</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous êtes sur le point d’exporter une longue vidéo</translation>
     </message>
     <message>
         <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-        <translation type="unfinished"></translation>
+        <translation>Il peut exiger plus d’un gigaoctet d’espace disque et prendre plusieurs minutes à complèter.</translation>
     </message>
     <message>
         <source>Export anyway?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>AVI format not recommended</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>For exporting a non-continuous recording with audio track, MKV or some other format is recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter quand même?</translation>
     </message>
     <message>
         <source>Export to AVI anyway?</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter en AVI quand même?</translation>
     </message>
     <message>
         <source>Selected format not recommended</source>
-        <translation type="unfinished"></translation>
+        <translation>Format sélectionné non recommandé</translation>
     </message>
     <message>
         <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour éviter un dégradage vidéo, format NOV ou EXE sont recommandé pour cette caméra.</translation>
     </message>
     <message>
         <source>Export with transcoding?</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter avec transcodage?</translation>
     </message>
     <message>
         <source>It will increase CPU usage and may take significant time.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ceci augmentera l&apos;utilisation CPU et peut prendre beaucoup de temps.</translation>
     </message>
     <message>
         <source>EXE format not recommended</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>EXE files over 4 GB can&apos;t be opened by double click due to a Windows limitation.</source>
-        <translation type="unfinished"></translation>
+        <translation>Format EXE non recommandé</translation>
     </message>
     <message>
         <source>Export to EXE anyway?</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter vers EXE quand même?</translation>
     </message>
     <message>
         <source>Failed to export Multi-Video</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec d’exportation multi-vidéo</translation>
     </message>
     <message>
         <source>Local files not allowed for Multi-Video export</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportation de fichiers locaux non autorisés pour multi-vidéo</translation>
     </message>
     <message>
         <source>Please remove all local files from the layout and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>S.V.P supprimer tous les fichiers locaux de la mise en page et réessayez.</translation>
     </message>
     <message>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter</translation>
     </message>
     <message>
         <source>You are about to export a lot of video</source>
-        <translation type="unfinished"></translation>
+        <translation>Vous êtes sur le point d’exporter beaucoup de vidéo</translation>
     </message>
     <message>
         <source>Too short period selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Période trop courte choisie</translation>
     </message>
     <message>
         <source>For exporting as Rapid Review, video length should be at least 10 seconds.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour l’exportation révision rapide, la longueur vidéo doit être d&apos;au moins 10 secondes.</translation>
     </message>
     <message>
         <source>Export completed</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportation terminée</translation>
     </message>
     <message>
         <source>Failed to export video</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec d&apos;exportation vidéo</translation>
+    </message>
+    <message>
+        <source>AVI format is not recommended</source>
+        <translation>Format AVI non recommandé</translation>
+    </message>
+    <message>
+        <source>For exporting a non-continuous recording MKV or some other format is recommended.</source>
+        <translation>Pour exporter un enregistrement non continu, MKV ou autre format est recommandé.</translation>
+    </message>
+    <message>
+        <source>EXE files over 4 GB cannot be opened by double click due to a Windows limitation.</source>
+        <translation>Un EXE de plus de 4GB ne peut pas être ouvert par un double clic en raison d&apos;une limitation Windows.</translation>
     </message>
 </context>
 <context>
@@ -7390,36 +7241,40 @@ devices</source>
         <translation>Mot de passe Administrateur</translation>
     </message>
     <message>
-        <source>Password cannot be empty!</source>
-        <translation>Mot de passe ne peut pas être vide!</translation>
-    </message>
-    <message>
         <source>Connecting to the current system...</source>
         <translation>Connexion sur le système actuel...</translation>
     </message>
     <message>
         <source>Systems will be merged shortly</source>
-        <translation type="unfinished"></translation>
+        <translation>Les systèmes seront fusionnées sous peu</translation>
     </message>
     <message>
         <source>Servers from the other System will appear in the resource tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>Serveurs de l’autre système apparaîtra dans l’arborescence des ressources.</translation>
     </message>
     <message>
         <source>Failed to merge Systems</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server connected to the System</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible de fusionner les systèmes</translation>
     </message>
     <message>
         <source>Failed to update Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec de mise à jour serveur</translation>
     </message>
     <message>
         <source>Total amount of licenses will decrease</source>
-        <translation type="unfinished"></translation>
+        <translation>Montant total de licences diminuera</translation>
+    </message>
+    <message>
+        <source>Server connected to System</source>
+        <translation>Serveur connecté au système</translation>
+    </message>
+    <message>
+        <source>Password cannot be empty.</source>
+        <translation>Mot de passe ne peut pas être vide.</translation>
+    </message>
+    <message>
+        <source>Cloud Systems cannot be merged</source>
+        <translation>Systèmes nuage ne peuvent pas être fusionnées</translation>
     </message>
 </context>
 <context>
@@ -7444,60 +7299,45 @@ devices</source>
         <source>New Layout %1</source>
         <translation>Nouvelle mise en page %1</translation>
     </message>
-    <message numerus="yes">
-        <source>Remove %n items from layout?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation type="unfinished">Supprimer</translation>
-    </message>
-    <message>
-        <source>Don&apos;t show this message again</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnWorkbenchResourcesChangesWatcher</name>
-    <message>
-        <source>The System is in the Safe Mode. It&apos;s not allowed to make any changes except license activation.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>The following %n items are not saved:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Les %n objets suivants ne sont pas sauvegardés:</numerusform>
+            <numerusform>Les %n objets suivants ne sont pas sauvegardés:</numerusform>
         </translation>
     </message>
     <message>
         <source>Changing System configuration not allowed in Safe Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Changement de configuration système n&apos;est autorisée en mode sans échec</translation>
     </message>
     <message>
         <source>Failed to save changes</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec d’enregistrer des changements</translation>
     </message>
     <message numerus="yes">
         <source>The following %n items are not deleted:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Les %n objets suivants ne sont supprimés:</numerusform>
+            <numerusform>Les %n objets suivants ne sont supprimés:</numerusform>
         </translation>
     </message>
     <message>
         <source>Deleting objects not allowed in Safe Mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Suppression d’objets interdits en mode sans échec</translation>
     </message>
     <message numerus="yes">
         <source>Failed to delete %n items:</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Échec de suppression de %n objet:</numerusform>
+            <numerusform>Échec de suppression de %n objets:</numerusform>
         </translation>
+    </message>
+    <message>
+        <source>System is in Safe Mode. It is not allowed to make any changes except license activation.</source>
+        <translation>Système en Mode sans échec. Il n’est pas permis d’apporter des modifications à l’exception d’activation de licence.</translation>
     </message>
 </context>
 <context>
@@ -7511,27 +7351,27 @@ devices</source>
     <name>QnWorkbenchScreenRecordingHandler</name>
     <message>
         <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-        <translation type="unfinished">Le sous-système de capture d&apos;écran n&apos;est pas encore initialisé. S.V.P, essayez plus tard.</translation>
+        <translation>Le sous-système de capture d&apos;écran n&apos;est pas encore initialisé. S.V.P, essayez plus tard.</translation>
     </message>
     <message>
         <source>Recording in %1...</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrement en %1...</translation>
     </message>
     <message>
         <source>Recorded Video</source>
-        <translation type="unfinished">Vidéo enregistrée</translation>
+        <translation>Vidéo enregistrée</translation>
     </message>
     <message>
         <source>Save Recording As...</source>
-        <translation type="unfinished">Sauvegarder la l&apos;enregistrement sous...</translation>
+        <translation>Sauvegarder la l&apos;enregistrement sous...</translation>
     </message>
     <message>
         <source>AVI (Audio/Video Interleaved) (*.avi)</source>
-        <translation type="unfinished">AVI (Audio/Video Interleaved) (*.avi)</translation>
+        <translation>AVI (Audio/Video intercalé) (*.avi)</translation>
     </message>
     <message>
         <source>Failed to start recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec démarrage d&apos;enregistrement</translation>
     </message>
 </context>
 <context>
@@ -7541,12 +7381,12 @@ devices</source>
         <translation>Image PNG (*.png)</translation>
     </message>
     <message>
-        <source>Save Screenshot As...</source>
-        <translation>Sauvegarder la capture d&apos;écran sous...</translation>
-    </message>
-    <message>
         <source>JPEG Image (*.jpg)</source>
         <translation>Image JPEG (*.jpg)</translation>
+    </message>
+    <message>
+        <source>Save Screenshot As...</source>
+        <translation>Sauvegarder la capture d&apos;écran sous...</translation>
     </message>
     <message>
         <source>Timestamp:</source>
@@ -7582,11 +7422,11 @@ devices</source>
     </message>
     <message>
         <source>Failed to save screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec de sauvegarde de capture d&apos;écran</translation>
     </message>
     <message>
         <source>Failed to take screenshot</source>
-        <translation type="unfinished"></translation>
+        <translation>Échec de prise de capture d&apos;écran</translation>
     </message>
 </context>
 <context>
@@ -7597,19 +7437,19 @@ devices</source>
     </message>
     <message>
         <source>%1 version available</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 version disponible</translation>
     </message>
     <message>
         <source>Major issues have been fixed. Update is strongly recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>Principaux problèmes ont été corrigés. Mise à jour fortement recommandée.</translation>
     </message>
     <message>
         <source>Update...</source>
-        <translation type="unfinished">Mise à jour...</translation>
+        <translation>Mise à jour...</translation>
     </message>
     <message>
-        <source>Don&apos;t notify again about this update</source>
-        <translation type="unfinished"></translation>
+        <source>Do not notify again about this update</source>
+        <translation>N’avertisser plus pour cette mise à jour</translation>
     </message>
 </context>
 <context>
@@ -7627,116 +7467,283 @@ devices</source>
         <translation>Nouveau Mur Vidéo...</translation>
     </message>
     <message>
-        <source>Enter the name of the Video Wall to create:</source>
-        <translation>Entrer le nom du Mur Vidéo à créer:</translation>
-    </message>
-    <message>
         <source>New Matrix %1</source>
         <translation>Nouvelle Matrice %1</translation>
     </message>
     <message>
-        <source>Close %1 Client before starting Video Wall?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished">Fermer</translation>
-    </message>
-    <message>
-        <source>Keep</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Video Wall license required</source>
-        <translation type="unfinished"></translation>
+        <translation>Licence de mur vidéo nécessaire</translation>
     </message>
     <message>
         <source>To enable this feature, please activate a Video Wall license.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Activate one more license to start the Video Wall control session.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour activer cette fonctionnalité, il faut activer une licence mur viédo.</translation>
     </message>
     <message>
         <source>Failed to apply changes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Screen controlled by another user</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Control session can&apos;t be started.</source>
-        <translation type="unfinished"></translation>
+        <translation>Impossible d’appliquer les changements</translation>
     </message>
     <message>
         <source>To enable Video Wall, please activate a Video Wall license.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour activer Mur vidéo, S.V.P activer une licence Mur vidéo.</translation>
     </message>
     <message numerus="yes">
         <source>Delete %n items?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Supprimer %n objet?</numerusform>
+            <numerusform>Supprimer %n objets?</numerusform>
         </translation>
     </message>
     <message>
-        <source>Activate one more license to start the Video Wall.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Stop Video Wall?</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrêter le mur vidéo?</translation>
     </message>
     <message>
         <source>To start it again, you should have physical access to its computer.</source>
-        <translation type="unfinished"></translation>
+        <translation>Pour le lancer encore une fois, vous devez avoir un accès physique à cet ordinateur.</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Can&apos;t save empty matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>Arrêt</translation>
     </message>
     <message numerus="yes">
         <source>Delete %n matrices?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Supprimer %n matrice?</numerusform>
+            <numerusform>Supprimer %n matrices?</numerusform>
         </translation>
     </message>
     <message>
         <source>More Video Wall licenses required</source>
-        <translation type="unfinished"></translation>
+        <translation>Autre licence de mur vidéo nécessaire</translation>
     </message>
     <message>
-        <source>There is another Video Wall with the same name</source>
-        <translation type="unfinished"></translation>
+        <source>Control session cannot be started.</source>
+        <translation>Session de contrôle ne peut pas être démarrée.</translation>
+    </message>
+    <message>
+        <source>Cannot save empty matrix</source>
+        <translation>Impossible d’enregistrer une matrice vide</translation>
+    </message>
+    <message>
+        <source>Screen is being controlled by another user</source>
+        <translation>Écran contrôlé par un autre usager</translation>
+    </message>
+    <message>
+        <source>Activate one more license to start Video Wall control session.</source>
+        <translation>Activer une licence de plus pour démarrer la session de contrôle Mur Vidéo.</translation>
+    </message>
+    <message>
+        <source>Enter the name of Video Wall to create:</source>
+        <translation>Entrez le nom de mur vidéo à créer:</translation>
+    </message>
+    <message>
+        <source>Activate one more license to start Video Wall.</source>
+        <translation>Activer une licence de plus pour démarrer le Mur Vidéo.</translation>
     </message>
 </context>
 <context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
         <source>New Web Page...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enter the url of the Web Page to add:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nouvelle Page Web...</translation>
     </message>
     <message>
         <source>This Web Page already exists</source>
-        <translation type="unfinished"></translation>
+        <translation>Cette Page Web existe déjà</translation>
+    </message>
+    <message>
+        <source>Enter URL of Web Page to add:</source>
+        <translation>Entrez l’URL de la Page Web à ajouter:</translation>
     </message>
 </context>
 <context>
-    <name>StatisticsOverlayWidget</name>
+    <name>Resources</name>
     <message>
-        <source>%1%</source>
-        <translation>%1%</translation>
+        <source>There is another layout with the same name</source>
+        <translation>Il y a une autre mise en page du même nom</translation>
+    </message>
+    <message>
+        <source>Overwrite existing layout?</source>
+        <translation>Remplacer mise en page existante?</translation>
+    </message>
+    <message>
+        <source>There is another layout with the same name.</source>
+        <translation>Il y a une autre mise en page du même nom.</translation>
+    </message>
+    <message numerus="yes">
+        <source>User will still have access to %n removed resources:</source>
+        <translation>
+            <numerusform>L&apos;usager aura toujours accès a %n ressource supprimée:</numerusform>
+            <numerusform>L&apos;usager aura toujours accès aux %n ressources supprimées:</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>To remove access, please go to User Settings.</source>
+        <translation>Pour supprimer l’accès, S.V.P allez dans paramètres de l&apos;usager.</translation>
+    </message>
+    <message numerus="yes">
+        <source>All users with this role will get access to %n resources:</source>
+        <translation>
+            <numerusform>Tous les usagers avec ce rôle auront accès à %n ressource:</numerusform>
+            <numerusform>Tous les usagers avec ce rôle auront accès aux %n ressources:</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>To remove access, please go to Role Settings.</source>
+        <translation>Pour retirer l’accès, S.V.P aller aux paramètres de rôle.</translation>
+    </message>
+    <message numerus="yes">
+        <source>All users with this role will still have access to %n removed resources:</source>
+        <translation>
+            <numerusform>Tous les usagers avec ce rôle auront accès à %n ressource retirée:</numerusform>
+            <numerusform>Tous les usagers avec ce rôle auront accès aux %n ressources retirées:</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Changes will affect other users</source>
+        <translation>Changements affecteront d&apos;autres utilisateurs</translation>
+    </message>
+    <message>
+        <source>This layout is shared with other users, so you change it for them too.</source>
+        <translation>Cet mise en page est partagée avec d’autres usagers, vous le changer pour eux aussi.</translation>
+    </message>
+    <message numerus="yes">
+        <source>User will lose access to %n resources:</source>
+        <translation>
+            <numerusform>L&apos;Usager perdra l’accès à %n ressource:</numerusform>
+            <numerusform>L&apos;Usager perdra l’accès à %n ressources:</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>All users with this role will lose access to %n resources:</source>
+        <translation>
+            <numerusform>Tous les usagers avec ce rôle perdront l&apos;accès à %n ressource:</numerusform>
+            <numerusform>Tous les usagers avec ce rôle perdront l&apos;accès aux %n ressources:</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n shared layouts?</source>
+        <translation>
+            <numerusform>Supprimer %n mise en page partagée?</numerusform>
+            <numerusform>Supprimer %n mises en page partagées?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n layouts are shared with other users, so you delete it for them too.</source>
+        <translation>
+            <numerusform>Cet %n mise en page est partagé avec d’autres usagers, vous la supprimer pour eux aussi.</numerusform>
+            <numerusform>Ces %n mises en page sont partagées avec d’autres usagers, vous les supprimer pour eux aussi.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Remove %n items from layout?</source>
+        <translation>
+            <numerusform>Supprimer %n objet de la mise en page?</numerusform>
+            <numerusform>Supprimer %n objets de la mise en page?</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Supprimer</translation>
+    </message>
+    <message>
+        <source>You will lose access to following resources:</source>
+        <translation>Vous perdrez l’accès aux ressources suivantes:</translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n users?</source>
+        <translation>
+            <numerusform>Supprimer %n usager?</numerusform>
+            <numerusform>Supprimer %n usagers?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n devices?</source>
+        <translation>
+            <numerusform>Supprimer %n périphérique?</numerusform>
+            <numerusform>Supprimer %n périphériques?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n cameras?</source>
+        <translation>
+            <numerusform>Supprimer %n caméra?</numerusform>
+            <numerusform>Supprimer %n caméras?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n I/O Modules?</source>
+        <translation>
+            <numerusform>Supprimer %n Module I/O?</numerusform>
+            <numerusform>Supprimer %n Modules I/O?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Delete %n items?</source>
+        <translation>
+            <numerusform>Supprimer %n objet?</numerusform>
+            <numerusform>Supprimer %n objets?</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of them are auto-discovered.</source>
+        <translation>
+            <numerusform>%n d&apos;entre eux est auto-découvert.</numerusform>
+            <numerusform>%n d&apos;entre eux sont auto-découverts.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n cameras are auto-discovered.</source>
+        <translation>
+            <numerusform>%n caméras est auto-découverte.</numerusform>
+            <numerusform>%n caméras sont auto-découvertes.</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O modules are auto-discovered.</source>
+        <translation>
+            <numerusform>%n Modules I/O est auto-découvert.</numerusform>
+            <numerusform>%n Modules I/O sont auto-découverts.</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>They may be auto-discovered again after removing.</source>
+        <translation>Ils peuvent être auto-découvert à nouveau après avoir été enlevé.</translation>
+    </message>
+    <message>
+        <source>You do not have permission to overwrite it.</source>
+        <translation>Vous n’êtes pas autorisé à l’écraser.</translation>
+    </message>
+    <message>
+        <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
+        <translation>Vous allez supprimer certaines ressources auxquelles vous avez accès à partir de mur vidéo uniquement. Vous ne les verrez pas dans votre liste de ressources et ne serez pas en mesure de les ajouter au mur vidéo à nouveau.</translation>
+    </message>
+</context>
+<context>
+    <name>VideoWall</name>
+    <message>
+        <source>There is another video wall with the same name</source>
+        <translation>Il y a un autre mur vidéo du même nom</translation>
+    </message>
+    <message>
+        <source>Close %1 before starting Video Wall?</source>
+        <translation>Fermer %1 avant de commencer le mur vidéo?</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>Keep</source>
+        <translation>Garder</translation>
+    </message>
+    <message>
+        <source>Local files cannot be placed on Video Wall Screen attached to another computer</source>
+        <translation>Fichiers locaux ne peuvent être placés sur l’écran de mur vidéo connecté à un autre ordinateur</translation>
+    </message>
+    <message>
+        <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
+        <translation>Pour afficher les fichiers locaux sur le mur de la vidéo, veuillez les attacher sur d’ordinateur où le mur vidéo est hébergé.</translation>
     </message>
 </context>
 </TS>

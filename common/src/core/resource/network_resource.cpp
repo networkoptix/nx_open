@@ -180,18 +180,13 @@ void QnNetworkResource::setMediaPort( int newPort )
     m_mediaPort = newPort;
 }
 
-QString QnNetworkResource::toString() const
-{
-    QString result;
-    QTextStream(&result) << getName() << "(" << getHostAddress() << ") live";
-    return result;
-}
-
 QString QnNetworkResource::toSearchString() const
 {
-    QString result;
-    QTextStream(&result) << QnResource::toSearchString() << " " << getPhysicalId(); //TODO: #Elric evil!
-    return result;
+    return base_type::toSearchString()
+        + L' ' + getMAC().toString()
+        + L' ' + getHostAddress()
+        + L' ' + lit("live")
+        ; //TODO: #Elric evil!
 }
 
 void QnNetworkResource::addNetworkStatus(NetworkStatus status)

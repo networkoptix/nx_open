@@ -6,25 +6,47 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 
+namespace {
+
+QnUserResourcePtr findUser(const QString& userName)
+{
+    const auto users = qnResPool->getResources<QnUserResource>();
+
+    /* TODO: Remove this hack which makes QnAvailableCamerasWatcher working.
+       Now it always needs a user resource, but when we connect from Lite Client we use
+       fake user name, so we don't have such user in the resource pool.
+       This hack picks up the system owner when we connect with such user name.
+       This is enough to make the cameras watcher working but not semantically correct.
+   */
+    const auto serverId = QnUuid::fromStringSafe(userName);
+    if (!serverId.isNull() && qnCommon->remoteGUID() == serverId)
+        return qnResPool->getAdministrator();
+
+    for (const auto& user: users)
+    {
+        if (userName.compare(user->getName(), Qt::CaseInsensitive) == 0)
+            return user;
+    }
+
+    return QnUserResourcePtr();
+}
+
+} // namespace
+
 QnUserWatcher::QnUserWatcher(QObject* parent) :
     base_type(parent)
 {
-    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived,
-        this, [this]
+    connect(QnClientMessageProcessor::instance(),
+        &QnClientMessageProcessor::initialResourcesReceived, this,
+        [this]
         {
-            const auto users = qnResPool->getResources<QnUserResource>();
-            const auto it = std::find_if(users.cbegin(), users.cend(),
-                [this](const QnUserResourcePtr& user)
-                {
-                    return m_userName.compare(user->getName(), Qt::CaseInsensitive) == 0;
-                }
-            );
-            setCurrentUser(it != users.cend() ? *it : QnUserResourcePtr());
+            setCurrentUser(findUser(m_userName));
         }
     );
 

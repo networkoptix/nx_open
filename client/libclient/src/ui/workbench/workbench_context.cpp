@@ -216,7 +216,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
     using namespace nx::vms::utils;
 
     SystemUri::Auth auth = uri.authenticator();
-    QnCredentials credentials(auth.user, auth.password);
+    QnEncodedCredentials credentials(auth.user, auth.password);
 
     switch (uri.clientCommand())
     {
@@ -224,7 +224,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
         {
             NX_LOG(lit("Custom URI: Connecting to cloud"), cl_logDEBUG1);
             qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
-            return false;
+            break;
         }
         case SystemUri::ClientCommand::Client:
         {
@@ -249,21 +249,22 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
             auto parameters = QnActionParameters().withArgument(Qn::UrlRole, systemUrl);
             parameters.setArgument(Qn::ForceRole, true);
             menu()->trigger(QnActions::ConnectAction, parameters);
+            return true;
 
-            break;
         }
         default:
             break;
     }
-    return true;
+    return false;
 }
 
 bool QnWorkbenchContext::connectUsingCommandLineAuth(const QnStartupParameters& startupParams)
 {
     /* Set authentication parameters from command line. */
 
+    QUrl appServerUrl = startupParams.parseAuthenticationString();
+
     //TODO: #refactor System URI to support videowall
-    QUrl appServerUrl = QUrl::fromUserInput(startupParams.authenticationString);
     if (!startupParams.videoWallGuid.isNull())
     {
         NX_ASSERT(appServerUrl.isValid());
@@ -303,21 +304,22 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
         }
     }
 
-    /* If no input files were supplied --- open connection settings dialog.
+    /* If no input files were supplied --- open welcome page.
     * Do not try to connect in the following cases:
     * * we were not connected and clicked "Open in new window"
     * * we have opened exported exe-file
-    * Otherwise we should try to connect or show Login Dialog.
+    * Otherwise we should try to connect or show welcome page.
     */
     const auto welcomeScreen = instance<QnWorkbenchWelcomeScreen>();
     welcomeScreen->setVisibleControls(true);
 
     if (!connectUsingCustomUri(startupParams.customUri)
         && startupParams.instantDrop.isEmpty()
-        && !haveInputFiles)
+        && !haveInputFiles
+        && !connectUsingCommandLineAuth(startupParams)
+        )
     {
-        if (!connectUsingCommandLineAuth(startupParams))
-            return false;
+        return false;
     }
 
     if (!startupParams.videoWallGuid.isNull())

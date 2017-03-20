@@ -17,7 +17,10 @@ const QLatin1String kDataDir("dataDir");
 static const QString kModuleName = lit("time_server");
 
 Settings::Settings():
-    m_settings(TimeServerAppInfo::applicationName(), kModuleName),
+    m_settings(
+        QnAppInfo::organizationNameForSettings(),
+        TimeServerAppInfo::applicationName(),
+        kModuleName),
     m_showHelpRequested(false)
 {
 }
@@ -29,8 +32,8 @@ bool Settings::isShowHelpRequested() const
 
 void Settings::load(int argc, char **argv)
 {
-    m_commandLineParser.parse(argc, argv, stderr);
-    m_settings.parseArgs(argc, (const char**)argv);
+    m_commandLineParser.parse(argc, (const char**) argv, stderr);
+    m_settings.parseArgs(argc, (const char**) argv);
 
     m_logging.load(m_settings, QLatin1String("log"));
 }
@@ -58,7 +61,7 @@ QString Settings::dataDir() const
 #endif
 }
 
-const QnLogSettings& Settings::logging() const
+const utils::log::Settings& Settings::logging() const
 {
     return m_logging;
 }

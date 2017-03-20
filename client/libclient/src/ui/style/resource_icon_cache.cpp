@@ -141,6 +141,7 @@ QnResourceIconCache::QnResourceIconCache(QObject* parent): QObject(parent)
     m_cache.insert(Camera | Offline,        loadIcon(lit("tree/camera_offline.png")));
     m_cache.insert(Camera | Unauthorized,   loadIcon(lit("tree/camera_unauthorized.png")));
     m_cache.insert(Layout | Locked,         loadIcon(lit("tree/layout_locked.png")));
+    m_cache.insert(SharedLayout | Locked,   loadIcon(lit("tree/layout_shared_locked.png")));
     m_cache.insert(VideoWallItem | Locked,  loadIcon(lit("tree/screen_locked.png")));
     m_cache.insert(VideoWallItem | Control, loadIcon(lit("tree/screen_controlled.png")));
     m_cache.insert(VideoWallItem | Offline, loadIcon(lit("tree/screen_offline.png")));
@@ -249,12 +250,17 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     }
     else if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
-        if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
+        const bool videowall = !layout->data().value(Qn::VideoWallResourceRole)
+            .value<QnVideoWallResourcePtr>().isNull();
+
+        if (videowall)
             key = VideoWall;
         else if (layout->isShared())
             key = SharedLayout;
-        else
-            status = layout->locked() ? Locked : Unknown;
+
+        status = (layout->locked() && !videowall)
+            ? Locked
+            : Unknown;
     }
     else
     {
