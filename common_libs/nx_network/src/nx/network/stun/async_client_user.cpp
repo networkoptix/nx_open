@@ -81,10 +81,10 @@ void AsyncClientUser::setOnReconnectedHandler(
         m_asyncGuard.sharedGuard().get());
 }
 
-void AsyncClientUser::setConnectionTimer(
+bool AsyncClientUser::setConnectionTimer(
     std::chrono::milliseconds period, AbstractAsyncClient::TimerHandler handler)
 {
-    m_client->addConnectionTimer(
+    return m_client->addConnectionTimer(
         period,
         [this, guard = m_asyncGuard.sharedGuard(), handler = std::move(handler)]()
         {
