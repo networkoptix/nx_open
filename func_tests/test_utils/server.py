@@ -179,7 +179,6 @@ class ServerConfig(object):
         self.box = box or box_config_factory()
         self.config_file_params = config_file_params  # dict or None
 
-
     def __repr__(self):
         return 'ServerConfig(%r @ %s)' % (self.name, self.box)
 

@@ -147,5 +147,8 @@ def test_session(run_options):
 
 
 @pytest.fixture
-def env_builder(request, test_session, run_options, cloud_host_host, customization_company_name):
-    return EnvironmentBuilder(request.module, test_session, run_options, request.config.cache, cloud_host_host, customization_company_name)
+def env_builder(request, test_session, run_options,
+                cloud_host_host, customization_company_name):
+    return EnvironmentBuilder(
+        request.module, test_session, run_options,
+        request.config.cache, cloud_host_host, customization_company_name)
