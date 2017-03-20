@@ -23,7 +23,7 @@ namespace applauncher
         \return \a ResultType::ok if request has been performed successfully, otherwise - error code
     */
     api::ResultType::Value restartClient(QnSoftwareVersion version = QnSoftwareVersion(),
-                       const QByteArray &auth = QByteArray());
+                       const QString &auth = QString());
 
     bool checkOnline(bool runWhenOffline = true);
 

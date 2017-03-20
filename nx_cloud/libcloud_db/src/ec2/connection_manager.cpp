@@ -11,12 +11,13 @@
 #include <utils/common/guard.h>
 
 #include "access_control/authorization_manager.h"
-#include "stree/cdb_ns.h"
+#include "compatible_ec2_protocol_version.h"
 #include "incoming_transaction_dispatcher.h"
 #include "outgoing_transaction_dispatcher.h"
+#include "p2p_sync_settings.h"
+#include "stree/cdb_ns.h"
 #include "transaction_transport.h"
 #include "transaction_transport_header.h"
-#include "p2p_sync_settings.h"
 
 namespace nx {
 namespace cdb {
@@ -97,22 +98,32 @@ void ConnectionManager::createTransactionConnection(
         return completionHandler(nx_http::StatusCode::badRequest);
     }
 
-    nx::String connectionId;
-    ::ec2::ApiPeerData remotePeer;
-    nx::String contentEncoding;
-    if (!fetchDataFromConnectRequest(request, &connectionId, &remotePeer, &contentEncoding))
+    ConnectionRequestAttributes connectionRequestAttributes;
+    if (!fetchDataFromConnectRequest(request, &connectionRequestAttributes))
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Error parsing createTransactionConnection request from (%1.%2; %3)")
-            .arg(remotePeer.id).arg(systemId).str(connection->socket()->getForeignAddress()),
+            .arg(connectionRequestAttributes.remotePeer.id).arg(systemId)
+            .str(connection->socket()->getForeignAddress()),
+            cl_logDEBUG1);
+        return completionHandler(nx_http::StatusCode::badRequest);
+    }
+
+    if (!isProtocolVersionCompatible(connectionRequestAttributes.remotePeerProtocolVersion))
+    {
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
+            lm("Incompatible connection request from (%1.%2; %3). Requested protocol version %4")
+            .arg(connectionRequestAttributes.remotePeer.id).arg(systemId)
+            .str(connection->socket()->getForeignAddress())
+            .arg(connectionRequestAttributes.remotePeerProtocolVersion),
             cl_logDEBUG1);
         return completionHandler(nx_http::StatusCode::badRequest);
     }
 
     NX_LOGX(QnLog::EC2_TRAN_LOG,
         lm("Received createTransactionConnection request from (%1.%2; %3). connectionId %4")
-        .arg(remotePeer.id).arg(systemId).str(connection->socket()->getForeignAddress())
-        .arg(connectionId),
+        .arg(connectionRequestAttributes.remotePeer.id).arg(systemId).str(connection->socket()->getForeignAddress())
+        .arg(connectionRequestAttributes.connectionId),
         cl_logDEBUG1);
 
     // newTransport MUST be ready to accept connections before sending response.
@@ -122,32 +133,31 @@ void ConnectionManager::createTransactionConnection(
         &m_connectionGuardSharedState,
         m_transactionLog,
         systemIdLocal,
-        connectionId,
+        connectionRequestAttributes.connectionId,
         m_localPeerData,
-        remotePeer,
+        connectionRequestAttributes.remotePeer,
         connection->socket()->getForeignAddress(),
         request,
-        contentEncoding);
+        connectionRequestAttributes.contentEncoding);
 
     ConnectionContext context{
         std::move(newTransport),
-        connectionId,
-        {systemIdLocal, remotePeer.id.toByteArray()} };
+        connectionRequestAttributes.connectionId,
+        {systemIdLocal, connectionRequestAttributes.remotePeer.id.toByteArray()} };
 
     if (!addNewConnection(std::move(context)))
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Failed to add new transaction connection from (%1.%2; %3). connectionId %4")
-            .arg(remotePeer.id).arg(systemId).str(connection->socket()->getForeignAddress())
-            .arg(connectionId),
+            .arg(connectionRequestAttributes.remotePeer.id).arg(systemId)
+            .str(connection->socket()->getForeignAddress()).arg(connectionRequestAttributes.connectionId),
             cl_logDEBUG1);
         return completionHandler(nx_http::StatusCode::forbidden);
     }
 
     auto requestResult =
         prepareOkResponseToCreateTransactionConnection(
-            connectionId,
-            contentEncoding,
+            connectionRequestAttributes,
             response);
     completionHandler(std::move(requestResult));
 }
@@ -370,8 +380,8 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
         .str(context.connection->commonTransportHeaderOfRemoteTransaction()),
         cl_logDEBUG1);
 
-    const auto systemConnectionCountBak = getConnectionCountBySystemId(
-        lock, context.fullPeerName.systemId);
+    const auto systemWasOffline = getConnectionCountBySystemId(
+        lock, context.fullPeerName.systemId) == 0;
     const auto systemId = context.fullPeerName.systemId.toStdString();
 
     if (!m_connections.insert(std::move(context)).second)
@@ -380,7 +390,7 @@ bool ConnectionManager::addNewConnection(ConnectionContext context)
         return false;
     }
 
-    if (systemConnectionCountBak == 0)
+    if (systemWasOffline)
     {
         lock.unlock();
         m_systemStatusChangedSubscription.notify(
@@ -538,14 +548,23 @@ void ConnectionManager::onTransactionDone(
 
 bool ConnectionManager::fetchDataFromConnectRequest(
     const nx_http::Request& request,
-    nx::String* const connectionId,
-    ::ec2::ApiPeerData* const remotePeer,
-    nx::String* const contentEncoding)
+    ConnectionRequestAttributes* connectionRequestAttributes)
 {
     auto connectionIdIter = request.headers.find(Qn::EC2_CONNECTION_GUID_HEADER_NAME);
     if (connectionIdIter == request.headers.end())
         return false;
-    *connectionId = connectionIdIter->second;
+    connectionRequestAttributes->connectionId = connectionIdIter->second;
+
+    if (!nx_http::readHeader(
+            request.headers,
+            Qn::EC2_PROTO_VERSION_HEADER_NAME,
+            &connectionRequestAttributes->remotePeerProtocolVersion))
+    {
+        NX_LOGX(QnLog::EC2_TRAN_LOG,
+            lm("Missing required header %1").arg(Qn::EC2_PROTO_VERSION_HEADER_NAME),
+            cl_logDEBUG2);
+        return false;
+    }
 
     QUrlQuery query = QUrlQuery(request.requestLine.url.query());
     const bool isClient = query.hasQueryItem("isClient");
@@ -577,12 +596,13 @@ bool ConnectionManager::fetchDataFromConnectRequest(
         nx_http::header::AcceptEncodingHeader acceptEncodingHeader(
             acceptEncodingHeaderIter->second);
         if (acceptEncodingHeader.encodingIsAllowed("identity"))
-            *contentEncoding = "identity";
+            connectionRequestAttributes->contentEncoding = "identity";
         else if (acceptEncodingHeader.encodingIsAllowed("gzip"))
-            *contentEncoding = "gzip";
+            connectionRequestAttributes->contentEncoding = "gzip";
     }
 
-    *remotePeer = ::ec2::ApiPeerData(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
+    connectionRequestAttributes->remotePeer =
+        ::ec2::ApiPeerData(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
     return true;
 }
 
@@ -607,29 +627,28 @@ void ConnectionManager::processSpecialTransaction(
         std::move(handler));
 }
 
-nx_http::RequestResult
-    ConnectionManager::prepareOkResponseToCreateTransactionConnection(
-        const nx::String& connectionId,
-        const nx::String& contentEncoding,
-        nx_http::Response* const response)
+nx_http::RequestResult ConnectionManager::prepareOkResponseToCreateTransactionConnection(
+    const ConnectionRequestAttributes& connectionRequestAttributes,
+    nx_http::Response* const response)
 {
     response->headers.emplace("Content-Type", ec2::TransactionTransport::TUNNEL_CONTENT_TYPE);
-    response->headers.emplace("Content-Encoding", contentEncoding);
+    response->headers.emplace("Content-Encoding", connectionRequestAttributes.contentEncoding);
     response->headers.emplace(Qn::EC2_GUID_HEADER_NAME, m_localPeerData.id.toByteArray());
     response->headers.emplace(
         Qn::EC2_RUNTIME_GUID_HEADER_NAME,
         m_localPeerData.instanceId.toByteArray());
-    // TODO: #ak have to support different proto versions and add runtime conversion between them.
+
+    NX_ASSERT(isProtocolVersionCompatible(connectionRequestAttributes.remotePeerProtocolVersion));
     response->headers.emplace(
         Qn::EC2_PROTO_VERSION_HEADER_NAME,
-        nx::String::number(nx_ec::EC2_PROTO_VERSION));
+        nx::String::number(connectionRequestAttributes.remotePeerProtocolVersion));
     response->headers.emplace("X-Nx-Cloud", "true");
     response->headers.emplace(Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME, "true");
 
     nx_http::RequestResult requestResult(nx_http::StatusCode::ok);
 
     requestResult.connectionEvents.onResponseHasBeenSent =
-        [this, connectionId](
+        [this, connectionId = connectionRequestAttributes.connectionId](
             nx_http::HttpServerConnection* connection)
         {
             QnMutexLocker lk(&m_mutex);

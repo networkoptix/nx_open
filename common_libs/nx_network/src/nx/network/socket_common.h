@@ -21,8 +21,8 @@
 #ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
 #endif
-#include "utils/common/hash.h"
-
+#include <utils/common/hash.h>
+#include <utils/common/systemerror.h>
 
 namespace nx {
 namespace network {
@@ -42,6 +42,12 @@ enum class NatTraversalSupport
     enabled,
 };
 
+enum class IpVersion
+{
+    v4 = AF_INET,
+    v6 = AF_INET6,
+};
+
 static const size_t kUDPHeaderSize = 8;
 static const size_t kIPHeaderSize = 20;
 static const size_t kMaxUDPDatagramSize = 64*1024 - kUDPHeaderSize - kIPHeaderSize;
@@ -53,13 +59,16 @@ enum InitializationFlags
     disableCloudConnect = 0x02
 };
 
-} // network
-} // nx
+NX_NETWORK_API bool socketCannotRecoverFromError(SystemError::ErrorCode sysErrorCode);
 
-//!Represents ipv4 address. Supports conversion to QString and to uint32
-/*!
-    \note Not using QHostAddress because QHostAddress can trigger dns name lookup which depends on Qt sockets which we do not want to use
-*/
+} // namespace network
+} // namespace nx
+
+/**
+ * Represents ipv4 address. Supports conversion to QString and to uint32.
+ * @note Not using QHostAddress because QHostAddress can trigger dns name 
+ * lookup which depends on Qt sockets which we do not want to use.
+ */
 class NX_NETWORK_API HostAddress
 {
 public:
@@ -69,17 +78,25 @@ public:
     HostAddress(const QString& addrStr);
     HostAddress(const char* addrStr);
 
+    ~HostAddress();
+
     bool operator==(const HostAddress& right) const;
     bool operator!=(const HostAddress& right) const;
     bool operator<(const HostAddress& right) const;
 
-    /** Domain name or IP v4 (if can be converted) or IP v6 */
+    /**
+     * Domain name or IP v4 (if can be converted) or IP v6.
+     */
     const QString& toString() const;
 
-    /** IP v4 if address is v4 or v6 which can be converted to v4 */
+    /**
+     * IP v4 if address is v4 or v6 which can be converted to v4.
+     */
     boost::optional<in_addr> ipV4() const;
 
-    /** IP v6 if address is v6 or v4 converted to v6 */
+    /**
+     * IP v6 if address is v6 or v4 converted to v6.
+     */
     boost::optional<in6_addr> ipV6() const;
 
     bool isLocal() const;
@@ -97,15 +114,21 @@ public:
     static boost::optional<in_addr> ipV4from(const in6_addr& addr);
     static in6_addr ipV6from(const in_addr& addr);
 
+    void swap(HostAddress& other);
+
 private:
     mutable boost::optional<QString> m_string;
     boost::optional<in_addr> m_ipV4;
     boost::optional<in6_addr> m_ipV6;
 };
 
+NX_NETWORK_API void swap(HostAddress& one, HostAddress& two);
+
 Q_DECLARE_METATYPE(HostAddress)
 
-//!Represents host and port (e.g. 127.0.0.1:1234)
+/**
+ * Represents host and port (e.g. 127.0.0.1:1234).
+ */
 class NX_NETWORK_API SocketAddress
 {
 public:
@@ -116,6 +139,7 @@ public:
     SocketAddress(const QString& str);
     SocketAddress(const QByteArray& utf8Str);
     SocketAddress(const char* utf8Str);
+    ~SocketAddress();
 
     bool operator==(const SocketAddress& rhs) const;
     bool operator!=(const SocketAddress& rhs) const;
@@ -131,7 +155,8 @@ public:
     static QString trimIpV6(const QString& ip);
 };
 
-inline uint qHash(const SocketAddress &address) {
+inline uint qHash(const SocketAddress &address)
+{
     return qHash(address.address.toString(), address.port);
 }
 

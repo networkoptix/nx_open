@@ -24,6 +24,7 @@ public:
 
     virtual QnResourceList findResources(void) override;
 
+    static const QString kSystemInfoProductionIdParamName;
 protected:
     virtual void processPacket(
         const QHostAddress& discoveryAddr,
@@ -58,8 +59,14 @@ private:
 
     bool isNxDevice(const nx_upnp::DeviceInfo& devInfo) const;
 
-    QString chooseProperPhysicalId(const QString& serialNumber, const QString& macAddress);
-    QnNetworkResourcePtr findExistingResource(const QString& serialNumber, const QString& macAddress);
+    QString chooseProperPhysicalId(
+        const QString& hostAddress,
+        const QString& serialNumber,
+        const QString& macAddress);
+    QnNetworkResourcePtr findExistingResource(
+        const QString& hostAddress,
+        const QString& serialNumber,
+        const QString& macAddress);
 
     void createResource(
         const nx_upnp::DeviceInfo& devInfo,

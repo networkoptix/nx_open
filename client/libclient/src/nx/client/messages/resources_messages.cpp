@@ -266,7 +266,7 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
         QDialogButtonBox::AcceptRole, QnButtonAccent::Warning);
-    messageBox.addCustomWidget(new QnResourceListView(resources, true, &messageBox));
+    messageBox.addCustomWidget(new QnResourceListView(resources, false, &messageBox));
     messageBox.setCheckBoxEnabled();
 
     const auto result = messageBox.exec();

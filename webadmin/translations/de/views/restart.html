@@ -1,0 +1,17 @@
+<div class="modal-header">
+    <h3 class="modal-title">System wird neu gestartet...</h3>
+</div>
+
+<form class="form" role="form" id="restartDialog">
+    <div class="col-sm-12">
+        <p>Der Neustart des Systems kann eine Weile dauern. Danach wird die Seite automatisch aktualisiert.</p>
+        <progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</progressbar>
+
+        <p>Wenn nach einer Weile nichts passiert, aktualisieren Sie die Seite bitte manuell</p>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">Aktualisieren</button>
+    </div>
+
+</form>

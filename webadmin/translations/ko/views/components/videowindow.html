@@ -1,0 +1,46 @@
+<div class="videowindow">
+
+    <div class="camera-view-informer camera-loading" ng-if="loading">
+        <div class="camera-view-preloader camera-view-message-icon"></div>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashRequired">
+        비디오를 재생할 수 없습니다. <br> <a href="https://get.adobe.com/flashplayer/" target="_blank"> </a> ARM 기반 서버에서 비디오재생을 위해 Adobe flash를 설치 해주세요.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashOrWebmRequired">
+        비디오를 재생할 수 없습니다. <br>제발 <a href="https://get.adobe.com/flashplayer/" target="_blank"> 어도비 플래시 설치</a> 또는 <a href="https://tools.google.com/dlpage/webmmf/" target="_blank"> WebM 코덱</a> Internet Explorer에서 비디오를 재생 합니다.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noArmSupport">
+        비디오를 재생할 수 없습니다. <br>현재 브라우저 또는 장치는  ARM 기반 서버에서의 비디오 재생을 지원 하지 않습니다.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noFormat">
+        비디오를 재생할 수 없습니다. <br>브라우저 또는 장치 가 카메라에서 비디오 재생을 지원 하지 않습니다.<br>
+    </div>
+
+
+    <div class="camera-view-informer" ng-if="ieNoWebm">
+        비디오를 재생할 수 없습니다. <br>Internet Explorer를 위한 <a href="https://tools.google.com/dlpage/webmmf/" target="_blank"> WebM 코덱</a>를 설치 하시기 바랍니다.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ieWin10">
+        비디오를 재생할 수 없습니다. <br>Micorosoft Edge 또는 구글 크롬브라우저를 사용하세요.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ubuntuNX">
+        비디오를 재생할 수 없습니다. <br>현재 브라우저는 ARM 기반 서버에서 비디오를 지원 하지 않습니다. 크롬 브라우저를 사용 하세요.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="errorLoading">
+        비디오를 재생할 수 없습니다. <br>오류가 발생 했습니다.<br>
+    </div>
+
+
+    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}" ng-include="Config.viewsDir + 'components/flashls.html'">
+    </div>
+
+    <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading}">
+    </div>
+</div>

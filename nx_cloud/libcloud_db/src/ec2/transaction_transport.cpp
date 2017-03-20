@@ -3,6 +3,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
+#include "compatible_ec2_protocol_version.h"
+
 namespace nx {
 namespace cdb {
 namespace ec2 {
@@ -195,7 +197,7 @@ void TransactionTransport::sendTransaction(
     auto serializedTransaction = transactionSerializer->serialize(
         remotePeer().dataFormat,
         std::move(transportHeader),
-        remotePeerProtocolVersion());
+        highestProtocolVersionCompatibleWithRemotePeer());
 
     post(
         [this, 
@@ -253,6 +255,13 @@ void TransactionTransport::onSomeDataReceivedFromRemotePeer()
         std::bind(&TransactionTransport::onInactivityTimeout, this));
 }
 
+int TransactionTransport::highestProtocolVersionCompatibleWithRemotePeer() const
+{
+    return remotePeerProtocolVersion() >= kMinSupportedProtocolVersion
+        ? kMaxSupportedProtocolVersion
+        : remotePeerProtocolVersion();
+}
+
 void TransactionTransport::onGotTransaction(
     Qn::SerializationFormat tranFormat,
     QByteArray data,
@@ -300,7 +309,7 @@ void TransactionTransport::forwardTransactionToProcessor(
     cdbTransportHeader.systemId = m_systemId;
     cdbTransportHeader.connectionId = m_connectionId;
     cdbTransportHeader.vmsTransportHeader = std::move(transportHeader);
-    cdbTransportHeader.transactionFormatVersion = remotePeerProtocolVersion();
+    cdbTransportHeader.transactionFormatVersion = highestProtocolVersionCompatibleWithRemotePeer();
     m_gotTransactionEventHandler(
         tranFormat,
         std::move(data),
@@ -378,7 +387,7 @@ void TransactionTransport::onTransactionsReadFromLog(
             tranData.serializer->serialize(
                 remotePeer().dataFormat,
                 transportHeader,
-                remotePeerProtocolVersion()));
+                highestProtocolVersionCompatibleWithRemotePeer()));
     }
 
     m_remotePeerTranState = readedUpTo;

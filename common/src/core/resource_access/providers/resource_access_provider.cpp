@@ -54,6 +54,20 @@ QnAbstractResourceAccessProvider::Source QnResourceAccessProvider::accessibleVia
     return accessSource;
 }
 
+QSet<QnAbstractResourceAccessProvider::Source> QnResourceAccessProvider::accessLevels(
+    const QnResourceAccessSubject& subject,
+    const QnResourcePtr& resource) const
+{
+    QSet<QnAbstractResourceAccessProvider::Source> result;
+    for (auto provider : m_providers)
+    {
+        const auto level = provider->accessibleVia(subject, resource);
+        if (level != Source::none)
+            result << level;
+    }
+    return result;
+}
+
 void QnResourceAccessProvider::addBaseProvider(QnAbstractResourceAccessProvider* provider)
 {
     provider->setParent(this);

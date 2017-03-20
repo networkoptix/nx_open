@@ -324,6 +324,12 @@
     <p class="master-description">Это может занять несколько минут</p>
 </div>
 
+<div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
+    <div class="master-icon"><span class="preloader"></span></div>
+    <h2>Объединение систем ...</h2>
+    <p class="master-description">Попытка подключения к системе</p>
+</div>
+
 
 <div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
@@ -332,7 +338,8 @@
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Повторить</button>         <button class="btn btn-default" ng-click="skip()">Настроить отдельную систему</button>
+        <button class="btn btn-default" ng-click="retry()">Повторить</button>
+         <button class="btn btn-default" ng-click="skip()">Настроить отдельную систему</button>
     </p>
 </div>
 
@@ -356,7 +363,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>Система готова к использованию</h2>
-    <p>Логин</p>
+    <p>Имя пользователя</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>Настройки разделенного доступа и учетной записи</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="открыть {{Config.cloud.productName}}"
@@ -407,7 +414,7 @@
 
 
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
-    <h2>Не удаётся подключиться к {{Config.cloud.productName}}</h2>
+    <h2>Не удается подключиться к {{Config.cloud.productName}}</h2>
     <p class="master-description">
         Требуется проверить подключение к Интернету.
     </p>
@@ -418,7 +425,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Не удается подключиться к {{Config.cloud.productName}}</h2>
+    <h2>Не удаётся подключиться к {{Config.cloud.productName}}</h2>
     <p class="master-description">
         {{cloudError}}
     </p>
@@ -452,7 +459,7 @@
             <div class="text-center"><b>С помощью приложения {{Config.productName}}</b></div>
             <div class="col-xs-6 text-right">Узел</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
             <div class="col-xs-6 text-right">Порт</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">Логин</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">Имя пользователя</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
             <div class="col-xs-6 text-right">Пароль</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>

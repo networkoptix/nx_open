@@ -67,6 +67,11 @@ public:
 
     static void setIpVersion(const QString& ipVersion);
 
+    /**
+     * @return Previous version.
+     */
+    static nx::network::IpVersion setUdpIpVersion(nx::network::IpVersion ipVersion);
+
     static int udpIpVersion();
     static int tcpClientIpVersion();
     static int tcpServerIpVersion();

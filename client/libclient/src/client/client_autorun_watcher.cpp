@@ -20,8 +20,18 @@ QString toWindowsRegistryFormat(const QString& path)
 
 QnClientAutoRunWatcher::QnClientAutoRunWatcher(QObject* parent)
 {
-    /* Write out the setting first, then listen to changes. */
-    qnSettings->setAutoStart(isAutoRun());
+    // Write out the setting first, then listen to changes.
+    bool autoRunEnabled = isAutoRun();
+    qnSettings->setAutoStart(autoRunEnabled);
+
+    if (autoRunEnabled)
+    {
+        // Fix path after migration from previous version.
+        const QString path = nx::vms::utils::autoRunPath(autoRunKey());
+        if (path != autoRunPath())
+            nx::vms::utils::setAutoRunEnabled(autoRunKey(), autoRunPath(), true);
+    }
+
     connect(qnSettings->notifier(kSettingsKey), &QnPropertyNotifier::valueChanged, this,
         [this]()
         {
@@ -31,7 +41,7 @@ QnClientAutoRunWatcher::QnClientAutoRunWatcher(QObject* parent)
 
 bool QnClientAutoRunWatcher::isAutoRun() const
 {
-    return nx::vms::utils::isAutoRunEnabled(autoRunKey(), autoRunPath());
+    return nx::vms::utils::isAutoRunEnabled(autoRunKey());
 }
 
 void QnClientAutoRunWatcher::setAutoRun(bool enabled)

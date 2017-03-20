@@ -1154,6 +1154,11 @@ void QnPlOnvifResource::notificationReceived(
     if( currentPortState != newPortState )
     {
         QString portId = portSourceIter->value;
+        bool success = false;
+        int intPortId = portId.toInt(&success);
+        // Onvif device enumerates ports from 1. see 'allPorts' filling code.
+        if (success)
+            portId = QString::number(intPortId + 1);
         size_t aliasesCount = m_portAliases.size();
         if (aliasesCount && aliasesCount == m_inputPortCount)
         {
@@ -1949,7 +1954,7 @@ QString QnPlOnvifResource::getInputPortNumberFromString(const QString& portName)
         auto portNum = portIndex.toInt(&canBeConvertedToNumber);
 
         if (canBeConvertedToNumber)
-            return QString::number(portNum);
+            return QString::number(portNum + 1);
     }
 
     return QString();
@@ -3012,8 +3017,9 @@ void QnPlOnvifResource::checkMaxFps(VideoConfigsResp& response, const QString& e
     VideoEncoder* vEncoder = 0;
     for (uint i = 0; i < response.Configurations.size(); ++i)
     {
-        if (QString::fromStdString(response.Configurations[i]->token) == encoderId)
-            vEncoder = response.Configurations[i];
+        auto configuration = response.Configurations[i];
+        if (configuration && QString::fromStdString(configuration->token) == encoderId)
+            vEncoder = configuration;
     }
     if (!vEncoder || !vEncoder->RateControl)
         return;
@@ -3739,7 +3745,8 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
 
     auto resourceId = getId();
 
-    propertyDictionary->setValue(resourceId, Qn::VIDEO_LAYOUT_PARAM_NAME, m_videoLayout->toString());
+    auto nonConstThis = const_cast<QnPlOnvifResource*>(this);
+    nonConstThis->setProperty(Qn::VIDEO_LAYOUT_PARAM_NAME, m_videoLayout->toString());
     propertyDictionary->saveParams(resourceId);
 
     return m_videoLayout;

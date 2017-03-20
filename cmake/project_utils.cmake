@@ -62,6 +62,6 @@ function(nx_add_target name type)
     endif()
 
     if(NX_PRIVATE_LIBS)
-        target_link_libraries(${name} PRIVATE ${NX_PUBLIC_LIBS})
+        target_link_libraries(${name} PRIVATE ${NX_PRIVATE_LIBS})
     endif()
 endfunction()

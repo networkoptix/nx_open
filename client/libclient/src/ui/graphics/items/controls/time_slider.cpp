@@ -643,7 +643,7 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep>* absoluteSteps, QVector<QnTim
     QString moSuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Months);
     QString ySuffix = QnTimeStrings::suffix(QnTimeStrings::Suffix::Years);
 
-    bool ampm = QLocale::system().timeFormat().contains(lit("ap"), Qt::CaseInsensitive);
+    bool ampm = QLocale().timeFormat().contains(lit("ap"), Qt::CaseInsensitive);
 
     const QString& hFormat = ampm ? hApFormat : hmFormat;
     const QString& mFormat = ampm ? hmApFormat : hmFormat;

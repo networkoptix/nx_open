@@ -554,8 +554,9 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
         connect(exportProgressDialog, &QnProgressDialog::canceled, tool, &QnClientVideoCameraExportTool::stop);
 
-        connect(tool, &QnClientVideoCameraExportTool::finished, this, &QnWorkbenchExportHandler::at_camera_exportFinished);
+        connect(tool, &QnClientVideoCameraExportTool::finished, exportProgressDialog, &QWidget::hide);
         connect(tool, &QnClientVideoCameraExportTool::finished, exportProgressDialog, &QnProgressDialog::deleteLater);
+        connect(tool, &QnClientVideoCameraExportTool::finished, this, &QnWorkbenchExportHandler::at_camera_exportFinished);
         connect(tool, &QnClientVideoCameraExportTool::rangeChanged, exportProgressDialog, &QnProgressDialog::setRange);
         connect(tool, &QnClientVideoCameraExportTool::valueChanged, exportProgressDialog, &QnProgressDialog::setValue);
 
