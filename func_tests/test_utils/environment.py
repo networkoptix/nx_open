@@ -96,7 +96,8 @@ class EnvironmentBuilder(object):
             patch_set_cloud_host = None
         else:
             patch_set_cloud_host = self._cloud_host_host
-        server.init(config.start, self._reset_servers, patch_set_cloud_host=patch_set_cloud_host)
+        server.init(config.start, self._reset_servers, patch_set_cloud_host=patch_set_cloud_host,
+                    config_file_params=config.config_file_params)
         if server.is_started() and not server.is_system_set_up() and config.setup == ServerConfig.SETUP_LOCAL:
             log.info('Setting up server %s:', server)
             server.setup_local_system()

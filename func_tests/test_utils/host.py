@@ -16,6 +16,9 @@ import shutil
 log = logging.getLogger(__name__)
 
 
+PROCESS_TIMEOUT_SEC = 60*60  # 1 hour
+
+
 class ProcessError(subprocess.CalledProcessError):
 
     def __str__(self):
@@ -23,6 +26,18 @@ class ProcessError(subprocess.CalledProcessError):
 
     def __repr__(self):
         return 'ProcessError(%s)' % self
+
+
+class ProcessTimeoutError(subprocess.CalledProcessError):
+
+    def __init__(self, cmd):
+        subprocess.CalledProcessError.__init__(self, returncode=None, cmd=cmd)
+
+    def __str__(self):
+        return 'Command "%s" was timed out (timeout is %s seconds)' % (self.cmd, PROCESS_TIMEOUT_SEC)
+
+    def __repr__(self):
+        return 'ProcessTimeoutError(%s)' % self
 
 
 def log_output(name, output):
@@ -102,19 +117,27 @@ class LocalHost(Host):
         stdout_thread.start()
         stderr_thread.start()
         try:
-            if input:
-                try:
-                    pipe.stdin.write(input)
-                except IOError as e:
-                    if e.errno == errno.EPIPE:
-                        # communicate() should ignore broken pipe error
-                        pass
-                    elif (e.errno == errno.EINVAL and pipe.poll() is not None):
-                        # stdin.write() fails with EINVAL if the process already exited before the write
-                        pass
-                    else:
-                        raise
-                pipe.stdin.close()
+            try:
+                if input:
+                    try:
+                        pipe.stdin.write(input)
+                    except IOError as e:
+                        if e.errno == errno.EPIPE:
+                            # communicate() should ignore broken pipe error
+                            pass
+                        elif (e.errno == errno.EINVAL and pipe.poll() is not None):
+                            # stdin.write() fails with EINVAL if the process already exited before the write
+                            pass
+                        else:
+                            raise
+                    pipe.stdin.close()
+            finally:
+                stdout_thread.join(timeout=PROCESS_TIMEOUT_SEC)
+                if not stdout_thread.isAlive():
+                    stderr_thread.join(timeout=PROCESS_TIMEOUT_SEC)
+                if stdout_thread.isAlive() or stderr_thread.isAlive():
+                    pipe.kill()
+                    raise ProcessTimeoutError(subprocess.list2cmdline(args))
         finally:
             stdout_thread.join()
             stderr_thread.join()
