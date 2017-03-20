@@ -185,6 +185,7 @@ void QnToolTipWidget::setText(const QString &text) {
     label = new GraphicsLabel();
     label->setText(text);
     label->setAlignment(Qt::AlignCenter);
+    label->setPerformanceHint(GraphicsLabel::PixmapCaching);
 
     QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
     layout->setContentsMargins(0, 0, 0, 0);
