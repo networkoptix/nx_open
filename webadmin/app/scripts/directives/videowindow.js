@@ -302,7 +302,7 @@ angular.module('webadminApp')
 
                 element.bind('contextmenu',function() { return !!scope.debugMode; }); // Kill context menu
                 
-                
+
                 var format = null;
                 function srcChanged(){
                     scope.loading = false;
@@ -314,39 +314,35 @@ angular.module('webadminApp')
                             console.log("Recycling");
                             $timeout(srcChanged);
                             console.log("Continue");
-
-                            if(!format){
-                                scope.native = false;
-                                scope.flashls = false;
-                                scope.jsHls = false;
-                                return;
-                            }
-                            scope.player = format;
-                            switch(format){
-                                case "flashls":
-                                    initFlashls();
-                                    break;
-
-                                case "jshls":
-                                    initJsHls();
-                                    break;
-
-                                case "rtsp":
-                                    initRtsp();
-                                    break;
-
-                                case "native-hls":
-                                    initNativePlayer("hls");
-                                    break;
-
-                                case "webm":
-                                default:
-                                    initNativePlayer(format);
-                                    break;
-                            }
                         }
-                        else{
+                        if(!format){
+                            scope.native = false;
+                            scope.flashls = false;
+                            scope.jsHls = false;
+                            return;
+                        }
+                        scope.player = format;
+                        switch(format){
+                            case "flashls":
+                                initFlashls();
+                                break;
 
+                            case "jshls":
+                                initJsHls();
+                                break;
+
+                            case "rtsp":
+                                initRtsp();
+                                break;
+
+                            case "native-hls":
+                                initNativePlayer("hls");
+                                break;
+
+                            case "webm":
+                            default:
+                                initNativePlayer(format);
+                                break;
                         }
                     }
                 }
