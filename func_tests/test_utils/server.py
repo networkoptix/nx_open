@@ -18,6 +18,7 @@ import pytz
 import tzlocal
 import requests.exceptions
 import pytest
+import utils
 from .server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_SEC, HttpError, ServerRestApi
 from .vagrant_box_config import BoxConfigFactory, BoxConfig
 from .cloud_host import CloudHost
@@ -164,7 +165,8 @@ class ServerConfig(object):
 
     SETUP_LOCAL = 'local'
 
-    def __init__(self, box_config_factory, start=True, setup=SETUP_LOCAL, leave_initial_cloud_host=False, box=None):
+    def __init__(self, box_config_factory, start=True, setup=SETUP_LOCAL, leave_initial_cloud_host=False,
+                 box=None, config_file_params=None):
         assert box is None or isinstance(box, BoxConfig), repr(box)
         self.start = start
         self.setup = setup
@@ -175,6 +177,7 @@ class ServerConfig(object):
         # server binaries has original cloud host encoded by compilation step.
         self.leave_initial_cloud_host = leave_initial_cloud_host  # bool
         self.box = box or box_config_factory()
+        self.config_file_params = config_file_params  # dict or None
 
     def __repr__(self):
         return 'ServerConfig(%r @ %s)' % (self.name, self.box)
@@ -202,7 +205,7 @@ class Server(object):
     def __repr__(self):
         return 'Server%r@%s' % (self.name, self.url)
 
-    def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None):
+    def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None, config_file_params=None):
         self._is_started = was_started = self.service.get_status()
         log.info('Service for %s %s started', self, self._is_started and 'WAS' or 'was NOT')
         if reset:
@@ -211,7 +214,7 @@ class Server(object):
             self.storage.cleanup()
             if patch_set_cloud_host:
                 self.patch_binary_set_cloud_host(patch_set_cloud_host)  # may be changed by previous tests...
-            self.reset_config(logLevel=log_level, tranLogLevel=log_level)
+            self.reset_config(logLevel=log_level, tranLogLevel=log_level, **(config_file_params or {}))
             if must_start:
                 self.start_service()
         else:
@@ -524,7 +527,7 @@ class Storage(object):
     # server/var/data/data/low_quality/urn_uuid_b0e78864-c021-11d3-a482-f12907312681/2017/01/27/12/1485511093576_21332.mkv
     def _construct_fpath(self, camera_mac_addr, quality_part, start_time, duration):
         local_dt = start_time.astimezone(self.box.timezone)  # box local
-        unixtime_utc_ms = calendar.timegm(start_time.utctimetuple())*1000 + start_time.microsecond/1000
+        unixtime_utc_ms = utils.datetime_utc_to_timestamp(start_time)
         duration_ms = int(duration.total_seconds() * 1000)
         return os.path.join(
             self.dir, quality_part, camera_mac_addr,

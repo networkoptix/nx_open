@@ -1,4 +1,7 @@
 import logging
+import calendar
+import pytz
+from datetime import datetime
 
 
 log = logging.getLogger(__name__)
@@ -42,3 +45,12 @@ def str_to_bool(val):
     elif val == 'true' or val == '1':
         return True
     raise Exception('Invalid boolean "%s"' % val)
+
+def datetime_utc_to_timestamp(date_time):
+    return calendar.timegm(date_time.utctimetuple())*1000 + date_time.microsecond/1000
+
+def datetime_utc_from_timestamp(timestamp):
+    return datetime.utcfromtimestamp(timestamp).replace(tzinfo=pytz.utc)
+
+def datetime_utc_now():
+    return datetime.utcnow().replace(tzinfo=pytz.utc)

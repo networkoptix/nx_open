@@ -28,7 +28,6 @@ const QString NX_DEVICE_MODEL_PARAMETER_NAME(QLatin1String("nxDeviceModel"));
 const QString kActiSystemGroup("system");
 const QString kActiSystemInfoCommand("SYSTEM_INFO");
 const QString kActiDeviceXmlPath("devicedesc.xml");
-const QString kSystemInfoProductionIdParamName("production id");
 const QString kSystemInfoModelParamName("model number");
 const QString kSystemInfoMacParamName("mac address");
 const QString kSystemInfoCompanyParamName("company name");
@@ -37,6 +36,8 @@ const int kActiDeviceXmlPort = 49152;
 const int kDefaultActiTimeout = 4000;
 const int kCacheExpirationInterval = 60 * 1000;
 }
+
+const QString QnActiResourceSearcher::kSystemInfoProductionIdParamName("production id");
 
 QnActiResourceSearcher::QnActiResourceSearcher()
 {
@@ -465,7 +466,10 @@ void QnActiResourceSearcher::createResource(
 
     resource->setUrl(QUrl(devInfo.presentationUrl).toString(QUrl::StripTrailingSlash));
     resource->setMAC(mac);
-    resource->setPhysicalId(chooseProperPhysicalId(devInfo.serialNumber, mac.toString()));
+    resource->setPhysicalId(chooseProperPhysicalId(
+        QUrl(devInfo.presentationUrl).host(),
+        devInfo.serialNumber,
+        mac.toString()));
 
     if (!auth.isNull())
     {
@@ -489,9 +493,12 @@ bool QnActiResourceSearcher::isNxDevice(const nx_upnp::DeviceInfo& devInfo) cons
         devInfo.friendlyName.toLower().trimmed() == NX_VENDOR.toLower();
 }
 
-QString QnActiResourceSearcher::chooseProperPhysicalId(const QString& serialNumber, const QString& macAddress)
+QString QnActiResourceSearcher::chooseProperPhysicalId(
+    const QString& hostAddress,
+    const QString& serialNumber,
+    const QString& macAddress)
 {
-    auto existingRes = findExistingResource(serialNumber, macAddress);
+    auto existingRes = findExistingResource(hostAddress, serialNumber, macAddress);
 
     if (existingRes)
         return existingRes->getPhysicalId();
@@ -499,12 +506,39 @@ QString QnActiResourceSearcher::chooseProperPhysicalId(const QString& serialNumb
     return stringToActiPhysicalID(serialNumber);
 }
 
-QnNetworkResourcePtr QnActiResourceSearcher::findExistingResource(const QString& serialNumber, const QString& macAddress)
+QnNetworkResourcePtr QnActiResourceSearcher::findExistingResource(
+    const QString& hostAddress,
+    const QString& serialNumber,
+    const QString& macAddress)
 {
     auto existingRes = qnResPool->getNetResourceByPhysicalId(stringToActiPhysicalID(serialNumber));
 
     if (!existingRes)
         existingRes = qnResPool->getNetResourceByPhysicalId(stringToActiPhysicalID(macAddress));
+
+    if (!existingRes && !QnMacAddress(macAddress).isNull())
+        existingRes = qnResPool->getResourceByMacAddress(macAddress);
+
+    if (!existingRes && !serialNumber.isEmpty())
+    {
+        auto sameHostResources = qnResPool->getAllNetResourceByHostAddress(hostAddress)
+            .filtered<QnActiResource>();
+
+        for (const auto& camera: sameHostResources)
+        {
+            if (camera->getProperty(kSystemInfoProductionIdParamName) == serialNumber)
+                return camera;
+            // some cameras has different serial in multicast and via HTTP request. At this case multicast serial has last 6 digits of MAC address
+            if (serialNumber.startsWith("CAMERA-"))
+            {
+                QString macSuffix = serialNumber.right(6);
+                QString cameraMac = camera->getMAC().toString();
+                cameraMac.replace("-", "");
+                if (cameraMac.endsWith(macSuffix))
+                    return camera;
+            }
+        }
+    }
 
     return existingRes;
 }
