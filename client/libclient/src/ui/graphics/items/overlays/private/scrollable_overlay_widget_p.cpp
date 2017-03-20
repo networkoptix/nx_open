@@ -1,7 +1,6 @@
 #include "scrollable_overlay_widget_p.h"
 
 #include <ui/graphics/items/controls/html_text_item.h>
-#include <ui/graphics/instruments/motion_selection_instrument.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <nx/utils/math/fuzzy.h>
@@ -35,10 +34,8 @@ QnScrollableOverlayWidgetPrivate::QnScrollableOverlayWidgetPrivate(Qt::Alignment
 {
     m_scrollArea->setContentWidget(m_contentWidget);
     m_scrollArea->setAlignment(Qt::AlignBottom | Qt::AlignRight);
-    m_scrollArea->setProperty(Qn::NoBlockMotionSelection, true);
     m_scrollArea->setAcceptedMouseButtons(Qt::NoButton);
 
-    m_contentWidget->setProperty(Qn::NoBlockMotionSelection, true);
     m_contentWidget->setAcceptedMouseButtons(Qt::NoButton);
 
     m_mainLayout->setContentsMargins(0, 0, 0, 0);

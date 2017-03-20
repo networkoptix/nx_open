@@ -19,7 +19,6 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
-#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
@@ -224,7 +223,6 @@ public:
         m_color(color)
     {
         setCheckable(true);
-        setProperty(Qn::NoBlockMotionSelection, true);
         setToolTip(m_text);
         setIcon(qnSkin->icon("health_monitor/check.png"));
     }
@@ -493,7 +491,6 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     auto showLogButton = createStatisticAwareButton(lit("server_widget_show_log"));
     showLogButton->setIcon(qnSkin->icon("item/log.png"));
     showLogButton->setCheckable(false);
-    showLogButton->setProperty(Qn::NoBlockMotionSelection, true);
     showLogButton->setToolTip(tr("Show Log"));
     setHelpTopic(showLogButton, Qn::MainWindow_MonitoringItem_Log_Help);
     connect(showLogButton, &QnImageButtonWidget::clicked, this,
@@ -503,7 +500,6 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     auto checkIssuesButton = createStatisticAwareButton(lit("server_widget_check_issues"));
     checkIssuesButton->setIcon(qnSkin->icon("item/issues.png"));
     checkIssuesButton->setCheckable(false);
-    checkIssuesButton->setProperty(Qn::NoBlockMotionSelection, true);
     checkIssuesButton->setToolTip(tr("Check Issues"));
     connect(checkIssuesButton, &QnImageButtonWidget::clicked, this,
         [this] { menu()->trigger(QnActions::ServerIssuesAction, m_resource); });

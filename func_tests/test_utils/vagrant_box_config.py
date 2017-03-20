@@ -113,6 +113,9 @@ def make_vm_provision_command(script, env=None):
 def make_vbox_netnat_command(net_idx, network):
     return VirtualBoxConfigCommand([':modifyvm', ':id', '"--natnet%d"' % net_idx, '"%s"' % network])
 
+def make_vbox_host_time_disabled_command():
+    return VirtualBoxConfigCommand([':setextradata', ':id', '"VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled"', '1'])
+
 
 class BoxConfigFactory(object):
 
@@ -121,12 +124,14 @@ class BoxConfigFactory(object):
 
     # ip_address may end with .0 (like 1.2.3.0); this will be treated as network address, and dhcp will be used for it
     def __call__(self, name=None, install_server=True, provision_scripts=None,
-                 ip_address_list=None, required_file_list=None):
+                 ip_address_list=None, required_file_list=None, sync_time=True):
         commands = []
         if not required_file_list:
             required_file_list = []
         for ip_address in ip_address_list or [DEFAULT_HOSTNET]:
             commands += [make_vm_config_private_network_command(ip_address)]
+        if not sync_time:
+            commands += [make_vbox_host_time_disabled_command()]
         if install_server:
             commands += [make_vm_provision_command(
                 BOX_PROVISION_MEDIASERVER, env=dict(COMPANY_NAME='"%s"' % self._company_name))]

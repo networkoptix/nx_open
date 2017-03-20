@@ -19,6 +19,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/common/read_only.h>
+#include <ui/delegates/customizable_item_delegate.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/models/search_bookmarks_model.h>
@@ -35,35 +36,6 @@
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
 
-namespace {
-// TODO: #ynikitenkov Move to separate files with common style delegates
-class BoldItemDelegate: public QStyledItemDelegate
-{
-    using base_type = QStyledItemDelegate;
-
-public:
-    BoldItemDelegate(QObject* parent);
-
-protected:
-    virtual void initStyleOption(
-        QStyleOptionViewItem *option,
-        const QModelIndex &index) const override;
-};
-
-BoldItemDelegate::BoldItemDelegate(QObject* parent):
-    base_type(parent)
-{
-}
-
-void BoldItemDelegate::initStyleOption(
-    QStyleOptionViewItem *option,
-    const QModelIndex &index) const
-{
-    base_type::initStyleOption(option, index);
-    option->font.setBold(true);
-}
-
-}
 
 QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &filterText
     , qint64 utcStartTimeMs
@@ -167,8 +139,15 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     header->setSectionResizeMode(QHeaderView::ResizeToContents);
     header->setSectionResizeMode(QnSearchBookmarksModel::kTags, QHeaderView::Stretch);
 
+    auto boldItemDelegate = new QnCustomizableItemDelegate(this);
+    boldItemDelegate->setCustomInitStyleOption(
+        [](QStyleOptionViewItem* option, const QModelIndex& /*index*/)
+        {
+            option->font.setBold(true);
+        });
+
+    grid->setItemDelegateForColumn(QnSearchBookmarksModel::kCamera, boldItemDelegate);
     grid->setStyleSheet(lit("QTableView::item { padding-right: 24px }"));
-    grid->setItemDelegateForColumn(QnSearchBookmarksModel::kCamera, new BoldItemDelegate(this));
 }
 
 QnSearchBookmarksDialogPrivate::~QnSearchBookmarksDialogPrivate()

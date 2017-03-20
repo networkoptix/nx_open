@@ -13,7 +13,7 @@
 
 namespace {
 
-void makeTransparentForMouse(QGraphicsWidget* item)
+void makeTransparentForMouse(QGraphicsItem* item)
 {
     item->setAcceptedMouseButtons(Qt::NoButton);
     item->setAcceptHoverEvents(false);
@@ -161,6 +161,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(QGraphicsWidget* parent):
     m_button(new QPushButton())
 {
     setAutoFillBackground(true);
+
     makeTransparentForMouse(this);
 
     connect(this, &GraphicsWidget::geometryChanged, this, &QnStatusOverlayWidget::updateAreasSizes);

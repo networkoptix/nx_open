@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<WixLocalization Culture="en-us" Language="1033" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+<WixLocalization Culture="zh-cn" Language="1033" xmlns="http://schemas.microsoft.com/wix/2006/localization">
   <String Id="Caption">[WixBundleName] Setup - [WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>
@@ -58,7 +58,7 @@
   <String Id="FilesInUseDontCloseRadioButton">Do not close applications. A reboot will be required</String>
   <String Id="FilesInUseOkButton">OK</String>
   <String Id="FilesInUseCancelButton">Cancel</String>
-  <String Id="InstallLicenseText">By clicking "Accept and Install" you are agreeing to our</String>
+  <String Id="InstallLicenseText">By clicking "Accept and Install" you agree to</String>
   <String Id="Options">Options</String>
   <String Id="SelectApps">Select applications to be installed:</String>
 </WixLocalization>

@@ -33,8 +33,9 @@ const char* const kPingPath = "/cdb/ping";
 const char* const kEstablishEc2TransactionConnectionPath = "/cdb/ec2/events/ConnectingStage1";
 const char* const kDeprecatedEstablishEc2TransactionConnectionPath = "/ec2/events/ConnectingStage1";
 
-const char* const kMaintenanceGetVmsConnections = "/cdb/maintenance/getVmsConnections";
-const char* const kMaintenanceGetTransactionLog = "/cdb/maintenance/getTransactionLog";
+const char* const kMaintenanceGetVmsConnections = "/cdb/maintenance/vmsConnections";
+const char* const kMaintenanceGetTransactionLog = "/cdb/maintenance/transactionLog";
+const char* const kMaintenanceGetStatistics = "/cdb/maintenance/statistics";
 
 const char* const kCloudModuleXmlPath = "/cdb/cloud_modules.xml";
 

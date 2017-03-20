@@ -1077,6 +1077,11 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
             "cleans dangling cameras' and servers' user attributes, "
             "kvpairs and resourceStatuses, also cleans and rebuilds transaction log"), true);
 
+    commandLineParser.addParameter(&m_cmdLineArguments.moveHandlingCameras, "--move-handling-cameras", NULL,
+        lit("Move handling cameras to itself, "
+            "In some rare scenarios cameras can be assigned to removed server, "
+            "This startup parameter force server to move these cameras to itself"), true);
+
     commandLineParser.parse(argc, (const char**) argv, stderr);
     if (m_cmdLineArguments.showHelp)
     {
@@ -2067,6 +2072,31 @@ void MediaServerProcess::performActionsOnExit()
     }
 }
 
+void MediaServerProcess::moveHandlingCameras()
+{
+    QSet<QnUuid> servers;
+    for (const auto& server : qnResPool->getResources<QnMediaServerResource>())
+        servers << server->getId();
+    ec2::ApiCameraDataList camerasToUpdate;
+    for (const auto& camera: qnResPool->getAllCameras(/*all*/ QnResourcePtr()))
+    {
+        if (!servers.contains(camera->getParentId()))
+        {
+            ec2::ApiCameraData apiCameraData;
+            fromResourceToApi(camera, apiCameraData);
+            apiCameraData.parentId = qnCommon->moduleGUID(); //< move camera
+            camerasToUpdate.push_back(apiCameraData);
+        }
+    }
+
+    auto errCode = QnAppServerConnectionFactory::getConnection2()
+        ->getCameraManager(Qn::kSystemAccess)
+        ->addCamerasSync(camerasToUpdate);
+
+    if (errCode != ec2::ErrorCode::ok)
+        qWarning() << "Failed to move handling cameras due to database error. errCode=" << toString(errCode);
+}
+
 void MediaServerProcess::updateAllowedInterfaces()
 {
     // check registry
@@ -2658,6 +2688,10 @@ void MediaServerProcess::run()
     loadResourcesFromECS(messageProcessor.data());
     saveServerInfo(m_mediaServer);
     m_mediaServer->setStatus(Qn::Online);
+
+    if (m_cmdLineArguments.moveHandlingCameras)
+        moveHandlingCameras();
+
     qDebug() << "resources loaded for" << tt.elapsed();
     qnResourceAccessProvider->endUpdate();
     qDebug() << "access ready" << tt.elapsed();

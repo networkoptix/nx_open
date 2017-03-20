@@ -79,8 +79,11 @@ public:
     virtual void sendRequest(
         Message request, RequestHandler handler, void* client = 0) = 0;
 
-    /** Schedules repetable timer until disconnect */
-    virtual void addConnectionTimer(
+    /**
+     * Schedules repetable timer until disconnect.
+     * @return false if timer has not been scheduled (e.g., no connection is established at the moment).
+     */
+    virtual bool addConnectionTimer(
         std::chrono::milliseconds period, TimerHandler handler, void* client) = 0;
 
     /** Returns local address if client is connected to the server */
