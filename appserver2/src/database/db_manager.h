@@ -568,7 +568,8 @@ namespace detail
                 QnTransactionLog* tranLog,
                 QnReadWriteLock& mutex)
                 :
-                QnDbTransaction(database, mutex)
+                QnDbTransaction(database, mutex),
+                m_tranLog(tranLog)
             {
             }
 

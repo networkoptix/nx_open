@@ -61,20 +61,21 @@ public:
     virtual QnTransactionMessageBus* messageBus() const override;
     virtual QnDistributedMutexManager* distributedMutex() const override;
 private:
-    std::unique_ptr<ServerQueryProcessorAccess> m_serverQueryProcessor;
-    ClientQueryProcessor m_remoteQueryProcessor;
-    QnMutex m_mutex;
-    Settings m_settingsInstance;
     std::unique_ptr<detail::QnDbManager> m_dbManager;
+    std::unique_ptr<QnTransactionLog> m_transactionLog;
     std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
     std::unique_ptr<QnTransactionMessageBus> m_transactionMessageBus;
+    std::unique_ptr<ServerQueryProcessorAccess> m_serverQueryProcessor;
     std::unique_ptr<QnDistributedMutexManager> m_distributedMutexManager;
-    std::unique_ptr<QnTransactionLog> m_transactionLog;
-    Ec2DirectConnectionPtr m_directConnection;
-    Ec2ThreadPool m_ec2ThreadPool;
     bool m_terminated;
     int m_runningRequests;
     bool m_sslEnabled;
+
+    ClientQueryProcessor m_remoteQueryProcessor;
+    QnMutex m_mutex;
+    Settings m_settingsInstance;
+    Ec2DirectConnectionPtr m_directConnection;
+    Ec2ThreadPool m_ec2ThreadPool;
 
 private:
     int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);
