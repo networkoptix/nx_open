@@ -144,7 +144,7 @@ public:
     {
     }
 
-    virtual int read(void* data, size_t count) override;
+    virtual int read(void* data, size_t count) override
     {
         return m_func(data, count);
     }
