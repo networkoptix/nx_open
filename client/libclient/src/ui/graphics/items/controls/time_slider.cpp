@@ -984,8 +984,8 @@ void QnTimeSlider::setSliderPosition(qint64 position, bool keepInWindow)
 void QnTimeSlider::setValue(qint64 value, bool keepInWindow)
 {
     {
-        QScopedValueRollback<bool> updateRollback(m_updatingValue);
-        m_updatingValue = true; //< to not change tooltip visibility in setValue or setWindow
+        /* To not change tooltip visibility in setValue or setWindow: */
+        QScopedValueRollback<bool> updateRollback(m_updatingValue, true);
 
         qint64 oldValue = this->value();
         setValue(value);
