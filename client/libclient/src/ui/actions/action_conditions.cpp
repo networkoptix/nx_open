@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QAction>
 
+#include <boost/range/algorithm/count_if.hpp>
+
 #include <api/app_server_connection.h>
 
 #include <common/common_module.h>

@@ -1,6 +1,8 @@
 #include "licenses_propose_widget.h"
 #include "ui_licenses_propose_widget.h"
 
+#include <boost/range/algorithm/count_if.hpp>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 
