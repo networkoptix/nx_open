@@ -90,6 +90,7 @@ nx_spl::Storage* STORAGE_METHOD_CALL TestStorageFactory::createStorage(
         return nullptr;
     }
 
+    std::lock_guard<std::mutex> lock(m_storageHostsMutex);
     /* check if already exists */
     if (m_storageHosts.find(parsedUrl.host()) != m_storageHosts.cend())
     {
@@ -135,12 +136,19 @@ nx_spl::Storage* STORAGE_METHOD_CALL TestStorageFactory::createStorage(
     if (ecode)
         *ecode = nx_spl::error::NoError;
 
-    return createStorageImpl(vfsPair);
+    return createStorageImpl(vfsPair, parsedUrl.host());
 }
 
-nx_spl::Storage* TestStorageFactory::createStorageImpl(const utils::VfsPair& vfsPair)
+nx_spl::Storage* TestStorageFactory::createStorageImpl(
+    const utils::VfsPair& vfsPair, 
+    const std::string& host)
 {
-    return new TestStorage(vfsPair);
+    return new TestStorage(vfsPair,
+        [this, host]()
+        {
+            std::lock_guard<std::mutex> lock(m_storageHostsMutex);
+            m_storageHosts.erase(host);
+        });
 }
 
 const char* STORAGE_METHOD_CALL TestStorageFactory::storageType() const
@@ -180,4 +188,15 @@ unsigned int TestStorageFactory::addRef()
 unsigned int TestStorageFactory::releaseRef()
 {
     return pReleaseRef();
+}
+
+extern "C"
+{
+#ifdef _WIN32
+    __declspec(dllexport)
+#endif
+    nxpl::PluginInterface* createNXPluginInstance()
+    {
+        return new TestStorageFactory();
+    }
 }

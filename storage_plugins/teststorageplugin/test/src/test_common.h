@@ -121,7 +121,9 @@ class TestStorageFactoryHelper : public TestStorageFactory
 {
 public:
     TestStorageFactoryHelper(bool invalidConfig = false) : m_invalidConfig(invalidConfig) {}
+    
     std::string getConfigPath() const { return m_path; }
+    std::unordered_set<std::string> storageHosts() const { return m_storageHosts; }
 
 private:
     virtual bool readConfig(const std::string& path, std::string* outContent) override
@@ -135,9 +137,14 @@ private:
         return true;
     }
 
-    virtual nx_spl::Storage* createStorageImpl(const utils::VfsPair& vfsPair) override
+    virtual nx_spl::Storage* createStorageImpl(const utils::VfsPair& vfsPair, const std::string& host) override
     {
-        return new TestStorageHelper(vfsPair);
+        return new TestStorageHelper(vfsPair, 
+            [this, host]()
+            {
+                std::lock_guard<std::mutex> lock(m_storageHostsMutex);
+                m_storageHosts.erase(host);
+            } );
     }
 
     std::string m_path;

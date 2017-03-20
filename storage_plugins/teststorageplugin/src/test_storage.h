@@ -1,8 +1,9 @@
 #pragma once
 
-#include "third_party_storage.h"
-#include "common.h"
-#include "vfs.h"
+#include <functional>
+#include <third_party_storage.h>
+#include <common.h>
+#include <vfs.h>
 
 struct FsStubNode;
 
@@ -11,7 +12,8 @@ class TestStorage :
     public PluginRefCounter<TestStorage>
 {
 public:
-    TestStorage(const utils::VfsPair& vfsPair);
+    TestStorage(const utils::VfsPair& vfsPair, std::function<void()> onDestroyCb);
+    virtual ~TestStorage();
 
     virtual int STORAGE_METHOD_CALL isAvailable() const override;
 
@@ -79,4 +81,5 @@ private:
 
 private:
     utils::VfsPair m_vfsPair;
+    std::function<void()> m_onDestroyCb;
 };

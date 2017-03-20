@@ -71,7 +71,7 @@ TEST_F(TestStorageTest, IODevice_open_Write_NotExisting)
             nullptr));
 }
 
-TEST_F(TestStorageTest, IODevice_Read)
+TEST_F(TestStorageTest, IODevice_MediaFile_Read_Seek)
 {
     char buf[512];
     int ecode;
@@ -92,4 +92,77 @@ TEST_F(TestStorageTest, IODevice_Read)
     ASSERT_EQ(ecode, nx_spl::error::NoError);
     buf[10] = '\0';
     ASSERT_EQ(strcmp(buf, "1234567890"), 0);
+
+    ASSERT_TRUE(ioDevice1->seek(0, &ecode));
+    ASSERT_EQ(ioDevice1->read(buf, 10, &ecode), 10);
+    ASSERT_EQ(ecode, nx_spl::error::NoError);
+    buf[10] = '\0';
+    ASSERT_EQ(strcmp(buf, "1234567890"), 0);
+}
+
+TEST_F(TestStorageTest, IODevice_DbFile_Write)
+{
+    int ecode;
+    IODeviceUniquePtr ioDevice1(
+        dynamic_cast<TestIODeviceHelper*>(
+            storage->open(
+                "test://storage/some/path/db.nxdb",
+                nx_spl::io::WriteOnly,
+                &ecode)), 
+        ioDeviceDeleter);
+    ASSERT_TRUE((bool)ioDevice1);
+    ASSERT_EQ(ecode, nx_spl::error::NoError);
+
+    ASSERT_EQ(ioDevice1->write(nullptr, 10, &ecode), 10);
+    ASSERT_EQ(ecode, nx_spl::error::NoError);
+}
+
+TEST_F(TestStorageTest, IODevice_DbFile_Read)
+{
+    int ecode;
+
+    /* open for read should fail */
+    IODeviceUniquePtr ioDevice1(
+        dynamic_cast<TestIODeviceHelper*>(
+            storage->open(
+                "test://storage/some/path/db.nxdb",
+                nx_spl::io::ReadOnly,
+                &ecode)), 
+        ioDeviceDeleter);
+    ASSERT_FALSE((bool)ioDevice1);
+    ASSERT_NE(ecode, nx_spl::error::NoError);
+}
+
+TEST_F(TestStorageTest, IODevice_InfoTxt_Read)
+{
+    int ecode;
+    char buf[512];
+    IODeviceUniquePtr ioDevice1(
+        dynamic_cast<TestIODeviceHelper*>(
+            storage->open(
+                "test://storage/some/path/info.txt",
+                nx_spl::io::ReadOnly,
+                &ecode)), 
+        ioDeviceDeleter);
+    ASSERT_TRUE((bool)ioDevice1);
+    ASSERT_EQ(ecode, nx_spl::error::NoError);
+    ASSERT_GT(ioDevice1->read(buf, 512, &ecode), 0);
+    ASSERT_EQ(ecode, nx_spl::error::NoError);
+    ASSERT_NE(strstr(buf, "TestStorageCamera"), nullptr);
+}
+
+TEST_F(TestStorageTest, IODevice_InfoTxt_Write)
+{
+    int ecode;
+    IODeviceUniquePtr ioDevice1(
+        dynamic_cast<TestIODeviceHelper*>(
+            storage->open(
+                "test://storage/some/path/info.txt",
+                nx_spl::io::WriteOnly,
+                &ecode)), 
+        ioDeviceDeleter);
+    ASSERT_TRUE((bool)ioDevice1);
+    ASSERT_EQ(ecode, nx_spl::error::NoError);
+    ASSERT_EQ(ioDevice1->write(nullptr, 10, &ecode), 10);
+    ASSERT_EQ(ecode, nx_spl::error::NoError);
 }

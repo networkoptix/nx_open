@@ -41,15 +41,26 @@ TEST(TestStorageFactoryTest, alreadyExists)
     auto storage = factory.createStorage("test://storage1/some/path", nullptr);
     ASSERT_TRUE(storage);
     ASSERT_FALSE(factory.createStorage("test://storage1/some/path", nullptr));
+
+    storage->releaseRef();
 }
 
 TEST(TestStorageFactoryTest, configNotRead)
 {
-    TestStorageFactoryHelper factory;
+    TestStorageFactoryHelper factory(true);
 
-    /* wrong scheme */
-    auto storage = factory.createStorage("test://storage1/some/path", nullptr);
-    ASSERT_TRUE(storage);
     ASSERT_FALSE(factory.createStorage("test://storage1/some/path", nullptr));
     ASSERT_FALSE(factory.createStorage("test://storage1/some/other/path2", nullptr));
+}
+
+TEST(TestStorageFactoryTest, StorageRemovedOnDestroy)
+{
+    TestStorageFactoryHelper factory;
+
+    auto storage = factory.createStorage("test://storage1/some/path", nullptr);
+    ASSERT_TRUE(storage);
+    ASSERT_NE(factory.storageHosts().find("storage1"), factory.storageHosts().cend());
+
+    storage->releaseRef();
+    ASSERT_EQ(factory.storageHosts().find("storage1"), factory.storageHosts().cend());
 }

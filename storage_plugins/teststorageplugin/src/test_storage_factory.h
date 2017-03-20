@@ -2,6 +2,7 @@
 
 #include <unordered_set>
 #include <string>
+#include <mutex>
 #include <third_party_storage.h>
 #include <common.h>
 #include <vfs.h>
@@ -34,8 +35,9 @@ public: // plugin interface implementation
 
 private:
     virtual bool readConfig(const std::string& path, std::string* outContent);
-    virtual nx_spl::Storage* createStorageImpl(const utils::VfsPair& vfsPair);
+    virtual nx_spl::Storage* createStorageImpl(const utils::VfsPair& vfsPair, const std::string&);
 
-private:
+protected:
     std::unordered_set<std::string> m_storageHosts;
+    std::mutex m_storageHostsMutex;
 };

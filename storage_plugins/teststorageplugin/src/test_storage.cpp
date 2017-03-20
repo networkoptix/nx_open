@@ -66,7 +66,15 @@ bool nodeExists(struct FsStubNode* root, const char* url, int* ecode)
 
 }
 
-TestStorage::TestStorage(const utils::VfsPair& vfsPair) : m_vfsPair(vfsPair) {}
+TestStorage::TestStorage(const utils::VfsPair& vfsPair, std::function<void()> onDestroyCb):
+    m_vfsPair(vfsPair),
+    m_onDestroyCb(onDestroyCb)
+{}
+
+TestStorage::~TestStorage()
+{
+    m_onDestroyCb();
+}
 
 int STORAGE_METHOD_CALL TestStorage::isAvailable() const
 {
@@ -77,9 +85,25 @@ nx_spl::IODevice* STORAGE_METHOD_CALL TestStorage::open(const char* url, int fla
 {
     FileCategory category = FileCategory::media;
     if (strstr(url, ".nxdb") != nullptr)
+    {
+        if (!(flags & nx_spl::io::WriteOnly))
+        {
+            if (ecode)
+                *ecode = nx_spl::error::UnknownError;
+            return nullptr;
+        }
         category = FileCategory::db;
+    }
     else if (strstr(url, "info.txt") != nullptr)
+    {
+        if ((flags & nx_spl::io::ReadOnly))
+        {
+            if (ecode)
+                *ecode = nx_spl::error::NoError;
+            return createIODevice(m_vfsPair.sampleFilePath, (int)FileCategory::infoTxt, flags, 1, ecode);
+        }
         category = FileCategory::infoTxt;
+    }
 
     auto filePath = urlToPath(url);
     FsStubNode* fileNode = FsStubNode_find(m_vfsPair.root, filePath.c_str());
