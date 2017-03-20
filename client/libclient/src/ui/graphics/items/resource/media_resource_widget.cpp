@@ -560,7 +560,6 @@ void QnMediaResourceWidget::createButtons()
         QnImageButtonWidget *screenshotButton = createStatisticAwareButton(lit("media_widget_screenshot"));
         screenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
         screenshotButton->setCheckable(false);
-        screenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
         screenshotButton->setToolTip(tr("Screenshot"));
         setHelpTopic(screenshotButton, Qn::MainWindow_MediaItem_Screenshot_Help);
         connect(screenshotButton, &QnImageButtonWidget::clicked, this,
@@ -572,7 +571,6 @@ void QnMediaResourceWidget::createButtons()
         QnImageButtonWidget *searchButton = createStatisticAwareButton(lit("media_widget_msearch"));
         searchButton->setIcon(qnSkin->icon("item/search.png"));
         searchButton->setCheckable(true);
-        searchButton->setProperty(Qn::NoBlockMotionSelection, true);
         searchButton->setToolTip(tr("Smart Search"));
         setHelpTopic(searchButton, Qn::MainWindow_MediaItem_SmartSearch_Help);
         connect(searchButton, &QnImageButtonWidget::toggled, this,
@@ -584,7 +582,6 @@ void QnMediaResourceWidget::createButtons()
         QnImageButtonWidget *ptzButton = createStatisticAwareButton(lit("media_widget_ptz"));
         ptzButton->setIcon(qnSkin->icon("item/ptz.png"));
         ptzButton->setCheckable(true);
-        ptzButton->setProperty(Qn::NoBlockMotionSelection, true);
         ptzButton->setToolTip(tr("PTZ"));
         setHelpTopic(ptzButton, Qn::MainWindow_MediaItem_Ptz_Help);
         connect(ptzButton, &QnImageButtonWidget::toggled, this,
@@ -596,7 +593,6 @@ void QnMediaResourceWidget::createButtons()
         QnImageButtonWidget *fishEyeButton = createStatisticAwareButton(lit("media_widget_fisheye"));
         fishEyeButton->setIcon(qnSkin->icon("item/fisheye.png"));
         fishEyeButton->setCheckable(true);
-        fishEyeButton->setProperty(Qn::NoBlockMotionSelection, true);
         fishEyeButton->setToolTip(tr("Dewarping"));
         fishEyeButton->setChecked(item()->dewarpingParams().enabled);
         setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_Dewarping_Help);
@@ -609,7 +605,6 @@ void QnMediaResourceWidget::createButtons()
         QnImageButtonWidget *zoomWindowButton = createStatisticAwareButton(lit("media_widget_zoom"));
         zoomWindowButton->setIcon(qnSkin->icon("item/zoom_window.png"));
         zoomWindowButton->setCheckable(true);
-        zoomWindowButton->setProperty(Qn::NoBlockMotionSelection, true);
         zoomWindowButton->setToolTip(tr("Create Zoom Window"));
         setHelpTopic(zoomWindowButton, Qn::MainWindow_MediaItem_ZoomWindows_Help);
         connect(zoomWindowButton, &QnImageButtonWidget::toggled, this,
@@ -621,7 +616,6 @@ void QnMediaResourceWidget::createButtons()
         QnImageButtonWidget *enhancementButton = createStatisticAwareButton(lit("media_widget_enchancement"));
         enhancementButton->setIcon(qnSkin->icon("item/image_enhancement.png"));
         enhancementButton->setCheckable(true);
-        enhancementButton->setProperty(Qn::NoBlockMotionSelection, true);
         enhancementButton->setToolTip(tr("Image Enhancement"));
         enhancementButton->setChecked(item()->imageEnhancement().enabled);
         setHelpTopic(enhancementButton, Qn::MainWindow_MediaItem_ImageEnhancement_Help);
@@ -635,7 +629,6 @@ void QnMediaResourceWidget::createButtons()
         ioModuleButton->setIcon(qnSkin->icon("item/io.png"));
         ioModuleButton->setCheckable(true);
         ioModuleButton->setChecked(false);
-        ioModuleButton->setProperty(Qn::NoBlockMotionSelection, true);
         ioModuleButton->setToolTip(tr("I/O Module"));
         connect(ioModuleButton, &QnImageButtonWidget::toggled, this,
             &QnMediaResourceWidget::at_ioModuleButton_toggled);
@@ -647,7 +640,6 @@ void QnMediaResourceWidget::createButtons()
         QnImageButtonWidget *debugScreenshotButton = createStatisticAwareButton(lit("media_widget_debug_screenshot"));
         debugScreenshotButton->setIcon(qnSkin->icon("item/screenshot.png"));
         debugScreenshotButton->setCheckable(false);
-        debugScreenshotButton->setProperty(Qn::NoBlockMotionSelection, true);
         debugScreenshotButton->setToolTip(lit("Debug set of screenshots"));
         connect(debugScreenshotButton, &QnImageButtonWidget::clicked, this,
             [this]

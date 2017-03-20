@@ -11,10 +11,9 @@ bool createDesktopFile(
     const QString& applicationBinaryPath,
     const QString& applicationName,
     const QString& description,
-    const QString& customization,
+    const QString& icon,
     const nx::utils::SoftwareVersion& version = nx::utils::SoftwareVersion(),
-    const QString& protocol = QString()
-    );
+    const QString& protocol = QString());
 
 } // namespace utils
 } // namespace vms

@@ -549,14 +549,25 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
 
 void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index)
 {
-    QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-    if ((resource && resource->hasFlags(Qn::server))
-        || nodeType == Qn::ServersNode
-        || nodeType == Qn::UserResourcesNode)
+    /* Auto-expand certain nodes. */
+    switch (index.data(Qn::NodeTypeRole).value<Qn::NodeType>())
     {
-        ui->resourcesTreeView->expand(index);
+        case Qn::ResourceNode:
+        {
+            const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+            if (!resource || !resource->hasFlags(Qn::server))
+                break;
+        }
+        /* FALL THROUGH */
+        case Qn::ServersNode:
+        case Qn::UserResourcesNode:
+            ui->resourcesTreeView->expand(index);
+            break;
+
+        default:
+            break;
     }
+
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
 }
 

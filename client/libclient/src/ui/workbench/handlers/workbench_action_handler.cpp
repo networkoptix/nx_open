@@ -445,9 +445,11 @@ void QnWorkbenchActionHandler::openNewWindow(const QStringList &args) {
     arguments << lit("--no-single-application");
     arguments << lit("--no-version-mismatch-check");
 
-    if (context()->user()) {
+    if (context()->user())
+    {
         arguments << lit("--auth");
-        arguments << QString::fromUtf8(QnAppServerConnectionFactory::url().toEncoded());
+        arguments << QnStartupParameters::createAuthenticationString(
+            QnAppServerConnectionFactory::url());
     }
 
     if (mainWindow())
@@ -1803,6 +1805,8 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
 
         if (status == QnAppServerFileCache::OperationResult::sizeLimitExceeded)
         {
+            //TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
+            //Important: maximumFileSize() is hardcoded in 1024-base
             const auto maxFileSize = QnAppServerFileCache::maximumFileSize() / (1024 * 1024);
             QnMessageBox::warning(mainWindow(),
                 tr("Image too big"),

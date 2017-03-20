@@ -509,15 +509,29 @@ void QnVideowallItemWidget::updateHud(bool animate)
 bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect, const QnLayoutItemData &data)
 {
     QnResourcePtr resource = qnResPool->getResourceByDescriptor(data.resource);
+    if (!resource)
+        return true; // Absent resources must not display "Loading..." overlay
 
-    bool isServer = resource && resource->flags().testFlag(Qn::server);
+    auto drawFixedThumbnail = [painter, &paintRect](const QPixmap& thumb)
+        {
+            auto ar = QnGeometry::aspectRatio(thumb.size());
+            auto rect = QnGeometry::expanded(ar, paintRect, Qt::KeepAspectRatio).toRect();
+            painter->drawPixmap(rect, thumb);
+        };
 
-    if (isServer && !m_widget->m_thumbs.contains(resource->getId()))
+    if (resource->hasFlags(Qn::server))
     {
-        m_widget->m_thumbs[resource->getId()] = qnSkin->pixmap("events/thumb_server.png");
-    } //TODO: #GDM #VW local files placeholder
-
-    if (resource && m_widget->m_thumbs.contains(resource->getId()))
+        drawFixedThumbnail(qnSkin->pixmap("item_placeholders/videowall_server_placeholder.png"));
+    }
+    else if (resource->hasFlags(Qn::web_page))
+    {
+        drawFixedThumbnail(qnSkin->pixmap("item_placeholders/videowall_webpage_placeholder.png"));
+    }
+    else if (resource->hasFlags(Qn::local_media))
+    {
+        drawFixedThumbnail(qnSkin->pixmap("item_placeholders/videowall_local_placeholder.png"));
+    }
+    else if (m_widget->m_thumbs.contains(resource->getId()))
     {
         QPixmap pixmap = m_widget->m_thumbs[resource->getId()];
 
@@ -527,24 +541,23 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
         mediaLayout.setWidth(qMax(mediaLayout.width(), 1));
         mediaLayout.setHeight(qMax(mediaLayout.height(), 1));
 
-        QRectF sourceRect = isServer
-            ? pixmap.rect()
-            : QRectF(0, 0, pixmap.width() * mediaLayout.width(), pixmap.height() * mediaLayout.height());
+        QRectF sourceRect(0, 0, pixmap.width() * mediaLayout.width(),
+            pixmap.height() * mediaLayout.height());
 
         auto drawPixmap =
             [painter, &pixmap, &mediaLayout](const QRectF &targetRect)
-        {
-            int width = targetRect.width() / mediaLayout.width();
-            int height = targetRect.height() / mediaLayout.height();
-            for (int i = 0; i < mediaLayout.width(); ++i)
             {
-                for (int j = 0; j < mediaLayout.height(); ++j)
+                int width = targetRect.width() / mediaLayout.width();
+                int height = targetRect.height() / mediaLayout.height();
+                for (int i = 0; i < mediaLayout.width(); ++i)
                 {
-                    painter->drawPixmap(QRectF(targetRect.left() + width * i,
-                        targetRect.top() + height * j, width, height).toRect(), pixmap);
+                    for (int j = 0; j < mediaLayout.height(); ++j)
+                    {
+                        painter->drawPixmap(QRectF(targetRect.left() + width * i,
+                            targetRect.top() + height * j, width, height).toRect(), pixmap);
+                    }
                 }
-            }
-        };
+            };
 
         if (!qFuzzyIsNull(data.rotation))
         {

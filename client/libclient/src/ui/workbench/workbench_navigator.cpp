@@ -1419,7 +1419,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
             {
                 /* Set to last minute. */
                 endTimeMSec = qnSyncTime->currentMSecsSinceEpoch();
-                startTimeMSec = m_recordingStartUtcMs;
+                startTimeMSec = endTimeMSec - kTimelineWindowNearLive;
             }
             else
             {
@@ -1434,11 +1434,6 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow)
             endTimeMSec = endTimeUSec == DATETIME_NOW
                 ? qnSyncTime->currentMSecsSinceEpoch()
                 : endTimeUSec / 1000;
-
-            //TODO: #vkutin Change this later:
-            /* Temporary fix until we redesign "initializing recording" state: */
-            if (m_isRecording && m_syncedWidgets.contains(m_currentMediaWidget))
-                m_recordingStartUtcMs = startTimeMSec;
         }
     }
 

@@ -36,3 +36,5 @@ Config.allowDebugMode = false;
 //Config.webclientEnabled = false; // Uncomment this string to disable web client
 Config.productName = 'PCMS';
 Config.cloud.productName = 'PCMS Cloud';
+
+Config.supportedLanguages = ['zh_CN'];

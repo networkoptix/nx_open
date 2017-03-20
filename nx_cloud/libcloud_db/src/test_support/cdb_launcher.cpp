@@ -907,6 +907,20 @@ api::ResultCode CdbLauncher::getVmsConnections(
     return resCode;
 }
 
+api::ResultCode CdbLauncher::getStatistics(api::Statistics* const statistics)
+{
+    auto connection = connectionFactory()->createConnection();
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode, *statistics) =
+        makeSyncCall<nx::cdb::api::ResultCode, api::Statistics>(
+            std::bind(
+                &nx::cdb::api::MaintenanceManager::getStatistics,
+                connection->maintenanceManager(),
+                std::placeholders::_1));
+    return resCode;
+}
+
 bool CdbLauncher::isStartedWithExternalDb() const
 {
     const nx::db::ConnectionOptions connectionOptions = dbConnectionOptions();

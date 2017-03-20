@@ -366,12 +366,12 @@
     <message>
         <location/>
         <source>Description</source>
-        <translation>&amp;Описание</translation>
+        <translation>Описание</translation>
     </message>
     <message>
         <location/>
         <source>Timeout</source>
-        <translation>&amp;Таймаут</translation>
+        <translation>Таймаут</translation>
     </message>
     <message>
         <location/>
@@ -543,7 +543,7 @@
     <message>
         <location/>
         <source>Subnet Scan</source>
-        <translation>&amp;Сканировать Сеть</translation>
+        <translation>Сканировать Сеть</translation>
     </message>
     <message>
         <location/>
@@ -568,7 +568,7 @@
     <message>
         <location/>
         <source>Add selected</source>
-        <translation>&amp;Добавить выбранные</translation>
+        <translation>Добавить выбранные</translation>
     </message>
 </context>
 <context>
@@ -751,7 +751,7 @@
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
         <source>Output ID:</source>
-        <translation>ID тревожного в&amp;ыхода:</translation>
+        <translation>ID тревожного выхода:</translation>
     </message>
     <message>
         <location/>
@@ -1036,7 +1036,7 @@
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
         <source>PTZ preset:</source>
-        <translation>&amp;PTZ позиция:</translation>
+        <translation>PTZ позиция:</translation>
     </message>
 </context>
 <context>
@@ -1145,7 +1145,7 @@
     <message>
         <location/>
         <source>Add...</source>
-        <translation>&amp;Добавить...</translation>
+        <translation>Добавить...</translation>
     </message>
     <message>
         <location/>
@@ -1282,22 +1282,22 @@
     <message>
         <location/>
         <source>Crop to monitor aspect ratio</source>
-        <translation>&amp;Обрезать по соотношению сторон монитора</translation>
+        <translation>Обрезать по соотношению сторон монитора</translation>
     </message>
     <message>
         <location/>
         <source>Width:</source>
-        <translation>&amp;Ширина:</translation>
+        <translation>Ширина:</translation>
     </message>
     <message>
         <location/>
         <source>Height:</source>
-        <translation>&amp;Высота:</translation>
+        <translation>Высота:</translation>
     </message>
     <message>
         <location/>
         <source>Opacity:</source>
-        <translation>&amp;Прозрачность:</translation>
+        <translation>Прозрачность:</translation>
     </message>
 </context>
 <context>
@@ -1554,7 +1554,7 @@
     <message>
         <location/>
         <source>Connection Options:</source>
-        <translation>П&amp;араметры подключения:</translation>
+        <translation>Параметры подключения:</translation>
     </message>
     <message>
         <location/>
@@ -1584,7 +1584,7 @@
     <message>
         <location/>
         <source>Auto-Login</source>
-        <translation>&amp;Запомнить пароль</translation>
+        <translation>Запомнить пароль</translation>
     </message>
 </context>
 <context>
@@ -1963,17 +1963,17 @@
     <message>
         <location/>
         <source>Add...</source>
-        <translation>&amp;Добавить...</translation>
+        <translation>Добавить...</translation>
     </message>
     <message>
         <location/>
         <source>Rename...</source>
-        <translation>&amp;Переименовать...</translation>
+        <translation>Переименовать...</translation>
     </message>
     <message>
         <location/>
         <source>Delete...</source>
-        <translation>&amp;Удалить...</translation>
+        <translation>Удалить...</translation>
     </message>
 </context>
 <context>
@@ -2134,7 +2134,7 @@
     <message>
         <location/>
         <source>Delete...</source>
-        <translation>&amp;Удалить...</translation>
+        <translation>Удалить...</translation>
     </message>
     <message>
         <location/>
@@ -2315,7 +2315,7 @@
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
         <source>Additional Recipients:</source>
-        <translation>&amp;Дополнительные получатели:</translation>
+        <translation>Дополнительные получатели:</translation>
     </message>
     <message>
         <location/>

@@ -22,6 +22,7 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <common/common_globals.h>
+#include <utils/common/guard.h>
 #include <utils/common/long_runnable.h>
 #include <utils/media/custom_output_stream.h>
 
@@ -318,7 +319,7 @@ TEST_F(AsyncHttpClientTest, MultiRequestTest)
         client.get(),
         [&](nx_http::AsyncHttpClientPtr client)
         {
-            ASSERT_FALSE(client->failed());
+            ASSERT_FALSE(client->failed()) << "Response: " << client->response();
             ASSERT_EQ(client->response()->statusLine.statusCode, nx_http::StatusCode::ok);
             ASSERT_EQ(client->fetchMessageBodyBuffer(), expectedResponse);
             auto contentTypeIter = client->response()->headers.find("Content-Type");
@@ -710,6 +711,9 @@ TEST_F(AsyncHttpClientTest, ReusingExistingConnection)
         std::atomic<int> responseCount(0);
 
         auto httpClient = AsyncHttpClient::create();
+        auto httpClientGuard = makeScopedGuard(
+            [&httpClient]() { httpClient->pleaseStopSync(); });
+
         httpClient->setSendTimeoutMs(1000);
         QObject::connect(
             httpClient.get(), &AsyncHttpClient::done,

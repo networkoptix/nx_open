@@ -1,0 +1,9 @@
+<div class="container">
+    <ng-include src="'customization/sdkeula.html'"></ng-include>
+    <form role="form">
+        <div class="checkbox">
+        <label><input type="checkbox" ng-model="agree">네, 동의합니다.</label>
+            </div>
+        <button class="btn btn-default" ng-click="next()" ng-disabled="!agree">다음</button>
+    </form>
+</div>

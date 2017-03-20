@@ -8,6 +8,7 @@
 #include <nx/utils/software_version.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/utils/desktop_file_linux.h>
+#include <nx/vms/utils/app_info.h>
 
 namespace {
 
@@ -196,7 +197,7 @@ bool registerSystemUriProtocolHandler(
             applicationBinaryPath,
             applicationName,
             description,
-            customization,
+            nx::vms::utils::AppInfo::iconFileName(),
             version,
             protocol))
         {

@@ -8,7 +8,6 @@
 #include <core/resource_access/resource_access_manager.h>
 
 #include <core/resource/device_dependent_strings.h>
-#include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -27,6 +26,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_tree_model.h>
+#include <ui/models/resource/tree/resource_tree_model_node_manager.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
@@ -52,7 +52,7 @@ bool nodeRequiresChildren(Qn::NodeType nodeType)
     return result.contains(nodeType);
 }
 
-}
+} // namespace
 
 QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn::NodeType nodeType, const QnUuid& uuid) :
     base_type(),
@@ -209,7 +209,9 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, con
 }
 
 QnResourceTreeModelNode::~QnResourceTreeModelNode()
-{}
+{
+    NX_ASSERT(m_resource.isNull());
+}
 
 void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
 {
@@ -217,42 +219,33 @@ void QnResourceTreeModelNode::setResource(const QnResourcePtr& resource)
         return;
 
     NX_ASSERT(m_type == Qn::LayoutItemNode
-        || m_type == Qn::ResourceNode
-        || m_type == Qn::VideoWallItemNode
-        || m_type == Qn::EdgeNode
-        || m_type == Qn::SharedLayoutNode
-        || m_type == Qn::SharedResourceNode
-        || m_type == Qn::CurrentUserNode
-    );
+           || m_type == Qn::ResourceNode
+           || m_type == Qn::VideoWallItemNode
+           || m_type == Qn::EdgeNode
+           || m_type == Qn::SharedLayoutNode
+           || m_type == Qn::SharedResourceNode
+           || m_type == Qn::CurrentUserNode);
 
-    if (m_resource)
+    if (m_initialized)
     {
-        m_resource->disconnect(this);
-        accessController()->disconnect(this);
+        auto nodePtr = toSharedPointer();
+        NX_EXPECT(!nodePtr.isNull());
+        manager()->removeResourceNode(nodePtr);
+        m_resource = resource;
+        manager()->addResourceNode(nodePtr);
     }
-
-    m_resource = resource;
-
-    if (m_resource)
+    else
     {
-        connect(resource, &QnResource::nameChanged, this, &QnResourceTreeModelNode::update);
-        connect(resource, &QnResource::urlChanged, this, &QnResourceTreeModelNode::update);
-        connect(resource, &QnResource::flagsChanged, this, &QnResourceTreeModelNode::update);
-
-        connect(resource, &QnResource::statusChanged, this,
-            &QnResourceTreeModelNode::updateResourceStatus);
-
-        if (auto camera = resource.dynamicCast<QnVirtualCameraResource>())
-        {
-            connect(camera, &QnVirtualCameraResource::statusFlagsChanged, this,
-                &QnResourceTreeModelNode::update);
-        }
-
-        connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
-            &QnResourceTreeModelNode::handlePermissionsChanged);
+        /* Called from a constructor: */
+        m_resource = resource;
     }
 
     update();
+}
+
+QnResourceTreeModelNodeManager* QnResourceTreeModelNode::manager() const
+{
+    return model()->nodeManager();
 }
 
 void QnResourceTreeModelNode::update()
@@ -371,6 +364,10 @@ void QnResourceTreeModelNode::initialize()
 {
     NX_ASSERT(!m_initialized);
     m_initialized = true;
+
+    /* If setResource was called from the constructor: */
+    if (m_resource)
+        manager()->addResourceNode(toSharedPointer());
 }
 
 void QnResourceTreeModelNode::deinitialize()
@@ -1070,13 +1067,10 @@ QnResourceTreeModel* QnResourceTreeModelNode::model() const
     return m_model;
 }
 
-void QnResourceTreeModelNode::handlePermissionsChanged(const QnResourcePtr& resource)
+void QnResourceTreeModelNode::handlePermissionsChanged()
 {
-    if (resource == m_resource)
-    {
-        m_editable.checked = false;
-        update();
-    }
+    m_editable.checked = false;
+    update();
 }
 
 QIcon QnResourceTreeModelNode::calculateIcon() const
@@ -1265,6 +1259,11 @@ void QnResourceTreeModelNode::updateResourceStatus()
     m_status = m_resource->getStatus();
     m_icon = calculateIcon();
     changeInternal();
+}
+
+bool QnResourceTreeModelNode::isPrimary() const
+{
+    return m_prev.isNull();
 }
 
 QDebug operator<<(QDebug dbg, QnResourceTreeModelNode* node)

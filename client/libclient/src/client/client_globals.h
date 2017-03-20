@@ -182,6 +182,8 @@ namespace Qn
         PtzObjectIdRole,                            /**< Role for PTZ tour/preset id. Value of type QString. */
         PtzObjectNameRole,                          /**< Role for PTZ tour/preset name. Value of type QString. */
         PtzTourSpotRole,                            /**< Role for PTZ tour spot. Value of type QnPtzTourSpot. */
+        PtzSpeedRole,                               /**< Role for PTZ speed. Value of type QVector3D */
+        PtzPresetIndexRole,                         /**< Role for PTZ preset index. Value of type int */
 
         /* Context-based. */
         CurrentLayoutResourceRole,

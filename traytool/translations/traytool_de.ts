@@ -5,11 +5,11 @@
     <name>QObject</name>
     <message>
         <source>System Tray</source>
-        <translation>System Tray</translation>
+        <translation>Systemtray</translation>
     </message>
     <message>
         <source>There is no system tray on this system.</source>
-        <translation>Es gibt kein System Tray auf diesem System.</translation>
+        <translation>Es gibt kein Systemtray auf diesem System.</translation>
     </message>
     <message>
         <source>Application will now quit.</source>
@@ -47,8 +47,7 @@
     </message>
     <message>
         <source>No %1 services installed</source>
-        <translatorcomment>What is &quot;No&quot; - is it № or &quot;Nein&quot;?</translatorcomment>
-        <translation>No %1 Dienste wurden installiert</translation>
+        <translation>Keine %1 Dienste wurden installiert</translation>
     </message>
     <message>
         <source>&amp;Quit</source>
@@ -60,59 +59,59 @@
     </message>
     <message>
         <source>Server has been stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Server wurde angehalten</translation>
     </message>
     <message>
         <source>Server has been started</source>
-        <translation type="unfinished"></translation>
+        <translation>Server wurde gestartet</translation>
     </message>
     <message>
         <source>Server will be stopped. Continue?</source>
-        <translation type="unfinished">Medienserver wird gestoppt. Fortsetzen?</translation>
+        <translation>Server wird gestoppt. Fortsetzen?</translation>
     </message>
     <message>
         <source>Show Server Log</source>
-        <translation type="unfinished"></translation>
+        <translation>Serverlog anzeigen</translation>
     </message>
     <message>
         <source>Start Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Server starten</translation>
     </message>
     <message>
         <source>Stop Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Server stoppen</translation>
     </message>
     <message>
         <source>Server Web Page</source>
-        <translation type="unfinished"></translation>
+        <translation>Server-Webseite</translation>
     </message>
     <message>
         <source>stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>wurde gestoppt</translation>
     </message>
     <message>
         <source>starting</source>
-        <translation type="unfinished"></translation>
+        <translation>wird gestartet</translation>
     </message>
     <message>
         <source>stopping</source>
-        <translation type="unfinished"></translation>
+        <translation>wird gestoppt</translation>
     </message>
     <message>
         <source>started</source>
-        <translation type="unfinished"></translation>
+        <translation>wurde gestartet</translation>
     </message>
     <message>
         <source>resuming</source>
-        <translation type="unfinished"></translation>
+        <translation>wird fortgesetzt</translation>
     </message>
     <message>
         <source>paused</source>
-        <translation type="unfinished"></translation>
+        <translation>wurde angehalten</translation>
     </message>
     <message>
         <source>pausing</source>
-        <translation type="unfinished"></translation>
+        <translation>wird angehalten</translation>
     </message>
 </context>
 </TS>

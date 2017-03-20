@@ -2,10 +2,13 @@
    Initial task https://networkoptix.atlassian.net/browse/TEST-177
 '''
 
-import pytest, time
-from test_utils import bool_to_str, str_to_bool
-from server import MEDIASERVER_MERGE_TIMEOUT_SEC
-from server_rest_api import ServerRestApiError, HttpError
+import pytest, time, logging
+from test_utils.utils import bool_to_str, str_to_bool
+from test_utils.server import MEDIASERVER_MERGE_TIMEOUT_SEC
+from test_utils.server_rest_api import ServerRestApiError, HttpError
+import server_api_data_generators as generator
+
+log = logging.getLogger(__name__)
 
 @pytest.fixture
 def env(env_builder, server):
@@ -165,6 +168,32 @@ def test_cloud_merge_after_disconnect(env, cloud_host):
     check_system_settings(
         env.two,
         auditTrailEnabled=bool_to_str(expected_auditTrailEnabled))
+
+@pytest.fixture
+def env_setup(env_builder, server):
+    one = server()
+    two = server()
+    return env_builder(one=one, two=two)
+
+def wait_entity_merge_done(env_setup, method, api_object, api_method):
+    log.info('TEST for %s %s.%s:', method.upper(), api_object, api_method)
+    start = time.time()
+    while True:
+        result_1 = env_setup.one.rest_api.get_api_fn(method, api_object, api_method)()
+        result_2 = env_setup.two.rest_api.get_api_fn(method, api_object, api_method)()
+        if result_1 == result_2: return
+        if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
+            assert result_1 == result_2
+        time.sleep(MEDIASERVER_MERGE_TIMEOUT_SEC / 10.0)
+
+def test_merge_resources(env_setup):
+    user_data = generator.generate_user_data(1)
+    camera_data = generator.generate_camera_data(1)
+    env_setup.one.rest_api.ec2.saveUser.POST(**user_data)
+    env_setup.two.rest_api.ec2.saveCamera.POST(**camera_data)
+    env_setup.two.merge_systems(env_setup.one)
+    wait_entity_merge_done(env_setup, 'GET', 'ec2', 'getUsers')
+    wait_entity_merge_done(env_setup, 'GET', 'ec2', 'getCamerasEx')
 
 @pytest.fixture
 def env_merged(env_builder, server):

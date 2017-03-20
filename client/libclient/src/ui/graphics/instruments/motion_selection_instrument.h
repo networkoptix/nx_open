@@ -24,7 +24,7 @@ public:
     QBrush brush() const;
 
     /**
-     * \param selectionModifiers        Keyboard modifiers that must be pressed for the 
+     * \param selectionModifiers        Keyboard modifiers that must be pressed for the
      *                                  selection process to start. Defaults to 0.
      */
     void setSelectionModifiers(Qt::KeyboardModifiers selectionModifiers);
@@ -70,13 +70,18 @@ protected:
     void ensureSelectionItem();
 
 private:
+    void updateCursor();
+    void setWidget(QnMediaResourceWidget* widget);
+    void setItemUnderMouse(QGraphicsItem* item);
+
+private:
     QBrush m_brush;
     QPen m_pen;
     QPointer<SelectionItem> m_selectionItem;
-    QPointer<QnMediaResourceWidget> m_target;
+    QPointer<QnMediaResourceWidget> m_widget;
+    QGraphicsItem* m_itemUnderMouse = nullptr;
     bool m_selectionStartedEmitted;
     bool m_isClick;
-    bool m_clearingBlocked;
     Qt::KeyboardModifiers m_selectionModifiers;
     Qt::KeyboardModifiers m_multiSelectionModifiers;
     QRect m_gridRect;
@@ -92,12 +97,5 @@ private:
  * will be used.
  */
 #define MotionSelectionModifiers _id("_qn_motionSelectionModifiers")
-
-/**
- * Name of the property to set on a graphics item to stop it from
- * blocking motion selection.
- */
-#define NoBlockMotionSelection _id("_qn_noBlockMotionSelection")
-
 
 #endif // QN_MOTION_SELECTION_INSTRUMENT_H

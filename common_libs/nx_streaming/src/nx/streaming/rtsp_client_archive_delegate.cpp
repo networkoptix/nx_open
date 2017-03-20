@@ -701,6 +701,22 @@ void QnRtspClientArchiveDelegate::processMetadata(const quint8* data, int dataSi
         emit dataDropped(m_reader);
 }
 
+namespace {
+
+/**
+ * @return Zero version if serverString is invalid.
+ */
+nx::utils::SoftwareVersion extractServerVersion(const nx_http::StringType& serverString)
+{
+    int versionStartPos = serverString.indexOf("/") + 1;
+    int versionEndPos = serverString.indexOf(" ", versionStartPos);
+
+    return nx::utils::SoftwareVersion(
+        serverString.mid(versionStartPos, versionEndPos - versionStartPos));
+}
+
+} // namespace
+
 QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum, qint64* parserPosition)
 {
     QnMutexLocker lock( &m_mutex );
@@ -711,8 +727,10 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     if (itr == m_parsers.end())
     {
         auto parser = new QnNxRtpParser();
-        auto serverVersion = nx_http::extractServerVersion(m_rtspSession->serverInfo());
-        if (!serverVersion.isNull() && serverVersion < nx::utils::SoftwareVersion("3.0.0.0"))
+        // TODO: Use nx_http::header::Server here
+        // to get RFC2616-conformant Server header parsing function.
+        auto serverVersion = extractServerVersion(m_rtspSession->serverInfo());
+        if (!serverVersion.isNull() && serverVersion < nx::utils::SoftwareVersion(3, 0))
             parser->setAudioEnabled(false);
         itr = m_parsers.insert(channelNum, QnNxRtpParserPtr(parser));
     }

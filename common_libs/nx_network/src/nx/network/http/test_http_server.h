@@ -1,10 +1,4 @@
-/**********************************************************
-* 9 jan 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef TEST_HTTP_SERVER_H
-#define TEST_HTTP_SERVER_H
+#pragma once
 
 #include <memory>
 
@@ -153,5 +147,3 @@ private:
     virtual std::shared_ptr<RandomlyFailingHttpConnection> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) override;
 };
-
-#endif  //TEST_HTTP_SERVER_H

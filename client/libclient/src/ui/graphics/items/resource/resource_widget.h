@@ -191,9 +191,7 @@ public:
     /**
      * \returns                         Options for this widget.
      */
-    Options options() const {
-        return m_options;
-    }
+    Options options() const;
 
     /**
      * \param option                    Affected option.

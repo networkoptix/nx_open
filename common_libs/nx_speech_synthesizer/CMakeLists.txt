@@ -1,4 +1,7 @@
 rdep_add_package(festival)
-rdep_add_package(any/festival-vox)
+if(NOT "${festival-vox_version}" STREQUAL "system")
+    rdep_add_package(any/festival-vox)
+endif()
 
-nx_add_target(nx_speech_synthesizer LIBRARY PUBLIC_LIBS common festival)
+nx_add_target(nx_speech_synthesizer LIBRARY
+    PUBLIC_LIBS common festival)

@@ -39,6 +39,7 @@ angular.module('webadminApp')
                     'mp4': 'video/mp4'
                 };
 
+                scope.Config = Config;
                 scope.debugMode = Config.debug.video && Config.allowDebugMode;
                 scope.debugFormat = Config.allowDebugMode && Config.debug.videoFormat;
 
@@ -308,7 +309,7 @@ angular.module('webadminApp')
                             }, function (position, duration) {
                                 if (position != 0) {
                                     scope.loading = false;
-                                    scope.vgUpdateTime({$currentTime: position/1000, $duration: duration});
+                                    scope.vgUpdateTime({$currentTime: position, $duration: duration});
                                 }
                             });
                         });
