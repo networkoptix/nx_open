@@ -22,6 +22,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
+#include <QtCore/QSettings>
 
 #include <QtGui/QDesktopServices>
 #include <QtGui/QWindow>
