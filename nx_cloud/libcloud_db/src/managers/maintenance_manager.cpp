@@ -61,7 +61,7 @@ void MaintenanceManager::getTransactionLog(
 }
 
 void MaintenanceManager::getStatistics(
-    const AuthorizationInfo& authzInfo,
+    const AuthorizationInfo& /*authzInfo*/,
     std::function<void(api::ResultCode, api::Statistics)> completionHandler)
 {
     m_timer.post(
