@@ -445,7 +445,7 @@ std::list< Guard > PortMapper::changeIpEvents( Device& device, HostAddress exter
 {
     std::list< Guard > callbackGuards;
 
-    std::swap( device.externalIp, externalIp );
+    device.externalIp.swap(externalIp);
     for( auto& map : device.mapped )
     {
         const auto it = m_mapRequests.find( map.first );

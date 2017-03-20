@@ -304,11 +304,12 @@ void QnLoginDialog::accept()
             if (m_requestHandle != handle)
                 return; //connect was cancelled
 
+
+            const auto status = QnConnectionDiagnosticsHelper::validateConnection(
+                connectionInfo, errorCode, this);
+
             m_requestHandle = -1;
             updateUsability();
-
-            auto status = QnConnectionDiagnosticsHelper::validateConnection(
-                connectionInfo, errorCode, this);
 
             if (!guard)
                 return;
@@ -490,8 +491,15 @@ void QnLoginDialog::resetAutoFoundConnectionsModel()
 
         if (!vm.isValid)
         {
+            const bool showBuild = compatibilityCode == Qn::IncompatibleProtocolConnectionResult
+                || compatibilityCode == Qn::IncompatibleCloudHostConnectionResult;
+
+            auto versionFormat = showBuild
+                ? QnSoftwareVersion::FullFormat
+                : QnSoftwareVersion::BugfixFormat;
+
             vm.title += lit(" (v%1)")
-                .arg(data.info.version.toString(QnSoftwareVersion::BugfixFormat));
+                .arg(data.info.version.toString(versionFormat));
         }
 
         viewModels.push_back(vm);

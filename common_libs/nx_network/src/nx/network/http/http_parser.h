@@ -1,23 +1,15 @@
-/**********************************************************
-* 23 dec 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef HTTP_PARSER_H
-#define HTTP_PARSER_H
+#pragma once 
 
 #include "httpstreamreader.h"
 #include "httptypes.h"
 #include "../buffer.h"
 #include "../connection_server/base_protocol_message_types.h"
 
-
 namespace nx_http {
 
-/*!
-    This class is just a wrapper for use with \a nx_api::BaseStreamProtocolConnection class. 
-    \todo get rid of this!
-*/
+/**
+ * This class is just a wrapper for use with \a nx_api::BaseStreamProtocolConnection class. 
+ */
 class NX_NETWORK_API MessageParser
 {
 public:
@@ -46,6 +38,4 @@ private:
     Message* m_msg;
 };
 
-}   // namespace nx_http
-
-#endif  //HTTP_PARSER_H
+} // namespace nx_http

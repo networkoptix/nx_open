@@ -11,7 +11,8 @@ TransactionTransport::TransactionTransport(
     ::ec2::ConnectionGuardSharedState* const connectionGuardSharedState,
     ec2::ApiPeerData localPeer,
     const std::string& systemId,
-    const std::string& systemAuthKey)
+    const std::string& systemAuthKey,
+    int protocolVersion)
 :
     ec2::QnTransactionTransportBase(
         connectionGuardSharedState,
@@ -21,6 +22,7 @@ TransactionTransport::TransactionTransport(
     m_systemId(systemId),
     m_systemAuthKey(systemAuthKey)
 {
+    setLocalPeerProtocolVersion(protocolVersion);
 }
 
 void TransactionTransport::fillAuthInfo(

@@ -4,11 +4,11 @@
     background-color: #00aeef; }
 
 
-.navbar-default .navbar-nav>li>a {
+#top.navbar-default .navbar-nav>li>a {
     color: white; }
 
 
-.navbar-default .navbar-nav>li>a:hover {
+#top.navbar-default .navbar-nav>li>a:hover {
     background-color: #009bd5; }
 
 #top a.navbar-brand:hover {

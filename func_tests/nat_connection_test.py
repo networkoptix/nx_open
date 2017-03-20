@@ -1,6 +1,6 @@
 import logging
 import pytest
-from vagrant_box_config import DEFAULT_HOSTNET
+from test_utils.vagrant_box_config import DEFAULT_HOSTNET
 
 
 log = logging.getLogger(__name__)
@@ -43,7 +43,7 @@ def test_merged_servers_should_return_same_results_to_certain_api_calls(env):
         ('GET', 'ec2', 'getUsers'),
         ]
     for method, api_object, api_method in test_api_calls:
-        log.info('TEST for %s %s.%s:', method.upper(), api_object, api_method)
+        log.info('TEST for %s %s.%s:', method, api_object, api_method)
         result_one = env.one.rest_api.get_api_fn(method, api_object, api_method)()
         result_two = env.two.rest_api.get_api_fn(method, api_object, api_method)()
         assert result_one == result_two

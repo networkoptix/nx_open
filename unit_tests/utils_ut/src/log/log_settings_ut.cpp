@@ -26,7 +26,7 @@ TEST(Settings, correct_parsing)
     ASSERT_EQ(cl_logDEBUG2, logSettings.level);
     ASSERT_EQ(QString("/var/log/"), logSettings.directory);
     ASSERT_EQ(77, logSettings.maxBackupCount);
-    ASSERT_EQ(184632, logSettings.maxFileSize);
+    ASSERT_EQ(184632U, logSettings.maxFileSize);
 }
 
 } // namespace test

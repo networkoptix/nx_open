@@ -5,12 +5,14 @@
 from hashlib import md5
 import uuid
 
+
 BASE_CAMERA_IP_ADDRESS=0xC0A80000 # 192.168.0.0
 BASE_SERVER_IP_ADDRESS=0xA0A0000  # 10.10.0.0
-CAMERA_SERVER_GUID_PREFIX="CA14E2A0-8E25-E200-0000"
-SERVER_GUID_PREFIX="8E25E200-0000-0000-0000"
-USER_GUID_PREFIX="58E20000-0000-0000-0000"
+CAMERA_SERVER_GUID_PREFIX="ca14e2a0-8e25-e200-0000"
+SERVER_GUID_PREFIX="8e25e200-0000-0000-0000"
+USER_GUID_PREFIX="58e20000-0000-0000-0000"
 CAMERA_MAC_PREFIX="CA:14:"
+
 
 def generate_camera_server_guid(id, quoted=True):
     guid = "%s-%012d" % (CAMERA_SERVER_GUID_PREFIX, id)
@@ -159,5 +161,3 @@ def generate_resource_params_data(resource_id, **kw):
 
 def generate_remove_resource_data(resource_id):
     return dict(id=resource_id)
-
-

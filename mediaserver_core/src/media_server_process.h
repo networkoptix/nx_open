@@ -57,6 +57,7 @@ public:
     QString allowedDiscoveryPeers;
     QString ifListFilter;
     bool cleanupDb;
+    bool moveHandlingCameras;
 
     QString configFilePath;
     QString rwConfigFilePath;
@@ -76,6 +77,7 @@ public:
         lit("INFO")),
 #endif
         cleanupDb(false),
+        moveHandlingCameras(false),
         showVersion(false),
         showHelp(false)
     {
@@ -131,6 +133,7 @@ private:
 
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();
+    void moveHandlingCameras();
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
     void registerRestHandlers(CloudManagerGroup* const cloudManagerGroup);
@@ -147,6 +150,7 @@ private:
     void parseCommandLineParameters(int argc, char* argv[]);
     void updateAllowedInterfaces();
     void addCommandLineParametersFromConfig();
+    void saveServerInfo(const QnMediaServerResourcePtr& server);
 private:
     int m_argc;
     char** m_argv;

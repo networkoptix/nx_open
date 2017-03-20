@@ -485,12 +485,21 @@ bool UdtSocket<InterfaceToImplement>::open()
     }
 
     //tuning udt socket
+    constexpr const int kPacketsCoeff = 2;
+    constexpr const int kBytesCoeff = 6;
+
     constexpr const int kMtuSize = 1400;
-    constexpr const int kMaximumUdtWindowSizePackets = 64;
-    constexpr const int kUdtSendBufSize = 48 * kMtuSize;
-    constexpr const int kUdtRecvBufSize = 48 * kMtuSize;
-    constexpr const int kUdpSendBufSize = 48 * kMtuSize;
-    constexpr const int kUdpRecvBufSize = 48 * kMtuSize;
+    constexpr const int kMaximumUdtWindowSizePacketsBase = 64;
+    constexpr const int kMaximumUdtWindowSizePackets = 
+        kMaximumUdtWindowSizePacketsBase * kPacketsCoeff;
+
+    constexpr const int kUdtBufferMultiplier = 48;
+    constexpr const int kUdtSendBufSize = kUdtBufferMultiplier * kMtuSize * kBytesCoeff;
+    constexpr const int kUdtRecvBufSize = kUdtBufferMultiplier * kMtuSize * kBytesCoeff;
+
+    constexpr const int kUdpBufferMultiplier = 64;
+    constexpr const int kUdpSendBufSize = kUdpBufferMultiplier * kMtuSize * kBytesCoeff;
+    constexpr const int kUdpRecvBufSize = kUdpBufferMultiplier * kMtuSize * kBytesCoeff;
 
     if (UDT::setsockopt(
         m_impl->udtHandle, 0, UDT_MSS,
@@ -628,7 +637,7 @@ int UdtStreamSocket::send( const void* buffer, unsigned int bufferLen )
         const auto sysErrorCode =
             detail::convertToSystemError(UDT::getlasterror().getErrorCode());
 
-        if (sysErrorCode != SystemError::wouldBlock)
+        if (socketCannotRecoverFromError(sysErrorCode))
             m_state = detail::SocketState::open;
 
         SystemError::setLastErrorCode(sysErrorCode);
@@ -730,7 +739,7 @@ void UdtStreamSocket::connectAsync(
         addr,
         [this, handler = std::move(handler)](SystemError::ErrorCode errorCode) mutable
         {
-            if (errorCode != SystemError::noError && errorCode != SystemError::wouldBlock)
+            if (socketCannotRecoverFromError(errorCode))
                 m_state = detail::SocketState::open;
             handler(errorCode);
         });
@@ -841,7 +850,7 @@ int UdtStreamSocket::handleRecvResult(int recvResult)
         const int udtErrorCode = UDT::getlasterror().getErrorCode();
         const auto sysErrorCode = detail::convertToSystemError(udtErrorCode);
 
-        if (sysErrorCode != SystemError::wouldBlock)
+        if (socketCannotRecoverFromError(sysErrorCode))
             m_state = detail::SocketState::open;
 
         // UDT doesn't translate the EOF into a recv with zero return, but instead

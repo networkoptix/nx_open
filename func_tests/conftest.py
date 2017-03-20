@@ -7,16 +7,18 @@ import sys
 import os.path
 import logging
 import pytest
-from utils import SimpleNamespace
-from session import TestSession
-from test_utils import ServerFactory, EnvironmentBuilder
-from host import SshHostConfig
-from vagrant_box_config import box_config_factory
-from cloud_host import resolve_cloud_host_from_registry, create_cloud_host
-from camera import MEDIA_SAMPLE_FPATH, SampleMediaFile, Camera
+from test_utils.utils import SimpleNamespace
+from test_utils.session import TestSession
+from test_utils.customization import read_customization_company_name
+from test_utils.environment import EnvironmentBuilder
+from test_utils.host import SshHostConfig
+from test_utils.vagrant_box_config import BoxConfigFactory
+from test_utils.cloud_host import resolve_cloud_host_from_registry, create_cloud_host
+from test_utils.server import ServerConfigFactory
+from test_utils.camera import MEDIA_SAMPLE_FPATH, SampleMediaFile, Camera
 
 
-DEFAULT_CLOUD_GROUP = 'dev'
+DEFAULT_CLOUD_GROUP = 'test'
 DEFAULT_CUSTOMIZATION = 'default'
 
 DEFAULT_WORK_DIR = os.path.expanduser('/tmp/funtest')
@@ -27,7 +29,7 @@ DEFAULT_VM_NAME_PREFIX = 'funtest-'
 DEFAULT_VM_HOST_USER = 'root'
 DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
 
-DEFAULT_MAX_LOG_WIDTH = 200
+DEFAULT_MAX_LOG_WIDTH = 500
 
 
 log = logging.getLogger(__name__)
@@ -66,8 +68,6 @@ def pytest_addoption(parser):
     parser.addoption('--resource-synchronization-test-config-file',
                      help='config file for resource synchronization test')
 
-
-
 @pytest.fixture(scope='session')
 def run_options(request):
     vm_host = request.config.getoption('--vm-host')
@@ -91,6 +91,10 @@ def run_options(request):
         max_log_width=request.config.getoption('--max-log-width'),
         )
 
+@pytest.fixture(scope='session')
+def customization_company_name(run_options):
+    return read_customization_company_name(run_options.customization)
+
 
 @pytest.fixture(params=['http', 'https'])
 def http_schema(request):
@@ -98,12 +102,12 @@ def http_schema(request):
 
 
 @pytest.fixture
-def box():
-    return box_config_factory
+def box(customization_company_name):
+    return BoxConfigFactory(customization_company_name)
 
 @pytest.fixture
-def server():
-    return ServerFactory()
+def server(box):
+    return ServerConfigFactory(box)
 
 
 # cloud host dns name, like: 'cloud-dev.hdw.mx'
@@ -143,5 +147,8 @@ def test_session(run_options):
 
 
 @pytest.fixture
-def env_builder(request, test_session, run_options, cloud_host_host):
-    return EnvironmentBuilder(test_session, run_options, request.config.cache, cloud_host_host)
+def env_builder(request, test_session, run_options,
+                cloud_host_host, customization_company_name):
+    return EnvironmentBuilder(
+        request.module, test_session, run_options,
+        request.config.cache, cloud_host_host, customization_company_name)

@@ -123,6 +123,8 @@ public:
     virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread) override;
     virtual void stopWhileInAioThread() override;
 
+    void setLocalPeerProtocolVersion(int version);
+
     /** Enables outgoing transaction channel. */
     void setOutgoingConnection(QSharedPointer<AbstractCommunicatingSocket> socket);
     void monitorConnectionForClosure();
@@ -351,6 +353,7 @@ private:
     bool m_remotePeerSupportsKeepAlive;
     bool m_isKeepAliveEnabled;
     int m_remotePeerEcProtoVersion;
+    int m_localPeerProtocolVersion;
 
 private:
     QnTransactionTransportBase(

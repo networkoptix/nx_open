@@ -430,9 +430,6 @@ bool CLH264RtpParser::processData(
     const quint8* bufferEnd = rtpBuffer + bytesRead;
     quint16 sequenceNum = ntohs(rtpHeader->sequence);
 
-    if (rtpHeader->payloadType != m_rtpChannel)
-        return true; // skip data
-
     if (curPtr >= bufferEnd)
         return clearInternalBuffer();
 
@@ -469,8 +466,15 @@ bool CLH264RtpParser::processData(
     if (isPacketLost)
         return false;
 
+    if (rtpHeader->payloadType != m_rtpChannel)
+        return true; // skip data
+
     if (rtpHeader->padding)
+    {
         bufferEnd -= bufferEnd[-1];
+        if (curPtr >= bufferEnd)
+            return clearInternalBuffer();
+    }
 
     if (isPacketStartsNewFrame(curPtr, bufferEnd))
     {

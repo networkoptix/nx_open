@@ -4,6 +4,8 @@
 
 #include <utils/common/app_info.h>
 
+#include <nx/utils/string.h>
+
 QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType messageType)
 {
     switch (messageType)
@@ -43,10 +45,15 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
 QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType messageType,
     const QString& resourceName)
 {
+    //TODO: #GDM #3.1 elide on the widget level
+    static const int kMaxNameLength = 30;
+
     switch (messageType)
     {
         case QnSystemHealth::UsersEmailIsEmpty:
-            return tr("Email address is not set for user %1").arg(resourceName);
+            return tr("Email address is not set for user %1")
+                .arg(nx::utils::elideString(resourceName, kMaxNameLength));
+
         case QnSystemHealth::CloudPromo:
         {
             const QString kLearnMoreText = tr("Learn more");

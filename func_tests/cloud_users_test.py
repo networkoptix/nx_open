@@ -4,6 +4,7 @@
 '''
 import pytest
 
+
 SECOND_CLOUD_USER='vfedorov@networkoptix.com'
 SECOND_CLOUD_PASSWORD='123qweasd'
 ADMIN_PERMISSIONS='|'.join([

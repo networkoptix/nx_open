@@ -13,19 +13,23 @@ MenuItem
     rightPadding: 16
     spacing: 16
 
-    implicitWidth: Math.max(
-        background.implicitWidth,
-        label.implicitWidth
-            + (indicator && control.checkable ? indicator.implicitWidth + spacing : 0)
-            + leftPadding + rightPadding)
-    implicitHeight: Math.max(
-        background.implicitHeight,
-        label.implicitHeight + topPadding + bottomPadding)
+    implicitWidth: enabled
+        ? Math.max(
+            background.implicitWidth,
+            label.implicitWidth
+                + (indicator && control.checkable ? indicator.implicitWidth + spacing : 0)
+                + leftPadding + rightPadding)
+        : 0
+    implicitHeight: enabled
+        ? Math.max(
+            background.implicitHeight,
+            label.implicitHeight + topPadding + bottomPadding)
+        : 0
 
     background: Rectangle
     {
         implicitHeight: 48
-        implicitWidth: 120
+        implicitWidth: 48
         color: ColorTheme.contrast3
 
         MaterialEffect

@@ -31,7 +31,6 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
-#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/controls/html_text_item.h>
 #include <ui/graphics/items/standard/graphics_label.h>
@@ -236,9 +235,7 @@ void QnResourceWidget::addInfoOverlay()
     enum { kMargin = 2 };
 
     m_overlayWidgets->detailsItem->setOptions(infoOptions);
-    m_overlayWidgets->detailsItem->setProperty(Qn::NoBlockMotionSelection, true);
     auto detailsOverlay = new QnScrollableOverlayWidget(Qt::AlignLeft, this);
-    detailsOverlay->setProperty(Qn::NoBlockMotionSelection, true);
     detailsOverlay->setContentsMargins(kMargin, 0, 0, kMargin);
     detailsOverlay->addItem(m_overlayWidgets->detailsItem);
     detailsOverlay->setMaxFillCoeff(QSizeF(0.3, 0.8));
@@ -249,9 +246,7 @@ void QnResourceWidget::addInfoOverlay()
 
 
     m_overlayWidgets->positionItem->setOptions(infoOptions);
-    m_overlayWidgets->positionItem->setProperty(Qn::NoBlockMotionSelection, true);
     auto positionOverlay = new QnScrollableOverlayWidget(Qt::AlignRight, this);
-    positionOverlay->setProperty(Qn::NoBlockMotionSelection, true);
     positionOverlay->setContentsMargins(0, 0, kMargin, kMargin);
     positionOverlay->addItem(m_overlayWidgets->positionItem);
     positionOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
@@ -275,7 +270,6 @@ void QnResourceWidget::createButtons()
 {
     QnImageButtonWidget *closeButton = createStatisticAwareButton(lit("res_widget_close"));
     closeButton->setIcon(qnSkin->icon("item/close.png"));
-    closeButton->setProperty(Qn::NoBlockMotionSelection, true);
     closeButton->setToolTip(tr("Close"));
     connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close);
 
@@ -283,13 +277,11 @@ void QnResourceWidget::createButtons()
     infoButton->setIcon(qnSkin->icon("item/info.png"));
     infoButton->setCheckable(true);
     infoButton->setChecked(item()->displayInfo());
-    infoButton->setProperty(Qn::NoBlockMotionSelection, true);
     infoButton->setToolTip(tr("Information"));
     connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
 
     QnImageButtonWidget *rotateButton = createStatisticAwareButton(lit("res_widget_rotate"));
     rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
-    rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
     rotateButton->setToolTip(tr("Rotate"));
     setHelpTopic(rotateButton, Qn::MainWindow_MediaItem_Rotate_Help);
     connect(rotateButton, &QnImageButtonWidget::pressed, this, &QnResourceWidget::rotationStartRequested);
@@ -447,6 +439,11 @@ QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry, qrea
 QRectF QnResourceWidget::calculateGeometry(const QRectF &enclosingGeometry) const
 {
     return calculateGeometry(enclosingGeometry, this->rotation());
+}
+
+QnResourceWidget::Options QnResourceWidget::options() const
+{
+    return m_options;
 }
 
 QString QnResourceWidget::titleText() const
@@ -1034,6 +1031,7 @@ void QnResourceWidget::paintWindowFrame(
     if (qFuzzyIsNull(m_frameOpacity))
         return;
 
+    QnScopedPainterOpacityRollback opacityRollback(painter, painter->opacity() * m_frameOpacity);
     static const int kFramePadding = 1;
     QnNxStyle::paintCosmeticFrame(painter, rect(), calculateFrameColor(),
         -calculateFrameWidth(), -kFramePadding); //< negative values for outer frame
