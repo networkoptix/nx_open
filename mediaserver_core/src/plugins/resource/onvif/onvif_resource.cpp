@@ -3587,7 +3587,6 @@ void QnPlOnvifResource::renewPullPointSubscriptionFallback(quint64 timerId)
     QnMutexLocker lk(&m_ioPortMutex);
     if (timerId != m_renewSubscriptionTimerID)
         return;
-    m_renewSubscriptionTimerID = 0;
     if (!m_inputMonitored)
         return;
     lk.unlock();
@@ -3595,6 +3594,7 @@ void QnPlOnvifResource::renewPullPointSubscriptionFallback(quint64 timerId)
     removePullPointSubscription();
     createPullPointSubscription();
     lk.relock();
+    m_renewSubscriptionTimerID = 0;
 }
 
 void QnPlOnvifResource::onPullMessagesResponseReceived(
