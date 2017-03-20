@@ -15,7 +15,9 @@ namespace {
 
 std::string urlToPath(const char* url)
 {
-    return utils::Url(url).hostPath();
+    if (strstr(url, "test://"))
+        return utils::Url(url).hostPath();
+    return url;
 }
 
 std::string lastPathSegment(const std::string& path)
@@ -158,11 +160,15 @@ nx_spl::IODevice* TestStorage::createIODevice(
 
 uint64_t STORAGE_METHOD_CALL TestStorage::getFreeSpace(int* ecode) const 
 {
+    if (ecode)
+        *ecode = nx_spl::error::NoError;
     return 5000LL * 1024 * 1024 * 1024;
 }
 
 uint64_t STORAGE_METHOD_CALL TestStorage::getTotalSpace(int* ecode) const 
 {
+    if (ecode)
+        *ecode = nx_spl::error::NoError;
     return 10000LL * 1024 * 1024 * 1024;
 }
 
