@@ -90,7 +90,7 @@ QCheckBox* QnBackupScheduleDialog::checkboxByDayOfWeek( Qt::DayOfWeek day ) {
 }
 
 void QnBackupScheduleDialog::initDayOfWeekCheckboxes() {
-    auto locale = QLocale::system();
+    QLocale locale;
 
     QFont nameFont = this->font();
     nameFont.setCapitalization(QFont::Capitalize);
@@ -114,7 +114,7 @@ void QnBackupScheduleDialog::initDayOfWeekCheckboxes() {
 
 void QnBackupScheduleDialog::updateDayOfWeekCheckboxes()
 {
-    auto locale = QLocale::system();
+    QLocale locale;
 
     for (size_t i = 0; i < m_dowCheckboxes.size(); ++i)
     {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QObject>
 #include <QtCore/QString>
 
 class QnAppInfo: public QObject

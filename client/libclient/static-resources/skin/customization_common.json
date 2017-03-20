@@ -734,15 +734,6 @@
         "color": "dark1.setAlpha(38)"
     },
 
-    "QnBackupCamerasDialog": {
-        "colors": {
-            "disabled": "#808080",
-            "low":  "#9eb236",
-            "high": "#ff5500",
-            "both": "#cc853d"
-        }
-    },
-
     "QnFailoverPriorityDialog": {
         "colors": {
             "never": "#808080",
@@ -772,10 +763,12 @@
     },
 
     "QnNotificationWidget" : {
+        "_": "'dark' is used to paint horizontal line, 'alternateBase' - to paint More Notifications",
         "palette": {
             "default": {
                 "dark": "dark6",
-                "windowText": "light10"
+                "windowText": "light10",
+                "alternateBase": "dark17"
             }
         }
     },

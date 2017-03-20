@@ -15,9 +15,14 @@ QString AppInfo::nativeUriProtocolDescription()
     return QStringLiteral("${client.display.name}");
 }
 
-QString AppInfo::iconFileName()
+QString AppInfo::desktopFileName()
 {
     return QStringLiteral("${installer.name}.desktop");
+}
+
+QString AppInfo::iconFileName()
+{
+    return QStringLiteral("vmsclient-${customization}.png");
 }
 
 QString AppInfo::productNameShort()

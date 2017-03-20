@@ -31,7 +31,23 @@
         <height>659</height>
        </rect>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,0,0,0,1">
+      <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,0,0,0,0,1">
+       <item>
+        <spacer name="verticalSpacer_8">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>16</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item>
         <layout class="QHBoxLayout" name="topButtonsLayout">
          <item>
@@ -853,10 +869,13 @@
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::MinimumExpanding</enum>
+         </property>
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>1</height>
+           <height>16</height>
           </size>
          </property>
         </spacer>
