@@ -276,12 +276,13 @@ void FsStubNode_forEach(
 
 int FsStubNode_fullPath(struct FsStubNode *fsNode, char *buf, int size)
 {
-    int resultSize = -1;
+    int resultSize = 1;
     struct FsStubNode *curNode = fsNode;
     int writePos, nameLen;
 
     for (; curNode; curNode = curNode->parent)
-        resultSize += strlen(curNode->name) + 1;
+        if (curNode->parent)
+            resultSize += strlen(curNode->name) + 1;
 
     if (resultSize > size)
         return resultSize;
@@ -298,7 +299,7 @@ int FsStubNode_fullPath(struct FsStubNode *fsNode, char *buf, int size)
             buf[writePos] = '/';
         }
     }
-    buf[resultSize] = '\0';
+    buf[resultSize - 1] = '\0';
 
     return resultSize;
 }
