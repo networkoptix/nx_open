@@ -15,6 +15,11 @@ QString toString(const QByteArray& t)
     return QString::fromUtf8(t);
 }
 
+QString toString(const QUrl& url)
+{
+    return url.toString(QUrl::RemovePassword);
+}
+
 QString toString(const std::string& t)
 {
     return QString::fromStdString(t);

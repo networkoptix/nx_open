@@ -35,7 +35,7 @@ public:
     void setOnReconnectedHandler(AbstractAsyncClient::ReconnectHandler handler);
 
     /** Timer is called over and over again until connection is closed */
-    void setConnectionTimer(
+    bool setConnectionTimer(
         std::chrono::milliseconds period, AbstractAsyncClient::TimerHandler handler);
 
     /** Shall be called before the last shared_pointer is gone */

@@ -218,8 +218,8 @@ public:
         const AccountWithPassword& account,
         const std::string& systemId);
 
-    api::ResultCode getVmsConnections(
-        api::VmsConnectionDataList* const vmsConnections);
+    api::ResultCode getVmsConnections(api::VmsConnectionDataList* const vmsConnections);
+    api::ResultCode getStatistics(api::Statistics* const statistics);
 
     bool isStartedWithExternalDb() const;
     bool placePreparedDB(const QString& dbDumpPath);
