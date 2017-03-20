@@ -1,0 +1,17 @@
+<div class="modal-header">
+    <h3 class="modal-title">시스템 재시작</h3>
+</div>
+
+<form class="form" role="form" id="restartDialog">
+    <div class="col-sm-12">
+        <p>시스템 재시작은 시간이 좀 걸릴 수 있습니다. 이후에 자동으로 페이지가 새로 고쳐집니다.</p>
+        <progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</progressbar>
+
+        <p>아무런 반응이 없을시 페이지를 수동으로 새로고침 하세요</p>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">새로고침</button>
+    </div>
+
+</form>

@@ -40,6 +40,7 @@ namespace {
     const qint64 correctionThreshold = 5000;
     const auto kDefaultWindowSize = std::chrono::milliseconds(std::chrono::hours(24)).count();
     const qint64 kMSecsInMinute = 60 * 1000;
+    const qint64 kMinimumAnimationTickMs = 10;
 
     struct TextMarkInfo
     {
@@ -1279,7 +1280,7 @@ void QnTimelinePrivate::updateStripesTextures()
 
 void QnTimelinePrivate::animateProperties()
 {
-    qint64 dt = 10;
+    qint64 dt = kMinimumAnimationTickMs;
 
     {
         auto time = animationTimer.elapsed();

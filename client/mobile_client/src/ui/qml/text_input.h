@@ -2,6 +2,8 @@
 
 #include <QtQuick/private/qquicktextinput_p.h>
 
+class QQuickMouseEvent;
+
 class QnQuickTextInputPrivate;
 
 class QnQuickTextInput: public QQuickTextInput
@@ -58,8 +60,9 @@ signals:
     void scrollByMouseChanged();
     void backgroundChanged();
     void placeholderTextChanged();
-    void clicked();
-    void pressAndHold(const QPoint& pos);
+    void clicked(QQuickMouseEvent* event);
+    void pressAndHold(QQuickMouseEvent* event);
+    void doubleClicked(QQuickMouseEvent* event);
     void enterKeyTypeChanged();
 
 protected:
@@ -67,10 +70,8 @@ protected:
     virtual void mousePressEvent(QMouseEvent* event) override;
     virtual void mouseMoveEvent(QMouseEvent* event) override;
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
+    virtual void mouseDoubleClickEvent(QMouseEvent* event) override;
     virtual void keyPressEvent(QKeyEvent* event) override;
-
-private:
-    void emitPressAndHold();
 
 private:
     Q_DECLARE_PRIVATE(QnQuickTextInput)
@@ -80,6 +81,4 @@ private:
     int m_selectionStart = -1;
     int m_selectionEnd = -1;
     int m_cursorPosition = -1;
-    QTimer* m_pressAndHoldTimer = nullptr;
-    EnterKeyType m_enterKeyType = EnterKeyDefault;
 };
