@@ -468,7 +468,7 @@ private:
 
     NxUi::AbstractWorkbenchPanel* m_panel = nullptr;
     QGraphicsItem* m_backgroundItem = nullptr;
-    QnLayoutFlags m_flags = QnLayoutFlag::NoTimeline;
+    QnLayoutFlags m_flags = QnLayoutFlag::Empty;
     QIcon m_icon;
 };
 
