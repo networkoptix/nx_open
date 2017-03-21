@@ -84,6 +84,10 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
     ui->setupUi(this);
     retranslateUi();
 
+    setWindowFlags(windowFlags()
+        | Qt::WindowMaximizeButtonHint
+        | Qt::MaximizeUsingFullscreenGeometryHint);
+
     setWarningStyle(ui->warningLabel);
 
     setHelpTopic(this, Qn::AuditTrail_Help);

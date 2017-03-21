@@ -15,6 +15,10 @@ QnSearchBookmarksDialog::QnSearchBookmarksDialog(
     d_ptr(new QnSearchBookmarksDialogPrivate(filterText, utcStartTimeMs, utcFinishTimeMs, this))
 {
     setHelpTopic(this, Qn::Bookmarks_Search_Help);
+
+    setWindowFlags(windowFlags()
+        | Qt::WindowMaximizeButtonHint
+        | Qt::MaximizeUsingFullscreenGeometryHint);
 }
 
 QnSearchBookmarksDialog::~QnSearchBookmarksDialog()
