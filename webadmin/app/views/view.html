@@ -58,7 +58,7 @@
                             <camera-links ng-if="cameraLinksEnabled"
                                           position="positionProvider.playedPosition"
                                           live-mode="positionProvider.liveMode"
-                                          active-camera="activeCamera" player="player" resolution-hls="resolutionHls"></camera-links>
+                                          active-camera="activeCamera" player="player" current-resolution="currentResolution"></camera-links>
                             <ul class="tree nav" >
                                 <li ng-repeat="server in mediaServers" ng-if="server.visible">
                                     <a ng-if="server.allowAutoRedundancy || server.flags.indexOf('SF_Edge')<0 "
@@ -179,7 +179,7 @@
                                 <videowindow ng-class="{invisible: iOSVideoTooLarge || !positionSelected && (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
                                              vg-update-time="updateTime($currentTime, $duration)"
                                              vg-player-ready="playerReady($API)"
-                                             vg-src="acitveVideoSource" player="player">
+                                             vg-src="activeVideoSource" player="player">
                                 </videowindow>
                             </div>
 

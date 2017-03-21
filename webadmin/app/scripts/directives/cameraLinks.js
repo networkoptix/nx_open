@@ -12,8 +12,7 @@ angular.module('webadminApp')
                 position: "=",
                 liveMode: "=",
                 player: "=",
-                resolutionHls: "="
-
+                currentResolution: "="
             },
             templateUrl: Config.viewsDir + 'components/cameraLinks.html',
             link: function (scope, element/*, attrs*/) {
@@ -37,23 +36,18 @@ angular.module('webadminApp')
                 scope.formatLink = function(camera, stream,transport){
                     var linkTemplates = {
                         'preview': 'http://{{host}}/api/image?physicalId={{physicalId}}{{previewPosition}}{{auth}}',
-                        'rtsp':'rtsp://{{host}}/{{physicalId}}?stream={{streamIndex}}{{position}}{{auth}}',
-                        'transrtsp':'rtsp://{{host}}/{{physicalId}}?stream={{streamIndex}}{{position}}&resolution={{resolution}}{{auth}}',
                         'hls':'http://{{host}}/hls/{{physicalId}}.m3u8?{{streamLetter}}{{position}}{{auth}}',
                         'webm':'http://{{host}}/media/{{physicalId}}.webm?pos={{position}}&resolution={{resolution}}{{auth}}',
                         'mjpeg':'http://{{host}}/media/{{physicalId}}.mpjpeg?pos={{position}}&resolution={{resolution}}{{auth}}',
                         'download':'http://{{host}}/hls/{{physicalId}}.mkv?{{streamLetter}}{{position}}&duration={{duration}}{{auth}}'
                     };
-                    if(stream == -1 && transport == 'rtsp'){
-                        transport='transrtsp';
-                    }
 
                     return linkTemplates[transport].
                         replace("{{host}}", window.location.host).
                         replace("{{physicalId}}", camera.physicalId).
                         replace("{{streamIndex}}", stream).
                         replace("{{streamLetter}}", stream?'lo':'hi').
-                        replace("{{auth}}", !scope.useAuth?'':'&auth=' + (transport=='rtsp'?mediaserver.authForRtsp():mediaserver.authForMedia())).
+                        replace("{{auth}}", !scope.useAuth?'':'&auth=' + (mediaserver.authForMedia())).
                         replace("{{position}}", scope.liveMode || !scope.position?'':'&pos=' + scope.position).
                         replace("{{previewPosition}}", scope.liveMode || !scope.position?'&time=LATEST':'&time=' + scope.position).
                         replace("{{duration}}", scope.duration).

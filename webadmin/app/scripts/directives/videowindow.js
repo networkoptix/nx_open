@@ -31,7 +31,6 @@ angular.module('webadminApp')
             templateUrl: Config.viewsDir + 'components/videowindow.html',// ???
 
             link: function (scope, element/*, attrs*/) {
-
                 var mimeTypes = {
                     'hls': 'application/x-mpegURL',
                     'webm': 'video/webm',
@@ -91,6 +90,7 @@ angular.module('webadminApp')
                     }
                     var weHaveWebm = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['webm'];});
                     var weHaveHls = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['hls'];});
+                    var jsHlsSupported = Hls.isSupported();
 
                     //Should Catch MS edge, Safari, Mobile Devices
                     if(weHaveHls && (canPlayNatively("hls") || window.jscd.mobile)){
@@ -113,19 +113,19 @@ angular.module('webadminApp')
                     switch(window.jscd.browser){
                         case 'Microsoft Internet Explorer':
                             // Check version here
-                            if(window.jscd.browserMajorVersion>=10 && weHaveHls){
+                            if(jsHlsSupported && weHaveHls){
                                 return "jshls";
                             }
-                            if(window.jscd.flashVersion){ // We have flash - try to play using flash
+                            if(window.jscd.flashVersion && weHaveHls){ // We have flash - try to play using flash
                                 return "flashls";
                             }
                             if (weHaveWebm){
                                 return 'webm';
                             }
                             //Could not find a supported player for the Browser gonna display whats needed instead.
-                            if(!weHaveWebm){
+                            if(weHaveWebm){
                                 if(window.jscd.osVersion < 10){
-                                    if(!weHaveHls){
+                                    if(weHaveHls){
                                         scope.flashOrWebmRequired = true;
                                     }
                                     else{
@@ -148,10 +148,10 @@ angular.module('webadminApp')
                         case "Opera":
                         case "Webkit":
                         default:
-                            if(weHaveHls) {
+                            if(jsHlsSupported && weHaveHls) {
                                 return "jshls";// We are hoping that we have some good browser
                             }
-                            if(window.jscd.flashVersion){ // We have flash - try to play using flash
+                            if(window.jscd.flashVersion &&  weHaveHls){ // We have flash - try to play using flash
                                 return "flashls";
                             }
                             if(weHaveWebm){
@@ -168,14 +168,14 @@ angular.module('webadminApp')
                 //TODO: remove ID, generate it dynamically
 
                 var activePlayer = null;
-                function newPlayer(player){
+                function recyclePlayer(player){
                     if(activePlayer != player) {
                         element.find(".videoplayer").html("");
                         scope.vgPlayerReady({$API: null});
                         activePlayer = player;
-                        return true;
+                        return false;
                     }
-                    return false;
+                    return true;
                 }
 
                 // TODO: Create common interface for each player, html5 compatible or something
@@ -304,7 +304,7 @@ angular.module('webadminApp')
                     scope.errorLoading = false;
                     if(scope.vgSrc ) {
                         format = detectBestFormat();
-                        if(newPlayer(format)){ // Remove or recycle old player.
+                        if(!recyclePlayer(format)){ // Remove or recycle old player.
                             // Some problem happened. We must reload video here
                             $timeout(srcChanged);
                         }
