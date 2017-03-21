@@ -43,6 +43,8 @@
 
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/collection.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/recording_status_helper.h>
@@ -84,7 +86,6 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
-#include <nx/utils/collection.h>
 #include <utils/common/html.h>
 #include <utils/common/delayed.h>
 #include <utils/license_usage_helper.h>
@@ -554,9 +555,8 @@ void QnMediaResourceWidget::invokeTrigger(const QString& id, const QnUuid& resou
             if (success && result.error == QnRestResult::NoError)
                 return;
 
-            QnMessageBox::warning(mainWindow(),
-                tr("Failed to invoke trigger %1").arg(id),
-                result.errorString);
+            NX_LOG(tr("Failed to invoke trigger %1 (%2)").arg(id).arg(result.errorString),
+                cl_logERROR);
         };
 
     qnCommon->currentServer()->restConnection()->softwareTriggerCommand(
