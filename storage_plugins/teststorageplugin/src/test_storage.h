@@ -74,11 +74,10 @@ public: // plugin interface implementation
     virtual unsigned int releaseRef() override;
 
 private:
-    virtual nx_spl::IODevice* createIODevice(
-        const std::string& name, 
-        int category, 
-        int flags, 
-        int size,
+    virtual nx_spl::IODevice* createIODevice(const std::string& name,
+        int category,
+        int flags,
+        int64_t size,
         int* ecode) const;
 
 private:

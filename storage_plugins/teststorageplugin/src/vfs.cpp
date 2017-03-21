@@ -11,6 +11,28 @@
 
 namespace utils {
 
+namespace {
+#if defined(__linux__)
+#include <sys/stat.h>
+
+int64_t fileSize(const std::string& fileName)
+{
+    struct stat st;
+    if (stat(fileName.c_str(), &st) != 0)
+        return 0;
+
+    return st.st_size;
+}
+
+#elif defined (_WIN32)
+int64_t fileSize(const std::string& fileName)
+{
+    return 0;
+}
+#endif
+
+}
+
 std::string jsonTypeName(enum JsonType type)
 {
     switch (type)
@@ -138,6 +160,7 @@ bool utils::buildVfsFromJson(const char* jsonString, const char* rootPath, VfsPa
     if (!checkJsonObjValue(sampleVal, jsonStringT, kSampleKey, jsonString))
         return false;
     outVfsPair->sampleFilePath = sampleVal->u.string;
+    outVfsPair->sampleFileSize = fileSize(outVfsPair->sampleFilePath);
 
     /* cameras */
     const char* kCamerasKey = "cameras";

@@ -131,14 +131,15 @@ nx_spl::IODevice* STORAGE_METHOD_CALL TestStorage::open(const char* url, int fla
         return nullptr;
     }
 
-    return createIODevice(m_vfsPair.sampleFilePath, (int)category, flags, 1, ecode);
+    return createIODevice(m_vfsPair.sampleFilePath, (int)category,
+                          flags, m_vfsPair.sampleFileSize, ecode);
 }
 
 nx_spl::IODevice* TestStorage::createIODevice(
     const std::string& name, 
     int category, 
     int flags, 
-    int size,
+    int64_t size,
     int* ecode) const
 {
     FILE* f = nullptr;

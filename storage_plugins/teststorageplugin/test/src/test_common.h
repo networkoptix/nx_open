@@ -106,7 +106,7 @@ public:
         const std::string& name, 
         int category, 
         int flags, 
-        int size,
+        int64_t size,
         int* ecode) const override
     {
         if (ecode)

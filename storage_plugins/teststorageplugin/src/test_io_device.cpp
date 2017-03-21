@@ -64,8 +64,6 @@ uint32_t TestIODevice::read(void* dst, const uint32_t size, int* ecode) const
     switch (m_category)
     {
     case FileCategory::db:
-        LOG("[TestStorage, IODevice, read] attempt to read from DB file %s. "
-            " That shouldn't happen\n", m_sampleFileName.c_str());
         setEcode(ecode, nx_spl::error::UnknownError);
         return 0;
     case FileCategory::infoTxt:
@@ -91,7 +89,7 @@ uint32_t TestIODevice::readImpl(void* dst, uint32_t size, int* ecode) const
         return 0;
     }
     setEcode(ecode, nx_spl::error::NoError);
-    return fread(dst, size, 1, m_file);
+    return fread(dst, 1, size, m_file);
 }
 
 int TestIODevice::getMode() const 
@@ -103,7 +101,7 @@ uint32_t TestIODevice::size(int* ecode) const
 {
     if (ecode)
         *ecode = nx_spl::error::NoError;
-    return 0;
+    return m_size;
 }
 
 int TestIODevice::seek(uint64_t pos, int* ecode)
@@ -145,6 +143,7 @@ int TestIODevice::seekImpl(uint64_t pos, int* ecode)
         return 0;
     }
 
+    setEcode(ecode, nx_spl::error::NoError);
     return 1;
 }
 
@@ -163,4 +162,15 @@ TestIODevice::TestIODevice(const std::string& name, FileCategory category, int m
     m_file(f),
     m_camInfoPos(0)
 {
+    switch (category)
+    {
+    case FileCategory::db:
+        m_size = 0;
+        break;
+    case FileCategory::media:
+        break;
+    case FileCategory::infoTxt:
+        m_size = strlen(kCamInfo);
+        break;
+    }
 }

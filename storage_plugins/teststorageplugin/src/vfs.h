@@ -2,6 +2,7 @@
 
 #include <string>
 #include <functional>
+#include <cstdint>
 #include "detail/fs_stub.h"
 
 namespace utils {
@@ -11,6 +12,7 @@ std::string fsJoin(const std::string& subPath1, const std::string& subPath2);
 struct VfsPair
 {
     std::string sampleFilePath;
+    int64_t sampleFileSize;
     FsStubNode* root;
 
     VfsPair() : root(nullptr) {}
