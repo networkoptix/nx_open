@@ -1,14 +1,6 @@
 #include "software_trigger_icons.h"
 #include <ui/style/skin.h>
 
-QIcon QnSoftwareTriggerIcons::iconByName(const QString& name)
-{
-    const auto icon = qnSkin->icon(iconsPath() + name + lit(".png"));
-    return icon.isNull()
-        ? iconByName(defaultIconName())
-        : icon;
-}
-
 QString QnSoftwareTriggerIcons::iconsPath()
 {
     return lit("soft_triggers/");
@@ -16,7 +8,7 @@ QString QnSoftwareTriggerIcons::iconsPath()
 
 QString QnSoftwareTriggerIcons::defaultIconName()
 {
-    return lit("_lights_on");
+    return lit("_bell_on");
 }
 
 const QStringList& QnSoftwareTriggerIcons::iconNames()
@@ -46,4 +38,20 @@ const QStringList& QnSoftwareTriggerIcons::iconNames()
     });
 
     return iconNames;
+}
+
+QPixmap QnSoftwareTriggerIcons::pixmapByName(const QString& name)
+{
+    const auto pixmap = qnSkin->pixmap(iconsPath() + name + lit(".png"));
+    return pixmap.isNull()
+        ? pixmapByName(defaultIconName())
+        : pixmap;
+}
+
+QIcon QnSoftwareTriggerIcons::iconByName(const QString& name)
+{
+    const auto icon = qnSkin->icon(iconsPath() + name + lit(".png"));
+    return icon.isNull()
+        ? iconByName(defaultIconName())
+        : icon;
 }

@@ -28,6 +28,11 @@ QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(QWidg
     connect(ui->usersButton, &QPushButton::clicked, this,
         &QnSoftwareTriggerBusinessEventWidget::at_usersButton_clicked);
 
+    auto columnCount = qCeil(qSqrt(QnSoftwareTriggerIcons::iconNames().size()));
+    if (columnCount % 2) //< ensure the number of columns is even
+        ++columnCount;
+    ui->iconComboBox->setColumnCount(columnCount);
+
     ui->iconComboBox->setIcons(
         QnSoftwareTriggerIcons::iconsPath(),
         QnSoftwareTriggerIcons::iconNames());

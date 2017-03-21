@@ -529,8 +529,7 @@ void QnMediaResourceWidget::resetSoftwareTriggerButtons()
     for (auto iter = m_softwareTriggers.cbegin(); iter != m_softwareTriggers.cend(); ++iter)
     {
         const auto trigger = new QnSoftwareTriggerButton(this);
-        trigger->setIcon(QnSoftwareTriggerIcons::iconByName(iter.value()));
-        trigger->setFixedSize(qnSkin->maximumSize(trigger->icon()));
+        trigger->setIcon(iter.value());
         trigger->setToolTip(QnBusinessStringsHelper::getSoftwareTriggerName(iter.key()));
 
         m_softwareTriggerIds << overlayWidgets()->triggersOverlay->insertItem(pos++, trigger);

@@ -20,18 +20,25 @@ public:
     Qt::Edge toolTipEdge() const;
     void setToolTipEdge(Qt::Edge edge);
 
+    QSize buttonSize() const;
+    void setButtonSize(const QSize& size);
+
+    /* Set icon by name. Pixmap will be obtained from QnSoftwareTriggerIcons::pixmapByName. */
+    void setIcon(const QString& name);
+
 protected:
-    //TODO: #vkutin #common Remove this when normal icons have proper background.
-    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
-        QWidget* widget) override;
+    using base_type::setIcon;
 
 private:
     void updateToolTipPosition();
     void updateToolTipTailEdge();
     void updateToolTipVisibility();
+    void generateIcon();
 
 private:
     QnStyledTooltipWidget* const m_toolTip;
     HoverFocusProcessor* const m_toolTipHoverProcessor;
     Qt::Edge m_toolTipEdge;
+    QString m_iconName;
+    QSize m_buttonSize;
 };
