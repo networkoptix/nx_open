@@ -5,6 +5,7 @@
 #include <utils/common/connective.h>
 #include <finders/systems_finder.h>
 #include <nx/utils/disconnect_helper.h>
+#include <nx/utils/collection.h>
 #include <network/system_description.h>
 #include <client_core/client_core_settings.h>
 
@@ -362,19 +363,21 @@ bool QnSystemHostsModel::lessThan(
     const auto leftUrl = sourceLeft.data(UrlRole).toUrl();
     const auto rightUrl = sourceRight.data(UrlRole).toUrl();
     if (!leftUrl.isValid() || !rightUrl.isValid())
+    {
+        NX_ASSERT(false, "Urls should be valid");
         return sourceLeft.row() < sourceRight.row();
+    }
 
     const auto recentUrls = hostsModel()->recentConnectionUrls();
     const auto getIndexOfConnection =
         [recentUrls](const QUrl& url) -> int
         {
-            const auto it = std::find_if(recentUrls.begin(), recentUrls.end(),
+            return qnIndexOf(recentUrls,
                 [url, recentUrls](const QUrl& recentUrl)
                 {
                     return ((recentUrl.host() == url.host())
                         && isSamePort(recentUrl.port(), url.port()));
                 });
-            return (it == recentUrls.end() ? -1 : std::distance(it, recentUrls.begin()));
         };
 
     const int leftIndex = getIndexOfConnection(leftUrl);
@@ -418,5 +421,5 @@ QUrl QnSystemHostsModel::firstHost() const
 
 QnSystemHostsModel::HostsModel* QnSystemHostsModel::hostsModel() const
 {
-    return dynamic_cast<HostsModel*>(sourceModel());
+    return static_cast<HostsModel*>(sourceModel());
 }

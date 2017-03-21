@@ -28,7 +28,9 @@ private:
     QnMediaDewarpingParams m_mediaDewarping;
     QnItemDewarpingParams m_itemDewarping;
     QSize m_lastImageSize;
-    QPointF* m_transform[MAX_COLOR_PLANES];
+
+    typedef QVector<QPointF> PointsVector;
+    PointsVector m_transform[MAX_COLOR_PLANES];
     QScopedPointer<CLVideoDecoderOutput> m_tmpBuffer;
     int m_lastImageFormat;
 };

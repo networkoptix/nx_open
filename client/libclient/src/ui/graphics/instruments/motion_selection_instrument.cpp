@@ -20,7 +20,8 @@
 
 namespace {
 
-auto motionSelectionEnabled = [](QnMediaResourceWidget* widget)
+auto motionSelectionEnabled =
+    [](QnMediaResourceWidget* widget)
     {
         NX_ASSERT(widget);
         if (!widget)
@@ -32,7 +33,8 @@ auto motionSelectionEnabled = [](QnMediaResourceWidget* widget)
     };
 
 // This way we detect widget that can possibly have DisplayMotion enabled
-auto widgetWithMotion = [](QGraphicsItem* item)
+auto widgetWithMotion =
+    [](QGraphicsItem* item)
     {
         if (auto widget = dynamic_cast<QnMediaResourceWidget*>(item))
             return widget->resource()->toResource()->hasFlags(Qn::motion);
