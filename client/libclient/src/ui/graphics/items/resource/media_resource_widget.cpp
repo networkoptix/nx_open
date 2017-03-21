@@ -104,7 +104,7 @@ static constexpr int kMicroInMilliSeconds = 1000;
 // Who returns it? --gdm?
 static constexpr int kNoTimeValue = 0;
 
-static constexpr qreal kTwoWayAudioButtonSize = 44.0;
+static constexpr qreal kTwoWayAudioButtonSize = 40.0;
 
 static constexpr qreal kMotionRegionAlpha = 0.4;
 
