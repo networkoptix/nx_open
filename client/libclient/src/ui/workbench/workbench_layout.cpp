@@ -69,6 +69,60 @@ QnWorkbenchLayout::~QnWorkbenchLayout() {
     clear();
 }
 
+QnLayoutFlags QnWorkbenchLayout::flags() const
+{
+    return m_flags;
+}
+
+QIcon QnWorkbenchLayout::icon() const
+{
+    return m_icon;
+}
+
+void QnWorkbenchLayout::setIcon(const QIcon& value)
+{
+    m_icon = value;
+    emit iconChanged();
+}
+
+void QnWorkbenchLayout::setFlags(QnLayoutFlags value)
+{
+    if (m_flags == value)
+        return;
+
+    m_flags = value;
+    emit flagsChanged();
+}
+
+
+NxUi::AbstractWorkbenchPanel* QnWorkbenchLayout::panel() const
+{
+    return m_panel;
+}
+
+void QnWorkbenchLayout::setPanel(NxUi::AbstractWorkbenchPanel* value)
+{
+    if (m_panel == value)
+        return;
+
+    m_panel = value;
+    emit panelChanged();
+}
+
+QGraphicsItem* QnWorkbenchLayout::backgroundItem() const
+{
+    return m_backgroundItem;
+}
+
+void QnWorkbenchLayout::setBackgroundItem(QGraphicsItem* value)
+{
+    if (m_backgroundItem == value)
+        return;
+
+    m_backgroundItem = value;
+    emit backgroundItemChanged();
+}
+
 QnLayoutResourcePtr QnWorkbenchLayout::resource() const {
     QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(const_cast<QnWorkbenchLayout *>(this));
     if(synchronizer == NULL)

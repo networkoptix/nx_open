@@ -7,14 +7,15 @@
 #include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_pool.h"
 
-QnLayoutResource::QnLayoutResource():
+QnLayoutResource::QnLayoutResource(Qn::LayoutResourceType type):
     base_type(),
     m_items(new QnThreadsafeItemStorage<QnLayoutItemData>(&m_mutex, this)),
     m_cellAspectRatio(-1.0),
     m_cellSpacing(-1.0),
     m_backgroundSize(1, 1),
     m_backgroundOpacity(0.7),
-    m_locked(false)
+    m_locked(false),
+    m_type(type)
 {
     addFlags(Qn::layout);
     setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kLayoutTypeId));
@@ -32,6 +33,10 @@ Qn::ResourceStatus QnLayoutResource::getStatus() const
     return Qn::Online;
 }
 
+Qn::LayoutResourceType QnLayoutResource::type() const
+{
+    return m_type;
+}
 
 QnLayoutResourcePtr QnLayoutResource::clone() const
 {

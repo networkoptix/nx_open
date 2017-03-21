@@ -27,10 +27,9 @@ class QnLayoutResource: public QnResource,
     typedef QnResource base_type;
 
 public:
-    QnLayoutResource();
+    QnLayoutResource(Qn::LayoutResourceType type = Qn::LayoutResourceType::defaultLayout);
 
-
-    Qn::LayoutResourceType type() { return Qn::LayoutResourceType::defaultLayout; }
+    Qn::LayoutResourceType type() const;
 
     virtual QString getUniqueId() const override;
     virtual Qn::ResourceStatus getStatus() const override;
@@ -140,6 +139,7 @@ private:
     QString m_backgroundImageFilename;
     qreal m_backgroundOpacity;
     bool m_locked;
+    Qn::LayoutResourceType m_type;
 };
 
 Q_DECLARE_METATYPE(QnLayoutResourcePtr);
