@@ -25,7 +25,8 @@ class TestServer:
 {
 public:
     TestServer(const nx::stun::MessageDispatcher& dispatcher):
-        SocketServer(&dispatcher, false)
+        SocketServer(&dispatcher, false),
+        m_totalConnectionsAccepted(0)
     {
     }
 
@@ -41,14 +42,23 @@ public:
 
     std::vector<std::shared_ptr<ServerConnection>> connections;
 
+    std::size_t totalConnectionsAccepted() const
+    {
+        return m_totalConnectionsAccepted.load();
+    }
+
 protected:
     virtual std::shared_ptr<ServerConnection> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) override
     {
+        ++m_totalConnectionsAccepted;
         auto connection = SocketServer::createConnection(std::move(_socket));
         connections.push_back(connection);
         return connection;
     };
+
+private:
+    std::atomic<std::size_t> m_totalConnectionsAccepted;
 };
 
 class StunClientServerTest:
@@ -173,7 +183,8 @@ TEST_F(StunClientServerTest, Connectivity)
     // TODO: It may take an undefined time for server->connectionCount() to be increased.
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    ASSERT_EQ(1U, server->connectionCount());
+    ASSERT_EQ(1U, server->connectionCount()) << 
+        "Total connections accepted: " << server->totalConnectionsAccepted();
 
     ASSERT_TRUE(client->addConnectionTimer(timerPeriod, incrementTimer, nullptr));
     std::this_thread::sleep_for(timerPeriod * 5);
