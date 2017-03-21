@@ -101,7 +101,9 @@ int TestIODevice::getMode() const
 
 uint32_t TestIODevice::size(int* ecode) const
 {
-    return m_size;
+    if (ecode)
+        *ecode = nx_spl::error::NoError;
+    return 0;
 }
 
 int TestIODevice::seek(uint64_t pos, int* ecode)
