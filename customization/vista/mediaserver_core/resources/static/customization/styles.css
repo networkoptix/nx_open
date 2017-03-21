@@ -3,11 +3,11 @@
     background-color: black; }
 
 
-.navbar-default .navbar-nav>li>a {
+#top.navbar-default .navbar-nav>li>a {
     color: white; }
 
 
-.navbar-default .navbar-nav>li>a:hover {
+#topS.navbar-default .navbar-nav>li>a:hover {
     background-color: black; }
 
 #top a.navbar-brand:hover {

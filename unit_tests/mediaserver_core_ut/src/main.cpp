@@ -2,6 +2,7 @@
 #include "utils.h"
 
 #include <nx/network/test_support/run_test.h>
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 
 nx::ut::cfg::Config config;
 
@@ -48,5 +49,13 @@ int main(int argc, char** argv)
         arguments.push_back(QString::fromUtf8(argv[i]));
     fillConfig(arguments);
 #endif
-    return nx::network::test::runTest(argc, argv);
+    return nx::network::test::runTest(
+        argc, argv,
+        [](const nx::utils::ArgumentParser& args)
+        {
+            if (const auto value = args.get("tmp"))
+                nx::utils::test::TestWithTemporaryDirectory::setTemporaryDirectoryPath(*value);
+            return nx::utils::test::DeinitFunctions();
+        },
+        0);
 }

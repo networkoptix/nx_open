@@ -127,29 +127,28 @@ QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) co
             auto resource = index.sibling(index.row(), NameColumn).
                 data(Qn::ResourceRole).value<QnResourcePtr>();
 
-            /* Providers calculation is a bit long so using it only when needed. */
-            QnResourceList providers;
-            auto source = (role == Qt::ToolTipRole)
-                ? qnResourceAccessProvider->accessibleVia(m_subject, resource, &providers)
-                : qnResourceAccessProvider->accessibleVia(m_subject, resource);
-
             switch (role)
             {
                 case Qt::DecorationRole:
                 {
-                    switch (source)
-                    {
-                        case QnAbstractResourceAccessProvider::Source::layout:
-                            return qnResIconCache->icon(QnResourceIconCache::Layout);
-                        case QnAbstractResourceAccessProvider::Source::videowall:
-                            return qnResIconCache->icon(QnResourceIconCache::VideoWall);
-                        default:
-                            return QVariant();
-                    }
+                    const auto accessLevels = qnResourceAccessProvider->accessLevels(m_subject,
+                        resource);
+
+                    if (accessLevels.contains(QnAbstractResourceAccessProvider::Source::layout))
+                        return qnResIconCache->icon(QnResourceIconCache::SharedLayout);
+
+                    if (accessLevels.contains(QnAbstractResourceAccessProvider::Source::videowall))
+                        return qnResIconCache->icon(QnResourceIconCache::VideoWall);
+
+                    return QVariant();
                 }
 
                 case Qt::ToolTipRole:
+                {
+                    QnResourceList providers;
+                    qnResourceAccessProvider->accessibleVia(m_subject, resource, &providers);
                     return getTooltip(providers);
+                }
 
                 case Qn::DisabledRole:
                     return index.sibling(index.row(), NameColumn).data(role);

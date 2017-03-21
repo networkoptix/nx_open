@@ -116,6 +116,7 @@ def make_vbox_netnat_command(net_idx, network):
 def make_vbox_host_time_disabled_command():
     return VirtualBoxConfigCommand([':setextradata', ':id', '"VBoxInternal/Devices/VMMDev/0/Config/GetHostTimeDisabled"', '1'])
 
+
 class BoxConfigFactory(object):
 
     def __init__(self, company_name):

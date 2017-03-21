@@ -192,6 +192,13 @@ void SocketFactory::setIpVersion(const QString& ipVersion)
     ::abort();
 }
 
+nx::network::IpVersion SocketFactory::setUdpIpVersion(nx::network::IpVersion ipVersion)
+{
+    const int prevVersion = s_udpIpVersion.load();
+    s_udpIpVersion = static_cast<int>(ipVersion);
+    return static_cast<nx::network::IpVersion>(prevVersion);
+}
+
 int SocketFactory::udpIpVersion()
 {
     return s_udpIpVersion;

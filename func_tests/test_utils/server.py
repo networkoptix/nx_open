@@ -18,6 +18,7 @@ import pytz
 import tzlocal
 import requests.exceptions
 import pytest
+import utils
 from .server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_SEC, HttpError, ServerRestApi
 from .vagrant_box_config import BoxConfigFactory, BoxConfig
 from .cloud_host import CloudHost
@@ -177,7 +178,6 @@ class ServerConfig(object):
         self.leave_initial_cloud_host = leave_initial_cloud_host  # bool
         self.box = box or box_config_factory()
         self.config_file_params = config_file_params  # dict or None
-
 
     def __repr__(self):
         return 'ServerConfig(%r @ %s)' % (self.name, self.box)
@@ -527,7 +527,7 @@ class Storage(object):
     # server/var/data/data/low_quality/urn_uuid_b0e78864-c021-11d3-a482-f12907312681/2017/01/27/12/1485511093576_21332.mkv
     def _construct_fpath(self, camera_mac_addr, quality_part, start_time, duration):
         local_dt = start_time.astimezone(self.box.timezone)  # box local
-        unixtime_utc_ms = calendar.timegm(start_time.utctimetuple())*1000 + start_time.microsecond/1000
+        unixtime_utc_ms = utils.datetime_utc_to_timestamp(start_time)
         duration_ms = int(duration.total_seconds() * 1000)
         return os.path.join(
             self.dir, quality_part, camera_mac_addr,

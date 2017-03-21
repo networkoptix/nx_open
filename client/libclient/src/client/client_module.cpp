@@ -3,6 +3,7 @@
 #include <memory>
 
 #include <QtWidgets/QApplication>
+#include <QtWebKit/QWebSettings>
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
@@ -168,6 +169,9 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     initNetwork(startupParams);
     initSkin(startupParams);
     initLocalResources(startupParams);
+
+    QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
+    QWebSettings::globalSettings()->enablePersistentStorage();
 }
 
 QnClientModule::~QnClientModule()

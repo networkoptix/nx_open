@@ -13,6 +13,9 @@ option(rdepSync
     "Whether rdep should sync packages or use only existing copies"
     ON)
 
+set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
+    "One of [Debug Release RelWithDebInfo MinSizeRel].")
+
 project(vms VERSION 3.0.0)
 
 set(releaseVersion ${PROJECT_VERSION})
