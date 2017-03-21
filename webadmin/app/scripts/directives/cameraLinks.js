@@ -35,7 +35,6 @@ angular.module('webadminApp')
                 };
 
                 scope.formatLink = function(camera, stream,transport){
-                    scope.transport = transport;
                     var linkTemplates = {
                         'preview': 'http://{{host}}/api/image?physicalId={{physicalId}}{{previewPosition}}{{auth}}',
                         'rtsp':'rtsp://{{host}}/{{physicalId}}?stream={{streamIndex}}{{position}}{{auth}}',
@@ -59,7 +58,10 @@ angular.module('webadminApp')
                         replace("{{previewPosition}}", scope.liveMode || !scope.position?'&time=LATEST':'&time=' + scope.position).
                         replace("{{duration}}", scope.duration).
                         replace("{{resolution}}", scope.resolution);
-                }
+                };
+
+                scope.$watch("player",function(){scope.transport = scope.player == 'webm' ? 'webm' : 'hls'});
+
             }
         };
     }]);

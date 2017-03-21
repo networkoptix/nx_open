@@ -5,9 +5,8 @@ var hlsAPI = new (function(){
     enableWorker = true,
     levelCapping = -1,
     defaultAudioCodec = undefined,
-    dumpfMP4 = false,
-    readyToPlay = false,
-    urlToPlay;
+    dumpfMP4 = false;
+
     this.init = function(element, readyHandler, errorHandler){
         video = element[0];
         if(Hls.isSupported()) {
@@ -50,6 +49,7 @@ var hlsAPI = new (function(){
                 load : data.stats.tload - data.stats.tfirst,
                 duration : data.stats.tload - data.stats.tfirst,
             };
+
             events.load.push(event);
         });
         hls.on(Hls.Events.MANIFEST_PARSED,function(event,data) {
@@ -377,26 +377,16 @@ var hlsAPI = new (function(){
         this.readyHandler(this);
     };
     this.play = function(offset){
-        if(!readyToPlay)
-            return;
         video.play();
     };
     this.pause = function(){
         video.pause();
     };
     this.load = function(url){
-        readyToPlay = false;
-        urlToPlay = url;
         hls.loadSource(url);
         hls.autoLevelCapping = levelCapping;
         hls.attachMedia(video);
     };
-
-    this.readyToPlay = function(){
-        readyToPlay = true;
-        if(urlToPlay)
-            this.play();
-    }
 
     var lastSeekingIdx, lastStartPosition,lastDuration, lastAudioTrackSwitchingIdx;
     function handleVideoEvent(evt) {

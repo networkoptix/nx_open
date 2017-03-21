@@ -92,7 +92,7 @@ angular.module('webadminApp')
                     var weHaveWebm = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['webm'];});
                     var weHaveHls = _.find(scope.vgSrc,function(src){return src.type == mimeTypes['hls'];});
 
-                    //Should Catch MS edge, Safari, Mobile Devic
+                    //Should Catch MS edge, Safari, Mobile Devices
                     if(weHaveHls && (canPlayNatively("hls") || window.jscd.mobile)){
                         return "native-hls";
                     }
@@ -172,12 +172,8 @@ angular.module('webadminApp')
                     if(activePlayer != player) {
                         element.find(".videoplayer").html("");
                         scope.vgPlayerReady({$API: null});
-                        if(activePlayer == 'flashls' && player == 'webm'){
-                            // This is hack! When switching from flashls to webm video - webm player stucks. Seems like chrome issue.
-                            activePlayer = player;
-                            return true;
-                        }
                         activePlayer = player;
+                        return true;
                     }
                     return false;
                 }
@@ -284,7 +280,6 @@ angular.module('webadminApp')
                     scope.flashls = false;
                     scope.native = false;
                     scope.jsHls = true;
-                    console.log("Init js hls");
                     hlsAPI.init( element.find(".videoplayer"), function (api) {
                             scope.vgApi = api;
                             if (scope.vgSrc) {
@@ -311,9 +306,7 @@ angular.module('webadminApp')
                         format = detectBestFormat();
                         if(newPlayer(format)){ // Remove or recycle old player.
                             // Some problem happened. We must reload video here
-                            console.log("Recycling");
                             $timeout(srcChanged);
-                            console.log("Continue");
                         }
                         if(!format){
                             scope.native = false;
@@ -329,10 +322,6 @@ angular.module('webadminApp')
 
                             case "jshls":
                                 initJsHls();
-                                break;
-
-                            case "rtsp":
-                                initRtsp();
                                 break;
 
                             case "native-hls":
