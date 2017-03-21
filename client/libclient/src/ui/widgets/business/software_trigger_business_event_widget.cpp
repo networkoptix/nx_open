@@ -8,9 +8,14 @@
 #include <core/resource/user_resource.h>
 #include <ui/common/aligner.h>
 #include <ui/dialogs/resource_selection_dialog.h>
-#include <ui/style/software_trigger_icons.h>
+#include <ui/style/software_trigger_pixmaps.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
+namespace {
+
+static constexpr int kDropdownIconSize = 40;
+
+} // namespace
 
 QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(QWidget* parent) :
     base_type(parent),
@@ -28,14 +33,16 @@ QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(QWidg
     connect(ui->usersButton, &QPushButton::clicked, this,
         &QnSoftwareTriggerBusinessEventWidget::at_usersButton_clicked);
 
-    auto columnCount = qCeil(qSqrt(QnSoftwareTriggerIcons::iconNames().size()));
+    auto columnCount = qCeil(qSqrt(QnSoftwareTriggerPixmaps::pixmapNames().size()));
     if (columnCount % 2) //< ensure the number of columns is even
         ++columnCount;
     ui->iconComboBox->setColumnCount(columnCount);
 
-    ui->iconComboBox->setIcons(
-        QnSoftwareTriggerIcons::iconsPath(),
-        QnSoftwareTriggerIcons::iconNames());
+    ui->iconComboBox->setItemSize({ kDropdownIconSize, kDropdownIconSize });
+
+    ui->iconComboBox->setPixmaps(
+        QnSoftwareTriggerPixmaps::pixmapsPath(),
+        QnSoftwareTriggerPixmaps::pixmapNames());
 
     auto aligner = new QnAligner(this);
     aligner->addWidget(ui->nameLabel);

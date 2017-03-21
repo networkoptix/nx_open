@@ -68,7 +68,7 @@
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/style/nx_style.h>
-#include <ui/style/software_trigger_icons.h>
+#include <ui/style/software_trigger_pixmaps.h>
 #include <ui/widgets/properties/camera_settings_tab.h>
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workbench/workbench_context.h>

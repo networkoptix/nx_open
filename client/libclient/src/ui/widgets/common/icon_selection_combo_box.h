@@ -22,6 +22,11 @@ public:
     */
     void setIcons(const QString& path, const QStringList& names,
         const QString& extension = lit(".png"));
+    void setPixmaps(const QString& path, const QStringList& names,
+        const QString& extension = lit(".png"));
+
+    void setIcons(const QVector<QPair<QString, QIcon>>& icons);
+    void setPixmaps(const QVector<QPair<QString, QPixmap>>& pixmaps);
 
     /**
     Number of displayed columns, 0 means it is chosen automatically (default).
@@ -35,6 +40,12 @@ public:
     */
     int maxVisibleRows() const;
     void setMaxVisibleRows(int count);
+
+    /**
+    Dropdown list item size. If not set, iconSize is used.
+    */
+    QSize itemSize() const;
+    void setItemSize(const QSize& size);
 
     /**
     Currently selected icon, identified by name.
@@ -54,6 +65,12 @@ protected:
     virtual void adjustPopupParameters();
 
 private:
+    void createModel();
+
+private:
     int m_columnCount = 0; //< automatic by default
     int m_maxVisibleRows = 5;
+
+    class Delegate;
+    const QScopedPointer<Delegate> m_delegate;
 };

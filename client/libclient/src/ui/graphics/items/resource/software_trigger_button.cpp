@@ -5,7 +5,7 @@
 #include <ui/graphics/items/generic/slider_tooltip_widget.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/style/icon.h>
-#include <ui/style/software_trigger_icons.h>
+#include <ui/style/software_trigger_pixmaps.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_painter_rollback.h>
 
@@ -174,7 +174,7 @@ void QnSoftwareTriggerButton::generateIcon()
     if (m_iconName.isEmpty())
         return;
 
-    const auto buttonPixmap = QnSoftwareTriggerIcons::pixmapByName(m_iconName);
+    const auto buttonPixmap = QnSoftwareTriggerPixmaps::pixmapByName(m_iconName);
 
     const auto generateStatePixmap =
         [this, buttonPixmap](const QBrush& background) -> QPixmap

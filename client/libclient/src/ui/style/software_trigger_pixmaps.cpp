@@ -1,19 +1,19 @@
-#include "software_trigger_icons.h"
+#include "software_trigger_pixmaps.h"
 #include <ui/style/skin.h>
 
-QString QnSoftwareTriggerIcons::iconsPath()
+QString QnSoftwareTriggerPixmaps::pixmapsPath()
 {
     return lit("soft_triggers/");
 }
 
-QString QnSoftwareTriggerIcons::defaultIconName()
+QString QnSoftwareTriggerPixmaps::defaultPixmapName()
 {
     return lit("_bell_on");
 }
 
-const QStringList& QnSoftwareTriggerIcons::iconNames()
+const QStringList& QnSoftwareTriggerPixmaps::pixmapNames()
 {
-    static const QStringList iconNames({
+    static const QStringList pixmapNames({
         lit("_lights_on"),
         lit("_lights_off"),
         lit("_alarm_on"),
@@ -37,21 +37,13 @@ const QStringList& QnSoftwareTriggerIcons::iconNames()
         lit("speaker")
     });
 
-    return iconNames;
+    return pixmapNames;
 }
 
-QPixmap QnSoftwareTriggerIcons::pixmapByName(const QString& name)
+QPixmap QnSoftwareTriggerPixmaps::pixmapByName(const QString& name)
 {
-    const auto pixmap = qnSkin->pixmap(iconsPath() + name + lit(".png"));
+    const auto pixmap = qnSkin->pixmap(pixmapsPath() + name + lit(".png"));
     return pixmap.isNull()
-        ? pixmapByName(defaultIconName())
+        ? pixmapByName(defaultPixmapName())
         : pixmap;
-}
-
-QIcon QnSoftwareTriggerIcons::iconByName(const QString& name)
-{
-    const auto icon = qnSkin->icon(iconsPath() + name + lit(".png"));
-    return icon.isNull()
-        ? iconByName(defaultIconName())
-        : icon;
 }
