@@ -2316,9 +2316,6 @@ void MediaServerProcess::run()
             Qn::PT_Server,
             nx::utils::TimerManager::instance()));
 
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &MediaServerProcess::at_runtimeInfoChanged);
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &MediaServerProcess::at_runtimeInfoChanged);
-
     MediaServerStatusWatcher mediaServerStatusWatcher;
     QScopedPointer<QnConnectToCloudWatcher> connectToCloudWatcher(new QnConnectToCloudWatcher(ec2ConnectionFactory->messageBus()));
 
@@ -2364,6 +2361,11 @@ void MediaServerProcess::run()
             .arg(ec2::toString(errorCode)), cl_logERROR );
         QnSleep::msleep(3000);
     }
+    QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
+
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &MediaServerProcess::at_runtimeInfoChanged);
+    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &MediaServerProcess::at_runtimeInfoChanged);
+    at_runtimeInfoChanged(QnRuntimeInfoManager::instance()->localInfo());
 
     if (needToStop())
         return; //TODO #ak correctly deinitialize what has been initialised
@@ -2399,7 +2401,6 @@ void MediaServerProcess::run()
 
     settings->setValue(LOW_PRIORITY_ADMIN_PASSWORD, "");
 
-    QnAppServerConnectionFactory::setEc2Connection( ec2Connection );
     auto clearEc2ConnectionGuardFunc = [](MediaServerProcess*){
         QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr()); };
     std::unique_ptr<MediaServerProcess, decltype(clearEc2ConnectionGuardFunc)>

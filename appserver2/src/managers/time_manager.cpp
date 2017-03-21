@@ -324,7 +324,8 @@ namespace ec2
 
     TimeSynchronizationManager::TimeSynchronizationManager(
         Qn::PeerType peerType,
-        nx::utils::TimerManager* const timerManager)
+        nx::utils::TimerManager* const timerManager,
+        QnTransactionMessageBus* messageBus)
     :
         m_localSystemTimeDelta( std::numeric_limits<qint64>::min() ),
         m_broadcastSysTimeTaskID( 0 ),
@@ -332,6 +333,7 @@ namespace ec2
         m_manualTimerServerSelectionCheckTaskID( 0 ),
         m_checkSystemTimeTaskID( 0 ),
         m_terminated( false ),
+        m_messageBus(messageBus),
         m_peerType( peerType ),
         m_timerManager(timerManager),
         m_internetTimeSynchronizationPeriod( INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC ),
@@ -412,12 +414,13 @@ namespace ec2
             currentMSecsSinceEpoch(),
             m_localTimePriorityKey );
 
-        onDbManagerInitialized();
+        if (m_connection)
+            onDbManagerInitialized();
 
-        connect(connection->messageBus(), &QnTransactionMessageBus::newDirectConnectionEstablished,
+        connect(m_messageBus, &QnTransactionMessageBus::newDirectConnectionEstablished,
                  this, &TimeSynchronizationManager::onNewConnectionEstablished,
                  Qt::DirectConnection );
-        connect(connection->messageBus(), &QnTransactionMessageBus::peerLost,
+        connect(m_messageBus, &QnTransactionMessageBus::peerLost,
                  this, &TimeSynchronizationManager::onPeerLost,
                  Qt::DirectConnection );
         Qn::directConnect(qnGlobalSettings, &QnGlobalSettings::timeSynchronizationSettingsChanged,
@@ -546,11 +549,14 @@ namespace ec2
             arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).arg(m_localTimePriorityKey.toUInt64(), 0, 16), cl_logINFO);
         m_timeSynchronized = true;
         //saving synchronized time to DB
-        Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
-            &saveSyncTime,
-            m_connection,
-            0,
-            m_usedTimeSyncInfo.timePriorityKey)));
+        if (m_connection)
+        {
+            Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
+                &saveSyncTime,
+                m_connection,
+                0,
+                m_usedTimeSyncInfo.timePriorityKey)));
+        }
 
         if (!synchronizingByCurrentServer)
         {
@@ -771,11 +777,14 @@ namespace ec2
         const qint64 curSyncTime = m_usedTimeSyncInfo.syncTime + m_monotonicClock.elapsed() - m_usedTimeSyncInfo.monotonicClockValue;
         //saving synchronized time to DB
         m_timeSynchronized = true;
-        Ec2ThreadPool::instance()->start( make_custom_runnable( std::bind(
-            &saveSyncTime,
-            m_connection,
-            QDateTime::currentMSecsSinceEpoch() - curSyncTime,
-            m_usedTimeSyncInfo.timePriorityKey) ) );
+        if (m_connection)
+        {
+            Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
+                &saveSyncTime,
+                m_connection,
+                QDateTime::currentMSecsSinceEpoch() - curSyncTime,
+                m_usedTimeSyncInfo.timePriorityKey)));
+        }
         lock->unlock();
         {
             WhileExecutingDirectCall callGuard( this );
@@ -1025,7 +1034,7 @@ namespace ec2
             tran.params.peerSysTime = QDateTime::currentMSecsSinceEpoch();  //currentMSecsSinceEpoch();
         }
         peerSystemTimeReceived( tran ); //remembering own system time
-        m_connection->messageBus()->sendTransaction( tran );
+        m_messageBus->sendTransaction( tran );
     }
 
     void TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired( quint64 /*taskID*/ )
@@ -1421,11 +1430,14 @@ namespace ec2
                 forceTimeResync();
             }
 
-            Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
-                &saveSyncTime,
-                m_connection,
-                QDateTime::currentMSecsSinceEpoch() - getSyncTime(),
-                m_usedTimeSyncInfo.timePriorityKey)));
+            if (m_connection)
+            {
+                Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
+                    &saveSyncTime,
+                    m_connection,
+                    QDateTime::currentMSecsSinceEpoch() - getSyncTime(),
+                    m_usedTimeSyncInfo.timePriorityKey)));
+            }
         }
 
         QnMutexLocker lk(&m_mutex);
@@ -1438,15 +1450,18 @@ namespace ec2
 
     void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(QnMutexLockerBase* const /*lk*/)
     {
-        Ec2ThreadPool::instance()->start(make_custom_runnable([this]
+        if (m_connection)
         {
-            ApiMiscData localTimeData(
-                LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
-                QByteArray::number(m_localTimePriorityKey.toUInt64()));
-            auto manager = m_connection->getMiscManager(Qn::kSystemAccess);
-            if (manager->saveMiscParamSync(localTimeData) != ec2::ErrorCode::ok)
-                qWarning() << "Failed to save misc param to the local DB";
-        }));
+            Ec2ThreadPool::instance()->start(make_custom_runnable([this]
+            {
+                ApiMiscData localTimeData(
+                    LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
+                    QByteArray::number(m_localTimePriorityKey.toUInt64()));
+                auto manager = m_connection->getMiscManager(Qn::kSystemAccess);
+                if (manager->saveMiscParamSync(localTimeData) != ec2::ErrorCode::ok)
+                    qWarning() << "Failed to save misc param to the local DB";
+            }));
+        }
     }
 
     void TimeSynchronizationManager::onTimeSynchronizationSettingsChanged()

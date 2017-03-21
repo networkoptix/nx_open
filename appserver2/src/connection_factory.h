@@ -63,8 +63,8 @@ public:
 private:
     std::unique_ptr<detail::QnDbManager> m_dbManager;
     std::unique_ptr<QnTransactionLog> m_transactionLog;
-    std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
     std::unique_ptr<QnTransactionMessageBus> m_transactionMessageBus;
+    std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
     std::unique_ptr<ServerQueryProcessorAccess> m_serverQueryProcessor;
     std::unique_ptr<QnDistributedMutexManager> m_distributedMutexManager;
     bool m_terminated;

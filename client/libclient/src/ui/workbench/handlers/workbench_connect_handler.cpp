@@ -85,6 +85,7 @@
 #include <helpers/system_helpers.h>
 
 #include <watchers/cloud_status_watcher.h>
+#include <nx_ec/dummy_handler.h>
 
 namespace {
 
@@ -738,7 +739,13 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
 
             /* We can get here during disconnect process */
             if (auto connection = connection2())
-                connection->sendRuntimeData(info.data);
+            {
+                connection->getMiscManager(Qn::kSystemAccess)->saveRuntimeInfo(
+                    info.data,
+                    ec2::DummyHandler::instance(),
+                    &ec2::DummyHandler::onRequestDone);
+
+            }
         });
 
 

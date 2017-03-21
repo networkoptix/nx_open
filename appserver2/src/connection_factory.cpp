@@ -48,10 +48,10 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
         peerType == Qn::PT_Server
         ? new QnTransactionLog(m_dbManager.get())
         : nullptr),
-    m_timeSynchronizationManager(
-        new TimeSynchronizationManager(peerType, timerManager)),
     m_transactionMessageBus(
         new QnTransactionMessageBus(m_dbManager.get(), peerType)),
+    m_timeSynchronizationManager(
+        new TimeSynchronizationManager(peerType, timerManager, m_transactionMessageBus.get())),
     m_serverQueryProcessor(
         peerType == Qn::PT_Server
         ? new ServerQueryProcessorAccess(m_dbManager.get(), m_transactionMessageBus.get())
@@ -64,6 +64,8 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
 {
     if (m_dbManager)
         m_dbManager->setTransactionLog(m_transactionLog.get());
+    if (peerType != Qn::PT_Server)
+        m_timeSynchronizationManager->start(nullptr);
 
     // Cannot be done in TimeSynchronizationManager constructor to keep valid object destruction
     // order.

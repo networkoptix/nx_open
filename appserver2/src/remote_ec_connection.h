@@ -44,6 +44,7 @@ namespace ec2
         const QnConnectionInfo m_connectionInfo;
         QUrl m_peerUrl;
     };
+    typedef std::shared_ptr<RemoteEC2Connection> RemoteEC2ConnectionPtr;
 }
 
 #endif  //REMOTE_EC_CONNECTION_H

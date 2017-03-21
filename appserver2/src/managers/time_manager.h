@@ -128,7 +128,8 @@ namespace ec2
         */
         TimeSynchronizationManager(
             Qn::PeerType peerType,
-            nx::utils::TimerManager* const timerManager);
+            nx::utils::TimerManager* const timerManager,
+            QnTransactionMessageBus* messageBus);
         virtual ~TimeSynchronizationManager();
 
         //!Implemenattion of QnStoppable::pleaseStop
@@ -253,6 +254,7 @@ namespace ec2
         boost::optional<qint64> m_prevMonotonicClock;
         bool m_terminated;
         std::shared_ptr<Ec2DirectConnection> m_connection;
+        QnTransactionMessageBus* m_messageBus;
         /*!
             \a TimeSyncInfo::syncTime stores local time on specified server
         */
