@@ -120,6 +120,8 @@ if(withDesktopClient OR withMobileClient)
 endif()
 
 if(withTests)
+    rdep_add_package(gtest)
+    rdep_add_package(gmock)
     add_subdirectory(unit_tests)
 endif()
 
