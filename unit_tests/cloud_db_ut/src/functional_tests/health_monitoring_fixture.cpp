@@ -9,7 +9,7 @@ namespace test {
 
 FtHealthMonitoring::FtHealthMonitoring()
 {
-    init();
+    m_anotherUser = addActivatedAccount2();
 }
 
 void FtHealthMonitoring::givenSystemWithSomeHistory()
@@ -21,23 +21,51 @@ void FtHealthMonitoring::givenSystemWithSomeHistory()
 
 void FtHealthMonitoring::establishConnectionFromMediaserverToCloud()
 {
-    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
-    waitForCloudAndVmsToSyncUsers();
+    openTransactionConnections(1);
+    waitForConnectionsToMoveToACertainState(
+        {::ec2::QnTransactionTransportBase::Connected,
+            ::ec2::QnTransactionTransportBase::ReadyForStreaming },
+        std::chrono::hours(1));
 
-    waitForSystemToBecome(api::SystemHealth::online);
+    //waitForSystemToBecome(api::SystemHealth::online);
     saveHistoryItem(api::SystemHealth::online);
+}
+
+void FtHealthMonitoring::establishConnectionFromMediaserverToCloudReusingPeerId()
+{
+    QnUuid peerId;
+    connectionHelper().getAccessToConnectionByIndex(
+        0,
+        [&peerId](test::TransactionConnectionHelper::ConnectionContext* connectionContext)
+        {
+            peerId = connectionContext->peerInfo.id;
+        });
+
+    const auto connectionId = connectionHelper().establishTransactionConnection(
+        cdbSynchronizationUrl(),
+        system().id,
+        system().authKey,
+        KeepAlivePolicy::enableKeepAlive,
+        nx_ec::EC2_PROTO_VERSION,
+        peerId);
+
+    connectionHelper().waitForState(
+        {::ec2::QnTransactionTransportBase::Connected,
+            ::ec2::QnTransactionTransportBase::ReadyForStreaming},
+        connectionId,
+        std::chrono::hours(1));
 }
 
 void FtHealthMonitoring::closeConnectionFromMediaserverToCloud()
 {
-    appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(cdbEc2TransactionUrl());
+    closeAllConnections();
     saveHistoryItem(api::SystemHealth::offline);
     waitForSystemToBecome(api::SystemHealth::offline);
 }
 
 void FtHealthMonitoring::whenCdbIsRestarted()
 {
-    ASSERT_TRUE(cdb()->restart());
+    ASSERT_TRUE(restart());
 }
 
 void FtHealthMonitoring::whenSystemIsSharedWithSomeone()
@@ -53,9 +81,9 @@ void FtHealthMonitoring::whenSystemIsSharedWithSomeone()
 
     const auto accessRole = nx::utils::random::choice(accessRolesToTest);
 
-    cdb()->shareSystemEx(
-        ownerAccount(),
-        registeredSystemData(),
+    shareSystemEx(
+        account(),
+        system(),
         m_anotherUser,
         accessRole);
 }
@@ -65,9 +93,9 @@ void FtHealthMonitoring::thenSomeoneDoesNotHaveAccessToTheHistory()
     api::SystemHealthHistory history;
     ASSERT_EQ(
         api::ResultCode::forbidden,
-        cdb()->getSystemHealthHistory(
+        getSystemHealthHistory(
             m_anotherUser.email, m_anotherUser.password,
-            registeredSystemData().id, &history));
+            system().id, &history));
 }
 
 void FtHealthMonitoring::thenSystemCredentialsCannotBeUsedToAccessHistory()
@@ -75,9 +103,9 @@ void FtHealthMonitoring::thenSystemCredentialsCannotBeUsedToAccessHistory()
     api::SystemHealthHistory history;
     ASSERT_EQ(
         api::ResultCode::forbidden,
-        cdb()->getSystemHealthHistory(
-            registeredSystemData().id, registeredSystemData().authKey,
-            registeredSystemData().id, &history));
+        getSystemHealthHistory(
+            system().id, system().authKey,
+            system().id, &history));
 }
 
 void FtHealthMonitoring::assertSystemOnline()
@@ -95,9 +123,9 @@ void FtHealthMonitoring::assertHistoryIsCorrect()
     api::SystemHealthHistory history;
     ASSERT_EQ(
         api::ResultCode::ok,
-        cdb()->getSystemHealthHistory(
-            ownerAccount().email, ownerAccount().password,
-            registeredSystemData().id, &history));
+        getSystemHealthHistory(
+            account().email, account().password,
+            system().id, &history));
     ASSERT_EQ(m_expectedHealthHistory.events.size(), history.events.size());
 
     for (size_t i = 0; i < m_expectedHealthHistory.events.size(); ++i)
@@ -106,13 +134,15 @@ void FtHealthMonitoring::assertHistoryIsCorrect()
     }
 }
 
-void FtHealthMonitoring::init()
+void FtHealthMonitoring::assertHistoryHasASingleOnlineRecord()
 {
-    ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
-    ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
-    ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
-
-    m_anotherUser = cdb()->addActivatedAccount2();
+    api::SystemHealthHistory history;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        getSystemHealthHistory(
+            account().email, account().password,
+            system().id, &history));
+    ASSERT_EQ(1U, history.events.size());
 }
 
 void FtHealthMonitoring::waitForSystemToBecome(api::SystemHealth status)
@@ -122,12 +152,12 @@ void FtHealthMonitoring::waitForSystemToBecome(api::SystemHealth status)
         api::SystemDataEx systemData;
         ASSERT_EQ(
             api::ResultCode::ok,
-            cdb()->fetchSystemData(
-                ownerAccount().email, ownerAccount().password,
-                registeredSystemData().id, &systemData));
+            fetchSystemData(
+                account().email, account().password,
+                system().id, &systemData));
         if (systemData.stateOfHealth == status)
             break;
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
 
@@ -136,9 +166,9 @@ void FtHealthMonitoring::assertSystemStatusIs(api::SystemHealth status)
     api::SystemDataEx systemData;
     ASSERT_EQ(
         api::ResultCode::ok,
-        cdb()->fetchSystemData(
-            ownerAccount().email, ownerAccount().password,
-            registeredSystemData().id, &systemData));
+        fetchSystemData(
+            account().email, account().password,
+            system().id, &systemData));
     ASSERT_EQ(status, systemData.stateOfHealth);
 }
 
