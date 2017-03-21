@@ -18,6 +18,7 @@ class LayoutsFactory:
     public QObject,
     public Singleton<LayoutsFactory>
 {
+    Q_OBJECT
     using base_type = QObject;
 
 public:
