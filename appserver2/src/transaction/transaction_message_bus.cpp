@@ -1403,7 +1403,6 @@ void QnTransactionMessageBus::doPeriodicTasks()
     }
 
     // add new outgoing connections
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     for (QMap<QUrl, RemoteUrlConnectInfo>::iterator itr = m_remoteUrls.begin(); itr != m_remoteUrls.end(); ++itr)
     {
         const QUrl& url = itr.key();

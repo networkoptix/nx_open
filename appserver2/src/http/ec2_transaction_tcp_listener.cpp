@@ -14,7 +14,6 @@
 #include "http/custom_headers.h"
 #include "audit/audit_manager.h"
 #include "settings.h"
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/fusion/serialization/lexical.h>
 
@@ -301,8 +300,7 @@ void QnTransactionTcpProcessor::run()
             // checking mechanics.
             if (access != Qn::kSystemAccess)
             {
-                auto user = qnResPool->getResourceById<QnUserResource>(d->accessRights.userId);
-                bool authAsOwner = (user && user->userRole() == Qn::UserRole::Owner);
+                bool authAsOwner = d->accessRights.userId == QnUserResource::kAdminGuid;
                 NX_ASSERT(authAsOwner, "Server must always be authorised as owner");
                 if (authAsOwner)
                     access = Qn::kSystemAccess;
