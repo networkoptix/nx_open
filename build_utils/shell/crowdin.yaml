@@ -7,7 +7,12 @@ files:
       - /webadmin/views/debug.html
       - /webadmin/views/sdkeula.html
   -
-    source: '/*.*'
+    source: '/*.ts'
     translation: '%file_name%_%locale_with_underscore%.%file_extension%'
+    ignore:
+      - crowdin.yaml
+  -
+    source: '/*.wxl'
+    translation: '%file_name%_%locale%.%file_extension%'
     ignore:
       - crowdin.yaml
