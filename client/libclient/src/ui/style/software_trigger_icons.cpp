@@ -11,21 +11,39 @@ QIcon QnSoftwareTriggerIcons::iconByName(const QString& name)
 
 QString QnSoftwareTriggerIcons::iconsPath()
 {
-    return lit("triggers/");
+    return lit("soft_triggers/");
 }
 
 QString QnSoftwareTriggerIcons::defaultIconName()
 {
-    //TODO: #vkutin Specify default (fallback) icon.
-    return lit("mic");
+    return lit("_lights_on");
 }
 
 const QStringList& QnSoftwareTriggerIcons::iconNames()
 {
-    //TODO: #vkutin #common Fill this with software trigger icon names.
-
     static const QStringList iconNames({
-        lit("mic") });
+        lit("_lights_on"),
+        lit("_lights_off"),
+        lit("_alarm_on"),
+        lit("_alarm_off"),
+        lit("_bell_on"),
+        lit("_bell_off"),
+        lit("_door_opened"),
+        lit("_door_closed"),
+        lit("_lock_locked"),
+        lit("_lock_unlocked"),
+        lit("_mark_yes"),
+        lit("_mark_no"),
+        lit("ban"),
+        lit("bookmark"),
+        lit("bubble"),
+        lit("circle"),
+        lit("message"),
+        lit("mic"),
+        lit("puzzle"),
+        lit("siren"),
+        lit("speaker")
+    });
 
     return iconNames;
 }
