@@ -25,6 +25,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/style/globals.h>
+#include <nx/client/ui/workbench/layouts/layout_factory.h>
 
 QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent):
     base_type(parent),
@@ -101,7 +102,7 @@ void QnCameraMotionMaskWidget::init()
 
 void QnCameraMotionMaskWidget::createWorkbenchLayout()
 {
-    auto workbenchLayout = new QnWorkbenchLayout(this);
+    auto workbenchLayout = qnLayoutFactory->create(this);
     workbenchLayout->setCellSpacing(0);
     m_context->workbench()->setCurrentLayout(workbenchLayout);
 }

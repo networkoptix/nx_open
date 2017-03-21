@@ -56,6 +56,7 @@
 #include <nx/utils/log/log.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/ec2_lib.h>
+#include <nx/client/ui/workbench/layouts/layout_factory.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -86,6 +87,8 @@
 #include <ui/customization/customizer.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+#include <ui/workbench/workbench_layout.h>
+
 #ifdef Q_OS_WIN
 #include <ui/workaround/iexplore_url_handler.h>
 #endif
@@ -280,6 +283,15 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     /* Depends on QnClientSettings, never used directly. */
     common->store(new QnClientAutoRunWatcher());
+
+    const auto defaultLayoutCreator =
+        [](const QnLayoutResourcePtr& /* resource */, QObject* parent) -> QnWorkbenchLayout*
+        {
+            return (new QnWorkbenchLayout(parent));
+        };
+
+    common->store(new nx::client::ui::workbench::layouts::LayoutsFactory(defaultLayoutCreator));
+
 
     common->setModuleGUID(clientInstanceManager->instanceGuid());
     nx::network::SocketGlobals::outgoingTunnelPool()

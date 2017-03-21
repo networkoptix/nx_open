@@ -360,6 +360,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceStatus)
 
+    enum class LayoutResourceType
+    {
+        defaultLayout = 0,
+    };
+
     /** Level of detail for displaying resource info. */
     enum ResourceInfoLevel
     {

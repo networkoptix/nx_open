@@ -155,6 +155,7 @@
 #include <vms_gateway_embeddable.h>
 #include <utils/unity_launcher_workaround.h>
 #include <utils/connection_diagnostics_helper.h>
+#include <nx/client/ui/workbench/layouts/layout_factory.h>
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
@@ -822,8 +823,9 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
             continue;
 
         QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource);
-        if (layout == NULL) {
-            layout = new QnWorkbenchLayout(layoutResource, workbench());
+        if (layout == NULL)
+        {
+            layout = qnLayoutFactory->create(layoutResource, workbench());
             workbench()->addLayout(layout);
         }
         /* Explicit set that we do not control videowall through this layout */
