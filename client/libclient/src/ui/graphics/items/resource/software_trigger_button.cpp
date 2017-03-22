@@ -169,7 +169,7 @@ void QnSoftwareTriggerButton::setIcon(const QString& name)
     if (m_iconName == iconName)
         return;
 
-    m_iconName = name;
+    m_iconName = iconName;
     generateIcon();
 }
 
