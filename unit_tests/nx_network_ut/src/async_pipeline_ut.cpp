@@ -1,3 +1,5 @@
+#include <thread>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/async_pipeline.h>
@@ -13,11 +15,13 @@ namespace test {
 class AsyncBufferReader:
     public aio::BasicPollable
 {
+    using base_type = aio::BasicPollable;
+
 public:
     enum class InputDepletionPolicy
     {
         sendConnectionReset,
-        ignore
+        ignore,
     };
 
     AsyncBufferReader(
@@ -28,8 +32,26 @@ public:
         m_input(input),
         m_output(output),
         m_inputDepletionPolicy(inputDepletionPolicy),
-        m_errorState(false)
+        m_errorState(false),
+        m_totalBytesRead(0),
+        m_sendPaused(false),
+        m_sendBuffer(nullptr)
     {
+        bindToAioThread(getAioThread());
+    }
+
+    virtual ~AsyncBufferReader() override
+    {
+        if (isInSelfAioThread())
+            stopWhileInAioThread();
+    }
+
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
+    {
+        base_type::bindToAioThread(aioThread);
+
+        m_reader.bindToAioThread(aioThread);
+        m_writer.bindToAioThread(aioThread);
     }
 
     void readSomeAsync(
@@ -38,7 +60,7 @@ public:
     {
         NX_ASSERT(buffer->capacity() > buffer->size());
       
-        post(
+        m_reader.post(
             [this, buffer, handler = std::move(handler)]()
             {
                 if (m_errorState)
@@ -49,10 +71,15 @@ public:
 
                 int bytesRead = m_input->read(
                     buffer->data() + buffer->size(),
-                    buffer->capacity());
+                    buffer->capacity() - buffer->size());
                 if (bytesRead > 0)
                 {
+                    {
+                        QnMutexLocker lock(&m_mutex);
+                        m_totalDataRead.append(buffer->data() + buffer->size(), bytesRead);
+                    }
                     buffer->resize(buffer->size() + bytesRead);
+                    m_totalBytesRead += bytesRead;
                     handler(SystemError::noError, bytesRead);
                     return;
                 }
@@ -65,25 +92,61 @@ public:
         const nx::Buffer& buffer,
         std::function<void(SystemError::ErrorCode, size_t)> handler)
     {
-        post(
-            [this, &buffer, handler = std::move(handler)]()
-            {
-                if (m_errorState)
-                {
-                    handler(SystemError::connectionReset, (size_t)-1);
-                    return;
-                }
+        QnMutexLocker lock(&m_mutex);
 
-                int bytesWritten = m_output->write(buffer.constData(), buffer.size());
-                handler(
-                    bytesWritten >= 0 ? SystemError::noError : SystemError::connectionReset,
-                    bytesWritten);
-            });
+        m_sendHandler = std::move(handler);
+        m_sendBuffer = &buffer;
+        if (m_sendPaused)
+            return;
+
+        performAsyncSend(lock);
     }
 
-    void cancelIOSync(nx::network::aio::EventType /*eventType*/)
+    void cancelIOSync(nx::network::aio::EventType eventType)
     {
-        pleaseStopSync();
+        if (eventType == nx::network::aio::EventType::etRead ||
+            eventType == nx::network::aio::EventType::etNone)
+        {
+            m_reader.pleaseStopSync();
+        }
+
+        if (eventType == nx::network::aio::EventType::etWrite ||
+            eventType == nx::network::aio::EventType::etNone)
+        {
+            m_writer.pleaseStopSync();
+        }
+    }
+
+    void pauseSendingData()
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_sendPaused = true;
+    }
+
+    void resumeSendingData()
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_sendPaused = false;
+        if (m_sendHandler)
+            performAsyncSend(lock);
+    }
+
+    void waitForSomeDataToBeRead()
+    {
+        auto totalBytesReadBak = m_totalBytesRead.load();
+        while (totalBytesReadBak == m_totalBytesRead)
+            std::this_thread::yield();
+    }
+
+    void waitForReadSequenceToFinish()
+    {
+
+    }
+
+    QByteArray dataRead() const
+    {
+        QnMutexLocker lock(&m_mutex);
+        return m_totalDataRead;
     }
 
     void setErrorState()
@@ -96,6 +159,20 @@ private:
     utils::pipeline::AbstractInput* m_input;
     utils::pipeline::AbstractOutput* m_output;
     std::atomic<bool> m_errorState;
+    std::atomic<std::size_t> m_totalBytesRead;
+    mutable QnMutex m_mutex;
+    QByteArray m_totalDataRead;
+    std::function<void(SystemError::ErrorCode, size_t)> m_sendHandler;
+    bool m_sendPaused;
+    const nx::Buffer* m_sendBuffer;
+    aio::BasicPollable m_reader;
+    aio::BasicPollable m_writer;
+
+    virtual void stopWhileInAioThread() override
+    {
+        m_reader.pleaseStopSync();
+        m_writer.pleaseStopSync();
+    }
 
     void handleInputDepletion(
         std::function<void(SystemError::ErrorCode, size_t)> handler)
@@ -108,6 +185,29 @@ private:
             case InputDepletionPolicy::ignore:
                 break;
         }
+    }
+
+    void performAsyncSend(const QnMutexLockerBase&)
+    {
+        decltype(m_sendHandler) handler;
+        m_sendHandler.swap(handler);
+        auto buffer = m_sendBuffer;
+        m_sendBuffer = nullptr;
+
+        m_writer.post(
+            [this, buffer, handler = std::move(handler)]()
+            {
+                if (m_errorState)
+                {
+                    handler(SystemError::connectionReset, (size_t)-1);
+                    return;
+                }
+
+                int bytesWritten = m_output->write(buffer->constData(), buffer->size());
+                handler(
+                    bytesWritten >= 0 ? SystemError::noError : SystemError::connectionReset,
+                    bytesWritten);
+            });
     }
 };
 
@@ -204,14 +304,7 @@ protected:
         if (!m_channel)
             createChannel();
 
-        //utils::promise<SystemError::ErrorCode> done;
-        //m_channel->setOnDone(
-        //    [&done](SystemError::ErrorCode sysErrorCode)
-        //    {
-        //        done.set_value(sysErrorCode);
-        //    });
         m_channel->start();
-        //ASSERT_EQ(SystemError::noError, done.get_future().get());
     }
 
     void startExchangingInfiniteData()
@@ -221,6 +314,26 @@ protected:
         m_channel->start();
     }
     
+    void pauseRightDestination()
+    {
+        m_rightFile->pauseSendingData();
+    }
+
+    void resumeRightDestination()
+    {
+        m_rightFile->resumeSendingData();
+    }
+
+    void waitForSomeDataToBeReadFromLeftSource()
+    {
+        m_leftFile->waitForSomeDataToBeRead();
+    }
+
+    void waitForChannelToStopReadingLeftSource()
+    {
+        m_leftFile->waitForReadSequenceToFinish();
+    }
+
     void waitForSomeExchangeToHappen()
     {
         m_rightDest.waitForSomeDataToBeReceived();
@@ -230,6 +343,11 @@ protected:
     void stopChannel()
     {
         m_channel->pleaseStopSync();
+    }
+
+    void closeLeftSource()
+    {
+        m_leftFile->setErrorState();
     }
 
     void emulateErrorOnAnySource()
@@ -246,6 +364,11 @@ protected:
     {
         m_rightDest.waitForReceivedDataToMatch(m_originalData);
         m_leftDest.waitForReceivedDataToMatch(m_originalData);
+    }
+
+    void assertAllDataFromLeftHasBeenTransferredToTheRight()
+    {
+        m_rightDest.waitForReceivedDataToMatch(m_leftFile->dataRead());
     }
 
 private:
@@ -293,16 +416,43 @@ TEST_F(AsynchronousChannel, reports_error_from_source)
 TEST_F(AsynchronousChannel, forwards_all_received_data_after_channel_closure)
 {
     startExchangingInfiniteData();
+    waitForSomeExchangeToHappen();
     pauseRightDestination();
     waitForSomeDataToBeReadFromLeftSource();
     closeLeftSource();
     resumeRightDestination();
-    assertAllDataHasBeenPassed();
+    assertAllDataFromLeftHasBeenTransferredToTheRight();
 }
 
-//TEST_F(AsynchronousChannel, read_cache)
-//TEST_F(AsynchronousChannel, read_saturation)
+TEST_F(AsynchronousChannel, DISABLED_read_saturation)
+{
+    startExchangingInfiniteData();
+    waitForSomeExchangeToHappen();
+
+    pauseRightDestination();
+    waitForChannelToStopReadingLeftSource();
+
+    resumeRightDestination();
+    waitForSomeExchangeToHappen();
+}
+
 //TEST_F(AsynchronousChannel, inactivity_timeout)
+//{
+//    channel()->setInactivityTimeout();
+//    startExchangingInfiniteData();
+//    pauseDataSources();
+//    assertChannelDoneDueToInactivity();
+//}
+//
+//TEST_F(AsynchronousChannel, channel_stops_sources_before_reporting_done)
+//{
+//    initializeFixedDataInput();
+//    exchangeData();
+//    assertDataExchangeWasSuccessful();
+//    assertSourceHasBeenStoppedByChannel();
+//}
+
+//TEST_F(AsynchronousChannel, deleting_object_within_done_handler)
 
 } // namespace test
 } // namespace network

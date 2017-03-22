@@ -4,6 +4,7 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "aio/basic_pollable.h"
+#include "detail/async_one_way_channel.h"
 
 namespace nx {
 namespace network {
@@ -28,15 +29,34 @@ class AsyncChannelImpl:
     using base_type = AsynchronousChannel;
 
 public:
-    AsyncChannelImpl(LeftFile leftFile, RightFile rightFile)
+    AsyncChannelImpl(LeftFile leftFile, RightFile rightFile):
+        m_closedChannelCount(0)
     {
-        m_leftFileContext.file = std::move(leftFile);
-        m_leftFileContext.readBuffer.reserve(kDefaultReadBufferSize);
+        m_leftFile = std::move(leftFile);
+        m_rightFile = std::move(rightFile);
 
-        m_rightFileContext.file = std::move(rightFile);
-        m_rightFileContext.readBuffer.reserve(kDefaultReadBufferSize);
+        initializeOneWayChannel(&m_leftToRight, &m_leftFile, &m_rightFile);
+        initializeOneWayChannel(&m_rightToLeft, &m_rightFile, &m_leftFile);
 
         bindToAioThread(getAioThread());
+    }
+
+    template<typename Source, typename Destination>
+    void initializeOneWayChannel(
+        std::unique_ptr<detail::AsyncOneWayChannel<Source, Destination>>* channel,
+        Source* source,
+        Destination* destination)
+    {
+        *channel =
+            std::make_unique<detail::AsyncOneWayChannel<Source, Destination>>(
+                *source,
+                *destination,
+                AsynchronousChannel::kDefaultReadBufferSize);
+        (*channel)->setOnDone(
+            [this](SystemError::ErrorCode sysErrorCode)
+            {
+                handleChannelClosure(sysErrorCode);
+            });
     }
 
     virtual ~AsyncChannelImpl() override
@@ -48,14 +68,14 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
     {
         base_type::bindToAioThread(aioThread);
-        m_leftFileContext.file->bindToAioThread(aioThread);
-        m_rightFileContext.file->bindToAioThread(aioThread);
+        m_leftFile->bindToAioThread(aioThread);
+        m_rightFile->bindToAioThread(aioThread);
     }
 
     virtual void start() override
     {
-        scheduleRead(&m_leftFileContext, &m_rightFileContext);
-        scheduleRead(&m_rightFileContext, &m_leftFileContext);
+        m_leftToRight->start();
+        m_rightToLeft->start();
     }
 
     virtual void setOnDone(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
@@ -64,137 +84,53 @@ public:
     }
 
 private:
-    template<typename FileType>
-    struct FileContext
-    {
-        FileType file;
-        nx::Buffer readBuffer;
-        std::list<nx::Buffer> sendQueue;
-        bool isReading = false;
-    };
+    std::unique_ptr<detail::AsyncOneWayChannel<LeftFile, RightFile>> m_leftToRight;
+    std::unique_ptr<detail::AsyncOneWayChannel<RightFile, LeftFile>> m_rightToLeft;
 
-    FileContext<LeftFile> m_leftFileContext;
-    FileContext<RightFile> m_rightFileContext;
+    LeftFile m_leftFile;
+    RightFile m_rightFile;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onDoneHandler;
+    int m_closedChannelCount;
 
     virtual void stopWhileInAioThread() override
     {
-        if (m_leftFileContext.file)
+        m_leftToRight.reset();
+        m_rightToLeft.reset();
+
+        if (m_leftFile)
         {
-            m_leftFileContext.file->pleaseStopSync();
-            m_leftFileContext.file = nullptr;
+            m_leftFile->pleaseStopSync();
+            m_leftFile = nullptr;
         }
-        if (m_rightFileContext.file)
+        if (m_rightFile)
         {
-            m_rightFileContext.file->pleaseStopSync();
-            m_rightFileContext.file = nullptr;
+            m_rightFile->pleaseStopSync();
+            m_rightFile = nullptr;
         }
     }
 
-    template<typename FileTypeOne, typename FileTypeTwo>
-    void scheduleRead(FileContext<FileTypeOne>* ctx, FileContext<FileTypeTwo>* anotherCtx)
+    void handleChannelClosure(SystemError::ErrorCode reason)
     {
-        using namespace std::placeholders;
-
-        ctx->file->readSomeAsync(
-            &ctx->readBuffer,
-            [this, ctx, anotherCtx](
-                SystemError::ErrorCode sysErrorCode, std::size_t bytesRead)
-            {
-                onDataRead(ctx, anotherCtx, sysErrorCode, bytesRead);
-            });
-        ctx->isReading = true;
-    }
-
-    template<typename FileTypeOne, typename FileTypeTwo>
-    void onDataRead(
-        FileContext<FileTypeOne>* ctx,
-        FileContext<FileTypeTwo>* anotherCtx,
-        SystemError::ErrorCode sysErrorCode,
-        std::size_t /*bytesRead*/)
-    {
-        ctx->isReading = false;
-
-        if (sysErrorCode != SystemError::noError)
-            return reportFailure(sysErrorCode);
-
-        nx::Buffer tmp;
-        ctx->readBuffer.swap(tmp);
-        scheduleSend(std::move(tmp), anotherCtx, ctx);
-        ctx->readBuffer.reserve(kDefaultReadBufferSize);
-        if (!readyToAcceptMoreData(anotherCtx))
+        ++m_closedChannelCount;
+        if (m_closedChannelCount < 2)
             return;
-        scheduleRead(ctx, anotherCtx);
-    }
-
-    template<typename FileTypeOne, typename FileTypeTwo>
-    void scheduleSend(
-        nx::Buffer data,
-        FileContext<FileTypeOne>* ctx,
-        FileContext<FileTypeTwo>* anotherCtx)
-    {
-        ctx->sendQueue.push_back(std::move(data));
-        if (ctx->sendQueue.size() > 1) //< Send already in progress?
-            return;
-        sendNextData(ctx, anotherCtx);
-    }
-
-    template<typename FileType>
-    bool readyToAcceptMoreData(FileContext<FileType>* /*fileContext*/)
-    {
-        // TODO
-        return true;
-    }
-
-    template<typename FileTypeOne, typename FileTypeTwo>
-    void sendNextData(FileContext<FileTypeOne>* ctx, FileContext<FileTypeTwo>* anotherCtx)
-    {
-        using namespace std::placeholders;
-
-        ctx->file->sendAsync(
-            ctx->sendQueue.front(),
-            [this, ctx, anotherCtx](
-                SystemError::ErrorCode sysErrorCode, std::size_t bytesRead)
-            {
-                onDataSent(ctx, anotherCtx, sysErrorCode, bytesRead);
-            });
-    }
-
-    template<typename FileTypeOne, typename FileTypeTwo>
-    void onDataSent(
-        FileContext<FileTypeOne>* ctx,
-        FileContext<FileTypeTwo>* anotherCtx,
-        SystemError::ErrorCode sysErrorCode,
-        std::size_t /*bytesRead*/)
-    {
-        if (sysErrorCode != SystemError::noError)
-            return reportFailure(sysErrorCode);
-        ctx->sendQueue.pop_front();
-
-        if (!ctx->sendQueue.empty())
-            sendNextData(ctx, anotherCtx);
-
-        if (!readyToAcceptMoreData(ctx))
-        {
-            NX_ASSERT(!ctx->sendQueue.empty());
-            return;
-        }
-
-        // Resuming read, if needed.
-        if (!anotherCtx->isReading)
-            scheduleRead(anotherCtx, ctx);
+        reportFailure(reason);
     }
     
     void reportFailure(SystemError::ErrorCode sysErrorCode)
     {
-        m_leftFileContext.file->cancelIOSync(aio::EventType::etNone);
-        m_rightFileContext.file->cancelIOSync(aio::EventType::etNone);
+        m_leftFile->cancelIOSync(aio::EventType::etNone);
+        m_rightFile->cancelIOSync(aio::EventType::etNone);
 
         if (m_onDoneHandler)
             m_onDoneHandler(sysErrorCode);
     }
 };
 
+/**
+ * LeftFile and RightFile types must be at least movable.
+ * That allows them to be std::unique_ptr<Something>.
+ */
 template<typename LeftFile, typename RightFile>
 std::unique_ptr<AsyncChannelImpl<LeftFile, RightFile>> makeAsyncChannel(
     LeftFile leftFile, RightFile rightFile)
