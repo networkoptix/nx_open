@@ -20,6 +20,9 @@ public:
         QSharedPointer<AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
 
+
+    static void cleanupProxyInfo(nx_http::Request* request);
+
     virtual ~QnProxyConnectionProcessor();
 protected:
     virtual void run() override;
