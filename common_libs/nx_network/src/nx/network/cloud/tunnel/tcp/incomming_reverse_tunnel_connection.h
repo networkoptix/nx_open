@@ -13,17 +13,19 @@ namespace tcp {
  * Sustains desired NXRC/1.0 connections count and returns sockets when some usefull data is
  * avaliable on them.
  */
-class NX_NETWORK_API IncomingReverseTunnelConnection
-:
+class NX_NETWORK_API IncomingReverseTunnelConnection:
     public AbstractIncomingTunnelConnection
 {
 public:
+    using StartHandler = std::function<void(SystemError::ErrorCode)>;
+
     IncomingReverseTunnelConnection(
-        String selfHostName, String targetHostName, SocketAddress targetEndpoint);
+        String selfHostName, String targetHostName, SocketAddress proxyServiceEndpoint);
 
-    typedef std::function<void(SystemError::ErrorCode)> StartHandler;
-
-    /** Initiates connectors spawn, @param handler is called when tunnel is ready to use or failed */
+    /**
+     * Initiates connectors spawn.
+     * @param handler is called when tunnel is ready to use or failed.
+     */
     void start(aio::AbstractAioThread* aioThread, RetryPolicy policy, StartHandler handler);
     void setHttpTimeouts(nx_http::AsyncHttpClient::Timeouts timeouts);
 
@@ -38,7 +40,7 @@ private:
 
     const String m_selfHostName;
     const String m_targetHostName;
-    const SocketAddress m_targetEndpoint;
+    const SocketAddress m_proxyServiceEndpoint;
 
     nx_http::AsyncHttpClient::Timeouts m_httpTimeouts;
     size_t m_expectedPoolSize = 1;

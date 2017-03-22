@@ -9,17 +9,18 @@ namespace cloud {
 namespace tcp {
 
 IncomingReverseTunnelConnection::IncomingReverseTunnelConnection(
-    String selfHostName, String targetHostName, SocketAddress targetEndpoint)
+    String selfHostName, String targetHostName, SocketAddress proxyServiceEndpoint)
 :
     m_selfHostName(std::move(selfHostName)),
     m_targetHostName(std::move(targetHostName)),
-    m_targetEndpoint(std::move(targetEndpoint))
+    m_proxyServiceEndpoint(std::move(proxyServiceEndpoint))
 {
 }
 
 void IncomingReverseTunnelConnection::start(
     aio::AbstractAioThread* aioThread, RetryPolicy policy, StartHandler handler)
 {
+    NX_ASSERT(policy.maxRetryCount > 0); //< TODO: #ak Should refactor and remove this assert.
     m_timer.reset(new RetryTimer(policy, aioThread));
     m_startHandler = std::move(handler);
     m_timer->scheduleNextTry([this](){ spawnConnectorIfNeeded(); });
@@ -72,7 +73,7 @@ void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
 
     NX_LOGX(lm("Start connector(%1)").arg(*connectorIt), cl_logDEBUG2);
     (*connectorIt)->connect(
-        m_targetEndpoint,
+        m_proxyServiceEndpoint,
         [this, connectorIt](SystemError::ErrorCode code)
         {
             auto connector = std::move(*connectorIt);
