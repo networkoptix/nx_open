@@ -9,6 +9,52 @@ namespace nx {
 namespace network {
 namespace detail {
 
+class BufferQueue
+{
+public:
+    BufferQueue():
+        m_sizeBytes(0)
+    {
+    }
+
+    bool empty() const
+    {
+        return m_buffers.empty();
+    }
+
+    template<typename BufferRef>
+    void push_back(BufferRef&& buffer)
+    {
+        m_buffers.push_back(std::forward<BufferRef>(buffer));
+        m_sizeBytes += m_buffers.back().size();
+    }
+
+    std::size_t size() const
+    {
+        return m_buffers.size();
+    }
+
+    std::size_t sizeBytes() const
+    {
+        return m_sizeBytes;
+    }
+
+    const nx::Buffer& front() const
+    {
+        return m_buffers.front();
+    }
+
+    void pop_front()
+    {
+        m_sizeBytes -= m_buffers.front().size();
+        m_buffers.pop_front();
+    }
+
+private:
+    std::list<nx::Buffer> m_buffers;
+    std::size_t m_sizeBytes;
+};
+
 template<typename SourcePtr, typename DestinationPtr>
 class AsyncOneWayChannel
 {
@@ -16,11 +62,13 @@ public:
     AsyncOneWayChannel(
         SourcePtr& source,
         DestinationPtr& destination,
-        std::size_t readBufferSize)
+        std::size_t readBufferSize,
+        std::size_t maxSendQueueSizeBytes)
         :
         m_source(source),
         m_destination(destination),
         m_readBufferSize(readBufferSize),
+        m_maxSendQueueSizeBytes(maxSendQueueSizeBytes),
         m_isReading(false),
         m_isSourceOpened(true),
         m_sourceClosureReason(SystemError::noError)
@@ -48,8 +96,9 @@ private:
     SourcePtr& m_source;
     DestinationPtr& m_destination;
     const std::size_t m_readBufferSize;
+    const std::size_t m_maxSendQueueSizeBytes;
     nx::Buffer m_readBuffer;
-    std::list<nx::Buffer> m_sendQueue;
+    BufferQueue m_sendQueue;
     bool m_isReading;
     bool m_isSourceOpened;
     SystemError::ErrorCode m_sourceClosureReason;
@@ -112,8 +161,7 @@ private:
 
     bool readyToAcceptMoreData()
     {
-        // TODO
-        return true;
+        return m_sendQueue.sizeBytes() < m_maxSendQueueSizeBytes;
     }
 
     void sendNextDataChunk()
