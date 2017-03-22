@@ -140,11 +140,11 @@ TEST_F(StunClientServerTest, Connectivity)
         SystemError::timedOut)); //< No server to connect.
 
     startServer(address);
-    EXPECT_EQ(sendTestRequestSync(), SystemError::noError);
-    EXPECT_EQ(1U, server->connectionCount());
+    ASSERT_EQ(SystemError::noError, sendTestRequestSync());
+    ASSERT_EQ(1U, server->connectionCount());
 
     server.reset();
-    EXPECT_NE(sendTestRequestSync(), SystemError::noError);
+    ASSERT_NE(SystemError::noError, sendTestRequestSync());
 
     client->addOnReconnectedHandler(reconnectHandler);
 
@@ -153,29 +153,31 @@ TEST_F(StunClientServerTest, Connectivity)
 
     // There might be a small delay before server creates connection from accepted socket.
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    EXPECT_EQ(1U, server->connectionCount());
+    ASSERT_EQ(1U, server->connectionCount());
 
-    client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
+    ASSERT_TRUE(client->addConnectionTimer(timerPeriod, incrementTimer, nullptr));
     std::this_thread::sleep_for(timerPeriod * 5);
-    EXPECT_GT(timerTicks, 3U); //< Expect at least 3 timer ticks in 5 periods.
+    ASSERT_GT(timerTicks, 3U); //< Expect at least 3 timer ticks in 5 periods.
 
     server.reset();
-    EXPECT_NE(sendTestRequestSync(), SystemError::noError);
+    ASSERT_NE(sendTestRequestSync(), SystemError::noError);
     timerTicks = 0;
 
     // Wait some time so client will retry to connect again and again.
     std::this_thread::sleep_for(defaultSettings().reconnectPolicy.initialDelay * 5);
-    EXPECT_EQ(0U, timerTicks); //< Timer does not tick while connection is brocken;
+    ASSERT_EQ(0U, timerTicks); //< Timer does not tick while connection is broken;
 
     startServer(address);
     reconnectEvents.pop(); // Automatic reconnect is expected, again.
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    EXPECT_EQ(1U, server->connectionCount());
+    // TODO: It may take an undefined time for server->connectionCount() to be increased.
 
-    client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    ASSERT_EQ(1U, server->connectionCount());
+
+    ASSERT_TRUE(client->addConnectionTimer(timerPeriod, incrementTimer, nullptr));
     std::this_thread::sleep_for(timerPeriod * 5);
-    EXPECT_GT(timerTicks, 3U); //< Expect at least 3 timer ticks in 5 periods.
+    ASSERT_GT(timerTicks, 3U); //< Expect at least 3 timer ticks in 5 periods.
 }
 
 TEST_F(StunClientServerTest, RequestResponse)

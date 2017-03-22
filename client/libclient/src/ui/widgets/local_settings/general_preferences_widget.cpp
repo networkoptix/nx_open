@@ -112,6 +112,7 @@ void QnGeneralPreferencesWidget::loadDataToUi()
     setUserIdleTimeoutMs(qnSettings->userIdleTimeoutMSecs());
     setPrimaryAudioDeviceName(m_recorderSettings->primaryAudioDevice().fullName());
     setSecondaryAudioDeviceName(m_recorderSettings->secondaryAudioDevice().fullName());
+    setAutoStart(qnSettings->autoStart());
 }
 
 bool QnGeneralPreferencesWidget::hasChanges() const
@@ -164,6 +165,8 @@ void QnGeneralPreferencesWidget::at_addMediaFolderButton_clicked()
         QnCustomFileDialog::directoryDialogOptions());
     if (dirName.isEmpty())
         return;
+
+    dirName = QDir::toNativeSeparators(dirName);
 
     if (mediaFolders().contains(dirName))
     {

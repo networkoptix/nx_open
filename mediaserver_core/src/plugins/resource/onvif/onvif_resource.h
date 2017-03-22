@@ -521,6 +521,10 @@ private:
     void removePullPointSubscription();
     void pullMessages( quint64 timerID );
     void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
+    /**
+     * Used for cameras that do not support renew request.
+     */
+    void renewPullPointSubscriptionFallback(quint64 timerId);
     void onPullMessagesResponseReceived(
         PullPointSubscriptionWrapper* soapWrapper,
         int resultCode,

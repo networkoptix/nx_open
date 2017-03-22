@@ -67,6 +67,8 @@
 #include <utils/common/command_line_parser.h>
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
+#include <plugins/io_device/joystick/joystick_manager.h>
+
 namespace
 {
     const int kSuccessCode = 0;
@@ -148,6 +150,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     Qt::WindowFlags flags = qnRuntime->isVideoWallMode()
         ? Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint
         : static_cast<Qt::WindowFlags>(0);
+
+    // todo: remove it. VMS-5837
+    using namespace nx::client::plugins::io_device;
+    std::unique_ptr<joystick::Manager> joystickManager(new joystick::Manager(context.data()));
+
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data(), NULL, flags));
     context->setMainWindow(mainWindow.data());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
@@ -177,6 +184,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
         }
     }
     mainWindow->show();
+    joystickManager->start();
     if (customScreen)
     {
         /* We must handle 'move' event _before_ we activate fullscreen. */

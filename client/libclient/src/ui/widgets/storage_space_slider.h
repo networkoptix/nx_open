@@ -43,6 +43,7 @@ public:
     }
 
     QString text() const {
+        //TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
         const qint64 bytesInMiB = 1024 * 1024;
 
         if(!m_textFormatHasPlaceholder) {

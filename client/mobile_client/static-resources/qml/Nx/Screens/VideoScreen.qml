@@ -227,7 +227,9 @@ PageBase
 
         VideoDummy
         {
-            width: videoScreen.width
+            y: -header.height
+            width: mainWindow.width
+            height: mainWindow.height
             state: videoScreenController.dummyState
 
             MouseArea

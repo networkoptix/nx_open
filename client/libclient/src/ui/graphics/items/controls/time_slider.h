@@ -491,6 +491,8 @@ private:
 
     GraphicsLabel* m_tooltipLine1;
     GraphicsLabel* m_tooltipLine2;
+
+    bool m_updatingValue;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

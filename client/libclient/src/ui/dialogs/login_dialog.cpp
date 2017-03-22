@@ -304,14 +304,16 @@ void QnLoginDialog::accept()
             if (m_requestHandle != handle)
                 return; //connect was cancelled
 
-            m_requestHandle = -1;
-            updateUsability();
 
-            auto status = QnConnectionDiagnosticsHelper::validateConnection(
+            const auto status = QnConnectionDiagnosticsHelper::validateConnection(
                 connectionInfo, errorCode, this);
 
             if (!guard)
                 return;
+
+            m_requestHandle = -1;
+            updateUsability();
+
             switch (status)
             {
                 case Qn::SuccessConnectionResult:

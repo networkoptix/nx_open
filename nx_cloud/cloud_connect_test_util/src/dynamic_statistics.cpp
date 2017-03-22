@@ -2,6 +2,8 @@
 
 #include <sstream>
 
+#include <nx/utils/string.h>
+
 namespace nx {
 namespace cctu {
 
@@ -40,11 +42,13 @@ std::string DynamicStatistics::toStdString() const
 {
     std::ostringstream statisticsStringStream;
     statisticsStringStream << "rate: ";
+
     statisticsStringStream << "in: ";
-    printBandwidth(statisticsStringStream, m_inputBandwidth);
+    statisticsStringStream << nx::utils::bytesToString(m_inputBandwidth).toStdString() << "Bps";
     statisticsStringStream << ", ";
+
     statisticsStringStream << "out: ";
-    printBandwidth(statisticsStringStream, m_outputBandwidth);
+    statisticsStringStream << nx::utils::bytesToString(m_outputBandwidth).toStdString() << "Bps";
     return statisticsStringStream.str();
 }
 
@@ -60,25 +64,6 @@ size_t DynamicStatistics::calcBandwidth(
     const auto bandwidthSincePrevMark =
         ((bytesTransferred - prevBytesTransferred) * 1000) / timePassed.count();
     return (prevCalculatedBytesPerSecond * 0.7) + (bandwidthSincePrevMark * 0.3);
-}
-
-void DynamicStatistics::printBandwidth(
-    std::ostream& statisticsStringStream, size_t bandwidth)
-{
-    std::string unitName = "Bps";
-    if (bandwidth > 10 * 1024)
-    {
-        bandwidth /= 1024;
-        unitName = "KBps";
-    }
-
-    if (bandwidth > 10 * 1024)
-    {
-        bandwidth /= 1024;
-        unitName = "MBps";
-    }
-
-    statisticsStringStream << bandwidth << " " << unitName;
 }
 
 } // namespace cctu

@@ -40,8 +40,8 @@ private:
 class QnNotificationWidget: public Clickable<GraphicsWidget>
 {
     Q_OBJECT
-    typedef Clickable<GraphicsWidget> base_type;
 
+    using base_type = Clickable<GraphicsWidget>;
 public:
     explicit QnNotificationWidget(QGraphicsItem* parent = nullptr, Qt::WindowFlags flags = 0);
     virtual ~QnNotificationWidget();
@@ -83,10 +83,12 @@ signals:
 protected:
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
     virtual void clickedNotify(QGraphicsSceneMouseEvent* event) override;
+    virtual void changeEvent(QEvent* event) override;
 
 private:
     void hideToolTip();
     void showToolTip();
+    void updateLabelPalette();
 
 private slots:
     void updateToolTipVisibility();

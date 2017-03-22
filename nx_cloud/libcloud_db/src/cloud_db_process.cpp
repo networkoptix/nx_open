@@ -459,6 +459,11 @@ void CloudDBProcess::registerApiHandlers(
         &MaintenanceManager::getTransactionLog, maintenanceManager,
         EntityType::maintenance, DataActionType::fetch);
 
+    registerHttpHandler(
+        kMaintenanceGetStatistics,
+        &MaintenanceManager::getStatistics, maintenanceManager,
+        EntityType::maintenance, DataActionType::fetch);
+
     //---------------------------------------------------------------------------------------------
     msgDispatcher->registerRequestProcessor<http_handler::GetCloudModulesXml>(
         http_handler::GetCloudModulesXml::kHandlerPath,

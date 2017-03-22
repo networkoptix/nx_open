@@ -549,30 +549,24 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
 
 void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index)
 {
-    const auto nodeType =
-        [](const QModelIndex& index)
+    /* Auto-expand certain nodes. */
+    switch (index.data(Qn::NodeTypeRole).value<Qn::NodeType>())
+    {
+        case Qn::ResourceNode:
         {
-            return index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
-        };
-
-    const auto isAutoExpandType =
-        [](Qn::NodeType type)
-        {
-            return type == Qn::ServersNode || type == Qn::UserResourcesNode;
-        };
-
-    const auto isRealServerNode =
-        [index, nodeType]()
-        {
-            if (nodeType(index.parent()) != Qn::ServersNode)
-                return false;
-
             const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-            return resource && resource->hasFlags(Qn::server);
-        };
+            if (!resource || !resource->hasFlags(Qn::server))
+                break;
+        }
+        /* FALL THROUGH */
+        case Qn::ServersNode:
+        case Qn::UserResourcesNode:
+            ui->resourcesTreeView->expand(index);
+            break;
 
-    if (isRealServerNode() || isAutoExpandType(nodeType(index)))
-        ui->resourcesTreeView->expand(index);
+        default:
+            break;
+    }
 
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
 }

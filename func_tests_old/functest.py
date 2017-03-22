@@ -1313,7 +1313,6 @@ SimpleTestKeys = {
 
 # Tests to be run on the vargant boxes, separately or within the autotest sequence
 BoxTestKeys = OrderedDict([
-    ('--timesync', TimeSyncTest),
     ('--ts-noinet', TimeSyncNoInetTest),
     ('--ts-inet', TimeSyncWithInetTest),
     ('--bstorage', BackupStorageTest),
