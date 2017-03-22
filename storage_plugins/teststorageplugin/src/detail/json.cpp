@@ -145,6 +145,13 @@ static int parseArray(const char **source, struct JsonVal *value)
     if (parseChar(source, '[') != 0)
         return -1;
 
+    skipWhiteSpaces(source);
+    if (**source == ']')
+    {
+        ++*source;
+        return 0;
+    }
+
     while (**source)
     {
         skipWhiteSpaces(source);
@@ -264,6 +271,13 @@ static int parseObject(const char **source, struct JsonVal *value)
 
     if (parseChar(source, '{') != 0)
         return -1;
+
+    skipWhiteSpaces(source);
+    if (**source == '}')
+    {
+        ++*source;
+        return 0;
+    }
 
     while (**source)
     {

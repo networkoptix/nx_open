@@ -17,7 +17,7 @@
                 strftime(___buf, sizeof(___buf), "%H:%M:%S", localtime(&___tval.tv_sec)); \
                 sprintf(___buf + strlen(___buf), ".%06ld\t", ___tval.tv_usec); \
                 sprintf(___buf + strlen(___buf), "%ld\t", pthread_self()); \
-                sprintf(___buf + strlen(___buf), __VA_ARGS__); \
+                snprintf(___buf + strlen(___buf), 4096 - strlen(___buf), __VA_ARGS__); \
                 fprintf(stdout, "%s\n", ___buf); \
                 fflush(stdout); \
             } while (0)
