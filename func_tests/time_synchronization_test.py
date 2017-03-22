@@ -57,22 +57,22 @@ def env(env_builder, box, server, time_server):
     build_env.time_server = time_server
     set_time_on_server(build_env.one, BASE_TIME)
     set_time_on_server(build_env.two, BASE_TIME - timedelta(hours=20))
-    turn_inet_off_and_check_time_server(build_env.one.box, build_env.time_server)
-    turn_inet_off_and_check_time_server(build_env.two.box, build_env.time_server)
+    turn_rfc868_off_and_check_time_server(build_env.one.box, build_env.time_server)
+    turn_rfc868_off_and_check_time_server(build_env.two.box, build_env.time_server)
     build_env.one.start_service()
     build_env.two.start_service()
     build_env.one.setup_local_system()
     build_env.two.setup_local_system()
     build_env.one.merge_systems(build_env.two)
     build_env.primary, build_env.secondary = get_primary_server(build_env)
-    wait_server_box_sync(build_env.primary, build_env.primary.box)
-    wait_servers_sync(build_env)
+    wait_for_server_and_box_time_synced(build_env.primary, build_env.primary.box)
+    wait_for_servers_time_synced(build_env)
     return build_env
 
 def set_time_on_server(server, new_time):
     server.date_change_time = utils.datetime_utc_now()
     server.base_time = new_time
-    server.box.host.run_command(['date',  '--set=@%d' % (
+    server.box.host.run_command(['date', '-u', '--set=@%d' % (
        utils.datetime_utc_to_timestamp(new_time) / 1000)])
 
 def get_server_current_time(server):
@@ -81,7 +81,7 @@ def get_server_current_time(server):
     return utils.datetime_utc_from_timestamp(server_time_data / 1000.)
 
 def get_box_time(box):
-  box_time_data = float(box.host.run_command(['date', '+%s.%N']))
+  box_time_data = float(box.host.run_command(['date', '-u', '+%s.%N']))
   return utils.datetime_utc_from_timestamp(box_time_data)
   
 def get_primary_server(env):
@@ -89,7 +89,7 @@ def get_primary_server(env):
     time_response_2 = env.two.rest_api.ec2.getCurrentTime.GET()
     return (env.one, env.two) if time_response_1['isPrimaryTimeServer'] else (env.two, env.one)
 
-def wait_server_box_sync(server, box):
+def wait_for_server_and_box_time_synced(server, box):
     '''Wait box(system) & mediaserver time synchronization'''
     start = time.time()
     while True:
@@ -106,7 +106,7 @@ def wait_server_box_sync(server, box):
                 server.box, time_diff, datetime_to_str(box_time), datetime_to_str(server_time)))
         time.sleep(SYNC_TIMEOUT_SEC / 10.0)
 
-def wait_servers_sync(env):
+def wait_for_servers_time_synced(env):
     '''Wait 2 mediaservers time synchronization'''
     start = time.time()
     while True:
@@ -125,15 +125,14 @@ def wait_servers_sync(env):
                 env.two.box, datetime_to_str(server_time_2)))
         time.sleep(SYNC_TIMEOUT_SEC / 10.0)
 
-def check_time_server_is_unreachable(box, time_server):
+def assert_rfc868_server_is_unreachable(box, time_server):
     with pytest.raises(ProcessError) as x_info:
         box.host.run_command(
             ['nc', '-w', str(TIME_SERVER_WAIT_TIMEOUT_SEC),
              time_server.address, str(time_server.port)])
     assert x_info.value.returncode == 1
 
-def check_server_time(env, server, get_exp_time_fn):
-    expected_time = get_exp_time_fn(env)
+def assert_server_time_matches(server, expected_time):
     server_time = get_server_current_time(server)
     time_diff = abs(server_time - expected_time)
     log.debug("Server %r time: '%s' compare with '%s', difference: '%s'",
@@ -143,35 +142,35 @@ def check_server_time(env, server, get_exp_time_fn):
         "Too much time difference (%s) between: %r: '%s' and expected: '%s" % (
         time_diff, server.box, datetime_to_str(server_time), datetime_to_str(expected_time)))
 
-def compare_primary_box_and_server_time(env, server):
-    def get_box_expected_time(env):
-        return env.primary.base_time + (utils.datetime_utc_now() - env.primary.date_change_time) 
-    check_server_time(env, server, get_box_expected_time)
+def assert_server_and_box_time_matches(env, server):
+    expected_time = env.primary.base_time + (
+      utils.datetime_utc_now() - env.primary.date_change_time)
+    assert_server_time_matches(server, expected_time)
 
-def get_iptables_command(command):
+def get_iptables_rfc868_rule_command(command):
     return ['sudo', 'iptables', command, 'OUTPUT', '-p',
             'tcp', '--dport', '37', '-j', 'DROP']
 
-def check_iptables_inet_rule(box):
+def does_iptables_rfc868_rule_exist(box):
     try:
-        box.host.run_command(get_iptables_command('-C'))
+        box.host.run_command(get_iptables_rfc868_rule_command('-C'))
         return True
     except ProcessError:
         return False
 
-def turn_inet_on_and_check_time_server(box, time_server):
-    if check_iptables_inet_rule(box):
-        box.host.run_command(get_iptables_command('-D'))
+def turn_rfc868_on_and_check_time_server(box, time_server):
+    if does_iptables_rfc868_rule_exist(box):
+        box.host.run_command(get_iptables_rfc868_rule_command('-D'))
         box.host.run_command(
             ['nc', '-w', str(TIME_SERVER_WAIT_TIMEOUT_SEC),
              time_server.address, str(time_server.port)])
 
-def turn_inet_off_and_check_time_server(box, time_server):
-    if not check_iptables_inet_rule(box):
-        box.host.run_command(get_iptables_command('-A'))
-        check_time_server_is_unreachable(box, time_server)
+def turn_rfc868_off_and_check_time_server(box, time_server):
+    if not does_iptables_rfc868_rule_exist(box):
+        box.host.run_command(get_iptables_rfc868_rule_command('-A'))
+        assert_rfc868_server_is_unreachable(box, time_server)
 
-def wait_server_inet_sync(env, server):
+def wait_for_server_and_rfc868_time_synced(env, server):
     '''Wait internet time server & mediaserver time synchronization'''
     start = time.time()
     while True:
@@ -188,52 +187,51 @@ def wait_server_inet_sync(env, server):
                 server.box, time_diff, datetime_to_str(inet_time), datetime_to_str(server_time)))
         time.sleep(SYNC_TIMEOUT_SEC / 10.0)
 
-def compare_inet_and_server_time(env, server):
-    def get_inet_time(env):
-        return env.time_server.get_time()
-    check_server_time(env, server, get_inet_time)
+def assert_server_and_rfc868_time_matches(env, server):
+    expected_time = env.time_server.get_time()
+    assert_server_time_matches(server, expected_time)
 
 def test_initial(env):
-    check_time_server_is_unreachable(env.one.box, env.time_server)
-    check_time_server_is_unreachable(env.two.box, env.time_server)
-    compare_primary_box_and_server_time(env, env.primary)
+    assert_rfc868_server_is_unreachable(env.one.box, env.time_server)
+    assert_rfc868_server_is_unreachable(env.two.box, env.time_server)
+    assert_server_and_box_time_matches(env, env.primary)
 
 def test_change_primary_server(env):
     env.secondary.rest_api.ec2.forcePrimaryTimeServer.POST(id=env.secondary.ecs_guid)
     env.primary, env.secondary = env.secondary, env.primary
     set_time_on_server(env.primary, BASE_TIME + timedelta(hours=5))
-    wait_server_box_sync(env.primary, env.primary.box)
-    wait_servers_sync(env)
-    compare_primary_box_and_server_time(env, env.primary)
+    wait_for_server_and_box_time_synced(env.primary, env.primary.box)
+    wait_for_servers_time_synced(env)
+    assert_server_and_box_time_matches(env, env.primary)
 
 def test_change_time_on_primary_server(env):
     set_time_on_server(env.primary, BASE_TIME + timedelta(hours=20))
-    wait_server_box_sync(env.primary, env.primary.box)
-    wait_servers_sync(env)
-    compare_primary_box_and_server_time(env, env.primary)
+    wait_for_server_and_box_time_synced(env.primary, env.primary.box)
+    wait_for_servers_time_synced(env)
+    assert_server_and_box_time_matches(env, env.primary)
 
 def test_change_time_on_secondary_server(env):
     set_time_on_server(env.secondary, BASE_TIME + timedelta(hours=10))
     time.sleep(SYNC_TIMEOUT_SEC / 2.0)
-    compare_primary_box_and_server_time(env, env.secondary)
+    assert_server_and_box_time_matches(env, env.secondary)
 
 def test_primary_server_temporary_offline(env):
-    compare_primary_box_and_server_time(env, env.secondary)
+    assert_server_and_box_time_matches(env, env.secondary)
     env.primary.stop_service()
     time.sleep(SYNC_TIMEOUT_SEC / 2.0)
-    compare_primary_box_and_server_time(env, env.secondary)
+    assert_server_and_box_time_matches(env, env.secondary)
     env.secondary.restart()
-    compare_primary_box_and_server_time(env, env.secondary)
+    assert_server_and_box_time_matches(env, env.secondary)
     env.primary.start_service()
     set_time_on_server(env.primary, BASE_TIME + timedelta(hours=15))
-    wait_server_box_sync(env.primary, env.primary.box)
-    wait_servers_sync(env)
-    compare_primary_box_and_server_time(env, env.secondary)
+    wait_for_server_and_box_time_synced(env.primary, env.primary.box)
+    wait_for_servers_time_synced(env)
+    assert_server_and_box_time_matches(env, env.secondary)
 
 # This isn't specified now. Wait for a specification.
 # 
 # def test_secondary_server_alone(env):
-#     compare_primary_box_and_server_time(env, env.secondary)
+#     assert_server_and_box_time_matches(env, env.secondary)
 #     env.primary.service.stop()
 #     env.secondary.rest_api.ec2.removeResource.POST(id=env.primary.ecs_guid)
 #     servers = env.secondary.rest_api.ec2.getMediaServersEx.GET()
@@ -242,32 +240,32 @@ def test_primary_server_temporary_offline(env):
 #     assert time_response_secondary['isPrimaryTimeServer']
 #     env.primary, env.secondary = env.secondary, None
 #     set_time_on_server(env.primary, BASE_TIME - timedelta(hours=15))
-#     wait_server_box_sync(env.primary, env.primary.box)    
+#    wait_for_server_and_box_time_synced(env.primary, env.primary.box)    
 
 def test_secondary_server_temporary_inet_on(env):
-    # Turn on internet time on secondary box
-    turn_inet_on_and_check_time_server(env.secondary.box, env.time_server)
-    wait_server_inet_sync(env, env.primary)
-    wait_server_inet_sync(env, env.secondary)
+    # Turn on RFC868 (time protocol) on secondary box
+    turn_rfc868_on_and_check_time_server(env.secondary.box, env.time_server)
+    wait_for_server_and_rfc868_time_synced(env, env.primary)
+    wait_for_server_and_rfc868_time_synced(env, env.secondary)
     # Change system time on primary box
     set_time_on_server(env.primary, BASE_TIME - timedelta(hours=5))
     time.sleep(SYNC_TIMEOUT_SEC / 2.0)
-    compare_inet_and_server_time(env, env.primary)
-    # Turn internet time off
-    turn_inet_off_and_check_time_server(env.secondary.box, env.time_server)
+    assert_server_and_rfc868_time_matches(env, env.primary)
+    # Turn off RFC868 (time protocol)
+    turn_rfc868_off_and_check_time_server(env.secondary.box, env.time_server)
     time.sleep(SYNC_TIMEOUT_SEC / 2.0)
-    compare_inet_and_server_time(env, env.primary)
+    assert_server_and_rfc868_time_matches(env, env.primary)
     # Stop secondary server
     env.secondary.stop_service()
     time.sleep(SYNC_TIMEOUT_SEC / 2.0)
-    compare_inet_and_server_time(env, env.primary)
+    assert_server_and_rfc868_time_matches(env, env.primary)
     env.secondary.start_service()
     time.sleep(SYNC_TIMEOUT_SEC / 2.0)
-    compare_inet_and_server_time(env, env.primary)
+    assert_server_and_rfc868_time_matches(env, env.primary)
     # Restart secondary server
     env.secondary.restart()
     time.sleep(SYNC_TIMEOUT_SEC / 2.0)
-    compare_inet_and_server_time(env, env.primary)
+    assert_server_and_rfc868_time_matches(env, env.primary)
     # Stop and start both servers - so that servers forget internet time
     env.secondary.stop_service()
     env.primary.stop_service()
@@ -277,6 +275,6 @@ def test_secondary_server_temporary_inet_on(env):
     # Detect new primary and change its system time
     env.primary, env.secondary = get_primary_server(env)
     set_time_on_server(env.primary, BASE_TIME - timedelta(hours=25))
-    wait_server_box_sync(env.primary, env.primary.box)
-    wait_servers_sync(env)
-    compare_primary_box_and_server_time(env, env.secondary)
+    wait_for_server_and_box_time_synced(env.primary, env.primary.box)
+    wait_for_servers_time_synced(env)
+    assert_server_and_box_time_matches(env, env.secondary)
