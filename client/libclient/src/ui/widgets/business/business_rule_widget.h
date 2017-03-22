@@ -9,6 +9,7 @@
 #include <ui/models/business_rules_view_model.h>
 
 #include <ui/widgets/business/abstract_business_params_widget.h>
+#include <ui/widgets/common/panel.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 #include <utils/common/connective.h>
@@ -20,11 +21,11 @@ namespace Ui {
 class QStateMachine;
 class QStandardItemModel;
 
-class QnBusinessRuleWidget : public Connective<QWidget>, public QnWorkbenchContextAware
+class QnBusinessRuleWidget : public Connective<QnPanel>, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    typedef Connective<QWidget> base_type;
+    typedef Connective<QnPanel> base_type;
 public:
     explicit QnBusinessRuleWidget(QWidget *parent = 0);
     virtual ~QnBusinessRuleWidget();
@@ -34,6 +35,7 @@ public:
 
 public slots:
     void at_scheduleButton_clicked();
+
 
 protected:
     /**

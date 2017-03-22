@@ -71,7 +71,6 @@
 <script src="bower_components/screenfull/dist/screenfull.js"></script>
 <script src="bower_components/ngstorage/ngStorage.js"></script>
 <script src="bower_components/chartjs/Chart.js"></script>
-<script src="bower_components/typeahead-focus/typeahead-focus.js"></script>
 <script src="bower_components/jquery-timepicker-jt/jquery.timepicker.js"></script>
 <script src="bower_components/angular-jquery-timepicker/src/timepickerdirective.js"></script>
 <!-- endbower -->
@@ -81,6 +80,7 @@
 <script src="scripts/vendor/jquery-file-upload/jquery.fileupload.js"></script>
 <script src="scripts/vendor/jquery-file-upload/jquery.fileupload-process.js"></script>
 <script src="scripts/vendor/jquery.event.drag-2.2.js"></script>
+<script src="scripts/vendor/typeahead-focus.js"></script>
 
 <script src="scripts/vendor/date.js"></script>
 <script src="scripts/vendor/swfobject.js"></script>
@@ -154,20 +154,6 @@
 
 
 <script src="customization/config.js"></script>
-
-<script type="text/ng-template" id="offline_modal">
-    <div class="modal-header">
-        <h3 class="modal-title">Server is offline</h3>
-    </div>
-
-    <form class="form" role="form" id="restartDialog">
-        <div class="modal-body" class="col-sm-12">
-            <p>Server can't handle requests now. Trying to reach it again.</p>
-            <progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</progressbar>
-            <p>If nothing happens for a while - you could check server condition manually or refresh the page</p>
-        </div>
-    </form>
-</script>
 
 </body>
 </html>
