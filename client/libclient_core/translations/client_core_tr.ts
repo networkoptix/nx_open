@@ -5,118 +5,118 @@
     <name>QnCloudResultInfo</name>
     <message>
         <source>Successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Başarılı.</translation>
     </message>
     <message>
         <source>Invalid login or password.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geçersiz kullanıcı adı veya parola.</translation>
     </message>
     <message>
         <source>Requested operation is not allowed with provided credentials.</source>
-        <translation type="unfinished"></translation>
+        <translation>Mevcut izinler ile istenilen işlemler yapılamaz.</translation>
     </message>
     <message>
         <source>This account is not activated. Please check your email.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bu hesap aktif değil. Lütfen e-postanızı kontrol edin.</translation>
     </message>
     <message>
         <source>This account is blocked.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hesap kilitlenmiş.</translation>
     </message>
     <message>
         <source>Requested feature is not implemented.</source>
-        <translation type="unfinished"></translation>
+        <translation>İstenen özellik uygulanmadı.</translation>
     </message>
     <message>
         <source>Unknown realm.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilinmeyen Bölge.</translation>
     </message>
     <message>
         <source>Bad request.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hatalı istek.</translation>
     </message>
     <message>
         <source>Invalid nonce.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geçersiz giriş.</translation>
     </message>
     <message>
         <source>Credentials are no longer valid.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kimlik bilgileri artık geçerli değil.</translation>
     </message>
     <message>
         <source>Invalid data received.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geçersiz veri dosyası.</translation>
     </message>
     <message>
         <source>Unknown error.</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilinmeyen hata.</translation>
     </message>
     <message>
         <source>Unexpected network error. Please check your Internet connection and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunucuya bağlanamıyor. Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin.</translation>
     </message>
     <message>
         <source>Invalid login.</source>
-        <translation type="unfinished"></translation>
+        <translation>Geçersiz giriş.</translation>
     </message>
     <message>
         <source>Requested object is not found.</source>
-        <translation type="unfinished"></translation>
+        <translation>İstenen nesne bulunamadı.</translation>
     </message>
     <message>
         <source>Object already exists.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nesne zaten var.</translation>
     </message>
     <message>
         <source>Internal %1 error. Please contact support team.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <translation>Bilinmeyen Hata %1. Lütfen Destek Birimiyle İletişime Geçin.</translation>
     </message>
     <message>
         <source>Sorry, %1 Service is temporary unavailable. We are doing our best to restore it. Please try again later.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <translation>Üzgünüz, %1 hizmeti geçici olarak kullanılamıyor. Geri yüklemek için elimizden geleni yapıyoruz. Lütfen daha sonra yeniden deneyin.</translation>
     </message>
     <message>
         <source>Sorry, %1 Service could not process your request. Please try again in a few moments.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished"></translation>
+        <translation>Üzgünüz, %1 hizmeti isteğinizi işleyemedi. Lütfen birkaç dakika sonra yeniden deneyin.</translation>
     </message>
 </context>
 <context>
     <name>QnCloudSystemInformationWatcher</name>
     <message>
-        <source>Your system</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Owner: %1</source>
         <comment>%1 is a user name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Sahibi: %1</translation>
+    </message>
+    <message>
+        <source>Your System</source>
+        <translation>Sistem</translation>
     </message>
 </context>
 <context>
     <name>QnDirectSystemsFinder</name>
     <message>
         <source>System</source>
-        <translation type="unfinished"></translation>
+        <translation>Sistem</translation>
     </message>
     <message>
         <source>System (%1)</source>
         <comment>%1 is ip and port of system</comment>
-        <translation type="unfinished"></translation>
+        <translation>Sistemi (%1)</translation>
     </message>
 </context>
 <context>
     <name>QnSystemsModel</name>
     <message>
-        <source>Your system</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Owner: %1</source>
         <comment>%1 is a user name</comment>
-        <translation type="unfinished"></translation>
+        <translation>Sahibi: %1</translation>
+    </message>
+    <message>
+        <source>Your System</source>
+        <translation>Sistem</translation>
     </message>
 </context>
 </TS>
