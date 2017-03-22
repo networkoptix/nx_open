@@ -162,7 +162,7 @@ void MotionSelectionInstrument::setWidget(QnMediaResourceWidget* widget)
     updateCursor();
 }
 
-void MotionSelectionInstrument::setItemUnderMouse(QGraphicsItem* item)
+void MotionSelectionInstrument::setItemUnderMouse(QGraphicsWidget* item)
 {
     if (m_itemUnderMouse == item)
         return;
@@ -205,12 +205,14 @@ bool MotionSelectionInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* e
 {
     auto view = this->view(viewport);
 
+    // Really UiElementsWidget always getting here for main scene, resource widget for motion tab
+    auto item = dynamic_cast<QGraphicsWidget*>(
+        this->item(view, event->pos(), [](QGraphicsItem* item){ return item->isWidget(); }));
+    setItemUnderMouse(item);
+
     auto widget = dynamic_cast<QnMediaResourceWidget*>(
         this->item(view, event->pos(), widgetWithMotion));
     setWidget(widget);
-
-    // Really UiElementsWidget always getting here
-    setItemUnderMouse(this->item(view, event->pos()));
 
     event->accept();
     return false;
