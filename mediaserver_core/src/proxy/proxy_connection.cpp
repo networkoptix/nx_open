@@ -250,10 +250,10 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
 
 void QnProxyConnectionProcessor::cleanupProxyInfo(nx_http::Request* request)
 {
-    static const char* kProxyheadersPrefix = "Proxy-";
+    static const char* kProxyHeadersPrefix = "Proxy-";
 
-    auto itr = request->headers.lower_bound(kProxyheadersPrefix);
-    while (itr != request->headers.end() && itr->first.startsWith(kProxyheadersPrefix))
+    auto itr = request->headers.lower_bound(kProxyHeadersPrefix);
+    while (itr != request->headers.end() && itr->first.startsWith(kProxyHeadersPrefix))
         itr = request->headers.erase(itr);
 
     request->requestLine.url = request->requestLine.url.toString(
