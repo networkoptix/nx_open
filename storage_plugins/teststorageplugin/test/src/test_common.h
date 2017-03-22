@@ -17,17 +17,17 @@
             "id": "someCameraId1",
             "hi": [
                 {
-                    "durationMs": "429626247",
+                    "durationMs": "60000",
                     "startTimeMs": "1453550461075"
                 },
                 {
-                    "durationMs": "429626247",
+                    "durationMs": "60000",
                     "startTimeMs": "1453550461076"
                 }
             ],
             "low": [
                 {
-                    "durationMs": "429626247",
+                    "durationMs": "60000",
                     "startTimeMs": "1453550461077"
                 } 
             ]
@@ -37,13 +37,13 @@
             "id": "someCameraId2",
             "hi": [
                 {
-                    "durationMs": "429626247",
+                    "durationMs": "60000",
                     "startTimeMs": "1453550461078"
                 }
             ],
             "low": [
                 {
-                    "durationMs": "429626247",
+                    "durationMs": "60000",
                     "startTimeMs": "1453550461079"
                 } 
             ]

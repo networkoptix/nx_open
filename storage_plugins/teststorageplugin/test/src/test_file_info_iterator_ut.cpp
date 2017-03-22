@@ -62,14 +62,14 @@ TEST_F(TestFileInfoIteratorTest, Files)
     ASSERT_EQ(ecode, nx_spl::error::NoError);
     ASSERT_EQ(strcmp(
         fInfo->url, 
-        "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461075.mkv"), 0);
+        "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461075_60000.mkv"), 0);
     ASSERT_EQ(fInfo->type, nx_spl::isFile);
 
     fInfo = fileIterator->next(&ecode);
     ASSERT_EQ(ecode, nx_spl::error::NoError);
     ASSERT_EQ(strcmp(
         fInfo->url, 
-        "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076.mkv"), 0);
+        "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076_60000.mkv"), 0);
 
     fileIterator->releaseRef();
 }

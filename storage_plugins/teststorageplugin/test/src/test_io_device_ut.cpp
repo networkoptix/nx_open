@@ -9,7 +9,7 @@ TEST_F(TestStorageTest, IODevice_open_Read)
     IODeviceUniquePtr ioDevice1(
         dynamic_cast<TestIODeviceHelper*>(
             storage->open(
-                "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076.mkv",
+                "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076_60000.mkv",
                 nx_spl::io::ReadOnly,
                 &ecode)), 
         ioDeviceDeleter);
@@ -41,7 +41,7 @@ TEST_F(TestStorageTest, IODevice_open_Write_Existing)
     IODeviceUniquePtr ioDevice1(
         dynamic_cast<TestIODeviceHelper*>(
             storage->open(
-                "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076.mkv",
+                "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076_60000.mkv",
                 nx_spl::io::WriteOnly,
                 &ecode)), 
         ioDeviceDeleter);
@@ -78,10 +78,12 @@ TEST_F(TestStorageTest, IODevice_MediaFile_Read_Seek)
     IODeviceUniquePtr ioDevice1(
         dynamic_cast<TestIODeviceHelper*>(
             storage->open(
-                "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076.mkv",
+                "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076_60000.mkv",
                 nx_spl::io::ReadOnly,
                 &ecode)), 
         ioDeviceDeleter);
+
+    ASSERT_TRUE(ioDevice1);
 
     ASSERT_EQ(ioDevice1->read(buf, 5, &ecode), 5);
     ASSERT_EQ(ecode, nx_spl::error::NoError);
