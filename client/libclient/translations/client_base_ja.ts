@@ -1876,12 +1876,12 @@ to view more bookmarks</source>
     <message>
         <source>to</source>
         <extracomment>&quot;to&quot; is from the sentence &quot;Send email _to_:&quot;</extracomment>
-        <translation>～</translation>
+        <translation>宛先</translation>
     </message>
     <message>
         <source>at</source>
         <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
-        <translation>-</translation>
+        <translation>デバイス</translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -2731,7 +2731,7 @@ to %1</source>
     <name>QnConnectToCloudDialog</name>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Password</source>
@@ -2800,7 +2800,7 @@ to %1</source>
     </message>
     <message>
         <source>Compatibility mode for versions lower than %1 is not supported.</source>
-        <translation> %1以下のバージョンでは互換性モードがサポートされません.</translation>
+        <translation>%1以下のバージョンでは互換性モードがサポートされません.</translation>
     </message>
     <message>
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
@@ -3689,7 +3689,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>DN</source>
@@ -3697,7 +3697,7 @@ to %1</source>
     </message>
     <message>
         <source>Name</source>
-        <translation type="unfinished">Name</translation>
+        <translation>名前</translation>
     </message>
 </context>
 <context>
@@ -3728,7 +3728,7 @@ to %1</source>
     </message>
     <message>
         <source>Import Selected</source>
-        <translation type="unfinished">Import Selected</translation>
+        <translation>インポートの選択</translation>
     </message>
 </context>
 <context>
@@ -4130,7 +4130,7 @@ to %1</source>
     <name>QnLoginToCloudDialog</name>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Password</source>
@@ -4405,7 +4405,7 @@ to %1</source>
     </message>
     <message>
         <source>Kb/s</source>
-        <translation>kb/s</translation>
+        <translation>Kb/s</translation>
     </message>
     <message>
         <source>Mb/s</source>
@@ -4828,15 +4828,15 @@ to %1</source>
     </message>
     <message>
         <source>Cameras from other servers and removed cameras</source>
-        <translation>&lt;他サーバーのカメラと削除されたカメラ&gt;</translation>
+        <translation>他サーバーのカメラと削除されたカメラ</translation>
     </message>
     <message>
         <source>%1 TB</source>
-        <translation>%1 Tb</translation>
+        <translation>%1 TB</translation>
     </message>
     <message>
         <source>%1 GB</source>
-        <translation>%1 Gb</translation>
+        <translation>%1 GB</translation>
     </message>
     <message numerus="yes">
         <source>Total %1 %n devices</source>
@@ -4994,7 +4994,7 @@ to %1</source>
     <name>QnResourceTreeModelOtherSystemsNode</name>
     <message>
         <source>New System</source>
-        <translation type="unfinished">New System</translation>
+        <translation>新規システム</translation>
     </message>
 </context>
 <context>
@@ -5637,7 +5637,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>SMTP Server</source>
@@ -5672,7 +5672,7 @@ to %1</source>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Email is not valid.</source>
@@ -6010,7 +6010,7 @@ to %1</source>
     </message>
     <message>
         <source>%1 GB</source>
-        <translation>%1 Gb</translation>
+        <translation>%1 GB</translation>
     </message>
 </context>
 <context>
@@ -6079,7 +6079,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Updates</source>
@@ -6296,6 +6296,71 @@ to %1</source>
         <source>No thumbnails available</source>
         <translation>使用できるサムネイルはありません</translation>
     </message>
+    <message>
+        <source>hh:mm</source>
+        <comment>Format for displaying hours and minutes on timeline.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hh:mm ap</source>
+        <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>h ap</source>
+        <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd</source>
+        <comment>Format for displaying days on timeline.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MMMM</source>
+        <comment>Format for displaying months on timeline.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying years on timeline</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm</source>
+        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm ap</source>
+        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm</source>
+        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy h ap</source>
+        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy</source>
+        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MMMM yyyy</source>
+        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying year caption in timeline&apos;s header</comment>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnTwoStepFileDialog</name>
@@ -6493,7 +6558,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
 </context>
 <context>
@@ -6642,7 +6707,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Email cannot be empty.</source>
@@ -6800,7 +6865,7 @@ to %1</source>
     <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n files?</source>
         <translation>
-            <numerusform> %n ファイルを削除しますか？</numerusform>
+            <numerusform>%n ファイルを削除しますか？</numerusform>
         </translation>
     </message>
     <message>
@@ -6932,7 +6997,7 @@ to %1</source>
     </message>
     <message>
         <source>Press %1 to search bookmarks</source>
-        <translation> %1 でブックマーク検索</translation>
+        <translation>%1 でブックマーク検索</translation>
     </message>
     <message>
         <source>Server offline</source>
@@ -7195,7 +7260,7 @@ to %1</source>
     </message>
     <message>
         <source>Cloud Systems cannot be merged</source>
-        <translation type="unfinished">Cloud Systems cannot be merged</translation>
+        <translation>クラウド システムを統合することはできません</translation>
     </message>
 </context>
 <context>

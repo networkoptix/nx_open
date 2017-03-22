@@ -24,7 +24,7 @@
     </message>
     <message>
         <source>UAC must be enabled to request privileges for non-admin users.</source>
-        <translation>Yönetici Olmayan Kullanıcılara Ayrıcalık Tanımak İçin UAC  Etkinleştirilmelidir.</translation>
+        <translation>Yönetici Olmayan Kullanıcılara Ayrıcalık Tanımak İçin UAC Etkinleştirilmelidir.</translation>
     </message>
 </context>
 <context>
@@ -35,7 +35,7 @@
     </message>
     <message>
         <source>Specified database does not exist.</source>
-        <translation>Belirtilen Veritabanı  Yok.</translation>
+        <translation>Belirtilen Veritabanı Yok.</translation>
     </message>
     <message>
         <source>Specified parameter is invalid.</source>
@@ -46,72 +46,72 @@
         <translation>Kurulu Servislere Erişilemiyor</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to access installed services:</source>
-        <translation>Kurulu Servislere Erişmeye Çalışırken Hata Oluştu:</translation>
-    </message>
-    <message>
         <source>No %1 services installed</source>
         <translation>%1 Servisler Kurulamadı</translation>
-    </message>
-    <message>
-        <source>Media server has been stopped</source>
-        <translation>Medya Sunucusu Durduruldu</translation>
-    </message>
-    <message>
-        <source>Media server has been started</source>
-        <translation>Medya Sunucusu Başlatıldı</translation>
-    </message>
-    <message>
-        <source> (stopped)</source>
-        <translation>(durduruldu)</translation>
-    </message>
-    <message>
-        <source> (starting)</source>
-        <translation>(başlatılıyor)</translation>
-    </message>
-    <message>
-        <source> (stopping)</source>
-        <translation>(durduruluyor)</translation>
-    </message>
-    <message>
-        <source> (started)</source>
-        <translation>(başlatıldı)</translation>
-    </message>
-    <message>
-        <source> (resuming)</source>
-        <translation>(sürdürülüyor)</translation>
-    </message>
-    <message>
-        <source> (paused)</source>
-        <translation>(durduruldu)</translation>
-    </message>
-    <message>
-        <source> (pausing)</source>
-        <translation>(durduruluyor)</translation>
-    </message>
-    <message>
-        <source>Media server will be stopped. Continue?</source>
-        <translation>Medya Sunucusu Durdurulacak. Devam Edilsin Mi?</translation>
     </message>
     <message>
         <source>&amp;Quit</source>
         <translation>&amp;Çıkış</translation>
     </message>
     <message>
-        <source>Show &amp;Media Server Log</source>
-        <translation>&amp;Medya Sunucu Günlüğünü Göster</translation>
+        <source>An error has occurred while trying to access installed services:</source>
+        <translation>Kurulu Servislere Erişmeye Çalışırken Hata Oluştu:</translation>
     </message>
     <message>
-        <source>Start Media Server</source>
-        <translation>Medya Sunucusunu Başlat</translation>
+        <source>Server has been stopped</source>
+        <translation>Sunucu Durduruldu</translation>
     </message>
     <message>
-        <source>Stop Media Server</source>
-        <translation>Medya Sunucusunu Durdur</translation>
+        <source>Server has been started</source>
+        <translation>Sunucu Başlatıldı</translation>
     </message>
     <message>
-        <source>Media Server Web Page</source>
-        <translation>Medya Sunucusu Web Sayfası</translation>
+        <source>Server will be stopped. Continue?</source>
+        <translation>Sunucu durdurulacak. Devam edilsin mi?</translation>
+    </message>
+    <message>
+        <source>Show Server Log</source>
+        <translation>Sunucu günlüğü göster</translation>
+    </message>
+    <message>
+        <source>Start Server</source>
+        <translation>Başlat</translation>
+    </message>
+    <message>
+        <source>Stop Server</source>
+        <translation>Durdur</translation>
+    </message>
+    <message>
+        <source>Server Web Page</source>
+        <translation>Sunucu web sayfası</translation>
+    </message>
+    <message>
+        <source>stopped</source>
+        <translation>Durduruldu</translation>
+    </message>
+    <message>
+        <source>starting</source>
+        <translation>Başlatılıyor</translation>
+    </message>
+    <message>
+        <source>stopping</source>
+        <translation>durduruluyor</translation>
+    </message>
+    <message>
+        <source>started</source>
+        <translation>başlatıldı</translation>
+    </message>
+    <message>
+        <source>resuming</source>
+        <translation>sürdürülüyor</translation>
+    </message>
+    <message>
+        <source>paused</source>
+        <translation>duraklatıldı</translation>
+    </message>
+    <message>
+        <source>pausing</source>
+        <translation>duraklatılıyor</translation>
     </message>
 </context>
 </TS>

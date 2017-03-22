@@ -23,7 +23,7 @@ bool isSamePort(int first, int second)
     return ((first == second) || (isDefaultPort(first) == isDefaultPort(second)));
 }
 
-} //unnamed namespace
+} // namespace
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 class QnSystemHostsModel::HostsModel: public Connective<QAbstractListModel>
@@ -303,7 +303,7 @@ bool QnSystemHostsModel::HostsModel::updateServerHostInternal(
     }
 
     it->second = host;
-    const auto row = (it - m_hosts.begin());
+    const auto row = std::distance(it, m_hosts.begin());
     const auto modelIndex = index(row);
     emit dataChanged(modelIndex, modelIndex);
 
@@ -326,7 +326,7 @@ void QnSystemHostsModel::HostsModel::removeServerInternal(const ServerIdHostList
     if (it == m_hosts.end())
         return;
 
-    const auto row = it - m_hosts.begin();
+    const auto row = std::distance(it, m_hosts.begin());
     beginRemoveRows(QModelIndex(), row, row);
     m_hosts.erase(it);
     endRemoveRows();
@@ -344,7 +344,7 @@ QnSystemHostsModel::HostsModel::getDataIt(const QnUuid& serverId)
 
 QHash<int, QByteArray> QnSystemHostsModel::HostsModel::roleNames() const
 {
-    static const auto kRoles = QHash<int, QByteArray>{ {QnSystemHostsModel::UrlRole, "url"} };
+    static const auto kRoles = QHash<int, QByteArray>{{QnSystemHostsModel::UrlRole, "url"}};
     return base_type::roleNames().unite(kRoles);
 }
 
@@ -382,7 +382,7 @@ bool QnSystemHostsModel::lessThan(
 
     const int leftIndex = getIndexOfConnection(leftUrl);
     const int rightIndex = getIndexOfConnection(rightUrl);
-    if ((leftIndex == rightIndex))
+    if (leftIndex == rightIndex)
         return (sourceLeft.row() < sourceRight.row());
 
     if (leftIndex == -1)
