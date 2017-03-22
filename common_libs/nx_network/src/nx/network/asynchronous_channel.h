@@ -14,7 +14,7 @@ class AsynchronousChannel:
 {
 public:
     static constexpr std::size_t kDefaultReadBufferSize = 16 * 1024;
-    static constexpr std::size_t kDefaultSendQueueSizeBytes = 128 * 1024;
+    static constexpr std::size_t kDefaultMaxSendQueueSizeBytes = 128 * 1024;
 
     virtual ~AsynchronousChannel() override = default;
 
@@ -51,7 +51,8 @@ public:
             std::make_unique<detail::AsyncOneWayChannel<Source, Destination>>(
                 *source,
                 *destination,
-                AsynchronousChannel::kDefaultReadBufferSize);
+                AsynchronousChannel::kDefaultReadBufferSize,
+                AsynchronousChannel::kDefaultMaxSendQueueSizeBytes);
         (*channel)->setOnDone(
             [this](SystemError::ErrorCode sysErrorCode)
             {

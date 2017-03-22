@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/async_pipeline.h>
+#include <nx/network/asynchronous_channel.h>
 #include <nx/utils/pipeline.h>
 #include <nx/utils/random.h>
 #include <nx/utils/thread/mutex.h>
@@ -35,7 +35,9 @@ public:
         m_errorState(false),
         m_totalBytesRead(0),
         m_sendPaused(false),
-        m_sendBuffer(nullptr)
+        m_sendBuffer(nullptr),
+        m_readPosted(false),
+        m_readSequence(0)
     {
         bindToAioThread(getAioThread());
     }
@@ -59,10 +61,13 @@ public:
         std::function<void(SystemError::ErrorCode, size_t)> handler)
     {
         NX_ASSERT(buffer->capacity() > buffer->size());
+        m_readPosted = true;
       
         m_reader.post(
             [this, buffer, handler = std::move(handler)]()
             {
+                m_readPosted = false;
+
                 if (m_errorState)
                 {
                     handler(SystemError::connectionReset, (size_t)-1);
@@ -77,10 +82,14 @@ public:
                     {
                         QnMutexLocker lock(&m_mutex);
                         m_totalDataRead.append(buffer->data() + buffer->size(), bytesRead);
+                        m_totalBytesRead += bytesRead;
                     }
                     buffer->resize(buffer->size() + bytesRead);
-                    m_totalBytesRead += bytesRead;
+
                     handler(SystemError::noError, bytesRead);
+
+                    if (!m_readPosted)
+                        ++m_readSequence;
                     return;
                 }
 
@@ -138,9 +147,11 @@ public:
             std::this_thread::yield();
     }
 
-    void waitForReadSequenceToFinish()
+    void waitForReadSequenceToBreak()
     {
-
+        auto readSequenceBak = m_readSequence.load();
+        while (readSequenceBak == m_readSequence)
+            std::this_thread::yield();
     }
 
     QByteArray dataRead() const
@@ -167,6 +178,8 @@ private:
     const nx::Buffer* m_sendBuffer;
     aio::BasicPollable m_reader;
     aio::BasicPollable m_writer;
+    bool m_readPosted;
+    std::atomic<int> m_readSequence;
 
     virtual void stopWhileInAioThread() override
     {
@@ -331,7 +344,7 @@ protected:
 
     void waitForChannelToStopReadingLeftSource()
     {
-        m_leftFile->waitForReadSequenceToFinish();
+        m_leftFile->waitForReadSequenceToBreak();
     }
 
     void waitForSomeExchangeToHappen()
@@ -424,7 +437,7 @@ TEST_F(AsynchronousChannel, forwards_all_received_data_after_channel_closure)
     assertAllDataFromLeftHasBeenTransferredToTheRight();
 }
 
-TEST_F(AsynchronousChannel, DISABLED_read_saturation)
+TEST_F(AsynchronousChannel, read_saturation)
 {
     startExchangingInfiniteData();
     waitForSomeExchangeToHappen();
