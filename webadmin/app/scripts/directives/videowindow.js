@@ -148,10 +148,10 @@ angular.module('webadminApp')
                         case "Opera":
                         case "Webkit":
                         default:
-                            if(jsHlsSupported && weHaveHls && 0) {
+                            if(jsHlsSupported && weHaveHls) {
                                 return "jshls";// We are hoping that we have some good browser
                             }
-                            if(window.jscd.flashVersion &&  weHaveHls && 0){ // We have flash - try to play using flash
+                            if(window.jscd.flashVersion &&  weHaveHls){ // We have flash - try to play using flash
                                 return "flashls";
                             }
                             if(weHaveWebm && canPlayNatively("webm")){
