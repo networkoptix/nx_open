@@ -72,9 +72,8 @@ void QnSoftwareTriggerBusinessEventWidget::at_model_dataChanged(QnBusiness::Fiel
         const auto params = model()->eventParams();
         const auto text = params.inputPortId.trimmed();
         ui->triggerIdLineEdit->setText(text);
-        ui->iconComboBox->setCurrentIcon(QnSoftwareTriggerPixmaps::hasPixmap(params.caption)
-            ? params.caption
-            : QnSoftwareTriggerPixmaps::defaultPixmapName());
+        ui->iconComboBox->setCurrentIcon(
+            QnSoftwareTriggerPixmaps::effectivePixmapName(params.caption));
 
         if (params.metadata.instigators.empty())
         {

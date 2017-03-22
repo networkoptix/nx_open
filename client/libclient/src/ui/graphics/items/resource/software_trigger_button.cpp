@@ -162,9 +162,7 @@ void QnSoftwareTriggerButton::setButtonSize(const QSize& size)
 
 void QnSoftwareTriggerButton::setIcon(const QString& name)
 {
-    const QString iconName = QnSoftwareTriggerPixmaps::hasPixmap(name)
-        ? name
-        : QnSoftwareTriggerPixmaps::defaultPixmapName();
+    const QString iconName = QnSoftwareTriggerPixmaps::effectivePixmapName(name);
 
     if (m_iconName == iconName)
         return;

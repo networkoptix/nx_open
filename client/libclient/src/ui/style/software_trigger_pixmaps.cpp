@@ -26,6 +26,11 @@ QString QnSoftwareTriggerPixmaps::defaultPixmapName()
     return lit("_bell_on");
 }
 
+QString QnSoftwareTriggerPixmaps::effectivePixmapName(const QString& name)
+{
+    return hasPixmap(name) ? name : defaultPixmapName();
+}
+
 const QStringList& QnSoftwareTriggerPixmaps::pixmapNames()
 {
     static const QStringList pixmapNames =
