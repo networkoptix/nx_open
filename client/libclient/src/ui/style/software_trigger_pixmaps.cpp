@@ -34,7 +34,7 @@ const QStringList& QnSoftwareTriggerPixmaps::pixmapNames()
             std::set<QString, decltype(&nx::utils::naturalStringLess)> names(
                 &nx::utils::naturalStringLess);
 
-            QRegExp suffixesToSkip(lit("(_hovered|_pressed|_selected|_disabled|@[0-9]+x)$"));
+            QRegExp suffixesToSkip(QLatin1String("(_hovered|_pressed|_selected|_disabled|@[0-9]+x)$"));
 
             for (const auto path: qnSkin->paths())
             {
