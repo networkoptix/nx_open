@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <algorithm>
 #include <fstream>
+#include <iterator>
 #include "test_storage_factory.h"
 #include "test_storage.h"
 #include "log.h"
@@ -25,10 +26,12 @@ std::string getAppDir()
 
 #if defined (_WIN32)
 
-    int bytes = GetModuleFileName(NULL, pBuf, len);
+	TCHAR tBuf[512];
+    int bytes = GetModuleFileName(NULL, tBuf, 512);
     if (bytes == 0)
         return result;
     char separator = '\\';
+	WideCharToMultiByte(CP_UTF8, 0, tBuf, 512, buf, 512, 0, 0);
 
 #elif defined (__linux__)
 

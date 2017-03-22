@@ -307,7 +307,7 @@ struct JsonVal jsonParseString(const char *str, char *errorBuf, int errorBufSize
     struct JsonVal result;
     const char *_str = str;
 
-    result = (struct JsonVal){jsonNullT};
+    result.type = jsonNullT;
     if (parseObject(&_str, &result) != 0)
         fillError(_str, errorBuf, errorBufSize);
     else

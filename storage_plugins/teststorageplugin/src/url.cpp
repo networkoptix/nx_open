@@ -1,3 +1,4 @@
+#include <iterator>
 #include "url.h"
 
 namespace utils {

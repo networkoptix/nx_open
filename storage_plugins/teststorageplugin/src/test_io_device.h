@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <third_party_storage.h>
 #include <common.h>
 #include <detail/fs_stub.h>
