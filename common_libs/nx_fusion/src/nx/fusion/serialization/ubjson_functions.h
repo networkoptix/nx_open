@@ -320,5 +320,9 @@ bool deserialize(QnUbjsonReader<Input> *stream, std::array<T, N> *target) {
     return true;
 }
 
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+(QSize)(QSizeF)(QRect)(QRectF)(QPoint)(QPointF)(QVector2D)(QVector3D)(QVector4D),
+(ubjson)
+)
 
 #endif // QN_UBJSON_FUNCTIONS_H
