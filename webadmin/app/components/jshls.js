@@ -81,7 +81,7 @@ var hlsAPI = new (function(){
                 parsing : data.stats.tparsed - data.stats.tload,
                 duration : data.stats.tload - data.stats.tfirst
             };
-            const parsingDuration = data.stats.tparsed - data.stats.tload;
+            var parsingDuration = data.stats.tparsed - data.stats.tload;
             if (stats.levelParsed) {
                 this.sumLevelParsingMs += parsingDuration;
             }

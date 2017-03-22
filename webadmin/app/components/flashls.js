@@ -57,7 +57,7 @@ var flashlsAPI = new (function(flashObject) {
         readyToPlay = false;
         urlToPlay = url;
         if(url.indexOf("http")!=0){
-            url = window.location.origin + url;
+            url = window.location.protocol + "//" + window.location.host + url;
         }
         this.flashObject.playerLoad(url);
     };
