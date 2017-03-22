@@ -25,9 +25,22 @@ int64_t fileSize(const std::string& fileName)
 }
 
 #elif defined (_WIN32)
+#include <windows.h>
+
 int64_t fileSize(const std::string& fileName)
 {
-    return 0;
+	TCHAR buf[2048];
+	MultiByteToWideChar(CP_UTF8, 0, fileName.c_str(), fileName.size(), buf, 2048);
+
+	HANDLE hFile = CreateFile(buf, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (!hFile)
+		return 0;
+
+	LARGE_INTEGER result;
+	if (!GetFileSizeEx(hFile, &result))
+		return 0;
+
+    return result.QuadPart;
 }
 #endif
 

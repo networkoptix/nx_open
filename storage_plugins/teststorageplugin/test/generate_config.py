@@ -27,7 +27,7 @@ def main():
     except:
         print('sample file {} not found'.format(args.sample))
         sys.exit(-1)
-    result = {'sample': args.sample, 'cameras': []}
+    result = {'sample': os.path.abspath(args.sample), 'cameras': []}
     for camId in range(args.camera_count):
         currentStartTime = args.start_time
         cameraObj = {'id': 'camera' + str(camId), 'hi': [], 'low': []}
