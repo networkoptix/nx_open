@@ -142,8 +142,9 @@ void QnResourceTreeModelLayoutNode::itemRemoved(const QnLayoutItemData& item)
 {
     if (auto node = m_items.take(item.uuid))
     {
+        if (node->resource())
+            --m_loadedItems;
         node->deinitialize();
-        --m_loadedItems;
         updateLoadedState();
     }
 }

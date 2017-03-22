@@ -239,7 +239,7 @@
     <message>
         <location/>
         <source>Email settings</source>
-        <translation>E-Maileinstellungen</translation>
+        <translation>Email einstellungen</translation>
     </message>
     <message>
         <location/>
@@ -895,7 +895,7 @@
     <message>
         <location/>
         <source>Incorrect Email or Password</source>
-        <translation>Falsche E-Mail oder Passwort</translation>
+        <translation>Falsche Email oder Passwort</translation>
     </message>
 </context>
 <context>
@@ -1899,7 +1899,7 @@
     <message>
         <location/>
         <source>Incorrect Email or Password</source>
-        <translation>E-Mail oder Passwort ungültig</translation>
+        <translation>Email oder Passwort ungültig</translation>
     </message>
 </context>
 <context>
@@ -2320,7 +2320,7 @@
     <message>
         <location/>
         <source>Global Email Settings...</source>
-        <translation>Allgemeine E-Maileinstellungen...</translation>
+        <translation>Allgemeine Emaileinstellungen...</translation>
     </message>
 </context>
 <context>
@@ -2586,7 +2586,7 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp/smtp_settings_widget.ui"/>
         <source>Outgoing Email Settings</source>
-        <translation>Einstellungen für ausgehende E-Mail</translation>
+        <translation>Einstellungen für ausgehende Email</translation>
     </message>
     <message>
         <location/>

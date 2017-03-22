@@ -159,7 +159,7 @@ void QnScreenshotLoader::at_imageLoaded(const QImage &image)
 // QnWorkbenchScreenshotHandler
 // -------------------------------------------------------------------------- //
 QnWorkbenchScreenshotHandler::QnWorkbenchScreenshotHandler(QObject *parent):
-    QObject(parent),
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     m_screenshotProgressDialog(0),
     m_progressShowTime(0),
@@ -627,7 +627,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         return;
     }
 
-    QnScreenshotLoader* loader = new QnScreenshotLoader(localParameters, this);
+    QScopedPointer<QnScreenshotLoader> loader(new QnScreenshotLoader(localParameters, this));
     connect(loader, &QnImageProvider::imageChanged, this,   &QnWorkbenchScreenshotHandler::at_imageLoaded);
     loader->setBaseProvider(imageProvider); // preload screenshot here
 
@@ -636,6 +636,7 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
         localParameters.filename = widget->resource()->toResource()->getName();  /*< suggested name */
         if (!updateParametersFromDialog(localParameters))
             return;
+
         loader->setParameters(localParameters); //update changed fields
         qnSettings->setLastScreenshotDir(QFileInfo(localParameters.filename).absolutePath());
         qnSettings->setTimestampCorner(localParameters.timestampPosition);
@@ -645,5 +646,5 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
     }
 
     m_canceled = false;
-    loader->loadAsync();
+    loader.take()->loadAsync(); //< Remove owning
 }
