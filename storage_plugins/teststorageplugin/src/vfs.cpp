@@ -93,7 +93,7 @@ struct JsonValAutoDestroy
     JsonVal* jsonVal;
 };
 
-std::string pathFromTimeStamp(const std::string& timestampString)
+std::string pathFromTimeStamp(const char* timestampString, const char* durationString)
 {
     std::stringstream out;
     time_t t = (time_t)(std::stoll(timestampString) / 1000);
@@ -104,12 +104,13 @@ std::string pathFromTimeStamp(const std::string& timestampString)
         << std::setw(2) << (ltime->tm_mon + 1) << "/"
         << std::setw(2) << (ltime->tm_mday) << "/"
         << std::setw(2) << (ltime->tm_hour) << "/"
-        << timestampString << ".mkv"; 
+        << timestampString << "_" << durationString << ".mkv";
 
     return out.str();
 }
 
-bool addChunks(JsonVal* arrayVal, FsStubNode* root, const std::string& rootPath, const char* jsonString)
+bool addChunks(JsonVal* arrayVal, FsStubNode* root,  const std::string& rootPath,
+               const char* jsonString, int64_t fileSize)
 {
     for (int i = 0; i < JsonVal_arrayLen(arrayVal); ++i)
     {
@@ -129,10 +130,12 @@ bool addChunks(JsonVal* arrayVal, FsStubNode* root, const std::string& rootPath,
 
         FsStubNode_add(
             root, 
-            fsJoin(rootPath, pathFromTimeStamp(startTimeVal->u.string)).c_str(),
+            fsJoin(rootPath,
+                   pathFromTimeStamp(startTimeVal->u.string,
+                                     durationVal->u.string)).c_str(),
             file,
             660,
-            std::stoll(durationVal->u.string));
+            fileSize);
     }
 
     return true;
@@ -190,10 +193,11 @@ bool utils::buildVfsFromJson(const char* jsonString, const char* rootPath, VfsPa
         if (!checkJsonObjValue(qualityVal, jsonArrayT, kHiQualityKey, jsonString))
             return false;
 
-        if (!addChunks(qualityVal, 
-                outVfsPair->root, 
-                fsJoin(fsJoin(rootPath, "hi_quality"), idVal->u.string), 
-                jsonString))
+        if (!addChunks(qualityVal,
+                       outVfsPair->root,
+                       fsJoin(fsJoin(rootPath, "hi_quality"), idVal->u.string),
+                       jsonString,
+                       outVfsPair->sampleFileSize))
         {
             return false;
         }
@@ -204,10 +208,11 @@ bool utils::buildVfsFromJson(const char* jsonString, const char* rootPath, VfsPa
         if (!checkJsonObjValue(qualityVal, jsonArrayT, kLowQualityKey, jsonString))
             return false;
 
-        if (!addChunks(qualityVal, 
-                outVfsPair->root, 
-                fsJoin(fsJoin(rootPath, "low_quality"), idVal->u.string),
-                jsonString))
+        if (!addChunks(qualityVal,
+                       outVfsPair->root,
+                       fsJoin(fsJoin(rootPath, "low_quality"), idVal->u.string),
+                       jsonString,
+                       outVfsPair->sampleFileSize))
         {
             return false;
         }
