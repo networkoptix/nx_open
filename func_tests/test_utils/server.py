@@ -527,7 +527,7 @@ class Storage(object):
     # server/var/data/data/low_quality/urn_uuid_b0e78864-c021-11d3-a482-f12907312681/2017/01/27/12/1485511093576_21332.mkv
     def _construct_fpath(self, camera_mac_addr, quality_part, start_time, duration):
         local_dt = start_time.astimezone(self.box.timezone)  # box local
-        unixtime_utc_ms = utils.datetime_utc_to_timestamp(start_time)
+        unixtime_utc_ms = utils.datetime_utc_to_timestamp(start_time) * 1000
         duration_ms = int(duration.total_seconds() * 1000)
         return os.path.join(
             self.dir, quality_part, camera_mac_addr,
