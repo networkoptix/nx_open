@@ -511,7 +511,7 @@ void QnMediaResourceWidget::resetSoftwareTriggerButtons()
     {
         const auto& rule = iter.value();
 
-        if (rule->eventType() != QnBusiness::SoftwareTriggerEvent)
+        if (rule->isDisabled() || rule->eventType() != QnBusiness::SoftwareTriggerEvent)
             continue;
 
         const auto users = rule->eventParams().metadata.instigators;
