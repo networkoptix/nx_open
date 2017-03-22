@@ -75,16 +75,10 @@ ErrorCode detail::ServerQueryProcessor::removeResourceStatusHelper(
         transactionType);
 }
 
-detail::ServerQueryProcessor::PostProcessList& detail::ServerQueryProcessor::getStaticPostProcessList()
+detail::ServerQueryProcessor ServerQueryProcessorAccess::getAccess(
+    const Qn::UserAccessData userAccessData)
 {
-    static detail::ServerQueryProcessor::PostProcessList postProcessList;
-    return postProcessList;
-}
-
-QnMutex& detail::ServerQueryProcessor::getStaticUpdateMutex()
-{
-    static QnMutex updateMutex;
-    return updateMutex;
+    return detail::ServerQueryProcessor(this, userAccessData);
 }
 
 } //namespace ec2
