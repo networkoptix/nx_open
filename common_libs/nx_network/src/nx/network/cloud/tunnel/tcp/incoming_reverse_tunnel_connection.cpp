@@ -87,7 +87,11 @@ void IncomingReverseTunnelConnection::spawnConnectorIfNeeded()
                 return; //< Ignore, better luck next time.
             }
 
+            nx::utils::ObjectDestructionFlag::Watcher thisDestructionWatcher(&m_destructionFlag);
             utils::moveAndCallOptional(m_startHandler, code);
+            if (thisDestructionWatcher.objectDestroyed())
+                return;
+
             if (code == SystemError::noError)
                 return saveConnection(std::move(connector));
 

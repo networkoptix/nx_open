@@ -3,6 +3,7 @@
 #include <nx/network/cloud/tunnel/abstract_incoming_tunnel_connection.h>
 #include <nx/network/cloud/tunnel/tcp/reverse_connector.h>
 #include <nx/network/retry_timer.h>
+#include <nx/utils/object_destruction_flag.h>
 
 namespace nx {
 namespace network {
@@ -52,6 +53,7 @@ private:
 
     StartHandler m_startHandler;
     AcceptHandler m_acceptHandler;
+    nx::utils::ObjectDestructionFlag m_destructionFlag;
 };
 
 } // namespace tcp

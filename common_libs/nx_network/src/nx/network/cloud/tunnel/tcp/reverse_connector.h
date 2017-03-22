@@ -23,6 +23,7 @@ public:
 
     ReverseConnector(
         String selfHostName, String targetHostName, aio::AbstractAioThread* aioThread);
+    virtual ~ReverseConnector();
 
     ReverseConnector(const ReverseConnector&) = delete;
     ReverseConnector(ReverseConnector&&) = delete;
