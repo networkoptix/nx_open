@@ -19,7 +19,7 @@
 #include <nx/streaming/config.h>
 
 #include <plugins/resource/avi/avi_archive_delegate.h>
-#include <plugins/resource/avi/avi_archive_custom_data.h>
+#include <plugins/resource/avi/avi_archive_metadata.h>
 #include <nx/streaming/archive_stream_reader.h>
 
 #include "transcoding/ffmpeg_audio_transcoder.h"
@@ -613,94 +613,46 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         bool isTranscode = !m_extraTranscodeParams.isEmpty() || (m_dstVideoCodec != AV_CODEC_ID_NONE && m_dstVideoCodec != mediaData->compressionType);
 
         const QnConstResourceVideoLayoutPtr& layout = mediaDev->getVideoLayout(m_mediaProvider);
-        QString layoutStr = QnArchiveStreamReader::serializeLayout(layout.data());
+
+        QnAviArchiveMetadata::Format fileFormat = QnAviArchiveMetadata::Format::mkv;
+        if (fileExt == lit("avi"))
+            fileFormat = QnAviArchiveMetadata::Format::avi;
+        else if (fileExt == lit("mp4"))
+            fileFormat = QnAviArchiveMetadata::Format::mp4;
+
+        QnAviArchiveMetadata metadata;
+        metadata.version = QnAviArchiveMetadata::kLatestVersion; // Always save with latest version
+
+        if (!isTranscode)
         {
-            if (!isTranscode)
-                av_dict_set(
-                    &m_recordingContextVector[i].formatCtx->metadata,
-                    QnAviArchiveDelegate::getTagName(
-                        QnAviArchiveDelegate::LayoutInfoTag,
-                        fileExt
-                    ),
-                    layoutStr.toLatin1().data(),
-                    0
-                );
+            metadata.videoLayoutSize = layout->size();
+            metadata.videoLayoutChannels = layout->getChannels();
+            metadata.overridenAr = mediaDev->customAspectRatio();
+        }
 
-            if (isUtcOffsetAllowed())
-            {
-                qint64 startTimeMs = mediaData->timestamp/1000;
-                av_dict_set(
-                    &m_recordingContextVector[i].formatCtx->metadata,
-                    QnAviArchiveDelegate::getTagName(
-                        QnAviArchiveDelegate::StartTimeTag,
-                        fileExt
-                    ),
-                    QString::number(startTimeMs).toLatin1().data(),
-                    0
-                );
-            }
+        if (isUtcOffsetAllowed())
+            metadata.startTimeMs = mediaData->timestamp/1000ll;
 
-            av_dict_set(
-                &m_recordingContextVector[i].formatCtx->metadata,
-                QnAviArchiveDelegate::getTagName(
-                    QnAviArchiveDelegate::SoftwareTag,
-                    fileExt
-                ),
-                "Network Optix",
-                0
-            );
+        metadata.dewarpingParams = mediaDev->getDewarpingParams();
+        if (isTranscode)
+            metadata.dewarpingParams.enabled = false;
 
-            QnMediaDewarpingParams mediaDewarpingParams = mediaDev->getDewarpingParams();
-            if (mediaDewarpingParams.enabled && !isTranscode) {
-                // dewarping exists in resource and not activated now. Allow dewarping for saved file
-                av_dict_set(
-                    &m_recordingContextVector[i].formatCtx->metadata,
-                    QnAviArchiveDelegate::getTagName(
-                        QnAviArchiveDelegate::DewarpingTag,
-                        fileExt
-                    ),
-                    QJson::serialized<QnMediaDewarpingParams>(mediaDewarpingParams),
-                    0
-                );
-            }
+#ifndef SIGN_FRAME_ENABLED
+        if (m_needCalcSignature)
+        {
+            QByteArray signPattern = QnSignHelper::getSignPattern();
+            if (m_serverTimeZoneMs != Qn::InvalidUtcOffset)
+                signPattern.append(QByteArray::number(m_serverTimeZoneMs)); // add server timeZone as one more column to sign pattern
+            while (signPattern.size() < QnSignHelper::getMaxSignSize())
+                signPattern.append(" ");
+            metadata.signature = signPattern.mid(0, QnSignHelper::getMaxSignSize());
+        }
+#endif
 
-            if (!isTranscode) {
-                QnAviArchiveCustomData customData;
-                customData.overridenAr = mediaDev->customAspectRatio();
-                av_dict_set(
-                    &m_recordingContextVector[i].formatCtx->metadata,
-                    QnAviArchiveDelegate::getTagName(
-                        QnAviArchiveDelegate::CustomTag,
-                        fileExt
-                    ),
-                    QJson::serialized<QnAviArchiveCustomData>(customData),
-                    0
-                );
-            }
+        metadata.saveToFile(m_recordingContextVector[i].formatCtx, fileFormat);
 
-    #ifndef SIGN_FRAME_ENABLED
-            if (m_needCalcSignature) {
-                QByteArray signPattern = QnSignHelper::getSignPattern();
-                if (m_serverTimeZoneMs != Qn::InvalidUtcOffset)
-                    signPattern.append(QByteArray::number(m_serverTimeZoneMs)); // add server timeZone as one more column to sign pattern
-                while (signPattern.size() < QnSignHelper::getMaxSignSize())
-                    signPattern.append(" ");
-                signPattern = signPattern.mid(0, QnSignHelper::getMaxSignSize());
-
-                av_dict_set(
-                    &m_recordingContextVector[i].formatCtx->metadata,
-                    QnAviArchiveDelegate::getTagName(
-                        QnAviArchiveDelegate::SignatureTag,
-                        fileExt
-                    ),
-                    signPattern.data(),
-                    0
-                );
-            }
-    #endif
-
+        { // empty scope
             m_recordingContextVector[i].formatCtx->start_time = mediaData->timestamp;
-
 
             int videoChannels = isTranscode ? 1 : layout->channelCount();
             QnConstCompressedVideoDataPtr vd =

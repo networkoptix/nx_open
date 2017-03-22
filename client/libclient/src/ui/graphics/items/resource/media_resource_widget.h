@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <array>
 
 #include "resource_widget.h"
@@ -189,6 +190,10 @@ protected:
     void ensureTwoWayAudioWidget();
     bool animationAllowed() const;
 
+    void resetSoftwareTriggerButtons();
+
+    void invokeTrigger(const QString& id, const QnUuid& resourceId);
+
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
     void at_screenshotButton_clicked();
@@ -307,6 +312,9 @@ private:
     QVector<QColor> m_motionSensitivityColors;
 
     QnTwoWayAudioWidget* m_twoWayAudioWidget;
+
+    QMap<QString, QString> m_softwareTriggers; //< ID -> icon name
+    QList<QnUuid> m_softwareTriggerIds; // UUIDs of overlay items
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

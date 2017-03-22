@@ -19,7 +19,8 @@ const qreal kDefaultRoundingRadius = 2.0;
 
 QnStyledTooltipWidget::QnStyledTooltipWidget(QGraphicsItem* parent):
     base_type(parent),
-    m_tailLength(style::Metrics::kStandardPadding)
+    m_tailLength(style::Metrics::kStandardPadding),
+    m_tailEdge(Qt::BottomEdge)
 {
     setRoundingRadius(kDefaultRoundingRadius);
     setTailWidth(m_tailLength * 2.0);
@@ -46,8 +47,23 @@ void QnStyledTooltipWidget::setTailLength(qreal tailLength)
         return;
 
     m_tailLength = tailLength;
-
     updateTailPos();
+}
+
+Qt::Edge QnStyledTooltipWidget::tailEdge() const
+{
+    return m_tailEdge;
+}
+
+void QnStyledTooltipWidget::setTailEdge(Qt::Edge tailEdge)
+{
+    if (m_tailEdge == tailEdge)
+        return;
+
+    const auto pointingTo = mapToParent(tailPos());
+    m_tailEdge = tailEdge;
+    updateTailPos();
+    pointTo(pointingTo);
 }
 
 void QnStyledTooltipWidget::setGeometry(const QRectF& rect)
@@ -60,7 +76,26 @@ void QnStyledTooltipWidget::setGeometry(const QRectF& rect)
         updateTailPos();
 }
 
-void QnStyledTooltipWidget::updateTailPos() {
+void QnStyledTooltipWidget::updateTailPos()
+{
     QRectF rect = this->rect();
-    setTailPos(QPointF((rect.left() + rect.right()) / 2, rect.bottom() + m_tailLength));
+    switch (m_tailEdge)
+    {
+        case Qt::LeftEdge:
+            setTailPos(QPointF(rect.left() - m_tailLength, (rect.top() + rect.bottom()) / 2));
+            break;
+
+        case Qt::RightEdge:
+            setTailPos(QPointF(rect.right() + m_tailLength, (rect.top() + rect.bottom()) / 2));
+            break;
+
+        case Qt::TopEdge:
+            setTailPos(QPointF((rect.left() + rect.right()) / 2, rect.top() - m_tailLength));
+            break;
+
+        case Qt::BottomEdge:
+        default:
+            setTailPos(QPointF((rect.left() + rect.right()) / 2, rect.bottom() + m_tailLength));
+            break;
+    }
 }
