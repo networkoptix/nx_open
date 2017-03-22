@@ -2142,13 +2142,11 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
         return result;
 
     result = getStorageByIndex(optimalStorageIndex);
-    if (!result)
+    if (result)
     {
-        NX_LOG(lit("[Storage, Selection] Failed to find storage for index %1")
-            .arg(optimalStorageIndex), cl_logDEBUG2);
+        NX_LOG(lit("[Storage, Selection] Selected storage %1").arg(result->getUrl()), cl_logDEBUG2);
         return result;
     }
-    NX_LOG(lit("[Storage, Selection] Selected storage %1").arg(result->getUrl()), cl_logDEBUG2);
 
     auto hasFastScanned = [this]
     {
@@ -2162,8 +2160,12 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
     };
 
 
-    if (!result) {
-        if (!m_warnSended && !hasFastScanned() && m_firstStoragesTestDone) {
+    if (!result)
+    {
+        NX_LOG(lit("[Storage, Selection] Failed to find storage for index %1").arg(optimalStorageIndex),
+               cl_logDEBUG2);
+        if (!m_warnSended && !hasFastScanned() && m_firstStoragesTestDone)
+        {
             if (m_role == QnServer::StoragePool::Normal)
             {   // 'noStorageAvailbale' signal results in client notification.
                 // For backup storages No Available Storage error is translated to

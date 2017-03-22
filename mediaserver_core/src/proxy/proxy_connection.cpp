@@ -248,6 +248,18 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
     return true;
 }
 
+void QnProxyConnectionProcessor::cleanupProxyInfo(nx_http::Request* request)
+{
+    static const char* kProxyHeadersPrefix = "Proxy-";
+
+    auto itr = request->headers.lower_bound(kProxyHeadersPrefix);
+    while (itr != request->headers.end() && itr->first.startsWith(kProxyHeadersPrefix))
+        itr = request->headers.erase(itr);
+
+    request->requestLine.url = request->requestLine.url.toString(
+        QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority);
+}
+
 bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstRoute)
 {
     Q_D(QnProxyConnectionProcessor);
@@ -359,11 +371,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 
         // No dst route Id means proxy to external resource.
         // All proxy hops have already been passed. Remove proxy-auth header.
-        // TODO: HTTP RFC declares some other proxy headers which should not be passed to a target
-        // server.We probably should remove all headers starting with 'Proxy-'
-        auto itr = d->request.headers.find("Proxy-Authorization");
-        if (itr != d->request.headers.end())
-            d->request.headers.erase(itr);
+        cleanupProxyInfo(&d->request);
     }
 
     if (!dstRoute.id.isNull() && dstRoute.id != qnCommon->moduleGUID())

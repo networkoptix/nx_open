@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Event Rules</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -144,15 +144,22 @@
        </attribute>
       </widget>
      </item>
-     <item>
-      <widget class="QnBusinessRuleWidget" name="detailsWidget" native="true"/>
-     </item>
     </layout>
    </item>
    <item>
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QnBusinessRuleWidget" name="detailsWidget" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
      </property>
     </widget>
    </item>

@@ -103,7 +103,6 @@ public:
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     SystemStatusChangedSubscription& systemStatusChangedSubscription();
-    const SystemStatusChangedSubscription& systemStatusChangedSubscription() const;
 
 private:
     class FullPeerName
@@ -178,12 +177,12 @@ private:
     
     template<int connectionIndexNumber, typename ConnectionKeyType>
         void removeExistingConnection(
-            QnMutexLockerBase* const /*lock*/,
+            const QnMutexLockerBase& /*lock*/,
             ConnectionKeyType connectionKey);
     
     template<typename ConnectionIndex, typename Iterator, typename CompletionHandler>
     void removeConnectionByIter(
-        QnMutexLockerBase* const /*lock*/,
+        const QnMutexLockerBase& /*lock*/,
         ConnectionIndex& connectionIndex,
         Iterator connectionIterator,
         CompletionHandler completionHandler);

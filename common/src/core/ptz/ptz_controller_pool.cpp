@@ -12,12 +12,31 @@
 #include "abstract_ptz_controller.h"
 #include "proxy_ptz_controller.h"
 
+#include <utils/common/delete_later.h>
+
+namespace {
+
+void moveControllerToThread(QnPtzControllerPtr controller, QThread* thread)
+{
+    QnPtzControllerPtr controllerIt = controller;
+    while (controllerIt)
+    {
+        controllerIt->moveToThread(thread);
+        if (QnProxyPtzControllerPtr proxyController = controllerIt.dynamicCast<QnProxyPtzController>())
+            controllerIt = proxyController->baseController();
+        else
+            controllerIt.clear();
+    }
+}
+
+} // namespace
+
 // -------------------------------------------------------------------------- //
 // QnPtzControllerPoolPrivate
 // -------------------------------------------------------------------------- //
 class QnPtzControllerPoolPrivate {
 public:
-    QnPtzControllerPoolPrivate(): 
+    QnPtzControllerPoolPrivate():
         mode(QnPtzControllerPool::NormalControllerConstruction),
         executorThread(NULL),
         commandThreadPool(NULL),
@@ -144,15 +163,18 @@ void QnPtzControllerPool::registerResource(const QnResourcePtr &resource) {
 }
 
 void QnPtzControllerPool::unregisterResource(const QnResourcePtr &resource) {
-    bool changed = false;
+    QnPtzControllerPtr oldController;
+
     {
         QnMutexLocker locker( &d->mutex );
-
-        changed = d->controllerByResource.remove(resource) > 0;
+        oldController = d->controllerByResource.take(resource);
     }
 
-    if(changed)
+    if (oldController)
+    {
         emit controllerChanged(resource);
+        oldController.reset(nullptr, &qnDeleteLater);
+    }
 }
 
 void QnPtzControllerPool::updateController(const QnResourcePtr &resource) {
@@ -187,16 +209,11 @@ void QnPtzControllerPoolPrivate::updateController(const QnResourcePtr &resource)
      * to executor thread. Note that controllers don't run synchronous requests
      * in their associated thread, so this won't present any problems for
      * other users of the executor thread. */
-    QnPtzControllerPtr controllerIt = controller;
-    while(controllerIt) {
-        controllerIt->moveToThread(executorThread);
-        if(QnProxyPtzControllerPtr proxyController = controllerIt.dynamicCast<QnProxyPtzController>()) {
-            controllerIt = proxyController->baseController();
-        } else {
-            controllerIt.clear();
-        }
-    }
+    moveControllerToThread(controller, executorThread);
 
     emit q->controllerChanged(resource);
+
+    if (oldController)
+        oldController.reset(nullptr, &qnDeleteLater);
 }
 

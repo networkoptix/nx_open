@@ -24,6 +24,11 @@ ReverseConnector::ReverseConnector(
     m_httpClient->addAdditionalHeader(kNxRcHostName, selfHostName);
 }
 
+ReverseConnector::~ReverseConnector()
+{
+    m_httpClient->pleaseStopSync();
+}
+
 void ReverseConnector::setHttpTimeouts(nx_http::AsyncHttpClient::Timeouts timeouts)
 {
     m_httpClient->setSendTimeoutMs(timeouts.sendTimeout.count());
@@ -48,7 +53,7 @@ void ReverseConnector::connect(const SocketAddress& endpoint, ConnectHandler han
 
             if (m_httpClient->response()->statusLine.statusCode != 101)
             {
-                NX_LOG(lm("Upexpected status: (%1) %2")
+                NX_LOG(lm("Unexpected status: (%1) %2")
                     .arg(m_httpClient->response()->statusLine.statusCode)
                     .arg(m_httpClient->response()->statusLine.reasonPhrase), cl_logDEBUG1);
 
