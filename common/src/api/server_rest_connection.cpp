@@ -79,17 +79,13 @@ rest::Handle ServerConnection::twoWayAudioCommand(const QnUuid& cameraId, bool s
     return executeGet(lit("/api/transmitAudio"), params, callback, targetThread);
 }
 
-rest::Handle ServerConnection::softwareTriggerCommand(
-    const QnUuid& cameraId, const QString& triggerId,
-    const QString& triggerName, const QString& iconName,
+rest::Handle ServerConnection::softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
     GetCallback callback, QThread* targetThread)
 {
     QnRequestParamList params;
     params.insert(lit("timestamp"), lit("%1").arg(qnSyncTime->currentMSecsSinceEpoch()));
     params.insert(lit("event_type"), QnLexical::serialized(QnBusiness::SoftwareTriggerEvent));
     params.insert(lit("inputPortId"), triggerId);
-    params.insert(lit("caption"), triggerName);
-    params.insert(lit("description"), iconName);
     params.insert(lit("eventResourceId"), cameraId.toString());
     return executeGet(lit("/api/createEvent"), params, callback, targetThread);
 }
