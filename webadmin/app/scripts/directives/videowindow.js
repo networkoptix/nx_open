@@ -119,7 +119,7 @@ angular.module('webadminApp')
                             if(window.jscd.flashVersion && weHaveHls){ // We have flash - try to play using flash
                                 return "flashls";
                             }
-                            if (weHaveWebm){
+                            if(weHaveWebm && window.jscd.osVersion < 10 && canPlayNatively("webm")){
                                 return 'webm';
                             }
                             //Could not find a supported player for the Browser gonna display whats needed instead.
@@ -148,13 +148,13 @@ angular.module('webadminApp')
                         case "Opera":
                         case "Webkit":
                         default:
-                            if(jsHlsSupported && weHaveHls) {
+                            if(jsHlsSupported && weHaveHls && 0) {
                                 return "jshls";// We are hoping that we have some good browser
                             }
-                            if(window.jscd.flashVersion &&  weHaveHls){ // We have flash - try to play using flash
+                            if(window.jscd.flashVersion &&  weHaveHls && 0){ // We have flash - try to play using flash
                                 return "flashls";
                             }
-                            if(weHaveWebm){
+                            if(weHaveWebm && canPlayNatively("webm")){
                                 return "webm";
                             }
                     }
