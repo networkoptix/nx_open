@@ -522,7 +522,7 @@ void QnMediaResourceWidget::resetSoftwareTriggerButtons()
             continue;
 
         const auto triggerName = rule->eventParams().inputPortId.trimmed();
-        m_softwareTriggers.insert(triggerName, rule->eventParams().caption);
+        m_softwareTriggers.emplace(triggerName, rule->eventParams().caption);
     }
 
     /* Create buttons (sorted by QMap with default QString comparison): */
@@ -530,13 +530,13 @@ void QnMediaResourceWidget::resetSoftwareTriggerButtons()
     for (auto iter = m_softwareTriggers.cbegin(); iter != m_softwareTriggers.cend(); ++iter)
     {
         const auto trigger = new QnSoftwareTriggerButton(this);
-        trigger->setIcon(iter.value());
-        trigger->setToolTip(QnBusinessStringsHelper::getSoftwareTriggerName(iter.key()));
+        trigger->setIcon(iter->second);
+        trigger->setToolTip(QnBusinessStringsHelper::getSoftwareTriggerName(iter->first));
 
         m_softwareTriggerIds << overlayWidgets()->triggersOverlay->insertItem(pos++, trigger);
 
         connect(trigger, &QnImageButtonWidget::clicked, this,
-            [this, id = iter.key(), resourceId]()
+            [this, id = iter->first, resourceId]()
             {
                 invokeTrigger(id, resourceId);
             });
