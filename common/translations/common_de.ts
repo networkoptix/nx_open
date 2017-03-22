@@ -498,7 +498,7 @@
     </message>
     <message>
         <source>Send Email</source>
-        <translation>E-Mail senden</translation>
+        <translation>Email senden</translation>
     </message>
 </context>
 <context>
