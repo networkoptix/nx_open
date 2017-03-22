@@ -65,6 +65,7 @@ namespace rest
         Handle twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread = 0);
 
         Handle softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
+            const QString& triggerName, const QString& iconName,
             GetCallback callback, QThread* targetThread = 0);
 
         Handle getStatisticsSettingsAsync(Result<QByteArray>::type callback

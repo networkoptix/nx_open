@@ -124,12 +124,15 @@ void QnBusinessEventConnector::at_cameraInput(const QnResourcePtr &resource, con
     );
 }
 
-void QnBusinessEventConnector::at_softwareTrigger(const QnResourcePtr& resource, const QString& triggerId, qint64 timeStamp)
+void QnBusinessEventConnector::at_softwareTrigger(const QnResourcePtr& resource,
+    const QString& triggerId, const QString& triggerName,
+    const QString& iconName, qint64 timeStamp)
 {
     if (!resource)
         return;
 
-    auto triggerEvent = new QnSoftwareTriggerEvent(resource->toSharedPointer(), timeStamp, triggerId);
+    auto triggerEvent = new QnSoftwareTriggerEvent(resource->toSharedPointer(),
+        timeStamp, triggerId, triggerName, iconName);
     qnBusinessRuleProcessor->processBusinessEvent(QnSoftwareTriggerEventPtr(triggerEvent));
 }
 
@@ -209,7 +212,8 @@ bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParame
                     *errMessage = "'SoftwareTriggerEvent' requires 'resource' parameter";
                 return false;
             }
-            at_softwareTrigger(resource, params.inputPortId, params.eventTimestampUsec);
+            at_softwareTrigger(resource, params.inputPortId, params.caption,
+                params.description, params.eventTimestampUsec);
             break;
         case QnBusiness::CameraDisconnectEvent:
             if (!resource) {

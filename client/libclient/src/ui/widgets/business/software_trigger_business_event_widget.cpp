@@ -70,10 +70,9 @@ void QnSoftwareTriggerBusinessEventWidget::at_model_dataChanged(QnBusiness::Fiel
     if (fields.testFlag(QnBusiness::EventParamsField))
     {
         const auto params = model()->eventParams();
-        const auto text = params.inputPortId.trimmed();
-        ui->triggerIdLineEdit->setText(text);
+        ui->triggerIdLineEdit->setText(params.caption);
         ui->iconComboBox->setCurrentIcon(
-            QnSoftwareTriggerPixmaps::effectivePixmapName(params.caption));
+            QnSoftwareTriggerPixmaps::effectivePixmapName(params.description));
 
         if (params.metadata.instigators.empty())
         {
@@ -96,8 +95,8 @@ void QnSoftwareTriggerBusinessEventWidget::paramsChanged()
 
     auto eventParams = model()->eventParams();
 
-    eventParams.inputPortId = ui->triggerIdLineEdit->text().trimmed();
-    eventParams.caption = ui->iconComboBox->currentIcon();
+    eventParams.caption = ui->triggerIdLineEdit->text().trimmed();
+    eventParams.description = ui->iconComboBox->currentIcon();
 
     model()->setEventParams(eventParams);
 }

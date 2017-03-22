@@ -1,6 +1,5 @@
 #pragma once
 
-#include <map>
 #include <array>
 
 #include "resource_widget.h"
@@ -29,7 +28,6 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 #include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
 #include <utils/media/sse_helper.h>
-#include <nx/utils/string.h>
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
@@ -314,9 +312,13 @@ private:
 
     QnTwoWayAudioWidget* m_twoWayAudioWidget;
 
-    /* Software triggers map: ID -> icon name */
-    using SoftwareTriggers = std::map<QString, QString, decltype(&nx::utils::naturalStringLess)>;
-    SoftwareTriggers m_softwareTriggers = SoftwareTriggers(&nx::utils::naturalStringLess);
+    struct SoftwareTriggerInfo
+    {
+        QString name;
+        QString icon;
+    };
+
+    QHash<QString, SoftwareTriggerInfo> m_softwareTriggers;
 
     QList<QnUuid> m_softwareTriggerIds; // UUIDs of overlay items
 };
