@@ -53,23 +53,33 @@ extern "C" {
 #include <boost/algorithm/cxx11/any_of.hpp>
 
 /* QT headers. */
-#include <QtWidgets/QAction>
 
+/*
+#include <QtWidgets/QAction>
 #include <QtNetwork/QAuthenticator>
 #include <QtCore/QBuffer>
 #include <QtWidgets/QCheckBox>
 #include <QtGui/QCloseEvent>
-#include <QtGui/QColor>
 #include <QtWidgets/QCompleter>
 #include <QtCore/QDataStream>
-#include <QtCore/QDateTime>
 #include <QtGui/QDesktopServices>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
-#include <QtCore/QDir>
 #include <QtXml/QDomDocument>
 #include <QtXml/QDomElement>
 #include <QtCore/QEasingCurve>
+#include <QtNetwork/QHostAddress>
+#include <QtCore/QPropertyAnimation>
+#include <QtGui/QRadialGradient>
+#include <QtNetwork/QNetworkAddressEntry>
+#include <QtNetwork/QNetworkInterface>
+#include <QtCore/QParallelAnimationGroup>
+#include <QtCore/QIODevice>
+*/
+
+#include <QtGui/QColor>
+#include <QtCore/QDateTime>
+#include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 #include <QtCore/QFileInfoList>
@@ -82,8 +92,6 @@ extern "C" {
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
-#include <QtNetwork/QHostAddress>
-#include <QtCore/QIODevice>
 #include <QtWidgets/QInputDialog>
 #include <QtGui/QKeyEvent>
 #include <QtWidgets/QLayout>
@@ -93,24 +101,21 @@ extern "C" {
 #include <QtCore/QMap>
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
-#include <nx/utils/thread/mutex.h>
 #include <QtCore/QMutexLocker>
-#include <QtNetwork/QNetworkAddressEntry>
-#include <QtNetwork/QNetworkInterface>
+
 #include <QtCore/QObject>
 #include <QtGui/QPaintEngine>
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
 #include <QtCore/QPair>
-#include <QtCore/QParallelAnimationGroup>
+
 #include <QtGui/QPixmap>
 #include <QtGui/QPixmapCache>
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>
-#include <QtCore/QPropertyAnimation>
+
 #include <QtWidgets/QPushButton>
 #include <QtCore/QQueue>
-#include <QtGui/QRadialGradient>
 #include <QtWidgets/QRadioButton>
 #include <QtCore/QRect>
 #include <QtCore/QRectF>
@@ -126,15 +131,12 @@ extern "C" {
 #include <QtWidgets/QStyleOption>
 #include <QtWidgets/QStyleOptionGraphicsItem>
 #include <QtWidgets/QTabWidget>
-#include <QtCore/QTextStream>
 #include <QtCore/QThread>
 #include <QtCore/QThreadPool>
 #include <QtCore/QTime>
 #include <QtCore/QTimer>
 #include <QtWidgets/QVBoxLayout>
-#include <QtGui/QWheelEvent>
 #include <QtWidgets/QWidget>
-#include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/qmath.h>
 #include <QtCore/QtDebug>
 #include <QtWidgets/QApplication>
@@ -143,8 +145,8 @@ extern "C" {
 #include <QtGui/QResizeEvent>
 #include <QtWidgets/QtWidgets>
 #include <QtOpenGL/QGLWidget>
-#include <QFileSystemWatcher>
 
+#include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <ui/dialogs/common/message_box.h>
 

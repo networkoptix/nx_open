@@ -262,7 +262,7 @@ void QnConnectToCloudDialogPrivate::bindSystem()
     cloudConnection->systemManager()->bindSystem(sysRegistrationData, completionHandler);
 }
 
-void QnConnectToCloudDialogPrivate::showSuccess(const QString& cloudLogin)
+void QnConnectToCloudDialogPrivate::showSuccess(const QString& /*cloudLogin*/)
 {
     Q_Q(QnConnectToCloudDialog);
 

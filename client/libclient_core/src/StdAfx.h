@@ -4,9 +4,6 @@
 
 #ifdef __cplusplus
 
-/* This file should be included only main in vms projects. */
-#include <common/common_globals.h>
-
 /* STL headers. */
 #include <algorithm>
 #include <functional>
