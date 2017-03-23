@@ -2177,6 +2177,11 @@ void MediaServerProcess::run()
     if (!allowedSslVersions.isEmpty())
         nx::network::SslEngine::setAllowedServerVersions(allowedSslVersions.toUtf8());
 
+    const auto allowedSslCiphers = MSSettings::roSettings()->value(
+        nx_ms_conf::ALLOWED_SSL_CIPHERS, QString()).toString();
+    if (!allowedSslCiphers.isEmpty())
+        nx::network::SslEngine::setAllowedServerCiphers(allowedSslCiphers.toUtf8());
+
     nx::network::SslEngine::useOrCreateCertificate(
         MSSettings::roSettings()->value(
             nx_ms_conf::SSL_CERTIFICATE_PATH,

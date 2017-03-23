@@ -224,5 +224,10 @@ void SslEngine::setAllowedServerVersions(const String& versions)
     ssl::SslStaticData::setAllowedServerVersions(versions);
 }
 
+void SslEngine::setAllowedServerCiphers(const String& ciphers)
+{
+    ssl::SslStaticData::setAllowedServerCiphers(ciphers);
+}
+
 } // namespace network
 } // namespace nx
