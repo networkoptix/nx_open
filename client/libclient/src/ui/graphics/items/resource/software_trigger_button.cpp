@@ -1,5 +1,7 @@
 #include "software_trigger_button.h"
 
+#include <QtWidgets/QApplication>
+
 #include <ui/common/geometry.h>
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/slider_tooltip_widget.h>

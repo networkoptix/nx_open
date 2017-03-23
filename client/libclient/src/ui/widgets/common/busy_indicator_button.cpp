@@ -1,5 +1,7 @@
 #include "busy_indicator_button.h"
 
+#include <QtWidgets/QStylePainter>
+
 #include <ui/widgets/common/busy_indicator.h>
 
 

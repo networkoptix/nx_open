@@ -2,6 +2,9 @@
 
 #include <QtGui/QIcon>
 
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QDesktopWidget>
+
 #include <client/client_settings.h>
 
 #include <core/resource/videowall_resource.h>

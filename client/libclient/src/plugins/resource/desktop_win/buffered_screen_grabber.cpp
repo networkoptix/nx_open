@@ -1,5 +1,7 @@
 #include "buffered_screen_grabber.h"
 
+#include <QtCore/QLibrary>
+
 namespace {
 
 #ifndef DWM_EC_DISABLECOMPOSITION

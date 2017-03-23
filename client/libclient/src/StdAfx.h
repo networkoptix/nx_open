@@ -49,6 +49,13 @@ extern "C" {
 
 /* QT headers. */
 
+#include <QtCore/QObject>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+#include <QtCore/QList>
+#include <QtCore/QMap>
+
+
 #include <QtGui/QColor>
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
@@ -68,14 +75,11 @@ extern "C" {
 #include <QtGui/QKeyEvent>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QLineEdit>
-#include <QtCore/QList>
 #include <QtWidgets/QListView>
-#include <QtCore/QMap>
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 #include <QtCore/QMutexLocker>
 
-#include <QtCore/QObject>
 #include <QtGui/QPaintEngine>
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
@@ -88,35 +92,17 @@ extern "C" {
 
 #include <QtWidgets/QPushButton>
 #include <QtCore/QQueue>
-#include <QtWidgets/QRadioButton>
 #include <QtCore/QRect>
 #include <QtCore/QRectF>
-#include <QtWidgets/QScrollBar>
-#include <QtCore/QSemaphore>
 #include <QtCore/QSet>
 #include <QtCore/QSize>
-#include <QtWidgets/QSlider>
-#include <QtCore/QString>
-#include <QtCore/QStringList>
-#include <QtCore/QStringListModel>
-#include <QtWidgets/QStyle>
-#include <QtWidgets/QStyleOption>
-#include <QtWidgets/QStyleOptionGraphicsItem>
-#include <QtWidgets/QTabWidget>
 #include <QtCore/QThread>
 #include <QtCore/QThreadPool>
 #include <QtCore/QTime>
 #include <QtCore/QTimer>
-#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 #include <QtCore/qmath.h>
 #include <QtCore/QtDebug>
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QMainWindow>
-#include <QtGui/QPainter>
-#include <QtGui/QResizeEvent>
-#include <QtWidgets/QtWidgets>
-#include <QtOpenGL/QGLWidget>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>

@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <QtGui/QGuiApplication>
+
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QGraphicsItem>

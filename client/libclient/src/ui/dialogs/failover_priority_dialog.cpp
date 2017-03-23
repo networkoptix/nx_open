@@ -1,5 +1,11 @@
 #include "failover_priority_dialog.h"
 
+#include <QtCore/QCoreApplication>
+
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QWidget>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>

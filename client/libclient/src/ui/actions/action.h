@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QPointer>
+
 #include <QtWidgets/QAction>
 
 #include <ui/workbench/workbench_context_aware.h>

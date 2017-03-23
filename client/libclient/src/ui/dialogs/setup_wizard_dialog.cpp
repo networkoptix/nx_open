@@ -1,5 +1,7 @@
 #include "setup_wizard_dialog.h"
 
+#include <QtCore/QUrlQuery>
+
 #include <QtWidgets/QBoxLayout>
 
 #include <common/common_module.h>

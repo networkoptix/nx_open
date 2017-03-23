@@ -1,5 +1,7 @@
 #include "timeline_workbench_panel.h"
 
+#include <QtWidgets/QGraphicsLinearLayout>
+
 #include <client/client_runtime_settings.h>
 
 #include <ui/actions/action_manager.h>

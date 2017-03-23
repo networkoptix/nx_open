@@ -1,6 +1,6 @@
-#ifndef QN_UI_ELEMENTS_WIDGET_H
-#define QN_UI_ELEMENTS_WIDGET_H
+#pragma once
 
+#include <QtCore/QPointer>
 
 #include <QtWidgets/QGraphicsWidget>
 
@@ -11,7 +11,7 @@ class Instrument;
 
 /**
  * A graphics widget that has the same coordinate system as a viewport.
- * 
+ *
  * Useful for placing UI controls.
  */
 class QnUiElementsWidget: public GraphicsWidget {
@@ -32,6 +32,3 @@ private slots:
 private:
     QPointer<Instrument> m_instrument;
 };
-
-
-#endif // QN_UI_ELEMENTS_WIDGET_H

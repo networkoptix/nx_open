@@ -3,6 +3,9 @@
 #ifdef Q_OS_WIN
 #   include <Windows.h>
 
+#include <QtCore/QCoreApplication>
+#include <QtWidgets/QWidget>
+
 enum {
     WM_QT_SENDPOSTEDEVENTS = WM_USER + 1 /* Copied from qeventdispatcher_win.cpp. */
 };

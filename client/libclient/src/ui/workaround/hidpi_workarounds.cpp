@@ -1,8 +1,13 @@
-
 #include "hidpi_workarounds.h"
 
+#include <QtCore/QPointer>
+
+#include <QtGui/QGuiApplication>
 #include <QtGui/QMovie>
 #include <QtGui/QPixmap>
+#include <QtGui/QScreen>
+#include <QtGui/QWindow>
+
 #include <QtWidgets/QLabel>
 
 #include <nx/utils/raii_guard.h>

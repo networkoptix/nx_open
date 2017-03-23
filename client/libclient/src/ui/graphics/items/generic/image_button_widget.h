@@ -1,10 +1,11 @@
-#ifndef QN_IMAGE_BUTTON_WIDGET_H
-#define QN_IMAGE_BUTTON_WIDGET_H
+#pragma once
 
 #include <array>
 
 #include <QtGui/QPixmap>
+#include <QtGui/QOpenGLBuffer>
 #include <QtGui/QOpenGLFunctions>
+#include <QtGui/QOpenGLVertexArrayObject>
 
 #include <ui/common/margins.h>
 #include <ui/processors/clickable.h>
@@ -184,6 +185,3 @@ private:
     qreal m_rotationSpeed;
     qreal m_rotation;
 };
-
-
-#endif // QN_IMAGE_BUTTON_WIDGET_H

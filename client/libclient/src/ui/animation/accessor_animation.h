@@ -1,9 +1,8 @@
-#ifndef QN_ACCESSOR_ANIMATION_H
-#define QN_ACCESSOR_ANIMATION_H
+#pragma once
 
 #include <QtCore/QVariantAnimation>
 #include <QtCore/QScopedPointer>
-
+#include <QtCore/QPointer>
 
 #include <ui/common/accessor.h>
 
@@ -49,5 +48,3 @@ private:
     QScopedPointer<AbstractAccessor> m_accessor;
     QPointer<QObject> m_target;
 };
-
-#endif // QN_ACCESSOR_ANIMATION_H

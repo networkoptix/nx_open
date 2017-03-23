@@ -1,5 +1,7 @@
 #include "desktop_camera_connection.h"
 
+#include <QtCore/QElapsedTimer>
+
 #include <common/common_module.h>
 
 #include "core/resource/media_server_resource.h"

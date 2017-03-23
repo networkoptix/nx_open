@@ -1,6 +1,8 @@
 #include "nx_style_p.h"
 #include "skin.h"
 
+#include <QtWidgets/QScrollBar>
+
 #include <limits>
 
 #include <utils/common/scoped_painter_rollback.h>

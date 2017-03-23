@@ -1,5 +1,6 @@
-#ifndef _SYNC_PLAY_ARCHIVE_DELEGATE_H__
-#define _SYNC_PLAY_ARCHIVE_DELEGATE_H__
+#pragma once
+
+#include <QtCore/QPointer>
 
 #include <utils/media/externaltimesource.h>
 
@@ -49,9 +50,8 @@ private:
     //QnMutex m_mutex;
     //bool m_usePrebuffer;
     //QnAbstractMediaDataPtr m_nextData;
-    QnAbstractArchiveStreamReader* m_reader; 
+    QnAbstractArchiveStreamReader* m_reader;
     QPointer<QnArchiveSyncPlayWrapper> m_syncWrapper;
     QnAbstractArchiveDelegate* m_ownerDelegate;
 };
 
-#endif // _SYNC_PLAY_ARCHIVE_DELEGATE_H__

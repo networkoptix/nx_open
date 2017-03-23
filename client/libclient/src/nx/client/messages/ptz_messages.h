@@ -1,5 +1,9 @@
 #pragma once
 
+#include <QtCore/QCoreApplication>
+
+class QWidget;
+
 namespace nx {
 namespace client {
 namespace messages {

@@ -1,5 +1,7 @@
 #include "workbench_user_inactivity_watcher.h"
 
+#include <QtWidgets/QWidget>
+
 #include "client/client_settings.h"     // conflicts with <X11/extensions/scrnsaver.h>
 
 #if defined(Q_OS_WIN)

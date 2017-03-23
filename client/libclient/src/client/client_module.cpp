@@ -540,8 +540,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
     customizer->customize(qnGlobals);
 
     /* Initialize application UI. Skip if run in console (e.g. unit-tests). */
-    QGuiApplication* ui = qobject_cast<QGuiApplication*>(qApp);
-    if (ui)
+    if (qApp)
     {
         QnFontLoader::loadFonts(QDir(QApplication::applicationDirPath()).absoluteFilePath(lit("fonts")));
 

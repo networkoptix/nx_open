@@ -1,8 +1,11 @@
 #pragma once
 
+#include <QtCore/QPointer>
+
 #include <ui/dialogs/common/button_box_dialog.h>
 #include <utils/common/updatable.h>
 
+class QTabWidget;
 class QnAbstractPreferencesWidget;
 
 /**

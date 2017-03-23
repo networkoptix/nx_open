@@ -11,8 +11,11 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
 #include <QtCore/qmath.h>
+#include <QtCore/QScopedValueRollback>
 
 #include <QtGui/QPainter>
+
+#include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsSceneWheelEvent>
 
 #include <camera/thumbnails_loader.h>

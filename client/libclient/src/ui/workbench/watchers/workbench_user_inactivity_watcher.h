@@ -1,9 +1,10 @@
-#ifndef WORKBENCH_USER_INACTIVITY_WATCHER_H
-#define WORKBENCH_USER_INACTIVITY_WATCHER_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QTimer>
 #include <QtCore/QDateTime>
+#include <QtCore/QPointer>
+
 #include <QtWidgets/QWidget>
 
 #include <ui/workbench/workbench_context_aware.h>
@@ -69,5 +70,3 @@ private:
     QPointer<QWidget> m_mainWindow;
     QDateTime m_mainWindowMinimizedTime;
 };
-
-#endif // WORKBENCH_USER_INACTIVITY_WATCHER_H

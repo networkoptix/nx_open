@@ -2,6 +2,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QLockFile>
+#include <QtCore/QProcess>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QCoreApplication>
 

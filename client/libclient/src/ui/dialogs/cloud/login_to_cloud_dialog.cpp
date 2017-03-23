@@ -1,6 +1,8 @@
 #include "login_to_cloud_dialog.h"
 #include "ui_login_to_cloud_dialog.h"
 
+#include <QtWidgets/QGraphicsOpacityEffect>
+
 #include <client_core/client_core_settings.h>
 
 #include <helpers/cloud_url_helper.h>

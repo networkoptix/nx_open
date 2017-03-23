@@ -1,6 +1,8 @@
 #include "license_details_dialog.h"
 #include "ui_license_details_dialog.h"
 
+#include <QtGui/QClipboard>
+
 #include <licensing/license.h>
 #include <ui/style/custom_style.h>
 

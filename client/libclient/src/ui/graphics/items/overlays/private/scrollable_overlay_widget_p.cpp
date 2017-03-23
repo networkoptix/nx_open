@@ -1,5 +1,7 @@
 #include "scrollable_overlay_widget_p.h"
 
+#include <QtWidgets/QGraphicsLinearLayout>
+
 #include <ui/graphics/items/controls/html_text_item.h>
 
 #include <utils/common/scoped_value_rollback.h>

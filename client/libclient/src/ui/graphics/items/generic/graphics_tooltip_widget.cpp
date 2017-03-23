@@ -1,5 +1,7 @@
 #include "graphics_tooltip_widget.h"
 
+#include <QtWidgets/QGraphicsLinearLayout>
+
 #include <ui/processors/clickable.h>
 #include <ui/style/helper.h>
 #include <ui/widgets/common/text_edit_label.h>

@@ -1,5 +1,7 @@
-#ifndef QN_SHADOW_ITEM
-#define QN_SHADOW_ITEM
+#pragma once
+
+#include <QtGui/QOpenGLBuffer >
+#include <QtGui/QOpenGLVertexArrayObject >
 
 #include <QtWidgets/QGraphicsObject>
 
@@ -69,5 +71,3 @@ private:
     QOpenGLVertexArrayObject m_vertices;
     QOpenGLBuffer m_positionBuffer;
 };
-
-#endif // QN_SHADOW_ITEM
