@@ -42,8 +42,8 @@ TEST_F(FtHealthMonitoring, history_is_not_reported_for_unknown_id)
     api::SystemHealthHistory history;
     ASSERT_NE(
         api::ResultCode::ok,
-        cdb()->getSystemHealthHistory(
-            ownerAccount().email, ownerAccount().password,
+        getSystemHealthHistory(
+            account().email, account().password,
             QnUuid::createUuid().toStdString(), &history));
 }
 
@@ -58,6 +58,19 @@ TEST_F(FtHealthMonitoring, history_is_not_available_to_system_credentials)
 {
     givenSystemWithSomeHistory();
     thenSystemCredentialsCannotBeUsedToAccessHistory();
+}
+
+TEST_F(FtHealthMonitoring, no_excess_system_online_records)
+{
+    establishConnectionFromMediaserverToCloud();
+    assertHistoryHasASingleOnlineRecord();
+
+    establishConnectionFromMediaserverToCloudReusingPeerId();
+
+    // Giving some for history to be saved to DB.
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+
+    assertHistoryHasASingleOnlineRecord();
 }
 
 } // namespace test
