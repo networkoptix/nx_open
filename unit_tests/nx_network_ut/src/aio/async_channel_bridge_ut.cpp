@@ -4,7 +4,7 @@
 
 #include <boost/optional.hpp>
 
-#include <nx/network/async_channel_bridge.h>
+#include <nx/network/aio/async_channel_bridge.h>
 #include <nx/network/aio/abstract_async_channel.h>
 #include <nx/utils/pipeline.h>
 #include <nx/utils/random.h>
@@ -13,12 +13,13 @@
 
 namespace nx {
 namespace network {
+namespace aio {
 namespace test {
 
 class TestAsyncChannel:
-    public aio::AbstractAsyncChannel
+    public AbstractAsyncChannel
 {
-    using base_type = aio::BasicPollable;
+    using base_type = BasicPollable;
 
 public:
     enum class InputDepletionPolicy
@@ -53,7 +54,7 @@ public:
             stopWhileInAioThread();
     }
 
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
+    virtual void bindToAioThread(AbstractAioThread* aioThread) override
     {
         base_type::bindToAioThread(aioThread);
 
@@ -90,16 +91,16 @@ public:
         performAsyncSend(lock);
     }
 
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override
+    virtual void cancelIOSync(EventType eventType) override
     {
-        if (eventType == nx::network::aio::EventType::etRead ||
-            eventType == nx::network::aio::EventType::etNone)
+        if (eventType == EventType::etRead ||
+            eventType == EventType::etNone)
         {
             m_reader.pleaseStopSync();
         }
 
-        if (eventType == nx::network::aio::EventType::etWrite ||
-            eventType == nx::network::aio::EventType::etNone)
+        if (eventType == EventType::etWrite ||
+            eventType == EventType::etNone)
         {
             m_writer.pleaseStopSync();
         }
@@ -175,8 +176,8 @@ private:
     bool m_sendPaused;
     const nx::Buffer* m_sendBuffer;
 
-    aio::BasicPollable m_reader;
-    aio::BasicPollable m_writer;
+    BasicPollable m_reader;
+    BasicPollable m_writer;
     bool m_readPosted;
     std::atomic<int> m_readSequence;
 
@@ -313,11 +314,11 @@ private:
 //-------------------------------------------------------------------------------------------------
 // Test fixture
 
-class AsyncChannelBridge:
+class AioAsyncChannelBridge:
     public ::testing::Test
 {
 public:
-    AsyncChannelBridge()
+    AioAsyncChannelBridge()
     {
         m_originalData.resize(nx::utils::random::number<int>(1, 1024*1024));
         std::generate(
@@ -326,7 +327,7 @@ public:
             rand);
     }
 
-    ~AsyncChannelBridge()
+    ~AioAsyncChannelBridge()
     {
         if (m_bridge)
             m_bridge->pleaseStopSync();
@@ -350,14 +351,14 @@ protected:
     {
         initializeFixedDataInput();
         createChannel();
-        m_bridge->start(std::bind(&AsyncChannelBridge::onBridgeDone, this, std::placeholders::_1));
+        m_bridge->start(std::bind(&AioAsyncChannelBridge::onBridgeDone, this, std::placeholders::_1));
     }
 
     void startExchangingInfiniteData()
     {
         initializeInfiniteDataInput();
         createChannel();
-        m_bridge->start(std::bind(&AsyncChannelBridge::onBridgeDone, this, std::placeholders::_1));
+        m_bridge->start(std::bind(&AioAsyncChannelBridge::onBridgeDone, this, std::placeholders::_1));
     }
     
     void pauseRightDestination()
@@ -439,7 +440,7 @@ private:
     NotifyingOutput m_leftDest;
     std::unique_ptr<utils::pipeline::AbstractInput> m_rightSource;
     NotifyingOutput m_rightDest;
-    std::unique_ptr<network::AsyncChannelBridge> m_bridge;
+    std::unique_ptr<aio::AsyncChannelBridge> m_bridge;
     std::unique_ptr<TestAsyncChannel> m_leftFile;
     std::unique_ptr<TestAsyncChannel> m_rightFile;
     nx::utils::promise<SystemError::ErrorCode> m_bridgeDone;
@@ -481,20 +482,20 @@ private:
 //-------------------------------------------------------------------------------------------------
 // Test cases
 
-TEST_F(AsyncChannelBridge, data_is_passed_through)
+TEST_F(AioAsyncChannelBridge, data_is_passed_through)
 {
     startExchangingFiniteData();
     assertDataExchangeWasSuccessful();
 }
 
-TEST_F(AsyncChannelBridge, cancellation)
+TEST_F(AioAsyncChannelBridge, cancellation)
 {
     startExchangingInfiniteData();
     waitForSomeExchangeToHappen();
     stopChannel();
 }
 
-TEST_F(AsyncChannelBridge, reports_error_from_source)
+TEST_F(AioAsyncChannelBridge, reports_error_from_source)
 {
     startExchangingInfiniteData();
     waitForSomeExchangeToHappen();
@@ -502,7 +503,7 @@ TEST_F(AsyncChannelBridge, reports_error_from_source)
     assertErrorHasBeenReported();
 }
 
-TEST_F(AsyncChannelBridge, forwards_all_received_data_after_channel_closure)
+TEST_F(AioAsyncChannelBridge, forwards_all_received_data_after_channel_closure)
 {
     startExchangingInfiniteData();
     waitForSomeExchangeToHappen();
@@ -513,7 +514,7 @@ TEST_F(AsyncChannelBridge, forwards_all_received_data_after_channel_closure)
     assertAllDataFromLeftHasBeenTransferredToTheRight();
 }
 
-TEST_F(AsyncChannelBridge, read_saturation)
+TEST_F(AioAsyncChannelBridge, read_saturation)
 {
     startExchangingInfiniteData();
     waitForSomeExchangeToHappen();
@@ -525,7 +526,7 @@ TEST_F(AsyncChannelBridge, read_saturation)
     waitForSomeExchangeToHappen();
 }
 
-TEST_F(AsyncChannelBridge, inactivity_timeout)
+TEST_F(AioAsyncChannelBridge, inactivity_timeout)
 {
     setInactivityTimeout();
     startExchangingInfiniteData();
@@ -533,7 +534,7 @@ TEST_F(AsyncChannelBridge, inactivity_timeout)
     assertBridgeDoneDueToInactivity();
 }
 
-TEST_F(AsyncChannelBridge, deleting_object_within_done_handler)
+TEST_F(AioAsyncChannelBridge, deleting_object_within_done_handler)
 {
     setAdditionalOnBridgeDoneHandler(
         [this](SystemError::ErrorCode) { deleteBridge(); });
@@ -542,7 +543,7 @@ TEST_F(AsyncChannelBridge, deleting_object_within_done_handler)
 }
 
 class DummyAsyncChannel:
-    public aio::AbstractAsyncChannel
+    public AbstractAsyncChannel
 {
 public:
     DummyAsyncChannel(int* dummyChannelCount):
@@ -568,7 +569,7 @@ public:
     {
     }
 
-    virtual void cancelIOSync(nx::network::aio::EventType /*eventType*/) override
+    virtual void cancelIOSync(EventType /*eventType*/) override
     {
     }
 
@@ -576,7 +577,7 @@ private:
     int* m_dummyChannelCount;
 };
 
-TEST_F(AsyncChannelBridge, takes_ownership_when_supplying_unique_ptr)
+TEST_F(AioAsyncChannelBridge, takes_ownership_when_supplying_unique_ptr)
 {
     int dummyChannelCount = 0;
 
@@ -591,5 +592,6 @@ TEST_F(AsyncChannelBridge, takes_ownership_when_supplying_unique_ptr)
 }
 
 } // namespace test
+} // namespace aio
 } // namespace network
 } // namespace nx

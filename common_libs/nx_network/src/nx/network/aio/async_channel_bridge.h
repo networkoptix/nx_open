@@ -7,12 +7,13 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "aio/basic_pollable.h"
-#include "aio/timer.h"
+#include "basic_pollable.h"
+#include "timer.h"
 #include "detail/async_channel_unidirectional_bridge.h"
 
 namespace nx {
 namespace network {
+namespace aio {
 
 /**
  * Bridge between two asynchronous channels (e.g., sockets).
@@ -215,5 +216,6 @@ std::unique_ptr<AsyncChannelBridgeImpl<LeftFile, RightFile>> makeAsyncChannelBri
         std::move(rightFile));
 }
 
+} // namespace aio
 } // namespace network
 } // namespace nx

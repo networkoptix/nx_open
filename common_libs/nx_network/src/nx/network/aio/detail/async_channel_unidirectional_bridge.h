@@ -7,6 +7,7 @@
 
 namespace nx {
 namespace network {
+namespace aio {
 namespace detail {
 
 class BufferQueue
@@ -229,5 +230,6 @@ private:
 };
 
 } // namespace detail
+} // namespace aio
 } // namespace network
 } // namespace nx
