@@ -365,7 +365,7 @@ void QnGridBackgroundItem::updateGeometry()
 {
     Q_D(QnGridBackgroundItem);
 
-    if (d->backgroundType == BackgroundType::Default)
+    if (d->backgroundType != BackgroundType::Image)
     {
         d->sceneBoundingRect = QRect();
         const qreal d = std::numeric_limits<qreal>::max() / 4;
@@ -529,7 +529,6 @@ void QnGridBackgroundItem::paint(
     {
         painter->setBrush(Qt::gray);
         painter->drawRect(display()->boundedViewportGeometry());
-        qDebug() << display()->boundedViewportGeometry();
         return;
     }
 
