@@ -811,7 +811,13 @@
     },
 
     "QnSoftwareTriggerButton": {
-        "palette": { "default": { "window": "dark1.setAlpha(128)" } }
+        "palette": {
+            "default": {
+                "window": "dark1.setAlpha(128)",
+                "highlight": "brand_core.setAlpha(179)",
+                "dark": "brand_core.setAlpha(128)"
+            }
+        }
     },
 
     "QnAuditLogModel": {

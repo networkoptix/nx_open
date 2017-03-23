@@ -57,7 +57,9 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
     m_model(),
     m_eventParameters(NULL),
     m_actionParameters(NULL),
-    m_updating(false)
+    m_updating(false),
+    m_eventAligner(new QnAligner(this)),
+    m_actionAligner(new QnAligner(this))
 {
     ui->setupUi(this);
 
@@ -81,11 +83,8 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
 
     connect(ui->commentsLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_commentsLineEdit_textChanged(QString)));
 
-    auto aligner1 = new QnAligner(this);
-    aligner1->addWidgets({ ui->eventDoLabel, ui->eventAtLabel });
-
-    auto aligner2 = new QnAligner(this);
-    aligner2->addWidgets({ ui->actionDoLabel, ui->actionAtLabel });
+    m_eventAligner->addWidgets({ ui->eventDoLabel, ui->eventAtLabel });
+    m_actionAligner->addWidgets({ ui->actionDoLabel, ui->actionAtLabel });
 
     retranslateUi();
 }
@@ -262,6 +261,9 @@ void QnBusinessRuleWidget::initEventParameters()
         m_eventParameters->updateTabOrder(ui->eventResourcesHolder, ui->scheduleButton);
         m_eventParameters->setVisible(true);
         m_eventParameters->setModel(m_model);
+
+        if (const auto aligner = m_eventParameters->findChild<QnAligner*>())
+            m_eventAligner->addAligner(aligner);
     }
     else
     {
@@ -310,6 +312,9 @@ void QnBusinessRuleWidget::initActionParameters()
         m_actionParameters->updateTabOrder(getTabBeforeTarget(), ui->commentsLineEdit);
         m_actionParameters->setVisible(true);
         m_actionParameters->setModel(m_model);
+
+        if (const auto aligner = m_actionParameters->findChild<QnAligner*>())
+            m_actionAligner->addAligner(aligner);
     }
     else
     {
