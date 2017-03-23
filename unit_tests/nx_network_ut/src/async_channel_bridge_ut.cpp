@@ -5,6 +5,7 @@
 #include <boost/optional.hpp>
 
 #include <nx/network/async_channel_bridge.h>
+#include <nx/network/aio/abstract_async_channel.h>
 #include <nx/utils/pipeline.h>
 #include <nx/utils/random.h>
 #include <nx/utils/thread/mutex.h>
@@ -15,7 +16,7 @@ namespace network {
 namespace test {
 
 class TestAsyncChannel:
-    public aio::BasicPollable
+    public aio::AbstractAsyncChannel
 {
     using base_type = aio::BasicPollable;
 
@@ -60,9 +61,9 @@ public:
         m_writer.bindToAioThread(aioThread);
     }
 
-    void readSomeAsync(
+    virtual void readSomeAsync(
         nx::Buffer* const buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler)
+        std::function<void(SystemError::ErrorCode, size_t)> handler) override
     {
         NX_ASSERT(buffer->capacity() > buffer->size());
         
@@ -75,9 +76,9 @@ public:
         performAsyncRead(lock);
     }
 
-    void sendAsync(
+    virtual void sendAsync(
         const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler)
+        std::function<void(SystemError::ErrorCode, size_t)> handler) override
     {
         QnMutexLocker lock(&m_mutex);
 
@@ -89,7 +90,7 @@ public:
         performAsyncSend(lock);
     }
 
-    void cancelIOSync(nx::network::aio::EventType eventType)
+    virtual void cancelIOSync(nx::network::aio::EventType eventType) override
     {
         if (eventType == nx::network::aio::EventType::etRead ||
             eventType == nx::network::aio::EventType::etNone)
@@ -332,18 +333,6 @@ public:
     }
 
 protected:
-    void initializeFixedDataInput()
-    {
-        m_leftSource = std::make_unique<utils::pipeline::ReflectingPipeline>(m_originalData);
-        m_rightSource = std::make_unique<utils::pipeline::ReflectingPipeline>(m_originalData);
-    }
-
-    void initializeInfiniteDataInput()
-    {
-        m_leftSource = std::make_unique<utils::pipeline::RandomDataSource>();
-        m_rightSource = std::make_unique<utils::pipeline::RandomDataSource>();
-    }
-    
     void setInactivityTimeout()
     {
         m_inactivityTimeout = std::chrono::milliseconds(1);
@@ -351,23 +340,16 @@ protected:
             m_bridge->setInactivityTimeout(*m_inactivityTimeout);
     }
 
-    void createChannel()
+    void setAdditionalOnBridgeDoneHandler(
+        nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
-        m_leftFile = std::make_unique<TestAsyncChannel>(
-            m_leftSource.get(), &m_leftDest, TestAsyncChannel::InputDepletionPolicy::ignore);
-        m_rightFile = std::make_unique<TestAsyncChannel>(
-            m_rightSource.get(), &m_rightDest, TestAsyncChannel::InputDepletionPolicy::ignore);
-
-        m_bridge = makeAsyncChannelBridge(m_leftFile.get(), m_rightFile.get());
-        if (m_inactivityTimeout)
-            m_bridge->setInactivityTimeout(*m_inactivityTimeout);
+        m_additionalOnBridgeDoneHandler = std::move(handler);
     }
 
-    void exchangeData()
+    void startExchangingFiniteData()
     {
-        if (!m_bridge)
-            createChannel();
-
+        initializeFixedDataInput();
+        createChannel();
         m_bridge->start(std::bind(&AsyncChannelBridge::onBridgeDone, this, std::placeholders::_1));
     }
 
@@ -446,6 +428,11 @@ protected:
         ASSERT_EQ(SystemError::timedOut, m_bridgeDone.get_future().get());
     }
 
+    void deleteBridge()
+    {
+        m_bridge.reset();
+    }
+
 private:
     QByteArray m_originalData;
     std::unique_ptr<utils::pipeline::AbstractInput> m_leftSource;
@@ -457,9 +444,36 @@ private:
     std::unique_ptr<TestAsyncChannel> m_rightFile;
     nx::utils::promise<SystemError::ErrorCode> m_bridgeDone;
     boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_additionalOnBridgeDoneHandler;
+
+    void createChannel()
+    {
+        m_leftFile = std::make_unique<TestAsyncChannel>(
+            m_leftSource.get(), &m_leftDest, TestAsyncChannel::InputDepletionPolicy::ignore);
+        m_rightFile = std::make_unique<TestAsyncChannel>(
+            m_rightSource.get(), &m_rightDest, TestAsyncChannel::InputDepletionPolicy::ignore);
+
+        m_bridge = makeAsyncChannelBridge(m_leftFile.get(), m_rightFile.get());
+        if (m_inactivityTimeout)
+            m_bridge->setInactivityTimeout(*m_inactivityTimeout);
+    }
+
+    void initializeFixedDataInput()
+    {
+        m_leftSource = std::make_unique<utils::pipeline::ReflectingPipeline>(m_originalData);
+        m_rightSource = std::make_unique<utils::pipeline::ReflectingPipeline>(m_originalData);
+    }
+
+    void initializeInfiniteDataInput()
+    {
+        m_leftSource = std::make_unique<utils::pipeline::RandomDataSource>();
+        m_rightSource = std::make_unique<utils::pipeline::RandomDataSource>();
+    }
 
     void onBridgeDone(SystemError::ErrorCode sysErrorCode)
     {
+        if (m_additionalOnBridgeDoneHandler)
+            m_additionalOnBridgeDoneHandler(sysErrorCode);
         m_bridgeDone.set_value(sysErrorCode);
     }
 };
@@ -469,8 +483,7 @@ private:
 
 TEST_F(AsyncChannelBridge, data_is_passed_through)
 {
-    initializeFixedDataInput();
-    exchangeData();
+    startExchangingFiniteData();
     assertDataExchangeWasSuccessful();
 }
 
@@ -520,17 +533,62 @@ TEST_F(AsyncChannelBridge, inactivity_timeout)
     assertBridgeDoneDueToInactivity();
 }
 
-//TEST_F(AsyncChannelBridge, channel_stops_sources_before_reporting_done)
-//{
-//    initializeFixedDataInput();
-//    exchangeData();
-//    assertDataExchangeWasSuccessful();
-//    assertSourceHasBeenStoppedByChannel();
-//}
+TEST_F(AsyncChannelBridge, deleting_object_within_done_handler)
+{
+    setAdditionalOnBridgeDoneHandler(
+        [this](SystemError::ErrorCode) { deleteBridge(); });
+    startExchangingFiniteData();
+    assertDataExchangeWasSuccessful();
+}
 
-//TEST_F(AsyncChannelBridge, deleting_object_within_done_handler)
+class DummyAsyncChannel:
+    public aio::AbstractAsyncChannel
+{
+public:
+    DummyAsyncChannel(int* dummyChannelCount):
+        m_dummyChannelCount(dummyChannelCount)
+    {
+        ++(*m_dummyChannelCount);
+    }
 
-//TEST_F(AsyncChannelBridge, takes_ownership_when_supplying_unique_ptr)
+    virtual ~DummyAsyncChannel() override
+    {
+        --(*m_dummyChannelCount);
+    }
+
+    virtual void readSomeAsync(
+        nx::Buffer* const /*buffer*/,
+        std::function<void(SystemError::ErrorCode, size_t)> /*handler*/) override
+    {
+    }
+
+    virtual void sendAsync(
+        const nx::Buffer& /*buffer*/,
+        std::function<void(SystemError::ErrorCode, size_t)> /*handler*/) override
+    {
+    }
+
+    virtual void cancelIOSync(nx::network::aio::EventType /*eventType*/) override
+    {
+    }
+
+private:
+    int* m_dummyChannelCount;
+};
+
+TEST_F(AsyncChannelBridge, takes_ownership_when_supplying_unique_ptr)
+{
+    int dummyChannelCount = 0;
+
+    auto left = std::make_unique<DummyAsyncChannel>(&dummyChannelCount);
+    auto right = std::make_unique<DummyAsyncChannel>(&dummyChannelCount);
+    ASSERT_EQ(2, dummyChannelCount);
+
+    auto bridge = makeAsyncChannelBridge(std::move(left), std::move(right));
+    bridge.reset();
+
+    ASSERT_EQ(0, dummyChannelCount);
+}
 
 } // namespace test
 } // namespace network

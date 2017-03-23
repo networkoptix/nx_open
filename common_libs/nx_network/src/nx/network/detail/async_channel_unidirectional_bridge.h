@@ -199,10 +199,7 @@ private:
             m_onSomeActivityHander();
 
         if (sysErrorCode != SystemError::noError)
-        {
-            reportFailure(sysErrorCode);
-            return;
-        }
+            return reportFailure(sysErrorCode);
 
         m_sendQueue.pop_front();
         if (!m_isSourceOpened && m_sendQueue.empty())
