@@ -33,7 +33,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     QObject* parent)
     :
     base_type(settings, parentWidget, parent),
-    backgroundItem(new QnControlBackgroundWidget(Qn::RightBorder, parentWidget)),
+    backgroundItem(new QnControlBackgroundWidget(Qt::RightEdge, parentWidget)),
     item(new QnNotificationsCollectionWidget(parentWidget, 0, context())),
     pinButton(NxUi::newPinButton(parentWidget, context(),
         action(QnActions::PinNotificationsAction))),

@@ -13,37 +13,16 @@ struct QnEventMetaData
     //! Cameras list which associated with event. EventResourceId may be POS terminal, but this is a camera list which should be shown with this event
     std::vector<QnUuid> cameraRefs;
 
-    QnEventMetaData() {}
+    //! Users that can generate this event. Empty == any user
+    std::vector<QnUuid> instigators;
 
-    QnEventMetaData(const QnEventMetaData& right)
-    :
-        cameraRefs(right.cameraRefs)
-    {
-    }
-
-    QnEventMetaData(QnEventMetaData&& right)
-    :
-        cameraRefs(std::move(right.cameraRefs))
-    {
-    }
-
-    QnEventMetaData& operator=(const QnEventMetaData& right)
-    {
-        if (&right == this)
-            return *this;
-        cameraRefs = right.cameraRefs;
-        return *this;
-    }
-    
-    QnEventMetaData& operator=(QnEventMetaData&& right)
-    {
-        if (&right == this)
-            return *this;
-        cameraRefs = std::move(right.cameraRefs);
-        return *this;
-    }
+    QnEventMetaData() = default;
+    QnEventMetaData(const QnEventMetaData&) = default;
+    QnEventMetaData(QnEventMetaData&&) = default;
+    QnEventMetaData& operator= (const QnEventMetaData&) = default;
+    QnEventMetaData& operator= (QnEventMetaData&&) = default;
 };
-#define QnEventMetaData_Fields (cameraRefs)
+#define QnEventMetaData_Fields (cameraRefs)(instigators)
 QN_FUSION_DECLARE_FUNCTIONS(QnEventMetaData, (ubjson)(json)(eq)(xml)(csv_record));
 
 
@@ -58,8 +37,8 @@ struct QnBusinessEventParameters {
 
     /** Event source - camera or server. */
     QnUuid eventResourceId;
-    
-    /* Resource name with cause a event. 
+
+    /* Resource name with cause a event.
     *  resourceName is used if no resource actually registered in our system.
     *  External custom event can provide some resource name with doesn't match resourceId in our system. At this case resourceName is filled and resourceId stay empty
     */
@@ -78,7 +57,7 @@ struct QnBusinessEventParameters {
     QString inputPortId;
 
     //! short event description. Used for camera/server conflict as resource name which cause error. Used in custom events as short description
-    QString caption;    
+    QString caption;
 
     //! long event description. Used for camera/server conflict as long description (conflict list). Used in ReasonedEvents as reason description. Used in custom events as long description
     QString description;

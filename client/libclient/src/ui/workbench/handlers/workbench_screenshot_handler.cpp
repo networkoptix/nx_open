@@ -58,15 +58,12 @@ QnScreenshotParameters::QnScreenshotParameters():
     utcTimestampMsec(0),
     isUtc(false),
     displayTimeMsec(0),
-    filename(),
-    timestampPosition(Qn::BottomRightCorner),
-    itemDewarpingParams(),
-    mediaDewarpingParams(),
-    imageCorrectionParams(),
-    zoomRect(),
     customAspectRatio(0.0),
     rotationAngle(0.0)
-{}
+{
+    timestampParams.enabled = true;
+    timestampParams.corner = Qt::BottomRightCorner;
+}
 
 QString QnScreenshotParameters::timeString() const {
     if (utcTimestampMsec == latestScreenshotTime)
@@ -271,14 +268,14 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
     }
     count *= imageCorrList.size();
 
-    typedef QPair<QString, Qn::Corner> crn_type;
+    typedef QPair<QString, int> crn_type;
     QList<crn_type> tsCorners;
     tsCorners
-        << crn_type(lit("_nots"), Qn::NoCorner)
-        << crn_type(lit("_topLeft"), Qn::TopLeftCorner)
-        << crn_type(lit("_topRight"), Qn::TopRightCorner)
-        << crn_type(lit("_btmLeft"), Qn::BottomLeftCorner)
-        << crn_type(lit("_btmRight"), Qn::BottomRightCorner);
+        << crn_type(lit("_nots"), -1)
+        << crn_type(lit("_topLeft"), Qt::TopLeftCorner)
+        << crn_type(lit("_topRight"), Qt::TopRightCorner)
+        << crn_type(lit("_btmLeft"), Qt::BottomLeftCorner)
+        << crn_type(lit("_btmRight"), Qt::BottomRightCorner);
     count *= tsCorners.size();
 
     QnResourceDisplayPtr display = widget->display();
@@ -316,7 +313,10 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
 
                     for (const crn_type &crn: tsCorners) {
                         Key tsKey(keyStack, crn.first);
-                        parameters.timestampPosition = crn.second;
+
+                        parameters.timestampParams.enabled = crn.second >= 0;
+                        if (parameters.timestampParams.enabled)
+                            parameters.timestampParams.corner = static_cast<Qt::Corner>(crn.second);
 
                         for (const QString &fmt: formats) {
                             Key fmtKey(keyStack, fmt);
@@ -370,7 +370,7 @@ void QnWorkbenchScreenshotHandler::at_takeScreenshotAction_triggered() {
     parameters.isUtc = widget->resource()->toResource()->flags() & Qn::utc;
     parameters.displayTimeMsec = screenshotTimeMSec(widget, true);
     parameters.filename = filename;
-    parameters.timestampPosition = qnSettings->timestampCorner();
+   // parameters.timestampPosition = qnSettings->timestampCorner(); //TODO: #GDM #3.1 store full screenshot settings
     parameters.itemDewarpingParams = widget->item()->dewarpingParams();
     parameters.mediaDewarpingParams = widget->dewarpingParams();
     parameters.imageCorrectionParams = widget->item()->imageEnhancement();
@@ -413,12 +413,16 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     dialog->setAcceptMode(QFileDialog::AcceptSave);
 
     QComboBox* comboBox = new QComboBox(dialog.data());
-    comboBox->addItem(tr("No Timestamp"), static_cast<int>(Qn::NoCorner));
-    comboBox->addItem(tr("Top Left Corner"), static_cast<int>(Qn::TopLeftCorner));
-    comboBox->addItem(tr("Top Right Corner"), static_cast<int>(Qn::TopRightCorner));
-    comboBox->addItem(tr("Bottom Left Corner"), static_cast<int>(Qn::BottomLeftCorner));
-    comboBox->addItem(tr("Bottom Right Corner"), static_cast<int>(Qn::BottomRightCorner));
-    comboBox->setCurrentIndex(comboBox->findData(parameters.timestampPosition, Qt::UserRole, Qt::MatchExactly));
+    comboBox->addItem(tr("No Timestamp"), -1);
+    comboBox->addItem(tr("Top Left Corner"), Qt::TopLeftCorner);
+    comboBox->addItem(tr("Top Right Corner"), Qt::TopRightCorner);
+    comboBox->addItem(tr("Bottom Left Corner"), Qt::BottomLeftCorner);
+    comboBox->addItem(tr("Bottom Right Corner"), Qt::BottomRightCorner);
+
+    if (!parameters.timestampParams.enabled)
+        comboBox->setCurrentIndex(0);
+    else
+        comboBox->setCurrentIndex(comboBox->findData(parameters.timestampParams.corner, Qt::UserRole, Qt::MatchExactly));
 
     dialog->addWidget(tr("Timestamp:"), comboBox);
     setHelpTopic(dialog.data(), Qn::MainWindow_MediaItem_Screenshot_Help);
@@ -472,8 +476,14 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
         break;
     }
 
+    {
+        int corner = comboBox->itemData(comboBox->currentIndex()).toInt();
+        parameters.timestampParams.enabled = (corner >= 0);
+        if (parameters.timestampParams.enabled)
+            parameters.timestampParams.corner = static_cast<Qt::Corner>(corner);
+    }
+
     parameters.filename = fileName;
-    parameters.timestampPosition = static_cast<Qn::Corner>(comboBox->itemData(comboBox->currentIndex()).value<int>());
     return true;
 }
 
@@ -497,7 +507,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
 
     if (!result.isNull()) {
         //TODO: #GDM looks like total mess
-        qint64 timeMsec = parameters.utcTimestampMsec == latestScreenshotTime
+        parameters.timestampParams.timeMs = parameters.utcTimestampMsec == latestScreenshotTime
             ? QDateTime::currentMSecsSinceEpoch()
             : parameters.displayTimeMsec;
 
@@ -505,7 +515,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         // Doing heavy filters only. This filters doesn't supported on server side for screenshots
         transcodeParams.setDewarpingParams(parameters.mediaDewarpingParams, parameters.itemDewarpingParams);
         transcodeParams.setContrastParams(parameters.imageCorrectionParams);
-        transcodeParams.setTimeCorner(parameters.timestampPosition, 0, timeMsec);
+        transcodeParams.setTimeStampParams(parameters.timestampParams);
         transcodeParams.setRotation(parameters.rotationAngle);
         transcodeParams.setSrcRect(parameters.zoomRect);
         QList<QnAbstractImageFilterPtr> filters = transcodeParams.createFilterChain(result.size());
@@ -639,7 +649,8 @@ void QnWorkbenchScreenshotHandler::takeScreenshot(QnMediaResourceWidget *widget,
 
         loader->setParameters(localParameters); //update changed fields
         qnSettings->setLastScreenshotDir(QFileInfo(localParameters.filename).absolutePath());
-        qnSettings->setTimestampCorner(localParameters.timestampPosition);
+        //TODO: #GDM #3.1 store screenshot settings
+        //qnSettings->setTimestampCorner(localParameters.timestampPosition);
 
         showProgressDelayed(tr("Saving %1").arg(QFileInfo(localParameters.filename).fileName()));
         connect(m_screenshotProgressDialog, &QnProgressDialog::canceled, loader, &QnScreenshotLoader::deleteLater);

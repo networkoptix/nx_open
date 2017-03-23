@@ -178,16 +178,6 @@ bool QnTimePeriod::isInfinite() const {
     return durationMs == ::infiniteDuration;
 }
 
-Qn::TimePeriodType QnTimePeriod::type() const {
-    if(isNull())
-        return Qn::NullTimePeriod;
-
-    if(isEmpty())
-        return Qn::EmptyTimePeriod;
-
-    return Qn::NormalTimePeriod;
-}
-
 qint64 QnTimePeriod::infiniteDuration() {
     return ::infiniteDuration;
 }
