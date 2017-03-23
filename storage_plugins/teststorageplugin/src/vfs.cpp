@@ -37,9 +37,13 @@ int64_t fileSize(const std::string& fileName)
 		return 0;
 
 	LARGE_INTEGER result;
-	if (!GetFileSizeEx(hFile, &result))
-		return 0;
+    if (!GetFileSizeEx(hFile, &result))
+    {
+        CloseHandle(hFile);
+        return 0;
+    }
 
+    CloseHandle(hFile);
     return result.QuadPart;
 }
 #endif
