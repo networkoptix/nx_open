@@ -56,10 +56,10 @@ private:
 };
 
 template<typename SourcePtr, typename DestinationPtr>
-class AsyncOneWayChannel
+class AsyncChannelUnidirectionalBridge
 {
 public:
-    AsyncOneWayChannel(
+    AsyncChannelUnidirectionalBridge(
         SourcePtr& source,
         DestinationPtr& destination,
         std::size_t readBufferSize,

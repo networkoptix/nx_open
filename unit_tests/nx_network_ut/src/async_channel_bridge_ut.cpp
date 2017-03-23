@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/asynchronous_channel.h>
+#include <nx/network/async_channel_bridge.h>
 #include <nx/utils/pipeline.h>
 #include <nx/utils/random.h>
 #include <nx/utils/thread/mutex.h>
@@ -268,11 +268,11 @@ private:
 //-------------------------------------------------------------------------------------------------
 // Test fixture
 
-class AsynchronousChannel:
+class AsyncChannelBridge:
     public ::testing::Test
 {
 public:
-    AsynchronousChannel()
+    AsyncChannelBridge()
     {
         m_originalData.resize(nx::utils::random::number<int>(1, 1024*1024));
         std::generate(
@@ -281,7 +281,7 @@ public:
             rand);
     }
 
-    ~AsynchronousChannel()
+    ~AsyncChannelBridge()
     {
         if (m_channel)
             m_channel->pleaseStopSync();
@@ -307,9 +307,9 @@ protected:
         m_rightFile = std::make_unique<AsyncBufferReader>(
             m_rightSource.get(), &m_rightDest, AsyncBufferReader::InputDepletionPolicy::ignore);
 
-        m_channel = makeAsyncChannel(m_leftFile.get(), m_rightFile.get());
+        m_channel = makeAsyncChannelBridge(m_leftFile.get(), m_rightFile.get());
         m_channel->setOnDone(
-            std::bind(&AsynchronousChannel::onChannelDone, this, std::placeholders::_1));
+            std::bind(&AsyncChannelBridge::onChannelDone, this, std::placeholders::_1));
     }
 
     void exchangeData()
@@ -390,7 +390,7 @@ private:
     NotifyingOutput m_leftDest;
     std::unique_ptr<utils::pipeline::AbstractInput> m_rightSource;
     NotifyingOutput m_rightDest;
-    std::unique_ptr<network::AsynchronousChannel> m_channel;
+    std::unique_ptr<network::AsyncChannelBridge> m_channel;
     std::unique_ptr<AsyncBufferReader> m_leftFile;
     std::unique_ptr<AsyncBufferReader> m_rightFile;
     nx::utils::promise<SystemError::ErrorCode> m_channelDone;
@@ -404,21 +404,21 @@ private:
 //-------------------------------------------------------------------------------------------------
 // Test cases
 
-TEST_F(AsynchronousChannel, data_is_passed_through)
+TEST_F(AsyncChannelBridge, data_is_passed_through)
 {
     initializeFixedDataInput();
     exchangeData();
     assertDataExchangeWasSuccessful();
 }
 
-TEST_F(AsynchronousChannel, cancellation)
+TEST_F(AsyncChannelBridge, cancellation)
 {
     startExchangingInfiniteData();
     waitForSomeExchangeToHappen();
     stopChannel();
 }
 
-TEST_F(AsynchronousChannel, reports_error_from_source)
+TEST_F(AsyncChannelBridge, reports_error_from_source)
 {
     startExchangingInfiniteData();
     waitForSomeExchangeToHappen();
@@ -426,7 +426,7 @@ TEST_F(AsynchronousChannel, reports_error_from_source)
     assertErrorHasBeenReported();
 }
 
-TEST_F(AsynchronousChannel, forwards_all_received_data_after_channel_closure)
+TEST_F(AsyncChannelBridge, forwards_all_received_data_after_channel_closure)
 {
     startExchangingInfiniteData();
     waitForSomeExchangeToHappen();
@@ -437,7 +437,7 @@ TEST_F(AsynchronousChannel, forwards_all_received_data_after_channel_closure)
     assertAllDataFromLeftHasBeenTransferredToTheRight();
 }
 
-TEST_F(AsynchronousChannel, read_saturation)
+TEST_F(AsyncChannelBridge, read_saturation)
 {
     startExchangingInfiniteData();
     waitForSomeExchangeToHappen();
@@ -449,7 +449,7 @@ TEST_F(AsynchronousChannel, read_saturation)
     waitForSomeExchangeToHappen();
 }
 
-//TEST_F(AsynchronousChannel, inactivity_timeout)
+//TEST_F(AsyncChannelBridge, inactivity_timeout)
 //{
 //    channel()->setInactivityTimeout();
 //    startExchangingInfiniteData();
@@ -457,7 +457,7 @@ TEST_F(AsynchronousChannel, read_saturation)
 //    assertChannelDoneDueToInactivity();
 //}
 //
-//TEST_F(AsynchronousChannel, channel_stops_sources_before_reporting_done)
+//TEST_F(AsyncChannelBridge, channel_stops_sources_before_reporting_done)
 //{
 //    initializeFixedDataInput();
 //    exchangeData();
@@ -465,7 +465,9 @@ TEST_F(AsynchronousChannel, read_saturation)
 //    assertSourceHasBeenStoppedByChannel();
 //}
 
-//TEST_F(AsynchronousChannel, deleting_object_within_done_handler)
+//TEST_F(AsyncChannelBridge, deleting_object_within_done_handler)
+
+//TEST_F(AsyncChannelBridge, takes_ownership_when_supplying_unique_ptr)
 
 } // namespace test
 } // namespace network

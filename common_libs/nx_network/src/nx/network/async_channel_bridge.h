@@ -4,32 +4,32 @@
 #include <nx/utils/std/cpp14.h>
 
 #include "aio/basic_pollable.h"
-#include "detail/async_one_way_channel.h"
+#include "detail/async_channel_unidirectional_bridge.h"
 
 namespace nx {
 namespace network {
 
-class AsynchronousChannel:
+class AsyncChannelBridge:
     public aio::BasicPollable
 {
 public:
     static constexpr std::size_t kDefaultReadBufferSize = 16 * 1024;
     static constexpr std::size_t kDefaultMaxSendQueueSizeBytes = 128 * 1024;
 
-    virtual ~AsynchronousChannel() override = default;
+    virtual ~AsyncChannelBridge() override = default;
 
     virtual void start() = 0;
     virtual void setOnDone(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
 };
 
 template<typename LeftFile, typename RightFile>
-class AsyncChannelImpl:
-    public AsynchronousChannel
+class AsyncChannelBridgeImpl:
+    public AsyncChannelBridge
 {
-    using base_type = AsynchronousChannel;
+    using base_type = AsyncChannelBridge;
 
 public:
-    AsyncChannelImpl(LeftFile leftFile, RightFile rightFile):
+    AsyncChannelBridgeImpl(LeftFile leftFile, RightFile rightFile):
         m_closedChannelCount(0)
     {
         m_leftFile = std::move(leftFile);
@@ -43,16 +43,16 @@ public:
 
     template<typename Source, typename Destination>
     void initializeOneWayChannel(
-        std::unique_ptr<detail::AsyncOneWayChannel<Source, Destination>>* channel,
+        std::unique_ptr<detail::AsyncChannelUnidirectionalBridge<Source, Destination>>* channel,
         Source* source,
         Destination* destination)
     {
         *channel =
-            std::make_unique<detail::AsyncOneWayChannel<Source, Destination>>(
+            std::make_unique<detail::AsyncChannelUnidirectionalBridge<Source, Destination>>(
                 *source,
                 *destination,
-                AsynchronousChannel::kDefaultReadBufferSize,
-                AsynchronousChannel::kDefaultMaxSendQueueSizeBytes);
+                AsyncChannelBridge::kDefaultReadBufferSize,
+                AsyncChannelBridge::kDefaultMaxSendQueueSizeBytes);
         (*channel)->setOnDone(
             [this](SystemError::ErrorCode sysErrorCode)
             {
@@ -60,7 +60,7 @@ public:
             });
     }
 
-    virtual ~AsyncChannelImpl() override
+    virtual ~AsyncChannelBridgeImpl() override
     {
         if (isInSelfAioThread())
             stopWhileInAioThread();
@@ -85,8 +85,8 @@ public:
     }
 
 private:
-    std::unique_ptr<detail::AsyncOneWayChannel<LeftFile, RightFile>> m_leftToRight;
-    std::unique_ptr<detail::AsyncOneWayChannel<RightFile, LeftFile>> m_rightToLeft;
+    std::unique_ptr<detail::AsyncChannelUnidirectionalBridge<LeftFile, RightFile>> m_leftToRight;
+    std::unique_ptr<detail::AsyncChannelUnidirectionalBridge<RightFile, LeftFile>> m_rightToLeft;
 
     LeftFile m_leftFile;
     RightFile m_rightFile;
@@ -133,10 +133,10 @@ private:
  * That allows them to be std::unique_ptr<Something>.
  */
 template<typename LeftFile, typename RightFile>
-std::unique_ptr<AsyncChannelImpl<LeftFile, RightFile>> makeAsyncChannel(
+std::unique_ptr<AsyncChannelBridgeImpl<LeftFile, RightFile>> makeAsyncChannelBridge(
     LeftFile leftFile, RightFile rightFile)
 {
-    return std::make_unique<AsyncChannelImpl<LeftFile, RightFile>>(
+    return std::make_unique<AsyncChannelBridgeImpl<LeftFile, RightFile>>(
         std::move(leftFile),
         std::move(rightFile));
 }
