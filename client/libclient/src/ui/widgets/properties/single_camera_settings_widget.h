@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QWidget>
 
+#include <common/common_globals.h>
+
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>

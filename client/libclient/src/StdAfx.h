@@ -38,11 +38,6 @@ extern "C" {
 #endif
 
 #ifdef __cplusplus
-/* This file should be included only main in vms projects. */
-#include <common/common_globals.h>
-#endif
-
-#ifdef __cplusplus
 
 /* STL headers. */
 #include <algorithm>
@@ -53,29 +48,6 @@ extern "C" {
 #include <boost/algorithm/cxx11/any_of.hpp>
 
 /* QT headers. */
-
-/*
-#include <QtWidgets/QAction>
-#include <QtNetwork/QAuthenticator>
-#include <QtCore/QBuffer>
-#include <QtWidgets/QCheckBox>
-#include <QtGui/QCloseEvent>
-#include <QtWidgets/QCompleter>
-#include <QtCore/QDataStream>
-#include <QtGui/QDesktopServices>
-#include <QtWidgets/QDialog>
-#include <QtWidgets/QDialogButtonBox>
-#include <QtXml/QDomDocument>
-#include <QtXml/QDomElement>
-#include <QtCore/QEasingCurve>
-#include <QtNetwork/QHostAddress>
-#include <QtCore/QPropertyAnimation>
-#include <QtGui/QRadialGradient>
-#include <QtNetwork/QNetworkAddressEntry>
-#include <QtNetwork/QNetworkInterface>
-#include <QtCore/QParallelAnimationGroup>
-#include <QtCore/QIODevice>
-*/
 
 #include <QtGui/QColor>
 #include <QtCore/QDateTime>

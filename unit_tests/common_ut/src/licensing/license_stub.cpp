@@ -51,7 +51,9 @@ QnFutureLicenseStub::QnFutureLicenseStub(int count) {
     setCameraCount(count);
 }
 
-bool QnFutureLicenseStub::isValid(ErrorCode* errCode /* = 0 */, ValidationMode mode /* = VM_Regular */) const {
-    QN_UNUSED(errCode, mode);
+bool QnFutureLicenseStub::isValid(
+    ErrorCode* /*errCode  = 0 */,
+    ValidationMode /* mode = VM_Regular */) const
+{
     return true;
 }
