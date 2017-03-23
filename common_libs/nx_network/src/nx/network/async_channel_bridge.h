@@ -1,9 +1,14 @@
 #pragma once
 
+#include <chrono>
+
+#include <boost/optional.hpp>
+
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/cpp14.h>
 
 #include "aio/basic_pollable.h"
+#include "aio/timer.h"
 #include "detail/async_channel_unidirectional_bridge.h"
 
 namespace nx {
@@ -20,6 +25,7 @@ public:
 
     virtual void start() = 0;
     virtual void setOnDone(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
+    virtual void setInactivityTimeout(std::chrono::milliseconds) = 0;
 };
 
 template<typename LeftFile, typename RightFile>
@@ -41,6 +47,71 @@ public:
         bindToAioThread(getAioThread());
     }
 
+    virtual ~AsyncChannelBridgeImpl() override
+    {
+        if (isInSelfAioThread())
+            stopWhileInAioThread();
+    }
+
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
+    {
+        base_type::bindToAioThread(aioThread);
+        m_leftFile->bindToAioThread(aioThread);
+        m_rightFile->bindToAioThread(aioThread);
+        m_timer.bindToAioThread(aioThread);
+    }
+
+    virtual void start() override
+    {
+        post(
+            [this]()
+            {
+                m_leftToRight->start();
+                m_rightToLeft->start();
+                startInactivityTimerIfNeeded();
+            });
+    }
+
+    virtual void setOnDone(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
+    {
+        m_onDoneHandler = std::move(handler);
+    }
+
+    virtual void setInactivityTimeout(std::chrono::milliseconds timeout) override
+    {
+        m_inactivityTimeout = timeout;
+    }
+
+private:
+    std::unique_ptr<detail::AsyncChannelUnidirectionalBridge<LeftFile, RightFile>> m_leftToRight;
+    std::unique_ptr<detail::AsyncChannelUnidirectionalBridge<RightFile, LeftFile>> m_rightToLeft;
+
+    LeftFile m_leftFile;
+    RightFile m_rightFile;
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onDoneHandler;
+    int m_closedChannelCount;
+    boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
+    aio::Timer m_timer;
+    std::chrono::steady_clock::time_point m_prevActivityTime;
+
+    virtual void stopWhileInAioThread() override
+    {
+        m_timer.pleaseStopSync();
+        m_leftToRight.reset();
+        m_rightToLeft.reset();
+
+        if (m_leftFile)
+        {
+            m_leftFile->pleaseStopSync();
+            m_leftFile = nullptr;
+        }
+        if (m_rightFile)
+        {
+            m_rightFile->pleaseStopSync();
+            m_rightFile = nullptr;
+        }
+    }
+
     template<typename Source, typename Destination>
     void initializeOneWayChannel(
         std::unique_ptr<detail::AsyncChannelUnidirectionalBridge<Source, Destination>>* channel,
@@ -58,56 +129,7 @@ public:
             {
                 handleChannelClosure(sysErrorCode);
             });
-    }
-
-    virtual ~AsyncChannelBridgeImpl() override
-    {
-        if (isInSelfAioThread())
-            stopWhileInAioThread();
-    }
-
-    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
-    {
-        base_type::bindToAioThread(aioThread);
-        m_leftFile->bindToAioThread(aioThread);
-        m_rightFile->bindToAioThread(aioThread);
-    }
-
-    virtual void start() override
-    {
-        m_leftToRight->start();
-        m_rightToLeft->start();
-    }
-
-    virtual void setOnDone(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
-    {
-        m_onDoneHandler = std::move(handler);
-    }
-
-private:
-    std::unique_ptr<detail::AsyncChannelUnidirectionalBridge<LeftFile, RightFile>> m_leftToRight;
-    std::unique_ptr<detail::AsyncChannelUnidirectionalBridge<RightFile, LeftFile>> m_rightToLeft;
-
-    LeftFile m_leftFile;
-    RightFile m_rightFile;
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onDoneHandler;
-    int m_closedChannelCount;
-
-    virtual void stopWhileInAioThread() override
-    {
-        m_leftToRight.reset();
-        m_rightToLeft.reset();
-
-        if (m_leftFile)
-        {
-            m_leftFile->pleaseStopSync();
-            m_leftFile = nullptr;
-        }
-        if (m_rightFile)
-        {
-            m_rightFile->pleaseStopSync();
-            m_rightFile = nullptr;
-        }
+        (*channel)->setOnSomeActivity([this]() { onSomeActivity(); });
     }
 
     void handleChannelClosure(SystemError::ErrorCode reason)
@@ -116,6 +138,35 @@ private:
         if (m_closedChannelCount < 2)
             return;
         reportFailure(reason);
+    }
+
+    void startInactivityTimerIfNeeded()
+    {
+        if (!m_inactivityTimeout)
+            return;
+
+        m_prevActivityTime = std::chrono::steady_clock::now();
+        m_timer.start(
+            *m_inactivityTimeout,
+            std::bind(&AsyncChannelBridgeImpl::onInactivityTimer, this));
+    }
+
+    void onInactivityTimer()
+    {
+        using namespace std::chrono;
+
+        const auto timeSincePrevActivity = steady_clock::now() - m_prevActivityTime;
+        if (timeSincePrevActivity >= *m_inactivityTimeout)
+            return reportFailure(SystemError::timedOut);
+
+        m_timer.start(
+            duration_cast<milliseconds>(*m_inactivityTimeout - timeSincePrevActivity),
+            std::bind(&AsyncChannelBridgeImpl::onInactivityTimer, this));
+    }
+
+    void onSomeActivity()
+    {
+        m_prevActivityTime = std::chrono::steady_clock::now();
     }
     
     void reportFailure(SystemError::ErrorCode sysErrorCode)

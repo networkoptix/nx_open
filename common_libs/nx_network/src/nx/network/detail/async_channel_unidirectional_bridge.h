@@ -73,7 +73,7 @@ public:
         m_isSourceOpened(true),
         m_sourceClosureReason(SystemError::noError)
     {
-        m_readBuffer.reserve(m_readBufferSize);
+        m_readBuffer.reserve((int)m_readBufferSize);
     }
 
     void start()
@@ -83,7 +83,12 @@ public:
 
     void setOnDone(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
     {
-        m_onDoneHandler.swap(handler);
+        m_onDoneHandler = std::move(handler);
+    }
+
+    void setOnSomeActivity(nx::utils::MoveOnlyFunc<void()> handler)
+    {
+        m_onSomeActivityHander = std::move(handler);
     }
 
 private:
@@ -103,6 +108,7 @@ private:
     bool m_isSourceOpened;
     SystemError::ErrorCode m_sourceClosureReason;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onDoneHandler;
+    nx::utils::MoveOnlyFunc<void()> m_onSomeActivityHander;
 
     void scheduleRead()
     {
@@ -122,6 +128,9 @@ private:
         SystemError::ErrorCode sysErrorCode,
         std::size_t bytesRead)
     {
+        if (m_onSomeActivityHander)
+            m_onSomeActivityHander();
+
         m_isReading = false;
 
         if (sysErrorCode != SystemError::noError || bytesRead == 0)
@@ -145,7 +154,7 @@ private:
         nx::Buffer tmp;
         m_readBuffer.swap(tmp);
         scheduleSend(std::move(tmp));
-        m_readBuffer.reserve(m_readBufferSize);
+        m_readBuffer.reserve((int)m_readBufferSize);
         if (!readyToAcceptMoreData())
             return;
         scheduleRead();
@@ -181,6 +190,9 @@ private:
         SystemError::ErrorCode sysErrorCode,
         std::size_t /*bytesRead*/)
     {
+        if (m_onSomeActivityHander)
+            m_onSomeActivityHander();
+
         if (sysErrorCode != SystemError::noError)
         {
             reportFailure(sysErrorCode);

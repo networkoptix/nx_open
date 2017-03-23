@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <boost/optional.hpp>
+
 #include <nx/network/async_channel_bridge.h>
 #include <nx/utils/pipeline.h>
 #include <nx/utils/random.h>
@@ -12,7 +14,7 @@ namespace nx {
 namespace network {
 namespace test {
 
-class AsyncBufferReader:
+class TestAsyncChannel:
     public aio::BasicPollable
 {
     using base_type = aio::BasicPollable;
@@ -24,7 +26,7 @@ public:
         ignore,
     };
 
-    AsyncBufferReader(
+    TestAsyncChannel(
         utils::pipeline::AbstractInput* input,
         utils::pipeline::AbstractOutput* output,
         InputDepletionPolicy inputDepletionPolicy)
@@ -34,6 +36,8 @@ public:
         m_inputDepletionPolicy(inputDepletionPolicy),
         m_errorState(false),
         m_totalBytesRead(0),
+        m_readPaused(false),
+        m_readBuffer(nullptr),
         m_sendPaused(false),
         m_sendBuffer(nullptr),
         m_readPosted(false),
@@ -42,7 +46,7 @@ public:
         bindToAioThread(getAioThread());
     }
 
-    virtual ~AsyncBufferReader() override
+    virtual ~TestAsyncChannel() override
     {
         if (isInSelfAioThread())
             stopWhileInAioThread();
@@ -61,40 +65,14 @@ public:
         std::function<void(SystemError::ErrorCode, size_t)> handler)
     {
         NX_ASSERT(buffer->capacity() > buffer->size());
-        m_readPosted = true;
-      
-        m_reader.post(
-            [this, buffer, handler = std::move(handler)]()
-            {
-                m_readPosted = false;
-
-                if (m_errorState)
-                {
-                    handler(SystemError::connectionReset, (size_t)-1);
-                    return;
-                }
-
-                int bytesRead = m_input->read(
-                    buffer->data() + buffer->size(),
-                    buffer->capacity() - buffer->size());
-                if (bytesRead > 0)
-                {
-                    {
-                        QnMutexLocker lock(&m_mutex);
-                        m_totalDataRead.append(buffer->data() + buffer->size(), bytesRead);
-                        m_totalBytesRead += bytesRead;
-                    }
-                    buffer->resize(buffer->size() + bytesRead);
-
-                    handler(SystemError::noError, bytesRead);
-
-                    if (!m_readPosted)
-                        ++m_readSequence;
-                    return;
-                }
-
-                handleInputDepletion(std::move(handler));
-            });
+        
+        QnMutexLocker lock(&m_mutex);
+        m_readHandler = std::move(handler);
+        m_readBuffer = buffer;
+        if (m_readPaused)
+            return;
+        
+        performAsyncRead(lock);
     }
 
     void sendAsync(
@@ -124,6 +102,20 @@ public:
         {
             m_writer.pleaseStopSync();
         }
+    }
+
+    void pauseReadingData()
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_readPaused = true;
+    }
+
+    void resumeReadingData()
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_readPaused = false;
+        if (m_readHandler)
+            performAsyncRead(lock);
     }
 
     void pauseSendingData()
@@ -173,9 +165,15 @@ private:
     std::atomic<std::size_t> m_totalBytesRead;
     mutable QnMutex m_mutex;
     QByteArray m_totalDataRead;
+
+    std::function<void(SystemError::ErrorCode, size_t)> m_readHandler;
+    bool m_readPaused;
+    nx::Buffer* m_readBuffer;
+
     std::function<void(SystemError::ErrorCode, size_t)> m_sendHandler;
     bool m_sendPaused;
     const nx::Buffer* m_sendBuffer;
+
     aio::BasicPollable m_reader;
     aio::BasicPollable m_writer;
     bool m_readPosted;
@@ -198,6 +196,50 @@ private:
             case InputDepletionPolicy::ignore:
                 break;
         }
+    }
+
+    void performAsyncRead(const QnMutexLockerBase& /*lock*/)
+    {
+        m_readPosted = true;
+      
+        m_reader.post(
+            [this]()
+            {
+                decltype(m_readHandler) handler;
+                handler.swap(m_readHandler);
+
+                auto buffer = m_readBuffer;
+                m_readBuffer = nullptr;
+
+                m_readPosted = false;
+
+                if (m_errorState)
+                {
+                    handler(SystemError::connectionReset, (size_t)-1);
+                    return;
+                }
+
+                int bytesRead = m_input->read(
+                    buffer->data() + buffer->size(),
+                    buffer->capacity() - buffer->size());
+                if (bytesRead > 0)
+                {
+                    {
+                        QnMutexLocker lock(&m_mutex);
+                        m_totalDataRead.append(buffer->data() + buffer->size(), bytesRead);
+                        m_totalBytesRead += bytesRead;
+                    }
+                    buffer->resize(buffer->size() + bytesRead);
+
+                    handler(SystemError::noError, bytesRead);
+
+                    if (!m_readPosted)
+                        ++m_readSequence;
+                    return;
+                }
+
+                handleInputDepletion(std::move(handler));
+            });
     }
 
     void performAsyncSend(const QnMutexLockerBase&)
@@ -230,10 +272,12 @@ class NotifyingOutput:
 public:
     virtual int write(const void* data, size_t count) override
     {
+        NX_ASSERT(count <= std::numeric_limits<int>::max());
+
         QnMutexLocker lock(&m_mutex);
-        m_receivedData.append(static_cast<const char*>(data), count);
+        m_receivedData.append(static_cast<const char*>(data), (int)count);
         m_cond.wakeAll();
-        return count;
+        return (int)count;
     }
 
     void waitForReceivedDataToMatch(const QByteArray& referenceData)
@@ -283,8 +327,8 @@ public:
 
     ~AsyncChannelBridge()
     {
-        if (m_channel)
-            m_channel->pleaseStopSync();
+        if (m_bridge)
+            m_bridge->pleaseStopSync();
     }
 
 protected:
@@ -299,32 +343,41 @@ protected:
         m_leftSource = std::make_unique<utils::pipeline::RandomDataSource>();
         m_rightSource = std::make_unique<utils::pipeline::RandomDataSource>();
     }
+    
+    void setInactivityTimeout()
+    {
+        m_inactivityTimeout = std::chrono::milliseconds(1);
+        if (m_bridge)
+            m_bridge->setInactivityTimeout(*m_inactivityTimeout);
+    }
 
     void createChannel()
     {
-        m_leftFile = std::make_unique<AsyncBufferReader>(
-            m_leftSource.get(), &m_leftDest, AsyncBufferReader::InputDepletionPolicy::ignore);
-        m_rightFile = std::make_unique<AsyncBufferReader>(
-            m_rightSource.get(), &m_rightDest, AsyncBufferReader::InputDepletionPolicy::ignore);
+        m_leftFile = std::make_unique<TestAsyncChannel>(
+            m_leftSource.get(), &m_leftDest, TestAsyncChannel::InputDepletionPolicy::ignore);
+        m_rightFile = std::make_unique<TestAsyncChannel>(
+            m_rightSource.get(), &m_rightDest, TestAsyncChannel::InputDepletionPolicy::ignore);
 
-        m_channel = makeAsyncChannelBridge(m_leftFile.get(), m_rightFile.get());
-        m_channel->setOnDone(
-            std::bind(&AsyncChannelBridge::onChannelDone, this, std::placeholders::_1));
+        m_bridge = makeAsyncChannelBridge(m_leftFile.get(), m_rightFile.get());
+        m_bridge->setOnDone(
+            std::bind(&AsyncChannelBridge::onBridgeDone, this, std::placeholders::_1));
+        if (m_inactivityTimeout)
+            m_bridge->setInactivityTimeout(*m_inactivityTimeout);
     }
 
     void exchangeData()
     {
-        if (!m_channel)
+        if (!m_bridge)
             createChannel();
 
-        m_channel->start();
+        m_bridge->start();
     }
 
     void startExchangingInfiniteData()
     {
         initializeInfiniteDataInput();
         createChannel();
-        m_channel->start();
+        m_bridge->start();
     }
     
     void pauseRightDestination()
@@ -353,9 +406,15 @@ protected:
         m_leftDest.waitForSomeDataToBeReceived();
     }
 
+    void pauseDataSources()
+    {
+        m_leftFile->pauseReadingData();
+        m_rightFile->pauseReadingData();
+    }
+
     void stopChannel()
     {
-        m_channel->pleaseStopSync();
+        m_bridge->pleaseStopSync();
     }
 
     void closeLeftSource()
@@ -370,7 +429,7 @@ protected:
     
     void assertErrorHasBeenReported()
     {
-        ASSERT_NE(SystemError::noError, m_channelDone.get_future().get());
+        ASSERT_NE(SystemError::noError, m_bridgeDone.get_future().get());
     }
 
     void assertDataExchangeWasSuccessful()
@@ -384,20 +443,26 @@ protected:
         m_rightDest.waitForReceivedDataToMatch(m_leftFile->dataRead());
     }
 
+    void assertBridgeDoneDueToInactivity()
+    {
+        ASSERT_EQ(SystemError::timedOut, m_bridgeDone.get_future().get());
+    }
+
 private:
     QByteArray m_originalData;
     std::unique_ptr<utils::pipeline::AbstractInput> m_leftSource;
     NotifyingOutput m_leftDest;
     std::unique_ptr<utils::pipeline::AbstractInput> m_rightSource;
     NotifyingOutput m_rightDest;
-    std::unique_ptr<network::AsyncChannelBridge> m_channel;
-    std::unique_ptr<AsyncBufferReader> m_leftFile;
-    std::unique_ptr<AsyncBufferReader> m_rightFile;
-    nx::utils::promise<SystemError::ErrorCode> m_channelDone;
+    std::unique_ptr<network::AsyncChannelBridge> m_bridge;
+    std::unique_ptr<TestAsyncChannel> m_leftFile;
+    std::unique_ptr<TestAsyncChannel> m_rightFile;
+    nx::utils::promise<SystemError::ErrorCode> m_bridgeDone;
+    boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
 
-    void onChannelDone(SystemError::ErrorCode sysErrorCode)
+    void onBridgeDone(SystemError::ErrorCode sysErrorCode)
     {
-        m_channelDone.set_value(sysErrorCode);
+        m_bridgeDone.set_value(sysErrorCode);
     }
 };
 
@@ -449,14 +514,14 @@ TEST_F(AsyncChannelBridge, read_saturation)
     waitForSomeExchangeToHappen();
 }
 
-//TEST_F(AsyncChannelBridge, inactivity_timeout)
-//{
-//    channel()->setInactivityTimeout();
-//    startExchangingInfiniteData();
-//    pauseDataSources();
-//    assertChannelDoneDueToInactivity();
-//}
-//
+TEST_F(AsyncChannelBridge, inactivity_timeout)
+{
+    setInactivityTimeout();
+    startExchangingInfiniteData();
+    pauseDataSources();
+    assertBridgeDoneDueToInactivity();
+}
+
 //TEST_F(AsyncChannelBridge, channel_stops_sources_before_reporting_done)
 //{
 //    initializeFixedDataInput();
