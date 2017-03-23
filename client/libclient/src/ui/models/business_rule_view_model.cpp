@@ -468,6 +468,7 @@ void QnBusinessRuleViewModel::setEventType(const QnBusiness::EventType value)
         case QnBusiness::SoftwareTriggerEvent:
             m_eventParams.inputPortId = QnUuid::createUuid().toSimpleString();
             m_eventParams.description = QnSoftwareTriggerPixmaps::defaultPixmapName();
+            m_eventParams.caption = QString();
             break;
 
         default:
