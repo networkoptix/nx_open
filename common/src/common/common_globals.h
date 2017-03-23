@@ -20,7 +20,7 @@
 Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(Qn,
-    Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
+    ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
     PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
     StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
@@ -28,42 +28,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     RebuildAction BackupAction FailoverPriority
     Permission GlobalPermission UserRole ConnectionResult
     ,
-    Borders Corners ResourceFlags CameraCapabilities PtzDataFields PtzCapabilities PtzTraits
+    ResourceFlags CameraCapabilities PtzDataFields PtzCapabilities PtzTraits
     MotionTypes TimePeriodTypes
     ServerFlags CameraBackupQualities TimeFlags CameraStatusFlags IOPortTypes
     Permissions GlobalPermissions
     )
-
-
-    // TODO: #Elric #5.0 use Qt::Edge ?
-    /**
-     * Generic enumeration describing borders of a rectangle.
-     */
-    enum Border {
-        NoBorders = 0,
-        LeftBorder = 0x1,
-        RightBorder = 0x2,
-        TopBorder = 0x4,
-        BottomBorder = 0x8,
-        AllBorders = LeftBorder | RightBorder | TopBorder | BottomBorder
-    };
-    Q_DECLARE_FLAGS(Borders, Border)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(Borders)
-
-
-    /**
-     * Generic enumeration describing corners of a rectangle.
-     */
-    enum Corner {
-        NoCorner = 0,
-        TopLeftCorner = 0x1,
-        TopRightCorner = 0x2,
-        BottomLeftCorner = 0x4,
-        BottomRightCorner = 0x8,
-        AllCorners = TopLeftCorner | TopRightCorner | BottomLeftCorner | BottomRightCorner
-    };
-    Q_DECLARE_FLAGS(Corners, Corner)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(Corners)
 
     enum ExtrapolationMode {
         ConstantExtrapolation,
@@ -895,7 +864,7 @@ Q_DECLARE_METATYPE(Qn::StatusChangeReason)
 // TODO: #Elric #enum
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::TimePeriodContent)(Qn::Corner)(Qn::UserRole)(Qn::ConnectionResult),
+    (Qn::TimePeriodContent)(Qn::UserRole)(Qn::ConnectionResult),
     (metatype)
 )
 

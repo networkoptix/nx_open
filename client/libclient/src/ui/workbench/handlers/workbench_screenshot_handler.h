@@ -10,6 +10,8 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+#include <transcoding/timestamp_params.h>
+
 #include <utils/image_provider.h>
 #include <utils/color_space/image_correction.h>
 #include <utils/common/connective.h>
@@ -25,7 +27,7 @@ struct QnScreenshotParameters
     bool isUtc;
     qint64 displayTimeMsec;
     QString filename;
-    Qn::Corner timestampPosition;
+    QnTimeStampParams timestampParams;
     QnItemDewarpingParams itemDewarpingParams;
     QnMediaDewarpingParams mediaDewarpingParams;
     ImageCorrectionParams imageCorrectionParams;
