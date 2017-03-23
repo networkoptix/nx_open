@@ -2,6 +2,8 @@
 
 #include <chrono>
 
+#include <QUrlQuery>
+
 #include <nx/utils/std/cpp14.h>
 #include <cdb/ec2_request_paths.h>
 
@@ -34,12 +36,16 @@ TransactionConnectionHelper::ConnectionId
         const std::string& login,
         const std::string& password,
         KeepAlivePolicy keepAlivePolicy,
-        int protocolVersion)
+        int protocolVersion,
+        QnUuid peerId)
 {
     auto localPeerInfo = localPeer();
-    localPeerInfo.id = QnUuid::createUuid();
+    localPeerInfo.id = peerId.isNull() ? QnUuid::createUuid() : peerId;
+
+    const auto str = localPeerInfo.id.toString();
 
     ConnectionContext connectionContext;
+    connectionContext.peerInfo = localPeerInfo;
     connectionContext.connectionGuardSharedState =
         std::make_unique<::ec2::ConnectionGuardSharedState>();
     connectionContext.connection =
@@ -68,7 +74,12 @@ TransactionConnectionHelper::ConnectionId
     m_connections.emplace(
         connectionId,
         std::move(connectionContext));
+
+    // TODO: #ak TransactionTransport should do that. But somehow it doesn't...
     QUrl url = appserver2BaseUrl;
+    QUrlQuery urlQuery(url.query());
+    urlQuery.addQueryItem("guid", localPeerInfo.id.toString());
+    url.setQuery(urlQuery);
     url.setPath(api::kEc2EventsPath);
     transactionConnectionPtr->doOutgoingConnect(url);
 

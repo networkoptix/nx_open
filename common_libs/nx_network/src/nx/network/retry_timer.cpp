@@ -18,6 +18,9 @@ constexpr const std::chrono::milliseconds RetryPolicy::kNoMaxDelay;
 constexpr const std::chrono::milliseconds RetryPolicy::kDefaultInitialDelay;
 constexpr const std::chrono::milliseconds RetryPolicy::kDefaultMaxDelay;
 
+const RetryPolicy RetryPolicy::kNoRetries(
+    0, kDefaultInitialDelay, kDefaultDelayMultiplier, kDefaultMaxDelay);
+
 RetryPolicy::RetryPolicy():
     maxRetryCount(kDefaultMaxRetryCount),
     initialDelay(kDefaultInitialDelay),

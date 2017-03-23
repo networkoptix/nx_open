@@ -86,13 +86,13 @@
 <context>
     <name>QnCloudSystemInformationWatcher</name>
     <message>
-        <source>Your system</source>
-        <translation>Ваша система</translation>
-    </message>
-    <message>
         <source>Owner: %1</source>
         <comment>%1 is a user name</comment>
         <translation>Владелец: %1</translation>
+    </message>
+    <message>
+        <source>Your System</source>
+        <translation>Ваша система</translation>
     </message>
 </context>
 <context>
@@ -110,13 +110,13 @@
 <context>
     <name>QnSystemsModel</name>
     <message>
-        <source>Your system</source>
-        <translation>Ваша система</translation>
-    </message>
-    <message>
         <source>Owner: %1</source>
         <comment>%1 is a user name</comment>
         <translation>Владелец: %1</translation>
+    </message>
+    <message>
+        <source>Your System</source>
+        <translation>Ваша система</translation>
     </message>
 </context>
 </TS>

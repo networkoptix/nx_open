@@ -47,7 +47,7 @@ def str_to_bool(val):
     raise Exception('Invalid boolean "%s"' % val)
 
 def datetime_utc_to_timestamp(date_time):
-    return calendar.timegm(date_time.utctimetuple())*1000 + date_time.microsecond/1000
+    return calendar.timegm(date_time.utctimetuple()) + date_time.microsecond/1000000.
 
 def datetime_utc_from_timestamp(timestamp):
     return datetime.utcfromtimestamp(timestamp).replace(tzinfo=pytz.utc)

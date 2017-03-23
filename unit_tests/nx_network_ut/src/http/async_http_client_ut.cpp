@@ -321,9 +321,12 @@ TEST_F(AsyncHttpClientTest, MultiRequestTest)
         client.get(),
         [&](nx_http::AsyncHttpClientPtr client)
         {
-            ASSERT_FALSE(client->failed()) << "Response: " << client->response();
-            ASSERT_EQ(client->response()->statusLine.statusCode, nx_http::StatusCode::ok);
-            ASSERT_EQ(client->fetchMessageBodyBuffer(), expectedResponse);
+            ASSERT_FALSE(client->failed()) << "Response: " << 
+                (client->response() == nullptr
+                    ? std::string("null")
+                    : client->response()->statusLine.reasonPhrase.toStdString());
+            ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
+            ASSERT_EQ(expectedResponse, client->fetchMessageBodyBuffer());
             auto contentTypeIter = client->response()->headers.find("Content-Type");
             ASSERT_TRUE(contentTypeIter != client->response()->headers.end());
 
