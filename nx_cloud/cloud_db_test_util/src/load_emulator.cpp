@@ -66,7 +66,9 @@ void LoadEmulator::openConnections()
                 .setHost(cdbEndpoint.address.toString())
                 .setPort(cdbEndpoint.port),
             system.id,
-            system.authKey);
+            system.authKey,
+            KeepAlivePolicy::enableKeepAlive,
+            nx_ec::EC2_PROTO_VERSION);
 
         ++systemIndex;
         if (systemIndex == m_systems.systems.size())

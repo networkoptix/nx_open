@@ -73,11 +73,11 @@ void Ec2MserverCloudSynchronizationKeepAlive::testTransactionConnectionKeepAlive
 
     m_transactionConnectionHelper.getAccessToConnectionById(
         m_connectionId,
-        [this](test::TransactionTransport* const connection)
+        [this](test::TransactionConnectionHelper::ConnectionContext* connectionContext)
         {
             m_connectionInactivityTimeout =
-                connection->connectionKeepAliveTimeout() *
-                connection->keepAliveProbeCount();
+                connectionContext->connection->connectionKeepAliveTimeout() *
+                connectionContext->connection->keepAliveProbeCount();
         });
 
     ASSERT_TRUE(

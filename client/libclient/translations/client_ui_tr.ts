@@ -16,7 +16,7 @@
     <message>
         <location/>
         <source>Credits</source>
-        <translation>Krediler</translation>
+        <translation>Jenerik</translation>
     </message>
     <message>
         <location/>
@@ -25,13 +25,21 @@
     </message>
     <message>
         <location/>
-        <source>Connected servers</source>
-        <translation>Bağlı Sunucular</translation>
+        <source>Support</source>
+        <translation>Destek</translation>
     </message>
     <message>
         <location/>
-        <source>Support</source>
-        <translation>Destek</translation>
+        <source>System Servers</source>
+        <translation>Sistem Sunucuları</translation>
+    </message>
+</context>
+<context>
+    <name>AccessibleResourcesWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/accessible_resources_widget.ui"/>
+        <source>Filter</source>
+        <translation>Filtrele</translation>
     </message>
 </context>
 <context>
@@ -49,7 +57,7 @@
     <message>
         <location/>
         <source>Gamma</source>
-        <translation>Kontrast Derecesi</translation>
+        <translation>Gama</translation>
     </message>
     <message>
         <location/>
@@ -65,6 +73,44 @@
         <location/>
         <source>White level</source>
         <translation>Aydınlık Seviyesi</translation>
+    </message>
+</context>
+<context>
+    <name>AdvancedSettingsWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/local_settings/advanced_settings_widget.ui"/>
+        <source>Downmix Audio from 5.1 to 2.1</source>
+        <translation>Downmix Audio from 5.1 to 2.1</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Double Buffering</source>
+        <translation>Çift Arabellek</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable only if the client takes too much CPU</source>
+        <translation>Sadece istemcinin yüksek CPU kullandığı durumda devre dışı bırak</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Maximum Live Buffer Length</source>
+        <translation>Maksimum tampon bellek Büyüklüğü</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Browse Logs</source>
+        <translation>Günlüklere göz at</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Clear Local Cache</source>
+        <translation>Yerel önbelleği temizle</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reset All Warnings</source>
+        <translation>Tüm uyarıları sıfırla</translation>
     </message>
 </context>
 <context>
@@ -91,19 +137,37 @@
     </message>
 </context>
 <context>
+    <name>ApplauncherControlDialog</name>
+    <message>
+        <location filename="../src/nx/client/ui/dialogs/debug/applauncher_control_dialog.ui"/>
+        <source>Add External Storage...</source>
+        <translation>Harici Depolama Ekle...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Version:</source>
+        <translation>Versiyon:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Check</source>
+        <translation>İşaretli</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Not Checked</source>
+        <translation>İşaretli değil</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Get Installed Versions</source>
+        <translation>Yüklü sürümleri al</translation>
+    </message>
+</context>
+<context>
     <name>AuditLogDialog</name>
     <message>
         <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
-        <source>Audit Trail</source>
-        <translation>Denetim Merkezi</translation>
-    </message>
-    <message>
-        <location/>
-        <source>From</source>
-        <translation>Dan</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Yenile</translation>
     </message>
@@ -144,11 +208,6 @@
     </message>
     <message>
         <location/>
-        <source>E-mail settings</source>
-        <translation>E-Mail Ayarları</translation>
-    </message>
-    <message>
-        <location/>
         <source>System actions</source>
         <translation>Sistem Hareketleri</translation>
     </message>
@@ -169,13 +228,23 @@
     </message>
     <message>
         <location/>
-        <source>To</source>
-        <translation>Ya</translation>
+        <source>Audit Trail</source>
+        <translation>Denetim Merkezi</translation>
     </message>
     <message>
         <location/>
-        <source>All Servers are offline. Audit data is not available.</source>
-        <translation>Tüm Sunucular Çevrimdışı. Veri Denetimi Mevcut Değil.</translation>
+        <source>Clear Filter</source>
+        <translation>Filtreleri temizle</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Email settings</source>
+        <translation>E-posta ayarları</translation>
+    </message>
+    <message>
+        <location/>
+        <source>All servers are offline. Audit data is not available.</source>
+        <translation>Tüm sunucular çevrimdışı. Denetim dataları erişilemez.</translation>
     </message>
 </context>
 <context>
@@ -192,16 +261,6 @@
     </message>
     <message>
         <location/>
-        <source>Finish:</source>
-        <translation>Bitir:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Start:</source>
-        <translation>Başlat:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Limit Bandwidth to:</source>
         <translation>Bant Genişliği Sınırı:</translation>
     </message>
@@ -209,6 +268,59 @@
         <location/>
         <source>Mbit/s</source>
         <translation>Mbit/s</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bitrate limitation could lead to backup failure.</source>
+        <translation>Bitrate limitleme yedekleme problemine sebep olabilir.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Finish</source>
+        <translation>Bitiş</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start</source>
+        <translation>Başla</translation>
+    </message>
+</context>
+<context>
+    <name>BackupSettingsDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
+        <source>Backup Settings</source>
+        <translation>Yedekleme Ayarları</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Server Settings</source>
+        <translation>Sunucu Ayarları</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set Schedule...</source>
+        <translation>Takvimi Ayarla...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
+        <translation>Sadece ileri zamanlı kayıtlar yedeklenecektir. Yedekleme işlemi mevcut kayıtları dikkate almayacaktır.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Execute Backup</source>
+        <translation>Yedeklemeyi çalıştır</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Archive From</source>
+        <translation>Arşiv yedeklemesinin başlanıgıcı</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Quality</source>
+        <translation>Yedekleme Kalitesi</translation>
     </message>
 </context>
 <context>
@@ -220,13 +332,13 @@
     </message>
     <message>
         <location/>
-        <source>Tags:</source>
-        <translation>Etiketler:</translation>
+        <source>seconds</source>
+        <translation>saniye</translation>
     </message>
     <message>
         <location/>
-        <source>seconds</source>
-        <translation>saniye</translation>
+        <source>Tags:</source>
+        <translation>Etiketler:</translation>
     </message>
     <message>
         <location/>
@@ -243,61 +355,56 @@
     <name>BookmarkWidget</name>
     <message>
         <location filename="../src/ui/widgets/bookmark_widget.ui"/>
-        <source>&amp;Name</source>
-        <translation>&amp;İsim</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Timeout</source>
-        <translation>&amp;Zaman Aşımı</translation>
-    </message>
-    <message>
-        <location/>
-        <source>T&amp;ags</source>
-        <translation>&amp;Etiketler</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Description</source>
-        <translation>&amp;Açıklama</translation>
-    </message>
-    <message>
-        <location/>
-        <source>List of tags divided by commas or spaces</source>
-        <translation>Virgül veya Boşlukla Ayrılmış Etiketlerin Listesi</translation>
-    </message>
-    <message>
-        <location/>
         <source>Popular tags</source>
         <translation>Popüler Etiketler</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Name</source>
+        <translation>İsim</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Description</source>
+        <translation>Açıklama</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Timeout</source>
+        <translation>Zaman Aşımı</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tags</source>
+        <translation>Etiketler</translation>
+    </message>
+    <message>
+        <location/>
+        <source>List of tags divided by commas</source>
+        <translation>Virgülle ayrılmış etiket listesi</translation>
     </message>
 </context>
 <context>
     <name>BookmarksLog</name>
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
-        <source>Bookmark Log</source>
-        <translation>Yer İmi Günlüğü</translation>
-    </message>
-    <message>
-        <location/>
-        <source>-</source>
-        <translation>-</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Yenile</translation>
     </message>
     <message>
         <location/>
-        <source>&lt; Any camera &gt;</source>
-        <translation>&lt;Herhangi Bir Kamera&gt;</translation>
+        <source>All Servers are offline. Logs are not available.</source>
+        <translation>Tüm Sunucular Çevrimdışı. Günlükler Mevcut Değil.</translation>
     </message>
     <message>
         <location/>
-        <source>All Servers are offline. Logs are not available.</source>
-        <translation>Tüm Sunucular Çevrimdışı. Günlükler Mevcut Değil.</translation>
+        <source>Bookmark Log</source>
+        <translation>Yer İmi Günlüğü</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Clear Filter</source>
+        <translation>Filtreyi Temizle</translation>
     </message>
 </context>
 <context>
@@ -306,11 +413,6 @@
         <location filename="../src/ui/widgets/business/business_rule_widget.ui"/>
         <source>Event</source>
         <translation>Durum</translation>
-    </message>
-    <message>
-        <location/>
-        <source>When</source>
-        <translation>Başlama Zamanı</translation>
     </message>
     <message>
         <location/>
@@ -329,24 +431,24 @@
     </message>
     <message>
         <location/>
-        <source>Do</source>
-        <translation>Yap</translation>
+        <source>Comments:</source>
+        <translation>Yorumlar:</translation>
     </message>
     <message>
         <location/>
-        <source>Comments:</source>
-        <translation>Yorumlar:</translation>
+        <source>When</source>
+        <translation>Başlama Zamanı</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Do</source>
+        <translation>Yap</translation>
     </message>
 </context>
 <context>
     <name>BusinessRulesDialog</name>
     <message>
         <location filename="../src/ui/dialogs/business_rules_dialog.ui"/>
-        <source>Alarm/Event Rules</source>
-        <translation>Alarm/Olay Kuralları</translation>
-    </message>
-    <message>
-        <location/>
         <source>Add</source>
         <translation>Ekle</translation>
     </message>
@@ -357,41 +459,21 @@
     </message>
     <message>
         <location/>
-        <source>Event log</source>
-        <translation>Olay Günlükleri</translation>
+        <source>Event Rules</source>
+        <translation>Olay Kuralları</translation>
     </message>
     <message>
         <location/>
-        <source>Advanced...</source>
-        <translation>Gelişmiş...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>X</source>
-        <translation>X</translation>
+        <source>Event Log...</source>
+        <translation>Olay Günlükleri...</translation>
     </message>
 </context>
 <context>
     <name>CameraAdditionDialog</name>
     <message>
         <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
-        <source>Add device(s)...</source>
-        <translation>Aygıt(lar) Ekle...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Selected Server:</source>
-        <translation>Seçilen Sunucu:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Server is offline</source>
         <translation>Sunucu Çevrimdışı</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Device Address:</source>
-        <translation>Aygıt Adresi:</translation>
     </message>
     <message>
         <location/>
@@ -400,53 +482,8 @@
     </message>
     <message>
         <location/>
-        <source>S&amp;tart IP:</source>
-        <translation>&amp;Başlangıç IP&apos;si:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;End IP:</source>
-        <translation>&amp;Bitiş IP&apos;si:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>S&amp;ubnet Scan</source>
-        <translation>&amp;Alt Ağ Tara</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Login:</source>
-        <translation>&amp;Giriş:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;Şifre:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Auto</source>
         <translation>Otomatik</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Discovery Port:</source>
-        <translation>&amp;Keşif Port&apos;u:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Discovered Devices:</source>
-        <translation>Bulunan Aygıtlar:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Brand</source>
-        <translation>Marka</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Model</source>
-        <translation>Model</translation>
     </message>
     <message>
         <location/>
@@ -465,44 +502,99 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Scan</source>
-        <translation>&amp;Tara</translation>
+        <source>Brand</source>
+        <translation>Marka</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Add selected</source>
-        <translation>&amp;Seçilenleri Ekle</translation>
+        <source>Model</source>
+        <translation>Model</translation>
     </message>
     <message>
         <location/>
         <source>New Scan...</source>
         <translation>Yeni Tarama...</translation>
     </message>
+    <message>
+        <location/>
+        <source>Add device(s)...</source>
+        <translation>Aygıt(lar) Ekle...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Discovered Devices:</source>
+        <translation>Bulunan Aygıtlar:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Device Address</source>
+        <translation>Cihaz adresi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Start IP</source>
+        <translation>Başlangıç IP</translation>
+    </message>
+    <message>
+        <location/>
+        <source>End IP</source>
+        <translation>Bitiş IP</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Subnet Scan</source>
+        <translation>Subnet Tarama</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Discovery Port</source>
+        <translation>Portları Tara</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation>Parola</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation>Giriş</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Scan</source>
+        <translation>Tara</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add selected</source>
+        <translation>Seçileni ekle</translation>
+    </message>
 </context>
 <context>
     <name>CameraAdvancedParamsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
-        <source>Refresh</source>
-        <translation>Yenile</translation>
+        <source>Category</source>
+        <translation>Kategori</translation>
     </message>
     <message>
         <location/>
-        <source>Category</source>
-        <translation>Kategori</translation>
+        <source>Refresh</source>
+        <translation>Yenile</translation>
     </message>
 </context>
 <context>
     <name>CameraAdvancedSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
-        <source>This camera has no advanced settings</source>
-        <translation>Bu Kamera Gelişmiş Ayarlar İçermiyor</translation>
+        <source>about:blank</source>
+        <translation>hakkında:boş</translation>
     </message>
     <message>
         <location/>
-        <source>about:blank</source>
-        <translation>about:blank</translation>
+        <source>Advanced settings are unavailable</source>
+        <translation>Gelişmiş seçenekler kullanılamıyor</translation>
     </message>
 </context>
 <context>
@@ -519,18 +611,8 @@
     </message>
     <message>
         <location/>
-        <source>Keep camera streams&apos; and profiles&apos; settings</source>
-        <translation>Kamera Profil ve Akış Ayarlarını Sakla</translation>
-    </message>
-    <message>
-        <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation>Uyarı! Bu Kayıt Takvimindeki Kaliteyi ve FPS Ayarlarını Etkileyebilir.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation>&quot;Sistemin Kameraları Optimize Etmesine İzin Ver&quot; Yönetici Tarafından Devre Dışı Bırakıldı.</translation>
     </message>
     <message>
         <location/>
@@ -561,11 +643,6 @@
         <location/>
         <source>High quality</source>
         <translation>Yüksek Kalite</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Warning! Low quality may result in low resolution image.</source>
-        <translation>Uyarı! Düşük Kalite Düşük Çözünürlüğe Sebep Olabilir.</translation>
     </message>
     <message>
         <location/>
@@ -614,18 +691,43 @@
     </message>
     <message>
         <location/>
-        <source>Calculate bitrate per GOP instead of bitrate per second (It&apos;ll increase bitrate for camera)</source>
-        <translation>Saniye Başı Bit Hızı Yerine GOP Başı Bit Hızını Hesapla(Kamera İçin Bit Hızını Yükseltecek)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation>Uyarı! Sistem Performansınızın Potansiyel Etkisinden Kesin Olarak Eminseniz Bu Ayarları Değiştirmeyin.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Restore Defaults</source>
         <translation>Varsayılanları Geri Yükle</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Low quality may result in low resolution image.</source>
+        <translation>Uyarı! Düşük Kalite Düşük Çözünürlüğe Sebep Olabilir.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion detection control</source>
+        <translation>Hareket algılama kontrolü</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Force motion detection for stream:</source>
+        <translation>Hareket algılamayı bu akış için zorla:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
+        <translation>Bitrate&apos;i GOP a göre hesapla. ( kameranın bitratei yükselebilir)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Keep camera streams and profiles settings</source>
+        <translation>Kamera akış ve profil ayarlarını koru</translation>
+    </message>
+    <message>
+        <location/>
+        <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation>Sistemin kamera ayarlarını optinimize etmesi yönetici tarafından devre dışı bırakıldı.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
+        <translation>Uyarı! Bu ayarları değiştrimeniz önerilmez. Bu değişiklikler olası sistem sorunlarına yol açabilir.</translation>
     </message>
 </context>
 <context>
@@ -640,62 +742,32 @@
     <name>CameraListDialog</name>
     <message>
         <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
-        <source>Filter:</source>
-        <translation>Filtrele:</translation>
+        <source>Add Device...</source>
+        <translation>Cihaz ekle...</translation>
     </message>
 </context>
 <context>
     <name>CameraOutputBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
-        <source>&amp;Output ID:</source>
-        <translation>&amp;Output ID:</translation>
+        <source>Output ID:</source>
+        <translation>Çıkış numarası:</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Auto-reset in (sec):</source>
-        <translation>&amp;Otomatik Yeniden Başlatma (saniye):</translation>
+        <source>Fixed duration:</source>
+        <translation>Belirlenmiş Zaman:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation>saniye</translation>
     </message>
 </context>
 <context>
     <name>CameraScheduleWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
-        <source>Enable Recording</source>
-        <translation>Kamera Kaydını Etkinleştir</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Get More Licenses...</source>
-        <translation>Daha Fazla Lisans Al...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Recording Schedule</source>
-        <translation>Kayıt Takvimi</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Show Quality on Schedule</source>
-        <translation>Kayıt Kalitesini Takvimde Göster</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Panic Mode: </source>
-        <translation>Panik Modu:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Show FPS on Schedule</source>
-        <translation>FPS&apos;yi Takvimde Göster</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Note: Recording Schedule is based on Server Time</source>
-        <translation>Not:Kayıt Takvimi Sunucu Zamanına Bağlıdır</translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule Settings</source>
         <translation>Takvim Ayarları</translation>
     </message>
@@ -718,11 +790,6 @@
         <location/>
         <source>Motion Only</source>
         <translation>Sedece Hareket</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion + Low-Res </source>
-        <translation>Hareket + Düşük Çözünürlük</translation>
     </message>
     <message>
         <location/>
@@ -761,24 +828,74 @@
     </message>
     <message>
         <location/>
-        <source> s</source>
-        <extracomment>Short for &quot;seconds&quot;</extracomment>
-        <translation>saniye</translation>
-    </message>
-    <message>
-        <location/>
         <source>Post-Recording</source>
         <translation>Son Kayıt Süresi</translation>
     </message>
     <message>
         <location/>
-        <source>Apply changes before copying schedule</source>
-        <translation>Değişiklikleri Takvimi Kopyalamadan Önce Uygula</translation>
+        <source>Copy Schedule...</source>
+        <translation>Takvimi Kopyala...</translation>
     </message>
     <message>
         <location/>
-        <source>Copy Schedule...</source>
-        <translation>Takvimi Kopyala...</translation>
+        <source>Recording</source>
+        <translation>Kaydediliyor</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Activate License...</source>
+        <translation>Lisansı Etkinleştir...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show Quality</source>
+        <translation>Kaliteyi Göster</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show FPS</source>
+        <translation>FPS&apos;yi Göster</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Copying Schedule</source>
+        <translation>Takvimi kopyala</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Apply changes before copying schedule.</source>
+        <translation>Takvim kopyalanmadan önce değişiklikleri uygula.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Panic Mode:</source>
+        <translation>Panik modu:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion + Lo-Res</source>
+        <translation>Hareket + Düşük Kalite</translation>
+    </message>
+</context>
+<context>
+    <name>ChangeUserPasswordDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
+        <source>Change password</source>
+        <translation>Şifre değiştir</translation>
+    </message>
+</context>
+<context>
+    <name>ConnectToCloudDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
+        <source>Stay logged in</source>
+        <translation>Oturum açık kalsın</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Incorrect Email or Password</source>
+        <translation>Hatalı e-posta veya parola</translation>
     </message>
 </context>
 <context>
@@ -838,7 +955,7 @@
 <context>
     <name>DatabaseManagementWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/database_management_widget.ui"/>
+        <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
         <source>Create Backup...</source>
         <translation>Yedek Oluştur...</translation>
     </message>
@@ -857,11 +974,6 @@
     </message>
     <message>
         <location/>
-        <source>-</source>
-        <translation>-</translation>
-    </message>
-    <message>
-        <location/>
         <source>Clear Filter</source>
         <translation>Filtreyi Temizle</translation>
     </message>
@@ -872,21 +984,87 @@
     </message>
     <message>
         <location/>
-        <source>Alarm/Event Rules</source>
-        <translation>Alarm/Olay Kuralları</translation>
+        <source>All Servers are offline. Logs are not available.</source>
+        <translation>Tüm Sunucular Çevrimdışı. Günlükler Mevcut Değil.</translation>
     </message>
     <message>
         <location/>
-        <source>All Servers are offline. Logs are not available.</source>
-        <translation>Tüm Sunucular Çevrimdışı. Günlükler Mevcut Değil.</translation>
+        <source>Event Rules...</source>
+        <translation>Olay Kuralları...</translation>
+    </message>
+</context>
+<context>
+    <name>ExecHttpRequestActionWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
+        <source>HTTP content</source>
+        <translation>HTTP içeriği</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login to authenticate (optional)</source>
+        <translation>Kimlik doğrulaması (isteğe Bağlı)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation>Giriş</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password to authenticate (optional)</source>
+        <translation>Kimlik doğrulaması (isteğe Bağlı)</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation>Parola</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Content type</source>
+        <translation>İçerik Tipi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>HTTP URL</source>
+        <translation>HTTP URL</translation>
     </message>
 </context>
 <context>
     <name>ExecPtzPresetBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
-        <source>&amp;PTZ preset:</source>
-        <translation>&amp;PTZ Turu:</translation>
+        <source>PTZ preset:</source>
+        <translation>PTZ ön tanımlı pozisyon:</translation>
+    </message>
+</context>
+<context>
+    <name>ExportTimelapseDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
+        <source>Export Rapid Review</source>
+        <translation>Hızlı Bakışı aktar</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Initial Video Length</source>
+        <translation>Geçersiz video boyutu</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Exported Video Length</source>
+        <translation>Dışa aktarılan Video uzunluğu</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rapid Review speed</source>
+        <translation>Gözden geçirme hızı</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Frames Interval</source>
+        <translation>Zaman Aralığı</translation>
     </message>
 </context>
 <context>
@@ -908,56 +1086,46 @@
     </message>
     <message>
         <location/>
-        <source>Camera View Angle Correction</source>
-        <translation>Kamera Görüntü Açısı Doğrulaması</translation>
+        <source>Fisheye Dewarping</source>
+        <translation>Balıkgözü bölümleme</translation>
     </message>
     <message>
         <location/>
-        <source>Calibration</source>
-        <translation>Kalibrasyon</translation>
+        <source>Auto Calibration</source>
+        <translation>Otomatik Kalibrasyon</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mount Angle Correction:</source>
+        <translation>Açı düzeltme:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Y Offset</source>
+        <translation>Y Ekseni</translation>
+    </message>
+    <message>
+        <location/>
+        <source>X Offset</source>
+        <translation>X Ekseni</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Size</source>
+        <translation>Boyut</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Ellipticity</source>
+        <translation>Eliptiklik oranı</translation>
     </message>
 </context>
 <context>
     <name>GeneralPreferencesWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/general_preferences_widget.ui"/>
-        <source>Main Media Folder</source>
-        <translation>Varsayılan Medya Klasörü</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Gözat...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Extra Media Folders</source>
-        <translation>Ekstra Medya Klasörleri</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Add...</source>
-        <translation>&amp;Ekle...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Remove</source>
-        <translation>&amp;Kaldır</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
         <source>Misc</source>
         <translation>Diğer</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation>Sesi 5.1&apos;den 2.1&apos;e Karıştır</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Restart required</source>
-        <translation>Yeniden Başlatma Gerekiyor</translation>
     </message>
     <message>
         <location/>
@@ -976,101 +1144,56 @@
     </message>
     <message>
         <location/>
-        <source>Run Application when PC Boots:</source>
-        <translation>Uygulamayı Başlangıçta Çalıştır:</translation>
+        <source>Add...</source>
+        <translation>Ekle...</translation>
     </message>
     <message>
         <location/>
-        <source>Double Buffering:</source>
-        <translation>Çift Tamponlama:</translation>
+        <source>Remove</source>
+        <translation>Kaldır</translation>
     </message>
     <message>
         <location/>
-        <source>Browse Logs</source>
-        <translation>Günlüklere Gözat</translation>
+        <source>Local Media Folders</source>
+        <translation>Yerel ortam klasörleri</translation>
     </message>
     <message>
         <location/>
-        <source>Clear Local Cache</source>
-        <translation>Yerel Önbelleği Temizle</translation>
+        <source>Audio Input</source>
+        <translation>Ses girişi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>First Source</source>
+        <translation>İlk kaynak</translation>
+    </message>
+    <message>
+        <location/>
+        <source>None</source>
+        <translation>Hiç</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Second Source</source>
+        <translation>İkinci Kaynak</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Run Application when PC Boots up</source>
+        <translation>Pc açıldığında uygulamayı başlat</translation>
     </message>
 </context>
 <context>
     <name>GeneralSystemAdministrationWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/general_system_administration_widget.ui"/>
-        <source>Administration</source>
-        <translation>Sistem Yönetimi</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Alarm/Event Rules...</source>
-        <translation>&amp;Alarm/Olay Kuralları...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+E</source>
-        <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Event Log...</source>
-        <translation>&amp;Durum Günlükleri...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+L</source>
-        <translation>Ctrl+L</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+M</source>
-        <translation>Ctrl+M</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Health Monitoring...</source>
-        <translation>&amp;Sağlık Denetimi...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Monitor All Servers on a Single Layout</source>
-        <translation>Tüm Sunucuları Tek Bir Ekrana Bağla</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Audit Trail...</source>
-        <translation>Denetim Merkezi...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Open Audit Trail Log</source>
-        <translation>Denetim Merkezi Günlüğünü Aç</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Bookmarks...</source>
-        <translation>&amp;Yer İmleri...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ctrl+B</source>
-        <translation>Ctrl+B</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Yer İmi Listesini Aç (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/system_settings/general_system_administration_widget.ui"/>
         <source>System Settings</source>
         <translation>Sistem Ayarları</translation>
     </message>
     <message>
         <location/>
-        <source>System Backup and Restore</source>
-        <translation>Sistem Yedekleme ve Geri Yükleme</translation>
+        <source>Backup and Restore</source>
+        <translation>Yedekleme ve Geri Yükleme</translation>
     </message>
 </context>
 <context>
@@ -1082,18 +1205,13 @@
     </message>
     <message>
         <location/>
-        <source>Force aspect ratio to:</source>
-        <translation>En-Boy Oranını Zorla:</translation>
+        <source>Aspect Ratio</source>
+        <translation>En-Boy Oranı</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>Bu Bir Fish-Eye Lensli Kameradır</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Default Rotation:</source>
-        <translation>Varsayılan Rotasyon:</translation>
+        <source>Rotation</source>
+        <translation>Döndürme</translation>
     </message>
 </context>
 <context>
@@ -1105,19 +1223,19 @@
     </message>
     <message>
         <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;Görüntü Yok&gt;</translation>
+        <source>Loading Image...Please Wait.</source>
+        <translation>Görüntü Yükleniyor... Lütfen Bekleyin.</translation>
     </message>
     <message>
         <location/>
-        <source>Loading Image...Please Wait.</source>
-        <translation>Görüntü Yükleniyor... Lütfen Bekleyin.</translation>
+        <source>No image</source>
+        <translation>İmaj yok</translation>
     </message>
 </context>
 <context>
     <name>LayoutSettingsDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/layout_settings_dialog.ui"/>
+        <location filename="../src/ui/dialogs/resource_properties/layout_settings_dialog.ui"/>
         <source>Layout Settings</source>
         <translation>Ekran Ayarları</translation>
     </message>
@@ -1158,76 +1276,36 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Crop to monitor aspect ratio</source>
-        <translation>&amp;Ekran Çözünürlüğünü Kırp</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Width:</source>
-        <translation>&amp;Genişlik:</translation>
-    </message>
-    <message>
-        <location/>
-        <source> cells</source>
-        <translation>hücre</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Height:</source>
-        <translation>&amp;Uzunluk:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Opacity:</source>
-        <translation>&amp;Bulanıklık:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation>%</translation>
-    </message>
-    <message>
-        <location/>
         <source>Keep Aspect Ratio</source>
         <translation>Ekran Çözünürlük Oranını Koru</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Crop to monitor aspect ratio</source>
+        <translation>En boy oranına korumak için kırp</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Width:</source>
+        <translation>En:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Height:</source>
+        <translation>Boy:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Opacity:</source>
+        <translation>Opasite:</translation>
     </message>
 </context>
 <context>
     <name>LdapSettingsDialog</name>
     <message>
         <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
-        <source>LDAP Settings</source>
-        <translation>LDAP Ayarları</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Server UR&amp;L:</source>
-        <translation>&amp;Sunucu URL&apos;si:</translation>
-    </message>
-    <message>
-        <location/>
         <source>ldap(s)://host:port</source>
-        <translation>Idap(s)://host:port</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Ad&amp;min DN:</source>
-        <translation>&amp;Admin DN&apos;si:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;Şifre:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Search Base:</source>
-        <translation>Arama Tabanı:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Search Filter:</source>
-        <translation>Arama Filtresi:</translation>
+        <translation>ldap(s)://host:port</translation>
     </message>
     <message>
         <location/>
@@ -1239,6 +1317,36 @@
         <source>Testing...</source>
         <translation>Test Ediliyor...</translation>
     </message>
+    <message>
+        <location/>
+        <source>LDAP Settings</source>
+        <translation>LDAP Ayarları</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Server URL</source>
+        <translation>Sunucu URL&apos;si</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Admin DN</source>
+        <translation>Yönetici DN</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation>Parola</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Search Base</source>
+        <translation>Arama Tabanı</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Search Filter</source>
+        <translation>Arama Filtresi</translation>
+    </message>
 </context>
 <context>
     <name>LdapUsersDialog</name>
@@ -1249,16 +1357,6 @@
     </message>
     <message>
         <location/>
-        <source>Select users to import</source>
-        <translation>İçeri Aktarmak İçin Kullanıcıları Seç</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Filter...</source>
-        <translation>Filtrele...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Loading...</source>
         <translation>Yükleniyor...</translation>
     </message>
@@ -1266,6 +1364,16 @@
         <location/>
         <source>Connection error</source>
         <translation>Bağlantı Hatası</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Role to assign to imported users</source>
+        <translation>İçeri aktarılan kullanıcılara rol ata</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable imported users</source>
+        <translation>Içeri aktarılan kullanıcıları devredışı bırak</translation>
     </message>
 </context>
 <context>
@@ -1300,16 +1408,11 @@
         <source>Features</source>
         <translation>Özellikler</translation>
     </message>
-    <message>
-        <location/>
-        <source>This license type requires a higher software version.</source>
-        <translation>BU lisans türü daha yüksek bir yazılım sürümü gerektiriyor.</translation>
-    </message>
 </context>
 <context>
     <name>LicenseManagerWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/license_manager_widget.ui"/>
+        <location filename="../src/ui/widgets/system_settings/license_manager_widget.ui"/>
         <source>Active Licenses</source>
         <translation>Lisansları Etkinleştir</translation>
     </message>
@@ -1320,13 +1423,18 @@
     </message>
     <message>
         <location/>
-        <source>Selected License Details</source>
-        <translation>Seçilen Lisans Detayları</translation>
+        <source>New License</source>
+        <translation>Yeni Lisans</translation>
     </message>
     <message>
         <location/>
-        <source>New License</source>
-        <translation>Yeni Lisans</translation>
+        <source>Details...</source>
+        <translation>Detaylar...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>The software is licensed to</source>
+        <translation>Yazlım lisansı sahibi</translation>
     </message>
 </context>
 <context>
@@ -1336,23 +1444,18 @@
         <source>Warning</source>
         <translation>Uyarı</translation>
     </message>
+    <message>
+        <location/>
+        <source>License issues:</source>
+        <translation>Lisans sorunları:</translation>
+    </message>
 </context>
 <context>
     <name>LicenseWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/license_widget.ui"/>
-        <source>Automatic Activation via Internet</source>
-        <translation>İnternet Üzerinden Otomatik Etkinleştirme</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/system_settings/license_widget.ui"/>
         <source>Manual Activation</source>
         <translation>Manuel Olarak Etkinleştirme</translation>
-    </message>
-    <message>
-        <location/>
-        <source>License Key:</source>
-        <translation>Lisans Anahtarı:</translation>
     </message>
     <message>
         <location/>
@@ -1361,23 +1464,8 @@
     </message>
     <message>
         <location/>
-        <source>License Key is Invalid</source>
-        <translation>Lisans Anahtarı Geçersiz</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Hardware ID:</source>
-        <translation>Donanım ID&apos;si:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Copy to Clipboard</source>
         <translation>Panoya Yapıştır</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Activation Key File:</source>
-        <translation>Aktivasyon Anahtarı Dosyası:</translation>
     </message>
     <message>
         <location/>
@@ -1404,6 +1492,31 @@
         <source>Activate License</source>
         <translation>Lisansı Etkinleştir</translation>
     </message>
+    <message>
+        <location/>
+        <source>Internet Activation</source>
+        <translation>İnternet Aktivasyonu</translation>
+    </message>
+    <message>
+        <location/>
+        <source>License Key</source>
+        <translation>Lisans Anahtarı</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Invalid License Key</source>
+        <translation>Gerçesiz Lisans Anahtarı</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Hardware ID</source>
+        <translation>Donanım Kimliği</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Activation Key File</source>
+        <translation>Aktivasyon Anahtar Dosyası</translation>
+    </message>
 </context>
 <context>
     <name>LicensesProposeWidget</name>
@@ -1414,20 +1527,22 @@
     </message>
     <message>
         <location/>
-        <source>Get More Licenses...</source>
-        <translation>Daha Fazla Lisans Al...</translation>
+        <source>Activate License...</source>
+        <translation>Lisansı Etkinleştir...</translation>
+    </message>
+</context>
+<context>
+    <name>LocalSettingsDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/local_settings_dialog.ui"/>
+        <source>Local Settings</source>
+        <translation>Yerel Ayarlar</translation>
     </message>
 </context>
 <context>
     <name>LoginDialog</name>
     <message>
         <location filename="../src/ui/dialogs/login_dialog.ui"/>
-        <source>Connect to Server</source>
-        <comment>Groupbox Title</comment>
-        <translation>Sunucuya Bağlan</translation>
-    </message>
-    <message>
-        <location/>
         <source>Save...</source>
         <translation>Kaydet...</translation>
     </message>
@@ -1438,111 +1553,46 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Connection Options:</source>
-        <translation>&amp;Bağlantı Seçenekleri:</translation>
+        <source>Connection Options:</source>
+        <translation>Bağlantı Seçenekleri:</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Host:</source>
-        <translation>&amp;Host:</translation>
+        <source>Host</source>
+        <translation>Host</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Login:</source>
-        <translation>&amp;Giriş:</translation>
+        <source>Port</source>
+        <translation>Port</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;Şifre:</translation>
+        <source>Login</source>
+        <translation>Giriş</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Test</source>
-        <translation>&amp;Test Et</translation>
+        <source>Password</source>
+        <translation>Parola</translation>
     </message>
     <message>
         <location/>
-        <source>P&amp;ort:</source>
-        <translation>&amp;Port:</translation>
+        <source>Test</source>
+        <translation>Test</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Auto-Login</source>
-        <translation>&amp;Otomatik Giriş</translation>
+        <source>Auto-Login</source>
+        <translation>Otomatik Giriş</translation>
     </message>
 </context>
 <context>
     <name>LookAndFeelPreferencesWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/look_and_feel_preferences_widget.ui"/>
+        <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
         <source>Look and Feel</source>
         <translation>Görünüm ve Tema</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Time Mode:</source>
-        <translation>Zaman Modu:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Language:</source>
-        <translation>Dil:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Show IP in tree:</source>
-        <translation>IP Listesinde Göster:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Skin:</source>
-        <translation>Görünüm:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Tour sequence cycle time:</source>
-        <translation>Tur Zamanı Devir Süresi:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Restart required.</source>
-        <translation>Yeniden Başlatma Gerekli.</translation>
-    </message>
-    <message>
-        <location/>
-        <source> seconds</source>
-        <translation>Saniye</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Background Animation</source>
-        <translation>Arkaplan Animasyonu</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable Background Animation</source>
-        <translation>Arkaplan Animasyonunu Etkinleştir</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Color:</source>
-        <translation>Renk:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Select color...</source>
-        <translation>Renk Seç...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Intensity:</source>
-        <translation>Yuğunluk:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>%</source>
-        <translation></translation>
     </message>
     <message>
         <location/>
@@ -1551,28 +1601,56 @@
     </message>
     <message>
         <location/>
-        <source>Enable Background Image</source>
-        <translation>Arkaplan Görüntüsünü Etkinleştir</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Image:</source>
-        <translation>Görüntü:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;No image&gt;</source>
-        <translation>&lt;Görüntü Yok&gt;</translation>
-    </message>
-    <message>
-        <location/>
         <source>Browse...</source>
         <translation>Gözat...</translation>
     </message>
     <message>
         <location/>
-        <source>Mode:</source>
-        <translation>Mod:</translation>
+        <source>Language</source>
+        <translation>Dil</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Time Mode</source>
+        <translation>Zaman modu</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Image</source>
+        <translation>Resim</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mode</source>
+        <translation>Mod</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Intensity</source>
+        <translation>Yoğunluk</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show additional info in tree</source>
+        <translation>Listede ek bilgi göster</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Tour cycle</source>
+        <translation>Tur periyodu</translation>
+    </message>
+    <message>
+        <location/>
+        <source>seconds</source>
+        <translation>saniye</translation>
+    </message>
+</context>
+<context>
+    <name>MessageBox</name>
+    <message>
+        <location filename="../src/ui/dialogs/common/message_box.ui"/>
+        <source>Do not show this message again</source>
+        <translation>Bu mesajı bir daha gösterme</translation>
     </message>
 </context>
 <context>
@@ -1630,6 +1708,11 @@
         <source>Test...</source>
         <translation>Test Et...</translation>
     </message>
+    <message>
+        <location/>
+        <source>Play to user</source>
+        <translation>Kullanıcıya oynat</translation>
+    </message>
 </context>
 <context>
     <name>PopupBusinessActionWidget</name>
@@ -1647,27 +1730,19 @@
 <context>
     <name>PopupSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/popup_settings_widget.ui"/>
+        <location filename="../src/ui/widgets/local_settings/popup_settings_widget.ui"/>
         <source>Show all notifications</source>
         <translation>Tüm Bildirimleri Göster</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Alarms/Events</source>
-        <translation>Alarmlar/Olaylar</translation>
     </message>
     <message>
         <location/>
         <source>System Notifications</source>
         <translation>Sistem Bildirimleri</translation>
     </message>
-</context>
-<context>
-    <name>PreferencesDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/preferences_dialog.ui"/>
-        <source>Local Settings</source>
-        <translation>Yerel Ayarlar</translation>
+        <location/>
+        <source>Events</source>
+        <translation>Olaylar</translation>
     </message>
 </context>
 <context>
@@ -1758,23 +1833,8 @@
     <name>QnBuildNumberDialog</name>
     <message>
         <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
-        <source>Install a specific build.</source>
-        <translation>Özel Yapı Kur.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Build Number:</source>
-        <translation>Sürüm Numarası:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>99990</source>
-        <translation>99990</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Password:</source>
-        <translation>Şifre:</translation>
+        <source>Choose a specific build</source>
+        <translation>Özel bir yapı seçin</translation>
     </message>
 </context>
 <context>
@@ -1786,14 +1846,17 @@
     </message>
 </context>
 <context>
+    <name>QnCompatibilityVersionInstallationDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.ui"/>
+        <source>Installing Compatibility Version...</source>
+        <translation>Uyumu sürüm yükleniyor...</translation>
+    </message>
+</context>
+<context>
     <name>QnCredentialsDialog</name>
     <message>
         <location filename="../src/ui/dialogs/credentials_dialog.ui"/>
-        <source>Enter a valid username and password...</source>
-        <translation>Geçerli Bir Kullanıcı Adı ve Şifre Girin...</translation>
-    </message>
-    <message>
-        <location/>
         <source>User:</source>
         <translation>Kullanıcı Adı:</translation>
     </message>
@@ -1802,13 +1865,10 @@
         <source>Password:</source>
         <translation>Şifre:</translation>
     </message>
-</context>
-<context>
-    <name>QnFisheyeCalibrationWidget</name>
     <message>
-        <location filename="../src/ui/widgets/fisheye/fisheye_calibration_widget.ui"/>
-        <source>Auto Calibration</source>
-        <translation>Otomatik Kalibrasyon</translation>
+        <location/>
+        <source>Enter a valid username and password...</source>
+        <translation>Geçerli Bir Kullanıcı Adı ve Şifre Girin...</translation>
     </message>
 </context>
 <context>
@@ -1818,6 +1878,29 @@
         <source>Form</source>
         <translation>Biçim</translation>
     </message>
+    <message>
+        <location/>
+        <source>Enable tile interface</source>
+        <translation>Arabirimi etkinleştir</translation>
+    </message>
+</context>
+<context>
+    <name>QnLoginToCloudDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
+        <source>Log in</source>
+        <translation>Giriş yap</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Stay logged in</source>
+        <translation>Oturum açık kalsın</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Incorrect Email or Password</source>
+        <translation>Hatalı e-posta veya parola</translation>
+    </message>
 </context>
 <context>
     <name>QnMediaFileSettingsDialog</name>
@@ -1825,16 +1908,6 @@
         <location filename="../src/ui/dialogs/media_file_settings_dialog.ui"/>
         <source>File Settings</source>
         <translation>Dosya Ayarları</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Picture is not loaded</source>
-        <translation>Resim Yüklenemedi</translation>
-    </message>
-    <message>
-        <location/>
-        <source>This is a fish-eye lens file</source>
-        <translation>Bu Bir Fish Eye Lens Dosyasıdır</translation>
     </message>
 </context>
 <context>
@@ -1861,13 +1934,18 @@
     </message>
     <message>
         <location/>
-        <source>The new system will have password and name from the system:</source>
-        <translation>Yeni Sistem Mevcut Sistemden İsim ve Şifre Alacaktır:</translation>
+        <source>You will be reconnected.</source>
+        <translation>Yeniden Bağlanacaksınız.</translation>
     </message>
     <message>
         <location/>
-        <source>You will be reconnected.</source>
-        <translation>Yeniden Bağlanacaksınız.</translation>
+        <source>Login:</source>
+        <translation>Giriş:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>The new System will have password and name from System:</source>
+        <translation>Yeni sistem bu sistemin şifresini ve adını alacaktır:</translation>
     </message>
 </context>
 <context>
@@ -1879,23 +1957,23 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Play</source>
-        <translation>&amp;Oynat</translation>
+        <source>Play</source>
+        <translation>Oynat</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Add...</source>
-        <translation>&amp;Ekle...</translation>
+        <source>Add...</source>
+        <translation>Ekle...</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Rename...</source>
-        <translation>&amp;Yeniden Adlandır...</translation>
+        <source>Rename...</source>
+        <translation>Yeniden adlandır...</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Delete...</source>
-        <translation>&amp;Sil...</translation>
+        <source>Delete...</source>
+        <translation>Sil...</translation>
     </message>
 </context>
 <context>
@@ -1905,26 +1983,11 @@
         <source>Filter</source>
         <translation>Filtrele</translation>
     </message>
-    <message>
-        <location/>
-        <source>Reset Filter</source>
-        <translation>Filtreyi Sıfırla</translation>
-    </message>
-    <message>
-        <location/>
-        <source>X</source>
-        <translation>X</translation>
-    </message>
 </context>
 <context>
     <name>QnRoutingManagementWidget</name>
     <message>
-        <location filename="../src/ui/widgets/routing_management_widget.ui"/>
-        <source>Available Server Addresses</source>
-        <translation>Mevcut Sunucu Adresleri</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/system_settings/routing_management_widget.ui"/>
         <source>Add URL</source>
         <translation>URL Ekle</translation>
     </message>
@@ -1935,54 +1998,19 @@
     </message>
     <message>
         <location/>
-        <source>Removing this connection option could lead to system malfunction.</source>
-        <translation>Bu Bağlantıyı Kaldırmak Sistem Çökmelerine Sebep Olabilir.</translation>
+        <source>Add</source>
+        <translation>Ekle</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Removing this connection option could lead to System malfunction.</source>
+        <translation>Bu bağlantıyı kaldırma sistem çökmelerine sebep olabilir.</translation>
     </message>
 </context>
 <context>
     <name>QnServerUpdatesWidget</name>
     <message>
-        <location filename="../src/ui/widgets/server_updates_widget.ui"/>
-        <source>Available Update:</source>
-        <translation>Güncelleme Mevcut:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Unknown</source>
-        <translation>Bilinmeyen</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Update</source>
-        <translation>Güncelle</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Update from file:</source>
-        <translation>Dosyadan Güncelle:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Archive url:</source>
-        <translation>Arşiv URL&apos;si:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Copy to Clipboard</source>
-        <translation>Panoya Kopyala</translation>
-    </message>
-    <message>
-        <location/>
-        <source>To update manually, download and use the archive file on the following link:</source>
-        <translation>Manuel Güncelleme İçin Linkteki Arşiv Dosyasını İndirin ve Kullanın:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>...</source>
-        <translation>...</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
         <source>Cancel</source>
         <translation>İptal</translation>
     </message>
@@ -1998,8 +2026,23 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates on the Internet.</source>
-        <translation>İnternetten Güncellemeleri Kontrol Etme Başarısız.</translation>
+        <source>Updating to...</source>
+        <translation>Güncelleniyor...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Link copied</source>
+        <translation>Bağlantı kopyalandı</translation>
+    </message>
+    <message>
+        <location/>
+        <source>You have the latest version installed</source>
+        <translation>Son sürüm yüklü</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applying System updates at the end of the week is not recommended.</source>
+        <translation>Hafta bitiminde güncelleme yapmak önerilmez.</translation>
     </message>
 </context>
 <context>
@@ -2034,13 +2077,13 @@
     </message>
     <message>
         <location/>
-        <source>Warning: file with same name already exists!</source>
-        <translation>Uyarı:Aynı İsimle Bir Dosya Zaten Var!</translation>
+        <source>Options</source>
+        <translation>Seçenekler</translation>
     </message>
     <message>
         <location/>
-        <source>Options</source>
-        <translation>Seçenekler</translation>
+        <source>Warning: file with the same name already exists!</source>
+        <translation>Uyarı: aynı isimli dosya zaten mevcut!</translation>
     </message>
 </context>
 <context>
@@ -2054,9 +2097,9 @@
 <context>
     <name>QnUserManagementWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/user_management_widget.ui"/>
-        <source>Filter...</source>
-        <translation>Filtrele...</translation>
+        <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
+        <source>LDAP Settings...</source>
+        <translation>LDAP Ayarları...</translation>
     </message>
     <message>
         <location/>
@@ -2065,39 +2108,44 @@
     </message>
     <message>
         <location/>
-        <source>LDAP Settings...</source>
-        <translation>LDAP Ayarları...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Fetch Users from LDAP...</source>
         <translation>Kullanıcıları LDAP&apos;den Çek...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable Selected</source>
-        <translation>Seçilenleri Etkinleştir</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Disable Selected</source>
-        <translation>Seçilenleri Devre Dışı Bırak</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Delete Selected</source>
-        <translation>Seçilenleri Sil</translation>
     </message>
     <message>
         <location/>
         <source>Clear Selection</source>
         <translation>Seçilenleri Temizle</translation>
     </message>
+    <message>
+        <location/>
+        <source>Search users</source>
+        <translation>Kullanıcıları ara</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Enable</source>
+        <translation>Etkinleştir</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable</source>
+        <translation>Devredışı</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Delete...</source>
+        <translation>Sil...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Edit Roles...</source>
+        <translation>Rolleri Düzenle...</translation>
+    </message>
 </context>
 <context>
     <name>QnVideowallSettingsDialog</name>
     <message>
-        <location filename="../src/ui/dialogs/videowall_settings_dialog.ui"/>
+        <location filename="../src/ui/dialogs/resource_properties/videowall_settings_dialog.ui"/>
         <source>Video Wall Settings</source>
         <translation>Video Wall Ayarları</translation>
     </message>
@@ -2139,41 +2187,31 @@
     </message>
     <message>
         <location/>
-        <source>Pre-Recording:</source>
-        <translation>Ön Kayıt Süresi:</translation>
+        <source>s</source>
+        <translation>s</translation>
     </message>
     <message>
         <location/>
-        <source>s</source>
-        <translation>s</translation>
+        <source>max</source>
+        <translation>maksimum</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Pre-Recording:</source>
+        <translation>Ön Kayıt Süresi:</translation>
     </message>
     <message>
         <location/>
         <source>Post-Recording:</source>
         <translation>Son Kayıt Süresi:</translation>
     </message>
-    <message>
-        <location/>
-        <source>max</source>
-        <translation>max</translation>
-    </message>
 </context>
 <context>
     <name>RecordingSettings</name>
     <message>
-        <location filename="../src/ui/widgets/settings/recording_settings_widget.ui"/>
-        <source>Video Recording</source>
-        <translation>Video Kaydı</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
         <source>Temporary Folder</source>
         <translation>Geçici Dosya</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Browse...</source>
-        <translation>&amp;Gözat...</translation>
     </message>
     <message>
         <location/>
@@ -2212,146 +2250,23 @@
     </message>
     <message>
         <location/>
-        <source>Resolution:</source>
-        <translation>Çözünürlük:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Native</source>
-        <translation>Yerel</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Quarter Native</source>
-        <translation>Quarter Native</translation>
-    </message>
-    <message>
-        <location/>
-        <source>1920x1080</source>
-        <translation>1920x1080</translation>
-    </message>
-    <message>
-        <location/>
-        <source>1280x720</source>
-        <translation>1280x720</translation>
-    </message>
-    <message>
-        <location/>
-        <source>640x480</source>
-        <translation>640x480</translation>
-    </message>
-    <message>
-        <location/>
-        <source>320x240</source>
-        <translation>320x240</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Recording Quality:</source>
-        <translation>Kayıt Kalitesi:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Best</source>
-        <translation>En iyi</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Average</source>
-        <translation>Ortalama</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Performance</source>
-        <translation>Performans</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Audio Grabber</source>
-        <translation>Ses </translation>
-    </message>
-    <message>
-        <location/>
-        <source>Primary Device:</source>
-        <translation>Birincil Aygıt:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>None</source>
-        <translation>Yok</translation>
-    </message>
-    <message>
-        <location/>
-        <source>External Device:</source>
-        <translation>Harici Aygıt:</translation>
-    </message>
-    <message>
-        <location/>
         <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
         <translation>En iyi kalite ve çözünürlük için güçlü bir bilgisayar tavsiye edilir.</translation>
     </message>
-</context>
-<context>
-    <name>RecordingStatisticsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/properties/recording_statistics_widget.ui"/>
-        <source>Refresh</source>
-        <translation>Yenile</translation>
+        <location/>
+        <source>Browse...</source>
+        <translation>Gözat...</translation>
     </message>
     <message>
         <location/>
-        <source>Forecast for full storage(s) usage</source>
-        <translation>Tüm Depolama Alanı Kullanımı İçin Tahmini Süre</translation>
+        <source>Resolution</source>
+        <translation>Çözünürlük</translation>
     </message>
     <message>
         <location/>
-        <source>1000 Tb</source>
-        <translation>1000 Tb</translation>
-    </message>
-    <message>
-        <location/>
-        <source>100 Tb</source>
-        <translation>100 Tb</translation>
-    </message>
-    <message>
-        <location/>
-        <source>0 Tb</source>
-        <translation>0 Tb</translation>
-    </message>
-    <message>
-        <location/>
-        <source>1 Tb</source>
-        <translation>1 Tb</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Tb</source>
-        <translation>Tb</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Additional storage:</source>
-        <translation>Depolama Alanı Ekle:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>10 Tb</source>
-        <translation>10 Tb</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Current usage</source>
-        <translation>Mevcut Kullanım</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Forecast</source>
-        <translation>Tahmini Süre</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Servers is offline. Statistics is not available.</source>
-        <translation>Sunucu Çevrimdışı. İstatistikler Kullanılamıyor.</translation>
+        <source>Recording Quality</source>
+        <translation>Kayıt Kalitesi</translation>
     </message>
 </context>
 <context>
@@ -2365,24 +2280,6 @@
         <location/>
         <source>Search</source>
         <translation>Arama</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Reset Filter</source>
-        <translation>Filtreleri Sıfırla</translation>
-    </message>
-    <message>
-        <location/>
-        <source>X</source>
-        <translation>X</translation>
-    </message>
-</context>
-<context>
-    <name>ResourceListDialog</name>
-    <message>
-        <location filename="../src/ui/dialogs/resource_list_dialog.ui"/>
-        <source>Never suggest saving layouts</source>
-        <translation>Bir Daha Bunu Gösterme</translation>
     </message>
 </context>
 <context>
@@ -2407,46 +2304,31 @@
         <source>Test...</source>
         <translation>Test Et...</translation>
     </message>
+    <message>
+        <location/>
+        <source>Speak to user</source>
+        <translation>Kullnıcıya konuş</translation>
+    </message>
 </context>
 <context>
     <name>SendmailBusinessActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
-        <source>&amp;Additional Recipients:</source>
-        <translation>&amp;Diğer Alıcılar:</translation>
+        <source>Additional Recipients:</source>
+        <translation>Diğer Alıcılar:</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Global Email Settings...</source>
-        <translation>&amp;Genel E Posta Ayarları...</translation>
+        <source>Global Email Settings...</source>
+        <translation>Genel e-posta ayarları...</translation>
     </message>
 </context>
 <context>
     <name>ServerSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
-        <source>Name:</source>
-        <translation>İsim:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>IP Address:</source>
-        <translation>IP Adresi:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Ping</source>
         <translation>Ping</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Port:</source>
-        <translation>Port:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>9000</source>
-        <translation>9000</translation>
     </message>
     <message>
         <location/>
@@ -2457,6 +2339,21 @@
         <location/>
         <source>Failover Priority...</source>
         <translation>Failover Önceliği...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Name</source>
+        <translation>İsim</translation>
+    </message>
+    <message>
+        <location/>
+        <source>IP Address</source>
+        <translation>IP Adresi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Port</source>
+        <translation>Port</translation>
     </message>
 </context>
 <context>
@@ -2486,16 +2383,6 @@
     </message>
     <message>
         <location/>
-        <source>Rule will work only for prolonged events</source>
-        <translation>Kural Sadece Devam Eden Olaylarda Çalışacaktır</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Also show on source camera</source>
-        <translation>Kaynak Kamerada Göster</translation>
-    </message>
-    <message>
-        <location/>
         <source>Display text for:</source>
         <translation>Ekranda Görünecek Metin:</translation>
     </message>
@@ -2503,6 +2390,16 @@
         <location/>
         <source>Use custom text:</source>
         <translation>Özel Metin Kullan:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rule will work only for prolonged events</source>
+        <translation>Kural Sadece Devam Eden Olaylarda Çalışacaktır</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Also show on source camera</source>
+        <translation>Kaynak Kamerada Göster</translation>
     </message>
 </context>
 <context>
@@ -2532,26 +2429,6 @@
     </message>
     <message>
         <location/>
-        <source>Name:</source>
-        <translation>İsim:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Model:</source>
-        <translation>Model:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Firmware:</source>
-        <translation>Aygıt Yazılımı:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Vendor:</source>
-        <translation>Sağlayıcı:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Address</source>
         <translation>Adres</translation>
     </message>
@@ -2562,38 +2439,8 @@
     </message>
     <message>
         <location/>
-        <source>Web Page:</source>
-        <translation>Web Sayfası:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>IP Address:</source>
-        <translation>IP Adresi:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>MAC Address:</source>
-        <translation>MAC Adresi:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Authentication</source>
         <translation>Kimlik Doğrulama</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Login:</source>
-        <translation>Giriş:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Password:</source>
-        <translation>Şifre:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enable Audio</source>
-        <translation>Sesi Etkinleştir</translation>
     </message>
     <message>
         <location/>
@@ -2607,66 +2454,6 @@
     </message>
     <message>
         <location/>
-        <source>Motion is not available for this camera.</source>
-        <translation>Bu Kamera İçin Hareket Mevcut Değil.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion Settings</source>
-        <translation>Hareket Ayarları</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion Detection</source>
-        <translation>Hareket Algılama</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Hardware (camera built-in)</source>
-        <translation>Donanım (Dahili Kamera)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Software - maximum FPS could decrease slightly on server</source>
-        <translation>Yazılım - Maksimum FPS Sunucuda Düşüşe Sebep Olabilir</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Sensitivity:</source>
-        <translation>Duyarlılık:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Motion Mask (0)</source>
-        <translation>Hareket Maskesi (0)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Maximum sensitivity (9)</source>
-        <translation>Maksimum Duyarlılık (9)</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Camera web page:</source>
-        <translation>Kamera Web Sayfası:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>URL</source>
-        <translation>URL</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Reset Motion Regions</source>
-        <translation>Hareket Bölgelerini Sıfırla</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Fisheye</source>
-        <translation>Fish-Eye</translation>
-    </message>
-    <message>
-        <location/>
         <source>Advanced</source>
         <translation>Gelişmiş</translation>
     </message>
@@ -2677,39 +2464,99 @@
     </message>
     <message>
         <location/>
+        <source>Enable Audio</source>
+        <translation>Sesi Etkinleştir</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion is not available for this camera.</source>
+        <translation>Bu Kamera İçin Hareket Mevcut Değil.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Motion Detection</source>
+        <translation>Hareket Algılama</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Fisheye</source>
+        <translation>Fish-Eye</translation>
+    </message>
+    <message>
+        <location/>
         <source>I/O ports</source>
         <translation>I/O Portları</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Name</source>
+        <translation>İsim</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Model</source>
+        <translation>Model</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Firmware</source>
+        <translation>Firmware</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Vendor</source>
+        <translation>Üretici</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Audio</source>
+        <translation>Ses</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Login</source>
+        <translation>Giriş</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Password</source>
+        <translation>Parola</translation>
+    </message>
+    <message>
+        <location/>
+        <source>IP Address</source>
+        <translation>IP Adresi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Web Page</source>
+        <translation>Web Sayfası</translation>
+    </message>
+    <message>
+        <location/>
+        <source>MAC Address</source>
+        <translation>MAC Adresi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Sensitivity</source>
+        <translation>Hassasiyet</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Reset</source>
+        <translation>Sıfırla</translation>
+    </message>
+    <message>
+        <location/>
+        <source>TextLabel</source>
+        <translation type="unfinished">TextLabel</translation>
     </message>
 </context>
 <context>
     <name>SmtpAdvancedSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/system_settings/smtp_advanced_settings_widget.ui"/>
-        <source>SMTP &amp;Server:</source>
-        <translation>&amp;SMTP Sunucusu:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;User:</source>
-        <translation>&amp;Kullanıcı:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;Şifre:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Email:</source>
-        <translation>E Posta:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>P&amp;ort:</source>
-        <translation>&amp;Port:</translation>
-    </message>
-    <message>
-        <location/>
+        <location filename="../src/ui/widgets/system_settings/smtp/smtp_advanced_settings_widget.ui"/>
         <source>Unsecure Connection</source>
         <translation>Güvenli Olmayan Bağlantı</translation>
     </message>
@@ -2730,24 +2577,14 @@
     </message>
     <message>
         <location/>
-        <source>&amp;System Signature:</source>
-        <translation>&amp;Sistem İmzası:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enter a short system description here.</source>
-        <translation>Kısa Bir Sistem Açıklaması Giriniz.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Support Signature:</source>
-        <translation>Destek İmzası:</translation>
+        <source>Port:</source>
+        <translation>Port:</translation>
     </message>
 </context>
 <context>
     <name>SmtpSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/system_settings/smtp_settings_widget.ui"/>
+        <location filename="../src/ui/widgets/system_settings/smtp/smtp_settings_widget.ui"/>
         <source>Outgoing Email Settings</source>
         <translation>Giden Posta Ayarları</translation>
     </message>
@@ -2763,44 +2600,15 @@
     </message>
 </context>
 <context>
-    <name>SmtpSimpleSettingsWidget</name>
-    <message>
-        <location filename="../src/ui/widgets/system_settings/smtp_simple_settings_widget.ui"/>
-        <source>&amp;Email:</source>
-        <translation>&amp;Email:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;Şifre:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;System Signature:</source>
-        <translation>&amp;Sistem İmzası:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enter a short system description here.</source>
-        <translation>Kısa Bir Sistem Açıklaması Girin.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Support Signature:</source>
-        <translation>Destek İmzası:</translation>
-    </message>
-</context>
-<context>
     <name>SmtpTestConnectionWidget</name>
     <message>
-        <location filename="../src/ui/widgets/system_settings/smtp_test_connection_widget.ui"/>
+        <location filename="../src/ui/widgets/system_settings/smtp/smtp_test_connection_widget.ui"/>
         <source>Server:</source>
         <translation>Sunucu:</translation>
     </message>
     <message>
         <location/>
         <source>Port:</source>
-        <translatorcomment>Bağlantı Noktası</translatorcomment>
         <translation>Port:</translation>
     </message>
     <message>
@@ -2835,71 +2643,34 @@
     </message>
 </context>
 <context>
+    <name>StorageAnalyticsWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
+        <source>Current Statistics</source>
+        <translation>İstatisikler</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Forecast for Full Storage Usage</source>
+        <translation>Depolama alanı tahminleri</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Additional storage:</source>
+        <translation>Ek depolama alanı:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Server is offline. Statistics are not available.</source>
+        <translation>Sunucu çevrimdışı. İstatistikler kullanılabilir değil.</translation>
+    </message>
+</context>
+<context>
     <name>StorageConfigWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
-        <source>Main Storage Locations</source>
-        <translation>Ana Depolama Alanı Yerleri</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Add External Storage...</source>
-        <translation>Ek Depolama Alanı Ekle...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Rebuild Archive Index</source>
-        <translation>Arşivi Tekrar Dizinle</translation>
-    </message>
-    <message>
-        <location/>
-        <source>You haven&apos;t configured any backup storage. Backup won&apos;t be performed.</source>
-        <translation>Henüz Bir Yedekleme Depolama Alanı Ayarlanmadı. Yedekleme Alınmayacak.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Storage backup is available if there are 2 or more valid storage drives in the system.</source>
-        <translation>Depolama Alanı Yedeklemesi Sistemde Geçerli İki veya Daha Fazla Sürücü Varsa Geçerlidir.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup Storage Locations</source>
-        <translation>Yedekleme Depolama Alanı Yerleri</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Global Backup Settings</source>
-        <translation>Geniş Çaplı Yedekleme Ayarları</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup Archive From:</source>
-        <translation>Yedeklemeyi Şurdan Arşivle:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup Quality:</source>
-        <translation>Yedekleme Kalitesi:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&lt;Select at least one camera&gt; </source>
-        <translation>&lt;En az bir kamera seç&gt;</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Server Backup Settings</source>
-        <translation>Sunucu Yedekleme Ayarları</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Execute Backup</source>
-        <translation>Yedeklemeyi Çalıştır</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Set Schedule...</source>
-        <translation>Takvim Kur...</translation>
+        <source>Cancel</source>
+        <translation>İptal</translation>
     </message>
     <message>
         <location/>
@@ -2908,24 +2679,38 @@
     </message>
     <message>
         <location/>
-        <source>Unchecking the storage will cause nothing but writing stop.
-It won&apos;t deny oldest footage removing from the drive.</source>
-        <translation>Depolama Alanını Kontrol Etmemek Yazmayı Durdurmaya Yol Açacak. En Eski Kamera Görüntülerini Sürücüden Kaldırmayı Engellemeyecek.</translation>
+        <source>Add External Storage...</source>
+        <translation>Ek Depolama Alanı Ekle...</translation>
     </message>
     <message>
         <location/>
-        <source>Backup Time Label</source>
-        <translation>Yedekleme Zaman Etiketi</translation>
+        <source>Storage Locations</source>
+        <translation>Depolama konumları</translation>
     </message>
     <message>
         <location/>
-        <source>Backup progress</source>
-        <translation>Yedekleme İlerleme Durumu</translation>
+        <source>Reindex Archive</source>
+        <translation>Arşivi tekrar indexle</translation>
     </message>
     <message>
         <location/>
-        <source>Cancel</source>
-        <translation>İptal</translation>
+        <source>Reindex Backup</source>
+        <translation>Yedeklemeyi tekrar indexle</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Archive</source>
+        <translation>Yedek Arşivi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Settings...</source>
+        <translation>Yedekleme Ayarları...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
+        <translation>Kayıt depolama durduralacaktır. Hedef dışı kayıtlar silinmeye devam edecektir.</translation>
     </message>
 </context>
 <context>
@@ -2967,19 +2752,19 @@ It won&apos;t deny oldest footage removing from the drive.</source>
 <context>
     <name>SystemSettingsWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
+        <location filename="../src/ui/widgets/system_settings/system_settings_widget.ui"/>
         <source>(recommended)</source>
         <translation>(Önerilen)</translation>
     </message>
     <message>
         <location/>
-        <source>Send anonymous usage and crash statistics to software developers</source>
-        <translation>Anonim Kullanım Bilgisini ve Hata Raporlarını Gönder</translation>
+        <source>Enable audit trail</source>
+        <translation>Denetim Merkezini Etkinleştir</translation>
     </message>
     <message>
         <location/>
-        <source>Enable audit trail</source>
-        <translation>Denetim Merkezini Etkinleştir</translation>
+        <source>Send anonymous usage and crash statistics to software developers</source>
+        <translation>Anonim Kullanım Bilgisini ve Hata Raporlarını Gönder</translation>
     </message>
     <message>
         <location/>
@@ -2990,88 +2775,84 @@ It won&apos;t deny oldest footage removing from the drive.</source>
 <context>
     <name>TimeServerSelectionWidget</name>
     <message>
-        <location filename="../src/ui/widgets/settings/time_server_selection_widget.ui"/>
-        <source>Current System Time:</source>
-        <translation>Güncel Sistem Saati:</translation>
+        <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
+        <source>System Time</source>
+        <translation>Sistem Zamanı</translation>
     </message>
     <message>
         <location/>
-        <source>Synchronizing...</source>
-        <translation>Eşitleniyor...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Choose a locally available server to act as the time server if the system has no Internet access:</source>
-        <translation>Eğer Sistemin İnternet Erişimi Yoksa Zaman Sunucusu Olarak Yerel Bir Sunucu Seçin:</translation>
+        <source>System time is synchronized with the Internet and is independent from server local time.
+Selected server will be used as a time server if System has no Internet access.</source>
+        <translation>Sistem zamanı internet üzerinden alınır ve yerel sunucunun saatinden bağımsızdır. Eğer internet erişimi yoksa seçili sunucu zaman sunucusu olarak kullanılacaktır.</translation>
     </message>
 </context>
 <context>
-    <name>UserSettingsDialog</name>
+    <name>UserProfileWidget</name>
     <message>
-        <location filename="../src/ui/dialogs/user_settings_dialog.ui"/>
-        <source>Create New User</source>
-        <translation>Yeni Kullanıcı Yarat</translation>
+        <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
+        <source>Change Password...</source>
+        <translation>Parolayı değiştir...</translation>
+    </message>
+</context>
+<context>
+    <name>UserRoleSettingsWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/user_role_settings_widget.ui"/>
+        <source>Name</source>
+        <translation>İsim</translation>
     </message>
     <message>
         <location/>
-        <source>Access rights</source>
-        <translation>Erişim Hakları</translation>
+        <source>Users</source>
+        <translation>Kullanıcılar</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Login:</source>
-        <translation>&amp;Giriş:</translation>
+        <source>Delete Role</source>
+        <translation>Yetkiyi kaldır</translation>
+    </message>
+</context>
+<context>
+    <name>UserRolesDialog</name>
+    <message>
+        <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
+        <source>User Roles</source>
+        <translation>Kullanıcı Yetkileri</translation>
     </message>
     <message>
         <location/>
-        <source>C&amp;urrent Password:</source>
-        <translation>M&amp;evcut Şife:</translation>
+        <source>There are no custom user roles yet.
+Click &quot;New role&quot; button to create one.</source>
+        <translation>Özel tanımlı kullanıcı yetkilendirmesi yok. Oluşturmak için &quot;Yeni Rol&quot; butonuna tıklayın.</translation>
     </message>
     <message>
         <location/>
-        <source>E&amp;mail:</source>
-        <translation>E&amp;Mail:</translation>
+        <source>New role</source>
+        <translation>Yeni yetki</translation>
+    </message>
+</context>
+<context>
+    <name>UserSettingsWidget</name>
+    <message>
+        <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
+        <source>User Type</source>
+        <translation>Kullanıcı Türü</translation>
     </message>
     <message>
         <location/>
-        <source>&amp;Password:</source>
-        <translation>&amp;Şifre:</translation>
+        <source>Role</source>
+        <translation>Yetki</translation>
     </message>
     <message>
         <location/>
-        <source>Advanced...</source>
-        <translation>Gelişmiş...</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Access Rights:</source>
-        <translation>&amp;Erişim Hakları:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Confirm Password:</source>
-        <translation>&amp;Şifreyi Onayla:</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Enabled:</source>
-        <translation>İzin Ver:</translation>
+        <source>Edit Roles...</source>
+        <translation>Rolleri Düzenle...</translation>
     </message>
 </context>
 <context>
     <name>WeekTimeScheduleDialog</name>
     <message>
         <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
-        <source>Schedule</source>
-        <translation>Takvim</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Note: Schedule is based on server time.</source>
-        <translation>Not: Takvim sunucu saatine göre ayarlanacaktır.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule Settings</source>
         <translation>Takvim Ayarları</translation>
     </message>
@@ -3084,6 +2865,16 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <location/>
         <source>Off</source>
         <translation>Kapalı</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Schedule</source>
+        <translation>Takvim</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Note: Schedule is based on server time.</source>
+        <translation>Not: Takvim sunucu saatine göre ayarlanacaktır.</translation>
     </message>
 </context>
 </TS>

@@ -33,6 +33,8 @@ public:
     constexpr static const std::chrono::milliseconds kDefaultMaxDelay =
         std::chrono::minutes(1);
 
+    const static RetryPolicy kNoRetries;
+
     unsigned int maxRetryCount;
     std::chrono::milliseconds initialDelay;
     /**

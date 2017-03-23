@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <functional>
 #include <memory>
 #include <thread>
@@ -63,10 +64,12 @@ private:
     QUrl m_notificationModuleUrl;
     std::set<nx_http::AsyncHttpClientPtr> m_ongoingRequests;
     QnCounter m_startedAsyncCallsCounter;
+    std::atomic<std::uint64_t> m_notificationSequence;
 
     void onSendNotificationRequestDone(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx_http::AsyncHttpClientPtr client,
+        std::uint64_t notificationIndex,
         std::function<void(bool)> completionHandler);
 };
 

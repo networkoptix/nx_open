@@ -1628,7 +1628,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation>E-Mail-Einstellungen wurden geändert</translation>
+        <translation>Email-Einstellungen wurden geändert</translation>
     </message>
     <message>
         <source>Filled circle mark means the archive is still available</source>
@@ -2758,7 +2758,7 @@ to %1</source>
     <name>QnConnectToCloudDialog</name>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Password</source>
@@ -3723,7 +3723,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>DN</source>
@@ -4031,7 +4031,7 @@ to %1</source>
     </message>
     <message>
         <source>Please send Email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation>Senden Sie eine E-Mail mit dem Lizenzschlüssel und der Hardware-ID an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
+        <translation>Senden Sie eine Email mit dem Lizenzschlüssel und der Hardware-ID an %1, um einen Aktivierungsschlüssel zu erhalten.</translation>
     </message>
     <message>
         <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
@@ -4171,7 +4171,7 @@ to %1</source>
     <name>QnLoginToCloudDialog</name>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Password</source>
@@ -5235,29 +5235,29 @@ to %1</source>
     </message>
     <message>
         <source>User %1 has invalid Email address</source>
-        <translation>Benutzer %1 hat eine ungültige E-Mailadresse</translation>
+        <translation>Benutzer %1 hat eine ungültige Emailadresse</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 users have invalid Email address</source>
         <translation>
-            <numerusform>%n von %1 Benutzer hat eine ungültige E-Mailadresse</numerusform>
-            <numerusform>%n von %1 Benutzer hat eine ungültige E-Mailadresse</numerusform>
+            <numerusform>%n von %1 Benutzer hat eine ungültige Emailadresse</numerusform>
+            <numerusform>%n von %1 Benutzer hat eine ungültige Emailadresse</numerusform>
         </translation>
     </message>
     <message>
         <source>Invalid Email address %1</source>
-        <translation>Ungültige E-Mailadresse %1</translation>
+        <translation>Ungültige Emailadresse %1</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 additional Email addresses are invalid</source>
         <translation>
-            <numerusform>%n von %1 zusätzliche E-Mailadresse ist ungültig</numerusform>
+            <numerusform>%n von %1 zusätzliche Emailadresse ist ungültig</numerusform>
             <numerusform>%n von %1 zusätzliche E-Mailadressen sind ungültig</numerusform>
         </translation>
     </message>
     <message>
         <source>Send Email to %1</source>
-        <translation>E-Mail an %1 senden</translation>
+        <translation>Email an %1 senden</translation>
     </message>
 </context>
 <context>
@@ -5695,7 +5695,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>SMTP Server</source>
@@ -5730,11 +5730,11 @@ to %1</source>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation>E-Mail ist nicht gültig.</translation>
+        <translation>Email ist nicht gültig.</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6138,7 +6138,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Updates</source>
@@ -6161,7 +6161,7 @@ to %1</source>
     <name>QnSystemHealthStringsHelper</name>
     <message>
         <source>Email address is not set</source>
-        <translation>E-Mailadresse ist nicht festgelegt</translation>
+        <translation>Emailadresse ist nicht festgelegt</translation>
     </message>
     <message>
         <source>No licenses</source>
@@ -6169,7 +6169,7 @@ to %1</source>
     </message>
     <message>
         <source>Email server is not set</source>
-        <translation>E-Mailserver ist nicht festgelegt</translation>
+        <translation>Emailserver ist nicht festgelegt</translation>
     </message>
     <message>
         <source>Connection to server lost</source>
@@ -6201,15 +6201,15 @@ to %1</source>
     </message>
     <message>
         <source>Email address is not set for user %1</source>
-        <translation>E-Mailadresse bei Benutzer %1 ist nicht gesetzt</translation>
+        <translation>Emailadresse bei Benutzer %1 ist nicht gesetzt</translation>
     </message>
     <message>
         <source>Email address is not set.</source>
-        <translation>E-Mailadresse nicht gesetzt.</translation>
+        <translation>Emailadresse nicht gesetzt.</translation>
     </message>
     <message>
         <source>Email server is not set.</source>
-        <translation>E-Mailserver ist nicht festgelegt.</translation>
+        <translation>Emailserver ist nicht festgelegt.</translation>
     </message>
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
@@ -6253,11 +6253,11 @@ to %1</source>
     </message>
     <message>
         <source>Error while sending Email</source>
-        <translation>Fehler beim Senden der E-Mail</translation>
+        <translation>Fehler beim Senden der Email</translation>
     </message>
     <message>
         <source>Some users have not set their Email addresses.</source>
-        <translation>Einige Benutzer haben Ihre E-Mailadresse nicht konfiguriert.</translation>
+        <translation>Einige Benutzer haben Ihre Emailadresse nicht konfiguriert.</translation>
     </message>
     <message>
         <source>System is running in safe mode.</source>
@@ -6270,11 +6270,11 @@ to %1</source>
     </message>
     <message>
         <source>You cannot receive System notifications by Email.</source>
-        <translation>Sie können keine Systembenachrichtigungen per E-Mail erhalten.</translation>
+        <translation>Sie können keine Systembenachrichtigungen per Email erhalten.</translation>
     </message>
     <message>
         <source>They cannot receive System notifications by Email.</source>
-        <translation>Sie können keine Systembenachrichtigungen per E-Mail erhalten.</translation>
+        <translation>Sie können keine Systembenachrichtigungen per Email erhalten.</translation>
     </message>
 </context>
 <context>
@@ -6354,6 +6354,71 @@ to %1</source>
     <message>
         <source>No thumbnails available</source>
         <translation>Keine Miniaturansichten verfügbar</translation>
+    </message>
+    <message>
+        <source>hh:mm</source>
+        <comment>Format for displaying hours and minutes on timeline.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>hh:mm ap</source>
+        <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>h ap</source>
+        <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd</source>
+        <comment>Format for displaying days on timeline.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MMMM</source>
+        <comment>Format for displaying months on timeline.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying years on timeline</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm</source>
+        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm ap</source>
+        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm</source>
+        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy h ap</source>
+        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy</source>
+        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>MMMM yyyy</source>
+        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying year caption in timeline&apos;s header</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6557,7 +6622,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
 </context>
 <context>
@@ -6707,11 +6772,11 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Email cannot be empty.</source>
-        <translation>E-Mail darf nicht leer sein.</translation>
+        <translation>Email darf nicht leer sein.</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6727,18 +6792,18 @@ to %1</source>
     </message>
     <message>
         <source>Cloud user with specified Email already exists.</source>
-        <translation>Ein Cloudbenutzer mit angegebener E-Mail existiert bereits.</translation>
+        <translation>Ein Cloudbenutzer mit angegebener Email existiert bereits.</translation>
     </message>
 </context>
 <context>
     <name>QnValidatorStrings</name>
     <message>
         <source>Email cannot be empty.</source>
-        <translation>E-Mail darf nicht leer sein.</translation>
+        <translation>Email darf nicht leer sein.</translation>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation>E-Mail ist nicht gültig.</translation>
+        <translation>Email ist nicht gültig.</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>
