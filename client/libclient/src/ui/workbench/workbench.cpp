@@ -42,9 +42,16 @@ QnWorkbench::QnWorkbench(QObject *parent):
     const auto defaultLayoutCreator =
         [](const QnLayoutResourcePtr& /* resource */, QObject* parent) -> QnWorkbenchLayout*
         {
-            return (new QnWorkbenchLayout(parent));
+            return new QnWorkbenchLayout(parent);
         };
+    const auto standardLayoutCreator =
+        [](const QnLayoutResourcePtr& resource, QObject* parent) -> QnWorkbenchLayout*
+        {
+            return (new QnWorkbenchLayout(resource, parent));
+        };
+
     qnLayoutFactory->addCreator(defaultLayoutCreator);
+    qnLayoutFactory->addCreator(standardLayoutCreator);
 
     m_dummyLayout = qnLayoutFactory->create(this);
     setCurrentLayout(m_dummyLayout);
