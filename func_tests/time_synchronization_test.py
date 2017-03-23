@@ -88,6 +88,7 @@ def set_time_on_server(server, new_time):
     server.date_change_time = utils.datetime_utc_now()
     server.base_time = new_time
     server.box.host.run_command(['date', '-u', '--set=@%d' % (
+       utils.datetime_utc_to_timestamp(new_time))])
        utils.datetime_utc_to_timestamp(new_time) )])
 
 @measure_call_duration

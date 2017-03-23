@@ -23,6 +23,7 @@ from .server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_
 from .vagrant_box_config import BoxConfigFactory, BoxConfig
 from .cloud_host import CloudHost
 from .camera import Camera, SampleMediaFile
+from .media_stream import open_media_stream
 
 
 MEDIASERVER_CONFIG_PATH = '/opt/{company_name}/mediaserver/etc/mediaserver.conf'
@@ -112,45 +113,6 @@ class Service(object):
         self.run_action(is_up and 'start' or 'stop')
 
 
-class ServerPersistentInfo(object):
-
-    _cache_key = 'nx/mediaservers'
-
-    @classmethod
-    def load_from_cache(cls, cache):
-        return map(cls.from_dict, cache.get(cls._cache_key, []))
-
-    @classmethod
-    def save_to_cache(cls, cache, server_persistent_info_list):
-        cache.set(cls._cache_key, [info.to_dict() for into in server_persistent_info_list])
-
-    @classmethod
-    def from_dict(cls, d):
-        return ServerPersistentInfo(
-            name=d['name'],
-            box_name=d['box_name'],
-            storage_url=d['storage_url'],
-            user=d['user'],
-            password=d['password'],
-            )
-
-    def __init__(self, name, box_name, storage_url, user, password):
-        self.name = name
-        self.box_name = box_name
-        self.storage_url = storage_url
-        self.user = user
-        self.password = password
-
-    def to_dict(self):
-        return dict(
-            name=self.name,
-            box_name=self.box_name,
-            storage_url=self.storage_url,
-            user=self.user,
-            password=self.password,
-            )
-
-
 class ServerConfigFactory(object):
 
     def __init__(self, box_config_factory):
@@ -231,9 +193,6 @@ class Server(object):
     def is_started(self):
         assert self._is_started is not None, 'is_started state is still unknown'
         return self._is_started
-
-    def get_persistent_info(self):
-        return ServerPersistentInfo(self.name, self.box.name, self.user, self.password)
 
     def start_service(self):
         self.set_service_status(started=True)
@@ -496,6 +455,11 @@ class Server(object):
         log.info('Server %r returned recorded periods:', self.name)
         log.info('\t%s', '\n\t'.join(map(str, periods)))
         return periods
+
+    def get_media_stream(self, stream_type, camera):
+        assert stream_type in ['rtsp', 'webm', 'hls', 'direct-hls'], repr(stream_type)
+        assert isinstance(camera, Camera), repr(camera)
+        return open_media_stream(self.url, self.user, self.password, stream_type, camera.mac_addr)
 
 
 class Storage(object):
