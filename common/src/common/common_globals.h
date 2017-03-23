@@ -23,7 +23,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
     PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
-    StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
+    StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType SerializationFormat PeerType StatisticsDeviceType
     ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction FailoverPriority
     Permission GlobalPermission UserRole ConnectionResult
@@ -173,13 +173,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
     Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities)
-
-
-    enum Projection {
-        RectilinearProjection,
-        EquirectangularProjection
-    };
-
 
     enum PtzTrait {
         NoPtzTraits             = 0x00,
@@ -339,12 +332,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceInfoLevel)
 
-	    enum class StatusChangeReason
+    enum class StatusChangeReason
     {
         Local,
         GotFromRemotePeer
     };
-
 
     enum BitratePerGopType {
         BPG_None,
@@ -434,16 +426,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(IODefaultState)
 
-    enum TimePeriodType {
-        NullTimePeriod      = 0x1,  /**< No period. */
-        EmptyTimePeriod     = 0x2,  /**< Period of zero length. */
-        NormalTimePeriod    = 0x4,  /**< Normal period with non-zero length. */
-    };
-
-    Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes)
-
-
     enum TimePeriodContent {
         RecordingContent,
         MotionContent,
@@ -529,18 +511,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         PT_Count
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
-
-    enum PropertyDataType {
-        PDT_None        = 0,
-        PDT_Value       = 1,
-        PDT_OnOff       = 2,
-        PDT_Boolen      = 3,
-        PDT_MinMaxStep  = 4,
-        PDT_Enumeration = 5,
-        PDT_Button      = 6
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PropertyDataType)
-
 
     enum SerializationFormat {
         JsonFormat          = 0,
@@ -874,7 +844,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
         (Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
-        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
+        (Qn::SerializationFormat)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
         (Qn::BookmarkSortField)(Qt::SortOrder)
         (Qn::RebuildAction)(Qn::BackupAction)
         (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
