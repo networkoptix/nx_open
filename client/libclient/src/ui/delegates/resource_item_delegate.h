@@ -3,7 +3,10 @@
 #include <QtCore/QPointer>
 #include <QtWidgets/QStyledItemDelegate>
 
+#include <common/common_globals.h>
+
 #include <client/client_color_types.h>
+
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/customization/customized.h>
 

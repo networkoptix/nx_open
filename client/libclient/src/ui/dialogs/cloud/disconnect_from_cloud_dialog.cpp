@@ -78,6 +78,11 @@ private:
     void validateCloudPassword();
     void setupResetPasswordPage();
     void setupConfirmationPage();
+
+    void onCloudPassowrdValidated(
+        bool success,
+        const QString& password);
+
 public:
     const Scenario scenario;
     QWidget* authorizeWidget;
@@ -99,6 +104,10 @@ QnDisconnectFromCloudDialog::QnDisconnectFromCloudDialog(QWidget *parent):
     d_ptr(new QnDisconnectFromCloudDialogPrivate(this))
 {
     d_ptr->setupUi();
+
+    Q_D(QnDisconnectFromCloudDialog);
+    connect(this, &QnDisconnectFromCloudDialog::cloudPassowrdValidated,
+        d, &QnDisconnectFromCloudDialogPrivate::onCloudPassowrdValidated, Qt::QueuedConnection);
 }
 
 QnDisconnectFromCloudDialog::~QnDisconnectFromCloudDialog()
@@ -339,6 +348,29 @@ QString QnDisconnectFromCloudDialogPrivate::disconnectWarnMessage() const
     return tr("You will be disconnected from this System and able to login again through local network with local account");
 }
 
+void QnDisconnectFromCloudDialogPrivate::onCloudPassowrdValidated(
+    bool success,
+    const QString& password)
+{
+    m_cloudPasswordCache[password] = success;
+    lockUi(false);
+    if (success)
+    {
+        if (scenario == Scenario::CloudOwnerOnly)
+            setupResetPasswordPage();
+        else
+            unbindSystem();
+    }
+    else
+    {
+        authorizePasswordField->validate();
+        if (scenario == Scenario::CloudOwnerOnly)
+            nextButton->setFocus(Qt::OtherFocusReason);
+        else
+            okButton->setFocus(Qt::OtherFocusReason);
+    }
+}
+
 void QnDisconnectFromCloudDialogPrivate::validateCloudPassword()
 {
     NX_ASSERT(scenario == Scenario::CloudOwnerOnly || scenario == Scenario::CloudOwner);
@@ -356,32 +388,7 @@ void QnDisconnectFromCloudDialogPrivate::validateCloudPassword()
             if (!guard)
                 return;
 
-            bool success = (code == nx::cdb::api::ResultCode::ok);
-            executeDelayed(
-                [guard, this, success, password]
-                {
-                    if (!guard)
-                        return;
-
-                    m_cloudPasswordCache[password] = success;
-                    lockUi(false);
-                    if (success)
-                    {
-                        if (scenario == Scenario::CloudOwnerOnly)
-                            setupResetPasswordPage();
-                        else
-                            unbindSystem();
-                    }
-                    else
-                    {
-                        authorizePasswordField->validate();
-                        if (scenario == Scenario::CloudOwnerOnly)
-                            nextButton->setFocus(Qt::OtherFocusReason);
-                        else
-                            okButton->setFocus(Qt::OtherFocusReason);
-                    }
-
-                }, kDefaultDelay, guard->thread());
+            emit guard->cloudPassowrdValidated((code == nx::cdb::api::ResultCode::ok), password);
         };
 
     lockUi(true);

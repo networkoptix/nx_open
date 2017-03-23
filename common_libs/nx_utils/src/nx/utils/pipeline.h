@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include <nx/utils/std/cpp14.h>
+
 namespace nx {
 namespace utils {
 namespace pipeline {
@@ -82,7 +84,7 @@ class NX_UTILS_API ReflectingPipeline:
     public TwoWayPipeline
 {
 public:
-    ReflectingPipeline();
+    ReflectingPipeline(QByteArray initialData = QByteArray());
 
     virtual int write(const void* data, size_t count) override;
     /**
@@ -95,9 +97,29 @@ public:
      */
     std::size_t totalBytesThrough() const;
 
+    const QByteArray& internalBuffer() const;
+
 private:
     QByteArray m_buffer;
     std::size_t m_totalBytesThrough;
+};
+
+//-------------------------------------------------------------------------------------------------
+// RandomDataSource
+
+class NX_UTILS_API RandomDataSource:
+    public AbstractInput
+{
+public:
+    static constexpr std::size_t kDefaultMinReadSize = 4*1024;
+    static constexpr std::size_t kDefaultMaxReadSize = 64*1024;
+
+    RandomDataSource();
+
+    virtual int read(void* data, size_t count) override;
+
+private:
+    const std::pair<std::size_t, std::size_t> m_readSizeRange;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -142,7 +164,7 @@ public:
     {
     }
 
-    virtual int write(const void* data, size_t count) override
+    virtual int read(void* data, size_t count) override
     {
         return m_func(data, count);
     }
@@ -151,11 +173,11 @@ private:
     WriteFunc m_func;
 };
 
-template<typename WriteFunc>
-std::unique_ptr<CustomInputPipeline<WriteFunc>>
-    makeCustomInputPipeline(WriteFunc func)
+template<typename ReadFunc>
+std::unique_ptr<CustomInputPipeline<ReadFunc>>
+    makeCustomInputPipeline(ReadFunc func)
 {
-    return std::make_unique<CustomInputPipeline<WriteFunc>>(std::move(func));
+    return std::make_unique<CustomInputPipeline<ReadFunc>>(std::move(func));
 }
 
 } // namespace pipeline

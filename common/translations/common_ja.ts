@@ -85,7 +85,7 @@
     <message>
         <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation type="unfinished">Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</translation>
+        <translation>クラウド システムへの統合はクラウドに接続されていないシステムとのみ結合できます　システム名とパスワードはクラウド システムから取得されます。</translation>
     </message>
 </context>
 <context>
@@ -349,7 +349,7 @@
     </message>
     <message>
         <source>Generic Event at %1</source>
-        <translation>一般的イベント  %1</translation>
+        <translation>一般的イベント %1</translation>
     </message>
     <message>
         <source>Input Port: %1</source>
@@ -484,7 +484,7 @@
     <message>
         <source>MAC #%1: %2</source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-        <translation>MAC #%1: %2  {1:?} {2?}</translation>
+        <translation>MAC #%1: %2</translation>
     </message>
     <message>
         <source>Send Email</source>

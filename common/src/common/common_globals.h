@@ -1,9 +1,5 @@
 #pragma once
 
-#ifndef BOOST_BIND_NO_PLACEHOLDERS
-#define BOOST_BIND_NO_PLACEHOLDERS
-#endif // BOOST_BIND_NO_PLACEHOLDERS
-#include <cassert>
 #include <limits>
 
 #include <QtCore/QtGlobal>
@@ -11,59 +7,25 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
-#include <nx/utils/unused.h>
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/utils/datetime.h>
-#include <nx/utils/literal.h>
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(Qn,
-    Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
+    ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
     PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
-    StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
+    StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType SerializationFormat PeerType StatisticsDeviceType
     ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction FailoverPriority
     Permission GlobalPermission UserRole ConnectionResult
     ,
-    Borders Corners ResourceFlags CameraCapabilities PtzDataFields PtzCapabilities PtzTraits
+    ResourceFlags CameraCapabilities PtzDataFields PtzCapabilities PtzTraits
     MotionTypes TimePeriodTypes
     ServerFlags CameraBackupQualities TimeFlags CameraStatusFlags IOPortTypes
     Permissions GlobalPermissions
     )
-
-
-    // TODO: #Elric #5.0 use Qt::Edge ?
-    /**
-     * Generic enumeration describing borders of a rectangle.
-     */
-    enum Border {
-        NoBorders = 0,
-        LeftBorder = 0x1,
-        RightBorder = 0x2,
-        TopBorder = 0x4,
-        BottomBorder = 0x8,
-        AllBorders = LeftBorder | RightBorder | TopBorder | BottomBorder
-    };
-    Q_DECLARE_FLAGS(Borders, Border)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(Borders)
-
-
-    /**
-     * Generic enumeration describing corners of a rectangle.
-     */
-    enum Corner {
-        NoCorner = 0,
-        TopLeftCorner = 0x1,
-        TopRightCorner = 0x2,
-        BottomLeftCorner = 0x4,
-        BottomRightCorner = 0x8,
-        AllCorners = TopLeftCorner | TopRightCorner | BottomLeftCorner | BottomRightCorner
-    };
-    Q_DECLARE_FLAGS(Corners, Corner)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(Corners)
 
     enum ExtrapolationMode {
         ConstantExtrapolation,
@@ -204,13 +166,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
     Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability)
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities)
-
-
-    enum Projection {
-        RectilinearProjection,
-        EquirectangularProjection
-    };
-
 
     enum PtzTrait {
         NoPtzTraits             = 0x00,
@@ -370,12 +325,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceInfoLevel)
 
-	    enum class StatusChangeReason
+    enum class StatusChangeReason
     {
         Local,
         GotFromRemotePeer
     };
-
 
     enum BitratePerGopType {
         BPG_None,
@@ -465,16 +419,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(IODefaultState)
 
-    enum TimePeriodType {
-        NullTimePeriod      = 0x1,  /**< No period. */
-        EmptyTimePeriod     = 0x2,  /**< Period of zero length. */
-        NormalTimePeriod    = 0x4,  /**< Normal period with non-zero length. */
-    };
-
-    Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes)
-
-
     enum TimePeriodContent {
         RecordingContent,
         MotionContent,
@@ -560,18 +504,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         PT_Count
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
-
-    enum PropertyDataType {
-        PDT_None        = 0,
-        PDT_Value       = 1,
-        PDT_OnOff       = 2,
-        PDT_Boolen      = 3,
-        PDT_MinMaxStep  = 4,
-        PDT_Enumeration = 5,
-        PDT_Button      = 6
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PropertyDataType)
-
 
     enum SerializationFormat {
         JsonFormat          = 0,
@@ -895,7 +827,7 @@ Q_DECLARE_METATYPE(Qn::StatusChangeReason)
 // TODO: #Elric #enum
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::TimePeriodContent)(Qn::Corner)(Qn::UserRole)(Qn::ConnectionResult),
+    (Qn::TimePeriodContent)(Qn::UserRole)(Qn::ConnectionResult),
     (metatype)
 )
 
@@ -905,7 +837,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
         (Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
-        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
+        (Qn::SerializationFormat)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
         (Qn::BookmarkSortField)(Qt::SortOrder)
         (Qn::RebuildAction)(Qn::BackupAction)
         (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)

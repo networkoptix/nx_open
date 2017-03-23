@@ -353,6 +353,15 @@ namespace
         return nullptr;
     }
 
+    bool isIconListCombo(const QComboBox* combo)
+    {
+        if (!combo)
+            return false;
+
+        const auto list = qobject_cast<const QListView*>(combo->view());
+        return list && list->viewMode() == QListView::IconMode;
+    }
+
     enum ScrollBarStyle
     {
         CommonScrollBar,
@@ -1850,7 +1859,8 @@ void QnNxStyle::drawControl(
             {
                 static constexpr int kComboBoxMarginAdjustment = 7; //< to align with other controls
                 QStyleOptionComboBox opt(*comboBox);
-                opt.rect.setLeft(opt.rect.left() + kComboBoxMarginAdjustment);
+                if (!isIconListCombo(qobject_cast<const QComboBox*>(widget)))
+                    opt.rect.setLeft(opt.rect.left() + kComboBoxMarginAdjustment);
                 base_type::drawControl(element, &opt, painter, widget);
                 return;
             }
@@ -2579,9 +2589,9 @@ QRect QnNxStyle::subControlRect(
                 {
                     case SC_ComboBoxArrow:
                     {
-                        rect = QRect(comboBox->rect.right() - comboBox->rect.height(),
+                        rect = QRect(comboBox->rect.right() - Metrics::kButtonHeight,
                                      comboBox->rect.top(),
-                                     comboBox->rect.height(),
+                                     Metrics::kButtonHeight,
                                      comboBox->rect.height());
                         rect.adjust(1, 1, 0, -1);
                         break;
@@ -2591,8 +2601,21 @@ QRect QnNxStyle::subControlRect(
                     {
                         int frameWidth = pixelMetric(PM_ComboBoxFrameWidth, option, widget);
                         rect = comboBox->rect;
-                        rect.setRight(rect.right() - rect.height());
+                        rect.setRight(rect.right() - Metrics::kButtonHeight);
                         rect.adjust(frameWidth, frameWidth, 0, -frameWidth);
+                        break;
+                    }
+
+                    case SC_ComboBoxListBoxPopup:
+                    {
+                        rect = base_type::subControlRect(CC_ComboBox, option, subControl, widget);
+                        if (widget)
+                        {
+                            const int width = widget->property(Properties::kComboBoxPopupWidth).toInt();
+                            if (width != 0)
+                                rect.setWidth(width);
+                        }
+
                         break;
                     }
 
@@ -3191,8 +3214,10 @@ QSize QnNxStyle::sizeFromContents(
             int height = qMax(size.height(), Metrics::kButtonHeight);
 
             int hMargin = pixelMetric(PM_ButtonMargin, option, widget);
-            int width = qMax(Metrics::kMinimumButtonWidth,
-                             size.width() + hMargin + (hasArrow ? height : hMargin));
+            int width = size.width() + (hasArrow ? Metrics::kButtonHeight : hMargin);
+
+            if (!isIconListCombo(qobject_cast<const QComboBox*>(widget)))
+                width = qMax(Metrics::kMinimumButtonWidth, width + hMargin);
 
             return QSize(width, height);
         }

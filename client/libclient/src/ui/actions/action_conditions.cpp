@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QAction>
 
+#include <boost/range/algorithm/count_if.hpp>
+
 #include <api/app_server_connection.h>
 
 #include <common/common_module.h>
@@ -59,6 +61,21 @@
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
+
+namespace {
+
+Qn::TimePeriodType periodType(const QnTimePeriod& period)
+{
+    if (period.isNull())
+        return Qn::NullTimePeriod;
+
+    if (period.isEmpty())
+        return Qn::EmptyTimePeriod;
+
+    return Qn::NormalTimePeriod;
+}
+
+}
 
 QnActionCondition::QnActionCondition(QObject *parent):
     QObject(parent),
@@ -574,19 +591,19 @@ Qn::ActionVisibility QnTimePeriodActionCondition::check(const QnActionParameters
         return Qn::InvisibleAction;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
-    if(!(m_periodTypes & period.type())) {
-        return m_nonMatchingVisibility;
-    } else {
+    if (m_periodTypes.testFlag(periodType(period)))
         return Qn::EnabledAction;
-    }
+
+    return m_nonMatchingVisibility;
 }
 
-Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &parameters) {
+Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &parameters)
+{
     if(!parameters.hasArgument(Qn::TimePeriodRole))
         return Qn::InvisibleAction;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
-    if(!(Qn::NormalTimePeriod & period.type()))
+    if (periodType(period) != Qn::NormalTimePeriod)
         return Qn::DisabledAction;
 
     // Export selection
@@ -619,7 +636,7 @@ Qn::ActionVisibility QnAddBookmarkActionCondition::check(const QnActionParameter
         return Qn::InvisibleAction;
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
-    if(!(Qn::NormalTimePeriod & period.type()))
+    if (periodType(period) != Qn::NormalTimePeriod)
         return Qn::DisabledAction;
 
     if(!context()->workbench()->item(Qn::CentralRole))

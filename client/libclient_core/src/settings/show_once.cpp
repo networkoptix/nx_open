@@ -2,6 +2,7 @@
 
 #include <QtCore/QSettings>
 #include <QtCore/QStandardPaths>
+#include <QtCore/QDir>
 
 #include <nx/utils/log/assert.h>
 

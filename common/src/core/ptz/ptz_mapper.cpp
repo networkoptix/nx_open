@@ -1,6 +1,7 @@
 #include "ptz_mapper.h"
 
 #include <cassert>
+#include <array>
 
 #include <utils/math/math.h>
 #include <nx/fusion/model_functions.h>
@@ -14,7 +15,7 @@ QN_DEFINE_LEXICAL_ENUM(AngleSpace,
     (Mm35EquivSpace,   "35MmEquiv")
 )
 
-typedef boost::array<QnSpaceMapperPtr<qreal>, 3> PtzMapperPart;
+typedef std::array<QnSpaceMapperPtr<qreal>, 3> PtzMapperPart;
 
 
 QnPtzMapper::QnPtzMapper(const QnSpaceMapperPtr<QVector3D> &inputMapper, const QnSpaceMapperPtr<QVector3D> &outputMapper):
@@ -61,10 +62,10 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnSpaceMapperPtr<q
 
     Qn::ExtrapolationMode extrapolationMode;
     QVector<qreal> device, logical;
-    qreal deviceMultiplier = 1.0, logicalMultiplier = 1.0; 
+    qreal deviceMultiplier = 1.0, logicalMultiplier = 1.0;
     AngleSpace space = DegreesSpace;
     if(
-        !QJson::deserialize(ctx, map, lit("extrapolationMode"), &extrapolationMode) || 
+        !QJson::deserialize(ctx, map, lit("extrapolationMode"), &extrapolationMode) ||
         !QJson::deserialize(ctx, map, lit("device"), &device) ||
         !QJson::deserialize(ctx, map, lit("logical"), &logical) ||
         !QJson::deserialize(ctx, map, lit("deviceMultiplier"), &deviceMultiplier, true) ||
@@ -82,7 +83,7 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnSpaceMapperPtr<q
     }
 
     if(space == Mm35EquivSpace) {
-        /* What is linear in 35mm-equiv space is non-linear in degrees, 
+        /* What is linear in 35mm-equiv space is non-linear in degrees,
          * so we compensate by inserting additional data points. */
         while(logical.size() < 16) {
             for(int i = logical.size() - 2; i >= 0; i--) {
@@ -115,7 +116,7 @@ bool deserialize(QnJsonContext *ctx, const QJsonValue &value, PtzMapperPart *tar
 
     PtzMapperPart local;
     if(
-        !QJson::deserialize(ctx, map, lit("x"), &local[0], true) || 
+        !QJson::deserialize(ctx, map, lit("x"), &local[0], true) ||
         !QJson::deserialize(ctx, map, lit("y"), &local[1], true) ||
         !QJson::deserialize(ctx, map, lit("z"), &local[2], true)
     ) {

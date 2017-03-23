@@ -1,7 +1,8 @@
-#ifndef QN_ADVANCED_SETTINGS_WIDGET_H
-#define QN_ADVANCED_SETTINGS_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
+
+#include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -44,5 +45,3 @@ private:
     /* Flag if we can edit the quality settings (for isSecondStreamEnabled() function).  */
     bool m_qualityEditable;
 };
-
-#endif // QN_ADVANCED_SETTINGS_WIDGET_H

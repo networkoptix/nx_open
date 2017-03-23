@@ -112,7 +112,6 @@ namespace {
     bool qn_commonMetaTypes_initialized = false;
 }
 
-QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::Corner)
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ResourceInfoLevel);
 
 void QnCommonMetaTypes::initialize() {
@@ -256,9 +255,6 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnMediaDewarpingParams>();
     qRegisterMetaType<QnItemDewarpingParams>();
-
-    qRegisterMetaType<Qn::Corner>();
-    qRegisterMetaTypeStreamOperators<Qn::Corner>();
 
     qRegisterMetaType<QnConnectionInfo>();
     qRegisterMetaType<Qn::PanicMode>();

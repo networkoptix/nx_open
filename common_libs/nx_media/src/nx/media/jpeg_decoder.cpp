@@ -18,22 +18,19 @@ public:
 //-------------------------------------------------------------------------------------------------
 // JpegDecoder
 
-JpegDecoder::JpegDecoder(const ResourceAllocatorPtr& allocator, const QSize& resolution)
+JpegDecoder::JpegDecoder(const ResourceAllocatorPtr& /*allocator*/, const QSize& /*resolution*/)
 :
     d_ptr(new JpegDecoderPrivate())
 {
-    QN_UNUSED(allocator, resolution);
 }
 
-bool JpegDecoder::isCompatible(const AVCodecID codec, const QSize& resolution)
+bool JpegDecoder::isCompatible(const AVCodecID codec, const QSize& /*resolution*/)
 {
-    Q_UNUSED(resolution);
     return codec == AV_CODEC_ID_MJPEG;
 }
 
-QSize JpegDecoder::maxResolution(const AVCodecID codec)
+QSize JpegDecoder::maxResolution(const AVCodecID /*codec*/)
 {
-    QN_UNUSED(codec);
     return QSize();
 }
 

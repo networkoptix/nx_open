@@ -809,7 +809,17 @@
     "QnCloudStatusPanel": {
         "palette": { "default": { "window": "dark8" } }
     },
-        
+
+    "QnSoftwareTriggerButton": {
+        "palette": {
+            "default": {
+                "window": "dark1.setAlpha(128)",
+                "highlight": "brand_core.setAlpha(179)",
+                "dark": "brand_core.setAlpha(128)"
+            }
+        }
+    },
+
     "QnAuditLogModel": {
         "colors": {
             "httpLink": "brand_d2",

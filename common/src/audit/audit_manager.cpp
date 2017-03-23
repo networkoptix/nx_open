@@ -2,6 +2,8 @@
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include "api/global_settings.h"
+
+#include <nx/utils/datetime.h>
 #include <nx/utils/log/assert.h>
 
 namespace

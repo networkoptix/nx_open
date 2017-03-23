@@ -16,11 +16,22 @@
 #include "actions.h"
 
 namespace Qn {
-    enum MatchMode {
-        Any,            /**< Match if at least one resource satisfies the criterion. */
-        All,            /**< Match only if all resources satisfy the criterion. */
-        ExactlyOne      /**< Match only if exactly one resource satisfies condition. */
-    };
+
+enum MatchMode
+{
+    Any,            /**< Match if at least one resource satisfies the criterion. */
+    All,            /**< Match only if all resources satisfy the criterion. */
+    ExactlyOne      /**< Match only if exactly one resource satisfies condition. */
+};
+
+enum TimePeriodType
+{
+    NullTimePeriod = 0x1,  /**< No period. */
+    EmptyTimePeriod = 0x2,  /**< Period of zero length. */
+    NormalTimePeriod = 0x4,  /**< Normal period with non-zero length. */
+};
+Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType)
+Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes)
 
 } // namespace Qn
 
@@ -421,7 +432,11 @@ public:
 class QnTimePeriodActionCondition: public QnActionCondition
 {
 public:
-    QnTimePeriodActionCondition(Qn::TimePeriodTypes periodTypes, Qn::ActionVisibility nonMatchingVisibility, QObject *parent):
+    QnTimePeriodActionCondition(
+        Qn::TimePeriodTypes periodTypes,
+        Qn::ActionVisibility nonMatchingVisibility,
+        QObject *parent)
+        :
         QnActionCondition(parent),
         m_periodTypes(periodTypes),
         m_nonMatchingVisibility(nonMatchingVisibility)

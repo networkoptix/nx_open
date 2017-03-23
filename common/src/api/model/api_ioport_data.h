@@ -1,5 +1,6 @@
-#ifndef __IOPORT_DATA_H_
-#define __IOPORT_DATA_H_
+#pragma once
+
+#include <common/common_globals.h>
 
 #include <nx/utils/uuid.h>
 #include <nx/fusion/model_functions_fwd.h>
@@ -31,7 +32,7 @@ struct QnCameraPortsData
     QnIOPortDataList ports;
 };
 #define QnCameraPortsData_Fields (id)(ports)
-    
+
 struct QnIOStateData
 {
     QnIOStateData(): isActive(false), timestamp(0) {}
@@ -56,5 +57,3 @@ typedef std::vector<QnCameraIOStateData> QnCameraIOStateDataList;
 #define QnCameraIOStateData_Fields (id)(state)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((QnIOPortData)(QnCameraPortsData)(QnIOStateData)(QnCameraIOStateData), (json)(ubjson)(eq))
-
-#endif  //__IOPORT_DATA_H_

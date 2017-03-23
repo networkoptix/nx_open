@@ -1,6 +1,7 @@
 #include "camera_advanced_settings_widget.h"
 #include "ui_camera_advanced_settings_widget.h"
 
+#include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QNetworkReply>
 
 #include <api/app_server_connection.h>

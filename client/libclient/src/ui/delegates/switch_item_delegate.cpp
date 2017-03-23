@@ -48,10 +48,9 @@ void QnSwitchItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& 
     }
 }
 
-QSize QnSwitchItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
+QSize QnSwitchItemDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const QModelIndex& /*index*/) const
 {
-    QN_UNUSED(option, index);
-    const int kFocusFrameMargin = 2;
+    static const int kFocusFrameMargin = 2;
     return style::Metrics::kStandaloneSwitchSize + QSize(style::Metrics::kSwitchMargin, kFocusFrameMargin) * 2;
 }
 

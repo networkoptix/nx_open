@@ -41,6 +41,7 @@ class QnTcpListener;
 static const int kMaxProxyTtl = 8;
 static const std::chrono::milliseconds kIoTimeout = std::chrono::minutes(16);
 static const std::chrono::milliseconds kPollTimeout = std::chrono::milliseconds(1);
+static const int kReadBufferSize = 1024 * 128; /* ~ 1 gbit/s */
 
 // ----------------------------- QnProxyConnectionProcessor ----------------------------
 
@@ -247,6 +248,18 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
     return true;
 }
 
+void QnProxyConnectionProcessor::cleanupProxyInfo(nx_http::Request* request)
+{
+    static const char* kProxyHeadersPrefix = "Proxy-";
+
+    auto itr = request->headers.lower_bound(kProxyHeadersPrefix);
+    while (itr != request->headers.end() && itr->first.startsWith(kProxyHeadersPrefix))
+        itr = request->headers.erase(itr);
+
+    request->requestLine.url = request->requestLine.url.toString(
+        QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority);
+}
+
 bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstRoute)
 {
     Q_D(QnProxyConnectionProcessor);
@@ -358,11 +371,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 
         // No dst route Id means proxy to external resource.
         // All proxy hops have already been passed. Remove proxy-auth header.
-        // TODO: HTTP RFC declares some other proxy headers which should not be passed to a target
-        // server.We probably should remove all headers starting with 'Proxy-'
-        auto itr = d->request.headers.find("Proxy-Authorization");
-        if (itr != d->request.headers.end())
-            d->request.headers.erase(itr);
+        cleanupProxyInfo(&d->request);
     }
 
     if (!dstRoute.id.isNull() && dstRoute.id != qnCommon->moduleGUID())
@@ -488,12 +497,10 @@ void QnProxyConnectionProcessor::run()
         d->socket->close();
 }
 
-static const size_t READ_BUFFER_SIZE = 1024*64;
-
 void QnProxyConnectionProcessor::doRawProxy()
 {
     Q_D(QnProxyConnectionProcessor);
-    nx::Buffer buffer(READ_BUFFER_SIZE, Qt::Uninitialized);
+    nx::Buffer buffer(kReadBufferSize, Qt::Uninitialized);
 
     // NOTE: Poll set would be more effective than a busy loop, but we can not use it because
     //     SSL sockets do not support it properly.
@@ -519,7 +526,7 @@ void QnProxyConnectionProcessor::doRawProxy()
 void QnProxyConnectionProcessor::doSmartProxy()
 {
     Q_D(QnProxyConnectionProcessor);
-    nx::Buffer buffer(READ_BUFFER_SIZE, Qt::Uninitialized);
+    nx::Buffer buffer(kReadBufferSize, Qt::Uninitialized);
     d->clientRequest.clear();
 
     // NOTE: Poll set would be more effective than a busy loop, but we can not use it because
@@ -555,7 +562,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
                     d->dstSocket->send(d->clientRequest);
                     if (isWebSocket)
                     {
-                        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), READ_BUFFER_SIZE, nullptr))
+                        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), kReadBufferSize, nullptr))
                             return; // send rest of data
 
                         doRawProxy(); // switch to binary mode
@@ -588,7 +595,7 @@ void QnProxyConnectionProcessor::doSmartProxy()
         }
 
         bool someBytesRead2 = false;
-        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), READ_BUFFER_SIZE, &someBytesRead2))
+        if (!doProxyData(d->dstSocket.data(), d->socket.data(), buffer.data(), kReadBufferSize, &someBytesRead2))
             return;
 
         if (!someBytesRead1 && !someBytesRead2)

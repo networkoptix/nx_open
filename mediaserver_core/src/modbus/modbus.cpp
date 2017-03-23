@@ -124,16 +124,14 @@ QString ModbusResponse::getExceptionString() const
     return exceptionDescriptionByCode(exceptionFunctionCode);
 }
 
-QByteArray ModbusIdRequestData::encode(const ModbusIdRequestData& request)
+QByteArray ModbusIdRequestData::encode(const ModbusIdRequestData& /*request*/)
 {
-    QN_UNUSED(request);
     NX_ASSERT(false, "ModbusIdRequestData::encode is not implemented");
     return QByteArray();
 }
 
-ModbusIdResponseData ModbusIdResponseData::decode(const QByteArray& response)
+ModbusIdResponseData ModbusIdResponseData::decode(const QByteArray& /*response*/)
 {
-    QN_UNUSED(response);
     NX_ASSERT(false, "ModbusIdResponseData::decode is not implemented");
     return ModbusIdResponseData();
 }

@@ -1,8 +1,7 @@
-
 #include <thread>
 
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/stun/async_client.h>
@@ -25,30 +24,44 @@ class TestServer:
 {
 public:
     TestServer(const nx::stun::MessageDispatcher& dispatcher):
-        SocketServer(&dispatcher, false)
+        SocketServer(&dispatcher, false),
+        m_totalConnectionsAccepted(0)
     {
     }
 
     virtual ~TestServer() override
     {
         pleaseStopSync();
-        for (auto& connection: connections)
+        for (auto& connection: m_connections)
         {
             connection->pleaseStopSync();
             connection.reset();
         }
     }
 
-    std::vector<std::shared_ptr<ServerConnection>> connections;
+    std::size_t totalConnectionsAccepted() const
+    {
+        return m_totalConnectionsAccepted.load();
+    }
+
+    std::vector<std::shared_ptr<ServerConnection>>& connections()
+    {
+        return m_connections;
+    }
 
 protected:
     virtual std::shared_ptr<ServerConnection> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) override
     {
+        ++m_totalConnectionsAccepted;
         auto connection = SocketServer::createConnection(std::move(_socket));
-        connections.push_back(connection);
+        m_connections.push_back(connection);
         return connection;
     };
+
+private:
+    std::atomic<std::size_t> m_totalConnectionsAccepted;
+    std::vector<std::shared_ptr<ServerConnection>> m_connections;
 };
 
 class StunClientServerTest:
@@ -106,7 +119,7 @@ protected:
     SystemError::ErrorCode sendIndicationSync(int method)
     {
         utils::TestSyncQueue<SystemError::ErrorCode> sendWaiter;
-        const auto connection = server->connections.front();
+        const auto connection = server->connections().front();
         connection->sendMessage(
             Message(Header(MessageClass::indication, method)),
             sendWaiter.pusher());
@@ -140,11 +153,11 @@ TEST_F(StunClientServerTest, Connectivity)
         SystemError::timedOut)); //< No server to connect.
 
     startServer(address);
-    EXPECT_EQ(sendTestRequestSync(), SystemError::noError);
-    EXPECT_EQ(1U, server->connectionCount());
+    ASSERT_EQ(SystemError::noError, sendTestRequestSync());
+    ASSERT_EQ(1U, server->connectionCount());
 
     server.reset();
-    EXPECT_NE(sendTestRequestSync(), SystemError::noError);
+    ASSERT_NE(SystemError::noError, sendTestRequestSync());
 
     client->addOnReconnectedHandler(reconnectHandler);
 
@@ -153,29 +166,34 @@ TEST_F(StunClientServerTest, Connectivity)
 
     // There might be a small delay before server creates connection from accepted socket.
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    EXPECT_EQ(1U, server->connectionCount());
+    ASSERT_EQ(1U, server->connectionCount());
 
-    client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
+    ASSERT_TRUE(client->addConnectionTimer(timerPeriod, incrementTimer, nullptr));
     std::this_thread::sleep_for(timerPeriod * 5);
-    EXPECT_GT(timerTicks, 3U); //< Expect at least 3 timer ticks in 5 periods.
+    ASSERT_GT(timerTicks, 3U); //< Expect at least 3 timer ticks in 5 periods.
 
     server.reset();
-    EXPECT_NE(sendTestRequestSync(), SystemError::noError);
+    ASSERT_NE(sendTestRequestSync(), SystemError::noError);
     timerTicks = 0;
 
     // Wait some time so client will retry to connect again and again.
     std::this_thread::sleep_for(defaultSettings().reconnectPolicy.initialDelay * 5);
-    EXPECT_EQ(0U, timerTicks); //< Timer does not tick while connection is brocken;
+    ASSERT_EQ(0U, timerTicks); //< Timer does not tick while connection is broken;
 
     startServer(address);
     reconnectEvents.pop(); // Automatic reconnect is expected, again.
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    EXPECT_EQ(1U, server->connectionCount());
+    while (server->totalConnectionsAccepted() == 0)
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    ASSERT_EQ(1U, server->connectionCount()) << 
+        "Total connections accepted: " << server->totalConnectionsAccepted();
 
-    client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);
+    ASSERT_TRUE(client->addConnectionTimer(timerPeriod, incrementTimer, nullptr)) <<
+        "Server connection count " << server->connectionCount();
     std::this_thread::sleep_for(timerPeriod * 5);
-    EXPECT_GT(timerTicks, 3U); //< Expect at least 3 timer ticks in 5 periods.
+    // Expect at least 3 timer ticks in 5 periods.
+    ASSERT_GT(timerTicks, 3U) <<
+        "Server connection count " << server->connectionCount();
 }
 
 TEST_F(StunClientServerTest, RequestResponse)

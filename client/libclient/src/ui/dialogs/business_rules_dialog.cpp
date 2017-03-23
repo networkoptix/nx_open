@@ -43,6 +43,7 @@
 #include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
 #include <utils/common/event_processors.h>
+#include <utils/common/delayed.h>
 
 using boost::algorithm::any_of;
 
@@ -176,6 +177,10 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
 {
     ui->setupUi(this);
     retranslateUi();
+
+    setWindowFlags(windowFlags()
+        | Qt::WindowMaximizeButtonHint
+        | Qt::MaximizeUsingFullscreenGeometryHint);
 
     QnSnappedScrollBar *scrollBar = new QnSnappedScrollBar(this);
     ui->tableView->setVerticalScrollBar(scrollBar->proxyScrollBar());
@@ -358,6 +363,9 @@ void QnBusinessRulesDialog::showEvent( QShowEvent *event )
     base_type::showEvent(event);
     if (SortRulesProxyModel* sortModel = dynamic_cast<SortRulesProxyModel*>(ui->tableView->model()))
         sortModel->sort(ui->tableView->horizontalHeader()->sortIndicatorSection(), ui->tableView->horizontalHeader()->sortIndicatorOrder());
+
+    ui->tableView->setCurrentIndex(QModelIndex());
+    ui->filterLineEdit->setFocus();
 }
 
 
@@ -448,13 +456,23 @@ void QnBusinessRulesDialog::at_resources_deleted( int handle, ec2::ErrorCode err
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
+void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous)
+{
     Q_UNUSED(previous)
 
-    QnBusinessRuleViewModelPtr ruleModel = m_rulesViewModel->rule(current);
-    m_currentDetailsWidget->setModel(ruleModel);
+    const auto handleRowChanged =
+        [this, current]()
+        {
+            QnBusinessRuleViewModelPtr ruleModel = m_rulesViewModel->rule(current);
+            m_currentDetailsWidget->setModel(ruleModel);
+            updateControlButtons();
+        };
 
-    updateControlButtons();
+    /**
+     * Fixes QT bug when we able to select multiple rows even if we set single selection mode.
+     * See VMS-5799.
+     */
+    executeDelayedParented(handleRowChanged, 0, this);
 }
 
 void QnBusinessRulesDialog::at_tableViewport_resizeEvent() {

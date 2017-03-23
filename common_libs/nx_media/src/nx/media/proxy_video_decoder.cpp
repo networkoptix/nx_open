@@ -1,20 +1,23 @@
 #include "proxy_video_decoder.h"
 #if defined(ENABLE_PROXY_DECODER)
 
-#define OUTPUT_PREFIX "ProxyVideoDecoder: "
-#include "proxy_video_decoder_utils.h"
+#include <nx/utils/debug_utils.h>
 
-#include "proxy_video_decoder_private.h"
+#include "proxy_video_decoder_utils.h"
+#include "proxy_video_decoder_impl.h"
 
 namespace nx {
 namespace media {
 
 namespace {
 
-static ProxyVideoDecoderPrivate* createProxyVideoDecoderPrivate(
-    const ProxyVideoDecoderPrivate::Params& params)
+static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder: ";
+
+static ProxyVideoDecoderImpl* createProxyVideoDecoderImpl(
+    const ProxyVideoDecoderImpl::Params& params)
 {
     int flagsCount =
+        (int) conf.implStub +
         (int) conf.implDisplay +
         (int) conf.implRgb +
         (int) conf.implYuvPlanar +
@@ -24,27 +27,27 @@ static ProxyVideoDecoderPrivate* createProxyVideoDecoderPrivate(
     if (flagsCount > 1)
     {
         PRINT << "More than one impl... configuration flag is set; using STUB w/o libproxydecoder";
-        return ProxyVideoDecoderPrivate::createImplStub(params);
+        return ProxyVideoDecoderImpl::createImplStub(params);
     }
 
     if (flagsCount == 0)
     {
         PRINT << "No impl... configuration flag is set; using STUB w/o libproxydecoder";
-        return ProxyVideoDecoderPrivate::createImplStub(params);
+        return ProxyVideoDecoderImpl::createImplStub(params);
     }
 
     if (conf.implStub)
-        return ProxyVideoDecoderPrivate::createImplStub(params);
+        return ProxyVideoDecoderImpl::createImplStub(params);
     if (conf.implDisplay)
-        return ProxyVideoDecoderPrivate::createImplDisplay(params);
+        return ProxyVideoDecoderImpl::createImplDisplay(params);
     if (conf.implRgb)
-        return ProxyVideoDecoderPrivate::createImplRgb(params);
+        return ProxyVideoDecoderImpl::createImplRgb(params);
     if (conf.implYuvPlanar)
-        return ProxyVideoDecoderPrivate::createImplYuvPlanar(params);
+        return ProxyVideoDecoderImpl::createImplYuvPlanar(params);
     if (conf.implYuvNative)
-        return ProxyVideoDecoderPrivate::createImplYuvNative(params);
+        return ProxyVideoDecoderImpl::createImplYuvNative(params);
     if (conf.implGl)
-        return ProxyVideoDecoderPrivate::createImplGl(params);
+        return ProxyVideoDecoderImpl::createImplGl(params);
 
     NX_CRITICAL(false);
     return nullptr; //< Warning suppress.
@@ -63,11 +66,11 @@ ProxyVideoDecoder::ProxyVideoDecoder(
 
     conf.reload();
 
-    ProxyVideoDecoderPrivate::Params params;
+    ProxyVideoDecoderImpl::Params params;
     params.owner = this;
     params.allocator = allocator;
     params.resolution = resolution;
-    d.reset(createProxyVideoDecoderPrivate(params));
+    d.reset(createProxyVideoDecoderImpl(params));
 }
 
 ProxyVideoDecoder::~ProxyVideoDecoder()
@@ -103,7 +106,7 @@ bool ProxyVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resolut
     if (resolution.width() > maxRes.width() || resolution.height() > maxRes.height())
     {
         OUTPUT << "isCompatible(codec: " << codec << ", resolution: " << resolution
-            << ") -> false: resolution is higher than " 
+            << ") -> false: resolution is higher than "
             << maxRes.width() << " x " << maxRes.height();
         return false;
     }

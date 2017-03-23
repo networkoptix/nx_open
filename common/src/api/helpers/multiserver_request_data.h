@@ -2,6 +2,8 @@
 
 #include <QUrlQuery>
 
+#include <common/common_globals.h>
+
 #include <utils/common/request_param.h>
 
 struct QnMultiserverRequestData

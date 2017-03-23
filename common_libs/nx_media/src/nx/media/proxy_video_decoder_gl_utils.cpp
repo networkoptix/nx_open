@@ -1,14 +1,14 @@
+#include "proxy_video_decoder_gl_utils.h"
 #if defined(ENABLE_PROXY_DECODER)
 
-#define OUTPUT_PREFIX "ProxyVideoDecoder[gl_utils]: "
-#include "proxy_video_decoder_utils.h"
-
-#include "proxy_video_decoder_gl_utils.h" //< Should be included after proxy_video_decoder_utils.h
+#include <nx/utils/debug_utils.h>
 
 namespace nx {
 namespace media {
 
 namespace {
+
+constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder[gl_utils]: ";
 
 static const char* glFramebufferStatusStr(GLenum status)
 {
@@ -93,6 +93,8 @@ void outputGlFbo(const char* tag)
         OUTPUT << tag << ": current FBO ==" << curFbo;
     }
 }
+
+constexpr const char* FboManager::OUTPUT_PREFIX;
 
 void checkGlFramebufferStatus()
 {

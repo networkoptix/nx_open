@@ -1,7 +1,7 @@
-#ifndef MERGE_SYSTEMS_DIALOG_H
-#define MERGE_SYSTEMS_DIALOG_H
+#pragma once
 
 #include <QtWidgets/QDialog>
+#include <QtNetwork/QAuthenticator>
 
 #include <core/resource/resource_fwd.h>
 #include <utils/merge_systems_common.h>
@@ -59,5 +59,3 @@ private:
     QAuthenticator m_remoteOwnerCredentials;
     bool m_successfullyFinished;
 };
-
-#endif // MERGE_SYSTEMS_DIALOG_H

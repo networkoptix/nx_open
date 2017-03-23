@@ -93,6 +93,7 @@ public:
         std::shared_ptr<const SerializableAbstractTransaction> transactionSerializer);
 
     api::VmsConnectionDataList getVmsConnections() const;
+    std::size_t getVmsConnectionCount() const;
     bool isSystemConnected(const std::string& systemId) const;
 
     unsigned int getConnectionCountBySystemId(const nx::String& systemId) const;
@@ -102,7 +103,6 @@ public:
         nx::utils::MoveOnlyFunc<void()> completionHandler);
 
     SystemStatusChangedSubscription& systemStatusChangedSubscription();
-    const SystemStatusChangedSubscription& systemStatusChangedSubscription() const;
 
 private:
     class FullPeerName
@@ -177,12 +177,12 @@ private:
     
     template<int connectionIndexNumber, typename ConnectionKeyType>
         void removeExistingConnection(
-            QnMutexLockerBase* const /*lock*/,
+            const QnMutexLockerBase& /*lock*/,
             ConnectionKeyType connectionKey);
     
     template<typename ConnectionIndex, typename Iterator, typename CompletionHandler>
     void removeConnectionByIter(
-        QnMutexLockerBase* const /*lock*/,
+        const QnMutexLockerBase& /*lock*/,
         ConnectionIndex& connectionIndex,
         Iterator connectionIterator,
         CompletionHandler completionHandler);

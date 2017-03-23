@@ -19,6 +19,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <nx/utils/log/log.h>
 #include <core/resource/param.h>
+#include "acti_resource_searcher.h"
 
 const QString QnActiResource::MANUFACTURE(lit("ACTI"));
 const QString QnActiResource::CAMERA_PARAMETER_GROUP_ENCODER(lit("encoder"));
@@ -583,6 +584,10 @@ CameraDiagnostics::Result QnActiResource::initInternal()
     setProperty(Qn::IS_AUDIO_SUPPORTED_PARAM_NAME, m_hasAudio ? 1 : 0);
     setProperty(Qn::MAX_FPS_PARAM_NAME, getMaxFps());
     setProperty(Qn::HAS_DUAL_STREAMING_PARAM_NAME, !m_resolution[1].isEmpty() ? 1 : 0);
+    QString serialNumber = report.value(QnActiResourceSearcher::kSystemInfoProductionIdParamName);
+    if (!serialNumber.isEmpty())
+        setProperty(QnActiResourceSearcher::kSystemInfoProductionIdParamName, serialNumber);
+
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();

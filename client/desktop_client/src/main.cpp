@@ -17,17 +17,21 @@
 
 #include <iostream>
 
-#include <client/self_updater.h>
-
 #include <QtCore/QString>
 #include <QtCore/QDir>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonDocument>
+#include <QtCore/QSettings>
 
 #include <QtGui/QDesktopServices>
+#include <QtGui/QWindow>
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
+
+#include <QtOpenGL/QGLWidget>
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
@@ -38,8 +42,8 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
-
 #include <client/client_startup_parameters.h>
+#include <client/self_updater.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/timer_manager.h>
@@ -66,6 +70,8 @@
 #include <utils/common/util.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
+
+#include <plugins/io_device/joystick/joystick_manager.h>
 
 namespace
 {
@@ -148,6 +154,11 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     Qt::WindowFlags flags = qnRuntime->isVideoWallMode()
         ? Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint
         : static_cast<Qt::WindowFlags>(0);
+
+    // todo: remove it. VMS-5837
+    using namespace nx::client::plugins::io_device;
+    std::unique_ptr<joystick::Manager> joystickManager(new joystick::Manager(context.data()));
+
     QScopedPointer<QnMainWindow> mainWindow(new QnMainWindow(context.data(), NULL, flags));
     context->setMainWindow(mainWindow.data());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
@@ -177,6 +188,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
         }
     }
     mainWindow->show();
+    joystickManager->start();
     if (customScreen)
     {
         /* We must handle 'move' event _before_ we activate fullscreen. */
