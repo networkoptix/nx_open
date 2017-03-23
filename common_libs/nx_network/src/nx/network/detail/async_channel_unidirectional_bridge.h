@@ -61,14 +61,12 @@ class AsyncChannelUnidirectionalBridge
 public:
     AsyncChannelUnidirectionalBridge(
         SourcePtr& source,
-        DestinationPtr& destination,
-        std::size_t readBufferSize,
-        std::size_t maxSendQueueSizeBytes)
+        DestinationPtr& destination)
         :
         m_source(source),
         m_destination(destination),
-        m_readBufferSize(readBufferSize),
-        m_maxSendQueueSizeBytes(maxSendQueueSizeBytes),
+        m_readBufferSize(16*1024),
+        m_maxSendQueueSizeBytes(128*1024),
         m_isReading(false),
         m_isSourceOpened(true),
         m_sourceClosureReason(SystemError::noError)
@@ -76,14 +74,21 @@ public:
         m_readBuffer.reserve((int)m_readBufferSize);
     }
 
-    void start()
+    void setReadBufferSize(std::size_t readBufferSize)
     {
-        scheduleRead();
+        m_readBufferSize = readBufferSize;
+        m_readBuffer.reserve((int)m_readBufferSize);
     }
 
-    void setOnDone(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    void setMaxSendQueueSizeBytes(std::size_t maxSendQueueSizeBytes)
     {
-        m_onDoneHandler = std::move(handler);
+        m_maxSendQueueSizeBytes = maxSendQueueSizeBytes;
+    }
+
+    void start(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> doneHandler)
+    {
+        m_onDoneHandler = std::move(doneHandler);
+        scheduleRead();
     }
 
     void setOnSomeActivity(nx::utils::MoveOnlyFunc<void()> handler)
@@ -100,8 +105,8 @@ private:
 
     SourcePtr& m_source;
     DestinationPtr& m_destination;
-    const std::size_t m_readBufferSize;
-    const std::size_t m_maxSendQueueSizeBytes;
+    std::size_t m_readBufferSize;
+    std::size_t m_maxSendQueueSizeBytes;
     nx::Buffer m_readBuffer;
     BufferQueue m_sendQueue;
     bool m_isReading;

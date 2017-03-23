@@ -14,6 +14,21 @@
 namespace nx {
 namespace network {
 
+/**
+ * Bridge between two asynchronous channels (e.g., sockets).
+ * Reads data from both channels and writes to another one.
+ * Seeks for loading both channels simultaneously regardless 
+ *   of channel speed difference to maximize throughput.
+ * Supports:
+ * - Inactivity timeout.
+ * - Limit on size of data waiting to be written.
+ *
+ * Example of usage:
+ * @code {*.cpp}
+ *   auto bridge = nx::network::makeAsyncChannelBridge(socket1, socket2);
+ *   bridge->start(functor_executed_on_bridge_closure);
+ * @endcode
+ */
 class AsyncChannelBridge:
     public aio::BasicPollable
 {
@@ -23,9 +38,10 @@ public:
 
     virtual ~AsyncChannelBridge() override = default;
 
-    virtual void start() = 0;
-    virtual void setOnDone(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) = 0;
+    virtual void setReadBufferSize(std::size_t readBufferSize) = 0;
+    virtual void setMaxSendQueueSizeBytes(std::size_t maxSendQueueSizeBytes) = 0;
     virtual void setInactivityTimeout(std::chrono::milliseconds) = 0;
+    virtual void start(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> doneHandler) = 0;
 };
 
 template<typename LeftFile, typename RightFile>
@@ -61,25 +77,37 @@ public:
         m_timer.bindToAioThread(aioThread);
     }
 
-    virtual void start() override
+    virtual void setReadBufferSize(std::size_t readBufferSize) override
     {
-        post(
-            [this]()
-            {
-                m_leftToRight->start();
-                m_rightToLeft->start();
-                startInactivityTimerIfNeeded();
-            });
+        m_leftToRight->setReadBufferSize(readBufferSize);
+        m_rightToLeft->setReadBufferSize(readBufferSize);
     }
 
-    virtual void setOnDone(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
+    virtual void setMaxSendQueueSizeBytes(std::size_t maxSendQueueSizeBytes) override
     {
-        m_onDoneHandler = std::move(handler);
+        m_leftToRight->setMaxSendQueueSizeBytes(maxSendQueueSizeBytes);
+        m_rightToLeft->setMaxSendQueueSizeBytes(maxSendQueueSizeBytes);
     }
 
     virtual void setInactivityTimeout(std::chrono::milliseconds timeout) override
     {
         m_inactivityTimeout = timeout;
+    }
+
+    virtual void start(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> doneHandler) override
+    {
+        using namespace std::placeholders;
+
+        m_onDoneHandler = std::move(doneHandler);
+        post(
+            [this]()
+            {
+                m_leftToRight->start(
+                    std::bind(&AsyncChannelBridgeImpl::handleChannelClosure, this, _1));
+                m_rightToLeft->start(
+                    std::bind(&AsyncChannelBridgeImpl::handleChannelClosure, this, _1));
+                startInactivityTimerIfNeeded();
+            });
     }
 
 private:
@@ -121,14 +149,9 @@ private:
         *channel =
             std::make_unique<detail::AsyncChannelUnidirectionalBridge<Source, Destination>>(
                 *source,
-                *destination,
-                AsyncChannelBridge::kDefaultReadBufferSize,
-                AsyncChannelBridge::kDefaultMaxSendQueueSizeBytes);
-        (*channel)->setOnDone(
-            [this](SystemError::ErrorCode sysErrorCode)
-            {
-                handleChannelClosure(sysErrorCode);
-            });
+                *destination);
+        (*channel)->setReadBufferSize(AsyncChannelBridge::kDefaultReadBufferSize);
+        (*channel)->setMaxSendQueueSizeBytes(AsyncChannelBridge::kDefaultMaxSendQueueSizeBytes);
         (*channel)->setOnSomeActivity([this]() { onSomeActivity(); });
     }
 

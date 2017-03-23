@@ -359,8 +359,6 @@ protected:
             m_rightSource.get(), &m_rightDest, TestAsyncChannel::InputDepletionPolicy::ignore);
 
         m_bridge = makeAsyncChannelBridge(m_leftFile.get(), m_rightFile.get());
-        m_bridge->setOnDone(
-            std::bind(&AsyncChannelBridge::onBridgeDone, this, std::placeholders::_1));
         if (m_inactivityTimeout)
             m_bridge->setInactivityTimeout(*m_inactivityTimeout);
     }
@@ -370,14 +368,14 @@ protected:
         if (!m_bridge)
             createChannel();
 
-        m_bridge->start();
+        m_bridge->start(std::bind(&AsyncChannelBridge::onBridgeDone, this, std::placeholders::_1));
     }
 
     void startExchangingInfiniteData()
     {
         initializeInfiniteDataInput();
         createChannel();
-        m_bridge->start();
+        m_bridge->start(std::bind(&AsyncChannelBridge::onBridgeDone, this, std::placeholders::_1));
     }
     
     void pauseRightDestination()
