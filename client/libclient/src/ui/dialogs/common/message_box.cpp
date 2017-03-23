@@ -178,12 +178,7 @@ int QnMessageBoxPrivate::execReturnCode(QAbstractButton* button) const
 }
 
 QnMessageBox::QnMessageBox(QWidget* parent):
-    base_type(parent,
-        Qt::Dialog
-            | Qt::MSWindowsFixedSizeDialogHint
-            | Qt::CustomizeWindowHint
-            | Qt::WindowTitleHint
-            | Qt::WindowCloseButtonHint),
+    base_type(parent, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint),
     ui(new Ui::MessageBox),
     d_ptr(new QnMessageBoxPrivate(this))
 {
