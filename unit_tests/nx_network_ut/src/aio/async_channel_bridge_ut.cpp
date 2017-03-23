@@ -546,8 +546,12 @@ class DummyAsyncChannel:
     public AbstractAsyncChannel
 {
 public:
-    DummyAsyncChannel(int* dummyChannelCount):
-        m_dummyChannelCount(dummyChannelCount)
+    DummyAsyncChannel(
+        int* dummyChannelCount,
+        int* pleaseStopCallCount)
+        :
+        m_dummyChannelCount(dummyChannelCount),
+        m_pleaseStopCallCount(pleaseStopCallCount)
     {
         ++(*m_dummyChannelCount);
     }
@@ -555,6 +559,11 @@ public:
     virtual ~DummyAsyncChannel() override
     {
         --(*m_dummyChannelCount);
+    }
+
+    virtual void pleaseStopSync(bool /*x*/ = false) override
+    {
+        ++(*m_pleaseStopCallCount);
     }
 
     virtual void readSomeAsync(
@@ -575,20 +584,39 @@ public:
 
 private:
     int* m_dummyChannelCount;
+    int* m_pleaseStopCallCount;
 };
 
 TEST_F(AioAsyncChannelBridge, takes_ownership_when_supplying_unique_ptr)
 {
     int dummyChannelCount = 0;
+    int pleaseStopCallCount = 0;
 
-    auto left = std::make_unique<DummyAsyncChannel>(&dummyChannelCount);
-    auto right = std::make_unique<DummyAsyncChannel>(&dummyChannelCount);
+    auto left = std::make_unique<DummyAsyncChannel>(&dummyChannelCount, &pleaseStopCallCount);
+    auto right = std::make_unique<DummyAsyncChannel>(&dummyChannelCount, &pleaseStopCallCount);
     ASSERT_EQ(2, dummyChannelCount);
 
     auto bridge = makeAsyncChannelBridge(std::move(left), std::move(right));
     bridge.reset();
 
+    ASSERT_EQ(2, pleaseStopCallCount);
     ASSERT_EQ(0, dummyChannelCount);
+}
+
+TEST_F(AioAsyncChannelBridge, channels_created_on_stack)
+{
+    int dummyChannelCount = 0;
+    int pleaseStopCallCount = 0;
+
+    DummyAsyncChannel left(&dummyChannelCount, &pleaseStopCallCount);
+    DummyAsyncChannel right(&dummyChannelCount, &pleaseStopCallCount);
+    ASSERT_EQ(2, dummyChannelCount);
+
+    auto bridge = makeAsyncChannelBridge(&left, &right);
+    bridge.reset();
+
+    ASSERT_EQ(2, dummyChannelCount);
+    ASSERT_EQ(2, pleaseStopCallCount);
 }
 
 } // namespace test
