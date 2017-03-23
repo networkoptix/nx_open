@@ -39,7 +39,7 @@ static const size_t RESPONSE_BUFFER_SIZE = 16 * 1024;
 constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultSendTimeout;
 constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultResponseReadTimeout;
 constexpr const std::chrono::seconds AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout;
-
+    
 constexpr int kMaxNumberOfRedirects = 5;
 
 AsyncHttpClient::Timeouts::Timeouts(
@@ -177,7 +177,7 @@ SystemError::ErrorCode AsyncHttpClient::lastSysErrorCode() const
 {
     if (m_lastSysErrorCode != SystemError::noError)
         return m_lastSysErrorCode;
-        // Ensuring system error code is always non-zero in case of failure 
+    // Ensuring system error code is always non-zero in case of failure 
     //  to simplify AsyncHttpClient user's life.
     return failed() ? SystemError::connectionReset : SystemError::noError;
 }
@@ -770,7 +770,7 @@ void AsyncHttpClient::processReceivedBytes(
         const size_t bytesParsed = parseReceivedBytes(bytesRead);
         QByteArray receivedBytesLeft;
         if (bytesParsed != (std::size_t)-1)
-                receivedBytesLeft = m_responseBuffer.mid((int)bytesParsed);
+            receivedBytesLeft = m_responseBuffer.mid((int)bytesParsed);
         m_responseBuffer.resize(0);
 
         bool continueReceiving = false;
@@ -963,7 +963,7 @@ bool AsyncHttpClient::repeatRequestIfNeeded(const Response& response)
 
             break;
         }
-
+            
         case StatusCode::proxyAuthenticationRequired:
         {
             if (!m_proxyAuthorizationTried &&
@@ -974,7 +974,7 @@ bool AsyncHttpClient::repeatRequestIfNeeded(const Response& response)
             }
             break;
         }
-
+            
         case StatusCode::found:
         case StatusCode::movedPermanently:
             return sendRequestToNewLocation(response);
@@ -1041,17 +1041,17 @@ void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
     const bool useHttp11 = true;   //TODO #ak check if we need it (e.g. we using keep-alive or requesting live capture)
 
     m_request.requestLine.method = httpMethod;
-    if (m_proxyEndpoint)
-        {
-        m_request.requestLine.url = m_contentLocationUrl;
-        }
-    else    //if no proxy specified then erasing http://host:port from request url
-        {
-            m_request.requestLine.url = m_contentLocationUrl.path();
-            m_request.requestLine.url.setQuery(m_contentLocationUrl.query());
-            m_request.requestLine.url.setFragment(m_contentLocationUrl.fragment());
-        }
 
+    if (m_proxyEndpoint)
+    {
+        m_request.requestLine.url = m_contentLocationUrl;
+    }
+    else    //if no proxy specified then erasing http://host:port from request url
+    {
+        m_request.requestLine.url = m_contentLocationUrl.path();
+        m_request.requestLine.url.setQuery(m_contentLocationUrl.query());
+        m_request.requestLine.url.setFragment(m_contentLocationUrl.fragment());
+    }
     m_request.requestLine.version = useHttp11 ? nx_http::http_1_1 : nx_http::http_1_0;
 
     nx_http::insertOrReplaceHeader(
@@ -1310,7 +1310,7 @@ struct SharedState
     nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler;
 };
 
-    } // namespace 
+} // namespace 
 
 template<typename ... Args>
 void AsyncHttpClient::doHttpOperation(

@@ -15,6 +15,7 @@ class QTabBar;
 class QBoxLayout;
 class QSpacerItem;
 class QToolButton;
+class QStackedWidget;
 
 class QnActionManager;
 class QnLayoutTabBar;

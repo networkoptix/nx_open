@@ -5,12 +5,16 @@
 #endif
 
 #include <QtCore/QFile>
+
+#include <QtGui/QFileOpenEvent>
+
+#include <QtNetwork/QNetworkReply>
+
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QDesktopWidget>
-#include <QtGui/QFileOpenEvent>
-#include <QtNetwork/QNetworkReply>
+#include <QtWidgets/QStackedWidget>
 
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>

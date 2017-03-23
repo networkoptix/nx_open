@@ -1,8 +1,6 @@
 #pragma once
 #if defined(ENABLE_PROXY_DECODER)
 
-// Should be included after proxy_video_decoder_utils.h (for OUTPUT_PREFIX).
-
 #include <memory>
 
 #include <QtGui/QOpenGLFramebufferObject>
@@ -10,6 +8,10 @@
 #include <QtGui/QOpenGLTexture>
 #include <EGL/egl.h>
 #include <EGL/eglext.h>
+
+#include <nx/utils/debug_utils.h>
+
+#include "proxy_video_decoder_utils.h"
 
 namespace nx {
 namespace media {
@@ -50,6 +52,8 @@ void checkGlError(QOpenGLFunctions* funcs, const char* tag);
     OUTPUT << "OpenGL " #OBJ " END"; \
 } while (0)
 
+//-------------------------------------------------------------------------------------------------
+
 void outputGlFbo(const char* tag);
 
 typedef std::shared_ptr<QOpenGLFramebufferObject> FboPtr;
@@ -57,8 +61,9 @@ typedef std::shared_ptr<QOpenGLFramebufferObject> FboPtr;
 class FboManager
 {
 public:
-    FboManager(const QSize& frameSize, int queueSize)
-    :
+    static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder[gl_utils]: ";
+
+    FboManager(const QSize& frameSize, int queueSize):
         m_frameSize(frameSize),
         m_index(0),
         m_queueSize(queueSize)

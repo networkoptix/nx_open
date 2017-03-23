@@ -1,12 +1,12 @@
 #include "storage_config_widget.h"
 #include "ui_storage_config_widget.h"
 
+#include <boost/range/algorithm/count_if.hpp>
+
 #include <api/global_settings.h>
 #include <api/model/storage_space_reply.h>
 #include <api/model/backup_status_reply.h>
 #include <api/model/rebuild_archive_reply.h>
-
-#include <boost/range/algorithm/count_if.hpp>
 
 #include <camera/camera_data_manager.h>
 #include <core/resource/client_storage_resource.h>
