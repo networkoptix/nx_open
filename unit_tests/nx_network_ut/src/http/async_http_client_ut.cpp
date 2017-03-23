@@ -285,96 +285,110 @@ TEST_F(AsyncHttpClientTest, motionJpegRetrieval)
     clients.clear();
 }
 
-TEST_F(AsyncHttpClientTest, MultiRequestTest)
+class AsyncHttpClientTestMultiRequest:
+    public AsyncHttpClientTest
 {
-    ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
-        "/test",
-        "SimpleTest",
-        "application/text"));
-    ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
-        "/test2",
-        "SimpleTest2",
-        "application/text"));
-    ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
-        "/test3",
-        "SimpleTest3",
-        "application/text"));
-    ASSERT_TRUE(testHttpServer()->bindAndListen());
-
-    const QUrl url(lit("http://127.0.0.1:%1/test")
-        .arg(testHttpServer()->serverAddress().port));
-    const QUrl url2(lit("http://127.0.0.1:%1/test2")
-        .arg(testHttpServer()->serverAddress().port));
-    const QUrl url3(lit("http://127.0.0.1:%1/test3")
-        .arg(testHttpServer()->serverAddress().port));
-
-    auto client = nx_http::AsyncHttpClient::create();
-
-    QByteArray expectedResponse;
-
-    QnMutex mutex;
-    QnWaitCondition waitCond;
-    bool requestFinished = false;
-
-    QObject::connect(
-        client.get(), &nx_http::AsyncHttpClient::done,
-        client.get(),
-        [&](nx_http::AsyncHttpClientPtr client)
-        {
-            ASSERT_FALSE(client->failed()) << "Response: " << 
-                (client->response() == nullptr
-                    ? std::string("null")
-                    : client->response()->statusLine.reasonPhrase.toStdString());
-            client->socket()->cancelIOSync(nx::network::aio::etNone);
-
-            ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
-            ASSERT_EQ(expectedResponse, client->fetchMessageBodyBuffer());
-            auto contentTypeIter = client->response()->headers.find("Content-Type");
-            ASSERT_TRUE(contentTypeIter != client->response()->headers.end());
-
-            QnMutexLocker lock(&mutex);
-            requestFinished = true;
-            waitCond.wakeAll();
-        },
-        Qt::DirectConnection);
-
-    static const int kWaitTimeoutMs = 1000 * 10;
-    // step 0: check if client reconnect smoothly if server already dropped connection
-    // step 1: check 2 requests in a row via same connection
-    for (int i = 0; i < 2; ++i)
+public:
+    AsyncHttpClientTestMultiRequest():
+        m_client(nx_http::AsyncHttpClient::create()),
+        m_requestFinished(false)
     {
-        std::cout<<"Using "<<(i != 0 ? "persistent" : "not persistent")<<" server connections"<<std::endl;
-
-        testHttpServer()->setPersistentConnectionEnabled(i != 0);
-
-        {
-            QnMutexLocker lock(&mutex);
-            requestFinished = false;
-            expectedResponse = "SimpleTest";
-            client->doGet(url);
-            while (!requestFinished)
-                ASSERT_TRUE(waitCond.wait(&mutex, kWaitTimeoutMs));
-        }
-
-        {
-            QnMutexLocker lock(&mutex);
-            requestFinished = false;
-            expectedResponse = "SimpleTest2";
-            client->doGet(url2);
-            while (!requestFinished)
-                ASSERT_TRUE(waitCond.wait(&mutex, kWaitTimeoutMs));
-        }
-
-        {
-            QnMutexLocker lock(&mutex);
-            requestFinished = false;
-            expectedResponse = "SimpleTest3";
-            client->doGet(url3);
-            while (!requestFinished)
-                ASSERT_TRUE(waitCond.wait(&mutex, kWaitTimeoutMs));
-        }
-
+        init();
     }
+
+protected:
+    void doRequest(const QUrl& url, const QByteArray& message)
+    {
+        static const int kWaitTimeoutMs = 1000 * 10;
+
+        QnMutexLocker lock(&m_mutex);
+        m_requestFinished = false;
+        m_expectedResponse = message;
+        m_client->doGet(url);
+        while (!m_requestFinished)
+            ASSERT_TRUE(m_waitCond.wait(&m_mutex, kWaitTimeoutMs));
+    }
+
+    void doMultipleRequestsReusingHttpClient()
+    {
+        for (const auto& ctx: m_requests)
+            doRequest(ctx.url, ctx.message);
+    }
+
+private:
+    struct TestRequestContext
+    {
+        QUrl url;
+        QByteArray message;
+    };
+
+    std::vector<TestRequestContext> m_requests;
+
+    nx_http::AsyncHttpClientPtr m_client;
+    QnMutex m_mutex;
+    QnWaitCondition m_waitCond;
+    bool m_requestFinished;
+    QByteArray m_expectedResponse;
+
+    void init()
+    {
+        m_requests.resize(3);
+        for (std::size_t i = 0; i < m_requests.size(); ++i)
+        {
+            m_requests[i].url = QUrl(
+                lit("http://127.0.0.1/AsyncHttpClientTestMultiRequest_%1").arg(i));
+            m_requests[i].message = lit("SimpleMessage_%1").arg(i).toLatin1();
+        }
+
+        for (const auto& ctx: m_requests)
+        {
+            ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
+                ctx.url.path(),
+                ctx.message,
+                "application/text"));
+        }
+
+        ASSERT_TRUE(testHttpServer()->bindAndListen());
+
+        for (auto& ctx: m_requests)
+            ctx.url.setPort(testHttpServer()->serverAddress().port);
+
+        QObject::connect(
+            m_client.get(), &nx_http::AsyncHttpClient::done,
+            m_client.get(),
+            [this](nx_http::AsyncHttpClientPtr client) { onDone(std::move(client)); },
+            Qt::DirectConnection);
+    }
+
+    void onDone(nx_http::AsyncHttpClientPtr client)
+    {
+        ASSERT_FALSE(client->failed()) << "Response: " <<
+            (client->response() == nullptr
+                ? std::string("null")
+                : client->response()->statusLine.reasonPhrase.toStdString());
+        client->socket()->cancelIOSync(nx::network::aio::etNone);
+
+        ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
+        ASSERT_EQ(m_expectedResponse, client->fetchMessageBodyBuffer());
+        auto contentTypeIter = client->response()->headers.find("Content-Type");
+        ASSERT_TRUE(contentTypeIter != client->response()->headers.end());
+
+        QnMutexLocker lock(&m_mutex);
+        m_requestFinished = true;
+        m_waitCond.wakeAll();
+    }
+};
+
+TEST_F(AsyncHttpClientTestMultiRequest, server_does_not_support_persistent_connections)
+{
+    testHttpServer()->setPersistentConnectionEnabled(false);
+    doMultipleRequestsReusingHttpClient();
+}
+
+TEST_F(AsyncHttpClientTestMultiRequest, server_supports_persistent_connections)
+{
+    testHttpServer()->setPersistentConnectionEnabled(true);
+    doMultipleRequestsReusingHttpClient();
 }
 
 TEST_F(AsyncHttpClientTest, ConnectionBreak)
