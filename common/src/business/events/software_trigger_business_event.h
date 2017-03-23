@@ -13,6 +13,9 @@ public:
     const QString& triggerId() const;
 
     virtual QnBusinessEventParameters getRuntimeParams() const override;
+    virtual QnBusinessEventParameters getRuntimeParamsEx(
+        const QnBusinessEventParameters& ruleEventParams) const override;
+
     virtual bool checkEventParams(const QnBusinessEventParameters &params) const override;
     virtual bool isEventStateMatched(QnBusiness::EventState state,
         QnBusiness::ActionType actionType) const override;

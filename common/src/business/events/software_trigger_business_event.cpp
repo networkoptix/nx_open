@@ -19,6 +19,15 @@ QnBusinessEventParameters QnSoftwareTriggerEvent::getRuntimeParams() const
     return params;
 }
 
+QnBusinessEventParameters QnSoftwareTriggerEvent::getRuntimeParamsEx(
+    const QnBusinessEventParameters& ruleEventParams) const
+{
+    auto params = getRuntimeParams();
+    params.caption = ruleEventParams.caption;
+    params.description = ruleEventParams.description;
+    return params;
+}
+
 bool QnSoftwareTriggerEvent::checkEventParams(const QnBusinessEventParameters& params) const
 {
     return m_triggerId == params.inputPortId;
