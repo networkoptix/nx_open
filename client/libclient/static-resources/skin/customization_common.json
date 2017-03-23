@@ -466,14 +466,6 @@
         }
     },
 
-    "QnNotificationsCollectionWidget": {
-        "palette": {
-            "default": {
-                "mid": "dark8"
-            }
-        }
-    },
-
     "QnResourceWidget": {
         "palette": {
             "default": {
@@ -762,12 +754,20 @@
         }
     },
 
+    "QnNotificationsCollectionWidget": {
+        "palette": {
+            "default": {
+                "mid": "dark8",
+                "windowText": "light10"
+            }
+        }
+    },
+
     "QnNotificationWidget" : {
         "_": "'dark' is used to paint horizontal line, 'alternateBase' - to paint More Notifications",
         "palette": {
             "default": {
                 "dark": "dark6",
-                "windowText": "light10",
                 "alternateBase": "dark17"
             }
         }

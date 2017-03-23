@@ -609,5 +609,5 @@ QString QnBusinessStringsHelper::getSoftwareTriggerName(const QString& id)
 QString QnBusinessStringsHelper::getSoftwareTriggerName(const QnBusinessEventParameters& params)
 {
     NX_ASSERT(params.eventType == QnBusiness::SoftwareTriggerEvent);
-    return getSoftwareTriggerName(params.inputPortId);
+    return getSoftwareTriggerName(params.caption);
 }

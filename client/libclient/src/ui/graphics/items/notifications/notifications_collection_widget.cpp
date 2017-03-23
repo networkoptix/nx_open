@@ -504,19 +504,9 @@ QIcon QnNotificationsCollectionWidget::iconForAction(const QnAbstractBusinessAct
 
         case QnBusiness::SoftwareTriggerEvent:
         {
-            const auto rules = qnClientMessageProcessor->businessRules();
-            const auto iter = rules.find(businessAction->getBusinessRuleId());
-            const QString pixmapName = iter != rules.end()
-                ? iter.value()->eventParams().description
-                : QString();
-
-            const auto pixmap = QnSoftwareTriggerPixmaps::pixmapByName(pixmapName);
-
-            QIcon icon;
-            icon.addPixmap(pixmap, QIcon::Normal);
-            icon.addPixmap(pixmap, QIcon::Active);
-            icon.addPixmap(pixmap, QIcon::Selected);
-            return icon;
+            return QnSoftwareTriggerPixmaps::colorizedPixmap(
+                businessAction->getRuntimeParams().description,
+                palette().color(QPalette::WindowText));
         }
 
         case QnBusiness::StorageFailureEvent:

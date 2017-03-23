@@ -22,4 +22,7 @@ struct QnSoftwareTriggerPixmaps
 
     /** Get a pixmap by it's name with fallback to default if specified is not available. */
     static QPixmap pixmapByName(const QString& name);
+
+    /** Get colorized pixmap with fallback to default if specified is not available. */
+    static QPixmap colorizedPixmap(const QString& name, const QColor& color);
 };

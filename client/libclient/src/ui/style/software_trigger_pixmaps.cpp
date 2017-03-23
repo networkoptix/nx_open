@@ -76,3 +76,26 @@ QPixmap QnSoftwareTriggerPixmaps::pixmapByName(const QString& name)
         ? getTriggerPixmap(defaultPixmapName())
         : pixmap;
 }
+
+QPixmap QnSoftwareTriggerPixmaps::colorizedPixmap(const QString& name, const QColor& color)
+{
+    static QPixmapCache staticCache;
+
+    const auto effectiveName = effectivePixmapName(name);
+    const auto key = effectiveName + lit("\n") + color.name();
+
+    QPixmap result;
+    if (staticCache.find(key, &result))
+        return result;
+
+    result = getTriggerPixmap(effectiveName);
+    result.detach();
+
+    QPainter painter(&result);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+    painter.fillRect(QRect(QPoint(), result.size() / result.devicePixelRatio()), color);
+    painter.end();
+
+    staticCache.insert(key, result);
+    return result;
+}
