@@ -7,7 +7,6 @@
 #include <nx/utils/log/log.h>
 
 #include <business/business_strings_helper.h>
-#include <business/business_event_rule.h>
 
 #include <camera/single_thumbnail_loader.h>
 
@@ -20,7 +19,6 @@
 #include <core/resource/resource_display_info.h>
 
 #include <client/client_settings.h>
-#include <client/client_message_processor.h>
 #include <client/client_runtime_settings.h>
 
 #include <ui/animation/opacity_animator.h>
