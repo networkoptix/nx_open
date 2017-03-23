@@ -325,6 +325,8 @@ TEST_F(AsyncHttpClientTest, MultiRequestTest)
                 (client->response() == nullptr
                     ? std::string("null")
                     : client->response()->statusLine.reasonPhrase.toStdString());
+            client->socket()->cancelIOSync(nx::network::aio::etNone);
+
             ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
             ASSERT_EQ(expectedResponse, client->fetchMessageBodyBuffer());
             auto contentTypeIter = client->response()->headers.find("Content-Type");
