@@ -160,9 +160,9 @@ public:
     }
 
 private:
-    InputDepletionPolicy m_inputDepletionPolicy;
     utils::pipeline::AbstractInput* m_input;
     utils::pipeline::AbstractOutput* m_output;
+    InputDepletionPolicy m_inputDepletionPolicy;
     std::atomic<bool> m_errorState;
     std::atomic<std::size_t> m_totalBytesRead;
     mutable QnMutex m_mutex;
