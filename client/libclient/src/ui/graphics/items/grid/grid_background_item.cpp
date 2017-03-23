@@ -19,142 +19,222 @@
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_layout.h>
 
 #include <utils/common/warnings.h>
 
-#ifdef _WIN32
-//if defined, background is drawn with native API (as gl texture), else - QPainter::drawImage is used
-#define NATIVE_PAINT_BACKGROUND
-#ifdef NATIVE_PAINT_BACKGROUND
-//!use YUV 420 with alpha plane
-#define USE_YUVA420
-#endif
+#if defined(_WIN32)
+    /**
+     * if defined, background is drawn with native API (as gl texture),
+     * else - QPainter::drawImage is used
+     */
+    #define NATIVE_PAINT_BACKGROUND
+    #if defined(NATIVE_PAINT_BACKGROUND)
+        // Use YUV 420 with alpha plane
+        #define USE_YUVA420
+    #endif
 #endif
 
 
 namespace {
-    enum ImageStatus {
-        None,
-        Loading,
-        Loaded
-    };
 
-    const char *loaderFilenamePropertyName = "_qn_loaderFilename";
+static const auto loaderFilenamePropertyName = "_qn_loaderFilename";
+
+enum class ImageStatus
+{
+    None,
+    Loading,
+    Loaded
+};
+
+enum class BackgroundType
+{
+    Default,
+    Image,
+    Special
+};
+
+BackgroundType backgroundTypeFromLayout(const QnLayoutResourcePtr& layout)
+{
+    const auto workbenchLayout = QnWorkbenchLayout::instance(layout);
+    if (workbenchLayout && workbenchLayout->flags().testFlag(QnLayoutFlag::SpecialBackground))
+        return BackgroundType::Special;
+
+    if (layout->backgroundImageFilename().isEmpty())
+        return BackgroundType::Default;
+
+    return BackgroundType::Image;
 }
 
-class QnGridBackgroundItemPrivate {
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+static constexpr QSize kDefaultImageSize = QSize(1, 1);
+struct BackgroundImageData
+{
+    QString fileName;
+    QSize size = kDefaultImageSize;
+    qreal opacity = 0.7;
+    Qn::ImageBehaviour mode = Qn::ImageBehaviour::Stretch;
+    bool isLocal = true;
+
+    static BackgroundImageData getForDefaultType();
+    static BackgroundImageData getForImageType(const QnLayoutResourcePtr& layout);
+
+    bool imageIsVisible(bool connected) const;
+
+    bool operator==(const BackgroundImageData& other) const;
+    bool operator!=(const BackgroundImageData& other) const;
+};
+
+bool BackgroundImageData::imageIsVisible(bool connected) const
+{
+    return (isLocal || connected)
+        && !fileName.isEmpty()
+        && !qFuzzyIsNull(opacity);
+}
+
+BackgroundImageData BackgroundImageData::getForDefaultType()
+{
+    const auto background = qnSettings->backgroundImage();
+    return BackgroundImageData({
+        background.name,
+        kDefaultImageSize,
+        background.actualImageOpacity(),
+        background.mode,
+        true}); //< Image is always local for default background image.
+}
+
+BackgroundImageData BackgroundImageData::getForImageType(const QnLayoutResourcePtr& layout)
+{
+    const auto background = qnSettings->backgroundImage();
+    return BackgroundImageData({
+        layout->backgroundImageFilename(),
+        layout->backgroundSize(),
+        qBound<qreal>(0, layout->backgroundOpacity(), 1),
+        background.mode,
+        layout->isFile()}); //< Image is local if layout is exported.
+}
+
+bool BackgroundImageData::operator==(const BackgroundImageData& other) const
+{
+    return (fileName == other.fileName)
+        && (size == other.size)
+        && (mode == other.mode)
+        && (isLocal == other.isLocal)
+        && qFuzzyEquals(opacity, other.opacity);
+}
+
+bool BackgroundImageData::operator!=(const BackgroundImageData& other) const
+{
+    return !(*this == other);
+}
+
+} // namespace
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+class QnGridBackgroundItemPrivate
+{
 public:
-    QnGridBackgroundItemPrivate():
-        imageSize(1, 1),
-        imageAspectRatio(1),
-        imageOpacity(0.7),
-        imageMode(Qn::ImageBehaviour::Stretch),
-        isDefaultBackground(true),
-        imageIsLocal(true),
-        connected(false),
-#ifdef NATIVE_PAINT_BACKGROUND
-        imgUploaded(false),
-#endif
-        imageStatus(ImageStatus::None)
-    {}
+    BackgroundType backgroundType = BackgroundType::Default;
 
-    virtual ~QnGridBackgroundItemPrivate() {}
+    qreal imageAspectRatio = 1.0;
+    BackgroundImageData imageData;
+    ImageStatus imageStatus = ImageStatus::None;
 
-    bool imageIsVisible() const {
-        return
-                !qFuzzyIsNull(imageOpacity) &&
-                !imageFilename.isEmpty() &&
-                (imageIsLocal || connected);
-
-    }
-
-    QString imageFilename;
-    QSize imageSize;
-    qreal imageAspectRatio;
-    qreal imageOpacity;
-    Qn::ImageBehaviour imageMode;
-
-    /** Layout has no own background, using default image (if exists). */
-    bool isDefaultBackground;
-
-    bool imageIsLocal;
-    bool connected;
 
     QRectF rect;
     QRect sceneBoundingRect;
-
-#ifdef NATIVE_PAINT_BACKGROUND
-    bool imgUploaded;
-#else
-    QImage image;
-#endif
-    ImageStatus imageStatus;
     QHash<QString, QImage> imagesMemCache;  //TODO: #GDM #Common #High replace with QCache
+
+    #if defined(NATIVE_PAINT_BACKGROUND)
+        bool imgUploaded = false;
+    #else
+        QImage image;
+    #endif
+    bool connected;
 };
 
+//////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem *parent, QnWorkbenchContext *context):
-    QGraphicsObject(parent),
-    QnWorkbenchContextAware(NULL, context),
+QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem* parent, QnWorkbenchContext* context):
+    base_type(parent),
+    QnWorkbenchContextAware(nullptr, context),
     d_ptr(new QnGridBackgroundItemPrivate())
 {
-    setAcceptedMouseButtons(0);
+    setAcceptedMouseButtons(Qt::NoButton);
 
-    auto imageLoaded = [this](const QString &filename, QnAppServerFileCache::OperationResult status) {
-        at_imageLoaded(filename, status == QnAppServerFileCache::OperationResult::ok);
-    };
+    const auto imageLoaded =
+        [this](const QString& filename, QnAppServerFileCache::OperationResult status)
+        {
+            at_imageLoaded(filename, status == QnAppServerFileCache::OperationResult::ok);
+        };
 
-    connect(this->context()->instance<QnLocalFileCache>(),      &QnAppServerFileCache::fileDownloaded, this, imageLoaded);
-    connect(this->context()->instance<QnAppServerImageCache>(), &QnAppServerFileCache::fileDownloaded, this, imageLoaded);
-    connect(qnCommon,   &QnCommonModule::remoteIdChanged,   this, &QnGridBackgroundItem::updateConnectedState);
+    const auto localFilesCache = context->instance<QnLocalFileCache>();
+    connect(localFilesCache, &QnAppServerFileCache::fileDownloaded, this, imageLoaded);
 
-    connect(qnSettings->notifier(QnClientSettings::BACKGROUND_IMAGE),
-        &QnPropertyNotifier::valueChanged, this, &QnGridBackgroundItem::updateDefaultBackground);
+    const auto appServerImageCache = context->instance<QnAppServerImageCache>();
+    connect(appServerImageCache, &QnAppServerFileCache::fileDownloaded, this, imageLoaded);
 
-    /* Don't disable this item here. When disabled, it starts accepting wheel events
-     * (and probably other events too). Looks like a Qt bug. */
+    connect(qnCommon, &QnCommonModule::remoteIdChanged,
+        this, &QnGridBackgroundItem::updateConnectedState);
+
+    const auto notifier = qnSettings->notifier(QnClientSettings::BACKGROUND_IMAGE);
+    connect(notifier, &QnPropertyNotifier::valueChanged,
+        this, &QnGridBackgroundItem::updateDefaultBackground);
+
+    /**
+     * Don't disable this item here. When disabled, it starts accepting wheel events
+     * (and probably other events too). Looks like a Qt bug.
+     */
 
     updateConnectedState();
     updateDefaultBackground();
 }
 
-QnGridBackgroundItem::~QnGridBackgroundItem() {
-#ifdef NATIVE_PAINT_BACKGROUND
-    m_renderer.reset();
-    m_imgUploader.reset();
-#endif
+QnGridBackgroundItem::~QnGridBackgroundItem()
+{
+    #ifdef NATIVE_PAINT_BACKGROUND
+        m_renderer.reset();
+        m_imgUploader.reset();
+    #endif
 }
 
-QRectF QnGridBackgroundItem::boundingRect() const {
+QRectF QnGridBackgroundItem::boundingRect() const
+{
     Q_D(const QnGridBackgroundItem);
     return d->rect;
 }
 
-void QnGridBackgroundItem::updateDefaultBackground() {
+void QnGridBackgroundItem::updateDefaultBackground()
+{
     Q_D(QnGridBackgroundItem);
-    if (!d->isDefaultBackground)
+    if (d->backgroundType != BackgroundType::Default)
         return;
 
-    QnBackgroundImage background = qnSettings->backgroundImage();
-    bool hasChanges = false;
+    const QnBackgroundImage background = qnSettings->backgroundImage();
 
-    if (d->imageFilename != background.name) {
-        d->imageFilename = background.name;
+    bool hasChanges = false;
+    if (d->imageData.fileName != background.name)
+    {
+        d->imageData.fileName = background.name;
         d->imageStatus = ImageStatus::None;
-#ifdef NATIVE_PAINT_BACKGROUND
-        m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>();
-#else
-        d->image = QImage();
-#endif
+        #ifdef NATIVE_PAINT_BACKGROUND
+            m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>();
+        #else
+            d->image = QImage();
+        #endif
         hasChanges = true;
     }
-    if (!qFuzzyEquals(d->imageOpacity, background.actualImageOpacity())) {
-        d->imageOpacity = background.actualImageOpacity();
+
+    if (!qFuzzyEquals(d->imageData.opacity, background.actualImageOpacity()))
+    {
+        d->imageData.opacity = background.actualImageOpacity();
         hasChanges = true;
     }
-    if (d->imageMode != background.mode) {
-        d->imageMode = background.mode;
+
+    if (d->imageData.mode != background.mode)
+    {
+        d->imageData.mode = background.mode;
         hasChanges = true;
     }
 
@@ -165,110 +245,128 @@ void QnGridBackgroundItem::updateDefaultBackground() {
     updateDisplay();
 }
 
-void QnGridBackgroundItem::updateDisplay() {
+void QnGridBackgroundItem::updateDisplay()
+{
     Q_D(QnGridBackgroundItem);
 
-    if (!d->imageIsVisible()) {
+    if (d->backgroundType == BackgroundType::Special)
+    {
+        setOpacity(1.0);
+        updateGeometry();
+        return;
+    }
+
+    if (!d->imageData.imageIsVisible(d->connected))
+    {
         setOpacity(0.0);
         return;
-    } else {
-        setOpacity(d->imageOpacity);
+    }
+    else
+    {
+        setOpacity(d->imageData.opacity);
         updateGeometry();
     }
 
     if (d->imageStatus != ImageStatus::None)
         return;
+
     d->imageStatus = ImageStatus::Loading;
-    cache()->downloadFile(d->imageFilename);
+    cache()->downloadFile(d->imageData.fileName);
 }
 
-const QRectF& QnGridBackgroundItem::viewportRect() const {
+const QRectF& QnGridBackgroundItem::viewportRect() const
+{
     Q_D(const QnGridBackgroundItem);
     return d->rect;
 }
 
-void QnGridBackgroundItem::setViewportRect(const QRectF &rect) {
+void QnGridBackgroundItem::setViewportRect(const QRectF& rect)
+{
     Q_D(QnGridBackgroundItem);
     prepareGeometryChange();
     d->rect = rect;
 }
 
-QnWorkbenchGridMapper* QnGridBackgroundItem::mapper() const {
+QnWorkbenchGridMapper* QnGridBackgroundItem::mapper() const
+{
     return m_mapper.data();
 }
 
-void QnGridBackgroundItem::setMapper(QnWorkbenchGridMapper *mapper) {
+void QnGridBackgroundItem::setMapper(QnWorkbenchGridMapper* mapper)
+{
     if (m_mapper.data())
-        disconnect(m_mapper.data(), 0, this, 0);
+        disconnect(m_mapper.data(), nullptr, this, nullptr);
+
     m_mapper = mapper;
-    if (mapper) {
-        connect(mapper,     SIGNAL(originChanged()),    this,   SLOT(updateGeometry()));
-        connect(mapper,     SIGNAL(cellSizeChanged()),  this,   SLOT(updateGeometry()));
-        connect(mapper,     SIGNAL(spacingChanged()),   this,   SLOT(updateGeometry()));
+    if (mapper)
+    {
+        connect(mapper, &QnWorkbenchGridMapper::originChanged,
+            this, &QnGridBackgroundItem::updateGeometry);
+        connect(mapper, &QnWorkbenchGridMapper::cellSizeChanged,
+            this, &QnGridBackgroundItem::updateGeometry);
+        connect(mapper, &QnWorkbenchGridMapper::spacingChanged,
+            this, &QnGridBackgroundItem::updateGeometry);
     }
 
     updateGeometry();
 }
 
-void QnGridBackgroundItem::update(const QnLayoutResourcePtr &layout) {
+void QnGridBackgroundItem::update(const QnLayoutResourcePtr& layout)
+{
     Q_D(QnGridBackgroundItem);
 
-    bool isDefaultBackground = layout->backgroundImageFilename().isEmpty();
-    bool isExportedLayout = layout->isFile();
+    const auto type = backgroundTypeFromLayout(layout);
+    if (type == d->backgroundType && type == BackgroundType::Special)
+        return; //< Nothing couldn't be changed here
 
-    QnBackgroundImage background = qnSettings->backgroundImage();
+    const auto data =
+        [layout, type]() -> BackgroundImageData
+        {
+            switch(type)
+            {
+                case BackgroundType::Special:
+                    return BackgroundImageData();
+                case BackgroundType::Image:
+                    return BackgroundImageData::getForImageType(layout);
+                case BackgroundType::Default:
+                    return BackgroundImageData::getForDefaultType();
+                default:
+                    NX_ASSERT(false, "Wrong BackgroundType value passed");
+                    return BackgroundImageData();
+            };
+            return BackgroundImageData();
+        }();
 
-    QString filename = isDefaultBackground
-        ? background.name
-        : layout->backgroundImageFilename();
+    setOpacity(d->imageData.opacity);
+    if (d->backgroundType == type && d->imageData == data)
+        return;
 
-    QSize imageSize = isDefaultBackground
-        ? QSize(1, 1)
-        : layout->backgroundSize();
+    d->backgroundType = type;
+    d->imageData = data;
+    d->imageStatus = ImageStatus::None;
 
-    qreal opacity = isDefaultBackground
-        ? background.actualImageOpacity()
-        : qBound(0.0, layout->backgroundOpacity(), 1.0);
-
-    Qn::ImageBehaviour imageMode = background.mode;
-
-    bool hasChanges =
-            (d->isDefaultBackground != isDefaultBackground) ||
-            (d->imageIsLocal != (isExportedLayout || isDefaultBackground) ) ||
-            (d->imageFilename != filename) ||
-            (d->imageSize != imageSize) ||
-            (d->imageMode != imageMode) ||
-            (!qFuzzyEquals(d->imageOpacity, opacity));
-
-    if (hasChanges) {
-        d->isDefaultBackground = isDefaultBackground;
-        d->imageIsLocal = isExportedLayout || isDefaultBackground;
-        d->imageFilename = filename;
-        d->imageSize = imageSize;
-        d->imageMode = imageMode;
-        d->imageOpacity = opacity;
-        d->imageStatus = ImageStatus::None;
-#ifdef NATIVE_PAINT_BACKGROUND
+    #ifdef NATIVE_PAINT_BACKGROUND
         m_imgAsFrame = QSharedPointer<CLVideoDecoderOutput>();
-#else
+    #else
         d->image = QImage();
-#endif
-    }
+    #endif
 
     updateDisplay();
 }
 
-QRect QnGridBackgroundItem::sceneBoundingRect() const {
+QRect QnGridBackgroundItem::sceneBoundingRect() const
+{
     Q_D(const QnGridBackgroundItem);
-    if (!d->imageIsVisible())
-        return QRect();
-    return d->sceneBoundingRect;
+
+    return !d->imageData.imageIsVisible(d->connected) ? QRect() : d->sceneBoundingRect;
 }
 
-void QnGridBackgroundItem::updateGeometry() {
+void QnGridBackgroundItem::updateGeometry()
+{
     Q_D(QnGridBackgroundItem);
 
-    if (d->isDefaultBackground) {
+    if (d->backgroundType == BackgroundType::Default)
+    {
         d->sceneBoundingRect = QRect();
         const qreal d = std::numeric_limits<qreal>::max() / 4;
         setViewportRect(QRectF(QPointF(-d, -d), QPointF(d, d)));
@@ -278,65 +376,77 @@ void QnGridBackgroundItem::updateGeometry() {
     if(mapper() == NULL)
         return;
 
-    int left = d->imageSize.width() / 2;
-    int top =  d->imageSize.height() / 2;
-    d->sceneBoundingRect = QRect(-left, -top, d->imageSize.width(), d->imageSize.height());
+    const int left = d->imageData.size.width() / 2;
+    const int top =  d->imageData.size.height() / 2;
+    d->sceneBoundingRect = QRect(-left, -top,
+        d->imageData.size.width(), d->imageData.size.height());
 
-    QRectF targetRect = mapper()->mapFromGrid(d->sceneBoundingRect);
+    const QRectF targetRect = mapper()->mapFromGrid(d->sceneBoundingRect);
     setViewportRect(targetRect);
 }
 
-void QnGridBackgroundItem::updateConnectedState() {
+void QnGridBackgroundItem::updateConnectedState()
+{
     Q_D(QnGridBackgroundItem);
     d->connected = !qnCommon->remoteGUID().isNull();
     updateDisplay();
 }
 
-void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok) {
+void QnGridBackgroundItem::at_imageLoaded(const QString& filename, bool ok)
+{
     Q_D(QnGridBackgroundItem);
-    if (filename != d->imageFilename || d->imageStatus != ImageStatus::Loading)
+
+    if (filename != d->imageData.fileName || d->imageStatus != ImageStatus::Loading)
         return;
+
     d->imageStatus = ImageStatus::Loaded;
     if (!ok)
         return;
 
-    if (d->imagesMemCache.contains(d->imageFilename)) {
-        setImage(d->imagesMemCache[d->imageFilename]);
+    if (d->imagesMemCache.contains(d->imageData.fileName))
+    {
+        setImage(d->imagesMemCache[d->imageData.fileName]);
         return;
     }
 
-    QnThreadedImageLoader* loader = new QnThreadedImageLoader(this);
+    const auto loader = new QnThreadedImageLoader(this);
     loader->setInput(cache()->getFullPath(filename));
     loader->setSize(cache()->getMaxImageSize());
-    loader->setProperty(loaderFilenamePropertyName, d->imageFilename);
-    connect(loader, SIGNAL(finished(QImage)), this, SLOT(setImage(QImage)));
+    loader->setProperty(loaderFilenamePropertyName, d->imageData.fileName);
+
+    #define QnThreadedImageLoaderFinished \
+        static_cast<void (QnThreadedImageLoader::*)(const QImage& )> \
+        (&QnThreadedImageLoader::finished)
+
+    connect(loader, QnThreadedImageLoaderFinished, this, &QnGridBackgroundItem::setImage);
     loader->start();
 }
 
-QnAppServerImageCache* QnGridBackgroundItem::cache() {
+QnAppServerImageCache* QnGridBackgroundItem::cache()
+{
     Q_D(const QnGridBackgroundItem);
 
-    if (d->imageIsLocal)
-        return context()->instance<QnLocalFileCache>();
-    return context()->instance<QnAppServerImageCache>();
+    return d->imageData.isLocal
+        ? context()->instance<QnLocalFileCache>()
+        : context()->instance<QnAppServerImageCache>();
 }
 
-void QnGridBackgroundItem::setImage(const QImage &image) {
+void QnGridBackgroundItem::setImage(const QImage& image)
+{
     Q_D(QnGridBackgroundItem);
 
-    QString filename = sender()
-            ? sender()->property(loaderFilenamePropertyName).toString()
-            : QString();
+    const auto filename = sender()
+        ? sender()->property(loaderFilenamePropertyName).toString()
+        : QString();
 
-    if (!filename.isEmpty() && filename != d->imageFilename)
+    if (!filename.isEmpty() && filename != d->imageData.fileName)
         return; // race condition
 
     if (d->imageStatus != ImageStatus::Loaded)    // image name was changed during load
         return;
 
-    if (!d->imagesMemCache.contains(d->imageFilename)) {
-        d->imagesMemCache.insert(d->imageFilename, image);
-    }
+    if (!d->imagesMemCache.contains(d->imageData.fileName))
+        d->imagesMemCache.insert(d->imageData.fileName, image);
 
     d->imageAspectRatio = QnGeometry::aspectRatio(image.size());
 
@@ -408,22 +518,37 @@ void QnGridBackgroundItem::setImage(const QImage &image) {
 #endif
 }
 
-void QnGridBackgroundItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
+void QnGridBackgroundItem::paint(
+    QPainter* painter,
+    const QStyleOptionGraphicsItem* /* option*/,
+    QWidget* /* widget */)
 {
     Q_D(QnGridBackgroundItem);
 
+    if (d->backgroundType == BackgroundType::Special)
+    {
+        painter->setBrush(Qt::gray);
+        painter->drawRect(display()->boundedViewportGeometry());
+        qDebug() << display()->boundedViewportGeometry();
+        return;
+    }
+
     QRectF targetRect = d->rect;
-    if (d->isDefaultBackground) {
-        switch (d->imageMode) {
-        case Qn::ImageBehaviour::Fit:
-            targetRect = QnGeometry::expanded(d->imageAspectRatio, display()->viewportGeometry(), Qt::KeepAspectRatio, Qt::AlignCenter);
-            break;
-        case Qn::ImageBehaviour::Crop:
-            targetRect = QnGeometry::expanded(d->imageAspectRatio, display()->viewportGeometry(), Qt::KeepAspectRatioByExpanding, Qt::AlignCenter);
-            break;
-        default:
-            targetRect = display()->viewportGeometry();
-            break;
+    if (d->backgroundType == BackgroundType::Default)
+    {
+        switch (d->imageData.mode)
+        {
+            case Qn::ImageBehaviour::Fit:
+                targetRect = QnGeometry::expanded(d->imageAspectRatio,
+                    display()->viewportGeometry(), Qt::KeepAspectRatio, Qt::AlignCenter);
+                break;
+            case Qn::ImageBehaviour::Crop:
+                targetRect = QnGeometry::expanded(d->imageAspectRatio,
+                    display()->viewportGeometry(), Qt::KeepAspectRatioByExpanding, Qt::AlignCenter);
+                break;
+            default:
+                targetRect = display()->viewportGeometry();
+                break;
         }
     }
 

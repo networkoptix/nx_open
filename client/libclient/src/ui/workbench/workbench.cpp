@@ -39,6 +39,13 @@ QnWorkbench::QnWorkbench(QObject *parent):
 
     m_mapper = new QnWorkbenchGridMapper(this);
 
+    const auto defaultLayoutCreator =
+        [](const QnLayoutResourcePtr& /* resource */, QObject* parent) -> QnWorkbenchLayout*
+        {
+            return (new QnWorkbenchLayout(parent));
+        };
+    qnLayoutFactory->addCreator(defaultLayoutCreator);
+
     m_dummyLayout = qnLayoutFactory->create(this);
     setCurrentLayout(m_dummyLayout);
 }

@@ -15,7 +15,6 @@
 
 #include <client/client_globals.h>
 
-class QGraphicsItem;
 class QnWorkbenchItem;
 namespace NxUi {
 class AbstractWorkbenchPanel;
@@ -24,13 +23,13 @@ class AbstractWorkbenchPanel;
 
 enum class QnLayoutFlag
 {
-    Empty       = 0x0,
-    NoDrop      = 0x1,
-    NoZoom      = 0x2,
-    NoMove      = 0x4,
-    NoTimeline  = 0x8,
+    Empty               = 0x00,
+    NoDrop              = 0x01,
+    NoZoom              = 0x02,
+    NoMove              = 0x04,
+    NoTimeline          = 0x08,
+    SpecialBackground   = 0x10
 };
-
 Q_DECLARE_FLAGS(QnLayoutFlags, QnLayoutFlag)
 
 /**
@@ -80,10 +79,10 @@ public:
      */
     static QnWorkbenchLayout *instance(const QnLayoutResourcePtr &layout);
 
-
     /**
      * \returns                         Layout associated with the given resource, if any.
      */
+    // TODO: #ynikitenkov remove function below. Inherite video wall resoure from layout?
     static QnWorkbenchLayout *instance(const QnVideoWallResourcePtr &videowall);
 
     /**
@@ -99,9 +98,6 @@ public:
 
     NxUi::AbstractWorkbenchPanel* panel() const;
     void setPanel(NxUi::AbstractWorkbenchPanel* value);
-
-    QGraphicsItem* backgroundItem() const;
-    void setBackgroundItem(QGraphicsItem* value);
 
     /**
      * \returns                         Name of this layout.
@@ -349,8 +345,6 @@ signals:
 
     void panelChanged();
 
-    void backgroundItemChanged();
-
     /**
      * This signal is emitted when this layout is about to be destroyed
      * (i.e. its destructor has started).
@@ -467,7 +461,6 @@ private:
     QHash<int, QVariant> m_dataByRole;
 
     NxUi::AbstractWorkbenchPanel* m_panel = nullptr;
-    QGraphicsItem* m_backgroundItem = nullptr;
     QnLayoutFlags m_flags = QnLayoutFlag::Empty;
     QIcon m_icon;
 };

@@ -25,26 +25,19 @@ public:
     using LayoutCreator =
         std::function<QnWorkbenchLayout* (const QnLayoutResourcePtr& resource, QObject* parent)>;
 
-    LayoutsFactory(
-        const LayoutCreator& emptyResourceLayoutCreator,
-        QObject* parent = nullptr);
+    LayoutsFactory(QObject* parent = nullptr);
 
     QnWorkbenchLayout* create(QObject* parent = nullptr);
 
     QnWorkbenchLayout* create(
-        const QnLayoutResourcePtr& resource = QnLayoutResourcePtr(),
+        const QnLayoutResourcePtr& resource,
         QObject* parent = nullptr);
 
-
-    void addCreator(
-        Qn::LayoutResourceType type,
-        const LayoutCreator& creator);
+    void addCreator(const LayoutCreator& creator);
 
 private:
-    using CreatorsHash = QHash<int, LayoutCreator>;
-
-    LayoutCreator m_emptyResourceLayoutCreator;
-    CreatorsHash m_creators;
+    using CreatorsList = QList<LayoutCreator>;
+    CreatorsList m_creators;
 };
 
 } // namespace layouts

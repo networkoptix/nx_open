@@ -94,7 +94,6 @@ void QnWorkbenchLayout::setFlags(QnLayoutFlags value)
     emit flagsChanged();
 }
 
-
 NxUi::AbstractWorkbenchPanel* QnWorkbenchLayout::panel() const
 {
     return m_panel;
@@ -107,20 +106,6 @@ void QnWorkbenchLayout::setPanel(NxUi::AbstractWorkbenchPanel* value)
 
     m_panel = value;
     emit panelChanged();
-}
-
-QGraphicsItem* QnWorkbenchLayout::backgroundItem() const
-{
-    return m_backgroundItem;
-}
-
-void QnWorkbenchLayout::setBackgroundItem(QGraphicsItem* value)
-{
-    if (m_backgroundItem == value)
-        return;
-
-    m_backgroundItem = value;
-    emit backgroundItemChanged();
 }
 
 QnLayoutResourcePtr QnWorkbenchLayout::resource() const {
