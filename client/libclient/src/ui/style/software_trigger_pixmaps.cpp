@@ -7,7 +7,6 @@
 namespace {
 
 static const QString kPixmapExtension = lit(".png");
-static const QString kPixmapFilter = lit("*") + kPixmapExtension;
 
 QPixmap getTriggerPixmap(const QString& name)
 {
@@ -44,7 +43,9 @@ const QStringList& QnSoftwareTriggerPixmaps::pixmapNames()
             for (const auto path: qnSkin->paths())
             {
                 const auto fullPath = path + QDir::separator() + pixmapsPath();
-                const auto entries = QDir(fullPath).entryList({ kPixmapFilter }, QDir::Files);
+                const QStringList pixmapFilter({ lit("*") + kPixmapExtension });
+
+                const auto entries = QDir(fullPath).entryList(pixmapFilter, QDir::Files);
 
                 for (const auto entry: entries)
                 {
