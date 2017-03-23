@@ -264,11 +264,11 @@ bool QnNoptixStyle::drawItemViewItemControl(const QStyleOption *option, QPainter
     return true;
 }
 
-bool QnNoptixStyle::skipItemViewPrimitive(PrimitiveElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget) const
+bool QnNoptixStyle::skipItemViewPrimitive(PrimitiveElement /*element*/,
+    const QStyleOption* option,
+    QPainter* painter,
+    const QWidget* widget) const
 {
-    QN_UNUSED(element);
-    QN_UNUSED(painter);
-
     const auto workaround = make3xHiDpiWorkaround(painter);
 
     if (!widget)

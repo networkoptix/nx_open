@@ -227,10 +227,8 @@ void QnToolTipWidget::setGeometry(const QRectF &rect) {
         invalidateShape();
 }
 
-void QnToolTipWidget::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+void QnToolTipWidget::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
-    QN_UNUSED(option, widget);
-
     ensureShape();
 
     /* Render background. */

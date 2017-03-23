@@ -1,9 +1,5 @@
 #pragma once
 
-#ifndef BOOST_BIND_NO_PLACEHOLDERS
-#define BOOST_BIND_NO_PLACEHOLDERS
-#endif // BOOST_BIND_NO_PLACEHOLDERS
-#include <cassert>
 #include <limits>
 
 #include <QtCore/QtGlobal>
@@ -11,10 +7,7 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
-#include <nx/utils/unused.h>
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/utils/datetime.h>
-#include <nx/utils/literal.h>
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT

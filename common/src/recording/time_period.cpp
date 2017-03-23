@@ -11,6 +11,8 @@
 #include <nx/fusion/fusion/fusion_adaptor.h>
 #include "time_period_list.h"
 
+#include <nx/utils/datetime.h>
+
 QN_FUSION_ADAPT_STRUCT(QnTimePeriod, (startTimeMs)(durationMs))
 QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES((QnTimePeriod), (ubjson)(xml)(csv_record))
 

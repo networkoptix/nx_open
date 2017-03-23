@@ -19,7 +19,10 @@
 
 
 #include "extensions/workbench_stream_synchronizer.h"
+
 #include "utils/common/util.h"
+
+#include <nx/utils/datetime.h>
 
 namespace {
     template<class PointContainer>

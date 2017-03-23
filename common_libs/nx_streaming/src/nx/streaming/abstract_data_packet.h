@@ -3,12 +3,12 @@
 
 #include <memory>
 
-#include <common/common_globals.h>
+#include <nx/utils/datetime.h>
 
 class QnAbstractStreamDataProvider;
 
 struct QnAbstractDataPacket {
-    QnAbstractDataPacket(): dataProvider(0), timestamp(DATETIME_INVALID) {} 
+    QnAbstractDataPacket(): dataProvider(0), timestamp(DATETIME_INVALID) {}
     virtual ~QnAbstractDataPacket() {}
 
     QnAbstractStreamDataProvider *dataProvider;
