@@ -1705,6 +1705,13 @@
 		},
         {
             "keys":[
+                "DW|DWC-MTT4W*",
+                "DigitalWatchdog|DWC-MTT4W*"
+             ],
+             "trustToVideoSourceSize": false
+        },
+        {
+            "keys":[
                 "Digital_Watchdog|DWC-PF5M1TIR", "DigitalWatchdog|DWC-MD85DiA", "DigitalWatchdog|DWC-MV85DiA", "Digital_Watchdog|DWC-MV85DiA"
             ],
             "highStreamBitrateBounds": {
