@@ -26,7 +26,8 @@ angular.module('webadminApp')
                 vgUpdateTime:"&",
                 vgPlayerReady:"&",
                 vgSrc:"=",
-                player:"="
+                player:"=",
+                activeFormat:"="
             },
             templateUrl: Config.viewsDir + 'components/videowindow.html',// ???
 
@@ -62,8 +63,8 @@ angular.module('webadminApp')
                     scope.ieWin10 = false;
                     scope.ubuntuNX = false;
 
-                    if(scope.debugMode && scope.debugFormat){
-                        return scope.debugFormat;
+                    if(scope.debugMode && scope.activeFormat != "Auto"){
+                        return scope.activeFormat;
                     }
 
                     //This function gets available sources for camera and chooses the best player for this browser
@@ -139,6 +140,10 @@ angular.module('webadminApp')
                             break;
 
                         case "Firefox":
+                            if(weHaveWebm && canPlayNatively("webm"))
+                            {
+                                return "webm";
+                            }
                             if(weHaveHls && window.jscd.os === 'Linux'){
                                 scope.ubuntuNX = true;
                                 return false;
@@ -339,6 +344,9 @@ angular.module('webadminApp')
                 scope.$watch("vgSrc",srcChanged);
 
                 scope.$on('$destroy',recyclePlayer);
+
+                if(scope.debugMode)
+                    scope.$watch('activeFormat', srcChanged);
             }
         }
     }]);

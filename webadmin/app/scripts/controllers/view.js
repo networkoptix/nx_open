@@ -14,6 +14,7 @@ angular.module('webadminApp').controller('ViewCtrl',
             Low: 'lo'
         };
         $scope.Config = Config;
+        $scope.debugMode = Config.allowDebugMode;
         $scope.session = $sessionStorage;
         $scope.storage = $localStorage;
         $scope.storage.serverStates = $scope.storage.serverStates || {};
@@ -59,6 +60,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         };
 
         $scope.activeFormat = 'Auto';
+        $scope.manualFormats = ['Auto', 'jshls','native-hls','flashls','webm'];
         $scope.availableFormats = [
             'Auto',
             'video/webm',
@@ -271,7 +273,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + resolutionHls + positionMedia + authParam ), type: mimeTypes.hls, transport:'hls'},
                 { src: ( serverUrl + '/media/' + cameraId + '.webm?rt&resolution=' + resolution + positionMedia + authParam ), type: mimeTypes.webm, transport:'webm' }
             ],function(src){
-                return formatSupported(src.transport,false) && $scope.activeFormat === 'Auto'|| $scope.activeFormat === src.type;
+                return formatSupported(src.transport,false) && $scope.activeFormat === 'Auto' || $scope.debugMode && $scope.manualFormats.indexOf($scope.activeFormat) > -1;
             });
         }
 
