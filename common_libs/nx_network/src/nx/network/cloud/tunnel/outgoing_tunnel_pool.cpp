@@ -19,6 +19,7 @@ OutgoingTunnelPool::OutgoingTunnelPool():
 OutgoingTunnelPool::~OutgoingTunnelPool()
 {
     NX_ASSERT(m_terminated);
+    NX_ASSERT(m_pool.empty());
 }
 
 void OutgoingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
@@ -31,8 +32,20 @@ void OutgoingTunnelPool::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHa
         {
             tunnelsStopped(std::move(completionHandler));
         });
-    for (const auto& tunnel: m_pool)
-        tunnel.second.tunnel->pleaseStop(tunnelsStoppedFuture.fork());
+    decltype(m_pool) pool;
+    m_pool.swap(pool);
+    for (std::pair<const QString, TunnelContext>& tunnelData: pool)
+    {
+        auto tunnelContext = std::move(tunnelData.second);
+        auto tunnelPtr = tunnelContext.tunnel.get();
+        tunnelPtr->pleaseStop(
+            [handler = tunnelsStoppedFuture.fork(),
+                tunnelContext = std::move(tunnelContext)]() mutable
+            {
+                tunnelContext.tunnel.reset();
+                handler();
+            });
+    }
 }
 
 void OutgoingTunnelPool::establishNewConnection(
@@ -42,6 +55,8 @@ void OutgoingTunnelPool::establishNewConnection(
     OutgoingTunnel::NewConnectionHandler handler)
 {
     using namespace std::placeholders;
+
+    NX_ASSERT(!m_terminated && !m_stopping);
 
     QnMutexLocker lock(&m_mutex);
 
