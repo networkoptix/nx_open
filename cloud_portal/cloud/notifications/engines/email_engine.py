@@ -37,12 +37,15 @@ def send(email, msg_type, message, customization):
     email_txt_body = pystache.render(message_txt_template, {"message": message, "config": config})
     email_from = custom_config["mail_from"]
 
-    msg = EmailMultiAlternatives(subject, email_html_body, email_from, to=(email,))
-    msg.attach_alternative(email_txt_body, "text/plain")
+    msg = EmailMultiAlternatives(subject, email_txt_body, email_from, to=(email,))
+    msg.content_subtype = 'plain'  # Main content is now text/html
+    msg.attach_alternative(email_html_body, "text/html")
+
+    # msg = EmailMultiAlternatives(subject, email_html_body, email_from, to=(email,))
+    # msg.content_subtype = 'html'  # Main content is now text/html
+    # msg.attach_alternative(email_txt_body, "text/plain")
+
     msg.mixed_subtype = 'related'
-
-    msg.content_subtype = 'html'  # Main content is now text/html
-
     logo_filename = os.path.join(templates_root, 'email_logo.png')
     msg_img = MIMEImage(read_logo(logo_filename))
     msg_img.add_header('Content-ID', '<logo>')
