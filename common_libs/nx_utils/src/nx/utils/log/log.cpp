@@ -7,6 +7,8 @@
 #include <QtCore/QThread>
 #include <QtCore/QDateTime>
 
+#include "../string.h"
+
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
     #include <sys/types.h>
     #include <linux/unistd.h>
@@ -379,14 +381,14 @@ void QnLog::applyArguments(const nx::utils::ArgumentParser& arguments)
 {
     QnLogLevel logLevel(cl_logNONE);
 
-    unsigned int maxFileSize = 1024 * 1024 * 10;
+    std::uint64_t maxFileSize = 1024 * 1024 * 10;
     if (const auto value = arguments.get("log-size", "ls"))
-        maxFileSize = value->toUInt();
+        maxFileSize = nx::utils::stringToBytes(*value);
 
     if (const auto value = arguments.get("log-file", "lf"))
     {
         logLevel = cl_logDEBUG1;
-        instance()->create(*value, maxFileSize, 5, logLevel);
+        instance()->create(*value, (quint32)maxFileSize, 5, logLevel);
     }
 
     if (const auto value = arguments.get("log-level", "ll"))
