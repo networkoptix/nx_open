@@ -343,6 +343,8 @@ TEST_F(AsyncHttpClientTest, MultiRequestTest)
     // step 1: check 2 requests in a row via same connection
     for (int i = 0; i < 2; ++i)
     {
+        std::cout<<"Using "<<(i != 0 ? "persistent" : "not persistent")<<" server connections"<<std::endl;
+
         testHttpServer()->setPersistentConnectionEnabled(i != 0);
 
         {
