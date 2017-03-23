@@ -17,6 +17,7 @@ def env(env_builder, server):
     return env_builder(server=server)
 
 # https://networkoptix.atlassian.net/browse/TEST-181
+# https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920667/Media+stream+loading+test
 def test_media_stream_should_be_loaded_correctly(env, camera, sample_media_file, stream_type):
     # prepare media archive
     camera_id = env.server.add_camera(camera)
