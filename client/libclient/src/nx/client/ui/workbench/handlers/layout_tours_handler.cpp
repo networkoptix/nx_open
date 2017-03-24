@@ -1,5 +1,7 @@
 #include "layout_tours_handler.h"
 
+#include <QtWidgets/QAction>
+
 #include <ui/workbench/workbench.h>
 #include <core/resource/layout_resource.h>
 #include <nx/client/ui/workbench/layouts/special_layout.h>
