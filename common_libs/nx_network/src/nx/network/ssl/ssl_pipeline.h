@@ -34,7 +34,7 @@ public:
     bool eof() const;
     bool failed() const;
 
-    void close();
+    void shutdown();
 
 protected:
     SSL* ssl();

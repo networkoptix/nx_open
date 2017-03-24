@@ -43,12 +43,18 @@ public:
 
     QByteArray transferThrough(QByteArray dataToSend)
     {
+        bool senderActive = true;
+        bool receiverActive = true;
+
         const int msgLength = dataToSend.size();
 
         QByteArray result;
 
         while (!dataToSend.isEmpty())
         {
+            if (!senderActive && !receiverActive)
+                break;
+
             if (m_clientToServerPipeline.totalBytesThrough() == m_clientToServerTotalBytesThrough &&
                 m_serverToClientPipeline.totalBytesThrough() == m_serverToClientTotalBytesThrough)
             {
@@ -60,26 +66,31 @@ public:
             m_clientToServerTotalBytesThrough = m_clientToServerPipeline.totalBytesThrough();
             m_serverToClientTotalBytesThrough = m_serverToClientPipeline.totalBytesThrough();
 
-            const int bytesToWrite = std::min<int>(m_maxBytesToWrite, dataToSend.size());
+            if (senderActive)
+            {
+                const int bytesToWrite = std::min<int>(m_maxBytesToWrite, dataToSend.size());
+                const int bytesWritten = 
+                    m_clientPipeline->write(dataToSend.constData(), bytesToWrite);
+                if (bytesWritten > 0)
+                    dataToSend.remove(0, bytesWritten);
+                else if (bytesWritten == 0)
+                    ; // TODO
+                else if (bytesWritten != utils::pipeline::StreamIoError::wouldBlock)
+                    senderActive = false;
+            }
 
-            const int bytesWritten = 
-                m_clientPipeline->write(dataToSend.constData(), bytesToWrite);
-            if (bytesWritten > 0)
-                dataToSend.remove(0, bytesWritten);
-            else if (bytesWritten == 0)
-                ; // TODO
-            else if (bytesWritten != utils::pipeline::StreamIoError::wouldBlock)
-                break;
-
-            QByteArray readBuffer;
-            readBuffer.resize(msgLength);
-            int bytesRead = m_serverPipeline->read(readBuffer.data(), readBuffer.size());
-            if (bytesRead > 0)
-                result += readBuffer.mid(0, bytesRead);
-            else if (bytesRead == 0)
-                ; // TODO
-            else if (bytesRead != utils::pipeline::StreamIoError::wouldBlock)
-                break;
+            if (receiverActive)
+            {
+                QByteArray readBuffer;
+                readBuffer.resize(msgLength);
+                int bytesRead = m_serverPipeline->read(readBuffer.data(), readBuffer.size());
+                if (bytesRead > 0)
+                    result += readBuffer.mid(0, bytesRead);
+                else if (bytesRead == 0)
+                    ; // TODO
+                else if (bytesRead != utils::pipeline::StreamIoError::wouldBlock)
+                    receiverActive = false;
+            }
         }
 
         return result;
@@ -183,6 +194,7 @@ class SslPipeline:
 {
 public:
     SslPipeline():
+        m_clientPipeline(nullptr),
         m_serverPipeline(nullptr)
     {
         givenRandomData();
@@ -237,6 +249,11 @@ protected:
         }
     }
 
+    void whenAnySideHasBeenShutDown()
+    {
+        m_clientPipeline->shutdown();
+    }
+
     void thenEncodedDataIsNotEmpty()
     {
         ASSERT_FALSE(m_encodedData.isEmpty());
@@ -263,9 +280,17 @@ protected:
         ASSERT_TRUE(m_inputData.startsWith(m_outputData));
     }
 
+    void thenBothSidesReportEof()
+    {
+        ASSERT_TRUE(m_clientPipeline->eof());
+        ASSERT_TRUE(m_serverPipeline->eof());
+    }
+
     std::unique_ptr<Pipeline> createClientPipeline()
     {
-        return std::make_unique<ConnectingPipeline>();
+        auto pipeline = std::make_unique<ConnectingPipeline>();
+        m_clientPipeline = pipeline.get();
+        return std::move(pipeline);
     }
 
     std::unique_ptr<Pipeline> createServerPipeline()
@@ -280,6 +305,7 @@ private:
     QByteArray m_encodedData;
     QByteArray m_outputData;
     std::unique_ptr<TestPipeline> m_pipeline;
+    ConnectingPipeline* m_clientPipeline;
     AcceptingPipeline* m_serverPipeline;
 };
 
@@ -327,11 +353,20 @@ TEST_F(SslPipeline, random_error_in_data)
 
     // On error in handshake data SSL may not report error but keep asking for data. 
     // Another side will also be asking for data and as a result pipe will stuck.
-    //thenServerPipelineHasFailed();
+    // So, we cannot always detect error.
     thenPartialDataHasBeenReceived();
 }
 
-//TEST_F(SslPipeline, eof)
+TEST_F(SslPipeline, shutdown)
+{
+    givenEncodeDecodePipeline();
+
+    whenDataIsTransferredThroughPipeline();
+    whenAnySideHasBeenShutDown();
+    whenDataIsTransferredThroughPipeline();
+
+    thenBothSidesReportEof();
+}
 
 //TEST_F(SslPipeline, handshake_error)
 
