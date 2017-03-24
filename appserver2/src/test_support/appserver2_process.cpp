@@ -302,11 +302,14 @@ int Appserver2Process::exec()
     tcpListener.pleaseStop();
 
     ec2Connection->stopReceivingNotifications();
+
+    messageProcessor.reset();
+    ec2Connection.reset();
+
     appServerConnectionFactory.setEc2Connection(nullptr);
     appServerConnectionFactory.setEC2ConnectionFactory(nullptr);
 
     m_ecConnection = nullptr;
-    ec2Connection.reset();
 
     return 0;
 }
