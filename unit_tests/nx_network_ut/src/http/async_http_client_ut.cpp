@@ -704,14 +704,12 @@ protected:
 
     void performRequestToValidUrl()
     {
-        scheduleRequestToValidUrlJustAfterFirstRequest();
-        sendNextRequest();
+        m_httpClient->doGet(m_testUrl);
     }
 
     void performRequestToInvalidUrl()
     {
-        m_scheduledRequests.push(QUrl("http://example.com:58249/test"));
-        sendNextRequest();
+        m_httpClient->doGet(QUrl("http://example.com:58249/test"));
     }
 
     void assertRequestSucceeded()
