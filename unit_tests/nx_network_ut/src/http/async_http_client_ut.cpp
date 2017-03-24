@@ -647,8 +647,7 @@ class AsyncHttpClientReusingConnection:
 public:
     static const char* testPath;
 
-    AsyncHttpClientReusingConnection():
-        m_responseCount(0)
+    AsyncHttpClientReusingConnection()
     {
         m_httpClient = nx_http::AsyncHttpClient::create();
         m_httpClient->setSendTimeoutMs(1000);
@@ -731,7 +730,6 @@ private:
 
     QUrl m_testUrl;
     nx::utils::SyncQueue<std::unique_ptr<nx_http::Response>> m_responseQueue;
-    std::atomic<int> m_responseCount;
     nx_http::AsyncHttpClientPtr m_httpClient;
     std::queue<QUrl> m_scheduledRequests;
     std::map<
@@ -748,13 +746,10 @@ private:
 
     void onRequestCompleted(AsyncHttpClientPtr client)
     {
-        ++m_responseCount;
         if (client->response() && !client->failed())
             m_responseQueue.push(std::make_unique<nx_http::Response>(*client->response()));
         else
             m_responseQueue.push(nullptr);
-        if (m_responseCount >= 2)
-            return;
 
         if (m_scheduledRequests.empty())
             return;
