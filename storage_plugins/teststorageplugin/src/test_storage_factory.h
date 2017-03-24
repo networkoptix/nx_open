@@ -12,9 +12,9 @@
 static const nxpl::NX_GUID IID_StorageFactory =
 { { 0x2e, 0x2c, 0x7a, 0x3d, 0x25, 0x6d, 0x40, 0x18, 0xb4, 0xe, 0x51, 0x2d, 0x72, 0x51, 0xb, 0xec } };
 
-class TestStorageFactory
-    : public nx_spl::StorageFactory,
-      public PluginRefCounter<TestStorageFactory>
+class TestStorageFactory :
+    public nx_spl::StorageFactory,
+    public PluginRefCounter<TestStorageFactory>
 {
 public:
     virtual const char** STORAGE_METHOD_CALL findAvailable() const override;

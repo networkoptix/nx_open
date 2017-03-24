@@ -5,9 +5,9 @@
 #include <common.h>
 #include <detail/fs_stub.h>
 
-class TestFileInfoIterator
-    : public nx_spl::FileInfoIterator,
-      public PluginRefCounter<TestFileInfoIterator> 
+class TestFileInfoIterator :
+    public nx_spl::FileInfoIterator,
+    public PluginRefCounter<TestFileInfoIterator>
 {
 public:
     TestFileInfoIterator(FsStubNode* node, const std::string& prefix);

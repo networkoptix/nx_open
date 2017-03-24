@@ -13,9 +13,9 @@ enum class FileCategory
     infoTxt
 };
 
-class TestIODevice 
-    : public nx_spl::IODevice,
-      public PluginRefCounter<TestIODevice>
+class TestIODevice :
+    public nx_spl::IODevice,
+    public PluginRefCounter<TestIODevice>
 {
 public:
     TestIODevice(const std::string& name, FileCategory category, 
