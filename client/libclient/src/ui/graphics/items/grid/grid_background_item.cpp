@@ -96,23 +96,23 @@ bool BackgroundImageData::imageIsVisible(bool connected) const
 BackgroundImageData BackgroundImageData::getForDefaultType()
 {
     const auto background = qnSettings->backgroundImage();
-    return BackgroundImageData({
+    return BackgroundImageData{
         background.name,
         kDefaultImageSize,
         background.actualImageOpacity(),
         background.mode,
-        true}); //< Image is always local for default background image.
+        true}; //< Image is always local for default background image.
 }
 
 BackgroundImageData BackgroundImageData::getForImageType(const QnLayoutResourcePtr& layout)
 {
     const auto background = qnSettings->backgroundImage();
-    return BackgroundImageData({
+    return BackgroundImageData{
         layout->backgroundImageFilename(),
         layout->backgroundSize(),
         qBound<qreal>(0, layout->backgroundOpacity(), 1),
         background.mode,
-        layout->isFile()}); //< Image is local if layout is exported.
+        layout->isFile()}; //< Image is local if layout is exported.
 }
 
 bool BackgroundImageData::operator==(const BackgroundImageData& other) const
