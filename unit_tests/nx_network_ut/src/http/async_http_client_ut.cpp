@@ -19,6 +19,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
+#include <nx/utils/test_support/utils.h>
 #include <nx/utils/thread/sync_queue.h>
 
 #include <common/common_globals.h>
@@ -58,11 +59,11 @@ private:
     const bool m_expectSsl;
 };
 
-class AsyncHttpClientTest:
+class AsyncHttpClient:
     public ::testing::Test
 {
 public:
-    AsyncHttpClientTest():
+    AsyncHttpClient():
         m_testHttpServer(std::make_unique<TestHttpServer>())
     {
         m_testHttpServer->registerRequestProcessor<SslAssertHandler>(
@@ -120,7 +121,7 @@ protected:
     }
 };
 
-TEST_F(AsyncHttpClientTest, Https)
+TEST_F(AsyncHttpClient, Https)
 {
     ASSERT_TRUE(m_testHttpServer->bindAndListen());
     httpsTest(lit("http"), lit("httpOnly"));
@@ -128,7 +129,7 @@ TEST_F(AsyncHttpClientTest, Https)
 }
 
 // TODO: #mux Better create HttpServer test and move it there.
-TEST_F(AsyncHttpClientTest, ServerModRewrite)
+TEST_F(AsyncHttpClient, ServerModRewrite)
 {
     m_testHttpServer->registerStaticProcessor(
         nx_http::kAnyPath, "root", "text/plain");
@@ -180,7 +181,7 @@ static void testHttpClientForFastRemove(const QUrl& url)
 }
 } // namespace
 
-TEST_F(AsyncHttpClientTest, FastRemove)
+TEST_F(AsyncHttpClient, FastRemove)
 {
     testHttpClientForFastRemove(lit("http://127.0.0.1/"));
     testHttpClientForFastRemove(lit("http://localhost/"));
@@ -191,7 +192,7 @@ TEST_F(AsyncHttpClientTest, FastRemove)
     testHttpClientForFastRemove(lit("https://doestNotExist.host/"));
 }
 
-TEST_F(AsyncHttpClientTest, FastRemoveBadHost)
+TEST_F(AsyncHttpClient, FastRemoveBadHost)
 {
     QUrl url(lit("http://doestNotExist.host/"));
 
@@ -203,7 +204,7 @@ TEST_F(AsyncHttpClientTest, FastRemoveBadHost)
     }
 }
 
-TEST_F(AsyncHttpClientTest, motionJpegRetrieval)
+TEST_F(AsyncHttpClient, motionJpegRetrieval)
 {
     static const int CONCURRENT_CLIENT_COUNT = 100;
 
@@ -286,7 +287,7 @@ TEST_F(AsyncHttpClientTest, motionJpegRetrieval)
 }
 
 class AsyncHttpClientTestMultiRequest:
-    public AsyncHttpClientTest
+    public AsyncHttpClient
 {
 public:
     AsyncHttpClientTestMultiRequest():
@@ -332,7 +333,9 @@ private:
 
     void init()
     {
-        m_requests.resize(3);
+        const std::size_t testRequestCount = 3;
+        m_requests.resize(testRequestCount);
+
         for (std::size_t i = 0; i < m_requests.size(); ++i)
         {
             m_requests[i].url = QUrl(
@@ -391,7 +394,7 @@ TEST_F(AsyncHttpClientTestMultiRequest, server_supports_persistent_connections)
     doMultipleRequestsReusingHttpClient();
 }
 
-TEST_F(AsyncHttpClientTest, ConnectionBreak)
+TEST_F(AsyncHttpClient, ConnectionBreak)
 {
     static const QByteArray kResponse(
         "HTTP/1.1 200 OK\r\n"
@@ -477,7 +480,7 @@ private:
 };
 } // namespace
 
-TEST_F(AsyncHttpClientTest, ConnectionBreakAfterReceivingSecondRequest)
+TEST_F(AsyncHttpClient, ConnectionBreakAfterReceivingSecondRequest)
 {
     static const char* testPath = "/ConnectionBreakAfterReceivingSecondRequest";
 
@@ -636,59 +639,113 @@ TEST_F(AsyncHttpClientReliability, BreakingConnectionAtRandomPoint)
 }
 
 //-------------------------------------------------------------------------------------------------
+// AsyncHttpClientReusingConnection
 
-TEST_F(AsyncHttpClientTest, ReusingExistingConnection)
+class AsyncHttpClientReusingConnection:
+    public AsyncHttpClient
 {
-    static const char* testPath = "/ReusingExistingConnection";
-    testHttpServer()->setPersistentConnectionEnabled(false);
-    ASSERT_TRUE(
-        testHttpServer()->registerStaticProcessor(
-            testPath,
-            "qwade324dwfasd123sdf23sdfsdf",
-            "text/plain"));
-    ASSERT_TRUE(testHttpServer()->bindAndListen());
+public:
+    static const char* testPath;
 
-    const QUrl testUrl(lm("http://%1%2")
-        .str(testHttpServer()->serverAddress()).arg(testPath));
-
-    for (int i = 0; i < 2; ++i)
+    AsyncHttpClientReusingConnection():
+        m_responseCount(0)
     {
-        nx::utils::SyncQueue<nx_http::Response> responseQueue;
-        std::atomic<int> responseCount(0);
+        testHttpServer()->setPersistentConnectionEnabled(false);
+        NX_GTEST_ASSERT_TRUE(
+            testHttpServer()->registerStaticProcessor(
+                testPath,
+                "qwade324dwfasd123sdf23sdfsdf",
+                "text/plain"));
+        NX_GTEST_ASSERT_TRUE(testHttpServer()->bindAndListen());
 
-        auto httpClient = AsyncHttpClient::create();
-        auto httpClientGuard = makeScopedGuard(
-            [&httpClient]() { httpClient->pleaseStopSync(); });
+        m_testUrl = lm("http://%1%2").str(testHttpServer()->serverAddress()).arg(testPath);
 
-        httpClient->setSendTimeoutMs(1000);
+        m_httpClient = nx_http::AsyncHttpClient::create();
+        m_httpClient->setSendTimeoutMs(1000);
         QObject::connect(
-            httpClient.get(), &AsyncHttpClient::done,
-            [&testUrl, &responseQueue, &responseCount](AsyncHttpClientPtr client)
+            m_httpClient.get(), &nx_http::AsyncHttpClient::done,
+            [this](AsyncHttpClientPtr client)
             {
-                ++responseCount;
-                if (client->response())
-                    responseQueue.push(*client->response());
-                else
-                    responseQueue.push(nx_http::Response());
-                if (responseCount >= 2)
-                    return;
-                client->doGet(testUrl);
+                onRequestCompleted(std::move(client));
             });
-        if (i == 1)
-        {
-            // Testing connection to a bad url.
-            httpClient->doGet(QUrl("http://example.com:58249/test"));
-        }
-        else
-        {
-            httpClient->doGet(testUrl);
-        }
-
-        constexpr const auto responseWaitDelay = std::chrono::seconds(3);
-        ASSERT_TRUE((bool) responseQueue.pop(responseWaitDelay));
-        ASSERT_TRUE((bool) responseQueue.pop(responseWaitDelay));
     }
+
+    ~AsyncHttpClientReusingConnection()
+    {
+        m_httpClient->pleaseStopSync();
+    }
+
+protected:
+    void scheduleRequestToValidUrlJustAfterFirstRequest()
+    {
+        m_scheduledRequests.push(m_testUrl);
+    }
+
+    void performRequestToValidUrl()
+    {
+        m_httpClient->doGet(m_testUrl);
+    }
+
+    void performRequestToInvalidUrl()
+    {
+        m_httpClient->doGet(QUrl("http://example.com:58249/test"));
+    }
+
+    void assertRequestSucceeded()
+    {
+        ASSERT_NE(nullptr, m_responseQueue.pop());
+    }
+
+    void assertRequestFailed()
+    {
+        ASSERT_EQ(nullptr, m_responseQueue.pop());
+    }
+
+private:
+    QUrl m_testUrl;
+    nx::utils::SyncQueue<std::unique_ptr<nx_http::Response>> m_responseQueue;
+    std::atomic<int> m_responseCount;
+    nx_http::AsyncHttpClientPtr m_httpClient;
+    std::queue<QUrl> m_scheduledRequests;
+
+    void onRequestCompleted(AsyncHttpClientPtr client)
+    {
+        ++m_responseCount;
+        if (client->response())
+            m_responseQueue.push(std::make_unique<nx_http::Response>(*client->response()));
+        else
+            m_responseQueue.push(nullptr);
+        if (m_responseCount >= 2)
+            return;
+
+        if (m_scheduledRequests.empty())
+            return;
+
+        const auto scheduledRequestUrl = m_scheduledRequests.front();
+        m_scheduledRequests.pop();
+        client->doGet(scheduledRequestUrl);
+    }
+};
+
+const char* AsyncHttpClientReusingConnection::testPath = "/ReusingExistingConnection";
+
+TEST_F(AsyncHttpClientReusingConnection, connecting_to_the_valid_url_first)
+{
+    scheduleRequestToValidUrlJustAfterFirstRequest();
+    performRequestToValidUrl();
+    assertRequestSucceeded();
+    assertRequestSucceeded();
 }
+
+TEST_F(AsyncHttpClientReusingConnection, connecting_to_the_invalid_url_first)
+{
+    scheduleRequestToValidUrlJustAfterFirstRequest();
+    performRequestToInvalidUrl();
+    assertRequestFailed();
+    assertRequestSucceeded();
+}
+
+//-------------------------------------------------------------------------------------------------
 
 class TestTcpServer:
     public QnLongRunnable
@@ -754,7 +811,7 @@ private:
     bool m_terminated;
 };
 
-TEST(AsyncHttpClientTest2, PartionedIncomingData)
+TEST(AsyncHttpClient, PartionedIncomingData)
 {
     std::vector<QByteArray> dataToSend;
 
