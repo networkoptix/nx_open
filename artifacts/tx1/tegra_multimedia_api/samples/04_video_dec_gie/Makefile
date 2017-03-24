@@ -28,54 +28,73 @@
 #
 ###############################################################################
 
+export TEGRA_ARMABI = aarch64-linux-gnu
+
 include ../Rules.mk
 
 APP := video_dec_gie
-
-SO := video_dec_gie.so
+SO := libtegra_video.so
 
 CLASS_DIR := ../common/classes
-
+NX_UTILS_DIR := ../../nx/utils/
 ALGO_DIR := ../common/algorithm/cuda
-
 GIE_DIR := ../common/algorithm/gie
+
+NX_UTILS_SRCS := $(wildcard $(NX_UTILS_DIR)/*.cpp)
+NX_UTILS_OBJS := $(NX_UTILS_SRCS:.cpp=.o)
 
 SRCS := \
 	video_dec_gie_csvparser.cpp \
 	video_dec_gie_main.cpp \
-	$(wildcard $(CLASS_DIR)/*.cpp)
+	config.cpp \
+	tegra_video.cpp \
+	tegra_video_impl.cpp \
+	tegra_video_stub.cpp \
+	$(wildcard $(CLASS_DIR)/*.cpp) \
 
 OBJS := $(SRCS:.cpp=.o)
 
 CPPFLAGS += \
 	-std=c++11 \
 	-fPIC \
+	-fvisibility=hidden \
+	-DNX_UTILS_API= \
+	-DTEGRA_VIDEO_API='__attribute__ ((visibility ("default")))' \
+	-I"../.." \
 	-I"../common/algorithm/cuda" \
 	-I"../common/algorithm/gie" \
-	-I"$(CUDA_PATH)/targets/aarch64-linux/include"
+	-I"$(CUDA_PATH)/targets/aarch64-linux/include" \
 
 LDFLAGS += \
 	-L"$(CUDA_PATH)/targets/aarch64-linux/lib" \
 	-ldl -lpthread -lrt \
 	-lv4l2 -lEGL -lGLESv2 -lX11 \
 	-lnvbuf_utils -lnvjpeg \
-	-lcuda -lcudart
+	-lcuda -lcudart \
 
 OBJS += \
 	../common/algorithm/cuda/NvAnalysis.o \
 	../common/algorithm/cuda/NvCudaProc.o \
-	../common/algorithm/gie/gie_inference.o
+	../common/algorithm/gie/gie_inference.o \
+	debug_utils.o \
+	flag_config.o \
 
 LDFLAGS += \
 	-lnvinfer -lnvcaffe_parser \
 	-lcudnn -lcublas -lcudart_static \
 	-lnvToolsExt -lrt -ldl -lwconv \
-	-lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_objdetect
+	-lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_objdetect \
 
 all: $(APP) $(SO)
 
 $(CLASS_DIR)/%.o: $(CLASS_DIR)/%.cpp
 	$(MAKE) -C $(CLASS_DIR)
+
+debug_utils.o: $(NX_UTILS_DIR)/debug_utils.cpp
+	$(CPP) $(CPPFLAGS) -c $<
+
+flag_config.o: $(NX_UTILS_DIR)/flag_config.cpp
+	$(CPP) $(CPPFLAGS) -c $<
 
 $(ALGO_DIR)/%.o: $(ALGO_DIR)/%.c
 	$(MAKE) -C $(ALGO_DIR)
@@ -99,4 +118,4 @@ clean:
 	$(MAKE) -C $(CLASS_DIR) clean
 	$(MAKE) -C $(ALGO_DIR) clean
 	$(MAKE) -C $(GIE_DIR) clean
-	rm -rf *.o $(APP) $(SO)
+	rm -rf *.o $(NX_UTILS_DIR)/*.o $(APP) $(SO)
