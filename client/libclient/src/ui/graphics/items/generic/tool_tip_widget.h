@@ -36,7 +36,7 @@ public:
      * \returns                         Widget's side to which balloon's tail is attached, or zero if
      *                                  there is no tail.
      */
-    Qt::Edge tailBorder() const;
+    Qt::Edges tailBorder() const;
 
     /**
      * \returns                         Width of the base of balloon's tail.
