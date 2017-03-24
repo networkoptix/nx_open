@@ -4,15 +4,18 @@
 
 #include <QtCore/QProcess>
 
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QDesktopWidget>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QImage>
-#include <QtWidgets/QWhatsThis>
+#include <QtGui/QImageWriter>
+
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QCheckBox>
-#include <QtGui/QImageWriter>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QWhatsThis>
 
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>

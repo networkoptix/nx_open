@@ -1,7 +1,7 @@
-#ifndef QN_CLICKABLE_H
-#define QN_CLICKABLE_H
+#pragma once
 
 #include <QtWidgets/QGraphicsSceneMouseEvent>
+#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <nx/utils/math/fuzzy.h>
 #include <utils/common/forward.h>
@@ -9,8 +9,8 @@
 /**
  * A mixin class that lets graphics items handle mouse clicks properly.
  * Not a processor because the logic it implements is pretty simple.
- * 
- * Registered clicks are to be processed by overriding the <tt>clickedNotify</tt> 
+ *
+ * Registered clicks are to be processed by overriding the <tt>clickedNotify</tt>
  * function in derived class.
  */
 template<class Base, class Derived = void>
@@ -25,7 +25,7 @@ public:
     /**
      * Sets the mouse buttons that are clickable. By default, no mouse buttons
      * are clickable.
-     * 
+     *
      * \param clickableButtons          Clickable buttons.
      */
     void setClickableButtons(Qt::MouseButtons clickableButtons) {
@@ -44,7 +44,7 @@ protected:
 
         event->accept();
         m_isDoubleClick = event->type() == QEvent::GraphicsSceneMouseDoubleClick;
-        
+
         pressedNotify(event);
     }
 
@@ -72,7 +72,7 @@ protected:
     /**
      * This function is called each time a mouse click on this item is registered.
      * Handling it is up to derived class.
-     * 
+     *
      * \param event                     Event that caused the mouse click to be generated.
      */
     virtual void clickedNotify(QGraphicsSceneMouseEvent *event) { Q_UNUSED(event); };
@@ -83,7 +83,7 @@ protected:
 
 private:
     /* We cannot implement these as virtual signals because virtual signals are
-     * not supported by new connect syntax. So we use CRTP. Nice bonus is that 
+     * not supported by new connect syntax. So we use CRTP. Nice bonus is that
      * there is no need to befriend base class as signals are public in Qt5. */
 
     void clicked(Qt::MouseButton) {}
@@ -102,5 +102,3 @@ private:
     bool m_isDoubleClick;
     bool m_skipDoubleClick;
 };
-
-#endif // QN_CLICKABLE_H

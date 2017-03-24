@@ -113,10 +113,6 @@ QIcon QnNoptixIconLoader::load(
 {
     static const QString kSeparator = lit("=^_^=");
 
-    QGuiApplication* guiApp = qobject_cast<QGuiApplication*>(qApp);
-    if (!guiApp)
-        return QIcon();
-
     QString key = name + kSeparator + checkedName;
     if (!suffixes)
     {

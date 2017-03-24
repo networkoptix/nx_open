@@ -1,5 +1,6 @@
 #include "alert_bar.h"
 
+#include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QLabel>
 
 #include <ui/common/palette.h>

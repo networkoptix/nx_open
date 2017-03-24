@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QElapsedTimer>
+
 #include <api/server_rest_connection_fwd.h>
 
 #include <client/client_color_types.h>

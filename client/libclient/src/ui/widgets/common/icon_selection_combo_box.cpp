@@ -2,6 +2,8 @@
 
 #include <QtGui/QStandardItemModel>
 
+#include <QtWidgets/QListView>
+
 #include <ui/common/indents.h>
 #include <ui/delegates/styled_combo_box_delegate.h>
 #include <ui/style/helper.h>

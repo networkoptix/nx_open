@@ -1,4 +1,9 @@
 #include "io_module_overlay_widget.h"
+
+#include <QtCore/QElapsedTimer>
+
+#include <QtWidgets/QGraphicsLinearLayout>
+
 #include "io_module_form_overlay_contents.h"
 #include "io_module_grid_overlay_contents.h"
 

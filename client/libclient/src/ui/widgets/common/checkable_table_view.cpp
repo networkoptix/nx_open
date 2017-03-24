@@ -1,7 +1,8 @@
+#include "checkable_table_view.h"
+
 #include <QtCore/QVariant>
 #include <QtCore/QVector>
-
-#include "checkable_table_view.h"
+#include <QtCore/QScopedValueRollback>
 
 #include <client/client_globals.h>
 

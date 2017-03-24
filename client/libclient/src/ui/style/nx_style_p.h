@@ -11,6 +11,9 @@
 #include "noptix_style_animator.h"
 #include "helper.h"
 
+class QInputDialog;
+class QScrollBar;
+
 class QnNxStylePrivate : public QCommonStylePrivate, public QnGeometry
 {
     Q_DECLARE_PUBLIC(QnNxStyle)

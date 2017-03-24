@@ -1,5 +1,7 @@
 #include "client_autorun_watcher.h"
 
+#include <QtCore/QCoreApplication>
+
 #include <client/client_settings.h>
 #include <client/client_installations_manager.h>
 

@@ -597,6 +597,7 @@ TEST_F(AioAsyncChannelBridge, takes_ownership_when_supplying_unique_ptr)
     ASSERT_EQ(2, dummyChannelCount);
 
     auto bridge = makeAsyncChannelBridge(std::move(left), std::move(right));
+    bridge->pleaseStopSync();
     bridge.reset();
 
     ASSERT_EQ(2, pleaseStopCallCount);
@@ -613,6 +614,7 @@ TEST_F(AioAsyncChannelBridge, channels_created_on_stack)
     ASSERT_EQ(2, dummyChannelCount);
 
     auto bridge = makeAsyncChannelBridge(&left, &right);
+    bridge->pleaseStopSync();
     bridge.reset();
 
     ASSERT_EQ(2, dummyChannelCount);

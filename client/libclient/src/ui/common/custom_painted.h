@@ -4,6 +4,8 @@
 #include <type_traits>
 
 #include <QtGui/QPainter>
+
+#include <QtWidgets/QStyleOption>
 #include <QtWidgets/QWidget>
 
 class CustomPaintedBase

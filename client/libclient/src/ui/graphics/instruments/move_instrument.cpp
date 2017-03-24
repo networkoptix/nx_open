@@ -1,8 +1,11 @@
 #include "move_instrument.h"
+
+#include <QtGui/QMouseEvent>
+
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGraphicsItem>
-#include <QtGui/QMouseEvent>
-#include <QtWidgets/QApplication>
 
 namespace {
 

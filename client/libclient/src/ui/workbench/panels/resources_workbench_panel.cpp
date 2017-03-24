@@ -2,6 +2,10 @@
 
 #include <QtCore/QScopedValueRollback>
 
+#include <QtWidgets/QAction>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QMenu>
+
 #include <nx/client/ui/workbench/workbench_animations.h>
 
 #include <ui/actions/action_manager.h>

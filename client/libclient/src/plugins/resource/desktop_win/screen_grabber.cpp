@@ -1,9 +1,16 @@
 #include "screen_grabber.h"
 
-#include <QtGui/QScreen>
-#include <QtCore/QLibrary>
-#include <nx/utils/log/log.h>
 #include <emmintrin.h>
+
+#include <QtCore/QLibrary>
+
+#include <QtGui/QOpenGLFunctions>
+#include <QtGui/QScreen>
+
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QDesktopWidget>
+
+#include <nx/utils/log/log.h>
 #include "utils/media/sse_helper.h"
 #include "utils/color_space/yuvconvert.h"
 

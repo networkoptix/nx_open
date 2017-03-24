@@ -7,28 +7,37 @@
 
 #include <QtCore/QtMath>
 #include <QtGui/QPainter>
+#include <QtGui/QWindow>
+#include <QtGui/private/qfont_p.h>
+
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QAbstractItemView>
+#include <QtWidgets/QCalendarWidget>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QDateTimeEdit>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QFormLayout>
+#include <QtWidgets/QGroupBox>
+#include <QtWidgets/QInputDialog>
+#include <QtWidgets/QItemDelegate>
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QListView>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QPlainTextEdit>
+#include <QtWidgets/QProxyStyle>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QRadioButton>
+#include <QtWidgets/QScrollBar>
+#include <QtWidgets/QSpinBox>
 #include <QtWidgets/QStyleOption>
 #include <QtWidgets/QStyleOptionButton>
-#include <QtWidgets/QPushButton>
+#include <QtWidgets/QTextEdit>
 #include <QtWidgets/QToolButton>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QCalendarWidget>
-#include <QtWidgets/QComboBox>
-#include <QtWidgets/QSpinBox>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QGroupBox>
-#include <QtWidgets/QDateTimeEdit>
-#include <QtWidgets/QRadioButton>
-#include <QtWidgets/QMenu>
-#include <QtWidgets/QDialogButtonBox>
-#include <QtWidgets/QAbstractItemView>
-#include <QtWidgets/QHeaderView>
-#include <QtWidgets/QFormLayout>
-#include <QtWidgets/QProxyStyle>
-#include <QtWidgets/QInputDialog>
+#include <QtWidgets/QTreeView>
 
-#include <QtGui/private/qfont_p.h>
 #include <QtWidgets/private/qabstractitemview_p.h>
 
 #include <ui/common/indents.h>

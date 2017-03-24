@@ -1,6 +1,7 @@
 #include "text_overlay_widget.h"
 
 #include <QtCore/QTimer>
+
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <core/resource/camera_bookmark.h>

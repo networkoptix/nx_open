@@ -2,9 +2,11 @@
 
 #include <limits>
 
+#include <QtCore/QMimeData>
+
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsSceneDragDropEvent>
 #include <QtWidgets/QGraphicsItem>
-#include <QtCore/QMimeData>
 
 #include <common/common_globals.h>
 

@@ -3,6 +3,8 @@
 
 #include <QtCore/QTimer>
 
+#include <QtWidgets/QPushButton>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <api/app_server_connection.h>

@@ -4,6 +4,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QTreeView>
 #include <QtWidgets/QTableView>
+#include <QtWidgets/QHeaderView>
 
 namespace
 {

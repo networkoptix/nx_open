@@ -5,6 +5,8 @@
 
 #include <nx/utils/uuid.h>
 
+class QGraphicsLinearLayout;
+
 class QnScrollableOverlayWidgetPrivate
 {
     Q_DECLARE_PUBLIC(QnScrollableOverlayWidget)

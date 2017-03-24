@@ -1,6 +1,7 @@
 #include "workbench_screenshot_handler.h"
 
 #include <QtCore/QTimer>
+#include <QtCore/QStack>
 
 #include <QtGui/QImageWriter>
 #include <QtGui/QPainter>

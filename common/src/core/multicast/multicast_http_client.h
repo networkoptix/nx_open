@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QElapsedTimer>
+
 #include "multicast_http_fwd.h"
 #include "multicast_http_transport.h"
 
@@ -12,10 +14,10 @@ namespace QnMulticast
     {
         Q_OBJECT
     public:
-  
+
         static const int NO_TIMEOUT = -1;
 
-        /** 
+        /**
         *!param userAgent client side human readable name. It must be provided for server-side audit trails purpose
         *!param localGuid optional parameter to identify client side. Auto generated if empty
         */

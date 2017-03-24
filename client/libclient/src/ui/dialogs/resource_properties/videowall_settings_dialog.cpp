@@ -1,6 +1,8 @@
 #include "videowall_settings_dialog.h"
 #include "ui_videowall_settings_dialog.h"
 
+#include <QtCore/QStandardPaths>
+
 #include <api/app_server_connection.h>
 
 #include <client/client_settings.h>

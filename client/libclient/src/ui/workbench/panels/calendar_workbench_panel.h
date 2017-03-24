@@ -2,6 +2,7 @@
 
 #include <ui/workbench/panels/abstract_workbench_panel.h>
 
+class QGraphicsItem;
 class QnMaskedProxyWidget;
 class QnCalendarWidget;
 class QnImageButtonWidget;

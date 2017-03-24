@@ -2,7 +2,6 @@
 #define QN_FISHEYE_PTZ_CONTROLLER_H
 
 #include <QtCore/QPointer>
-#include <QtCore/QElapsedTimer>
 #include <QtGui/QVector3D>
 
 #include <core/resource/resource_fwd.h>
@@ -29,7 +28,7 @@ public:
 
     virtual bool continuousMove(const QVector3D &speed) override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
-    
+
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
@@ -68,7 +67,7 @@ private:
 
     QnPtzLimits m_limits;
     bool m_unlimitedPan;
-    
+
     qreal m_aspectRatio;
 
     AnimationMode m_animationMode;

@@ -1,9 +1,7 @@
-/**********************************************************
-* 30 sep 2013
-* a.kolesnikov
-***********************************************************/
-
 #include "compatibility_version_installation_dialog.h"
+
+#include <QtWidgets/QPushButton>
+
 #include "ui_compatibility_version_installation_dialog.h"
 #include "utils/compatibility_version_installation_tool.h"
 #include "update/media_server_update_tool.h"

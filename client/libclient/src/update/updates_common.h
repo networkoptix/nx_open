@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QCoreApplication>
+
 #include <core/resource/resource_fwd.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>

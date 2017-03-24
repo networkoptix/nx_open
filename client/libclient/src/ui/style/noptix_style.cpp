@@ -3,12 +3,16 @@
 #include <cmath> /* For std::fmod. */
 
 #include <QtCore/QSet>
-#include <QtWidgets/QApplication>
+
 #include <QtGui/QPainter>
 #include <QtGui/QImage>
+
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsWidget>
 #include <QtWidgets/QStyleOption>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QAction>
+#include <QtWidgets/QToolTip>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QHeaderView>

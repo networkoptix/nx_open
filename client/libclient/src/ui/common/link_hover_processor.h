@@ -1,5 +1,7 @@
 #pragma once
 
+class QLabel;
+
 /*
  * Class to dynamically change hovered/unhovered label links color and cursor.
  *  Color is changed to style::linkColor(m_label, isHovered).

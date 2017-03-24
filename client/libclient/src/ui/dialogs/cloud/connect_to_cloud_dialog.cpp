@@ -1,6 +1,8 @@
 #include "connect_to_cloud_dialog.h"
 #include "ui_connect_to_cloud_dialog.h"
 
+#include <QtWidgets/QGraphicsOpacityEffect>
+
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 

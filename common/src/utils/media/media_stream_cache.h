@@ -10,8 +10,6 @@
 #include <memory>
 #include <functional> /* For std::function. */
 
-#include <QtCore/QElapsedTimer>
-
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <nx/utils/thread/mutex.h>
 

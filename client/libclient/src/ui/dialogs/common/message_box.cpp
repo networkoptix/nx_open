@@ -1,7 +1,9 @@
 #include "message_box.h"
 #include "ui_message_box.h"
 
+#include <QtGui/QClipboard>
 #include <QtGui/QStandardItemModel>
+
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
 

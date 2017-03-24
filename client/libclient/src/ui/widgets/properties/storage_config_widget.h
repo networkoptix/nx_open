@@ -23,7 +23,9 @@ namespace Ui {
     class StorageConfigWidget;
 } // namespace Ui
 
+class QMenu;
 class QnStorageListModel;
+
 class QnStorageConfigWidget: public Connective<QnAbstractPreferencesWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT

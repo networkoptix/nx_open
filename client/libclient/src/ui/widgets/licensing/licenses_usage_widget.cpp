@@ -1,5 +1,8 @@
 #include "licenses_usage_widget.h"
 
+#include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QLabel>
+
 #include <ui/style/custom_style.h>
 
 #include <utils/license_usage_helper.h>
@@ -39,7 +42,7 @@ private:
 };
 
 
-QnLicensesUsageWidget::QnLicensesUsageWidget(QWidget *parent): 
+QnLicensesUsageWidget::QnLicensesUsageWidget(QWidget *parent):
     QWidget(parent) {}
 
 QnLicensesUsageWidget::~QnLicensesUsageWidget() {
