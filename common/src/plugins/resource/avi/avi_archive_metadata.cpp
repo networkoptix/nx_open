@@ -213,12 +213,13 @@ QnAviArchiveMetadata QnAviArchiveMetadata::loadFromFile(const AVFormatContext* c
 
 void QnAviArchiveMetadata::saveToFile(AVFormatContext* context, Format format)
 {
+    int flags = 0;
+
     av_dict_set(
         &context->metadata,
         getTagName(CustomTag, format),
         QJson::serialized<QnAviArchiveMetadata>(*this),
-        0
-    );
+        flags);
 
     // Other tags are not supported in mp4 format.
     if (format == QnAviArchiveMetadata::Format::mp4)
@@ -233,7 +234,7 @@ void QnAviArchiveMetadata::saveToFile(AVFormatContext* context, Format format)
             &context->metadata,
             getTagName(LayoutInfoTag, format),
             layoutStr.toLatin1().data(),
-            0);
+            flags);
     }
 
     if (startTimeMs > 0)
@@ -242,26 +243,23 @@ void QnAviArchiveMetadata::saveToFile(AVFormatContext* context, Format format)
             &context->metadata,
             getTagName(StartTimeTag, format),
             QString::number(startTimeMs).toLatin1().data(),
-            0
-        );
+            flags);
     }
 
     av_dict_set(
         &context->metadata,
         getTagName(SoftwareTag, format),
         "Network Optix",
-        0
-    );
+        flags);
 
     if (dewarpingParams.enabled)
     {
-        // Dewarping exists in resource and not activated now. Allow dewarping for saved file.
+        // Dewarping exists in resource and is not activated now. Allow dewarping for saved file.
         av_dict_set(
             &context->metadata,
             getTagName(DewarpingTag, format),
             QJson::serialized<QnMediaDewarpingParams>(dewarpingParams),
-            0
-        );
+            flags);
     }
 
     if (!signature.isEmpty())
@@ -270,7 +268,6 @@ void QnAviArchiveMetadata::saveToFile(AVFormatContext* context, Format format)
             &context->metadata,
             getTagName(SignatureTag, format),
             signature.data(),
-            0
-        );
+            flags);
     }
 }
