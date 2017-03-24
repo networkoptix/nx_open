@@ -811,7 +811,7 @@ private:
     bool m_terminated;
 };
 
-TEST(AsyncHttpClient, PartionedIncomingData)
+TEST_F(AsyncHttpClient, PartionedIncomingData)
 {
     std::vector<QByteArray> dataToSend;
 
