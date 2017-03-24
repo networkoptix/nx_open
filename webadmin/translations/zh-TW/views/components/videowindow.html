@@ -1,0 +1,54 @@
+<div class="videowindow">
+
+    <div class="camera-view-informer camera-loading" ng-if="loading">
+        <div class="camera-view-preloader camera-view-message-icon"></div>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashRequired">
+        無法播放影像.<br>
+        請 <a href="https://get.adobe.com/flashplayer/" target="_blank">安裝 Adobe Flash</a> 以在ARM伺服器上播放影像.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashOrWebmRequired">
+        無法播放影像.<br>
+        請 <a href="https://get.adobe.com/flashplayer/" target="_blank">安裝 Adobe Flash</a> or <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">WebM codec</a> 以在IE上播放影像.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noArmSupport">
+        無法播放影像.<br>
+        此瀏覽器或裝置不支援在ARM伺服器上回放影像.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noFormat">
+        無法播放影像.<br>
+        此瀏覽器或裝置不支援從攝影機回放影像.<br>
+    </div>
+
+
+    <div class="camera-view-informer" ng-if="ieNoWebm">
+        無法播放影像.<br>
+        請安裝 <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">WebM codec</a> 以在IE上播放影像.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ieWin10">
+        無法播放影像.<br>
+        請使用 Microsoft Edge 或 Google Chrome 瀏覽器.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ubuntuNX">
+        無法播放影像.<br>
+        此瀏覽器不支援來自ARM伺服器的影像. 請改用 Chromium browser.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="errorLoading">
+        無法播放影像.<br>
+        發生錯誤.<br>
+    </div>
+
+
+    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}" ng-include="Config.viewsDir + 'components/flashls.html'">
+    </div>
+
+    <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading}">
+    </div>
+</div>
