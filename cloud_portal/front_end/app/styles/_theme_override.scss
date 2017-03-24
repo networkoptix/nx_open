@@ -240,7 +240,10 @@ select.form-control{
 
 
 .btn{
-  outline: none !important;;
+  outline: none !important;
+  max-width: 238px;
+  text-overflow: ellipsis;
+  overflow: hidden;
   &:hover,
   &:active,
   &.active,
