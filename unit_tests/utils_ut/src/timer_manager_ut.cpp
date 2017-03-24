@@ -64,8 +64,10 @@ protected:
 
     void assertTimerErrorFactorIsNotLargerThan(float coeff)
     {
-        const auto minTime = delay * (1 - coeff);
-        const auto maxTime = delay * (1 + coeff);
+        const auto minTime = std::chrono::duration_cast<
+            std::remove_const<decltype(delay)>::type>(delay * (1 - coeff));
+        const auto maxTime = std::chrono::duration_cast<
+            std::remove_const<decltype(delay)>::type>(delay * (1 + coeff));
 
         const auto totalTime = m_lastTimerEventClock - m_timerStartClock;
         const auto averageEventTime = totalTime / m_eventCount.load();
