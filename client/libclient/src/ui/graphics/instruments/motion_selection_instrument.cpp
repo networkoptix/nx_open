@@ -157,7 +157,10 @@ void MotionSelectionInstrument::setWidget(QnMediaResourceWidget* widget)
     m_widget = widget;
 
     if (m_widget)
+    {
         connect(m_widget, &QnResourceWidget::optionsChanged, this, &MotionSelectionInstrument::updateCursor);
+        connect(m_widget, &QObject::destroyed, this, &MotionSelectionInstrument::updateCursor);
+    }
 
     updateCursor();
 }
