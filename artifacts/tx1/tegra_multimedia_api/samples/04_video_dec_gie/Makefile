@@ -47,12 +47,15 @@ SRCS := \
 	video_dec_gie_csvparser.cpp \
 	video_dec_gie_main.cpp \
 	config.cpp \
+	main_tv.cpp \
 	tegra_video.cpp \
 	tegra_video_impl.cpp \
 	tegra_video_stub.cpp \
 	$(wildcard $(CLASS_DIR)/*.cpp) \
 
 OBJS := $(SRCS:.cpp=.o)
+
+HEADERS := $(wildcard *.h)
 
 CPPFLAGS += \
 	-std=c++11 \
@@ -90,10 +93,10 @@ all: $(APP) $(SO)
 $(CLASS_DIR)/%.o: $(CLASS_DIR)/%.cpp
 	$(MAKE) -C $(CLASS_DIR)
 
-debug_utils.o: $(NX_UTILS_DIR)/debug_utils.cpp
+debug_utils.o: $(NX_UTILS_DIR)/debug_utils.cpp $(NX_UTILS_DIR)/debug_utils.h
 	$(CPP) $(CPPFLAGS) -c $<
 
-flag_config.o: $(NX_UTILS_DIR)/flag_config.cpp
+flag_config.o: $(NX_UTILS_DIR)/flag_config.cpp $(NX_UTILS_DIR)/flag_config.h
 	$(CPP) $(CPPFLAGS) -c $<
 
 $(ALGO_DIR)/%.o: $(ALGO_DIR)/%.c
@@ -105,7 +108,7 @@ $(ALGO_DIR)/%.o: $(ALGO_DIR)/%.cu
 $(GIE_DIR)/%.o: $(GIE_DIR)/%.cpp
 	$(MAKE) -C $(GIE_DIR)
 
-%.o: %.cpp
+%.o: %.cpp $(HEADERS)
 	$(CPP) $(CPPFLAGS) -c $<
 
 $(APP): $(OBJS)

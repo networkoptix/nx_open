@@ -33,7 +33,7 @@ Stub::Stub(const Params& params):
     m_deployFile(params.deployFile),
     m_cacheFile(params.cacheFile)
 {
-    OUTPUT << "Stub created:";
+    OUTPUT << "Stub(): created:";
     OUTPUT << "    modelFile: " << m_modelFile;
     OUTPUT << "    deployFile: " << m_deployFile;
     OUTPUT << "    cacheFile: " << m_cacheFile;
@@ -41,6 +41,7 @@ Stub::Stub(const Params& params):
 
 Stub::~Stub()
 {
+    OUTPUT << "~Stub(): destroyed.";
 }
 
 bool Stub::pushCompressedFrame(const CompressedFrame* compressedFrame)

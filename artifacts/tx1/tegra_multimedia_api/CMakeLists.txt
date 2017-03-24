@@ -29,7 +29,8 @@ set(SOURCE_FILES
     samples/04_video_dec_gie/config.cpp
     samples/04_video_dec_gie/tegra_video_impl.cpp
     samples/04_video_dec_gie/tegra_video_stub.cpp
-
+    samples/04_video_dec_gie/main_tv.h
+    samples/04_video_dec_gie/main_tv.cpp
     argus/apps/camera/common/ConditionVariable.cpp
     argus/apps/camera/common/ConditionVariable.h
     argus/apps/camera/common/Mutex.cpp

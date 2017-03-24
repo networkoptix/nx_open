@@ -46,6 +46,9 @@
 
 #define OUTPUT_PREFIX "[video_dec_gie_main] "
 #include <nx/utils/debug_utils.h>
+#include "config.h"
+
+#include "main_tv.h"
 
 namespace {
 
@@ -66,11 +69,6 @@ static const int kNetHeight = 540;
 #define IS_NAL_UNIT_START(buffer_ptr) \
             (!buffer_ptr[0] && !buffer_ptr[1] && \
              !buffer_ptr[2] && (buffer_ptr[3] == 1))
-
-const char *GOOGLE_NET_DEPLOY_NAME =
-             "../../data/model/GoogleNet-modified.prototxt";
-const char *GOOGLE_NET_MODEL_NAME =
-             "../../data/model/GoogleNet-modified-online_iter_30000.caffemodel";
 
 using namespace std;
 using namespace nvinfer1;
@@ -590,14 +588,17 @@ gieThread(void *arg)
             void *cuda_buf = ctx->gie_ctx->getBuffer(0);
 
             // TODO: #mshevchenko: Here they convert RGB to float directly to NN buffer in VRAM.
+OUTPUT << "Going to call mapEGLImage2Float(egl_image, width: " << ctx->gie_ctx->getNetWidth()
+    << ", height: " << ctx->gie_ctx->getNetHeight()
+    << ", buffer: " << (cuda_buf ? "not null" : "null") << ")";
 
             // map eglimage into GPU address
-            mapEGLImage2Float(&egl_image,  ctx->gie_ctx->getNetWidth(),
+LL          mapEGLImage2Float(&egl_image,  ctx->gie_ctx->getNetWidth(),
                               ctx->gie_ctx->getNetHeight(),
                               (char *)cuda_buf + batch_offset * sizeof(float));
 
             // Destroy EGLImage
-            NvDestroyEGLImage(ctx->egl_display, egl_image);
+LL          NvDestroyEGLImage(ctx->egl_display, egl_image);
             egl_image = NULL;
 #endif
             buf_num++;
@@ -756,8 +757,8 @@ static void
 setDefaults(context_t * ctx)
 {
     memset(ctx, 0, sizeof(context_t));
-    ctx->deployfile = GOOGLE_NET_DEPLOY_NAME;
-    ctx->modelfile = GOOGLE_NET_MODEL_NAME;
+    ctx->deployfile = conf.deployFile;
+    ctx->modelfile = conf.modelFile;
     ctx->gie_ctx = new GIE_Context;
     ctx->gie_ctx->setDumpResult(true);
     ctx->gie_buf_queue = new queue<Shared_Buffer>;
@@ -1034,11 +1035,10 @@ mainNx(int argc, char *argv[])
         std::cerr << "ERROR: File not specified." << std::endl;
         return 1;
     }
-
     const char *const filename = argv[1];
 
     Detector detector;
-    detector.startInference(GOOGLE_NET_MODEL_NAME, GOOGLE_NET_DEPLOY_NAME, "./gieModel.cache");
+    detector.startInference(conf.modelFile, conf.deployFile, conf.cacheFile);
 
     ifstream in_file;
     in_file.open(filename, ios::in | ios::binary);
@@ -1066,7 +1066,7 @@ main(int argc, char *argv[])
     if (argc == 1 || strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)
     {
         std::cout << "Usage: " << argv[0] << " <mode> <file> ..." << std::endl;
-        std::cout << "Here <mode> is one of: \"--original\", \"--nx\"." << std::endl;
+        std::cout << "Here <mode> is one of: \"--original\", \"--nx\", \"--tv\"." << std::endl;
         return 1;
     }
     else if (strcmp(argv[1], "--original") == 0)
@@ -1078,6 +1078,11 @@ main(int argc, char *argv[])
     {
         std::cout << "Running in --nx mode." << std::endl;
         return mainNx(argc - 1, &argv[1]);
+    }
+    else if (strcmp(argv[1], "--tv") == 0)
+    {
+        std::cout << "Running in --tv mode." << std::endl;
+        return mainTv(argc - 1, &argv[1]);
     }
     else
     {
@@ -1433,7 +1438,13 @@ Detector::getNetHeight() const
 int
 Detector::fillBuffer(const uint8_t* data, int dataSize, NvBuffer* buffer)
 {
-    streamsize bytes_to_read = MIN(CHUNK_SIZE, buffer->planes[0].length);
+    if (!buffer)
+    {
+        PRINT << "ERROR: Detector::fillBuffer(dataSize: " << dataSize << ", buffer: null)";
+        return 0;
+    }
+
+    streamsize bytes_to_read = MIN(dataSize, buffer->planes[0].length);
     memcpy(buffer->planes[0].data, data, bytes_to_read);
     buffer->planes[0].bytesused = bytes_to_read;
 

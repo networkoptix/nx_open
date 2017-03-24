@@ -74,6 +74,7 @@ bool Impl::pushCompressedFrame(const CompressedFrame* compressedFrame)
     std::lock_guard<std::mutex> lock(m_mutex);
     m_ptsMap[m_inFrameCounter] = compressedFrame->ptsUs;
     ++m_inFrameCounter;
+
     m_detector->pushCompressedFrame(compressedFrame->data, compressedFrame->dataSize);
 
     OUTPUT << "pushCompressedFrame() END";
