@@ -435,7 +435,7 @@ public:
     QnTimePeriodActionCondition(
         Qn::TimePeriodTypes periodTypes,
         Qn::ActionVisibility nonMatchingVisibility,
-        QObject *parent)
+        QObject* parent)
         :
         QnActionCondition(parent),
         m_periodTypes(periodTypes),

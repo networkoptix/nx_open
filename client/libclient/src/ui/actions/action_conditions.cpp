@@ -75,7 +75,7 @@ Qn::TimePeriodType periodType(const QnTimePeriod& period)
     return Qn::NormalTimePeriod;
 }
 
-}
+} // namespace
 
 QnActionCondition::QnActionCondition(QObject *parent):
     QObject(parent),
