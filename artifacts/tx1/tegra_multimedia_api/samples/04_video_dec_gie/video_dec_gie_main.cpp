@@ -49,8 +49,8 @@
 
 namespace {
 
-static const int kNetWidth = 940;
-static const int kNetHeight = 560;
+static const int kNetWidth = 960;
+static const int kNetHeight = 540;
 
 } // namespace
 
