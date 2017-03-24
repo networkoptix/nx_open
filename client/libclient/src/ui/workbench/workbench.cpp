@@ -3,6 +3,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <core/resource/layout_resource.h>
+
 #include <core/resource/user_resource.h>
 
 #include <ui/style/globals.h>
@@ -15,16 +16,29 @@
 #include <utils/common/warnings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/util.h>
+
 #include <nx/client/ui/workbench/layouts/layout_factory.h>
+#include <common/common_module.h>
 
 namespace {
-    QnWorkbenchItem *bestItemForRole(QnWorkbenchItem **itemByRole, Qn::ItemRole role) {
-        for(int i = 0; i != role ; i++)
-            if(itemByRole[i])
-                return itemByRole[i];
-        return NULL;
-    }
+QnWorkbenchItem *bestItemForRole(QnWorkbenchItem **itemByRole, Qn::ItemRole role) {
+    for(int i = 0; i != role ; i++)
+        if(itemByRole[i])
+            return itemByRole[i];
+    return NULL;
+}
 
+void addLayoutCreators()
+{
+    const auto standardLayoutCreator =
+        [](const QnLayoutResourcePtr& resource, QObject* parent) -> QnWorkbenchLayout*
+        {
+            return new QnWorkbenchLayout(resource, parent);
+        };
+
+    qnCommon->store(new nx::client::ui::workbench::layouts::LayoutsFactory());
+    qnLayoutFactory->addCreator(standardLayoutCreator);
+}
 } // anonymous namespace
 
 
@@ -37,22 +51,8 @@ QnWorkbench::QnWorkbench(QObject *parent):
     for(int i = 0; i < Qn::ItemRoleCount; i++)
         m_itemByRole[i] = NULL;
 
+    addLayoutCreators();
     m_mapper = new QnWorkbenchGridMapper(this);
-
-    const auto defaultLayoutCreator =
-        [](const QnLayoutResourcePtr& /* resource */, QObject* parent) -> QnWorkbenchLayout*
-        {
-            return new QnWorkbenchLayout(parent);
-        };
-    const auto standardLayoutCreator =
-        [](const QnLayoutResourcePtr& resource, QObject* parent) -> QnWorkbenchLayout*
-        {
-            return new QnWorkbenchLayout(resource, parent);
-        };
-
-    qnLayoutFactory->addCreator(defaultLayoutCreator);
-    qnLayoutFactory->addCreator(standardLayoutCreator);
-
     m_dummyLayout = qnLayoutFactory->create(this);
     setCurrentLayout(m_dummyLayout);
 }

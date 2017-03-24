@@ -43,7 +43,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_runtime_data.h>
-#include <nx/client/ui/workbench/layouts/layout_factory.h>
 
 #include <decoders/video/abstract_video_decoder.h>
 
@@ -282,8 +281,6 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     /* Depends on QnClientSettings, never used directly. */
     common->store(new QnClientAutoRunWatcher());
-
-    common->store(new nx::client::ui::workbench::layouts::LayoutsFactory());
 
     common->setModuleGUID(clientInstanceManager->instanceGuid());
     nx::network::SocketGlobals::outgoingTunnelPool()
