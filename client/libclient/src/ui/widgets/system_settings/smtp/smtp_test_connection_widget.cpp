@@ -8,6 +8,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <utils/email/email.h>
+#include <common/common_module.h>
 
 namespace {
     const int testSmtpTimeoutMSec = 20 * 1000;
@@ -98,6 +99,12 @@ bool QnSmtpTestConnectionWidget::testSettings(const QnEmailSettings &value)
 
         serverConnection = server->apiConnection();
         break;
+    }
+
+    if (!serverConnection)
+    {
+        if (auto server = qnCommon->currentServer())
+            serverConnection = server->apiConnection();
     }
 
     if (!serverConnection)
