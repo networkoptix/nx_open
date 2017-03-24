@@ -650,16 +650,6 @@ public:
     AsyncHttpClientReusingConnection():
         m_responseCount(0)
     {
-        testHttpServer()->setPersistentConnectionEnabled(false);
-        NX_GTEST_ASSERT_TRUE(
-            testHttpServer()->registerStaticProcessor(
-                testPath,
-                "qwade324dwfasd123sdf23sdfsdf",
-                "text/plain"));
-        NX_GTEST_ASSERT_TRUE(testHttpServer()->bindAndListen());
-
-        m_testUrl = lm("http://%1%2").str(testHttpServer()->serverAddress()).arg(testPath);
-
         m_httpClient = nx_http::AsyncHttpClient::create();
         m_httpClient->setSendTimeoutMs(1000);
         QObject::connect(
@@ -673,9 +663,40 @@ public:
     ~AsyncHttpClientReusingConnection()
     {
         m_httpClient->pleaseStopSync();
+        m_testHttpServer.reset();
     }
 
 protected:
+    void initializeStaticContentServer()
+    {
+        testHttpServer()->setPersistentConnectionEnabled(false);
+        NX_GTEST_ASSERT_TRUE(
+            testHttpServer()->registerStaticProcessor(
+                testPath,
+                "qwade324dwfasd123sdf23sdfsdf",
+                "text/plain"));
+        NX_GTEST_ASSERT_TRUE(testHttpServer()->bindAndListen());
+
+        m_testUrl = lm("http://%1%2").str(testHttpServer()->serverAddress()).arg(testPath);
+    }
+
+    void initializeDelayedConnectionClosureServer()
+    {
+        using namespace std::placeholders;
+
+        testHttpServer()->setPersistentConnectionEnabled(true);
+
+        auto httpHandlerFunc =
+            std::bind(&AsyncHttpClientReusingConnection::delayedConnectionClosureHttpHandlerFunc,
+                this, _1, _2, _3, _4, _5);
+        NX_GTEST_ASSERT_TRUE(
+            testHttpServer()->registerRequestProcessorFunc(
+                testPath, std::move(httpHandlerFunc)));
+        NX_GTEST_ASSERT_TRUE(testHttpServer()->bindAndListen());
+
+        m_testUrl = lm("http://%1%2").str(testHttpServer()->serverAddress()).arg(testPath);
+    }
+
     void scheduleRequestToValidUrlJustAfterFirstRequest()
     {
         m_scheduledRequests.push(m_testUrl);
@@ -683,12 +704,14 @@ protected:
 
     void performRequestToValidUrl()
     {
-        m_httpClient->doGet(m_testUrl);
+        scheduleRequestToValidUrlJustAfterFirstRequest();
+        sendNextRequest();
     }
 
     void performRequestToInvalidUrl()
     {
-        m_httpClient->doGet(QUrl("http://example.com:58249/test"));
+        m_scheduledRequests.push(QUrl("http://example.com:58249/test"));
+        sendNextRequest();
     }
 
     void assertRequestSucceeded()
@@ -702,16 +725,33 @@ protected:
     }
 
 private:
+    struct HttpConnectionContext
+    {
+        nx::network::aio::Timer timer;
+        int requestsReceived = 0;
+    };
+
     QUrl m_testUrl;
     nx::utils::SyncQueue<std::unique_ptr<nx_http::Response>> m_responseQueue;
     std::atomic<int> m_responseCount;
     nx_http::AsyncHttpClientPtr m_httpClient;
     std::queue<QUrl> m_scheduledRequests;
+    std::map<
+        nx_http::HttpServerConnection*,
+        std::unique_ptr<HttpConnectionContext>> m_connectionToContext;
+    QnMutex m_mutex;
+
+    void sendNextRequest()
+    {
+        const auto scheduledRequestUrl = m_scheduledRequests.front();
+        m_scheduledRequests.pop();
+        m_httpClient->doGet(scheduledRequestUrl);
+    }
 
     void onRequestCompleted(AsyncHttpClientPtr client)
     {
         ++m_responseCount;
-        if (client->response())
+        if (client->response() && !client->failed())
             m_responseQueue.push(std::make_unique<nx_http::Response>(*client->response()));
         else
             m_responseQueue.push(nullptr);
@@ -721,9 +761,64 @@ private:
         if (m_scheduledRequests.empty())
             return;
 
-        const auto scheduledRequestUrl = m_scheduledRequests.front();
-        m_scheduledRequests.pop();
-        client->doGet(scheduledRequestUrl);
+        sendNextRequest();
+    }
+
+    void delayedConnectionClosureHttpHandlerFunc(
+        nx_http::HttpServerConnection* const connection,
+        stree::ResourceContainer /*authInfo*/,
+        nx_http::Request request,
+        nx_http::Response* const /*response*/,
+        nx_http::RequestProcessedHandler completionHandler)
+    {
+        nx_http::RequestResult requestResult(nx_http::StatusCode::ok);
+
+        HttpConnectionContext* connectionContext = nullptr;
+        {
+            QnMutexLocker lock(&m_mutex);
+            auto p = m_connectionToContext.emplace(connection, nullptr);
+            if (p.second)
+                p.first->second = std::make_unique<HttpConnectionContext>();
+            connectionContext = p.first->second.get();
+        }
+
+        ++connectionContext->requestsReceived;
+
+        requestResult.connectionEvents.onResponseHasBeenSent =
+            std::bind(&AsyncHttpClientReusingConnection::onResponseSent, this, connection);
+        connection->registerCloseHandler(
+            std::bind(&AsyncHttpClientReusingConnection::onConnectionClosed, this, connection));
+
+        completionHandler(std::move(requestResult));
+    }
+
+    void onResponseSent(nx_http::HttpServerConnection* connection)
+    {
+        QnMutexLocker lock(&m_mutex);
+
+        auto it = m_connectionToContext.find(connection);
+        if (it == m_connectionToContext.end())
+            return;
+
+        it->second->timer.bindToAioThread(connection->getAioThread());
+        it->second->timer.start(
+            std::chrono::milliseconds(nx::utils::random::number<int>(1, 30)),
+            std::bind(&AsyncHttpClientReusingConnection::closeConnection, this, connection));
+    }
+
+    void closeConnection(nx_http::HttpServerConnection* connection)
+    {
+        connection->socket()->shutdown();
+        connection->closeConnection(SystemError::connectionReset);
+    }
+
+    void onConnectionClosed(nx_http::HttpServerConnection* connection)
+    {
+        QnMutexLocker lock(&m_mutex);
+
+        auto it = m_connectionToContext.find(connection);
+        if (it != m_connectionToContext.end())
+            m_connectionToContext.erase(it);
     }
 };
 
@@ -731,6 +826,7 @@ const char* AsyncHttpClientReusingConnection::testPath = "/ReusingExistingConnec
 
 TEST_F(AsyncHttpClientReusingConnection, connecting_to_the_valid_url_first)
 {
+    initializeStaticContentServer();
     scheduleRequestToValidUrlJustAfterFirstRequest();
     performRequestToValidUrl();
     assertRequestSucceeded();
@@ -739,9 +835,19 @@ TEST_F(AsyncHttpClientReusingConnection, connecting_to_the_valid_url_first)
 
 TEST_F(AsyncHttpClientReusingConnection, connecting_to_the_invalid_url_first)
 {
+    initializeStaticContentServer();
     scheduleRequestToValidUrlJustAfterFirstRequest();
     performRequestToInvalidUrl();
     assertRequestFailed();
+    assertRequestSucceeded();
+}
+
+TEST_F(AsyncHttpClientReusingConnection, server_closes_connection_with_random_delay)
+{
+    initializeDelayedConnectionClosureServer();
+    scheduleRequestToValidUrlJustAfterFirstRequest();
+    performRequestToValidUrl();
+    assertRequestSucceeded();
     assertRequestSucceeded();
 }
 
