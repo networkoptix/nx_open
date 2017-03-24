@@ -40,6 +40,7 @@
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <utils/common/delayed.h>
+#include <nx/client/ui/workbench/layouts/layout_factory.h>
 
 namespace {
     class QnAlarmLayoutResource: public QnLayoutResource {
@@ -230,8 +231,9 @@ QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout() {
     }
 
     QnWorkbenchLayout* workbenchAlarmLayout = QnWorkbenchLayout::instance(QnLayoutResourcePtr(alarmLayout));
-    if (!workbenchAlarmLayout) {
-        workbenchAlarmLayout = new QnWorkbenchLayout(alarmLayout, workbench());
+    if (!workbenchAlarmLayout)
+    {
+        workbenchAlarmLayout = qnLayoutFactory->create(alarmLayout, workbench());
         workbenchAlarmLayout->setData(Qt::DecorationRole, qnSkin->icon("layouts/alarm.png"));
         workbench()->addLayout(workbenchAlarmLayout);
     }

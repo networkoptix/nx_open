@@ -52,6 +52,7 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <nx/client/ui/workbench/layouts/layout_factory.h>
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
@@ -367,7 +368,8 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
         user == layoutOwnerUser)   //making current only new layout of current user
     {
         int index = workbench()->currentLayoutIndex();
-        workbench()->insertLayout(new QnWorkbenchLayout(newLayout, this), index);
+
+        workbench()->insertLayout(qnLayoutFactory->create(newLayout, this), index);
         workbench()->setCurrentLayoutIndex(index);
         workbench()->removeLayout(index + 1);
 
@@ -1063,7 +1065,7 @@ void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
 
 void QnWorkbenchLayoutsHandler::at_openNewTabAction_triggered()
 {
-    QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
+    QnWorkbenchLayout *layout = qnLayoutFactory->create(this);
 
     layout->setName(generateUniqueLayoutName(context()->user(), tr("New Layout"), tr("New Layout %1")));
 

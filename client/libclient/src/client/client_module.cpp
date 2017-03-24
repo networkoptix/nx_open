@@ -86,6 +86,7 @@
 #include <ui/customization/customizer.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+
 #ifdef Q_OS_WIN
 #include <ui/workaround/iexplore_url_handler.h>
 #endif
