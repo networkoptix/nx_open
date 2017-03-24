@@ -99,6 +99,7 @@ class ServerRestApiProxy(object):
 class RestApiBase(object):
 
     def __init__(self, server_name, url, user, password):
+        assert url.endswith('/'), repr(url)  # http://localhost:7001/
         self.server_name = server_name
         self.url = url
         self.user = user
