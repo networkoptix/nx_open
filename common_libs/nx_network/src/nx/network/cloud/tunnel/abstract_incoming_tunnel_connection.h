@@ -9,12 +9,13 @@ namespace nx {
 namespace network {
 namespace cloud {
 
+// TODO: #ak Inherit aio::BasicPollable.
+
 /**
  *  Represents incomming tunnel connection established using one of a nat
  *  traversal methods.
  */
-class NX_NETWORK_API AbstractIncomingTunnelConnection
-:
+class NX_NETWORK_API AbstractIncomingTunnelConnection:
     public QnStoppableAsync
 {
 public:

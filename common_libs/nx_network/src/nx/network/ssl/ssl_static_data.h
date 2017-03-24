@@ -31,6 +31,7 @@ public:
 
     static SslStaticData* instance();
     static void setAllowedServerVersions(const String& versions);
+    static void setAllowedServerCiphers(const String& ciphers);
 
 private:
     std::unique_ptr<SSL_CTX, decltype(&SSL_CTX_free)> m_serverContext;
@@ -38,6 +39,7 @@ private:
 
     static std::atomic<bool> s_isInitialized;
     static int s_disabledServerVersions;
+    static String s_allowedServerCiphers;
 };
 
 } // namespace ssl

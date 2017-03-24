@@ -87,7 +87,7 @@ void AsyncClient::sendRequest(
     };
 }
 
-void AsyncClient::addConnectionTimer(
+bool AsyncClient::addConnectionTimer(
     std::chrono::milliseconds period, TimerHandler handler, void* client)
 {
     QnMutexLocker lock(&m_mutex);
@@ -96,14 +96,14 @@ void AsyncClient::addConnectionTimer(
         NX_LOGX(lm("Ignore timer from client(%1), state is %2")
             .strs(client, static_cast<int>(m_state)), cl_logDEBUG1);
      
-        return;
+        return false;
     }
 
     const auto timer = m_connectionTimers.emplace(
         client, std::make_unique<network::aio::Timer>(getAioThread())).first;
 
     startTimer(timer, period, std::move(handler));
-
+    return true;
 }
 
 SocketAddress AsyncClient::localAddress() const

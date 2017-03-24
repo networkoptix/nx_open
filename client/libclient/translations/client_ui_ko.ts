@@ -366,12 +366,12 @@
     <message>
         <location/>
         <source>Description</source>
-        <translation>설명(&amp;D)</translation>
+        <translation>설명</translation>
     </message>
     <message>
         <location/>
         <source>Timeout</source>
-        <translation>시간제한(&amp;T)</translation>
+        <translation>시간제한</translation>
     </message>
     <message>
         <location/>
@@ -543,12 +543,12 @@
     <message>
         <location/>
         <source>Subnet Scan</source>
-        <translation>서브넷 검색 (&amp;u)</translation>
+        <translation>서브넷 검색</translation>
     </message>
     <message>
         <location/>
         <source>Discovery Port</source>
-        <translation>검색 포트(&amp;D):</translation>
+        <translation>검색 포트:</translation>
     </message>
     <message>
         <location/>
@@ -568,7 +568,7 @@
     <message>
         <location/>
         <source>Add selected</source>
-        <translation>추가 선택(&amp;A)</translation>
+        <translation>추가 선택</translation>
     </message>
 </context>
 <context>
@@ -589,7 +589,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
         <source>about:blank</source>
-        <translation>상세 </translation>
+        <translation>상세</translation>
     </message>
     <message>
         <location/>
@@ -612,7 +612,7 @@
     <message>
         <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation>주위: 이 옵션 활성화 시  기 설정된 녹화 설정 값과 다르게 동작할 수 있습니다. </translation>
+        <translation>주위: 이 옵션 활성화 시 기 설정된 녹화 설정 값과 다르게 동작할 수 있습니다.</translation>
     </message>
     <message>
         <location/>
@@ -751,7 +751,7 @@
     <message>
         <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
         <source>Output ID:</source>
-        <translation>출력 ID(&amp;O):</translation>
+        <translation>출력 ID:</translation>
     </message>
     <message>
         <location/>
@@ -1145,7 +1145,7 @@
     <message>
         <location/>
         <source>Add...</source>
-        <translation>추가(&amp;A)...</translation>
+        <translation>추가...</translation>
     </message>
     <message>
         <location/>
@@ -1282,22 +1282,22 @@
     <message>
         <location/>
         <source>Crop to monitor aspect ratio</source>
-        <translation>모니터에 맞춰 비율 조정(&amp;C)</translation>
+        <translation>모니터에 맞춰 비율 조정</translation>
     </message>
     <message>
         <location/>
         <source>Width:</source>
-        <translation>너비(&amp;W):</translation>
+        <translation>너비:</translation>
     </message>
     <message>
         <location/>
         <source>Height:</source>
-        <translation>높이(&amp;H):</translation>
+        <translation>높이:</translation>
     </message>
     <message>
         <location/>
         <source>Opacity:</source>
-        <translation>투명도(&amp;H):</translation>
+        <translation>투명도:</translation>
     </message>
 </context>
 <context>
@@ -1554,7 +1554,7 @@
     <message>
         <location/>
         <source>Connection Options:</source>
-        <translation>접속 옵션(&amp;C):</translation>
+        <translation>접속 옵션:</translation>
     </message>
     <message>
         <location/>
@@ -1584,7 +1584,7 @@
     <message>
         <location/>
         <source>Auto-Login</source>
-        <translation>자동-로그인(&amp;A)</translation>
+        <translation>자동-로그인</translation>
     </message>
 </context>
 <context>
@@ -1963,17 +1963,17 @@
     <message>
         <location/>
         <source>Add...</source>
-        <translation>추가(&amp;A)...</translation>
+        <translation>추가...</translation>
     </message>
     <message>
         <location/>
         <source>Rename...</source>
-        <translation>이름 변경(&amp;R)...</translation>
+        <translation>이름 변경...</translation>
     </message>
     <message>
         <location/>
         <source>Delete...</source>
-        <translation>삭제(&amp;D)...</translation>
+        <translation>삭제...</translation>
     </message>
 </context>
 <context>
@@ -2134,7 +2134,7 @@
     <message>
         <location/>
         <source>Delete...</source>
-        <translation>삭제(&amp;D)...</translation>
+        <translation>삭제...</translation>
     </message>
     <message>
         <location/>
@@ -2315,12 +2315,12 @@
     <message>
         <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
         <source>Additional Recipients:</source>
-        <translation>함께 받는사람(&amp;A):</translation>
+        <translation>함께 받는사람:</translation>
     </message>
     <message>
         <location/>
         <source>Global Email Settings...</source>
-        <translation>이메일 설정(&amp;G)...</translation>
+        <translation>이메일 설정...</translation>
     </message>
 </context>
 <context>
@@ -2769,7 +2769,7 @@
     <message>
         <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-        <translation>주위: 이 옵션 활성화 시  기 설정된 녹화 설정 값과 다르게 동작할 수 있습니다. </translation>
+        <translation>주위: 이 옵션 활성화 시 기 설정된 녹화 설정 값과 다르게 동작할 수 있습니다.</translation>
     </message>
 </context>
 <context>

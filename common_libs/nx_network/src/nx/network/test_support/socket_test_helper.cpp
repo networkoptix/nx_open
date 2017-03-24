@@ -452,11 +452,11 @@ void TestConnection::reportFinish(SystemError::ErrorCode code)
     return handler(m_id, this, code);
 }
 
-void TestConnection::prepareConsequentDataToSend(QByteArray* buf)
+void TestConnection::prepareConsequentDataToSend(QByteArray* buffer)
 {
     for (char* 
-        pos = buf->data();
-        pos <= (buf->data() + buf->size() - sizeof(m_dataSequence));
+        pos = buffer->data();
+        pos <= (buffer->data() + buffer->size() - sizeof(m_dataSequence));
         pos += sizeof(m_dataSequence))
     {
         uint64_t x = htonll(m_dataSequence);

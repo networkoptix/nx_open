@@ -51,7 +51,7 @@ QnLogMessage QnLogMessage::arg(const QnUuid& a, int fieldWidth, wchar_t fillChar
 
 QnLogMessage QnLogMessage::arg(const QUrl& a, int fieldWidth, wchar_t fillChar) const
 {
-    return m_str.arg(a.toString(QUrl::RemovePassword), fieldWidth, fillChar);
+    return m_str.arg(toString(a), fieldWidth, fillChar);
 }
 
 QnLogMessage QnLogMessage::arg(std::chrono::seconds a, int fieldWidth, wchar_t fillChar) const

@@ -35,6 +35,7 @@ extern const char* const kDeprecatedEstablishEc2TransactionConnectionPath;
 // Maintenance.
 extern const char* const kMaintenanceGetVmsConnections;
 extern const char* const kMaintenanceGetTransactionLog;
+extern const char* const kMaintenanceGetStatistics;
 
 extern const char* const kCloudModuleXmlPath;
 

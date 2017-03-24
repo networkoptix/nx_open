@@ -39,8 +39,7 @@ void Ec2MserverCloudSynchronizationConnection::openTransactionConnectionsOfSpeci
     {
         m_connectionIds.push_back(
             m_connectionHelper.establishTransactionConnection(
-                utils::UrlBuilder().setScheme("http")
-                .setHost(endpoint().address.toString()).setPort(endpoint().port),
+                cdbSynchronizationUrl(),
                 system().id,
                 system().authKey,
                 KeepAlivePolicy::enableKeepAlive,
@@ -87,6 +86,13 @@ void Ec2MserverCloudSynchronizationConnection::waitUntilClosedConnectionCountRea
 void Ec2MserverCloudSynchronizationConnection::closeAllConnections()
 {
     m_connectionHelper.closeAllConnections();
+    m_connectionIds.clear();
+}
+
+QUrl Ec2MserverCloudSynchronizationConnection::cdbSynchronizationUrl() const
+{
+    return utils::UrlBuilder().setScheme("http")
+        .setHost(endpoint().address.toString()).setPort(endpoint().port);
 }
 
 OnConnectionBecomesActiveSubscription& 
@@ -99,6 +105,11 @@ OnConnectionFailureSubscription&
     Ec2MserverCloudSynchronizationConnection::onConnectionFailureSubscription()
 {
     return m_connectionHelper.onConnectionFailureSubscription();
+}
+
+test::TransactionConnectionHelper& Ec2MserverCloudSynchronizationConnection::connectionHelper()
+{
+    return m_connectionHelper;
 }
 
 void Ec2MserverCloudSynchronizationConnection::waitForAtLeastNConnectionsToMoveToACertainState(
