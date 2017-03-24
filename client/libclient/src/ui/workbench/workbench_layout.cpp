@@ -34,27 +34,17 @@ namespace {
 
 } // anonymous namespace
 
-QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent):
-    QObject(parent)
-{
-    // TODO: #Elric this does not belong here.
-    setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
-
-    initCellParameters();
-}
-
 QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObject *parent):
     QObject(parent)
 {
-    if(resource.isNull()) {
-        qnNullWarning(resource);
-        return;
-    }
 
     // TODO: #Elric this does not belong here.
     setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
 
     initCellParameters();
+
+    if(resource.isNull())
+        return;
 
     QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(this, resource, this);
     synchronizer->setAutoDeleting(true);

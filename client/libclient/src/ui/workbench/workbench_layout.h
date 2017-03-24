@@ -56,13 +56,6 @@ public:
     /**
      * Constructor.
      *
-     * \param parent                    Parent object for this layout.
-     */
-    QnWorkbenchLayout(QObject *parent = NULL);
-
-    /**
-     * Constructor.
-     *
      * \param resource                  Layout resource that this layout will
      *                                  be in sync with.
      * \param parent                    Parent object for this layout.
