@@ -569,7 +569,7 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
         auto iconName = AppInfo::iconFileName();
 
         const auto iconPath =
-            QDir(QApplication::applicationDirPath()).absoluteFilePath(
+            QDir(QCoreApplication::applicationDirPath()).absoluteFilePath(
                 lit("../share/icons/%1").arg(iconName));
 
         if (QFile::exists(iconPath))
