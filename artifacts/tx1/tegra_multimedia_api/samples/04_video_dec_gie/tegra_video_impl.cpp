@@ -81,6 +81,9 @@ bool Impl::pushCompressedFrame(const CompressedFrame* compressedFrame)
 
 bool Impl::pullRectsForFrame(std::vector<Rect>* rects, int64_t* outPtsUs)
 {
+    if (!m_detector->hasRectangles())
+        return false;
+
     OUTPUT << "pullRectsForFrame() BEGIN";
     auto rectsFromGie = m_detector->getRectangles();
     auto netHeight = m_detector->getNetHeight();
