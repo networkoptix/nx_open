@@ -122,8 +122,10 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
 {
     setClickableButtons(Qt::RightButton | Qt::LeftButton);
 
-    m_closeButton->setIcon(qnSkin->icon(lit("events/notification_close.png")));
-    m_closeButton->setFixedSize(QnSkin::maximumSize(m_closeButton->icon()));
+    const auto closeButtonIcon = qnSkin->icon(lit("events/notification_close.png"));
+    const auto closeButtonSize = QnSkin::maximumSize(closeButtonIcon);
+    m_closeButton->setIcon(closeButtonIcon);
+    m_closeButton->setFixedSize(closeButtonSize);
     m_closeButton->setVisible(false);
     connect(m_closeButton, &QnImageButtonWidget::clicked, this, &QnNotificationWidget::closeTriggered);
 
@@ -133,7 +135,8 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
 
     connect(m_textLabel, &QnProxyLabel::linkActivated, this, &QnNotificationWidget::linkActivated);
 
-    m_layout->setContentsMargins(kHorizontalMargin, kVerticalMargin, kHorizontalMargin, kVerticalMargin);
+    m_layout->setContentsMargins(kHorizontalMargin, kVerticalMargin,
+        closeButtonSize.width(), kVerticalMargin);
     m_layout->addItem(m_textLabel);
     m_layout->setStretchFactor(m_textLabel, 1.0);
 
