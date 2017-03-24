@@ -1,5 +1,7 @@
 #include "special_layout.h"
 
+#include <nx/client/ui/workbench/panels/special_layout_panel.h>
+
 namespace nx {
 namespace client {
 namespace ui {
@@ -10,6 +12,7 @@ SpecialLayout::SpecialLayout(const QnLayoutResourcePtr& resource, QObject* paren
     base_type(resource, parent)
 {
     setFlags(flags() | QnLayoutFlag::SpecialBackground);
+    //setPanel(panels::SpecailLayoutPanel(this));
 }
 
 } // namespace layouts

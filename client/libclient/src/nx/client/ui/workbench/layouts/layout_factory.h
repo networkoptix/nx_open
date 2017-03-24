@@ -33,6 +33,11 @@ public:
         const QnLayoutResourcePtr& resource,
         QObject* parent = nullptr);
 
+    /**
+     * @brief addCreator Adds creation function
+     * @param creator Creation function. Should return constructed layout or nullptr
+     * if specified layout resource does not fit inner criterias or constraints.
+     */
     void addCreator(const LayoutCreator& creator);
 
 private:
