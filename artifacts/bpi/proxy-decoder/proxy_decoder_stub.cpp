@@ -292,7 +292,7 @@ void Stub::displayDecoded(void* frameHandle, const Rect* rect)
         static int64_t prevPtsUs = 0;
         std::string ptsStr;
         if (prevPtsUs != 0)
-            ptsStr = stringFormat("dPTS %3d;", int((500 + ptsUs - prevPtsUs) / 1000));
+            ptsStr = stringFormat("dPTS %3d;", (int) ((500 + ptsUs - prevPtsUs) / 1000));
         prevPtsUs = ptsUs;
 
         NX_SHOW_FPS("displayDecoded", ptsStr.c_str());

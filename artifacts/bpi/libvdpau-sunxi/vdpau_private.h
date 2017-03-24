@@ -171,16 +171,24 @@ typedef struct
 #define ALIGN(x, a) (((x) + ((typeof(x))(a) - 1)) & ~((typeof(x))(a) - 1))
 #define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
 
-
+// TODO: #mshevchenko Consider moving to nx/debug/utils_c.h
 #if defined(DEBUG)
 	#include <stdio.h>
 
 	#define VDPAU_DBG(format, ...) fprintf(stderr, "[VDPAU SUNXI] " format "\n", ##__VA_ARGS__)
 
-	#define VDPAU_DBG_ONCE(format, ...) do { static uint8_t __once; if (!__once) { fprintf(stderr, "[VDPAU SUNXI] " format "\n", ##__VA_ARGS__); __once = 1; } } while(0)
+	#define VDPAU_DBG_ONCE(format, ...) do \
+    { \
+        static uint8_t VDPAU_DBG_once = 0; \
+        if (!VDPAU_DBG_once) \
+        { \
+            fprintf(stderr, "[VDPAU SUNXI] " format "\n", ##__VA_ARGS__); \
+            VDPAU_DBG_once = 1; \
+        } \
+    } while(0)
 
 	// Log execution of a line - to use, put double-L at the beginning of the line.
-	#define LL fprintf(stderr, "####### line %d [%s]\n", __LINE__, __FILE__);
+	#define LL fprintf(stderr, "####### line %d, file %s\n", __LINE__, __FILE__);
 #else // DEBUG
 	#define VDPAU_DBG(format, ...)
 	#define VDPAU_DBG_ONCE(format, ...)
