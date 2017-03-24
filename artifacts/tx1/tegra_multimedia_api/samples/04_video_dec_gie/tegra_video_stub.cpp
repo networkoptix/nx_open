@@ -46,14 +46,16 @@ Stub::~Stub()
 bool Stub::pushCompressedFrame(const CompressedFrame* compressedFrame)
 {
     OUTPUT << "pushCompressedFrame(data, dataSize: " << compressedFrame->dataSize
-        << ", ptsUs: " << compressedFrame->ptsUs << ")";
+        << ", ptsUs: " << compressedFrame->ptsUs << ") -> true";
+    return true;
 }
 
 bool Stub::pullRectsForFrame(std::vector<Rect>* rects, int64_t* outPtsUs)
 {
-    OUTPUT << "pullRectsForFrame()";
+    OUTPUT << "pullRectsForFrame() -> false";
 
     *outPtsUs = 0;
+    return false;
 }
 
 } // namespace
