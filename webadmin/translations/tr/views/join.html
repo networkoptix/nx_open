@@ -58,7 +58,7 @@
             <p>Bu sistem birleştirliyor.<b>{{systems.systemName}}</b>ile<b>{{systems.joinSystemName}}</b></p>
             <p>
                 Yeni sistem aşağıdaki sistem ile aynı isim ve parolaya sahip olacaktır.<br/>
-<label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/>{{systems.systemName}}mevcut sistem</label><br/>
+<label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/>{{systems.systemName}}(mevcut sistem)</label><br/>
 <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/>{{systems.joinSystemName}}</label>
             </p>
         </div>

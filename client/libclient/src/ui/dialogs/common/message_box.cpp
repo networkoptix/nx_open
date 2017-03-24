@@ -177,8 +177,8 @@ int QnMessageBoxPrivate::execReturnCode(QAbstractButton* button) const
     return ret;
 }
 
-QnMessageBox::QnMessageBox(QWidget* parent, Qt::WindowFlags flags):
-    base_type(parent, flags),
+QnMessageBox::QnMessageBox(QWidget* parent):
+    base_type(parent, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint),
     ui(new Ui::MessageBox),
     d_ptr(new QnMessageBoxPrivate(this))
 {
@@ -194,12 +194,8 @@ QnMessageBox::QnMessageBox(
     QDialogButtonBox::StandardButton defaultButton,
     QWidget* parent)
     :
-    base_type(parent, Qt::Dialog | Qt::MSWindowsFixedSizeDialogHint),
-    ui(new Ui::MessageBox),
-    d_ptr(new QnMessageBoxPrivate(this))
+    QnMessageBox(parent)
 {
-    initialize();
-
     if (!text.isEmpty())
         setText(text);
     setStandardButtons(buttons);

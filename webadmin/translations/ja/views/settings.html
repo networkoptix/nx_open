@@ -86,7 +86,7 @@
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>このシステムは {{Config.cloud.productName}}にリンクされ, システムオーナーは: <b>{{cloudAccountName}}</b></p>
+                            <p>このシステムは {{Config.cloud.productName}}にリンクされています システムオーナー: <b>{{cloudAccountName}}</b></p>
                             <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">{{Config.cloud.productName}}から切断</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"

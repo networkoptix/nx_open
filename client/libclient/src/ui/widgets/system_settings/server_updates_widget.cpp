@@ -210,6 +210,11 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     updateVersionPage();
 }
 
+QnServerUpdatesWidget::~QnServerUpdatesWidget()
+{
+    m_updateTool->disconnect(this);
+}
+
 bool QnServerUpdatesWidget::tryClose(bool /*force*/)
 {
     m_updateTool->cancelUpdatesCheck();

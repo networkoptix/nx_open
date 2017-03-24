@@ -11,8 +11,10 @@
 namespace {
 
 const qreal kReserveFactor = 1.2;
+const qreal kWindowsReservedFreeSpace = 500 * 1024 * 1024;
 
-qint64 spaceRequiredForUpdate(const QString& fileName)
+qint64 spaceRequiredForUpdate(
+    const QnSystemInformation& systemInformation, const QString& fileName)
 {
     QFile updateFile(fileName);
 
@@ -22,10 +24,15 @@ qint64 spaceRequiredForUpdate(const QString& fileName)
     qint64 result = updateFile.size();
 
     QuaZip zip(fileName);
-    for (const auto info: zip.getFileInfoList64())
+    for (const auto& info: zip.getFileInfoList64())
         result += info.uncompressedSize;
 
-    return result * kReserveFactor;
+    result *= kReserveFactor;
+
+    if (systemInformation.platform == lit("windows"))
+        result += kWindowsReservedFreeSpace;
+
+    return result;
 }
 
 } // namespace
@@ -45,7 +52,7 @@ void QnCheckFreeSpacePeerTask::doStart()
 {
     m_requiredSpaceBySystemInformation.clear();
     for (auto it = m_files.begin(); it != m_files.end(); ++it)
-        m_requiredSpaceBySystemInformation[it.key()] = spaceRequiredForUpdate(it.value());
+        m_requiredSpaceBySystemInformation[it.key()] = spaceRequiredForUpdate(it.key(), *it);
 
     auto handleReply =
         [this](bool success, rest::Handle requestId, const QnUpdateFreeSpaceReply& reply)
