@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPlainTextEdit>
+#include <QtWidgets/QStyle>
 
 #include <camera/camera_thumbnail_manager.h>
 

@@ -1,5 +1,7 @@
 #include "calendar_workbench_panel.h"
 
+#include <QtWidgets/QGraphicsItem>
+
 #include <nx/client/ui/workbench/workbench_animations.h>
 
 #include <ui/help/help_topic_accessor.h>

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QAbstractItemModel>
 
 #include <ui/common/indents.h>
-
 
 class QnWidgetTableDelegate: public QObject
 {

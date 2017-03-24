@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QStyle>
 
 #include <client/client_globals.h>
 

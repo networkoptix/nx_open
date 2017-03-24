@@ -1,7 +1,7 @@
-#ifndef QN_STORAGE_SPACE_SLIDER_H
-#define QN_STORAGE_SPACE_SLIDER_H
+#pragma once
 
 #include <QtWidgets/QSlider>
+#include <QtWidgets/QStyle>
 
 #include <nx/utils/string.h>
 #include <utils/math/color_transformations.h>
@@ -133,5 +133,3 @@ private:
     QString m_textFormat;
     bool m_textFormatHasPlaceholder;
 };
-
-#endif // QN_STORAGE_SPACE_SLIDER_H

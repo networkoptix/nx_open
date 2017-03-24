@@ -2,6 +2,8 @@
 
 #include <QtCore/QDateTime>
 
+#include <QtWidgets/QGraphicsSceneMouseEvent>
+
 #include <client/client_settings.h>
 
 #include <ui/common/palette.h>

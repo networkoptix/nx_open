@@ -1,6 +1,7 @@
 #include "audit_item_delegate.h"
 
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QAbstractScrollArea>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>

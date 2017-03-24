@@ -3,6 +3,7 @@
 #include <set>
 
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QScrollArea>
 
 #include <boost/range.hpp>
 #include <boost/algorithm/cxx11/any_of.hpp>

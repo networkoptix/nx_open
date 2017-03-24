@@ -59,31 +59,19 @@ extern "C" {
 #include <QtGui/QColor>
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtCore/QFileInfo>
-#include <QtCore/QFileInfoList>
 #include <QtGui/QFont>
-#include <QtGui/QFontMetrics>
-#include <QtWidgets/QGraphicsItem>
-#include <QtWidgets/QGraphicsProxyWidget>
-#include <QtWidgets/QGraphicsScene>
-#include <QtWidgets/QGraphicsSceneMouseEvent>
-#include <QtWidgets/QGraphicsView>
+// #include <QtWidgets/QGraphicsItem>
+// #include <QtWidgets/QGraphicsProxyWidget>
+// #include <QtWidgets/QGraphicsScene>
+// #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGroupBox>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QInputDialog>
 #include <QtGui/QKeyEvent>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QListView>
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
-#include <QtCore/QMutexLocker>
-
 #include <QtGui/QPaintEngine>
 #include <QtGui/QPainter>
-#include <QtGui/QPainterPath>
-#include <QtCore/QPair>
 
 #include <QtGui/QPixmap>
 #include <QtGui/QPixmapCache>
@@ -102,7 +90,6 @@ extern "C" {
 #include <QtCore/QTimer>
 #include <QtWidgets/QWidget>
 #include <QtCore/qmath.h>
-#include <QtCore/QtDebug>
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>

@@ -9,6 +9,9 @@
 #include <QtGui/QWindow>
 
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QGraphicsProxyWidget>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
 
 #include <nx/utils/raii_guard.h>
 

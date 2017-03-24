@@ -1,5 +1,7 @@
 #include "graphics_pixmap.h"
 
+#include <QtWidgets/QStyleOptionGraphicsItem>
+
 #include <ui/common/geometry.h>
 
 class GraphicsPixmapPrivate {

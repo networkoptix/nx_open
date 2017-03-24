@@ -6,6 +6,7 @@
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QStyleOptionGraphicsItem>
 
 #include <common/common_globals.h>
 

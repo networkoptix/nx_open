@@ -8,6 +8,7 @@
 #include <QtGui/QImage>
 
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsWidget>
 #include <QtWidgets/QStyleOption>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QAction>

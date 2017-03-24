@@ -1,6 +1,10 @@
 #include "nx_style_p.h"
 #include "skin.h"
 
+#include <QtWidgets/QInputDialog>
+#include <QtWidgets/QGraphicsProxyWidget>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QScrollBar>
 
 #include <limits>

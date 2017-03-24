@@ -1,6 +1,7 @@
 #include "graphics_tooltip_widget.h"
 
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QGraphicsProxyWidget>
 
 #include <ui/processors/clickable.h>
 #include <ui/style/helper.h>

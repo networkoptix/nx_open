@@ -1,7 +1,7 @@
-#ifndef SEARCH_LINE_EDIT_H
-#define SEARCH_LINE_EDIT_H
+#pragma once
 
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QStyleOption>
 
 class QTimer;
 
@@ -50,5 +50,3 @@ private:
     int m_textChangedSignalFilterMs;
     QTimerPtr m_filterTimer;
 };
-
-#endif // SEARCH_LINE_EDIT_H
