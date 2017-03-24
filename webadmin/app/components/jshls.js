@@ -11,7 +11,7 @@ var hlsAPI = new (function(){
         video = element[0];
         if(Hls.isSupported()) {
             if(hls) {
-                hls.destroy();
+                //hls.destroy();
                 if(hls.bufferTimer) {
                     clearInterval(hls.bufferTimer);
                     hls.bufferTimer = undefined;

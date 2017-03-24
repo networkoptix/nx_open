@@ -145,6 +145,13 @@ table.webclient-window>tbody>tr>td.alert{
   -ms-transform: translateY(-50%);
 }
 
+.half-height {
+  height: 50%;
+}
+
+.full-height {
+  height: 100%;
+}
 
 .videowindow video.fullsize,
 .videowindow.fullscreen video{
