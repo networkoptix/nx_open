@@ -15,6 +15,7 @@
 class QnProxyLabel;
 class HoverFocusProcessor;
 class QnImageProvider;
+class QGraphicsLinearLayout;
 
 class QnNotificationToolTipWidget: public QnGraphicsToolTipWidget
 {

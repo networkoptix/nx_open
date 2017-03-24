@@ -72,14 +72,14 @@ protected:
 private:
     void updateCursor();
     void setWidget(QnMediaResourceWidget* widget);
-    void setItemUnderMouse(QGraphicsItem* item);
+    void setItemUnderMouse(QGraphicsWidget* item);
 
 private:
     QBrush m_brush;
     QPen m_pen;
     QPointer<SelectionItem> m_selectionItem;
     QPointer<QnMediaResourceWidget> m_widget;
-    QGraphicsItem* m_itemUnderMouse = nullptr;
+    QPointer<QGraphicsWidget> m_itemUnderMouse;
     bool m_selectionStartedEmitted;
     bool m_isClick;
     Qt::KeyboardModifiers m_selectionModifiers;

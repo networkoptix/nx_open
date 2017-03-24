@@ -3,6 +3,8 @@
 
 #include <deque>
 
+#include <QtCore/QElapsedTimer>
+
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLShaderProgram>

@@ -6,6 +6,10 @@
 #include <QtCore/QUrlQuery>
 #include <QtCore/QTimer>
 
+#include <QtGui/QClipboard>
+
+#include <QtWidgets/QMenu>
+
 #include <api/global_settings.h>
 
 #include <common/common_module.h>
@@ -208,6 +212,11 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
     updateButtonAccent();
     updateDownloadButton();
     updateVersionPage();
+}
+
+QnServerUpdatesWidget::~QnServerUpdatesWidget()
+{
+    m_updateTool->disconnect(this);
 }
 
 bool QnServerUpdatesWidget::tryClose(bool /*force*/)

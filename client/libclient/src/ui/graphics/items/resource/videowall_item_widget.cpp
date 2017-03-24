@@ -1,8 +1,13 @@
 #include "videowall_item_widget.h"
 
 #include <QtCore/QMimeData>
+
 #include <QtGui/QDrag>
+
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QStyleOptionGraphicsItem>
 
 #include <common/common_globals.h>
 

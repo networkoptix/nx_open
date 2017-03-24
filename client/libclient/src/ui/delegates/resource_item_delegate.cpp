@@ -1,5 +1,6 @@
 ﻿#include "resource_item_delegate.h"
 
+#include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QApplication>
 
 #include <common/common_globals.h>

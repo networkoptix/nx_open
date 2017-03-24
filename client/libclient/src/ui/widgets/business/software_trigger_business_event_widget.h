@@ -7,9 +7,6 @@ namespace Ui {
 class SoftwareTriggerBusinessEventWidget;
 } // namespace Ui
 
-//TODO: #vkutin This implementation is a stub
-// Actual implementation will be done as soon as software triggers specification is ready.
-
 class QnSoftwareTriggerBusinessEventWidget: public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
@@ -21,10 +18,11 @@ public:
 
     virtual void updateTabOrder(QWidget* before, QWidget* after) override;
 
-protected slots:
+protected:
     virtual void at_model_dataChanged(QnBusiness::Fields fields) override;
 
-private slots:
+private:
+    void at_usersButton_clicked();
     void paramsChanged();
 
 private:

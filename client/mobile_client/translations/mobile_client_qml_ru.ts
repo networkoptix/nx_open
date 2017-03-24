@@ -46,13 +46,6 @@
     </message>
 </context>
 <context>
-    <name>CloudSystemInformation</name>
-    <message>
-        <source>OFFLINE</source>
-        <translation>НЕ В СЕТИ</translation>
-    </message>
-</context>
-<context>
     <name>CredentialsEditor</name>
     <message>
         <source>Email</source>
@@ -307,7 +300,7 @@
 <context>
     <name>OfflineDummy</name>
     <message>
-        <source>You are not connected to any system</source>
+        <source>You are not connected to any System</source>
         <translation>Нет подключения ни к одной системе</translation>
     </message>
 </context>
@@ -408,6 +401,14 @@
         <source>This server has too old version. Please update it to the latest version.</source>
         <translation>Версия этого сервера устарела. Пожалуйста, обновите его до последней версии.</translation>
     </message>
+    <message>
+        <source>OFFLINE</source>
+        <translation>НЕ В СЕТИ</translation>
+    </message>
+    <message>
+        <source>INCOMPATIBLE</source>
+        <translation>НЕСОВМЕСТИМАЯ</translation>
+    </message>
 </context>
 <context>
     <name>SessionsScreen</name>
@@ -420,20 +421,8 @@
         <translation>Не удаётся подключиться к %1</translation>
     </message>
     <message>
-        <source>No systems found</source>
-        <translation>Системы не найдены</translation>
-    </message>
-    <message>
         <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
         <translation>Проверьте сетевое подключение или нажмите кнопку &quot;%1&quot; для ввода адреса известного сервера.</translation>
-    </message>
-    <message>
-        <source>Cannot connect to the system &quot;%1&quot;</source>
-        <translation>Не удаётся подключиться к системе &quot;%1&quot;</translation>
-    </message>
-    <message>
-        <source>Cannot connect to the server</source>
-        <translation>Не удаётся подключиться к серверу</translation>
     </message>
     <message>
         <source>Check your network connection or contact a system administrator</source>
@@ -446,6 +435,18 @@
     <message>
         <source>Connect to Another Server...</source>
         <translation>Подключиться к другому серверу...</translation>
+    </message>
+    <message>
+        <source>No Systems found</source>
+        <translation>Системы не найдены</translation>
+    </message>
+    <message>
+        <source>Cannot connect to System &quot;%1&quot;</source>
+        <translation>Не удаётся подключиться к системе &quot;%1&quot;</translation>
+    </message>
+    <message>
+        <source>Cannot connect to Server</source>
+        <translation>Не удаётся подключиться к серверу</translation>
     </message>
 </context>
 <context>
@@ -505,10 +506,6 @@
     <message>
         <source>Unknown</source>
         <translation>Неизвестно</translation>
-    </message>
-    <message>
-        <source>INCOMPATIBLE</source>
-        <translation>НЕСОВМЕСТИМАЯ</translation>
     </message>
 </context>
 <context>

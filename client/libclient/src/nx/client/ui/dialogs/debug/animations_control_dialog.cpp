@@ -1,5 +1,10 @@
 #include "animations_control_dialog.h"
 
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QBoxLayout>
+
 #include <nx/client/ui/workbench/workbench_animations.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>

@@ -1,7 +1,10 @@
 #include "table_export_helper.h"
 
 #include <QtCore/QMimeData>
+#include <QtCore/QAbstractItemModel>
+
 #include <QtGui/QClipboard>
+
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QApplication>
 

@@ -2,6 +2,8 @@
 
 #include <functional>
 
+#include <QtCore/QElapsedTimer>
+
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <core/resource/camera_bookmark.h>
 #include <utils/common/id.h>

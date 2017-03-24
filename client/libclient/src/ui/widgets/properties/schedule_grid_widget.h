@@ -5,6 +5,8 @@
 #include <QtGui/QColor>
 #include <QtWidgets/QWidget>
 
+#include <common/common_globals.h>
+
 #include <client/client_color_types.h>
 
 #include <ui/common/custom_painted.h>

@@ -3,7 +3,6 @@
 
 #include <memory>
 
-#include <QtCore/QElapsedTimer>
 #include <QCryptographicHash>
 
 #include <nx/network/nettools.h>

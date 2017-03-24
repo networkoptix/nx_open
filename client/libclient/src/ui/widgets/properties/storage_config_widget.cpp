@@ -1,6 +1,8 @@
 #include "storage_config_widget.h"
 #include "ui_storage_config_widget.h"
 
+#include <QtWidgets/QMenu>
+
 #include <boost/range/algorithm/count_if.hpp>
 
 #include <api/global_settings.h>
@@ -482,6 +484,7 @@ void QnStorageConfigWidget::loadDataToUi()
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     loadStoragesFromResources();
     m_backupSchedule = m_server->getBackupSchedule();
+    m_camerasToBackup = getCurrentSelectedCameras();
 
     updateDisabledStoragesWarning(false);
 

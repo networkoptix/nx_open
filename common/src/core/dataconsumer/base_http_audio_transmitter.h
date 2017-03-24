@@ -2,6 +2,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <QtCore/QElapsedTimer>
+
 #include "audio_data_transmitter.h"
 #include <nx/network/http/asynchttpclient.h>
 #include <transcoding/ffmpeg_audio_transcoder.h>
@@ -36,11 +38,11 @@ protected:
 
     virtual QUrl transmissionUrl() const = 0;
     virtual std::chrono::milliseconds transmissionTimeout() const = 0;
-    virtual nx_http::StringType contentType() const = 0;  
+    virtual nx_http::StringType contentType() const = 0;
 
     virtual void pleaseStop() override;
 
-protected: 
+protected:
     bool sendBuffer(AbstractStreamSocket* socket, const char* buffer, size_t size);
     std::unique_ptr<AbstractStreamSocket> takeSocket(
         const nx_http::AsyncHttpClientPtr& httpClient) const;

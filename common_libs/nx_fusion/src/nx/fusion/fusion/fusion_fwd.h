@@ -1,5 +1,4 @@
-#ifndef QN_FUSION_FWD_H
-#define QN_FUSION_FWD_H
+#pragma once
 
 #ifndef Q_MOC_RUN
 #include <boost/preprocessor/seq/for_each.hpp>
@@ -59,5 +58,3 @@ namespace QnFusion {
     QN_FUSION_DECLARE_FUNCTIONS(BOOST_PP_TUPLE_ENUM(CLASS), BOOST_PP_TUPLE_ENUM(PARAMS))
 
 #endif // Q_MOC_RUN
-
-#endif // QN_FUSION_FWD_H

@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtNetwork/QHostAddress>
+#include <QtNetwork/QAuthenticator>
 
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>

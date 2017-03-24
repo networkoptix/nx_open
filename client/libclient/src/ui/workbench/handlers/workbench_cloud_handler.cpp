@@ -2,6 +2,8 @@
 
 #include <QtGui/QDesktopServices>
 
+#include <QtWidgets/QAction>
+
 #include <api/app_server_connection.h>
 
 #include <client/desktop_client_message_processor.h>

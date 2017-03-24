@@ -1,6 +1,6 @@
 #include "screen_manager.h"
 
-#include <QtCore/QCoreApplication>
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 
 #include "utils/common/app_info.h"
@@ -30,7 +30,7 @@ void ScreenUsageData::setScreens(const QSet<int> &screens)
 {
     this->screens = 0;
     for (int screen: screens)
-        this->screens |= 1 << screen;
+        this->screens |= 1ull << screen;
 }
 
 QSet<int> ScreenUsageData::getScreens() const

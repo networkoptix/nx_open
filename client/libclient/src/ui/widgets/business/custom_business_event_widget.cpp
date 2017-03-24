@@ -1,6 +1,8 @@
 #include "custom_business_event_widget.h"
 #include "ui_custom_business_event_widget.h"
 
+#include <QtGui/QDesktopServices>
+
 #include <common/common_module.h>
 
 #include <core/resource/camera_resource.h>

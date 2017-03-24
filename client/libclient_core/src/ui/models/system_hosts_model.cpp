@@ -5,6 +5,7 @@
 #include <utils/common/connective.h>
 #include <finders/systems_finder.h>
 #include <nx/utils/disconnect_helper.h>
+#include <nx/utils/collection.h>
 #include <network/system_description.h>
 #include <client_core/client_core_settings.h>
 
@@ -22,7 +23,7 @@ bool isSamePort(int first, int second)
     return ((first == second) || (isDefaultPort(first) == isDefaultPort(second)));
 }
 
-} //unnamed namespace
+} // namespace
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 class QnSystemHostsModel::HostsModel: public Connective<QAbstractListModel>
@@ -302,8 +303,13 @@ bool QnSystemHostsModel::HostsModel::updateServerHostInternal(
     }
 
     it->second = host;
-    const auto row = (it - m_hosts.begin());
+
+    const auto row = std::distance(m_hosts.begin(), it);
+    NX_ASSERT(row >= 0);
+
     const auto modelIndex = index(row);
+    NX_ASSERT(modelIndex.isValid());
+
     emit dataChanged(modelIndex, modelIndex);
 
     return true;
@@ -325,7 +331,9 @@ void QnSystemHostsModel::HostsModel::removeServerInternal(const ServerIdHostList
     if (it == m_hosts.end())
         return;
 
-    const auto row = it - m_hosts.begin();
+    const auto row = std::distance(m_hosts.begin(), it);
+    NX_ASSERT(row >= 0);
+
     beginRemoveRows(QModelIndex(), row, row);
     m_hosts.erase(it);
     endRemoveRows();
@@ -343,7 +351,7 @@ QnSystemHostsModel::HostsModel::getDataIt(const QnUuid& serverId)
 
 QHash<int, QByteArray> QnSystemHostsModel::HostsModel::roleNames() const
 {
-    static const auto kRoles = QHash<int, QByteArray>{ {QnSystemHostsModel::UrlRole, "url"} };
+    static const auto kRoles = QHash<int, QByteArray>{{QnSystemHostsModel::UrlRole, "url"}};
     return base_type::roleNames().unite(kRoles);
 }
 
@@ -362,24 +370,26 @@ bool QnSystemHostsModel::lessThan(
     const auto leftUrl = sourceLeft.data(UrlRole).toUrl();
     const auto rightUrl = sourceRight.data(UrlRole).toUrl();
     if (!leftUrl.isValid() || !rightUrl.isValid())
+    {
+        NX_ASSERT(false, "Urls should be valid");
         return sourceLeft.row() < sourceRight.row();
+    }
 
     const auto recentUrls = hostsModel()->recentConnectionUrls();
     const auto getIndexOfConnection =
         [recentUrls](const QUrl& url) -> int
         {
-            const auto it = std::find_if(recentUrls.begin(), recentUrls.end(),
+            return qnIndexOf(recentUrls,
                 [url, recentUrls](const QUrl& recentUrl)
                 {
                     return ((recentUrl.host() == url.host())
                         && isSamePort(recentUrl.port(), url.port()));
                 });
-            return (it == recentUrls.end() ? -1 : std::distance(it, recentUrls.begin()));
         };
 
     const int leftIndex = getIndexOfConnection(leftUrl);
     const int rightIndex = getIndexOfConnection(rightUrl);
-    if ((leftIndex == rightIndex))
+    if (leftIndex == rightIndex)
         return (sourceLeft.row() < sourceRight.row());
 
     if (leftIndex == -1)
@@ -418,5 +428,5 @@ QUrl QnSystemHostsModel::firstHost() const
 
 QnSystemHostsModel::HostsModel* QnSystemHostsModel::hostsModel() const
 {
-    return dynamic_cast<HostsModel*>(sourceModel());
+    return static_cast<HostsModel*>(sourceModel());
 }

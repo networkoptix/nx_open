@@ -50,7 +50,6 @@ public:
 
     QnBusinessRuleViewModelPtr rule(const QModelIndex &index) const;
 
-protected:
     QnBusinessRuleViewModelPtr ruleModelById(const QnUuid &id) const;
 
 private:

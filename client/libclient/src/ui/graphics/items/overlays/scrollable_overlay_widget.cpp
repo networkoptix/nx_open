@@ -1,5 +1,7 @@
 #include "scrollable_overlay_widget.h"
 
+#include <QtWidgets/QGraphicsLinearLayout>
+
 #include <ui/graphics/items/overlays/private/scrollable_overlay_widget_p.h>
 
 QnScrollableOverlayWidget::QnScrollableOverlayWidget(Qt::Alignment alignment, QGraphicsWidget *parent /*= nullptr*/ )

@@ -84,7 +84,7 @@ class NX_UTILS_API ReflectingPipeline:
     public TwoWayPipeline
 {
 public:
-    ReflectingPipeline();
+    ReflectingPipeline(QByteArray initialData = QByteArray());
 
     virtual int write(const void* data, size_t count) override;
     /**
@@ -102,6 +102,24 @@ public:
 private:
     QByteArray m_buffer;
     std::size_t m_totalBytesThrough;
+};
+
+//-------------------------------------------------------------------------------------------------
+// RandomDataSource
+
+class NX_UTILS_API RandomDataSource:
+    public AbstractInput
+{
+public:
+    static constexpr std::size_t kDefaultMinReadSize = 4*1024;
+    static constexpr std::size_t kDefaultMaxReadSize = 64*1024;
+
+    RandomDataSource();
+
+    virtual int read(void* data, size_t count) override;
+
+private:
+    const std::pair<std::size_t, std::size_t> m_readSizeRange;
 };
 
 //-------------------------------------------------------------------------------------------------

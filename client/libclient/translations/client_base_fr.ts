@@ -268,33 +268,6 @@ pour afficher plus de signets</translation>
     </message>
 </context>
 <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-        <source>Zoom In</source>
-        <translation>Zoom Avant</translation>
-    </message>
-    <message>
-        <source>Zoom Out</source>
-        <translation>Zoom Arrière</translation>
-    </message>
-    <message>
-        <source>Focus Far</source>
-        <translation>Focus Loin</translation>
-    </message>
-    <message>
-        <source>Focus Near</source>
-        <translation>Focus Près</translation>
-    </message>
-    <message>
-        <source>Auto Focus</source>
-        <translation>Focus automatique</translation>
-    </message>
-    <message>
-        <source>Change Dewarping Mode</source>
-        <translation>Changer Mode Dérouler</translation>
-    </message>
-</context>
-<context>
     <name>QObject</name>
     <message>
         <source>Parameter 1 is null.</source>
@@ -3219,7 +3192,7 @@ to %1</source>
     <message numerus="yes">
         <source>Event log for %1 - %n event(s) found</source>
         <translation>
-            <numerusform>Journal d&apos;événement pour %1  - %n événement trouvé</numerusform>
+            <numerusform>Journal d&apos;événement pour %1 - %n événement trouvé</numerusform>
             <numerusform>Journal d&apos;événement pour %1  - %n événements trouvés</numerusform>
         </translation>
     </message>
@@ -4447,15 +4420,15 @@ to %1</source>
     <name>QnNetworkSpeedStrings</name>
     <message>
         <source>b/s</source>
-        <translation>b/s</translation>
+        <translation>B/s</translation>
     </message>
     <message>
         <source>Kb/s</source>
-        <translation>Kb/s</translation>
+        <translation>KB/s</translation>
     </message>
     <message>
         <source>Mb/s</source>
-        <translation>Mb/s</translation>
+        <translation>MB/s</translation>
     </message>
 </context>
 <context>
@@ -4882,11 +4855,11 @@ to %1</source>
     </message>
     <message>
         <source>%1 TB</source>
-        <translation>%1 Tb</translation>
+        <translation>%1 TB</translation>
     </message>
     <message>
         <source>%1 GB</source>
-        <translation>%1 Gb</translation>
+        <translation>%1 GB</translation>
     </message>
     <message numerus="yes">
         <source>Total %1 %n devices</source>
@@ -6074,7 +6047,7 @@ to %1</source>
     </message>
     <message>
         <source>%1 GB</source>
-        <translation>%1 Gb</translation>
+        <translation>%1 GB</translation>
     </message>
 </context>
 <context>
@@ -6359,6 +6332,71 @@ to %1</source>
     <message>
         <source>No thumbnails available</source>
         <translation>Aucune miniature disponible</translation>
+    </message>
+    <message>
+        <source>hh:mm</source>
+        <comment>Format for displaying hours and minutes on timeline.</comment>
+        <translation type="unfinished">hh:mm</translation>
+    </message>
+    <message>
+        <source>hh:mm ap</source>
+        <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
+        <translation type="unfinished">hh:mm ap</translation>
+    </message>
+    <message>
+        <source>h ap</source>
+        <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
+        <translation type="unfinished">h ap</translation>
+    </message>
+    <message>
+        <source>dd</source>
+        <comment>Format for displaying days on timeline.</comment>
+        <translation type="unfinished">dd</translation>
+    </message>
+    <message>
+        <source>MMMM</source>
+        <comment>Format for displaying months on timeline.</comment>
+        <translation type="unfinished">MMMM</translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying years on timeline</comment>
+        <translation type="unfinished">yyyy</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm</source>
+        <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm ap</source>
+        <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <translation type="unfinished">dd MMMM yyyy hh:mm ap</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy hh:mm</source>
+        <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
+        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy h ap</source>
+        <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
+        <translation type="unfinished">dd MMMM yyyy h ap</translation>
+    </message>
+    <message>
+        <source>dd MMMM yyyy</source>
+        <comment>Format for displaying day caption in timeline&apos;s header.</comment>
+        <translation type="unfinished">dd MMMM yyyy</translation>
+    </message>
+    <message>
+        <source>MMMM yyyy</source>
+        <comment>Format for displaying month caption in timeline&apos;s header.</comment>
+        <translation type="unfinished">MMMM yyyy</translation>
+    </message>
+    <message>
+        <source>yyyy</source>
+        <comment>Format for displaying year caption in timeline&apos;s header</comment>
+        <translation type="unfinished">yyyy</translation>
     </message>
 </context>
 <context>

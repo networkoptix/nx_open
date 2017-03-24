@@ -148,7 +148,6 @@ QnFisheyeImageFilter::QnFisheyeImageFilter(const QnMediaDewarpingParams& mediaDe
     m_tmpBuffer(new CLVideoDecoderOutput()),
     m_lastImageFormat(-1)
 {
-    memset (m_transform, 0, sizeof(m_transform));
 }
 
 CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOutputPtr& srcFrame)
@@ -215,7 +214,7 @@ CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOu
             quint8* dstLine = frame->data[plane] + y*frame->linesize[plane];
             for (int x = 0; x < w; ++x)
             {
-                const QPointF* dstPixel = m_transform[plane] + index;
+                const QPointF* dstPixel = m_transform[plane].data() + index;
                 quint8 pixel = GetPixel(m_tmpBuffer->data[plane], m_tmpBuffer->linesize[plane], dstPixel->x(), dstPixel->y());
                 dstLine[x] = pixel;
 
@@ -239,8 +238,7 @@ QVector3D sphericalToCartesian(qreal theta, qreal phi) { // TODO: #Elric use fun
 
 void QnFisheyeImageFilter::updateFisheyeTransform(const QSize& imageSize, int plane, qreal ar)
 {
-    delete m_transform[plane];
-    m_transform[plane] = new QPointF[imageSize.width() * imageSize.height()];
+    m_transform[plane] = PointsVector(imageSize.width() * imageSize.height());
 
     if (m_itemDewarping.panoFactor == 1)
         updateFisheyeTransformRectilinear(imageSize, plane, ar);
@@ -284,7 +282,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformRectilinear(const QSize& imageS
                     dx.z(),     dy.z(),     center.z(),     0.0,
                     0.0,        0.0,        0.0,            1.0);
 
-    QPointF* dstPos = m_transform[plane];
+    QPointF* dstPos = m_transform[plane].data();
     int dstDelta = 1;
     if (m_mediaDewarping.viewMode == QnMediaDewarpingParams::VerticalDown) {
         dstPos += imageSize.height()*imageSize.width() - 1;
@@ -359,7 +357,7 @@ void QnFisheyeImageFilter::updateFisheyeTransformEquirectangular(const QSize& im
     qreal xCenter = m_mediaDewarping.xCenter;
     qreal yCenter = m_mediaDewarping.yCenter;
 
-    QPointF* dstPos = m_transform[plane];
+    QPointF* dstPos = m_transform[plane].data();
 
     int dstDelta = 1;
     if (m_mediaDewarping.viewMode == QnMediaDewarpingParams::VerticalDown) {

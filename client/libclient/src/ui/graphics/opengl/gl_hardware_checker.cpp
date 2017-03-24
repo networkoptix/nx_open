@@ -1,5 +1,7 @@
 #include "gl_hardware_checker.h"
 
+#include <QtGui/QOpenGLFunctions>
+
 #include <client/client_app_info.h>
 
 #include <utils/common/warnings.h>

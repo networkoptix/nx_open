@@ -1,9 +1,6 @@
-#ifndef QN_TIME_PERIOD_H
-#define QN_TIME_PERIOD_H
+#pragma once
 
 #include <QtCore/QMetaType>
-
-#include <common/common_globals.h>
 
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -30,8 +27,7 @@ public:
      */
     QnTimePeriod(qint64 startTimeMs, qint64 durationMs);
 
-    static QnTimePeriod fromInterval(qint64 startTimeMs
-        , qint64 endTimeMs);
+    static QnTimePeriod fromInterval(qint64 startTimeMs, qint64 endTimeMs);
 
     QnTimePeriod& operator = (const QnTimePeriod &other);
 
@@ -78,11 +74,6 @@ public:
      */
     qint64 distanceToTime(qint64 timeMs) const;
 
-    /**
-     * \return                          Type of this time period.
-     */
-    Qn::TimePeriodType type() const;
-
     QByteArray serialize() const;
     QnTimePeriod& deserialize(const QByteArray& data);
 
@@ -106,5 +97,3 @@ QDebug operator<<(QDebug dbg, const QnTimePeriod &period);
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);
 
 QN_FUSION_DECLARE_FUNCTIONS(QnTimePeriod, (json)(metatype)(ubjson)(xml)(csv_record));
-
-#endif // QN_TIME_PERIOD_H

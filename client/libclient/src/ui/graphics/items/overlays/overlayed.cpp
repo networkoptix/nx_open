@@ -1,6 +1,7 @@
 #include "overlayed.h"
 
 #include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>

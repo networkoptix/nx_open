@@ -1,10 +1,10 @@
 #include "ptz_instrument.h"
 #include "ptz_instrument_p.h"
 
-#include <cassert>
-
 #include <QtCore/QVariant>
+
 #include <QtWidgets/QGraphicsSceneMouseEvent>
+#include <QtWidgets/QApplication>
 
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>

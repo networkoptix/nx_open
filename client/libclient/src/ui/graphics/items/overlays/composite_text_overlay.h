@@ -1,7 +1,6 @@
-
 #pragma once
 
-#include <QElapsedTimer>
+#include <QtCore/QElapsedTimer>
 
 #include <utils/common/connective.h>
 #include <client/client_color_types.h>

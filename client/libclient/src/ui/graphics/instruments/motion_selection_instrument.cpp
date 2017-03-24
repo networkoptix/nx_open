@@ -20,7 +20,8 @@
 
 namespace {
 
-auto motionSelectionEnabled = [](QnMediaResourceWidget* widget)
+auto motionSelectionEnabled =
+    [](QnMediaResourceWidget* widget)
     {
         NX_ASSERT(widget);
         if (!widget)
@@ -32,7 +33,8 @@ auto motionSelectionEnabled = [](QnMediaResourceWidget* widget)
     };
 
 // This way we detect widget that can possibly have DisplayMotion enabled
-auto widgetWithMotion = [](QGraphicsItem* item)
+auto widgetWithMotion =
+    [](QGraphicsItem* item)
     {
         if (auto widget = dynamic_cast<QnMediaResourceWidget*>(item))
             return widget->resource()->toResource()->hasFlags(Qn::motion);
@@ -155,12 +157,15 @@ void MotionSelectionInstrument::setWidget(QnMediaResourceWidget* widget)
     m_widget = widget;
 
     if (m_widget)
+    {
         connect(m_widget, &QnResourceWidget::optionsChanged, this, &MotionSelectionInstrument::updateCursor);
+        connect(m_widget, &QObject::destroyed, this, &MotionSelectionInstrument::updateCursor);
+    }
 
     updateCursor();
 }
 
-void MotionSelectionInstrument::setItemUnderMouse(QGraphicsItem* item)
+void MotionSelectionInstrument::setItemUnderMouse(QGraphicsWidget* item)
 {
     if (m_itemUnderMouse == item)
         return;
@@ -203,12 +208,14 @@ bool MotionSelectionInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* e
 {
     auto view = this->view(viewport);
 
+    // Really UiElementsWidget always getting here for main scene, resource widget for motion tab
+    auto item = dynamic_cast<QGraphicsWidget*>(
+        this->item(view, event->pos(), [](QGraphicsItem* item){ return item->isWidget(); }));
+    setItemUnderMouse(item);
+
     auto widget = dynamic_cast<QnMediaResourceWidget*>(
         this->item(view, event->pos(), widgetWithMotion));
     setWidget(widget);
-
-    // Really UiElementsWidget always getting here
-    setItemUnderMouse(this->item(view, event->pos()));
 
     event->accept();
     return false;

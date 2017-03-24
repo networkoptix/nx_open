@@ -1,5 +1,7 @@
 #include "workbench_layouts_handler.h"
 
+#include <QtWidgets/QAction>
+
 #include <api/app_server_connection.h>
 
 #include <client/client_globals.h>

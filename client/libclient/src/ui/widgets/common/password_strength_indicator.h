@@ -5,6 +5,7 @@
 #include <client/client_color_types.h>
 #include <ui/utils/password_information.h>
 
+class QLineEdit;
 class QnPasswordStrengthIndicatorPrivate;
 
 class QnPasswordStrengthIndicator : public QWidget

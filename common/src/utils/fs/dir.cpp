@@ -75,7 +75,7 @@ SystemError::ErrorCode readPartitions(
 
     return SystemError::noError;
 #else
-    QN_UNUSED(partitionInfoList);
+    Q_UNUSED(partitionInfoList);
     return SystemError::notImplemented;
 #endif
 }

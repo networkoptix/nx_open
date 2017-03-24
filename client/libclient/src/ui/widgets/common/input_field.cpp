@@ -1,6 +1,8 @@
 #include "input_field.h"
 #include "password_strength_indicator.h"
 
+#include <QtWidgets/QBoxLayout>
+
 #include <ui/common/accessor.h>
 #include <ui/style/custom_style.h>
 #include <ui/widgets/word_wrapped_label.h>

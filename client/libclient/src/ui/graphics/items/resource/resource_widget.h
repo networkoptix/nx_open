@@ -3,7 +3,6 @@
 #include <QtCore/QVector>
 #include <QtCore/QMetaType>
 #include <QtCore/QPointer>
-#include <QtCore/QElapsedTimer>
 
 #include <client/client_color_types.h>
 

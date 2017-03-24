@@ -3,6 +3,7 @@
 
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QRadioButton>
 
 #include <boost/range/algorithm/count_if.hpp>
