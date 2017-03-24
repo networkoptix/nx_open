@@ -837,6 +837,8 @@ mainOriginal(int argc, char *argv[])
     ctx.conv->output_plane.setDQThreadCallback(conv0_outputDqbufThreadCallback);
     ctx.conv->capture_plane.setDQThreadCallback(conv0_captureDqbufThreadCallback);
 
+    ctx.rectQueuePtr = new std::queue<std::vector<cv::Rect>>;
+
     // Step-3: Create GIE
     ctx.gie_ctx->buildGieContext(ctx.deployfile, ctx.modelfile);
     pthread_create(&ctx.gie_thread_handle, NULL, gieThread, &ctx);
@@ -1049,7 +1051,7 @@ mainNx(int argc, char *argv[])
 int
 main(int argc, char *argv[])
 {
-    if (argc == 1 || strcmp(argv[1], "-h") != 0 || strcmp(argv[1], "--help") != 0)
+    if (argc == 1 || strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)
     {
         std::cout << "Usage: " << argv[0] << " <mode> <file> ..." << std::endl;
         std::cout << "Here <mode> is one of: \"--original\", \"--nx\"." << std::endl;
