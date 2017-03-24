@@ -68,7 +68,7 @@ BackgroundType backgroundTypeFromLayout(const QnLayoutResourcePtr& layout)
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-static constexpr QSize kDefaultImageSize = QSize(1, 1);
+static const QSize kDefaultImageSize = QSize(1, 1);
 struct BackgroundImageData
 {
     QString fileName;
@@ -76,6 +76,15 @@ struct BackgroundImageData
     qreal opacity = 0.7;
     Qn::ImageBehaviour mode = Qn::ImageBehaviour::Stretch;
     bool isLocal = true;
+
+    BackgroundImageData() = default;
+
+    BackgroundImageData(
+        const QString& fileName,
+        const QSize& size,
+        qreal opacity,
+        Qn::ImageBehaviour mode,
+        bool isLocal);
 
     static BackgroundImageData getForDefaultType();
     static BackgroundImageData getForImageType(const QnLayoutResourcePtr& layout);
@@ -85,6 +94,21 @@ struct BackgroundImageData
     bool operator==(const BackgroundImageData& other) const;
     bool operator!=(const BackgroundImageData& other) const;
 };
+
+BackgroundImageData::BackgroundImageData(
+    const QString& fileName,
+    const QSize& size,
+    qreal opacity,
+    Qn::ImageBehaviour mode,
+    bool isLocal)
+    :
+    fileName(fileName),
+    size(size),
+    opacity(opacity),
+    mode(mode),
+    isLocal(isLocal)
+{
+}
 
 bool BackgroundImageData::imageIsVisible(bool connected) const
 {
@@ -96,23 +120,23 @@ bool BackgroundImageData::imageIsVisible(bool connected) const
 BackgroundImageData BackgroundImageData::getForDefaultType()
 {
     const auto background = qnSettings->backgroundImage();
-    return BackgroundImageData({
+    return BackgroundImageData(
         background.name,
         kDefaultImageSize,
         background.actualImageOpacity(),
         background.mode,
-        true}); //< Image is always local for default background image.
+        true); //< Image is always local for default background image.
 }
 
 BackgroundImageData BackgroundImageData::getForImageType(const QnLayoutResourcePtr& layout)
 {
     const auto background = qnSettings->backgroundImage();
-    return BackgroundImageData({
+    return BackgroundImageData(
         layout->backgroundImageFilename(),
         layout->backgroundSize(),
         qBound<qreal>(0, layout->backgroundOpacity(), 1),
         background.mode,
-        layout->isFile()}); //< Image is local if layout is exported.
+        layout->isFile()); //< Image is local if layout is exported.
 }
 
 bool BackgroundImageData::operator==(const BackgroundImageData& other) const
