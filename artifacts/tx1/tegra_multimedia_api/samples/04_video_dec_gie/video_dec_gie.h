@@ -1,3 +1,5 @@
+#pragma once
+
 /*
  * Copyright (c) 2016, NVIDIA CORPORATION. All rights reserved.
  *
@@ -35,6 +37,9 @@
 #include <pthread.h>
 #include "gie_inference.h"
 #include "nvosd.h"
+#include <vector>
+#include <queue>
+#include <opencv2/objdetect.hpp>
 
 using namespace std;
 
@@ -79,6 +84,7 @@ typedef struct
 
     string deployfile;
     string modelfile;
+    std::queue<std::vector<cv::Rect>>* rectQueuePtr;
 } context_t;
 
 typedef struct

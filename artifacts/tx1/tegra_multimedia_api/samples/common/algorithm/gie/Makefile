@@ -37,6 +37,7 @@ OBJS:= $(SRCS:.cpp=.o)
 GIE_DIR := $(TARGET_ROOTFS)/home/ubuntu/GIE
 
 CPPFLAGS += -std=c++11 \
+	-fPIC \
 	-I"$(GIE_DIR)/include" \
 	-I"$(CUDA_PATH)/targets/aarch64-linux/include"
 

@@ -35,6 +35,7 @@ SRCS:= $(wildcard *.cpp)
 OBJS:= $(SRCS:.cpp=.o)
 
 CPPFLAGS += \
+	-fPIC \
 	-I"../../../include" \
 	-I"../../../include/libjpeg-8b"
 

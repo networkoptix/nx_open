@@ -32,6 +32,8 @@ include ../Rules.mk
 
 APP := video_dec_gie
 
+SO := video_dec_gie.so
+
 CLASS_DIR := ../common/classes
 
 ALGO_DIR := ../common/algorithm/cuda
@@ -47,6 +49,7 @@ OBJS := $(SRCS:.cpp=.o)
 
 CPPFLAGS += \
 	-std=c++11 \
+	-fPIC \
 	-I"../common/algorithm/cuda" \
 	-I"../common/algorithm/gie" \
 	-I"$(CUDA_PATH)/targets/aarch64-linux/include"
@@ -69,7 +72,7 @@ LDFLAGS += \
 	-lnvToolsExt -lrt -ldl -lwconv \
 	-lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_objdetect
 
-all: $(APP)
+all: $(APP) $(SO)
 
 $(CLASS_DIR)/%.o: $(CLASS_DIR)/%.cpp
 	$(MAKE) -C $(CLASS_DIR)
@@ -89,8 +92,11 @@ $(GIE_DIR)/%.o: $(GIE_DIR)/%.cpp
 $(APP): $(OBJS)
 	$(CPP) -o $@ $(OBJS) $(CPPFLAGS) $(LDFLAGS)
 
+$(SO): $(APP);
+	$(CPP) -o $@ $(OBJS) $(CPPFLAGS) $(LDFLAGS) -shared
+
 clean:
 	$(MAKE) -C $(CLASS_DIR) clean
 	$(MAKE) -C $(ALGO_DIR) clean
 	$(MAKE) -C $(GIE_DIR) clean
-	rm -rf *.o $(APP)
+	rm -rf *.o $(APP) $(SO)

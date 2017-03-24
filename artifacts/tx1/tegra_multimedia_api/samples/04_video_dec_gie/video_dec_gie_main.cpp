@@ -26,6 +26,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include "video_dec_gie_main.h"
+
 #include <errno.h>
 #include <fstream>
 #include <iostream>
@@ -615,19 +617,26 @@ gieThread(void *arg)
         ctx->gie_ctx->doInference(
             rectList_queue);
 #endif
-        while(!rectList_queue.empty())
-        {
-            vector<cv::Rect> rectList = rectList_queue.front();
-            rectList_queue.pop();
 
-            for (int i = 0; i < rectList.size(); i++)
+        {
+            pthread_mutex_lock(&ctx->gie_lock);
+            while(!rectList_queue.empty())
             {
-                cv::Rect &r = rectList[i];
-                cout <<"  x "<< r.x <<" y: " << r.y
-                     <<" width "<< r.width <<" height "<< r.height
-                     << endl;
+                vector<cv::Rect> rectList = rectList_queue.front();
+                rectList_queue.pop();
+
+                ctx->rectQueuePtr->push(rectList);
+                for (int i = 0; i < rectList.size(); i++)
+                {
+                    cv::Rect &r = rectList[i];
+                    cout <<"  x "<< r.x <<" y: " << r.y
+                         <<" width "<< r.width <<" height "<< r.height
+                         << endl;
+                }
             }
+            pthread_mutex_unlock(&ctx->gie_lock);
         }
+
         if (process_last_batch == 1)
         {
             break;
@@ -744,8 +753,27 @@ setDefaults(context_t * ctx)
     pthread_cond_init(&ctx->queue_cond, NULL);
 }
 
+static void
+setDefaultsNx(
+    context_t * ctx,
+    std::string modelFileName,
+    std::string deployFileName,
+    std::string cacheFileName)
+{
+    memset(ctx, 0, sizeof(context_t));
+    ctx->deployfile = deployFileName;
+    ctx->modelfile = modelFileName;
+    ctx->gie_ctx = new GIE_Context;
+    ctx->gie_ctx->setDumpResult(true);
+    ctx->gie_buf_queue = new queue<Shared_Buffer>;
+
+    ctx->conv_output_plane_buf_queue = new queue < NvBuffer * >;
+    pthread_mutex_init(&ctx->queue_lock, NULL);
+    pthread_cond_init(&ctx->queue_cond, NULL);
+}
+
 int
-main(int argc, char *argv[])
+mainOriginal(int argc, char *argv[])
 {
     context_t ctx;
     int ret = 0;
@@ -978,4 +1006,340 @@ cleanup:
         cout << "App run was successful" << endl;
     }
     return -error;
+}
+
+int
+mainNx(int argc, char *argv[])
+{
+    if (argc != 2)
+    {
+        std::cerr << "ERROR: File not specified." << std::endl;
+        return 1;
+    }
+
+    const char *const filename = argv[1];
+
+    Detector detector;
+    detector.startInference(GOOGLE_NET_MODEL_NAME, GOOGLE_NET_DEPLOY_NAME, "./gieModel.cache");
+
+    ifstream in_file;
+    in_file.open(filename, ios::in | ios::binary);
+    if (!in_file.is_open())
+    {
+        std::cerr << "Can't open input file " << filename << std::endl;
+        return 1;
+    }
+
+    auto buf = new char[CHUNK_SIZE];
+    while (true)
+    {
+        in_file.read(buf, CHUNK_SIZE);
+        auto dataSize = in_file.gcount();
+        detector.pushCompressedData(buf, dataSize);
+    }
+
+    delete buf;
+    return 0;
+}
+
+int
+main(int argc, char *argv[])
+{
+    if (argc == 1 || strcmp(argv[1], "-h") != 0 || strcmp(argv[1], "--help") != 0)
+    {
+        std::cout << "Usage: " << argv[0] << " <mode> <file> ..." << std::endl;
+        std::cout << "Here <mode> is one of: \"--original\", \"--nx\"." << std::endl;
+        return 1;
+    }
+    else if (strcmp(argv[1], "--original") == 0)
+    {
+        std::cout << "Running in -original mode." << std::endl;
+        return mainOriginal(argc - 1, &argv[1]);
+    }
+    else if (strcmp(argv[1], "--nx") == 0)
+    {
+        std::cout << "Running in --nx mode." << std::endl;
+        return mainNx(argc - 1, &argv[1]);
+    }
+    else
+    {
+        std::cout << "ERROR: Invalid <mode>. Run with -h for help." << std::endl;
+        return 1;
+    }
+}
+
+int
+Detector::startInference(std::string modelFileName, std::string deployFileName, std::string cacheFileName)
+{
+    int ret = 0;
+    int error = 0;
+    setDefaultsNx(&m_ctx, modelFileName, deployFileName, cacheFileName);
+
+    m_ctx.decoder_pixfmt = V4L2_PIX_FMT_H264;
+#if 0
+    if (parseCsvArgs(&ctx, ctx.gie_ctx, argc, argv))
+    {
+        cerr << "Error parsing commandline arguments." << endl;
+        return -1;
+    }
+#endif // 0
+
+    /*ctx.in_file = new ifstream(ctx.in_file_path);
+    TEST_ERROR(!ctx.in_file->is_open(), "Error opening input file", cleanup);*/
+
+    // Step-1: Create Decoder
+    m_ctx.dec = NvVideoDecoder::createVideoDecoder("dec0");
+    TEST_ERROR(!m_ctx.dec, "Could not create decoder", cleanup);
+
+    // Subscribe to Resolution change event
+    ret = m_ctx.dec->subscribeEvent(V4L2_EVENT_RESOLUTION_CHANGE, 0, 0);
+    TEST_ERROR(ret < 0, "Could not subscribe to V4L2_EVENT_RESOLUTION_CHANGE", cleanup);
+
+    // Set V4L2_CID_MPEG_VIDEO_DISABLE_COMPLETE_FRAME_INPUT control to false
+    // so that application can send chunks of encoded data instead of forming
+    // complete frames. This needs to be done before setting format on the
+    // output plane.
+    ret = m_ctx.dec->disableCompleteFrameInputBuffer();
+    TEST_ERROR(ret < 0, "Error in decoder disableCompleteFrameInputBuffer", cleanup);
+
+    // Set format on the output plane
+    ret = m_ctx.dec->setOutputPlaneFormat(m_ctx.decoder_pixfmt, 2 * 1024 * 1024);
+    TEST_ERROR(ret < 0, "Could not set output plane format", cleanup);
+
+    // V4L2_CID_MPEG_VIDEO_DISABLE_DPB should be set after output plane
+    // set format
+    if (m_ctx.disable_dpb)
+    {
+        ret = m_ctx.dec->disableDPB();
+        TEST_ERROR(ret < 0, "Error in disableDPB", cleanup);
+    }
+
+    // Query, Export and Map the output plane buffers so that we can read
+    // encoded data into the buffers
+    ret = m_ctx.dec->output_plane.setupPlane(V4L2_MEMORY_MMAP, 10, true, false);
+    TEST_ERROR(ret < 0, "Error while setting up output plane", cleanup);
+
+    // Step-2: Create Conv0
+    // Create converter to convert from BL to PL for writing raw video
+    // to file or crop the frame and display
+    m_ctx.conv = NvVideoConverter::createVideoConverter("conv0");
+    TEST_ERROR(!m_ctx.conv, "Could not create video converter", cleanup);
+    m_ctx.conv->output_plane.setDQThreadCallback(conv0_outputDqbufThreadCallback);
+    m_ctx.conv->capture_plane.setDQThreadCallback(conv0_captureDqbufThreadCallback);
+
+    m_ctx.rectQueuePtr = &m_rects;
+
+    // Step-3: Create GIE
+    m_ctx.gie_ctx->buildGieContext(m_ctx.deployfile, m_ctx.modelfile);
+    pthread_create(&m_ctx.gie_thread_handle, NULL, gieThread, &m_ctx);
+
+    // Start decoder after GIE
+    ret = m_ctx.dec->output_plane.setStreamStatus(true);
+    TEST_ERROR(ret < 0, "Error in output plane stream on", cleanup);
+    pthread_create(&m_ctx.dec_capture_loop, NULL, decCaptureLoop, &m_ctx);
+
+cleanup:
+    return 0;
+
+#if 0
+
+    // Step-5: Handling EOS.
+    // After sending EOS, all the buffers from output plane should be dequeued.
+    // and after that capture plane loop should be signalled to stop.
+    while (m_ctx.dec->output_plane.getNumQueuedBuffers() > 0 &&
+           !m_ctx.got_error && !m_ctx.dec->isInError())
+    {
+        struct v4l2_buffer v4l2_buf;
+        struct v4l2_plane planes[MAX_PLANES];
+
+        memset(&v4l2_buf, 0, sizeof(v4l2_buf));
+        memset(planes, 0, sizeof(planes));
+
+        v4l2_buf.m.planes = planes;
+        ret = m_ctx.dec->output_plane.dqBuffer(v4l2_buf, NULL, NULL, -1);
+        if (ret < 0)
+        {
+            cerr << "Error DQing buffer at output plane" << endl;
+            abort(&m_ctx);
+            break;
+        }
+    }
+
+cleanup:
+    // Signal EOS to the decoder capture loop
+    m_ctx.got_eos = true;
+    if (m_ctx.dec_capture_loop)
+    {
+        pthread_join(m_ctx.dec_capture_loop, NULL);
+    }
+
+    if (m_ctx.gie_stop == 0)
+    {
+        m_ctx.gie_stop = 1;
+        pthread_cond_broadcast(&m_ctx.gie_cond);
+        pthread_join(m_ctx.gie_thread_handle, NULL);
+    }
+
+    // Send EOS to converter
+    if (m_ctx.conv)
+    {
+        if (sendEOStoConverter(&m_ctx) < 0)
+        {
+            cerr << "Error while queueing EOS buffer on converter output"
+                 << endl;
+        }
+        m_ctx.conv->capture_plane.waitForDQThread(-1);
+    }
+
+    if (m_ctx.dec && m_ctx.dec->isInError())
+    {
+        cerr << "Decoder is in error" << endl;
+        error = 1;
+    }
+    if (m_ctx.got_error)
+    {
+        error = 1;
+    }
+
+    // The decoder destructor does all the cleanup i.e set streamoff on output and capture planes,
+    // unmap buffers, tell decoder to deallocate buffer (reqbufs ioctl with counnt = 0),
+    // and finally call v4l2_close on the fd.
+    delete m_ctx.dec;
+    delete m_ctx.conv;
+
+    // Similarly, EglRenderer destructor does all the cleanup
+    //delete ctx.renderer;
+    delete m_ctx.in_file;
+    delete m_ctx.conv_output_plane_buf_queue;
+    delete []nalu_parse_buffer;
+
+    free(m_ctx.in_file_path);
+
+    delete m_ctx.gie_buf_queue;
+    m_ctx.gie_ctx->destroyGieContext();
+    delete m_ctx.gie_ctx;
+
+    if (error)
+    {
+        cout << "App run failed" << endl;
+    }
+    else
+    {
+        cout << "App run was successful" << endl;
+    }
+    return -error;
+
+#endif // 0
+}
+
+bool
+Detector::hasRectangles()
+{
+    LockGurad lock(&(m_ctx.gie_lock));
+    return !m_rects.empty();
+}
+
+bool
+Detector::pushCompressedData(char* data, int dataSize)
+{
+    // Step-4: Input encoded data to decoder until EOF.
+    // Read encoded data and enqueue all the output plane buffers.
+    // Exit loop in case file read is complete.
+
+    if (dataSize <= 0)
+        return false;
+
+    bool isError = m_ctx.got_error || m_ctx.dec->isInError();
+    auto numBuffers = m_ctx.dec->output_plane.getNumBuffers();
+
+    if (m_firstTimePush && !isError && m_firstTimePushBufferNum < numBuffers)
+    {
+        struct v4l2_buffer v4l2_buf;
+        struct v4l2_plane planes[MAX_PLANES];
+        NvBuffer *buffer;
+
+        memset(&v4l2_buf, 0, sizeof(v4l2_buf));
+        memset(planes, 0, sizeof(planes));
+
+        buffer = m_ctx.dec->output_plane.getNthBuffer(m_firstTimePushBufferNum);
+        fillBuffer(data, dataSize, buffer);
+
+        v4l2_buf.index = m_firstTimePushBufferNum;
+        v4l2_buf.m.planes = planes;
+        v4l2_buf.m.planes[0].bytesused = buffer->planes[0].bytesused;
+
+        // It is necessary to queue an empty buffer to signal EOS to the decoder
+        // i.e. set v4l2_buf.m.planes[0].bytesused = 0 and queue the buffer
+        auto ret = m_ctx.dec->output_plane.qBuffer(v4l2_buf, NULL);
+        if (ret < 0)
+        {
+            cerr << "Error Qing buffer at output plane" << endl;
+            abort(&m_ctx);
+            return false;
+        }
+
+        m_firstTimePushBufferNum++;
+
+        if (m_firstTimePushBufferNum >= numBuffers)
+            m_firstTimePush = false;
+
+        return true;
+    }
+
+    // Since all the output plane buffers have been queued, we first need to
+    // dequeue a buffer from output plane before we can read new data into it
+    // and queue it again.
+    if (!isError)
+    {
+        struct v4l2_buffer v4l2_buf;
+        struct v4l2_plane planes[MAX_PLANES];
+        NvBuffer *buffer;
+
+        memset(&v4l2_buf, 0, sizeof(v4l2_buf));
+        memset(planes, 0, sizeof(planes));
+
+        v4l2_buf.m.planes = planes;
+
+        auto ret = m_ctx.dec->output_plane.dqBuffer(v4l2_buf, &buffer, NULL, -1);
+        if (ret < 0)
+        {
+            cerr << "Error DQing buffer at output plane" << endl;
+            abort(&m_ctx);
+            return false;
+        }
+
+        fillBuffer(data, dataSize, buffer);
+        v4l2_buf.m.planes[0].bytesused = buffer->planes[0].bytesused;
+
+        ret = m_ctx.dec->output_plane.qBuffer(v4l2_buf, NULL);
+        if (ret < 0)
+        {
+            cerr << "Error Qing buffer at output plane" << endl;
+            abort(&m_ctx);
+            return false;
+        }
+
+    }
+
+    return true;
+}
+
+std::vector<cv::Rect>
+Detector::getRectangles()
+{
+    LockGurad lock(&(m_ctx.gie_lock));
+    auto rects = m_rects.front();
+    m_rects.pop();
+
+    return rects;
+}
+
+int
+Detector::fillBuffer(char* data, int dataSize, NvBuffer* buffer)
+{
+    streamsize bytes_to_read = MIN(CHUNK_SIZE, buffer->planes[0].length);
+    memcpy(buffer->planes[0].data, data, bytes_to_read);
+    buffer->planes[0].bytesused = bytes_to_read;
+
+    return bytes_to_read;
 }
