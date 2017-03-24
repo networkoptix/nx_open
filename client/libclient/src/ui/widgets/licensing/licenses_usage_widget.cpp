@@ -1,5 +1,6 @@
 #include "licenses_usage_widget.h"
 
+#include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QLabel>
 
 #include <ui/style/custom_style.h>

@@ -1,6 +1,8 @@
 #include "storage_config_widget.h"
 #include "ui_storage_config_widget.h"
 
+#include <QtWidgets/QMenu>
+
 #include <boost/range/algorithm/count_if.hpp>
 
 #include <api/global_settings.h>

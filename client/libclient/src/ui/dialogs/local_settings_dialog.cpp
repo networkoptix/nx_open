@@ -2,6 +2,7 @@
 #include "ui_local_settings_dialog.h"
 
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
 
 #include <client/client_settings.h>
 #include <client/client_app_info.h>

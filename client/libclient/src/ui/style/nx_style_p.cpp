@@ -1,6 +1,7 @@
 #include "nx_style_p.h"
 #include "skin.h"
 
+#include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QGraphicsProxyWidget>
 #include <QtWidgets/QGraphicsScene>

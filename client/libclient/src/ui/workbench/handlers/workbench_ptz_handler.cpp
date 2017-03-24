@@ -3,6 +3,8 @@
 #include <QtCore/QEventLoop>
 #include <QtCore/QTimer>
 
+#include <QtWidgets/QAction>
+
 #include <api/app_server_connection.h>
 
 #include <nx/utils/collection.h>
@@ -142,11 +144,11 @@ QnWorkbenchPtzHandler::QnWorkbenchPtzHandler(QObject *parent):
     connect(action(QnActions::DebugGetPtzPositionAction), &QAction::triggered, this, &QnWorkbenchPtzHandler::at_debugGetPtzPositionAction_triggered);
 
     connect(
-        action(QnActions::PtzContinuousMoveAction), &QAction::triggered, 
+        action(QnActions::PtzContinuousMoveAction), &QAction::triggered,
         this, &QnWorkbenchPtzHandler::at_ptzContinuousMoveAction_triggered);
 
     connect(
-        action(QnActions::PtzActivatePresetByIndexAction), &QAction::triggered, 
+        action(QnActions::PtzActivatePresetByIndexAction), &QAction::triggered,
         this, &QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered);
 }
 
@@ -416,13 +418,13 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()
     controller->getPresets(&presetList);
     std::sort(
         presetList.begin(),
-        presetList.end(), 
+        presetList.end(),
         [](QnPtzPreset f, QnPtzPreset s){ return f.name < s.name; });
 
     if (presetIndex < presetList.size() && presetIndex >= 0)
     {
         menu()->trigger(
-            QnActions::PtzActivateObjectAction, 
+            QnActions::PtzActivateObjectAction,
             QnActionParameters(widget)
                 .withArgument(
                     Qn::PtzObjectIdRole,

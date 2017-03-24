@@ -3,6 +3,8 @@
 
 #include <QtCore/QLocale>
 
+#include <QtWidgets/QComboBox>
+
 #include <core/resource/server_backup_schedule.h>
 
 #include <nx_ec/data/api_media_server_data.h>

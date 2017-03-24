@@ -6,6 +6,7 @@
 #include <QtQuick/QQuickView>
 #include <QtQml/QQmlContext>
 
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QProxyStyle>
 #include <QtWidgets/QStackedWidget>

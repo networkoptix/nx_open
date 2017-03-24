@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsProxyWidget>
+#include <QtWidgets/QBoxLayout>
 
 #include <ui/processors/clickable.h>
 #include <ui/style/helper.h>

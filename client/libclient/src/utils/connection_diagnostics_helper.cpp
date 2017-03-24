@@ -1,5 +1,7 @@
 #include "connection_diagnostics_helper.h"
 
+#include <QtCore/QThread>
+
 #include <api/model/connection_info.h>
 
 #include <common/common_module.h>

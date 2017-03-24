@@ -1,5 +1,7 @@
 #include "aligner.h"
 
+#include <QtWidgets/QLayout>
+
 #include <ui/common/accessor.h>
 #include <ui/style/helper.h>
 #include <utils/common/event_processors.h>

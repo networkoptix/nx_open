@@ -2,6 +2,8 @@
 
 #include <set>
 
+#include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QGroupBox>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QScrollArea>
 

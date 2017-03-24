@@ -3,6 +3,7 @@
 #include <QtCore/QPointer>
 
 #include <QtGui/QGuiApplication>
+#include <QtWidgets/QMenu>
 #include <QtGui/QMovie>
 #include <QtGui/QPixmap>
 #include <QtGui/QScreen>

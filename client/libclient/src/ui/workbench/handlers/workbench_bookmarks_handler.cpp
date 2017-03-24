@@ -1,5 +1,7 @@
 #include "workbench_bookmarks_handler.h"
 
+#include <QtWidgets/QAction>
+
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 

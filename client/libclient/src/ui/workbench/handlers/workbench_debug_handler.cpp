@@ -1,8 +1,10 @@
 #include "workbench_debug_handler.h"
 
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QToolButton>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QToolButton>
 
 #include <QtWebKitWidgets/QWebView>
 

@@ -55,40 +55,24 @@ extern "C" {
 #include <QtCore/QList>
 #include <QtCore/QMap>
 
-
 #include <QtGui/QColor>
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
 #include <QtGui/QFont>
-// #include <QtWidgets/QGraphicsItem>
-// #include <QtWidgets/QGraphicsProxyWidget>
-// #include <QtWidgets/QGraphicsScene>
-// #include <QtWidgets/QGraphicsView>
-#include <QtWidgets/QGroupBox>
-#include <QtGui/QKeyEvent>
-#include <QtWidgets/QLayout>
-#include <QtWidgets/QLineEdit>
-#include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QPaintEngine>
 #include <QtGui/QPainter>
 
-#include <QtGui/QPixmap>
-#include <QtGui/QPixmapCache>
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>
 
-#include <QtWidgets/QPushButton>
 #include <QtCore/QQueue>
 #include <QtCore/QRect>
 #include <QtCore/QRectF>
 #include <QtCore/QSet>
 #include <QtCore/QSize>
-#include <QtCore/QThread>
-#include <QtCore/QThreadPool>
 #include <QtCore/QTime>
 #include <QtCore/QTimer>
-#include <QtWidgets/QWidget>
 #include <QtCore/qmath.h>
 
 #include <nx/utils/thread/mutex.h>

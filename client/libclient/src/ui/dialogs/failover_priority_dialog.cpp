@@ -3,6 +3,7 @@
 #include <QtCore/QCoreApplication>
 
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QWidget>
 

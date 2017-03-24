@@ -3,6 +3,7 @@
 
 #include <QtCore/QTimer>
 
+#include <QtWidgets/QPushButton>
 #include <QtWidgets/QTableView>
 
 #include <core/resource_management/resource_pool.h>

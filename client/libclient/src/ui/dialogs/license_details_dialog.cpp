@@ -3,6 +3,8 @@
 
 #include <QtGui/QClipboard>
 
+#include <QtWidgets/QPushButton>
+
 #include <licensing/license.h>
 #include <ui/style/custom_style.h>
 

@@ -1,5 +1,6 @@
-
 #include "workbench_alarm_layout_handler.h"
+
+#include <QtWidgets/QAction>
 
 #include <api/runtime_info_manager.h>
 #include <nx/streaming/archive_stream_reader.h>

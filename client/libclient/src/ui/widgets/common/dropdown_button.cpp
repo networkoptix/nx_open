@@ -1,6 +1,7 @@
 #include "dropdown_button.h"
 
 #include <QtWidgets/QDesktopWidget>
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QStyleOptionButton>
 #include <QtWidgets/QStylePainter>
 #include <QtWidgets/private/qpushbutton_p.h>

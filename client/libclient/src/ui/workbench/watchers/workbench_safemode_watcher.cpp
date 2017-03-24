@@ -1,6 +1,8 @@
 #include "workbench_safemode_watcher.h"
 
+#include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
 
 #include <common/common_module.h>
 

@@ -10,6 +10,7 @@
 
 #include <QtNetwork/QNetworkReply>
 
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QToolButton>

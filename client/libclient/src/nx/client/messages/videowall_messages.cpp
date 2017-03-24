@@ -1,6 +1,7 @@
 #include "videowall_messages.h"
 
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QPushButton>
 
 #include <client/client_app_info.h>
 #include <client/client_settings.h>

@@ -1,10 +1,11 @@
 #include "self_updater.h"
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QLockFile>
 #include <QtCore/QProcess>
 #include <QtCore/QStandardPaths>
-#include <QtCore/QCoreApplication>
+#include <QtCore/QThread>
 
 #include <api/applauncher_api.h>
 

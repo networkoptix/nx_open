@@ -3,6 +3,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QLineEdit>
 
 #include <common/common_module.h>
 
