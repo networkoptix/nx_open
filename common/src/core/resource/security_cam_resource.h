@@ -64,7 +64,8 @@ public:
 
     virtual int reservedSecondStreamFps() const;
 
-    virtual void setIframeDistance(int frames, int timems) = 0; // sets the distance between I frames
+    /** sets the distance between I frames */
+    virtual void setIframeDistance(int /*frames*/, int /*timems*/) {}
 
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);
 

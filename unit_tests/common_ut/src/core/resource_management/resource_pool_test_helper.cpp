@@ -4,8 +4,8 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/storage_resource_stub.h>
-#include <core/resource/camera_resource_stub.h>
+#include <test_support/resource/storage_resource_stub.h>
+#include <test_support/resource/camera_resource_stub.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
 
@@ -49,7 +49,7 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::addLayout()
 
 QnVirtualCameraResourcePtr QnResourcePoolTestHelper::createCamera()
 {
-    QnVirtualCameraResourcePtr camera(new QnCameraResourceStub());
+    QnVirtualCameraResourcePtr camera(new nx::CameraResourceStub());
     camera->setName(QStringLiteral("camera"));
     return camera;
 }
@@ -92,7 +92,7 @@ QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer()
 
 QnStorageResourcePtr QnResourcePoolTestHelper::addStorage(const QnMediaServerResourcePtr& server)
 {
-    QnStorageResourcePtr storage(new QnStorageResourceStub());
+    QnStorageResourcePtr storage(new nx::StorageResourceStub());
     storage->setParentId(server->getId());
     qnResPool->addResource(storage);
     return storage;

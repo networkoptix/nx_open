@@ -28,6 +28,7 @@
 #include <nx1/info.h>
 
 #include "ec2_connection_processor.h"
+#include <test_support/resource/test_resource_factory.h>
 
 static int registerQtResources()
 {
@@ -117,7 +118,8 @@ public:
         QnResourceDiscoveryManager* resourceDiscoveryManager)
         :
         m_resourcePool(resourcePool),
-        m_resourceDiscoveryManager(resourceDiscoveryManager)
+        m_resourceDiscoveryManager(resourceDiscoveryManager),
+        m_factory(new nx::TestResourceFactory())
     {
     }
 
@@ -131,7 +133,7 @@ protected:
 
     virtual QnResourceFactory* getResourceFactory() const override
     {
-        return m_resourceDiscoveryManager;
+        return nx::TestResourceFactory::instance();
     }
 
     virtual void updateResource(
@@ -142,6 +144,7 @@ protected:
     }
 
 protected:
+    std::unique_ptr<nx::TestResourceFactory> m_factory;
     QnResourcePool* const m_resourcePool;
     QnResourceDiscoveryManager* m_resourceDiscoveryManager;
 };

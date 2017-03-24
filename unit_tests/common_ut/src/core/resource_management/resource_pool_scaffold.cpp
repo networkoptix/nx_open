@@ -10,7 +10,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/camera_resource_stub.h>
+#include <test_support/resource/camera_resource_stub.h>
 #include <core/resource/media_server_resource.h>
 
 QnResourcePoolScaffold::QnResourcePoolScaffold() {
@@ -45,7 +45,7 @@ QnVirtualCameraResourceList QnResourcePoolScaffold::addCameras(Qn::LicenseType c
 
     QnVirtualCameraResourceList result;
     for (int i = 0; i < count; ++i) {
-        QnVirtualCameraResourcePtr camera(new QnCameraResourceStub(cameraType));
+        QnVirtualCameraResourcePtr camera(new nx::CameraResourceStub(cameraType));
         camera->setParentId(m_resPool->getAllServers(Qn::AnyStatus).first()->getId());
         camera->setLicenseUsed(licenseRequired);
         m_resPool->addResource(camera);

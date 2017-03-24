@@ -14,7 +14,7 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
-#include <core/resource/camera_resource_stub.h>
+#include <test_support/resource/camera_resource_stub.h>
 
 #include <nx/fusion/model_functions.h>
 

@@ -44,7 +44,9 @@ TEST(ExecActionAccessRightsTest, main)
         nx::utils::promise<ec2::ErrorCode> resultPromise;
         nx::utils::future<ec2::ErrorCode> resultFuture = resultPromise.get_future();
 
-        ec2::ServerQueryProcessorAccess().getAccess(userAccess).processUpdateAsync(
+        ec2::QnTransactionMessageBus messageBus(nullptr/*QnDbManager*/, Qn::PT_Server);
+        ec2::ServerQueryProcessorAccess(nullptr/*QnDbManager*/, &messageBus)
+            .getAccess(userAccess).processUpdateAsync(
             actionTran,
             [&resultPromise](ec2::ErrorCode ecode)
             {

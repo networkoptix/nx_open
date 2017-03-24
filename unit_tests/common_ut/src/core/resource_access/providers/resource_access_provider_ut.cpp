@@ -12,8 +12,8 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/storage_resource_stub.h>
-#include <core/resource/camera_resource_stub.h>
+#include <test_support/resource/storage_resource_stub.h>
+#include <test_support/resource/camera_resource_stub.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
 
