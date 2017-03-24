@@ -85,6 +85,7 @@ typedef struct
     string deployfile;
     string modelfile;
     std::queue<std::vector<cv::Rect>>* rectQueuePtr;
+    bool needToStop;
 } context_t;
 
 typedef struct

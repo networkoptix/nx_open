@@ -44,6 +44,16 @@
 #include "video_dec_gie.h"
 #include "gie_inference.h"
 
+#define OUTPUT_PREFIX "[video_dec_gie_main] "
+#include <nx/utils/debug_utils.h>
+
+namespace {
+
+static const int kNetWidth = 940;
+static const int kNetHeight = 560;
+
+} // namespace
+
 #define USE_CPU_FOR_INTFLOAT_CONVERSION 0
 
 #define TEST_ERROR(cond, str, label) if(cond) { \
@@ -751,6 +761,7 @@ setDefaults(context_t * ctx)
     ctx->gie_ctx = new GIE_Context;
     ctx->gie_ctx->setDumpResult(true);
     ctx->gie_buf_queue = new queue<Shared_Buffer>;
+    ctx->needToStop = false;
 
     ctx->conv_output_plane_buf_queue = new queue < NvBuffer * >;
     pthread_mutex_init(&ctx->queue_lock, NULL);
@@ -770,6 +781,7 @@ setDefaultsNx(
     ctx->gie_ctx = new GIE_Context;
     ctx->gie_ctx->setDumpResult(true);
     ctx->gie_buf_queue = new queue<Shared_Buffer>;
+    ctx->needToStop = false;
 
     ctx->conv_output_plane_buf_queue = new queue < NvBuffer * >;
     pthread_mutex_init(&ctx->queue_lock, NULL);
@@ -1036,12 +1048,12 @@ mainNx(int argc, char *argv[])
         return 1;
     }
 
-    auto buf = new char[CHUNK_SIZE];
+    auto buf = new uint8_t[CHUNK_SIZE];
     while (true)
     {
-        in_file.read(buf, CHUNK_SIZE);
+        in_file.read((char*)buf, CHUNK_SIZE);
         auto dataSize = in_file.gcount();
-        detector.pushCompressedData(buf, dataSize);
+        detector.pushCompressedFrame(buf, dataSize);
     }
 
     delete buf;
@@ -1238,6 +1250,72 @@ cleanup:
 #endif // 0
 }
 
+bool Detector::stopSync()
+{
+    int error = 0;
+    m_ctx.got_eos = true;
+    if (m_ctx.dec_capture_loop)
+    {
+        pthread_join(m_ctx.dec_capture_loop, NULL);
+    }
+
+    if (m_ctx.gie_stop == 0)
+    {
+        m_ctx.gie_stop = 1;
+        pthread_cond_broadcast(&m_ctx.gie_cond);
+        pthread_join(m_ctx.gie_thread_handle, NULL);
+    }
+
+    // Send EOS to converter
+    if (m_ctx.conv)
+    {
+        if (sendEOStoConverter(&m_ctx) < 0)
+        {
+            cerr << "Error while queueing EOS buffer on converter output"
+                 << endl;
+        }
+        m_ctx.conv->capture_plane.waitForDQThread(-1);
+    }
+
+    if (m_ctx.dec && m_ctx.dec->isInError())
+    {
+        PRINT << "Decoder is in error";
+        error = 1;
+    }
+    if (m_ctx.got_error)
+    {
+        error = 1;
+    }
+
+    // The decoder destructor does all the cleanup i.e set streamoff on output and capture planes,
+    // unmap buffers, tell decoder to deallocate buffer (reqbufs ioctl with counnt = 0),
+    // and finally call v4l2_close on the fd.
+    delete m_ctx.dec;
+    delete m_ctx.conv;
+
+    // Similarly, EglRenderer destructor does all the cleanup
+    //delete ctx.renderer;
+    delete m_ctx.in_file;
+    delete m_ctx.conv_output_plane_buf_queue;
+
+    if (m_ctx.in_file_path)
+        free(m_ctx.in_file_path);
+
+    delete m_ctx.gie_buf_queue;
+    m_ctx.gie_ctx->destroyGieContext();
+    delete m_ctx.gie_ctx;
+
+    if (error)
+    {
+        PRINT << "App run failed";
+    }
+    else
+    {
+        PRINT << "App run was successful";
+    }
+    return -error;
+}
+
 bool
 Detector::hasRectangles()
 {
@@ -1246,7 +1324,7 @@ Detector::hasRectangles()
 }
 
 bool
-Detector::pushCompressedData(char* data, int dataSize)
+Detector::pushCompressedFrame(const uint8_t* data, int dataSize)
 {
     // Step-4: Input encoded data to decoder until EOF.
     // Read encoded data and enqueue all the output plane buffers.
@@ -1341,7 +1419,19 @@ Detector::getRectangles()
 }
 
 int
-Detector::fillBuffer(char* data, int dataSize, NvBuffer* buffer)
+Detector::getNetWidth() const
+{
+    return kNetWidth;
+}
+
+int
+Detector::getNetHeight() const
+{
+    return kNetHeight;
+}
+
+int
+Detector::fillBuffer(const uint8_t* data, int dataSize, NvBuffer* buffer)
 {
     streamsize bytes_to_read = MIN(CHUNK_SIZE, buffer->planes[0].length);
     memcpy(buffer->planes[0].data, data, bytes_to_read);

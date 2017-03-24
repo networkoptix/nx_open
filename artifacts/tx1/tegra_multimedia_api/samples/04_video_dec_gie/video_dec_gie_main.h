@@ -41,12 +41,15 @@ public:
     }
 
     int startInference(std::string modelFileName, std::string deployFileName, std::string cacheFileName);
-    bool pushCompressedData(char* data, int dataSize);
+    bool stopSync();
+    bool pushCompressedFrame(const uint8_t* data, int dataSize);
     bool hasRectangles();
     std::vector<cv::Rect> getRectangles();
+    int getNetWidth() const;
+    int getNetHeight() const;
 
 private:
-    int fillBuffer(char* data, int dataSize, NvBuffer* buffer);
+    int fillBuffer(const uint8_t* data, int dataSize, NvBuffer* buffer);
 
 private:
     std::mutex m_mutex;
