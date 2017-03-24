@@ -162,7 +162,21 @@ const char* STORAGE_METHOD_CALL TestStorageFactory::storageType() const
 
 const char* TestStorageFactory::lastErrorMessage(int ecode) const
 {
-    return errorCodeToString((ErrorCode)ecode);
+    using namespace nx_spl;
+    switch ((error::code_t)ecode)
+    {
+    case error::NoError: return "No error";
+    case error::StorageUnavailable: return "Storage is not available";
+    case error::NotEnoughSpace: return "Not enough space";
+    case error::SpaceInfoNotAvailable: return "Space info not available";
+    case error::EndOfFile: return "End of file";
+    case error::ReadNotSupported: return "Read not supported";
+    case error::WriteNotSupported: return "Write not supported";
+    case error::UrlNotExists: return "Url doesn't exist";
+    case error::UnknownError: return "Unknown error";
+    }
+
+    return nullptr;
 }
 
 void* TestStorageFactory::queryInterface(const nxpl::NX_GUID& interfaceID)

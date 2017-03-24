@@ -1,19 +1,6 @@
 #pragma once
 
 #include <atomic>
-#include <cstdio>
-
-#define ERROR_CODE_LIST(APPLY) \
-    APPLY(ok)
-
-#define ERROR_CODE_APPLY_ENUM(value) value,
-
-enum ErrorCode
-{
-    ERROR_CODE_LIST(ERROR_CODE_APPLY_ENUM)
-};
-
-const char* errorCodeToString(ErrorCode ecode);
 
 template <typename P>
 class PluginRefCounter
@@ -35,4 +22,4 @@ public:
     }
 private:
     std::atomic<int> m_count;
-}; // class PluginRefCounter
+};
