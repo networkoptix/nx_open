@@ -75,8 +75,6 @@ private:
     QnMutex m_mutex;
     Settings m_settingsInstance;
     Ec2DirectConnectionPtr m_directConnection;
-    Ec2ThreadPool m_ec2ThreadPool;
-
 private:
     int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);
     int establishConnectionToRemoteServer(
