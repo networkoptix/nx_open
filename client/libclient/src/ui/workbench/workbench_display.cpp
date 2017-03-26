@@ -2007,8 +2007,6 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutAboutToBeChanged()
 
     foreach(QnWorkbenchItem *item, layout->items())
         at_layout_itemRemoved(item);
-    if (gridBackgroundItem())
-        gridBackgroundItem()->setOpacity(0.0);
 
     m_inChangeLayout = false;
 }
