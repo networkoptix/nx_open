@@ -1,6 +1,31 @@
 #include "special_layout.h"
 
-#include <nx/client/ui/workbench/panels/special_layout_panel.h>
+#include <QtWidgets/QGraphicsProxyWidget>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
+
+namespace {
+
+class SpecialLayoutPanelWidget: public QGraphicsProxyWidget
+{
+public:
+    SpecialLayoutPanelWidget()
+    {
+        auto body = new QWidget();
+        body->setMinimumSize(1700, 300);
+        const  auto layout = new QHBoxLayout(body);
+        const auto text = new QLabel(body);
+        layout->addWidget(text);
+        layout->setAlignment(text, Qt::AlignHCenter);
+        text->setText(lit("++++++++++++++++++++++++++++"));
+        setWidget(body);
+    }
+
+private:
+
+};
+
+} // namespace
 
 namespace nx {
 namespace client {
@@ -12,7 +37,7 @@ SpecialLayout::SpecialLayout(const QnLayoutResourcePtr& resource, QObject* paren
     base_type(resource, parent)
 {
     setFlags(flags() | QnLayoutFlag::SpecialBackground);
-    //setPanel(panels::SpecailLayoutPanel(this));
+    setPanelWidget(new SpecialLayoutPanelWidget());
 }
 
 } // namespace layouts

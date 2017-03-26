@@ -4,6 +4,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 #include <QtCore/QHash>
+#include <QtCore/QPointer>
 
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>
@@ -15,10 +16,9 @@
 
 #include <client/client_globals.h>
 
+class QGraphicsWidget;
 class QnWorkbenchItem;
-namespace NxUi {
-class AbstractWorkbenchPanel;
-}
+
 // TODO: #Elric review doxydocs
 
 enum class QnLayoutFlag
@@ -89,8 +89,8 @@ public:
     QnLayoutFlags flags() const;
     void setFlags(QnLayoutFlags value);
 
-    NxUi::AbstractWorkbenchPanel* panel() const;
-    void setPanel(NxUi::AbstractWorkbenchPanel* value);
+    void setPanelWidget(QGraphicsWidget* widget); //< Takes ownership.
+    QGraphicsWidget* panelWidget() const;
 
     /**
      * \returns                         Name of this layout.
@@ -336,8 +336,7 @@ signals:
 
     void iconChanged();
 
-    void panelChanged();
-
+    void panelWidgetChanged();
     /**
      * This signal is emitted when this layout is about to be destroyed
      * (i.e. its destructor has started).
@@ -453,9 +452,9 @@ private:
     /** User data by role. */
     QHash<int, QVariant> m_dataByRole;
 
-    NxUi::AbstractWorkbenchPanel* m_panel = nullptr;
     QnLayoutFlags m_flags = QnLayoutFlag::Empty;
     QIcon m_icon;
+    QPointer<QGraphicsWidget> m_panelWidget;
 };
 
 typedef QList<QnWorkbenchLayout *> QnWorkbenchLayoutList;

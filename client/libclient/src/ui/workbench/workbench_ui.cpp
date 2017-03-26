@@ -65,6 +65,7 @@
 #include <ui/workbench/panels/title_workbench_panel.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/client/ui/workbench/panels/special_layout_panel.h>
 
 #include <utils/common/event_processors.h>
 
@@ -144,19 +145,13 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     QnPaneSettingsMap settings = qnSettings->paneSettings();
 
-    /* Tree panel. */
     if (qnRuntime->isDesktopMode())
-        createTreeWidget(settings[Qn::WorkbenchPane::Tree]);
-
-    /* Title bar. */
-    if (qnRuntime->isDesktopMode())
-        createTitleWidget(settings[Qn::WorkbenchPane::Title]);
-
-    /* Notifications. */
-    if (qnRuntime->isDesktopMode()
-        && !qnSettings->lightMode().testFlag(Qn::LightModeNoNotifications))
     {
-        createNotificationsWidget(settings[Qn::WorkbenchPane::Notifications]);
+        createTreeWidget(settings[Qn::WorkbenchPane::Tree]); //< Tree panel.
+        createTitleWidget(settings[Qn::WorkbenchPane::Title]); //< Title bar.
+        createSpecialLayoutWidget(settings[Qn::WorkbenchPane::SpecialLayout]); //< Special layout
+        if (!qnSettings->lightMode().testFlag(Qn::LightModeNoNotifications))
+            createNotificationsWidget(settings[Qn::WorkbenchPane::Notifications]); //< Notifications
     }
 
     /* Calendar. */
@@ -977,6 +972,12 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
             updateFpsGeometry();
             updateViewportMargins();
         });
+}
+
+void QnWorkbenchUi::createSpecialLayoutWidget(const QnPaneSettings& settings)
+{
+    m_specialLayoutPanel = new nx::client::ui::workbench::panels::SpecialLayoutPanel(
+        settings, m_controlsWidget, this);
 }
 
 #pragma endregion Title methods

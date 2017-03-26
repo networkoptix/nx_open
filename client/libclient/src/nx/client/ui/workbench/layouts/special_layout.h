@@ -11,12 +11,11 @@ namespace layouts {
 
 class SpecialLayout: public QnWorkbenchLayout
 {
+    Q_OBJECT
     using base_type = QnWorkbenchLayout;
 
 public:
     SpecialLayout(const QnLayoutResourcePtr& resource, QObject* parent = nullptr);
-
-private:
 };
 
 } // namespace layouts

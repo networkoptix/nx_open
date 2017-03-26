@@ -11,7 +11,6 @@ namespace {
 
 class LayoutTourResource: public QnLayoutResource
 {
-
 };
 
 void registerCreator()
@@ -45,13 +44,17 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
     connect(action(QnActions::OpenLayoutTourAction), &QAction::triggered, this,
         [this]()
         {
-            const auto layout =
-                qnLayoutFactory->create(QnLayoutResourcePtr(new LayoutTourResource()), this);
-            layout->setName(lit("Test Layout Tours"));
-            if (layout)
-                workbench()->addLayout(layout);
-            else
+            const auto tourResource = QnLayoutResourcePtr(new LayoutTourResource());
+            const auto layout = qnLayoutFactory->create(tourResource, this);
+            if (!layout)
+            {
                 NX_ASSERT(false, "Can't create layout tours");
+                return;
+            }
+
+            layout->setName(lit("Test Layout Tours"));
+            workbench()->addLayout(layout);
+            workbench()->setCurrentLayout(layout);
         });
 }
 

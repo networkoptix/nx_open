@@ -2,6 +2,8 @@
 
 #include <limits>
 
+#include <QtWidgets/QGraphicsWidget>
+
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
@@ -54,7 +56,8 @@ QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObjec
     synchronizer->update();
 }
 
-QnWorkbenchLayout::~QnWorkbenchLayout() {
+QnWorkbenchLayout::~QnWorkbenchLayout()
+{
     bool signalsBlocked = blockSignals(false);
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
@@ -87,18 +90,24 @@ void QnWorkbenchLayout::setFlags(QnLayoutFlags value)
     emit flagsChanged();
 }
 
-NxUi::AbstractWorkbenchPanel* QnWorkbenchLayout::panel() const
+void QnWorkbenchLayout::setPanelWidget(QGraphicsWidget* widget)
 {
-    return m_panel;
-}
-
-void QnWorkbenchLayout::setPanel(NxUi::AbstractWorkbenchPanel* value)
-{
-    if (m_panel == value)
+    if (m_panelWidget == widget)
         return;
 
-    m_panel = value;
-    emit panelChanged();
+    if (m_panelWidget)
+        delete m_panelWidget;
+
+    m_panelWidget = widget;
+    if (m_panelWidget)
+        m_panelWidget->setParent(this);
+
+    emit panelWidgetChanged();
+}
+
+QGraphicsWidget* QnWorkbenchLayout::panelWidget() const
+{
+    return m_panelWidget;
 }
 
 QnLayoutResourcePtr QnWorkbenchLayout::resource() const {
