@@ -1,7 +1,8 @@
-
 #include "separator.h"
 
 #include <numeric>
+
+#include <QtGui/QPainter>
 
 namespace
 {

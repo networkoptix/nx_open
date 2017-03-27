@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtGui/QPainter>
+
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QStyle>
 
