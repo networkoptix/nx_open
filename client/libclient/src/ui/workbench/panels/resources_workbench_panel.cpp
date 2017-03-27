@@ -1,6 +1,7 @@
 #include "resources_workbench_panel.h"
 
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QTimer>
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QComboBox>

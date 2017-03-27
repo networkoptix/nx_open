@@ -3,6 +3,8 @@
 
 #include <QtCore/QSortFilterProxyModel>
 
+#include <QtGui/QKeyEvent>
+
 #include <api/global_settings.h>
 
 #include <client/client_settings.h>

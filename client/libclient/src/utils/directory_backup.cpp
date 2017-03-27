@@ -1,5 +1,6 @@
 #include "directory_backup.h"
 
+#include <QtCore/QDateTime>
 #include <QtCore/QDir>
 
 #include <nx/utils/log/log.h>

@@ -1,10 +1,10 @@
-#ifndef QN_WORKBENCH_ACTION_HANDLER_H
-#define QN_WORKBENCH_ACTION_HANDLER_H
+#pragma once
 
 #include <atomic>
 
 #include <QtCore/QBuffer>
 #include <QtCore/QObject>
+#include <QtCore/QQueue>
 
 #include <QtWidgets/QDialogButtonBox>
 
@@ -269,5 +269,3 @@ private:
 
     std::multimap<QUrl, ServerRequest> m_serverRequests;
 };
-
-#endif // QN_WORKBENCH_ACTION_HANDLER_H

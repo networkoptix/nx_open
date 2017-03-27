@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtGui/QPainter>
+#include <QtGui/QPaintEvent>
 
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QListView>

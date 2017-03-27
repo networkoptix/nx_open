@@ -1,5 +1,7 @@
 #include "link_hover_processor.h"
 
+#include <QtGui/QMouseEvent>
+
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QLabel>
 

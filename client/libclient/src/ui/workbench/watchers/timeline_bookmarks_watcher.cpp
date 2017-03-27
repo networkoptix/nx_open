@@ -1,5 +1,6 @@
-
 #include "timeline_bookmarks_watcher.h"
+
+#include <QtCore/QTimer>
 
 #include <utils/common/delayed.h>
 #include <utils/camera/bookmark_helpers.h>

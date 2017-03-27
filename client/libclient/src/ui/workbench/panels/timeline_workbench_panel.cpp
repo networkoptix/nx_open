@@ -1,5 +1,7 @@
 #include "timeline_workbench_panel.h"
 
+#include <QtCore/QTimer>
+
 #include <QtWidgets/QAction>
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QMenu>

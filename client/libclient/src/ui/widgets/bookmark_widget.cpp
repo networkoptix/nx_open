@@ -1,6 +1,8 @@
 #include "bookmark_widget.h"
 #include "ui_bookmark_widget.h"
 
+#include <QtCore/QDateTime>
+
 #include <core/resource/camera_bookmark.h>
 
 #include <ui/style/custom_style.h>

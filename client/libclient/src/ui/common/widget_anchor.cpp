@@ -1,5 +1,7 @@
 #include "widget_anchor.h"
 
+#include <QtCore/QEvent>
+
 #include <QtWidgets/QWidget>
 
 #include <nx/utils/log/assert.h>

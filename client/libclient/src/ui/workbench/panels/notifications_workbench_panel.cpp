@@ -1,5 +1,7 @@
 #include "notifications_workbench_panel.h"
 
+#include <QtCore/QTimer>
+
 #include <QtWidgets/QAction>
 
 #include <nx/client/ui/workbench/workbench_animations.h>

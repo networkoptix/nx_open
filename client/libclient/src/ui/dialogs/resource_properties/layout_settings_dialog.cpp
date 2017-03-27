@@ -1,7 +1,7 @@
 #include "layout_settings_dialog.h"
 #include "ui_layout_settings_dialog.h"
 
-#include <QtCore/qmath.h>
+#include <QtCore/QtMath>
 #include <QtCore/QUrl>
 #include <QtGui/QResizeEvent>
 

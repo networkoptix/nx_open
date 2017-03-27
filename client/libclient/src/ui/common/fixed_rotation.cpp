@@ -1,10 +1,10 @@
 #include "fixed_rotation.h"
 
 #include <cmath>
+
+#include <QtCore/QtMath>
+
 #include <QtWidgets/QGraphicsWidget>
-
-#include <qmath.h>
-
 
 Qn::FixedRotation fixedRotationFromDegrees(qreal degrees){
     qreal result = std::fmod(degrees + 45, 360);
