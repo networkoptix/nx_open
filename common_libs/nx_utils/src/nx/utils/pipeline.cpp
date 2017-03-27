@@ -1,5 +1,7 @@
 #include "pipeline.h"
 
+#include "random.h"
+
 namespace nx {
 namespace utils {
 namespace pipeline {
@@ -46,7 +48,8 @@ int ProxyPipeline::write(const void* data, size_t count)
 //-------------------------------------------------------------------------------------------------
 // ReflectingPipeline
 
-ReflectingPipeline::ReflectingPipeline():
+ReflectingPipeline::ReflectingPipeline(QByteArray initialData):
+    m_buffer(std::move(initialData)),
     m_totalBytesThrough(0)
 {
 }
@@ -73,6 +76,33 @@ int ReflectingPipeline::read(void* data, size_t count)
 std::size_t ReflectingPipeline::totalBytesThrough() const
 {
     return m_totalBytesThrough;
+}
+
+const QByteArray& ReflectingPipeline::internalBuffer() const
+{
+    return m_buffer;
+}
+
+//-------------------------------------------------------------------------------------------------
+// RandomDataSource
+
+constexpr std::size_t RandomDataSource::kDefaultMinReadSize;
+constexpr std::size_t RandomDataSource::kDefaultMaxReadSize;
+
+RandomDataSource::RandomDataSource():
+    m_readSizeRange(kDefaultMinReadSize, kDefaultMaxReadSize)
+{
+}
+
+int RandomDataSource::read(void* data, size_t count)
+{
+    const std::size_t bytesToRead =
+        std::min<std::size_t>(
+            count,
+            random::number<std::size_t>(m_readSizeRange.first, m_readSizeRange.second));
+    char* charData = static_cast<char*>(data);
+    std::generate(charData, charData + bytesToRead, rand);
+    return bytesToRead;
 }
 
 } // namespace pipeline

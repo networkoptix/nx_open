@@ -3,12 +3,16 @@
 #include <cmath> /* For std::fmod. */
 
 #include <QtCore/QSet>
-#include <QtWidgets/QApplication>
+
 #include <QtGui/QPainter>
 #include <QtGui/QImage>
+
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsWidget>
 #include <QtWidgets/QStyleOption>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QAction>
+#include <QtWidgets/QToolTip>
 #include <QtWidgets/QToolBar>
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QHeaderView>
@@ -264,11 +268,11 @@ bool QnNoptixStyle::drawItemViewItemControl(const QStyleOption *option, QPainter
     return true;
 }
 
-bool QnNoptixStyle::skipItemViewPrimitive(PrimitiveElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget) const
+bool QnNoptixStyle::skipItemViewPrimitive(PrimitiveElement /*element*/,
+    const QStyleOption* option,
+    QPainter* painter,
+    const QWidget* widget) const
 {
-    QN_UNUSED(element);
-    QN_UNUSED(painter);
-
     const auto workaround = make3xHiDpiWorkaround(painter);
 
     if (!widget)

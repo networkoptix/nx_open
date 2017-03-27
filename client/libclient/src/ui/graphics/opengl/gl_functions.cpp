@@ -3,7 +3,10 @@
 #include <boost/preprocessor/stringize.hpp>
 
 #include <nx/utils/thread/mutex.h>
+
+#include <QtCore/QDir>
 #include <QtCore/QRegExp>
+
 #include <QtGui/QOpenGLContext>
 
 #include <utils/common/warnings.h>

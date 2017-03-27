@@ -60,9 +60,10 @@ public:
             });
     }
 
-    virtual void addConnectionTimer(
+    virtual bool addConnectionTimer(
         std::chrono::milliseconds /*period*/, TimerHandler /*handler*/, void* /*client*/)
     {
+        return true;
     }
 
     virtual SocketAddress localAddress() const override

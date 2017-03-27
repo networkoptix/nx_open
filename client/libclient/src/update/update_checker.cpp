@@ -1,5 +1,7 @@
 #include "update_checker.h"
 
+#include <QtCore/QJsonDocument>
+
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 

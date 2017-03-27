@@ -3,6 +3,9 @@
 
 #include <QtCore/QTimer>
 
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QTableView>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/user_roles_manager.h>

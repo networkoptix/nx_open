@@ -1,5 +1,9 @@
 #include "notifications_workbench_panel.h"
 
+#include <QtCore/QTimer>
+
+#include <QtWidgets/QAction>
+
 #include <nx/client/ui/workbench/workbench_animations.h>
 
 #include <ui/help/help_topic_accessor.h>
@@ -33,7 +37,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     QObject* parent)
     :
     base_type(settings, parentWidget, parent),
-    backgroundItem(new QnControlBackgroundWidget(Qn::RightBorder, parentWidget)),
+    backgroundItem(new QnControlBackgroundWidget(Qt::RightEdge, parentWidget)),
     item(new QnNotificationsCollectionWidget(parentWidget, 0, context())),
     pinButton(NxUi::newPinButton(parentWidget, context(),
         action(QnActions::PinNotificationsAction))),
@@ -134,7 +138,7 @@ bool NotificationsWorkbenchPanel::isOpened() const
 
 void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
 {
-    using namespace nx::client::ui::workbench;
+    using namespace nx::client::desktop::ui::workbench;
 
     ensureAnimationAllowed(&animate);
 

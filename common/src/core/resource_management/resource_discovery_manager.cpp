@@ -1,14 +1,14 @@
-
 #include "resource_discovery_manager.h"
 
 #include <exception>
 #include <list>
-
-#include <QtConcurrent/QtConcurrent>
 #include <set>
 
-#include <QtConcurrent/QtConcurrentMap>
+#include <QtCore/QElapsedTimer>
 #include <QtCore/QThreadPool>
+
+#include <QtConcurrent/QtConcurrent>
+#include <QtConcurrent/QtConcurrentMap>
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>

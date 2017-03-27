@@ -772,6 +772,15 @@ enum IDType
      */
     PtzCalibrateFisheyeAction,
 
+    /**
+     * Performs continuous move with given speed.
+     */
+    PtzContinuousMoveAction,
+
+    /**
+     * Activates preset by index
+     */
+    PtzActivatePresetByIndexAction, 
 
     /* Layout actions. */
 
@@ -915,6 +924,8 @@ enum IDType
      * Toggles tour mode.
      */
     ToggleTourModeAction,
+
+    OpenLayoutTourAction,
 
     /* Timeline actions. */
 
@@ -1099,6 +1110,22 @@ enum IDType
 
     /** Hide cloud promo */
     HideCloudPromoAction,
+	
+    /**
+     * Go to the next item on layout.
+     */
+    GoToNextItemAction,
+
+    /**
+     * Go to the previous item on layout
+     */
+    GoToPreviousItemAction,
+
+    /**
+     * Maximizes/Unmaximizes current item
+     **/
+    ToggleCurrentItemMaximizationStateAction,
+	
 
     ActionCount,
 

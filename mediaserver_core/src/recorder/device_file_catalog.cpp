@@ -1,5 +1,7 @@
 #include "device_file_catalog.h"
 
+#include <array>
+
 #include <QtCore/QDir>
 #include <QtCore/QElapsedTimer>
 
@@ -28,7 +30,6 @@
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
-#include <boost/array.hpp>
 #include "utils/common/concurrent.h"
 #include "storage_db_pool.h"
 
@@ -36,7 +37,7 @@ QnMutex DeviceFileCatalog::m_rebuildMutex;
 QSet<void*> DeviceFileCatalog::m_pauseList;
 
 namespace {
-    boost::array<QString, QnServer::ChunksCatalogCount> catalogPrefixes = {"low_quality", "hi_quality"};
+    std::array<QString, QnServer::ChunksCatalogCount> catalogPrefixes = {"low_quality", "hi_quality"};
 
     QString toLocalStoragePath(const QnStorageResourcePtr &storage, const QString& absolutePath)
     {
@@ -114,7 +115,7 @@ qint64 DeviceFileCatalog::getSpaceByStorageIndex(int storageIndex) const
         if (chunk.storageIndex == storageIndex)
             result += chunk.getFileSize();
     }
-        
+
     return result;
 }
 

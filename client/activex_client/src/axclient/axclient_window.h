@@ -3,7 +3,21 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 
-class QnMainWindow;
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+
+class MainWindow;
+
+namespace workbench {
+
+} // namespace workbench
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx
+
 class QnWorkbenchContext;
 class QnWorkbenchAccessController;
 
@@ -54,7 +68,7 @@ private:
     QWidget *m_parentWidget;
     QScopedPointer<QnWorkbenchContext> m_context;
     QScopedPointer<QnWorkbenchAccessController> m_accessController;
-    QScopedPointer<QnMainWindow> m_mainWindow;
+    QScopedPointer<nx::client::desktop::ui::MainWindow> m_mainWindow;
 };
 
 #define qnAxClient QnAxClientWindow::instance()

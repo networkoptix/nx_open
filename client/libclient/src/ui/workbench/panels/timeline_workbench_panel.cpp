@@ -1,5 +1,11 @@
 #include "timeline_workbench_panel.h"
 
+#include <QtCore/QTimer>
+
+#include <QtWidgets/QAction>
+#include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QMenu>
+
 #include <client/client_runtime_settings.h>
 
 #include <ui/actions/action_manager.h>
@@ -53,7 +59,7 @@ static const int kShowWidgetHiddenHeight = 12;
 
 namespace NxUi {
 
-using namespace nx::client::ui::workbench;
+using namespace nx::client::desktop::ui::workbench;
 
 TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     const QnPaneSettings& settings,

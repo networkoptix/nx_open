@@ -2,6 +2,7 @@
 #include "proxy_label.h"
 
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLayout>
 

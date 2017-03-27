@@ -18,10 +18,12 @@ import pytz
 import tzlocal
 import requests.exceptions
 import pytest
+import utils
 from .server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_SEC, HttpError, ServerRestApi
 from .vagrant_box_config import BoxConfigFactory, BoxConfig
 from .cloud_host import CloudHost
 from .camera import Camera, SampleMediaFile
+from .media_stream import open_media_stream
 
 
 MEDIASERVER_CONFIG_PATH = '/opt/{company_name}/mediaserver/etc/mediaserver.conf'
@@ -111,45 +113,6 @@ class Service(object):
         self.run_action(is_up and 'start' or 'stop')
 
 
-class ServerPersistentInfo(object):
-
-    _cache_key = 'nx/mediaservers'
-
-    @classmethod
-    def load_from_cache(cls, cache):
-        return map(cls.from_dict, cache.get(cls._cache_key, []))
-
-    @classmethod
-    def save_to_cache(cls, cache, server_persistent_info_list):
-        cache.set(cls._cache_key, [info.to_dict() for into in server_persistent_info_list])
-
-    @classmethod
-    def from_dict(cls, d):
-        return ServerPersistentInfo(
-            name=d['name'],
-            box_name=d['box_name'],
-            storage_url=d['storage_url'],
-            user=d['user'],
-            password=d['password'],
-            )
-
-    def __init__(self, name, box_name, storage_url, user, password):
-        self.name = name
-        self.box_name = box_name
-        self.storage_url = storage_url
-        self.user = user
-        self.password = password
-
-    def to_dict(self):
-        return dict(
-            name=self.name,
-            box_name=self.box_name,
-            storage_url=self.storage_url,
-            user=self.user,
-            password=self.password,
-            )
-
-
 class ServerConfigFactory(object):
 
     def __init__(self, box_config_factory):
@@ -164,7 +127,8 @@ class ServerConfig(object):
 
     SETUP_LOCAL = 'local'
 
-    def __init__(self, box_config_factory, start=True, setup=SETUP_LOCAL, leave_initial_cloud_host=False, box=None):
+    def __init__(self, box_config_factory, start=True, setup=SETUP_LOCAL, leave_initial_cloud_host=False,
+                 box=None, config_file_params=None):
         assert box is None or isinstance(box, BoxConfig), repr(box)
         self.start = start
         self.setup = setup
@@ -175,6 +139,7 @@ class ServerConfig(object):
         # server binaries has original cloud host encoded by compilation step.
         self.leave_initial_cloud_host = leave_initial_cloud_host  # bool
         self.box = box or box_config_factory()
+        self.config_file_params = config_file_params  # dict or None
 
     def __repr__(self):
         return 'ServerConfig(%r @ %s)' % (self.name, self.box)
@@ -202,7 +167,7 @@ class Server(object):
     def __repr__(self):
         return 'Server%r@%s' % (self.name, self.url)
 
-    def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None):
+    def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None, config_file_params=None):
         self._is_started = was_started = self.service.get_status()
         log.info('Service for %s %s started', self, self._is_started and 'WAS' or 'was NOT')
         if reset:
@@ -211,7 +176,7 @@ class Server(object):
             self.storage.cleanup()
             if patch_set_cloud_host:
                 self.patch_binary_set_cloud_host(patch_set_cloud_host)  # may be changed by previous tests...
-            self.reset_config(logLevel=log_level, tranLogLevel=log_level)
+            self.reset_config(logLevel=log_level, tranLogLevel=log_level, **(config_file_params or {}))
             if must_start:
                 self.start_service()
         else:
@@ -228,9 +193,6 @@ class Server(object):
     def is_started(self):
         assert self._is_started is not None, 'is_started state is still unknown'
         return self._is_started
-
-    def get_persistent_info(self):
-        return ServerPersistentInfo(self.name, self.box.name, self.user, self.password)
 
     def start_service(self):
         self.set_service_status(started=True)
@@ -494,6 +456,11 @@ class Server(object):
         log.info('\t%s', '\n\t'.join(map(str, periods)))
         return periods
 
+    def get_media_stream(self, stream_type, camera):
+        assert stream_type in ['rtsp', 'webm', 'hls', 'direct-hls'], repr(stream_type)
+        assert isinstance(camera, Camera), repr(camera)
+        return open_media_stream(self.url, self.user, self.password, stream_type, camera.mac_addr)
+
 
 class Storage(object):
 
@@ -524,7 +491,7 @@ class Storage(object):
     # server/var/data/data/low_quality/urn_uuid_b0e78864-c021-11d3-a482-f12907312681/2017/01/27/12/1485511093576_21332.mkv
     def _construct_fpath(self, camera_mac_addr, quality_part, start_time, duration):
         local_dt = start_time.astimezone(self.box.timezone)  # box local
-        unixtime_utc_ms = calendar.timegm(start_time.utctimetuple())*1000 + start_time.microsecond/1000
+        unixtime_utc_ms = int(utils.datetime_utc_to_timestamp(start_time) * 1000)
         duration_ms = int(duration.total_seconds() * 1000)
         return os.path.join(
             self.dir, quality_part, camera_mac_addr,

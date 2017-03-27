@@ -98,6 +98,8 @@
 #include "workbench_display.h"
 #include "workbench_access_controller.h"
 
+#include <plugins/io_device/joystick/joystick_manager.h>
+
 //#define QN_WORKBENCH_CONTROLLER_DEBUG
 #ifdef QN_WORKBENCH_CONTROLLER_DEBUG
 #   define TRACE(...) qDebug() << __VA_ARGS__;
@@ -326,7 +328,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(m_rotationInstrument,       SIGNAL(rotationStarted(QGraphicsView *, QGraphicsWidget *)),                                this,                           SLOT(at_rotationStarted(QGraphicsView *, QGraphicsWidget *)));
     connect(m_rotationInstrument,       SIGNAL(rotationFinished(QGraphicsView *, QGraphicsWidget *)),                               this,                           SLOT(at_rotationFinished(QGraphicsView *, QGraphicsWidget *)));
     connect(m_motionSelectionInstrument, SIGNAL(selectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)),                 this,                           SLOT(at_motionSelectionProcessStarted(QGraphicsView *, QnMediaResourceWidget *)));
-    connect(m_motionSelectionInstrument, SIGNAL(selectionStarted(QGraphicsView *, QnMediaResourceWidget *)),                        this,                           SLOT(at_motionSelectionStarted(QGraphicsView *, QnMediaResourceWidget *)));
     connect(m_motionSelectionInstrument, SIGNAL(motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)),     this,                           SLOT(at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *, const QRect &)));
     connect(m_motionSelectionInstrument, SIGNAL(motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)),                     this,                           SLOT(at_motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *)));
     connect(sceneKeySignalingInstrument, SIGNAL(activated(QGraphicsScene *, QEvent *)),                                             this,                           SLOT(at_scene_keyPressed(QGraphicsScene *, QEvent *)));
@@ -468,6 +469,19 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(action(QnActions::ToggleTourModeAction), SIGNAL(triggered(bool)),                                                              this,                           SLOT(at_toggleTourModeAction_triggered(bool)));
     connect(accessController(), &QnWorkbenchAccessController::permissionsChanged, this,
         &QnWorkbenchController::at_accessController_permissionsChanged);
+
+    connect(
+        action(QnActions::GoToNextItemAction), &QAction::triggered,
+        this, &QnWorkbenchController::at_nextItemAction_triggered);
+
+    connect(
+        action(QnActions::GoToPreviousItemAction), &QAction::triggered,
+        this, &QnWorkbenchController::at_previousItemAction_triggered);
+
+    connect(
+        action(QnActions::ToggleCurrentItemMaximizationStateAction), &QnAction::triggered,
+        this, &QnWorkbenchController::at_toggleCurrentItemMaximizationState_triggered);
+
 }
 
 QnWorkbenchGridMapper *QnWorkbenchController::mapper() const {
@@ -657,12 +671,7 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     switch(e->key()) {
     case Qt::Key_Enter:
     case Qt::Key_Return: {
-        QnResourceWidget *widget = display()->widget(Qn::CentralRole);
-        if(widget && widget == display()->widget(Qn::ZoomedRole)) {
-            menu()->trigger(QnActions::UnmaximizeItemAction, widget);
-        } else {
-            menu()->trigger(QnActions::MaximizeItemAction, widget);
-        }
+        toggleCurrentItemMaximizationState();
         break;
     }
     case Qt::Key_Up:
@@ -1091,19 +1100,25 @@ void QnWorkbenchController::at_motionSelectionProcessStarted(QGraphicsView *, Qn
     widget->setOption(QnResourceWidget::DisplayMotion, true);
 }
 
-void QnWorkbenchController::at_motionSelectionStarted(QGraphicsView *, QnMediaResourceWidget *widget) {
-    foreach(QnResourceWidget *otherWidget, display()->widgets())
-        if(otherWidget != widget)
-            if(QnMediaResourceWidget *otherMediaWidget = dynamic_cast<QnMediaResourceWidget *>(otherWidget))
-                otherMediaWidget->clearMotionSelection();
-}
-
 void QnWorkbenchController::at_motionRegionCleared(QGraphicsView *, QnMediaResourceWidget *widget) {
     widget->clearMotionSelection();
 }
 
-void QnWorkbenchController::at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *widget, const QRect &region) {
+void QnWorkbenchController::at_motionRegionSelected(QGraphicsView *, QnMediaResourceWidget *widget, const QRect &region)
+{
+    if (region.isEmpty())
+        return;
+
     widget->addToMotionSelection(region);
+
+    for (auto otherWidget: display()->widgets())
+    {
+        if (otherWidget != widget)
+        {
+            if (auto otherMediaWidget = dynamic_cast<QnMediaResourceWidget*>(otherWidget))
+                otherMediaWidget->clearMotionSelection();
+        }
+    }
 }
 
 void QnWorkbenchController::at_item_leftPressed(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info)
@@ -1374,6 +1389,21 @@ void QnWorkbenchController::at_checkFileSignatureAction_triggered()
     dialog->exec();
 }
 
+void QnWorkbenchController::at_nextItemAction_triggered()
+{
+    moveCursor(QPoint(1, 0), QPoint(0, 1));
+}
+
+void QnWorkbenchController::at_previousItemAction_triggered()
+{
+    moveCursor(QPoint(-1, 0), QPoint(0, -1));
+}
+
+void QnWorkbenchController::at_toggleCurrentItemMaximizationState_triggered()
+{
+    toggleCurrentItemMaximizationState();
+}
+
 void QnWorkbenchController::at_toggleSmartSearchAction_triggered() {
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
 
@@ -1522,4 +1552,14 @@ void QnWorkbenchController::at_ptzProcessStarted(QnMediaResourceWidget *widget) 
     display()->scene()->clearSelection();
     widget->setSelected(true);
     display()->bringToFront(widget);
+}
+
+void QnWorkbenchController::toggleCurrentItemMaximizationState()
+{
+    QnResourceWidget *widget = display()->widget(Qn::CentralRole);
+    if(widget && widget == display()->widget(Qn::ZoomedRole)) {
+        menu()->trigger(QnActions::UnmaximizeItemAction, widget);
+    } else {
+        menu()->trigger(QnActions::MaximizeItemAction, widget);
+    }
 }

@@ -1,6 +1,8 @@
 #include "client_instance_manager.h"
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QTimer>
+
 #include <QtWidgets/QDesktopWidget>
 
 #include <client/client_settings.h>

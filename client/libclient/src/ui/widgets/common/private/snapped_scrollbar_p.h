@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QPointer>
+
 #include <ui/widgets/common/scroll_bar_proxy.h>
 
 class QnSnappedScrollBar;

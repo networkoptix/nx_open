@@ -4,15 +4,18 @@
 
 #include <QtCore/QProcess>
 
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QDesktopWidget>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QImage>
-#include <QtWidgets/QWhatsThis>
+#include <QtGui/QImageWriter>
+
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QCheckBox>
-#include <QtGui/QImageWriter>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QWhatsThis>
 
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
@@ -155,6 +158,7 @@
 #include <vms_gateway_embeddable.h>
 #include <utils/unity_launcher_workaround.h>
 #include <utils/connection_diagnostics_helper.h>
+#include <nx/client/ui/workbench/layouts/layout_factory.h>
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
@@ -187,7 +191,14 @@ const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
 //!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
 static const quint32 PROCESS_TERMINATE_TIMEOUT = 15000;
 
-using nx::client::desktop::utils::UnityLauncherWorkaround;
+
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace workbench {
+
+using utils::UnityLauncherWorkaround;
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchActionHandler
@@ -822,8 +833,9 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
             continue;
 
         QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource);
-        if (layout == NULL) {
-            layout = new QnWorkbenchLayout(layoutResource, workbench());
+        if (layout == NULL)
+        {
+            layout = qnLayoutFactory->create(layoutResource, workbench());
             workbench()->addLayout(layout);
         }
         /* Explicit set that we do not control videowall through this layout */
@@ -2274,3 +2286,9 @@ void QnWorkbenchActionHandler::deleteDialogs() {
     if (systemAdministrationDialog())
         delete systemAdministrationDialog();
 }
+
+} // namespace workbench
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

@@ -1,0 +1,17 @@
+<div class="modal-header">
+    <h3 class="modal-title">重啟系統...</h3>
+</div>
+
+<form class="form" role="form" id="restartDialog">
+    <div class="col-sm-12">
+        <p>重啟系統可能需要一段時間. 之後將自動重整頁面.</p>
+        <progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</progressbar>
+
+        <p>如果一段時間沒任何反應, 請手動重整頁面</p>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">重新整理</button>
+    </div>
+
+</form>

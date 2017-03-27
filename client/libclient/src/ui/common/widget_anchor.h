@@ -1,6 +1,8 @@
 #pragma once
 
-#include <QtWidgets/QWidget>
+#include <QtCore/QPointer>
+
+class QWidget;
 
 /**
  * Common class to anchor a widget to edges of its parent.

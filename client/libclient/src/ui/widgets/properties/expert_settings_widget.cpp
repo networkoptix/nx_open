@@ -13,6 +13,7 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+#include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <ui/common/checkbox_utils.h>
 #include <ui/help/help_topic_accessor.h>
@@ -25,6 +26,11 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     m_qualityEditable(false)
 {
     ui->setupUi(this);
+
+    NX_ASSERT(parent);
+    QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
+    ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
+    scrollBar->setUseMaximumSpace(true);
 
     QnCheckbox::autoCleanTristate(ui->checkBoxForceMotionDetection);
 

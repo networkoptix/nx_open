@@ -1,6 +1,8 @@
 #include "connect_to_cloud_dialog.h"
 #include "ui_connect_to_cloud_dialog.h"
 
+#include <QtWidgets/QGraphicsOpacityEffect>
+
 #include <api/global_settings.h>
 #include <api/server_rest_connection.h>
 
@@ -143,7 +145,8 @@ QnConnectToCloudDialog::QnConnectToCloudDialog(QWidget* parent) :
 
     connect(ui->loginInputField,    &QnInputField::textChanged, d, &QnConnectToCloudDialogPrivate::updateUi);
     connect(ui->passwordInputField, &QnInputField::textChanged, d, &QnConnectToCloudDialogPrivate::updateUi);
-
+    connect(this, &QnConnectToCloudDialog::bindFinished,
+        d, &QnConnectToCloudDialogPrivate::at_bindFinished, Qt::QueuedConnection);
     setWarningStyle(ui->invalidCredentialsLabel);
 
     d->lockUi(false);
@@ -254,29 +257,25 @@ void QnConnectToCloudDialogPrivate::bindSystem()
             if (!guard)
                 return;
 
-            const auto timerCallback =
-                [this, guard, result, systemData, serverConnection]()
-                {
-                    if (guard)
-                        at_bindFinished(result, systemData, serverConnection);
-                };
-
-            executeDelayed(timerCallback, 0, thread);
+            Q_Q(QnConnectToCloudDialog);
+            emit q->bindFinished(result, systemData, serverConnection);
         };
 
     cloudConnection->systemManager()->bindSystem(sysRegistrationData, completionHandler);
 }
 
-void QnConnectToCloudDialogPrivate::showSuccess(const QString& cloudLogin)
+void QnConnectToCloudDialogPrivate::showSuccess(const QString& /*cloudLogin*/)
 {
     Q_Q(QnConnectToCloudDialog);
 
     linkedSuccessfully = true;
-    q->accept();
 
     QnMessageBox::success(q->parentWidget(),
         tr("System connected to %1", "%1 is the cloud name (like 'Nx Cloud')")
             .arg(QnAppInfo::cloudName()));
+
+    // Since we have QTBUG-40585 event loops of dialogs shouldn't be intersected.
+    q->accept();
 }
 
 void QnConnectToCloudDialogPrivate::showFailure(const QString &message)

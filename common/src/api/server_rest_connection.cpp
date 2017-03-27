@@ -1,5 +1,8 @@
-#include <atomic>
 #include "server_rest_connection.h"
+
+#include <atomic>
+
+#include <QtCore/QElapsedTimer>
 
 #include <api/model/password_data.h>
 #include <api/model/cloud_credentials_data.h>

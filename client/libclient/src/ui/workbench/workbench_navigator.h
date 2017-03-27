@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSet>
+#include <QtCore/QTime>
 
 #include <array>
 
@@ -25,6 +26,7 @@
 #include <camera/thumbnails_loader.h>
 
 class QAction;
+class QCompleter;
 
 class QnWorkbenchItem;
 class QnWorkbenchDisplay;

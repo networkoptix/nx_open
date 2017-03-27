@@ -1,5 +1,12 @@
-
 #include "bookmarks_viewer.h"
+
+#include <QtCore/QElapsedTimer>
+#include <QtCore/QTimer>
+
+#include <QtGui/QTextDocument>
+#include <QtGui/QAbstractTextDocumentLayout>
+
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <core/resource/camera_bookmark.h>
 

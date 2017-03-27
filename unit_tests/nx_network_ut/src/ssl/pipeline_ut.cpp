@@ -92,8 +92,8 @@ private:
     std::unique_ptr<utils::pipeline::TwoWayPipeline> m_serverPipeline;
     std::unique_ptr<utils::pipeline::AbstractOutputConverter> m_betweenClientAndServer;
     const int m_maxBytesToWrite;
-    int m_clientToServerTotalBytesThrough;
-    int m_serverToClientTotalBytesThrough;
+    std::size_t m_clientToServerTotalBytesThrough;
+    std::size_t m_serverToClientTotalBytesThrough;
 };
 
 /**
@@ -272,7 +272,7 @@ protected:
     {
         auto serverPipeline = std::make_unique<AcceptingPipeline>();
         m_serverPipeline = serverPipeline.get();
-        return serverPipeline;
+        return std::move(serverPipeline);
     }
 
 private:

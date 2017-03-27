@@ -252,10 +252,8 @@ void QnFisheyeCalibrationImageWidget::dragMove(DragInfo *info) {
     emit centerModified(newCenter);
 }
 
-void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent* event)
+void QnFisheyeCalibrationImageWidget::paintEvent(QPaintEvent* /*event*/)
 {
-    QN_UNUSED(event);
-
     if (m_image.isNull())
         return;
 

@@ -1,6 +1,11 @@
 #include "user_role_settings_widget.h"
 #include "ui_user_role_settings_widget.h"
 
+#include <QtGui/QStandardItemModel>
+
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QRadioButton>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 

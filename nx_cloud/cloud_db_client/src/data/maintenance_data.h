@@ -11,8 +11,10 @@ namespace api {
 #define VmsConnectionData_Fields (systemId)(mediaserverEndpoint)
 #define VmsConnectionDataList_Fields (connections)
 
+#define Statistics_Fields (onlineServerCount)
+
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (VmsConnectionData)(VmsConnectionDataList),
+    (VmsConnectionData)(VmsConnectionDataList)(Statistics),
     (json));
 
 } // namespace api

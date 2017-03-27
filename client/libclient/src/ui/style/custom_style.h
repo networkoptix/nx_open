@@ -6,6 +6,8 @@
 class QWidget;
 class QPalette;
 class QPushButton;
+class QTabWidget;
+class QStackedWidget;
 
 void setWarningStyle(QWidget *widget);
 void setWarningStyle(QPalette *palette);

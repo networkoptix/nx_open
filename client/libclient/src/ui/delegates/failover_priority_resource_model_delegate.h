@@ -1,5 +1,7 @@
 #pragma once
 
+#include <common/common_globals.h>
+
 #include <client/client_color_types.h>
 
 #include <core/resource/resource_fwd.h>

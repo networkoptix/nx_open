@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <QtGui/QGuiApplication>
+
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QGraphicsItem>
@@ -1744,6 +1746,14 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false).
         condition(new QnToggleTourActionCondition(this));
 
+    factory(QnActions::OpenLayoutTourAction).
+        flags(Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Start Layouts Tour")).
+        toggledText(tr("Stop Layouts Tour")).
+        shortcut(lit("Alt+L")).
+        autoRepeat(false);
+
     factory().
         flags(Qn::Scene | Qn::NoTarget).
         separator();
@@ -2010,6 +2020,22 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Notifications | Qn::NoTarget).
         text(tr("Pin Notifications")).
         toggledText(tr("Unpin Notifications"));
+
+    factory(QnActions::GoToNextItemAction)
+        .flags(Qn::NoTarget);
+
+    factory(QnActions::GoToPreviousItemAction)
+        .flags(Qn::NoTarget);
+
+    factory(QnActions::ToggleCurrentItemMaximizationStateAction)
+        .flags(Qn::NoTarget);
+
+    factory(QnActions::PtzContinuousMoveAction)
+        .flags(Qn::NoTarget);
+
+    factory(QnActions::PtzActivatePresetByIndexAction)
+        .flags(Qn::NoTarget);
+
 }
 
 QnActionManager::~QnActionManager()

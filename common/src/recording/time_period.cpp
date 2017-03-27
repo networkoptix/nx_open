@@ -11,6 +11,8 @@
 #include <nx/fusion/fusion/fusion_adaptor.h>
 #include "time_period_list.h"
 
+#include <nx/utils/datetime.h>
+
 QN_FUSION_ADAPT_STRUCT(QnTimePeriod, (startTimeMs)(durationMs))
 QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES((QnTimePeriod), (ubjson)(xml)(csv_record))
 
@@ -176,16 +178,6 @@ bool QnTimePeriod::isNull() const {
 
 bool QnTimePeriod::isInfinite() const {
     return durationMs == ::infiniteDuration;
-}
-
-Qn::TimePeriodType QnTimePeriod::type() const {
-    if(isNull())
-        return Qn::NullTimePeriod;
-
-    if(isEmpty())
-        return Qn::EmptyTimePeriod;
-
-    return Qn::NormalTimePeriod;
 }
 
 qint64 QnTimePeriod::infiniteDuration() {

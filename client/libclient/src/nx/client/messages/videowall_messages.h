@@ -1,6 +1,10 @@
 #pragma once
 
+#include <QtCore/QCoreApplication>
+
 #include <core/resource/resource_fwd.h>
+
+class QWidget;
 
 namespace nx {
 namespace client {

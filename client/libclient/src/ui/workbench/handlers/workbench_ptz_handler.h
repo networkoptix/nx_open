@@ -25,6 +25,10 @@ private slots:
     void at_debugCalibratePtzAction_triggered();
     void at_debugGetPtzPositionAction_triggered();
 
+    void at_ptzContinuousMoveAction_triggered();
+    void at_ptzActivatePresetByIndexAction_triggered();
+
 private:
+    QVector3D applyRotation(const QVector3D& speed, qreal rotation) const;
     void showSetPositionWarning(const QnResourcePtr& resource);
 };

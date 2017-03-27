@@ -1,9 +1,15 @@
-
 #include "workbench_welcome_screen.h"
+
+#include <QtCore/QMimeData>
 
 #include <QtQuickWidgets/QQuickWidget>
 #include <QtQuick/QQuickView>
 #include <QtQml/QQmlContext>
+
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QProxyStyle>
+#include <QtWidgets/QStackedWidget>
 
 #include <common/common_module.h>
 #include <core/resource/resource_fwd.h>

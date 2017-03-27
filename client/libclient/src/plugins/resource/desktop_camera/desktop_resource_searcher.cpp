@@ -29,18 +29,15 @@ QnResourceList QnDesktopResourceSearcher::findResources()
     return m_impl->findResources();
 }
 
-bool QnDesktopResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) const
+bool QnDesktopResourceSearcher::isResourceTypeSupported(QnUuid /*resourceTypeId*/) const
 {
-    QN_UNUSED(resourceTypeId);
     return false;
 }
 
 QnResourcePtr QnDesktopResourceSearcher::createResource(
-    const QnUuid &resourceTypeId,
-    const QnResourceParams &params)
+    const QnUuid& /*resourceTypeId*/,
+    const QnResourceParams& /*params*/)
 {
-    QN_UNUSED(resourceTypeId);
-    QN_UNUSED(params);
     return QnResourcePtr();
 }
 

@@ -1,6 +1,8 @@
 #include "change_user_password_dialog.h"
 #include "ui_change_user_password_dialog.h"
 
+#include <QtWidgets/QLineEdit>
+
 #include <core/resource/user_resource.h>
 
 #include <ui/common/aligner.h>

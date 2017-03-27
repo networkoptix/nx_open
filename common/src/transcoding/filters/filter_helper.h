@@ -9,6 +9,8 @@
 #include "abstract_image_filter.h"
 #include "core/ptz/media_dewarping_params.h"
 
+#include <transcoding/timestamp_params.h>
+
 class QnImageFilterHelper
 {
 public:
@@ -20,14 +22,14 @@ public:
     void setSrcRect(const QRectF& cropRect); // crop image filter
     void setDewarpingParams(const QnMediaDewarpingParams& params1, const QnItemDewarpingParams& params2); // fisheye image filter
     void setContrastParams(const ImageCorrectionParams& params); // contrast image filter
-    void setTimeCorner(Qn::Corner corner, qint64 offset, qint64 timeMsec); // time image filter, time in milliseconds since epoch, zero time means take from frame
+    void setTimeStampParams(const QnTimeStampParams& params); // time image filter, time in milliseconds since epoch, zero time means take from frame
     void setCodec(AVCodecID codecID);
-    
+
     const static QSize defaultResolutionLimit;
 
-    /** 
+    /**
      * Create filters for source image processing
-     * 
+     *
      * \param srcResolution             Source video size
      * \param srcResolution             Source video size
      * \returns                         Filter chain to process video
@@ -44,10 +46,8 @@ private:
     QnMediaDewarpingParams m_mediaDewarpingParams;
     QnItemDewarpingParams m_itemDewarpingParams;
     ImageCorrectionParams m_contrastParams;
-    Qn::Corner m_timestampCorner;
+    QnTimeStampParams m_timestampParams;
     AVCodecID m_codecID;
-    qint64 m_onscreenDateOffset;
-    qint64 m_timeMs;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

@@ -9,7 +9,7 @@
 #include <core/resource/layout_item_data.h>
 
 #include <utils/common/threadsafe_item_storage.h>
-
+#include <common/common_globals.h>
 
 /**
  * QnLayoutResource class describes the set of resources together with their view options.

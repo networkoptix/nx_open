@@ -1,5 +1,7 @@
 #pragma once
 
+#include <common/common_globals.h>
+
 #include <nx_ec/ec_api_fwd.h>
 
 struct QnConnectionInfo;

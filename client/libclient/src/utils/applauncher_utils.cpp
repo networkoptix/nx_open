@@ -1,6 +1,7 @@
 #include "applauncher_utils.h"
 
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QDesktopWidget>
 
 #include <common/common_module.h>
 

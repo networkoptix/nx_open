@@ -13,6 +13,8 @@
 
 #include <utils/common/connective.h>
 
+class QLabel;
+
 namespace Ui {
     class ServerSettingsWidget;
 }

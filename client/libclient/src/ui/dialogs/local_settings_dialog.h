@@ -10,6 +10,7 @@ namespace Ui
     class LocalSettingsDialog;
 }
 
+class QLabel;
 class QnAdvancedSettingsWidget;
 class QnLookAndFeelPreferencesWidget;
 

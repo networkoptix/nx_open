@@ -451,9 +451,9 @@ QnConstResourceAudioLayoutPtr QnDesktopAudioOnlyDataProvider::getAudioLayout()
     return m_audioLayout;
 }
 
-void QnDesktopAudioOnlyDataProvider::beforeDestroyDataProvider(QnAbstractDataConsumer *dataProviderWrapper)
+void QnDesktopAudioOnlyDataProvider::beforeDestroyDataProvider(
+    QnAbstractDataConsumer* /*dataProviderWrapper*/)
 {
-    QN_UNUSED(dataProviderWrapper);
 }
 
 bool QnDesktopAudioOnlyDataProvider::readyToStop() const

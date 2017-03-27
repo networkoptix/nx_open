@@ -1,5 +1,13 @@
 #include "non_modal_dialog_constructor.h"
 
+#include <QtCore/QEvent>
+
+#include <QtGui/QWindow>
+
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QDesktopWidget>
+#include <QtWidgets/QWidget>
+
 namespace {
     const int extrah = 40;
     const int extraw = 10;
@@ -82,4 +90,31 @@ void QnShowDialogHelper::showNonModalDialog(QWidget* dialog, const QRect &target
         dialog->raise();
     else
         show(dialog, targetGeometry);
+}
+
+QnDelayedShowHelper::QnDelayedShowHelper(QWidget* targetWidget, const QRect &targetGeometry, int sourceCount, QObject *parent):
+    QObject(parent),
+    m_targetWidget(targetWidget),
+    m_targetGeometry(targetGeometry),
+    m_sourceCount(sourceCount)
+{
+
+}
+
+bool QnDelayedShowHelper::eventFilter(QObject *watched, QEvent *event)
+{
+    if (m_targetWidget && event->type() == QEvent::Hide)
+    {
+        watched->removeEventFilter(this);   //avoid double call
+        m_sourceCount--;
+
+        if (m_sourceCount <= 0)
+        {
+            show(m_targetWidget.data(), m_targetGeometry);
+            deleteLater();
+        }
+
+    }
+
+    return QObject::eventFilter(watched, event);
 }

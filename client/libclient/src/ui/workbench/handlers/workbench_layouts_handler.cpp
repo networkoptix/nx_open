@@ -1,5 +1,7 @@
 #include "workbench_layouts_handler.h"
 
+#include <QtWidgets/QAction>
+
 #include <api/app_server_connection.h>
 
 #include <client/client_globals.h>
@@ -50,9 +52,16 @@
 #include <utils/common/delete_later.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <nx/client/ui/workbench/layouts/layout_factory.h>
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
+
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace workbench {
 
 namespace {
 QString generateUniqueLayoutName(const QnUserResourcePtr &user, const QString &defaultName, const QString &nameTemplate)
@@ -65,7 +74,7 @@ QString generateUniqueLayoutName(const QnUserResourcePtr &user, const QString &d
             usedNames.push_back(layout->getName());
     }
 
-    return nx::utils::generateUniqueString(usedNames, defaultName, nameTemplate);
+    return utils::generateUniqueString(usedNames, defaultName, nameTemplate);
 }
 
 /**
@@ -104,8 +113,7 @@ QnResourceList calculateResourcesToShare(const QnResourceList& resources,
     return resources.filtered(sharingRequired);
 }
 
-} // unnamed namespace
-
+} // namespace
 
 QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent):
     QObject(parent),
@@ -162,13 +170,13 @@ void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, 
     QnLayoutResourceList existing = alreadyExistingLayouts(newName, layout->getParentId(), layout);
     if (!canRemoveLayouts(existing))
     {
-        nx::client::messages::Resources::layoutAlreadyExists(mainWindow());
+        messages::Resources::layoutAlreadyExists(mainWindow());
         return;
     }
 
     if (!existing.isEmpty())
     {
-        if (!nx::client::messages::Resources::overrideLayout(mainWindow()))
+        if (!messages::Resources::overrideLayout(mainWindow()))
             return;
         removeLayouts(existing);
     }
@@ -287,7 +295,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
                     return;
                 }
 
-                if (!nx::client::messages::Resources::overrideLayout(mainWindow()))
+                if (!messages::Resources::overrideLayout(mainWindow()))
                     return;
 
                 saveLayout(layout);
@@ -298,14 +306,14 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
             QnLayoutResourceList existing = alreadyExistingLayouts(name, user->getId(), excludingSelfLayout);
             if (!canRemoveLayouts(existing))
             {
-                nx::client::messages::Resources::layoutAlreadyExists(mainWindow());
+                messages::Resources::layoutAlreadyExists(mainWindow());
                 dialog->setName(proposedName);
                 continue;
             }
 
             if (!existing.isEmpty())
             {
-                if (!nx::client::messages::Resources::overrideLayout(mainWindow()))
+                if (!messages::Resources::overrideLayout(mainWindow()))
                     return;
 
                 removeLayouts(existing);
@@ -319,13 +327,13 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
         QnLayoutResourceList existing = alreadyExistingLayouts(name, user->getId(), layout);
         if (!canRemoveLayouts(existing))
         {
-            nx::client::messages::Resources::layoutAlreadyExists(mainWindow());
+            messages::Resources::layoutAlreadyExists(mainWindow());
             return;
         }
 
         if (!existing.isEmpty())
         {
-            if (!nx::client::messages::Resources::overrideLayout(mainWindow()))
+            if (!messages::Resources::overrideLayout(mainWindow()))
                 return;
             removeLayouts(existing);
         }
@@ -365,7 +373,8 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
         user == layoutOwnerUser)   //making current only new layout of current user
     {
         int index = workbench()->currentLayoutIndex();
-        workbench()->insertLayout(new QnWorkbenchLayout(newLayout, this), index);
+
+        workbench()->insertLayout(qnLayoutFactory->create(newLayout, this), index);
         workbench()->setCurrentLayoutIndex(index);
         workbench()->removeLayout(index + 1);
 
@@ -387,7 +396,7 @@ void QnWorkbenchLayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& i
 {
     if (items.size() > 1)
     {
-        const bool confirm = nx::client::messages::Resources::removeItemsFromLayout(mainWindow(),
+        const bool confirm = messages::Resources::removeItemsFromLayout(mainWindow(),
             QnActionParameterTypes::resources(items));
 
         if (!confirm)
@@ -529,7 +538,7 @@ bool QnWorkbenchLayoutsHandler::confirmChangeSharedLayout(const LayoutChange& ch
     if (!accessibleToCustomUsers)
         return true;
 
-    return nx::client::messages::Resources::sharedLayoutEdit(mainWindow());
+    return messages::Resources::sharedLayoutEdit(mainWindow());
 }
 
 bool QnWorkbenchLayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layouts)
@@ -551,7 +560,7 @@ bool QnWorkbenchLayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourc
     if (!accessibleToCustomUsers)
         return true;
 
-    return nx::client::messages::Resources::deleteSharedLayouts(mainWindow(), layouts);
+    return messages::Resources::deleteSharedLayouts(mainWindow(), layouts);
 }
 
 bool QnWorkbenchLayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr& user,
@@ -565,12 +574,12 @@ bool QnWorkbenchLayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr
     switch (user->userRole())
     {
         case Qn::UserRole::CustomPermissions:
-            return nx::client::messages::Resources::changeUserLocalLayout(mainWindow(), change.removed);
+            return messages::Resources::changeUserLocalLayout(mainWindow(), change.removed);
         case Qn::UserRole::CustomUserRole:
-            return nx::client::messages::Resources::addToRoleLocalLayout(
+            return messages::Resources::addToRoleLocalLayout(
                     mainWindow(),
                     calculateResourcesToShare(change.added, user))
-                && nx::client::messages::Resources::removeFromRoleLocalLayout(
+                && messages::Resources::removeFromRoleLocalLayout(
                     mainWindow(),
                     change.removed);
         default:
@@ -610,7 +619,7 @@ bool QnWorkbenchLayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePt
             stillAccessible << resource;
     }
 
-    return nx::client::messages::Resources::deleteLocalLayouts(mainWindow(), stillAccessible);
+    return messages::Resources::deleteLocalLayouts(mainWindow(), stillAccessible);
 }
 
 bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& subject,
@@ -650,7 +659,7 @@ bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnResourceAccess
             resourcesBecomeUnaccessible << resource;
     }
 
-    return nx::client::messages::Resources::stopSharingLayouts(mainWindow(),
+    return messages::Resources::stopSharingLayouts(mainWindow(),
         resourcesBecomeUnaccessible, subject);
 }
 
@@ -734,95 +743,21 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(
             if (!changed)
                 continue;
 
-            bool saveable = accessController()->hasPermissions(resource, Qn::SavePermission);
-            if (saveable)
-                saveableResources.push_back(resource);
-            else
-                rollbackResources.push_back(resource);
+            rollbackResources.push_back(resource);
         }
     }
 
 
     rollbackResources.append(saveableResources);
     saveableResources.clear();
-    closeLayouts(resources, rollbackResources, saveableResources);
+    closeLayoutsInternal(resources, rollbackResources);
     return true;
 }
 
-void QnWorkbenchLayoutsHandler::closeLayouts(
+void QnWorkbenchLayoutsHandler::closeLayoutsInternal(
     const QnLayoutResourceList& resources,
-    const QnLayoutResourceList& rollbackResources,
-    const QnLayoutResourceList& saveResources)
+    const QnLayoutResourceList& rollbackResources)
 {
-    if (!saveResources.empty())
-    {
-        QnLayoutResourceList fileResources, normalResources, videowallReviewResources;
-        foreach(const QnLayoutResourcePtr &resource, saveResources)
-        {
-            if (resource->isFile())
-            {
-                fileResources.push_back(resource);
-            }
-            else if (!resource->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
-            {
-                videowallReviewResources.push_back(resource);
-            }
-            else
-            {
-                normalResources.push_back(resource);
-            }
-        }
-
-        auto counter = new QnCounter(0, this);
-        connect(counter, &QnCounter::reachedZero, counter, &QObject::deleteLater);
-
-        if (!normalResources.isEmpty())
-        {
-            auto callback = [counter](bool success, const QnLayoutResourcePtr &layout)
-            {
-                QN_UNUSED(success, layout);
-                counter->decrement();
-            };
-            for (const QnLayoutResourcePtr& layout : normalResources)
-                if (snapshotManager()->save(layout, callback))
-                    counter->increment();
-        }
-
-        QnWorkbenchExportHandler *exportHandler = context()->instance<QnWorkbenchExportHandler>();
-        foreach(const QnLayoutResourcePtr &fileResource, fileResources)
-        {
-            bool isReadOnly = !(accessController()->permissions(fileResource) & Qn::WritePermission);
-
-            if (exportHandler->saveLocalLayout(fileResource, isReadOnly, false, counter, SLOT(decrement())))
-                counter->increment();
-        }
-
-        if (!videowallReviewResources.isEmpty())
-        {
-            for (const QnLayoutResourcePtr &layout: videowallReviewResources)
-            {
-                //TODO: #GDM #VW #LOW refactor common code to common place
-                if (!context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout,
-                    [this, layout, counter](int reqId, ec2::ErrorCode errorCode)
-                    {
-                        Q_UNUSED(reqId);
-                        snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
-                        counter->decrement();
-                        if (errorCode != ec2::ErrorCode::ok)
-                            return;
-                        snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsChanged);
-                    }))
-                    continue;
-                snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) | Qn::ResourceIsBeingSaved);
-                counter->increment();
-            }
-        }
-
-        // magic that will invoke slot if counter is empty and delete it afterwards
-        counter->increment();
-        counter->decrement();
-    }
-
     for (const QnLayoutResourcePtr &resource: rollbackResources)
         snapshotManager()->restore(resource);
 
@@ -872,7 +807,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
     QnLayoutResourceList existing = alreadyExistingLayouts(dialog->name(), user->getId());
     if (!canRemoveLayouts(existing))
     {
-        nx::client::messages::Resources::layoutAlreadyExists(mainWindow());
+        messages::Resources::layoutAlreadyExists(mainWindow());
         return;
     }
 
@@ -884,7 +819,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
                 return layout->hasFlags(Qn::local);
             });
 
-        if (!allAreLocal && !nx::client::messages::Resources::overrideLayout(mainWindow()))
+        if (!allAreLocal && !messages::Resources::overrideLayout(mainWindow()))
             return;
 
         removeLayouts(existing);
@@ -1061,7 +996,7 @@ void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
 
 void QnWorkbenchLayoutsHandler::at_openNewTabAction_triggered()
 {
-    QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
+    QnWorkbenchLayout *layout = qnLayoutFactory->create(this);
 
     layout->setName(generateUniqueLayoutName(context()->user(), tr("New Layout"), tr("New Layout %1")));
 
@@ -1089,3 +1024,9 @@ void QnWorkbenchLayoutsHandler::forcedUpdate()
 {
     //do nothing
 }
+
+} // namespace workbench
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

@@ -4,7 +4,10 @@
 #include <fstream>
 #include <tchar.h>
 #include <Windows.h>
+#include <Commctrl.h>
 #include "version.h"
+#include "progress.h"
+#include "resource.h"
 #include <iostream>
 
 // -------------------------------------------------------------------------- //
@@ -42,6 +45,14 @@ using namespace std;
 
 static const int IO_BUFFER_SIZE = 1024*1024;
 static const int64_t MAGIC = 0x73a0b934820d4055ll;
+
+wstring loadString(UINT id)
+{
+    enum { BUFFER_SIZE = 1024 };
+    wchar_t buffer[BUFFER_SIZE];
+    LoadString(0, IDS_UNPACKING, buffer, BUFFER_SIZE);
+    return buffer;
+}
 
 wstring closeDirPath(const wstring& name)
 {
@@ -122,7 +133,7 @@ void checkDir(set<wstring>& checkedDirs, const wstring& dir)
         createDirectory(normalizedName);
 }
 
-int extractFile(ifstream& srcFile, const wstring& fullFileName, int64_t pos, int64_t fileSize)
+int extractFile(ifstream& srcFile, const wstring& fullFileName, int64_t pos, int64_t fileSize, QnLauncherProgress& progress)
 {
     srcFile.seekg(pos);
     ofstream dstFile;
@@ -136,6 +147,8 @@ int extractFile(ifstream& srcFile, const wstring& fullFileName, int64_t pos, int
         srcFile.read(buffer, min(bytesLeft, 1024*1024ll));
         dstFile.write(buffer, srcFile.gcount());
         bytesLeft -= srcFile.gcount();
+        pos += srcFile.gcount();
+        progress.setPos(pos);
     } while (srcFile.gcount() > 0 && bytesLeft > 0);
 
     dstFile.close();
@@ -220,17 +233,25 @@ int launchFile(const wstring& executePath)
         }
         delete [] buffer;
         wstring dstDir = getDstDir();
-        int i = 0;
 
         set<wstring> checkedDirs;
         checkDir(checkedDirs, dstDir);
 
-        for (; i < filePosList.size()-1; ++i)
+        if (filePosList.size() > 1)
         {
-            wstring fullFileName = getFullFileName(dstDir, fileNameList[i]);
-            checkDir(checkedDirs, extractFilePath(fullFileName));
-            extractFile(srcFile, fullFileName, filePosList[i], filePosList[i+1] - filePosList[i]);
+            QnLauncherProgress progress(std::wstring(QN_CLIENT_DISPLAY_NAME)
+                + L" - " + loadString(IDS_UNPACKING).c_str());
+
+            progress.setRange(filePosList.front(), filePosList.back());
+
+            for (int i = 0; i < filePosList.size() - 1; ++i)
+            {
+                wstring fullFileName = getFullFileName(dstDir, fileNameList[i]);
+                checkDir(checkedDirs, extractFilePath(fullFileName));
+                extractFile(srcFile, fullFileName, filePosList[i], filePosList[i+1] - filePosList[i], progress);
+            }
         }
+
         srcFile.close();
 
         // start client
@@ -245,7 +266,8 @@ int launchFile(const wstring& executePath)
         }
 
         return 0;
-    } catch(...)
+    }
+    catch(...)
     {
         delete [] buffer;
         return -2;
@@ -270,6 +292,12 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                        LPTSTR    lpCmdLine,
                        int       nCmdShow)
 {
+    INITCOMMONCONTROLSEX initCtrlEx;
+    memset(&initCtrlEx, 0, sizeof(initCtrlEx));
+    initCtrlEx.dwSize = sizeof(INITCOMMONCONTROLSEX);
+    initCtrlEx.dwICC = ICC_PROGRESS_CLASS;
+    InitCommonControlsEx(&initCtrlEx);
+
     if (std::wstring(lpCmdLine).empty())
     {
         wchar_t exepath[MAX_PATH];

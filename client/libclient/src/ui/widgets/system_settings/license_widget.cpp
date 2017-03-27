@@ -4,6 +4,8 @@
 #include <QtCore/QFile>
 #include <QtCore/QUrl>
 
+#include <QtGui/QClipboard>
+
 #include <common/common_module.h>
 
 #include <licensing/license.h>

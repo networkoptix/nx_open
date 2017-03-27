@@ -1,5 +1,7 @@
 #include "styled_combo_box_delegate.h"
 
+#include <QtWidgets/QApplication>
+
 #include <ui/style/helper.h>
 #include <utils/common/scoped_painter_rollback.h>
 

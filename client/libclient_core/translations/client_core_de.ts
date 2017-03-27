@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>This account is not activated. Please check your email.</source>
-        <translation>Dieser Account ist nicht aktiviert. Bitte überprüfen Sie Ihre E-Mail.</translation>
+        <translation>Dieser Account ist nicht aktiviert. Bitte überprüfen Sie Ihre Email.</translation>
     </message>
     <message>
         <source>This account is blocked.</source>

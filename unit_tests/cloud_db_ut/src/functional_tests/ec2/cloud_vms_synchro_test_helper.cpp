@@ -10,6 +10,7 @@
 #include <transaction/transaction.h>
 
 #include <api/global_settings.h>
+#include <cloud_db_client/src/cdb_request_path.h>
 #include <utils/common/app_info.h>
 
 namespace nx {
@@ -705,8 +706,8 @@ void Ec2MserverCloudSynchronization::waitForCloudAndVmsToSyncSystemData(
 api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLog(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
-    const QUrl url(lm("http://%1/%2?systemId=%3")
-        .str(cdb()->endpoint()).arg("cdb/maintenance/getTransactionLog")
+    const QUrl url(lm("http://%1%2?systemId=%3")
+        .str(cdb()->endpoint()).arg(kMaintenanceGetTransactionLog)
         .arg(registeredSystemData().id));
     return fetchTransactionLog(url, transactionList);
 }

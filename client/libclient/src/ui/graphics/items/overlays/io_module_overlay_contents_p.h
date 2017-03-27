@@ -2,6 +2,8 @@
 
 #include <functional>
 
+#include <QtWidgets/QGraphicsLayout>
+
 #include <ui/processors/clickable.h>
 #include <utils/common/connective.h>
 

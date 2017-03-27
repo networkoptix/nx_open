@@ -2,9 +2,12 @@
 #include "ui_audit_log_dialog.h"
 
 #include <QtCore/QMimeData>
+
 #include <QtGui/QClipboard>
-#include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
+
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QLabel>
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
@@ -83,6 +86,10 @@ QnAuditLogDialog::QnAuditLogDialog(QWidget* parent) :
 {
     ui->setupUi(this);
     retranslateUi();
+
+    setWindowFlags(windowFlags()
+        | Qt::WindowMaximizeButtonHint
+        | Qt::MaximizeUsingFullscreenGeometryHint);
 
     setWarningStyle(ui->warningLabel);
 
@@ -292,7 +299,7 @@ void QnAuditLogDialog::setupGridCommon(QnTableView* grid, bool master)
     setupContextMenu(grid);
 }
 
-void QnAuditLogDialog::setupContextMenu(QTableView* gridMaster)
+void QnAuditLogDialog::setupContextMenu(QnTableView* gridMaster)
 {
     gridMaster->addAction(m_clipboardAction);
     gridMaster->addAction(m_exportAction);
@@ -939,7 +946,7 @@ void QnAuditLogDialog::at_customContextMenuRequested(const QPoint&)
     QnHiDpiWorkarounds::showMenu(menu.data(), QCursor::pos());
 }
 
-QTableView* QnAuditLogDialog::currentGridView() const
+QnTableView* QnAuditLogDialog::currentGridView() const
 {
     if (ui->gridDetails->hasFocus())
         return ui->gridDetails;

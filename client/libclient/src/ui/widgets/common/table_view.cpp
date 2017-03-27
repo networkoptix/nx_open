@@ -1,4 +1,10 @@
 #include "table_view.h"
+
+#include <QtGui/QPainter>
+
+#include <QtWidgets/QHeaderView>
+#include <QtWidgets/QScrollBar>
+
 #include <ui/common/item_view_hover_tracker.h>
 #include <ui/style/helper.h>
 

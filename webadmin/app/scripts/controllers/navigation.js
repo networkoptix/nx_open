@@ -9,6 +9,7 @@ angular.module('webadminApp')
 
         nativeClient.init().then(function(result){
             $scope.settings.liteClient = result.lite;
+            $('body').addClass('lite-client-mode');
         });
 
         $scope.hasProxy = mediaserver.hasProxy();

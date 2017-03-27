@@ -1,6 +1,11 @@
 #include "resources_workbench_panel.h"
 
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QTimer>
+
+#include <QtWidgets/QAction>
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QMenu>
 
 #include <nx/client/ui/workbench/workbench_animations.h>
 
@@ -47,7 +52,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
     m_resizing(false),
     m_updateResizerGeometryLater(false),
     m_resizerWidget(new QnResizerWidget(Qt::Horizontal, parentWidget)),
-    m_backgroundItem(new QnControlBackgroundWidget(Qn::LeftBorder, parentWidget)),
+    m_backgroundItem(new QnControlBackgroundWidget(Qt::LeftEdge, parentWidget)),
     m_showButton(newShowHideButton(parentWidget, context(), action(QnActions::ToggleTreeAction))),
     m_pinButton(newPinButton(parentWidget, context(), action(QnActions::PinTreeAction))),
     m_hidingProcessor(new HoverFocusProcessor(parentWidget)),
@@ -183,7 +188,7 @@ bool ResourceTreeWorkbenchPanel::isOpened() const
 
 void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
 {
-    using namespace nx::client::ui::workbench;
+    using namespace nx::client::desktop::ui::workbench;
 
     ensureAnimationAllowed(&animate);
 

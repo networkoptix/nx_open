@@ -3,8 +3,12 @@
 #include <utils/common/app_info.h>
 
 #include <QtCore/QFile>
+#include <QtCore/QSortFilterProxyModel>
 #include <QtCore/QTextStream>
 #include <QtCore/QUrlQuery>
+
+#include <QtGui/QKeyEvent>
+#include <QtGui/QClipboard>
 
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QTreeWidgetItem>
