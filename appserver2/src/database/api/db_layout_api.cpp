@@ -256,7 +256,7 @@ bool removeLayout(const QSqlDatabase& database, const QnUuid& id)
 {
     int internalId = api::getResourceInternalId(database, id);
     if (internalId == 0)
-        return false;
+        return true;
 
     if (!removeItems(database, internalId))
         return false;

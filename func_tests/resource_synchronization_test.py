@@ -155,11 +155,12 @@ def env(request, env_builder, server):
         def read_servers(config):
             server_list = config.get(DEFAULT_CONFIG_SECTION, 'serverList')
             return server_list.split(",")
-        servers = [RemoteServer('srv-%d' % idx,
+        servers = {'srv_%d' % idx:
+                    RemoteServer('srv-%d' % idx,
                                  'http://%s/' % srv,
                                  config.get(DEFAULT_CONFIG_SECTION, CONFIG_USERNAME),
                                  config.get(DEFAULT_CONFIG_SECTION, CONFIG_PASSWORD))
-                   for idx, srv in enumerate(read_servers(config))]
+                   for idx, srv in enumerate(read_servers(config))}
         return SimpleNamespace(servers=servers,
                                test_size=config.get_int(DEFAULT_CONFIG_SECTION, CONFIG_TESTSIZE),
                                thread_number=config.get_int(DEFAULT_CONFIG_SECTION, CONFIG_THREADS))
@@ -169,7 +170,6 @@ def env(request, env_builder, server):
         boxes_env = env_builder(merge_servers=[one, two],  one=one, two=two)
         boxes_env.test_size = DEFAULT_TEST_SIZE
         boxes_env.thread_number = DEFAULT_THREAD_NUMBER
-        boxes_env.servers = [boxes_env.one, boxes_env.two]
         return boxes_env
 
 def get_response(server, method, api_object, api_method):
@@ -178,6 +178,7 @@ def get_response(server, method, api_object, api_method):
 def wait_entity_merge_done(servers, method, api_object, api_method):
     log.info('TEST for %s %s.%s:', method, api_object, api_method)
     start = time.time()
+    servers = servers.values()
     while True:
         result_expected = get_response(servers[0], method, api_object, api_method)
         def check(servers, result_expected):
@@ -200,6 +201,7 @@ def check_api_calls(env, calls):
 
 def check_transaction_log(env):
     log.info('TEST for GET ec2.getTransactionLog:')
+    servers = env.servers.values()
     def servers_to_str(servers):
         return ', '.join("%s(%s)" % (s.title, s.url) for s in servers)
     def transactions_to_str(transactions):
@@ -207,12 +209,12 @@ def check_transaction_log(env):
     start = time.time()
     while True:
         srv_transactions = {}
-        for srv in env.servers:
+        for srv in servers:
             transactions = map(Transaction.from_dict, srv.rest_api.ec2.getTransactionLog.GET())
             for t in transactions:
                 srv_transactions.setdefault(t, []).append(srv)
         unmatched_transactions = {t: l for t, l in srv_transactions.iteritems()
-                                  if len(l) != len(env.servers)}
+                                  if len(l) != len(servers)}
         if not unmatched_transactions: return
         if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
             assert False, "Unmatched transaction:\n  %s" % transactions_to_str(unmatched_transactions)
@@ -223,13 +225,14 @@ def server_api_post( (server_api_method, data) ):
     return server_api_method(json=data)
 
 def prepare_calls_list(env, gen, api_method, sequence = None):
+    servers = env.servers.values()
     data_generator_fn = gen[api_method]
     sequence = sequence or range(env.test_size)
     calls_list = []
     for i, data in data_generator_fn(sequence[:env.test_size]):
         log.info('TEST data: %s', data)
-        server_i = i % len(env.servers)
-        server = env.servers[server_i]
+        server_i = i % len(servers)
+        server = servers[server_i]
         server_api_fn = server.rest_api.get_api_fn('POST', 'ec2', api_method)
         calls_list.append((server_api_fn, data))
     return calls_list
@@ -277,7 +280,7 @@ def test_api_get_methods(env):
         ('GET', 'ec2', 'getFullInfo'),
         ('GET', 'ec2', 'getLicenses')
         ]
-    for srv in env.servers:
+    for srv in env.servers.values():
         for method, api_object, api_method in test_api_get_methods:
             srv.rest_api.get_api_fn(method, api_object, api_method)()
 
@@ -354,6 +357,7 @@ def test_resource_remove_update_conflict(env, resource_generators):
     cameras = prepare_and_make_async_post_calls(env, resource_generators, 'saveCamera')
     users = prepare_and_make_async_post_calls(env, resource_generators, 'saveUser')
     servers = prepare_and_make_async_post_calls(env, resource_generators, 'saveMediaServer')
+    env_servers = env.servers.values()
     check_api_calls(
         env,
         [ ('GET', 'ec2', 'getCamerasEx'),
@@ -369,8 +373,8 @@ def test_resource_remove_update_conflict(env, resource_generators):
         api_method = api_methods[i % 3]
         data = v[i % 3]
         data['name'] += '_changed'
-        server_1 = env.servers[i % len(env.servers)]
-        server_2 = env.servers[(i+1) % len(env.servers)]
+        server_1 = env_servers[i % len(env_servers)]
+        server_2 = env_servers[(i+1) % len(env_servers)]
         api_calls.append((server_1.rest_api.get_api_fn('POST', 'ec2', api_method), data))
         api_calls.append((server_2.rest_api.get_api_fn('POST', 'ec2', 'removeResource'), dict(id=data['id'])))
 
