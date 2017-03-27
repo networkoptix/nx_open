@@ -111,9 +111,7 @@ protected:
 
     QnSystemAdministrationDialog *systemAdministrationDialog() const;
 
-    QnWorkbenchNotificationsHandler* notificationsHandler() const;
-
-    protected slots:
+protected slots:
 
     void submitDelayedDrops();
     void submitInstantDrop();

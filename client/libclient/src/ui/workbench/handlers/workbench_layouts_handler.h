@@ -74,10 +74,9 @@ private:
 
     void removeLayouts(const QnLayoutResourceList &layouts);
 
-    void closeLayouts(
+    void closeLayoutsInternal(
         const QnLayoutResourceList& resources,
-        const QnLayoutResourceList& rollbackResources,
-        const QnLayoutResourceList& saveResources);
+        const QnLayoutResourceList& rollbackResources);
     bool closeLayouts(const QnLayoutResourceList& resources, bool force = false);
     bool closeLayouts(const QnWorkbenchLayoutList& layouts, bool force = false);
 };

@@ -738,95 +738,21 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(
             if (!changed)
                 continue;
 
-            bool saveable = accessController()->hasPermissions(resource, Qn::SavePermission);
-            if (saveable)
-                saveableResources.push_back(resource);
-            else
-                rollbackResources.push_back(resource);
+            rollbackResources.push_back(resource);
         }
     }
 
 
     rollbackResources.append(saveableResources);
     saveableResources.clear();
-    closeLayouts(resources, rollbackResources, saveableResources);
+    closeLayoutsInternal(resources, rollbackResources);
     return true;
 }
 
-void QnWorkbenchLayoutsHandler::closeLayouts(
+void QnWorkbenchLayoutsHandler::closeLayoutsInternal(
     const QnLayoutResourceList& resources,
-    const QnLayoutResourceList& rollbackResources,
-    const QnLayoutResourceList& saveResources)
+    const QnLayoutResourceList& rollbackResources)
 {
-    if (!saveResources.empty())
-    {
-        QnLayoutResourceList fileResources, normalResources, videowallReviewResources;
-        foreach(const QnLayoutResourcePtr &resource, saveResources)
-        {
-            if (resource->isFile())
-            {
-                fileResources.push_back(resource);
-            }
-            else if (!resource->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
-            {
-                videowallReviewResources.push_back(resource);
-            }
-            else
-            {
-                normalResources.push_back(resource);
-            }
-        }
-
-        auto counter = new QnCounter(0, this);
-        connect(counter, &QnCounter::reachedZero, counter, &QObject::deleteLater);
-
-        if (!normalResources.isEmpty())
-        {
-            auto callback = [counter](bool success, const QnLayoutResourcePtr &layout)
-            {
-                QN_UNUSED(success, layout);
-                counter->decrement();
-            };
-            for (const QnLayoutResourcePtr& layout : normalResources)
-                if (snapshotManager()->save(layout, callback))
-                    counter->increment();
-        }
-
-        QnWorkbenchExportHandler *exportHandler = context()->instance<QnWorkbenchExportHandler>();
-        foreach(const QnLayoutResourcePtr &fileResource, fileResources)
-        {
-            bool isReadOnly = !(accessController()->permissions(fileResource) & Qn::WritePermission);
-
-            if (exportHandler->saveLocalLayout(fileResource, isReadOnly, false, counter, SLOT(decrement())))
-                counter->increment();
-        }
-
-        if (!videowallReviewResources.isEmpty())
-        {
-            for (const QnLayoutResourcePtr &layout: videowallReviewResources)
-            {
-                //TODO: #GDM #VW #LOW refactor common code to common place
-                if (!context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout,
-                    [this, layout, counter](int reqId, ec2::ErrorCode errorCode)
-                    {
-                        Q_UNUSED(reqId);
-                        snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
-                        counter->decrement();
-                        if (errorCode != ec2::ErrorCode::ok)
-                            return;
-                        snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsChanged);
-                    }))
-                    continue;
-                snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) | Qn::ResourceIsBeingSaved);
-                counter->increment();
-            }
-        }
-
-        // magic that will invoke slot if counter is empty and delete it afterwards
-        counter->increment();
-        counter->decrement();
-    }
-
     for (const QnLayoutResourcePtr &resource: rollbackResources)
         snapshotManager()->restore(resource);
 
