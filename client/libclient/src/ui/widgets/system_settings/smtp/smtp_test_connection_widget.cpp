@@ -109,6 +109,7 @@ bool QnSmtpTestConnectionWidget::testSettings(const QnEmailSettings &value)
 
     if (!serverConnection)
     {
+        // todo: invalid error message. It could be a local email server.
         QnMessageBox::warning(this,
             tr("No Servers connected to Internet"), tr("Cannot perform the test."));
         return false;
