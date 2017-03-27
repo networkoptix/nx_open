@@ -37,11 +37,12 @@ private:
     std::vector<nx::utils::thread> m_threads;
 };
 
-class TakingSocketRestHandler: public nx_http::AbstractHttpRequestHandler
+class TakingSocketRestHandler:
+    public nx_http::AbstractHttpRequestHandler
 {
 public:
-    TakingSocketRestHandler(ThreadStorage* threadStorage)
-        : m_threadStorage(threadStorage)
+    TakingSocketRestHandler(ThreadStorage* threadStorage):
+        m_threadStorage(threadStorage)
     {
     }
 
@@ -85,9 +86,9 @@ private:
     ThreadStorage* m_threadStorage;
 };
 
-class TakingHttpSocketTest: public ::testing::Test
+class TakingHttpSocketTest:
+    public ::testing::Test
 {
-
 protected:
     std::unique_ptr<TestHttpServer> testHttpServer()
     {
@@ -195,7 +196,7 @@ protected:
                 .arg(kRestHandlerPath));
 
             ASSERT_TRUE(httpClient->doGet(url))
-                << "Failed to perform GET request";
+                << "Failed to perform GET request "<<i;
 
             {
                 std::unique_ptr<nx_http::HttpClient> localHttpClient;

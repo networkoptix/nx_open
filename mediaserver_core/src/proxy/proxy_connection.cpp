@@ -318,12 +318,14 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 
         if (urlPath.isEmpty())
             urlPath = "/";
-        QString query = url.query();
-        if (!query.isEmpty()) {
-            urlPath += lit("?");
-            urlPath += query;
-        }
-        d->request.requestLine.url = urlPath;
+
+        auto updatedUrl = urlPath;
+        if (!url.query().isEmpty())
+            updatedUrl += lit("?") + url.query();
+        if (!url.fragment().isEmpty())
+            updatedUrl += lit("#") + url.fragment();
+
+        d->request.requestLine.url = updatedUrl;
     }
 
     nx_http::HttpHeaders::const_iterator xCameraGuidIter = d->request.headers.find( Qn::CAMERA_GUID_HEADER_NAME );
@@ -337,9 +339,11 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             dstRoute.id = camera->getParentId();
     }
 
-    nx_http::HttpHeaders::const_iterator itr = d->request.headers.find( Qn::SERVER_GUID_HEADER_NAME );
+    const auto itr = d->request.headers.find(Qn::SERVER_GUID_HEADER_NAME);
     if (itr != d->request.headers.end())
         dstRoute.id = QnUuid::fromStringSafe(itr->second);
+    else if (!dstRoute.id.isNull())
+        d->request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, dstRoute.id.toByteArray());
 
     if (dstRoute.id == qnCommon->moduleGUID())
     {
@@ -398,15 +402,6 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             nx_http::StringType existAuthSession = nx_http::getHeaderValue(d->request.headers, Qn::AUTH_SESSION_HEADER_NAME);
             if (existAuthSession.isEmpty())
                 nx_http::insertOrReplaceHeader(&d->request.headers, nx_http::HttpHeader(Qn::AUTH_SESSION_HEADER_NAME, authSession().toByteArray()));
-
-            QString path = d->request.requestLine.url.path();
-            if (!path.startsWith(QLatin1Char('/')))
-                path.prepend(QLatin1Char('/'));
-            if (dstRoute.id.isNull())
-                path.prepend(QString(lit("/proxy/%1/%2:%3")).arg(dstUrl.scheme()).arg(dstUrl.host()).arg(dstUrl.port()));
-            else
-                path.prepend(QString(lit("/proxy/%1/%2")).arg(dstUrl.scheme()).arg(dstRoute.id.toString()));
-            d->request.requestLine.url = path;
         }
         dstUrl.setHost(dstRoute.addr.address.toString());
         dstUrl.setPort(dstRoute.addr.port);

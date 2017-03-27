@@ -303,8 +303,13 @@ bool QnSystemHostsModel::HostsModel::updateServerHostInternal(
     }
 
     it->second = host;
-    const auto row = std::distance(it, m_hosts.begin());
+
+    const auto row = std::distance(m_hosts.begin(), it);
+    NX_ASSERT(row >= 0);
+
     const auto modelIndex = index(row);
+    NX_ASSERT(modelIndex.isValid());
+
     emit dataChanged(modelIndex, modelIndex);
 
     return true;
@@ -326,7 +331,9 @@ void QnSystemHostsModel::HostsModel::removeServerInternal(const ServerIdHostList
     if (it == m_hosts.end())
         return;
 
-    const auto row = std::distance(it, m_hosts.begin());
+    const auto row = std::distance(m_hosts.begin(), it);
+    NX_ASSERT(row >= 0);
+
     beginRemoveRows(QModelIndex(), row, row);
     m_hosts.erase(it);
     endRemoveRows();

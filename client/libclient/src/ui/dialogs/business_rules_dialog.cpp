@@ -456,15 +456,17 @@ void QnBusinessRulesDialog::at_resources_deleted( int handle, ec2::ErrorCode err
     updateControlButtons();
 }
 
-void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous)
+void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &current,
+    const QModelIndex& /*previous*/)
 {
-    Q_UNUSED(previous)
+    QnBusinessRuleViewModelPtr ruleModel = m_rulesViewModel->rule(current);
+    QnUuid id = ruleModel ? ruleModel->id() : QnUuid();
 
     const auto handleRowChanged =
-        [this, current]()
+        [this, id]()
         {
-            QnBusinessRuleViewModelPtr ruleModel = m_rulesViewModel->rule(current);
-            m_currentDetailsWidget->setModel(ruleModel);
+            auto rule = m_rulesViewModel->ruleModelById(id);
+            m_currentDetailsWidget->setModel(rule);
             updateControlButtons();
         };
 
