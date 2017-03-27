@@ -99,16 +99,25 @@ if(LINUX)
         -Wno-unknown-pragmas
         -Wno-ignored-qualifiers)
 
-    set(CMAKE_SKIP_BUILD_RPATH ON)
-    set(CMAKE_EXE_LINKER_FLAGS "-Wl,--disable-new-dtags")
-    set(CMAKE_SHARED_LINKER_FLAGS "-rdynamic -Wl,--allow-shlib-undefined")
+    if(fullRpath)
+        set(CMAKE_SKIP_BUILD_RPATH OFF)
+        set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF)
+    else()
+        set(CMAKE_SKIP_BUILD_RPATH ON)
+        set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+        set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
+    endif()
+
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
+    set(CMAKE_SHARED_LINKER_FLAGS
+        "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--allow-shlib-undefined")
 endif()
 
 if(MACOSX)
     add_compile_options(
         -msse4.1
         -Wno-unused-local-typedef)
-    set(CMAKE_SHARED_LINKER_FLAGS "-undefined dynamic_lookup")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
 endif()
 
 option(qml_debug "Enable QML debugger" ON)
