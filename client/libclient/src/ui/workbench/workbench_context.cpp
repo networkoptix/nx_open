@@ -292,7 +292,7 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
     /* Process input files. */
     bool haveInputFiles = false;
     {
-        auto window = qobject_cast<nx::client::desktop::ui::QnMainWindow*>(mainWindow());
+        auto window = qobject_cast<nx::client::desktop::ui::MainWindow*>(mainWindow());
         NX_ASSERT(window);
 
         bool skipArg = true;

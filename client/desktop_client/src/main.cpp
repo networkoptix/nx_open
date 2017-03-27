@@ -163,7 +163,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     using namespace nx::client::plugins::io_device;
     std::unique_ptr<joystick::Manager> joystickManager(new joystick::Manager(context.data()));
 
-    QScopedPointer<ui::QnMainWindow> mainWindow(new ui::QnMainWindow(context.data(), NULL, flags));
+    QScopedPointer<ui::MainWindow> mainWindow(new ui::MainWindow(context.data(), NULL, flags));
     context->setMainWindow(mainWindow.data());
     mainWindow->setAttribute(Qt::WA_QuitOnClose);
     application->setActivationWindow(mainWindow.data());
@@ -209,7 +209,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
     if (!allowMultipleClientInstances)
     {
         QObject::connect(application, &QtSingleApplication::messageReceived, mainWindow.data(),
-            &ui::QnMainWindow::handleMessage);
+            &ui::MainWindow::handleMessage);
     }
 
     client.initDesktopCamera(dynamic_cast<QGLWidget*>(mainWindow->viewport()));

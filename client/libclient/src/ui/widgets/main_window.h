@@ -34,7 +34,7 @@ namespace client {
 namespace desktop {
 namespace ui {
 
-class QnMainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware {
+class MainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware {
     Q_OBJECT;
 
     typedef QnEmulatedFrameWidget base_type;
@@ -45,8 +45,8 @@ public:
     };
     Q_DECLARE_FLAGS(Options, Option);
 
-    QnMainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WindowFlags flags = 0);
-    virtual ~QnMainWindow();
+    MainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    virtual ~MainWindow();
 
     bool isTitleVisible() const;
 
@@ -126,7 +126,7 @@ private:
     bool m_inFullscreenTransition;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnMainWindow::Options);
+Q_DECLARE_OPERATORS_FOR_FLAGS(MainWindow::Options);
 
 } // namespace ui
 } // namespace desktop
