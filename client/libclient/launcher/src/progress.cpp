@@ -14,7 +14,8 @@ static constexpr WORD kResolution = 10000;
 
 } // namespace
 
-QnLauncherProgress::QnLauncherProgress(LPCWSTR caption): m_caption(caption)
+QnLauncherProgress::QnLauncherProgress(const std::wstring& caption):
+    m_caption(caption)
 {
     WNDCLASSEX cls;
     memset(&cls, 0, sizeof(cls));

@@ -6,7 +6,7 @@
 class QnLauncherProgress
 {
 public:
-    QnLauncherProgress(LPCWSTR caption);
+    QnLauncherProgress(const std::wstring& caption);
     ~QnLauncherProgress();
 
     void setRange(long long minPos, long long maxPos);

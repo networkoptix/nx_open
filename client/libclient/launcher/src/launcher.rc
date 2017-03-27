@@ -2,5 +2,5 @@
 
 STRINGTABLE
 BEGIN
-    IDS_UNPACKING "Nx Witness - Unpacking..."
+    IDS_UNPACKING "Unpacking..."
 END

@@ -239,7 +239,9 @@ int launchFile(const wstring& executePath)
 
         if (filePosList.size() > 1)
         {
-            QnLauncherProgress progress(loadString(IDS_UNPACKING).c_str());
+            QnLauncherProgress progress(std::wstring(QN_CLIENT_DISPLAY_NAME)
+                + L" - " + loadString(IDS_UNPACKING).c_str());
+
             progress.setRange(filePosList.front(), filePosList.back());
 
             for (int i = 0; i < filePosList.size() - 1; ++i)
