@@ -1,3 +1,15 @@
+set(_fullRpath ON)
+
+if(CMAKE_CROSSCOMPILING)
+    set(_fullRpath OFF)
+endif()
+
+option(fullRpath
+    "Unset to leave only relative RPATHs (Must be OFF for production builds)."
+    ${_fullRpath})
+
+unset(_fullRpath)
+
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)

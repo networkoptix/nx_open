@@ -13,10 +13,6 @@ option(rdepSync
     "Whether rdep should sync packages or use only existing copies"
     ON)
 
-option(fullRpath
-    "Unset to leave only relative RPATHs (Must be OFF for production builds)."
-    ON)
-
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
