@@ -1,14 +1,15 @@
 #pragma once
 
-#include <business/events/abstract_business_event.h>
+#include <business/events/prolonged_business_event.h>
 
 
-class QnSoftwareTriggerEvent: public QnAbstractBusinessEvent
+class QnSoftwareTriggerEvent: public QnProlongedBusinessEvent
 {
-    using base_type = QnAbstractBusinessEvent;
+    using base_type = QnProlongedBusinessEvent;
 
 public:
-    QnSoftwareTriggerEvent(const QnResourcePtr& resource, qint64 timeStampUs, const QString& triggerId);
+    QnSoftwareTriggerEvent(const QnResourcePtr& resource, const QString& triggerId,
+        qint64 timeStampUs, QnBusiness::EventState toggleState = QnBusiness::UndefinedState);
 
     const QString& triggerId() const;
 
@@ -17,8 +18,6 @@ public:
         const QnBusinessEventParameters& ruleEventParams) const override;
 
     virtual bool checkEventParams(const QnBusinessEventParameters &params) const override;
-    virtual bool isEventStateMatched(QnBusiness::EventState state,
-        QnBusiness::ActionType actionType) const override;
 
 private:
     const QString m_triggerId;
