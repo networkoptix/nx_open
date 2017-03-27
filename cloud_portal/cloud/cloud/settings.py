@@ -139,22 +139,22 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            'format': '[%(levelname)s] %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
         },
         'simple': {
-            'format': '%(levelname)s %(message)s'
+            'format': '[%(levelname)s] %(message)s'
         },
     },
     'handlers': {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'simple'
+            'formatter': 'verbose'
         },
         'mail_admins': {
             'level': 'ERROR',
             'class': 'cloud.logger.LimitAdminEmailHandler',
-            'formatter': 'verbose'
+            'formatter': 'simple'
         },
     },
     'loggers': {
