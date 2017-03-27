@@ -5,7 +5,6 @@
 #include <QtSql/QtSql>
 
 #include "utils/common/util.h"
-#include "common/common_module.h"
 #include "managers/time_manager.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_discovery_data.h"
@@ -183,8 +182,7 @@ QnUuid QnDbManager::getType(const QString& typeName)
     return QnUuid();
 }
 
-QnDbManager::QnDbManager()
-:
+QnDbManager::QnDbManager(QnCommonModule* commonModule):
     m_licenseOverflowMarked(false),
     m_initialized(false),
     m_tranStatic(m_sdbStatic, m_mutexStatic),
@@ -192,7 +190,8 @@ QnDbManager::QnDbManager()
     m_isBackupRestore(false),
     m_dbReadOnly(false),
     m_resyncFlags(),
-    m_tranLog(nullptr)
+    m_tranLog(nullptr),
+    m_commonModule(commonModule)
 {
 }
 
@@ -209,8 +208,8 @@ bool QnDbManager::migrateServerGUID(const QString& table, const QString& field)
 {
     QSqlQuery updateGuidQuery( m_sdb );
     updateGuidQuery.prepare(lit("UPDATE %1 SET %2=? WHERE %2=?").arg(table).arg(field) );
-    updateGuidQuery.addBindValue( qnCommon->moduleGUID().toRfc4122() );
-    updateGuidQuery.addBindValue( qnCommon->obsoleteServerGuid().toRfc4122() );
+    updateGuidQuery.addBindValue(m_commonModule->moduleGUID().toRfc4122() );
+    updateGuidQuery.addBindValue(m_commonModule->obsoleteServerGuid().toRfc4122() );
     if( !updateGuidQuery.exec() )
     {
         qWarning() << "can't initialize sqlLite database!" << updateGuidQuery.lastError().text();
@@ -249,6 +248,16 @@ bool createCorruptedDbBackup(const QString& dbFileName)
     return true;
 }
 
+QString QnDbManager::getDatabaseName(const QString& baseName)
+{
+    return baseName + m_commonModule->moduleGUID().toString();
+}
+
+QnCommonModule* QnDbManager::commonModule() const
+{
+    return m_commonModule;
+}
+
 bool QnDbManager::init(const QUrl& dbUrl)
 {
     NX_ASSERT(m_tranLog != nullptr);
@@ -259,7 +268,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
         const QString dbFilePathStatic = QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path");
 
         QString dbFileName = closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite");
-        addDatabase(dbFileName, "QnDbManager");
+        addDatabase(dbFileName, getDatabaseName("QnDbManager"));
 
         QString backupDbFileName = dbFileName + QString::fromLatin1(".backup");
         bool needCleanup = QUrlQuery(dbUrl.query()).hasQueryItem("cleanupDb");
@@ -279,7 +288,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
             }
         }
 
-        m_sdbStatic = QSqlDatabase::addDatabase("QSQLITE", "QnDbManagerStatic");
+        m_sdbStatic = QSqlDatabase::addDatabase("QSQLITE", getDatabaseName("QnDbManagerStatic"));
         QString path2 = dbFilePathStatic.isEmpty() ? dbFilePath : dbFilePathStatic;
         m_sdbStatic.setDatabaseName(closeDirPath(path2) + QString::fromLatin1("ecs_static.sqlite"));
 
@@ -307,8 +316,8 @@ bool QnDbManager::init(const QUrl& dbUrl)
                     return false;
                 }
 
-                qint64 currentIdentityTime = qnCommon->systemIdentityTime();
-                qnCommon->setSystemIdentityTime(qMax(currentIdentityTime + 1, dbRestoreTime), qnCommon->moduleGUID());
+                qint64 currentIdentityTime = m_commonModule->systemIdentityTime();
+                m_commonModule->setSystemIdentityTime(qMax(currentIdentityTime + 1, dbRestoreTime), m_commonModule->moduleGUID());
             }
         }
 
@@ -341,7 +350,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
 
         QnDbManager::QnDbTransactionLocker locker(getTransaction());
 
-        if (!qnCommon->obsoleteServerGuid().isNull())
+        if (!m_commonModule->obsoleteServerGuid().isNull())
         {
             if (!migrateServerGUID("vms_resource", "guid"))
                 return false;
@@ -424,12 +433,12 @@ bool QnDbManager::init(const QUrl& dbUrl)
             licenseOverflowTime = query.value(0).toByteArray().toLongLong();
             m_licenseOverflowMarked = licenseOverflowTime > 0;
         }
-
-        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+        const auto& runtimeInfoManager = commonModule()->runtimeInfoManager();
+        QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
         if (localInfo.data.prematureLicenseExperationDate != licenseOverflowTime)
         {
             localInfo.data.prematureLicenseExperationDate = licenseOverflowTime;
-            QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
+            runtimeInfoManager->updateLocalItem(localInfo);
         }
 
         query.addBindValue(DB_INSTANCE_KEY);
@@ -553,12 +562,12 @@ bool QnDbManager::init(const QUrl& dbUrl)
             NX_ASSERT(userResource->isOwner(), Q_FUNC_INFO, "Admin must be admin as it is found by name");
         }
 
-        QString defaultAdminPassword = qnCommon->defaultAdminPassword();
+        QString defaultAdminPassword = m_commonModule->defaultAdminPassword();
         if ((userResource->getHash().isEmpty() || m_dbJustCreated) && defaultAdminPassword.isEmpty())
         {
             defaultAdminPassword = helpers::kFactorySystemPassword;
             if (m_dbJustCreated)
-                qnCommon->setUseLowPriorityAdminPasswordHack(true);
+                m_commonModule->setUseLowPriorityAdminPasswordHack(true);
         }
 
 
@@ -577,14 +586,16 @@ bool QnDbManager::init(const QUrl& dbUrl)
             }
         }
 
-        updateUserResource |= aux::applyRestoreDbData(qnCommon->beforeRestoreDbData(), userResource);
+        updateUserResource |= aux::applyRestoreDbData(m_commonModule->beforeRestoreDbData(), userResource);
 
         if (updateUserResource)
         {
             // admin user resource has been updated
-            QnTransaction<ApiUserData> userTransaction(ApiCommand::saveUser);
+            QnTransaction<ApiUserData> userTransaction(
+                ApiCommand::saveUser,
+                m_commonModule->moduleGUID());
             m_tranLog->fillPersistentInfo(userTransaction);
-            if (qnCommon->useLowPriorityAdminPasswordHack())
+            if (m_commonModule->useLowPriorityAdminPasswordHack())
                 userTransaction.persistentInfo.timestamp = Timestamp::fromInteger(1); // use hack to declare this change with low proprity in case if admin has been changed in other system (keep other admin user fields unchanged)
             fromResourceToApi(userResource, userTransaction.params);
             executeTransactionNoLock(userTransaction, QnUbjson::serialized(userTransaction));
@@ -606,7 +617,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
                              WHERE coalesce(rs.status,0) != ? %1").arg(serverCondition));
         queryCameras.bindValue(0, Qn::Offline);
         if (!m_isBackupRestore)
-            queryCameras.bindValue(1, qnCommon->moduleGUID().toRfc4122());
+            queryCameras.bindValue(1, m_commonModule->moduleGUID().toRfc4122());
         if (!queryCameras.exec()) {
             qWarning() << Q_FUNC_INFO << __LINE__ << queryCameras.lastError();
             NX_ASSERT(0);
@@ -614,7 +625,9 @@ bool QnDbManager::init(const QUrl& dbUrl)
         }
         while (queryCameras.next())
         {
-            QnTransaction<ApiResourceStatusData> tran(ApiCommand::setResourceStatus);
+            QnTransaction<ApiResourceStatusData> tran(
+                ApiCommand::setResourceStatus,
+                m_commonModule->moduleGUID());
             m_tranLog->fillPersistentInfo(tran);
             tran.params.id = QnUuid::fromRfc4122(queryCameras.value(0).toByteArray());
             tran.params.status = Qn::Offline;
@@ -692,7 +705,10 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::fun
 
     for(const ObjectType& object: objects)
     {
-        QnTransaction<ObjectType> transaction(command, object);
+        QnTransaction<ObjectType> transaction(
+            command,
+            m_commonModule->moduleGUID(),
+            object);
         auto transactionDescriptor = ec2::getActualTransactionDescriptorByValue<ObjectType>(command);
 
         if (transactionDescriptor)
@@ -1487,7 +1503,7 @@ QnDbManager::~QnDbManager()
     if (m_sdbStatic.isOpen())
     {
         m_sdbStatic = QSqlDatabase();
-        QSqlDatabase::removeDatabase("QnDbManagerStatic");
+        QSqlDatabase::removeDatabase(getDatabaseName("QnDbManagerStatic"));
     }
 }
 
@@ -1895,7 +1911,7 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiDatabas
     f.write(tran.params.data);
     f.close();
 
-    QSqlDatabase testDB = QSqlDatabase::addDatabase("QSQLITE", "QnDbManagerTmp");
+    QSqlDatabase testDB = QSqlDatabase::addDatabase("QSQLITE", getDatabaseName("QnDbManagerTmp"));
     testDB.setDatabaseName( f.fileName());
     if (!testDB.open() || !isObjectExists(lit("table"), lit("transaction_log"), testDB)) {
         QFile::remove(f.fileName());

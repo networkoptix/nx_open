@@ -20,6 +20,7 @@
 #include "core/resource_access/user_access_data.h"
 #include "core/resource_access/resource_access_manager.h"
 #include "core/resource/user_resource.h"
+#include <common/common_module.h>
 
 
 namespace ec2
@@ -80,11 +81,13 @@ namespace detail
         friend ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id, detail::QnDbManager* db);
 
     public:
-        QnDbManager();
+        QnDbManager(QnCommonModule* commonModule);
         virtual ~QnDbManager();
 
         bool init(const QUrl& dbUrl);
         bool isInitialized() const;
+
+        QnCommonModule* commonModule() const;
 
         template <class T>
         ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)
@@ -640,6 +643,8 @@ namespace detail
 
         /** Raise flags if db is not just created. Always returns true. */
         bool resyncIfNeeded(ResyncFlags flags);
+
+        QString getDatabaseName(const QString& baseName);
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;
@@ -664,6 +669,7 @@ namespace detail
         bool m_dbReadOnly;
         ResyncFlags m_resyncFlags;
         QnTransactionLog* m_tranLog;
+        QnCommonModule* m_commonModule;
     };
 } // namespace detail
 
@@ -815,7 +821,6 @@ public:
 
         return m_dbManager->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
     }
-
 private:
     template<typename T>
     void filterData(T& target)

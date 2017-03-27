@@ -58,11 +58,12 @@ bool QnTransactionLog::clear()
 
 bool QnTransactionLog::init()
 {
+    const auto& commonModule = m_dbManager->commonModule();
     QSqlQuery delQuery(m_dbManager->getDB());
     delQuery.prepare("DELETE FROM transaction_sequence \
                        WHERE NOT (transaction_sequence.peer_guid = ? AND transaction_sequence.db_guid = ?) \
                          AND NOT exists(select 1 from transaction_log tl where tl.peer_guid = transaction_sequence.peer_guid and tl.db_guid = transaction_sequence.db_guid)");
-    delQuery.addBindValue(QnSql::serialized_field(qnCommon->moduleGUID()));
+    delQuery.addBindValue(QnSql::serialized_field(commonModule->moduleGUID()));
     delQuery.addBindValue(QnSql::serialized_field(m_dbManager->getID()));
     if (!delQuery.exec())
         qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
@@ -183,7 +184,7 @@ Timestamp QnTransactionLog::getTimeStamp()
 
 int QnTransactionLog::currentSequenceNoLock() const
 {
-    QnTranStateKey key (qnCommon->moduleGUID(), m_dbManager->getID());
+    QnTranStateKey key (m_dbManager->commonModule()->moduleGUID(), m_dbManager->getID());
     return qMax(m_state.values.value(key), m_commitData.state.values.value(key));
 }
 
@@ -255,7 +256,7 @@ ErrorCode QnTransactionLog::saveToDB(
     NX_ASSERT(!tran.peerID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
     NX_ASSERT(!tran.persistentInfo.dbID.isNull(), Q_FUNC_INFO, "Transaction ID MUST be filled!");
     NX_ASSERT(tran.persistentInfo.sequence, Q_FUNC_INFO, "Transaction sequence MUST be filled!");
-    if (tran.peerID == qnCommon->moduleGUID() && tran.persistentInfo.dbID == m_dbManager->getID())
+    if (tran.peerID == m_dbManager->commonModule()->moduleGUID() && tran.persistentInfo.dbID == m_dbManager->getID())
         NX_ASSERT(tran.persistentInfo.timestamp > 0);
 
     QSqlQuery query(m_dbManager->getDB());
@@ -415,7 +416,9 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
     if (!query.exec())
         return ErrorCode::failure;
 
-    QnTransaction<ApiUpdateSequenceData> syncMarkersTran(ApiCommand::updatePersistentSequence);
+    QnTransaction<ApiUpdateSequenceData> syncMarkersTran(
+        ApiCommand::updatePersistentSequence,
+        m_dbManager->commonModule()->moduleGUID());
     while (query.next())
     {
         QnTranStateKey key(

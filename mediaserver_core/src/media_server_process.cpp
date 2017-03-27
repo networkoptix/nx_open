@@ -2185,9 +2185,7 @@ void MediaServerProcess::run()
         QnAppInfo::productName().toUtf8(), "US",
         QnAppInfo::organizationName().toUtf8());
 
-    QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
-    QScopedPointer<QnCameraHistoryPool> historyPool(new QnCameraHistoryPool());
-    QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
+    commonModule->setMessageProcessor(new QnServerMessageProcessor(commonModule));
     QScopedPointer<QnMasterServerStatusWatcher> masterServerWatcher(new QnMasterServerStatusWatcher());
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb());

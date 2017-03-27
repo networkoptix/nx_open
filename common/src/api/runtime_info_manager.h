@@ -8,6 +8,7 @@
 
 #include <nx/utils/singleton.h>
 #include <utils/common/threadsafe_item_storage.h>
+#include <common/common_module_aware.h>
 
 struct QnPeerRuntimeInfo {
     QnPeerRuntimeInfo(){}
@@ -39,8 +40,9 @@ Q_DECLARE_METATYPE(QnPeerRuntimeInfoList)
 Q_DECLARE_METATYPE(QnPeerRuntimeInfoMap)
 
 
-class QnRuntimeInfoManager: public QObject,
-    public Singleton<QnRuntimeInfoManager>,
+class QnRuntimeInfoManager:
+    public QObject,
+    public QnCommonModuleAware,
     private QnThreadsafeItemStorageNotifier<QnPeerRuntimeInfo>
 {
     Q_OBJECT

@@ -16,6 +16,7 @@
 
 #include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
+#include <common/common_module_aware.h>
 
 class QnResource;
 class QnNetworkResource;
@@ -32,7 +33,7 @@ class CLRecorderDevice;
  *
  * If resource is conflicting it must not be placed in resource pool.
  */
-class QN_EXPORT QnResourcePool : public Connective<QObject>, public Singleton<QnResourcePool>
+class QN_EXPORT QnResourcePool: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
 
@@ -46,7 +47,7 @@ public:
         AllResources
     };
 
-    QnResourcePool(QObject* parent = NULL);
+    QnResourcePool(QObject* parent);
     ~QnResourcePool();
 
     /**
@@ -220,6 +221,7 @@ public:
 
 
     QnLayoutResourceList getLayoutsWithResource(const QnUuid &cameraGuid) const;
+
 signals:
     void resourceAdded(const QnResourcePtr &resource);
     void resourceRemoved(const QnResourcePtr &resource);

@@ -104,7 +104,7 @@ public:
     QSet<QnResourcePtr> layoutResources() const;
 
     /** Get all resources placed on the layout. WARNING: method is SLOW! */
-    static QSet<QnResourcePtr> layoutResources(const QnLayoutItemDataMap& items);
+    QSet<QnResourcePtr> layoutResources(const QnLayoutItemDataMap& items) const;
 
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);

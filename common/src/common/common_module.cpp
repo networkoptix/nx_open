@@ -43,6 +43,9 @@
 #include <nx/utils/timer_manager.h>
 #include <api/http_client_pool.h>
 #include <utils/common/long_runable_cleanup.h>
+#include <api/session_manager.h>
+#include <network/module_finder.h>
+#include <network/router.h>
 
 namespace
 {
@@ -116,8 +119,9 @@ qint64 BeforeRestoreDbData::getSpaceLimitForStorage(const QString& url) const
 
 // ------------------- QnCommonModule --------------------
 
-QnCommonModule::QnCommonModule(QObject *parent):
-    QObject(parent)
+QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
+    QObject(parent),
+    m_messageProcessor(nullptr)
 {
     Q_INIT_RESOURCE(common);
 
@@ -135,6 +139,11 @@ QnCommonModule::QnCommonModule(QObject *parent):
     store(new nx::utils::TimerManager());
 
     m_dataPool = instance<QnResourceDataPool>();
+
+    m_sessionManager = new QnSessionManager(this);
+    m_moduleFinder = new QnModuleFinder(this, clientMode);
+    m_router = new QnRouter(this, m_moduleFinder);
+
     loadResourceData(m_dataPool, lit(":/resource_data.json"), true);
     loadResourceData(m_dataPool, QCoreApplication::applicationDirPath() + lit("/resource_data.json"), false);
 
@@ -147,13 +156,14 @@ QnCommonModule::QnCommonModule(QObject *parent):
 
     instance<nx_http::ClientPool>();
 
-    instance<QnResourcePool>();             /*< Depends on nothing. */
+    m_resourcePool = new QnResourcePool(this);  /*< Depends on nothing. */
     instance<QnUserRolesManager>();         /*< Depends on nothing. */
     instance<QnResourceAccessSubjectsCache>(); /*< Depends on respool and roles. */
     instance<QnSharedResourcesManager>();   /*< Depends on respool and roles. */
     instance<QnResourceAccessProvider>();   /*< Depends on respool, roles and shared resources. */
 
-    instance<QnGlobalPermissionsManager>(); /* Depends on respool. */
+    m_globalPermissionManager = new QnGlobalPermissionsManager(this); /* Depends on respool. */
+    m_runtimeInfoManager = new QnRuntimeInfoManager(this);
 
     /* Some of base providers depend on QnGlobalPermissionsManager and QnSharedResourcesManager. */
     qnResourceAccessProvider->addBaseProvider(new QnPermissionsResourceAccessProvider());
@@ -161,10 +171,11 @@ QnCommonModule::QnCommonModule(QObject *parent):
     qnResourceAccessProvider->addBaseProvider(new QnSharedLayoutItemAccessProvider());
     qnResourceAccessProvider->addBaseProvider(new QnVideoWallItemAccessProvider());
 
-    instance<QnResourceAccessManager>();    /*< Depends on access provider. */
+    m_resourceAccessManager = new QnResourceAccessManager>(this);    /*< Depends on access provider. */
 
 
-    instance<QnGlobalSettings>();
+    m_globalSettings = new QnGlobalSettings(this);
+    m_cameraHistory = new QnCameraHistoryPool(this);
 
     /* Init members. */
     m_runUuid = QnUuid::createUuid();
@@ -191,9 +202,9 @@ void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &serve
     connect(server.data(),  &QnMediaServerResource::serverFlagsChanged,  this,   &QnCommonModule::resetCachedValue);
     connect(server.data(),  &QnMediaServerResource::primaryAddressChanged,  this,   &QnCommonModule::resetCachedValue);
 
-    connect(qnGlobalSettings, &QnGlobalSettings::systemNameChanged, this, &QnCommonModule::resetCachedValue);
-    connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this, &QnCommonModule::resetCachedValue);
-    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, this, &QnCommonModule::resetCachedValue);
+    connect(m_globalSettings, &QnGlobalSettings::systemNameChanged, this, &QnCommonModule::resetCachedValue);
+    connect(m_globalSettings, &QnGlobalSettings::localSystemIdChanged, this, &QnCommonModule::resetCachedValue);
+    connect(m_globalSettings, &QnGlobalSettings::cloudSettingsChanged, this, &QnCommonModule::resetCachedValue);
 
 }
 
@@ -217,7 +228,7 @@ QnMediaServerResourcePtr QnCommonModule::currentServer() const {
     QnUuid serverId = remoteGUID();
     if (serverId.isNull())
         return QnMediaServerResourcePtr();
-    return qnResPool->getResourceById(serverId).dynamicCast<QnMediaServerResource>();
+    return m_resourcePool->getResourceById(serverId).dynamicCast<QnMediaServerResource>();
 }
 
 QnSoftwareVersion QnCommonModule::engineVersion() const {
@@ -301,7 +312,7 @@ void QnCommonModule::updateModuleInformationUnsafe()
     // This code works only on server side.
     NX_ASSERT(!moduleGUID().isNull());
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(moduleGUID());
+    QnMediaServerResourcePtr server = m_resourcePool->getResourceById<QnMediaServerResource>(moduleGUID());
     //NX_ASSERT(server);
     if (!server)
         return;
@@ -310,9 +321,9 @@ void QnCommonModule::updateModuleInformationUnsafe()
     m_moduleInformation.name = server->getName();
     m_moduleInformation.serverFlags = server->getServerFlags();
 
-    m_moduleInformation.systemName = qnGlobalSettings->systemName();
-    m_moduleInformation.localSystemId = qnGlobalSettings->localSystemId();
-    m_moduleInformation.cloudSystemId = qnGlobalSettings->cloudSystemId();
+    m_moduleInformation.systemName = m_globalSettings->systemName();
+    m_moduleInformation.localSystemId = m_globalSettings->localSystemId();
+    m_moduleInformation.cloudSystemId = m_globalSettings->cloudSystemId();
 }
 
 void QnCommonModule::setSystemIdentityTime(qint64 value, const QnUuid& sender)
@@ -374,4 +385,14 @@ Qn::PeerType QnCommonModule::localPeerType() const
 QDateTime QnCommonModule::startupTime() const
 {
     return m_startupTime;
+}
+
+QnCommonMessageProcessor* QnCommonModule::messageProcessor() const
+{
+    return m_messageProcessor;
+}
+
+void QnCommonModule::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
+{
+    m_messageProcessor = messageProcessor;
 }

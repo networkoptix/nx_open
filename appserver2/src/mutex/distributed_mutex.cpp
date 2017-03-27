@@ -47,7 +47,9 @@ bool QnDistributedMutex::isAllPeersReady() const
 
 void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCommand::Value command, const QnUuid& dstPeer)
 {
-    QnTransaction<ApiLockData> tran(command);
+    QnTransaction<ApiLockData> tran(
+        command,
+        m_owner->messageBus()->commonModule()->moduleGUID());
     tran.params.name = m_name;
     tran.params.peer = lockInfo.peer;
     tran.params.timestamp = lockInfo.timestamp;
@@ -62,7 +64,7 @@ void QnDistributedMutex::at_newPeerFound(ec2::ApiPeerAliveData data)
         return;
 
     QnMutexLocker lock( &m_mutex );
-    NX_ASSERT(data.peer.id != qnCommon->moduleGUID());
+    NX_ASSERT(data.peer.id != m_owner->messageBus()->commonModule()->moduleGUID());
     if (!m_selfLock.isEmpty())
         sendTransaction(m_selfLock, ApiCommand::lockRequest, data.peer.id);
 }
@@ -101,7 +103,7 @@ void QnDistributedMutex::at_timeout()
 void QnDistributedMutex::lockAsync(int timeoutMs)
 {
     QnMutexLocker lock( &m_mutex );
-    m_selfLock = LockRuntimeInfo(qnCommon->moduleGUID(), m_owner->newTimestamp(), m_name);
+    m_selfLock = LockRuntimeInfo(m_owner->messageBus()->commonModule()->moduleGUID(), m_owner->newTimestamp(), m_name);
     if (m_owner->m_userDataHandler)
         m_selfLock.userData = m_owner->m_userDataHandler->getUserData(m_name);
     sendTransaction(m_selfLock, ApiCommand::lockRequest, QnUuid()); // send broadcast
@@ -133,7 +135,7 @@ void QnDistributedMutex::unlockInternal()
 
     for(ApiLockData lockData: m_delayedResponse) {
         QnUuid srcPeer = lockData.peer;
-        lockData.peer = qnCommon->moduleGUID();
+        lockData.peer = m_owner->messageBus()->commonModule()->moduleGUID();
         sendTransaction(lockData, ApiCommand::lockResponse, srcPeer);
     }
     m_delayedResponse.clear();

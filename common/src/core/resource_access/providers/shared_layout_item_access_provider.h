@@ -1,12 +1,13 @@
 #pragma once
 
 #include <core/resource_access/providers/base_resource_access_provider.h>
+#include <common/common_module_aware.h>
 
 class QnLayoutItemAggregator;
 using QnLayoutItemAggregatorPtr = QSharedPointer<QnLayoutItemAggregator>;
 
 /** Handles access to cameras and web pages, placed on shared layouts. */
-class QnSharedLayoutItemAccessProvider: public QnBaseResourceAccessProvider
+class QnSharedLayoutItemAccessProvider: public QnBaseResourceAccessProvider, public QnCommonModuleAware
 {
     using base_type = QnBaseResourceAccessProvider;
 

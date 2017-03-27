@@ -18,6 +18,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx_ec/data/api_resource_data.h>
+#include <common/common_module_aware.h>
 
 class QnAbstractResourcePropertyAdaptor;
 
@@ -81,12 +82,13 @@ const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
 } // namespace settings_names
 } // namespace nx
 
-class QnGlobalSettings: public Connective<QObject>, public Singleton<QnGlobalSettings> {
+class QnGlobalSettings: public Connective<QObject>, public QnCommonModuleAware
+{
     Q_OBJECT
     typedef Connective<QObject> base_type;
 
 public:
-    QnGlobalSettings(QObject *parent = NULL);
+    QnGlobalSettings(QObject* parent = nullptr);
     virtual ~QnGlobalSettings();
 
     void initialize();

@@ -37,12 +37,13 @@ static const char* const kIncomingTransactionsPath = "ec2/forward_events";
 
 Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
     Qn::PeerType peerType,
-    nx::utils::TimerManager* const timerManager)
+    nx::utils::TimerManager* const timerManager,
+    QnCommonModule* commonModule)
     :
     // dbmanager is initialized by direct connection.
     m_dbManager(
         peerType == Qn::PT_Server
-        ? new detail::QnDbManager()
+        ? new detail::QnDbManager(commonModule)
         : nullptr),
     m_transactionLog(
         peerType == Qn::PT_Server
@@ -60,7 +61,9 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
         new QnDistributedMutexManager(m_transactionMessageBus.get())),
     m_terminated(false),
     m_runningRequests(0),
-    m_sslEnabled(false)
+    m_sslEnabled(false),
+    m_commonModule(commonModule),
+    m_remoteQueryProcessor(commonModule)
 {
     if (m_dbManager)
         m_dbManager->setTransactionLog(m_transactionLog.get());
@@ -124,7 +127,7 @@ int Ec2DirectConnectionFactory::connectAsync(
     QUrl url = addr;
     url.setUserName(url.userName().toLower());
 
-    if (ApiPeerData::isMobileClient(qnCommon->localPeerType()))
+    if (ApiPeerData::isMobileClient(m_commonModule->localPeerType()))
     {
         QUrlQuery query(url);
         query.removeQueryItem(lit("format"));
@@ -1625,20 +1628,20 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     nx_http::Response* response)
 {
     auto localInfo = qnRuntimeInfoManager->localInfo().data;
-    connectionInfo->version = qnCommon->engineVersion();
+    connectionInfo->version = m_commonModule->engineVersion();
     connectionInfo->brand = localInfo.brand;
     connectionInfo->customization = localInfo.customization;
-    connectionInfo->systemName = qnGlobalSettings->systemName();
-    connectionInfo->ecsGuid = qnCommon->moduleGUID().toString();
-    connectionInfo->cloudSystemId = qnGlobalSettings->cloudSystemId();
-    connectionInfo->localSystemId = qnGlobalSettings->localSystemId();
+    connectionInfo->systemName = m_commonModule->globalSettings()->systemName();
+    connectionInfo->ecsGuid = m_commonModule->moduleGUID().toString();
+    connectionInfo->cloudSystemId = m_commonModule->globalSettings()->cloudSystemId();
+    connectionInfo->localSystemId = m_commonModule->globalSettings()->localSystemId();
     #if defined(__arm__)
         connectionInfo->box = QnAppInfo::armBox();
     #endif
     connectionInfo->allowSslConnections = m_sslEnabled;
     connectionInfo->nxClusterProtoVersion = nx_ec::EC2_PROTO_VERSION;
     connectionInfo->ecDbReadOnly = Settings::instance()->dbReadOnly();
-    connectionInfo->newSystem = qnGlobalSettings->isNewSystem();
+    connectionInfo->newSystem = m_commonModule->globalSettings()->isNewSystem();
     if (response)
     {
         connectionInfo->effectiveUserName =

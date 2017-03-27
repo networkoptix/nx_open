@@ -22,6 +22,7 @@
 
 #include <utils/common/connective.h>
 #include <nx/utils/log/log.h>
+#include <common/common_module_aware.h>
 
 //#define DISCOVERY_DBG
 
@@ -32,7 +33,7 @@
             .arg(res->getUrl()) \
             .arg(res->getHostAddress()) \
             .arg(res->getMAC().toString()) \
-            .arg(res->getUniqueId()) 
+            .arg(res->getUniqueId())
 # define FL1(x) QString::fromLatin1(x)
 #else
 #   define DLOG(...)
@@ -87,7 +88,7 @@ class QnResourceDiscoveryManager
 :
     public Connective<QnLongRunnable>,
     public QnResourceFactory,
-    public Singleton<QnResourceDiscoveryManager>
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
@@ -102,7 +103,7 @@ public:
 
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
-    QnResourceDiscoveryManager();
+    QnResourceDiscoveryManager(QnCommonModule* commonModule);
     ~QnResourceDiscoveryManager();
 
     // this function returns only new devices( not in all_devices list);
@@ -133,7 +134,7 @@ public:
     QSet<QString> lastDiscoveredIds() const;
     void addResourcesImmediatly(QnResourceList& resources);
 
-    static QnNetworkResourcePtr findSameResource(const QnNetworkResourcePtr& netRes);
+    QnNetworkResourcePtr findSameResource(const QnNetworkResourcePtr& netRes) const;
 
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;

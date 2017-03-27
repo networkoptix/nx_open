@@ -13,7 +13,6 @@
 #include "nx/fusion/serialization/xml.h"
 #include "nx/fusion/serialization/csv.h"
 #include "nx/fusion/serialization/ubjson.h"
-#include "common/common_module.h"
 #include <nx_ec/transaction_timestamp.h>
 
 namespace ec2
@@ -1335,16 +1334,6 @@ APPLY(10101, getMiscParam, ApiMiscData, \
          */
         QnAbstractTransaction():
             command(ApiCommand::NotDefined),
-            peerID(qnCommon->moduleGUID()),
-            transactionType(TransactionType::Regular)
-        {
-        }
-        /**
-         * Sets \a QnAbstractTransaction::peerID to \a qnCommon->moduleGUID().
-         */
-        QnAbstractTransaction(ApiCommand::Value value):
-            command(value),
-            peerID(qnCommon->moduleGUID()),
             transactionType(TransactionType::Regular)
         {
         }
@@ -1420,14 +1409,6 @@ APPLY(10101, getMiscParam, ApiMiscData, \
         }
         QnTransaction(const QnAbstractTransaction& abstractTran):
             QnAbstractTransaction(abstractTran)
-        {
-        }
-        QnTransaction(
-            ApiCommand::Value command,
-            const T& params = T())
-            :
-            QnAbstractTransaction(command),
-            params(params)
         {
         }
         QnTransaction(

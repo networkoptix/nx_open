@@ -329,10 +329,13 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
 // QnMediaServerConnection
 
 QnMediaServerConnection::QnMediaServerConnection(
-    const QnMediaServerResourcePtr& mserver, const QnUuid& videowallGuid,
-    bool enableOfflineRequests, QObject* parent)
+    const QnCommonModule* commonModule,
+    const QnMediaServerResourcePtr& mserver,
+    const QnUuid& videowallGuid,
+    bool enableOfflineRequests,
+    QObject* parent)
     :
-    base_type(parent, mserver),
+    base_type(commonModule, parent, mserver),
     m_proxyPort(0),
     m_enableOfflineRequests(enableOfflineRequests)
 {
@@ -355,7 +358,7 @@ QnMediaServerConnection::QnMediaServerConnection(
     if (!videowallGuid.isNull())
         extraHeaders.emplace(Qn::VIDEOWALL_GUID_HEADER_NAME, videowallGuid.toByteArray());
     extraHeaders.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME,
-        qnCommon->runningInstanceGUID().toByteArray());
+        commonModule->runningInstanceGUID().toByteArray());
     extraHeaders.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME,
         QnAppServerConnectionFactory::url().userName().toUtf8());
 	extraHeaders.emplace(nx_http::header::kUserAgent, nx_http::userAgentString());

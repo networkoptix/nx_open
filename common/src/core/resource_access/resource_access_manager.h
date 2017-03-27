@@ -16,11 +16,12 @@
 
 #include <utils/common/connective.h>
 #include <utils/common/updatable.h>
+#include <common/common_module_aware.h>
 
 class QnResourceAccessManager:
     public Connective<QObject>,
     public QnUpdatable,
-    public Singleton<QnResourceAccessManager>
+    public QnCommonModuleAware
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;

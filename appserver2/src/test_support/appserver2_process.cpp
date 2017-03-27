@@ -204,8 +204,8 @@ int Appserver2Process::exec()
     QnRuntimeInfoManager runtimeInfoManager;
 
     ec2::ApiRuntimeData runtimeData;
-    runtimeData.peer.id = qnCommon->moduleGUID();
-    runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
+    runtimeData.peer.id = commonModule.moduleGUID();
+    runtimeData.peer.instanceId = commonModule.runningInstanceGUID();
     runtimeData.peer.peerType = Qn::PT_Server;
     runtimeData.box = QnAppInfo::armBox();
     runtimeData.brand = QnAppInfo::productNameShort();
@@ -232,7 +232,7 @@ int Appserver2Process::exec()
 
     //initializeLogging(settings);
     std::unique_ptr<ec2::AbstractECConnectionFactory>
-        ec2ConnectionFactory(getConnectionFactory(Qn::PT_Server, &timerManager));
+        ec2ConnectionFactory(getConnectionFactory(Qn::PT_Server, &timerManager, &commonModule));
 
     std::map<QString, QVariant> confParams;
     ec2ConnectionFactory->setConfParams(std::move(confParams));

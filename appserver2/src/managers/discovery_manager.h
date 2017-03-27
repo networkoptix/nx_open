@@ -7,7 +7,8 @@
 namespace ec2
 {
 
-    class QnDiscoveryNotificationManager : public AbstractDiscoveryNotificationManager
+    class QnDiscoveryNotificationManager:
+        public AbstractDiscoveryNotificationManager
     {
     public:
         void triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction, NotificationSource source);

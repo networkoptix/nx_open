@@ -22,6 +22,7 @@
 #include <nx/network/socket_global.h>
 
 #include <utils/common/app_info.h>
+#include <common/common_module.h>
 
 #define TIMER_DEBUG_LOG(MESSAGE) do \
 { \
@@ -62,6 +63,7 @@ namespace {
 QnDirectModuleFinder::QnDirectModuleFinder(QObject* parent)
 :
     QObject(parent),
+    QnCommonModuleAware(parent),
     m_maxConnections(kDefaultMaxConnections),
     m_checkTimer(new QTimer(this))
 {
@@ -282,7 +284,7 @@ void QnDirectModuleFinder::at_checkTimer_timeout()
 
 std::chrono::milliseconds QnDirectModuleFinder::maxPingTimeout() const
 {
-    return QnGlobalSettings::instance()->serverDiscoveryAliveCheckTimeout();
+    return commonModule()->globalSettings()->serverDiscoveryAliveCheckTimeout();
 }
 
 std::chrono::milliseconds QnDirectModuleFinder::aliveCheckInterval() const
@@ -295,5 +297,5 @@ std::chrono::milliseconds QnDirectModuleFinder::aliveCheckInterval() const
 
 std::chrono::milliseconds QnDirectModuleFinder::discoveryCheckInterval() const
 {
-    return QnGlobalSettings::instance()->serverDiscoveryPingTimeout();
+    return commonModule()->globalSettings()->serverDiscoveryPingTimeout();
 }

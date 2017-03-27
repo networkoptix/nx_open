@@ -13,6 +13,7 @@
 #include <utils/common/safe_direct_connection.h>
 #include <api/http_client_pool.h>
 #include <core/resource/resource_fwd.h>
+#include <common/common_module_aware.h>
 
 /*
 * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -25,11 +26,12 @@ namespace rest
 {
     class ServerConnection:
         public QObject,
+        public QnCommonModuleAware,
         public Qn::EnableSafeDirectConnection
     {
         Q_OBJECT
     public:
-        ServerConnection(const QnUuid& serverId);
+        ServerConnection(QnCommonModule* commonModule, const QnUuid& serverId);
         virtual ~ServerConnection();
 
 

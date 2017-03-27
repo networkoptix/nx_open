@@ -92,7 +92,7 @@ public:
         QnMutexLocker lock(&m_mutex);
         if (m_connections.isEmpty())
             return;
-        QnTransactionTransportHeader ttHeader(connectedServerPeers() << qnCommon->moduleGUID(), dstPeers);
+        QnTransactionTransportHeader ttHeader(connectedServerPeers() << commonModule()->moduleGUID(), dstPeers);
         ttHeader.fillSequence();
         sendTransactionInternal(tran, ttHeader);
     }
@@ -146,6 +146,7 @@ public:
 
     ConnectionGuardSharedState* connectionGuardSharedState();
 
+    QnCommonModule* commonModule() const;
 signals:
     void peerLost(ApiPeerAliveData data);
     //!Emitted when a new peer has joined cluster or became online
@@ -259,6 +260,7 @@ private:
     void sendDelayedAliveTran();
     void reconnectAllPeers(QnMutexLockerBase* const /*lock*/);
 
+    QUrl addCurrentPeerInfo(const QUrl& srcUrl) const;
 private slots:
     void at_stateChanged(QnTransactionTransport::State state);
     void at_gotTransaction(

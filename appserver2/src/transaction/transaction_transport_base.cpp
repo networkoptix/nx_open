@@ -534,7 +534,7 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
         m_httpClient->setUserPassword(remotePeerUrl.password());
     }
 
-    if (m_localPeer.isServer() && QnCommonModule::instance())
+    if (m_localPeer.isServer())
         m_httpClient->addAdditionalHeader(
             Qn::EC2_SYSTEM_ID_HEADER_NAME,
             qnGlobalSettings->localSystemId().toByteArray());

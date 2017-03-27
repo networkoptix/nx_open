@@ -27,6 +27,7 @@
 #include "nx/fusion/serialization/ubjson.h"
 #include "http/custom_headers.h"
 #include "api/model/audit/auth_session.h"
+#include <common/common_module.h>
 
 namespace {
     Qn::SerializationFormat serializationFormatFromUrl(const QUrl &url, Qn::SerializationFormat defaultFormat = Qn::UbjsonFormat)
@@ -37,16 +38,6 @@ namespace {
             format = QnLexical::deserialized(formatString, defaultFormat);
         return format;
     }
-
-    void addCustomHeaders(const nx_http::AsyncHttpClientPtr& httpClient)
-    {
-        //TODO #ak videowall looks strange here
-        if (!QnAppServerConnectionFactory::videowallGuid().isNull())
-            httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
-        httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
-        httpClient->addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray()); //< allow to update realm if migration
-    }
-
 } // anonymous namespace
 
 namespace ec2
@@ -59,8 +50,13 @@ namespace ec2
         public QObject
     {
         Q_OBJECT
-
     public:
+
+        ClientQueryProcessor(const QnCommonModule* commonModule):
+            m_commonModule(commonModule)
+        {
+        }
+
         virtual ~ClientQueryProcessor()
         {
             pleaseStopSync();
@@ -257,6 +253,17 @@ namespace ec2
                     return handler( ErrorCode::serverError );
             }
         }
+    private:
+        void addCustomHeaders(const nx_http::AsyncHttpClientPtr& httpClient)
+        {
+            //TODO #ak videowall looks strange here
+            if (!QnAppServerConnectionFactory::videowallGuid().isNull())
+                httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
+            httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, m_commonModule->runningInstanceGUID().toByteArray());
+            httpClient->addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray()); //< allow to update realm if migration
+        }
+    private:
+        const QnCommonModule* m_commonModule;
     };
 }
 

@@ -58,14 +58,14 @@ QnMediaServerResource::QnMediaServerResource():
 
     m_statusTimer.restart();
 
-    QnResourceList resList = qnResPool->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
+    QnResourceList resList = resourcePool()->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
     if (!resList.isEmpty())
         m_firstCamera = resList.first();
 
-    connect(qnResPool, &QnResourcePool::resourceAdded,
+    connect(resourcePool(), &QnResourcePool::resourceAdded,
         this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved,
         this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
 
     connect(this, &QnResource::resourceChanged,
@@ -277,8 +277,11 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
     {
         QnMediaServerResourcePtr thisPtr = toSharedPointer(this).dynamicCast<QnMediaServerResource>();
         m_apiConnection = QnMediaServerConnectionPtr(
-            new QnMediaServerConnection(thisPtr, QnAppServerConnectionFactory::videowallGuid()),
-            &qnDeleteLater);
+            new QnMediaServerConnection(
+                resourcePool()->commonModule(),
+                thisPtr,
+                QnAppServerConnectionFactory::videowallGuid()),
+                &qnDeleteLater);
     }
 
     return m_apiConnection;
@@ -289,7 +292,9 @@ rest::QnConnectionPtr QnMediaServerResource::restConnection()
     QnMutexLocker lock( &m_mutex );
 
     if (!m_restConnection)
-        m_restConnection = rest::QnConnectionPtr(new rest::ServerConnection(getId()));
+        m_restConnection = rest::QnConnectionPtr(new rest::ServerConnection(
+            resourcePool()->commonModule(),
+            getId()));
 
     return m_restConnection;
 }
@@ -322,7 +327,7 @@ QString QnMediaServerResource::getUrl() const
 
 QnStorageResourceList QnMediaServerResource::getStorages() const
 {
-    return qnResPool->getResourcesByParentId(getId()).filtered<QnStorageResource>();
+    return resourcePool()->getResourcesByParentId(getId()).filtered<QnStorageResource>();
 }
 
 void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddress)
@@ -535,8 +540,8 @@ void QnMediaServerResource::setSystemInfo(const QnSystemInformation &systemInfo)
 }
 QnModuleInformation QnMediaServerResource::getModuleInformation() const
 {
-    if (getId() == qnCommon->moduleGUID())
-        return qnCommon->moduleInformation();
+    if (getId() == resourcePool()->commonModule()->moduleGUID())
+        return resourcePool()->commonModule()->moduleInformation();
 
     // build module information for other server
 
@@ -589,7 +594,7 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusCh
         }
 
         QnResource::setStatus(newStatus, reason);
-        QnResourceList childList = qnResPool->getResourcesByParentId(getId());
+        QnResourceList childList = resourcePool()->getResourcesByParentId(getId());
         for(const QnResourcePtr& res: childList)
         {
             if (res->hasFlags(Qn::depend_on_parent_status))

@@ -342,13 +342,16 @@ bool QnSecurityCamResource::isAnalog() const {
     return val.toInt() > 0;
 }
 
-bool QnSecurityCamResource::isAnalogEncoder() const {
-    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+bool QnSecurityCamResource::isAnalogEncoder() const
+{
+    const auto& commonModule = resourcePool()->commonModule();
+    QnResourceData resourceData = commonModule->dataPool()->data(toSharedPointer(this));
     return resourceData.value<bool>(lit("analogEncoder"));
 }
 
-bool QnSecurityCamResource::isEdge() const {
-    return QnMediaServerResource::isEdgeServer(qnResPool->getResourceById(getParentId()));
+bool QnSecurityCamResource::isEdge() const
+{
+    return QnMediaServerResource::isEdgeServer(resourcePool()->getResourceById(getParentId()));
 }
 
 Qn::LicenseType QnSecurityCamResource::licenseType() const
@@ -859,17 +862,20 @@ void QnSecurityCamResource::setBackupQualities(Qn::CameraBackupQualities value)
     emit backupQualitiesChanged(::toSharedPointer(this));
 }
 
-Qn::CameraBackupQualities QnSecurityCamResource::getActualBackupQualities() const {
+Qn::CameraBackupQualities QnSecurityCamResource::getActualBackupQualities() const
+{
     Qn::CameraBackupQualities result = getBackupQualities();
 
     if (result == Qn::CameraBackup_Disabled)
         return result;
 
-    auto value = qnGlobalSettings->backupQualities();
+    const auto& settings = resourcePool()->commonModule()->globalSettings();
+
+    auto value = settings->backupQualities();
 
     /* If backup is not configured on this camera, use 'Backup newly added cameras' value */
     if (result == Qn::CameraBackup_Default) {
-        return qnGlobalSettings->backupNewCamerasByDefault()
+        return settings->backupNewCamerasByDefault()
             ? value
             : Qn::CameraBackup_Disabled;
     }
@@ -892,8 +898,11 @@ void QnSecurityCamResource::setCameraControlDisabled(bool value) {
     (*userAttributesLock)->cameraControlDisabled = value;
 }
 
-bool QnSecurityCamResource::isCameraControlDisabled() const {
-    if (QnGlobalSettings::instance() && !QnGlobalSettings::instance()->isCameraSettingsOptimizationEnabled())
+bool QnSecurityCamResource::isCameraControlDisabled() const
+{
+    const auto& settings = resourcePool()->commonModule()->globalSettings();
+
+    if (settings && !settings->isCameraSettingsOptimizationEnabled())
         return true;
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
     return (*userAttributesLock)->cameraControlDisabled;
@@ -1055,7 +1064,8 @@ void QnSecurityCamResource::resetCachedValues()
 
 Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const
 {
-    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    const auto& commonModule = resourcePool()->commonModule();
+    QnResourceData resourceData = commonModule->dataPool()->data(toSharedPointer(this));
     if (resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP))
         return Qn::BPG_Predefined;
 

@@ -8,6 +8,7 @@
 
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
+#include <common/common_module.h>
 
 namespace {
 
@@ -29,7 +30,8 @@ QSet<QnUuid> layoutItems(const QnLayoutResourcePtr& layout)
 }
 
 QnSharedLayoutItemAccessProvider::QnSharedLayoutItemAccessProvider(QObject* parent):
-    base_type(parent)
+    base_type(parent),
+    QnCommonModuleAware(parent)
 {
     connect(qnSharedResourcesManager, &QnSharedResourcesManager::sharedResourcesChanged, this,
         &QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged);
@@ -77,7 +79,7 @@ void QnSharedLayoutItemAccessProvider::fillProviders(
     if (!isMediaResource(resource))
         return;
 
-    auto sharedLayouts = qnResPool->getResources<QnLayoutResource>(
+    auto sharedLayouts = commonModule()->resourcePool()->getResources<QnLayoutResource>(
         qnSharedResourcesManager->sharedResources(subject));
 
     auto resourceId = resource->getId();
@@ -142,7 +144,7 @@ void QnSharedLayoutItemAccessProvider::handleSubjectAdded(const QnResourceAccess
 {
     auto aggregator = ensureAggregatorForSubject(subject);
 
-    auto sharedLayouts = qnResPool->getResources<QnLayoutResource>(
+    auto sharedLayouts = commonModule()->resourcePool()->getResources<QnLayoutResource>(
         qnSharedResourcesManager->sharedResources(subject));
     for (auto layout : sharedLayouts)
         aggregator->addWatchedLayout(layout);
@@ -173,13 +175,13 @@ void QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged(
     auto added = (newValues - oldValues);
     auto removed = (oldValues - newValues);
 
-    for (const auto& layout: qnResPool->getResources<QnLayoutResource>(added))
+    for (const auto& layout: commonModule()->resourcePool()->getResources<QnLayoutResource>(added))
     {
         if (layout->isShared())
            aggregator->addWatchedLayout(layout);
     }
 
-    for (const auto& layout: qnResPool->getResources<QnLayoutResource>(removed))
+    for (const auto& layout: commonModule()->resourcePool()->getResources<QnLayoutResource>(removed))
     {
         if (layout->isShared())
             aggregator->removeWatchedLayout(layout);
@@ -212,7 +214,7 @@ QnLayoutItemAggregatorPtr QnSharedLayoutItemAccessProvider::ensureAggregatorForS
             if (isUpdating())
                 return;
 
-            auto resource = qnResPool->getResourceById(resourceId);
+            auto resource = commonModule()->resourcePool()->getResourceById(resourceId);
             if (!resource || !isMediaResource(resource))
                 return;
 

@@ -51,10 +51,12 @@ void QnDistributedMutexManager::at_gotLockRequest(ApiLockData lockData)
     if (netMutex)
         netMutex->at_gotLockRequest(lockData);
     else {
-        QnTransaction<ApiLockData> tran(ApiCommand::lockResponse);
+        QnTransaction<ApiLockData> tran(
+            ApiCommand::lockResponse,
+            m_messageBus->commonModule()->moduleGUID());
         tran.params.name = lockData.name;
         tran.params.timestamp = lockData.timestamp;
-        tran.params.peer = qnCommon->moduleGUID();
+        tran.params.peer = m_messageBus->commonModule()->moduleGUID();
         if (m_userDataHandler)
             tran.params.userData = m_userDataHandler->getUserData(lockData.name);
         m_messageBus->sendTransaction(tran, lockData.peer);

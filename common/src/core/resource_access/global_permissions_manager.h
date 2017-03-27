@@ -10,9 +10,11 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <utils/common/connective.h>
+#include <common/common_module_aware.h>
 
-class QnGlobalPermissionsManager: public Connective<QObject>,
-    public Singleton<QnGlobalPermissionsManager>
+class QnGlobalPermissionsManager:
+    public Connective<QObject>,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 

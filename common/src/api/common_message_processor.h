@@ -15,16 +15,17 @@
 
 #include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
+#include <common/common_module_aware.h>
 
 class QnResourceFactory;
 
-class QnCommonMessageProcessor: public Connective<QObject>, public Singleton<QnCommonMessageProcessor>
+class QnCommonMessageProcessor: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
 
     typedef Connective<QObject> base_type;
 public:
-    explicit QnCommonMessageProcessor(QObject *parent = 0);
+    explicit QnCommonMessageProcessor(QObject *parent = nullptr);
     virtual ~QnCommonMessageProcessor() {}
 
     virtual void init(const ec2::AbstractECConnectionPtr& connection);

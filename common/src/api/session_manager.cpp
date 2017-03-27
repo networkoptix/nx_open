@@ -25,9 +25,9 @@
 // QnSessionManager
 // -------------------------------------------------------------------------- //
 
-QnSessionManager::QnSessionManager(QObject *parent)
-:
-    QObject(parent)
+QnSessionManager::QnSessionManager(QObject* parent):
+    QObject(parent),
+    QnCommonModuleAware(parent)
 {
     qRegisterMetaType<AsyncRequestInfo>();
 
@@ -49,12 +49,6 @@ QnSessionManager::~QnSessionManager()
     auto httpPool = nx_http::ClientPool::instance();
     for (auto& httpClientAndRequestInfo : requestInProgress)
         httpPool->terminate(httpClientAndRequestInfo.first);
-}
-
-QnSessionManager *QnSessionManager::instance()
-{
-    NX_ASSERT(qnCommon->instance<QnSessionManager>(), Q_FUNC_INFO, "Make sure session manager exists");
-    return qnCommon->instance<QnSessionManager>();
 }
 
 void QnSessionManager::start()

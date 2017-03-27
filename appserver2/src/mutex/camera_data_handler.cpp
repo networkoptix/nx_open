@@ -36,33 +36,35 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
     }
 #endif
 
+    const auto& resPool = commonModule()->resourcePool();
+
     if (name.startsWith(CAM_INS_PREFIX))
     {
-        QnNetworkResourcePtr camRes = qnResPool->getNetResourceByPhysicalId(name.mid(CAM_INS_PREFIX.length()));
+        QnNetworkResourcePtr camRes = resPool->getNetResourceByPhysicalId(name.mid(CAM_INS_PREFIX.length()));
         if (camRes)
-            return qnCommon->moduleGUID().toRfc4122(); // block
+            return commonModule()->moduleGUID().toRfc4122(); // block
     }
     else if (name.startsWith(CAM_UPD_PREFIX))
     {
-        QnSecurityCamResourcePtr camRes = qnResPool->getNetResourceByPhysicalId(name.mid(CAM_UPD_PREFIX.length())).dynamicCast<QnSecurityCamResource>();
+        QnSecurityCamResourcePtr camRes = resPool->getNetResourceByPhysicalId(name.mid(CAM_UPD_PREFIX.length())).dynamicCast<QnSecurityCamResource>();
         if (camRes) {
             /* Temporary solution to correctly allow other server to take ownership of desktop camera. */
             if (camRes->hasFlags(Qn::desktop_camera) && camRes->isReadyToDetach())
                 return QByteArray(); // do not block desktop cameras that are ready to detach
 
-            if (camRes->preferredServerId() == qnCommon->moduleGUID())
-                return qnCommon->moduleGUID().toRfc4122(); // block
-            QnResourcePtr mServer = qnResPool->getResourceById(camRes->getParentId());
+            if (camRes->preferredServerId() == commonModule()->moduleGUID())
+                return commonModule()->moduleGUID().toRfc4122(); // block
+            QnResourcePtr mServer = resPool->getResourceById(camRes->getParentId());
             if (mServer && mServer->getStatus() == Qn::Online)
                 return mServer->getId().toRfc4122(); // block
         }
     }
     else if (name.startsWith(CAM_HISTORY_PREFIX))
     {
-        QnSecurityCamResourcePtr camRes = qnResPool->getNetResourceByPhysicalId(name.mid(CAM_HISTORY_PREFIX.length())).dynamicCast<QnSecurityCamResource>();
+        QnSecurityCamResourcePtr camRes = resPool->getNetResourceByPhysicalId(name.mid(CAM_HISTORY_PREFIX.length())).dynamicCast<QnSecurityCamResource>();
         if (camRes) {
-            if (camRes->getParentId() == qnCommon->moduleGUID())
-                return qnCommon->moduleGUID().toRfc4122(); // block
+            if (camRes->getParentId() == commonModule()->moduleGUID())
+                return commonModule()->moduleGUID().toRfc4122(); // block
         }
     }
 
@@ -72,7 +74,7 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
 bool QnMutexCameraDataHandler::checkUserData(const QString& name, const QByteArray& data)
 {
     if (name.startsWith(CAM_INS_PREFIX) || name.startsWith(CAM_UPD_PREFIX) || name.startsWith(CAM_HISTORY_PREFIX)) {
-        return data.isEmpty() || data == qnCommon->moduleGUID().toRfc4122();
+        return data.isEmpty() || data == commonModule()->moduleGUID().toRfc4122();
     }
     return true;
 }

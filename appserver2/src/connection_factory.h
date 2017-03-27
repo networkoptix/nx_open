@@ -31,7 +31,8 @@ class Ec2DirectConnectionFactory:
 public:
     Ec2DirectConnectionFactory(
         Qn::PeerType peerType,
-        nx::utils::TimerManager* const timerManager);
+        nx::utils::TimerManager* const timerManager,
+        QnCommonModule* commonModule);
     virtual ~Ec2DirectConnectionFactory();
 
     virtual void pleaseStop() override;
@@ -70,6 +71,7 @@ private:
     bool m_terminated;
     int m_runningRequests;
     bool m_sslEnabled;
+    QnCommonModule* m_commonModule;
 
     ClientQueryProcessor m_remoteQueryProcessor;
     QnMutex m_mutex;

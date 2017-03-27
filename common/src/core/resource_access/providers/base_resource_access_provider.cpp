@@ -8,15 +8,17 @@
 #include <core/resource_management/user_roles_manager.h>
 
 #include <core/resource/user_resource.h>
+#include <common/common_module.h>
 
 QnBaseResourceAccessProvider::QnBaseResourceAccessProvider(QObject* parent):
     base_type(parent),
+    QnCommonModuleAware(parent),
     m_mutex(QnMutex::NonRecursive),
     m_accessibleResources()
 {
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(commonModule()->resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnBaseResourceAccessProvider::handleResourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(commonModule()->resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnBaseResourceAccessProvider::handleResourceRemoved);
 
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
@@ -108,7 +110,7 @@ void QnBaseResourceAccessProvider::updateAccessBySubject(const QnResourceAccessS
     if (isUpdating())
         return;
 
-    for (const auto& resource : qnResPool->getResources())
+    for (const auto& resource : commonModule()->resourcePool()->getResources())
         updateAccess(subject, resource);
 }
 
@@ -238,7 +240,7 @@ void QnBaseResourceAccessProvider::handleSubjectRemoved(const QnResourceAccessSu
         resourceIds = m_accessibleResources.take(id);
     }
 
-    const auto resources = qnResPool->getResources(resourceIds);
+    const auto resources = commonModule()->resourcePool()->getResources(resourceIds);
     for (const auto& targetResource : resources)
         emit accessChanged(subject, targetResource, Source::none);
 }

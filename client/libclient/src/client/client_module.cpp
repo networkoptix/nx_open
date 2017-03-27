@@ -293,9 +293,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     common->store(new QnPlatformAbstraction());
 
     common->store(new QnClientPtzControllerPool());
-    common->store(new QnDesktopClientMessageProcessor());
-    common->store(new QnCameraHistoryPool());
-    common->store(new QnRuntimeInfoManager());
+    common->setMessageProcessor(new QnDesktopClientMessageProcessor(common));
     common->store(new QnClientResourceFactory());
 
     common->store(new QnResourcesChangesManager());

@@ -6,15 +6,18 @@
 #include <core/resource_management/user_roles_manager.h>
 
 #include <core/resource/user_resource.h>
+#include <common/common_module.h>
 
 QnGlobalPermissionsManager::QnGlobalPermissionsManager(QObject* parent):
     base_type(parent),
+    QnCommonModuleAware(parent),
     m_mutex(QnMutex::NonRecursive),
     m_cache()
 {
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    const auto& resPool = commonModule()->resourcePool();
+    connect(resPool, &QnResourcePool::resourceAdded, this,
         &QnGlobalPermissionsManager::handleResourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resPool, &QnResourcePool::resourceRemoved, this,
         &QnGlobalPermissionsManager::handleResourceRemoved);
 
     connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
@@ -70,7 +73,8 @@ bool QnGlobalPermissionsManager::hasGlobalPermission(const Qn::UserAccessData& a
     if (accessRights == Qn::kSystemAccess)
         return true;
 
-    auto user = qnResPool->getResourceById<QnUserResource>(accessRights.userId);
+    const auto& resPool = commonModule()->resourcePool();
+    auto user = resPool->getResourceById<QnUserResource>(accessRights.userId);
     if (!user)
         return false;
     return hasGlobalPermission(user, requiredPermission);

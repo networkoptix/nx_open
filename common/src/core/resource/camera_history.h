@@ -15,6 +15,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <common/common_module_aware.h>
 
 
 /**
@@ -35,11 +36,12 @@
  *  All methods that require camera history to operate are non-reliable.
  *
  */
-class QnCameraHistoryPool: public QObject, public Singleton<QnCameraHistoryPool> {
+class QnCameraHistoryPool: public QObject, public QnCommonModuleAware
+{
     Q_OBJECT
 
 public:
-    QnCameraHistoryPool(QObject *parent = NULL);
+    QnCameraHistoryPool(QObject* parent = nullptr);
     virtual ~QnCameraHistoryPool();
 
     /** Reset information about camera footage presence on different servers. */

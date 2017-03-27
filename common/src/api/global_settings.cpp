@@ -14,7 +14,7 @@
 #include <utils/crypt/symmetrical.h>
 
 #include <nx_ec/data/api_resource_data.h>
-
+#include <common/common_module.h>
 
 namespace
 {
@@ -69,9 +69,10 @@ namespace
 using namespace nx::settings_names;
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent):
-    base_type(parent)
+    base_type(parent),
+    QnCommonModuleAware(parent)
 {
-    NX_ASSERT(qnResPool);
+    NX_ASSERT(commonModule()->resourcePool());
 
     m_allAdaptors
         << initEmailAdaptors()
@@ -83,15 +84,16 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << initMiscAdaptors()
         ;
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(commonModule()->resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnGlobalSettings::at_resourcePool_resourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(commonModule()->resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnGlobalSettings::at_resourcePool_resourceRemoved);
     initialize();
 }
 
-QnGlobalSettings::~QnGlobalSettings() {
-    disconnect(qnResPool, NULL, this, NULL);
+QnGlobalSettings::~QnGlobalSettings()
+{
+    disconnect(commonModule()->resourcePool(), NULL, this, NULL);
     if(m_admin)
         at_resourcePool_resourceRemoved(m_admin);
 }
@@ -100,7 +102,7 @@ void QnGlobalSettings::initialize()
 {
     if (isInitialized())
         return;
-    for (const QnResourcePtr &resource : qnResPool->getResources())
+    for (const QnResourcePtr &resource : commonModule()->resourcePool()->getResources())
         at_resourcePool_resourceAdded(resource);
 }
 

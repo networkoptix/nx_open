@@ -30,8 +30,11 @@ class QnMediaServerConnection: public QnAbstractConnection
 
 public:
     QnMediaServerConnection(
-        const QnMediaServerResourcePtr& mserver, const QnUuid& videowallGuid = QnUuid(),
-        bool enableOfflineRequests = false, QObject* parent = nullptr);
+        const QnCommonModule* commonModule,
+        const QnMediaServerResourcePtr& mserver,
+        const QnUuid& videowallGuid = QnUuid(),
+        bool enableOfflineRequests = false,
+        QObject* parent = nullptr);
 
     virtual ~QnMediaServerConnection();
 

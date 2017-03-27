@@ -22,6 +22,7 @@
 #include <nx/network/http/httptypes.h>
 #include <utils/common/delayed.h>
 #include <nx/utils/log/log.h>
+#include <common/common_module.h>
 
 namespace {
     static const size_t ResponseReadTimeoutMs = 15 * 1000;
@@ -42,7 +43,12 @@ namespace {
 namespace rest
 {
 
-ServerConnection::ServerConnection(const QnUuid& serverId):
+ServerConnection::ServerConnection(
+    QnCommonModule* commonModule,
+    const QnUuid& serverId)
+    :
+    QObject(),
+    QnCommonModuleAware(commonModule),
     m_serverId(serverId)
 {
     auto httpPool = nx_http::ClientPool::instance();
@@ -72,7 +78,7 @@ rest::Handle ServerConnection::cameraThumbnailAsync( const QnThumbnailRequestDat
 rest::Handle ServerConnection::twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread /*= 0*/)
 {
     QnRequestParamList params;
-    params.insert(lit("clientId"),      qnCommon->moduleGUID().toString());
+    params.insert(lit("clientId"),      commonModule()->moduleGUID().toString());
     params.insert(lit("resourceId"),    cameraId.toString());
     params.insert(lit("action"),        start ? lit("start") : lit("stop"));
     return executeGet(lit("/api/transmitAudio"), params, callback, targetThread);
@@ -81,7 +87,7 @@ rest::Handle ServerConnection::twoWayAudioCommand(const QnUuid& cameraId, bool s
 QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
 {
     QnMediaServerResourcePtr server =
-        qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
+        commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->remoteGUID());
     if (!server)
         return QnMediaServerResourcePtr(); //< something wrong. No current server available
 
@@ -89,7 +95,7 @@ QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
         return server;
 
     // Current server doesn't have internet access. Try to find another one
-    for (const auto server: qnResPool->getAllServers(Qn::Online))
+    for (const auto server: commonModule()->resourcePool()->getAllServers(Qn::Online))
     {
         if (server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
             return server;
@@ -159,7 +165,7 @@ Handle ServerConnection::detachSystemFromCloud(
     PasswordData data;
     if (!resetAdminPassword.isEmpty())
     {
-        auto admin = qnResPool->getAdministrator();
+        auto admin = commonModule()->resourcePool()->getAdministrator();
         NX_ASSERT(admin);
         if (!admin)
             return Handle();
@@ -398,7 +404,7 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
     const nx_http::StringType& contentType,
     const nx_http::StringType& messageBody)
 {
-    const auto server =  qnResPool->getResourceById<QnMediaServerResource>(m_serverId);
+    const auto server =  commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(m_serverId);
     if (!server)
         return nx_http::ClientPool::Request();
 
@@ -423,18 +429,19 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
         request.headers.emplace(Qn::VIDEOWALL_GUID_HEADER_NAME, videoWallGuid.toByteArray());
     request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     request.headers.emplace(
-        Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME, commonModule()->runningInstanceGUID().toByteArray());
     request.headers.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME, user.toLower().toUtf8());
 
-    QnRoute route = QnRouter::instance()->routeTo(server->getId());
+    const auto& router = commonModule()->router();
+    QnRoute route = router->routeTo(server->getId());
     if (route.reverseConnect)
     {
         // no route exists. proxy via nearest server
-        auto nearestServer = qnCommon->currentServer();
+        auto nearestServer = commonModule()->currentServer();
         if (!nearestServer)
             return nx_http::ClientPool::Request();
         QUrl nearestUrl(server->getApiUrl());
-        if (nearestServer->getId() == qnCommon->moduleGUID())
+        if (nearestServer->getId() == commonModule()->moduleGUID())
             request.url.setHost(lit("127.0.0.1"));
         else
             request.url.setHost(nearestUrl.host());

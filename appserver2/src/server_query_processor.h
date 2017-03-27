@@ -40,6 +40,7 @@ struct ServerQueryProcessorAccess
     QnTransactionMessageBus* messageBus() { return m_messageBus; }
     PostProcessList* postProcessList() { return &m_postProcessList; }
     QnMutex* updateMutex() { return &m_updateMutex; }
+    const QnCommonModule* commonModule() const { return m_db->commonModule();  }
 private:
     detail::QnDbManager* m_db;
     QnTransactionMessageBus* m_messageBus;
@@ -749,7 +750,7 @@ private:
         ApiCommand::Value command,
         DataType data)
     {
-        QnTransaction<DataType> transaction(command, std::move(data));
+        QnTransaction<DataType> transaction(command, m_owner->commonModule()->moduleGUID(), std::move(data));
         transaction.historyAttributes.author = m_db.userAccessData().userId;
         return transaction;
     }
