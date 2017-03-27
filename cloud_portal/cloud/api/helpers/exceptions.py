@@ -107,10 +107,10 @@ class APIException(Exception):
                                ErrorCodes.not_found,
                                ErrorCodes.account_exists,
                                ErrorCodes.account_not_activated):
-            return 'INFO'
+            return logging.INFO
         if self.error_code in (ErrorCodes.forbidden,):
-            return 'WARNING'
-        return 'ERROR'
+            return logging.WARNING
+        return logging.ERROR
 
 
 class APIInternalException(APIException):
@@ -326,7 +326,7 @@ def handle_exceptions(func):
 
             return error.response()
         except Exception as error:
-            detailed_error = log_error(args[0], error, 'ERROR')
+            detailed_error = log_error(args[0], error, logging.ERROR)
 
             if not settings.DEBUG:
                 detailed_error = 'Unexpected error somewhere inside'
