@@ -5,10 +5,11 @@
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace workbench {
-namespace panels {
 
+class SpecialLayoutPanelPrivate;
 class SpecialLayoutPanel: public Connective<NxUi::AbstractWorkbenchPanel>
 {
     using base_type = Connective<NxUi::AbstractWorkbenchPanel>;
@@ -18,6 +19,8 @@ public:
         const QnPaneSettings& settings,
         QGraphicsWidget* parentWidget,
         QObject* parent = nullptr);
+
+    virtual ~SpecialLayoutPanel();
 
 public: // overrides
     virtual bool isPinned() const override;
@@ -38,12 +41,12 @@ public: // overrides
     virtual void stopAnimations() override;
 
 private:
-    class PanelPrivate;
-    const QScopedPointer<PanelPrivate> d;
+    Q_DECLARE_PRIVATE(SpecialLayoutPanel);
+    const QScopedPointer<SpecialLayoutPanelPrivate> d_ptr;
 };
 
-} // namespace panels
 } // namespace workbench
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx

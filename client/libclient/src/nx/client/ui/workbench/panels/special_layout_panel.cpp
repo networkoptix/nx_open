@@ -8,44 +8,55 @@
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace workbench {
-namespace panels {
 
-class SpecialLayoutPanel::PanelPrivate: public QObject, public QnWorkbenchContextAware
+class SpecialLayoutPanelPrivate: public QObject, public QnWorkbenchContextAware
 {
     using base_type = QObject;
 
-public:
-    PanelPrivate(QGraphicsItem* parentItem, QObject* parent);
+    Q_DECLARE_PUBLIC(SpecialLayoutPanel)
+    SpecialLayoutPanel* q_ptr = nullptr;
 
-    QGraphicsWidget* panelWidget() const;
+public:
+    SpecialLayoutPanelPrivate(
+        QGraphicsWidget* parentWidget,
+        QObject* objectParent,
+        SpecialLayoutPanel* parent);
+
+    QnWorkbenchLayout::GraphicsWidgetPtr panelWidget() const;
 
     void handleCurrentLayoutChanged(QnWorkbenchLayout* layout);
 
 private:
-    void setPanelWidget(QGraphicsWidget* widget);
+    void setPanelWidget(const QnWorkbenchLayout::GraphicsWidgetPtr& widget);
     void resetPanelWidget();
 
 private:
-    QGraphicsItem* const m_parentItem = nullptr;
+    QGraphicsItem* const m_parentWidget = nullptr;
     QnWorkbenchLayout* m_layout = nullptr;
-    QPointer<QGraphicsWidget> m_panelWidget;
+    QnWorkbenchLayout::GraphicsWidgetPtr m_panelWidget;
 };
 
-SpecialLayoutPanel::PanelPrivate::PanelPrivate(QGraphicsItem* parentItem, QObject* parent):
+SpecialLayoutPanelPrivate::SpecialLayoutPanelPrivate(
+    QGraphicsWidget* parentWidget,
+    QObject* objectParent,
+    SpecialLayoutPanel* parent)
+    :
     base_type(),
-    QnWorkbenchContextAware(parent),
-    m_parentItem(parentItem)
+    QnWorkbenchContextAware(objectParent),
+    q_ptr(parent),
+    m_parentWidget(parentWidget)
 {
     handleCurrentLayoutChanged(workbench()->currentLayout());
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
         [this](){ handleCurrentLayoutChanged(workbench()->currentLayout());});
     }
 
-void SpecialLayoutPanel::PanelPrivate::handleCurrentLayoutChanged(QnWorkbenchLayout* layout)
+void SpecialLayoutPanelPrivate::handleCurrentLayoutChanged(QnWorkbenchLayout* layout)
 {
-    const auto specialLayout = qobject_cast<layouts::SpecialLayout*>(layout);
+    const auto specialLayout = qobject_cast<SpecialLayout*>(layout);
     if (m_layout == specialLayout)
         return;
 
@@ -58,33 +69,34 @@ void SpecialLayoutPanel::PanelPrivate::handleCurrentLayoutChanged(QnWorkbenchLay
     if (!m_layout)
         return;
 
-    setPanelWidget(m_layout->panelWidget());
-    connect(m_layout, &QnWorkbenchLayout::panelWidgetChanged, this,
-        [this](){ setPanelWidget(m_layout->panelWidget());});
+    setPanelWidget(m_layout->createPanelWidget());
 }
 
-QGraphicsWidget* SpecialLayoutPanel::PanelPrivate::panelWidget() const
+QnWorkbenchLayout::GraphicsWidgetPtr SpecialLayoutPanelPrivate::panelWidget() const
 {
     return m_panelWidget;
 }
 
-void SpecialLayoutPanel::PanelPrivate::resetPanelWidget()
+void SpecialLayoutPanelPrivate::resetPanelWidget()
 {
-    setPanelWidget(nullptr);
+    setPanelWidget(QnWorkbenchLayout::GraphicsWidgetPtr());
 }
 
-void SpecialLayoutPanel::PanelPrivate::setPanelWidget(QGraphicsWidget* widget)
+void SpecialLayoutPanelPrivate::setPanelWidget(const QnWorkbenchLayout::GraphicsWidgetPtr& widget)
 {
     if (m_panelWidget == widget)
         return;
 
     if (m_panelWidget)
-        m_panelWidget->setParentItem(nullptr);
+        m_panelWidget.reset();
 
     m_panelWidget = widget;
 
     if (m_panelWidget)
-        m_panelWidget->setParentItem(m_parentItem);
+        m_panelWidget->setParentItem(m_parentWidget);
+
+    Q_Q(SpecialLayoutPanel);
+    emit q->geometryChanged();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -95,7 +107,11 @@ SpecialLayoutPanel::SpecialLayoutPanel(
     QObject* parent)
     :
     base_type(settings, parentWidget, parent),
-    d(new PanelPrivate(parentWidget, parent))
+    d_ptr(new SpecialLayoutPanelPrivate(parentWidget, parent, this))
+{
+}
+
+SpecialLayoutPanel::~SpecialLayoutPanel()
 {
 }
 
@@ -106,6 +122,7 @@ bool SpecialLayoutPanel::isPinned() const
 
 bool SpecialLayoutPanel::isOpened() const
 {
+    Q_D(const SpecialLayoutPanel);
     return d->panelWidget();
 }
 
@@ -116,6 +133,7 @@ void SpecialLayoutPanel::setOpened(bool opened, bool animate)
 
 bool SpecialLayoutPanel::isVisible() const
 {
+    Q_D(const SpecialLayoutPanel);
     return d->panelWidget();
 }
 
@@ -141,16 +159,18 @@ bool SpecialLayoutPanel::isHovered() const
 
 QRectF SpecialLayoutPanel::effectiveGeometry() const
 {
-    return QRectF();
+    Q_D(const SpecialLayoutPanel);
+    const auto widget = d->panelWidget();
+    return d ? widget->geometry() : QRectF();
 }
 
 void SpecialLayoutPanel::stopAnimations()
 {
 }
 
-} // namespace panels
 } // namespace workbench
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx
 

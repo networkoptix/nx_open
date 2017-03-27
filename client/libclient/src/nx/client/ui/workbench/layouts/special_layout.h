@@ -5,9 +5,9 @@
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace workbench {
-namespace layouts {
 
 class SpecialLayout: public QnWorkbenchLayout
 {
@@ -16,10 +16,13 @@ class SpecialLayout: public QnWorkbenchLayout
 
 public:
     SpecialLayout(const QnLayoutResourcePtr& resource, QObject* parent = nullptr);
+
+public: // overrides
+    virtual QnWorkbenchLayout::GraphicsWidgetPtr createPanelWidget() const override;
 };
 
-} // namespace layouts
 } // namespace workbench
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx

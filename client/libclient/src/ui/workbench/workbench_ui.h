@@ -52,15 +52,15 @@ class TitleWorkbenchPanel;
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace workbench {
-namespace panels {
 
 class SpecialLayoutPanel;
 
-} // namespace panels
 } // namespace workbench
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx
 
@@ -95,7 +95,8 @@ public:
         TreePanel = 0x1,
         TitlePanel = 0x2,
         TimelinePanel = 0x4,
-        NotificationsPanel = 0x8
+        NotificationsPanel = 0x8,
+        LayoutPanel = 0x10
     };
     Q_DECLARE_FLAGS(Panels, Panel)
 
@@ -127,6 +128,8 @@ public:
 
     /** Whether title bar is opened. */
     bool isTitleOpened() const;
+
+    bool isLayoutPanelOpened() const;
 
     /** Whether notification pane is opened. */
     bool isNotificationsOpened() const;
@@ -169,7 +172,8 @@ protected:
         const QRectF& treeGeometry,
         const QRectF& titleGeometry,
         const QRectF& timelineGeometry,
-        const QRectF& notificationsGeometry);
+        const QRectF& notificationsGeometry,
+        const QRectF& layoutPanelGeometry);
     void updateViewportMargins(bool animate = true);
     void updateViewportMarginsAnimated();
 
@@ -190,7 +194,7 @@ private:
     void createFpsWidget();
     void createTreeWidget(const QnPaneSettings& settings);
     void createTitleWidget(const QnPaneSettings& settings);
-    void createSpecialLayoutWidget(const QnPaneSettings& settings);
+    void createLayoutPanelWidget(const QnPaneSettings& settings);
     void createNotificationsWidget(const QnPaneSettings& settings);
     void createCalendarWidget(const QnPaneSettings& settings);
     void createTimelineWidget(const QnPaneSettings& settings);
@@ -273,7 +277,7 @@ private:
     /* Title-related state. */
     QPointer<NxUi::TitleWorkbenchPanel> m_title;
 
-    QPointer<nx::client::ui::workbench::panels::SpecialLayoutPanel> m_specialLayoutPanel;
+    QPointer<nx::client::desktop::ui::workbench::SpecialLayoutPanel> m_layoutPanel;
 
     /* Notifications window-related state. */
     QPointer<NxUi::NotificationsWorkbenchPanel> m_notifications;

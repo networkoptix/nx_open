@@ -19,6 +19,8 @@ public:
         layout->setAlignment(text, Qt::AlignHCenter);
         text->setText(lit("++++++++++++++++++++++++++++"));
         setWidget(body);
+
+        setOpacity(0.5);
     }
 
 private:
@@ -29,20 +31,25 @@ private:
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace workbench {
-namespace layouts {
 
 SpecialLayout::SpecialLayout(const QnLayoutResourcePtr& resource, QObject* parent):
     base_type(resource, parent)
 {
     setFlags(flags() | QnLayoutFlag::SpecialBackground);
-    setPanelWidget(new SpecialLayoutPanelWidget());
 }
 
-} // namespace layouts
+QnWorkbenchLayout::GraphicsWidgetPtr SpecialLayout::createPanelWidget() const
+{
+    return QnWorkbenchLayout::GraphicsWidgetPtr(new SpecialLayoutPanelWidget());
+}
+
+
 } // namespace workbench
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx
 

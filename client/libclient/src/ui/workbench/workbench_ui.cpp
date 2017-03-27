@@ -149,7 +149,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     {
         createTreeWidget(settings[Qn::WorkbenchPane::Tree]); //< Tree panel.
         createTitleWidget(settings[Qn::WorkbenchPane::Title]); //< Title bar.
-        createSpecialLayoutWidget(settings[Qn::WorkbenchPane::SpecialLayout]); //< Special layout
+        createLayoutPanelWidget(settings[Qn::WorkbenchPane::SpecialLayout]); //< Special layout
         if (!qnSettings->lightMode().testFlag(Qn::LightModeNoNotifications))
             createNotificationsWidget(settings[Qn::WorkbenchPane::Notifications]); //< Notifications
     }
@@ -260,6 +260,7 @@ QnWorkbenchUi::~QnWorkbenchUi()
     delete m_calendar;
     delete m_notifications;
     delete m_title;
+    delete m_layoutPanel;
     delete m_tree;
 
     delete m_controlsWidget;
@@ -425,13 +426,18 @@ QMargins QnWorkbenchUi::calculateViewportMargins(
     const QRectF& treeGeometry,
     const QRectF& titleGeometry,
     const QRectF& timelineGeometry,
-    const QRectF& notificationsGeometry)
+    const QRectF& notificationsGeometry,
+    const QRectF& layoutPanelGeometry)
 {
     using namespace std;
     QMargins result;
     if (treeGeometry.isValid())
         result.setLeft(max(0.0, floor(treeGeometry.left() + treeGeometry.width())));
-    result.setTop(max(0.0, floor(titleGeometry.bottom())));
+
+    const auto bottom = floor(layoutPanelGeometry.isValid()
+        ? layoutPanelGeometry.bottom()
+        : titleGeometry.bottom());
+    result.setTop(max(0.0, bottom));
 
     if (notificationsGeometry.isValid())
         result.setRight(max(0.0, floor(m_controlsWidgetRect.right() - notificationsGeometry.left())));
@@ -494,7 +500,8 @@ void QnWorkbenchUi::updateViewportMargins(bool animate)
             panelEffectiveGeometry(m_tree),
             panelEffectiveGeometry(m_title),
             timelineEffectiveGeometry,
-            panelEffectiveGeometry(m_notifications)
+            panelEffectiveGeometry(m_notifications),
+            panelEffectiveGeometry(m_layoutPanel)
         );
     }
 
@@ -528,10 +535,11 @@ bool QnWorkbenchUi::isHovered() const
 QnWorkbenchUi::Panels QnWorkbenchUi::openedPanels() const
 {
     return
-        (isTreeOpened() ? TreePanel : NoPanel) |
-        (isTitleOpened() ? TitlePanel : NoPanel) |
-        (isTimelineOpened() ? TimelinePanel : NoPanel) |
-        (isNotificationsOpened() ? NotificationsPanel : NoPanel);
+        (isTreeOpened() ? TreePanel : NoPanel)
+        | (isTitleOpened() ? TitlePanel : NoPanel)
+        | (isTimelineOpened() ? TimelinePanel : NoPanel)
+        | (isNotificationsOpened() ? NotificationsPanel : NoPanel)
+        | (isLayoutPanelOpened() ? LayoutPanel : NoPanel);
 }
 
 void QnWorkbenchUi::setOpenedPanels(Panels panels, bool animate)
@@ -940,6 +948,11 @@ bool QnWorkbenchUi::isTitleOpened() const
     return m_title && m_title->isOpened();
 }
 
+bool QnWorkbenchUi::isLayoutPanelOpened() const
+{
+    return m_layoutPanel && m_layoutPanel->isOpened();
+}
+
 void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
 {
     m_title = new NxUi::TitleWorkbenchPanel(settings, m_controlsWidget, this);
@@ -974,10 +987,13 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
         });
 }
 
-void QnWorkbenchUi::createSpecialLayoutWidget(const QnPaneSettings& settings)
+void QnWorkbenchUi::createLayoutPanelWidget(const QnPaneSettings& settings)
 {
-    m_specialLayoutPanel = new nx::client::ui::workbench::panels::SpecialLayoutPanel(
+    m_layoutPanel = new nx::client::desktop::ui::workbench::SpecialLayoutPanel(
         settings, m_controlsWidget, this);
+
+    connect(m_layoutPanel, &NxUi::AbstractWorkbenchPanel::geometryChanged,
+        this, &QnWorkbenchUi::updateViewportMarginsAnimated);
 }
 
 #pragma endregion Title methods

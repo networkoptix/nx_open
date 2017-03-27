@@ -550,7 +550,7 @@ void QnGridBackgroundItem::paint(
 
     if (d->backgroundType == BackgroundType::Special)
     {
-        painter->setBrush(Qt::gray);
+        painter->setBrush(Qt::red);
         painter->drawRect(display()->boundedViewportGeometry());
         return;
     }

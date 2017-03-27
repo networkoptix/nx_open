@@ -90,24 +90,9 @@ void QnWorkbenchLayout::setFlags(QnLayoutFlags value)
     emit flagsChanged();
 }
 
-void QnWorkbenchLayout::setPanelWidget(QGraphicsWidget* widget)
+QnWorkbenchLayout::GraphicsWidgetPtr QnWorkbenchLayout::createPanelWidget() const
 {
-    if (m_panelWidget == widget)
-        return;
-
-    if (m_panelWidget)
-        delete m_panelWidget;
-
-    m_panelWidget = widget;
-    if (m_panelWidget)
-        m_panelWidget->setParent(this);
-
-    emit panelWidgetChanged();
-}
-
-QGraphicsWidget* QnWorkbenchLayout::panelWidget() const
-{
-    return m_panelWidget;
+    return GraphicsWidgetPtr();
 }
 
 QnLayoutResourcePtr QnWorkbenchLayout::resource() const {

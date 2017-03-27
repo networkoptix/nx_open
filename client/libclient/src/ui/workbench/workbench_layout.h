@@ -89,8 +89,8 @@ public:
     QnLayoutFlags flags() const;
     void setFlags(QnLayoutFlags value);
 
-    void setPanelWidget(QGraphicsWidget* widget); //< Takes ownership.
-    QGraphicsWidget* panelWidget() const;
+    using GraphicsWidgetPtr = QSharedPointer<QGraphicsWidget>;
+    virtual GraphicsWidgetPtr createPanelWidget() const;
 
     /**
      * \returns                         Name of this layout.
@@ -336,7 +336,6 @@ signals:
 
     void iconChanged();
 
-    void panelWidgetChanged();
     /**
      * This signal is emitted when this layout is about to be destroyed
      * (i.e. its destructor has started).
@@ -454,7 +453,6 @@ private:
 
     QnLayoutFlags m_flags = QnLayoutFlag::Empty;
     QIcon m_icon;
-    QPointer<QGraphicsWidget> m_panelWidget;
 };
 
 typedef QList<QnWorkbenchLayout *> QnWorkbenchLayoutList;

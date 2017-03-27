@@ -19,7 +19,7 @@ void registerCreator()
         [](const QnLayoutResourcePtr& resource, QObject* parent) -> QnWorkbenchLayout*
         {
             if (const auto tourResource = resource.dynamicCast<LayoutTourResource>())
-                return new nx::client::ui::workbench::layouts::SpecialLayout(tourResource, parent);
+                return new nx::client::desktop::ui::workbench::SpecialLayout(tourResource, parent);
 
             return nullptr;
         };
