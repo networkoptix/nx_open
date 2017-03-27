@@ -413,7 +413,7 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
             m_startTimeUs = 1000ll * m_metadata.startTimeMs;
             if (m_startTimeUs >= UTC_TIME_DETECTION_THRESHOLD)
             {
-                m_resource->addFlags(Qn::utc);
+                m_resource->addFlags(Qn::utc | Qn::exported);
                 if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage))
                     m_resource->addFlags(Qn::sync | Qn::periods | Qn::motion); // use sync for exported layout only
             }

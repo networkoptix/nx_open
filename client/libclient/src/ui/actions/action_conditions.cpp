@@ -281,16 +281,12 @@ Qn::ActionVisibility QnClearMotionSelectionActionCondition::check(const QnResour
     return hasDisplayedGrid ? Qn::DisabledAction : Qn::InvisibleAction;
 }
 
-Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResourceWidgetList &widgets) {
-    foreach(QGraphicsItem *item, widgets) {
-        QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-        if(widget == NULL)
-            continue;
-
-        bool isUnsupported =
-            (widget->resource()->flags() & (Qn::network | Qn::still_image | Qn::server)) ||
-            !(widget->resource()->flags() & Qn::utc); // TODO: #GDM #Common this is wrong, we need a flag for exported files.
-        if(isUnsupported)
+Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResourceWidgetList &widgets)
+{
+    NX_ASSERT(widgets.size() == 1);
+    for (auto widget: widgets)
+    {
+        if (!widget->resource()->hasFlags(Qn::exported_media))
             return Qn::InvisibleAction;
     }
     return Qn::EnabledAction;
