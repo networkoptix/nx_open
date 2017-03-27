@@ -2,39 +2,92 @@
 #include <memory>
 #include <queue>
 
-#include <QtCore/QElapsedTimer>
 #include <gtest/gtest.h>
 
+#include <QtCore/QElapsedTimer>
+
+#include <nx/network/buffered_stream_socket.h>
+#include <nx/network/http/buffer_source.h>
+#include <nx/network/http/empty_message_body_source.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/std/thread.h>
-#include <nx/network/http/buffer_source.h>
-#include <nx/network/http/empty_message_body_source.h>
-#include <nx/network/buffered_stream_socket.h>
 
 namespace nx_http {
 
 static const nx::Buffer kPlayMessage("PLAY\r\n");
 static const nx::Buffer kTeardownMessage("TEARDOWN\r\n");
 
+class TestDataSendThread
+{
+public:
+    TestDataSendThread(nx::utils::MoveOnlyFunc<void()> func):
+        m_func(std::move(func))
+    {
+        m_thread = std::make_unique<nx::utils::thread>([this]() { threadFunc(); });
+    }
+
+    void join()
+    {
+        m_thread->join();
+    }
+
+    void resume()
+    {
+        m_resumed.set_value();
+    }
+
+private:
+    nx::utils::MoveOnlyFunc<void()> m_func;
+    std::unique_ptr<nx::utils::thread> m_thread;
+    nx::utils::promise<void> m_resumed;
+
+    void threadFunc()
+    {
+        m_resumed.get_future().wait();
+        m_func();
+    }
+};
+
 class ThreadStorage
 {
 public:
     ~ThreadStorage()
     {
-        for (auto& thread: m_threads)
-            thread.join();
+        clear();
     }
 
-    void add(nx::utils::thread thread)
+    void add(std::unique_ptr<TestDataSendThread> thread)
     {
         QnMutexLocker lock(&m_mutex);
         m_threads.emplace_back(std::move(thread));
     }
 
+    TestDataSendThread& back()
+    {
+        return *m_threads.back();
+    }
+
+    std::size_t size() const
+    {
+        return m_threads.size();
+    }
+
+    bool empty() const
+    {
+        return m_threads.empty();
+    }
+
+    void clear()
+    {
+        for (auto& thread : m_threads)
+            thread->join();
+        m_threads.clear();
+    }
+
 private:
     QnMutex m_mutex;
-    std::vector<nx::utils::thread> m_threads;
+    std::vector<std::unique_ptr<TestDataSendThread>> m_threads;
 };
 
 class TakingSocketRestHandler:
@@ -57,7 +110,7 @@ public:
         events.onResponseHasBeenSent = 
             [threadStorage = m_threadStorage](nx_http::HttpServerConnection* connection)
             {
-                threadStorage->add(nx::utils::thread(
+                threadStorage->add(std::make_unique<TestDataSendThread>(
                     [sock = connection->takeSocket()]() mutable
                     {
                         ASSERT_TRUE(sock->setNonBlockingMode(false));
@@ -144,6 +197,7 @@ protected:
         const int kPlayMessageNumber = 1;
         const int kTeardownMessageNumber = 2;
 
+        // TODO: Following loop is here only for debugging. Remove it.
         for (int i = 0; i < 20; ++i)
         {
             auto httpServer = testHttpServer();
@@ -172,6 +226,11 @@ protected:
                 tcpSocket = takeSocketFromHttpClient(httpClient);
                 std::swap(httpClient, localHttpClient);
             }
+
+            while (m_threadStorage.empty())
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+            m_threadStorage.back().resume();
 
             ASSERT_TRUE(tcpSocket->isConnected())
                 << "Socket taken from HTTP client is not connected";
@@ -230,6 +289,8 @@ protected:
 
             httpServer.reset();
             tcpSocket.reset();
+
+            m_threadStorage.clear();
         }
     }
 
