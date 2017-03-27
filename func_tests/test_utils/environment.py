@@ -168,7 +168,7 @@ class EnvironmentBuilder(object):
         log.info('----- build environment setup is complete ----------------------------->8 ----------------------------------------------')
         artifact_path_prefix = os.path.join(
             self._work_dir,
-            self._test_id.replace(':', '_').replace('.py', ''))
+            os.path.basename(self._test_id.replace(':', '_').replace('.py', '')))
         return Environment(artifact_path_prefix, servers)
 
     def __call__(self, *args, **kw):
