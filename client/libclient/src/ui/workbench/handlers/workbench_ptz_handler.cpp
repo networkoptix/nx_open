@@ -167,7 +167,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered()
     //TODO: #GDM #PTZ fix the text
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        nx::client::messages::Ptz::failedToGetPosition(mainWindow(),
+        nx::client::desktop::messages::Ptz::failedToGetPosition(mainWindow(),
         QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
         return;
     }
@@ -373,7 +373,7 @@ void QnWorkbenchPtzHandler::showSetPositionWarning(const QnResourcePtr& resource
 {
     if (resource->getStatus() == Qn::Offline || resource->getStatus() == Qn::Unauthorized)
     {
-        nx::client::messages::Ptz::failedToSetPosition(mainWindow(),
+        nx::client::desktop::messages::Ptz::failedToSetPosition(mainWindow(),
             QnResourceDisplayInfo(resource).toString(qnSettings->extraInfoInTree()));
     }
     //TODO: #GDM #PTZ check other cases

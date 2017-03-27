@@ -797,7 +797,7 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
         const auto resources = parameters.resources();
 
         // Displaying message delayed to avoid waiting cursor (see drop_instrument.cpp:245)
-        if (!nx::client::messages::VideoWall::checkLocalFiles(mainWindow(), index, resources, true))
+        if (!messages::VideoWall::checkLocalFiles(mainWindow(), index, resources, true))
             return;
     }
 
@@ -1611,7 +1611,7 @@ bool ActionHandler::validateResourceName(const QnResourcePtr &resource, const QS
         if (checkedFlags == Qn::user)
             QnMessageBox::warning(mainWindow(), tr("There is another user with the same name"));
         else
-            nx::client::messages::VideoWall::anotherVideoWall(mainWindow());
+            messages::VideoWall::anotherVideoWall(mainWindow());
 
         return false;
     }
@@ -1727,7 +1727,7 @@ void ActionHandler::at_removeFromServerAction_triggered()
                 && !resource->hasFlags(Qn::layout);
         });
 
-    if (nx::client::messages::Resources::deleteResources(mainWindow(), resources))
+    if (messages::Resources::deleteResources(mainWindow(), resources))
         qnResourcesChangesManager->deleteResources(resources);
 }
 
