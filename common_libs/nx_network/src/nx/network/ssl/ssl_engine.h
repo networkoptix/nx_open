@@ -28,6 +28,7 @@ public:
     static void useRandomCertificate(const String& module);
 
     static void setAllowedServerVersions(const String& versions);
+    static void setAllowedServerCiphers(const String& versions);
 };
 
 } // namespace network
