@@ -5,6 +5,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <nx/client/ui/workbench/layouts/special_layout.h>
+#include <utils/common/connective.h>
 
 namespace nx {
 namespace client {
@@ -12,9 +13,9 @@ namespace desktop {
 namespace ui {
 namespace workbench {
 
-class SpecialLayoutPanelPrivate: public QObject, public QnWorkbenchContextAware
+class SpecialLayoutPanelPrivate: public Connective<QObject>, public QnWorkbenchContextAware
 {
-    using base_type = QObject;
+    using base_type = Connective<QObject>;
 
     Q_DECLARE_PUBLIC(SpecialLayoutPanel)
     SpecialLayoutPanel* q_ptr = nullptr;
@@ -92,10 +93,14 @@ void SpecialLayoutPanelPrivate::setPanelWidget(const QnWorkbenchLayout::Graphics
 
     m_panelWidget = widget;
 
-    if (m_panelWidget)
-        m_panelWidget->setParentItem(m_parentWidget);
-
     Q_Q(SpecialLayoutPanel);
+    if (m_panelWidget)
+    {
+        m_panelWidget->setParentItem(m_parentWidget);
+        connect(m_panelWidget, &QGraphicsWidget::geometryChanged,
+            q, &NxUi::AbstractWorkbenchPanel::geometryChanged);
+    }
+
     emit q->geometryChanged();
 }
 
@@ -113,6 +118,12 @@ SpecialLayoutPanel::SpecialLayoutPanel(
 
 SpecialLayoutPanel::~SpecialLayoutPanel()
 {
+}
+
+QGraphicsWidget* SpecialLayoutPanel::widget()
+{
+    Q_D(const SpecialLayoutPanel);
+    return d->panelWidget().data();
 }
 
 bool SpecialLayoutPanel::isPinned() const

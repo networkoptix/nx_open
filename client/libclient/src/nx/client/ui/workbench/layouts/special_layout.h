@@ -16,9 +16,16 @@ class SpecialLayout: public QnWorkbenchLayout
 
 public:
     SpecialLayout(const QnLayoutResourcePtr& resource, QObject* parent = nullptr);
+    virtual ~SpecialLayout();
+
+    void setPanelCaption(const QString& caption);
 
 public: // overrides
     virtual QnWorkbenchLayout::GraphicsWidgetPtr createPanelWidget() const override;
+
+private:
+    class SpecialLayoutPrivate;
+    QScopedPointer<SpecialLayoutPrivate> d;
 };
 
 } // namespace workbench

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ui/workbench/panels/abstract_workbench_panel.h>
-#include <utils/common/connective.h>
 
 namespace nx {
 namespace client {
@@ -10,9 +9,9 @@ namespace ui {
 namespace workbench {
 
 class SpecialLayoutPanelPrivate;
-class SpecialLayoutPanel: public Connective<NxUi::AbstractWorkbenchPanel>
+class SpecialLayoutPanel: public NxUi::AbstractWorkbenchPanel
 {
-    using base_type = Connective<NxUi::AbstractWorkbenchPanel>;
+    using base_type = NxUi::AbstractWorkbenchPanel;
 
 public:
     SpecialLayoutPanel(
@@ -21,6 +20,8 @@ public:
         QObject* parent = nullptr);
 
     virtual ~SpecialLayoutPanel();
+
+    QGraphicsWidget* widget();
 
 public: // overrides
     virtual bool isPinned() const override;

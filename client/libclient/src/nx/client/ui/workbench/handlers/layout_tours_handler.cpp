@@ -2,12 +2,16 @@
 
 #include <QtWidgets/QAction>
 
+#include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
 #include <core/resource/layout_resource.h>
 #include <nx/client/ui/workbench/layouts/special_layout.h>
 #include <nx/client/ui/workbench/layouts/layout_factory.h>
 
+
 namespace {
+
+namespace w = nx::client::desktop::ui::workbench;
 
 class LayoutTourResource: public QnLayoutResource
 {
@@ -19,7 +23,7 @@ void registerCreator()
         [](const QnLayoutResourcePtr& resource, QObject* parent) -> QnWorkbenchLayout*
         {
             if (const auto tourResource = resource.dynamicCast<LayoutTourResource>())
-                return new nx::client::desktop::ui::workbench::SpecialLayout(tourResource, parent);
+                return new w::SpecialLayout(tourResource, parent);
 
             return nullptr;
         };
@@ -41,8 +45,20 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
 {
     registerCreator();
 
+    const auto setupToursLayout =
+        [](QnWorkbenchLayout* layout)
+        {
+            const auto special = qobject_cast<w::SpecialLayout*>(layout);
+            if (!special)
+            {
+                NX_ASSERT(false, "Invalid layout type");
+                return;
+            }
+            special->setPanelCaption(tr("Super Tours Layout"));
+        };
+
     connect(action(QnActions::OpenLayoutTourAction), &QAction::triggered, this,
-        [this]()
+        [this, setupToursLayout]()
         {
             const auto tourResource = QnLayoutResourcePtr(new LayoutTourResource());
             const auto layout = qnLayoutFactory->create(tourResource, this);
@@ -53,6 +69,9 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             }
 
             layout->setName(lit("Test Layout Tours"));
+            layout->setIcon(qnSkin->icon("tree/videowall.png"));
+            setupToursLayout(layout);
+
             workbench()->addLayout(layout);
             workbench()->setCurrentLayout(layout);
         });

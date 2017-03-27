@@ -243,6 +243,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
             connect(layout, &QnWorkbenchLayout::flagsChanged,
                 this, &QnWorkbenchUi::updateControlsVisibilityAnimated);
             updateControlsVisibilityAnimated();
+            updateLayoutPanelGeometry();
         });
 }
 
@@ -781,6 +782,7 @@ void QnWorkbenchUi::at_controlsWidget_geometryChanged()
 
     updateTreeGeometry();
     updateNotificationsGeometry();
+    updateLayoutPanelGeometry();
     updateFpsGeometry();
     updateViewportMargins(false);
 }
@@ -913,7 +915,8 @@ void QnWorkbenchUi::createTreeWidget(const QnPaneSettings& settings)
 
     connect(m_tree, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
         &QnWorkbenchUi::updateViewportMarginsAnimated);
-
+    connect(m_tree, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
+        &QnWorkbenchUi::updateLayoutPanelGeometry);
 }
 
 #pragma endregion Tree widget methods
@@ -973,6 +976,7 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
         {
             updateTreeGeometry();
             updateNotificationsGeometry();
+            updateLayoutPanelGeometry();
             updateFpsGeometry();
             updateViewportMargins(animated);
         });
@@ -982,6 +986,7 @@ void QnWorkbenchUi::createTitleWidget(const QnPaneSettings& settings)
         {
             updateTreeGeometry();
             updateNotificationsGeometry();
+            updateLayoutPanelGeometry();
             updateFpsGeometry();
             updateViewportMargins();
         });
@@ -1041,6 +1046,28 @@ QRectF QnWorkbenchUi::updatedNotificationsGeometry(const QRectF &notificationsGe
 
     QSizeF size(notificationsGeometry.width(), maxHeight);
     return QRectF(pos, size);
+}
+
+void QnWorkbenchUi::updateLayoutPanelGeometry()
+{
+    if (!m_layoutPanel || !m_layoutPanel->widget())
+        return;
+
+    const auto titleGeometry = m_title && m_title->isVisible()
+        ? m_title->item->geometry()
+        : QRectF();
+
+    const auto notificationsLeft = m_notifications && m_notifications->isVisible()
+        ? m_notifications->item->geometry().left()
+        : m_controlsWidgetRect.left();
+
+    const auto treeRight = m_tree && m_tree->isVisible()
+        ? m_tree->item->geometry().right()
+        : 0;
+
+    const auto topLeft = QPointF(treeRight, titleGeometry.bottom());
+    const auto size = QSizeF(notificationsLeft - treeRight, 0); // TODO #ynikitenkov: add height handling
+    m_layoutPanel->widget()->setGeometry(QRectF(topLeft, size));
 }
 
 void QnWorkbenchUi::updateNotificationsGeometry()
@@ -1126,6 +1153,8 @@ void QnWorkbenchUi::createNotificationsWidget(const QnPaneSettings& settings)
         &QnWorkbenchUi::updateViewportMarginsAnimated);
     connect(m_notifications, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
         &QnWorkbenchUi::updateFpsGeometry);
+    connect(m_notifications, &NxUi::AbstractWorkbenchPanel::geometryChanged, this,
+        &QnWorkbenchUi::updateLayoutPanelGeometry);
 }
 
 #pragma endregion Notifications widget methods
