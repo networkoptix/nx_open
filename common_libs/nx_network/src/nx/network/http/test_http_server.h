@@ -86,7 +86,6 @@ public:
             });
     }
 
-    bool registerRequestProcessor(const QString& path, ProcessHttpRequestFunc func);
 
     bool registerStaticProcessor(
         const QString& path,
