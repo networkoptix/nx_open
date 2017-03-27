@@ -25,6 +25,9 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
 
     connect(action(QnActions::NewWebPageAction), &QAction::triggered,
         this, &QnWorkbenchWebPageHandler::at_newWebPageAction_triggered);
+
+    connect(action(QnActions::EditResourceAction), &QAction::triggered,
+        this, &QnWorkbenchWebPageHandler::at_editWebPageAction_triggered);
 }
 
 QnWorkbenchWebPageHandler::~QnWorkbenchWebPageHandler()
@@ -35,23 +38,41 @@ void QnWorkbenchWebPageHandler::at_newWebPageAction_triggered()
 {
     QScopedPointer<QnWebpageDialog> dialog(new QnWebpageDialog(mainWindow()));
     dialog->setWindowTitle(tr("New Web Page"));
-    dialog->setWindowModality(Qt::ApplicationModal);
+    if (!dialog->exec())
+        return;
 
-    while (true)
-    {
-         if (!dialog->exec())
-             return;
+    const auto url = QUrl::fromUserInput(dialog->url());
 
-        QUrl url = QUrl::fromUserInput(dialog->url());
+    QnWebPageResourcePtr webPage(new QnWebPageResource(url));
+    if (!dialog->name().isEmpty())
+        webPage->setName(dialog->name());
 
-        QnWebPageResourcePtr webPage(new QnWebPageResource(url));
-        if (qnResPool->getResourceById(webPage->getId()))
+    qnResourcesChangesManager->saveWebPage(webPage, [](const QnWebPageResourcePtr& /*webPage*/) {});
+}
+
+void QnWorkbenchWebPageHandler::at_editWebPageAction_triggered()
+{
+    auto parameters = menu()->currentParameters(sender());
+
+    auto webPage = parameters.resource().dynamicCast<QnWebPageResource>();
+    if (!webPage)
+        return;
+
+    QScopedPointer<QnWebpageDialog> dialog(new QnWebpageDialog(mainWindow()));
+    dialog->setWindowTitle(tr("Edit Web Page"));
+    dialog->setName(webPage->getName());
+    dialog->setUrl(webPage->getUrl());
+    if (!dialog->exec())
+        return;
+
+    const auto url = QUrl::fromUserInput(dialog->url());
+
+    qnResourcesChangesManager->saveWebPage(webPage,
+        [url, name = dialog->name()](const QnWebPageResourcePtr& webPage)
         {
-            QnMessageBox::warning(mainWindow(), tr("This Web Page already exists"));
-            continue;
-        }
-
-        qnResourcesChangesManager->saveWebPage(webPage, [](const QnWebPageResourcePtr& /*webPage*/) {});
-        break;
-    };
+            webPage->setUrl(url.toString());
+            webPage->setName(name.isEmpty()
+                ? QnWebPageResource::nameForUrl(url)
+                : name);
+        });
 }

@@ -780,7 +780,7 @@ enum IDType
     /**
      * Activates preset by index
      */
-    PtzActivatePresetByIndexAction, 
+    PtzActivatePresetByIndexAction,
 
     /* Layout actions. */
 
@@ -1110,7 +1110,7 @@ enum IDType
 
     /** Hide cloud promo */
     HideCloudPromoAction,
-	
+
     /**
      * Go to the next item on layout.
      */
@@ -1125,7 +1125,11 @@ enum IDType
      * Maximizes/Unmaximizes current item
      **/
     ToggleCurrentItemMaximizationStateAction,
-	
+
+    /**
+    * Invokes an editor for editable resource (currently - only Web Page).
+    */
+    EditResourceAction,
 
     ActionCount,
 

@@ -346,6 +346,15 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
+/**
+* Condition for web page action.
+*/
+class QnWebPageActionCondition: public QnActionCondition
+{
+public:
+    using QnActionCondition::QnActionCondition;
+    virtual Qn::ActionVisibility check(const QnActionParameters& parameters) override;
+};
 
 /**
  * Condition for removal of a layout item.
