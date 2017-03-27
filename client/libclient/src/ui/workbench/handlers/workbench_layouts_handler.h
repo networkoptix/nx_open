@@ -7,6 +7,12 @@
 
 #include <ui/workbench/workbench_state_manager.h>
 
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace workbench {
+
 class QnWorkbenchLayoutsHandler: public QObject, public QnSessionAwareDelegate
 {
     Q_OBJECT
@@ -80,3 +86,9 @@ private:
     bool closeLayouts(const QnLayoutResourceList& resources, bool force = false);
     bool closeLayouts(const QnWorkbenchLayoutList& layouts, bool force = false);
 };
+
+} // namespace workbench
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

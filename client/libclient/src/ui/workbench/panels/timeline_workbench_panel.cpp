@@ -59,7 +59,7 @@ static const int kShowWidgetHiddenHeight = 12;
 
 namespace NxUi {
 
-using namespace nx::client::ui::workbench;
+using namespace nx::client::desktop::ui::workbench;
 
 TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     const QnPaneSettings& settings,

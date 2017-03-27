@@ -50,6 +50,12 @@ class QnAdjustVideoDialog;
 class QnSystemAdministrationDialog;
 class QnGraphicsMessageBox;
 
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace workbench {
+
 // TODO: #Elric split this class into several handlers, group actions by handler. E.g. screen recording should definitely be spun off.
 /**
 * This class implements logic for client actions.
@@ -267,3 +273,9 @@ private:
 
     std::multimap<QUrl, ServerRequest> m_serverRequests;
 };
+
+} // namespace workbench
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

@@ -57,6 +57,12 @@
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
 
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace workbench {
+
 namespace {
 QString generateUniqueLayoutName(const QnUserResourcePtr &user, const QString &defaultName, const QString &nameTemplate)
 {
@@ -68,7 +74,7 @@ QString generateUniqueLayoutName(const QnUserResourcePtr &user, const QString &d
             usedNames.push_back(layout->getName());
     }
 
-    return nx::utils::generateUniqueString(usedNames, defaultName, nameTemplate);
+    return utils::generateUniqueString(usedNames, defaultName, nameTemplate);
 }
 
 /**
@@ -107,8 +113,7 @@ QnResourceList calculateResourcesToShare(const QnResourceList& resources,
     return resources.filtered(sharingRequired);
 }
 
-} // unnamed namespace
-
+} // namespace
 
 QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent):
     QObject(parent),
@@ -165,13 +170,13 @@ void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, 
     QnLayoutResourceList existing = alreadyExistingLayouts(newName, layout->getParentId(), layout);
     if (!canRemoveLayouts(existing))
     {
-        nx::client::messages::Resources::layoutAlreadyExists(mainWindow());
+        messages::Resources::layoutAlreadyExists(mainWindow());
         return;
     }
 
     if (!existing.isEmpty())
     {
-        if (!nx::client::messages::Resources::overrideLayout(mainWindow()))
+        if (!messages::Resources::overrideLayout(mainWindow()))
             return;
         removeLayouts(existing);
     }
@@ -290,7 +295,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
                     return;
                 }
 
-                if (!nx::client::messages::Resources::overrideLayout(mainWindow()))
+                if (!messages::Resources::overrideLayout(mainWindow()))
                     return;
 
                 saveLayout(layout);
@@ -301,14 +306,14 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
             QnLayoutResourceList existing = alreadyExistingLayouts(name, user->getId(), excludingSelfLayout);
             if (!canRemoveLayouts(existing))
             {
-                nx::client::messages::Resources::layoutAlreadyExists(mainWindow());
+                messages::Resources::layoutAlreadyExists(mainWindow());
                 dialog->setName(proposedName);
                 continue;
             }
 
             if (!existing.isEmpty())
             {
-                if (!nx::client::messages::Resources::overrideLayout(mainWindow()))
+                if (!messages::Resources::overrideLayout(mainWindow()))
                     return;
 
                 removeLayouts(existing);
@@ -322,13 +327,13 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
         QnLayoutResourceList existing = alreadyExistingLayouts(name, user->getId(), layout);
         if (!canRemoveLayouts(existing))
         {
-            nx::client::messages::Resources::layoutAlreadyExists(mainWindow());
+            messages::Resources::layoutAlreadyExists(mainWindow());
             return;
         }
 
         if (!existing.isEmpty())
         {
-            if (!nx::client::messages::Resources::overrideLayout(mainWindow()))
+            if (!messages::Resources::overrideLayout(mainWindow()))
                 return;
             removeLayouts(existing);
         }
@@ -391,7 +396,7 @@ void QnWorkbenchLayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& i
 {
     if (items.size() > 1)
     {
-        const bool confirm = nx::client::messages::Resources::removeItemsFromLayout(mainWindow(),
+        const bool confirm = messages::Resources::removeItemsFromLayout(mainWindow(),
             QnActionParameterTypes::resources(items));
 
         if (!confirm)
@@ -533,7 +538,7 @@ bool QnWorkbenchLayoutsHandler::confirmChangeSharedLayout(const LayoutChange& ch
     if (!accessibleToCustomUsers)
         return true;
 
-    return nx::client::messages::Resources::sharedLayoutEdit(mainWindow());
+    return messages::Resources::sharedLayoutEdit(mainWindow());
 }
 
 bool QnWorkbenchLayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layouts)
@@ -555,7 +560,7 @@ bool QnWorkbenchLayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourc
     if (!accessibleToCustomUsers)
         return true;
 
-    return nx::client::messages::Resources::deleteSharedLayouts(mainWindow(), layouts);
+    return messages::Resources::deleteSharedLayouts(mainWindow(), layouts);
 }
 
 bool QnWorkbenchLayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr& user,
@@ -569,12 +574,12 @@ bool QnWorkbenchLayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr
     switch (user->userRole())
     {
         case Qn::UserRole::CustomPermissions:
-            return nx::client::messages::Resources::changeUserLocalLayout(mainWindow(), change.removed);
+            return messages::Resources::changeUserLocalLayout(mainWindow(), change.removed);
         case Qn::UserRole::CustomUserRole:
-            return nx::client::messages::Resources::addToRoleLocalLayout(
+            return messages::Resources::addToRoleLocalLayout(
                     mainWindow(),
                     calculateResourcesToShare(change.added, user))
-                && nx::client::messages::Resources::removeFromRoleLocalLayout(
+                && messages::Resources::removeFromRoleLocalLayout(
                     mainWindow(),
                     change.removed);
         default:
@@ -614,7 +619,7 @@ bool QnWorkbenchLayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePt
             stillAccessible << resource;
     }
 
-    return nx::client::messages::Resources::deleteLocalLayouts(mainWindow(), stillAccessible);
+    return messages::Resources::deleteLocalLayouts(mainWindow(), stillAccessible);
 }
 
 bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& subject,
@@ -654,7 +659,7 @@ bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnResourceAccess
             resourcesBecomeUnaccessible << resource;
     }
 
-    return nx::client::messages::Resources::stopSharingLayouts(mainWindow(),
+    return messages::Resources::stopSharingLayouts(mainWindow(),
         resourcesBecomeUnaccessible, subject);
 }
 
@@ -802,7 +807,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
     QnLayoutResourceList existing = alreadyExistingLayouts(dialog->name(), user->getId());
     if (!canRemoveLayouts(existing))
     {
-        nx::client::messages::Resources::layoutAlreadyExists(mainWindow());
+        messages::Resources::layoutAlreadyExists(mainWindow());
         return;
     }
 
@@ -814,7 +819,7 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
                 return layout->hasFlags(Qn::local);
             });
 
-        if (!allAreLocal && !nx::client::messages::Resources::overrideLayout(mainWindow()))
+        if (!allAreLocal && !messages::Resources::overrideLayout(mainWindow()))
             return;
 
         removeLayouts(existing);
@@ -1019,3 +1024,9 @@ void QnWorkbenchLayoutsHandler::forcedUpdate()
 {
     //do nothing
 }
+
+} // namespace workbench
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

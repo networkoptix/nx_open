@@ -138,7 +138,7 @@ bool NotificationsWorkbenchPanel::isOpened() const
 
 void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
 {
-    using namespace nx::client::ui::workbench;
+    using namespace nx::client::desktop::ui::workbench;
 
     ensureAnimationAllowed(&animate);
 

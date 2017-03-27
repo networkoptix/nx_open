@@ -8,8 +8,6 @@
 
 #include <QtGui/QFileOpenEvent>
 
-#include <QtNetwork/QNetworkReply>
-
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
@@ -103,6 +101,11 @@
 #include "layout_tab_bar.h"
 #include "dwm.h"
 
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+
 namespace
 {
     void processWidgetsRecursively(QLayout *layout, std::function<void(QWidget*)> func)
@@ -172,7 +175,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     setWindowTitle(QString());
 
     /* Initialize animations manager. */
-    context->instance<nx::client::ui::workbench::Animations>();
+    context->instance<workbench::Animations>();
 
     if (!qnRuntime->isVideoWallMode()) {
         bool smallWindow = qnSettings->lightMode() & Qn::LightModeSmallWindow;
@@ -225,12 +228,12 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchStateManager>();
 
     /* Set up handlers. */
-    context->instance<QnWorkbenchActionHandler>();
+    context->instance<workbench::QnWorkbenchActionHandler>();
     context->instance<QnWorkbenchConnectHandler>();
     context->instance<QnWorkbenchNotificationsHandler>();
     context->instance<QnWorkbenchScreenshotHandler>();
     context->instance<QnWorkbenchExportHandler>();
-    context->instance<QnWorkbenchLayoutsHandler>();
+    context->instance<workbench::QnWorkbenchLayoutsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<QnWorkbenchDebugHandler>();
     context->instance<QnWorkbenchVideoWallHandler>();
@@ -240,7 +243,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchBookmarksHandler>();
     context->instance<QnWorkbenchAlarmLayoutHandler>();
     context->instance<QnWorkbenchCloudHandler>();
-    context->instance<nx::client::ui::workbench::handlers::LayoutToursHandler>();
+    context->instance<workbench::LayoutToursHandler>();
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
@@ -794,3 +797,8 @@ void QnMainWindow::at_fileOpenSignalizer_activated(QObject *, QEvent *event) {
 
     handleMessage(static_cast<QFileOpenEvent *>(event)->file());
 }
+
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

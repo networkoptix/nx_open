@@ -32,9 +32,9 @@ void registerCreator()
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace workbench {
-namespace handlers {
 
 LayoutToursHandler::LayoutToursHandler(QObject* parent):
     base_type(parent),
@@ -55,8 +55,8 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
         });
 }
 
-} // namespace handlers
 } // namespace workbench
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx

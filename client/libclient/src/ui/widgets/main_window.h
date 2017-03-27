@@ -1,5 +1,4 @@
-#ifndef QN_MAIN_WINDOW_H
-#define QN_MAIN_WINDOW_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QMainWindow>
@@ -29,6 +28,11 @@ class QnWorkbenchSynchronizer;
 class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
 class QnMainWindowTitleBarWidget;
+
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
 
 class QnMainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware {
     Q_OBJECT;
@@ -124,4 +128,7 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnMainWindow::Options);
 
-#endif // QN_MAIN_WINDOW_H
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx
