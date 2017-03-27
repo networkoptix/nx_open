@@ -11,24 +11,24 @@
 
 namespace {
 
-namespace w = nx::client::desktop::ui::workbench;
+namespace workbench_alias = nx::client::desktop::ui::workbench;
 
 class LayoutTourResource: public QnLayoutResource
 {
 };
 
-void registerCreator()
+void registerCreator(workbench_alias::LayoutsFactory* factory)
 {
     const auto tourLayoutCreator =
         [](const QnLayoutResourcePtr& resource, QObject* parent) -> QnWorkbenchLayout*
         {
             if (const auto tourResource = resource.dynamicCast<LayoutTourResource>())
-                return new w::SpecialLayout(tourResource, parent);
+                return new workbench_alias::SpecialLayout(tourResource, parent);
 
             return nullptr;
         };
 
-    qnLayoutFactory->addCreator(tourLayoutCreator);
+    factory->addCreator(tourLayoutCreator);
 }
 
 } // namespace
@@ -43,12 +43,12 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
     base_type(parent),
     QObject(parent)
 {
-    registerCreator();
+    registerCreator(qnWorkbenchLayoutsFactory);
 
     const auto setupToursLayout =
         [](QnWorkbenchLayout* layout)
         {
-            const auto special = qobject_cast<w::SpecialLayout*>(layout);
+            const auto special = qobject_cast<workbench_alias::SpecialLayout*>(layout);
             if (!special)
             {
                 NX_ASSERT(false, "Invalid layout type");
@@ -61,7 +61,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
         [this, setupToursLayout]()
         {
             const auto tourResource = QnLayoutResourcePtr(new LayoutTourResource());
-            const auto layout = qnLayoutFactory->create(tourResource, this);
+            const auto layout = qnWorkbenchLayoutsFactory->create(tourResource, this);
             if (!layout)
             {
                 NX_ASSERT(false, "Can't create layout tours");

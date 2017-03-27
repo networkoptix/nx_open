@@ -1782,7 +1782,7 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered()
         layout = QnWorkbenchLayout::instance(layoutResource);
         if (!layout)
         {
-            layout = qnLayoutFactory->create(layoutResource, workbench());
+            layout = qnWorkbenchLayoutsFactory->create(layoutResource, workbench());
             workbench()->addLayout(layout);
         }
         layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(item.uuid));
@@ -2899,7 +2899,7 @@ void QnWorkbenchVideoWallHandler::updateControlLayout(const QnVideoWallResourceP
 
             QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(layoutResource);
             if (!layout)
-                layout = qnLayoutFactory->create(layoutResource, workbench());
+                layout = qnWorkbenchLayoutsFactory->create(layoutResource, workbench());
 
             if (workbench()->layoutIndex(layout) < 0)
                 workbench()->insertLayout(layout, layoutIndex);

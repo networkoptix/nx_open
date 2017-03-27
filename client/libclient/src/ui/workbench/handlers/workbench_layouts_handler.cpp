@@ -369,7 +369,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
     {
         int index = workbench()->currentLayoutIndex();
 
-        workbench()->insertLayout(qnLayoutFactory->create(newLayout, this), index);
+        workbench()->insertLayout(qnWorkbenchLayoutsFactory->create(newLayout, this), index);
         workbench()->setCurrentLayoutIndex(index);
         workbench()->removeLayout(index + 1);
 
@@ -1065,7 +1065,7 @@ void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
 
 void QnWorkbenchLayoutsHandler::at_openNewTabAction_triggered()
 {
-    QnWorkbenchLayout *layout = qnLayoutFactory->create(this);
+    QnWorkbenchLayout *layout = qnWorkbenchLayoutsFactory->create(this);
 
     layout->setName(generateUniqueLayoutName(context()->user(), tr("New Layout"), tr("New Layout %1")));
 

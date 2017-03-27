@@ -390,7 +390,7 @@ void QnLayoutTabBar::tabInserted(int index)
         QString name;
         if (m_layouts.size() != count())
         { /* Not inserted yet, allocate new one. It will be deleted with this tab bar. */
-            QnWorkbenchLayout *layout = qnLayoutFactory->create(this);
+            QnWorkbenchLayout *layout = qnWorkbenchLayoutsFactory->create(this);
             m_layouts.insert(index, layout);
             name = tabText(index);
         }
