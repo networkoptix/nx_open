@@ -58,20 +58,12 @@ public:
             [threadStorage = m_threadStorage](nx_http::HttpServerConnection* connection)
             {
                 threadStorage->add(nx::utils::thread(
-                    [sock = connection->takeSocket()]()
+                    [sock = connection->takeSocket()]() mutable
                     {
-                        int result = 0;
-                        sock->setNonBlockingMode(false);
-
-                        std::this_thread::sleep_for(std::chrono::seconds(1));
-                        result = sock->send(kPlayMessage);
-                        
-                        ASSERT_GT(result, 0);
-                        std::this_thread::sleep_for(std::chrono::seconds(1));
-                        result = sock->send(kTeardownMessage);
-
-                        ASSERT_GT(result, 0);
-                        std::this_thread::sleep_for(std::chrono::seconds(1));   
+                        ASSERT_TRUE(sock->setNonBlockingMode(false));
+                        ASSERT_GT(sock->send(kPlayMessage), 0);
+                        ASSERT_GT(sock->send(kTeardownMessage), 0);
+                        sock.reset();
                     }));
             };
 
@@ -114,7 +106,7 @@ protected:
         const std::size_t kTerminatorLength = 2;
         m_buffer.append(buffer, bufferLength);
 
-        while (true)
+        for (;;)
         {
             auto messageTerminatorPosition = m_buffer.indexOf(lit("\r\n"));
 
@@ -147,30 +139,17 @@ protected:
 
     void launchTest(const QString& scheme)
     {
-        const auto kRestHandlerPath = lit("/test");
-        const std::size_t kReadBufferSize = 65536;
-        char readBuffer[kReadBufferSize];
-
-        const int kTimeoutMs(1000);
-        const int kMessageReadTimeoutMs(5000);
+        const auto kRestHandlerPath = lit("/TakingHttpSocketTest");
         const int kAwaitedMessageNumber = 3;
-
-        std::unique_ptr<nx_http::HttpClient> httpClient;
-        std::unique_ptr<AbstractStreamSocket> tcpSocket;
-
         const int kPlayMessageNumber = 1;
         const int kTeardownMessageNumber = 2;
 
-        bool gotPlayMessage = false;
-        bool gotTeardownMessage = false;
-
-        std::unique_ptr<TestHttpServer> httpServer;
-
-        for (int i = 0; i < 3; ++i)
+        for (int i = 0; i < 20; ++i)
         {
-            httpServer = testHttpServer();
+            auto httpServer = testHttpServer();
             ASSERT_TRUE(httpServer->registerRequestProcessor<TakingSocketRestHandler>(
-                kRestHandlerPath, [this]()
+                kRestHandlerPath,
+                [this]()
                 {
                     return std::make_unique<TakingSocketRestHandler>(&m_threadStorage);
                 })) << "Failed to register request processor";
@@ -178,26 +157,16 @@ protected:
             ASSERT_TRUE(httpServer->bindAndListen())
                 << "Failed to start test http server";
 
-            {
-                std::unique_ptr<nx_http::HttpClient> localHttpClient =
-                    std::make_unique<nx_http::HttpClient>();
-
-                tcpSocket.reset();
-                std::swap(httpClient, localHttpClient);
-            }
-
-            httpClient->setSendTimeoutMs(kTimeoutMs);
-            httpClient->setResponseReadTimeoutMs(kTimeoutMs);
-            httpClient->setMessageBodyReadTimeoutMs(kTimeoutMs);
+            auto httpClient = std::make_unique<nx_http::HttpClient>();
 
             const QUrl url(lit("%1://%2%3")
                 .arg(scheme)
                 .arg(httpServer->serverAddress().toString())
                 .arg(kRestHandlerPath));
 
-            ASSERT_TRUE(httpClient->doGet(url))
-                << "Failed to perform GET request "<<i;
+            ASSERT_TRUE(httpClient->doGet(url)) << "Failed to perform GET request "<<i;
 
+            std::unique_ptr<AbstractStreamSocket> tcpSocket;
             {
                 std::unique_ptr<nx_http::HttpClient> localHttpClient;
                 tcpSocket = takeSocketFromHttpClient(httpClient);
@@ -207,17 +176,17 @@ protected:
             ASSERT_TRUE(tcpSocket->isConnected())
                 << "Socket taken from HTTP client is not connected";
 
-            QElapsedTimer timer;
-            timer.start();
-
             int bytesRead = 0;
             int messageNumber = 1;
 
-            gotPlayMessage = false;
-            gotTeardownMessage = false;
+            bool gotPlayMessage = false;
+            bool gotTeardownMessage = false;
 
-            while (tcpSocket->isConnected() && timer.elapsed() < kMessageReadTimeoutMs)
+            while (tcpSocket->isConnected())
             {
+                const std::size_t kReadBufferSize = 65536;
+                char readBuffer[kReadBufferSize];
+
                 bytesRead = tcpSocket->recv(readBuffer, kReadBufferSize);
                 if (bytesRead > 0)
                     parse(readBuffer, bytesRead);
@@ -259,8 +228,6 @@ protected:
             ASSERT_TRUE(gotTeardownMessage)
                 << "Have not got '" << kTeardownMessage.data() << "' message";;
 
-            decltype(httpClient) localHttpClient;
-            std::swap(httpClient, localHttpClient);
             httpServer.reset();
             tcpSocket.reset();
         }
