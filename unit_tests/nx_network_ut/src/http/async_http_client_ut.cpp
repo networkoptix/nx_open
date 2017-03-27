@@ -508,7 +508,7 @@ TEST_F(AsyncHttpClient, ConnectionBreakAfterReceivingSecondRequest)
 // AsyncHttpClientCorrectUrlTransferring
 
 class AsyncHttpClientCorrectUrlTransferring:
-    public AsyncHttpClientTest
+    public AsyncHttpClient
 {
 public:
     AsyncHttpClientCorrectUrlTransferring()
@@ -553,7 +553,7 @@ private:
         using namespace std::placeholders;
 
         ASSERT_TRUE(
-            testHttpServer()->registerRequestProcessor(
+            testHttpServer()->registerRequestProcessorFunc(
                 testPath(),
                 std::bind(&AsyncHttpClientCorrectUrlTransferring::onRequestReceived, this,
                     _1, _2, _3, _4, _5)));
