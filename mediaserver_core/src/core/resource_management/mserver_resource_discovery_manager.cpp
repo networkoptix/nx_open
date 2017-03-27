@@ -249,11 +249,12 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QStringList conflicts;
             for(const QnNetworkResourcePtr& camRes: itr.value())
             {
-                QString mac = camRes->getMAC().toString();
-                if (mac.isEmpty())
-                    mac = camRes->getId().toString();
+                // Human-readable value to help user identify a camera.
+                QString cameraId = camRes->getMAC().toString();
+                if (cameraId.isEmpty())
+                    cameraId = camRes->getId().toString();
 
-                conflicts << mac;
+                conflicts << cameraId;
                 if (auto camera = camRes.dynamicCast<QnVirtualCameraResource>())
                     camera->issueOccured();
             }
