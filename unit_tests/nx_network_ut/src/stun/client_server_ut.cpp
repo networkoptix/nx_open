@@ -169,8 +169,9 @@ TEST_F(StunClientServerTest, Connectivity)
     ASSERT_EQ(1U, server->connectionCount());
 
     ASSERT_TRUE(client->addConnectionTimer(timerPeriod, incrementTimer, nullptr));
-    std::this_thread::sleep_for(timerPeriod * 5);
-    ASSERT_GT(timerTicks, 3U); //< Expect at least 3 timer ticks in 5 periods.
+    // Checking that timer ticks certain times per some period is not reliable.
+    while (timerTicks < 3)
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     server.reset();
     ASSERT_NE(sendTestRequestSync(), SystemError::noError);
@@ -190,10 +191,9 @@ TEST_F(StunClientServerTest, Connectivity)
 
     ASSERT_TRUE(client->addConnectionTimer(timerPeriod, incrementTimer, nullptr)) <<
         "Server connection count " << server->connectionCount();
-    std::this_thread::sleep_for(timerPeriod * 5);
-    // Expect at least 3 timer ticks in 5 periods.
-    ASSERT_GT(timerTicks, 3U) <<
-        "Server connection count " << server->connectionCount();
+    // Checking that timer ticks certain times per some period is not reliable.
+    while (timerTicks < 3)
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 }
 
 TEST_F(StunClientServerTest, RequestResponse)
