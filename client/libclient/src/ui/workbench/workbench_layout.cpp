@@ -90,11 +90,6 @@ void QnWorkbenchLayout::setFlags(QnLayoutFlags value)
     emit flagsChanged();
 }
 
-QnWorkbenchLayout::GraphicsWidgetPtr QnWorkbenchLayout::createPanelWidget() const
-{
-    return GraphicsWidgetPtr();
-}
-
 QnLayoutResourcePtr QnWorkbenchLayout::resource() const {
     QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(const_cast<QnWorkbenchLayout *>(this));
     if(synchronizer == NULL)

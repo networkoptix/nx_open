@@ -1,44 +1,6 @@
 #include "special_layout.h"
 
-#include <QtWidgets/QGraphicsProxyWidget>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QLabel>
-
-namespace {
-
-class SpecialLayoutPanelWidget: public QGraphicsProxyWidget
-{
-    using base_type = QGraphicsProxyWidget;
-
-public:
-    SpecialLayoutPanelWidget();
-
-    void setCaption(const QString& caption);
-
-private:
-    QLabel* m_captionLabel;
-};
-
-SpecialLayoutPanelWidget::SpecialLayoutPanelWidget():
-    base_type(),
-    m_captionLabel(new QLabel())
-{
-    const auto body = new QWidget();
-
-    const auto layout = new QHBoxLayout(body);
-    layout->setContentsMargins(10, 10, 10, 10);
-
-    layout->addWidget(m_captionLabel);
-
-    setWidget(body);
-}
-
-void SpecialLayoutPanelWidget::setCaption(const QString& caption)
-{
-    m_captionLabel->setText(caption);
-}
-
-} // namespace
+#include <nx/client/ui/workbench/panels/special_layout_panel_widget.h>
 
 namespace nx {
 namespace client {
@@ -46,45 +8,9 @@ namespace desktop {
 namespace ui {
 namespace workbench {
 
-class SpecialLayout::SpecialLayoutPrivate
-{
-public:
-    void updateCurrentPanelWidget(SpecialLayoutPanelWidget* widget);
-
-    void setCaption(const QString& caption);
-
-private:
-    QPointer<SpecialLayoutPanelWidget> m_widget;
-    QString m_caption;
-};
-
-void SpecialLayout::SpecialLayoutPrivate::updateCurrentPanelWidget(SpecialLayoutPanelWidget* widget)
-{
-    if (m_widget == widget)
-        return;
-
-    m_widget = widget;
-    if (!m_widget)
-        return;
-
-    m_widget->setCaption(m_caption);
-}
-
-void SpecialLayout::SpecialLayoutPrivate::setCaption(const QString& caption)
-{
-    if (m_caption == caption)
-        return;
-
-    m_caption = caption;
-    if (m_widget)
-        m_widget->setCaption(caption);
-}
-
-//-------------------------------------------------------------------------------------------------
-
 SpecialLayout::SpecialLayout(const QnLayoutResourcePtr& resource, QObject* parent):
     base_type(resource, parent),
-    d(new SpecialLayoutPrivate())
+    m_panelWidget(new SpecialLayoutPanelWidget())
 {
     setFlags(flags() | QnLayoutFlag::SpecialBackground);
 }
@@ -93,18 +19,25 @@ SpecialLayout::~SpecialLayout()
 {
 }
 
-QnWorkbenchLayout::GraphicsWidgetPtr SpecialLayout::createPanelWidget() const
+void SpecialLayout::setPanelWidget(QGraphicsWidget* widget)
 {
-    const auto widget = new SpecialLayoutPanelWidget();
-    d->updateCurrentPanelWidget(widget);
-    return QnWorkbenchLayout::GraphicsWidgetPtr(widget);
+    if (m_panelWidget == widget)
+        return;
+
+    if (m_panelWidget)
+        delete m_panelWidget;
+
+    m_panelWidget = widget;
+    if (m_panelWidget)
+        m_panelWidget->setParent(this);
+
+    emit panelWidgetChanged();
 }
 
-void SpecialLayout::setPanelCaption(const QString& caption)
+QGraphicsWidget* SpecialLayout::panelWidget() const
 {
-    d->setCaption(caption);
+    return m_panelWidget;
 }
-
 
 } // namespace workbench
 } // namespace ui

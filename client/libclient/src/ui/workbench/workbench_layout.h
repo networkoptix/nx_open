@@ -16,7 +16,6 @@
 
 #include <client/client_globals.h>
 
-class QGraphicsWidget;
 class QnWorkbenchItem;
 
 // TODO: #Elric review doxydocs
@@ -88,9 +87,6 @@ public:
 
     QnLayoutFlags flags() const;
     void setFlags(QnLayoutFlags value);
-
-    using GraphicsWidgetPtr = QSharedPointer<QGraphicsWidget>;
-    virtual GraphicsWidgetPtr createPanelWidget() const;
 
     /**
      * \returns                         Name of this layout.

@@ -3,12 +3,18 @@
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_layout.h>
 
+class QGraphicsWidget;
+
 namespace nx {
 namespace client {
 namespace desktop {
 namespace ui {
 namespace workbench {
 
+/**
+ * @brief SpecialLayout class. Represents layout with autofilled background and top-anchored
+ * workbench panel. Uses SpecialLayoutPanelWidget as default implementation for panel.
+ */
 class SpecialLayout: public QnWorkbenchLayout
 {
     Q_OBJECT
@@ -18,14 +24,14 @@ public:
     SpecialLayout(const QnLayoutResourcePtr& resource, QObject* parent = nullptr);
     virtual ~SpecialLayout();
 
-    void setPanelCaption(const QString& caption);
+    void setPanelWidget(QGraphicsWidget* widget); //< Takes ownership under widget
+    QGraphicsWidget* panelWidget() const;
 
-public: // overrides
-    virtual QnWorkbenchLayout::GraphicsWidgetPtr createPanelWidget() const override;
+signals:
+    void panelWidgetChanged();
 
 private:
-    class SpecialLayoutPrivate;
-    QScopedPointer<SpecialLayoutPrivate> d;
+    QPointer<QGraphicsWidget> m_panelWidget;
 };
 
 } // namespace workbench
