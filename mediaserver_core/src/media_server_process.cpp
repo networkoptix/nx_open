@@ -527,7 +527,7 @@ static QStringList listRecordFolders()
 #ifdef Q_OS_LINUX
     QList<QnPlatformMonitor::PartitionSpace> partitions =
         qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
-            QnPlatformMonitor::LocalDiskPartition);
+            QnPlatformMonitor::LocalDiskPartition | QnPlatformMonitor::NetworkPartition);
 
     //always adding storage in data dir
     const QString& dataDirStorage = QDir::cleanPath(getDataDirectory() + "/data");
