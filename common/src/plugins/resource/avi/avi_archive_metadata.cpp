@@ -1,7 +1,6 @@
 #include "avi_archive_metadata.h"
 
-extern "C"
-{
+extern "C" {
 #include <libavformat/avformat.h>
 }
 
@@ -23,9 +22,9 @@ enum Tag
     CustomTag /**< Tag for all other future values encoded in JSON object. */
 };
 
-/*
-* Some containers supports only predefined tag names.
-*/
+/**
+ * Some containers supports only predefined tag names.
+ */
 const char* getTagName(Tag tag, QnAviArchiveMetadata::Format format)
 {
     switch (format)
@@ -34,12 +33,12 @@ const char* getTagName(Tag tag, QnAviArchiveMetadata::Format format)
         case QnAviArchiveMetadata::Format::avi:
             switch (tag)
             {
-                case StartTimeTag:  return "date"; // "ICRD";
-                case LayoutInfoTag: return "comment"; // "ICMT";
-                case SoftwareTag:   return "encoded_by"; // "ITCH";
-                case SignatureTag:  return "copyright"; // "ICOP";
+                case StartTimeTag:  return "date"; //< "ICRD"
+                case LayoutInfoTag: return "comment"; //< "ICMT"
+                case SoftwareTag:   return "encoded_by"; //< "ITCH"
+                case SignatureTag:  return "copyright"; //< "ICOP"
                 case DewarpingTag:  return "title";
-                case CustomTag:     return "IENG"; //IENG
+                case CustomTag:     return "IENG"; //< IENG
             }
             break;
 
@@ -56,7 +55,7 @@ const char* getTagName(Tag tag, QnAviArchiveMetadata::Format format)
             }
             break;
 
-        case QnAviArchiveMetadata::Format::mkv:
+        case QnAviArchiveMetadata::Format::custom:
             switch (tag)
             {
                 case StartTimeTag:  return "start_time";
@@ -67,6 +66,7 @@ const char* getTagName(Tag tag, QnAviArchiveMetadata::Format format)
                 case CustomTag:     return "custom_data";
             }
             break;
+
         default:
             break;
     }
@@ -74,9 +74,9 @@ const char* getTagName(Tag tag, QnAviArchiveMetadata::Format format)
     return "";
 }
 
-/*
-* Some containers supports only predefined tag names.
-*/
+/**
+ * Some containers supports only predefined tag names.
+ */
 const char* getTagName(Tag tag, const QString& formatName)
 {
     if (formatName == QLatin1String("avi"))
@@ -85,7 +85,7 @@ const char* getTagName(Tag tag, const QString& formatName)
     if (formatName == QLatin1String("mov"))
         return getTagName(tag, QnAviArchiveMetadata::Format::mp4);
 
-    return getTagName(tag, QnAviArchiveMetadata::Format::mkv);
+    return getTagName(tag, QnAviArchiveMetadata::Format::custom);
 }
 
 QByteArray tagValueRaw(const AVFormatContext* context, Tag tag, const QString& format)
@@ -141,14 +141,17 @@ bool deserializeLayout(const QString& layout, QnAviArchiveMetadata& metadata)
 // Keeping this to handle compatibility with versions < 3.0
 QString serializeLayout(const QnAviArchiveMetadata& metadata)
 {
-    auto position = [&metadata](int index)
+    auto position =
+        [&metadata](int index)
         {
             const auto& channels = metadata.videoLayoutChannels;
             auto width = metadata.videoLayoutSize.width();
 
             for (int i = 0; i < channels.size(); ++i)
+            {
                 if (channels[i] == index)
                     return QPoint(i % width, i / width);
+            }
 
             return QPoint();
         };
@@ -171,7 +174,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAviArchiveMetadata, (json), QnAviArchiveMetad
 
 QnAviArchiveMetadata QnAviArchiveMetadata::loadFromFile(const AVFormatContext* context)
 {
-    // prevent standart tag name parsing in 'avi' format
+    // Prevent standart tag name parsing in 'avi' format.
     const QString format = QString::fromLatin1(context->iformat->name).split(QLatin1Char(','))[0];
 
     const auto metadata = tagValueRaw(context, CustomTag, format);
@@ -183,7 +186,7 @@ QnAviArchiveMetadata QnAviArchiveMetadata::loadFromFile(const AVFormatContext* c
 
     result.signature = tagValueRaw(context, SignatureTag, format);
 
-    // check time zone in the sign's 4-th column
+    // Check time zone in the sign's 4-th column.
     QList<QByteArray> tmp = result.signature.split(QnSignHelper::getSignPatternDelim());
     if (tmp.size() > 4)
     {
@@ -198,7 +201,7 @@ QnAviArchiveMetadata QnAviArchiveMetadata::loadFromFile(const AVFormatContext* c
     if (!allowTags)
         return result;
 
-    // Set marker of invalid layout in case of error
+    // Set marker of invalid layout in case of error.
     if (!deserializeLayout(tagValue(context, LayoutInfoTag, format), result))
         result.videoLayoutSize = QSize();
 
@@ -210,18 +213,19 @@ QnAviArchiveMetadata QnAviArchiveMetadata::loadFromFile(const AVFormatContext* c
 
 void QnAviArchiveMetadata::saveToFile(AVFormatContext* context, Format format)
 {
+    int flags = 0;
+
     av_dict_set(
         &context->metadata,
         getTagName(CustomTag, format),
         QJson::serialized<QnAviArchiveMetadata>(*this),
-        0
-    );
+        flags);
 
-    // Other tags are not supported in mp4 format
+    // Other tags are not supported in mp4 format.
     if (format == QnAviArchiveMetadata::Format::mp4)
         return;
 
-    // Keep old format for compatibility with old clients
+    // Keep old format for compatibility with old clients.
 
     if (!videoLayoutSize.isEmpty())
     {
@@ -230,7 +234,7 @@ void QnAviArchiveMetadata::saveToFile(AVFormatContext* context, Format format)
             &context->metadata,
             getTagName(LayoutInfoTag, format),
             layoutStr.toLatin1().data(),
-            0);
+            flags);
     }
 
     if (startTimeMs > 0)
@@ -239,26 +243,23 @@ void QnAviArchiveMetadata::saveToFile(AVFormatContext* context, Format format)
             &context->metadata,
             getTagName(StartTimeTag, format),
             QString::number(startTimeMs).toLatin1().data(),
-            0
-        );
+            flags);
     }
 
     av_dict_set(
         &context->metadata,
         getTagName(SoftwareTag, format),
         "Network Optix",
-        0
-    );
+        flags);
 
     if (dewarpingParams.enabled)
     {
-        // dewarping exists in resource and not activated now. Allow dewarping for saved file
+        // Dewarping exists in resource and is not activated now. Allow dewarping for saved file.
         av_dict_set(
             &context->metadata,
             getTagName(DewarpingTag, format),
             QJson::serialized<QnMediaDewarpingParams>(dewarpingParams),
-            0
-        );
+            flags);
     }
 
     if (!signature.isEmpty())
@@ -267,7 +268,6 @@ void QnAviArchiveMetadata::saveToFile(AVFormatContext* context, Format format)
             &context->metadata,
             getTagName(SignatureTag, format),
             signature.data(),
-            0
-        );
+            flags);
     }
 }

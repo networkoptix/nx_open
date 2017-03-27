@@ -3,6 +3,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QList>
 
+#include <common/common_globals.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <client/client_globals.h>

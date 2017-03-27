@@ -1,6 +1,8 @@
 #include "general_system_administration_widget.h"
 #include "ui_general_system_administration_widget.h"
 
+#include <QtWidgets/QPushButton>
+
 #include <api/runtime_info_manager.h>
 
 #include <common/common_module.h>

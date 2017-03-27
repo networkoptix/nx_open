@@ -2,6 +2,12 @@
 #include "abstract_joystick.h"
 #include "joystick_config.h"
 
+#include <QtCore/QStandardPaths>
+
+#include <QtGui/QVector3D>
+
+#include <QtWidgets/QApplication>
+
 #include <plugins/io_device/joystick/controls/joystick_stick_control.h>
 
 #if defined(Q_OS_WIN)
@@ -16,7 +22,7 @@ namespace {
 
 const QString kDefaultConfigFileName = lit("joystick_config.json");
 
-} // namespace 
+} // namespace
 
 namespace nx {
 namespace client {
@@ -64,19 +70,19 @@ void Manager::loadDrivers()
 
 bool Manager::loadMappings()
 {
-    bool loaded = m_configHolder.load(
-        QCoreApplication::applicationDirPath() + lit("/%1").arg(kDefaultConfigFileName));
+    const auto path = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + L'/' + kDefaultConfigFileName;
+    bool loaded = m_configHolder.load(path);
 
     if (!loaded)
         loaded = m_configHolder.load(lit(":/%1").arg(kDefaultConfigFileName));
 
     return loaded;
-}   
+}
 
 void Manager::applyMappings(std::vector<JoystickPtr>& joysticks)
 {
     for (auto& joy: joysticks)
-    { 
+    {
         auto activeConfiguration = m_configHolder.getActiveConfigurationForJoystick(
             joy->id());
 
@@ -97,9 +103,9 @@ void Manager::applyMappings(std::vector<JoystickPtr>& joysticks)
             for (const auto& rule: rulesItr->second)
             {
                 bool ruleHasBeenAdded = control->addEventHandler(
-                        rule.eventType, 
+                        rule.eventType,
                         makeEventHandler(rule, control));
-                
+
                 if (!ruleHasBeenAdded)
                     qDebug() << "Can not add rule for control" << controlId;
             }
@@ -125,7 +131,7 @@ void Manager::applyMappingsAndCaptureJoysticks()
     {
         auto joysticks = drv->enumerateJoysticks();
         applyMappings(joysticks);
-        
+
         for (auto& joy: joysticks)
             drv->captureJoystick(joy);
     }
@@ -133,14 +139,14 @@ void Manager::applyMappingsAndCaptureJoysticks()
 
 EventHandler Manager::makeEventHandler(const config::Rule& rule, controls::ControlPtr control)
 {
-    auto handler = 
+    auto handler =
         [rule, control, this](EventType eventType, EventParameters eventParameters)
         {
             auto actionParameters = createActionParameters(
                 rule,
                 control,
                 eventParameters);
-            
+
             menu()->trigger(
                 rule.actionType,
                 actionParameters);
@@ -207,7 +213,7 @@ QVariant Manager::fromActionParameterValueToVariant(
 {
     int intValue = 0;
     bool isValid = false;
-    
+
     if (dataRole == Qn::ItemDataRole::PtzPresetIndexRole)
         intValue = actionParameterValue.toInt(&isValid);
 

@@ -1,5 +1,8 @@
 #include "graphics_scroll_area.h"
 
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsSceneWheelEvent>
+
 class QnGraphicsScrollAreaPrivate : public QObject {
     Q_DECLARE_PUBLIC(QnGraphicsScrollArea)
     QnGraphicsScrollArea *q_ptr;

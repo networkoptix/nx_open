@@ -1,5 +1,6 @@
 #include "email_manager.h"
 
+#include <chrono>
 #include <future>
 
 #include <api/global_settings.h>
@@ -19,7 +20,10 @@ namespace cdb {
 
 EMailManager::EMailManager(const conf::Settings& settings):
     m_settings(settings),
-    m_terminated(false)
+    m_terminated(false),
+    m_notificationSequence(
+        std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now().time_since_epoch()).count())
 {
     m_notificationModuleUrl = m_settings.notification().url;
 }
@@ -34,6 +38,11 @@ void EMailManager::sendAsync(
     const AbstractNotification& notification,
     std::function<void(bool)> completionHandler)
 {
+    auto currentNotificationIndex = ++m_notificationSequence;
+    NX_LOGX(lm("Sending notification %1. %2")
+        .arg(currentNotificationIndex).arg(notification.serializeToJson()),
+        cl_logDEBUG2);
+
     auto asyncOperationLocker = m_startedAsyncCallsCounter.getScopedIncrement();
 
     if (!m_settings.notification().enabled)
@@ -41,7 +50,7 @@ void EMailManager::sendAsync(
         if (completionHandler)
         {
             nx::network::SocketGlobals::aioService().post(
-                [asyncOperationLocker, completionHandler]()
+                [asyncOperationLocker, completionHandler = std::move(completionHandler)]()
                 {
                     completionHandler(false);
                 });
@@ -53,12 +62,14 @@ void EMailManager::sendAsync(
     QObject::connect(
         httpClient.get(), &nx_http::AsyncHttpClient::done,
         httpClient.get(),
-        [this, asyncOperationLocker, completionHandler](
-            nx_http::AsyncHttpClientPtr client)
+        [this, asyncOperationLocker, currentNotificationIndex,
+            completionHandler = std::move(completionHandler)](
+                nx_http::AsyncHttpClientPtr client)
         {
             onSendNotificationRequestDone(
                 std::move(asyncOperationLocker),
                 std::move(client),
+                currentNotificationIndex,
                 std::move(completionHandler));
         },
         Qt::DirectConnection);
@@ -77,18 +88,25 @@ void EMailManager::sendAsync(
 void EMailManager::onSendNotificationRequestDone(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx_http::AsyncHttpClientPtr client,
+    std::uint64_t notificationIndex,
     std::function<void(bool)> completionHandler)
 {
     if (client->failed())
     {
-        NX_LOGX(lm("Failed (1) to send email notification. %1")
-            .arg(SystemError::toString(client->lastSysErrorCode())), cl_logDEBUG1);
+        NX_LOGX(lm("Failed (1) to send email notification %1. %2")
+            .arg(notificationIndex).arg(SystemError::toString(client->lastSysErrorCode())),
+            cl_logDEBUG1);
     }
     else if (!nx_http::StatusCode::isSuccessCode(client->response()->statusLine.statusCode))
     {
-        NX_LOGX(lm("Failed (2) to send email notification. Received %1(%2) response")
-            .arg(client->response()->statusLine.statusCode).arg(client->response()->statusLine.reasonPhrase),
+        NX_LOGX(lm("Failed (2) to send email notification %1. Received %2(%3) response")
+            .arg(notificationIndex).arg(client->response()->statusLine.statusCode)
+            .arg(client->response()->statusLine.reasonPhrase),
             cl_logDEBUG1);
+    }
+    else
+    {
+        NX_LOGX(lm("Successfully sent notification %1").arg(notificationIndex), cl_logDEBUG2);
     }
 
     if (completionHandler)

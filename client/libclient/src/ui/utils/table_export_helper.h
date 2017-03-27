@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QCoreApplication>
+#include <QtCore/QModelIndexList>
 
 class QAbstractItemView;
 class QWidget;

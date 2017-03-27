@@ -4,9 +4,9 @@
 #include <QtCore/QList>
 #include <QtCore/QVector>
 #include <QtCore/QTimer>
+#include <QtCore/QPointer>
 
 #include "widget_table.h"
-
 
 class QnWidgetTablePrivate: public QObject
 {

@@ -1,5 +1,7 @@
 #include "system_weight_helper.h"
 
+#include <QtCore/QDateTime>
+
 #include <nx/utils/system_utils.h>
 #include <client_core/client_core_settings.h>
 

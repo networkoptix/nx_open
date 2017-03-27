@@ -1,7 +1,9 @@
 #include "resource_details_widget.h"
 
+#include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPlainTextEdit>
+#include <QtWidgets/QStyle>
 
 #include <camera/camera_thumbnail_manager.h>
 

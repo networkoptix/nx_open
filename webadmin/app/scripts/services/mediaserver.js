@@ -113,7 +113,7 @@ angular.module('webadminApp')
             if(offlineDialog === null) { //Dialog is not displayed
                 getModuleInformation().catch(function (/*error*/) {
                     offlineDialog = $modal.open({
-                        templateUrl: 'offline_modal',
+                        templateUrl: Config.viewsDir + 'components/offline.html',
                         controller: 'OfflineCtrl',
                         keyboard:false,
                         backdrop:'static'

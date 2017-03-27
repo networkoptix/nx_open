@@ -1,6 +1,8 @@
 #include "system_weights_manager.h"
 
 #include <QtCore/QTimer>
+#include <QtCore/QDateTime>
+
 #include <finders/systems_finder.h>
 #include <watchers/cloud_status_watcher.h>
 #include <client_core/client_core_settings.h>

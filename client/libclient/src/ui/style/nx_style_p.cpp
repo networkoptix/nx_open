@@ -1,6 +1,13 @@
 #include "nx_style_p.h"
 #include "skin.h"
 
+#include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QInputDialog>
+#include <QtWidgets/QGraphicsProxyWidget>
+#include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsView>
+#include <QtWidgets/QScrollBar>
+
 #include <limits>
 
 #include <utils/common/scoped_painter_rollback.h>

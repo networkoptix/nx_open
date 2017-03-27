@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QCoreApplication>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <client/client_globals.h>

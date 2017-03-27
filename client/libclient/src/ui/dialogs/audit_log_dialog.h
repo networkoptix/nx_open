@@ -1,9 +1,11 @@
 #pragma once
 
-#include <QtWidgets/QDialog>
-#include <QtGui/QStandardItem>
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QModelIndex>
+
+#include <QtGui/QStandardItem>
+
+#include <QtWidgets/QDialog>
 
 #include <api/model/audit/audit_record.h>
 #include <core/resource/resource_fwd.h>
@@ -15,6 +17,7 @@ class QnAuditLogDetailModel;
 class QnAuditItemDelegate;
 class QnTableView;
 class QnAuditLogModel;
+class QLabel;
 
 namespace Ui
 {
@@ -81,8 +84,8 @@ private:
     QnAuditRecordRefList applyFilter();
     void makeSessionData();
     void makeCameraData();
-    void setupContextMenu(QTableView* gridMaster);
-    QTableView* currentGridView() const;
+    void setupContextMenu(QnTableView* gridMaster);
+    QnTableView* currentGridView() const;
 
     void retranslateUi();
 

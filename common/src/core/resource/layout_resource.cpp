@@ -32,7 +32,6 @@ Qn::ResourceStatus QnLayoutResource::getStatus() const
     return Qn::Online;
 }
 
-
 QnLayoutResourcePtr QnLayoutResource::clone() const
 {
     QnLayoutResourcePtr result(new QnLayoutResource());

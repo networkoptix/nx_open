@@ -1,22 +1,24 @@
 #include "fisheye_calibrator.h"
 
-enum Corner {
-    LeftTop,
-    RightTop,
-    RightBottom,
-    LeftBottom
-};
-
 struct Distance
 {
-    Distance(): distance(INT64_MAX), corner(LeftTop) {}
-    Distance(qint64 distance, const QPointF& pos, Corner corner): distance(distance), pos(pos), corner(corner) {}
+    Distance()
+    {
+    }
 
-    qint64 distance;
+    Distance(qint64 distance, const QPointF& pos, Qt::Corner corner):
+        distance(distance),
+        pos(pos),
+        corner(corner)
+    {
+    }
+
+    qint64 distance = INT64_MAX;
     QPointF pos;
-    Corner corner;
+    Qt::Corner corner = Qt::TopLeftCorner;
 
-    bool operator< (const Distance& other) const {
+    bool operator< (const Distance& other) const
+    {
         return distance < other.distance;
     }
 };
@@ -139,7 +141,7 @@ qreal QnFisheyeCalibrator::findElipse(qreal& newRadius)
 
     // scan lines
     QPointF p1, p2;
-    for (int i = 0; i < 2; ++i) 
+    for (int i = 0; i < 2; ++i)
     {
         QVector<Distance> distances;
         qreal offset = (i==0) ? height*0.33 : height*0.66;
@@ -150,10 +152,10 @@ qreal QnFisheyeCalibrator::findElipse(qreal& newRadius)
         int x2 = findPixel(yMax, 0, 1);
         int x3 = findPixel(yMin, m_width-1, -1);
         int x4 = findPixel(yMin, 0, 1);
-        distances << Distance(qAbs(center.x() - x1), QPointF(x1, yMax), RightBottom);
-        distances << Distance(qAbs(center.x() - x2), QPointF(x2, yMax), LeftBottom);
-        distances << Distance(qAbs(center.x() - x3), QPointF(x3, yMin), RightTop);
-        distances << Distance(qAbs(center.x() - x4), QPointF(x4, yMin), LeftTop);
+        distances << Distance(qAbs(center.x() - x1), QPointF(x1, yMax), Qt::BottomRightCorner);
+        distances << Distance(qAbs(center.x() - x2), QPointF(x2, yMax), Qt::BottomLeftCorner);
+        distances << Distance(qAbs(center.x() - x3), QPointF(x3, yMin), Qt::TopRightCorner);
+        distances << Distance(qAbs(center.x() - x4), QPointF(x4, yMin), Qt::TopLeftCorner);
         std::sort(distances.begin(), distances.end());
         if (i == 0)
             p1 = QPointF(distances[3].pos);
@@ -187,18 +189,18 @@ void QnFisheyeCalibrator::findCircleParams()
         if (xLeft == -1)
             continue;
         qint64 distance = xLeft*xLeft + y*y;
-        if (distance < distances[LeftTop].distance) {
-            distances[LeftTop].distance = distance;
-            distances[LeftTop].pos = QPointF(xLeft, y);
+        if (distance < distances[Qt::TopLeftCorner].distance) {
+            distances[Qt::TopLeftCorner].distance = distance;
+            distances[Qt::TopLeftCorner].pos = QPointF(xLeft, y);
         }
 
         int xRight = findPixel(y, rightEdge, -1);
         if (xRight == -1)
             continue;
         distance = (rightEdge-xRight) * (rightEdge-xRight) + y*y;
-        if (distance < distances[RightTop].distance) {
-            distances[RightTop].distance = distance;
-            distances[RightTop].pos = QPointF(xRight, y);
+        if (distance < distances[Qt::TopRightCorner].distance) {
+            distances[Qt::TopRightCorner].distance = distance;
+            distances[Qt::TopRightCorner].pos = QPointF(xRight, y);
         }
     }
 
@@ -212,9 +214,9 @@ void QnFisheyeCalibrator::findCircleParams()
         if (xLeft == -1)
             continue;
         int distance = xLeft*xLeft + (bottomEdge-y) * (bottomEdge-y);
-        if (distance < distances[LeftBottom].distance) {
-            distances[LeftBottom].distance = distance;
-            distances[LeftBottom].pos = QPoint(xLeft, y);
+        if (distance < distances[Qt::BottomLeftCorner].distance) {
+            distances[Qt::BottomLeftCorner].distance = distance;
+            distances[Qt::BottomLeftCorner].pos = QPoint(xLeft, y);
         }
 
         int rightEdge = m_width-1;
@@ -223,9 +225,9 @@ void QnFisheyeCalibrator::findCircleParams()
             continue;
 
         distance = (rightEdge-xRight) * (rightEdge-xRight) + (bottomEdge-y) * (bottomEdge-y);
-        if (distance < distances[RightBottom].distance) {
-            distances[RightBottom].distance = distance;
-            distances[RightBottom].pos = QPoint(xRight, y);
+        if (distance < distances[Qt::BottomRightCorner].distance) {
+            distances[Qt::BottomRightCorner].distance = distance;
+            distances[Qt::BottomRightCorner].pos = QPoint(xRight, y);
         }
     }
 
@@ -392,7 +394,7 @@ void QnFisheyeCalibrator::analyseFrame(QImage frame)
 {
     frame = frame.scaled(frame.width() / 2, frame.height() / 2); // addition filtering
 
-    if (frame.format() != QImage::Format_Indexed8) 
+    if (frame.format() != QImage::Format_Indexed8)
     {
         // copy data to the tmp buffer because source buffer may be unaligned
         int inputNumBytes = frame.bytesPerLine()*frame.height();
@@ -406,7 +408,7 @@ void QnFisheyeCalibrator::analyseFrame(QImage frame)
         qFreeAligned(m_grayImageBuffer);
         m_grayImageBuffer = static_cast<uchar*>(qMallocAligned(numBytes, 32));
 
-        SwsContext* scaleContext = sws_getContext(frame.width(), frame.height(), AV_PIX_FMT_RGBA, 
+        SwsContext* scaleContext = sws_getContext(frame.width(), frame.height(), AV_PIX_FMT_RGBA,
             frame.width(), frame.height(), AV_PIX_FMT_GRAY8, SWS_BICUBIC, NULL, NULL, NULL);
 
         AVPicture dstPict;
@@ -438,7 +440,7 @@ void QnFisheyeCalibrator::analyseFrame(QImage frame)
     const quint8* curPtr = (const quint8*) frame.bits();
     delete m_filteredFrame;
     m_filteredFrame = new quint8[frame.width() * frame.height()];
-    
+
     quint8* dstPtr = m_filteredFrame;
     int srcYStep = frame.bytesPerLine();
 

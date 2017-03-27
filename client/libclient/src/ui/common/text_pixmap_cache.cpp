@@ -1,11 +1,14 @@
 #include "text_pixmap_cache.h"
 
 #include <limits>
+
 #include <QtCore/QCache>
+
 #include <QtGui/QFont>
 #include <QtGui/QPixmap>
 #include <QtGui/QPainter>
 #include <QtGui/QFontMetrics>
+#include <QtGui/QGuiApplication>
 
 #include <utils/common/hashed_font.h>
 #include <utils/common/hash.h>

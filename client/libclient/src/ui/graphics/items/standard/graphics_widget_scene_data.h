@@ -1,11 +1,12 @@
-#ifndef GRAPHICS_WIDGET_SCENE_DATA_H
-#define GRAPHICS_WIDGET_SCENE_DATA_H
+#pragma once
 
 #include <QtCore/QHash>
 #include <QtCore/QEvent>
 #include <QtCore/QPointF>
 #include <QtCore/QObject>
 #include <QtCore/QSet>
+#include <QtCore/QPointer>
+
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsItem>
 #include <QtWidgets/QGraphicsWidget>
@@ -18,9 +19,9 @@ public:
     /** Event type for scene-wide layout requests. */
     static const QEvent::Type HandlePendingLayoutRequests = static_cast<QEvent::Type>(QEvent::User + 0x19FA);
 
-    GraphicsWidgetSceneData(QGraphicsScene *scene, QObject *parent = NULL): 
-        QObject(parent), 
-        scene(scene) 
+    GraphicsWidgetSceneData(QGraphicsScene *scene, QObject *parent = NULL):
+        QObject(parent),
+        scene(scene)
     {
         NX_ASSERT(scene);
     }
@@ -45,5 +46,3 @@ public:
 };
 
 Q_DECLARE_METATYPE(GraphicsWidgetSceneData *);
-
-#endif //GRAPHICS_WIDGET_SCENE_DATA_H

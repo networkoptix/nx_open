@@ -1,5 +1,8 @@
 #include "link_hover_processor.h"
 
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QLabel>
+
 #include <nx/utils/log/assert.h>
 
 #include <ui/style/helper.h>

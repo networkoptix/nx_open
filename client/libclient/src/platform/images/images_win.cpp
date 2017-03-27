@@ -1,5 +1,7 @@
 #include "images_win.h"
 
+#include <QtGui/QGuiApplication>
+
 // TODO: #Elric use public interface QtWin::imageFromHBITMAP
 extern QImage qt_imageFromWinHBITMAP(HDC hdc, HBITMAP bitmap, int w, int h);
 
@@ -107,9 +109,9 @@ namespace {
         ".............aaaaaaaaaaa"};
 
     /**
-     * The code is based on <tt>qt_pixmapFromWinHICON</tt> function from <tt>QtGui</tt>. 
-     * 
-     * Original code didn't return the icon's hotspot and contained a bug 
+     * The code is based on <tt>qt_pixmapFromWinHICON</tt> function from <tt>QtGui</tt>.
+     *
+     * Original code didn't return the icon's hotspot and contained a bug
      * in bitmap size estimation.
      */
     QPixmap qt_pixmapFromWinHICON(HICON icon, QPoint *hotSpot) {
@@ -182,7 +184,7 @@ namespace {
                 }
             }
         }
-        
+
         //dispose resources created by iconinfo call
         DeleteObject(iconinfo.hbmMask);
         DeleteObject(iconinfo.hbmColor);
@@ -190,7 +192,7 @@ namespace {
         SelectObject(hdc, oldhdc); //restore state
         DeleteObject(winBitmap);
         DeleteDC(hdc);
-        
+
         return QPixmap::fromImage(image);
     }
 
@@ -211,14 +213,14 @@ namespace {
         case Qt::WhatsThisCursor:       return IDC_HELP;
         case Qt::BusyCursor:            return IDC_APPSTARTING;
 
-        case Qt::BlankCursor:       
+        case Qt::BlankCursor:
         case Qt::SplitVCursor:
         case Qt::SplitHCursor:
         case Qt::OpenHandCursor:
         case Qt::ClosedHandCursor:
         case Qt::BitmapCursor:
             return NULL; /* These are hardcoded as pixmaps in Qt. */
-            
+
         case Qt::DragCopyCursor:
         case Qt::DragMoveCursor:
         case Qt::DragLinkCursor:
@@ -251,7 +253,7 @@ QCursor QnWindowsImages::bitmapCursor(Qt::CursorShape shape) const {
     LPCWSTR cursorName = standardCursorName(shape);
     if(cursorName) {
         HCURSOR handle = LoadCursorW(0, cursorName);
-        
+
         QPoint hotSpot;
         QPixmap pixmap = qt_pixmapFromWinHICON(handle, &hotSpot);
 

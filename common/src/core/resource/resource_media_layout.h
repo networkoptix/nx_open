@@ -23,7 +23,7 @@ public:
     virtual ~QnResourceLayout() {}
 
     /**
-     * \returns                         Number of audio or video channels a device has.
+     * @return Number of audio or video channels a device has.
      */
     virtual int channelCount() const = 0;
 
@@ -80,18 +80,18 @@ public:
     QnResourceVideoLayout() {}
 
     /**
-     * \returns                         Size of the channel matrix.
+     * @return Size of the channel matrix.
      */
     virtual QSize size() const = 0;
 
     /**
-     * \returns                         Position of the given channel in a channel matrix.
+     * @return Position of the given channel in a channel matrix.
      */
     virtual QPoint position(int channel) const = 0;
 
     /**
-    * \returns                          Matrix data assumed to be in row-major order.
-    */
+     * @return Matrix data assumed to be in row-major order.
+     */
     virtual QVector<int> getChannels() const = 0;
 
     virtual QString toString() const { return QString(); }

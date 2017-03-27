@@ -4,6 +4,7 @@
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 
+class QLabel;
 class QnServerSettingsWidget;
 class QnStorageAnalyticsWidget;
 class QnStorageConfigWidget;

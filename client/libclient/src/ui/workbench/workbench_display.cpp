@@ -591,6 +591,7 @@ void QnWorkbenchDisplay::initSceneView()
 
     if (canShowLayoutBackground())
     {
+        //
         m_gridBackgroundItem = new QnGridBackgroundItem(NULL, context());
         m_scene->addItem(gridBackgroundItem());
         setLayer(gridBackgroundItem(), Qn::EMappingLayer);

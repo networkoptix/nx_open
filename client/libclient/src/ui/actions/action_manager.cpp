@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <QtGui/QGuiApplication>
+
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QGraphicsItem>
@@ -1743,6 +1745,14 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Alt+T")).
         autoRepeat(false).
         condition(new QnToggleTourActionCondition(this));
+
+    factory(QnActions::OpenLayoutTourAction).
+        flags(Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Start Layouts Tour")).
+        toggledText(tr("Stop Layouts Tour")).
+        shortcut(lit("Alt+L")).
+        autoRepeat(false);
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).

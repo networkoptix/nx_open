@@ -5,12 +5,17 @@
 #endif
 
 #include <QtCore/QFile>
+
+#include <QtGui/QFileOpenEvent>
+
+#include <QtNetwork/QNetworkReply>
+
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QDesktopWidget>
-#include <QtGui/QFileOpenEvent>
-#include <QtNetwork/QNetworkReply>
+#include <QtWidgets/QStackedWidget>
 
 #include <utils/common/warnings.h>
 #include <utils/common/event_processors.h>
@@ -91,6 +96,8 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/screen_manager.h>
+
+#include <nx/client/ui/workbench/handlers/layout_tours_handler.h>
 
 #include "resource_browser_widget.h"
 #include "layout_tab_bar.h"
@@ -233,6 +240,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchBookmarksHandler>();
     context->instance<QnWorkbenchAlarmLayoutHandler>();
     context->instance<QnWorkbenchCloudHandler>();
+    context->instance<nx::client::ui::workbench::handlers::LayoutToursHandler>();
 
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
@@ -292,6 +300,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     addAction(action(QnActions::AdjustVideoAction));
     addAction(action(QnActions::TogglePanicModeAction));
     addAction(action(QnActions::ToggleTourModeAction));
+    addAction(action(QnActions::OpenLayoutTourAction));
     addAction(action(QnActions::DebugIncrementCounterAction));
     addAction(action(QnActions::DebugDecrementCounterAction));
     addAction(action(QnActions::DebugControlPanelAction));

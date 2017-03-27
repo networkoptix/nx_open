@@ -1,5 +1,7 @@
 #include "password_strength_indicator.h"
 
+#include <QtWidgets/QLineEdit>
+
 #include <ui/common/widget_anchor.h>
 #include <ui/style/nx_style.h>
 

@@ -1,31 +1,39 @@
 #include "control_background_widget.h"
 
 namespace {
-    QLinearGradient borderGradient(Qn::Border border) {
-        switch(border) {
-            case Qn::TopBorder:     return QLinearGradient(0, 0, 0, 1);
-            case Qn::BottomBorder:  return QLinearGradient(0, 1, 0, 0);
-            case Qn::LeftBorder:    return QLinearGradient(0, 0, 1, 0);
-            case Qn::RightBorder:   return QLinearGradient(1, 0, 0, 0);
-            default:                return QLinearGradient();
-        }
+
+QLinearGradient borderGradient(Qt::Edge edge)
+{
+    switch (edge)
+    {
+        case Qt::TopEdge:
+            return QLinearGradient(0, 0, 0, 1);
+        case Qt::BottomEdge:
+            return QLinearGradient(0, 1, 0, 0);
+        case Qt::LeftEdge:
+            return QLinearGradient(0, 0, 1, 0);
+        case Qt::RightEdge:
+            return QLinearGradient(1, 0, 0, 0);
+        default:
+            return QLinearGradient();
     }
+}
 
 } // anonymous namespace
 
 QnControlBackgroundWidget::QnControlBackgroundWidget(QGraphicsItem *parent):
     base_type(parent)
 {
-    init(Qn::TopBorder);
+    init(Qt::TopEdge);
 }
 
-QnControlBackgroundWidget::QnControlBackgroundWidget(Qn::Border gradientBorder, QGraphicsItem *parent):
+QnControlBackgroundWidget::QnControlBackgroundWidget(Qt::Edge gradientBorder, QGraphicsItem *parent):
     base_type(parent)
 {
     init(gradientBorder);
 }
 
-void QnControlBackgroundWidget::init(Qn::Border gradientBorder) {
+void QnControlBackgroundWidget::init(Qt::Edge gradientBorder) {
     m_gradientBorder = gradientBorder;
     m_colors << QColor(0, 0, 0, 255) << QColor(0, 0, 0, 64);
 
@@ -35,11 +43,11 @@ void QnControlBackgroundWidget::init(Qn::Border gradientBorder) {
     updateWindowBrush();
 }
 
-Qn::Border QnControlBackgroundWidget::gradientBorder() const {
+Qt::Edge QnControlBackgroundWidget::gradientBorder() const {
     return m_gradientBorder;
 }
 
-void QnControlBackgroundWidget::setGradientBorder(Qn::Border gradientBorder) {
+void QnControlBackgroundWidget::setGradientBorder(Qt::Edge gradientBorder) {
     if(m_gradientBorder == gradientBorder)
         return;
 

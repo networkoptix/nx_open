@@ -1,5 +1,7 @@
 #include "validators.h"
 
+#include <QtCore/QCoreApplication>
+
 #include <utils/email/email.h>
 
 class QnValidatorStrings

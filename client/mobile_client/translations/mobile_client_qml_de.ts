@@ -49,7 +49,7 @@
     <name>CredentialsEditor</name>
     <message>
         <source>Email</source>
-        <translation>E-Mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Password</source>
@@ -73,7 +73,7 @@
     </message>
     <message>
         <source>Email and password cannot be empty</source>
-        <translation>E-Mail und Passwort dürfen nicht leer sein</translation>
+        <translation>Email und Passwort dürfen nicht leer sein</translation>
     </message>
     <message>
         <source>Log in</source>
@@ -81,7 +81,7 @@
     </message>
     <message>
         <source>Incorrect Email or Password</source>
-        <translation>E-Mail oder Passwort ungültig</translation>
+        <translation>Email oder Passwort ungültig</translation>
     </message>
 </context>
 <context>

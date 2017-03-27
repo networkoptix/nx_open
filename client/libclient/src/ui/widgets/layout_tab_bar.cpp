@@ -1,9 +1,10 @@
 #include "layout_tab_bar.h"
 
 #include <QtCore/QVariant>
-#include <nx/utils/uuid.h>
 
 #include <QtGui/QContextMenuEvent>
+
+#include <QtWidgets/QLayout>
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QMenu>
 
@@ -32,6 +33,9 @@
 #include <ui/style/skin.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/custom_style.h>
+#include <nx/client/ui/workbench/layouts/layout_factory.h>
+
+#include <nx/utils/uuid.h>
 
 namespace {
 static const int kMinimumTabSizeWidth = 50;
@@ -386,7 +390,7 @@ void QnLayoutTabBar::tabInserted(int index)
         QString name;
         if (m_layouts.size() != count())
         { /* Not inserted yet, allocate new one. It will be deleted with this tab bar. */
-            QnWorkbenchLayout *layout = new QnWorkbenchLayout(this);
+            QnWorkbenchLayout *layout = qnLayoutFactory->create(this);
             m_layouts.insert(index, layout);
             name = tabText(index);
         }

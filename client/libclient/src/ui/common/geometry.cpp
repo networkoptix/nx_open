@@ -481,18 +481,18 @@ QRectF QnGeometry::toSubRect(const QRectF &rect, const QRectF &absoluteSubRect) 
     );
 }
 
-QPointF QnGeometry::corner(const QRectF &rect, Qn::Corner corner) {
-    switch(corner) {
-        case Qn::TopLeftCorner:
+QPointF QnGeometry::corner(const QRectF &rect, Qt::Corner corner)
+{
+    switch (corner)
+    {
+        case Qt::TopLeftCorner:
             return rect.topLeft();
-        case Qn::TopRightCorner:
+        case Qt::TopRightCorner:
             return rect.topRight();
-        case Qn::BottomLeftCorner:
+        case Qt::BottomLeftCorner:
             return rect.bottomLeft();
-        case Qn::BottomRightCorner:
+        case Qt::BottomRightCorner:
             return rect.bottomRight();
-        case Qn::NoCorner:
-            return rect.center();
         default:
             qnWarning("Invalid corner value '%1'.", static_cast<int>(corner));
             return rect.center();

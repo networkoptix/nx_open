@@ -1,6 +1,8 @@
 #include "camera_bookmark_dialog.h"
 #include "ui_camera_bookmark_dialog.h"
 
+#include <QtWidgets/QPushButton>
+
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 

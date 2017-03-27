@@ -14,7 +14,6 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QStyle>
-#include <QtWidgets/QStyleOptionFrameV2>
 
 #include <ui/common/palette.h>
 #include <ui/style/skin.h>

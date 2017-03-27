@@ -6,6 +6,7 @@
 #include <QtCore/QUrl>
 #include <QtCore/QPointer>
 #include <QtCore/QSettings>
+#include <QtCore/QTimer>
 
 #include <api/global_settings.h>
 

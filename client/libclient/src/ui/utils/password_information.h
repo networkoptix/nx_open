@@ -1,7 +1,10 @@
 #pragma once
 
 #include <functional>
+
+#include <QtCore/QCoreApplication>
 #include <QtCore/QString>
+
 #include <nx/utils/password_analyzer.h>
 
 class QnPasswordInformation

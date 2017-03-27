@@ -1,5 +1,6 @@
-#ifndef QN_GRAPHICS_WIDGET_P_H
-#define QN_GRAPHICS_WIDGET_P_H
+#pragma once
+
+#include <QtCore/QPointer>
 
 #include "graphics_widget.h"
 
@@ -69,6 +70,3 @@ protected:
 private:
     Q_DECLARE_PUBLIC(GraphicsWidget);
 };
-
-
-#endif // QN_GRAPHICS_WIDGET_P_H

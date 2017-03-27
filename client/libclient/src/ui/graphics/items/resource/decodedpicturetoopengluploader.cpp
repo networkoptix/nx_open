@@ -1256,7 +1256,7 @@ static DecodedPictureToOpenGLUploader* runningUploader = NULL;
 
 DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     const QGLContext* const mainContext,
-    unsigned int asyncDepth )
+    unsigned int /*asyncDepth*/ )
 :
     d( new DecodedPictureToOpenGLUploaderPrivate(mainContext) ),
     m_format( AV_PIX_FMT_NONE ),
@@ -1272,8 +1272,6 @@ DecodedPictureToOpenGLUploader::DecodedPictureToOpenGLUploader(
     m_asyncUploadUsed( false ),
     m_initializedCtx( NULL )
 {
-    QN_UNUSED(asyncDepth);
-
 #ifdef ASYNC_UPLOADING_USED
     const std::vector<QSharedPointer<DecodedPictureToOpenGLUploadThread> >&
         pool = DecodedPictureToOpenGLUploaderContextPool::instance()->getPoolOfContextsSharedWith( mainContext );

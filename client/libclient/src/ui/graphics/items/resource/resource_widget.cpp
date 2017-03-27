@@ -257,7 +257,6 @@ void QnResourceWidget::addHudOverlays()
     setOverlayWidgetVisible(m_overlayWidgets->positionOverlay, false, false);
 
     auto triggersOverlay = new QnScrollableOverlayWidget(Qt::AlignRight, this);
-    triggersOverlay->setProperty(Qn::NoBlockMotionSelection, true);
     triggersOverlay->setContentsMargins(kMargin, 0, 0, kMargin);
     triggersOverlay->setItemSpacing(kTriggersSpacing);
     triggersOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));

@@ -2,6 +2,8 @@
 
 #include <array>
 
+#include <QtWidgets/QGraphicsScene>
+
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>

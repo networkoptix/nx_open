@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QQueue>
+
 #include <nx/utils/thread/mutex.h>
 
 #include <decoders/audio/audio_struct.h>
@@ -43,7 +45,7 @@ public:
 
     /** @return False if format is not supported. */
     bool isFormatSupported() const;
-    
+
     /** Forcing downmixing, even if output device supports multichannel output. */
     void setForceDownmix(bool value);
 

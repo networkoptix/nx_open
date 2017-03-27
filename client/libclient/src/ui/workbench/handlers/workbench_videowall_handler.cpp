@@ -102,6 +102,7 @@
 #include <utils/unity_launcher_workaround.h>
 
 #include <nx/vms/utils/platform/autorun.h>
+#include <nx/client/ui/workbench/layouts/layout_factory.h>
 
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG
@@ -1781,7 +1782,7 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered()
         layout = QnWorkbenchLayout::instance(layoutResource);
         if (!layout)
         {
-            layout = new QnWorkbenchLayout(layoutResource, workbench());
+            layout = qnLayoutFactory->create(layoutResource, workbench());
             workbench()->addLayout(layout);
         }
         layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(item.uuid));
@@ -2898,7 +2899,7 @@ void QnWorkbenchVideoWallHandler::updateControlLayout(const QnVideoWallResourceP
 
             QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(layoutResource);
             if (!layout)
-                layout = new QnWorkbenchLayout(layoutResource, workbench());
+                layout = qnLayoutFactory->create(layoutResource, workbench());
 
             if (workbench()->layoutIndex(layout) < 0)
                 workbench()->insertLayout(layout, layoutIndex);

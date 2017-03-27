@@ -20,6 +20,9 @@ public:
 
     const AccountWithPassword& account() const;
     const api::SystemData& system() const;
+    /**
+     * Opens connection. Each has random peerId.
+     */
     void openTransactionConnections(int count);
     void openTransactionConnectionsOfSpecifiedVersion(int count, int protoVersion);
     void waitForConnectionsToMoveToACertainState(
@@ -30,8 +33,13 @@ public:
     void waitUntilClosedConnectionCountReaches(int count);
     void closeAllConnections();
 
+    QUrl cdbSynchronizationUrl() const;
+
     OnConnectionBecomesActiveSubscription& onConnectionBecomesActiveSubscription();
     OnConnectionFailureSubscription& onConnectionFailureSubscription();
+
+protected:
+    test::TransactionConnectionHelper& connectionHelper();
 
 private:
     AccountWithPassword m_account;

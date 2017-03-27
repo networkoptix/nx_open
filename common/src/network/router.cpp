@@ -1,7 +1,5 @@
 #include "router.h"
 
-#include <QtCore/QElapsedTimer>
-
 // #include <nx/utils/log/log.h>
 // #include "nx_ec/dummy_handler.h"
 // #include "nx_ec/ec_api.h"
@@ -38,7 +36,7 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     if (!isknownServer && isClient) {
 		if (qnCommon->remoteGUID().isNull())
             return result;
-			
+
         result.gatewayId = qnCommon->remoteGUID(); // proxy via current server to the other/incompatible system (client side only)
         result.addr = m_moduleFinder->primaryAddress(result.gatewayId);
         NX_ASSERT(!result.addr.isNull(), Q_FUNC_INFO, "QnRouter: no primary interface found for current EC.");
@@ -69,7 +67,7 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
 void QnRouter::updateRequest(QUrl& url, nx_http::HttpHeaders& headers, const QnUuid &id)
 {
     QnRoute route = routeTo(id);
-    if (route.isValid()) 
+    if (route.isValid())
     {
         url.setHost(route.addr.address.toString());
         url.setPort(route.addr.port);

@@ -1,6 +1,8 @@
 #include "system_administration_dialog.h"
 #include "ui_system_administration_dialog.h"
 
+#include <QtWidgets/QPushButton>
+
 #include <common/common_module.h>
 
 #include <ui/widgets/system_settings/license_manager_widget.h>

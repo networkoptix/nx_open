@@ -4,15 +4,18 @@
 
 #include <QtCore/QProcess>
 
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QDesktopWidget>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QImage>
-#include <QtWidgets/QWhatsThis>
+#include <QtGui/QImageWriter>
+
+#include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QDesktopWidget>
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QCheckBox>
-#include <QtGui/QImageWriter>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QWhatsThis>
 
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
@@ -155,6 +158,7 @@
 #include <vms_gateway_embeddable.h>
 #include <utils/unity_launcher_workaround.h>
 #include <utils/connection_diagnostics_helper.h>
+#include <nx/client/ui/workbench/layouts/layout_factory.h>
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
@@ -822,8 +826,9 @@ void QnWorkbenchActionHandler::at_openLayoutsAction_triggered() {
             continue;
 
         QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource);
-        if (layout == NULL) {
-            layout = new QnWorkbenchLayout(layoutResource, workbench());
+        if (layout == NULL)
+        {
+            layout = qnLayoutFactory->create(layoutResource, workbench());
             workbench()->addLayout(layout);
         }
         /* Explicit set that we do not control videowall through this layout */
