@@ -901,8 +901,8 @@ void socketAcceptMixed(
     // no clients yet
     {
         std::unique_ptr<AbstractStreamSocket> accepted(server->accept());
-        ASSERT_EQ(accepted, nullptr);
-        ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::wouldBlock);
+        ASSERT_EQ(nullptr, accepted);
+        ASSERT_EQ(SystemError::wouldBlock, SystemError::getLastOSErrorCode());
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 
@@ -918,12 +918,7 @@ void socketAcceptMixed(
             connectionEstablishedPromise.set_value(code);
         });
 
-    auto connectionEstablishedFuture = connectionEstablishedPromise.get_future();
-    // let the client get in the server listen queue
-    ASSERT_EQ(
-        std::future_status::ready,
-        connectionEstablishedFuture.wait_for(std::chrono::seconds(1)));
-    ASSERT_EQ(SystemError::noError, connectionEstablishedFuture.get());
+    ASSERT_EQ(SystemError::noError, connectionEstablishedPromise.get_future().get());
 
     //if connect returned, it does not mean that accept has actually returned,
         //so giving internal socket implementation some time...
