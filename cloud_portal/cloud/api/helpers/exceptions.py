@@ -308,7 +308,7 @@ def handle_exceptions(func):
                    request_data,
                    error_formatted,
                    traceback.format_exc()
-                   )
+                   ).replace("Traceback", "")  # remove Traceback word from handled exceptions
 
         logger.log(log_level, error_formatted)
         return error_formatted
