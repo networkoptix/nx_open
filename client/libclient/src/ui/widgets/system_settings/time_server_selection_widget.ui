@@ -33,13 +33,6 @@
        <number>6</number>
       </property>
       <item>
-       <widget class="QLabel" name="timeDescLabel">
-        <property name="text">
-         <string>System Time</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QCheckBox" name="syncWithInternetCheckBox">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -52,6 +45,13 @@
         </property>
         <property name="checked">
          <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="timeDescLabel">
+        <property name="text">
+         <string>System Time</string>
         </property>
        </widget>
       </item>
