@@ -102,10 +102,15 @@ class APIException(Exception):
                 'errorData': self.error_data
             }, status=self.status_code)
 
-    def need_to_log(self):
-        return self.error_code not in (ErrorCodes.not_authorized,
-                                       ErrorCodes.not_found,
-                                       ErrorCodes.account_exists)
+    def log_level(self):
+        if self.error_code in (ErrorCodes.not_authorized,
+                               ErrorCodes.not_found,
+                               ErrorCodes.account_exists,
+                               ErrorCodes.account_not_activated):
+            return 'INFO'
+        if self.error_code in (ErrorCodes.forbidden,):
+            return 'WARNING'
+        return 'ERROR'
 
 
 class APIInternalException(APIException):
@@ -266,7 +271,7 @@ def handle_exceptions(func):
     :return:
     """
 
-    def log_error(request, error=None):
+    def log_error(request, error, log_level):
         page_url = 'unknown'
         user_name = 'not authorized'
         request_data = ''
@@ -305,7 +310,7 @@ def handle_exceptions(func):
                    traceback.format_exc()
                    )
 
-        logger.error(error_formatted)
+        logger.log(log_level, error_formatted)
         return error_formatted
 
     def handler(*args, **kwargs):
@@ -317,12 +322,11 @@ def handle_exceptions(func):
             return data
         except APIException as error:
             # Do not log not_authorized errors
-            if error.need_to_log():
-                log_error(args[0], error)
+            log_error(args[0], error, error.log_level())
 
             return error.response()
         except Exception as error:
-            detailed_error = log_error(args[0], error)
+            detailed_error = log_error(args[0], error, 'ERROR')
 
             if not settings.DEBUG:
                 detailed_error = 'Unexpected error somewhere inside'
