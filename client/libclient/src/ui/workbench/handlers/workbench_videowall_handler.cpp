@@ -1427,6 +1427,12 @@ void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts()
         for (const QnVideoWallItem& item: videowall->items()->getItems())
             used << item.layout;
 
+        for (const QnVideoWallMatrix& matrix: videowall->matrices()->getItems())
+        {
+            for (const auto& layoutId: matrix.layoutByItem.values())
+                used << layoutId;
+        }
+
         QnUuid videoWallId = videowall->getId();
         QnLayoutResourceList unused = qnResPool->getResourcesByParentId(videoWallId)
             .filtered<QnLayoutResource>(
