@@ -15,7 +15,7 @@ from test_utils.host import SshHostConfig
 from test_utils.vagrant_box_config import BoxConfigFactory
 from test_utils.cloud_host import resolve_cloud_host_from_registry, create_cloud_host
 from test_utils.server import ServerConfigFactory
-from test_utils.camera import MEDIA_SAMPLE_FPATH, SampleMediaFile, Camera
+from test_utils.camera import SampleMediaFile, Camera
 
 
 DEFAULT_CLOUD_GROUP = 'test'
@@ -30,6 +30,8 @@ DEFAULT_VM_HOST_USER = 'root'
 DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
 
 DEFAULT_MAX_LOG_WIDTH = 500
+
+MEDIA_SAMPLE_FPATH = 'sample.mkv'
 
 
 log = logging.getLogger(__name__)
@@ -46,7 +48,9 @@ def pytest_addoption(parser):
                      help='working directory for tests: all generated files will be placed there')
     parser.addoption('--bin-dir', default=DEFAULT_BIN_DIR,
                      help='directory with binary files for tests:'
-                          ' debian distributive and sample.mkv are expected there')
+                          ' debian distributive and media sample are expected there')
+    parser.addoption('--media-sample-path', default=MEDIA_SAMPLE_FPATH,
+                     help='media sample file path, default is %s in binany directory' % MEDIA_SAMPLE_FPATH)
     parser.addoption('--no-servers-reset', action='store_true',
                      help='skip servers reset/cleanup on test setup')
     parser.addoption('--recreate-boxes', action='store_true',
@@ -83,6 +87,7 @@ def run_options(request):
         customization=request.config.getoption('--customization'),
         work_dir=request.config.getoption('--work-dir'),
         bin_dir=request.config.getoption('--bin-dir'),
+        media_sample_path=request.config.getoption('--media-sample-path'),
         reset_servers=not request.config.getoption('--no-servers-reset'),
         recreate_boxes=request.config.getoption('--recreate-boxes'),
         vm_name_prefix=request.config.getoption('--vm-name-prefix'),
@@ -130,7 +135,7 @@ def camera():
 
 @pytest.fixture
 def sample_media_file(run_options):
-    fpath = os.path.abspath(os.path.join(run_options.bin_dir, MEDIA_SAMPLE_FPATH))
+    fpath = os.path.abspath(os.path.join(run_options.bin_dir, run_options.media_sample_path))
     assert os.path.isfile(fpath), '%s is expected at %s' % (os.path.basename(fpath), os.path.dirname(fpath))
     return SampleMediaFile(fpath)
 

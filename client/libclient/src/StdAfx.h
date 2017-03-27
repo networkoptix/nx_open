@@ -58,10 +58,7 @@ extern "C" {
 #include <QtGui/QColor>
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
-#include <QtGui/QFont>
 #include <QtGui/QMouseEvent>
-#include <QtGui/QPaintEngine>
-#include <QtGui/QPainter>
 
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>

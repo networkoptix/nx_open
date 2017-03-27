@@ -3,7 +3,6 @@
 #include <QtCore/QFile>
 
 #include <nx/network/http/buffer_source.h>
-#include <nx/network/http/server/handler/http_server_handler_custom_func.h>
 #include <nx/network/http/server/handler/http_server_handler_redirect.h>
 #include <nx/network/http/server/handler/http_server_handler_static_data.h>
 #include <nx/utils/random.h>
@@ -97,35 +96,6 @@ void TestHttpServer::registerUserCredentials(
     const nx::String& password)
 {
     m_credentialsProvider.addCredentials(userName, password);
-}
-
-bool TestHttpServer::registerRequestProcessor(
-    const QString& path, ProcessHttpRequestFunc func)
-{
-    auto sharedFunc = std::make_shared<ProcessHttpRequestFunc>(std::move(func));
-    auto invokeSharedFunc = 
-        [sharedFunc = std::move(sharedFunc)](
-            nx_http::HttpServerConnection* const connection,
-            stree::ResourceContainer authInfo,
-            nx_http::Request request,
-            nx_http::Response* const response,
-            nx_http::RequestProcessedHandler completionHandler)
-        {
-            (*sharedFunc)(
-                connection,
-                std::move(authInfo),
-                std::move(request),
-                response,
-                std::move(completionHandler));
-        };
-
-    return registerRequestProcessor<nx_http::server::handler::CustomFunc>(
-        path,
-        [invokeSharedFunc = std::move(invokeSharedFunc)]()
-            -> std::unique_ptr<nx_http::server::handler::CustomFunc>
-        {
-            return std::make_unique<nx_http::server::handler::CustomFunc>(invokeSharedFunc);
-        });
 }
 
 bool TestHttpServer::registerStaticProcessor(

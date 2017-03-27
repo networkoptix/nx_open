@@ -1,0 +1,181 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-push-8">
+            <system-info></system-info>
+        </div>
+        <div class="col-md-8 col-md-pull-4">
+            <alert type="danger" ng-if="settings.flags.noHDD">
+                此設備僅限於在與硬碟上運作.<br>
+                請關閉設備然後安裝硬碟.
+            </alert>
+            <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
+                此設備需要網路連接才能運作.<br>
+                請將它連接到本地網路或網際網路
+            </alert>
+            <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
+                此裝置之網路設定有誤.<br>
+                請將其連接到網路或設置正確的 IP 位址.
+            </alert>
+
+
+            <tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
+                <tab heading="{{L.settings.tabs.server}}" active="active.server">
+                    <div>
+                        <form novalidate name="settingsForm" class="form-horizontal" role="form" >
+                            <h3>通訊埠</h3>
+                            <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
+                                <div class="col-xs-6">
+                                    <input type="number" class="form-control" id="port" placeholder="通訊埠" name="port" ng-model="settings.port"
+                                           min="1"  max="65000"
+                                           pattern ="^\d*$" required>
+                                </div>
+
+                                <div class="col-xs-6">
+                                    <button type="button" class="btn btn-primary" ng-disabled="!settingsForm.$valid" ng-click="save()">更改埠</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div>
+                        <h3>重置伺服器</h3>
+                        <p>此操作將重置本伺服器回預設值 (清除資料庫和重置配置). 此伺服器將脫離目前的系統. 錄影資料將繼續保存.</p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">恢復出廠預設值</button></p>
+                    </div>
+                    <div>
+                        <h3>重新啟動</h3>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()">重啟伺服器</button>
+                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">重新開機</button></p>
+                    </div>
+                    <div ng-if="user.isOwner">
+                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form" >
+                            <h3>變更管理員密碼</h3>
+                            <p>如果本系統是本地系統 (未連接到雲) 這將改變使用者"admin"的密碼以及在某些伺服器上的還原 (root) 密碼.<br>
+                                否則這將只恢復密碼.</p>
+                            <div class="col-sm-6">
+                                <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
+                                        ng-click="changePassword()">變更密碼</button>
+                            </div>
+                        </form>
+                    </div>
+                </tab>
+
+                <tab heading="{{L.settings.tabs.system}}" active="active.system">
+                    <div>
+                        <h3>名稱</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" ng-model="settings.systemName">
+                            </div>
+
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-default" ng-click="renameSystem()">重命名系統</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div ng-if="canMerge" >
+                        <form class="form-horizontal" >
+                            <h3>合併系統</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">合併系統</button></p>
+                        </form>
+                    </div>
+
+                    <div>
+                        <h3>{{Config.cloud.productName}}</h3>
+
+                        <div ng-if="cloudSystemID">
+                            <p>此系統連結到 {{Config.cloud.productName}}, 系統擁有者: <b>{{cloudAccountName}}</b></p>
+                            <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">從 {{Config.cloud.productName}} 斷線</button></p>
+                            <p><a ng-if="!mode.liteClient"
+                                  ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
+                                  target="_blank">到 {{Config.cloud.productName}} 入口</a></p>
+                        </div>
+
+                        <div ng-if="!cloudSystemID">
+                            <alert type="warning">此系統未連結到 {{Config.cloud.productName}} 
+                                <a ng-if="!mode.liteClient"
+                                   ng-href="{{Config.cloud.portalUrl}}"
+                                   target="_blank">瞭解更多</a></alert>
+                            <alert type="error" ng-if="!hasInternetOnServer">將伺服器連接到網際網路來設定 {{Config.cloud.productName}}</alert>
+                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">需要網際網路以連接到 {{Config.cloud.productName}}</alert>
+                            <p ng-if="canConnectToCloud"  ><button
+                                    class="btn btn-default"
+                                    ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">連接到 {{Config.cloud.productName}}</button>
+                                <a ng-if="!mode.liteClient"  class="btn btn-default"
+                                   ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
+                                   target="_blank">新建 {{Config.cloud.productName}} 帳號</a></p>
+                        </div>
+                    </div>
+                </tab>
+
+                <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
+                    <div ng-if="settings.flags.canSetupNetwork">
+                        <h3>設備網路設置</h3>
+                        <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">保存設定並重新啟動設備</button>
+                    </div>
+                    <div ng-if="settings.flags.canSetupTime">
+                        <h3>日期和時間</h3>
+                        <form name="timeSettings">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td><label for="timeZone">時區</label></td>
+                                        <td><label for="date">日期</label></td>
+                                        <td><label for="time">時間</label></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td><select class="form-control"
+                                                    ng-options="zone.id as zone.name for zone in timeZones"
+                                                    id="timeZone"
+                                                    name="timeZone"
+                                                    ng-model="dateTimeSettings.timeZone"
+                                                    required></select></td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       id="date" name="date"
+                                                       class="form-control"
+                                                       datepicker-popup="{{Config.dateSettingsFormat}}"
+                                                       ng-model="dateTimeSettings.dateTime"
+                                                       required
+ is-open="dateTimeSettings.openDate"
+                                                       close-text="Close" />
+                                                <span class="input-group-btn">
+                                                    <button type="button"
+                                                            class="btn btn-default"
+                                                            ng-click="openDatePicker($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input class="form-control" ng-model="dateTimeSettings.dateTime" ui-timepicker>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <button class="btn btn-default" ng-click="saveDateTime()">保存日期和時間</button>
+                    </div>
+                    <div ng-if="(canRestoreSettings || canRestoreSettingsNotNetwork)">
+                        <h3>還原伺服器的設定</h3>
+                        <p><button type="button" class="btn btn-default" ng-if="canRestoreSettings" ng-click="restoreSettings()">完整還原</button>
+                            <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()">還原除了網路以外的設定</button></p>
+                    </div>
+                    <div ng-if="canRunClient || canStopClient">
+                        <h3>在伺服器上執行用戶端應用程式</h3>
+                        <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()">執行用戶端</button>
+                            <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">停止用戶端</button></p>
+                        <p>使用鍵盤/滑鼠或行動應用程式來控制它.</p>
+                    </div>
+                </tab>
+            </tabset>
+        </div>
+    </div>
+</div>

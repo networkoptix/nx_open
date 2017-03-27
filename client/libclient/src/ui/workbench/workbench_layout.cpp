@@ -37,27 +37,17 @@ namespace {
 
 } // anonymous namespace
 
-QnWorkbenchLayout::QnWorkbenchLayout(QObject *parent):
-    QObject(parent)
-{
-    // TODO: #Elric this does not belong here.
-    setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
-
-    initCellParameters();
-}
-
 QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObject *parent):
     QObject(parent)
 {
-    if(resource.isNull()) {
-        qnNullWarning(resource);
-        return;
-    }
 
     // TODO: #Elric this does not belong here.
     setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
 
     initCellParameters();
+
+    if(resource.isNull())
+        return;
 
     QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(this, resource, this);
     synchronizer->setAutoDeleting(true);
@@ -70,6 +60,45 @@ QnWorkbenchLayout::~QnWorkbenchLayout() {
     blockSignals(signalsBlocked);
 
     clear();
+}
+
+QnLayoutFlags QnWorkbenchLayout::flags() const
+{
+    return m_flags;
+}
+
+QIcon QnWorkbenchLayout::icon() const
+{
+    return m_icon;
+}
+
+void QnWorkbenchLayout::setIcon(const QIcon& value)
+{
+    m_icon = value;
+    emit iconChanged();
+}
+
+void QnWorkbenchLayout::setFlags(QnLayoutFlags value)
+{
+    if (m_flags == value)
+        return;
+
+    m_flags = value;
+    emit flagsChanged();
+}
+
+NxUi::AbstractWorkbenchPanel* QnWorkbenchLayout::panel() const
+{
+    return m_panel;
+}
+
+void QnWorkbenchLayout::setPanel(NxUi::AbstractWorkbenchPanel* value)
+{
+    if (m_panel == value)
+        return;
+
+    m_panel = value;
+    emit panelChanged();
 }
 
 QnLayoutResourcePtr QnWorkbenchLayout::resource() const {

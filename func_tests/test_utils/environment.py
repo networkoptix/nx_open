@@ -165,7 +165,10 @@ class EnvironmentBuilder(object):
             log.info('SERVER %s: %r at %s %s ecs_guid=%r local_system_id=%r',
                      name.upper(), server.name, server.box.name, server.url, server.ecs_guid, server.local_system_id)
         log.info('----- build environment setup is complete ----------------------------->8 ----------------------------------------------')
-        return SimpleNamespace(servers=servers, **servers)
+        return SimpleNamespace(
+            work_dir=self._work_dir,
+            servers=servers,
+            **servers)
 
     def __call__(self, *args, **kw):
         try:

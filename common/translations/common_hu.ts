@@ -488,7 +488,7 @@
     </message>
     <message>
         <source>Send Email</source>
-        <translation>E-mail küldése</translation>
+        <translation>Email küldése</translation>
     </message>
 </context>
 <context>

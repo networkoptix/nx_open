@@ -8,7 +8,7 @@ class QnGraphicsScene: public QGraphicsScene
     using base_type = QGraphicsScene;
 
 public:
-    QnGraphicsScene(QObject *parent = 0);
+    QnGraphicsScene(QObject* parent = nullptr);
     virtual ~QnGraphicsScene();
 
 protected:

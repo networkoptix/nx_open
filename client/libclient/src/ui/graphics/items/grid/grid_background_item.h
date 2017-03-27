@@ -16,29 +16,38 @@ class QnWorkbenchGridMapper;
 class QnGridBackgroundItemPrivate;
 class QnAppServerImageCache;
 
-class QnGridBackgroundItem : public QGraphicsObject, public QnWorkbenchContextAware
+class QnGridBackgroundItem: public QGraphicsObject, public QnWorkbenchContextAware
 {
     Q_OBJECT
+    using base_type = QGraphicsObject;
+
     Q_PROPERTY(QRectF viewportRect READ viewportRect WRITE setViewportRect)
 
 public:
-    explicit QnGridBackgroundItem(QGraphicsItem *parent = NULL, QnWorkbenchContext* context = NULL);
+    explicit QnGridBackgroundItem(
+        QGraphicsItem* parent = nullptr,
+        QnWorkbenchContext* context = nullptr);
+
     virtual ~QnGridBackgroundItem();
 
     virtual QRectF boundingRect() const override;
 
-    const QRectF &viewportRect() const;
-    void setViewportRect(const QRectF &rect);
+    const QRectF& viewportRect() const;
+    void setViewportRect(const QRectF& rect);
 
-    QnWorkbenchGridMapper *mapper() const;
-    void setMapper(QnWorkbenchGridMapper *mapper);
+    QnWorkbenchGridMapper* mapper() const;
+    void setMapper(QnWorkbenchGridMapper* mapper);
 
-    void update(const QnLayoutResourcePtr &layout);
+    void update(const QnLayoutResourcePtr& layout);
 
     QRect sceneBoundingRect() const;
 
 protected:
-    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
+    virtual void paint(
+        QPainter* painter,
+        const QStyleOptionGraphicsItem* option,
+        QWidget* widget) override;
+
     QScopedPointer<QnGridBackgroundItemPrivate> const d_ptr;
 
 private slots:

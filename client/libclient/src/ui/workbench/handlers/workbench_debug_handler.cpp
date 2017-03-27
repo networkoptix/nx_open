@@ -114,14 +114,16 @@ public:
             {
                 QnPaletteWidget *w = new QnPaletteWidget(this);
                 w->setPalette(qApp->palette());
-                auto messageBox = new QnMessageBox(mainWindow(), Qt::Window);
+                auto messageBox = new QnMessageBox(mainWindow());
+                messageBox->setWindowFlags(Qt::Window);
                 messageBox->addCustomWidget(w);
                 messageBox->show();
             });
 
         addButton(lit("Resource Pool"), [this]
             {
-                auto messageBox = new QnMessageBox(mainWindow(), Qt::Window);
+                auto messageBox = new QnMessageBox(mainWindow());
+                messageBox->setWindowFlags(Qt::Window);
                 messageBox->addCustomWidget(new QnResourceListView(qnResPool->getResources(), messageBox));
                 messageBox->show();
             });

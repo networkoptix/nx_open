@@ -1,5 +1,7 @@
 #include "autoscaled_plain_text.h"
 
+#include <QtGui/QPainter>
+
 #include <ui/common/geometry.h>
 #include <utils/common/event_processors.h>
 

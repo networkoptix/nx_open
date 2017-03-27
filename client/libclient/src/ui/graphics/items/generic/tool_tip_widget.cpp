@@ -106,11 +106,11 @@ QPointF QnToolTipWidget::tailPos() const {
     return m_tailPos;
 }
 
-Qt::Edge QnToolTipWidget::tailBorder() const
+Qt::Edges QnToolTipWidget::tailBorder() const
 {
     QPointF distance = m_tailPos - QnGeometry::closestPoint(rect(), m_tailPos);
     if (qFuzzyIsNull(distance))
-        return static_cast<Qt::Edge>(0);
+        return Qt::Edges();
 
     if (distance.y() < distance.x())
     {
@@ -280,19 +280,19 @@ void QnToolTipWidget::ensureShape() const {
     if (m_roundingRadius == kUseContentMargins)
         getContentsMargins(&l, &t, &r, &b);
 
-    Qt::Edge tailBorder = this->tailBorder();
+    Qt::Edges tailBorder = this->tailBorder();
     QRectF rect = this->rect();
 
     /* CCW traversal. */
     QPainterPath borderShape;
     borderShape.moveTo(rect.left(), rect.top() + t);
-    addEdgeTo(rect.left(),          rect.bottom() - b,  m_tailPos, m_tailWidth, tailBorder & Qt::LeftEdge, &borderShape);
+    addEdgeTo(rect.left(),          rect.bottom() - b,  m_tailPos, m_tailWidth, tailBorder.testFlag(Qt::LeftEdge), &borderShape);
      addArcTo(rect.left() + l,      rect.bottom(),      &borderShape);
-    addEdgeTo(rect.right() - r,     rect.bottom(),      m_tailPos, m_tailWidth, tailBorder & Qt::BottomEdge, &borderShape);
+    addEdgeTo(rect.right() - r,     rect.bottom(),      m_tailPos, m_tailWidth, tailBorder.testFlag(Qt::BottomEdge), &borderShape);
      addArcTo(rect.right(),         rect.bottom() - b,  &borderShape);
-    addEdgeTo(rect.right(),         rect.top() + t,     m_tailPos, m_tailWidth, tailBorder & Qt::RightEdge, &borderShape);
+    addEdgeTo(rect.right(),         rect.top() + t,     m_tailPos, m_tailWidth, tailBorder.testFlag(Qt::RightEdge), &borderShape);
      addArcTo(rect.right() - r,     rect.top(),         &borderShape);
-    addEdgeTo(rect.left() + l,      rect.top(),         m_tailPos, m_tailWidth, tailBorder & Qt::TopEdge, &borderShape);
+    addEdgeTo(rect.left() + l,      rect.top(),         m_tailPos, m_tailWidth, tailBorder.testFlag(Qt::TopEdge), &borderShape);
      addArcTo(rect.left(),          rect.top() + t,     &borderShape);
     borderShape.closeSubpath();
 

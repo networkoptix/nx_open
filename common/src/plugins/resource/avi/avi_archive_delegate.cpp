@@ -114,22 +114,8 @@ private:
 
 
 QnAviArchiveDelegate::QnAviArchiveDelegate():
-    m_formatContext(0),
-    m_playlistOffsetUsec(0),
-    m_selectedAudioChannel(0),
-    m_audioStreamIndex(-1),
-    m_firstVideoIndex(0),
-    m_startTimeUsec(0),
-    m_useAbsolutePos(true),
-    m_duration(AV_NOPTS_VALUE),
-    m_ioContext(0),
-    m_eofReached(false),
-    m_openMutex(QnMutex::Recursive),
-    m_fastStreamFind(false),
-    m_hasVideo(true),
-    m_lastSeekTime(AV_NOPTS_VALUE)
+    m_openMutex(QnMutex::Recursive)
 {
-    close();
     m_audioLayout.reset( new QnAviAudioLayout(this) );
     m_flags |= Flag_CanSendMotion;
 }
@@ -146,17 +132,17 @@ QnAviArchiveDelegate::~QnAviArchiveDelegate()
 
 qint64 QnAviArchiveDelegate::startTime() const
 {
-    return m_startTimeUsec;
+    return m_startTimeUs;
 }
 
 qint64 QnAviArchiveDelegate::endTime() const
 {
     //if (!m_streamsFound && !findStreams())
     //    return 0;
-    if (m_duration == qint64(AV_NOPTS_VALUE))
-        return m_duration;
+    if (m_durationUs == qint64(AV_NOPTS_VALUE))
+        return m_durationUs;
     else
-        return m_duration + m_startTimeUsec;
+        return m_durationUs + m_startTimeUs;
 }
 
 QnConstMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
@@ -252,7 +238,7 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
     data->flags = static_cast<QnAbstractMediaData::MediaFlags>(packet.flags);
 
     while (packet.stream_index >= m_lastPacketTimes.size())
-        m_lastPacketTimes << m_startTimeUsec;
+        m_lastPacketTimes << m_startTimeUs;
     if (data->timestamp == AV_NOPTS_VALUE) {
         /*
         AVStream* stream = m_formatContext->streams[packet.stream_index];
@@ -281,15 +267,15 @@ qint64 QnAviArchiveDelegate::seek(qint64 time, bool findIFrame)
     if (m_eofReached)
         return time;
 
-    qint64 relTime = qMax(time-m_startTimeUsec, 0ll);
+    qint64 relTime = qMax(time-m_startTimeUs, 0ll);
     if (m_hasVideo)
-        av_seek_frame(m_formatContext, -1, relTime + m_playlistOffsetUsec, findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
+        av_seek_frame(m_formatContext, -1, relTime + m_playlistOffsetUs, findIFrame ? AVSEEK_FLAG_BACKWARD : AVSEEK_FLAG_ANY);
     else {
         // mp3 seek is bugged in current ffmpeg version
         if (!reopen())
             return -1;
     }
-    m_lastSeekTime = relTime + m_playlistOffsetUsec + m_startTimeUsec; // file physical time to UTC time
+    m_lastSeekTime = relTime + m_playlistOffsetUs + m_startTimeUs; // file physical time to UTC time
     return time;
 }
 
@@ -370,7 +356,7 @@ void QnAviArchiveDelegate::close()
     m_formatContext = 0;
     m_initialized = false;
     m_streamsFound = false;
-    m_playlistOffsetUsec = 0;
+    m_playlistOffsetUs = 0;
     m_storage.clear();
     m_lastPacketTimes.clear();
     m_lastSeekTime = AV_NOPTS_VALUE;
@@ -424,8 +410,8 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
 
         if (m_useAbsolutePos)
         {
-            m_startTimeUsec = 1000ll * m_metadata.startTimeMs;
-            if (m_startTimeUsec >= UTC_TIME_DETECTION_THRESHOLD)
+            m_startTimeUs = 1000ll * m_metadata.startTimeMs;
+            if (m_startTimeUs >= UTC_TIME_DETECTION_THRESHOLD)
             {
                 m_resource->addFlags(Qn::utc);
                 if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage))
@@ -477,7 +463,7 @@ bool QnAviArchiveDelegate::findStreams()
 
         if (m_streamsFound)
         {
-            m_duration = m_formatContext->duration;
+            m_durationUs = m_formatContext->duration;
             initLayoutStreams();
         }
         else {
@@ -562,7 +548,7 @@ qint64 QnAviArchiveDelegate::packetTimestamp(const AVPacket& packet)
     if (packetTime == qint64(AV_NOPTS_VALUE))
         return AV_NOPTS_VALUE;
     else
-        return qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTimeUsec;
+        return qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTimeUs;
 }
 
 void QnAviArchiveDelegate::packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet)
@@ -576,9 +562,9 @@ void QnAviArchiveDelegate::packetTimestamp(QnCompressedVideoData* video, const A
     if (packetTime == qint64(AV_NOPTS_VALUE))
         video->timestamp = AV_NOPTS_VALUE;
     else
-        video->timestamp = qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTimeUsec;
+        video->timestamp = qMax(0ll, (qint64) (timeBase * (packetTime - firstDts))) +  m_startTimeUs;
     if (packet.pts != AV_NOPTS_VALUE) {
-        video->pts = qMax(0ll, (qint64) (timeBase * (packet.pts - firstDts))) +  m_startTimeUsec;
+        video->pts = qMax(0ll, (qint64) (timeBase * (packet.pts - firstDts))) +  m_startTimeUs;
     }
 }
 

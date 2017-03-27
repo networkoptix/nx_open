@@ -36,7 +36,6 @@ typedef nx::utils::MoveOnlyFunc<void(RequestResult)> RequestProcessedHandler;
 class NX_NETWORK_API AbstractHttpRequestHandler
 {
 public:
-    AbstractHttpRequestHandler();
     virtual ~AbstractHttpRequestHandler();
 
     /**
@@ -62,7 +61,7 @@ protected:
         stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler ) = 0;
+        nx_http::RequestProcessedHandler completionHandler) = 0;
 
     nx_http::Response* response();
 

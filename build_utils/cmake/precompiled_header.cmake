@@ -144,6 +144,7 @@ function(_add_gcc_clang_precompiled_header target input)
         COMMAND "${CMAKE_CXX_COMPILER}"
             "@${pch_dir}.parameters" ${cxx_standard} -x c++-header "${input}" -o "${pch_file}"
         DEPENDS "${input}" "${pch_dir}.parameters"
+        IMPLICIT_DEPENDS CXX "${input}"
         COMMENT "Precompiling ${pch_dir}")
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")

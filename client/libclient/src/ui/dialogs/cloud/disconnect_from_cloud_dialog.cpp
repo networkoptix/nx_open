@@ -243,9 +243,9 @@ void QnDisconnectFromCloudDialogPrivate::showFailure(const QString &message)
 void QnDisconnectFromCloudDialogPrivate::setVisibleButton(VisibleButton button)
 {
     const bool okButtonVisible = (button == VisibleButton::Ok);
-    const auto style = static_cast<QnButtonAccent>(okButtonVisible
+    const auto style = okButtonVisible
         ? QnButtonAccent::Warning
-        : QnButtonAccent::Standard);
+        : QnButtonAccent::Standard;
     const auto defaultButton = (okButtonVisible ? okButton : nextButton);
 
     okButton->setVisible(okButtonVisible);

@@ -14,7 +14,7 @@ enum class Projection
     Equirectangular
 };
 
-}
+} // namespace
 
 QnViewportPtzController::QnViewportPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController)

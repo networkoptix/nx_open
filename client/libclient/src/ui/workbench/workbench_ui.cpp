@@ -224,6 +224,31 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
             if (!m_inFreespace)
                 storeSettings();
         });
+
+    // TODO: #ynikitenkov before final commit: add currentLayoutFlags to the workbench()?
+    // Possibly it should be usedd in several places
+    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this,
+        [this]()
+        {
+            const auto layout = workbench()->currentLayout();
+            if (!layout)
+                return;
+
+            disconnect(layout, &QnWorkbenchLayout::flagsChanged,
+                this, &QnWorkbenchUi::updateControlsVisibilityAnimated);
+        });
+
+    connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
+        [this]()
+        {
+            const auto layout = workbench()->currentLayout();
+            if (!layout)
+                return;
+
+            connect(layout, &QnWorkbenchLayout::flagsChanged,
+                this, &QnWorkbenchUi::updateControlsVisibilityAnimated);
+            updateControlsVisibilityAnimated();
+        });
 }
 
 QnWorkbenchUi::~QnWorkbenchUi()
@@ -356,7 +381,12 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate)
 {    // TODO
     ensureAnimationAllowed(animate);
 
-    bool timelineVisible = calculateTimelineVisible(navigator()->currentWidget());
+    const auto layout = workbench()->currentLayout();
+    const bool allowedByLayout = (layout
+        ? !layout->flags().testFlag(QnLayoutFlag::NoTimeline)
+        : true);
+    const bool timelineVisible =
+        (allowedByLayout && calculateTimelineVisible(navigator()->currentWidget()));
 
     if (qnRuntime->isVideoWallMode())
     {

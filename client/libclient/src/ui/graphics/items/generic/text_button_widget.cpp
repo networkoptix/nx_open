@@ -1,6 +1,8 @@
 #include "text_button_widget.h"
 #include "image_button_widget_p.h"
 
+#include <QtGui/QPainter>
+
 #include <ui/common/palette.h>
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/common/geometry.h>

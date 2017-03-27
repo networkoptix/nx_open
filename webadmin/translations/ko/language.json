@@ -4,7 +4,7 @@
   "dialogs":{
     "okButton":"Ok",
     "openLink":"이 링크를 방문",
-    "openLinkWithTitle":"{{title} 링크를 방문"
+    "openLinkWithTitle":"{{title}} 링크를 방문"
   },
   "setup":{
     "createAccount":"계정을 만듭니다",

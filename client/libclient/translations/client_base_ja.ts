@@ -267,33 +267,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-        <source>Zoom In</source>
-        <translation>ズームイン</translation>
-    </message>
-    <message>
-        <source>Zoom Out</source>
-        <translation>ズームアウト</translation>
-    </message>
-    <message>
-        <source>Focus Far</source>
-        <translation>フォーカス遠</translation>
-    </message>
-    <message>
-        <source>Focus Near</source>
-        <translation>フォーカス近</translation>
-    </message>
-    <message>
-        <source>Auto Focus</source>
-        <translation>オートフォーカス</translation>
-    </message>
-    <message>
-        <source>Change Dewarping Mode</source>
-        <translation>歪み補正モード</translation>
-    </message>
-</context>
-<context>
     <name>QObject</name>
     <message>
         <source>Parameter 1 is null.</source>
@@ -6299,67 +6272,67 @@ to %1</source>
     <message>
         <source>hh:mm</source>
         <comment>Format for displaying hours and minutes on timeline.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">hh:mm</translation>
     </message>
     <message>
         <source>hh:mm ap</source>
         <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">hh:mm ap</translation>
     </message>
     <message>
         <source>h ap</source>
         <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">h ap</translation>
     </message>
     <message>
         <source>dd</source>
         <comment>Format for displaying days on timeline.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd</translation>
     </message>
     <message>
         <source>MMMM</source>
         <comment>Format for displaying months on timeline.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MMMM</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying years on timeline</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">yyyy</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd MMMM yyyy hh:mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd MMMM yyyy h ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
         <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-        <translation type="unfinished"></translation>
+        <translation>yyyy/MMMM/dd</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
         <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MMMM yyyy</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying year caption in timeline&apos;s header</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">yyyy</translation>
     </message>
 </context>
 <context>

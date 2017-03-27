@@ -49,7 +49,7 @@
     <name>CredentialsEditor</name>
     <message>
         <source>Email</source>
-        <translation>E-mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Password</source>
@@ -73,7 +73,7 @@
     </message>
     <message>
         <source>Email and password cannot be empty</source>
-        <translation>E-mail cím és jelszó nem lehet üres</translation>
+        <translation>Email cím és jelszó nem lehet üres</translation>
     </message>
     <message>
         <source>Log in</source>
@@ -81,7 +81,7 @@
     </message>
     <message>
         <source>Incorrect Email or Password</source>
-        <translation>Hibás e-mail cím vagy jelszó</translation>
+        <translation>Hibás Email cím vagy jelszó</translation>
     </message>
 </context>
 <context>

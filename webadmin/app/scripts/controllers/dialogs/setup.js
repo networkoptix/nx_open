@@ -544,7 +544,7 @@ angular.module('webadminApp')
         };
         $scope.finish = function(){
             nativeClient.closeDialog().catch(function(){
-                window.location.href = window.location.origin;
+                window.location.href = window.location.protocol + '//' + window.location.host;
 
                 /*
                 $location.path('/');
