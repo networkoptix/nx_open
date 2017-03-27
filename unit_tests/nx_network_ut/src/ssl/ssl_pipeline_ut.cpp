@@ -32,6 +32,12 @@ public:
         m_clientPipeline->setInput(&m_serverToClientPipeline);
     }
 
+    void setTransferWindowSize(std::size_t windowSize)
+    {
+        m_clientToServerPipeline.setMaxBufferSize(windowSize);
+        m_serverToClientPipeline.setMaxBufferSize(windowSize);
+    }
+
     void insertBetweenClientAndServer(
         std::unique_ptr<utils::pipeline::AbstractOutputConverter> stream)
     {
@@ -114,7 +120,6 @@ class NotifyingTwoWayPipelineWrapper:
     public utils::pipeline::TwoWayPipeline
 {
 public:
-    //using DataReadEventHandler = nx::utils::MoveOnlyFunc<void(void*, size_t)>;
     using DataWrittenEventHandler = nx::utils::MoveOnlyFunc<void(const void*, size_t)>;
 
     NotifyingTwoWayPipelineWrapper(
@@ -143,11 +148,6 @@ public:
     {
         m_twoWayPipeline->setInput(input);
     }
-
-    //void setOnDataRead(DataReadEventHandler func)
-    //{
-    //    m_onDataRead = std::move(func);
-    //}
 
     void setOnDataWritten(DataWrittenEventHandler func)
     {
@@ -286,6 +286,11 @@ protected:
         ASSERT_TRUE(m_serverPipeline->eof());
     }
 
+    void setTransferWindowSize(std::size_t windowSize)
+    {
+        m_pipeline->setTransferWindowSize(windowSize);
+    }
+
     std::unique_ptr<Pipeline> createClientPipeline()
     {
         auto pipeline = std::make_unique<ConnectingPipeline>();
@@ -298,6 +303,16 @@ protected:
         auto serverPipeline = std::make_unique<AcceptingPipeline>();
         m_serverPipeline = serverPipeline.get();
         return std::move(serverPipeline);
+    }
+
+    ConnectingPipeline* clientPipeline()
+    {
+        return m_clientPipeline;
+    }
+
+    AcceptingPipeline* serverPipeline()
+    {
+        return m_serverPipeline;
     }
 
 private:
@@ -368,15 +383,73 @@ TEST_F(SslPipeline, shutdown)
     thenBothSidesReportEof();
 }
 
-//TEST_F(SslPipeline, handshake_error)
-
 //TEST_F(SslPipeline, incompatible_algorithm)
 
-//TEST_F(SslPipeline, unexpected_intermediate_input_depletion)
+class SslPipelineThirstyFlags:
+    public SslPipeline
+{
+public:
 
-//TEST_F(SslPipeline, read_thirsty_flag)
+protected:
+    void givenPipelineReadyForIo()
+    {
+        givenEncodeDecodePipeline();
+        setTransferWindowSize(1024);
+        // Performing handshake.
+        whenDataIsTransferredThroughPipeline();
+    }
 
-//TEST_F(SslPipeline, write_thirsty_flag)
+    void testReadThirstyFlag(ssl::Pipeline* one, ssl::Pipeline* another)
+    {
+        std::array<char, 1024> buf;
+
+        ASSERT_FALSE(one->isReadThirsty());
+        one->read(buf.data(), buf.size());
+        ASSERT_TRUE(one->isReadThirsty());
+
+        another->write(buf.data(), buf.size());
+        one->read(buf.data(), buf.size());
+        ASSERT_FALSE(one->isReadThirsty());
+    }
+
+    void testWriteThirstyFlag(ssl::Pipeline* one, ssl::Pipeline* another)
+    {
+        std::array<char, 1024> buf;
+
+        ASSERT_FALSE(one->isWriteThirsty());
+
+        int result = 0;
+        for (;;)
+        {
+            result = one->write(buf.data(), buf.size());
+            if (result < 0)
+                break;
+        }
+        ASSERT_EQ(utils::pipeline::StreamIoError::wouldBlock, result);
+
+        ASSERT_TRUE(one->isWriteThirsty());
+
+        ASSERT_GT(another->read(buf.data(), buf.size()), 0);
+        ASSERT_GT(one->write(buf.data(), buf.size()), 0);
+        ASSERT_FALSE(one->isWriteThirsty());
+    }
+};
+
+TEST_F(SslPipelineThirstyFlags, read_thirsty)
+{
+    givenPipelineReadyForIo();
+
+    testReadThirstyFlag(clientPipeline(), serverPipeline());
+    testReadThirstyFlag(serverPipeline(), clientPipeline());
+}
+
+TEST_F(SslPipelineThirstyFlags, write_thirsty)
+{
+    givenPipelineReadyForIo();
+
+    testWriteThirstyFlag(clientPipeline(), serverPipeline());
+    testWriteThirstyFlag(serverPipeline(), clientPipeline());
+}
 
 } // namespace test
 } // namespace ssl

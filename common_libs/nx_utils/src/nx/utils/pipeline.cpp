@@ -50,12 +50,16 @@ int ProxyPipeline::write(const void* data, size_t count)
 
 ReflectingPipeline::ReflectingPipeline(QByteArray initialData):
     m_buffer(std::move(initialData)),
-    m_totalBytesThrough(0)
+    m_totalBytesThrough(0),
+    m_maxSize(0)
 {
 }
 
 int ReflectingPipeline::write(const void* data, size_t count)
 {
+    if (m_maxSize > 0 && m_buffer.size() >= m_maxSize)
+        return StreamIoError::wouldBlock;
+
     m_buffer.append(static_cast<const char*>(data), count);
     m_totalBytesThrough += count;
     return count;
@@ -71,6 +75,11 @@ int ReflectingPipeline::read(void* data, size_t count)
     m_buffer.remove(0, bytesToRead);
     m_totalBytesThrough += bytesToRead;
     return bytesToRead;
+}
+
+void ReflectingPipeline::setMaxBufferSize(std::size_t maxSize)
+{
+    m_maxSize = maxSize;
 }
 
 std::size_t ReflectingPipeline::totalBytesThrough() const

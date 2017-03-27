@@ -93,6 +93,11 @@ public:
     virtual int read(void* data, size_t count) override;
 
     /**
+     * @param maxSize 0 - no limit.
+     */
+    void setMaxBufferSize(std::size_t maxSize);
+
+    /**
      * Total of bytes written and read.
      */
     std::size_t totalBytesThrough() const;
@@ -102,6 +107,7 @@ public:
 private:
     QByteArray m_buffer;
     std::size_t m_totalBytesThrough;
+    std::size_t m_maxSize;
 };
 
 //-------------------------------------------------------------------------------------------------
