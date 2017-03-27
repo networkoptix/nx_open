@@ -8,7 +8,6 @@ import os.path
 import logging
 import shutil
 import subprocess
-from .utils import SimpleNamespace
 from .host import host_from_config
 from .vagrant_box_config import BoxConfig
 from .vagrant_box import Vagrant
@@ -29,8 +28,10 @@ class EnvironmentBuilder(object):
 
     vagrant_boxes_cache_key = 'nx/vagrant_boxes'
 
-    def __init__(self, module, test_session, options, cache, cloud_host_host, company_name):
-        self._test_dir = os.path.abspath(os.path.dirname(module.__file__))
+    def __init__(self, request, test_session, options, cache, cloud_host_host, company_name):
+        self._request = request
+        self._test_id = request.node.nodeid
+        self._test_dir = os.path.abspath(os.path.dirname(str(request.node.fspath)))
         self._test_session = test_session
         self._cache = cache
         self._cloud_host_host = cloud_host_host  # cloud host dns name, like: 'cloud-dev.hdw.mx'
@@ -165,14 +166,33 @@ class EnvironmentBuilder(object):
             log.info('SERVER %s: %r at %s %s ecs_guid=%r local_system_id=%r',
                      name.upper(), server.name, server.box.name, server.url, server.ecs_guid, server.local_system_id)
         log.info('----- build environment setup is complete ----------------------------->8 ----------------------------------------------')
-        return SimpleNamespace(
-            work_dir=self._work_dir,
-            servers=servers,
-            **servers)
+        artifact_path_prefix = os.path.join(
+            self._work_dir,
+            os.path.basename(self._test_id.replace(':', '_').replace('.py', '')))
+        return Environment(artifact_path_prefix, servers)
 
     def __call__(self, *args, **kw):
         try:
-            return self.build_environment(*args, **kw)
+            env = self.build_environment(*args, **kw)
+            self._request.addfinalizer(env.finalizer)
+            return env
         except subprocess.CalledProcessError as x:
             log.error('Command %s returned status %d:\n%s', x.cmd, x.returncode, x.output)
             raise
+
+
+class Environment(object):
+
+    def __init__(self, artifact_path_prefix, servers):
+        self.artifact_path_prefix = artifact_path_prefix
+        self.servers = servers
+        for name, server in servers.items():
+            setattr(self, name, server)
+
+    def finalizer(self):
+        log.info('FINALIZER for %s', self.artifact_path_prefix)
+        for name, server in self.servers.items():
+            log_path = '%s-server-%s.log' % (self.artifact_path_prefix, name)
+            with open(log_path, 'wb') as f:
+                f.write(server.get_log_file())
+            log.debug('log file for server %s, %s is stored to %s', name.upper(), server, log_path)
