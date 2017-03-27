@@ -191,7 +191,14 @@ const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
 //!time that is given to process to exit. After that, applauncher (if present) will try to terminate it
 static const quint32 PROCESS_TERMINATE_TIMEOUT = 15000;
 
-using nx::client::desktop::utils::UnityLauncherWorkaround;
+
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace workbench {
+
+using utils::UnityLauncherWorkaround;
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchActionHandler
@@ -2279,3 +2286,9 @@ void QnWorkbenchActionHandler::deleteDialogs() {
     if (systemAdministrationDialog())
         delete systemAdministrationDialog();
 }
+
+} // namespace workbench
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

@@ -7,6 +7,7 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QUrlQuery>
 
+#include <QtGui/QKeyEvent>
 #include <QtGui/QClipboard>
 
 #include <QtWidgets/QAbstractItemView>

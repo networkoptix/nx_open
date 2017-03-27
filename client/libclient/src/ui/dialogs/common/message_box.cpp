@@ -2,6 +2,8 @@
 #include "ui_message_box.h"
 
 #include <QtGui/QClipboard>
+#include <QtGui/QCloseEvent>
+#include <QtGui/QKeyEvent>
 #include <QtGui/QStandardItemModel>
 
 #include <QtWidgets/QDialogButtonBox>

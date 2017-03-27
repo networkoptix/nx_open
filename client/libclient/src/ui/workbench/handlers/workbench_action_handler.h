@@ -1,10 +1,10 @@
-#ifndef QN_WORKBENCH_ACTION_HANDLER_H
-#define QN_WORKBENCH_ACTION_HANDLER_H
+#pragma once
 
 #include <atomic>
 
 #include <QtCore/QBuffer>
 #include <QtCore/QObject>
+#include <QtCore/QQueue>
 
 #include <QtWidgets/QDialogButtonBox>
 
@@ -49,6 +49,12 @@ class QnWorkbenchNotificationsHandler;
 class QnAdjustVideoDialog;
 class QnSystemAdministrationDialog;
 class QnGraphicsMessageBox;
+
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+namespace workbench {
 
 // TODO: #Elric split this class into several handlers, group actions by handler. E.g. screen recording should definitely be spun off.
 /**
@@ -111,9 +117,7 @@ protected:
 
     QnSystemAdministrationDialog *systemAdministrationDialog() const;
 
-    QnWorkbenchNotificationsHandler* notificationsHandler() const;
-
-    protected slots:
+protected slots:
 
     void submitDelayedDrops();
     void submitInstantDrop();
@@ -270,4 +274,8 @@ private:
     std::multimap<QUrl, ServerRequest> m_serverRequests;
 };
 
-#endif // QN_WORKBENCH_ACTION_HANDLER_H
+} // namespace workbench
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

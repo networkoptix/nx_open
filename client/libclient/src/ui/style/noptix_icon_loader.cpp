@@ -1,5 +1,7 @@
 #include "noptix_icon_loader.h"
 
+#include <QtCore/QFileInfo>
+
 #include "skin.h"
 #include "icon_pixmap_accessor.h"
 

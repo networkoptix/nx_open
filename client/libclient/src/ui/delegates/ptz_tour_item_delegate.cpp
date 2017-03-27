@@ -1,5 +1,7 @@
 #include "ptz_tour_item_delegate.h"
 
+#include <QtCore/QEvent>
+
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QSpinBox>
 

@@ -1,5 +1,7 @@
 #include "compatibility_version_installation_tool.h"
 
+#include <QtCore/QTimer>
+
 #include "api/applauncher_api.h"
 #include "utils/applauncher_utils.h"
 

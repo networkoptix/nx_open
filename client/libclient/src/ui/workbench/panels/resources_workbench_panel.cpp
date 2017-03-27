@@ -1,6 +1,7 @@
 #include "resources_workbench_panel.h"
 
 #include <QtCore/QScopedValueRollback>
+#include <QtCore/QTimer>
 
 #include <QtWidgets/QAction>
 #include <QtWidgets/QComboBox>
@@ -187,7 +188,7 @@ bool ResourceTreeWorkbenchPanel::isOpened() const
 
 void ResourceTreeWorkbenchPanel::setOpened(bool opened, bool animate)
 {
-    using namespace nx::client::ui::workbench;
+    using namespace nx::client::desktop::ui::workbench;
 
     ensureAnimationAllowed(&animate);
 

@@ -1,5 +1,6 @@
 #include "popup_shadow.h"
 
+#include <QtCore/QEvent>
 #include <QtCore/QPointer>
 
 #include <QtWidgets/QLabel>

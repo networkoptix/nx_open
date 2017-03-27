@@ -3,9 +3,12 @@
 #include <cassert>
 
 #include <QtCore/QDate>
-#include <QtWidgets/QApplication>
+#include <QtCore/QtMath>
+
 #include <QtGui/QPainter>
 #include <QtGui/QMouseEvent>
+
+#include <QtWidgets/QApplication>
 
 #include <client/client_settings.h>
 #include <core/resource/media_resource.h>
