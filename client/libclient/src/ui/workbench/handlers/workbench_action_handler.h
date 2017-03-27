@@ -39,7 +39,7 @@ class QnWorkbench;
 class QnWorkbenchContext;
 class QnWorkbenchSynchronizer;
 class QnWorkbenchLayoutSnapshotManager;
-class QnWorkbenchActionHandler;
+class ActionHandler;
 class QnActionManager;
 class QnAction;
 class QnBusinessRulesDialog;
@@ -60,11 +60,11 @@ namespace workbench {
 /**
 * This class implements logic for client actions.
 */
-class QnWorkbenchActionHandler : public QObject, public QnWorkbenchContextAware {
+class ActionHandler : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT
 public:
-    QnWorkbenchActionHandler(QObject *parent = NULL);
-    virtual ~QnWorkbenchActionHandler();
+    ActionHandler(QObject *parent = NULL);
+    virtual ~ActionHandler();
 
 protected:
     struct AddToLayoutParams {

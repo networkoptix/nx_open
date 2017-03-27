@@ -228,12 +228,12 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchStateManager>();
 
     /* Set up handlers. */
-    context->instance<workbench::QnWorkbenchActionHandler>();
+    context->instance<workbench::ActionHandler>();
     context->instance<QnWorkbenchConnectHandler>();
     context->instance<QnWorkbenchNotificationsHandler>();
     context->instance<QnWorkbenchScreenshotHandler>();
     context->instance<QnWorkbenchExportHandler>();
-    context->instance<workbench::QnWorkbenchLayoutsHandler>();
+    context->instance<workbench::LayoutsHandler>();
     context->instance<QnWorkbenchPtzHandler>();
     context->instance<QnWorkbenchDebugHandler>();
     context->instance<QnWorkbenchVideoWallHandler>();

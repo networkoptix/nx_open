@@ -115,27 +115,27 @@ QnResourceList calculateResourcesToShare(const QnResourceList& resources,
 
 } // namespace
 
-QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent):
+LayoutsHandler::LayoutsHandler(QObject *parent):
     QObject(parent),
     QnSessionAwareDelegate(parent)
 {
-    connect(action(QnActions::NewUserLayoutAction),                 &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered);
-    connect(action(QnActions::SaveLayoutAction),                    &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_saveLayoutAction_triggered);
-    connect(action(QnActions::SaveLayoutAsAction),                  &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_saveLayoutAsAction_triggered);
-    connect(action(QnActions::SaveLayoutForCurrentUserAsAction),    &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered);
-    connect(action(QnActions::SaveCurrentLayoutAction),             &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAction_triggered);
-    connect(action(QnActions::SaveCurrentLayoutAsAction),           &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
-    connect(action(QnActions::CloseLayoutAction),                   &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_closeLayoutAction_triggered);
-    connect(action(QnActions::CloseAllButThisLayoutAction),         &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered);
-    connect(action(QnActions::RemoveFromServerAction),              &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_removeFromServerAction_triggered);
-    connect(action(QnActions::ShareLayoutAction),                   &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered);
-    connect(action(QnActions::StopSharingLayoutAction),             &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered);
-    connect(action(QnActions::OpenNewTabAction),                    &QAction::triggered, this, &QnWorkbenchLayoutsHandler::at_openNewTabAction_triggered);
+    connect(action(QnActions::NewUserLayoutAction),                 &QAction::triggered, this, &LayoutsHandler::at_newUserLayoutAction_triggered);
+    connect(action(QnActions::SaveLayoutAction),                    &QAction::triggered, this, &LayoutsHandler::at_saveLayoutAction_triggered);
+    connect(action(QnActions::SaveLayoutAsAction),                  &QAction::triggered, this, &LayoutsHandler::at_saveLayoutAsAction_triggered);
+    connect(action(QnActions::SaveLayoutForCurrentUserAsAction),    &QAction::triggered, this, &LayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered);
+    connect(action(QnActions::SaveCurrentLayoutAction),             &QAction::triggered, this, &LayoutsHandler::at_saveCurrentLayoutAction_triggered);
+    connect(action(QnActions::SaveCurrentLayoutAsAction),           &QAction::triggered, this, &LayoutsHandler::at_saveCurrentLayoutAsAction_triggered);
+    connect(action(QnActions::CloseLayoutAction),                   &QAction::triggered, this, &LayoutsHandler::at_closeLayoutAction_triggered);
+    connect(action(QnActions::CloseAllButThisLayoutAction),         &QAction::triggered, this, &LayoutsHandler::at_closeAllButThisLayoutAction_triggered);
+    connect(action(QnActions::RemoveFromServerAction),              &QAction::triggered, this, &LayoutsHandler::at_removeFromServerAction_triggered);
+    connect(action(QnActions::ShareLayoutAction),                   &QAction::triggered, this, &LayoutsHandler::at_shareLayoutAction_triggered);
+    connect(action(QnActions::StopSharingLayoutAction),             &QAction::triggered, this, &LayoutsHandler::at_stopSharingLayoutAction_triggered);
+    connect(action(QnActions::OpenNewTabAction),                    &QAction::triggered, this, &LayoutsHandler::at_openNewTabAction_triggered);
 
     connect(action(QnActions::RemoveLayoutItemAction), &QAction::triggered, this,
-        &QnWorkbenchLayoutsHandler::at_removeLayoutItemAction_triggered);
+        &LayoutsHandler::at_removeLayoutItemAction_triggered);
     connect(action(QnActions::RemoveLayoutItemFromSceneAction), &QAction::triggered, this,
-        &QnWorkbenchLayoutsHandler::at_removeLayoutItemFromSceneAction_triggered);
+        &LayoutsHandler::at_removeLayoutItemFromSceneAction_triggered);
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
@@ -161,11 +161,11 @@ QnWorkbenchLayoutsHandler::QnWorkbenchLayoutsHandler(QObject *parent):
         });
 }
 
-QnWorkbenchLayoutsHandler::~QnWorkbenchLayoutsHandler()
+LayoutsHandler::~LayoutsHandler()
 {
 }
 
-void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QString &newName)
+void LayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QString &newName)
 {
     QnLayoutResourceList existing = alreadyExistingLayouts(newName, layout->getParentId(), layout);
     if (!canRemoveLayouts(existing))
@@ -189,7 +189,7 @@ void QnWorkbenchLayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, 
         snapshotManager()->save(layout);
 }
 
-void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
+void LayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
 {
     if (!layout)
         return;
@@ -245,7 +245,7 @@ void QnWorkbenchLayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
     }
 }
 
-void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user)
+void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUserResourcePtr &user)
 {
     if (!layout || !user)
         return;
@@ -392,7 +392,7 @@ void QnWorkbenchLayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, 
         removeLayouts(QnLayoutResourceList() << layout);
 }
 
-void QnWorkbenchLayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& items, bool autoSave)
+void LayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& items, bool autoSave)
 {
     if (items.size() > 1)
     {
@@ -446,7 +446,7 @@ void QnWorkbenchLayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& i
     }
 }
 
-void QnWorkbenchLayoutsHandler::shareLayoutWith(const QnLayoutResourcePtr &layout,
+void LayoutsHandler::shareLayoutWith(const QnLayoutResourcePtr &layout,
     const QnResourceAccessSubject &subject)
 {
     NX_ASSERT(layout && subject.isValid());
@@ -479,7 +479,7 @@ void QnWorkbenchLayoutsHandler::shareLayoutWith(const QnLayoutResourcePtr &layou
     qnResourcesChangesManager->saveAccessibleResources(subject, accessible);
 }
 
-QnWorkbenchLayoutsHandler::LayoutChange QnWorkbenchLayoutsHandler::calculateLayoutChange(
+LayoutsHandler::LayoutChange LayoutsHandler::calculateLayoutChange(
     const QnLayoutResourcePtr& layout)
 {
     LayoutChange result;
@@ -496,7 +496,7 @@ QnWorkbenchLayoutsHandler::LayoutChange QnWorkbenchLayoutsHandler::calculateLayo
     return result;
 }
 
-bool QnWorkbenchLayoutsHandler::confirmLayoutChange(const LayoutChange& change,
+bool LayoutsHandler::confirmLayoutChange(const LayoutChange& change,
     const QnResourcePtr& layoutOwner)
 {
     NX_ASSERT(context()->user(), "Should never ask for layout saving when offline");
@@ -522,7 +522,7 @@ bool QnWorkbenchLayoutsHandler::confirmLayoutChange(const LayoutChange& change,
     return confirmChangeLocalLayout(layoutOwner.dynamicCast<QnUserResource>(), change);
 }
 
-bool QnWorkbenchLayoutsHandler::confirmChangeSharedLayout(const LayoutChange& change)
+bool LayoutsHandler::confirmChangeSharedLayout(const LayoutChange& change)
 {
     /* Checking if custom users have access to this shared layout. */
     auto allUsers = qnResPool->getResources<QnUserResource>();
@@ -541,7 +541,7 @@ bool QnWorkbenchLayoutsHandler::confirmChangeSharedLayout(const LayoutChange& ch
     return messages::Resources::sharedLayoutEdit(mainWindow());
 }
 
-bool QnWorkbenchLayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layouts)
+bool LayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layouts)
 {
     /* Checking if custom users have access to this shared layout. */
     auto allUsers = qnResPool->getResources<QnUserResource>();
@@ -563,7 +563,7 @@ bool QnWorkbenchLayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourc
     return messages::Resources::deleteSharedLayouts(mainWindow(), layouts);
 }
 
-bool QnWorkbenchLayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr& user,
+bool LayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr& user,
     const LayoutChange& change)
 {
     NX_ASSERT(user);
@@ -588,7 +588,7 @@ bool QnWorkbenchLayoutsHandler::confirmChangeLocalLayout(const QnUserResourcePtr
     return true;
 }
 
-bool QnWorkbenchLayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
+bool LayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
     const QnLayoutResourceList& layouts)
 {
     NX_ASSERT(user);
@@ -622,7 +622,7 @@ bool QnWorkbenchLayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePt
     return messages::Resources::deleteLocalLayouts(mainWindow(), stillAccessible);
 }
 
-bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& subject,
+bool LayoutsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& subject,
     const QnLayoutResourceList& layouts)
 {
     if (qnResourceAccessManager->hasGlobalPermission(subject, Qn::GlobalAccessAllMediaPermission))
@@ -663,13 +663,13 @@ bool QnWorkbenchLayoutsHandler::confirmStopSharingLayouts(const QnResourceAccess
         resourcesBecomeUnaccessible, subject);
 }
 
-bool QnWorkbenchLayoutsHandler::confirmChangeVideoWallLayout(const LayoutChange& change)
+bool LayoutsHandler::confirmChangeVideoWallLayout(const LayoutChange& change)
 {
     QnWorkbenchLayoutsChangeValidator validator(context());
     return validator.confirmChangeVideoWallLayout(change.layout, change.removed);
 }
 
-void QnWorkbenchLayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr& user,
+void LayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr& user,
     const LayoutChange& change)
 {
     NX_ASSERT(user);
@@ -685,7 +685,7 @@ void QnWorkbenchLayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr
     qnResourcesChangesManager->saveAccessibleResources(user, accessible);
 }
 
-bool QnWorkbenchLayoutsHandler::canRemoveLayouts(const QnLayoutResourceList &layouts)
+bool LayoutsHandler::canRemoveLayouts(const QnLayoutResourceList &layouts)
 {
     return all_of(layouts,
         [this](const QnLayoutResourcePtr& layout)
@@ -694,7 +694,7 @@ bool QnWorkbenchLayoutsHandler::canRemoveLayouts(const QnLayoutResourceList &lay
         });
 }
 
-void QnWorkbenchLayoutsHandler::removeLayouts(const QnLayoutResourceList &layouts)
+void LayoutsHandler::removeLayouts(const QnLayoutResourceList &layouts)
 {
     if (layouts.isEmpty())
         return;
@@ -718,7 +718,7 @@ void QnWorkbenchLayoutsHandler::removeLayouts(const QnLayoutResourceList &layout
     qnResourcesChangesManager->deleteResources(remoteResources);
 }
 
-bool QnWorkbenchLayoutsHandler::closeLayouts(const QnWorkbenchLayoutList &layouts, bool force)
+bool LayoutsHandler::closeLayouts(const QnWorkbenchLayoutList &layouts, bool force)
 {
     QnLayoutResourceList resources;
     for (auto layout: layouts)
@@ -727,7 +727,7 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(const QnWorkbenchLayoutList &layout
     return closeLayouts(resources, force);
 }
 
-bool QnWorkbenchLayoutsHandler::closeLayouts(
+bool LayoutsHandler::closeLayouts(
     const QnLayoutResourceList& resources,
     bool force)
 {
@@ -754,7 +754,7 @@ bool QnWorkbenchLayoutsHandler::closeLayouts(
     return true;
 }
 
-void QnWorkbenchLayoutsHandler::closeLayoutsInternal(
+void LayoutsHandler::closeLayoutsInternal(
     const QnLayoutResourceList& resources,
     const QnLayoutResourceList& rollbackResources)
 {
@@ -777,7 +777,7 @@ void QnWorkbenchLayoutsHandler::closeLayoutsInternal(
         action(QnActions::OpenNewTabAction)->trigger();
 }
 
-bool QnWorkbenchLayoutsHandler::closeAllLayouts(bool force)
+bool LayoutsHandler::closeAllLayouts(bool force)
 {
     return closeLayouts(qnResPool->getResources<QnLayoutResource>(), force);
 }
@@ -786,7 +786,7 @@ bool QnWorkbenchLayoutsHandler::closeAllLayouts(bool force)
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
+void LayoutsHandler::at_newUserLayoutAction_triggered()
 {
     QnUserResourcePtr user = menu()->currentParameters(sender()).resource().dynamicCast<QnUserResource>();
     if (!user)
@@ -837,17 +837,17 @@ void QnWorkbenchLayoutsHandler::at_newUserLayoutAction_triggered()
     menu()->trigger(QnActions::OpenSingleLayoutAction, QnActionParameters(layout));
 }
 
-void QnWorkbenchLayoutsHandler::at_saveLayoutAction_triggered()
+void LayoutsHandler::at_saveLayoutAction_triggered()
 {
     saveLayout(menu()->currentParameters(sender()).resource().dynamicCast<QnLayoutResource>());
 }
 
-void QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAction_triggered()
+void LayoutsHandler::at_saveCurrentLayoutAction_triggered()
 {
     saveLayout(workbench()->currentLayout()->resource());
 }
 
-void QnWorkbenchLayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered()
+void LayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered()
 {
     saveLayoutAs(
         menu()->currentParameters(sender()).resource().dynamicCast<QnLayoutResource>(),
@@ -855,7 +855,7 @@ void QnWorkbenchLayoutsHandler::at_saveLayoutForCurrentUserAsAction_triggered()
     );
 }
 
-void QnWorkbenchLayoutsHandler::at_saveLayoutAsAction_triggered()
+void LayoutsHandler::at_saveLayoutAsAction_triggered()
 {
     QnActionParameters parameters = menu()->currentParameters(sender());
 
@@ -865,7 +865,7 @@ void QnWorkbenchLayoutsHandler::at_saveLayoutAsAction_triggered()
     );
 }
 
-void QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAsAction_triggered()
+void LayoutsHandler::at_saveCurrentLayoutAsAction_triggered()
 {
     saveLayoutAs(
         workbench()->currentLayout()->resource(),
@@ -873,12 +873,12 @@ void QnWorkbenchLayoutsHandler::at_saveCurrentLayoutAsAction_triggered()
     );
 }
 
-void QnWorkbenchLayoutsHandler::at_closeLayoutAction_triggered()
+void LayoutsHandler::at_closeLayoutAction_triggered()
 {
     closeLayouts(menu()->currentParameters(sender()).layouts());
 }
 
-void QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered()
+void LayoutsHandler::at_closeAllButThisLayoutAction_triggered()
 {
     QnWorkbenchLayoutList layouts = menu()->currentParameters(sender()).layouts();
     if (layouts.empty())
@@ -891,7 +891,7 @@ void QnWorkbenchLayoutsHandler::at_closeAllButThisLayoutAction_triggered()
     closeLayouts(layoutsToClose);
 }
 
-void QnWorkbenchLayoutsHandler::at_removeFromServerAction_triggered()
+void LayoutsHandler::at_removeFromServerAction_triggered()
 {
     auto layouts = menu()->currentParameters(sender()).resources().filtered<QnLayoutResource>();
 
@@ -936,7 +936,7 @@ void QnWorkbenchLayoutsHandler::at_removeFromServerAction_triggered()
     }
 }
 
-void QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered()
+void LayoutsHandler::at_shareLayoutAction_triggered()
 {
     auto params = menu()->currentParameters(sender());
     auto layout = params.resource().dynamicCast<QnLayoutResource>();
@@ -958,7 +958,7 @@ void QnWorkbenchLayoutsHandler::at_shareLayoutAction_triggered()
     shareLayoutWith(layout, subject);
 }
 
-void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
+void LayoutsHandler::at_stopSharingLayoutAction_triggered()
 {
     auto params = menu()->currentParameters(sender());
     auto user = params.argument<QnUserResourcePtr>(Qn::UserResourceRole);
@@ -994,7 +994,7 @@ void QnWorkbenchLayoutsHandler::at_stopSharingLayoutAction_triggered()
     qnResourcesChangesManager->saveAccessibleResources(subject, accessible);
 }
 
-void QnWorkbenchLayoutsHandler::at_openNewTabAction_triggered()
+void LayoutsHandler::at_openNewTabAction_triggered()
 {
     QnWorkbenchLayout *layout = qnLayoutFactory->create(this);
 
@@ -1004,23 +1004,23 @@ void QnWorkbenchLayoutsHandler::at_openNewTabAction_triggered()
     workbench()->setCurrentLayout(layout);
 }
 
-void QnWorkbenchLayoutsHandler::at_removeLayoutItemAction_triggered()
+void LayoutsHandler::at_removeLayoutItemAction_triggered()
 {
     removeLayoutItems(menu()->currentParameters(sender()).layoutItems(), true);
 }
 
-void QnWorkbenchLayoutsHandler::at_removeLayoutItemFromSceneAction_triggered()
+void LayoutsHandler::at_removeLayoutItemFromSceneAction_triggered()
 {
     const auto layoutItems = menu()->currentParameters(sender()).layoutItems();
     removeLayoutItems(layoutItems, false);
 }
 
-bool QnWorkbenchLayoutsHandler::tryClose(bool force)
+bool LayoutsHandler::tryClose(bool force)
 {
     return closeAllLayouts(force);
 }
 
-void QnWorkbenchLayoutsHandler::forcedUpdate()
+void LayoutsHandler::forcedUpdate()
 {
     //do nothing
 }
