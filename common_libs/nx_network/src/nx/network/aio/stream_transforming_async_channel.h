@@ -4,6 +4,7 @@
 #include <memory>
 #include <tuple>
 
+#include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/pipeline.h>
 
 #include "abstract_async_channel.h"
@@ -93,6 +94,7 @@ private:
     std::deque<nx::Buffer> m_readRawData;
     std::deque<nx::Buffer> m_rawWriteQueue;
     bool m_asyncReadInProgress;
+    nx::utils::ObjectDestructionFlag m_destructionFlag;
 
     void readRawChannelAsync();
     int readRawDataFromCache(void* data, size_t count);

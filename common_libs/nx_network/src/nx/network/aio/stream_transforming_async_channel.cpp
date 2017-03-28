@@ -278,12 +278,26 @@ void StreamTransformingAsyncChannel::onDataWritten(
 
 void StreamTransformingAsyncChannel::handleIoError(SystemError::ErrorCode sysErrorCode)
 {
-    // TODO
     // We can have SystemError::noError here in case of a connection closure.
-    for (auto& userTask: m_userTaskQueue)
+    decltype(m_userTaskQueue) userTaskQueue;
+    userTaskQueue.swap(m_userTaskQueue);
+    for (auto& userTask: userTaskQueue)
     {
-        auto handler = std::move(userTask.handler);
-        handler(sysErrorCode, (std::size_t)-1);
+        auto handler = std::move(userTask->handler);
+        utils::ObjectDestructionFlag::Watcher thisDestructionWatcher(&m_destructionFlag);
+        if (sysErrorCode == SystemError::noError) //< Connection closed.
+        {
+            if (userTask->type == UserTaskType::read)
+                handler(sysErrorCode, 0);
+            else
+                handler(SystemError::connectionReset, (std::size_t)-1);
+        }
+        else
+        {
+            handler(sysErrorCode, (std::size_t)-1);
+        }
+        if (thisDestructionWatcher.objectDestroyed())
+            return;
     }
 }
 
