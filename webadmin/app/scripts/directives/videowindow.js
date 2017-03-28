@@ -241,19 +241,26 @@ angular.module('webadminApp')
                     scope.flashls = true;
                     scope.native = false;
                     scope.jsHls = false;
+
+                    var playerId = scope.playerId;
+                    if(!playerId){
+                        playerId = "player0";
+                    }
+                    
                     scope.flashSource = "components/flashlsChromeless.swf";
-                    var flAPI = new flashlsAPI(null);
                     if(scope.debugMode && scope.debugFormat){
                         scope.flashSource = "components/flashlsChromeless_debug.swf";
                     }
 
-                    if(flAPI.ready()){
-                        flAPI.kill();
+                    var flashlsApi = new flashlsAPI(null);
+
+                    if(flashlsApi.ready()){
+                        flashlsApi.kill();
                         scope.flashls = false; // Destroy it!
                         $timeout(initFlashls);
                     }else {
                         $timeout(function () {// Force DOM to refresh here
-                            flAPI.init("videowindow", scope.playerId, function (api) {
+                            flashlsApi.init("videowindow", playerId, function (api) {
                                 console.log("Success");
                                 scope.vgApi = api;
                                 if (scope.vgSrc) {
@@ -352,7 +359,9 @@ angular.module('webadminApp')
                     scope.$watch('activeFormat', srcChanged);
                 
                 scope.initFlash = function(){
-                    var tmp = '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"codebase="" id="flashvideoembed"';
+                    var playerId = !scope.playerId ? 'player0': scope.playerId;
+                
+                    var tmp = '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"codebase="" id="flashvideoembed_'+playerId+'"';
                     tmp += 'width="100%" height="100%">';
                     tmp += '\n\t<param name="movie"  value="'+scope.flashSource+'?inline=1" />';
                     tmp += '\n\t<param name="quality" value="high" />';
@@ -361,12 +370,14 @@ angular.module('webadminApp')
                     tmp += '\n\t<param name="bgcolor" value="#1C2327" />';
                     tmp += '\n\t<param name="allowFullScreen" value="true" />';
                     tmp += '\n\t<param name="wmode" value="transparent" />';
-                    tmp += '\n\t<param name="FlashVars" value="callback=' + scope.playerId + '" />';
+                    tmp += '\n\t<param name="FlashVars" value="callback=' + playerId + '" />';
                     tmp += '\n\t<embed src="'+scope.flashSource+'?inline=1" width="100%" height="100%"';
-                    tmp += ' name="flashvideoembed" quality="high" bgcolor="#1C2327" align="middle" allowFullScreen="true"';
+                    tmp += ' name="flashvideoembed_'+playerId+'" quality="high" bgcolor="#1C2327" align="middle" allowFullScreen="true"';
                     tmp += 'allowScriptAccess="always" type="application/x-shockwave-flash" swliveconnect="true" wmode="transparent"';
-                    tmp += 'FlashVars="callback='+scope.playerId+'">\n\t</embed>\n</object>';
-                    $('videowindow#'+scope.playerId)[0].children[0].children[0].innerHTML = tmp;
+                    tmp += 'FlashVars="callback='+playerId+'">\n\t</embed>\n</object>';
+                    
+                    playerId = !scope.playerId ? '' : '#'+playerId;
+                    $('videowindow'+playerId)[0].children[0].children[0].innerHTML = tmp;
                 };
             }
         }

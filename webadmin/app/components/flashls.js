@@ -9,7 +9,6 @@ function flashlsAPI (flashObject) {
     }
 
     this.kill = function(){
-        console.log('kill was called');
         this.flashObject = null;
     };
     this.ready = function(){
@@ -17,7 +16,7 @@ function flashlsAPI (flashObject) {
     };
 
     this.getFlashMovieObject = function (){
-        var movieName = 'flashvideoembed';
+        var movieName = 'flashvideoembed_'+this.id;
 
         if (window.document[movieName])
         {
@@ -43,9 +42,7 @@ function flashlsAPI (flashObject) {
 
     this.readyToPlay = function(){
         readyToPlay = true;
-        console.log("Ready to play");
         if(urlToPlay){
-            console.log("Sending play");
             this.play();
         }
     };
@@ -234,7 +231,7 @@ function flashlsAPI (flashObject) {
     this.getAutoLevelCapping = function() {
         return this.flashObject.getAutoLevelCapping();
     };
-    console.log(this);
+    
     this.flashlsEvents = {
         ready: function(flashTime) {
             //console.log('ready',flashTime);
@@ -270,22 +267,4 @@ function flashlsAPI (flashObject) {
         requestFragment: function(data) {},
         abortFragment: function(data) {}
     };
-}
-
-
-/*window.flashlsCallback = function(eventName, args) {
-    flashlsAPI.embedHandler();
-    if(flashlsAPI.flashlsEvents[eventName]) {
-        flashlsAPI.flashlsEvents[eventName].apply(null, args);
-    }
-};*/
-
-function man(first, last, msg){
-    this.first = first;
-    this.last = last;
-    this.msg = msg;
-
-    this.speak = function(){
-        console.log('%s %s says "%s".', this.first, this.last, this.msg);
-    }
 }
