@@ -43,6 +43,18 @@ static const qint64 LICENSE_RECORDING_STOP_TIME = 60 * 24 * 30;
 static const qint64 UPDATE_CAMERA_HISTORY_PERIOD_MSEC = 60 * 1000;
 static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 
+namespace {
+    void updateRuntimeInfoAfterLicenseOverflowTransaction(qint64 prematureLicenseExperationDate)
+    {
+        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+        if (localInfo.data.prematureLicenseExperationDate != prematureLicenseExperationDate)
+        {
+            localInfo.data.prematureLicenseExperationDate = prematureLicenseExperationDate;
+            QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
+        }
+    }
+}
+
 class QnServerDataProviderFactory: public QnDataProviderFactory
 {
 public:
@@ -556,7 +568,9 @@ void QnRecordingManager::at_checkLicenses()
         qint64 licenseOverflowTime = QnRuntimeInfoManager::instance()->localInfo().data.prematureLicenseExperationDate;
         if (licenseOverflowTime == 0) {
             licenseOverflowTime = qnSyncTime->currentMSecsSinceEpoch();
-            QnAppServerConnectionFactory::getConnection2()->getMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(true, licenseOverflowTime);
+            auto errCode = QnAppServerConnectionFactory::getConnection2()->getMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(true, licenseOverflowTime);
+            if (errCode == ec2::ErrorCode::ok)
+                updateRuntimeInfoAfterLicenseOverflowTransaction(licenseOverflowTime);
         }
         if (qnSyncTime->currentMSecsSinceEpoch() - licenseOverflowTime < m_recordingStopTime) {
             return; // not enough license, but timeout not reached yet
@@ -582,7 +596,12 @@ void QnRecordingManager::at_checkLicenses()
     else {
         qint64 licenseOverflowTime = QnRuntimeInfoManager::instance()->localInfo().data.prematureLicenseExperationDate;
         if (licenseOverflowTime)
+        {
             QnAppServerConnectionFactory::getConnection2()->getMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(false, 0);
+            if (errorCode == ErrorCode::ok)
+                updateRuntimeInfoAfterLicenseOverflowTransaction(0);
+        }
+
         m_tooManyRecordingCnt = 0;
     }
 }

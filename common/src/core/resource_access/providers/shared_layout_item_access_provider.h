@@ -7,7 +7,7 @@ class QnLayoutItemAggregator;
 using QnLayoutItemAggregatorPtr = QSharedPointer<QnLayoutItemAggregator>;
 
 /** Handles access to cameras and web pages, placed on shared layouts. */
-class QnSharedLayoutItemAccessProvider: public QnBaseResourceAccessProvider, public QnCommonModuleAware
+class QnSharedLayoutItemAccessProvider: public QnBaseResourceAccessProvider
 {
     using base_type = QnBaseResourceAccessProvider;
 

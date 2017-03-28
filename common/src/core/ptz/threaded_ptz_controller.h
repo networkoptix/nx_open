@@ -7,18 +7,22 @@ class QThreadPool;
 
 class QnThreadedPtzControllerPrivate;
 
-class QnPtzCommandBase: public QObject {
+class QnPtzCommandBase: public QObject
+{
     Q_OBJECT
 signals:
     void finished(Qn::PtzCommand command, const QVariant &data);
 };
 
 
-class QnThreadedPtzController: public QnProxyPtzController {
+class QnThreadedPtzController: public QnProxyPtzController
+{
     Q_OBJECT
     typedef QnProxyPtzController base_type;
 public:
-    QnThreadedPtzController(const QnPtzControllerPtr &baseController);
+    QnThreadedPtzController(
+        const QnPtzControllerPtr &baseController,
+        QThreadPool* threadPool);
     virtual ~QnThreadedPtzController();
 
     static bool extends(Qn::PtzCapabilities capabilities);
@@ -33,7 +37,7 @@ public:
     virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
     virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
     virtual bool getFlip(Qt::Orientations *flip) override;
-        
+
     virtual bool createPreset(const QnPtzPreset &preset) override;
     virtual bool updatePreset(const QnPtzPreset &preset) override;
     virtual bool removePreset(const QString &presetId) override;

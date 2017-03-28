@@ -10,13 +10,15 @@
 #include "nx_ec/data/api_conversion_functions.h"
 #include "business/business_event_rule.h"
 #include <api/global_settings.h>
+#include <common/common_module.h>
+#include "nx_ec/ec_api.h"
 
 namespace ec2
 {
 
-    ECConnectionAuditManager::ECConnectionAuditManager(AbstractECConnection* ecConnection)
+    ECConnectionAuditManager::ECConnectionAuditManager(AbstractECConnection* ecConnection):
+        m_connection(ecConnection)
     {
-        Q_UNUSED(ecConnection)
     }
 
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiCameraAttributesDataList& params, const QnAuthSession& authInfo)
@@ -111,7 +113,7 @@ namespace ec2
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiResourceParamWithRefData& param, const QnAuthSession& authInfo)
     {
         Q_UNUSED(command);
-        if (qnGlobalSettings->isGlobalSetting(param))
+        if (QnGlobalSettings::isGlobalSetting(param))
             qnAuditManager->notifySettingsChanged(authInfo, param.name);
     }
 
@@ -124,6 +126,7 @@ namespace ec2
 
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiIdData& params, const QnAuthSession& authInfo)
     {
+        const auto& resPool = m_connection->commonModule()->resourcePool();
         Qn::AuditRecordType eventType = Qn::AR_NotDefined;
         QString description;
         switch(command)
@@ -134,7 +137,7 @@ namespace ec2
             case ApiCommand::removeMediaServer:
             case ApiCommand::removeUser:
             {
-                if (QnResourcePtr res = qnResPool->getResourceById(params.id))
+                if (QnResourcePtr res = resPool->getResourceById(params.id))
                 {
                     description = res->getName();
                     if (res.dynamicCast<QnUserResource>())
@@ -152,7 +155,7 @@ namespace ec2
             case ApiCommand::removeEventRule:
             {
                 eventType = Qn::AR_BEventRemove;
-                auto msgProc = QnCommonMessageProcessor::instance();
+                auto msgProc = m_connection->commonModule()->messageProcessor();
                 if (msgProc) {
                     QnBusinessEventRulePtr bRule = msgProc->businessRules().value(params.id);
                     if (bRule)

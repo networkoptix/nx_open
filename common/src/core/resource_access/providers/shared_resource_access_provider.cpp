@@ -7,6 +7,7 @@
 #include <core/resource/layout_resource.h>
 
 #include <nx/utils/log/log.h>
+#include <common/common_module.h>
 
 QnSharedResourceAccessProvider::QnSharedResourceAccessProvider(QObject* parent):
     base_type(parent)
@@ -84,7 +85,7 @@ void QnSharedResourceAccessProvider::handleSharedResourcesChanged(
 
     QString subjectName = subject.name();
 
-    for (auto resource: qnResPool->getResources(changed))
+    for (auto resource: commonModule()->resourcePool()->getResources(changed))
     {
         if (newValues.contains(resource->getId()))
         {

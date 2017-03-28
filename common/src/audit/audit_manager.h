@@ -18,7 +18,8 @@
 
 class QnAuditManager:
     public QObject,
-    public QnCommonModuleAware
+    public QnCommonModuleAware,
+    public Singleton<QnAuditManager>
 {
     Q_OBJECT
 public:

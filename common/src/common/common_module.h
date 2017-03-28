@@ -25,6 +25,8 @@ class QnCameraHistoryPool;
 class QnGlobalPermissionsManager;
 class QnRuntimeInfoManager;
 class QnCommonMessageProcessor;
+class QnResourceAccessManager;
+class QnResourceAccessProvider;
 
 struct BeforeRestoreDbData
 {
@@ -111,6 +113,16 @@ public:
     QnRuntimeInfoManager* runtimeInfoManager() const
     {
         return m_runtimeInfoManager;
+    }
+
+    QnResourceAccessManager* resourceAccessManager() const
+    {
+        return m_resourceAccessManager;
+    }
+
+    QnResourceAccessProvider* resourceAccessProvider() const
+    {
+        return m_resourceAccessProvider;
     }
 
     void setModuleGUID(const QnUuid& guid) { m_uuid = guid; }
@@ -219,6 +231,7 @@ private:
     QnCommonMessageProcessor* m_messageProcessor;
     QnRuntimeInfoManager* m_runtimeInfoManager;
     QnResourceAccessManager* m_resourceAccessManager;
+    QnResourceAccessProvider* m_resourceAccessProvider;
 };
 
 //#define qnCommon (QnCommonModule::instance())

@@ -11,13 +11,14 @@
 
 #include "abstract_ptz_controller.h"
 #include "proxy_ptz_controller.h"
+#include <common/common_module.h>
 
 // -------------------------------------------------------------------------- //
 // QnPtzControllerPoolPrivate
 // -------------------------------------------------------------------------- //
 class QnPtzControllerPoolPrivate {
 public:
-    QnPtzControllerPoolPrivate(): 
+    QnPtzControllerPoolPrivate():
         mode(QnPtzControllerPool::NormalControllerConstruction),
         executorThread(NULL),
         commandThreadPool(NULL),
@@ -30,7 +31,6 @@ public:
     QHash<QnResourcePtr, QnPtzControllerPtr> controllerByResource;
     QThread *executorThread;
     QThreadPool *commandThreadPool;
-    QnResourcePool *resourcePool;
     QnPtzControllerPool *q;
     std::atomic<bool> deinitialized;
 };
@@ -61,10 +61,10 @@ private:
 // -------------------------------------------------------------------------- //
 QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
     base_type(parent),
+    QnCommonModuleAware(parent),
     d(new QnPtzControllerPoolPrivate())
 {
     d->q = this;
-    d->resourcePool = qnResPool;
 
     d->executorThread = new QThread(this);
     d->executorThread->setObjectName( lit("PTZExecutorThread") );
@@ -78,9 +78,9 @@ QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
 #endif
     d->commandThreadPool->setMaxThreadCount(maxThreads);
 
-    connect(d->resourcePool,    &QnResourcePool::resourceAdded,             this,   &QnPtzControllerPool::registerResource);
-    connect(d->resourcePool,    &QnResourcePool::resourceRemoved,           this,   &QnPtzControllerPool::unregisterResource);
-    for(const QnResourcePtr &resource: d->resourcePool->getResources())
+    connect(commonModule()->resourcePool(),    &QnResourcePool::resourceAdded,             this,   &QnPtzControllerPool::registerResource);
+    connect(commonModule()->resourcePool(),    &QnResourcePool::resourceRemoved,           this,   &QnPtzControllerPool::unregisterResource);
+    for(const QnResourcePtr &resource: commonModule()->resourcePool()->getResources())
         registerResource(resource);
 }
 

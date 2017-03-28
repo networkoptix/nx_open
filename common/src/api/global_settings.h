@@ -236,7 +236,7 @@ public:
     */
     const QList<QnAbstractResourcePropertyAdaptor*>& allSettings() const;
 
-    bool isGlobalSetting(const ec2::ApiResourceParamWithRefData& param) const;
+    static bool isGlobalSetting(const ec2::ApiResourceParamWithRefData& param);
 
     int maxRecorderQueueSizeBytes() const;
     int maxRecorderQueueSizePackets() const;

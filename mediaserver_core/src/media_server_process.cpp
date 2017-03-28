@@ -2189,7 +2189,7 @@ void MediaServerProcess::run()
     QScopedPointer<QnMasterServerStatusWatcher> masterServerWatcher(new QnMasterServerStatusWatcher());
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb());
-    std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager() );
+    std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager(commonModule) );
 
     TimeBasedNonceProvider timeBasedNonceProvider;
     CloudManagerGroup cloudManagerGroup(&timeBasedNonceProvider);

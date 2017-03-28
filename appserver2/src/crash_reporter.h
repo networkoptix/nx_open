@@ -9,14 +9,14 @@
 #include <QDir>
 #include <QSettings>
 #include <set>
-
+#include <common/common_module_aware.h>
 
 namespace ec2 {
 
-class CrashReporter
+class CrashReporter: public QnCommonModuleAware
 {
 public:
-    CrashReporter();
+    CrashReporter(QnCommonModule* commonModule);
     ~CrashReporter();
 
     /** Scans for local reports and sends them to the statistics server asynchronously
@@ -47,7 +47,7 @@ private:
     boost::optional<qint64> m_timerId;
 };
 
-class ReportData : public QObject
+class ReportData: public QObject
 {
     Q_OBJECT
 

@@ -341,11 +341,12 @@ void QnMulticastModuleFinder::run()
         }
 
         currentClock = QDateTime::currentMSecsSinceEpoch();
+        const auto& settings = commonModule()->globalSettings();
 
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis)
         {
             if (m_clientMode ||
-                (!qnGlobalSettings->isNewSystem() && qnGlobalSettings->isAutoDiscoveryEnabled()))
+                (!settings->isNewSystem() && settings->isAutoDiscoveryEnabled()))
             {
                 QnMutexLocker lk(&m_mutex);
                 for (UDPSocket *socket : m_clientSockets)

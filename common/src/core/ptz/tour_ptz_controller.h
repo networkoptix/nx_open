@@ -11,12 +11,13 @@ class QnTourPtzExecutor;
 
 typedef QHash<QString, QnPtzTour> QnPtzTourHash;
 
-class QnTourPtzController: public QnProxyPtzController {
+class QnTourPtzController: public QnProxyPtzController
+{
     Q_OBJECT
     typedef QnProxyPtzController base_type;
 
 public:
-    QnTourPtzController(const QnPtzControllerPtr &baseController);
+    QnTourPtzController(const QnPtzControllerPtr &baseController, QThread* executorThread);
     virtual ~QnTourPtzController();
 
     static bool extends(Qn::PtzCapabilities capabilities);

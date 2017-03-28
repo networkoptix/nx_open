@@ -118,14 +118,14 @@ namespace ec2
         #undef dbManager_queryOrReturn
         #undef dbManager_queryOrReturn_uuid
 
-        outData->systemId = helpers::currentSystemLocalId();
+        outData->systemId = helpers::currentSystemLocalId(m_ec2Connection->commonModule());
         return ErrorCode::ok;
     }
 
     ErrorCode Ec2StaticticsReporter::triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData)
     {
         removeTimer();
-        outData->systemId = helpers::currentSystemLocalId();
+        outData->systemId = helpers::currentSystemLocalId(m_ec2Connection->commonModule());
         outData->status = lit("initiated");
         return initiateReport(&outData->url);
     }
@@ -166,15 +166,16 @@ namespace ec2
 
     void Ec2StaticticsReporter::timerEvent()
     {
-        if (!qnGlobalSettings->isInitialized())
+        const auto& settings = m_ec2Connection->commonModule()->globalSettings();
+        if (!settings->isInitialized())
         {
             /* Try again. */
             setupTimer();
             return;
         }
 
-        if (!qnGlobalSettings->isStatisticsAllowed()
-            || qnGlobalSettings->isNewSystem())
+        if (!settings->isStatisticsAllowed()
+            || settings->isNewSystem())
         {
             NX_LOGX(lm("Automatic report system is disabled"), cl_logINFO);
 
@@ -203,10 +204,11 @@ namespace ec2
 
     QDateTime Ec2StaticticsReporter::plannedReportTime(const QDateTime& now)
     {
+        const auto& settings = m_ec2Connection->commonModule()->globalSettings();
         if (m_firstTime)
         {
             m_firstTime = false;
-            const auto reportedVersion = qnGlobalSettings->statisticsReportLastVersion();
+            const auto reportedVersion = settings->statisticsReportLastVersion();
             const auto currentVersion = nx::utils::AppInfo::applicationFullVersion();
 
             QCollator collator;
@@ -214,7 +216,7 @@ namespace ec2
             if (collator.compare(currentVersion, reportedVersion) > 0)
             {
                 const uint timeCycle = convertToSeconds(nx::utils::parseTimerDuration(
-                    qnGlobalSettings->statisticsReportTimeCycle(), kSendAfterUpdateTime));
+                    settings->statisticsReportTimeCycle(), kSendAfterUpdateTime));
 
                 m_plannedReportTime = now.addSecs(nx::utils::random::number(
                       timeCycle * kMinDelayRatio / 100,
@@ -229,13 +231,13 @@ namespace ec2
         }
 
         const uint timeCycle = convertToSeconds(nx::utils::parseTimerDuration(
-            qnGlobalSettings->statisticsReportTimeCycle(), kDefaultSendCycleTime));
+            settings->statisticsReportTimeCycle(), kDefaultSendCycleTime));
 
         const uint minDelay = timeCycle * kMinDelayRatio / 100;
         const uint maxDelay = timeCycle * kMaxdelayRation / 100;
         if (!m_plannedReportTime || *m_plannedReportTime > now.addSecs(maxDelay))
         {
-            const QDateTime lastTime = qnGlobalSettings->statisticsReportLastTime();
+            const QDateTime lastTime = settings->statisticsReportLastTime();
             m_plannedReportTime = (lastTime.isValid() ? lastTime : now).addSecs(
                 nx::utils::random::number<uint>(minDelay, maxDelay));
 
@@ -249,8 +251,9 @@ namespace ec2
 
     ErrorCode Ec2StaticticsReporter::initiateReport(QString* reportApi)
     {
+        const auto& settings = m_ec2Connection->commonModule()->globalSettings();
         ApiSystemStatistics data;
-        data.reportInfo.number = qnGlobalSettings->statisticsReportLastNumber();
+        data.reportInfo.number = settings->statisticsReportLastNumber();
         auto res = collectReportData(nullptr, &data);
         if (res != ErrorCode::ok)
         {
@@ -266,7 +269,7 @@ namespace ec2
         m_httpClient->setUserName(AUTH_USER);
         m_httpClient->setUserPassword(AUTH_PASSWORD);
 
-        const QString configApi = qnGlobalSettings->statisticsReportServerApi();
+        const QString configApi = settings->statisticsReportServerApi();
         const QString serverApi = configApi.isEmpty() ? DEFAULT_SERVER_API : configApi;
         const QUrl url = lit("%1/%2").arg(serverApi).arg(kServerReportApi);
         const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
@@ -283,6 +286,8 @@ namespace ec2
 
     void Ec2StaticticsReporter::finishReport(nx_http::AsyncHttpClientPtr httpClient)
     {
+        const auto& settings = m_ec2Connection->commonModule()->globalSettings();
+
         if (httpClient->hasRequestSuccesed())
         {
             m_timerCycle = kInitialTimerCycle;
@@ -292,11 +297,11 @@ namespace ec2
             const auto now = qnSyncTime->currentDateTime().toUTC();
             m_plannedReportTime = boost::none;
 
-            const int lastNumber = qnGlobalSettings->statisticsReportLastNumber();
-            qnGlobalSettings->setStatisticsReportLastNumber(lastNumber + 1);
-            qnGlobalSettings->setStatisticsReportLastTime(now);
-            qnGlobalSettings->setStatisticsReportLastVersion(nx::utils::AppInfo::applicationFullVersion());
-            qnGlobalSettings->synchronizeNow();
+            const int lastNumber = settings->statisticsReportLastNumber();
+            settings->setStatisticsReportLastNumber(lastNumber + 1);
+            settings->setStatisticsReportLastTime(now);
+            settings->setStatisticsReportLastVersion(nx::utils::AppInfo::applicationFullVersion());
+            settings->synchronizeNow();
         }
         else
         {

@@ -623,8 +623,9 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     qDebug() << "start loading resources";
     QElapsedTimer tt;
     tt.start();
-    qnResourceAccessManager->beginUpdate();
-    qnResourceAccessProvider->beginUpdate();
+
+    commonModule()->resourceAccessManager()->beginUpdate();
+    commonModule()->resourceAccessProvider()->beginUpdate();
 
     QnServerAdditionalAddressesDictionary::instance()->clear();
 
@@ -641,9 +642,9 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     resetTime();
 
     qDebug() << "resources loaded for" << tt.elapsed();
-    qnResourceAccessProvider->endUpdate();
+    commonModule()->resourceAccessProvider()->endUpdate();
     qDebug() << "access ready" << tt.elapsed();
-    qnResourceAccessManager->endUpdate();
+    commonModule()->resourceAccessManager()->endUpdate();
     qDebug() << "permissions ready" << tt.elapsed();
 
     emit initialResourcesReceived();

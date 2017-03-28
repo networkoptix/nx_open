@@ -114,10 +114,8 @@ class Appserver2MessageProcessor:
 {
 public:
     Appserver2MessageProcessor(
-        QnResourcePool* const resourcePool,
         QnResourceDiscoveryManager* resourceDiscoveryManager)
         :
-        m_resourcePool(resourcePool),
         m_resourceDiscoveryManager(resourceDiscoveryManager),
         m_factory(new nx::TestResourceFactory())
     {
@@ -140,12 +138,11 @@ protected:
         const QnResourcePtr& resource,
         ec2::NotificationSource /*source*/) override
     {
-        m_resourcePool->addResource(resource);
+        commonModule()->resourcePool()->addResource(resource);
     }
 
 protected:
     std::unique_ptr<nx::TestResourceFactory> m_factory;
-    QnResourcePool* const m_resourcePool;
     QnResourceDiscoveryManager* m_resourceDiscoveryManager;
 };
 
@@ -192,14 +189,12 @@ int Appserver2Process::exec()
 
     registerQtResources();
 
-    QnCommonModule commonModule;
+    QnCommonModule commonModule(false);
     commonModule.setModuleGUID(QnUuid::createUuid());
 
-    QnResourceDiscoveryManager resourceDiscoveryManager;
+    QnResourceDiscoveryManager resourceDiscoveryManager(&commonModule);
     // Starting receiving notifications.
-    auto messageProcessor = std::make_unique<Appserver2MessageProcessor>(
-        QnResourcePool::instance(),
-        &resourceDiscoveryManager);
+    commonModule.setMessageProcessor(new Appserver2MessageProcessor(&resourceDiscoveryManager));
 
     QnRuntimeInfoManager runtimeInfoManager;
 
@@ -286,7 +281,7 @@ int Appserver2Process::exec()
 
     tcpListener.start();
 
-    messageProcessor->init(QnAppServerConnectionFactory::getConnection2());
+    commonModule.messageProcessor()->init(QnAppServerConnectionFactory::getConnection2());
     //ec2Connection->startReceivingNotifications();
 
     processStartResult = true;
@@ -306,7 +301,6 @@ int Appserver2Process::exec()
 
     ec2Connection->stopReceivingNotifications();
 
-    messageProcessor.reset();
     ec2Connection.reset();
 
     appServerConnectionFactory.setEc2Connection(nullptr);

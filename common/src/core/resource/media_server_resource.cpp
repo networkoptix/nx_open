@@ -74,7 +74,8 @@ QnMediaServerResource::QnMediaServerResource():
     connect(this, &QnResource::propertyChanged,
         this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
 
-    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged,
+    const auto& settings = resourcePool()->commonModule()->globalSettings();
+    connect(settings, &QnGlobalSettings::cloudSettingsChanged,
         this, &QnMediaServerResource::at_cloudSettingsChanged, Qt::DirectConnection);
 }
 
@@ -560,14 +561,15 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const
             getProperty(safeModePropertyName), moduleInformation.ecDbReadOnly);
     }
 
-    moduleInformation.localSystemId = qnGlobalSettings->localSystemId();
-    moduleInformation.systemName = qnGlobalSettings->systemName();
+    const auto& settings = resourcePool()->commonModule()->globalSettings();
+    moduleInformation.localSystemId = settings->localSystemId();
+    moduleInformation.systemName = settings->systemName();
     moduleInformation.id = getId();
     moduleInformation.port = getPort();
     moduleInformation.version = getVersion();
     moduleInformation.systemInformation = getSystemInfo();
     moduleInformation.serverFlags = getServerFlags();
-    moduleInformation.cloudSystemId = qnGlobalSettings->cloudSystemId();
+    moduleInformation.cloudSystemId = settings->cloudSystemId();
 
     return moduleInformation;
 }

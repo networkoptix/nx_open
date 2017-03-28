@@ -128,7 +128,7 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
             if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
                 emit cameraFootageChanged(camera);
     });
-    QnCommonMessageProcessor *messageProcessor = QnCommonMessageProcessor::instance();
+    const QnCommonMessageProcessor* messageProcessor = commonModule()->messageProcessor();
     connect(messageProcessor,   &QnCommonMessageProcessor::businessActionReceived, this,
             [this] (const QnAbstractBusinessActionPtr &businessAction)
     {

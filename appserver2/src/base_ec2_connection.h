@@ -79,6 +79,8 @@ namespace ec2
         virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() override;
         virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() override;
 
+        virtual QnCommonModule* commonModule() const override;
+
         virtual void startReceivingNotifications() override;
         virtual void stopReceivingNotifications() override;
 

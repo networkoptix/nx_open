@@ -1,10 +1,12 @@
 #pragma once
 
 #include <nx_ec/ec_api_fwd.h>
+#include <common/common_module_aware.h>
 
 struct QnConnectionInfo;
 struct QnModuleInformation;
 class QnSoftwareVersion;
+class QnCommonModule;
 
 /**
 * Helper class to diagnose connection possibility.
@@ -19,22 +21,24 @@ class QnSoftwareVersion;
 *   * Otherwise, compatibility mode is enabled.
 *   * Internal 'ServerError' is for all other cases.
 */
-class QnConnectionValidator
+class QnConnectionValidator: public QnCommonModuleAware
 {
 public:
-    static QnSoftwareVersion minSupportedVersion();
+    QnConnectionValidator(QnCommonModule* commonModule);
 
-    static Qn::ConnectionResult validateConnection(const QnModuleInformation& info);
-    static Qn::ConnectionResult validateConnection(const QnConnectionInfo& connectionInfo,
-        ec2::ErrorCode networkError);
+    QnSoftwareVersion minSupportedVersion() const;
 
-    static bool isCompatibleToCurrentSystem(const QnModuleInformation& info);
+    Qn::ConnectionResult validateConnection(const QnModuleInformation& info) const;
+    Qn::ConnectionResult validateConnection(const QnConnectionInfo& connectionInfo,
+        ec2::ErrorCode networkError) const;
+
+    bool isCompatibleToCurrentSystem(const QnModuleInformation& info) const;
 
 protected:
-    static Qn::ConnectionResult validateConnectionInternal(
+    Qn::ConnectionResult validateConnectionInternal(
         const QString& brand,
         const QString& customization,
         int protoVersion,
         const QnSoftwareVersion& version,
-        const QString& cloudHost);
+        const QString& cloudHost) const;
 };

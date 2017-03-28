@@ -8,13 +8,15 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/ptz/ptz_fwd.h>
+#include <common/common_module_aware.h>
 
 class QThread;
 class QThreadPool;
 
 class QnPtzControllerPoolPrivate;
 
-class QnPtzControllerPool: public Connective<QObject>, public Singleton<QnPtzControllerPool> {
+class QnPtzControllerPool: public Connective<QObject>, public QnCommonModuleAware
+{
     Q_OBJECT
     typedef Connective<QObject> base_type;
 
@@ -24,7 +26,7 @@ public:
         ThreadedControllerConstruction
     };
 
-    QnPtzControllerPool(QObject *parent = NULL);
+    QnPtzControllerPool(QObject* parent = nullptr);
     virtual ~QnPtzControllerPool();
 
     QThread *executorThread() const;

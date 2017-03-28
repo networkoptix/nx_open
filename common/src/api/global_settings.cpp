@@ -924,7 +924,7 @@ const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings()
     return m_allAdaptors;
 }
 
-bool QnGlobalSettings::isGlobalSetting(const ec2::ApiResourceParamWithRefData& param) const
+bool QnGlobalSettings::isGlobalSetting(const ec2::ApiResourceParamWithRefData& param)
 {
-    return m_admin && m_admin->getId() == param.resourceId;
+    return QnUserResource::kAdminGuid == param.resourceId;
 }

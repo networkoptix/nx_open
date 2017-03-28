@@ -46,11 +46,17 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
     connect(commonModule(), &QnCommonModule::readOnlyChanged, this,
         &QnResourceAccessManager::recalculateAllPermissions);
 
-    connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
+    connect(
+        commonModule()->resourceAccessProvider(),
+        &QnResourceAccessProvider::accessChanged,
+        this,
         &QnResourceAccessManager::updatePermissions);
 
-    connect(commonModule()->globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
-        this, &QnResourceAccessManager::updatePermissionsBySubject);
+    connect(
+        commonModule()->globalPermissionsManager(),
+        &QnGlobalPermissionsManager::globalPermissionsChanged,
+        this,
+        &QnResourceAccessManager::updatePermissionsBySubject);
 
     connect(resPool, &QnResourcePool::resourceAdded, this,
         &QnResourceAccessManager::handleResourceAdded);
@@ -436,7 +442,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     if (hasGlobalPermission(subject, Qn::GlobalAdminPermission))
         result |= Qn::RemovePermission;
 
-    if (!qnResourceAccessProvider->hasAccess(subject, camera))
+    if (!commonModule()->resourceAccessProvider()->hasAccess(subject, camera))
         return result;
 
     result |= Qn::ReadPermission | Qn::ViewContentPermission;
@@ -461,7 +467,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     NX_ASSERT(server);
 
     Qn::Permissions result = Qn::ReadPermission;
-    if (!qnResourceAccessProvider->hasAccess(subject, server))
+    if (!commonModule()->resourceAccessProvider()->hasAccess(subject, server))
         return result;
 
     result |= Qn::ViewContentPermission;
@@ -513,7 +519,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
 {
     NX_ASSERT(webPage);
 
-    if (!qnResourceAccessProvider->hasAccess(subject, webPage))
+    if (!commonModule()->resourceAccessProvider()->hasAccess(subject, webPage))
         return Qn::NoPermissions;
 
     Qn::Permissions result = Qn::ReadPermission | Qn::ViewContentPermission;
@@ -599,7 +605,7 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
             /* Access to global layouts. Simple check is enough, exported layouts are checked on the client side. */
             if (layout->isShared())
             {
-                if (!qnResourceAccessProvider->hasAccess(subject, layout))
+                if (!commonModule()->resourceAccessProvider()->hasAccess(subject, layout))
                     return Qn::NoPermissions;
 
                 /* Global layouts editor. */

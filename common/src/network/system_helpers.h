@@ -7,6 +7,7 @@ class QUrl;
 struct QnCloudSystem;
 struct QnConnectionInfo;
 struct QnModuleInformation;
+class QnCommonModule;
 
 namespace helpers {
 
@@ -36,11 +37,11 @@ bool isNewSystem(const QnCloudSystem& info);
 
 bool isCloudSystem(const QnModuleInformation& info);
 
-QnUuid currentSystemLocalId();
+QnUuid currentSystemLocalId(const QnCommonModule* commonModule);
 
-bool currentSystemIsNew();
+bool currentSystemIsNew(const QnCommonModule* commonModule);
 
-bool serverBelongsToCurrentSystem(const QnModuleInformation& info);
+bool serverBelongsToCurrentSystem(const QnModuleInformation& info, const QnCommonModule* commonModule);
 
 /**
  * Checks whether user login is local or cloud.

@@ -47,6 +47,7 @@
 
 class QnRestProcessorPool;
 class QnHttpConnectionListener;
+class QnCommonModule;
 struct QnModuleInformation;
 
 //!Contains API classes for the new Server
@@ -719,6 +720,8 @@ namespace ec2
         virtual AbstractUpdatesNotificationManagerPtr getUpdatesNotificationManager() = 0;
         virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() = 0;
         virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() = 0;
+
+        virtual QnCommonModule* commonModule() const = 0;
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
         virtual QnTransactionMessageBus* messageBus() const = 0;

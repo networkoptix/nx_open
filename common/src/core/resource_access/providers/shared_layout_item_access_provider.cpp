@@ -30,8 +30,7 @@ QSet<QnUuid> layoutItems(const QnLayoutResourcePtr& layout)
 }
 
 QnSharedLayoutItemAccessProvider::QnSharedLayoutItemAccessProvider(QObject* parent):
-    base_type(parent),
-    QnCommonModuleAware(parent)
+    base_type(parent)
 {
     connect(qnSharedResourcesManager, &QnSharedResourcesManager::sharedResourcesChanged, this,
         &QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged);

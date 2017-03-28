@@ -13,6 +13,7 @@
 #include <utils/common/app_info.h>
 #include <api/global_settings.h>
 #include <network/system_helpers.h>
+#include <common/common_module_aware.h>
 
 namespace {
 
@@ -44,13 +45,19 @@ bool compatibleCustomization(const QString& c1, const QString& c2, bool isMobile
 
 } // namespace
 
-QnSoftwareVersion QnConnectionValidator::minSupportedVersion()
+QnConnectionValidator::QnConnectionValidator(QnCommonModule* commonModule) :
+    QnCommonModuleAware(commonModule)
 {
-    return ::minSupportedVersion(qnRuntimeInfoManager->localInfo().data);
+
+}
+
+QnSoftwareVersion QnConnectionValidator::minSupportedVersion() const
+{
+    return ::minSupportedVersion(commonModule()->runtimeInfoManager()->localInfo().data);
 }
 
 Qn::ConnectionResult QnConnectionValidator::validateConnection(
-    const QnModuleInformation& info)
+    const QnModuleInformation& info) const
 {
     return validateConnectionInternal(
         info.brand,
@@ -62,7 +69,7 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
 
 Qn::ConnectionResult QnConnectionValidator::validateConnection(
     const QnConnectionInfo& connectionInfo,
-    ec2::ErrorCode networkError)
+    ec2::ErrorCode networkError) const
 {
     using namespace Qn;
     if (networkError == ec2::ErrorCode::unauthorized)
@@ -86,10 +93,10 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
         connectionInfo.cloudHost);
 }
 
-bool QnConnectionValidator::isCompatibleToCurrentSystem(const QnModuleInformation& info)
+bool QnConnectionValidator::isCompatibleToCurrentSystem(const QnModuleInformation& info) const
 {
     return !info.localSystemId.isNull()
-        && helpers::serverBelongsToCurrentSystem(info)
+        && helpers::serverBelongsToCurrentSystem(info, commonModule())
         && validateConnection(info) == Qn::SuccessConnectionResult;
 }
 
@@ -98,9 +105,9 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     const QString& customization,
     int protoVersion,
     const QnSoftwareVersion& version,
-    const QString& cloudHost)
+    const QString& cloudHost) const
 {
-    auto localInfo = qnRuntimeInfoManager->localInfo().data;
+    auto localInfo = commonModule()->runtimeInfoManager()->localInfo().data;
     bool isMobile = localInfo.peer.isMobileClient();
 
     if (!compatibleCustomization(brand, localInfo.brand, isMobile))

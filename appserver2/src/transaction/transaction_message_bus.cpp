@@ -796,7 +796,7 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
                 {	// Transactions listed here should not go to the DbManager.
                     // We are only interested in relevant notifications triggered.
                     // Also they are allowed only if sender is Admin.
-                    if (!qnResourceAccessManager->hasGlobalPermission(
+                    if (!commonModule()->resourceAccessManager()->hasGlobalPermission(
                         sender->getUserAccessData(),
                         Qn::GlobalAdminPermission))
                     {

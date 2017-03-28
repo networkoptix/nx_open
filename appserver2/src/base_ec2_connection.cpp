@@ -199,6 +199,12 @@ AbstractVideowallNotificationManagerPtr
 }
 
 template<class QueryProcessorType>
+QnCommonModule* BaseEc2Connection<QueryProcessorType>::commonModule() const
+{
+
+}
+
+template<class QueryProcessorType>
 AbstractWebPageManagerPtr BaseEc2Connection<QueryProcessorType>::getWebPageManager(
     const Qn::UserAccessData& userAccessData)
 {

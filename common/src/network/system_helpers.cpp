@@ -123,20 +123,22 @@ bool isCloudSystem(const QnModuleInformation& info)
     return (info.version < kMinVersionWithLocalId ? false : !info.cloudSystemId.isEmpty());
 }
 
-QnUuid currentSystemLocalId()
+QnUuid currentSystemLocalId(const QnCommonModule* commonModule)
 {
-    const auto localId = qnGlobalSettings->localSystemId();
-    return (localId.isNull() ? qnCommon->remoteGUID() : localId);
+    const auto& settings = commonModule->globalSettings();
+    const auto localId = settings->localSystemId();
+    return (localId.isNull() ? commonModule->remoteGUID() : localId);
 }
 
-bool serverBelongsToCurrentSystem(const QnModuleInformation& info)
+bool serverBelongsToCurrentSystem(const QnModuleInformation& info, const QnCommonModule* commonModule)
 {
-    return (getLocalSystemId(info) == currentSystemLocalId());
+    return (getLocalSystemId(info) == currentSystemLocalId(commonModule));
 }
 
-bool currentSystemIsNew()
+bool currentSystemIsNew(const QnCommonModule* commonModule)
 {
-    return qnGlobalSettings->localSystemId().isNull();
+    const auto& settings = commonModule->globalSettings();
+    return settings->localSystemId().isNull();
 }
 
 bool isLocalUser(const QString& login)
