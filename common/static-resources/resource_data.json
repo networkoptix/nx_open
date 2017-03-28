@@ -1713,7 +1713,11 @@
         {
             "keys":[
                 "DW|DWC-MTT4W*",
-                "DigitalWatchdog|DWC-MTT4W*"
+                "DigitalWatchdog|DWC-MTT4W*",
+                "DW|DWC-MVT4W*",
+                "DigitalWatchdog|DWC-MVT4W*",
+                "DW|DWC-MBT4W*",
+                "DigitalWatchdog|DWC-MBT4W*"
              ],
              "trustToVideoSourceSize": false
         },

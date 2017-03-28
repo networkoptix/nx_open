@@ -29,7 +29,7 @@ def test_media_stream_should_be_loaded_correctly(env, camera, sample_media_file,
     # load stream
     stream = env.server.get_media_stream(stream_type, camera)
     metadata_list = stream.load_archive_stream_metadata(
-        os.path.join(env.work_dir, 'stream-media-%s' % stream_type),
+        '%s-stream-media-%s' % (env.artifact_path_prefix, stream_type),
         pos=start_time, duration=sample_media_file.duration)
     for metadata in metadata_list:
         assert metadata.width == sample_media_file.width
