@@ -799,7 +799,6 @@
                 <module>debsetup/mediaserver-deb</module>
 
                 <module>storage_plugins/teststorageplugin</module>
-                <module>storage_plugins/teststorageplugin/test</module>
             </modules>
             <properties>
                 <modification>ubuntu</modification>
@@ -979,6 +978,7 @@
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <openssl.version>1.0.0j</openssl.version>
+                <ffmpeg.version>3.1.1-bananapi</ffmpeg.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
                 <gcc.version>4.8.3</gcc.version>
@@ -1216,6 +1216,7 @@
             <modules>
                 <module>unit_tests</module>
                 <module>unit_tests_run</module>
+                <module>storage_plugins/teststorageplugin/test</module>
             </modules>
         </profile>
         <profile>
@@ -1229,6 +1230,7 @@
             </activation>
             <modules>
                 <module>unit_tests</module>
+                <module>storage_plugins/teststorageplugin/test</module>
             </modules>
         </profile>
         <profile>

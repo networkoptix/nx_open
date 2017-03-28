@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="%" sourcelanguage="en">
+<TS version="2.1" language="%" sourcelanguage="en_US">
 <context>
     <name>CloseButton</name>
     <message>
@@ -81,6 +81,30 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Scroll Left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll Right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scroll Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Triggers the action</source>
         <translation type="unfinished"></translation>
     </message>
@@ -104,6 +128,49 @@
         <source>Toggles the state</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Scrolls to the left</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scrolls to the right</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scrolls up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Scrolls down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Goes back a page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Goes to the next page</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QAndroidPlatformTheme</name>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes to All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No to All</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QCocoaMenuItem</name>
@@ -117,31 +184,54 @@
     </message>
     <message>
         <source>Config</source>
-        <translation type="unfinished">Конфигур</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Preference</source>
-        <translation type="unfinished">Свойств</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Options</source>
-        <translation type="unfinished">Параметры</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Setting</source>
-        <translation type="unfinished">Настройк</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Setup</source>
-        <translation type="unfinished">Настр</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Quit</source>
-        <translation type="unfinished">Заверш</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished">Выход</translation>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Paste</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QCocoaTheme</name>
+    <message>
+        <source>Don&apos;t Save</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -172,6 +262,19 @@
     </message>
     <message>
         <source>A&amp;lpha channel:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;HTML:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cursor at %1, %2
+Press ESC to cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Pick Screen Color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -207,15 +310,7 @@
     </message>
 </context>
 <context>
-    <name>QCoreApplication</name>
-    <message>
-        <source>QT_LAYOUT_DIRECTION</source>
-        <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QDateTimeEdit</name>
+    <name>QDateTimeParser</name>
     <message>
         <source>AM</source>
         <translation type="unfinished"></translation>
@@ -244,98 +339,6 @@
     <name>QDialogButtonBox</name>
     <message>
         <source>OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Apply</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Reset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Help</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Don&apos;t Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Close without Saving</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Discard</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Yes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Yes to &amp;All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;No</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>N&amp;o to All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Save All</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Abort</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Retry</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Ignore</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Restore Defaults</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -526,6 +529,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>All files (*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Directories</source>
         <translation type="unfinished"></translation>
     </message>
@@ -584,6 +591,11 @@ Do you want to delete it anyway?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>%1 File</source>
+        <extracomment>%1 is a file name suffix, for example txt</extracomment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -599,7 +611,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>Alias</source>
-        <comment>Mac OS X Finder</comment>
+        <comment>OS X Finder</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -702,6 +714,37 @@ Do you want to delete it anyway?</source>
     </message>
 </context>
 <context>
+    <name>QGnomeTheme</name>
+    <message>
+        <source>&amp;OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close without Saving</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QGuiApplication</name>
+    <message>
+        <source>QT_LAYOUT_DIRECTION</source>
+        <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QIODevice</name>
     <message>
         <source>Permission denied</source>
@@ -723,11 +766,69 @@ Do you want to delete it anyway?</source>
         <source>Unknown error</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>file to open is a directory</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QImageReader</name>
+    <message>
+        <source>Invalid device</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File not found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported image format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to read image data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QImageWriter</name>
+    <message>
+        <source>Unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device is not set</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device not writable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unsupported image format</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QInputDialog</name>
     <message>
         <source>Enter a value:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>QKeySequenceEdit</name>
+    <message>
+        <source>Press shortcut</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1, ...</source>
+        <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -782,6 +883,81 @@ Do you want to delete it anyway?</source>
     </message>
 </context>
 <context>
+    <name>QPlatformTheme</name>
+    <message>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Yes to &amp;All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;No</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>N&amp;o to All</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Abort</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Retry</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Ignore</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore Defaults</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QProgressDialog</name>
     <message>
         <source>Cancel</source>
@@ -789,9 +965,20 @@ Do you want to delete it anyway?</source>
     </message>
 </context>
 <context>
+    <name>QQnxFileDialogHelper</name>
+    <message>
+        <source>All files (*.*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QSaveFile</name>
     <message>
         <source>Existing file %1 is not writable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Filename refers to a directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -897,6 +1084,10 @@ Do you want to delete it anyway?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Application Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Cache</source>
         <translation type="unfinished"></translation>
     </message>
@@ -913,6 +1104,10 @@ Do you want to delete it anyway?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Shared Configuration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Shared Cache</source>
         <translation type="unfinished"></translation>
     </message>
@@ -921,7 +1116,6 @@ Do you want to delete it anyway?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
-
 <context>
     <name>QTabBar</name>
     <message>

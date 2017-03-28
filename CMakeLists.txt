@@ -72,6 +72,10 @@ list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
     set(CMAKE_FRAMEWORK_PATH "${QT_DIR}/lib")
 endif()
+set(CMAKE_EXE_LINKER_FLAGS
+    "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
+set(CMAKE_SHARED_LINKER_FLAGS
+    "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
 
 rdep_add_package(any/boost)
 rdep_add_package(any/qtservice)
