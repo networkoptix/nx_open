@@ -95,14 +95,14 @@ void EMailManager::onSendNotificationRequestDone(
     {
         NX_LOGX(lm("Failed (1) to send email notification %1. %2")
             .arg(notificationIndex).arg(SystemError::toString(client->lastSysErrorCode())),
-            cl_logDEBUG1);
+            cl_logERROR);
     }
     else if (!nx_http::StatusCode::isSuccessCode(client->response()->statusLine.statusCode))
     {
         NX_LOGX(lm("Failed (2) to send email notification %1. Received %2(%3) response")
             .arg(notificationIndex).arg(client->response()->statusLine.statusCode)
             .arg(client->response()->statusLine.reasonPhrase),
-            cl_logDEBUG1);
+            cl_logERROR);
     }
     else
     {
