@@ -6,6 +6,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/actions/action_manager.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 namespace nx {
 namespace client {
@@ -59,6 +60,8 @@ void LayoutToursHandler::openTousLayout()
     connect(startLayoutTourAction, &QAction::toggled, this, updateState);
     connect(stopLayutTourAction, &QAction::triggered, startLayoutTourAction, &QAction::toggle);
 
+    resource->setId(QnUuid::createUuid());
+    qnResPool->addResource(resource);
     menu()->trigger(QnActions::OpenSingleLayoutAction, resource);
 }
 
