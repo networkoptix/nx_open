@@ -252,16 +252,15 @@ angular.module('webadminApp')
                         scope.flashSource = "components/flashlsChromeless_debug.swf";
                     }
 
-                    var flashlsApi = new flashlsAPI(null);
+                    var flashlsAPI = new FlashlsAPI(null);
 
-                    if(flashlsApi.ready()){
-                        flashlsApi.kill();
+                    if(flashlsAPI.ready()){
+                        flashlsAPI.kill();
                         scope.flashls = false; // Destroy it!
                         $timeout(initFlashls);
                     }else {
                         $timeout(function () {// Force DOM to refresh here
-                            flashlsApi.init("videowindow", playerId, function (api) {
-                                console.log("Success");
+                            flashlsAPI.init(playerId, function (api) {
                                 scope.vgApi = api;
                                 if (scope.vgSrc) {
                                     $timeout(function () {

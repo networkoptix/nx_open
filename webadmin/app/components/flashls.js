@@ -1,4 +1,4 @@
-function flashlsAPI (flashObject) {
+function FlashlsAPI (flashObject) {
     function genCallback(flo, p){
         window[p] = function(eventName, args) {
             flo.embedHandler();
@@ -8,38 +8,6 @@ function flashlsAPI (flashObject) {
         };
     }
 
-    this.kill = function(){
-        this.flashObject = null;
-    };
-    this.ready = function(){
-        return !!this.flashObject;
-    };
-
-    this.getFlashMovieObject = function (){
-        var movieName = 'flashvideoembed_'+this.id;
-
-        if (window.document[movieName])
-        {
-            return window.document[movieName];
-        }
-        if (navigator.appName.indexOf('Microsoft Internet')==-1)
-        {
-            if (document.embeds && document.embeds[movieName])
-                return document.embeds[movieName];
-        }
-        else // if (navigator.appName.indexOf('Microsoft Internet')!=-1)
-        {
-            return document.getElementById(movieName);
-        }
-    };
-    this.embedHandler = function (e){
-        if(!this.flashObject) {
-            this.flashObject = this.getFlashMovieObject(); //e.ref is a pointer to the <object>
-            this.flashObject.playerSetLogDebug2(true);
-            this.readyHandler(this);
-        }
-    };
-
     this.readyToPlay = function(){
         readyToPlay = true;
         if(urlToPlay){
@@ -47,18 +15,14 @@ function flashlsAPI (flashObject) {
         }
     };
 
-    this.init = function(element,id,readyHandler,errorHandler, positionHandler) {
-        this.element = element;
+    this.init = function(id,readyHandler,errorHandler, positionHandler) {
+        this.id = id;
         this.readyHandler = readyHandler;
         this.errorHandler = errorHandler;
         this.positionHandler = positionHandler;
-        this.id = id;
         genCallback(this, id);
     };
 
-    this.constructor = function(flashObject) {
-        this.flashObject = flashObject;
-    };
     this.constructor(flashObject);
 
     var readyToPlay = false;
@@ -78,158 +42,6 @@ function flashlsAPI (flashObject) {
             return;
         }
         this.flashObject.playerPlay(offset || -1);
-    };
-
-    this.pause = function() {
-        this.flashObject.playerPause();
-    };
-
-    this.resume = function() {
-        this.flashObject.playerResume();
-    };
-
-    this.seek = function(offset) {
-        this.flashObject.playerSeek(offset);
-    };
-
-    this.stop = function() {
-        this.flashObject.playerStop();
-    };
-
-    this.volume = function(volume) {
-        this.flashObject.playerVolume(volume);
-    };
-
-    this.setCurrentLevel = function(level) {
-        this.flashObject.playerSetCurrentLevel(level);
-    };
-
-    this.setNextLevel = function(level) {
-        this.flashObject.playerSetNextLevel(level);
-    };
-
-    this.setLoadLevel = function(level) {
-        this.flashObject.playerSetLoadLevel(level);
-    };
-
-    this.setMaxBufferLength = function(len) {
-        this.flashObject.playerSetmaxBufferLength(len);
-    };
-
-    this.getPosition = function() {
-        return this.flashObject.getPosition();
-    };
-
-    this.getDuration = function() {
-        return this.flashObject.getDuration();
-    };
-
-    this.getbufferLength = function() {
-        return this.flashObject.getbufferLength();
-    };
-
-    this.getbackBufferLength = function() {
-        return this.flashObject.getbackBufferLength();
-    };
-
-    this.getLowBufferLength = function() {
-        return this.flashObject.getlowBufferLength();
-    };
-
-    this.getMinBufferLength = function() {
-        return this.flashObject.getminBufferLength();
-    };
-
-    this.getMaxBufferLength = function() {
-        return this.flashObject.getmaxBufferLength();
-    };
-
-    this.getLevels = function() {
-        return this.flashObject.getLevels();
-    };
-
-    this.getAutoLevel = function() {
-        return this.flashObject.getAutoLevel();
-    };
-
-    this.getCurrentLevel = function() {
-        return this.flashObject.getCurrentLevel();
-    };
-
-    this.getNextLevel = function() {
-        return this.flashObject.getNextLevel();
-    };
-
-    this.getLoadLevel = function() {
-        return this.flashObject.getLoadLevel();
-    };
-
-    this.getAudioTrackList = function() {
-        return this.flashObject.getAudioTrackList();
-    };
-
-    this.getStats = function() {
-        return this.flashObject.getStats();
-    };
-
-    this.setAudioTrack = function(trackId) {
-        this.flashObject.playerSetAudioTrack(trackId);
-    };
-
-    this.playerSetLogDebug = function(state) {
-        this.flashObject.playerSetLogDebug(state);
-    };
-
-    this.getLogDebug = function() {
-        return this.flashObject.getLogDebug();
-    };
-
-    this.playerSetLogDebug2 = function(state) {
-        this.flashObject.playerSetLogDebug2(state);
-    };
-
-    this.getLogDebug2 = function() {
-        return this.flashObject.getLogDebug2();
-    };
-
-    this.playerSetUseHardwareVideoDecoder = function(state) {
-        this.flashObject.playerSetUseHardwareVideoDecoder(state);
-    };
-
-    this.getUseHardwareVideoDecoder = function() {
-        return this.flashObject.getUseHardwareVideoDecoder();
-    };
-
-    this.playerSetflushLiveURLCache = function(state) {
-        this.flashObject.playerSetflushLiveURLCache(state);
-    };
-
-    this.getflushLiveURLCache = function() {
-        return this.flashObject.getflushLiveURLCache();
-    };
-
-    this.playerSetJSURLStream = function(state) {
-        this.flashObject.playerSetJSURLStream(state);
-    };
-
-    this.getJSURLStream = function() {
-        return this.flashObject.getJSURLStream();
-    };
-
-    this.playerCapLeveltoStage = function(state) {
-        this.flashObject.playerCapLeveltoStage(state);
-    };
-
-    this.getCapLeveltoStage = function() {
-        return this.flashObject.getCapLeveltoStage();
-    };
-
-    this.playerSetAutoLevelCapping = function(level) {
-        this.flashObject.playerSetAutoLevelCapping(level);
-    };
-
-    this.getAutoLevelCapping = function() {
-        return this.flashObject.getAutoLevelCapping();
     };
     
     this.flashlsEvents = {
@@ -268,3 +80,180 @@ function flashlsAPI (flashObject) {
         abortFragment: function(data) {}
     };
 }
+
+FlashlsAPI.prototype.kill = function(){
+    this.flashObject = null;
+};
+
+FlashlsAPI.prototype.ready = function(){
+    return !!this.flashObject;
+};
+
+FlashlsAPI.prototype.getFlashMovieObject = function (){
+    var movieName = 'flashvideoembed_'+this.id;
+
+    if (window.document[movieName])
+    {
+        return window.document[movieName];
+    }
+    if (navigator.appName.indexOf('Microsoft Internet')==-1)
+    {
+        if (document.embeds && document.embeds[movieName])
+            return document.embeds[movieName];
+    }
+    else // if (navigator.appName.indexOf('Microsoft Internet')!=-1)
+    {
+        return document.getElementById(movieName);
+    }
+};
+
+FlashlsAPI.prototype.embedHandler = function (e){
+    if(!this.flashObject) {
+        this.flashObject = this.getFlashMovieObject(); //e.ref is a pointer to the <object>
+        this.flashObject.playerSetLogDebug2(true);
+        this.readyHandler(this);
+    }
+};
+
+FlashlsAPI.prototype.constructor = function(flashObject) {
+    this.flashObject = flashObject;
+};
+
+FlashlsAPI.prototype.pause = function() {
+    this.flashObject.playerPause();
+};
+
+FlashlsAPI.prototype.resume = function() {
+    this.flashObject.playerResume();
+};
+
+FlashlsAPI.prototype.seek = function(offset) {
+    this.flashObject.playerSeek(offset);
+};
+
+FlashlsAPI.prototype.stop = function() {
+    this.flashObject.playerStop();
+};
+
+FlashlsAPI.prototype.volume = function(volume) {
+    this.flashObject.playerVolume(volume);
+};
+
+FlashlsAPI.prototype.setCurrentLevel = function(level) {
+    this.flashObject.playerSetCurrentLevel(level);
+};
+
+FlashlsAPI.prototype.setNextLevel = function(level) {
+    this.flashObject.playerSetNextLevel(level);
+};
+
+FlashlsAPI.prototype.setLoadLevel = function(level) {
+    this.flashObject.playerSetLoadLevel(level);
+};
+
+FlashlsAPI.prototype.setMaxBufferLength = function(len) {
+    this.flashObject.playerSetmaxBufferLength(len);
+};
+
+FlashlsAPI.prototype.getPosition = function() {
+    return this.flashObject.getPosition();
+};
+
+FlashlsAPI.prototype.getDuration = function() {
+    return this.flashObject.getDuration();
+};
+
+FlashlsAPI.prototype.getbufferLength = function() {
+    return this.flashObject.getbufferLength();
+};
+
+FlashlsAPI.prototype.getbackBufferLength = function() {
+    return this.flashObject.getbackBufferLength();
+};
+
+FlashlsAPI.prototype.getLowBufferLength = function() {
+    return this.flashObject.getlowBufferLength();
+};
+
+FlashlsAPI.prototype.getMinBufferLength = function() {
+    return this.flashObject.getminBufferLength();
+};
+
+FlashlsAPI.prototype.getMaxBufferLength = function() {
+    return this.flashObject.getmaxBufferLength();
+};
+
+FlashlsAPI.prototype.getLevels = function() {
+    return this.flashObject.getLevels();
+};
+
+FlashlsAPI.prototype.getAutoLevel = function() {
+    return this.flashObject.getAutoLevel();
+};
+
+FlashlsAPI.prototype.getCurrentLevel = function() {
+    return this.flashObject.getCurrentLevel();
+};
+FlashlsAPI.prototype.getNextLevel = function() {
+    return this.flashObject.getNextLevel();
+};
+FlashlsAPI.prototype.getLoadLevel = function() {
+    return this.flashObject.getLoadLevel();
+};
+FlashlsAPI.prototype.getAudioTrackList = function() {
+    return this.flashObject.getAudioTrackList();
+};
+FlashlsAPI.prototype.getStats = function() {
+    return this.flashObject.getStats();
+};
+FlashlsAPI.prototype.setAudioTrack = function(trackId) {
+    this.flashObject.playerSetAudioTrack(trackId);
+};
+FlashlsAPI.prototype.playerSetLogDebug = function(state) {
+    this.flashObject.playerSetLogDebug(state);
+};
+FlashlsAPI.prototype.getLogDebug = function() {
+    return this.flashObject.getLogDebug();
+};
+FlashlsAPI.prototype.playerSetLogDebug2 = function(state) {
+    this.flashObject.playerSetLogDebug2(state);
+};
+FlashlsAPI.prototype.getLogDebug2 = function() {
+    return this.flashObject.getLogDebug2();
+};
+FlashlsAPI.prototype.playerSetUseHardwareVideoDecoder = function(state) {
+    this.flashObject.playerSetUseHardwareVideoDecoder(state);
+};
+FlashlsAPI.prototype.getUseHardwareVideoDecoder = function() {
+    return this.flashObject.getUseHardwareVideoDecoder();
+};
+FlashlsAPI.prototype.playerSetflushLiveURLCache = function(state) {
+    this.flashObject.playerSetflushLiveURLCache(state);
+};
+FlashlsAPI.prototype.getflushLiveURLCache = function() {
+    return this.flashObject.getflushLiveURLCache();
+};
+
+FlashlsAPI.prototype.playerSetJSURLStream = function(state) {
+    this.flashObject.playerSetJSURLStream(state);
+};
+
+FlashlsAPI.prototype.getJSURLStream = function() {
+    return this.flashObject.getJSURLStream();
+};
+
+FlashlsAPI.prototype.playerCapLeveltoStage = function(state) {
+    this.flashObject.playerCapLeveltoStage(state);
+};
+
+FlashlsAPI.prototype.getCapLeveltoStage = function() {
+    return this.flashObject.getCapLeveltoStage();
+};
+
+FlashlsAPI.prototype.playerSetAutoLevelCapping = function(level) {
+    this.flashObject.playerSetAutoLevelCapping(level);
+};
+
+FlashlsAPI.prototype.getAutoLevelCapping = function() {
+    return this.flashObject.getAutoLevelCapping();
+};
