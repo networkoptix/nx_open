@@ -191,7 +191,10 @@ public:
 
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
     bool isTimeSynchronizationEnabled() const;
+
     bool isSynchronizingTimeWithInternet() const;
+    void setSynchronizingTimeWithInternet(bool value);
+
     bool takeCameraOwnershipWithoutLock() const;
 
     // -- Cloud settings

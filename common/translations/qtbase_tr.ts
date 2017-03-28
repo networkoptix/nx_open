@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="tr" sourcelanguage="en">
+<TS language="tr" sourcelanguage="en_US" version="2.1">
 <context>
     <name>CloseButton</name>
     <message>
@@ -15,8 +15,8 @@
         <translation>Servisler</translation>
     </message>
     <message>
-        <source>Hide tr1</source>
-        <translation>tr1&apos;i Gizle</translation>
+        <source>Hide %1</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Hide Others</source>
@@ -31,12 +31,12 @@
         <translation>Tercihler...</translation>
     </message>
     <message>
-        <source>Quit tr1</source>
-        <translation>tr1&apos;den Çık</translation>
+        <source>Quit %1</source>
+        <translation type="unfinished" />
     </message>
     <message>
-        <source>About tr1</source>
-        <translation>tr1 Hakkında</translation>
+        <source>About %1</source>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -81,6 +81,30 @@
         <translation>Değiştir</translation>
     </message>
     <message>
+        <source>Scroll Left</source>
+        <translation>Sola Kaydır</translation>
+    </message>
+    <message>
+        <source>Scroll Right</source>
+        <translation>Sağa Kaydır</translation>
+    </message>
+    <message>
+        <source>Scroll Up</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Scroll Down</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Previous Page</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Next Page</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
         <source>Triggers the action</source>
         <translation>Eylemi Harekete Geçirir</translation>
     </message>
@@ -103,6 +127,49 @@
     <message>
         <source>Toggles the state</source>
         <translation>Durumu Değiştirir</translation>
+    </message>
+    <message>
+        <source>Scrolls to the left</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Scrolls to the right</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Scrolls up</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Scrolls down</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Goes back a page</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Goes to the next page</source>
+        <translation type="unfinished" />
+    </message>
+</context>
+<context>
+    <name>QAndroidPlatformTheme</name>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Yes to All</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>No to All</source>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -143,6 +210,29 @@
         <source>Exit</source>
         <translation>Çıkış</translation>
     </message>
+    <message>
+        <source>Cut</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Paste</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation>Tümünü Seç</translation>
+    </message>
+</context>
+<context>
+    <name>QCocoaTheme</name>
+    <message>
+        <source>Don't Save</source>
+        <translation>Kaydetme</translation>
+    </message>
 </context>
 <context>
     <name>QColorDialog</name>
@@ -152,11 +242,11 @@
     </message>
     <message>
         <source>&amp;Sat:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>&amp;Val:</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>&amp;Red:</source>
@@ -173,6 +263,19 @@
     <message>
         <source>A&amp;lpha channel:</source>
         <translation>&amp;Alfa Kanalı:</translation>
+    </message>
+    <message>
+        <source>&amp;HTML:</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Cursor at %1, %2
+Press ESC to cancel</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>&amp;Pick Screen Color</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Select Color</source>
@@ -207,15 +310,7 @@
     </message>
 </context>
 <context>
-    <name>QCoreApplication</name>
-    <message>
-        <source>QT_LAYOUT_DIRECTION</source>
-        <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-        <translation>QT_DÜZEN_YÖNÜ</translation>
-    </message>
-</context>
-<context>
-    <name>QDateTimeEdit</name>
+    <name>QDateTimeParser</name>
     <message>
         <source>AM</source>
         <translation>AM</translation>
@@ -236,7 +331,7 @@
 <context>
     <name>QDialog</name>
     <message>
-        <source>What&apos;s This?</source>
+        <source>What's This?</source>
         <translation>Bu Nedir?</translation>
     </message>
 </context>
@@ -245,98 +340,6 @@
     <message>
         <source>OK</source>
         <translation>Tamam</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation>&amp;TAMAM</translation>
-    </message>
-    <message>
-        <source>&amp;Save</source>
-        <translation>&amp;Kaydet</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation>Kaydet</translation>
-    </message>
-    <message>
-        <source>Open</source>
-        <translation>Aç</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation>&amp;İptal</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>İptal</translation>
-    </message>
-    <message>
-        <source>&amp;Close</source>
-        <translation>&amp;Kapat</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>Kapat</translation>
-    </message>
-    <message>
-        <source>Apply</source>
-        <translation>Uygula</translation>
-    </message>
-    <message>
-        <source>Reset</source>
-        <translation>Sıfırla</translation>
-    </message>
-    <message>
-        <source>Help</source>
-        <translation>Yardım</translation>
-    </message>
-    <message>
-        <source>Don&apos;t Save</source>
-        <translation>Kaydetme</translation>
-    </message>
-    <message>
-        <source>Close without Saving</source>
-        <translation>Kaydetmeden Kapat</translation>
-    </message>
-    <message>
-        <source>Discard</source>
-        <translation>Çıkar</translation>
-    </message>
-    <message>
-        <source>&amp;Yes</source>
-        <translation>&amp;Evet</translation>
-    </message>
-    <message>
-        <source>Yes to &amp;All</source>
-        <translation>Tümüne &amp;Evet</translation>
-    </message>
-    <message>
-        <source>&amp;No</source>
-        <translation>&amp;Hayır</translation>
-    </message>
-    <message>
-        <source>N&amp;o to All</source>
-        <translation>Tümüne &amp;Hayır</translation>
-    </message>
-    <message>
-        <source>Save All</source>
-        <translation>Tümünü Kaydet</translation>
-    </message>
-    <message>
-        <source>Abort</source>
-        <translation>Durdur</translation>
-    </message>
-    <message>
-        <source>Retry</source>
-        <translation>Tekrar Dene</translation>
-    </message>
-    <message>
-        <source>Ignore</source>
-        <translation>Yoksay</translation>
-    </message>
-    <message>
-        <source>Restore Defaults</source>
-        <translation>Varsayılanları Geri Yükle</translation>
     </message>
 </context>
 <context>
@@ -383,8 +386,8 @@
         <translation>Adı Değiştirirken Hata Oluştu.</translation>
     </message>
     <message>
-        <source>Unable to restore from tr1: tr2</source>
-        <translation>tr1 den tr2 ye Geri Yükleme Başarısız</translation>
+        <source>Unable to restore from %1: %2</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Will not rename sequential file using block copy</source>
@@ -395,8 +398,8 @@
         <translation>Kaynak Dosya Kaldırılamıyor</translation>
     </message>
     <message>
-        <source>Cannot open tr1 for input</source>
-        <translation>tr1 İçin Giriş Açılamıyor</translation>
+        <source>Cannot open %1 for input</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Cannot open for output</source>
@@ -407,8 +410,8 @@
         <translation>Öbek Yazma Başarısız</translation>
     </message>
     <message>
-        <source>Cannot create tr1 for output</source>
-        <translation>tr1 İçin Çıkış Oluşturulamıyor</translation>
+        <source>Cannot create %1 for output</source>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -467,7 +470,7 @@
     </message>
     <message>
         <source>Files of type:</source>
-        <translation></translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Find Directory</source>
@@ -526,25 +529,29 @@
         <translation>&amp;Yeni Klasör</translation>
     </message>
     <message>
+        <source>All files (*)</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
         <source>Directories</source>
         <translation>Dizinler</translation>
     </message>
     <message>
-        <source>tr1
+        <source>%1
 Directory not found.
 Please verify the correct directory name was given.</source>
-        <translation>tr1 Dizini Bulunamadı. Lütfen Verilen Dizin  Adını Düzeltin.</translation>
+        <translation type="unfinished" />
     </message>
     <message>
-        <source>tr1 already exists.
+        <source>%1 already exists.
 Do you want to replace it?</source>
-        <translation>tr1 Zaten Var. Değiştirmek İster Misiniz?</translation>
+        <translation type="unfinished" />
     </message>
     <message>
-        <source>tr1
+        <source>%1
 File not found.
 Please verify the correct file name was given.</source>
-        <translation>tr1 Dosyası Bulunamadı. Lütfen Verilen Dosya Adını Düzeltin.</translation>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>New Folder</source>
@@ -555,13 +562,13 @@ Please verify the correct file name was given.</source>
         <translation>Sil</translation>
     </message>
     <message>
-        <source>&apos;tr1&apos; is write protected.
+        <source>'%1' is write protected.
 Do you want to delete it anyway?</source>
-        <translation>tr1 Yazma Korumalı. Yine de Silmek İstiyor Musunuz?</translation>
+        <translation type="unfinished" />
     </message>
     <message>
-        <source>Are you sure you want to delete &apos;tr1&apos;?</source>
-        <translation>tr1&apos;i Silmek İstediğinize Emin Misiniz?</translation>
+        <source>Are you sure you want to delete '%1'?</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Could not delete directory.</source>
@@ -584,6 +591,11 @@ Do you want to delete it anyway?</source>
         <translation>Sürücü</translation>
     </message>
     <message>
+        <source>%1 File</source>
+        <extracomment>%1 is a file name suffix, for example txt</extracomment>
+        <translation type="unfinished" />
+    </message>
+    <message>
         <source>File</source>
         <translation>Dosya</translation>
     </message>
@@ -599,7 +611,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>Alias</source>
-        <comment>Mac OS X Finder</comment>
+        <comment>OS X Finder</comment>
         <translation>Diğer Ad</translation>
     </message>
     <message>
@@ -639,32 +651,32 @@ Do you want to delete it anyway?</source>
 <context>
     <name>QFileSystemModel</name>
     <message>
-        <source>tr1 TB</source>
-        <translation>tr1 TB</translation>
+        <source>%1 TB</source>
+        <translation type="unfinished" />
     </message>
     <message>
-        <source>tr1 GB</source>
-        <translation>tr1 GB</translation>
+        <source>%1 GB</source>
+        <translation type="unfinished" />
     </message>
     <message>
-        <source>tr1 MB</source>
-        <translation>tr1 MB</translation>
+        <source>%1 MB</source>
+        <translation type="unfinished" />
     </message>
     <message>
-        <source>tr1 KB</source>
-        <translation>tr1 KB</translation>
+        <source>%1 KB</source>
+        <translation type="unfinished" />
     </message>
     <message>
-        <source>tr1 bytes</source>
-        <translation>tr1  bytes</translation>
+        <source>%1 bytes</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Invalid filename</source>
         <translation>Geçersiz Dosya Adı</translation>
     </message>
     <message>
-        <source>&lt;b&gt;The name &quot;tr1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-        <translation>&lt;b&gt;tr1 İsmi Kullanılamaz.&lt;/b&gt;&lt;p&gt;Daha Az Karakter İçeren veya Noktalama İşareti İçermeyen Başka Bir İsim Kullanmayı Deneyin.</translation>
+        <source>&lt;b&gt;The name "%1" can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Name</source>
@@ -697,8 +709,39 @@ Do you want to delete it anyway?</source>
         <translation>Bilgisayar</translation>
     </message>
     <message>
-        <source>tr1 byte(s)</source>
-        <translation>tr1 byte(s)</translation>
+        <source>%1 byte(s)</source>
+        <translation type="unfinished" />
+    </message>
+</context>
+<context>
+    <name>QGnomeTheme</name>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;TAMAM</translation>
+    </message>
+    <message>
+        <source>&amp;Save</source>
+        <translation>&amp;Kaydet</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;İptal</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>&amp;Kapat</translation>
+    </message>
+    <message>
+        <source>Close without Saving</source>
+        <translation>Kaydetmeden Kapat</translation>
+    </message>
+</context>
+<context>
+    <name>QGuiApplication</name>
+    <message>
+        <source>QT_LAYOUT_DIRECTION</source>
+        <comment>Translate this string to the string 'LTR' in left-to-right languages or to 'RTL' in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
+        <translation>QT_DÜZEN_YÖNÜ</translation>
     </message>
 </context>
 <context>
@@ -723,12 +766,70 @@ Do you want to delete it anyway?</source>
         <source>Unknown error</source>
         <translation>Bilinmeyen Hata</translation>
     </message>
+    <message>
+        <source>file to open is a directory</source>
+        <translation type="unfinished" />
+    </message>
+</context>
+<context>
+    <name>QImageReader</name>
+    <message>
+        <source>Invalid device</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>File not found</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Unsupported image format</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Unable to read image data</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Unknown error</source>
+        <translation>Bilinmeyen Hata</translation>
+    </message>
+</context>
+<context>
+    <name>QImageWriter</name>
+    <message>
+        <source>Unknown error</source>
+        <translation>Bilinmeyen Hata</translation>
+    </message>
+    <message>
+        <source>Device is not set</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Device not writable</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Unsupported image format</source>
+        <translation type="unfinished" />
+    </message>
 </context>
 <context>
     <name>QInputDialog</name>
     <message>
         <source>Enter a value:</source>
         <translation>Bir Değer Girin:</translation>
+    </message>
+</context>
+<context>
+    <name>QKeySequenceEdit</name>
+    <message>
+        <source>Press shortcut</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>%1, ...</source>
+        <extracomment>This text is an "unfinished" shortcut, expands like "Ctrl+A, ..."</extracomment>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -782,6 +883,81 @@ Do you want to delete it anyway?</source>
     </message>
 </context>
 <context>
+    <name>QPlatformTheme</name>
+    <message>
+        <source>OK</source>
+        <translation>Tamam</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>Kaydet</translation>
+    </message>
+    <message>
+        <source>Save All</source>
+        <translation>Tümünü Kaydet</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>Aç</translation>
+    </message>
+    <message>
+        <source>&amp;Yes</source>
+        <translation>&amp;Evet</translation>
+    </message>
+    <message>
+        <source>Yes to &amp;All</source>
+        <translation>Tümüne &amp;Evet</translation>
+    </message>
+    <message>
+        <source>&amp;No</source>
+        <translation>&amp;Hayır</translation>
+    </message>
+    <message>
+        <source>N&amp;o to All</source>
+        <translation>Tümüne &amp;Hayır</translation>
+    </message>
+    <message>
+        <source>Abort</source>
+        <translation>Durdur</translation>
+    </message>
+    <message>
+        <source>Retry</source>
+        <translation>Tekrar Dene</translation>
+    </message>
+    <message>
+        <source>Ignore</source>
+        <translation>Yoksay</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Kapat</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>İptal</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation>Çıkar</translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation>Yardım</translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation>Uygula</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>Sıfırla</translation>
+    </message>
+    <message>
+        <source>Restore Defaults</source>
+        <translation>Varsayılanları Geri Yükle</translation>
+    </message>
+</context>
+<context>
     <name>QProgressDialog</name>
     <message>
         <source>Cancel</source>
@@ -789,10 +965,21 @@ Do you want to delete it anyway?</source>
     </message>
 </context>
 <context>
+    <name>QQnxFileDialogHelper</name>
+    <message>
+        <source>All files (*.*)</source>
+        <translation type="unfinished" />
+    </message>
+</context>
+<context>
     <name>QSaveFile</name>
     <message>
-        <source>Existing file tr1 is not writable</source>
-        <translation>Var Olan tr1 Dosyası Yazılabilir Değil</translation>
+        <source>Existing file %1 is not writable</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Filename refers to a directory</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Writing canceled by application</source>
@@ -897,6 +1084,10 @@ Do you want to delete it anyway?</source>
         <translation>Uygulama Verileri</translation>
     </message>
     <message>
+        <source>Application Configuration</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
         <source>Cache</source>
         <translation>Önbellek</translation>
     </message>
@@ -911,6 +1102,10 @@ Do you want to delete it anyway?</source>
     <message>
         <source>Configuration</source>
         <translation>Yapılandırma</translation>
+    </message>
+    <message>
+        <source>Shared Configuration</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Shared Cache</source>
@@ -935,7 +1130,7 @@ Do you want to delete it anyway?</source>
 <context>
     <name>QWhatsThisAction</name>
     <message>
-        <source>What&apos;s This?</source>
+        <source>What's This?</source>
         <translation>Bu Nedir?</translation>
     </message>
 </context>

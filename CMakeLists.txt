@@ -72,6 +72,10 @@ list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
     set(CMAKE_FRAMEWORK_PATH "${QT_DIR}/lib")
 endif()
+set(CMAKE_EXE_LINKER_FLAGS
+    "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
+set(CMAKE_SHARED_LINKER_FLAGS
+    "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
 
 rdep_add_package(any/boost)
 rdep_add_package(any/qtservice)
@@ -115,6 +119,7 @@ if(withMediaServer)
     add_subdirectory(mediaserver_core)
     add_subdirectory(mediaserver)
     add_subdirectory(plugins)
+    add_subdirectory(storage_plugins)
 endif()
 
 if(withDesktopClient OR withMobileClient)
@@ -122,6 +127,8 @@ if(withDesktopClient OR withMobileClient)
 endif()
 
 if(withTests)
+    rdep_add_package(gtest)
+    rdep_add_package(gmock)
     add_subdirectory(unit_tests)
 endif()
 

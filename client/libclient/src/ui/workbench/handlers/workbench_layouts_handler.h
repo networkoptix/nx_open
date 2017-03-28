@@ -13,12 +13,12 @@ namespace desktop {
 namespace ui {
 namespace workbench {
 
-class QnWorkbenchLayoutsHandler: public QObject, public QnSessionAwareDelegate
+class LayoutsHandler: public QObject, public QnSessionAwareDelegate
 {
     Q_OBJECT
 public:
-    explicit QnWorkbenchLayoutsHandler(QObject *parent = 0);
-    virtual ~QnWorkbenchLayoutsHandler();
+    explicit LayoutsHandler(QObject *parent = 0);
+    virtual ~LayoutsHandler();
 
     void renameLayout(const QnLayoutResourcePtr &layout, const QString &newName);
     virtual bool tryClose(bool force) override;

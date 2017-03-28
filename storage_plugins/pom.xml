@@ -11,9 +11,38 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>storage_plugins</artifactId>
     <packaging>pom</packaging>
-    <name>Nx Witness Storage Plugins</name>
+    <name>Network Optix Storage Plugins</name>
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>
     </properties>
+
+    <modules>
+        <module>teststorageplugin</module>
+    </modules>
+
+   <profiles>
+        <profile>
+            <id>not-macosx</id>
+            <activation>
+                <os>
+                    <family>!mac</family>
+                </os>
+            </activation>
+            <modules>
+                <module>teststorageplugin/test</module>
+            </modules>
+        </profile>
+    </profiles>        
+    
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>build_environment</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/build_environment/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
 </project>

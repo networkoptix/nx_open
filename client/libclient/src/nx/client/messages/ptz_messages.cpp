@@ -12,6 +12,7 @@ static const QString kPtzPresetShowOnceKey(lit("PtzPresetInUse"));
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace messages {
 
 void Ptz::failedToGetPosition(QWidget* parent, const QString& cameraName)
@@ -52,5 +53,6 @@ bool Ptz::deletePresetInUse(QWidget* parent)
 }
 
 } // namespace messages
+} // namespace desktop
 } // namespace client
 } // namespace nx
