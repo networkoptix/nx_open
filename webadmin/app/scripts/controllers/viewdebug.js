@@ -113,7 +113,7 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
         $scope.selectPlayer = function(player){
             $scope.selectedPlayer = player;
             selectedPlayer = player;
-            console.log("selected ", player+1);
+            //console.log("selected ", player+1);
         }
 
 
