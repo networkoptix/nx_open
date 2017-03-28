@@ -6,7 +6,6 @@ angular.module('cloudApp')
         function ($scope, cloudApi, $routeParams, process, $localStorage,
                   $sessionStorage, account, $location, urlProtocol) {
 
-            $scope.L = L;
             $scope.session = $localStorage;
             $scope.context = $sessionStorage;
 
