@@ -119,6 +119,7 @@ if(withMediaServer)
     add_subdirectory(mediaserver_core)
     add_subdirectory(mediaserver)
     add_subdirectory(plugins)
+    add_subdirectory(storage_plugins)
 endif()
 
 if(withDesktopClient OR withMobileClient)
@@ -126,6 +127,8 @@ if(withDesktopClient OR withMobileClient)
 endif()
 
 if(withTests)
+    rdep_add_package(gtest)
+    rdep_add_package(gmock)
     add_subdirectory(unit_tests)
 endif()
 

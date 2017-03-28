@@ -172,7 +172,7 @@ class DirectHlsMediaStream(object):
         assert isinstance(pos, datetime), repr(pos)
         assert isinstance(duration, timedelta), repr(duration)
         temp_file_path = temp_file_name + '.%s' % self.format
-        pos_ms = datetime_utc_to_timestamp(pos) * 1000
+        pos_ms = int(datetime_utc_to_timestamp(pos) * 1000)
         duration_sec = int(duration.total_seconds() + 1)  # round to next value
         params = dict(pos=pos_ms, duration=duration_sec)
         metadata = load_stream_metadata_from_http(
