@@ -41,6 +41,12 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
 
     connect(m_webView, &QnGraphicsWebView::statusChanged, this, updateStatusesHandler);
 
+    connect(resource(), &QnResource::urlChanged, this,
+        [this]()
+        {
+            m_webView->setUrl(resource()->getUrl());
+        });
+
     setupOverlays();
     updateButtonsVisibility();
 }
