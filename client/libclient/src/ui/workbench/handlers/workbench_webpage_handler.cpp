@@ -26,7 +26,7 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject* parent /*= nullptr
     connect(action(QnActions::NewWebPageAction), &QAction::triggered,
         this, &QnWorkbenchWebPageHandler::at_newWebPageAction_triggered);
 
-    connect(action(QnActions::EditResourceAction), &QAction::triggered,
+    connect(action(QnActions::WebPageSettingsAction), &QAction::triggered,
         this, &QnWorkbenchWebPageHandler::at_editWebPageAction_triggered);
 }
 
@@ -58,11 +58,17 @@ void QnWorkbenchWebPageHandler::at_editWebPageAction_triggered()
     if (!webPage)
         return;
 
+    const auto oldName = webPage->getName();
+    const auto oldUrl = webPage->getUrl();
+
     QScopedPointer<QnWebpageDialog> dialog(new QnWebpageDialog(mainWindow()));
     dialog->setWindowTitle(tr("Edit Web Page"));
-    dialog->setName(webPage->getName());
-    dialog->setUrl(webPage->getUrl());
+    dialog->setName(oldName);
+    dialog->setUrl(oldUrl);
     if (!dialog->exec())
+        return;
+
+    if (oldName == dialog->name() && oldUrl == dialog->url())
         return;
 
     const auto url = QUrl::fromUserInput(dialog->url());

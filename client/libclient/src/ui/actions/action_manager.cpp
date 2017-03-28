@@ -1484,13 +1484,13 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree).
         separator();
 
-    factory(QnActions::EditResourceAction).
+    factory(QnActions::WebPageSettingsAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(tr("Edit...")).
         autoRepeat(false).
         condition(new QnConjunctionActionCondition(
-            new QnWebPageActionCondition(this),
+            new QnResourceActionCondition(hasFlags(Qn::web_page), Qn::ExactlyOne, this),
             new QnForbiddenInSafeModeCondition(this),
             this)
         );

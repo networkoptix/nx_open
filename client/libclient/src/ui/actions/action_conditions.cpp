@@ -471,18 +471,6 @@ Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParame
     return Qn::InvisibleAction;
 }
 
-Qn::ActionVisibility QnWebPageActionCondition::check(const QnActionParameters& parameters)
-{
-    if (parameters.resources().size() != 1)
-        return Qn::InvisibleAction;
-
-    const auto target = parameters.resource();
-    if (!target || !target->hasFlags(Qn::web_page))
-        return Qn::InvisibleAction;
-
-    return Qn::EnabledAction;
-}
-
 Qn::ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
     foreach(const QnLayoutItemIndex &item, layoutItems)
         if(!accessController()->hasPermissions(item.layout(), Qn::WritePermission | Qn::AddRemoveItemsPermission))

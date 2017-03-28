@@ -1127,9 +1127,9 @@ enum IDType
     ToggleCurrentItemMaximizationStateAction,
 
     /**
-    * Invokes an editor for editable resource (currently - only Web Page).
+    * Opens Web Page settings dialog.
     */
-    EditResourceAction,
+    WebPageSettingsAction,
 
     ActionCount,
 
