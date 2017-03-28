@@ -731,8 +731,6 @@ void QnMediaResourceWidget::ensureTwoWayAudioWidget()
     bool hasTwoWayAudio = m_camera && m_camera->hasTwoWayAudio()
         && accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission);
 
-    hasTwoWayAudio = true;
-
     if (!hasTwoWayAudio)
         return;
 
