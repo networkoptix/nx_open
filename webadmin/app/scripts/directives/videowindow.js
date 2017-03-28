@@ -294,18 +294,20 @@ angular.module('webadminApp')
                     scope.flashls = false;
                     scope.native = false;
                     scope.jsHls = true;
+
+                    var hlsAPI = new JsHlsAPI();
                     hlsAPI.init( element.find(".videoplayer"), function (api) {
-                            scope.vgApi = api;
-                            if (scope.vgSrc) {
-                                $timeout(function(){
-                                    scope.loading = false;
-                                });
-                                scope.vgApi.load(getFormatSrc('hls'));
-                            }
-                            scope.vgPlayerReady({$API:api});
-                        },  function (api) {
-                                console.log(api);
-                                console.error("some error");
+                        scope.vgApi = api;
+                        if (scope.vgSrc) {
+                            $timeout(function(){
+                                scope.loading = false;
+                            });
+                            scope.vgApi.load(getFormatSrc('hls'));
+                        }
+                        scope.vgPlayerReady({$API:api});
+                    },  function (api) {
+                            console.log(api);
+                            console.error("some error");
                     });
                 }
 

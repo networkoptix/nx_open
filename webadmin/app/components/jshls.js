@@ -1,30 +1,13 @@
 'use strict';
 
-var hlsAPI = new (function(){
-    var hls, events,stats,tracks,fmp4Data,video,
+function JsHlsAPI(){
+    var events, stats, fmp4Data,
     enableWorker = true,
-    levelCapping = -1,
+    //levelCapping = -1,
     defaultAudioCodec = undefined,
     dumpfMP4 = false;
 
-    this.init = function(element, readyHandler, errorHandler){
-        video = element[0];
-        if(Hls.isSupported()) {
-            if(hls) {
-                //hls.destroy();
-                if(hls.bufferTimer) {
-                    clearInterval(hls.bufferTimer);
-                    hls.bufferTimer = undefined;
-                }
-                hls = null;
-            }
-        }
-        events = { url : '', t0 : performance.now(), load : [], buffer : [], video : [], level : [], bitrate : []};
-        recoverDecodingErrorDate = recoverSwapAudioCodecDate = null;
-        fmp4Data = { 'audio': [], 'video': [] };
-
-        hls = new Hls({debug:false, enableWorker : enableWorker, defaultAudioCodec : defaultAudioCodec});
-
+    this.initHlsEvents = function(hls){
         hls.on(Hls.Events.MEDIA_ATTACHED,function() {
             events.video.push({time : performance.now() - events.t0, type : "Media attached"});
         });
@@ -126,7 +109,7 @@ var hlsAPI = new (function(){
             events.bitrate.push({time : performance.now() - events.t0, bitrate : event.bw , duration : data.frag.duration, level : event.id});
             if(hls.bufferTimer === undefined) {
                 events.buffer.push({ time : 0, buffer : 0, pos: 0});
-                hls.bufferTimer = window.setInterval(checkBuffer, 100);
+                hls.bufferTimer = window.setInterval(this.checkBuffer, 100);
             }
 
             var latency = data.stats.tfirst - data.stats.trequest,
@@ -307,7 +290,7 @@ var hlsAPI = new (function(){
                 console.log('fatal error :' + data.details);
                 switch(data.type) {
                     case Hls.ErrorTypes.MEDIA_ERROR:
-                        handleMediaError();
+                        this.handleMediaError();
                         break;
                     case Hls.ErrorTypes.NETWORK_ERROR:
                         console.log(",network error ...");
@@ -358,38 +341,34 @@ var hlsAPI = new (function(){
                 stats.fpsTotalDroppedFrames = data.totalDroppedFrames;
             }
         });
-        
-        video.addEventListener('resize', handleVideoEvent);
-        video.addEventListener('seeking', handleVideoEvent);
-        video.addEventListener('seeked', handleVideoEvent);
-        video.addEventListener('pause', handleVideoEvent);
-        video.addEventListener('play', handleVideoEvent);
-        video.addEventListener('canplay', handleVideoEvent);
-        video.addEventListener('canplaythrough', handleVideoEvent);
-        video.addEventListener('ended', handleVideoEvent);
-        video.addEventListener('playing', handleVideoEvent);
-        video.addEventListener('error', handleVideoEvent);
-        video.addEventListener('loadedmetadata', handleVideoEvent);
-        video.addEventListener('loadeddata', handleVideoEvent);
-        video.addEventListener('durationchange', handleVideoEvent);
-        
+    };
+
+    this.init = function(element, readyHandler, errorHandler){
+        this.video = element[0];
+        if(Hls.isSupported()) {
+            if(this.hls) {
+                this.hls.destroy();
+                if(this.hls.bufferTimer) {
+                    clearInterval(hls.bufferTimer);
+                    this.hls.bufferTimer = undefined;
+                }
+                this.hls = null;
+            }
+        }
+        events = { url : '', t0 : performance.now(), load : [], buffer : [], video : [], level : [], bitrate : []};
+        recoverDecodingErrorDate = recoverSwapAudioCodecDate = null;
+        fmp4Data = { 'audio': [], 'video': [] };
+
+        this.hls = new Hls({debug:false, enableWorker : enableWorker, defaultAudioCodec : defaultAudioCodec});
+
+        this.initHlsEvents(this.hls);        
+        this.initVideoHandlers();
         this.readyHandler = readyHandler;
         this.readyHandler(this);
     };
-    this.play = function(offset){
-        video.play();
-    };
-    this.pause = function(){
-        video.pause();
-    };
-    this.load = function(url){
-        hls.loadSource(url);
-        hls.autoLevelCapping = levelCapping;
-        hls.attachMedia(video);
-    };
 
     var lastSeekingIdx, lastStartPosition,lastDuration, lastAudioTrackSwitchingIdx;
-    function handleVideoEvent(evt) {
+    this.handleVideoEvent= function(evt){
         var data = '';
         switch(evt.type) {
             case 'durationchange':
@@ -426,7 +405,7 @@ var hlsAPI = new (function(){
                     break;
                 case mediaError.MEDIA_ERR_DECODE:
                     errorTxt = "The video playback was aborted due to a corruption problem or because the video used features your browser did not support";
-                    handleMediaError();
+                    this.handleMediaError();
                     break;
                 case mediaError.MEDIA_ERR_NETWORK:
                     errorTxt = "A network error caused the video download to fail part-way";
@@ -449,33 +428,63 @@ var hlsAPI = new (function(){
         if(evt.type === 'seeked') {
             events.video[lastSeekingIdx].duration = event.time - events.video[lastSeekingIdx].time;
         }
-    }
+    };
 
     var recoverDecodingErrorDate,recoverSwapAudioCodecDate;
-    function handleMediaError() {
+    this.handleMediaError= function(){
         if(autoRecoverError) {
             var now = performance.now();
             if(!recoverDecodingErrorDate || (now - recoverDecodingErrorDate) > 3000) {
                 recoverDecodingErrorDate = performance.now();
                 console.log(",try to recover media Error ...");
-                hls.recoverMediaError();
+                this.hls.recoverMediaError();
             } else {
                 if(!recoverSwapAudioCodecDate || (now - recoverSwapAudioCodecDate) > 3000) {
                     recoverSwapAudioCodecDate = performance.now();
                     console.log(",try to swap Audio Codec and recover media Error ...");
-                    hls.swapAudioCodec();
-                    hls.recoverMediaError();
+                    this.hls.swapAudioCodec();
+                    this.hls.recoverMediaError();
                 } else {
                     console.log(",cannot recover, last media error recovery failed ...");
                 }
             }
         }
-    }
+    };
 
-    function checkBuffer() {
-        var v = video.buffered;
+    this.checkBuffer = function(){
+        var v = this.video.buffered;
         if (v) {
             events.buffer.push();
         }
-    }
-})();
+    };
+}
+
+JsHlsAPI.prototype.play = function(offset){
+    this.video.play();
+};
+
+JsHlsAPI.prototype.pause = function(){
+    this.video.pause();
+};
+
+JsHlsAPI.prototype.load = function(url){
+    this.hls.loadSource(url);
+    this.hls.autoLevelCapping = -1; //levelCapping;
+    this.hls.attachMedia(this.video);
+};
+
+JsHlsAPI.prototype.initVideoHandlers = function(){
+    this.video.addEventListener('resize', this.handleVideoEvent);
+    this.video.addEventListener('seeking', this.handleVideoEvent);
+    this.video.addEventListener('seeked', this.handleVideoEvent);
+    this.video.addEventListener('pause', this.handleVideoEvent);
+    this.video.addEventListener('play', this.handleVideoEvent);
+    this.video.addEventListener('canplay', this.handleVideoEvent);
+    this.video.addEventListener('canplaythrough', this.handleVideoEvent);
+    this.video.addEventListener('ended', this.handleVideoEvent);
+    this.video.addEventListener('playing', this.handleVideoEvent);
+    this.video.addEventListener('error', this.handleVideoEvent);
+    this.video.addEventListener('loadedmetadata', this.handleVideoEvent);
+    this.video.addEventListener('loadeddata', this.handleVideoEvent);
+    this.video.addEventListener('durationchange', this.handleVideoEvent);
+};
