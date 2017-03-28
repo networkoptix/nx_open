@@ -1217,7 +1217,6 @@
             <modules>
                 <module>unit_tests</module>
                 <module>unit_tests_run</module>
-                <module>storage_plugins/teststorageplugin/test</module>
             </modules>
         </profile>
         <profile>
@@ -1231,7 +1230,6 @@
             </activation>
             <modules>
                 <module>unit_tests</module>
-                <module>storage_plugins/teststorageplugin/test</module>
             </modules>
         </profile>
         <profile>
