@@ -16,7 +16,7 @@ namespace ssl {
  * @note Not thread-safe.
  */
 class NX_NETWORK_API Pipeline:
-    public utils::pipeline::TwoWayPipeline
+    public utils::pipeline::Converter
 {
 public:
     /**

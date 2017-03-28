@@ -66,6 +66,14 @@ protected:
     AbstractInput* m_inputStream;
 };
 
+class NX_UTILS_API Converter:
+    public TwoWayPipeline
+{
+public:
+    virtual bool eof() const = 0;
+    virtual bool failed() const = 0;
+};
+
 //-------------------------------------------------------------------------------------------------
 // ProxyPipeline
 

@@ -29,6 +29,10 @@ public:
         const nx::Buffer& buffer,
         std::function<void(SystemError::ErrorCode, size_t)> handler) = 0;
 
+    /**
+     * Does not block if called within object's aio thread.
+     * If called from any other thread then returns after asynchronous handler completion.
+     */
     virtual void cancelIOSync(nx::network::aio::EventType eventType) = 0;
 };
 
