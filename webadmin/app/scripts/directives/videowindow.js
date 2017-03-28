@@ -25,6 +25,7 @@ angular.module('webadminApp')
             scope: {
                 vgUpdateTime:"&",
                 vgPlayerReady:"&",
+                playerId: "=",
                 vgSrc:"=",
                 player:"=",
                 activeFormat:"="
@@ -42,7 +43,6 @@ angular.module('webadminApp')
                 scope.Config = Config;
                 scope.debugMode = Config.debug.video && Config.allowDebugMode;
                 scope.debugFormat = Config.allowDebugMode && Config.debug.videoFormat;
-
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
                     if( scope.debugMode){
@@ -240,10 +240,10 @@ angular.module('webadminApp')
                     scope.flashls = true;
                     scope.native = false;
                     scope.jsHls = false;
-                    scope.flashSource = "components/flashlsChromeless.swf";
+                    scope.flashSource = "components/"+scope.playerId + ".swf";
 
                     if(scope.debugMode && scope.debugFormat){
-                        scope.flashSource = "components/flashlsChromeless_debug.swf";
+                        scope.flashSource = "components/"+scope.playerId + ".swf";
                     }
 
                     if(flashlsAPI.ready()){
@@ -252,13 +252,15 @@ angular.module('webadminApp')
                         $timeout(initFlashls);
                     }else {
                         $timeout(function () {// Force DOM to refresh here
-                            flashlsAPI.init("videowindow", function (api) {
+                            flashlsAPI.init("videowindow", scope.playerId, function (api) {
+                                console.log("Success");
                                 scope.vgApi = api;
                                 if (scope.vgSrc) {
                                     $timeout(function () {
                                         scope.loading = !!format;
                                     });
                                     scope.vgApi.load(getFormatSrc('hls'));
+
                                 }
 
                                 scope.vgPlayerReady({$API: api});
@@ -277,6 +279,7 @@ angular.module('webadminApp')
                                     scope.vgUpdateTime({$currentTime: position, $duration: duration});
                                 }
                             });
+                            playerHolders[scope.playerId].load(getFormatSrc('hls'));
                         });
                     }
                 }
@@ -347,6 +350,24 @@ angular.module('webadminApp')
 
                 if(scope.debugMode)
                     scope.$watch('activeFormat', srcChanged);
+                
+                scope.initFlash = function(){
+                    var tmp = '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"codebase="" id="flashvideoembed"';
+                    tmp += 'width="100%" height="100%">';
+                    tmp += '\n\t<param name="movie"  value="'+scope.flashSource+'?inline=1" />';
+                    tmp += '\n\t<param name="quality" value="high" />';
+                    tmp += '\n\t<param name="swliveconnect" value="true" />';
+                    tmp += '\n\t<param name="allowScriptAccess" value="always" />';
+                    tmp += '\n\t<param name="bgcolor" value="#1C2327" />';
+                    tmp += '\n\t<param name="allowFullScreen" value="true" />';
+                    tmp += '\n\t<param name="wmode" value="transparent" />';
+                    tmp += '\n\t<param name="FlashVars" value="callback=' + scope.playerId + '" />';
+                    tmp += '\n\t<embed src="'+scope.flashSource+'?inline=1" width="100%" height="100%"';
+                    tmp += ' name="flashvideoembed" quality="high" bgcolor="#1C2327" align="middle" allowFullScreen="true"';
+                    tmp += 'allowScriptAccess="always" type="application/x-shockwave-flash" swliveconnect="true" wmode="transparent"';
+                    tmp += 'FlashVars="callback='+scope.playerId+'">\n\t</embed>\n</object>';
+                    $('videowindow#'+scope.playerId)[0].children[0].children[0].innerHTML = tmp;
+                };
             }
         }
     }]);

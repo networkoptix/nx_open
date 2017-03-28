@@ -1,3 +1,12 @@
+function genCallback(p){
+    window[p] = function(eventName, args) {
+        flashlsAPI.embedHandler();
+        if(flashlsAPI.flashlsEvents[eventName]) {
+          flashlsAPI.flashlsEvents[eventName].apply(null, args);
+        }
+    };
+}
+
 var flashlsAPI = new (function(flashObject) {
 
     this.kill = function(){
@@ -39,11 +48,13 @@ var flashlsAPI = new (function(flashObject) {
         }
     };
 
-    this.init = function(element,readyHandler,errorHandler, positionHandler) {
+    this.init = function(element,id,readyHandler,errorHandler, positionHandler) {
         this.element = element;
         this.readyHandler = readyHandler;
         this.errorHandler = errorHandler;
         this.positionHandler = positionHandler;
+        this.id = id;
+        genCallback(id);
     };
 
     this.constructor = function(flashObject) {
@@ -260,9 +271,9 @@ flashlsAPI.flashlsEvents = {
 };
 
 
-window.flashlsCallback = function(eventName, args) {
+/*window.flashlsCallback = function(eventName, args) {
     flashlsAPI.embedHandler();
     if(flashlsAPI.flashlsEvents[eventName]) {
         flashlsAPI.flashlsEvents[eventName].apply(null, args);
     }
-};
+};*/

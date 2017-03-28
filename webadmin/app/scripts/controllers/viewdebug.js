@@ -104,7 +104,8 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
                                 'playerAPI': 'playerReady($API)',
                                 'activeVideoSource': $scope.activeVideoSource,
                                 'player': $scope.player,
-                                'activeFormat': $scope.activeFormat
+                                'activeFormat': $scope.activeFormat,
+                                'playerId': 'player'+i.toString()
             });
         }
         var selectedPlayer = 0;
@@ -112,9 +113,7 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
         $scope.selectPlayer = function(player){
             $scope.selectedPlayer = player;
             selectedPlayer = player;
-            console.log("seleced ", player+1);
-            console.log($("#player_"+player));
-            console.log($scope.players[player]);
+            console.log("selected ", player+1);
         }
 
 
@@ -239,9 +238,8 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
         }
 
         $scope.playerReady = function(API){
-            console.log("Player %d Ready", selectedPlayer);
             $scope.players[selectedPlayer].playerAPI = API;
-            console.log($scope.players);
+            console.log("Players");
             if(API) {
                 $scope.switchPlaying(true);
             }
@@ -354,6 +352,7 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
 
         $scope.switchPlaying = function(play){
             var currentPlayer = $scope.players[selectedPlayer].playerAPI;
+            console.log($scope.players);
             if(currentPlayer) {
                 if (play) {
                     currentPlayer.play();
