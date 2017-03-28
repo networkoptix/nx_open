@@ -31,8 +31,8 @@ namespace CameraDiagnostics
             end
         };
 
-        QString toString( Value val );
-        Value fromString( const QString& str );
+        QString toString(QnResourcePool* resPool, Value val);
+        Value fromString(const QString& str);
     }
 
     //!Contains error codes

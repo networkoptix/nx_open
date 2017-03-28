@@ -66,7 +66,11 @@ Ec2DirectConnectionFactory::Ec2DirectConnectionFactory(
     m_remoteQueryProcessor(commonModule)
 {
     if (m_dbManager)
+    {
         m_dbManager->setTransactionLog(m_transactionLog.get());
+        m_dbManager->setTimeSyncManager(m_timeSynchronizationManager.get());
+    }
+    m_transactionMessageBus->setTimeSyncManager(m_timeSynchronizationManager.get());
     if (peerType != Qn::PT_Server)
         m_timeSynchronizationManager->start(nullptr);
 
@@ -1324,7 +1328,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
         });
 
     p->registerHandler("ec2/activeConnections", new QnActiveConnectionsRestHandler(m_transactionMessageBus.get()));
-    p->registerHandler(QnTimeSyncRestHandler::PATH, new QnTimeSyncRestHandler());
+    p->registerHandler(QnTimeSyncRestHandler::PATH, new QnTimeSyncRestHandler(this));
 
 #if 0 // Using HTTP processor since HTTP REST does not support HTTP interleaving.
     p->registerHandler(
@@ -1817,6 +1821,11 @@ QnTransactionMessageBus* Ec2DirectConnectionFactory::messageBus() const
 QnDistributedMutexManager* Ec2DirectConnectionFactory::distributedMutex() const
 {
     return m_distributedMutexManager.get();
+}
+
+TimeSynchronizationManager* Ec2DirectConnectionFactory::timeSyncManager() const
+{
+    return m_timeSynchronizationManager.get();
 }
 
 } // namespace ec2

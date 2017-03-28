@@ -2,12 +2,15 @@
 
 #include <core/resource/resource_type.h>
 #include <api/global_settings.h>
+#include <common/common_module.h>
 
-QnAbstractResourceSearcher::QnAbstractResourceSearcher() :
+QnAbstractResourceSearcher::QnAbstractResourceSearcher(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
     m_discoveryMode(DiscoveryMode::fullyEnabled),
     m_localResources(false),
     m_shouldStop(false)
-{}
+{
+}
 
 QnAbstractResourceSearcher::~QnAbstractResourceSearcher()
 {
@@ -27,7 +30,8 @@ void QnAbstractResourceSearcher::setDiscoveryMode( DiscoveryMode mode )
 
 DiscoveryMode QnAbstractResourceSearcher::discoveryMode() const
 {
-    if (qnGlobalSettings->isInitialized() && qnGlobalSettings->isNewSystem())
+    const auto& settings = commonModule()->globalSettings();
+    if (settings->isInitialized() && settings->isNewSystem())
         return DiscoveryMode::disabled;
     return m_discoveryMode;
 }

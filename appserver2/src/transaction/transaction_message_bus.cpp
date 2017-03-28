@@ -206,6 +206,7 @@ bool handleTransaction(
 QnTransactionMessageBus::QnTransactionMessageBus(detail::QnDbManager* db, Qn::PeerType peerType)
     :
     m_db(db),
+    m_timeSyncManager(nullptr),
     m_localPeerType(peerType),
     //m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
@@ -366,7 +367,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
                 if (data.tran.params.peer.id != commonModule()->moduleGUID())
                     ttHeader.distance = 1;
                 ttHeader.processedPeers = connectedServerPeers() << commonModule()->moduleGUID();
-                ttHeader.fillSequence();
+                ttHeader.fillSequence(commonModule()->moduleGUID(), commonModule()->runningInstanceGUID());
                 sendTransactionInternal(std::move(data.tran), ttHeader); // resend broadcast alive info for that peer
                 itr = m_delayedAliveTran.erase(itr);
             }
@@ -769,13 +770,13 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
             onGotServerAliveInfo(tran, sender, transportHeader);
             return; // do not proxy. this call contains built in proxy
         case ApiCommand::forcePrimaryTimeServer:
-            TimeSynchronizationManager::instance()->onGotPrimariTimeServerTran(tran);
+            m_timeSyncManager->onGotPrimariTimeServerTran(tran);
             break;
         case ApiCommand::broadcastPeerSystemTime:
-            TimeSynchronizationManager::instance()->peerSystemTimeReceived(tran);
+            m_timeSyncManager->peerSystemTimeReceived(tran);
             break;
         case ApiCommand::getKnownPeersSystemTime:
-            TimeSynchronizationManager::instance()->knownPeersSystemTimeReceived(tran);
+            m_timeSyncManager->knownPeersSystemTimeReceived(tran);
             break;
         case ApiCommand::runtimeInfoChanged:
             if (!onGotServerRuntimeInfo(tran, sender, transportHeader))
@@ -1079,11 +1080,10 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         transport->setReadSync(true);
 
         //sending local time information on known servers
-        TimeSynchronizationManager* timeManager = TimeSynchronizationManager::instance();
-        if (timeManager)
+        if (m_timeSyncManager)
         {
             QnTransaction<ApiPeerSystemTimeDataList> tran;
-            tran.params = timeManager->getKnownPeersSystemTime();
+            tran.params = m_timeSyncManager->getKnownPeersSystemTime();
             tran.command = ApiCommand::getKnownPeersSystemTime;
             tran.peerID = commonModule()->moduleGUID();
             transport->sendTransaction(tran, processedPeers);
@@ -1444,7 +1444,9 @@ void QnTransactionMessageBus::doPeriodicTasks()
 
             itr.value().lastConnectedTime.restart();
             QnTransactionTransport* transport = new QnTransactionTransport(
-                &m_connectionGuardSharedState, localPeer());
+                commonModule(),
+                &m_connectionGuardSharedState,
+                localPeer());
             connect(transport, &QnTransactionTransport::gotTransaction, this, &QnTransactionMessageBus::at_gotTransaction, Qt::QueuedConnection);
             connect(transport, &QnTransactionTransport::stateChanged, this, &QnTransactionMessageBus::at_stateChanged, Qt::QueuedConnection);
             connect(transport, &QnTransactionTransport::remotePeerUnauthorized, this, &QnTransactionMessageBus::emitRemotePeerUnauthorized, Qt::QueuedConnection);
@@ -1567,6 +1569,7 @@ void QnTransactionMessageBus::gotConnectionFromRemotePeer(
         return; // reject incoming connection because of media server is about to restart
 
     QnTransactionTransport* transport = new QnTransactionTransport(
+        commonModule(),
         connectionGuid,
         std::move(connectionLockGuard),
         localPeer(),
@@ -1963,6 +1966,11 @@ int QnTransactionMessageBus::distanceToPeer(const QnUuid& dstPeer) const
 QnCommonModule* QnTransactionMessageBus::commonModule() const
 {
     return m_db->commonModule();
+}
+
+void QnTransactionMessageBus::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
+{
+    m_timeSyncManager = timeSyncManager;
 }
 
 } //namespace ec2

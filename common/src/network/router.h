@@ -24,7 +24,7 @@ struct QnRoute
     bool isValid() const { return !addr.isNull(); }
 };
 
-class QnRouter: public QnCommonModuleAware
+class QnRouter: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 public:

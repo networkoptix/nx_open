@@ -118,7 +118,7 @@ int QnBusinessEventManager<T>::resetBusinessRules( impl::SimpleHandlerPtr handle
 template<class T>
 QnTransaction<ApiBusinessActionData> QnBusinessEventManager<T>::prepareTransaction( ApiCommand::Value command, const QnAbstractBusinessActionPtr& resource )
 {
-    QnTransaction<ApiBusinessActionData> tran(command);
+    QnTransaction<ApiBusinessActionData> tran(command, m_messageBus->commonModule()->moduleGUID());
     fromResourceToApi(resource, tran.params);
     return tran;
 }

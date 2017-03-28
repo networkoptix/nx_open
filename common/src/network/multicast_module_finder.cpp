@@ -283,7 +283,8 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket)
         return true;
     }
 
-    auto connectionResult = QnConnectionValidator::validateConnection(*response);
+    QnConnectionValidator validator(commonModule());
+    auto connectionResult = validator.validateConnection(*response);
     if (connectionResult == Qn::IncompatibleInternalConnectionResult)
     {
         DEBUG_LOG(lm("Ignoring %1 (%2) with different customization %3 on local address %4").strs(

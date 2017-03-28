@@ -118,18 +118,19 @@ LicenseTypeInfo::LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Arra
 // -------------------------------------------------------------------------- //
 // QnLicense
 // -------------------------------------------------------------------------- //
-QnLicense::QnLicense()
-:
+QnLicense::QnLicense(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
     m_cameraCount(0),
     m_isValid1(false),
     m_isValid2(false)
 {
 }
 
-QnLicense::QnLicense(const QByteArray &licenseBlock)
-    : m_rawLicense(licenseBlock),
-      m_isValid1(false),
-      m_isValid2(false)
+QnLicense::QnLicense(QnCommonModule* commonModule, const QByteArray &licenseBlock):
+    QnCommonModuleAware(commonModule),
+    m_rawLicense(licenseBlock),
+    m_isValid1(false),
+    m_isValid2(false)
 {
     loadLicenseBlock( licenseBlock );
 }
@@ -151,14 +152,14 @@ void QnLicense::loadLicenseBlock( const QByteArray& licenseBlock )
     this->m_rawLicense = licenseBlock;
 }
 
-QnLicensePtr QnLicense::readFromStream(QTextStream &stream)
+QnLicensePtr QnLicense::readFromStream(QnCommonModule* commonModule, QTextStream &stream)
 {
     QByteArray licenseBlock;
     while (!stream.atEnd()) {
         QString line = stream.readLine();
         if (line.isEmpty()) {
             if (!licenseBlock.isEmpty())
-                return QnLicensePtr(new QnLicense(licenseBlock));
+                return QnLicensePtr(new QnLicense(commonModule, licenseBlock));
             else
                 continue;
         }
@@ -169,7 +170,7 @@ QnLicensePtr QnLicense::readFromStream(QTextStream &stream)
     if (licenseBlock.isEmpty())
         return QnLicensePtr();
 
-    return QnLicensePtr(new QnLicense(licenseBlock));
+    return QnLicensePtr(new QnLicense(commonModule, licenseBlock));
 }
 
 QString QnLicense::displayName() const {
@@ -218,8 +219,10 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     return QString();
 }
 
-QnUuid QnLicense::serverId() const {
-    for(const QnPeerRuntimeInfo& info: QnRuntimeInfoManager::instance()->items()->getItems())
+QnUuid QnLicense::serverId() const
+{
+    const auto& manager = commonModule()->runtimeInfoManager();
+    for(const QnPeerRuntimeInfo& info: manager->items()->getItems())
     {
         if (info.data.peer.peerType != Qn::PT_Server)
             continue;
@@ -324,8 +327,8 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
 {
     if (!m_isValid1 && !m_isValid2 && mode != VM_CheckInfo)
         return gotError(errCode, InvalidSignature);
-
-    QnPeerRuntimeInfo info = QnRuntimeInfoManager::instance()->items()->getItem(mode == VM_Regular ? serverId() : qnCommon->remoteGUID());
+    const auto& manager = commonModule()->runtimeInfoManager();
+    QnPeerRuntimeInfo info = manager->items()->getItem(mode == VM_Regular ? serverId() : commonModule()->remoteGUID());
 
     // #TODO: #ynikitenkov It does not make sense in case of VM_JustAdded. #refactor
     if (info.uuid.isNull())
@@ -722,7 +725,8 @@ QVector<QString> QnLicensePool::hardwareIds() const {
     return QnRuntimeInfoManager::instance()->remoteInfo().data.hardwareIds;
 }
 
-QString QnLicensePool::currentHardwareId() const {
+QString QnLicensePool::currentHardwareId() const
+{
     QString hardwareId;
 
     // hardwareIds is a ordered list

@@ -4,6 +4,7 @@
 #include "network/direct_module_finder.h"
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
+#include <common/common_module.h>
 
 namespace ec2 {
 
@@ -19,13 +20,18 @@ ApiDiscoveryData toApiDiscoveryData(
     return params;
 }
 
+QnDiscoveryNotificationManager::QnDiscoveryNotificationManager(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
+{
+
+}
 
 void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction, NotificationSource /*source*/)
 {
     NX_ASSERT(transaction.command == ApiCommand::discoverPeer, "Invalid command for this function", Q_FUNC_INFO);
 
     // TODO: maybe it's better to move it out and use signal?..
-    QnModuleFinder *moduleFinder = qnModuleFinder;
+    QnModuleFinder *moduleFinder = commonModule()->moduleFinder();
     if (moduleFinder && moduleFinder->directModuleFinder())
         moduleFinder->directModuleFinder()->checkUrl(QUrl(transaction.params.url));
 
@@ -64,7 +70,10 @@ void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<Api
 
 
 template<class QueryProcessorType>
-QnDiscoveryManager<QueryProcessorType>::QnDiscoveryManager(QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData) :
+QnDiscoveryManager<QueryProcessorType>::QnDiscoveryManager(
+    QueryProcessorType * const queryProcessor,
+    const Qn::UserAccessData &userAccessData)
+:
     m_queryProcessor(queryProcessor),
     m_userAccessData(userAccessData)
 {

@@ -31,6 +31,7 @@
 #include <utils/common/id.h>
 
 #include "connection_guard.h"
+#include <common/common_module_aware.h>
 
 
 namespace ec2
@@ -54,7 +55,8 @@ namespace ConnectionType
 
 class QnTransactionTransportBase:
     public QObject,
-    public nx::network::aio::BasicPollable
+    public nx::network::aio::BasicPollable,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
@@ -103,6 +105,7 @@ public:
 
     /** Initializer for incoming connection. */
     QnTransactionTransportBase(
+        QnCommonModule* commonModule,
         const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
@@ -114,6 +117,7 @@ public:
         int keepAliveProbeCount);
     //!Initializer for outgoing connection
     QnTransactionTransportBase(
+        QnCommonModule* commonModule,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer,
         std::chrono::milliseconds tcpKeepAliveTimeout,
@@ -225,7 +229,7 @@ protected:
     {
         QnTransactionTransportHeader header(_header);
         NX_ASSERT(header.processedPeers.contains(m_localPeer.id));
-        header.fillSequence();
+        header.fillSequence(commonModule()->moduleGUID(), commonModule()->runningInstanceGUID());
 #ifdef _DEBUG
 
         for (const QnUuid& peer : header.dstPeers)
@@ -357,6 +361,7 @@ private:
 
 private:
     QnTransactionTransportBase(
+        QnCommonModule* commonModule,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer,
         PeerRole peerRole,

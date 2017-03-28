@@ -19,6 +19,7 @@ QnRouter::QnRouter(
     QObject* parent,
     QnModuleFinder *moduleFinder)
     :
+    QObject(parent),
     QnCommonModuleAware(parent),
     m_moduleFinder(moduleFinder)
 {

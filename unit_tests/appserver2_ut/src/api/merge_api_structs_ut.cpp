@@ -323,7 +323,7 @@ protected:
     static void SetUpTestCase()
     {
         // Init singletons.
-        m_common = new QnCommonModule();
+        m_common = new QnCommonModule(false);
         m_common->setModuleGUID(QnUuid::createUuid());
     }
 

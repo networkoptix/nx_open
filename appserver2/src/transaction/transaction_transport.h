@@ -14,6 +14,7 @@ class QnTransactionTransport
 public:
     /** Initializer for incoming connection */
     QnTransactionTransport(
+        QnCommonModule* commonModule,
         const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
@@ -25,6 +26,7 @@ public:
         const Qn::UserAccessData &userAccessData);
     /** Initializer for outgoing connection */
     QnTransactionTransport(
+        QnCommonModule* commonModule,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer);
     ~QnTransactionTransport();

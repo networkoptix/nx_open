@@ -15,6 +15,7 @@
 #include <core/resource/videowall_resource.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
 
 
 //#define QN_NO_LICENSE_CHECK
@@ -76,10 +77,11 @@ static std::array<LicenseCompatibility, 19> compatibleLicenseType =
 /************************************************************************/
 /* QnLicenseUsageHelper                                                 */
 /************************************************************************/
-QnLicenseUsageWatcher::QnLicenseUsageWatcher(QObject* parent /* = NULL*/):
-    base_type(parent)
+QnLicenseUsageWatcher::QnLicenseUsageWatcher(QObject* parent):
+    base_type(parent),
+    QnCommonModuleAware(parent)
 {
-
+    const auto& resPool = commonModule()->resourcePool();
     /* Call update if server was added or removed or changed its status. */
     auto updateIfNeeded =
         [this](const QnResourcePtr &resource)
@@ -88,9 +90,9 @@ QnLicenseUsageWatcher::QnLicenseUsageWatcher(QObject* parent /* = NULL*/):
                 emit licenseUsageChanged();
         };
 
-    connect(qnResPool,      &QnResourcePool::resourceAdded,     this,   updateIfNeeded);
-    connect(qnResPool,      &QnResourcePool::statusChanged,     this,   updateIfNeeded);
-    connect(qnResPool,      &QnResourcePool::resourceRemoved,   this,   updateIfNeeded);
+    connect(resPool,      &QnResourcePool::resourceAdded,     this,   updateIfNeeded);
+    connect(resPool,      &QnResourcePool::statusChanged,     this,   updateIfNeeded);
+    connect(resPool,      &QnResourcePool::resourceRemoved,   this,   updateIfNeeded);
 
     connect(qnLicensePool,  &QnLicensePool::licensesChanged,    this,   &QnLicenseUsageWatcher::licenseUsageChanged);
 }
@@ -110,6 +112,7 @@ QnLicenseUsageHelper::Cache::Cache() {
 
 QnLicenseUsageHelper::QnLicenseUsageHelper(QObject *parent):
     base_type(parent),
+    QnCommonModuleAware(parent),
     m_dirty(true)
 {
 }
@@ -316,7 +319,10 @@ QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(const QnVirtualCameraResource
     init(camera);
 }
 
-void QnCamLicenseUsageWatcher::init(const QnVirtualCameraResourcePtr &camera) {
+void QnCamLicenseUsageWatcher::init(const QnVirtualCameraResourcePtr &camera)
+{
+    const auto& resPool = commonModule()->resourcePool();
+
     /* Listening to all changes that can affect licenses usage. */
     auto connectToCamera = [this](const QnVirtualCameraResourcePtr &camera) {
         connect(camera, &QnVirtualCameraResource::scheduleDisabledChanged,  this, &QnLicenseUsageWatcher::licenseUsageChanged);
@@ -336,20 +342,20 @@ void QnCamLicenseUsageWatcher::init(const QnVirtualCameraResourcePtr &camera) {
             emit licenseUsageChanged();
     };
 
-    connect(qnResPool, &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
+    connect(resPool, &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
+    connect(resPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
 
-    connect(qnResPool, &QnResourcePool::resourceAdded,   this,   [this, connectToCamera](const QnResourcePtr &resource) {
+    connect(resPool, &QnResourcePool::resourceAdded,   this,   [this, connectToCamera](const QnResourcePtr &resource) {
         if (const QnVirtualCameraResourcePtr &camera = resource.dynamicCast<QnVirtualCameraResource>())
             connectToCamera(camera);
     });
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,   [this](const QnResourcePtr &resource) {
+    connect(resPool, &QnResourcePool::resourceRemoved, this,   [this](const QnResourcePtr &resource) {
         if (const QnVirtualCameraResourcePtr &camera = resource.dynamicCast<QnVirtualCameraResource>())
             disconnect(camera, NULL, this, NULL);
     });
 
-    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getResources<QnVirtualCameraResource>())
+    for (const QnVirtualCameraResourcePtr &camera: resPool->getResources<QnVirtualCameraResource>())
         connectToCamera(camera);
 }
 
@@ -357,8 +363,10 @@ void QnCamLicenseUsageWatcher::init(const QnVirtualCameraResourcePtr &camera) {
 /************************************************************************/
 /* QnCamLicenseUsageHelper                                              */
 /************************************************************************/
-QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnCamLicenseUsageWatcherPtr &watcher
-    , QObject *parent):
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(
+    QObject* parent,
+    const QnCamLicenseUsageWatcherPtr &watcher)
+    :
     base_type(parent)
 {
     init(watcher);
@@ -437,8 +445,8 @@ void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLice
 {
     boost::fill(basicUsedLicenses, 0);
     boost::fill(proposedToUse, 0);
-
-    for (const auto& camera: qnResPool->getAllCameras(QnResourcePtr(), true))
+    const auto& resPool = commonModule()->resourcePool();
+    for (const auto& camera: resPool->getAllCameras(QnResourcePtr(), true))
     {
         Qn::LicenseType lt = camera->licenseType();
         bool requiresLicense = camera->isLicenseUsed();
@@ -492,7 +500,7 @@ QnSingleCamLicenceStatusHelper::CameraLicenseStatus QnSingleCamLicenceStatusHelp
 /************************************************************************/
 /* QnVideoWallLicenseUsageWatcher                                       */
 /************************************************************************/
-QnVideoWallLicenseUsageWatcher::QnVideoWallLicenseUsageWatcher(QObject* parent /* = NULL*/):
+QnVideoWallLicenseUsageWatcher::QnVideoWallLicenseUsageWatcher(QObject* parent):
     base_type(parent)
 {
     auto updateIfNeeded = [this](const QnResourcePtr &resource) {
@@ -512,10 +520,12 @@ QnVideoWallLicenseUsageWatcher::QnVideoWallLicenseUsageWatcher(QObject* parent /
             connectTo(videowall);
     };
 
-    connect(qnResPool, &QnResourcePool::resourceAdded,   this,   connectIfNeeded);
-    connect(qnResPool, &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
-    for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>())
+    const auto& resPool = commonModule()->resourcePool();
+
+    connect(resPool, &QnResourcePool::resourceAdded,   this,   connectIfNeeded);
+    connect(resPool, &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
+    connect(resPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
+    for (const QnVideoWallResourcePtr &videowall: resPool->getResources<QnVideoWallResource>())
         connectTo(videowall);
 }
 
@@ -543,7 +553,8 @@ void QnVideoWallLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUs
 
     int usedScreens = 0;
     int controlSessions = 0;
-    for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>())
+    const auto& resPool = commonModule()->resourcePool();
+    for (const QnVideoWallResourcePtr &videowall: resPool->getResources<QnVideoWallResource>())
     {
         /* Calculating total screens. */
         usedScreens += videowall->items()->getItems().size();
@@ -571,7 +582,11 @@ int QnVideoWallLicenseUsageHelper::licensesForScreens(int screens) {
 /************************************************************************/
 /* QnVideoWallLicenseUsageProposer                                      */
 /************************************************************************/
-QnVideoWallLicenseUsageProposer::QnVideoWallLicenseUsageProposer(QnVideoWallLicenseUsageHelper* helper, int screenCount, int controlSessionsCount):
+QnVideoWallLicenseUsageProposer::QnVideoWallLicenseUsageProposer(
+    QnVideoWallLicenseUsageHelper* helper,
+    int screenCount,
+    int controlSessionsCount)
+    :
     m_helper(helper),
     m_count(0)
 {
@@ -580,7 +595,9 @@ QnVideoWallLicenseUsageProposer::QnVideoWallLicenseUsageProposer(QnVideoWallLice
 
     int totalScreens = 0;
     int controlSessions = 0;
-    for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>()) {
+    const auto& resPool = helper->commonModule()->resourcePool();
+    for (const QnVideoWallResourcePtr &videowall: resPool->getResources<QnVideoWallResource>())
+    {
         /* Calculate total screens used. */
         totalScreens += videowall->items()->getItems().size();
 

@@ -61,11 +61,13 @@ namespace
     }
 
     Qn::ResourceStatus calculateModuleStatus(
-            const QnModuleInformation &moduleInformation,
-            Qn::ResourceStatus currentStatus = Qn::Online)
+        QnCommonModule* commonModule,
+        const QnModuleInformation &moduleInformation,
+        Qn::ResourceStatus currentStatus = Qn::Online)
     {
+        QnConnectionValidator validator(commonModule);
         Qn::ResourceStatus status =
-            QnConnectionValidator::isCompatibleToCurrentSystem(moduleInformation)
+            validator.isCompatibleToCurrentSystem(moduleInformation)
             ? Qn::Online
             : Qn::Incompatible;
         if (status == Qn::Online && currentStatus == Qn::Unauthorized)
@@ -334,7 +336,7 @@ void QnModuleFinder::at_responseReceived(
         if (oldModuleIsValid == newModuleIsValid) {
             QnUuid remoteId = commonModule()->remoteGUID();
             if (!remoteId.isNull() && remoteId == moduleInformation.id) {
-                QnUuid correctRuntimeId = QnRuntimeInfoManager::instance()->item(remoteId).uuid;
+                QnUuid correctRuntimeId = commonModule()->runtimeInfoManager()->item(remoteId).uuid;
                 oldModuleIsValid = item.moduleInformation.runtimeId == correctRuntimeId;
                 newModuleIsValid = moduleInformation.runtimeId == correctRuntimeId;
             }
@@ -407,7 +409,7 @@ void QnModuleFinder::at_responseReceived(
             updatePrimaryAddress(item, endpoint);
 
         SocketAddress addressToSend = item.primaryAddress;
-        item.status = calculateModuleStatus(item.moduleInformation, item.status);
+        item.status = calculateModuleStatus(commonModule(), item.moduleInformation, item.status);
         Qn::ResourceStatus statusToSend = item.status;
         lk.unlock();
 

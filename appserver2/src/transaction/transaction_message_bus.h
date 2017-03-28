@@ -28,6 +28,7 @@ class QnRuntimeTransactionLog;
 
 namespace ec2 {
 class ECConnectionNotificationManager;
+class TimeSynchronizationManager;
 
 class QnTransactionMessageBus
     :
@@ -93,7 +94,7 @@ public:
         if (m_connections.isEmpty())
             return;
         QnTransactionTransportHeader ttHeader(connectedServerPeers() << commonModule()->moduleGUID(), dstPeers);
-        ttHeader.fillSequence();
+        ttHeader.fillSequence(commonModule()->moduleGUID(), commonModule()->runningInstanceGUID());
         sendTransactionInternal(tran, ttHeader);
     }
 
@@ -147,6 +148,8 @@ public:
     ConnectionGuardSharedState* connectionGuardSharedState();
 
     QnCommonModule* commonModule() const;
+
+    void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager);
 signals:
     void peerLost(ApiPeerAliveData data);
     //!Emitted when a new peer has joined cluster or became online
@@ -276,6 +279,7 @@ private slots:
 
 private:
     detail::QnDbManager* m_db;
+    TimeSynchronizationManager* m_timeSyncManager;
 
     /** Info about us. */
     Qn::PeerType m_localPeerType;

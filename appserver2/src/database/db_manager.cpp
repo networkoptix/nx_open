@@ -191,7 +191,8 @@ QnDbManager::QnDbManager(QnCommonModule* commonModule):
     m_dbReadOnly(false),
     m_resyncFlags(),
     m_tranLog(nullptr),
-    m_commonModule(commonModule)
+    m_commonModule(commonModule),
+    m_timeSyncManager(nullptr)
 {
 }
 
@@ -3869,7 +3870,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ApiResourceParamW
 // getCurrentTime
 ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime)
 {
-    currentTime = TimeSynchronizationManager::instance()->getTimeInfo();
+    currentTime = m_timeSyncManager->getTimeInfo();
     return ErrorCode::ok;
 }
 
@@ -4550,6 +4551,11 @@ QnDbManager::QnDbTransaction* QnDbManager::getTransaction()
 void QnDbManager::setTransactionLog(QnTransactionLog* tranLog)
 {
     m_tranLog = tranLog;
+}
+
+void QnDbManager::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)
+{
+    m_timeSyncManager = timeSyncManager;
 }
 
 QnTransactionLog* QnDbManager::transactionLog() const

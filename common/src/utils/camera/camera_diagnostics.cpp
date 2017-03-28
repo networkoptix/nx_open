@@ -17,7 +17,9 @@ class QnCameraDiagnosticsErrorCodeStrings
 
 public:
     //!Returns textual description of error with  parameters
-    static QString toString(CameraDiagnostics::ErrorCode::Value val,
+    static QString toString(
+        QnResourcePool* resPool,
+        CameraDiagnostics::ErrorCode::Value val,
         const QnVirtualCameraResourcePtr& device,
         const QList<QString>& errorParams)
     {
@@ -79,7 +81,7 @@ public:
             {
                 errorMessageParts
                     << tr("Cannot connect to http port %1.").arg(p1)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsPluggedReboot, device);
+                    << QnDeviceDependentStrings::getNameFromSet(resPool, detailsPluggedReboot, device);
                 break;
             }
             case cannotOpenCameraMediaPort:
@@ -87,14 +89,14 @@ public:
                 errorMessageParts
                     << tr("Cannot open media URL %1. Failed to connect to media port %2.").arg(p1).arg(p2)
                     << tr("Make sure port %1 is accessible (e.g. forwarded).").arg(p2)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device);
+                    << QnDeviceDependentStrings::getNameFromSet(resPool, detailsRebootRestore, device);
                 break;
             }
             case connectionClosedUnexpectedly:
             {
                 errorMessageParts
                     << tr("Cannot open media URL %1. Connection to port %2 was closed unexpectedly.").arg(p1).arg(p2)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsPluggedReboot, device);
+                    << QnDeviceDependentStrings::getNameFromSet(resPool, detailsPluggedReboot, device);
                 break;
             }
             case responseParseError:
@@ -106,15 +108,15 @@ public:
                 );
 
                 errorMessageParts
-                    << QnDeviceDependentStrings::getNameFromSet(detailsBase, device)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resPool, detailsBase, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resPool, detailsRebootRestore, device)
                     << firmwareSupport;
                 break;
             }
             case noMediaTrack:
             {
                 errorMessageParts << tr("No supported media tracks at URL %1.").arg(p1)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resPool, detailsRebootRestore, device)
                     << firmwareSupport;
                 break;
             }
@@ -127,7 +129,7 @@ public:
             {
                 errorMessageParts
                     << tr("Cannot open media URL %1. Unsupported media protocol %2.").arg(p1).arg(p2)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resPool, detailsRebootRestore, device)
                     << firmwareSupport;
                 break;
             }
@@ -146,8 +148,8 @@ public:
 
                 errorMessageParts
                     << tr("Failed to configure parameter %1.").arg(p1)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsBase, device)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsAdvanced, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resPool, detailsBase, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resPool, detailsAdvanced, device)
                     << firmwareSupport;
                 break;
             }
@@ -159,8 +161,8 @@ public:
                     tr("I/O Module request \"%1\" failed with error \"%2\".").arg(p1).arg(p2)
                 );
                 errorMessageParts
-                    << QnDeviceDependentStrings::getNameFromSet(detailsBase, device)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resPool, detailsBase, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resPool, detailsRebootRestore, device)
                     << firmwareSupport;
                 break;
             }
@@ -173,7 +175,7 @@ public:
                 );
 
                 errorMessageParts
-                    << QnDeviceDependentStrings::getNameFromSet(details, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resPool, details, device)
                     << tr("Please contact support.");
                 break;
             }
@@ -181,7 +183,7 @@ public:
             {
                 errorMessageParts
                     << tr("An input/output error has occurred. OS message: \"%1\".").arg(p1)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsPluggedReboot, device);
+                    << QnDeviceDependentStrings::getNameFromSet(resPool, detailsPluggedReboot, device);
                 break;
             }
             case serverTerminated:
@@ -198,7 +200,7 @@ public:
                 );
 
                 errorMessageParts
-                    << QnDeviceDependentStrings::getNameFromSet(details, device);
+                    << QnDeviceDependentStrings::getNameFromSet(resPool, details, device);
                 break;
             }
             case badMediaStream:
@@ -210,7 +212,7 @@ public:
                 );
 
                 errorMessageParts
-                    << QnDeviceDependentStrings::getNameFromSet(details, device);
+                    << QnDeviceDependentStrings::getNameFromSet(resPool, details, device);
                 break;
             }
             case noMediaStream:
@@ -228,7 +230,7 @@ public:
                 );
 
                 errorMessageParts
-                    << QnDeviceDependentStrings::getNameFromSet(details, device);
+                    << QnDeviceDependentStrings::getNameFromSet(resPool, details, device);
                 break;
             }
             case cameraPluginError:
@@ -300,11 +302,13 @@ namespace CameraDiagnostics
     namespace ErrorCode
     {
 
-        QString toString(Value val
-            , const QnVirtualCameraResourcePtr &device
-            , const ErrorParams& errorParams)
+        QString toString(
+            QnResourcePool* resPool,
+            Value val,
+            const QnVirtualCameraResourcePtr &device,
+            const ErrorParams& errorParams)
         {
-            return QnCameraDiagnosticsErrorCodeStrings::toString(val, device, errorParams);
+            return QnCameraDiagnosticsErrorCodeStrings::toString(resPool, val, device, errorParams);
         }
 
         QString toString(int val

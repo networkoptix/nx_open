@@ -329,13 +329,12 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
 // QnMediaServerConnection
 
 QnMediaServerConnection::QnMediaServerConnection(
-    const QnCommonModule* commonModule,
+    QObject* parent,
     const QnMediaServerResourcePtr& mserver,
     const QnUuid& videowallGuid,
-    bool enableOfflineRequests,
-    QObject* parent)
-    :
-    base_type(commonModule, parent, mserver),
+    bool enableOfflineRequests)
+:
+    base_type(parent, mserver),
     m_proxyPort(0),
     m_enableOfflineRequests(enableOfflineRequests)
 {
@@ -358,7 +357,7 @@ QnMediaServerConnection::QnMediaServerConnection(
     if (!videowallGuid.isNull())
         extraHeaders.emplace(Qn::VIDEOWALL_GUID_HEADER_NAME, videowallGuid.toByteArray());
     extraHeaders.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME,
-        commonModule->runningInstanceGUID().toByteArray());
+        commonModule()->runningInstanceGUID().toByteArray());
     extraHeaders.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME,
         QnAppServerConnectionFactory::url().userName().toUtf8());
 	extraHeaders.emplace(nx_http::header::kUserAgent, nx_http::userAgentString());
@@ -846,7 +845,7 @@ int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
 {
     QnRequestParamList params;
     params << QnRequestParam("cameraId", cameraId);
-    params << QnRequestParam("type", CameraDiagnostics::Step::toString(previousStep));
+    params << QnRequestParam("type", CameraDiagnostics::Step::toString(commonModule()->resourcePool(), previousStep));
     return sendAsyncGetRequestLogged(CameraDiagnosticsObject,
         params, QN_STRINGIZE_TYPE(QnCameraDiagnosticsReply), target, slot);
 }

@@ -3,14 +3,18 @@
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_discovery_data.h>
 #include <transaction/transaction.h>
+#include <common/common_module_aware.h>
 
 namespace ec2
 {
 
     class QnDiscoveryNotificationManager:
-        public AbstractDiscoveryNotificationManager
+        public AbstractDiscoveryNotificationManager,
+        public QnCommonModuleAware
     {
     public:
+        QnDiscoveryNotificationManager(QnCommonModule* commonModule);
+
         void triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction, NotificationSource source);
         void triggerNotification(const QnTransaction<ApiDiscoveryData> &transaction, NotificationSource source);
         void triggerNotification(const ApiDiscoveryData &discoveryData, bool addInformation = true);
@@ -22,10 +26,12 @@ namespace ec2
     typedef std::shared_ptr<QnDiscoveryNotificationManager> QnDiscoveryNotificationManagerPtr;
 
     template<class QueryProcessorType>
-    class QnDiscoveryManager : public AbstractDiscoveryManager
+    class QnDiscoveryManager: public AbstractDiscoveryManager
     {
     public:
-        QnDiscoveryManager(QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData);
+        QnDiscoveryManager(
+            QueryProcessorType* const queryProcessor,
+            const Qn::UserAccessData &userAccessData);
         virtual ~QnDiscoveryManager();
 
     protected:

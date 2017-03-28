@@ -63,11 +63,13 @@ namespace ec2
     void QnHttpTransactionReceiver::run()
     {
         Q_D(QnHttpTransactionReceiver);
+
         initSystemThreadId();
 
+        const auto& globalSettings = d->messageBus->commonModule()->globalSettings();
         if( !d->socket->setRecvTimeout(
-                std::chrono::milliseconds(QnGlobalSettings::instance()->connectionKeepAliveTimeout()).count() *
-                QnGlobalSettings::instance()->keepAliveProbeCount()) ||
+                std::chrono::milliseconds(globalSettings->connectionKeepAliveTimeout()).count() *
+            globalSettings->keepAliveProbeCount()) ||
             !d->socket->setNoDelay(true) )
         {
             const int osErrorCode = SystemError::getLastOSErrorCode();

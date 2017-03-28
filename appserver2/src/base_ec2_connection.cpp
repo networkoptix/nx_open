@@ -33,8 +33,8 @@ BaseEc2Connection<QueryProcessorType>::BaseEc2Connection(
     m_storedFileNotificationManager(new QnStoredFileNotificationManager),
     m_updatesNotificationManager(new QnUpdatesNotificationManager),
     m_miscNotificationManager(new QnMiscNotificationManager),
-    m_discoveryNotificationManager(new QnDiscoveryNotificationManager),
-    m_timeNotificationManager(new QnTimeNotificationManager<QueryProcessorType>)
+    m_discoveryNotificationManager(new QnDiscoveryNotificationManager(commonModule())),
+    m_timeNotificationManager(new QnTimeNotificationManager<QueryProcessorType>(connectionFactory->timeSyncManager()))
 {
     m_notificationManager.reset(
         new ECConnectionNotificationManager(
@@ -201,7 +201,7 @@ AbstractVideowallNotificationManagerPtr
 template<class QueryProcessorType>
 QnCommonModule* BaseEc2Connection<QueryProcessorType>::commonModule() const
 {
-
+    return m_connectionFactory->messageBus()->commonModule();
 }
 
 template<class QueryProcessorType>
@@ -282,7 +282,10 @@ template<class QueryProcessorType>
 AbstractTimeManagerPtr BaseEc2Connection<QueryProcessorType>::getTimeManager(
     const Qn::UserAccessData& userAccessData)
 {
-    return std::make_shared<QnTimeManager<QueryProcessorType>>(m_queryProcessor, userAccessData);
+    return std::make_shared<QnTimeManager<QueryProcessorType>>(
+        m_queryProcessor,
+        m_connectionFactory->timeSyncManager(),
+        userAccessData);
 }
 
 template<class QueryProcessorType>

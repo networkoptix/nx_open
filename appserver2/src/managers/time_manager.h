@@ -117,7 +117,6 @@ namespace ec2
         public QObject,
         public QnStoppable,
         public EnableMultiThreadDirectConnection<TimeSynchronizationManager>,
-        public Singleton<TimeSynchronizationManager>,
         public Qn::EnableSafeDirectConnection
     {
         Q_OBJECT

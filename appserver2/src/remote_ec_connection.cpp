@@ -62,7 +62,8 @@ namespace ec2
         }
 
         //TODO #ak next call can be placed here just because we always have just one connection to EC
-        TimeSynchronizationManager::instance()->forgetSynchronizedTime();
+        //todo: #singletone it is not true any more
+        m_connectionFactory->timeSyncManager()->forgetSynchronizedTime();
     }
 
     Timestamp RemoteEC2Connection::getTransactionLogTime() const

@@ -17,6 +17,7 @@
 #include "nx/utils/latin1_array.h"
 #include "utils/common/id.h"
 #include "nx_ec/data/api_fwd.h"
+#include <common/common_module_aware.h>
 
 #ifdef __APPLE__
 #undef verify
@@ -32,7 +33,8 @@ struct LicenseTypeInfo
     bool allowedForARM;
 };
 
-class QnLicense {
+class QnLicense: public QnCommonModuleAware
+{
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
 public:
 
@@ -53,8 +55,8 @@ public:
         VM_JustCreated
     };
 
-    QnLicense();
-    QnLicense(const QByteArray& licenseBlock);
+    QnLicense(QnCommonModule* commonModule);
+    QnLicense(QnCommonModule* commonModule, const QByteArray& licenseBlock);
     virtual ~QnLicense();
 
     void loadLicenseBlock( const QByteArray& licenseBlock );
@@ -97,7 +99,7 @@ public:
 
     bool isInfoMode() const;
 
-    static QnLicensePtr readFromStream(QTextStream &stream);
+    static QnLicensePtr readFromStream(QnCommonModule* commonModule, QTextStream &stream);
 
     QString displayName() const;
     static QString displayName(Qn::LicenseType licenseType);

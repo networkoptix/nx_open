@@ -26,6 +26,8 @@
 namespace ec2
 {
 
+class TimeSynchronizationManager;
+
 namespace aux {
 bool applyRestoreDbData(const BeforeRestoreDbData& restoreData, const QnUserResourcePtr& admin);
 }
@@ -170,6 +172,7 @@ namespace detail
         virtual QnDbTransaction* getTransaction() override;
 
         void setTransactionLog(QnTransactionLog* tranLog);
+        void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager);
         QnTransactionLog* transactionLog() const;
 
     signals:
@@ -670,6 +673,7 @@ namespace detail
         ResyncFlags m_resyncFlags;
         QnTransactionLog* m_tranLog;
         QnCommonModule* m_commonModule;
+        TimeSynchronizationManager* m_timeSyncManager;
     };
 } // namespace detail
 

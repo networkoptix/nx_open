@@ -23,44 +23,48 @@
 namespace ec2 {
 
 // TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2DirectConnectionFactory
-class Ec2DirectConnectionFactory:
-    public AbstractECConnectionFactory,
-    public QnStoppable,
-    public QnJoinable
-{
-public:
-    Ec2DirectConnectionFactory(
-        Qn::PeerType peerType,
-        nx::utils::TimerManager* const timerManager,
-        QnCommonModule* commonModule);
-    virtual ~Ec2DirectConnectionFactory();
+    class Ec2DirectConnectionFactory :
+        public AbstractECConnectionFactory,
+        public QnStoppable,
+        public QnJoinable
+    {
+    public:
+        Ec2DirectConnectionFactory(
+            Qn::PeerType peerType,
+            nx::utils::TimerManager* const timerManager,
+            QnCommonModule* commonModule);
+        virtual ~Ec2DirectConnectionFactory();
 
-    virtual void pleaseStop() override;
-    virtual void join() override;
+        virtual void pleaseStop() override;
+        virtual void join() override;
 
-    /**
-     * Implementation of AbstractECConnectionFactory::testConnectionAsync.
-     */
-    virtual int testConnectionAsync(
-        const QUrl& addr, impl::TestConnectionHandlerPtr handler) override;
+        /**
+         * Implementation of AbstractECConnectionFactory::testConnectionAsync.
+         */
+        virtual int testConnectionAsync(
+            const QUrl& addr, impl::TestConnectionHandlerPtr handler) override;
 
-    /**
-     * Implementation of AbstractECConnectionFactory::connectAsync.
-     */
-    virtual int connectAsync(
-        const QUrl& addr,
-        const ApiClientInfoData& clientInfo,
-        impl::ConnectHandlerPtr handler) override;
+        /**
+         * Implementation of AbstractECConnectionFactory::connectAsync.
+         */
+        virtual int connectAsync(
+            const QUrl& addr,
+            const ApiClientInfoData& clientInfo,
+            impl::ConnectHandlerPtr handler) override;
 
-    virtual void registerRestHandlers(QnRestProcessorPool* const restProcessorPool) override;
+        virtual void registerRestHandlers(QnRestProcessorPool* const restProcessorPool) override;
 
-    virtual void registerTransactionListener(
-        QnHttpConnectionListener* httpConnectionListener) override;
+        virtual void registerTransactionListener(
+            QnHttpConnectionListener* httpConnectionListener) override;
 
-    virtual void setConfParams(std::map<QString, QVariant> confParams) override;
+        virtual void setConfParams(std::map<QString, QVariant> confParams) override;
 
-    virtual QnTransactionMessageBus* messageBus() const override;
-    virtual QnDistributedMutexManager* distributedMutex() const override;
+        virtual QnTransactionMessageBus* messageBus() const override;
+        virtual QnDistributedMutexManager* distributedMutex() const override;
+        virtual TimeSynchronizationManager* timeSyncManager() const override;
+
+        QnCommonModule* commonModule() const { return m_commonModule; }
+
 private:
     std::unique_ptr<detail::QnDbManager> m_dbManager;
     std::unique_ptr<QnTransactionLog> m_transactionLog;

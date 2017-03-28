@@ -60,6 +60,7 @@ namespace ec2
     class ECConnectionNotificationManager;
     class QnTransactionMessageBus;
     class QnDistributedMutexManager;
+    class TimeSynchronizationManager;
 
     struct QnPeerTimeInfo {
 
@@ -666,9 +667,7 @@ namespace ec2
     /*!
         \note All methods are asynchronous if other not specified
     */
-    class AbstractECConnection
-    :
-        public QObject
+    class AbstractECConnection: public QObject
     {
         Q_OBJECT
 
@@ -725,6 +724,7 @@ namespace ec2
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
         virtual QnTransactionMessageBus* messageBus() const = 0;
+
         virtual ECConnectionNotificationManager* notificationManager()
         {
             NX_ASSERT(0);
@@ -796,9 +796,7 @@ namespace ec2
     /*!
         \note All methods are asynchronous if other not specified
     */
-    class AbstractECConnectionFactory
-    :
-        public QObject
+    class AbstractECConnectionFactory: public QObject
     {
         Q_OBJECT
 
@@ -832,6 +830,7 @@ namespace ec2
         virtual void setConfParams( std::map<QString, QVariant> confParams ) = 0;
         virtual QnTransactionMessageBus* messageBus() const = 0;
         virtual QnDistributedMutexManager* distributedMutex() const = 0;
+        virtual TimeSynchronizationManager* timeSyncManager() const = 0;
     protected:
         virtual int testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler ) = 0;
         virtual int connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo,

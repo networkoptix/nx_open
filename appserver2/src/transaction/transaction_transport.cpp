@@ -12,6 +12,7 @@
 namespace ec2 {
 
 QnTransactionTransport::QnTransactionTransport(
+    QnCommonModule* commonModule,
     const QnUuid& connectionGuid,
     ConnectionLockGuard connectionLockGuard,
     const ApiPeerData& localPeer,
@@ -23,6 +24,7 @@ QnTransactionTransport::QnTransactionTransport(
     const Qn::UserAccessData &userAccessData)
 :
     QnTransactionTransportBase(
+        commonModule,
         connectionGuid,
         std::move(connectionLockGuard),
         localPeer,
@@ -30,22 +32,24 @@ QnTransactionTransport::QnTransactionTransport(
         connectionType,
         request,
         contentEncoding,
-        QnGlobalSettings::instance()->connectionKeepAliveTimeout(),
-        QnGlobalSettings::instance()->keepAliveProbeCount()),
+        commonModule->globalSettings()->connectionKeepAliveTimeout(),
+        commonModule->globalSettings()->keepAliveProbeCount()),
     m_userAccessData(userAccessData)
 {
     setOutgoingConnection(std::move(socket));
 }
 
 QnTransactionTransport::QnTransactionTransport(
+    QnCommonModule* commonModule,
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer)
 :
     QnTransactionTransportBase(
+        commonModule,
         connectionGuardSharedState,
         localPeer,
-        QnGlobalSettings::instance()->connectionKeepAliveTimeout(),
-        QnGlobalSettings::instance()->keepAliveProbeCount()),
+        commonModule->globalSettings()->connectionKeepAliveTimeout(),
+        commonModule->globalSettings()->keepAliveProbeCount()),
     m_userAccessData(Qn::kSystemAccess)
 {
 }
@@ -79,8 +83,9 @@ void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& htt
         return;
     }
 
+    const auto& resPool = commonModule()->resourcePool();
     QnMediaServerResourcePtr ownServer =
-        qnResPool->getResourceById<QnMediaServerResource>(localPeer().id);
+        resPool->getResourceById<QnMediaServerResource>(localPeer().id);
     if (ownServer && authByKey)
     {
         httpClient->setUserName(ownServer->getId().toString().toLower());
@@ -93,7 +98,7 @@ void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& htt
         if (ApiPeerData::isServer(localPeer().peerType))
         {
             // try auth by admin user if allowed
-            QnUserResourcePtr adminUser = qnResPool->getAdministrator();
+            QnUserResourcePtr adminUser = resPool->getAdministrator();
             if (adminUser)
             {
                 httpClient->setUserPassword(adminUser->getDigest());
@@ -128,7 +133,7 @@ bool QnTransactionTransport::sendSerializedTransaction(
 
     QnTransactionTransportHeader header(_header);
     NX_ASSERT(header.processedPeers.contains(localPeer().id));
-    header.fillSequence();
+    header.fillSequence(commonModule()->moduleGUID(), commonModule()->runningInstanceGUID());
     switch (remotePeer().dataFormat)
     {
         case Qn::JsonFormat:

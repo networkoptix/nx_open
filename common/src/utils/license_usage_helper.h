@@ -6,29 +6,31 @@
 #include <licensing/license.h>
 
 #include <utils/common/connective.h>
+#include <common/common_module_aware.h>
 
 static const QString QN_LICENSE_URL(lit("http://licensing.networkoptix.com/nxlicensed/activate.php"));
 
 struct LicenseCompatibility;
 
-class QnLicenseUsageWatcher: public Connective<QObject> {
+class QnLicenseUsageWatcher: public Connective<QObject>, public QnCommonModuleAware
+{
     Q_OBJECT
 
    typedef Connective<QObject> base_type;
 public:
-    QnLicenseUsageWatcher(QObject* parent = NULL);
+    QnLicenseUsageWatcher(QObject* parent);
 signals:
     void licenseUsageChanged();
 };
 
 typedef std::array<int, Qn::LC_Count> licensesArray;
 
-class QnLicenseUsageHelper: public Connective<QObject>
+class QnLicenseUsageHelper: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
     typedef  Connective<QObject> base_type;
 public:
-    QnLicenseUsageHelper(QObject *parent = NULL);
+    QnLicenseUsageHelper(QObject *parent);
 
     bool isValid() const;
 
@@ -134,7 +136,8 @@ private:
 
 typedef QSharedPointer<QnCamLicenseUsageWatcher> QnCamLicenseUsageWatcherPtr;
 
-class QnCamLicenseUsageHelper: public QnLicenseUsageHelper {
+class QnCamLicenseUsageHelper: public QnLicenseUsageHelper
+{
     Q_OBJECT
 
     typedef QnLicenseUsageHelper base_type;
@@ -144,8 +147,9 @@ public:
         With empty watcher parameter creates instance which tracks all cameras.
     */
 
-    QnCamLicenseUsageHelper(const QnCamLicenseUsageWatcherPtr &watcher = QnCamLicenseUsageWatcherPtr()
-        , QObject *parent = NULL);
+    QnCamLicenseUsageHelper(
+        QObject* parent,
+        const QnCamLicenseUsageWatcherPtr &watcher = QnCamLicenseUsageWatcherPtr());
 
     QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable
         , const QnCamLicenseUsageWatcherPtr &watcher = QnCamLicenseUsageWatcherPtr(), QObject *parent = NULL);
@@ -203,12 +207,13 @@ private:
     const QnCamLicenseUsageHelperPtr m_helper;
 };
 
-class QnVideoWallLicenseUsageWatcher: public QnLicenseUsageWatcher {
+class QnVideoWallLicenseUsageWatcher: public QnLicenseUsageWatcher
+{
     Q_OBJECT
 
     typedef QnLicenseUsageWatcher base_type;
 public:
-    QnVideoWallLicenseUsageWatcher(QObject* parent = NULL);
+    QnVideoWallLicenseUsageWatcher(QObject* parent);
 };
 
 class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper {
@@ -229,9 +234,13 @@ private:
 };
 
 /** Utility RAAA class to propose some licenses usage. */
-class QnVideoWallLicenseUsageProposer {
+class QnVideoWallLicenseUsageProposer
+{
 public:
-    QnVideoWallLicenseUsageProposer(QnVideoWallLicenseUsageHelper* helper, int screenCount, int controlSessionsCount);
+    QnVideoWallLicenseUsageProposer(
+        QnVideoWallLicenseUsageHelper* helper,
+        int screenCount,
+        int controlSessionsCount);
     ~QnVideoWallLicenseUsageProposer();
 private:
     QPointer<QnVideoWallLicenseUsageHelper> m_helper;
