@@ -1,15 +1,15 @@
-function genCallback(p){
-    window[p] = function(eventName, args) {
-        flashlsAPI.embedHandler();
-        if(flashlsAPI.flashlsEvents[eventName]) {
-          flashlsAPI.flashlsEvents[eventName].apply(null, args);
-        }
-    };
-}
-
-var flashlsAPI = new (function(flashObject) {
+function flashlsAPI (flashObject) {
+    function genCallback(flo, p){
+        window[p] = function(eventName, args) {
+            flo.embedHandler();
+            if(flo.flashlsEvents[eventName]) {
+              flo.flashlsEvents[eventName].apply(flo, args);
+            }
+        };
+    }
 
     this.kill = function(){
+        console.log('kill was called');
         this.flashObject = null;
     };
     this.ready = function(){
@@ -43,7 +43,9 @@ var flashlsAPI = new (function(flashObject) {
 
     this.readyToPlay = function(){
         readyToPlay = true;
+        console.log("Ready to play");
         if(urlToPlay){
+            console.log("Sending play");
             this.play();
         }
     };
@@ -54,7 +56,7 @@ var flashlsAPI = new (function(flashObject) {
         this.errorHandler = errorHandler;
         this.positionHandler = positionHandler;
         this.id = id;
-        genCallback(id);
+        genCallback(this, id);
     };
 
     this.constructor = function(flashObject) {
@@ -232,43 +234,43 @@ var flashlsAPI = new (function(flashObject) {
     this.getAutoLevelCapping = function() {
         return this.flashObject.getAutoLevelCapping();
     };
-})();
-
-flashlsAPI.flashlsEvents = {
-    ready: function(flashTime) {
-        //console.log('ready',flashTime);
-    },
-    videoSize: function(width, height) {
-        //console.log('videoSize',width, height);
-    },
-    complete: function() {
-        flashlsAPI.positionHandler(null);
-    },
-    error: function(code, url, message) {
-        flashlsAPI.errorHandler({message:message,code:code,url:url});
-        console.error('flashls error, code:'+ code + ' url:' + url + ' message:' + message);
-    },
-    manifest: function(duration, levels, loadmetrics) {
-        flashlsAPI.readyToPlay();
-    },
-    audioLevelLoaded: function(loadmetrics) {},
-    levelLoaded: function(loadmetrics) {},
-    fragmentLoaded: function(loadmetrics) {},
-    fragmentPlaying: function(playmetrics) {},
-    position: function(timemetrics) {
-        flashlsAPI.positionHandler( timemetrics.watched );
-    },
-    state: function(newState) {},
-    seekState: function(newState) {},
-    switch: function(newLevel) {},
-    audioTracksListChange: function(trackList) {},
-    audioTrackChange: function(trackId) {},
-    id3Updated: function(ID3Data) {},
-    requestPlaylist: function(data) {},
-    abortPlaylist: function(data) {},
-    requestFragment: function(data) {},
-    abortFragment: function(data) {}
-};
+    console.log(this);
+    this.flashlsEvents = {
+        ready: function(flashTime) {
+            //console.log('ready',flashTime);
+        },
+        videoSize: function(width, height) {
+            //console.log('videoSize',width, height);
+        },
+        complete: function() {
+            this.positionHandler(null);
+        },
+        error: function(code, url, message) {
+            this.errorHandler({message:message,code:code,url:url});
+            console.error('flashls error, code:'+ code + ' url:' + url + ' message:' + message);
+        },
+        manifest: function(duration, levels, loadmetrics) {
+            this.readyToPlay();
+        },
+        audioLevelLoaded: function(loadmetrics) {},
+        levelLoaded: function(loadmetrics) {},
+        fragmentLoaded: function(loadmetrics) {},
+        fragmentPlaying: function(playmetrics) {},
+        position: function(timemetrics) {
+            this.positionHandler( timemetrics.watched );
+        },
+        state: function(newState) {},
+        seekState: function(newState) {},
+        switch: function(newLevel) {},
+        audioTracksListChange: function(trackList) {},
+        audioTrackChange: function(trackId) {},
+        id3Updated: function(ID3Data) {},
+        requestPlaylist: function(data) {},
+        abortPlaylist: function(data) {},
+        requestFragment: function(data) {},
+        abortFragment: function(data) {}
+    };
+}
 
 
 /*window.flashlsCallback = function(eventName, args) {
@@ -277,3 +279,13 @@ flashlsAPI.flashlsEvents = {
         flashlsAPI.flashlsEvents[eventName].apply(null, args);
     }
 };*/
+
+function man(first, last, msg){
+    this.first = first;
+    this.last = last;
+    this.msg = msg;
+
+    this.speak = function(){
+        console.log('%s %s says "%s".', this.first, this.last, this.msg);
+    }
+}

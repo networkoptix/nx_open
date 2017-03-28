@@ -236,23 +236,24 @@ angular.module('webadminApp')
                     });
                 }
 
+                
                 function initFlashls() {
                     scope.flashls = true;
                     scope.native = false;
                     scope.jsHls = false;
-                    scope.flashSource = "components/"+scope.playerId + ".swf";
-
+                    scope.flashSource = "components/flashlsChromeless.swf";
+                    var flAPI = new flashlsAPI(null);
                     if(scope.debugMode && scope.debugFormat){
-                        scope.flashSource = "components/"+scope.playerId + ".swf";
+                        scope.flashSource = "components/flashlsChromeless_debug.swf";
                     }
 
-                    if(flashlsAPI.ready()){
-                        flashlsAPI.kill();
+                    if(flAPI.ready()){
+                        flAPI.kill();
                         scope.flashls = false; // Destroy it!
                         $timeout(initFlashls);
                     }else {
                         $timeout(function () {// Force DOM to refresh here
-                            flashlsAPI.init("videowindow", scope.playerId, function (api) {
+                            flAPI.init("videowindow", scope.playerId, function (api) {
                                 console.log("Success");
                                 scope.vgApi = api;
                                 if (scope.vgSrc) {
@@ -279,7 +280,6 @@ angular.module('webadminApp')
                                     scope.vgUpdateTime({$currentTime: position, $duration: duration});
                                 }
                             });
-                            playerHolders[scope.playerId].load(getFormatSrc('hls'));
                         });
                     }
                 }
