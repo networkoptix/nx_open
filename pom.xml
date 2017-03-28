@@ -978,6 +978,7 @@
                 <quazip.version>0.7</quazip.version>
                 <toolchain.version>rpi</toolchain.version>
                 <openssl.version>1.0.0j</openssl.version>
+                <ffmpeg.version>3.1.1-bananapi</ffmpeg.version>
                 <modification>bananapi</modification>
                 <rdep.target>bpi</rdep.target>
                 <gcc.version>4.8.3</gcc.version>
