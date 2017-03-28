@@ -22,6 +22,7 @@
 #include "nx/fusion/serialization/json.h"
 #include <nx/fusion/model_functions.h>
 #include "media_server_user_attributes.h"
+#include <common/static_common_module.h>
 
 #define SAFE(expr) {QnMutexLocker lock( &m_mutex ); expr;}
 
@@ -344,8 +345,7 @@ bool QnSecurityCamResource::isAnalog() const {
 
 bool QnSecurityCamResource::isAnalogEncoder() const
 {
-    const auto& commonModule = resourcePool()->commonModule();
-    QnResourceData resourceData = commonModule->dataPool()->data(toSharedPointer(this));
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     return resourceData.value<bool>(lit("analogEncoder"));
 }
 
@@ -1064,8 +1064,7 @@ void QnSecurityCamResource::resetCachedValues()
 
 Qn::BitratePerGopType QnSecurityCamResource::bitratePerGopType() const
 {
-    const auto& commonModule = resourcePool()->commonModule();
-    QnResourceData resourceData = commonModule->dataPool()->data(toSharedPointer(this));
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     if (resourceData.value<bool>(Qn::FORCE_BITRATE_PER_GOP))
         return Qn::BPG_Predefined;
 

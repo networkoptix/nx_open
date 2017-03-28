@@ -21,7 +21,7 @@ class QnThreadedPtzController: public QnProxyPtzController
     typedef QnProxyPtzController base_type;
 public:
     QnThreadedPtzController(
-        const QnPtzControllerPtr &baseController,
+        const QnPtzControllerPtr& baseController,
         QThreadPool* threadPool);
     virtual ~QnThreadedPtzController();
 

@@ -15,6 +15,7 @@
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
 #include "core/resource/security_cam_resource.h"
+#include <common/static_common_module.h>
 
 #define QN_TOUR_PTZ_EXECUTOR_DEBUG
 #ifdef QN_TOUR_PTZ_EXECUTOR_DEBUG
@@ -55,7 +56,8 @@ struct QnPtzTourData {
 // -------------------------------------------------------------------------- //
 // QnTourPtzExecutorPrivate
 // -------------------------------------------------------------------------- //
-class QnTourPtzExecutorPrivate: public ConnectiveBase {
+class QnTourPtzExecutorPrivate: public ConnectiveBase
+{
 public:
     enum State {
         Stopped,
@@ -141,7 +143,8 @@ QnTourPtzExecutorPrivate::~QnTourPtzExecutorPrivate() {
     }
 }
 
-void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller) {
+void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller)
+{
     baseController = controller;
     if(baseController->hasCapabilities(Qn::AsynchronousPtzCapability)) {
         /* Just use it as is. */
@@ -158,7 +161,7 @@ void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller) {
     }
 
     connect(baseController, &QnAbstractPtzController::finished, q, &QnTourPtzExecutor::at_controller_finished);
-    QnResourceData resourceData = qnCommon->dataPool()->data(baseController->resource().dynamicCast<QnSecurityCamResource>());
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(baseController->resource().dynamicCast<QnSecurityCamResource>());
     tourGetPosWorkaround = resourceData.value<bool>(lit("tourGetPosWorkaround"), false);
 }
 

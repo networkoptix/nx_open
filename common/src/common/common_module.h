@@ -194,8 +194,6 @@ signals:
     void remoteIdChanged(const QnUuid &id);
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void runningInstanceGUIDChanged();
-protected:
-    static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 private:
     void resetCachedValue();
     void updateModuleInformationUnsafe();

@@ -42,7 +42,7 @@ public:
         if (!transactionShouldBeSentToRemotePeer(transaction))
             return;
 
-        auto remoteAccess = ec2::getTransactionDescriptorByTransaction(transaction)->checkRemotePeerAccessFunc(m_userAccessData, transaction.params);
+        auto remoteAccess = ec2::getTransactionDescriptorByTransaction(transaction)->checkRemotePeerAccessFunc(commonModule(), m_userAccessData, transaction.params);
         if (remoteAccess == RemotePeerAccess::Forbidden)
         {
             NX_LOG(QnLog::EC2_TRAN_LOG, lit("Permission check failed while sending transaction %1 to peer %2")
@@ -61,7 +61,7 @@ public:
             return;
 
         auto td = ec2::getTransactionDescriptorByTransaction(transaction);
-        auto remoteAccess = td->checkRemotePeerAccessFunc(m_userAccessData, transaction.params);
+        auto remoteAccess = td->checkRemotePeerAccessFunc(commonModule(), m_userAccessData, transaction.params);
 
         if (remoteAccess == RemotePeerAccess::Forbidden)
         {
@@ -79,7 +79,7 @@ public:
                 cl_logDEBUG1);
 
             Cont<Param, A> filteredParams = transaction.params;
-            td->filterByReadPermissionFunc(m_userAccessData, filteredParams);
+            td->filterByReadPermissionFunc(commonModule(), m_userAccessData, filteredParams);
             auto newTransaction = transaction;
             newTransaction.params = filteredParams;
 

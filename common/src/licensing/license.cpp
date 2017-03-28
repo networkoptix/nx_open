@@ -118,16 +118,14 @@ LicenseTypeInfo::LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Arra
 // -------------------------------------------------------------------------- //
 // QnLicense
 // -------------------------------------------------------------------------- //
-QnLicense::QnLicense(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule),
+QnLicense::QnLicense():
     m_cameraCount(0),
     m_isValid1(false),
     m_isValid2(false)
 {
 }
 
-QnLicense::QnLicense(QnCommonModule* commonModule, const QByteArray &licenseBlock):
-    QnCommonModuleAware(commonModule),
+QnLicense::QnLicense(const QByteArray &licenseBlock):
     m_rawLicense(licenseBlock),
     m_isValid1(false),
     m_isValid2(false)
@@ -152,14 +150,14 @@ void QnLicense::loadLicenseBlock( const QByteArray& licenseBlock )
     this->m_rawLicense = licenseBlock;
 }
 
-QnLicensePtr QnLicense::readFromStream(QnCommonModule* commonModule, QTextStream &stream)
+QnLicensePtr QnLicense::readFromStream(QTextStream &stream)
 {
     QByteArray licenseBlock;
     while (!stream.atEnd()) {
         QString line = stream.readLine();
         if (line.isEmpty()) {
             if (!licenseBlock.isEmpty())
-                return QnLicensePtr(new QnLicense(commonModule, licenseBlock));
+                return QnLicensePtr(new QnLicense(licenseBlock));
             else
                 continue;
         }
@@ -170,7 +168,7 @@ QnLicensePtr QnLicense::readFromStream(QnCommonModule* commonModule, QTextStream
     if (licenseBlock.isEmpty())
         return QnLicensePtr();
 
-    return QnLicensePtr(new QnLicense(commonModule, licenseBlock));
+    return QnLicensePtr(new QnLicense(licenseBlock));
 }
 
 QString QnLicense::displayName() const {
@@ -219,9 +217,9 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     return QString();
 }
 
-QnUuid QnLicense::serverId() const
+QnUuid QnLicense::serverId(QnCommonModule* commonModule) const
 {
-    const auto& manager = commonModule()->runtimeInfoManager();
+    const auto& manager = commonModule->runtimeInfoManager();
     for(const QnPeerRuntimeInfo& info: manager->items()->getItems())
     {
         if (info.data.peer.peerType != Qn::PT_Server)
@@ -323,12 +321,15 @@ bool checkForARMBox(const QString& value)
    v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
    We just allow empty brand for all, because we believe license is correct.
 */
-bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
+bool QnLicense::isValid(
+    QnCommonModule* commonModule,
+    ErrorCode* errCode,
+    ValidationMode mode) const
 {
     if (!m_isValid1 && !m_isValid2 && mode != VM_CheckInfo)
         return gotError(errCode, InvalidSignature);
-    const auto& manager = commonModule()->runtimeInfoManager();
-    QnPeerRuntimeInfo info = manager->items()->getItem(mode == VM_Regular ? serverId() : commonModule()->remoteGUID());
+    const auto& manager = commonModule->runtimeInfoManager();
+    QnPeerRuntimeInfo info = manager->items()->getItem(mode == VM_Regular ? serverId(commonModule) : commonModule->remoteGUID());
 
     // #TODO: #ynikitenkov It does not make sense in case of VM_JustAdded. #refactor
     if (info.uuid.isNull())

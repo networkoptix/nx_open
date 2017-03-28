@@ -39,6 +39,8 @@ static int registerQtResources()
 //namespace nx {
 namespace ec2 {
 
+QnStaticCommonModule Appserver2ProcessPublic::staticCommon;
+
 namespace conf {
 
 class Settings

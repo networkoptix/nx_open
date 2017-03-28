@@ -10,6 +10,7 @@
 #include <nx/utils/thread/wait_condition.h>
 
 #include <utils/common/stoppable.h>
+#include <common/static_common_module.h>
 
 //namespace nx {
 namespace ec2 {
@@ -47,8 +48,7 @@ private:
 };
 
 
-class Appserver2ProcessPublic:
-    public QnStoppable
+class Appserver2ProcessPublic: public QnStoppable
 {
 public:
     Appserver2ProcessPublic(int argc, char **argv);
@@ -67,6 +67,7 @@ public:
 
 private:
     Appserver2Process* m_impl;
+    static QnStaticCommonModule staticCommon;
 };
 
 }   // namespace ec2

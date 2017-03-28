@@ -33,7 +33,7 @@ struct LicenseTypeInfo
     bool allowedForARM;
 };
 
-class QnLicense: public QnCommonModuleAware
+class QnLicense
 {
     Q_DECLARE_TR_FUNCTIONS(QnLicense);
 public:
@@ -55,8 +55,8 @@ public:
         VM_JustCreated
     };
 
-    QnLicense(QnCommonModule* commonModule);
-    QnLicense(QnCommonModule* commonModule, const QByteArray& licenseBlock);
+    QnLicense();
+    QnLicense(const QByteArray& licenseBlock);
     virtual ~QnLicense();
 
     void loadLicenseBlock( const QByteArray& licenseBlock );
@@ -64,7 +64,10 @@ public:
     /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    virtual bool isValid(ErrorCode* errCode = 0, ValidationMode mode = VM_Regular) const;
+    virtual bool isValid(
+        QnCommonModule* commonModule,
+        ErrorCode* errCode = 0,
+        ValidationMode mode = VM_Regular) const;
     QString validationInfo(ValidationMode mode = VM_Regular) const;
 
     static QString errorMessage(ErrorCode errCode);
@@ -99,7 +102,7 @@ public:
 
     bool isInfoMode() const;
 
-    static QnLicensePtr readFromStream(QnCommonModule* commonModule, QTextStream &stream);
+    static QnLicensePtr readFromStream(QTextStream &stream);
 
     QString displayName() const;
     static QString displayName(Qn::LicenseType licenseType);
@@ -107,7 +110,7 @@ public:
     static QString longDisplayName(Qn::LicenseType licenseType);
 
     /** Id of the server this license attached to (if it is present in the current system). */
-    QnUuid serverId() const;
+    QnUuid serverId(QnCommonModule* commonModule) const;
 
     static LicenseTypeInfo licenseTypeInfo(Qn::LicenseType licenseType);
 

@@ -5,12 +5,12 @@
 
 #include <vector>
 
-#include <core/dataprovider/abstract_media_stream_provider.h> 
-#include <core/resource/resource_consumer.h> 
-#include <core/resource/resource_media_layout.h> 
-#include <nx/streaming/media_data_packet.h> 
-#include <utils/camera/camera_diagnostics.h> 
-#include <utils/common/stoppable.h> 
+#include <core/dataprovider/abstract_media_stream_provider.h>
+#include <core/resource/resource_consumer.h>
+#include <core/resource/resource_media_layout.h>
+#include <nx/streaming/media_data_packet.h>
+#include <utils/camera/camera_diagnostics.h>
+#include <utils/common/stoppable.h>
 #include <utils/common/safe_direct_connection.h>
 
 #include <nx/streaming/rtsp_client.h>
@@ -53,6 +53,8 @@ private:
 public:
     QnMulticodecRtpReader(
         const QnResourcePtr& res,
+        int rtpFrameTimeoutMs,
+        int maxRtpRetryCount,
         std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>() );
     virtual ~QnMulticodecRtpReader();
 

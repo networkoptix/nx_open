@@ -759,7 +759,7 @@ public:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        if (!getTransactionDescriptorByParam<T2>()->checkReadPermissionFunc(m_userAccessData, t2))
+        if (!getTransactionDescriptorByParam<T2>()->checkReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, t2))
         {
             errorCode = ErrorCode::forbidden;
             t2 = T2();
@@ -774,7 +774,7 @@ public:
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        getTransactionDescriptorByParam<Cont<T2,A>>()->filterByReadPermissionFunc(m_userAccessData, outParam);
+        getTransactionDescriptorByParam<Cont<T2,A>>()->filterByReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, outParam);
         return errorCode;
     }
 
@@ -785,7 +785,7 @@ public:
     {
         if (!isTranAllowed(tran))
             return ErrorCode::forbidden;
-        if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
+        if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_dbManager->commonModule(), m_userAccessData, tran.params))
             return ErrorCode::forbidden;
         return m_dbManager->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
     }
@@ -796,7 +796,7 @@ public:
         if (!isTranAllowed(tran))
             return ErrorCode::forbidden;
         auto outParamContainer = tran.params;
-        getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, outParamContainer);
+        getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_dbManager->commonModule(), m_userAccessData, outParamContainer);
         if (outParamContainer.size() != tran.params.size())
             return ErrorCode::forbidden;
 
@@ -808,7 +808,7 @@ public:
     {
         if (!isTranAllowed(tran))
             return ErrorCode::forbidden;
-        if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
+        if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_dbManager->commonModule(), m_userAccessData, tran.params))
             return ErrorCode::forbidden;
         return m_dbManager->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
     }
@@ -819,7 +819,7 @@ public:
         if (!isTranAllowed(tran))
             return ErrorCode::forbidden;
         Cont<Param,A> paramCopy = tran.params;
-        getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, paramCopy);
+        getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_dbManager->commonModule(), m_userAccessData, paramCopy);
         if (paramCopy.size() != tran.params.size())
             return ErrorCode::forbidden;
 
@@ -829,7 +829,7 @@ private:
     template<typename T>
     void filterData(T& target)
     {
-        getTransactionDescriptorByParam<T>()->filterByReadPermissionFunc(m_userAccessData, target);
+        getTransactionDescriptorByParam<T>()->filterByReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, target);
     }
 
     Qn::UserAccessData m_userAccessData;

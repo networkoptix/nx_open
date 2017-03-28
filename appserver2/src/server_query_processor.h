@@ -40,7 +40,7 @@ struct ServerQueryProcessorAccess
     QnTransactionMessageBus* messageBus() { return m_messageBus; }
     PostProcessList* postProcessList() { return &m_postProcessList; }
     QnMutex* updateMutex() { return &m_updateMutex; }
-    const QnCommonModule* commonModule() const { return m_db->commonModule();  }
+    QnCommonModule* commonModule() const { return m_db->commonModule();  }
 private:
     detail::QnDbManager* m_db;
     QnTransactionMessageBus* m_messageBus;
@@ -394,7 +394,7 @@ private:
             }
             else
             {
-                if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_db.userAccessData(), tran.params))
+                if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_owner->commonModule(), m_db.userAccessData(), tran.params))
                 {
                     errorCode = ErrorCode::forbidden;
                     return;

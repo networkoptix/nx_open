@@ -22,7 +22,6 @@
 #include <core/resource_access/providers/shared_layout_item_access_provider.h>
 #include <core/resource_access/providers/videowall_item_access_provider.h>
 
-#include <core/resource_management/resource_data_pool.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include "core/resource_management/resource_properties.h"
@@ -125,8 +124,6 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
 {
     Q_INIT_RESOURCE(common);
 
-    nx::network::SocketGlobals::init();
-
     m_dirtyModuleInformation = true;
     m_cloudMode = false;
     m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());
@@ -138,14 +135,9 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
     /* Init statics. */
     store(new nx::utils::TimerManager());
 
-    m_dataPool = instance<QnResourceDataPool>();
-
     m_sessionManager = new QnSessionManager(this);
     m_moduleFinder = new QnModuleFinder(this, clientMode);
     m_router = new QnRouter(this, m_moduleFinder);
-
-    loadResourceData(m_dataPool, lit(":/resource_data.json"), true);
-    loadResourceData(m_dataPool, QCoreApplication::applicationDirPath() + lit("/resource_data.json"), false);
 
     instance<QnSyncTime>();
     instance<QnCameraUserAttributePool>();
@@ -191,8 +183,6 @@ QnCommonModule::~QnCommonModule()
 {
     /* Here all singletons will be destroyed, so we guarantee all socket work will stop. */
     clear();
-
-    nx::network::SocketGlobals::deinit();
 }
 
 void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &server)
@@ -289,12 +279,6 @@ QnModuleInformation QnCommonModule::moduleInformation()
         return m_moduleInformation;
     }
 
-}
-
-void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required) {
-    bool loaded = QFile::exists(fileName) && dataPool->load(fileName);
-
-    NX_ASSERT(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");  /* Getting an NX_ASSERT here? Something is wrong with resource data json file. */
 }
 
 void QnCommonModule::resetCachedValue()

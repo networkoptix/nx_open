@@ -28,6 +28,7 @@
 #include "simpleaudio_rtp_parser.h"
 #include "mjpeg_rtp_parser.h"
 #include "api/app_server_connection.h"
+#include <common/static_common_module.h>
 
 
 namespace {
@@ -59,7 +60,9 @@ static Value defaultTransportToUse( RtpTransport::_auto );
 
 QnMulticodecRtpReader::QnMulticodecRtpReader(
     const QnResourcePtr& res,
-    std::unique_ptr<AbstractStreamSocket> tcpSock )
+    int rtpFrameTimeoutMs,
+    int maxRtpRetryCount,
+    std::unique_ptr<AbstractStreamSocket> tcpSock)
 :
     QnResourceConsumer(res),
     m_RtpSession(std::move(tcpSock)),
@@ -70,10 +73,9 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_gotData(false),
     m_rtpStarted(false),
     m_prefferedAuthScheme(nx_http::header::AuthScheme::basic),
-    m_rtpFrameTimeoutMs(QnGlobalSettings::instance()->rtpFrameTimeoutMs()) 
+    m_rtpFrameTimeoutMs(rtpFrameTimeoutMs),
+    m_maxRtpRetryCount(maxRtpRetryCount)
 {
-    auto globalSettings = QnGlobalSettings::instance();
-    m_maxRtpRetryCount = globalSettings->maxRtpRetryCount();
 
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)
@@ -545,7 +547,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
                 auto secResource = m_resource.dynamicCast<QnSecurityCamResource>();
                 if (secResource)
                 {
-                    auto resData = qnCommon->dataPool()->data(secResource);
+                    auto resData = qnStaticCommon->dataPool()->data(secResource);
                     auto forceRtcpReports = resData.value<bool>(lit("forceRtcpReports"), false);
 
                     if (m_tracks[i].ioDevice)
