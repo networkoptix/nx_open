@@ -214,7 +214,10 @@ void QnLayoutResource::setData(const QHash<int, QVariant> &dataByRole)
 {
     QnMutexLocker locker(&m_mutex);
 
+    const auto updatedRoles = (dataByRole.keys() + m_dataByRole.keys()).toSet();
     m_dataByRole = dataByRole;
+    for (const auto role: updatedRoles)
+        emit dataChanged(role);
 }
 
 void QnLayoutResource::setData(int role, const QVariant &value)
@@ -222,6 +225,15 @@ void QnLayoutResource::setData(int role, const QVariant &value)
     QnMutexLocker locker(&m_mutex);
 
     m_dataByRole[role] = value;
+    emit dataChanged(role);
+}
+
+QVariant QnLayoutResource::data(int role)
+{
+    const auto it = m_dataByRole.find(role);
+    return it != m_dataByRole.end()
+        ? it.value()
+        : QVariant();
 }
 
 QHash<int, QVariant> QnLayoutResource::data() const

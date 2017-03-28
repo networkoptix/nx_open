@@ -66,6 +66,8 @@ public:
 
     void setData(int role, const QVariant &value);
 
+    QVariant data(int role);
+
     QHash<int, QVariant> data() const;
 
     void requestStore() { emit storeRequested(::toSharedPointer(this)); } // TODO: #Elric hack
@@ -119,6 +121,8 @@ signals:
     void backgroundImageChanged(const QnLayoutResourcePtr &resource);
     void backgroundOpacityChanged(const QnLayoutResourcePtr &resource);
     void lockedChanged(const QnLayoutResourcePtr &resource);
+
+    void dataChanged(int role);
 
 protected:
     virtual Qn::Notifier storedItemAdded(const QnLayoutItemData& item) override;

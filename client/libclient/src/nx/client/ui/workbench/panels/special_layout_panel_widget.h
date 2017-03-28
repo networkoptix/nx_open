@@ -3,6 +3,10 @@
 #include <QtWidgets/QAbstractButton>
 #include <QtWidgets/QGraphicsProxyWidget>
 
+#include <ui/workbench/workbench_context_aware.h>
+#include <core/resource/layout_resource.h>
+#include <utils/common/connective.h>
+
 class QLabel;
 class QHBoxLayout;
 
@@ -12,21 +16,25 @@ namespace desktop {
 namespace ui {
 namespace workbench {
 
-class SpecialLayoutPanelWidget: public QGraphicsProxyWidget
+class SpecialLayoutPanelWidget: public Connective<QGraphicsProxyWidget>,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = QGraphicsProxyWidget;
+    using base_type = Connective<QGraphicsProxyWidget>;
 
 public:
-    SpecialLayoutPanelWidget();
-
-    void setCaption(const QString& caption);
-
-    void addButton(QAbstractButton* button);
+    SpecialLayoutPanelWidget(const QnLayoutResourcePtr& layoutResource, QObject* parent = nullptr);
 
 private:
-    QLabel* m_captionLabel = nullptr;
+    void handleResourceDataChanged(int role);
+
+    void updateButtons();
+
+private:
+    QLabel* m_caption = nullptr;
+    QLabel* m_description = nullptr;
     QHBoxLayout* m_layout = nullptr;
+    QnLayoutResourcePtr m_layoutResource;
 };
 
 } // namespace workbench

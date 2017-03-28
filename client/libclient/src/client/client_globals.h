@@ -189,6 +189,16 @@ namespace Qn
         CurrentLayoutResourceRole,
         CurrentLayoutMediaItemsRole,
 
+        /**
+          * Special layout roles
+          */
+
+        IsSpecialLayoutRole,
+        LayoutIconRole,
+        CustomPanelTitleRole,
+        CustomPanelDescriptionRole,
+        CustomPanelActionsRoleRole,
+
         /* Arguments. */
         ActionIdRole,
         SerializedDataRole,

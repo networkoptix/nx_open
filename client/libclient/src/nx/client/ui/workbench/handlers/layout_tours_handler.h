@@ -21,8 +21,6 @@ public:
 
 private:
     void openTousLayout();
-
-    void setupToursLayout(QnWorkbenchLayout* layout);
 };
 
 } // namespace handlers

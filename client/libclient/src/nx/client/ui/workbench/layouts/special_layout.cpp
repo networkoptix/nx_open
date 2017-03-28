@@ -10,7 +10,7 @@ namespace workbench {
 
 SpecialLayout::SpecialLayout(const QnLayoutResourcePtr& resource, QObject* parent):
     base_type(resource, parent),
-    m_panelWidget(new SpecialLayoutPanelWidget())
+    m_panelWidget(new SpecialLayoutPanelWidget(resource, this))
 {
     setFlags(flags() | QnLayoutFlag::SpecialBackground);
 }

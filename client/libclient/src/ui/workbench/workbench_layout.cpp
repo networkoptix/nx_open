@@ -51,9 +51,17 @@ QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObjec
     if(resource.isNull())
         return;
 
+    m_icon = resource->data(Qn::LayoutIconRole).value<QIcon>();
     QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(this, resource, this);
     synchronizer->setAutoDeleting(true);
     synchronizer->update();
+
+    connect(this, &QnWorkbenchLayout::dataChanged, this,
+        [this](int role)
+        {
+            if (role == Qn::LayoutIconRole)
+                emit iconChanged();
+        });
 }
 
 QnWorkbenchLayout::~QnWorkbenchLayout()
@@ -73,12 +81,6 @@ QnLayoutFlags QnWorkbenchLayout::flags() const
 QIcon QnWorkbenchLayout::icon() const
 {
     return m_icon;
-}
-
-void QnWorkbenchLayout::setIcon(const QIcon& value)
-{
-    m_icon = value;
-    emit iconChanged();
 }
 
 void QnWorkbenchLayout::setFlags(QnLayoutFlags value)

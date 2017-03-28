@@ -2,37 +2,98 @@
 
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QToolButton>
 
+#include <client/client_globals.h>
+#include <ui/actions/action_manager.h>
+
+namespace {
+
+QString getString(int role, const QnLayoutResourcePtr& resource)
+{
+    return resource->data(role).toString();
+}
+
+}
 namespace nx {
 namespace client {
 namespace desktop {
 namespace ui {
 namespace workbench {
 
-SpecialLayoutPanelWidget::SpecialLayoutPanelWidget():
+SpecialLayoutPanelWidget::SpecialLayoutPanelWidget(
+    const QnLayoutResourcePtr& layoutResource,
+    QObject* parent)
+    :
     base_type(),
-    m_captionLabel(new QLabel()),
-    m_layout(new QHBoxLayout())
+    QnWorkbenchContextAware(parent),
+
+    m_caption(new QLabel()),
+    m_description(new QLabel()),
+    m_layout(new QHBoxLayout()),
+    m_layoutResource(layoutResource)
 {
+    setParent(parent);
+
     const auto body = new QWidget();
     body->setLayout(m_layout);
     setWidget(body);
 
+    const auto labelsLayout = new QVBoxLayout();
+    labelsLayout->addWidget(m_caption);
+    labelsLayout->addWidget(m_description);
+
     m_layout->setContentsMargins(10, 10, 10, 10);
-    m_layout->addWidget(m_captionLabel);
-    m_layout->addStretch(1);
+    m_layout->addLayout(labelsLayout);
+    m_layout->addStretch(1000);
 
-    setOpacity(0.5);
+    connect(m_layoutResource, &QnLayoutResource::dataChanged,
+        this, &SpecialLayoutPanelWidget::handleResourceDataChanged);
+
+    handleResourceDataChanged(Qn::CustomPanelTitleRole);
+    handleResourceDataChanged(Qn::CustomPanelDescriptionRole);
+    handleResourceDataChanged(Qn::CustomPanelActionsRoleRole);
+    handleResourceDataChanged(Qn::LayoutIconRole);
 }
 
-void SpecialLayoutPanelWidget::setCaption(const QString& caption)
+void SpecialLayoutPanelWidget::handleResourceDataChanged(int role)
 {
-    m_captionLabel->setText(caption);
+    switch(role)
+    {
+        case Qn::CustomPanelTitleRole:
+            m_caption->setText(getString(Qn::CustomPanelTitleRole, m_layoutResource));
+            break;
+        case Qn::CustomPanelDescriptionRole:
+            m_description->setText(getString(Qn::CustomPanelDescriptionRole, m_layoutResource));
+            break;
+        case Qn::CustomPanelActionsRoleRole:
+            updateButtons();
+            break;
+    }
 }
 
-void SpecialLayoutPanelWidget::addButton(QAbstractButton* button)
+void SpecialLayoutPanelWidget::updateButtons()
 {
-    m_layout->addWidget(button, 0, Qt::AlignRight);
+    static constexpr auto kButtonsStartIndex = 2;
+    while(true)
+    {
+        const auto count = m_layout->count();
+        if (count <= kButtonsStartIndex)
+            break;
+
+        const auto button = m_layout->itemAt(count - 1)->widget();
+        m_layout->removeWidget(button);
+    }
+
+    const auto actions = m_layoutResource->data(Qn::CustomPanelActionsRoleRole)
+        .value<QList<QnActions::IDType>>();
+
+    for (const auto& actionId: actions)
+    {
+        const auto button = new QToolButton();
+        button->setDefaultAction(action(actionId));
+        m_layout->addWidget(button, 0, Qt::AlignRight);
+    }
 }
 
 } // namespace workbench

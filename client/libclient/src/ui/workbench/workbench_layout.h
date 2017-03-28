@@ -83,7 +83,6 @@ public:
     virtual ~QnWorkbenchLayout();
 
     QIcon icon() const;
-    void setIcon(const QIcon& value);
 
     QnLayoutFlags flags() const;
     void setFlags(QnLayoutFlags value);
