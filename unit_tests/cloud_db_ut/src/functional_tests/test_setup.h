@@ -16,7 +16,6 @@ public:
     CdbFunctionalTest();
     ~CdbFunctionalTest();
 
-
 private:
 };
 
