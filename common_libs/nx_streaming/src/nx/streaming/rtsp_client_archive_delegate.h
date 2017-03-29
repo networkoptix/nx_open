@@ -120,8 +120,6 @@ private:
     int m_frameCnt;
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
 
-    QnUuid m_runtimeId;
-
 	QMap<int, QSharedPointer<QnNxRtpParser>> m_parsers;
 
     struct {
