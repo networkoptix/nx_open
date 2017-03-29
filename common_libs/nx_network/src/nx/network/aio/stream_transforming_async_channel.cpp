@@ -69,11 +69,10 @@ void StreamTransformingAsyncChannel::sendAsync(
 }
 
 void StreamTransformingAsyncChannel::cancelIOSync(
-    nx::network::aio::EventType eventType)
+    aio::EventType eventType)
 {
-    // TODO: #ak Cancel corresponding task.
-
-    m_rawDataChannel->cancelIOSync(eventType);
+    executeInAioThreadSync(std::bind(
+        &StreamTransformingAsyncChannel::cancelIoWhileInAioThread, this, eventType));
 }
 
 void StreamTransformingAsyncChannel::stopWhileInAioThread()
@@ -320,6 +319,39 @@ void StreamTransformingAsyncChannel::handleIoError(SystemError::ErrorCode sysErr
         }
         if (thisDestructionWatcher.objectDestroyed())
             return;
+    }
+}
+
+void StreamTransformingAsyncChannel::cancelIoWhileInAioThread(aio::EventType eventType)
+{
+    // Removing user task and cancelling operations on underlying 
+    //   raw channel that are required by the task cancelled.
+
+    for (auto it = m_userTaskQueue.begin(); it != m_userTaskQueue.end();)
+    {
+        if (it->get()->type == UserTaskType::read &&
+            (eventType == aio::EventType::etRead ||
+                eventType == aio::EventType::etNone))
+        {
+            it = m_userTaskQueue.erase(it);
+            if (m_asyncReadInProgress)
+            {
+                m_rawDataChannel->cancelIOSync(aio::EventType::etRead);
+                m_asyncReadInProgress = false;
+            }
+        }
+        else if (it->get()->type == UserTaskType::write &&
+            (eventType == aio::EventType::etWrite ||
+                eventType == aio::EventType::etNone))
+        {
+            it = m_userTaskQueue.erase(it);
+            m_rawDataChannel->cancelIOSync(aio::EventType::etWrite);
+            m_rawWriteQueue.clear();
+        }
+        else
+        {
+            ++it;
+        }
     }
 }
 

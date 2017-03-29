@@ -41,6 +41,7 @@ public:
         const nx::Buffer& buffer,
         IoCompletionHandler handler) override;
     virtual void cancelIOSync(EventType eventType) override;
+
     void pauseReadingData();
     void resumeReadingData();
     void pauseSendingData();
@@ -49,6 +50,9 @@ public:
     void waitForReadSequenceToBreak();
     QByteArray dataRead() const;
     void setErrorState();
+
+    bool isReadScheduled() const;
+    bool isWriteScheduled() const;
 
 private:
     utils::pipeline::AbstractInput* m_input;
@@ -69,7 +73,7 @@ private:
 
     BasicPollable m_reader;
     BasicPollable m_writer;
-    bool m_readPosted;
+    bool m_readScheduled;
     std::atomic<int> m_readSequence;
 
     virtual void stopWhileInAioThread() override;

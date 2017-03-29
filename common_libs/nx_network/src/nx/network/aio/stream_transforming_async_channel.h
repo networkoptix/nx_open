@@ -15,6 +15,12 @@ namespace aio {
 
 using UserIoHandler = std::function<void(SystemError::ErrorCode, size_t)>;
 
+/**
+ * Delegates read/write calls to the wrapped AbstractAsyncChannel 
+ *   moving data through utils::pipeline::Converter first.
+ * @warning Converter MUST NOT generate wouldBlock error by itself before 
+ *   invoking underlying input/output. Otherwise, behavior is undefined.
+ */
 class NX_NETWORK_API StreamTransformingAsyncChannel:
     public AbstractAsyncChannel
 {
@@ -30,7 +36,7 @@ public:
 
     virtual void readSomeAsync(nx::Buffer* const buffer, UserIoHandler handler) override;
     virtual void sendAsync(const nx::Buffer& buffer, UserIoHandler handler) override;
-    virtual void cancelIOSync(nx::network::aio::EventType eventType) override;
+    virtual void cancelIOSync(aio::EventType eventType) override;
 
 protected:
     virtual void stopWhileInAioThread() override;
@@ -119,6 +125,8 @@ private:
     void onSomeRawDataRead(SystemError::ErrorCode, std::size_t);
     void onRawDataWritten(SystemError::ErrorCode, std::size_t);
     void handleIoError(SystemError::ErrorCode sysErrorCode);
+
+    void cancelIoWhileInAioThread(aio::EventType eventType);
 };
 
 } // namespace aio

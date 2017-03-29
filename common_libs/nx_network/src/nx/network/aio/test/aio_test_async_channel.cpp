@@ -19,7 +19,7 @@ AsyncChannel::AsyncChannel(
     m_readBuffer(nullptr),
     m_sendPaused(false),
     m_sendBuffer(nullptr),
-    m_readPosted(false),
+    m_readScheduled(false),
     m_readSequence(0)
 {
     bindToAioThread(getAioThread());
@@ -73,13 +73,18 @@ void AsyncChannel::cancelIOSync(EventType eventType)
     if (eventType == EventType::etRead ||
         eventType == EventType::etNone)
     {
-        m_reader.pleaseStopSync();
+        m_reader.cancelPostedCallsSync();
+        m_readScheduled = false;
+        m_readHandler = nullptr;
+        m_readBuffer = nullptr;
     }
 
     if (eventType == EventType::etWrite ||
         eventType == EventType::etNone)
     {
-        m_writer.pleaseStopSync();
+        m_writer.cancelPostedCallsSync();
+        m_sendHandler = nullptr;
+        m_sendBuffer = nullptr;
     }
 }
 
@@ -136,6 +141,16 @@ void AsyncChannel::setErrorState()
     m_errorState = true;
 }
 
+bool AsyncChannel::isReadScheduled() const
+{
+    return m_readScheduled;
+}
+
+bool AsyncChannel::isWriteScheduled() const
+{
+    return m_sendHandler != nullptr;
+}
+
 void AsyncChannel::stopWhileInAioThread()
 {
     m_reader.pleaseStopSync();
@@ -165,13 +180,11 @@ void AsyncChannel::handleInputDepletion()
 
 void AsyncChannel::performAsyncRead(const QnMutexLockerBase& /*lock*/)
 {
-    m_readPosted = true;
+    m_readScheduled = true;
 
     m_reader.post(
         [this]()
         {
-            m_readPosted = false;
-
             if (m_errorState)
                 return reportIoCompletion(&m_readHandler, SystemError::connectionReset, (size_t)-1);
 
@@ -190,7 +203,7 @@ void AsyncChannel::performAsyncRead(const QnMutexLockerBase& /*lock*/)
 
                 reportIoCompletion(&m_readHandler, SystemError::noError, bytesRead);
 
-                if (!m_readPosted)
+                if (!m_readScheduled)
                     ++m_readSequence;
                 return;
             }
@@ -210,6 +223,9 @@ void AsyncChannel::reportIoCompletion(
     SystemError::ErrorCode sysErrorCode,
     std::size_t bytesTransferred)
 {
+    if (ioCompletionHandler == &m_readHandler)
+        m_readScheduled = false;
+
     IoCompletionHandler handler;
     handler.swap(*ioCompletionHandler);
     handler(sysErrorCode, bytesTransferred);
