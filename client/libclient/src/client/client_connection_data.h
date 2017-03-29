@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
@@ -32,7 +31,6 @@ Q_DECLARE_METATYPE(QnConnectionData)
 class QnConnectionDataList: public QList<QnConnectionData>
 {
 public:
-
     QnConnectionDataList(): QList<QnConnectionData>(){}
 
     /**
