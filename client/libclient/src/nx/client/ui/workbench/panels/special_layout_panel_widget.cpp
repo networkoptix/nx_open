@@ -64,7 +64,6 @@ void SpecialLayoutPanelWidget::handleResourceDataChanged(int role)
             break;
         case Qn::CustomPanelActionsRoleRole:
             updateButtons();
-            updateButtons();
             break;
         default:
             break;
