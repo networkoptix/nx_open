@@ -304,7 +304,6 @@ namespace CameraDiagnostics
     {
 
         QString toString(
-            QnResourcePool* resPool,
             Value val,
             const QnVirtualCameraResourcePtr &device,
             const ErrorParams& errorParams)

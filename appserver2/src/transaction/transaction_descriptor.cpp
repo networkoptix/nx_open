@@ -1113,7 +1113,6 @@ struct SetResourceParamTransactionType
 };
 
 ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(
-	QnCommonModule*,
     const QnUuid& id,
     detail::QnDbManager* db)
 {
