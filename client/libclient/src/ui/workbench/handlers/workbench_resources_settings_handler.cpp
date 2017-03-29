@@ -106,10 +106,13 @@ void QnWorkbenchResourcesSettingsHandler::at_newUserAction_triggered()
     user->setRawPermissions(Qn::GlobalLiveViewerPermissionSet);
     user->addFlags(Qn::local);
 
-    QnNonModalDialogConstructor<QnUserSettingsDialog> dialogConstructor(m_userSettingsDialog, mainWindow());
+    if (!m_userSettingsDialog)
+        m_userSettingsDialog = new QnUserSettingsDialog(mainWindow());
+
     m_userSettingsDialog->setUser(user);
     m_userSettingsDialog->setCurrentPage(QnUserSettingsDialog::SettingsPage);
     m_userSettingsDialog->forcedUpdate();
+    m_userSettingsDialog->exec();
 }
 
 void QnWorkbenchResourcesSettingsHandler::at_userSettingsAction_triggered()
