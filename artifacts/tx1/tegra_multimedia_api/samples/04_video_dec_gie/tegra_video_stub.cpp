@@ -22,6 +22,8 @@ public:
 
     virtual bool pullRectsForFrame(std::vector<Rect>* rects, int64_t* outPtsUs) override;
 
+    virtual bool hasMetadata() const override;
+
 private:
     const std::string m_modelFile;
     const std::string m_deployFile;
@@ -60,6 +62,11 @@ bool Stub::pullRectsForFrame(std::vector<Rect>* rects, int64_t* outPtsUs)
 }
 
 } // namespace
+
+bool Stub::hasMetadata() const
+{
+    return false;
+}
 
 //-------------------------------------------------------------------------------------------------
 

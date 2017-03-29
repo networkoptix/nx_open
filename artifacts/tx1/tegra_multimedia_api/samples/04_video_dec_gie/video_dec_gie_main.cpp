@@ -582,6 +582,7 @@ gieThread(void *arg)
                 cerr << "Error while mapping dmabuf fd ("
                      << buffer->planes[0].fd << ") to EGLImage"
                      << endl;
+
                 return NULL;
             }
 
@@ -593,12 +594,12 @@ OUTPUT << "Going to call mapEGLImage2Float(egl_image, width: " << ctx->gie_ctx->
     << ", buffer: " << (cuda_buf ? "not null" : "null") << ")";
 
             // map eglimage into GPU address
-LL          mapEGLImage2Float(&egl_image,  ctx->gie_ctx->getNetWidth(),
+            mapEGLImage2Float(&egl_image,  ctx->gie_ctx->getNetWidth(),
                               ctx->gie_ctx->getNetHeight(),
                               (char *)cuda_buf + batch_offset * sizeof(float));
 
             // Destroy EGLImage
-LL          NvDestroyEGLImage(ctx->egl_display, egl_image);
+            NvDestroyEGLImage(ctx->egl_display, egl_image);
             egl_image = NULL;
 #endif
             buf_num++;
@@ -1099,16 +1100,6 @@ Detector::startInference(std::string modelFileName, std::string deployFileName, 
     setDefaultsNx(&m_ctx, modelFileName, deployFileName, cacheFileName);
 
     m_ctx.decoder_pixfmt = V4L2_PIX_FMT_H264;
-#if 0
-    if (parseCsvArgs(&ctx, ctx.gie_ctx, argc, argv))
-    {
-        cerr << "Error parsing commandline arguments." << endl;
-        return -1;
-    }
-#endif // 0
-
-    /*ctx.in_file = new ifstream(ctx.in_file_path);
-    TEST_ERROR(!ctx.in_file->is_open(), "Error opening input file", cleanup);*/
 
     // Step-1: Create Decoder
     m_ctx.dec = NvVideoDecoder::createVideoDecoder("dec0");
@@ -1276,8 +1267,7 @@ bool Detector::stopSync()
     {
         if (sendEOStoConverter(&m_ctx) < 0)
         {
-            cerr << "Error while queueing EOS buffer on converter output"
-                 << endl;
+            PRINT << "Error while queueing EOS buffer on converter output";
         }
         m_ctx.conv->capture_plane.waitForDQThread(-1);
     }

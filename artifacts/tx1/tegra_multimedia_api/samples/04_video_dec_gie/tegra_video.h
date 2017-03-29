@@ -58,4 +58,6 @@ public:
     };
 
     virtual bool pullRectsForFrame(std::vector<Rect>* rects, int64_t* outPtsUs) = 0;
+
+    virtual bool hasMetadata() const = 0;
 };

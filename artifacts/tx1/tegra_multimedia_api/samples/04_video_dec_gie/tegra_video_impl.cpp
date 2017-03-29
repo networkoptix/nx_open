@@ -26,6 +26,8 @@ public:
 
     virtual bool pullRectsForFrame(std::vector<Rect>* rects, int64_t* outPtsUs) override;
 
+    virtual bool hasMetadata() const override;
+
 private:
     const std::string m_modelFile;
     const std::string m_deployFile;
@@ -77,15 +79,18 @@ bool Impl::pushCompressedFrame(const CompressedFrame* compressedFrame)
 
     m_detector->pushCompressedFrame(compressedFrame->data, compressedFrame->dataSize);
 
-    OUTPUT << "pushCompressedFrame() END";
+    return true;
 }
 
 bool Impl::pullRectsForFrame(std::vector<Rect>* rects, int64_t* outPtsUs)
 {
+
+    if (!rects || !outPtsUs)
+        return false;
+
     if (!m_detector->hasRectangles())
         return false;
 
-    OUTPUT << "pullRectsForFrame() BEGIN";
     auto rectsFromGie = m_detector->getRectangles();
     auto netHeight = m_detector->getNetHeight();
     auto netWidth = m_detector->getNetWidth();
@@ -108,9 +113,12 @@ bool Impl::pullRectsForFrame(std::vector<Rect>* rects, int64_t* outPtsUs)
         ++m_outFrameCounter;
     }
 
-    OUTPUT << "pullRectsForFrame() END";
-
     return true;
+}
+
+bool Impl::hasMetadata() const
+{
+    return m_detector->hasRectangles();
 }
 
 } // namespace

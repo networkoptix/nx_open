@@ -52,6 +52,9 @@ static const int HELNET_SCALE0 = -640;
 static const int HELNET_SCALE1 = -480;
 static const int HELNET_SCALE2 = 640;
 static const int HELNET_SCALE3 = 480;
+static const int GROUP_THRESHOLD = 3;
+static const float EPS = 0.2;
+
 const char *INPUT_BLOB_NAME = "data";
 const char *OUTPUT_BLOB_NAME = "coverage";
 const char *OUTPUT_BBOX_NAME = "bboxes";
@@ -643,7 +646,7 @@ GIE_Context::parseBbox(vector<cv::Rect>& rectList, int batch_th)
         }
     }
 
-    cv::groupRectangles(rectList, 3, 0.2);
+    cv::groupRectangles(rectList, GROUP_THRESHOLD, EPS);
 }
 
 
@@ -718,7 +721,7 @@ GIE_Context::parseHelBbox(
             }
         }
 
-        cv::groupRectangles(rectList, 3, 0.2);
+        cv::groupRectangles(rectList, GROUP_THRESHOLD, EPS);
     }
 }
 
