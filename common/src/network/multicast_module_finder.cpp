@@ -317,7 +317,9 @@ void QnMulticastModuleFinder::run()
     initSystemThreadId();
     NX_LOGX(lit("Has started"), cl_logDEBUG1);
 
-    QByteArray revealRequest = RevealRequest::serialize();
+    QByteArray revealRequest = RevealRequest(
+        commonModule()->moduleGUID(),
+        commonModule()->localPeerType()).serialize();
 
     if (!m_clientMode)
     {

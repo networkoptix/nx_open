@@ -604,7 +604,7 @@ void applyColumnFilter(QnCommonModule* commonModule, const Qn::UserAccessData& a
 struct ReadResourceAccess
 {
     template<typename Param>
-    bool operator()(QnCommonModule* commonModule, Qn::UserAccessData& accessData, Param& param)
+    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, Param& param)
     {
         if (resourceAccessHelper(commonModule, accessData, param.id, Qn::ReadPermission))
         {
@@ -638,7 +638,7 @@ struct ReadResourceParamAccess
         return false;
     }
 
-    bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ApiResourceParamData& param)
+    bool operator()(QnCommonModule*, const Qn::UserAccessData& accessData, ApiResourceParamData& param)
     {
         namespace ahlp = access_helpers;
         ahlp::FilterFunctorListType filters = {
@@ -852,7 +852,7 @@ struct UserInputAccess
 
         const auto& resPool = commonModule->resourcePool();
         auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        bool result = commonModule()->resourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalUserInputPermission);
+        bool result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalUserInputPermission);
         return result;
     }
 };
@@ -882,7 +882,7 @@ struct AdminOnlyAccessOut
 
         const auto& resPool = commonModule->resourcePool();
         auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-        RemotePeerAccess result = commonModule()->resourceAccessManager->hasGlobalPermission(userResource, Qn::GlobalAdminPermission)
+        RemotePeerAccess result = commonModule->resourceAccessManager()->hasGlobalPermission(userResource, Qn::GlobalAdminPermission)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
         return result;
@@ -1045,7 +1045,7 @@ struct ReadListAccessOut
 struct RegularTransactionType
 {
     template<typename Param>
-    ec2::TransactionType::Value operator()(const Param&, detail::QnDbManager*)
+    ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, detail::QnDbManager*)
     {
         return TransactionType::Regular;
     }
@@ -1054,7 +1054,7 @@ struct RegularTransactionType
 struct LocalTransactionType
 {
     template<typename Param>
-    ec2::TransactionType::Value operator()(const Param&, detail::QnDbManager*)
+    ec2::TransactionType::Value operator()(QnCommonModule*, const Param&, detail::QnDbManager*)
     {
         return TransactionType::Local;
     }
@@ -1088,7 +1088,7 @@ struct SetStatusTransactionType
 
 struct SaveUserTransactionType
 {
-    ec2::TransactionType::Value operator()(const ApiUserData& params, detail::QnDbManager* /*db*/)
+    ec2::TransactionType::Value operator()(QnCommonModule*, const ApiUserData& params, detail::QnDbManager* /*db*/)
     {
         return params.isCloud ? TransactionType::Cloud : TransactionType::Regular;
     }
@@ -1097,6 +1097,7 @@ struct SaveUserTransactionType
 struct SetResourceParamTransactionType
 {
     ec2::TransactionType::Value operator()(
+		QnCommonModule*,
         const ApiResourceParamWithRefData& param,
         detail::QnDbManager* /*db*/)
     {
@@ -1112,11 +1113,12 @@ struct SetResourceParamTransactionType
 };
 
 ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(
+	QnCommonModule*,
     const QnUuid& id,
     detail::QnDbManager* db)
 {
     ApiUserDataList userDataList;
-    ec2::ErrorCode errorCode = db->doQueryNoLock(id, userDataList);
+    ec2::ErrorCode errorCode = db->doQuery(id, userDataList);
 
     if (errorCode != ErrorCode::ok || userDataList.empty())
         return ec2::TransactionType::Unknown;

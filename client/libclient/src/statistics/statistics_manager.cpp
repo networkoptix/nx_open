@@ -114,14 +114,15 @@ namespace
     }
 }
 
-QnStatisticsManager::QnStatisticsManager(QObject *parent)
-    : base_type(parent)
-    , m_updateSettingsTimer(new QTimer())
-    , m_clientId()
-    , m_handle()
-    , m_settings()
-    , m_storage()
-    , m_modules()
+QnStatisticsManager::QnStatisticsManager(QObject *parent):
+    base_type(parent),
+    QnCommonModuleAware(parent),
+    m_updateSettingsTimer(new QTimer()),
+    m_clientId(),
+    m_handle(),
+    m_settings(),
+    m_storage(),
+    m_modules()
 {
     enum { kUpdatePeriodMs = 4 * 60 * 60 * 1000 };  // every 4 hours
     m_updateSettingsTimer->setSingleShot(false);

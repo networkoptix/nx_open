@@ -3,6 +3,7 @@
 #include <QtCore/QObject>
 
 #include <common/common_globals.h>
+#include <common/common_module_aware.h>
 
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/user_access_data.h>
@@ -16,7 +17,6 @@
 
 #include <utils/common/connective.h>
 #include <utils/common/updatable.h>
-#include <common/common_module_aware.h>
 
 class QnResourceAccessManager:
     public Connective<QObject>,
@@ -192,5 +192,3 @@ private:
 
     QHash<PermissionKey, Qn::Permissions> m_permissionsCache;
 };
-
-#define qnResourceAccessManager QnResourceAccessManager::instance()

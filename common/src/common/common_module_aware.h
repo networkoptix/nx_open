@@ -4,6 +4,7 @@ class QnCommonModule;
 class QnGlobalPermissionsManager;
 class QnLicensePool;
 class QnResourcePool;
+class QnResourceAccessManager;
 class QnResourceAccessSubjectsCache;
 class QnRuntimeInfoManager;
 class QnSharedResourcesManager;
@@ -20,6 +21,7 @@ public:
     QnLicensePool* licensePool() const;
     QnRuntimeInfoManager* runtimeInfoManager() const;
     QnResourcePool* resourcePool() const;
+    QnResourceAccessManager* resourceAccessManager() const;
     QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
     QnGlobalPermissionsManager* globalPermissionsManager() const;
     QnSharedResourcesManager* sharedResourcesManager() const;

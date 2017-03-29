@@ -62,6 +62,12 @@ QnResourcePool* QnCommonModuleAware::resourcePool() const
     return m_commonModule ? m_commonModule->resourcePool() : nullptr;
 }
 
+QnResourceAccessManager* QnCommonModuleAware::resourceAccessManager() const
+{
+    NX_ASSERT(m_commonModule);
+    return m_commonModule ? m_commonModule->resourceAccessManager() : nullptr;
+}
+
 QnResourceAccessSubjectsCache* QnCommonModuleAware::resourceAccessSubjectsCache() const
 {
     NX_ASSERT(m_commonModule);
