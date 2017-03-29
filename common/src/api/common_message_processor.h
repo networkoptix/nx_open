@@ -25,7 +25,7 @@ class QnCommonMessageProcessor: public Connective<QObject>, public QnCommonModul
 
     typedef Connective<QObject> base_type;
 public:
-    explicit QnCommonMessageProcessor(QObject *parent = nullptr);
+    explicit QnCommonMessageProcessor(QObject *parent);
     virtual ~QnCommonMessageProcessor() {}
 
     virtual void init(const ec2::AbstractECConnectionPtr& connection);
