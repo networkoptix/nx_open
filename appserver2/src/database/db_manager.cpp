@@ -713,7 +713,7 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::fun
         auto transactionDescriptor = ec2::getActualTransactionDescriptorByValue<ObjectType>(command);
 
         if (transactionDescriptor)
-            transaction.transactionType = transactionDescriptor->getTransactionTypeFunc(object, this);
+            transaction.transactionType = transactionDescriptor->getTransactionTypeFunc(commonModule(), object, this);
         else
             transaction.transactionType = ec2::TransactionType::Unknown;
 

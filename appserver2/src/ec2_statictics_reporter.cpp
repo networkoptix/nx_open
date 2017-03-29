@@ -15,6 +15,7 @@
 #include <network/system_helpers.h>
 
 #include "ec2_connection.h"
+#include <licensing/license_validator.h>
 
 static const std::chrono::hours kDefaultSendCycleTime(30 * 24); //< About a month.
 static const std::chrono::hours kSendAfterUpdateTime(3);
@@ -88,7 +89,8 @@ namespace ec2
             ApiLicenseData apiLicense;
             fromResourceToApi(license, apiLicense);
             ApiLicenseStatistics statLicense(std::move(apiLicense));
-            statLicense.validation = license->validationInfo();
+            QnLicenseValidator validator(m_ec2Connection->commonModule());
+            statLicense.validation = validator.validationInfo(license);
             outData->licenses.push_back(std::move(statLicense));
         }
 
