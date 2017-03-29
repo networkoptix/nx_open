@@ -371,3 +371,24 @@ void QnCommonModule::setPtzControllerPool(QnPtzControllerPool* ptzPool)
 {
     m_ptzPool = ptzPool;
 }
+
+
+void QnCommonModule::setEc2Connection(const std::shared_ptr<ec2::AbstractECConnection>& ec2Connection)
+{
+    m_ec2Connection = ec2Connection;
+}
+
+std::shared_ptr<ec2::AbstractECConnection> QnCommonModule::ec2Connection() const
+{
+    return m_ec2Connection;
+}
+
+QnUuid QnCommonModule::videowallGuid() const
+{
+    return m_videowallGuid;
+}
+
+void QnCommonModule::setVideowallGuid(const QnUuid &uuid)
+{
+    m_videowallGuid = uuid;
+}

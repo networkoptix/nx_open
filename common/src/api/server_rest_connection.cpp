@@ -407,6 +407,9 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
     const auto server =  commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(m_serverId);
     if (!server)
         return nx_http::ClientPool::Request();
+    const auto connection = commonModule()->ec2Connection();
+    if (!connection)
+        return nx_http::ClientPool::Request();
 
     nx_http::ClientPool::Request request;
     request.method = method;
@@ -416,15 +419,15 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
     request.contentType = contentType;
     request.messageBody = messageBody;
 
-    QString user = QnAppServerConnectionFactory::url().userName();
-    QString password = QnAppServerConnectionFactory::url().password();
+    QString user = connection->connectionInfo().ecUrl.userName();
+    QString password = connection->connectionInfo().ecUrl.password();
     if (user.isEmpty() || password.isEmpty())
     {
         // if auth is not known, use server auth key
         user = server->getId().toString();
         password = server->getAuthKey();
     }
-    auto videoWallGuid = QnAppServerConnectionFactory::videowallGuid();
+    auto videoWallGuid = commonModule()->videowallGuid();
     if (!videoWallGuid.isNull())
         request.headers.emplace(Qn::VIDEOWALL_GUID_HEADER_NAME, videoWallGuid.toByteArray());
     request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());

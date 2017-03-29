@@ -358,8 +358,11 @@ QnMediaServerConnection::QnMediaServerConnection(
         extraHeaders.emplace(Qn::VIDEOWALL_GUID_HEADER_NAME, videowallGuid.toByteArray());
     extraHeaders.emplace(Qn::EC2_RUNTIME_GUID_HEADER_NAME,
         commonModule()->runningInstanceGUID().toByteArray());
-    extraHeaders.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME,
-        QnAppServerConnectionFactory::url().userName().toUtf8());
+    if (const auto& connection = commonModule()->ec2Connection())
+    {
+        extraHeaders.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME,
+            connection->connectionInfo().ecUrl.userName().toUtf8());
+    }
 	extraHeaders.emplace(nx_http::header::kUserAgent, nx_http::userAgentString());
     setExtraHeaders(std::move(extraHeaders));
 }
@@ -1054,7 +1057,9 @@ int QnMediaServerConnection::cameraHistory(
 int QnMediaServerConnection::recordedTimePeriods(
     const QnChunksRequestData& request, QObject* target, const char* slot)
 {
-    const auto connectionVersion = QnAppServerConnectionFactory::connectionInfo().version;
+    QnSoftwareVersion connectionVersion;
+    if (const auto& connection = commonModule()->ec2Connection())
+        connectionVersion = connection->connectionInfo().version;
 
     QnChunksRequestData fixedFormatRequest(request);
     fixedFormatRequest.format = Qn::CompressedPeriodsFormat;

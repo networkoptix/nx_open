@@ -75,11 +75,11 @@ void QnTransactionTransport::close()
 
 void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey)
 {
-    if (!QnAppServerConnectionFactory::videowallGuid().isNull())
+    if (!commonModule()->videowallGuid().isNull())
     {
         httpClient->addAdditionalHeader(
             "X-NetworkOptix-VideoWall",
-            QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
+            commonModule()->videowallGuid().toString().toUtf8());
         return;
     }
 
@@ -93,7 +93,9 @@ void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& htt
     }
     else
     {
-        QUrl url = QnAppServerConnectionFactory::url();
+        QUrl url;
+        if (const auto& connection = commonModule()->ec2Connection())
+            url = connection->connectionInfo().ecUrl;
         httpClient->setUserName(url.userName().toLower());
         if (ApiPeerData::isServer(localPeer().peerType))
         {

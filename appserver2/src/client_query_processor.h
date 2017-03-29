@@ -45,15 +45,13 @@ namespace ec2
     static const size_t RESPONSE_WAIT_TIMEOUT_MS = 30*1000;
     static const size_t TCP_CONNECT_TIMEOUT_MS = 10*1000;
 
-    class ClientQueryProcessor
-    :
-        public QObject
+    class ClientQueryProcessor: public QObject, public QnCommonModuleAware
     {
         Q_OBJECT
     public:
 
-        ClientQueryProcessor(const QnCommonModule* commonModule):
-            m_commonModule(commonModule)
+        ClientQueryProcessor(QnCommonModule* commonModule):
+            QnCommonModuleAware(commonModule)
         {
         }
 
@@ -256,14 +254,11 @@ namespace ec2
     private:
         void addCustomHeaders(const nx_http::AsyncHttpClientPtr& httpClient)
         {
-            //TODO #ak videowall looks strange here
-            if (!QnAppServerConnectionFactory::videowallGuid().isNull())
-                httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
-            httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, m_commonModule->runningInstanceGUID().toByteArray());
+            if (!commonModule()->videowallGuid().isNull())
+                httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, commonModule()->videowallGuid().toString().toUtf8());
+            httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, commonModule()->runningInstanceGUID().toByteArray());
             httpClient->addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray()); //< allow to update realm if migration
         }
-    private:
-        const QnCommonModule* m_commonModule;
     };
 }
 

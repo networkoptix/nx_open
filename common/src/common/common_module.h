@@ -34,6 +34,10 @@ class QnMediaServerUserAttributesPool;
 class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
 
+namespace ec2 {
+    class AbstractECConnection;
+}
+
 struct BeforeRestoreDbData
 {
     void saveToSettings(QSettings* settings);
@@ -207,6 +211,11 @@ public:
     QnPtzControllerPool* ptzControllerPool() const;
     void setPtzControllerPool(QnPtzControllerPool* ptzPool);
 
+    void setEc2Connection(const std::shared_ptr<ec2::AbstractECConnection> &connection);
+    std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
+
+    QnUuid videowallGuid() const;
+    void setVideowallGuid(const QnUuid &uuid);
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -257,4 +266,7 @@ private:
     QnResourcePropertyDictionary* m_resourcePropertyDictionary = nullptr;
     QnResourceStatusDictionary* m_resourceStatusDictionary = nullptr;
     QnGlobalPermissionsManager* m_globalPermissionsManager = nullptr;
+
+    std::shared_ptr<ec2::AbstractECConnection> m_ec2Connection = nullptr;
+    QnUuid m_videowallGuid;
 };

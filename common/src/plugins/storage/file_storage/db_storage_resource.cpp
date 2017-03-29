@@ -1,5 +1,9 @@
 #include "db_storage_resource.h"
 #include <api/app_server_connection.h>
+#include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
+#include <core/resource_access/user_access_data.h>
+#include <nx_ec//ec_api.h>
 
 QnDbStorageResource::QnDbStorageResource() :
     QnStorageResource(),
@@ -22,7 +26,7 @@ QIODevice *QnDbStorageResource::open(const QString &fileName, QIODevice::OpenMod
 {
     m_filePath = removeProtocolPrefix(fileName);
 
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = resourcePool()->commonModule()->ec2Connection();
 
     if (!connection)
         return nullptr;

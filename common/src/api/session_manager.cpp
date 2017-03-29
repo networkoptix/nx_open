@@ -20,6 +20,7 @@
 #include <api/network_proxy_factory.h>
 #include <http/custom_headers.h>
 #include "http_client_pool.h"
+#include <nx_ec/ec_api.h>
 
 // -------------------------------------------------------------------------- //
 // QnSessionManager
@@ -241,7 +242,15 @@ int QnSessionManager::sendAsyncRequest(
         return -1;
     }
 
-    const auto appServerUrl = QnAppServerConnectionFactory::url();
+    const auto& connection = commonModule()->ec2Connection();
+    if (!connection)
+    {
+        NX_ASSERT(false, Q_FUNC_INFO,
+            lit("Not connected to ec2 database."));
+        return -1;
+    }
+
+    const QUrl appServerUrl = connection->connectionInfo().ecUrl;
     auto requestUrl = createApiUrl(url, objectName, params);
     requestUrl.setUserName(_url.userName().isEmpty() ? appServerUrl.userName() : _url.userName());
     requestUrl.setPassword(_url.password().isEmpty() ? appServerUrl.password() : _url.password());

@@ -125,7 +125,9 @@ QSet<QUrl> QnModuleFinder::ignoredUrlsForServer(const QnUuid &id)
     /* Currently used EC URL should be non-ignored. */
     if (id == commonModule()->remoteGUID())
     {
-        QUrl ecUrl = QnAppServerConnectionFactory::getConnection2()->connectionInfo().ecUrl;
+        QUrl ecUrl;
+        if (const auto& connection = commonModule()->ec2Connection())
+            ecUrl = connection->connectionInfo().ecUrl;
 
         QUrl url;
         url.setScheme(lit("http"));
@@ -595,9 +597,12 @@ void QnModuleFinder::sendModuleInformation(
     NX_LOG(lit("QnModuleFinder: Send info for %1: %2 -> %3.")
            .arg(moduleInformation.id.toString()).arg(address.toString()).arg(status), cl_logDEBUG2);
 
-    QnAppServerConnectionFactory::getConnection2()->getDiscoveryManager(Qn::kSystemAccess)->sendDiscoveredServer(
-                std::move(serverData),
-                ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    if (const auto& connection = commonModule()->ec2Connection())
+    {
+        connection->getDiscoveryManager(Qn::kSystemAccess)->sendDiscoveredServer(
+            std::move(serverData),
+            ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+    }
 }
 
 void QnModuleFinder::removeModule(const QnUuid &id)

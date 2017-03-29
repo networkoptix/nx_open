@@ -114,7 +114,8 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
         server = resource.dynamicCast<QnMediaServerResource>();
     }
 
-    if (server)
+    const auto& connection = commonModule->ec2Connection();
+    if (server && connection)
     {
         QnUuid id = server->getOriginalGuid();
         QnCommonModule* commonModule = server->resourcePool()->commonModule();
@@ -129,7 +130,7 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
             if( via )
                 *via = server->resourcePool()->getResourceById<QnMediaServerResource>( route.id );
 
-            const auto& url = QnAppServerConnectionFactory::url();
+            const auto& url = connection->connectionInfo().ecUrl;
             return QNetworkProxy(QNetworkProxy::HttpProxy,
                                  route.addr.address.toString(), route.addr.port,
                                  url.userName(), url.password());

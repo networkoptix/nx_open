@@ -112,7 +112,7 @@ void triggerNotification(
             auditData.authSession);
     }
 
-    QnAppServerConnectionFactory::getConnection2()
+    auditData.auditManager->ec2Connection()
         ->notificationManager()
         ->triggerNotification(tran, NotificationSource::Local);
 }
@@ -460,7 +460,7 @@ private:
         PostProcessList* const transactionsPostProcessList)
     {
         ErrorCode errorCode = ErrorCode::ok;
-        auto connection = QnAppServerConnectionFactory::getConnection2();
+        auto connection = m_owner->commonModule()->ec2Connection();
 
         #define RUN_AND_CHECK_ERROR(EXPR, MESSAGE) do \
         { \

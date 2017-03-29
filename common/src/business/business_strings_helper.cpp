@@ -23,6 +23,7 @@
 #include <core/resource_management/resource_pool.h>
 #include "core/resource/camera_history.h"
 #include "events/ip_conflict_business_event.h"
+#include <common/common_module.h>
 #include "business_event_rule.h"
 
 QnBusinessStringsHelper::QnBusinessStringsHelper(QObject* parent):
@@ -545,25 +546,28 @@ QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestamp
     if (newServer)
         mserverRes = newServer;
 
-    QUrl appServerUrl = QnAppServerConnectionFactory::url();
-    if (appServerUrl.host().isEmpty() || resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost)
+    if (const auto& connection = camera->commonModule()->ec2Connection())
     {
-        appServerUrl = mserverRes->getApiUrl();
-        if (isPublic) {
-            QString publicIP = mserverRes->getProperty(Qn::PUBLIC_IP);
-            if (!publicIP.isEmpty()) {
-                QStringList parts = publicIP.split(L':');
-                appServerUrl.setHost(parts[0]);
-                if (parts.size() > 1)
-                    appServerUrl.setPort(parts[1].toInt());
+        QUrl appServerUrl = connection->connectionInfo().ecUrl;
+        if (appServerUrl.host().isEmpty() || resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost)
+        {
+            appServerUrl = mserverRes->getApiUrl();
+            if (isPublic) {
+                QString publicIP = mserverRes->getProperty(Qn::PUBLIC_IP);
+                if (!publicIP.isEmpty()) {
+                    QStringList parts = publicIP.split(L':');
+                    appServerUrl.setHost(parts[0]);
+                    if (parts.size() > 1)
+                        appServerUrl.setPort(parts[1].toInt());
+                }
             }
         }
+        QString result(lit("http://%1:%2/static/index.html#/view/%3?time=%4"));
+        result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(camera->getUniqueId()).arg(timeStampMs);
+        return result;
     }
 
-    QString result(lit("http://%1:%2/static/index.html#/view/%3?time=%4"));
-    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(camera->getUniqueId()).arg(timeStampMs);
-
-    return result;
+    return QString();
 }
 
 QString QnBusinessStringsHelper::toggleStateToString(QnBusiness::EventState state) const

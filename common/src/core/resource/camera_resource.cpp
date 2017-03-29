@@ -16,6 +16,8 @@
 #include <utils/crypt/symmetrical.h>
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
+#include <core/resource_access/user_access_data.h>
+#include <nx_ec/ec_api.h>
 
 namespace {
 
@@ -514,7 +516,7 @@ int QnVirtualCameraResource::saveAsync()
     ec2::ApiCameraData apiCamera;
     fromResourceToApi(toSharedPointer(this), apiCamera);
 
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
     return conn->getCameraManager(Qn::kSystemAccess)->addCamera(apiCamera, this, []{});
 }
 

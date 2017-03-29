@@ -2,6 +2,7 @@
 
 #include <core/resource/storage_resource.h>
 #include <api/app_server_connection.h>
+#include <nx/utils/thread/wait_condition.h>
 
 class QnDbStorageResource : public QnStorageResource
 {

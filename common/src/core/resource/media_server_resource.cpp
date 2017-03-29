@@ -281,7 +281,7 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
             new QnMediaServerConnection(
                 resourcePool()->commonModule(),
                 thisPtr,
-                QnAppServerConnectionFactory::videowallGuid()),
+                resourcePool()->commonModule()->videowallGuid()),
                 &qnDeleteLater);
     }
 

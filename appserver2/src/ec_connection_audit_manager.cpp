@@ -201,4 +201,9 @@ namespace ec2
         Q_UNUSED(params);
         qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(authInfo, Qn::AR_DatabaseRestore));
     }
+
+    AbstractECConnection* ECConnectionAuditManager::ec2Connection() const
+    {
+        return m_connection;
+    }
 }
