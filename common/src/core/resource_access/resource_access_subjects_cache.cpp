@@ -36,15 +36,15 @@ QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(QObject* parent):
                 handleUserRemoved(user);
         });
 
-    connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
+    connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
         &QnResourceAccessSubjectsCache::handleRoleAdded);
-    connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
+    connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
         &QnResourceAccessSubjectsCache::handleRoleRemoved);
 
     for (const auto& user: resourcePool()->getResources<QnUserResource>())
         handleUserAdded(user);
 
-    for (const auto& role : qnUserRolesManager->userRoles())
+    for (const auto& role : userRolesManager()->userRoles())
         handleRoleAdded(role);
 }
 

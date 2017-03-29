@@ -32,7 +32,7 @@ QSet<QnUuid> layoutItems(const QnLayoutResourcePtr& layout)
 QnSharedLayoutItemAccessProvider::QnSharedLayoutItemAccessProvider(QObject* parent):
     base_type(parent)
 {
-    connect(qnSharedResourcesManager, &QnSharedResourcesManager::sharedResourcesChanged, this,
+    connect(sharedResourcesManager(), &QnSharedResourcesManager::sharedResourcesChanged, this,
         &QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged);
 }
 
@@ -79,7 +79,7 @@ void QnSharedLayoutItemAccessProvider::fillProviders(
         return;
 
     auto sharedLayouts = commonModule()->resourcePool()->getResources<QnLayoutResource>(
-        qnSharedResourcesManager->sharedResources(subject));
+        sharedResourcesManager()->sharedResources(subject));
 
     auto resourceId = resource->getId();
     for (const auto& layout : sharedLayouts)
@@ -144,7 +144,7 @@ void QnSharedLayoutItemAccessProvider::handleSubjectAdded(const QnResourceAccess
     auto aggregator = ensureAggregatorForSubject(subject);
 
     auto sharedLayouts = commonModule()->resourcePool()->getResources<QnLayoutResource>(
-        qnSharedResourcesManager->sharedResources(subject));
+        sharedResourcesManager()->sharedResources(subject));
     for (auto layout : sharedLayouts)
         aggregator->addWatchedLayout(layout);
 
@@ -195,7 +195,7 @@ void QnSharedLayoutItemAccessProvider::updateAccessToLayout(const QnLayoutResour
     const auto layoutId = layout->getId();
     for (const auto& subject : resourceAccessSubjectsCache()->allSubjects())
     {
-        auto shared = qnSharedResourcesManager->sharedResources(subject);
+        auto shared = sharedResourcesManager()->sharedResources(subject);
         if (!shared.contains(layoutId))
             continue;
 

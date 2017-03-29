@@ -1,14 +1,15 @@
 #pragma once
 
+#include <common/common_module_aware.h>
+
 #include <nx_ec/data/api_user_role_data.h>
 
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 
-class QnUserRolesManager: public QObject, public Singleton<QnUserRolesManager>
+class QnUserRolesManager: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
-
     using base_type = QObject;
 public:
     QnUserRolesManager(QObject* parent = nullptr);
@@ -38,10 +39,10 @@ public:
 
     static const QList<Qn::UserRole>& predefinedRoles();
 
-    static QString userRoleName(Qn::UserRole userRole);
     static QString userRoleDescription(Qn::UserRole userRole);
     static Qn::GlobalPermissions userRolePermissions(Qn::UserRole userRole);
 
+    static QString userRoleName(Qn::UserRole userRole);
     QString userRoleName(const QnUserResourcePtr& user) const;
 
     static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
@@ -55,5 +56,3 @@ private:
 
     QHash<QnUuid, ec2::ApiUserRoleData> m_roles;
 };
-
-#define qnUserRolesManager QnUserRolesManager::instance()

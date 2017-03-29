@@ -1,11 +1,13 @@
 #pragma once
 
 class QnCommonModule;
+class QnGlobalPermissionsManager;
 class QnLicensePool;
-class QnRuntimeInfoManager;
 class QnResourcePool;
 class QnResourceAccessSubjectsCache;
-class QnGlobalPermissionsManager;
+class QnRuntimeInfoManager;
+class QnSharedResourcesManager;
+class QnUserRolesManager;
 
 class QnCommonModuleAware
 {
@@ -20,6 +22,9 @@ public:
     QnResourcePool* resourcePool() const;
     QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
     QnGlobalPermissionsManager* globalPermissionsManager() const;
+    QnSharedResourcesManager* sharedResourcesManager() const;
+    QnUserRolesManager* userRolesManager() const;
+
 private:
     void init(QObject *parent);
 

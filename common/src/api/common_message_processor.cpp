@@ -294,24 +294,24 @@ void QnCommonMessageProcessor::on_accessRightsChanged(const ec2::ApiAccessRights
         accessibleResources << id;
     if (auto user = commonModule()->resourcePool()->getResourceById<QnUserResource>(accessRights.userId))
     {
-        qnSharedResourcesManager->setSharedResources(user, accessibleResources);
+        sharedResourcesManager()->setSharedResources(user, accessibleResources);
     }
     else
     {
-        auto role = qnUserRolesManager->userRole(accessRights.userId);
+        auto role = userRolesManager()->userRole(accessRights.userId);
         if (!role.isNull())
-            qnSharedResourcesManager->setSharedResources(role, accessibleResources);
+            sharedResourcesManager()->setSharedResources(role, accessibleResources);
     }
 }
 
 void QnCommonMessageProcessor::on_userRoleChanged(const ec2::ApiUserRoleData& userRole)
 {
-    qnUserRolesManager->addOrUpdateUserRole(userRole);
+    userRolesManager()->addOrUpdateUserRole(userRole);
 }
 
 void QnCommonMessageProcessor::on_userRoleRemoved(const QnUuid& userRoleId)
 {
-    qnUserRolesManager->removeUserRole(userRoleId);
+    userRolesManager()->removeUserRole(userRoleId);
     for (const auto& user : commonModule()->resourcePool()->getResources<QnUserResource>())
     {
         if (user->userRoleId() == userRoleId)
@@ -527,12 +527,12 @@ void QnCommonMessageProcessor::resetTime()
 
 void QnCommonMessageProcessor::resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights)
 {
-    qnSharedResourcesManager->reset(accessRights);
+    sharedResourcesManager()->reset(accessRights);
 }
 
 void QnCommonMessageProcessor::resetUserRoles(const ec2::ApiUserRoleDataList& roles)
 {
-    qnUserRolesManager->resetUserRoles(roles);
+    userRolesManager()->resetUserRoles(roles);
 }
 
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &)

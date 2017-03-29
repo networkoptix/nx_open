@@ -63,7 +63,7 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
     connect(resPool, &QnResourcePool::resourceRemoved, this,
         &QnResourceAccessManager::handleResourceRemoved);
 
-    connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
+    connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
         &QnResourceAccessManager::handleSubjectRemoved);
 
     recalculateAllPermissions();
@@ -83,7 +83,7 @@ void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubje
             if (subject.user())
                 return subject.user()->resourcePool() != nullptr;
 
-            return qnUserRolesManager->hasRole(subject.role().id);
+            return userRolesManager()->hasRole(subject.role().id);
         };
 
     PermissionKey key(subject.id(), resource->getId());
@@ -242,7 +242,7 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
     const ec2::ApiUserData& data) const
 {
     NX_EXPECT(!isUpdating());
-    if (!data.userRoleId.isNull() && !qnUserRolesManager->hasRole(data.userRoleId))
+    if (!data.userRoleId.isNull() && !userRolesManager()->hasRole(data.userRoleId))
         return false;
 
     return canCreateUser(subject, data.permissions, data.isAdmin);
@@ -844,7 +844,7 @@ bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& s
 bool QnResourceAccessManager::canModifyResource(const QnResourceAccessSubject& subject,
     const QnResourcePtr& target, const ec2::ApiUserData& update) const
 {
-    if (!update.userRoleId.isNull() && !qnUserRolesManager->hasRole(update.userRoleId))
+    if (!update.userRoleId.isNull() && !userRolesManager()->hasRole(update.userRoleId))
         return false;
 
     auto userResource = target.dynamicCast<QnUserResource>();

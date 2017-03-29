@@ -21,9 +21,9 @@ QnBaseResourceAccessProvider::QnBaseResourceAccessProvider(QObject* parent):
     connect(commonModule()->resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnBaseResourceAccessProvider::handleResourceRemoved);
 
-    connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
+    connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
         &QnBaseResourceAccessProvider::handleRoleAddedOrUpdated);
-    connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
+    connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
         &QnBaseResourceAccessProvider::handleRoleRemoved);
 }
 

@@ -176,7 +176,7 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
     if (flags.testFlag(Qn::user))
     {
         if (const QnUserResourcePtr& user = m_resource.dynamicCast<QnUserResource>())
-            m_extraInfo = qnUserRolesManager->userRoleName(user);
+            m_extraInfo = userRolesManager()->userRoleName(user);
     }
     else
     {

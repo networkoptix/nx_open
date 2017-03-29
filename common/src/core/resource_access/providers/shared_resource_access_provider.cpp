@@ -12,7 +12,7 @@
 QnSharedResourceAccessProvider::QnSharedResourceAccessProvider(QObject* parent):
     base_type(parent)
 {
-    connect(qnSharedResourcesManager, &QnSharedResourcesManager::sharedResourcesChanged, this,
+    connect(sharedResourcesManager(), &QnSharedResourcesManager::sharedResourcesChanged, this,
         &QnSharedResourceAccessProvider::handleSharedResourcesChanged);
 }
 
@@ -50,7 +50,7 @@ bool QnSharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubje
         return false;
     }
 
-    bool result = qnSharedResourcesManager->sharedResources(subject).contains(resource->getId());
+    bool result = sharedResourcesManager()->sharedResources(subject).contains(resource->getId());
 
     NX_LOG(QnLog::PERMISSIONS_LOG, lit("QnSharedResourceAccessProvider: update access %1 to %2: %3")
         .arg(subject.name())

@@ -19,9 +19,9 @@ QnGlobalPermissionsManager::QnGlobalPermissionsManager(QObject* parent):
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnGlobalPermissionsManager::handleResourceRemoved);
 
-    connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
+    connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
         &QnGlobalPermissionsManager::handleRoleAddedOrUpdated);
-    connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
+    connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
         &QnGlobalPermissionsManager::handleRoleRemoved);
 }
 
@@ -134,7 +134,7 @@ Qn::GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
         switch (user->userRole())
         {
             case Qn::UserRole::CustomUserRole:
-                result = globalPermissions(qnUserRolesManager->userRole(user->userRoleId()));
+                result = globalPermissions(userRolesManager()->userRole(user->userRoleId()));
                 break;
             case Qn::UserRole::Owner:
             case Qn::UserRole::Administrator:

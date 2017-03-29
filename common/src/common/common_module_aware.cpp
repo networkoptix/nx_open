@@ -1,11 +1,12 @@
 #include "common_module_aware.h"
 #include "common_module.h"
 
-
 //TODO: #GDM #3.1 think how to get rid of these includes
 #include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_access/global_permissions_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
 
+#include <core/resource_management/user_roles_manager.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <licensing/license.h>
@@ -71,4 +72,16 @@ QnGlobalPermissionsManager* QnCommonModuleAware::globalPermissionsManager() cons
 {
     NX_ASSERT(m_commonModule);
     return m_commonModule ? m_commonModule->instance<QnGlobalPermissionsManager>() : nullptr;
+}
+
+QnSharedResourcesManager* QnCommonModuleAware::sharedResourcesManager() const
+{
+    NX_ASSERT(m_commonModule);
+    return m_commonModule ? m_commonModule->instance<QnSharedResourcesManager>() : nullptr;
+}
+
+QnUserRolesManager* QnCommonModuleAware::userRolesManager() const
+{
+    NX_ASSERT(m_commonModule);
+    return m_commonModule ? m_commonModule->instance<QnUserRolesManager>() : nullptr;
 }
