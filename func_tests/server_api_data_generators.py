@@ -156,9 +156,10 @@ def generate_storage_data(storage_id, **kw):
     default_storage_data = dict(
         id=generate_storage_guid(storage_id),
         name=generate_name('Storage', storage_id),
+        # By default we use samba storage to avoid accidentally local storage creating
         url='smb://%s' % generate_ip_v4(storage_id, BASE_STORAGE_IP_ADDRESS),
-        usedForWriting=False,
         storageType='smb',
+        usedForWriting=False,
         isBackup=False)
     return dict(default_storage_data, **kw)
 

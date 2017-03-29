@@ -16,8 +16,8 @@ from test_utils.host import ProcessError
 log = logging.getLogger(__name__)
 
 BACKUP_STORAGE_PATH = '/tmp/bstorage'
-BACKUP_STORAGE_READY_TIMEOUT = 60  # seconds
-BACKUP_SCHEDULE_TIMEOUT = 60       # seconds
+BACKUP_STORAGE_READY_TIMEOUT_SEC = 60  # seconds
+BACKUP_SCHEDULE_TIMEOUT_SEC = 60       # seconds
 
 # Camera backup types
 BACKUP_HIGH = 1  # backup only high quality stream
@@ -27,6 +27,17 @@ BACKUP_BOTH = 3  # backup both (high & low) streams
 # Backup and archive subpaths
 HI_QUALITY_PATH = 'hi_quality'
 LOW_QUALITY_PATH = 'low_quality'
+
+# Backup settings
+
+# Combination (via "|") of the days of week on which the backup is active on,
+BACKUP_EVERY_DAY = 0x7f  # 0x7f means every day.
+
+# Duration of the synchronization period in seconds.
+BACKUP_DURATION_NOT_SET = -1  # -1 means not set.
+
+# Maximum backup bitrate in bytes per second.
+BACKUP_BITRATE_NOT_LIMITED = -1  # -1 means not limited.
 
 
 @pytest.fixture(params=['low', 'high', 'both'])
@@ -50,7 +61,7 @@ def env(env_builder, server, backup_type):
     built_env.one.set_system_settings(backupQualities=backup_type)
     add_backup_storage(built_env.one)
     change_and_assert_server_backup_type(built_env.one, 'BackupManual')
-    built_env.camera = add_camera(built_env.one, 1, backup_type)
+    built_env.camera = add_camera(built_env.one, camera_id=1, backup_type=backup_type)
     return built_env
 
 
@@ -60,17 +71,19 @@ def wait_storage_ready(server, stotage_guid):
         status = server.rest_api.ec2.getStatusList.GET(id=stotage_guid)
         if status and status[0]['status'] == 'Online':
             return
-        if time.time() - start >= BACKUP_STORAGE_READY_TIMEOUT:
-            assert False, "%r: storage '%s' isn't ready" % (
-                server.box, storage_guid)
-        time.sleep(BACKUP_STORAGE_READY_TIMEOUT / 10.)
+        if time.time() - start >= BACKUP_STORAGE_READY_TIMEOUT_SEC:
+            assert False, "%r: storage '%s' isn't ready in %s seconds" % (
+                server.box, storage_guid, BACKUP_STORAGE_READY_TIMEOUT_SEC)
+        time.sleep(BACKUP_STORAGE_READY_TIMEOUT_SEC / 10.)
 
 
 def change_and_assert_server_backup_type(server, expected_backup_type):
     server.rest_api.ec2.saveMediaServerUserAttributes.POST(
         serverId=server.ecs_guid, backupType='BackupManual',
-        backupDaysOfTheWeek=0x7f, backupStart=0,
-        backupDuration=-1, backupBitrate=-1)
+        backupDaysOfTheWeek=BACKUP_EVERY_DAY,
+        backupStart=0,  # start backup at 00:00:00
+        backupDuration=BACKUP_DURATION_NOT_SET,
+        backupBitrate=BACKUP_BITRATE_NOT_LIMITED)
     attributes = server.rest_api.ec2.getMediaServerUserAttributesList.GET(
         id=server.ecs_guid)
     assert (expected_backup_type and
@@ -81,7 +94,7 @@ def add_backup_storage(server):
     storages = server.rest_api.ec2.getStorages.GET()
     assert len(storages)
     backup_storage_data = generator.generate_storage_data(
-        1, isBackup=True,
+        storage_id=1, isBackup=True,
         parentId=server.ecs_guid,
         storageType='local',
         usedForWriting=True,
@@ -104,11 +117,12 @@ def wait_backup_finish(server, expected_backup_time):
         log.debug("'%r' api/backupControl.backupTimeMs: '%s', expected: '%s'",
                   server.box, utils.datetime_to_str(backup_time),
                   utils.datetime_to_str(expected_backup_time))
-        if backup_state == 'BackupState_None' and backup_time == expected_backup_time:
+        if backup_state == 'BackupState_None' and backup_time != 0:
+            assert backup_time == expected_backup_time
             return
-        if time.time() - start >= BACKUP_SCHEDULE_TIMEOUT:
+        if time.time() - start >= BACKUP_SCHEDULE_TIMEOUT_SEC:
             assert backup_state == 'BackupState_None' and backup_time == expected_backup_time
-        time.sleep(BACKUP_SCHEDULE_TIMEOUT / 10.0)
+        time.sleep(BACKUP_SCHEDULE_TIMEOUT_SEC / 10.)
 
 
 def add_camera(server, camera_id, backup_type):
@@ -129,8 +143,6 @@ def assert_path_does_not_exist(server, path):
 
 
 def assert_backup_equal_to_archive(server, backup_type):
-    backup_path = BACKUP_STORAGE_PATH
-    server_archive_path = server.storage.dir
     if backup_type == BACKUP_HIGH:
         backup_path = os.path.join(BACKUP_STORAGE_PATH, HI_QUALITY_PATH)
         server_archive_path = os.path.join(server.storage.dir, HI_QUALITY_PATH)
@@ -139,6 +151,9 @@ def assert_backup_equal_to_archive(server, backup_type):
         backup_path = os.path.join(BACKUP_STORAGE_PATH, LOW_QUALITY_PATH)
         server_archive_path = os.path.join(server.storage.dir, LOW_QUALITY_PATH)
         assert_path_does_not_exist(server, os.path.join(BACKUP_STORAGE_PATH, HI_QUALITY_PATH))
+    elif backup_type == BACKUP_BOTH:
+        backup_path = BACKUP_STORAGE_PATH
+        server_archive_path = server.storage.dir
     # Compare backup and archive storages
     server.box.host.run_command(['diff',
                                  '-x', '*.nxdb',  # don't compare storage databases
@@ -152,19 +167,23 @@ def test_backup_by_request(env, sample_media_file, backup_type):
     env.one.storage.save_media_sample(env.camera, start_time, sample_media_file)
     env.one.rebuild_archive()
     env.one.rest_api.api.backupControl.GET(action='start')
-    wait_backup_finish(env.one, start_time + sample_media_file.duration)
+    expected_backup_time=start_time + sample_media_file.duration
+    wait_backup_finish(env.one, expected_backup_time)
     assert_backup_equal_to_archive(env.one, backup_type)
 
 
 def test_backup_by_schedule(env, sample_media_file, backup_type):
-    start_time1 = datetime(2017, 3, 28, 9, 52, 16, tzinfo=pytz.utc)
-    start_time2 = start_time1 + sample_media_file.duration*2
-    env.one.storage.save_media_sample(env.camera, start_time1, sample_media_file)
-    env.one.storage.save_media_sample(env.camera, start_time2, sample_media_file)
+    start_time_1 = datetime(2017, 3, 28, 9, 52, 16, tzinfo=pytz.utc)
+    start_time_2 = start_time1 + sample_media_file.duration*2
+    env.one.storage.save_media_sample(env.camera, start_time_1, sample_media_file)
+    env.one.storage.save_media_sample(env.camera, start_time_2, sample_media_file)
     env.one.rebuild_archive()
     env.one.rest_api.ec2.saveMediaServerUserAttributes.POST(
         serverId=env.one.ecs_guid, backupType='BackupSchedule',
-        backupDaysOfTheWeek=0x7f, backupStart=0,
-        backupDuration=-1, backupBitrate=-1)
-    wait_backup_finish(env.one, start_time2 + sample_media_file.duration)
+        backupDaysOfTheWeek=BACKUP_EVERY_DAY,
+        backupStart=0,  # start backup at 00:00:00
+        backupDuration=BACKUP_DURATION_NOT_SET,
+        backupBitrate=BACKUP_BITRATE_NOT_LIMITED)
+    expected_backup_time=start_time_2 + sample_media_file.duration
+    wait_backup_finish(env.one, expected_backup_time)
     assert_backup_equal_to_archive(env.one, backup_type)
