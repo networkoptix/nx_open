@@ -291,7 +291,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         local_image = url | local | media | still_image | streamprovider,    /**< Local still image file. */
 
         web_page = url | remote,   /**< Web-page resource */
-        fake_server = remote_server | fake,
+        fake_server = remote_server | fake
     };
     Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFlags)

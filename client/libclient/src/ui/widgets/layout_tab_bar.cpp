@@ -168,7 +168,13 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
     if (!layout)
         return QIcon();
 
-    QIcon layoutIcon = layout->data(Qt::DecorationRole).value<QIcon>();
+    auto layoutIcon = layout->icon();
+    if (!layoutIcon.isNull())
+        return layoutIcon;
+
+    // TODO: #ynikitenkov #high refactor code below to use only layout->icon()
+
+    layoutIcon = layout->data(Qt::DecorationRole).value<QIcon>();
     if (!layoutIcon.isNull())
         return layoutIcon;
 
@@ -390,7 +396,7 @@ void QnLayoutTabBar::tabInserted(int index)
         QString name;
         if (m_layouts.size() != count())
         { /* Not inserted yet, allocate new one. It will be deleted with this tab bar. */
-            QnWorkbenchLayout *layout = qnLayoutFactory->create(this);
+            QnWorkbenchLayout *layout = qnWorkbenchLayoutsFactory->create(this);
             m_layouts.insert(index, layout);
             name = tabText(index);
         }
@@ -409,6 +415,8 @@ void QnLayoutTabBar::tabInserted(int index)
             updateTabText(layout);
             updateTabIcon(layout);
         });
+        connect(layout, &QnWorkbenchLayout::iconChanged, this,
+            [this, layout](){ updateTabIcon(layout); });
 
         if (!name.isNull())
             layout->setName(name); /* It is important to set the name after connecting so that the name change signal is delivered to us. */

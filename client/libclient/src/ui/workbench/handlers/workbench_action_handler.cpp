@@ -835,7 +835,7 @@ void ActionHandler::at_openLayoutsAction_triggered() {
         QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource);
         if (layout == NULL)
         {
-            layout = qnLayoutFactory->create(layoutResource, workbench());
+            layout = qnWorkbenchLayoutsFactory->create(layoutResource, workbench());
             workbench()->addLayout(layout);
         }
         /* Explicit set that we do not control videowall through this layout */

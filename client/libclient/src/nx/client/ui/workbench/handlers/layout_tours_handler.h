@@ -9,13 +9,16 @@ namespace desktop {
 namespace ui {
 namespace workbench {
 
-class LayoutToursHandler: public QnWorkbenchContextAware, public QObject
+class LayoutToursHandler: public QObject, public QnWorkbenchContextAware
 {
-    using base_type = QnWorkbenchContextAware;
+    Q_OBJECT
+    using base_type = QObject;
+
 public:
     LayoutToursHandler(QObject* parent = nullptr);
 
 private:
+    void openTousLayout();
 };
 
 } // namespace workbench

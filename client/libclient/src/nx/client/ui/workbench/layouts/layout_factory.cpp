@@ -2,12 +2,19 @@
 
 #include <core/resource/layout_resource.h>
 #include <nx/utils/log/assert.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace workbench {
-namespace layouts {
+
+LayoutsFactory* LayoutsFactory::instance(QnWorkbench* workbench)
+{
+    return workbench->context()->instance<LayoutsFactory>();
+}
 
 LayoutsFactory::LayoutsFactory(QObject* parent):
     base_type(parent)
@@ -38,8 +45,8 @@ void LayoutsFactory::addCreator(const LayoutCreator& creator)
     m_creators.prepend(creator);
 }
 
-} // namespace layouts
 } // namespace workbench
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx
