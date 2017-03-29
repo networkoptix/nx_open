@@ -13,11 +13,11 @@
     },
     "passwordRequirements":
     {
-        "minLengthMessage":"Password must contain at least 8 characters",
-        "requiredMessage": "Use only alphanumeric characters and keyboard \n symbols, avoid leading and trailing spaces.",
-        "weakMessage": "Use both upper- and lower-case letters \n and special symbols to make password stronger",
+        "minLengthMessage":"Password must be at least 8 characters long",
+        "requiredMessage": "Only latin letters, numbers and keyboard symbols are allowed",
+        "weakMessage": "Password should contain different types of symbols",
         "strongMessage": "Strong password!",
-        "commonMessage": "This password is in top most popular passwords in the world"
+        "commonMessage": "This password is in list of most popular passwords"
     },
     "settings":{
         "tabs":{
