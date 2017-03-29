@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QScopedPointer>
 #include <QtWidgets/QAbstractButton>
 #include <QtWidgets/QGraphicsProxyWidget>
 
@@ -9,6 +10,10 @@
 
 class QLabel;
 class QHBoxLayout;
+
+namespace Ui{
+class SpecialLayoutPanelWidget;
+} // namespace Ui
 
 namespace nx {
 namespace client {
@@ -25,16 +30,19 @@ class SpecialLayoutPanelWidget: public Connective<QGraphicsProxyWidget>,
 public:
     SpecialLayoutPanelWidget(const QnLayoutResourcePtr& layoutResource, QObject* parent = nullptr);
 
+    virtual ~SpecialLayoutPanelWidget();
+
 private:
     void handleResourceDataChanged(int role);
 
     void updateButtons();
 
 private:
-    QLabel* m_caption = nullptr;
-    QLabel* m_description = nullptr;
-    QHBoxLayout* m_layout = nullptr;
+    QScopedPointer<Ui::SpecialLayoutPanelWidget> ui;
     QnLayoutResourcePtr m_layoutResource;
+
+    using ButtonPtr = QSharedPointer<QAbstractButton>;
+    QList<ButtonPtr> m_actionButtons;
 };
 
 } // namespace workbench

@@ -3,8 +3,6 @@
 #include <QtCore/QObject>
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnWorkbenchLayout;
-
 namespace nx {
 namespace client {
 namespace ui {

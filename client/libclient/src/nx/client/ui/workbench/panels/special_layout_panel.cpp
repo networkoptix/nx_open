@@ -178,7 +178,7 @@ QRectF SpecialLayoutPanel::effectiveGeometry() const
 {
     Q_D(const SpecialLayoutPanel);
     const auto widget = d->panelWidget();
-    return d ? widget->geometry() : QRectF();
+    return widget ? widget->geometry() : QRectF();
 }
 
 void SpecialLayoutPanel::stopAnimations()

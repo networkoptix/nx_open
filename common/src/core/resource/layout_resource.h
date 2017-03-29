@@ -66,7 +66,7 @@ public:
 
     void setData(int role, const QVariant &value);
 
-    QVariant data(int role);
+    QVariant data(int role) const; // TODO: #ynikitenkov Possibly move to QnResourceRuntimeDataManager
 
     QHash<int, QVariant> data() const;
 
