@@ -13,14 +13,15 @@
 class QnTcpListener;
 class QnTCPConnectionProcessorPrivate;
 
-class QnTCPConnectionProcessor: public QnLongRunnable {
+class QnTCPConnectionProcessor: public QnLongRunnable
+{
     Q_OBJECT;
 
 public:
     static const int KEEP_ALIVE_TIMEOUT = 5  * 1000;
 
 
-    QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket);
+    QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnTCPConnectionProcessor();
 
     /**
@@ -85,7 +86,10 @@ protected:
     int readSocket( quint8* buffer, int bufSize );
     SocketAddress remoteHostAddress() const;
 
-    QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* d_ptr, QSharedPointer<AbstractStreamSocket> socket);
+    QnTCPConnectionProcessor(
+        QnTCPConnectionProcessorPrivate* d_ptr,
+        QSharedPointer<AbstractStreamSocket> socket,
+        QnTcpListener* owner);
 
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }

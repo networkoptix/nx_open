@@ -44,12 +44,10 @@ namespace ec2
     QnHttpTransactionReceiver::QnHttpTransactionReceiver(
         QnTransactionMessageBus* messageBus,
         QSharedPointer<AbstractStreamSocket> socket,
-        QnTcpListener* _owner )
+        QnTcpListener* owner )
     :
-        QnTCPConnectionProcessor( new QnHttpTransactionReceiverPrivate, socket )
+        QnTCPConnectionProcessor( new QnHttpTransactionReceiverPrivate, socket, owner)
     {
-        Q_UNUSED(_owner)
-
         setObjectName( "QnHttpTransactionReceiver" );
         Q_D(QnHttpTransactionReceiver);
         d->messageBus = messageBus;

@@ -85,12 +85,13 @@ class QnSimpleHttpConnectionListener:
 {
 public:
     QnSimpleHttpConnectionListener(
+        QnCommonModule* commonModule,
         const QHostAddress& address,
         int port,
         int maxConnections,
         bool useSsl)
     :
-        QnHttpConnectionListener(address, port, maxConnections, useSsl)
+        QnHttpConnectionListener(commonModule, address, port, maxConnections, useSsl)
     {
     }
 
@@ -263,6 +264,7 @@ int Appserver2Process::exec()
 
     nx_http::HttpModManager httpModManager;
     QnSimpleHttpConnectionListener tcpListener(
+        &commonModule,
         QHostAddress::Any,
         settings.endpoint().port,
         QnTcpListener::DEFAULT_MAX_CONNECTIONS,

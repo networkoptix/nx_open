@@ -22,7 +22,6 @@ protected:
     bool processRequest(bool noAuth);
 
 private:
-    QnHttpConnectionListener* m_owner;
     QnTCPConnectionProcessor* m_processor;
     QnMutex m_mutex;
 };

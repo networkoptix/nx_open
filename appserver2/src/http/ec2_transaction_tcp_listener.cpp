@@ -40,9 +40,9 @@ public:
 QnTransactionTcpProcessor::QnTransactionTcpProcessor(
     QnTransactionMessageBus* messageBus,
     QSharedPointer<AbstractStreamSocket> socket,
-    QnTcpListener* /*owner*/)
+    QnTcpListener* owner)
     :
-    QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket)
+    QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket, owner)
 {
     Q_D(QnTransactionTcpProcessor);
 

@@ -45,6 +45,7 @@ public:
     static const int DEFAULT_RTSP_PORT = 554;
 
     explicit QnHttpConnectionListener(
+        QnCommonModule* commonModule,
         const QHostAddress& address = QHostAddress::Any,
         int port = DEFAULT_RTSP_PORT,
         int maxConnections = QnTcpListener::DEFAULT_MAX_CONNECTIONS,

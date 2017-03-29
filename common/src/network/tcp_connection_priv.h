@@ -70,6 +70,7 @@ public:
     //enum State {State_Stopped, State_Paused, State_Playing, State_Rewind};
 
     QnTCPConnectionProcessorPrivate():
+        owner(nullptr),
         tcpReadBuffer(new quint8[TCP_READ_BUFFER_SIZE]),
         socketTimeout(5*1000),
         chunkedMode(false),
@@ -88,6 +89,7 @@ public:
 
 public:
     QSharedPointer<AbstractStreamSocket> socket;
+    QnTcpListener* owner;
     nx_http::Request request;
     nx_http::Response response;
     nx_http::HttpStreamReader httpStreamReader;
