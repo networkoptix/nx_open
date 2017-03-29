@@ -1808,10 +1808,10 @@ nx::db::DBResult SystemManager::processEc2SaveUser(
     systemSharingData->systemId = systemId.toStdString();
     ec2::convert(vmsUser, systemSharingData);
 
-    // We have no information about grantor here. Using system owner...
     const nx::db::InnerJoinFilterFields sqlFilter =
         {{"vms_user_id", ":vmsUserId",
-           QnSql::serialized_field(transaction.historyAttributes.author.toSimpleString())}};
+           QnSql::serialized_field(transaction.historyAttributes.author.toSimpleString())},
+         { "system_id", ":systemId", QnSql::serialized_field(systemId) } };
     api::SystemSharingEx grantorInfo;
     auto dbResult = m_systemSharingDao.fetchSharing(
         queryContext,
