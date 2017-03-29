@@ -31,7 +31,7 @@ add_definitions(
 if(WIN32)
     add_definitions(
         -DENABLE_VMAX
-        -DENABLE_DESKTOP_CAMERA    )
+        -DENABLE_DESKTOP_CAMERA)
 endif()
 
 if(UNIX)
@@ -87,6 +87,24 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     if(analyzeMutexLocksForDeadlock)
         add_definitions(-DANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
     endif()
+endif()
+
+if(WIN32)
+    add_definitions(-DNOMINMAX=)
+    add_compile_options(
+        /MP
+        /bigobj
+        /wd4290
+        /wd4661
+        /wd4100
+        /we4717)
+
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_compile_options(/wd4250)
+    endif()
+
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /LARGEADDRESSAWARE")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} /LARGEADDRESSAWARE")
 endif()
 
 if(UNIX)
