@@ -646,6 +646,10 @@ void QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged(
         return;
     }
 
+    // We got globalPermissionsChanged on user removing.
+    if (subject.user() && !subject.user()->resourcePool())
+        return;
+
     auto subjectNode = ensureSubjectNode(subject);
     removeNode(subjectNode);
 

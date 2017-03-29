@@ -691,11 +691,6 @@
     </message>
     <message>
         <location/>
-        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation>&quot;Cho phép hệ thống để tối ưu hóa các cài đặt máy ảnh&quot; bị vô hiệu hóa trong Quản trị hệ thống.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation>Cảnh báo! Điều này sẽ làm cho chất lượng và tỷ lệ khung hình (FPS) thiết lập trong Biểu ghi không liên quan.</translation>
     </message>
@@ -708,11 +703,6 @@
         <location/>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
         <translation>Cảnh báo! Lựa chọn chất lượng cao có thể ảnh hưởng đến CPU của bạn và hiệu suất mạng và có thể gây ra các vấn đề bổ sung.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation>Cảnh báo! Không thay đổi các thiết lập này, trừ khi bạn hoàn toàn chắc chắn về tác động tiềm năng của họ về hiệu năng hệ thống của bạn.</translation>
     </message>
     <message>
         <location/>
@@ -732,6 +722,16 @@
     <message>
         <location/>
         <source>Keep camera streams and profiles settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -900,7 +900,7 @@
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or password</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1185,7 +1185,7 @@
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots up</source>
+        <source>Run Application when PC Boots up</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1363,16 +1363,6 @@
     </message>
     <message>
         <location/>
-        <source>Select users to import</source>
-        <translation>Chọn người dùng để nhập khẩu</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Filter...</source>
-        <translation>Lọc...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Loading...</source>
         <translation>Đang tải...</translation>
     </message>
@@ -1380,6 +1370,16 @@
         <location/>
         <source>Connection error</source>
         <translation>Lôi kêt nôi</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Role to assign to imported users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable imported users</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1904,7 +1904,7 @@
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or password</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1935,11 +1935,6 @@
     </message>
     <message>
         <location/>
-        <source>The new system will have password and name from the system:</source>
-        <translation>Hệ thống mới sẽ có mật khẩu và tên từ hệ thống:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Check</source>
         <translation>kiểm tra</translation>
     </message>
@@ -1952,6 +1947,11 @@
         <location/>
         <source>Login:</source>
         <translation type="unfinished">Đăng nhập:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>The new System will have password and name from System:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2004,13 +2004,13 @@
     </message>
     <message>
         <location/>
-        <source>Removing this connection option could lead to system malfunction.</source>
-        <translation>Loại bỏ các tùy chọn kết nối này có thể dẫn đến hệ thống bị trục trặc.</translation>
+        <source>Add</source>
+        <translation type="unfinished">thêm</translation>
     </message>
     <message>
         <location/>
-        <source>Add</source>
-        <translation type="unfinished">thêm</translation>
+        <source>Removing this connection option could lead to System malfunction.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2032,11 +2032,6 @@
     </message>
     <message>
         <location/>
-        <source>Applying system updates at the end of the week is not recommended.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Updating to...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2048,6 +2043,11 @@
     <message>
         <location/>
         <source>You have the latest version installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applying System updates at the end of the week is not recommended.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2083,13 +2083,13 @@
     </message>
     <message>
         <location/>
-        <source>Warning: file with same name already exists!</source>
-        <translation>Cảnh báo: file có cùng tên đã tồn tại!</translation>
+        <source>Options</source>
+        <translation>Tùy chọn</translation>
     </message>
     <message>
         <location/>
-        <source>Options</source>
-        <translation>Tùy chọn</translation>
+        <source>Warning: file with the same name already exists!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2788,7 +2788,7 @@
     <message>
         <location/>
         <source>System time is synchronized with the Internet and is independent from server local time.
-Selected server will be used as a time server if the system has no Internet access.</source>
+Selected server will be used as a time server if System has no Internet access.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_TW" sourcelanguage="en">
+<TS version="2.1" language="zh-TW" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -92,7 +92,7 @@
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Bookmark</source>
-        <translation>書籤</translation>
+        <translation>寫入書籤</translation>
     </message>
     <message>
         <source>Panic recording</source>
@@ -100,7 +100,7 @@
     </message>
     <message>
         <source>Write to log</source>
-        <translation>寫入至記錄</translation>
+        <translation>寫入至日誌</translation>
     </message>
     <message>
         <source>Show notification</source>
@@ -333,7 +333,7 @@
     </message>
     <message>
         <source>Execute PTZ preset</source>
-        <translation>移動至PTZ預設點</translation>
+        <translation>移動PTZ至預設點</translation>
     </message>
     <message>
         <source>Show text overlay</source>
