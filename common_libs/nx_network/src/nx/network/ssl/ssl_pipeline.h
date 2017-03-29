@@ -28,11 +28,11 @@ public:
     virtual int write(const void* data, size_t count) override;
     virtual int read(void* data, size_t count) override;
 
+    virtual bool eof() const override;
+    virtual bool failed() const override;
+
     bool isReadThirsty() const;
     bool isWriteThirsty() const;
-
-    bool eof() const;
-    bool failed() const;
 
     void shutdown();
 

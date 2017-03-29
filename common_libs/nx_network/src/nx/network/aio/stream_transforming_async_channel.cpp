@@ -47,7 +47,8 @@ void StreamTransformingAsyncChannel::readSomeAsync(
     post(
         [this, buffer, handler = std::move(handler)]() mutable
         {
-            postUserReadTask(buffer, std::move(handler));
+            m_userTaskQueue.push_back(
+                std::make_unique<ReadTask>(buffer, std::move(handler)));
             tryToCompleteNextUserTask();
         });
 }
@@ -61,7 +62,8 @@ void StreamTransformingAsyncChannel::sendAsync(
     post(
         [this, &buffer, handler = std::move(handler)]() mutable
         {
-            postUserWriteTask(buffer, std::move(handler));
+            m_userTaskQueue.push_back(
+                std::make_unique<WriteTask>(buffer, std::move(handler)));
             tryToCompleteNextUserTask();
         });
 }
@@ -105,7 +107,7 @@ int StreamTransformingAsyncChannel::writeRawBytes(const void* data, size_t count
     {
         m_rawDataChannel->sendAsync(
             m_rawWriteQueue.front(),
-            std::bind(&StreamTransformingAsyncChannel::onDataWritten, this, _1, _2));
+            std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
     }
 
     return (int)count;
@@ -142,34 +144,37 @@ void StreamTransformingAsyncChannel::readRawChannelAsync()
     m_rawDataReadBuffer.reserve(kRawReadBufferSize);
     m_rawDataChannel->readSomeAsync(
         &m_rawDataReadBuffer,
-        std::bind(&StreamTransformingAsyncChannel::onSomeDataRead, this, _1, _2));
+        std::bind(&StreamTransformingAsyncChannel::onSomeRawDataRead, this, _1, _2));
     m_asyncReadInProgress = true;
-}
-
-void StreamTransformingAsyncChannel::postUserReadTask(
-    nx::Buffer* const buffer,
-    UserIoHandler handler)
-{
-    m_userTaskQueue.push_back(std::make_unique<ReadTask>(buffer, std::move(handler)));
-}
-
-void StreamTransformingAsyncChannel::postUserWriteTask(
-    const nx::Buffer& buffer,
-    UserIoHandler handler)
-{
-    m_userTaskQueue.push_back(std::make_unique<WriteTask>(buffer, std::move(handler)));
 }
 
 void StreamTransformingAsyncChannel::tryToCompleteNextUserTask()
 {
-    switch (m_userTaskQueue.front()->type)
+    //while (!m_userTaskQueue.empty())
+    {
+        UserTask* task = m_userTaskQueue.front().get();
+
+        utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
+        processTask(task);
+        if (watcher.objectDestroyed())
+            return;
+
+        NX_ASSERT(m_userTaskQueue.front().get() == task);
+        if (m_userTaskQueue.front()->status == UserTaskStatus::done)
+            m_userTaskQueue.pop_front();
+    }
+}
+
+void StreamTransformingAsyncChannel::processTask(UserTask* task)
+{
+    switch (task->type)
     {
         case UserTaskType::read:
-            processReadTask(static_cast<ReadTask*>(m_userTaskQueue.front().get()));
+            processReadTask(static_cast<ReadTask*>(task));
             break;
 
         case UserTaskType::write:
-            processWriteTask(static_cast<WriteTask*>(m_userTaskQueue.front().get()));
+            processWriteTask(static_cast<WriteTask*>(task));
             break;
 
         default:
@@ -206,8 +211,7 @@ void StreamTransformingAsyncChannel::processUserTask(
     if (sysErrorCode != SystemError::wouldBlock) //< Operation finished?
     {
         auto userHandler = std::move(task->handler);
-        NX_ASSERT(m_userTaskQueue.front().get() == task);
-        m_userTaskQueue.pop_front();
+        task->status = UserTaskStatus::done;
         userHandler(sysErrorCode, bytesTransferred);
     }
 }
@@ -238,7 +242,7 @@ std::tuple<SystemError::ErrorCode, int /*bytesTransferred*/>
     return std::make_tuple(SystemError::wouldBlock, -1);
 }
 
-void StreamTransformingAsyncChannel::onSomeDataRead(
+void StreamTransformingAsyncChannel::onSomeRawDataRead(
     SystemError::ErrorCode sysErrorCode,
     std::size_t bytesTransferred)
 {
@@ -256,7 +260,7 @@ void StreamTransformingAsyncChannel::onSomeDataRead(
     handleIoError(sysErrorCode);
 }
 
-void StreamTransformingAsyncChannel::onDataWritten(
+void StreamTransformingAsyncChannel::onRawDataWritten(
     SystemError::ErrorCode sysErrorCode,
     std::size_t /*bytesTransferred*/)
 {
@@ -267,7 +271,7 @@ void StreamTransformingAsyncChannel::onDataWritten(
     {
         m_rawDataChannel->sendAsync(
             m_rawWriteQueue.front(),
-            std::bind(&StreamTransformingAsyncChannel::onDataWritten, this, _1, _2));
+            std::bind(&StreamTransformingAsyncChannel::onRawDataWritten, this, _1, _2));
     }
 
     if (sysErrorCode == SystemError::noError)

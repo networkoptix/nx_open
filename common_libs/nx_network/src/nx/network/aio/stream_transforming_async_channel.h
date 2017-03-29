@@ -15,7 +15,7 @@ namespace aio {
 
 using UserIoHandler = std::function<void(SystemError::ErrorCode, size_t)>;
 
-class StreamTransformingAsyncChannel:
+class NX_NETWORK_API StreamTransformingAsyncChannel:
     public AbstractAsyncChannel
 {
     using base_type = AbstractAsyncChannel;
@@ -45,14 +45,22 @@ private:
         write,
     };
 
+    enum UserTaskStatus
+    {
+        inProgress,
+        done,
+    };
+
     struct UserTask
     {
         UserTaskType type;
         UserIoHandler handler;
+        UserTaskStatus status;
 
         UserTask(UserTaskType type, UserIoHandler handler):
             type(type),
-            handler(std::move(handler))
+            handler(std::move(handler)),
+            status(UserTaskStatus::inProgress)
         {
         }
     };
@@ -98,18 +106,19 @@ private:
 
     void readRawChannelAsync();
     int readRawDataFromCache(void* data, size_t count);
-    void postUserReadTask(nx::Buffer* const buffer, UserIoHandler handler);
-    void postUserWriteTask(const nx::Buffer& buffer, UserIoHandler handler);
+
     void tryToCompleteNextUserTask();
-    void StreamTransformingAsyncChannel::processReadTask(ReadTask* task);
-    void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task);
+    void processTask(UserTask* task);
+    void processReadTask(ReadTask* task);
+    void processWriteTask(WriteTask* task);
+
     template<typename TransformerFunc>
         void processUserTask(TransformerFunc func, UserTask* task);
     template<typename TransformerFunc>
     std::tuple<SystemError::ErrorCode, int /*bytesTransferred*/>
         invokeTransformer(TransformerFunc func);
-    void onSomeDataRead(SystemError::ErrorCode, std::size_t);
-    void onDataWritten(SystemError::ErrorCode, std::size_t);
+    void onSomeRawDataRead(SystemError::ErrorCode, std::size_t);
+    void onRawDataWritten(SystemError::ErrorCode, std::size_t);
     void handleIoError(SystemError::ErrorCode sysErrorCode);
 };
 
