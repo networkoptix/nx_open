@@ -8,9 +8,11 @@ import uuid
 
 BASE_CAMERA_IP_ADDRESS=0xC0A80000 # 192.168.0.0
 BASE_SERVER_IP_ADDRESS=0xA0A0000  # 10.10.0.0
+BASE_STORAGE_IP_ADDRESS=0xA002000 # 10.2.0.0
 CAMERA_SERVER_GUID_PREFIX="ca14e2a0-8e25-e200-0000"
 SERVER_GUID_PREFIX="8e25e200-0000-0000-0000"
 USER_GUID_PREFIX="58e20000-0000-0000-0000"
+STORAGE_GUID_PREFIX="81012a6e-0000-0000-0000"
 CAMERA_MAC_PREFIX="CA:14:"
 
 
@@ -24,6 +26,10 @@ def generate_server_guid(id, quoted=True):
 
 def generate_user_guid(id, quoted=True):
     guid = "%s-%012d" % (USER_GUID_PREFIX, id)
+    return "{%s}" % guid if quoted else guid
+
+def generate_storage_guid(id, quoted=True):
+    guid = "%s-%012d" % (STORAGE_GUID_PREFIX, id)
     return "{%s}" % guid if quoted else guid
 
 def generate_mac(id):
@@ -145,6 +151,23 @@ def generate_camera_user_attributes_data(camera, **kw):
         secondaryStreamQuality='SSQualityMedium'
         )
     return dict(default_camera_data, **kw)
+
+def generate_storage_data(storage_id, **kw):
+    default_storage_data = dict(
+        id=generate_storage_guid(storage_id),
+        name=generate_name('Storage', storage_id),
+        url='smb://%s' % generate_ip_v4(storage_id, BASE_STORAGE_IP_ADDRESS),
+        usedForWriting=False,
+        storageType='smb',
+        isBackup=False)
+    return dict(default_storage_data, **kw)
+
+def generate_layout_data(layout_id, **kw):
+    default_layout_data = dict(
+        id=generate_layout_guid(layout_id),
+        name=generate_name('Layout', layout_id),
+        items=[])
+    return dict(default_layout_data, **kw)
 
 def generate_mediaserver_user_attributes_data(server, **kw):
     return dict(

@@ -54,3 +54,7 @@ def datetime_utc_from_timestamp(timestamp):
 
 def datetime_utc_now():
     return datetime.utcnow().replace(tzinfo=pytz.utc)
+
+def datetime_to_str(date_time):
+  return date_time.strftime('%Y-%m-%d %H:%M:%S.%f %Z')
+
