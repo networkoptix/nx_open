@@ -111,13 +111,13 @@ def wait_backup_finish(server, expected_backup_time):
     start = time.time()
     while True:
         backup_response = server.rest_api.api.backupControl.GET()
-        backup_time_ms = float(backup_response['backupTimeMs'])
+        backup_time_ms = int(backup_response['backupTimeMs'])
         backup_state = backup_response['state']
         backup_time = utils.datetime_utc_from_timestamp(backup_time_ms / 1000.)
         log.debug("'%r' api/backupControl.backupTimeMs: '%s', expected: '%s'",
                   server.box, utils.datetime_to_str(backup_time),
                   utils.datetime_to_str(expected_backup_time))
-        if backup_state == 'BackupState_None' and backup_time != 0:
+        if backup_state == 'BackupState_None' and backup_time_ms != 0:
             assert backup_time == expected_backup_time
             return
         if time.time() - start >= BACKUP_SCHEDULE_TIMEOUT_SEC:
@@ -174,7 +174,7 @@ def test_backup_by_request(env, sample_media_file, backup_type):
 
 def test_backup_by_schedule(env, sample_media_file, backup_type):
     start_time_1 = datetime(2017, 3, 28, 9, 52, 16, tzinfo=pytz.utc)
-    start_time_2 = start_time1 + sample_media_file.duration*2
+    start_time_2 = start_time_1 + sample_media_file.duration*2
     env.one.storage.save_media_sample(env.camera, start_time_1, sample_media_file)
     env.one.storage.save_media_sample(env.camera, start_time_2, sample_media_file)
     env.one.rebuild_archive()
