@@ -1,8 +1,10 @@
 #include "io_module_grid_overlay_contents_p.h"
 
-#include <QtWidgets/QGraphicsScene>
-
 #include <array>
+
+#include <QtGui/QPainter>
+
+#include <QtWidgets/QGraphicsScene>
 
 #include <ui/style/helper.h>
 #include <ui/style/skin.h>

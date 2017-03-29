@@ -99,7 +99,7 @@ bool TitleWorkbenchPanel::isOpened() const
 
 void TitleWorkbenchPanel::setOpened(bool opened, bool animate)
 {
-    using namespace nx::client::ui::workbench;
+    using namespace nx::client::desktop::ui::workbench;
 
     ensureAnimationAllowed(&animate);
 

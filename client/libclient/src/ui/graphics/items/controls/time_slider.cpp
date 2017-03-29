@@ -10,7 +10,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
-#include <QtCore/qmath.h>
+#include <QtCore/QtMath>
 #include <QtCore/QScopedValueRollback>
 
 #include <QtGui/QPainter>

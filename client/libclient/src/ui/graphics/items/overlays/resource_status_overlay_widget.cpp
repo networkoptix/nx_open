@@ -1,5 +1,7 @@
 #include "resource_status_overlay_widget.h"
 
+#include <cmath>
+
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QPushButton>

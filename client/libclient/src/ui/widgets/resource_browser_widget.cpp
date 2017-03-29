@@ -677,7 +677,7 @@ void QnResourceBrowserWidget::hideToolTip()
     if (!m_tooltipWidget)
         return;
 
-    using namespace nx::client::ui::workbench;
+    using namespace nx::client::desktop::ui::workbench;
 
     auto animator = opacityAnimator(m_tooltipWidget);
     qnWorkbenchAnimations->setupAnimator(animator, Animations::Id::ResourcesPanelTooltipHide);
@@ -689,7 +689,7 @@ void QnResourceBrowserWidget::showToolTip()
     if (!m_tooltipWidget)
         return;
 
-    using namespace nx::client::ui::workbench;
+    using namespace nx::client::desktop::ui::workbench;
 
     auto animator = opacityAnimator(m_tooltipWidget);
     qnWorkbenchAnimations->setupAnimator(animator, Animations::Id::ResourcesPanelTooltipShow);

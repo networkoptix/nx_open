@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QSet>
+#include <QtCore/QTime>
 
 #include <array>
 

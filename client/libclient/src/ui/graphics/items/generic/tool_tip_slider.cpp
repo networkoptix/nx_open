@@ -136,7 +136,7 @@ void QnToolTipSlider::setAutoHideToolTip(bool autoHideToolTip) {
 
 void QnToolTipSlider::hideToolTip(bool animated)
 {
-    using namespace nx::client::ui::workbench;
+    using namespace nx::client::desktop::ui::workbench;
     qnWorkbenchAnimations->setupAnimator(m_tooltipWidgetVisibilityAnimator,
         Animations::Id::TimelineTooltipHide);
 
@@ -166,7 +166,7 @@ void QnToolTipSlider::setToolTipEnabled(bool enabled)
 
 void QnToolTipSlider::showToolTip(bool animated)
 {
-    using namespace nx::client::ui::workbench;
+    using namespace nx::client::desktop::ui::workbench;
     qnWorkbenchAnimations->setupAnimator(m_tooltipWidgetVisibilityAnimator,
         Animations::Id::TimelineTooltipShow);
 

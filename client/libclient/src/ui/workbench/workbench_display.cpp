@@ -197,7 +197,7 @@ void setScreenRecursive(QGraphicsItem* target, QScreen* screen)
 
 } // namespace
 
-using namespace nx::client::ui::workbench;
+using namespace nx::client::desktop::ui::workbench;
 
 QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     base_type(parent),

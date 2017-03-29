@@ -1,7 +1,8 @@
-
 #include "search_query_strategy.h"
 
 #include <boost/noncopyable.hpp>
+
+#include <QtCore/QTimerEvent>
 
 namespace
 {
@@ -111,7 +112,7 @@ void QnSearchQueryStrategy::Impl::killDelayTimer()
     }
 }
 
-/// 
+///
 
 QnSearchQueryStrategy::QnSearchQueryStrategy(QObject *parent
     , int minSymbolsCount
@@ -121,7 +122,7 @@ QnSearchQueryStrategy::QnSearchQueryStrategy(QObject *parent
 {
 }
 
-QnSearchQueryStrategy::~QnSearchQueryStrategy() 
+QnSearchQueryStrategy::~QnSearchQueryStrategy()
 {
 }
 

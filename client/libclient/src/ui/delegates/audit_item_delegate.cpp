@@ -1,5 +1,7 @@
 #include "audit_item_delegate.h"
 
+#include <QtGui/QMouseEvent>
+
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QAbstractScrollArea>
 

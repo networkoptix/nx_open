@@ -1,5 +1,7 @@
 #include "word_wrapped_label.h"
 
+#include <QtGui/QResizeEvent>
+
 namespace {
 
 const int kApproximateRowHeight = 15;

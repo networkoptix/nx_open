@@ -1,5 +1,7 @@
 #include "resizer_widget.h"
 
+#include <QtGui/QPainter>
+
 #include <QtWidgets/QStyleOptionGraphicsItem>
 
 QnResizerWidget::QnResizerWidget(Qt::Orientation orientation, QGraphicsItem *parent,

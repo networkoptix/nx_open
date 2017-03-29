@@ -1,12 +1,10 @@
 #pragma once
 
 #include <QtWidgets/QSlider>
-#include <QtWidgets/QStyle>
 
-#include <nx/utils/string.h>
-#include <utils/math/color_transformations.h>
-#include <ui/style/helper.h>
-
+class QEvent;
+class QMouseEvent;
+class QPaintEvent;
 
 /**
  * A slider that displays the space to be used on a storage.
@@ -15,118 +13,32 @@
  * This slider was used as an editor widget in server settings dialog.
  * Currently it is not used anywhere, but we want to keep it.
  */
-class QnStorageSpaceSlider: public QSlider {
+class QnStorageSpaceSlider: public QSlider
+{
     Q_OBJECT
-    typedef QSlider base_type;
+    using base_type = QSlider;
 
 public:
-    QnStorageSpaceSlider(QWidget *parent = NULL):
-        base_type(parent),
-        m_color(Qt::white)
-    {
-        setOrientation(Qt::Horizontal);
-        setMouseTracking(true);
-        setProperty(style::Properties::kSliderLength, 0);
+    QnStorageSpaceSlider(QWidget* parent = nullptr);
 
-        setTextFormat(lit("%1"));
+    const QColor& color() const;
+    void setColor(const QColor& color);
 
-        connect(this, SIGNAL(sliderPressed()), this, SLOT(update()));
-        connect(this, SIGNAL(sliderReleased()), this, SLOT(update()));
-    }
+    QString text() const;
+    QString textFormat() const;
+    void setTextFormat(const QString& textFormat);
 
-    const QColor &color() const {
-        return m_color;
-    }
-
-    void setColor(const QColor &color) {
-        m_color = color;
-    }
-
-    QString text() const {
-        //TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
-        const qint64 bytesInMiB = 1024 * 1024;
-
-        if(!m_textFormatHasPlaceholder) {
-            return m_textFormat;
-        } else {
-            if(isSliderDown()) {
-                return formatSize(sliderPosition() * bytesInMiB);
-            } else {
-                return lit("%1%").arg(static_cast<int>(relativePosition() * 100));
-            }
-        }
-    }
-
-    QString textFormat() const {
-        return m_textFormat;
-    }
-
-    void setTextFormat(const QString &textFormat) {
-        if(m_textFormat == textFormat)
-            return;
-
-        m_textFormat = textFormat;
-        m_textFormatHasPlaceholder = textFormat.contains(QLatin1String("%1"));
-        update();
-    }
-
-    static QString formatSize(qint64 size)
-    {
-        return nx::utils::formatFileSize(size, /*precision*/ 1, /*prefixThreshold*/ 10); /*< TODO: #rvasilenko what is 10? */
-    }
+    static QString formatSize(qint64 size);
 
 protected:
-    virtual void mouseMoveEvent(QMouseEvent *event) override {
-        base_type::mouseMoveEvent(event);
-
-        if(!isEmpty()) {
-            int x = handlePos();
-            if(qAbs(x - event->pos().x()) < 6) {
-                setCursor(Qt::SplitHCursor);
-            } else {
-                unsetCursor();
-            }
-        }
-    }
-
-    virtual void leaveEvent(QEvent *event) override {
-        unsetCursor();
-
-        base_type::leaveEvent(event);
-    }
-
-    virtual void paintEvent(QPaintEvent *) override {
-        QPainter painter(this);
-        QRect rect = this->rect();
-
-        painter.fillRect(rect, palette().color(backgroundRole()));
-
-        if(!isEmpty()) {
-            int x = handlePos();
-            painter.fillRect(QRect(QPoint(0, 0), QPoint(x, rect.bottom())), m_color);
-
-            painter.setPen(withAlpha(m_color.lighter(), 128));
-            painter.drawLine(QPoint(x, 0), QPoint(x, rect.bottom()));
-        }
-
-        const int textMargin = style()->pixelMetric(QStyle::PM_FocusFrameHMargin, 0, this) + 1;
-        QRect textRect = rect.adjusted(textMargin, 0, -textMargin, 0);
-        painter.setPen(palette().color(QPalette::WindowText));
-        painter.drawText(textRect, Qt::AlignLeft | Qt::AlignVCenter, text());
-    }
+    virtual void mouseMoveEvent(QMouseEvent* event) override;
+    virtual void leaveEvent(QEvent* event) override;
+    virtual void paintEvent(QPaintEvent* event) override;
 
 private:
-    qreal relativePosition() const {
-        return isEmpty() ? 0.0 : static_cast<double>(sliderPosition() - minimum()) / (maximum() - minimum());
-    }
-
-    int handlePos() const {
-        return rect().width() * relativePosition();
-    }
-
-    bool isEmpty() const {
-        return maximum() == minimum();
-    }
+    qreal relativePosition() const;
+    int handlePos() const;
+    bool isEmpty() const;
 
 private:
     QColor m_color;

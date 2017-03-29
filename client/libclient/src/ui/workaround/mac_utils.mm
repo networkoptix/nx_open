@@ -3,7 +3,7 @@
 #include <QtWidgets/QFileDialog>
 #include <QtCore/QFile>
 #include <QtCore/QDebug>
-#include <QtCore/qmath.h>
+#include <QtCore/QtMath>
 
 #include <sys/resource.h>
 

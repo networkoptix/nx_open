@@ -5,9 +5,9 @@
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace workbench {
-namespace handlers {
 
 class LayoutToursHandler: public QObject, public QnWorkbenchContextAware
 {
@@ -21,9 +21,8 @@ private:
     void openTousLayout();
 };
 
-} // namespace handlers
 } // namespace workbench
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx
-

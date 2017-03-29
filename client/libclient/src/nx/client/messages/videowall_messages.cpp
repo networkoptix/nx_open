@@ -16,6 +16,7 @@
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace messages {
 
 void VideoWall::anotherVideoWall(QWidget* parent)
@@ -77,7 +78,7 @@ bool VideoWall::checkLocalFiles(QWidget* parent,
     return false;
 }
 
-
 } // namespace messages
+} // namespace desktop
 } // namespace client
 } // namespace nx

@@ -4,7 +4,9 @@
 
 #include <QtCore/QLibrary>
 
+#include <QtGui/QImage>
 #include <QtGui/QOpenGLFunctions>
+#include <QtGui/QPainter>
 #include <QtGui/QScreen>
 
 #include <QtWidgets/QApplication>

@@ -5,10 +5,12 @@
 #include <QtCore/QString>
 
 #include <nx/network/connection_server/multi_address_server.h>
-#include <nx/network/http/server/http_message_dispatcher.h>
-#include <nx/network/http/server/http_server_base_authentication_manager.h>
-#include <nx/network/http/server/http_server_plain_text_credentials_provider.h>
-#include <nx/network/http/server/http_stream_socket_server.h>
+
+#include "server/http_message_dispatcher.h"
+#include "server/http_server_base_authentication_manager.h"
+#include "server/http_server_plain_text_credentials_provider.h"
+#include "server/http_stream_socket_server.h"
+#include "server/handler/http_server_handler_custom.h"
 
 //-------------------------------------------------------------------------------------------------
 
@@ -71,7 +73,19 @@ public:
             });
     }
 
-    bool registerRequestProcessor(const QString& path, ProcessHttpRequestFunc func);
+    template<typename Func>
+    bool registerRequestProcessorFunc(const QString& path, Func func)
+    {
+        using RequestHandlerType = nx_http::server::handler::CustomRequestHandler<const Func&>;
+
+        return m_httpMessageDispatcher.registerRequestProcessor<RequestHandlerType>(
+            path,
+            [func = std::move(func)]() -> std::unique_ptr<RequestHandlerType>
+            {
+                return std::make_unique<RequestHandlerType>(func);
+            });
+    }
+
 
     bool registerStaticProcessor(
         const QString& path,

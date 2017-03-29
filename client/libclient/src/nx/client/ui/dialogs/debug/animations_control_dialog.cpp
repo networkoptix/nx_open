@@ -11,10 +11,11 @@
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace dialogs {
 
-using namespace nx::client::ui::workbench;
+using namespace workbench;
 
 namespace {
 
@@ -159,6 +160,7 @@ AnimationsControlDialog::AnimationsControlDialog(QWidget* parent):
 
 } // namespace dialogs
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx
 

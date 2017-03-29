@@ -34,6 +34,8 @@ namespace {
 
 }
 
+using namespace nx::client::desktop::ui;
+
 QnAxClientWindow::QnAxClientWindow(QWidget *parent)
     : base_type(parent)
     , m_parentWidget(parent)
@@ -225,8 +227,8 @@ void QnAxClientWindow::createMainWindow() {
     QnActions::IDType effectiveMaximizeActionId = QnActions::FullscreenAction;
     m_context->menu()->registerAlias(QnActions::EffectiveMaximizeAction, effectiveMaximizeActionId);
 
-    m_mainWindow.reset(new QnMainWindow(m_context.data()));
-    m_mainWindow->setOptions(m_mainWindow->options() & ~(QnMainWindow::TitleBarDraggable));
+    m_mainWindow.reset(new MainWindow(m_context.data()));
+    m_mainWindow->setOptions(m_mainWindow->options() & ~(MainWindow::TitleBarDraggable));
 
     m_mainWindow->resize(100, 100);
     m_context->setMainWindow(m_mainWindow.data());

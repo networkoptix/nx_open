@@ -1,5 +1,7 @@
 #include "workbench_layout_watcher.h"
 
+#include <QtCore/QDir>
+
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 

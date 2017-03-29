@@ -1,5 +1,8 @@
 #include "tree_combo_box.h"
 
+#include <QtGui/QKeyEvent>
+#include <QtGui/QWheelEvent>
+
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QHeaderView>
 

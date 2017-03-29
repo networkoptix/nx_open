@@ -74,6 +74,7 @@ bool showCompositeDialog(
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace messages {
 
 void Resources::layoutAlreadyExists(QWidget* parent)
@@ -277,5 +278,6 @@ bool Resources::deleteResources(QWidget* parent, const QnResourceList& resources
 }
 
 } // namespace messages
+} // namespace desktop
 } // namespace client
 } // namespace nx

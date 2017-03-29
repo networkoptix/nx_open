@@ -144,8 +144,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
         data.storageType = QnLexical::serialized(partition.type);
 
         QnStorageResourcePtr storage = QnStorageResourcePtr(
-            QnStoragePluginFactory::instance()->createStorage(data.url, false)
-            );
+            QnStoragePluginFactory::instance()->createStorage(data.url, false));
 
         if (storage)
         {
@@ -155,6 +154,10 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
 
             data.isWritable = storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable();
             data.isOnline = true;
+
+            auto fileStorage = storage.dynamicCast<QnFileStorageResource>();
+            if (fileStorage)
+                data.reservedSpace = fileStorage->calcInitialSpaceLimit();
         }
 
         result.push_back(data);

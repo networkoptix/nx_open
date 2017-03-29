@@ -1,6 +1,10 @@
 #include "software_trigger_pixmaps.h"
 
 #include <set>
+
+#include <QtCore/QDir>
+#include <QtCore/QFileInfo>
+
 #include <ui/style/skin.h>
 #include <nx/utils/string.h>
 

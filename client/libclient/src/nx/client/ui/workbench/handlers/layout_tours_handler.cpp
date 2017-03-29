@@ -10,9 +10,9 @@
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace workbench {
-namespace handlers {
 
 LayoutToursHandler::LayoutToursHandler(QObject* parent):
     base_type(parent),
@@ -66,8 +66,8 @@ void LayoutToursHandler::openTousLayout()
     menu()->trigger(QnActions::OpenSingleLayoutAction, resource);
 }
 
-} // namespace handlers
 } // namespace workbench
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx

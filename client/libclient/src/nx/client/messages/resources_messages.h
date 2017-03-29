@@ -8,6 +8,7 @@
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace messages {
 
 class Resources
@@ -34,7 +35,7 @@ public:
     static bool deleteResources(QWidget* parent, const QnResourceList& resources);
 };
 
-
 } // namespace messages
+} // namespace desktop
 } // namespace client
 } // namespace nx

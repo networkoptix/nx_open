@@ -4,6 +4,7 @@
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace dialogs {
 
@@ -17,5 +18,6 @@ public:
 
 } // namespace dialogs
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx

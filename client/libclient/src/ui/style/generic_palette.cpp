@@ -1,5 +1,7 @@
 #include "generic_palette.h"
 
+#include <QtCore/QtMath>
+
 const int QnPaletteColor::kMaxAlpha = 255;
 
 uint qHash(const QColor &color)

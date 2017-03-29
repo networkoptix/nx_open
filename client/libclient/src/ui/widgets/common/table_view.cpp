@@ -1,5 +1,7 @@
 #include "table_view.h"
 
+#include <QtGui/QPainter>
+
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QScrollBar>
 

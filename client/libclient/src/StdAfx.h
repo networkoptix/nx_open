@@ -55,26 +55,6 @@ extern "C" {
 #include <QtCore/QList>
 #include <QtCore/QMap>
 
-#include <QtGui/QColor>
-#include <QtCore/QDateTime>
-#include <QtCore/QDir>
-#include <QtGui/QFont>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QPaintEngine>
-#include <QtGui/QPainter>
-
-#include <QtCore/QPoint>
-#include <QtCore/QPointF>
-
-#include <QtCore/QQueue>
-#include <QtCore/QRect>
-#include <QtCore/QRectF>
-#include <QtCore/QSet>
-#include <QtCore/QSize>
-#include <QtCore/QTime>
-#include <QtCore/QTimer>
-#include <QtCore/qmath.h>
-
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <ui/dialogs/common/message_box.h>

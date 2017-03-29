@@ -1,6 +1,7 @@
 #include "videowall_manage_widget.h"
 
 #include <QtGui/QIcon>
+#include <QtGui/QMouseEvent>
 
 #include <client/client_settings.h>
 
