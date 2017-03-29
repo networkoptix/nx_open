@@ -15,7 +15,7 @@ QnVideoWallItemAccessProvider::QnVideoWallItemAccessProvider(QObject* parent):
     base_type(parent),
     m_itemAggregator(new QnLayoutItemAggregator())
 {
-    connect(commonModule()->globalPermissionsManager(),
+    connect(globalPermissionsManager(),
         &QnGlobalPermissionsManager::globalPermissionsChanged,
         this,
         &QnVideoWallItemAccessProvider::updateAccessBySubject);
@@ -38,7 +38,7 @@ QnAbstractResourceAccessProvider::Source QnVideoWallItemAccessProvider::baseSour
 bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
-    if (!commonModule()->globalPermissionsManager()->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
+    if (!globalPermissionsManager()->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
         return false;
 
     if (resource->hasFlags(Qn::layout))
@@ -59,7 +59,7 @@ void QnVideoWallItemAccessProvider::fillProviders(
     const QnResourcePtr& resource,
     QnResourceList& providers) const
 {
-    if (!commonModule()->globalPermissionsManager()->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
+    if (!globalPermissionsManager()->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
         return;
 
     if (resource->hasFlags(Qn::layout))

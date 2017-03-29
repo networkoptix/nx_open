@@ -76,7 +76,7 @@ void QnBaseResourceAccessProvider::beforeUpdate()
 
 void QnBaseResourceAccessProvider::afterUpdate()
 {
-    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
+    for (const auto& subject : resourceAccessSubjectsCache()->allSubjects())
         updateAccessBySubject(subject);
 }
 
@@ -101,7 +101,7 @@ void QnBaseResourceAccessProvider::updateAccessToResource(const QnResourcePtr& r
     if (isUpdating())
         return;
 
-    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
+    for (const auto& subject : resourceAccessSubjectsCache()->allSubjects())
         updateAccess(subject, resource);
 }
 
@@ -145,7 +145,7 @@ void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& s
 
     if (subject.isRole())
     {
-        for (const auto& dependent: qnResourceAccessSubjectsCache->usersInRole(subject.role().id))
+        for (const auto& dependent: resourceAccessSubjectsCache()->usersInRole(subject.role().id))
             updateAccess(dependent, resource);
     }
 }
@@ -187,7 +187,7 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
         handleSubjectRemoved(user);
 
-    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
+    for (const auto& subject : resourceAccessSubjectsCache()->allSubjects())
     {
         if (subject.id() == resourceId)
             continue;
@@ -217,7 +217,7 @@ void QnBaseResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserRoleData&
         return;
 
     handleSubjectRemoved(userRole);
-    for (auto subject : qnResourceAccessSubjectsCache->usersInRole(userRole.id))
+    for (auto subject : resourceAccessSubjectsCache()->usersInRole(userRole.id))
         updateAccessBySubject(subject);
 }
 

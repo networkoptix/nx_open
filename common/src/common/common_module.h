@@ -23,7 +23,6 @@ class QnModuleFinder;
 class QnRouter;
 class QnGlobalSettings;
 class QnCameraHistoryPool;
-class QnGlobalPermissionsManager;
 class QnCommonMessageProcessor;
 class QnResourceAccessManager;
 class QnResourceAccessProvider;
@@ -100,11 +99,6 @@ public:
         return m_cameraHistory;
     }
 
-    QnGlobalPermissionsManager* globalPermissionsManager() const
-    {
-        return m_globalPermissionManager;
-    }
-
     QnRuntimeInfoManager* runtimeInfoManager() const
     {
         return m_runtimeInfoManager;
@@ -118,11 +112,6 @@ public:
     QnResourceAccessProvider* resourceAccessProvider() const
     {
         return m_resourceAccessProvider;
-    }
-
-    QnLicensePool* licensePool() const
-    {
-        return m_licensePool;
     }
 
     void setModuleGUID(const QnUuid& guid) { m_uuid = guid; }
@@ -224,10 +213,8 @@ private:
 
     QnGlobalSettings* m_globalSettings = nullptr;
     QnCameraHistoryPool* m_cameraHistory = nullptr;
-    QnGlobalPermissionsManager* m_globalPermissionManager = nullptr;
     QnCommonMessageProcessor* m_messageProcessor = nullptr;
     QnRuntimeInfoManager* m_runtimeInfoManager = nullptr;
     QnResourceAccessManager* m_resourceAccessManager = nullptr;
     QnResourceAccessProvider* m_resourceAccessProvider = nullptr;
-    QnLicensePool* m_licensePool = nullptr;
 };

@@ -15,7 +15,10 @@
 #include <core/resource/videowall_resource.h>
 
 #include <core/resource_management/resource_pool.h>
+
 #include <common/common_module.h>
+
+#include <licensing/license_validator.h>
 
 
 //#define QN_NO_LICENSE_CHECK
@@ -113,7 +116,8 @@ QnLicenseUsageHelper::Cache::Cache() {
 QnLicenseUsageHelper::QnLicenseUsageHelper(QObject *parent):
     base_type(parent),
     QnCommonModuleAware(parent),
-    m_dirty(true)
+    m_dirty(true),
+    m_validator(new QnLicenseValidator(this))
 {
 }
 
@@ -195,7 +199,7 @@ void QnLicenseUsageHelper::updateCache() const {
 
     /* Calculate total licenses. */
     for (Qn::LicenseType lt: licenseTypes())
-        m_cache.total[lt] = m_cache.licenses.totalLicenseByType(lt);
+        m_cache.total[lt] = m_cache.licenses.totalLicenseByType(lt, m_validator);
 
     /* Calculate used licenses with and without proposed cameras (to get proposed value as difference). */
     calculateUsedLicenses(basicUsedLicenses, m_cache.used);

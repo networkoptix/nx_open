@@ -53,7 +53,7 @@ QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) 
         &QnResourceAccessManager::updatePermissions);
 
     connect(
-        commonModule()->globalPermissionsManager(),
+        globalPermissionsManager(),
         &QnGlobalPermissionsManager::globalPermissionsChanged,
         this,
         &QnResourceAccessManager::updatePermissionsBySubject);
@@ -116,21 +116,21 @@ void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubje
 Qn::GlobalPermissions QnResourceAccessManager::globalPermissions(
     const QnResourceAccessSubject& subject) const
 {
-    return commonModule()->globalPermissionsManager()->globalPermissions(subject);
+    return globalPermissionsManager()->globalPermissions(subject);
 }
 
 bool QnResourceAccessManager::hasGlobalPermission(
     const Qn::UserAccessData& accessRights,
     Qn::GlobalPermission requiredPermission) const
 {
-    return commonModule()->globalPermissionsManager()->hasGlobalPermission(accessRights, requiredPermission);
+    return globalPermissionsManager()->hasGlobalPermission(accessRights, requiredPermission);
 }
 
 bool QnResourceAccessManager::hasGlobalPermission(
     const QnResourceAccessSubject& subject,
     Qn::GlobalPermission requiredPermission) const
 {
-    return commonModule()->globalPermissionsManager()->hasGlobalPermission(subject, requiredPermission);
+    return globalPermissionsManager()->hasGlobalPermission(subject, requiredPermission);
 }
 
 Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubject& subject,
@@ -282,7 +282,7 @@ void QnResourceAccessManager::recalculateAllPermissions()
     if (isUpdating())
         return;
 
-    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
+    for (const auto& subject : resourceAccessSubjectsCache()->allSubjects())
         updatePermissionsBySubject(subject);
 }
 
@@ -300,7 +300,7 @@ void QnResourceAccessManager::updatePermissionsToResource(const QnResourcePtr& r
     if (isUpdating())
         return;
 
-    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
+    for (const auto& subject : resourceAccessSubjectsCache()->allSubjects())
         updatePermissions(subject, resource);
 }
 
@@ -346,7 +346,7 @@ void QnResourceAccessManager::handleResourceRemoved(const QnResourcePtr& resourc
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
         handleSubjectRemoved(user);
 
-    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
+    for (const auto& subject : resourceAccessSubjectsCache()->allSubjects())
     {
         PermissionKey key(subject.id(), resourceId);
         {

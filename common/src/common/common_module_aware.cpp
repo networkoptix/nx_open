@@ -1,6 +1,15 @@
 #include "common_module_aware.h"
 #include "common_module.h"
 
+
+//TODO: #GDM #3.1 think how to get rid of these includes
+#include <core/resource_access/resource_access_subjects_cache.h>
+#include <core/resource_access/global_permissions_manager.h>
+
+#include <core/resource_management/resource_pool.h>
+
+#include <licensing/license.h>
+
 QnCommonModuleAware::QnCommonModuleAware(QnCommonModule* commonModule)
 {
     init(commonModule);
@@ -37,11 +46,29 @@ QnCommonModule* QnCommonModuleAware::commonModule() const
 QnLicensePool* QnCommonModuleAware::licensePool() const
 {
     NX_ASSERT(m_commonModule);
-    return m_commonModule ? m_commonModule->licensePool() : nullptr;
+    return m_commonModule ? m_commonModule->instance<QnLicensePool>() : nullptr;
 }
 
 QnRuntimeInfoManager* QnCommonModuleAware::runtimeInfoManager() const
 {
     NX_ASSERT(m_commonModule);
     return m_commonModule ? m_commonModule->runtimeInfoManager() : nullptr;
+}
+
+QnResourcePool* QnCommonModuleAware::resourcePool() const
+{
+    NX_ASSERT(m_commonModule);
+    return m_commonModule ? m_commonModule->resourcePool() : nullptr;
+}
+
+QnResourceAccessSubjectsCache* QnCommonModuleAware::resourceAccessSubjectsCache() const
+{
+    NX_ASSERT(m_commonModule);
+    return m_commonModule ? m_commonModule->instance<QnResourceAccessSubjectsCache>() : nullptr;
+}
+
+QnGlobalPermissionsManager* QnCommonModuleAware::globalPermissionsManager() const
+{
+    NX_ASSERT(m_commonModule);
+    return m_commonModule ? m_commonModule->instance<QnGlobalPermissionsManager>() : nullptr;
 }

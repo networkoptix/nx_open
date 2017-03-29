@@ -957,7 +957,7 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
 
     for (const auto& userRole: userRoles)
     {
-        for (const auto& subject: qnResourceAccessSubjectsCache->usersInRole(userRole.id))
+        for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(userRole.id))
         {
             const auto& user = subject.user();
             NX_ASSERT(user);

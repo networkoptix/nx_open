@@ -422,7 +422,8 @@ QList<QByteArray> QnLicenseListHelper::allLicenseKeys() const {
     return m_licenseDict.keys();
 }
 
-int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType, bool ignoreValidity) const
+int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType,
+    QnLicenseValidator* validator) const
 {
     if (licenseType == Qn::LC_Free)
         return std::numeric_limits<int>::max();
@@ -431,10 +432,13 @@ int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType, bool ig
 
     for (const QnLicensePtr& license: m_licenseDict.values())
     {
-        if (license->type() == licenseType
-            && (ignoreValidity || license->isValid())
-            )
-            result += license->cameraCount();
+        if (license->type() != licenseType)
+            continue;
+
+        if (validator && !validator->isValid(license))
+            continue;
+
+        result += license->cameraCount();
     }
     return result;
 }

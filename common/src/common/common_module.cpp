@@ -122,8 +122,7 @@ qint64 BeforeRestoreDbData::getSpaceLimitForStorage(const QString& url) const
 
 QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
     QObject(parent),
-    m_messageProcessor(nullptr),
-    m_licensePool(new QnLicensePool(this))
+    m_messageProcessor(nullptr)
 {
     Q_INIT_RESOURCE(common);
 
@@ -142,6 +141,7 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
     m_moduleFinder = new QnModuleFinder(this, clientMode);
     m_router = new QnRouter(this, m_moduleFinder);
 
+    instance<QnLicensePool>();
     instance<QnSyncTime>();
     instance<QnCameraUserAttributePool>();
     instance<QnMediaServerUserAttributesPool>();
@@ -158,7 +158,7 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
 
     m_resourceAccessProvider = new QnResourceAccessProvider(this);   /*< Depends on respool, roles and shared resources. */
 
-    m_globalPermissionManager = new QnGlobalPermissionsManager(this); /* Depends on respool. */
+    instance<QnGlobalPermissionsManager>(); /* Depends on respool. */
     m_runtimeInfoManager = new QnRuntimeInfoManager(this);
 
     /* Some of base providers depend on QnGlobalPermissionsManager and QnSharedResourcesManager. */

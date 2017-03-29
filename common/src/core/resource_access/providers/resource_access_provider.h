@@ -66,4 +66,3 @@ private:
 private:
     QList<QnAbstractResourceAccessProvider*> m_providers;
 };
-

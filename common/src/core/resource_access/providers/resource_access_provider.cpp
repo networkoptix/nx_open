@@ -120,7 +120,7 @@ void QnResourceAccessProvider::endUpdateInternal()
 
 void QnResourceAccessProvider::afterUpdate()
 {
-    for (const auto& subject: qnResourceAccessSubjectsCache->allSubjects())
+    for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
     {
         for (const QnResourcePtr& resource: commonModule()->resourcePool()->getResources())
         {

@@ -50,7 +50,7 @@ void QnSharedResourcesManager::reset(const ec2::ApiAccessRightsDataList& accessi
         }
     }
 
-    for (const auto& subject: qnResourceAccessSubjectsCache->allSubjects())
+    for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
     {
         auto oldValues = oldValuesMap.value(subject.id());
         auto newValues = sharedResources(subject);
@@ -124,7 +124,7 @@ void QnSharedResourcesManager::handleRoleAddedOrUpdated(const ec2::ApiUserRoleDa
 void QnSharedResourcesManager::handleRoleRemoved(const ec2::ApiUserRoleData& userRole)
 {
     handleSubjectRemoved(userRole);
-    for (auto subject: qnResourceAccessSubjectsCache->usersInRole(userRole.id))
+    for (auto subject: resourceAccessSubjectsCache()->usersInRole(userRole.id))
         setSharedResourcesInternal(subject, kEmpty);
 }
 

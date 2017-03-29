@@ -74,5 +74,3 @@ private:
     mutable QnMutex m_mutex;
     QHash<QnUuid, Qn::GlobalPermissions> m_cache;
 };
-
-#define qnGlobalPermissionsManager QnGlobalPermissionsManager::instance()

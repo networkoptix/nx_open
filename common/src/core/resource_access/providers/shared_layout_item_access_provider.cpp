@@ -193,7 +193,7 @@ void QnSharedLayoutItemAccessProvider::updateAccessToLayout(const QnLayoutResour
         return;
 
     const auto layoutId = layout->getId();
-    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
+    for (const auto& subject : resourceAccessSubjectsCache()->allSubjects())
     {
         auto shared = qnSharedResourcesManager->sharedResources(subject);
         if (!shared.contains(layoutId))

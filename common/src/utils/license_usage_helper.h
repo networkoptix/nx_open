@@ -120,6 +120,8 @@ private:
     };
 
     mutable Cache m_cache;
+
+    QnLicenseValidator* m_validator;
 };
 
 class QnCamLicenseUsageWatcher: public QnLicenseUsageWatcher {
