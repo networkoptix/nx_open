@@ -126,8 +126,8 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
             return qnSkin->maximumSize(option.icon);
         });
 
-    indirectAccessDelegate->setCustomPaint(
-        [](QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index)
+    const auto basePainter =
+        [this](QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index)
         {
             option.widget->style()->drawPrimitive(QStyle::PE_PanelItemViewItem,
                 &option, painter, option.widget);
@@ -135,7 +135,36 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
                 option.state.testFlag(QStyle::State_Selected)
                     ? QIcon::Normal
                     : QIcon::Disabled);
-        });
+        };
+
+    #if defined(Q_OS_MACX)
+        /**
+          * Workaround for incorrect selection behaviour on MacOS. For some reason QTreeview
+          * assumes that column 0 and 2 are selected, but column 1 is not.
+          */
+        const auto painter =
+            [this, basePainter](QPainter* painter,
+                const QStyleOptionViewItem& option,
+                const QModelIndex& index)
+            {
+                QStyleOptionViewItem fixedOption = option;
+                const auto indices = ui->resourcesTreeView->selectionModel()->selectedIndexes();
+                for (const auto selected: indices)
+                {
+                    if (selected.row() == index.row())
+                    {
+                        fixedOption.state |= QStyle::State_Selected;
+                        break;
+                    }
+                }
+
+                basePainter(painter, fixedOption, index);
+            };
+    #else
+        const auto& painter = base;
+    #endif
+
+    indirectAccessDelegate->setCustomPaint(painter);
 
     ui->resourcesTreeView->setItemDelegateForColumn(
         QnAccessibleResourcesModel::IndirectAccessColumn,
@@ -316,6 +345,7 @@ void QnAccessibleResourcesWidget::initControlsModel()
             m_controlsModel->index(0, QnResourceListModel::CheckColumn);
 
         bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
+        ui->resourcesTreeView->selectionModel()->reset();
         ui->resourcesTreeView->setEnabled(!checked);
         ui->filter->setEnabled(!checked);
         emit controlsChanged(checked);
