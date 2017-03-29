@@ -2219,7 +2219,7 @@ const QnSpeedRange& QnMediaResourceWidget::availableSpeedRange()
 * Software Triggers
 */
 
-QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createRelevantTrigger(
+QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRelevant(
     const QnBusinessEventRulePtr& rule)
 {
     NX_ASSERT(!m_softwareTriggers.contains(rule->id()));
@@ -2310,7 +2310,7 @@ void QnMediaResourceWidget::resetTriggers()
 
     /* Create new relevant triggers: */
     for (const auto& rule: QnCommonMessageProcessor::instance()->businessRules())
-        createRelevantTrigger(rule); //< creates a trigger only if the rule is relevant
+        createTriggerIfRelevant(rule); //< creates a trigger only if the rule is relevant
 }
 
 void QnMediaResourceWidget::at_businessRuleDeleted(const QnUuid& id)
@@ -2329,7 +2329,7 @@ void QnMediaResourceWidget::at_businessRuleChanged(const QnBusinessEventRulePtr&
     if (iter == m_softwareTriggers.end())
     {
         /* Create trigger if the rule is relevant: */
-        createRelevantTrigger(rule);
+        createTriggerIfRelevant(rule);
     }
     else
     {
@@ -2337,7 +2337,7 @@ void QnMediaResourceWidget::at_businessRuleChanged(const QnBusinessEventRulePtr&
         at_businessRuleDeleted(rule->id());
 
         /* Recreate trigger if the rule is still relevant: */
-        createRelevantTrigger(rule);
+        createTriggerIfRelevant(rule);
     }
 };
 

@@ -263,7 +263,7 @@ private:
         QnUuid overlayItemId;
     };
 
-    SoftwareTrigger* createRelevantTrigger(const QnBusinessEventRulePtr& rule);
+    SoftwareTrigger* createTriggerIfRelevant(const QnBusinessEventRulePtr& rule);
     bool isRelevantTriggerRule(const QnBusinessEventRulePtr& rule) const;
     void configureTriggerButton(QnSoftwareTriggerButton* button, const SoftwareTriggerInfo& info);
     void resetTriggers();
