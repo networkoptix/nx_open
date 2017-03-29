@@ -509,11 +509,12 @@ static int freeGB(QString drive)
 }
 #endif
 
-static QStringList listRecordFolders()
+static QStringList listRecordFolders(bool includeNetwork = false)
 {
     QStringList folderPaths;
 
 #ifdef Q_OS_WIN
+    (void)includeNetwork;
     for (const WinDriveInfo& drive: getWinDrivesInfo())
     {
         if (!(drive.access | WinDriveInfo::Writable) || drive.type != DRIVE_FIXED)
@@ -525,9 +526,11 @@ static QStringList listRecordFolders()
 #endif
 
 #ifdef Q_OS_LINUX
-    QList<QnPlatformMonitor::PartitionSpace> partitions =
-        qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
-            QnPlatformMonitor::LocalDiskPartition);
+    QnPlatformMonitor::PartitionTypes searchFlags = QnPlatformMonitor::LocalDiskPartition;
+    if (includeNetwork)
+        searchFlags |= QnPlatformMonitor::NetworkPartition;
+
+    auto partitions = qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(searchFlags);
 
     //always adding storage in data dir
     const QString& dataDirStorage = QDir::cleanPath(getDataDirectory() + "/data");
@@ -731,7 +734,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
                     return result;
                 }(),
-                listRecordFolders());
+                listRecordFolders(true));
 
         storagesToRemove.append(unMountedStorages);
 
@@ -2176,6 +2179,11 @@ void MediaServerProcess::run()
         nx_ms_conf::ALLOWED_SSL_VERSIONS, QString()).toString();
     if (!allowedSslVersions.isEmpty())
         nx::network::SslEngine::setAllowedServerVersions(allowedSslVersions.toUtf8());
+
+    const auto allowedSslCiphers = MSSettings::roSettings()->value(
+        nx_ms_conf::ALLOWED_SSL_CIPHERS, QString()).toString();
+    if (!allowedSslCiphers.isEmpty())
+        nx::network::SslEngine::setAllowedServerCiphers(allowedSslCiphers.toUtf8());
 
     nx::network::SslEngine::useOrCreateCertificate(
         MSSettings::roSettings()->value(

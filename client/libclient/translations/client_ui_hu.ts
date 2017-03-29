@@ -239,7 +239,7 @@
     <message>
         <location/>
         <source>Email settings</source>
-        <translation>E-mail beállítások</translation>
+        <translation>Email beállítások</translation>
     </message>
     <message>
         <location/>
@@ -417,7 +417,7 @@
     <message>
         <location/>
         <source>at</source>
-        <translation>-</translation>
+        <translation>itt</translation>
     </message>
     <message>
         <location/>
@@ -589,7 +589,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
         <source>about:blank</source>
-        <translation>névjegy: üres</translation>
+        <translation type="unfinished">about:blank</translation>
     </message>
     <message>
         <location/>
@@ -895,7 +895,7 @@
     <message>
         <location/>
         <source>Incorrect Email or Password</source>
-        <translation>Hibás e-mail cím vagy jelszó</translation>
+        <translation>Hibás Email cím vagy jelszó</translation>
     </message>
 </context>
 <context>
@@ -1899,7 +1899,7 @@
     <message>
         <location/>
         <source>Incorrect Email or Password</source>
-        <translation>Hibás e-mail cím vagy jelszó</translation>
+        <translation>Hibás Email cím vagy jelszó</translation>
     </message>
 </context>
 <context>
@@ -2586,7 +2586,7 @@
     <message>
         <location filename="../src/ui/widgets/system_settings/smtp/smtp_settings_widget.ui"/>
         <source>Outgoing Email Settings</source>
-        <translation>Kimenő email beállítások</translation>
+        <translation>Kimenő Email beállítások</translation>
     </message>
     <message>
         <location/>

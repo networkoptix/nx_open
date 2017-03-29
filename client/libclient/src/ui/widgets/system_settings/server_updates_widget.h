@@ -1,12 +1,12 @@
 #pragma once
 
+#include <QtCore/QUrl>
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
-#include <ui_server_updates_widget.h>
 
 #include <utils/common/id.h>
 #include <utils/common/software_version.h>
@@ -17,6 +17,10 @@ class QnServerUpdatesModel;
 class QnMediaServerUpdateTool;
 struct QnLowFreeSpaceWarning;
 
+namespace Ui {
+    class QnServerUpdatesWidget;
+} // namespace Ui
+
 class QnServerUpdatesWidget: public QnAbstractPreferencesWidget, public QnSessionAwareDelegate
 {
     Q_OBJECT
@@ -24,6 +28,7 @@ class QnServerUpdatesWidget: public QnAbstractPreferencesWidget, public QnSessio
 
 public:
     QnServerUpdatesWidget(QWidget* parent = nullptr);
+    ~QnServerUpdatesWidget();
 
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
@@ -42,7 +47,6 @@ public:
     virtual bool canApplyChanges() const override;
     virtual bool canDiscardChanges() const override;
 
-private slots:
     void at_updateFinished(const QnUpdateResult& result);
 
     void at_tool_stageChanged(QnFullUpdateStage stage);
@@ -80,7 +84,6 @@ private:
 
 private:
     QScopedPointer<Ui::QnServerUpdatesWidget> ui;
-
 
     Mode m_mode = Mode::LatestVersion;
 

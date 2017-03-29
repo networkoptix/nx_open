@@ -482,6 +482,7 @@ void QnStorageConfigWidget::loadDataToUi()
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     loadStoragesFromResources();
     m_backupSchedule = m_server->getBackupSchedule();
+    m_camerasToBackup = getCurrentSelectedCameras();
 
     updateDisabledStoragesWarning(false);
 

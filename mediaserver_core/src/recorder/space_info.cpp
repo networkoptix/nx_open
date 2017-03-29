@@ -19,7 +19,6 @@ void SpaceInfo::storageAdded(int index, int64_t totalSpace)
     QnMutexLocker lock(&m_mutex);
     auto storageIndexIt = storageByIndex(index);
     bool storageIndexNotFound = storageIndexIt == m_storageSpaceInfo.cend();
-    NX_ASSERT(storageIndexNotFound);
 
     if (!storageIndexNotFound)
     {

@@ -1539,13 +1539,6 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
         result = true;
     }
 
-    QString localParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(this->toSharedPointer());
-    QString sourceParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(source);
-    if (localParams != sourceParams) {
-        QnCameraAdvancedParamsReader::setEncodedParamsToResource(this->toSharedPointer(), sourceParams);
-        result = true;
-    }
-
     return result;
 }
 

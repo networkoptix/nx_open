@@ -267,33 +267,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-        <source>Zoom In</source>
-        <translation>Heranzoomen</translation>
-    </message>
-    <message>
-        <source>Zoom Out</source>
-        <translation>Herauszoomen</translation>
-    </message>
-    <message>
-        <source>Focus Far</source>
-        <translation>Fokus fern</translation>
-    </message>
-    <message>
-        <source>Focus Near</source>
-        <translation>Fokus nah</translation>
-    </message>
-    <message>
-        <source>Auto Focus</source>
-        <translation>Auto-Fokus</translation>
-    </message>
-    <message>
-        <source>Change Dewarping Mode</source>
-        <translation>Ändern des Dewarping-Modus</translation>
-    </message>
-</context>
-<context>
     <name>QObject</name>
     <message>
         <source>Parameter 1 is null.</source>
@@ -853,11 +826,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Layout Settings...</source>
-        <translation>Layout-Einstellungen...</translation>
+        <translation>Layouteinstellungen...</translation>
     </message>
     <message>
         <source>Video Wall Settings...</source>
-        <translation>Videowand-Einstellungen...</translation>
+        <translation>Videowandeinstellungen...</translation>
     </message>
     <message>
         <source>Ping...</source>
@@ -873,7 +846,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Server Settings...</source>
-        <translation>Server-Einstellungen...</translation>
+        <translation>Servereinstellungen...</translation>
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
@@ -1101,51 +1074,51 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Check Device Issues...</source>
-        <translation>Überprüfen von Geräte-Problemen...</translation>
+        <translation>Überprüfen von Geräteproblemen...</translation>
     </message>
     <message>
         <source>Check Devices Issues...</source>
-        <translation>Überprüfen von Geräte-Problemen...</translation>
+        <translation>Überprüfen von Geräteproblemen...</translation>
     </message>
     <message>
         <source>Check Camera Issues...</source>
-        <translation>Überprüfen von Kamera-Problemen...</translation>
+        <translation>Überprüfen von Kameraproblemen...</translation>
     </message>
     <message>
         <source>Check Cameras Issues...</source>
-        <translation>Überprüfen von Kamera-Problemen...</translation>
+        <translation>Überprüfen von Kameraproblemen...</translation>
     </message>
     <message>
         <source>Device Rules...</source>
-        <translation>Geräte-Regeln...</translation>
+        <translation>Geräteregeln...</translation>
     </message>
     <message>
         <source>Devices Rules...</source>
-        <translation>Geräte-Regeln...</translation>
+        <translation>Geräteregeln...</translation>
     </message>
     <message>
         <source>Camera Rules...</source>
-        <translation>Kamera-Regeln...</translation>
+        <translation>Kameraregeln...</translation>
     </message>
     <message>
         <source>Cameras Rules...</source>
-        <translation>Kamera-Regeln...</translation>
+        <translation>Kameraregeln...</translation>
     </message>
     <message>
         <source>Device Settings...</source>
-        <translation>Geräte-Einstellungen...</translation>
+        <translation>Geräteeinstellungen...</translation>
     </message>
     <message>
         <source>Devices Settings...</source>
-        <translation>Geräte-Einstellungen...</translation>
+        <translation>Geräteeinstellungen...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
-        <translation>Kamera-Einstellungen...</translation>
+        <translation>Kameraeinstellungen...</translation>
     </message>
     <message>
         <source>Cameras Settings...</source>
-        <translation>Kamera-Einstellungen...</translation>
+        <translation>Kameraeinstellungen...</translation>
     </message>
     <message>
         <source>Devices List by Server...</source>
@@ -1197,23 +1170,23 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Check I/O Modules Issues...</source>
-        <translation>I/O-Modul-Probleme prüfen...</translation>
+        <translation>I/O-Modulprobleme prüfen...</translation>
     </message>
     <message>
         <source>I/O Module Rules...</source>
-        <translation>I/O-Modul-Regeln...</translation>
+        <translation>I/O-Modulregeln...</translation>
     </message>
     <message>
         <source>I/O Modules Rules...</source>
-        <translation>I/O-Modul-Regeln...</translation>
+        <translation>I/O-Modulregeln...</translation>
     </message>
     <message>
         <source>I/O Module Settings...</source>
-        <translation>I/O-Modul-Einstellungen...</translation>
+        <translation>I/O-Moduleinstellungen...</translation>
     </message>
     <message>
         <source>I/O Modules Settings...</source>
-        <translation>I/O-Modul-Einstellungen...</translation>
+        <translation>I/O-Moduleinstellungen...</translation>
     </message>
     <message>
         <source>Remove Bookmarks...</source>
@@ -1249,11 +1222,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Event Rules...</source>
-        <translation>Ereignis-Regeln...</translation>
+        <translation>Ereignisregeln...</translation>
     </message>
     <message>
         <source>Disconnect from Server</source>
-        <translation>Server-Verbindung getrennt</translation>
+        <translation>Serververbindung getrennt</translation>
     </message>
     <message>
         <source>Browse Local Files</source>
@@ -1364,15 +1337,15 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>User settings...</source>
-        <translation>Benutzer-Einstellungen...</translation>
+        <translation>Benutzereinstellungen...</translation>
     </message>
     <message>
         <source>Server settings...</source>
-        <translation>Server-Einstellungen...</translation>
+        <translation>Servereinstellungen...</translation>
     </message>
     <message>
         <source>Camera settings...</source>
-        <translation>Kamera-Einstellungen...</translation>
+        <translation>Kameraeinstellungen...</translation>
     </message>
 </context>
 <context>
@@ -1628,7 +1601,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation>Email-Einstellungen wurden geändert</translation>
+        <translation>Emaileinstellungen wurden geändert</translation>
     </message>
     <message>
         <source>Filled circle mark means the archive is still available</source>
@@ -6358,67 +6331,67 @@ to %1</source>
     <message>
         <source>hh:mm</source>
         <comment>Format for displaying hours and minutes on timeline.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">hh:mm</translation>
     </message>
     <message>
         <source>hh:mm ap</source>
         <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">hh:mm ap</translation>
     </message>
     <message>
         <source>h ap</source>
         <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">h ap</translation>
     </message>
     <message>
         <source>dd</source>
         <comment>Format for displaying days on timeline.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd</translation>
     </message>
     <message>
         <source>MMMM</source>
         <comment>Format for displaying months on timeline.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MMMM</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying years on timeline</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">yyyy</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd MMMM yyyy hh:mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd MMMM yyyy h ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
         <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd MMMM yyyy</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
         <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MMMM yyyy</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying year caption in timeline&apos;s header</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">yyyy</translation>
     </message>
 </context>
 <context>
