@@ -90,7 +90,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
 endif()
 
 if(WIN32)
-    add_definitions(-DNOMINMAX=)
+    add_definitions(
+        -DNOMINMAX=
+        -DUNICODE)
     add_compile_options(
         /MP
         /bigobj
