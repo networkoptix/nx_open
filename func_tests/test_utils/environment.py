@@ -90,7 +90,7 @@ class EnvironmentBuilder(object):
 
     def _init_server(self, box_config_to_box, http_schema, config):
         box = box_config_to_box[config.box]
-        url = '%s://localhost:%d/' % (http_schema, config.box.rest_api_forwarded_port())
+        url = '%s://%s:%d/' % (http_schema, self._vm_host.host, config.box.rest_api_forwarded_port())
         server = Server(self._company_name, config.name, box, url)
         if config.leave_initial_cloud_host:
             patch_set_cloud_host = None

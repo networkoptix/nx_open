@@ -70,6 +70,11 @@ class Host(object):
 
     __metaclass__ = abc.ABCMeta
 
+    @property
+    @abc.abstractmethod
+    def host(self):
+        pass
+
     @abc.abstractmethod
     def run_command(self, args, input=None, cwd=None, log_output=True):
         pass
@@ -105,6 +110,10 @@ class LocalHost(Host):
 
     def __repr__(self):
         return 'LocalHost'
+
+    @property
+    def host(self):
+        return 'localhost'
 
     def run_command(self, args, input=None, cwd=None, log_output=True):
         args = map(str, args)
@@ -221,6 +230,10 @@ class RemoteSshHost(Host):
 
     def __repr__(self):
         return 'RemoteSshHost(%s)' % self
+
+    @property
+    def host(self):
+        return self._host
 
     def run_command(self, args, input=None, cwd=None, log_output=True):
         ssh_cmd = self._make_ssh_cmd() + ['{user}@{host}'.format(user=self._user, host=self._host)]

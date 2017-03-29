@@ -25,6 +25,7 @@ DEFAULT_WORK_DIR = os.path.expanduser('/tmp/funtest')
 DEFAULT_BIN_DIR = os.path.expanduser('/tmp/binaries')
 
 DEFAULT_VM_NAME_PREFIX = 'funtest-'
+DEFAULT_REST_API_FORWARDED_PORT_BASE = 17000
 
 DEFAULT_VM_HOST_USER = 'root'
 DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
@@ -57,6 +58,8 @@ def pytest_addoption(parser):
                      help='destroy and create again vagrant boxes')
     parser.addoption('--vm-name-prefix', default=DEFAULT_VM_NAME_PREFIX,
                      help='prefix for virtualenv machine names')
+    parser.addoption('--vm-port-base', default=DEFAULT_REST_API_FORWARDED_PORT_BASE,
+                     help='base REST API port forwarded to host')
     parser.addoption('--vm-host',
                      help='hostname or IP address for host with virtualbox,'
                           ' used to start virtual machines (by default it is local host)')
@@ -91,6 +94,7 @@ def run_options(request):
         reset_servers=not request.config.getoption('--no-servers-reset'),
         recreate_boxes=request.config.getoption('--recreate-boxes'),
         vm_name_prefix=request.config.getoption('--vm-name-prefix'),
+        vm_port_base=request.config.getoption('--vm-port-base'),
         vm_ssh_host_config=vm_ssh_host_config,
         vm_host_work_dir=request.config.getoption('--vm-host-dir'),
         max_log_width=request.config.getoption('--max-log-width'),
@@ -107,8 +111,8 @@ def http_schema(request):
 
 
 @pytest.fixture
-def box(customization_company_name):
-    return BoxConfigFactory(customization_company_name)
+def box(run_options, customization_company_name):
+    return BoxConfigFactory(run_options.vm_port_base, customization_company_name)
 
 @pytest.fixture
 def server(box):

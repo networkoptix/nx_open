@@ -1,6 +1,5 @@
 import logging
 import pytest
-from netaddr import IPNetwork
 from test_utils.vagrant_box_config import DEFAULT_PRIVATE_NET
 
 

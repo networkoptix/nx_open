@@ -9,7 +9,6 @@ from .utils import is_list_inst
 
 DEFAULT_NATNET1 = '10.10.0/24'
 DEFAULT_PRIVATE_NET = '10.10.1/24'
-REST_API_FORWARDED_PORT_BASE = 17000
 MEDIASERVER_LISTEN_PORT = 7001
 BOX_PROVISION_MEDIASERVER = 'box-provision-mediaserver.sh'
 MEDIASERVER_DIST_FNAME = 'mediaserver.deb'  # expected in vagrant dir
@@ -72,7 +71,8 @@ def make_vbox_host_time_disabled_command():
 
 class BoxConfigFactory(object):
 
-    def __init__(self, company_name):
+    def __init__(self, vm_port_base, company_name):
+        self._vm_port_base = vm_port_base
         self._company_name = company_name
 
     # ip_address may end with .0 (like 1.2.3.0); this will be treated as network address, and dhcp will be used for it
@@ -93,7 +93,7 @@ class BoxConfigFactory(object):
         for script in provision_scripts or []:
             vm_commands += [make_vm_provision_command(script)]
             required_file_list.append('{test_dir}/' + script)
-        return BoxConfig(name, ip_address_list, required_file_list, vm_commands, vbox_commands)
+        return BoxConfig(self._vm_port_base, name, ip_address_list, required_file_list, vm_commands, vbox_commands)
 
 
 class BoxConfig(object):
@@ -101,6 +101,7 @@ class BoxConfig(object):
     @classmethod
     def from_dict(cls, d, vm_name_prefix):
         return cls(
+            vm_port_base=d['vm_port_base'],
             name=d['name'],
             ip_address_list=map(IPNetwork, d['ip_address_list']),
             required_file_list=d['required_file_list'],
@@ -110,8 +111,9 @@ class BoxConfig(object):
             vm_name_prefix=vm_name_prefix,
             )
 
-    def __init__(self, name, ip_address_list, required_file_list, vm_commands, vbox_commands, idx=None, vm_name_prefix=None):
+    def __init__(self, vm_port_base, name, ip_address_list, required_file_list, vm_commands, vbox_commands, idx=None, vm_name_prefix=None):
         assert is_list_inst(ip_address_list, IPNetwork), repr(ip_address_list)
+        self.vm_port_base = vm_port_base
         self.name = name
         self.ip_address_list = ip_address_list
         self.required_file_list = required_file_list
@@ -130,6 +132,7 @@ class BoxConfig(object):
 
     def to_dict(self):
         return dict(
+            vm_port_base=self.vm_port_base,
             name=self.name,
             ip_address_list=map(str, self.ip_address_list),
             required_file_list=self.required_file_list,
@@ -157,7 +160,7 @@ class BoxConfig(object):
         return self.vm_name_prefix + self.box_name()
 
     def rest_api_forwarded_port(self):
-        return REST_API_FORWARDED_PORT_BASE + self.idx
+        return self.vm_port_base + self.idx
 
     def get_vagrant_config_commands(self, type):
         return [command for command in self.vagrant_config_commands if command.type() == type]
