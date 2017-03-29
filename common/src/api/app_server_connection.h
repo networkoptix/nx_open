@@ -19,9 +19,6 @@ class QnApiSerializer;
 class QN_EXPORT QnAppServerConnectionFactory
 {
 public:
-    QnAppServerConnectionFactory();
-    virtual ~QnAppServerConnectionFactory();
-
     static void setEc2Connection(const ec2::AbstractECConnectionPtr &connection );
     static ec2::AbstractECConnectionPtr ec2Connection(); // renamed to show compile errors. use commonModule->ec2Connection() instead
 
