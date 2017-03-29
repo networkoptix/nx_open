@@ -47,7 +47,7 @@ class QnRuntimeInfoManager:
 {
     Q_OBJECT
 public:
-    QnRuntimeInfoManager(QObject* parent = NULL);
+    QnRuntimeInfoManager(QObject* parent);
 
     const QnThreadsafeItemStorage<QnPeerRuntimeInfo> *items() const;
 
@@ -72,4 +72,3 @@ private:
     QScopedPointer<QnThreadsafeItemStorage<QnPeerRuntimeInfo> > m_items;
 };
 
-#define qnRuntimeInfoManager QnRuntimeInfoManager::instance()

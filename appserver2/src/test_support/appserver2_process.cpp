@@ -192,18 +192,16 @@ int Appserver2Process::exec()
 
     registerQtResources();
 
-    QnCommonModule commonModule(false);
-    commonModule.setModuleGUID(QnUuid::createUuid());
+    std::unique_ptr<QnCommonModule> commonModule(new QnCommonModule(false));
+    commonModule->setModuleGUID(QnUuid::createUuid());
 
-    QnResourceDiscoveryManager resourceDiscoveryManager(&commonModule);
+    QnResourceDiscoveryManager resourceDiscoveryManager(commonModule.get());
     // Starting receiving notifications.
-    commonModule.setMessageProcessor(new Appserver2MessageProcessor(&resourceDiscoveryManager));
-
-    QnRuntimeInfoManager runtimeInfoManager;
+    commonModule->setMessageProcessor(new Appserver2MessageProcessor(&resourceDiscoveryManager));
 
     ec2::ApiRuntimeData runtimeData;
-    runtimeData.peer.id = commonModule.moduleGUID();
-    runtimeData.peer.instanceId = commonModule.runningInstanceGUID();
+    runtimeData.peer.id = commonModule->moduleGUID();
+    runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = Qn::PT_Server;
     runtimeData.box = QnAppInfo::armBox();
     runtimeData.brand = QnAppInfo::productNameShort();
@@ -216,7 +214,7 @@ int Appserver2Process::exec()
     }
 
     runtimeData.hardwareIds << QnUuid::createUuid().toString();
-    runtimeInfoManager.updateLocalItem(runtimeData);    // initializing localInfo
+    commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
     conf::Settings settings;
     //parsing command line arguments
@@ -230,7 +228,7 @@ int Appserver2Process::exec()
 
     //initializeLogging(settings);
     std::unique_ptr<ec2::AbstractECConnectionFactory>
-        ec2ConnectionFactory(getConnectionFactory(Qn::PT_Server, &timerManager, &commonModule));
+        ec2ConnectionFactory(getConnectionFactory(Qn::PT_Server, &timerManager, commonModule.get()));
 
     std::map<QString, QVariant> confParams;
     ec2ConnectionFactory->setConfParams(std::move(confParams));
@@ -264,7 +262,7 @@ int Appserver2Process::exec()
 
     nx_http::HttpModManager httpModManager;
     QnSimpleHttpConnectionListener tcpListener(
-        &commonModule,
+        commonModule.get(),
         QHostAddress::Any,
         settings.endpoint().port,
         QnTcpListener::DEFAULT_MAX_CONNECTIONS,
@@ -285,7 +283,7 @@ int Appserver2Process::exec()
 
     tcpListener.start();
 
-    commonModule.messageProcessor()->init(QnAppServerConnectionFactory::getConnection2());
+    commonModule->messageProcessor()->init(QnAppServerConnectionFactory::getConnection2());
     //ec2Connection->startReceivingNotifications();
 
     processStartResult = true;
