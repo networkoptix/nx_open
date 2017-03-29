@@ -69,7 +69,7 @@ public:
     QnTourPtzExecutorPrivate();
     virtual ~QnTourPtzExecutorPrivate();
 
-    void init(const QnPtzControllerPtr &controller);
+    void init(const QnPtzControllerPtr &controller, QThreadPool* threadPool);
     void updateDefaults();
 
     void stopTour();
@@ -143,7 +143,7 @@ QnTourPtzExecutorPrivate::~QnTourPtzExecutorPrivate() {
     }
 }
 
-void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller)
+void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller, QThreadPool* threadPool)
 {
     baseController = controller;
     if(baseController->hasCapabilities(Qn::AsynchronousPtzCapability)) {
@@ -151,7 +151,7 @@ void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller)
     } else if(baseController->hasCapabilities(Qn::VirtualPtzCapability)) {
         usingBlockingController = true;
     } else {
-        baseController.reset(new QnThreadedPtzController(baseController));
+        baseController.reset(new QnThreadedPtzController(baseController, threadPool));
         usingThreadController = true;
 
         /* This call makes sure that thread controller lives in the same thread
@@ -359,11 +359,11 @@ void QnTourPtzExecutorPrivate::handleFinished(Qn::PtzCommand command, const QVar
 // -------------------------------------------------------------------------- //
 // QnTourPtzExecutor
 // -------------------------------------------------------------------------- //
-QnTourPtzExecutor::QnTourPtzExecutor(const QnPtzControllerPtr &controller):
+QnTourPtzExecutor::QnTourPtzExecutor(const QnPtzControllerPtr &controller, QThreadPool* threadPool):
     d(new QnTourPtzExecutorPrivate())
 {
     d->q = this;
-    d->init(controller);
+    d->init(controller, threadPool);
 
     connect(this, &QnTourPtzExecutor::startTourRequested,       this,   &QnTourPtzExecutor::at_startTourRequested,  Qt::QueuedConnection);
     connect(this, &QnTourPtzExecutor::stopTourRequested,        this,   &QnTourPtzExecutor::at_stopTourRequested,   Qt::QueuedConnection);

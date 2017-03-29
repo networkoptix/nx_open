@@ -21,10 +21,13 @@ bool deserialize(const QString& /*value*/, QnPtzTourHash* /*target*/)
 // -------------------------------------------------------------------------- //
 // QnTourPtzController
 // -------------------------------------------------------------------------- //
-QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr &baseController, QThread* executorThread):
+QnTourPtzController::QnTourPtzController(
+    const QnPtzControllerPtr &baseController,
+    QThreadPool* threadPool,
+    QThread* executorThread):
     base_type(baseController),
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(lit("ptzTours"), QnPtzTourHash(), this)),
-    m_executor(new QnTourPtzExecutor(baseController))
+    m_executor(new QnTourPtzExecutor(baseController, threadPool))
 {
     NX_ASSERT(!baseController->hasCapabilities(Qn::AsynchronousPtzCapability)); // TODO: #Elric
 

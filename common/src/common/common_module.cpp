@@ -380,3 +380,8 @@ void QnCommonModule::setMessageProcessor(QnCommonMessageProcessor* messageProces
 {
     m_messageProcessor = messageProcessor;
 }
+
+void QnCommonModule::setPtzControllerPool(QnPtzControllerPool* ptzPool)
+{
+    m_ptzPool = ptzPool;
+}

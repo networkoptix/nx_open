@@ -23,6 +23,7 @@ class QnModuleFinder;
 class QnRouter;
 class QnGlobalSettings;
 class QnCommonMessageProcessor;
+class QnPtzControllerPool;
 class QnResourceAccessManager;
 class QnResourceAccessProvider;
 
@@ -176,6 +177,9 @@ public:
     QnCommonMessageProcessor* messageProcessor() const;
     void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
 
+    QnPtzControllerPool* ptzControllerPool() const;
+    void setPtzControllerPool(QnPtzControllerPool* ptzPool);
+
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -213,6 +217,7 @@ private:
     QnGlobalSettings* m_globalSettings = nullptr;
     QnCameraHistoryPool* m_cameraHistory = nullptr;
     QnCommonMessageProcessor* m_messageProcessor = nullptr;
+    QnPtzControllerPool* m_ptzPool = nullptr;
     QnRuntimeInfoManager* m_runtimeInfoManager = nullptr;
     QnResourceAccessManager* m_resourceAccessManager = nullptr;
     QnResourceAccessProvider* m_resourceAccessProvider = nullptr;
