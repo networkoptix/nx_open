@@ -58,7 +58,7 @@ def pytest_addoption(parser):
                      help='destroy and create again vagrant boxes')
     parser.addoption('--vm-name-prefix', default=DEFAULT_VM_NAME_PREFIX,
                      help='prefix for virtualenv machine names')
-    parser.addoption('--vm-port-base', default=DEFAULT_REST_API_FORWARDED_PORT_BASE,
+    parser.addoption('--vm-port-base', type=int, default=DEFAULT_REST_API_FORWARDED_PORT_BASE,
                      help='base REST API port forwarded to host')
     parser.addoption('--vm-host',
                      help='hostname or IP address for host with virtualbox,'
