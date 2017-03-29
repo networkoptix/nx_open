@@ -620,7 +620,7 @@ struct ReadResourceAccessOut
     template<typename Param>
     RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const Param& param)
     {
-        return resourceAccessHelper(accessData, param.id, Qn::ReadPermission)
+        return resourceAccessHelper(commonModule, accessData, param.id, Qn::ReadPermission)
             ? RemotePeerAccess::Allowed
             : RemotePeerAccess::Forbidden;
     }
@@ -951,9 +951,9 @@ struct FilterListByAccess
     void operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamContainer& outList)
     {
         outList.erase(std::remove_if(outList.begin(), outList.end(),
-            [&accessData](typename ParamContainer::value_type &param)
+            [&accessData, commonModule](typename ParamContainer::value_type &param)
         {
-            return !SingleAccess()(accessData, param);
+            return !SingleAccess()(commonModule, accessData, param);
         }), outList.end());
     }
 };
@@ -967,9 +967,9 @@ struct FilterListByAccess<ModifyResourceAccess>
     void operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamContainer& outList)
     {
         outList.erase(std::remove_if(outList.begin(), outList.end(),
-            [&accessData, this](const typename ParamContainer::value_type &param)
+            [&accessData, this, commonModule](const typename ParamContainer::value_type &param)
         {
-            return !ModifyResourceAccess(isRemove)(accessData, param);
+            return !ModifyResourceAccess(isRemove)(commonModule, accessData, param);
         }), outList.end());
     }
 
@@ -1000,7 +1000,7 @@ struct ModifyListAccess
     bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamContainer& paramContainer)
     {
         ParamContainer tmpContainer = paramContainer;
-        FilterListByAccess<SingleAccess>()(accessData, tmpContainer);
+        FilterListByAccess<SingleAccess>()(commonModule, accessData, tmpContainer);
         if (paramContainer.size() != tmpContainer.size())
         {
             NX_LOG(lit("Modify list access filtered out %1 entries from %2. Transaction: %3")
@@ -1021,7 +1021,7 @@ struct ReadListAccess
     bool operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamContainer& paramContainer)
     {
         ParamContainer tmpContainer = paramContainer;
-        FilterListByAccess<SingleAccess>()(accessData, tmpContainer);
+        FilterListByAccess<SingleAccess>()(commonModule, accessData, tmpContainer);
         return tmpContainer.size() != paramContainer.size() && tmpContainer.empty();
     }
 };
@@ -1033,7 +1033,7 @@ struct ReadListAccessOut
     RemotePeerAccess operator()(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamContainer& paramContainer)
     {
         ParamContainer tmpContainer = paramContainer;
-        FilterListByAccess<SingleAccess>()(accessData, tmpContainer);
+        FilterListByAccess<SingleAccess>()(commonModule, accessData, tmpContainer);
         if (paramContainer.size() != tmpContainer.size() && tmpContainer.empty())
             return RemotePeerAccess::Forbidden;
         if (tmpContainer.size() == paramContainer.size())
