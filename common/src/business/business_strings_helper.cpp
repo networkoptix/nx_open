@@ -25,12 +25,6 @@
 #include "events/ip_conflict_business_event.h"
 #include "business_event_rule.h"
 
-
-namespace {
-    static const QString plainTextDelimiter(lit("\n"));
-    static const QString htmlDelimiter(lit("<br>"));
-}
-
 QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
     using namespace QnBusiness;
 
@@ -191,10 +185,9 @@ QString QnBusinessStringsHelper::getResoureIPFromParams(const QnBusinessEventPar
 	return result.isNull() ? params.resourceName : result;
 }
 
-QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr& action,
+QStringList QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr& action,
     const QnBusinessAggregationInfo &aggregationInfo,
-    Qn::ResourceInfoLevel detailLevel,
-    bool useHtml)
+    Qn::ResourceInfoLevel detailLevel)
 {
     QStringList result;
 
@@ -213,17 +206,10 @@ QString QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAction
             result << tr("Caption: %1").arg(params.caption);
     }
 
-    if (useHtml && eventType == QnBusiness::CameraMotionEvent)
-    {
-        result << tr("Url: %1").arg(urlForCamera(
-            params.eventResourceId, params.eventTimestampUsec, true));
-    }
-
     const auto details = aggregatedEventDetails(action, aggregationInfo);
-    if (!details.isEmpty())
-        result << details;
+    result << details;
 
-    return result.join(useHtml ? htmlDelimiter : plainTextDelimiter);
+    return result;
 }
 
 QStringList QnBusinessStringsHelper::eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount)
