@@ -126,7 +126,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
 
     QnResourcePtr source = eventSource(params);
     QnVirtualCameraResourcePtr camera = source.dynamicCast<QnVirtualCameraResource>();
-    QString resourceName = QnResourceDisplayInfo(source).toString(detailLevel);
+    QString resourceName = QnResourceDisplayInfo(commonModule(), source).toString(detailLevel);
     switch (params.eventType) {
     case UndefinedEvent:
         return tr("Undefined event has occurred on %1").arg(resourceName);
@@ -193,14 +193,14 @@ QString QnBusinessStringsHelper::eventAtResources(const QnBusinessEventParameter
 QString QnBusinessStringsHelper::getResoureNameFromParams(const QnBusinessEventParameters& params,
     Qn::ResourceInfoLevel detailLevel) const
 {
-    QString result = QnResourceDisplayInfo(eventSource(params)).toString(detailLevel);
+    QString result = QnResourceDisplayInfo(commonModule(), eventSource(params)).toString(detailLevel);
     return result.isEmpty() ? params.resourceName : result;
 }
 
 QString QnBusinessStringsHelper::getResoureIPFromParams(
     const QnBusinessEventParameters& params) const
 {
-	QString result = QnResourceDisplayInfo(eventSource(params)).host();
+	QString result = QnResourceDisplayInfo(commonModule(), eventSource(params)).host();
 	return result.isNull() ? params.resourceName : result;
 }
 

@@ -32,19 +32,23 @@ extern "C"
 
 #include <recording/stream_recorder_data.h>
 #include <boost/optional.hpp>
+#include <common/common_module_aware.h>
 
 class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;
 class QnFfmpegVideoTranscoder;
 
-class QnStreamRecorder : public QnAbstractDataConsumer, public QnResourceConsumer
+class QnStreamRecorder:
+    public QnAbstractDataConsumer,
+    public QnResourceConsumer,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
 public:
     static QString errorString(StreamRecorderError errCode);
 
-    QnStreamRecorder(const QnResourcePtr& dev);
+    QnStreamRecorder(QnCommonModule* commonModule, const QnResourcePtr& dev);
     virtual ~QnStreamRecorder();
 
     /*

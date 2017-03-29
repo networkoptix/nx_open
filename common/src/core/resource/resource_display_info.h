@@ -2,11 +2,12 @@
 
 #include <core/resource/resource_fwd.h>
 #include <common/common_globals.h>
+#include <common/common_module_aware.h>
 
-class QnResourceDisplayInfo
+class QnResourceDisplayInfo: public QnCommonModuleAware
 {
 public:
-    QnResourceDisplayInfo(const QnResourcePtr& resource);
+    QnResourceDisplayInfo(QnCommonModule* commonModule, const QnResourcePtr& resource);
 
     QString name() const;
     QString host() const;

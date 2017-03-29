@@ -42,12 +42,12 @@ QString utils::QnCameraNamesWatcher::getCameraName(const QnUuid& cameraId)
     connect(cameraResource.data(), &QnVirtualCameraResource::nameChanged, this,
         [this, cameraId](const QnResourcePtr &resource)
         {
-            const auto newName = QnResourceDisplayInfo(resource).toString(Qn::RI_NameOnly);
+            const auto newName = QnResourceDisplayInfo(commonModule(), resource).toString(Qn::RI_NameOnly);
             m_names[cameraId] = newName;
             emit cameraNameChanged(cameraId);
         });
 
-    const auto cameraName = QnResourceDisplayInfo(cameraResource).toString(Qn::RI_NameOnly);
+    const auto cameraName = QnResourceDisplayInfo(commonModule(), cameraResource).toString(Qn::RI_NameOnly);
     m_names[cameraId] = cameraName;
     return cameraName;
 }
