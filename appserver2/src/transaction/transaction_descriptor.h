@@ -129,7 +129,7 @@ template<typename ParamType>
 using CheckRemotePeerAccessFuncType = std::function<RemotePeerAccess(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamType&)>;
 
 template<typename ParamType>
-using GetTransactionTypeFuncType = std::function<ec2::TransactionType::Value(const ParamType&, detail::QnDbManager*)>;
+using GetTransactionTypeFuncType = std::function<ec2::TransactionType::Value(QnCommonModule*, const ParamType&, detail::QnDbManager*)>;
 
 template<typename ParamType>
 using GetHashFuncType = std::function<QnUuid(ParamType const &)>;
