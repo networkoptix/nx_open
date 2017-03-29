@@ -54,16 +54,24 @@ class Vagrant(object):
         self._vbox_manage = VBoxManage(vm_host)
         self._bin_dir = bin_dir
         self._vagrant_dir = vagrant_dir  # on vm_host
+        self._vagrant_file_path = os.path.join(self._vagrant_dir, 'Vagrantfile')
         self._vagrant_private_key_path = vagrant_private_key_path  # may be None
         self._ssh_config_path = ssh_config_path
         self._vagrant = RemotableVagrant(
             self._vm_host, root=self._vagrant_dir, quiet_stdout=False, quiet_stderr=False)
         self.boxes = {}  # box name -> VagrantBox
 
-    def destroy_all_boxes(self, boxes_config):
-        log.info('destroying old boxes: %s', ', '.join(config.vm_box_name() for config in boxes_config))
-        self._write_vagrantfile(boxes_config)
-        self._destroy_all_boxes()
+    def destroy_all_boxes(self, boxes_config=None):
+        if boxes_config is not None:
+            log.info('Destroying old boxes: %s', ', '.join(config.vm_box_name() for config in boxes_config))
+            self._write_vagrantfile(boxes_config)
+            self._vagrant.destroy()
+        else:
+            if os.path.exists(self._vagrant_file_path):
+                log.info('Destroying old boxes using old Vagrantfile')
+                self._vagrant.destroy()
+            else:
+                log.info('Old Vagrantfile "%s" is missing - will not destroy old boxes' % self._vagrant_file_path)
         if os.path.exists(self._ssh_config_path):
             os.remove(self._ssh_config_path)
 
@@ -84,9 +92,6 @@ class Vagrant(object):
         self._write_ssh_config(self.boxes.keys())  # write ssh config for all boxes, with new addresses
         for box in self.boxes.values():
             self._load_box_timezone(box)
-
-    def _destroy_all_boxes(self):
-        self._vagrant.destroy()
 
     def _copy_required_files_to_vagrant_dir(self, box_config):
         for file_path_format in box_config.required_file_list:
@@ -125,7 +130,7 @@ class Vagrant(object):
             natnet1=DEFAULT_NATNET1,
             template_file_path=template_file_path,
             boxes=expanded_boxes_config_list)
-        self._vm_host.write_file(os.path.join(self._vagrant_dir, 'Vagrantfile'), vagrantfile)
+        self._vm_host.write_file(self._vagrant_file_path, vagrantfile)
 
     # write ssh config with single box in it
     def _write_box_ssh_config(self, box_name):

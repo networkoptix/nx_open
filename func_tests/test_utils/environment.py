@@ -44,11 +44,16 @@ class EnvironmentBuilder(object):
         self._vm_host = host_from_config(options.vm_ssh_host_config)
         self._vm_host_work_dir = options.vm_host_work_dir
         self._boxes_config = []
+        self._boxes_config_is_loaded = False
         self._last_box_idx = 0
 
     def _load_boxes_config_from_cache(self):
-        return [BoxConfig.from_dict(d, self._vm_name_prefix)
-                for d in self._cache.get(self.vagrant_boxes_cache_key, [])]
+        try:
+            self._boxes_config = [BoxConfig.from_dict(d, self._vm_name_prefix)
+                                  for d in self._cache.get(self.vagrant_boxes_cache_key, [])]
+            self._boxes_config_is_loaded = True
+        except KeyError as x:  # may be due to changed version
+            log.warning('Failed to load boxes config: %s; will try to remove old boxes using old Vagrantfile' % x)
 
     def _save_boxes_config_to_cache(self):
         self._cache.set(self.vagrant_boxes_cache_key, [config.to_dict() for config in self._boxes_config])
@@ -118,7 +123,7 @@ class EnvironmentBuilder(object):
             boxes = []
         log.info('TEST_DIR=%r, WORK_DIR=%r, BIN_DIR=%r, CLOUD_HOST=%r, COMPANY_NAME=%r',
                  self._test_dir, self._work_dir, self._bin_dir, self._cloud_host_host, self._company_name)
-        self._boxes_config = self._load_boxes_config_from_cache()
+        self._load_boxes_config_from_cache()
         ssh_config_path = os.path.join(self._work_dir, 'ssh.config')
 
         if self._vm_is_local_host:
@@ -128,7 +133,10 @@ class EnvironmentBuilder(object):
         vagrant = Vagrant(self._test_dir, self._vm_host, self._bin_dir, vagrant_dir,
                           self._test_session.vagrant_private_key_path, ssh_config_path)
 
-        if self._test_session.must_recreate_boxes():
+        if not self._boxes_config_is_loaded:
+            vagrant.destroy_all_boxes()
+            self._test_session.set_boxes_recreated_flag()  # no more recreation is required
+        elif self._test_session.must_recreate_boxes():
             # to be able to destroy all old boxes we need old boxes config to create Vagrantfile with them
             vagrant.destroy_all_boxes(self._boxes_config)
             self._boxes_config = []  # now we can start afresh
