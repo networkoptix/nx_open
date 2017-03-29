@@ -268,33 +268,6 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
 </context>
 <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-        <source>Zoom In</source>
-        <translation>Zoom be</translation>
-    </message>
-    <message>
-        <source>Zoom Out</source>
-        <translation>Zoom ki</translation>
-    </message>
-    <message>
-        <source>Focus Far</source>
-        <translation>Fókusz távoli</translation>
-    </message>
-    <message>
-        <source>Focus Near</source>
-        <translation>Fókusz közeli</translation>
-    </message>
-    <message>
-        <source>Auto Focus</source>
-        <translation>Autó fókusz</translation>
-    </message>
-    <message>
-        <source>Change Dewarping Mode</source>
-        <translation>Dewarping mód változtatása</translation>
-    </message>
-</context>
-<context>
     <name>QObject</name>
     <message>
         <source>Parameter 1 is null.</source>
@@ -1622,7 +1595,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation>Az E-mail beállítások megváltoztak</translation>
+        <translation>Az Email beállítások megváltoztak</translation>
     </message>
     <message>
         <source>Filled circle mark means the archive is still available</source>
@@ -2734,7 +2707,7 @@ to %1</source>
     <name>QnConnectToCloudDialog</name>
     <message>
         <source>Email</source>
-        <translation>E-mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Password</source>
@@ -2835,7 +2808,7 @@ to %1</source>
     </message>
     <message>
         <source>Incorrect username or password</source>
-        <translation>Hibás e-mail cím vagy jelszó</translation>
+        <translation>Hibás Email cím vagy jelszó</translation>
     </message>
     <message>
         <source>Server may be restarting now. Please try again later.</source>
@@ -3692,7 +3665,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>E-mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>DN</source>
@@ -3997,7 +3970,7 @@ to %1</source>
     </message>
     <message>
         <source>Please send Email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-        <translation>Az aktivációs kulcs megküldéséhez, kérjük e-mailben küldje el a licenc kulcsot és a hardver ID-t %1 címre.</translation>
+        <translation>Az aktivációs kulcs megküldéséhez, kérjük Emailben küldje el a licenc kulcsot és a hardver ID-t %1 címre.</translation>
     </message>
     <message>
         <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
@@ -4133,7 +4106,7 @@ to %1</source>
     <name>QnLoginToCloudDialog</name>
     <message>
         <source>Email</source>
-        <translation>E-mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Password</source>
@@ -5185,27 +5158,27 @@ to %1</source>
     </message>
     <message>
         <source>User %1 has invalid Email address</source>
-        <translation>%1 felhasználó e-mail címe érvénytelen</translation>
+        <translation>%1 felhasználó Email címe érvénytelen</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 users have invalid Email address</source>
         <translation>
-            <numerusform>%n/%1 felhasználó e-mail címe érvénytelen</numerusform>
+            <numerusform>%n/%1 felhasználó Email címe érvénytelen</numerusform>
         </translation>
     </message>
     <message>
         <source>Invalid Email address %1</source>
-        <translation>%1 e-mail cím érvénytelen</translation>
+        <translation>%1 Email cím érvénytelen</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 additional Email addresses are invalid</source>
         <translation>
-            <numerusform>%n/%1 további e-mail cím érvénytelen</numerusform>
+            <numerusform>%n/%1 további Email cím érvénytelen</numerusform>
         </translation>
     </message>
     <message>
         <source>Send Email to %1</source>
-        <translation>E-mail küldése %1 címre</translation>
+        <translation>Email küldése %1 címre</translation>
     </message>
 </context>
 <context>
@@ -5640,7 +5613,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>E-mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>SMTP Server</source>
@@ -5675,7 +5648,7 @@ to %1</source>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
         <source>Email</source>
-        <translation>E-mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Email is not valid.</source>
@@ -6082,7 +6055,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>E-mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Updates</source>
@@ -6105,7 +6078,7 @@ to %1</source>
     <name>QnSystemHealthStringsHelper</name>
     <message>
         <source>Email address is not set</source>
-        <translation>Nincs email cím beállítva</translation>
+        <translation>Nincs Email cím beállítva</translation>
     </message>
     <message>
         <source>No licenses</source>
@@ -6113,7 +6086,7 @@ to %1</source>
     </message>
     <message>
         <source>Email server is not set</source>
-        <translation>Nincs email szerver beállítva</translation>
+        <translation>Nincs Email szerver beállítva</translation>
     </message>
     <message>
         <source>Connection to server lost</source>
@@ -6145,15 +6118,15 @@ to %1</source>
     </message>
     <message>
         <source>Email address is not set for user %1</source>
-        <translation>%1 felhasználó nem állított be email címet</translation>
+        <translation>%1 felhasználó nem állított be Email címet</translation>
     </message>
     <message>
         <source>Email address is not set.</source>
-        <translation>Nincs email cím beállítva.</translation>
+        <translation>Nincs Email cím beállítva.</translation>
     </message>
     <message>
         <source>Email server is not set.</source>
-        <translation>Nincs email szerver beállítva.</translation>
+        <translation>Nincs Email szerver beállítva.</translation>
     </message>
     <message>
         <source>Server times are not synchronized and a common time could not be detected automatically.</source>
@@ -6193,15 +6166,15 @@ to %1</source>
     </message>
     <message>
         <source>Some users have not set their Email addresses</source>
-        <translation>Egyes felhasználók nem állították be az e-mail címüket</translation>
+        <translation>Egyes felhasználók nem állították be az Email címüket</translation>
     </message>
     <message>
         <source>Error while sending Email</source>
-        <translation>Hiba az e-mail küldése közben</translation>
+        <translation>Hiba az Email küldése közben</translation>
     </message>
     <message>
         <source>Some users have not set their Email addresses.</source>
-        <translation>Egyes felhasználók nem állították be az e-mail címüket.</translation>
+        <translation>Egyes felhasználók nem állították be az Email címüket.</translation>
     </message>
     <message>
         <source>System is running in safe mode.</source>
@@ -6214,11 +6187,11 @@ to %1</source>
     </message>
     <message>
         <source>You cannot receive System notifications by Email.</source>
-        <translation>Nem tud rendszerértesítéseket kapni e-mailben.</translation>
+        <translation>Nem tud rendszerértesítéseket kapni Emailben.</translation>
     </message>
     <message>
         <source>They cannot receive System notifications by Email.</source>
-        <translation>Nem tudnak rendszerértesítéseket kapni e-mailben.</translation>
+        <translation>Nem tudnak rendszerértesítéseket kapni Emailben.</translation>
     </message>
 </context>
 <context>
@@ -6302,67 +6275,67 @@ to %1</source>
     <message>
         <source>hh:mm</source>
         <comment>Format for displaying hours and minutes on timeline.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">hh:mm</translation>
     </message>
     <message>
         <source>hh:mm ap</source>
         <comment>Format for displaying hours and minutes on timeline, with am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">hh:mm ap</translation>
     </message>
     <message>
         <source>h ap</source>
         <comment>Format for displaying hours on timeline, with am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">h ap</translation>
     </message>
     <message>
         <source>dd</source>
         <comment>Format for displaying days on timeline.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd</translation>
     </message>
     <message>
         <source>MMMM</source>
         <comment>Format for displaying months on timeline.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MMMM</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying years on timeline</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">yyyy</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm ap</source>
         <comment>Format for displaying minute caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd MMMM yyyy hh:mm ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy hh:mm</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, without am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd MMMM yyyy hh:mm</translation>
     </message>
     <message>
         <source>dd MMMM yyyy h ap</source>
         <comment>Format for displaying hour caption in timeline&apos;s header, with am/pm indicator.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd MMMM yyyy h ap</translation>
     </message>
     <message>
         <source>dd MMMM yyyy</source>
         <comment>Format for displaying day caption in timeline&apos;s header.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">dd MMMM yyyy</translation>
     </message>
     <message>
         <source>MMMM yyyy</source>
         <comment>Format for displaying month caption in timeline&apos;s header.</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">MMMM yyyy</translation>
     </message>
     <message>
         <source>yyyy</source>
         <comment>Format for displaying year caption in timeline&apos;s header</comment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">yyyy</translation>
     </message>
 </context>
 <context>
@@ -6561,7 +6534,7 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>E-mail</translation>
+        <translation>Email</translation>
     </message>
 </context>
 <context>
@@ -6710,11 +6683,11 @@ to %1</source>
     </message>
     <message>
         <source>Email</source>
-        <translation>E-mail</translation>
+        <translation>Email</translation>
     </message>
     <message>
         <source>Email cannot be empty.</source>
-        <translation>Az e-mail mező nem lehet üres.</translation>
+        <translation>Az Email mező nem lehet üres.</translation>
     </message>
     <message>
         <source>Password</source>
@@ -6730,18 +6703,18 @@ to %1</source>
     </message>
     <message>
         <source>Cloud user with specified Email already exists.</source>
-        <translation>A felhő felhasználó a megadott e-mail címmel már létezik.</translation>
+        <translation>A felhő felhasználó a megadott Email címmel már létezik.</translation>
     </message>
 </context>
 <context>
     <name>QnValidatorStrings</name>
     <message>
         <source>Email cannot be empty.</source>
-        <translation>Az e-mail mező nem lehet üres.</translation>
+        <translation>Az Email mező nem lehet üres.</translation>
     </message>
     <message>
         <source>Email is not valid.</source>
-        <translation>Nem érvényes e-mail.</translation>
+        <translation>Nem érvényes Email.</translation>
     </message>
     <message>
         <source>Password cannot be empty.</source>

@@ -369,7 +369,7 @@ void QnInstallUpdatesPeerTask::at_installUpdateResponse(
         return;
 
     NX_LOG(
-        lit("Update: QnInstallUpdatePeerTask: Reply [status = %1, reply = %2, server: %2, %3].")
+        lit("Update: QnInstallUpdatePeerTask: Reply [status = %1, reply = %2, server: %3, %4].")
             .arg(status)
             .arg(reply.offset)
             .arg(server->getName())

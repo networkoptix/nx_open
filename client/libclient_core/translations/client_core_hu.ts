@@ -17,7 +17,7 @@
     </message>
     <message>
         <source>This account is not activated. Please check your email.</source>
-        <translation>Ez a fiók nincs aktiválva. Kérjük ellenőrizze e-mailjét.</translation>
+        <translation>Ez a fiók nincs aktiválva. Kérjük ellenőrizze Emailjét.</translation>
     </message>
     <message>
         <source>This account is blocked.</source>

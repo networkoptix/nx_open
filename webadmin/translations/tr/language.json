@@ -100,13 +100,13 @@
     "invalidFile":"Güncelleme başarısız. Dosyalar geçersiz.",
     "incompatibleSystem":"Güncelleme başarısız. Dosyalar başka bir sistem için ayarlanmış.",
     "extractionError":"Güncelleme başarısız. Yükleme alanı yetersiz. Lütfen diskteki boş alanı kontrol edin.",
-    "installationError":"Güncelleme başarısız. Yükelme komutları çalıştırılılamıyor.",
+    "installationError":"Güncelleme başarısız. Yükleme komutları çalıştırılamıyor.",
     "selectFiles":"Dosyaları seç"
   },
   "cameraLinks":{
     "highStream":"Yüksek akış",
     "lowStream":"Düşük akış",
-    "transcoding":"Transkodlama",
+    "transcoding":"Dönüştürme",
     "unknown":"Bilinmeyen"
   },
   "advanced":{

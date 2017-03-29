@@ -169,7 +169,7 @@ class VagrantBox(object):
         return '%s@%s/%s' % (self.name, self.ip_address, self.timezone)
 
     def __repr__(self):
-        return 'Box%s' % self
+        return 'Box(%s)' % self
 
     def change_host_name(self, host_name):
         self.host.run_command(['hostnamectl', 'set-hostname', host_name])

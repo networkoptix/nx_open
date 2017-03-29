@@ -468,9 +468,13 @@ QnThirdPartyStorageResource::getFileList(const QString& dirName)
             if (fi == nullptr || ecode != nx_spl::error::NoError)
                 break;
 
+            QString urlString = QString::fromLatin1(fi->url);
+            if (!urlString.contains("://"))
+                urlString = QUrl(dirName).toString(QUrl::RemovePath) + QString::fromLatin1(fi->url);
+
             ret.append(
                 QnAbstractStorageResource::FileInfo(
-                    QUrl(dirName).toString(QUrl::RemovePath) + QString::fromLatin1(fi->url),
+                    urlString,
                     fi->size,
                     (fi->type & nx_spl::isDir) ? true : false
                 )

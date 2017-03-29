@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="th">
+<TS language="th" sourcelanguage="en_US" version="2.1">
 <context>
     <name>CloseButton</name>
     <message>
@@ -81,6 +81,30 @@
         <translation>สลับไปมา</translation>
     </message>
     <message>
+        <source>Scroll Left</source>
+        <translation>เลื่อนทางซ้าย</translation>
+    </message>
+    <message>
+        <source>Scroll Right</source>
+        <translation>เลื่อนทางขวา</translation>
+    </message>
+    <message>
+        <source>Scroll Up</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Scroll Down</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Previous Page</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Next Page</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
         <source>Triggers the action</source>
         <translation>ให้เกิดการกระทำ</translation>
     </message>
@@ -103,6 +127,49 @@
     <message>
         <source>Toggles the state</source>
         <translation>สลับไปมาตามสถานการณ์</translation>
+    </message>
+    <message>
+        <source>Scrolls to the left</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Scrolls to the right</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Scrolls up</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Scrolls down</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Goes back a page</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Goes to the next page</source>
+        <translation type="unfinished" />
+    </message>
+</context>
+<context>
+    <name>QAndroidPlatformTheme</name>
+    <message>
+        <source>Yes</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Yes to All</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>No</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>No to All</source>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -143,6 +210,29 @@
         <source>Exit</source>
         <translation>ออก</translation>
     </message>
+    <message>
+        <source>Cut</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Paste</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Select All</source>
+        <translation>เลือกทั้งหมด</translation>
+    </message>
+</context>
+<context>
+    <name>QCocoaTheme</name>
+    <message>
+        <source>Don't Save</source>
+        <translation>ไม่ บันทึก</translation>
+    </message>
 </context>
 <context>
     <name>QColorDialog</name>
@@ -173,6 +263,19 @@
     <message>
         <source>A&amp;lpha channel:</source>
         <translation>&amp;ช่องอัลฟา:</translation>
+    </message>
+    <message>
+        <source>&amp;HTML:</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Cursor at %1, %2
+Press ESC to cancel</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>&amp;Pick Screen Color</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Select Color</source>
@@ -207,15 +310,7 @@
     </message>
 </context>
 <context>
-    <name>QCoreApplication</name>
-    <message>
-        <source>QT_LAYOUT_DIRECTION</source>
-        <comment>Translate this string to the string &apos;LTR&apos; in left-to-right languages or to &apos;RTL&apos; in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
-        <translation>QT_LAYOUT_DIRECTION</translation>
-    </message>
-</context>
-<context>
-    <name>QDateTimeEdit</name>
+    <name>QDateTimeParser</name>
     <message>
         <source>AM</source>
         <translation>AM</translation>
@@ -236,7 +331,7 @@
 <context>
     <name>QDialog</name>
     <message>
-        <source>What&apos;s This?</source>
+        <source>What's This?</source>
         <translation>นี่คืออะไร?</translation>
     </message>
 </context>
@@ -245,98 +340,6 @@
     <message>
         <source>OK</source>
         <translation>ตกลง</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation>&amp;ตกลง</translation>
-    </message>
-    <message>
-        <source>&amp;Save</source>
-        <translation>&amp;บันทึก</translation>
-    </message>
-    <message>
-        <source>Save</source>
-        <translation>บันทึก</translation>
-    </message>
-    <message>
-        <source>Open</source>
-        <translation>เปิด</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation>&amp;ยกเลิก</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>ยกเลิก</translation>
-    </message>
-    <message>
-        <source>&amp;Close</source>
-        <translation>&amp;ปิด</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>ปิด</translation>
-    </message>
-    <message>
-        <source>Apply</source>
-        <translation>ยอมรับ</translation>
-    </message>
-    <message>
-        <source>Reset</source>
-        <translation>รีเซ็ต</translation>
-    </message>
-    <message>
-        <source>Help</source>
-        <translation>ช่วยเหลือ</translation>
-    </message>
-    <message>
-        <source>Don&apos;t Save</source>
-        <translation>ไม่ บันทึก</translation>
-    </message>
-    <message>
-        <source>Close without Saving</source>
-        <translation>ปิดโดยไม่ต้องทำการบันทึก</translation>
-    </message>
-    <message>
-        <source>Discard</source>
-        <translation>ทิ้ง</translation>
-    </message>
-    <message>
-        <source>&amp;Yes</source>
-        <translation>&amp;ใช่</translation>
-    </message>
-    <message>
-        <source>Yes to &amp;All</source>
-        <translation>ใช่ &amp;ทั้งหมด</translation>
-    </message>
-    <message>
-        <source>&amp;No</source>
-        <translation>&amp;ไม่</translation>
-    </message>
-    <message>
-        <source>N&amp;o to All</source>
-        <translation>&amp;ไม่ ทั้งหมด</translation>
-    </message>
-    <message>
-        <source>Save All</source>
-        <translation>บันทึกทั้งหมด</translation>
-    </message>
-    <message>
-        <source>Abort</source>
-        <translation>เกี่ยวกับ</translation>
-    </message>
-    <message>
-        <source>Retry</source>
-        <translation>ลองอีกครั้ง</translation>
-    </message>
-    <message>
-        <source>Ignore</source>
-        <translation>ไม่สนใจ</translation>
-    </message>
-    <message>
-        <source>Restore Defaults</source>
-        <translation>คืนค่าเริ่มต้น</translation>
     </message>
 </context>
 <context>
@@ -526,6 +529,10 @@
         <translation>&amp;โฟลเดอร์ ใหม่</translation>
     </message>
     <message>
+        <source>All files (*)</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
         <source>Directories</source>
         <translation>ไดเรคทอรี่</translation>
     </message>
@@ -560,14 +567,14 @@ Please verify the correct file name was given.</source>
         <translation>ลบ</translation>
     </message>
     <message>
-        <source>&apos;%1&apos; is write protected.
+        <source>'%1' is write protected.
 Do you want to delete it anyway?</source>
-        <translation>&apos;%1&apos; คือการเขียนป้องกัน
+        <translation>'%1' คือการเขียนป้องกัน
 คุณต้องการที่จะลบมันหรือไม่?</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete &apos;%1&apos;?</source>
-        <translation>คุณแน่ใจหรือว่าต้องการลบ &apos;%1&apos;?</translation>
+        <source>Are you sure you want to delete '%1'?</source>
+        <translation>คุณแน่ใจหรือว่าต้องการลบ '%1'?</translation>
     </message>
     <message>
         <source>Could not delete directory.</source>
@@ -590,6 +597,11 @@ Do you want to delete it anyway?</source>
         <translation>ที่อยู่ข้อมูล</translation>
     </message>
     <message>
+        <source>%1 File</source>
+        <extracomment>%1 is a file name suffix, for example txt</extracomment>
+        <translation type="unfinished" />
+    </message>
+    <message>
         <source>File</source>
         <translation>ไฟล์</translation>
     </message>
@@ -605,7 +617,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
         <source>Alias</source>
-        <comment>Mac OS X Finder</comment>
+        <comment>OS X Finder</comment>
         <translation>นามแฝง</translation>
     </message>
     <message>
@@ -669,8 +681,8 @@ Do you want to delete it anyway?</source>
         <translation>ชื่อไฟล์ที่ไม่ถูกต้อง</translation>
     </message>
     <message>
-        <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-        <translation>&lt;b&gt;ชื่อ &quot;%1&quot; ไม่สามารถใช้ได้.&lt;/b&gt;&lt;p&gt;โปรดใช้ชื่ออื่น, กับตัวละครให้น้อยลงหรือไม่มีเครื่องหมายวรรคตอน.</translation>
+        <source>&lt;b&gt;The name "%1" can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
+        <translation>&lt;b&gt;ชื่อ "%1" ไม่สามารถใช้ได้.&lt;/b&gt;&lt;p&gt;โปรดใช้ชื่ออื่น, กับตัวละครให้น้อยลงหรือไม่มีเครื่องหมายวรรคตอน.</translation>
     </message>
     <message>
         <source>Name</source>
@@ -708,6 +720,37 @@ Do you want to delete it anyway?</source>
     </message>
 </context>
 <context>
+    <name>QGnomeTheme</name>
+    <message>
+        <source>&amp;OK</source>
+        <translation>&amp;ตกลง</translation>
+    </message>
+    <message>
+        <source>&amp;Save</source>
+        <translation>&amp;บันทึก</translation>
+    </message>
+    <message>
+        <source>&amp;Cancel</source>
+        <translation>&amp;ยกเลิก</translation>
+    </message>
+    <message>
+        <source>&amp;Close</source>
+        <translation>&amp;ปิด</translation>
+    </message>
+    <message>
+        <source>Close without Saving</source>
+        <translation>ปิดโดยไม่ต้องทำการบันทึก</translation>
+    </message>
+</context>
+<context>
+    <name>QGuiApplication</name>
+    <message>
+        <source>QT_LAYOUT_DIRECTION</source>
+        <comment>Translate this string to the string 'LTR' in left-to-right languages or to 'RTL' in right-to-left languages (such as Hebrew and Arabic) to get proper widget layout.</comment>
+        <translation>QT_LAYOUT_DIRECTION</translation>
+    </message>
+</context>
+<context>
     <name>QIODevice</name>
     <message>
         <source>Permission denied</source>
@@ -729,12 +772,70 @@ Do you want to delete it anyway?</source>
         <source>Unknown error</source>
         <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
     </message>
+    <message>
+        <source>file to open is a directory</source>
+        <translation type="unfinished" />
+    </message>
+</context>
+<context>
+    <name>QImageReader</name>
+    <message>
+        <source>Invalid device</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>File not found</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Unsupported image format</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Unable to read image data</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Unknown error</source>
+        <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
+    </message>
+</context>
+<context>
+    <name>QImageWriter</name>
+    <message>
+        <source>Unknown error</source>
+        <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
+    </message>
+    <message>
+        <source>Device is not set</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Device not writable</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>Unsupported image format</source>
+        <translation type="unfinished" />
+    </message>
 </context>
 <context>
     <name>QInputDialog</name>
     <message>
         <source>Enter a value:</source>
         <translation>ป้อนค่า:</translation>
+    </message>
+</context>
+<context>
+    <name>QKeySequenceEdit</name>
+    <message>
+        <source>Press shortcut</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
+        <source>%1, ...</source>
+        <extracomment>This text is an "unfinished" shortcut, expands like "Ctrl+A, ..."</extracomment>
+        <translation type="unfinished" />
     </message>
 </context>
 <context>
@@ -788,6 +889,81 @@ Do you want to delete it anyway?</source>
     </message>
 </context>
 <context>
+    <name>QPlatformTheme</name>
+    <message>
+        <source>OK</source>
+        <translation>ตกลง</translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation>บันทึก</translation>
+    </message>
+    <message>
+        <source>Save All</source>
+        <translation>บันทึกทั้งหมด</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>เปิด</translation>
+    </message>
+    <message>
+        <source>&amp;Yes</source>
+        <translation>&amp;ใช่</translation>
+    </message>
+    <message>
+        <source>Yes to &amp;All</source>
+        <translation>ใช่ &amp;ทั้งหมด</translation>
+    </message>
+    <message>
+        <source>&amp;No</source>
+        <translation>&amp;ไม่</translation>
+    </message>
+    <message>
+        <source>N&amp;o to All</source>
+        <translation>&amp;ไม่ ทั้งหมด</translation>
+    </message>
+    <message>
+        <source>Abort</source>
+        <translation>เกี่ยวกับ</translation>
+    </message>
+    <message>
+        <source>Retry</source>
+        <translation>ลองอีกครั้ง</translation>
+    </message>
+    <message>
+        <source>Ignore</source>
+        <translation>ไม่สนใจ</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>ปิด</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>ยกเลิก</translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation>ทิ้ง</translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation>ช่วยเหลือ</translation>
+    </message>
+    <message>
+        <source>Apply</source>
+        <translation>ยอมรับ</translation>
+    </message>
+    <message>
+        <source>Reset</source>
+        <translation>รีเซ็ต</translation>
+    </message>
+    <message>
+        <source>Restore Defaults</source>
+        <translation>คืนค่าเริ่มต้น</translation>
+    </message>
+</context>
+<context>
     <name>QProgressDialog</name>
     <message>
         <source>Cancel</source>
@@ -795,10 +971,21 @@ Do you want to delete it anyway?</source>
     </message>
 </context>
 <context>
+    <name>QQnxFileDialogHelper</name>
+    <message>
+        <source>All files (*.*)</source>
+        <translation type="unfinished" />
+    </message>
+</context>
+<context>
     <name>QSaveFile</name>
     <message>
         <source>Existing file %1 is not writable</source>
         <translation>แฟ้มที่มีอยู่ %1 ไม่สามารถเขียนได้</translation>
+    </message>
+    <message>
+        <source>Filename refers to a directory</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Writing canceled by application</source>
@@ -903,6 +1090,10 @@ Do you want to delete it anyway?</source>
         <translation>ข้อมูลแอพลิเคชัน</translation>
     </message>
     <message>
+        <source>Application Configuration</source>
+        <translation type="unfinished" />
+    </message>
+    <message>
         <source>Cache</source>
         <translation>แคช</translation>
     </message>
@@ -917,6 +1108,10 @@ Do you want to delete it anyway?</source>
     <message>
         <source>Configuration</source>
         <translation>การกำหนดค่า</translation>
+    </message>
+    <message>
+        <source>Shared Configuration</source>
+        <translation type="unfinished" />
     </message>
     <message>
         <source>Shared Cache</source>
@@ -941,7 +1136,7 @@ Do you want to delete it anyway?</source>
 <context>
     <name>QWhatsThisAction</name>
     <message>
-        <source>What&apos;s This?</source>
+        <source>What's This?</source>
         <translation>นี่คืออะไร?</translation>
     </message>
 </context>
