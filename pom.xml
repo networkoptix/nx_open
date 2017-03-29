@@ -67,7 +67,7 @@
         <nxtool.guid>{d78c3988-0459-4dce-a1dc-e70df990fa54}</nxtool.guid>
         <ftpstorageplugin.guid>{f6c9f457-910c-4c0d-bb67-b4f752a8664e}</ftpstorageplugin.guid>
         <teststorageplugin.guid>{3d6223e8-eca2-47e1-ad40-a24bd2e2a78f}</teststorageplugin.guid>
-        <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid>
+        <!-- <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid> -->
         <common_ut.guid>{2f2d9175-70c1-404d-82e3-5e797b92263c}</common_ut.guid>
         <cloud_connectivity_ut.guid>{f568398b-8ca3-44cc-9707-d1f63b2aa1c6}</cloud_connectivity_ut.guid>
         <nx_network_ut.guid>{f7dfa168-fa41-4d4a-b475-e785acb4ff45}</nx_network_ut.guid>
@@ -803,6 +803,7 @@
                 <module>debsetup/mediaserver-deb</module>
 
                 <module>storage_plugins/teststorageplugin</module>
+                <!-- <module>storage_plugins/teststorageplugin/test</module> -->
             </modules>
             <properties>
                 <modification>ubuntu</modification>
@@ -1220,7 +1221,6 @@
             <modules>
                 <module>unit_tests</module>
                 <module>unit_tests_run</module>
-                <module>storage_plugins/teststorageplugin/test</module>
             </modules>
         </profile>
         <profile>
@@ -1234,7 +1234,6 @@
             </activation>
             <modules>
                 <module>unit_tests</module>
-                <module>storage_plugins/teststorageplugin/test</module>
             </modules>
         </profile>
         <profile>
