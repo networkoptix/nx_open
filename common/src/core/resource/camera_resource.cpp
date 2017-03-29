@@ -14,6 +14,8 @@
 #include <utils/common/util.h>
 #include <utils/math/math.h>
 #include <utils/crypt/symmetrical.h>
+#include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
 
 namespace {
 
@@ -453,12 +455,12 @@ void QnVirtualCameraResource::forceDisableAudio()
 
 void QnVirtualCameraResource::saveParams()
 {
-    propertyDictionary->saveParams(getId());
+    resourcePool()->commonModule()->propertyDictionary()->saveParams(getId());
 }
 
 void QnVirtualCameraResource::saveParamsAsync()
 {
-    propertyDictionary->saveParamsAsync(getId());
+    resourcePool()->commonModule()->propertyDictionary()->saveParamsAsync(getId());
 }
 
 void QnVirtualCameraResource::updateDefaultAuthIfEmpty(const QString& login, const QString& password)

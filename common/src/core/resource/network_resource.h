@@ -8,6 +8,7 @@
 #include "resource.h"
 
 class QnTimePeriodList;
+class QnCommonModule;
 
 class QN_EXPORT QnNetworkResource : public QnResource
 {
@@ -44,7 +45,10 @@ public:
     void setDefaultAuth(const QString &user, const QString &password);
     void setDefaultAuth(const QAuthenticator &auth);
 
-    static QAuthenticator getResourceAuth(const QnUuid &resourceId, const QnUuid &resourceTypeId);
+    static QAuthenticator getResourceAuth(
+        QnCommonModule* commonModule,
+        const QnUuid &resourceId,
+        const QnUuid &resourceTypeId);
     QAuthenticator getAuth() const;
 
     // if reader will find out that authentication is requred => setAuthenticated(false) must be called

@@ -36,14 +36,11 @@
 
 #include <licensing/license.h>
 
-#include "utils/common/synctime.h"
 #include <utils/common/app_info.h>
 
 #include <nx/network/socket_global.h>
 
 #include <nx/utils/timer_manager.h>
-#include <api/http_client_pool.h>
-#include <utils/common/long_runable_cleanup.h>
 #include <api/session_manager.h>
 #include <network/module_finder.h>
 #include <network/router.h>
@@ -124,41 +121,30 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
     QObject(parent),
     m_messageProcessor(nullptr)
 {
-    Q_INIT_RESOURCE(common);
-
     m_dirtyModuleInformation = true;
     m_cloudMode = false;
     m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());
 
-    QnCommonMetaTypes::initialize();
-
-    store(new QnLongRunableCleanup());
-
-    /* Init statics. */
-    store(new nx::utils::TimerManager());
 
     m_sessionManager = new QnSessionManager(this);
     m_moduleFinder = new QnModuleFinder(this, clientMode);
     m_router = new QnRouter(this, m_moduleFinder);
 
-    instance<QnLicensePool>();
-    instance<QnSyncTime>();
-    instance<QnCameraUserAttributePool>();
-    instance<QnMediaServerUserAttributesPool>();
-    instance<QnResourcePropertyDictionary>();
-    instance<QnResourceStatusDictionary>();
-    instance<QnServerAdditionalAddressesDictionary>();
-
-    instance<nx_http::ClientPool>();
+    m_licensePool = new QnLicensePool(this);
+    m_cameraUserAttributesPool = new QnCameraUserAttributePool(this);
+    m_mediaServerUserAttributesPool = new QnMediaServerUserAttributesPool(this);
+    m_resourcePropertyDictionary = new QnResourcePropertyDictionary(this);
+    m_resourceStatusDictionary = new QnResourceStatusDictionary(this);
+    instance<QnServerAdditionalAddressesDictionary>(); // todo: static common or common?
 
     m_resourcePool = new QnResourcePool(this);  /*< Depends on nothing. */
-    instance<QnUserRolesManager>();         /*< Depends on nothing. */
-    instance<QnResourceAccessSubjectsCache>(); /*< Depends on respool and roles. */
-    instance<QnSharedResourcesManager>();   /*< Depends on respool and roles. */
+    m_userRolesManager = new QnUserRolesManager(this);         /*< Depends on nothing. */
+    m_resourceAccessSubjectCache = new QnResourceAccessSubjectsCache(this); /*< Depends on respool and roles. */
+    m_sharedResourceManager = new QnSharedResourcesManager(this);   /*< Depends on respool and roles. */
 
     m_resourceAccessProvider = new QnResourceAccessProvider(this);   /*< Depends on respool, roles and shared resources. */
 
-    instance<QnGlobalPermissionsManager>(); /* Depends on respool. */
+    m_globalPermissionsManager = new QnGlobalPermissionsManager(this); /* Depends on respool. */
     m_runtimeInfoManager = new QnRuntimeInfoManager(this);
 
     /* Some of base providers depend on QnGlobalPermissionsManager and QnSharedResourcesManager. */

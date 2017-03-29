@@ -3,9 +3,9 @@
 #include "nx_ec/dummy_handler.h"
 
 QnResourcePropertyDictionary::QnResourcePropertyDictionary(QObject *parent):
-        QObject(parent)
+    QnCommonModuleAware(parent),
+    QObject(parent)
 {
-
 }
 
 bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)

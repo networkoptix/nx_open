@@ -141,7 +141,7 @@ QString QnMediaServerResource::getName() const
     }
 
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
         if( !(*lk)->name.isEmpty() )
             return (*lk)->name;
     }
@@ -167,7 +167,7 @@ void QnMediaServerResource::setName( const QString& name )
         return;
 
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
         if ((*lk)->name == name)
             return;
         (*lk)->name = name;
@@ -475,24 +475,25 @@ QnSoftwareVersion QnMediaServerResource::getVersion() const
 
 void QnMediaServerResource::setMaxCameras(int value)
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
     (*lk)->maxCameras = value;
 }
 
 int QnMediaServerResource::getMaxCameras() const
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
     return (*lk)->maxCameras;
 }
 
-QnServerBackupSchedule QnMediaServerResource::getBackupSchedule() const {
-    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+QnServerBackupSchedule QnMediaServerResource::getBackupSchedule() const
+{
+    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
     return (*lk)->backupSchedule;
 }
 
 void QnMediaServerResource::setBackupSchedule(const QnServerBackupSchedule &value) {
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
         if ((*lk)->backupSchedule == value)
             return;
         (*lk)->backupSchedule = value;
@@ -503,7 +504,7 @@ void QnMediaServerResource::setBackupSchedule(const QnServerBackupSchedule &valu
 void QnMediaServerResource::setRedundancy(bool value)
 {
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
         if ((*lk)->isRedundancyEnabled == value)
             return;
         (*lk)->isRedundancyEnabled = value;
@@ -513,7 +514,7 @@ void QnMediaServerResource::setRedundancy(bool value)
 
 bool QnMediaServerResource::isRedundancy() const
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
     return (*lk)->isRedundancyEnabled;
 }
 

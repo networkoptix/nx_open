@@ -27,6 +27,7 @@
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
 class QnResourcePool;
+class QnCommonModule;
 
 class QnInitResPool: public QThreadPool
 {
@@ -191,7 +192,11 @@ public:
 
     virtual bool hasProperty(const QString &key) const;
     virtual QString getProperty(const QString &key) const;
-    static QString getResourceProperty(const QString& key, const QnUuid &resourceId, const QnUuid &resourceTypeId);
+    static QString getResourceProperty(
+        QnCommonModule* commonModule,
+        const QString& key,
+        const QnUuid &resourceId,
+        const QnUuid &resourceTypeId);
 
     ec2::ApiResourceParamDataList getRuntimeProperties() const;
     ec2::ApiResourceParamDataList getAllProperties() const;
@@ -292,6 +297,7 @@ public:
 
     void getParamsPhysicalAsync(const QSet<QString> &ids);
     void setParamsPhysicalAsync(const QnCameraAdvancedParamValueList &values);
+    QnCommonModule* commonModule() const;
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers);
 

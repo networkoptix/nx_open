@@ -30,6 +30,7 @@
 #include "../resource_management/status_dictionary.h"
 
 #include <core/resource/security_cam_resource.h>
+#include <common/common_module.h>
 
 std::atomic<bool> QnResource::m_appStopping(false);
 QnMutex QnResource::m_initAsyncMutex;
@@ -329,7 +330,7 @@ void QnResource::update(const QnResourcePtr& other)
 
             for (auto prop : locallySavedProperties)
             {
-                if (propertyDictionary->setValue(
+                if (commonModule()->propertyDictionary()->setValue(
                     id,
                     prop.first,
                     prop.second.value,
@@ -589,7 +590,7 @@ void QnResource::setTypeByName(const QString& resTypeName)
 
 Qn::ResourceStatus QnResource::getStatus() const
 {
-    return qnStatusDictionary->value(getId());
+    return commonModule()->statusDictionary()->value(getId());
 }
 
 void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
@@ -631,13 +632,11 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     if (m_removedFromPool)
         return;
 
-
-
     QnUuid id = getId();
-    Qn::ResourceStatus oldStatus = qnStatusDictionary->value(id);
+    Qn::ResourceStatus oldStatus = commonModule()->statusDictionary()->value(id);
     if (oldStatus == newStatus)
         return;
-    qnStatusDictionary->setValue(id, newStatus);
+    commonModule()->statusDictionary()->setValue(id, newStatus);
     doStatusChanged(oldStatus, newStatus, reason);
 }
 
@@ -833,7 +832,7 @@ void QnResource::initializationDone()
 
 bool QnResource::hasProperty(const QString &key) const
 {
-    return propertyDictionary->hasProperty(getId(), key);
+    return commonModule()->propertyDictionary()->hasProperty(getId(), key);
 }
 
 QString QnResource::getProperty(const QString &key) const
@@ -849,7 +848,7 @@ QString QnResource::getProperty(const QString &key) const
         }
         else
         {
-            value = propertyDictionary->value(m_id, key);
+            value = commonModule()->propertyDictionary()->value(m_id, key);
         }
     }
 
@@ -864,12 +863,16 @@ QString QnResource::getProperty(const QString &key) const
     return value;
 }
 
-QString QnResource::getResourceProperty(const QString& key, const QnUuid &resourceId, const QnUuid &resourceTypeId)
+QString QnResource::getResourceProperty(
+    QnCommonModule* commonModule,
+    const QString& key,
+    const QnUuid &resourceId,
+    const QnUuid &resourceTypeId)
 {
     //TODO: #GDM think about code duplication
     NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred.");
 
-    QString value = propertyDictionary->value(resourceId, key);
+    QString value = commonModule->propertyDictionary()->value(resourceId, key);
     if (value.isNull())
     {
         // find default value in resourceType
@@ -901,7 +904,7 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
     }
 
     NX_ASSERT(!getId().isNull());
-    bool isModified = propertyDictionary->setValue(getId(), key, value, markDirty, replaceIfExists);
+    bool isModified = commonModule()->propertyDictionary()->setValue(getId(), key, value, markDirty, replaceIfExists);
     if (isModified)
         emitPropertyChanged(key);
 
@@ -920,7 +923,7 @@ bool QnResource::removeProperty(const QString& key)
     }
 
     NX_ASSERT(!getId().isNull());
-    propertyDictionary->removeProperty(getId(), key);
+    commonModule()->propertyDictionary()->removeProperty(getId(), key);
     emitPropertyChanged(key);
 
     return true;
@@ -952,14 +955,14 @@ ec2::ApiResourceParamDataList QnResource::getRuntimeProperties() const
     }
     else
     {
-        return propertyDictionary->allProperties(getId());
+        return commonModule()->propertyDictionary()->allProperties(getId());
     }
 }
 
 ec2::ApiResourceParamDataList QnResource::getAllProperties() const
 {
     ec2::ApiResourceParamDataList result;
-    ec2::ApiResourceParamDataList runtimeProperties = propertyDictionary->allProperties(getId());
+    ec2::ApiResourceParamDataList runtimeProperties = commonModule()->propertyDictionary()->allProperties(getId());
     ParamTypeMap staticDefaultProperties;
 
     QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
@@ -1210,4 +1213,10 @@ void QnResource::setRemovedFromPool(bool value)
 {
     QnMutexLocker mutexLocker(&m_mutex);
     m_removedFromPool = value;
+}
+
+QnCommonModule* QnResource::commonModule() const
+{
+    NX_ASSERT(resourcePool());
+    return resourcePool() ? resourcePool()->commonModule() : nullptr;
 }

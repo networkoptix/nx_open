@@ -16,7 +16,7 @@ class QnResourceAccessSubjectsCache:
     Q_OBJECT
     using base_type = Connective<QObject>;
 public:
-    QnResourceAccessSubjectsCache(QObject* parent = nullptr);
+    QnResourceAccessSubjectsCache(QObject* parent);
 
     /** List of all subjects of the resources access: users and roles. */
     QList<QnResourceAccessSubject> allSubjects() const;

@@ -12,7 +12,7 @@ class QnUserRolesManager: public QObject, public QnCommonModuleAware
     Q_OBJECT
     using base_type = QObject;
 public:
-    QnUserRolesManager(QObject* parent = nullptr);
+    QnUserRolesManager(QObject* parent);
     virtual ~QnUserRolesManager();
 
     ec2::ApiUserRoleDataList userRoles() const;

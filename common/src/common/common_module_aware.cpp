@@ -68,6 +68,12 @@ QnResourceAccessManager* QnCommonModuleAware::resourceAccessManager() const
     return m_commonModule ? m_commonModule->resourceAccessManager() : nullptr;
 }
 
+QnResourceAccessProvider* QnCommonModuleAware::resourceAccessProvider() const
+{
+    NX_ASSERT(m_commonModule);
+    return m_commonModule ? m_commonModule->resourceAccessProvider() : nullptr;
+}
+
 QnResourceAccessSubjectsCache* QnCommonModuleAware::resourceAccessSubjectsCache() const
 {
     NX_ASSERT(m_commonModule);
@@ -96,4 +102,28 @@ QnCameraHistoryPool* QnCommonModuleAware::cameraHistoryPool() const
 {
     NX_ASSERT(m_commonModule);
     return m_commonModule ? m_commonModule->cameraHistoryPool() : nullptr;
+}
+
+QnResourcePropertyDictionary* QnCommonModuleAware::propertyDictionary() const
+{
+    NX_ASSERT(m_commonModule);
+    return m_commonModule ? m_commonModule->propertyDictionary() : nullptr;
+}
+
+QnCameraUserAttributePool* QnCommonModuleAware::cameraUserAttributesPool() const
+{
+    NX_ASSERT(m_commonModule);
+    return m_commonModule ? m_commonModule->cameraUserAttributesPool() : nullptr;
+}
+
+QnMediaServerUserAttributesPool* QnCommonModuleAware::mediaServerUserAttributesPool() const
+{
+    NX_ASSERT(m_commonModule);
+    return m_commonModule ? m_commonModule->mediaServerUserAttributesPool() : nullptr;
+}
+
+QnResourceStatusDictionary* QnCommonModuleAware::statusDictionary() const
+{
+    NX_ASSERT(m_commonModule);
+    return m_commonModule ? m_commonModule->statusDictionary() : nullptr;
 }

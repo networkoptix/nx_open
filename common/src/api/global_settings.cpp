@@ -558,7 +558,7 @@ void QnGlobalSettings::synchronizeNow()
     //NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
     if (!m_admin)
         return;
-    propertyDictionary->saveParamsAsync(m_admin->getId());
+    propertyDictionary()->saveParamsAsync(m_admin->getId());
 }
 
 bool QnGlobalSettings::resynchronizeNowSync()
@@ -568,7 +568,7 @@ bool QnGlobalSettings::resynchronizeNowSync()
         NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
         if (!m_admin)
             return false;
-        propertyDictionary->markAllParamsDirty(m_admin->getId());
+        propertyDictionary()->markAllParamsDirty(m_admin->getId());
     }
     return  synchronizeNowSync();
 }
@@ -582,7 +582,7 @@ bool QnGlobalSettings::synchronizeNowSync()
     NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
     if (!m_admin)
         return false;
-    return propertyDictionary->saveParams(m_admin->getId());
+    return propertyDictionary()->saveParams(m_admin->getId());
 }
 
 bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr& mediaServer)
@@ -617,7 +617,7 @@ bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr
                 changed = true;
                 m_statisticsAllowedAdaptor->setValue(QnOptionalBool(value));
             }
-            propertyDictionary->removeProperty(mediaServer->getId(), kStatisticsReportAllowed);
+            propertyDictionary()->removeProperty(mediaServer->getId(), kStatisticsReportAllowed);
         }
     }
 

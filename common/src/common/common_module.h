@@ -26,6 +26,13 @@ class QnCommonMessageProcessor;
 class QnPtzControllerPool;
 class QnResourceAccessManager;
 class QnResourceAccessProvider;
+class QnUserRolesManager;
+class QnResourceAccessSubjectsCache;
+class QnSharedResourcesManager;
+class QnCameraUserAttributePool;
+class QnMediaServerUserAttributesPool;
+class QnResourcePropertyDictionary;
+class QnResourceStatusDictionary;
 
 struct BeforeRestoreDbData
 {
@@ -114,6 +121,26 @@ public:
         return m_resourceAccessProvider;
     }
 
+    QnResourcePropertyDictionary* propertyDictionary() const
+    {
+        return m_resourcePropertyDictionary;
+    }
+
+    QnResourceStatusDictionary* statusDictionary() const
+    {
+        return m_resourceStatusDictionary;
+    }
+
+    QnCameraUserAttributePool* cameraUserAttributesPool() const
+    {
+        return m_cameraUserAttributesPool;
+    }
+
+    QnMediaServerUserAttributesPool* mediaServerUserAttributesPool() const
+    {
+        return m_mediaServerUserAttributesPool;
+    }
+
     void setModuleGUID(const QnUuid& guid) { m_uuid = guid; }
     QnUuid moduleGUID() const{ return m_uuid; }
 
@@ -193,6 +220,9 @@ private:
     bool m_dirtyModuleInformation;
     QnSessionManager* m_sessionManager = nullptr;
     QnResourcePool* m_resourcePool = nullptr;
+    QnUserRolesManager* m_userRolesManager = nullptr;
+    QnResourceAccessSubjectsCache* m_resourceAccessSubjectCache = nullptr;
+    QnSharedResourcesManager* m_sharedResourceManager = nullptr;
     QnModuleFinder* m_moduleFinder = nullptr;
     QnRouter* m_router = nullptr;
 
@@ -221,4 +251,10 @@ private:
     QnRuntimeInfoManager* m_runtimeInfoManager = nullptr;
     QnResourceAccessManager* m_resourceAccessManager = nullptr;
     QnResourceAccessProvider* m_resourceAccessProvider = nullptr;
+    QnLicensePool* m_licensePool = nullptr;
+    QnCameraUserAttributePool* m_cameraUserAttributesPool = nullptr;
+    QnMediaServerUserAttributesPool* m_mediaServerUserAttributesPool = nullptr;
+    QnResourcePropertyDictionary* m_resourcePropertyDictionary = nullptr;
+    QnResourceStatusDictionary* m_resourceStatusDictionary = nullptr;
+    QnGlobalPermissionsManager* m_globalPermissionsManager = nullptr;
 };

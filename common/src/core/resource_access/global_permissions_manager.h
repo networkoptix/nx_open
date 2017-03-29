@@ -20,7 +20,7 @@ class QnGlobalPermissionsManager:
 
     using base_type = Connective<QObject>;
 public:
-    QnGlobalPermissionsManager(QObject* parent = nullptr);
+    QnGlobalPermissionsManager(QObject* parent);
     virtual ~QnGlobalPermissionsManager();
 
     /** Get a set of global permissions that will not work without the given one. */

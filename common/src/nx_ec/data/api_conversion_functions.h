@@ -11,6 +11,7 @@
 #include <utils/common/ldap_fwd.h>
 
 class SocketAddress;
+class QnCameraUserAttributePool;
 
 namespace ec2
 {
@@ -22,9 +23,15 @@ namespace ec2
     void fromResourceToApi(const QnAbstractBusinessActionPtr& src, ApiBusinessActionData& dst);
     void fromApiToResource(const ApiBusinessActionData& src, QnAbstractBusinessActionPtr& dst);
 
-    void fromApiToResource(const ApiCameraData& src, QnVirtualCameraResourcePtr& dst);
-    void fromResourceToApi(const QnVirtualCameraResourcePtr& src, ApiCameraData& dst);
-    void fromResourceListToApi(const QnVirtualCameraResourceList& src, ApiCameraDataList& dst);
+    void fromApiToResource(
+        const ApiCameraData& src,
+        QnVirtualCameraResourcePtr& dst);
+    void fromResourceToApi(
+        const QnVirtualCameraResourcePtr& src,
+        ApiCameraData& dst);
+    void fromResourceListToApi(
+        const QnVirtualCameraResourceList& src,
+        ApiCameraDataList& dst);
 
     void fromResourceToApi(const QnScheduleTask& src, ApiScheduleTaskData& dst);
     void fromApiToResource(const ApiScheduleTaskData& src, QnScheduleTask& dst, const QnUuid& resourceId);
@@ -34,9 +41,18 @@ namespace ec2
     void fromApiToResourceList(const ApiCameraAttributesDataList& src, QnCameraUserAttributesList& dst);
     void fromResourceListToApi(const QnCameraUserAttributesList& src, ApiCameraAttributesDataList& dst);
 
-    void fromApiToResource(const ApiCameraDataEx& src, QnVirtualCameraResourcePtr& dst);
-    void fromResourceToApi(const QnVirtualCameraResourcePtr& src, ApiCameraDataEx& dst);
-    void fromResourceListToApi(const QnVirtualCameraResourceList& src, ApiCameraDataExList& dst);
+    void fromApiToResource(
+        const ApiCameraDataEx& src,
+        QnVirtualCameraResourcePtr& dst,
+        QnCameraUserAttributePool* attributesPool);
+    void fromResourceToApi(
+        const QnVirtualCameraResourcePtr& src,
+        ApiCameraDataEx& dst,
+        QnCameraUserAttributePool* attributesPool);
+    void fromResourceListToApi(
+        const QnVirtualCameraResourceList& src,
+        ApiCameraDataExList& dst,
+        QnCameraUserAttributePool* attributesPool);
 
     void fromResourceToApi(const QnEmailSettings& src, ApiEmailSettingsData& dst);
     void fromApiToResource(const ApiEmailSettingsData& src, QnEmailSettings& dst);

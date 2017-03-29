@@ -315,35 +315,44 @@ void fromResourceListToApi(const QnCameraUserAttributesList& src, ApiCameraAttri
 //// ApiCameraDataEx
 ////////////////////////////////////////////////////////////
 
-void fromApiToResource(const ApiCameraDataEx& src, QnVirtualCameraResourcePtr& dst)
+void fromApiToResource(
+    const ApiCameraDataEx& src,
+    QnVirtualCameraResourcePtr& dst,
+    QnCameraUserAttributePool* attributesPool)
 {
     fromApiToResource(static_cast<const ApiCameraData&>(src), dst);
     //TODO #ak using QnCameraUserAttributePool here is not good
-    QnCameraUserAttributePool::ScopedLock userAttributesLock(QnCameraUserAttributePool::instance(), dst->getId());
+    QnCameraUserAttributePool::ScopedLock userAttributesLock(attributesPool, dst->getId());
     fromApiToResource(static_cast<const ApiCameraAttributesData&>(src), *userAttributesLock);
 
     for (const ApiResourceParamData& srcParam: src.addParams)
         dst->setProperty(srcParam.name, srcParam.value, QnResource::NO_MARK_DIRTY);
 }
 
-void fromResourceToApi(const QnVirtualCameraResourcePtr& src, ApiCameraDataEx& dst)
+void fromResourceToApi(
+    const QnVirtualCameraResourcePtr& src,
+    ApiCameraDataEx& dst,
+    QnCameraUserAttributePool* attributesPool)
 {
     fromResourceToApi(src, static_cast<ApiCameraData&>(dst));
     //TODO #ak using QnCameraUserAttributePool here is not good
-    QnCameraUserAttributePool::ScopedLock userAttributesLock(QnCameraUserAttributePool::instance(), src->getId());
+    QnCameraUserAttributePool::ScopedLock userAttributesLock(attributesPool, src->getId());
     fromResourceToApi(*userAttributesLock, static_cast<ApiCameraAttributesData&>(dst));
 
     for (const ec2::ApiResourceParamData& srcParam: src->getRuntimeProperties())
         dst.addParams.push_back(srcParam);
 }
 
-void fromResourceListToApi(const QnVirtualCameraResourceList& src, ApiCameraDataExList& dst)
+void fromResourceListToApi(
+    const QnVirtualCameraResourceList& src,
+    ApiCameraDataExList& dst,
+    QnCameraUserAttributePool* attributesPool)
 {
     dst.reserve(dst.size() + src.size());
     for (const QnVirtualCameraResourcePtr& srcCamera: src)
     {
         dst.push_back(ApiCameraDataEx());
-        fromResourceToApi(srcCamera, dst.back());
+        fromResourceToApi(srcCamera, dst.back(), attributesPool);
     }
 }
 

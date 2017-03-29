@@ -145,12 +145,12 @@ Q_DECLARE_METATYPE(QnLicenseList)
 /**
  * License storage which is associated with instance of Server (i.e. should be reloaded when switching appserver).
  */
-class QnLicensePool : public QObject, public QnCommonModuleAware
+class QnLicensePool: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 
 public:
-    QnLicensePool(QObject* parent = nullptr);
+    QnLicensePool(QObject* parent);
 
     /** Number of cameras per analog encoder that require 1 license. */
     static int camerasPerAnalogEncoder();
@@ -183,4 +183,3 @@ private:
     QTimer m_timer;
     QnLicenseValidator* m_licenseValidator;
 };
-
