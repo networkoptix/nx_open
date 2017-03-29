@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include <QtCore/QObject>
 #include <QtCore/QList>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
@@ -28,8 +29,10 @@ Q_DECLARE_METATYPE(QnConnectionData)
 /**
  * @brief The QnConnectionDataList class        List of all stored connection credentials.
  */
-class QnConnectionDataList: public QList<QnConnectionData> {
+class QnConnectionDataList: public QList<QnConnectionData>
+{
 public:
+
     QnConnectionDataList(): QList<QnConnectionData>(){}
 
     /**
@@ -63,12 +66,6 @@ public:
     QString generateUniqueName(const QString &base);
 
     int getIndexByName(const QString& name) const;
-
-    /**
-     * @brief defaultLastUsedNameKey            Get the name for the default connection as it stored in settings.
-     * @return                                  Constant "Last used connection" string.
-     */
-    static QString defaultLastUsedNameKey();
 };
 
 Q_DECLARE_METATYPE(QnConnectionDataList)

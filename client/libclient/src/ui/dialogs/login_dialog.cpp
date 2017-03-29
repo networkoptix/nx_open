@@ -394,6 +394,16 @@ void QnLoginDialog::hideEvent(QHideEvent *event)
     m_renderingWidget->stopPlayback();
 }
 
+QString QnLoginDialog::defaultLastUsedConnectionName()
+{
+    return tr("* Last used connection *");
+}
+
+QString QnLoginDialog::depricatedLastUsedConnectionName()
+{
+    return defaultLastUsedConnectionName();
+}
+
 void QnLoginDialog::resetConnectionsModel()
 {
     if (m_lastUsedItem != NULL)
@@ -404,7 +414,7 @@ void QnLoginDialog::resetConnectionsModel()
     const auto url = qnSettings->lastLocalConnectionUrl();
     m_lastUsedItem = (url.host().isEmpty()
         ? nullptr
-        : ::newConnectionItem(QnConnectionDataList::defaultLastUsedNameKey(), url));
+        : ::newConnectionItem(defaultLastUsedConnectionName(), url));
 
     if (m_lastUsedItem != NULL)
     {
@@ -446,7 +456,7 @@ void QnLoginDialog::resetSavedSessionsModel()
     for (const auto& connection : customConnections)
     {
         NX_ASSERT(!connection.name.isEmpty());
-        if (connection.name == QnConnectionDataList::defaultLastUsedNameKey())
+        if (connection.name == depricatedLastUsedConnectionName())
         {
             /**
               * Client with version which is less than 3.0 stores last used connection in custom
