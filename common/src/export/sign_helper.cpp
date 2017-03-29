@@ -5,7 +5,10 @@
 
 #include "nx/streaming/video_data_packet.h"
 #include <nx/streaming/config.h>
-#include "licensing/license.h"
+
+#include <licensing/license.h>
+#include <licensing/license_validator.h>
+
 #include "utils/media/nalUnits.h"
 #include "utils/common/util.h"
 #include "utils/common/scoped_painter_rollback.h"
@@ -58,10 +61,12 @@ float getAvgColor(const AVFrame* frame, int plane, const QRect& rect)
     return sum / (rect.width() * rect.height());
 }
 
-QnSignHelper::QnSignHelper(QnCommonModule* commonModule):
+QnSignHelper::QnSignHelper(QnCommonModule* commonModule, QObject* parent):
+    base_type(parent),
     QnCommonModuleAware(commonModule),
     m_cachedMetric(QFont()),
-    m_outPacket(av_packet_alloc())
+    m_outPacket(av_packet_alloc()),
+    m_licenseValidator(new QnLicenseValidator(this))
 {
     m_opacity = 1.0;
     m_signBackground = Qt::white;
@@ -75,7 +80,8 @@ QnSignHelper::QnSignHelper(QnCommonModule* commonModule):
     m_licensedToStr = tr("Trial License");
     for (const QnLicensePtr& license: list)
     {
-        if (license->type() != Qn::LC_Trial && license->isValid()) {
+        if (license->type() != Qn::LC_Trial && m_licenseValidator->isValid(license))
+        {
             m_licensedToStr = license->name();
             break;
         }

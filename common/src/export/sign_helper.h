@@ -6,6 +6,8 @@
 
 #include <common/common_module_aware.h>
 
+#include <licensing/license_fwd.h>
+
 #include <utils/common/cryptographic_hash.h>
 
 #include <nx/streaming/video_data_packet.h>
@@ -16,11 +18,12 @@ static const QnCryptographicHash::Algorithm EXPORT_SIGN_METHOD = QnCryptographic
 class SPSUnit;
 class PPSUnit;
 
-class QnSignHelper: public QnCommonModuleAware
+class QnSignHelper: public QObject, public QnCommonModuleAware
 {
-    Q_DECLARE_TR_FUNCTIONS(QnSignHelper)
+    Q_OBJECT
+    using base_type = QObject;
 public:
-    QnSignHelper(QnCommonModule* commonModule);
+    QnSignHelper(QnCommonModule* commonModule, QObject* parent = nullptr);
     ~QnSignHelper();
     void setLogo(QPixmap logo);
     QnCompressedVideoDataPtr createSignatureFrame(AVCodecContext* srcCodec, QnCompressedVideoDataPtr iFrame);
@@ -82,4 +85,6 @@ private:
     QString m_hwIdStr;
     QString m_licensedToStr;
     AVPacket* m_outPacket;
+
+    QnLicenseValidator* m_licenseValidator = nullptr;
 };
