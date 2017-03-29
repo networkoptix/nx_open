@@ -28,7 +28,7 @@ public:
         const QModelIndex& sourceLeft,
         const QModelIndex& sourceRight) const override;
 
-public: // Properties
+public: // properties
     QString systemId() const;
     void setSystemId(const QString& id);
 

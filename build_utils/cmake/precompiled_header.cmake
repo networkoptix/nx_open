@@ -41,13 +41,13 @@ endfunction()
 function(_get_cxx_standard target STANDARD_VAR)
     get_property(standard TARGET ${target} PROPERTY CXX_STANDARD)
     if(standard STREQUAL "98")
-        set(standard "-std=c++98")
+        set(standard "${CMAKE_CXX98_STANDARD_COMPILE_OPTION}")
     elseif(standard STREQUAL "11")
-        set(standard "-std=c++0x")
+        set(standard "${CMAKE_CXX11_STANDARD_COMPILE_OPTION}")
     elseif(standard STREQUAL "14")
-        set(standard "-std=c++1y")
+        set(standard "${CMAKE_CXX14_STANDARD_COMPILE_OPTION}")
     elseif(standard STREQUAL "17")
-        set(standard "-std=c++1z")
+        set(standard "${CMAKE_CXX17_STANDARD_COMPILE_OPTION}")
     else()
         unset(standard)
     endif()
@@ -139,11 +139,25 @@ function(_add_gcc_clang_precompiled_header target input)
     _get_cxx_standard(${target} cxx_standard)
 
     file(MAKE_DIRECTORY "${pch_dir}")
+
+    set(depfile_args)
+    set(depfile_cmd_args)
+    if("${CMAKE_GENERATOR}" STREQUAL "Ninja")
+        set(depfile "${pch_dir}.d")
+        file(RELATIVE_PATH pch_file_relative "${CMAKE_BINARY_DIR}" "${pch_file}")
+
+        set(depfile_args DEPFILE "${depfile}")
+        set(depfile_cmd_args -MD -MF "${depfile}" -MT "${pch_file_relative}")
+    endif()
+
     add_custom_command(
         OUTPUT "${pch_file}"
         COMMAND "${CMAKE_CXX_COMPILER}"
             "@${pch_dir}.parameters" ${cxx_standard} -x c++-header "${input}" -o "${pch_file}"
+            ${depfile_cmd_args}
         DEPENDS "${input}" "${pch_dir}.parameters"
+        IMPLICIT_DEPENDS CXX "${input}"
+        ${depfile_args}
         COMMENT "Precompiling ${pch_dir}")
 
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")

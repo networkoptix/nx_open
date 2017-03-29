@@ -322,7 +322,9 @@ void QnTransactionMessageBus::removeAlivePeer(const QnUuid& id, bool sendTran, b
         QnTranState runtimeState;
         QList<QnTransaction<ApiRuntimeData>> result;
         m_runtimeTransactionLog->getTransactionsAfter(runtimeState, result);
-        NX_ASSERT(result.size() == 1 && result[0].peerID == commonModule()->moduleGUID());
+        const bool validPeerId = result.size() == 1 && result[0].peerID == commonModule()->moduleGUID();
+        if (!validPeerId)
+            NX_LOG("ASSERT(result.size() == 1 && result[0].peerID == commonModule()->moduleGUID())", cl_logERROR);
     }
 #endif
 

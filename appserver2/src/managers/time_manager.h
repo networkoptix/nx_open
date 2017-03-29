@@ -1,10 +1,4 @@
-/**********************************************************
-* 02 jul 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_EC2_TIME_MANAGER_H
-#define NX_EC2_TIME_MANAGER_H
+#pragma once
 
 #include <map>
 
@@ -30,47 +24,48 @@
 
 #include <nx/utils/thread/mutex.h>
 
-/*! \page time_sync Time synchronization in cluster
-    Server system time is never changed. To adjust server times means, adjust server "delta" which server adds to it's time.
-    To change/adjust server time - means to adjust it's delta.
+/**
+ * Time synchronization in cluster.
+ * Server system time is never changed. To adjust server times means, adjust server "delta" which server adds to it's time.
+ * To change/adjust server time - means to adjust it's delta.
+ *
+ * PTS(primary time server) (if any) pushes it's time to other servers( adjusts other servers' time):\n
+ * - every hour (to all servers in the system)
+ * - upon PTS changed event (to all servers in the system)
+ * - if new server is connected to the system( only to this new server).
+ *
+ * If possible PTS server adjusts it's time once per hour from internet.
+ *
+ * PTS is selected in prioritized order: \n
+ * - selected by user
+ * - availability of internet access
+ * - non edge server
+ *
+ * In case if there is ambiguity in choosing PTS automatically, random server is chosen as PTS and notification sent to client.
+ *
+ * Once PTS pushed it's time to the server, server marks it's time as actual time. Time remains actual till server is restarted.
+ * If there is no PTS in the system, new server( just connected) takes time from any server with actual time.
+ *
+ * Client should offer user to select PTS if there is no PTS in the system and there are at least 2 servers in the system with actual time more than 500 ms different.
+ *
+ * \todo if system without internet access (with PTS selected) joined by a server with internet access, should new server become PTS?
+ */
 
-    PTS(primary time server) (if any) pushes it's time to other servers( adjusts other servers' time):\n
-    - every hour (to all servers in the system)
-    - upon PTS changed event (to all servers in the system)
-    - if new server is connected to the system( only to this new server).
+namespace ec2 {
 
-    If possible PTS server adjusts it's time once per hour from internet.
-
-    PTS is selected in prioritized order: \n
-    - selected by user
-    - availability of internet access
-    - non edge server
-
-    In case if there is ambiguity in choosing PTS automatically, random server is chosen as PTS and notification sent to client.
-
-    Once PTS pushed it's time to the server, server marks it's time as actual time. Time remains actual till server is restarted.
-    If there is no PTS in the system, new server( just connected) takes time from any server with actual time.
-
-    Client should offer user to select PTS if there is no PTS in the system and there are at least 2 servers in the system with actual time more than 500 ms different.
-
-    \todo if system without internet access (with PTS selected) joined by a server with internet access, should new server become PTS?
-*/
-
-namespace ec2
-{
 class Ec2DirectConnection;
-
-/*!
-    \note \a sequence has less priority than \a TimeSynchronizationManager::peerIsServer and \a TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer flags
-*/
+/**
+ * Sequence has less priority than TimeSynchronizationManager::peerIsServer and 
+ * TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer flags
+ */
 class TimePriorityKey
 {
 public:
-    //!sequence number. Incremented with each peer selection by user
+        //!sequence number. Incremented with each peer selection by user
     quint16 sequence;
-    //!bitset of flags from \a TimeSynchronizationManager class
+        //!bitset of flags from \a TimeSynchronizationManager class
     quint16 flags;
-    //!some random number
+        //!some random number
     quint32 seed;
 
     TimePriorityKey();
@@ -91,12 +86,12 @@ class TimeSyncInfo
 {
 public:
     qint64 monotonicClockValue;
-    //!synchronized millis from epoch, corresponding to \a monotonicClockValue
+    /** Synchronized millis from epoch, corresponding to monotonicClockValue. */
     qint64 syncTime;
-    //!priority key, corresponding to \a syncTime value. This is not necessarily priority key of current server
-    /*!
-        When local host accepts another peer's time it uses priority key of that peer
-    */
+    /**
+     * Priority key, corresponding to syncTime value. This is not necessarily priority key of current server.
+     * When local host accepts another peer's time it uses priority key of that peer.
+     */
     TimePriorityKey timePriorityKey;
 
     TimeSyncInfo(
@@ -108,12 +103,11 @@ public:
     bool fromString( const QByteArray& str );
 };
 
-//!Cares about synchronizing time across all peers in cluster
-/*!
-    Time with highest priority key is selected as current
-*/
-class TimeSynchronizationManager
-:
+/**
+ * Cares about synchronizing time across all peers in cluster.
+ * Time with highest priority key is selected as current.
+ */
+class TimeSynchronizationManager:
     public QObject,
     public QnStoppable,
     public EnableMultiThreadDirectConnection<TimeSynchronizationManager>,
@@ -122,40 +116,40 @@ class TimeSynchronizationManager
     Q_OBJECT
 
 public:
-    /*!
-        \note \a TimeSynchronizationManager::start MUST be called before using class instance
-    */
+    /**
+     * TimeSynchronizationManager::start MUST be called before using class instance.
+     */
     TimeSynchronizationManager(
         Qn::PeerType peerType,
         nx::utils::TimerManager* const timerManager,
         QnTransactionMessageBus* messageBus);
     virtual ~TimeSynchronizationManager();
 
-    //!Implemenattion of QnStoppable::pleaseStop
+    /** Implemenattion of QnStoppable::pleaseStop. */
     virtual void pleaseStop() override;
 
-    //!Initial initialization
-    /*!
-        \note Cannot do it in constructor to keep valid object destruction order
-        TODO #ak look like incapsulation failure. Better remove this method
-    */
-    void start(const std::shared_ptr<Ec2DirectConnection>& connection);
+    /**
+     * Initial initialization.
+     * @note Cannot do it in constructor to keep valid object destruction order.
+     * TODO #ak look like incapsulation failure. Better remove this method.
+     */
+    void start();
 
-    //!Returns synchronized time (millis from epoch, UTC)
+    /** Returns synchronized time (millis from epoch, UTC). */
     qint64 getSyncTime() const;
     ApiTimeData getTimeInfo() const;
-    //!Called when primary time server has been changed by user
+    /** Called when primary time server has been changed by user. */
     void onGotPrimariTimeServerTran(const QnTransaction<ApiIdData>& tran);
     void primaryTimeServerChanged(const ApiIdData& serverId);
     void peerSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeData>& tran );
     void knownPeersSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeDataList>& tran );
-    //!Returns synchronized time with time priority key (not local, but the one used)
+    /** Returns synchronized time with time priority key (not local, but the one used). */
     TimeSyncInfo getTimeSyncInfo() const;
-    //!Returns value of internal monotonic clock
+    /** Returns value of internal monotonic clock. */
     qint64 getMonotonicClock() const;
-    //!Resets synchronized time to local system time with local peer priority
+    /** Resets synchronized time to local system time with local peer priority. */
     void forgetSynchronizedTime();
-    //!Reset sync time and resynce
+    /** Reset sync time and resynce. */
     void forceTimeResync();
     QnPeerTimeInfoList getPeerTimeInfoList() const;
     ApiPeerSystemTimeDataList getKnownPeersSystemTime() const;
@@ -165,20 +159,20 @@ public:
         boost::optional<qint64> requestRttMillis);
 
 signals:
-    //!Emitted when there is ambiguity while choosing primary time server automatically
-    /*!
-        User SHOULD call \a TimeSynchronizationManager::forcePrimaryTimeServer to set primary time server manually.
-        This signal is emitted periodically until ambiguity in choosing primary time server has been resolved (by user or automatically)
-    */
+    /**
+     * Emitted when there is ambiguity while choosing primary time server automatically.
+     * User SHOULD call TimeSynchronizationManager::forcePrimaryTimeServer to set primary time server manually..
+     * This signal is emitted periodically until ambiguity in choosing primary time server has been resolved (by user or automatically)
+     */
     void primaryTimeServerSelectionRequired();
-    //!Emitted when synchronized time has been changed
+    /** Emitted when synchronized time has been changed. */
     void timeChanged( qint64 syncTime );
-    //!Emitted when peer \a peerId local time has changed
-    /*!
-        \param peerId
-        \param syncTime Synchronized time (UTC, millis from epoch) corresponding to \a peerLocalTime
-        \param peerLocalTime Peer local time (UTC, millis from epoch)
-    */
+    /**
+     * Emitted when peer peerId local time has changed.
+     * @param peerId.
+     * @param syncTime Synchronized time (UTC, millis from epoch) corresponding to peerLocalTime.
+     * @param peerLocalTime Peer local time (UTC, millis from epoch).
+     */
     void peerTimeChanged(const QnUuid &peerId, qint64 syncTime, qint64 peerLocalTime);
 
 private:
@@ -186,7 +180,7 @@ private:
     {
         QnUuid peerID;
         qint64 localMonotonicClock;
-        //!synchronized millis from epoch, corresponding to \a monotonicClockValue
+        /** Synchronized millis from epoch, corresponding to monotonicClockValue. */
         qint64 remotePeerSyncTime;
 
         RemotePeerTimeInfo(
@@ -207,7 +201,7 @@ private:
         nx_http::AuthInfoCache::AuthorizationCacheItem authData;
         nx::utils::TimerManager::TimerGuard syncTimerID;
         nx_http::AsyncHttpClientPtr httpClient;
-        //!request round-trip time
+        /** Request round-trip time. */
         boost::optional<qint64> rttMillis;
 
         PeerContext(
@@ -218,7 +212,7 @@ private:
             authData( std::move(_authData) )
         {}
 
-        //PeerContext( PeerContext&& right ) = default;
+            //PeerContext( PeerContext&& right ) = default;
         PeerContext( PeerContext&& right )
         :
             peerAddress( std::move(right.peerAddress) ),
@@ -227,7 +221,7 @@ private:
             httpClient( std::move(right.httpClient) )
         {}
 
-        //PeerContext& operator=( PeerContext&& right ) = default;
+            //PeerContext& operator=( PeerContext&& right ) = default;
         PeerContext& operator=( PeerContext&& right )
         {
             peerAddress = std::move(right.peerAddress);
@@ -237,9 +231,9 @@ private:
         }
     };
 
-    //!Delta (millis) from \a m_monotonicClock to local time, synchronized with internet
+    /** Delta (millis) from m_monotonicClock to local time, synchronized with internet. */
     qint64 m_localSystemTimeDelta;
-    //!Using monotonic clock to be proof to local system time change
+    /** Using monotonic clock to be proof to local system time change. */
     QElapsedTimer m_monotonicClock;
     //!priority key of current server
     TimePriorityKey m_localTimePriorityKey;
@@ -254,9 +248,7 @@ private:
     bool m_terminated;
     std::shared_ptr<Ec2DirectConnection> m_connection;
     QnTransactionMessageBus* m_messageBus;
-    /*!
-        \a TimeSyncInfo::syncTime stores local time on specified server
-    */
+    /** TimeSyncInfo::syncTime stores local time on specified server. */
     std::map<QnUuid, TimeSyncInfo> m_systemTimeByPeer;
     const Qn::PeerType m_peerType;
     nx::utils::TimerManager* const m_timerManager;
@@ -269,15 +261,15 @@ private:
     void selectLocalTimeAsSynchronized(
         QnMutexLockerBase* const lk,
         quint16 newTimePriorityKeySequence);
-    /*!
-        \param lock Locked \a m_mutex. This method will unlock it to emit \a TimeSynchronizationManager::timeChanged signal
-        \param remotePeerID
-        \param localMonotonicClock value of local monotonic clock (received with \a TimeSynchronizationManager::monotonicClockValue)
-        \param remotePeerSyncTime remote peer time (millis, UTC from epoch) corresponding to local clock (\a localClock)
-        \param remotePeerTimePriorityKey This value is used to select peer to synchronize time with.\n
-            - upper DWORD is bitset of flags \a peerTimeSetByUser, \a peerTimeSynchronizedWithInternetServer and \a peerTimeNonEdgeServer
-            - low DWORD - some random number
-    */
+    /**
+     * @param lock Locked m_mutex. This method will unlock it to emit TimeSynchronizationManager::timeChanged signal.
+     * @param remotePeerID
+     * @param localMonotonicClock value of local monotonic clock (received with TimeSynchronizationManager::monotonicClockValue).
+     * @param remotePeerSyncTime remote peer time (millis, UTC from epoch) corresponding to local clock (localClock).
+     * @param remotePeerTimePriorityKey This value is used to select peer to synchronize time with.
+     *   - upper DWORD is bitset of flags peerTimeSetByUser, peerTimeSynchronizedWithInternetServer and peerTimeNonEdgeServer.
+     *   - low DWORD - some random number
+     */
     void remotePeerTimeSyncUpdate(
         QnMutexLockerBase* const lock,
         const QnUuid& remotePeerID,
@@ -287,11 +279,11 @@ private:
         qint64 timeErrorEstimation );
     void broadcastLocalSystemTime( quint64 taskID );
     void checkIfManualTimeServerSelectionIsRequired( quint64 taskID );
-    //!Periodically synchronizing time with internet (if possible)
+    /** Periodically synchronizing time with internet (if possible). */
     void syncTimeWithInternet( quint64 taskID );
     void onTimeFetchingDone( qint64 millisFromEpoch, SystemError::ErrorCode errorCode );
     void addInternetTimeSynchronizationTask();
-    //!Returns time received from the internet or current local system time
+    /** Returns time received from the internet or current local system time. */
     qint64 currentMSecsSinceEpoch() const;
 
     void updateRuntimeInfoPriority(quint64 priority);
@@ -326,6 +318,5 @@ private slots:
     void onDbManagerInitialized();
     void onTimeSynchronizationSettingsChanged();
 };
-}
 
-#endif  //NX_EC2_TIME_MANAGER_H
+} // namespace ec2

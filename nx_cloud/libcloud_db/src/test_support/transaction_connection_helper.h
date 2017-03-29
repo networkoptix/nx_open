@@ -30,6 +30,17 @@ using OnConnectionFailureSubscription =
 class TransactionConnectionHelper
 {
 public:
+    struct ConnectionContext
+    {
+        ::ec2::ApiPeerData peerInfo;
+        /**
+        * Keeping separate instance with each connection to allow
+        * multiple connections to same peer be created.
+        */
+        std::unique_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState;
+        std::unique_ptr<test::TransactionTransport> connection;
+    };
+
     using ConnectionId = int;
 
     TransactionConnectionHelper();
@@ -45,7 +56,8 @@ public:
         const std::string& login,
         const std::string& password,
         KeepAlivePolicy keepAlivePolicy,
-        int protocolVersion);
+        int protocolVersion,
+        QnUuid peerId = QnUuid());
     
     bool waitForState(
         const std::vector<::ec2::QnTransactionTransportBase::State> desiredStates,
@@ -62,7 +74,15 @@ public:
     {
         QnMutexLocker lk(&m_mutex);
         auto it = m_connections.find(connectionId);
-        func(it == m_connections.end() ? nullptr : it->second.connection.get());
+        func(it == m_connections.end() ? nullptr : &it->second);
+    }
+
+    template<typename Func>
+    void getAccessToConnectionByIndex(std::size_t index, Func func)
+    {
+        QnMutexLocker lk(&m_mutex);
+        auto it = std::next(m_connections.begin(), index);
+        func(it == m_connections.end() ? nullptr : &it->second);
     }
 
     void closeAllConnections();
@@ -73,16 +93,6 @@ public:
     OnConnectionFailureSubscription& onConnectionFailureSubscription();
 
 private:
-    struct ConnectionContext
-    {
-        /**
-         * Keeping separate instance with each connection to allow 
-         * multiple connections to same peer be created.
-         */
-        std::unique_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState;
-        std::unique_ptr<test::TransactionTransport> connection;
-    };
-
     QnUuid m_moduleGuid;
     QnUuid m_runningInstanceGuid;
     std::map<ConnectionId, ConnectionContext> m_connections;

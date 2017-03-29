@@ -249,10 +249,14 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             QStringList conflicts;
             for(const QnNetworkResourcePtr& camRes: itr.value())
             {
-                conflicts << camRes->getPhysicalId();
-                QnVirtualCameraResource* cam = dynamic_cast<QnVirtualCameraResource*>(camRes.data());
-                if (cam)
-                    cam->issueOccured();
+                // Human-readable value to help user identify a camera.
+                QString cameraId = camRes->getMAC().toString();
+                if (cameraId.isEmpty())
+                    cameraId = camRes->getId().toString();
+
+                conflicts << cameraId;
+                if (auto camera = camRes.dynamicCast<QnVirtualCameraResource>())
+                    camera->issueOccured();
             }
             emit CameraIPConflict(hostAddr, conflicts);
         }

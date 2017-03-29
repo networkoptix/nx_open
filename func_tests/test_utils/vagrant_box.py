@@ -117,20 +117,10 @@ class Vagrant(object):
         self._vbox_manage.delete_vms(vms_name)
 
     def _load_box_ip_address(self, config):
-        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'vms'])
-        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'hostonlyifs'])
-        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'natnets'])
-        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'intnets'])
-        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'bridgedifs'])
-        self._vm_host.run_command(['VBoxManage', '--nologo', 'list', 'dhcpservers'])
-        self._vm_host.run_command(['/sbin/ifconfig'])
         adapter_idx = 1  # use ip address from first host network
         cmd = ['VBoxManage', '--nologo', 'guestproperty', 'get',
                config.vm_box_name(), '/VirtualBox/GuestInfo/Net/%d/V4/IP' % adapter_idx]
-        # temporary: vbox returns invalid address sometimes; try load ip address several times with delay to see what happens
-        for i in range(10):
-            output = self._vm_host.run_command(cmd)
-            time.sleep(0.5)
+        output = self._vm_host.run_command(cmd)
         l = output.strip().split()
         assert l[0] == 'Value:', repr(output)  # Does interface exist?
         return l[1]
@@ -179,7 +169,7 @@ class VagrantBox(object):
         return '%s@%s/%s' % (self.name, self.ip_address, self.timezone)
 
     def __repr__(self):
-        return 'Box%s' % self
+        return 'Box(%s)' % self
 
     def change_host_name(self, host_name):
         self.host.run_command(['hostnamectl', 'set-hostname', host_name])

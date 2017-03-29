@@ -1,8 +1,3 @@
-/**********************************************************
-* 02 jul 2014
-* a.kolesnikov
-***********************************************************/
-
 #include "time_manager.h"
 
 #include <algorithm>
@@ -45,22 +40,20 @@
 #include "ec2_connection.h"
 
 
-namespace ec2
-{
-//!This parameter holds difference between local system time and synchronized time
+namespace ec2 {
+
+/** This parameter holds difference between local system time and synchronized time. */
 static const QByteArray TIME_DELTA_PARAM_NAME = "sync_time_delta";
 static const QByteArray LOCAL_TIME_PRIORITY_KEY_PARAM_NAME = "time_priority_key";
-//!Time priority correspinding to saved synchronised time
+/** Time priority correspinding to saved synchronised time. */
 static const QByteArray USED_TIME_PRIORITY_KEY_PARAM_NAME = "used_time_priority_key";
 
 template<class Function>
-class CustomRunnable
-:
+class CustomRunnable:
     public QRunnable
 {
 public:
-    CustomRunnable( Function&& function )
-    :
+    CustomRunnable( Function&& function ):
         m_function( std::move(function) )
     {
         setAutoDelete( true );
@@ -81,9 +74,9 @@ CustomRunnable<Function>* make_custom_runnable( Function&& function )
     return new CustomRunnable<Function>( std::move( function ) );
 }
 
-/*!
-    \param syncTimeToLocalDelta local_time - sync_time
-*/
+/**
+ * @param syncTimeToLocalDelta local_time - sync_time
+ */
 bool saveSyncTime(
     Ec2DirectConnectionPtr connection,
     qint64 syncTimeToLocalDelta,
@@ -106,9 +99,9 @@ bool saveSyncTime(
         manager->saveMiscParamSync(priorityData) == ErrorCode::ok;
 }
 
-/*!
-    \param syncTimeToLocalDelta local_time - sync_time
-*/
+/**
+ * @param syncTimeToLocalDelta local_time - sync_time
+ */
 bool loadSyncTime(
     Ec2DirectConnectionPtr connection,
     qint64* const syncTimeToLocalDelta,
@@ -139,8 +132,7 @@ bool loadSyncTime(
 //////////////////////////////////////////////
 //   TimePriorityKey
 //////////////////////////////////////////////
-TimePriorityKey::TimePriorityKey()
-:
+TimePriorityKey::TimePriorityKey():
     sequence(0),
     flags(0),
     seed(0)
@@ -281,37 +273,40 @@ static const size_t MIN_INTERNET_SYNC_TIME_PERIOD_SEC = 60;
 static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*MILLIS_PER_SEC;
 static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 60*MILLIS_PER_SEC;
 static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 60;
-//!Reporting time synchronization information to other peers once per this period
+/** Reporting time synchronization information to other peers once per this period. */
 static const int TIME_SYNC_SEND_TIMEOUT_SEC = 10;
 #else
 static const size_t LOCAL_SYSTEM_TIME_BROADCAST_PERIOD_MS = 10*60*MILLIS_PER_SEC;
-//!Once per 10 minutes checking if manual time server selection is required
+/** Once per 10 minutes checking if manual time server selection is required. */
 static const size_t MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS = 10*60*MILLIS_PER_SEC;
-//!Accurate time is fetched from internet with this period
+/** Accurate time is fetched from internet with this period. */
 static const size_t INTERNET_SYNC_TIME_PERIOD_SEC = 60*60;
-//!Reporting time synchronization information to other peers once per this period
+/** Reporting time synchronization information to other peers once per this period. */
 static const int TIME_SYNC_SEND_TIMEOUT_SEC = 10*60;
 #endif
-//!If time synchronization with internet failes, period is multiplied on this value, but it cannot exceed \a MAX_PUBLIC_SYNC_TIME_PERIOD_SEC
+/**
+ * If time synchronization with internet failes, period is multiplied on this value, 
+ * but it cannot exceed MAX_PUBLIC_SYNC_TIME_PERIOD_SEC.
+ */
 static const size_t INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF = 2;
 static const size_t MAX_INTERNET_SYNC_TIME_PERIOD_SEC = 60*60;
 //static const size_t INTERNET_TIME_EXPIRATION_PERIOD_SEC = 7*24*60*60;   //one week
-//!Considering internet time equal to local time if difference is no more than this value
+/** Considering internet time equal to local time if difference is no more than this value. */
 static const qint64 MAX_LOCAL_SYSTEM_TIME_DRIFT_MS = 10*MILLIS_PER_SEC;
-//!Maximum allowed drift between synchronized time and time received via internet
+/** Maximum allowed drift between synchronized time and time received via internet. */
 static const qint64 MAX_SYNC_VS_INTERNET_TIME_DRIFT_MS = 20*MILLIS_PER_SEC;
 static const int MAX_SEQUENT_INTERNET_SYNCHRONIZATION_FAILURES = 15;
 static const int MAX_RTT_TIME_MS = 10 * 1000;
-//!Maximum time drift between servers that we want to keep up to
+/** Maximum time drift between servers that we want to keep up to. */
 static const int MAX_DESIRED_TIME_DRIFT_MS = 1000;
-//!Considering that other server's time is retrieved with error not less then \a MIN_GET_TIME_ERROR_MS
-/*!
-    This should help against redundant clock resync
-*/
+/**
+ * Considering that other server's time is retrieved with error not less then MIN_GET_TIME_ERROR_MS.
+ * This should help against redundant clock resync.
+ */
 static const int MIN_GET_TIME_ERROR_MS = 100;
-//!once per this interval we check if local OS time has been changed
+/** Once per this interval we check if local OS time has been changed. */
 static const int SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS = 10 * MILLIS_PER_SEC;
-//!this coefficient applied to request round-trip time when comparing sync time from different servers
+/** This coefficient applied to request round-trip time when comparing sync time from different servers. */
 static const int SYNC_TIME_DRIFT_MAX_ERROR_COEFF = 5;
 
 static_assert( MIN_INTERNET_SYNC_TIME_PERIOD_SEC > 0, "MIN_INTERNET_SYNC_TIME_PERIOD_SEC MUST be > 0!" );
@@ -531,7 +526,7 @@ void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
 
     //local peer is selected by user as primary time server
     const bool synchronizingByCurrentServer = m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey;
-    //incrementing sequence
+    //incrementing sequence 
     m_localTimePriorityKey.sequence = newTimePriorityKeySequence;
     //"select primary time server" means "take its local time", so resetting internet synchronization flag
     m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
@@ -544,7 +539,7 @@ void TimeSynchronizationManager::selectLocalTimeAsSynchronized(
 
     //using current server time info
     const qint64 elapsed = m_monotonicClock.elapsed();
-    //selection of peer as primary time server means it's local system time is to be used as synchronized time
+    //selection of peer as primary time server means it's local system time is to be used as synchronized time 
     //in case of internet connection absence
     m_usedTimeSyncInfo = TimeSyncInfo(
         elapsed,
@@ -785,11 +780,11 @@ void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
     m_timeSynchronized = true;
     if (m_connection)
     {
-        Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
+            Ec2ThreadPool::instance()->start( make_custom_runnable( std::bind(
             &saveSyncTime,
             m_connection,
             QDateTime::currentMSecsSinceEpoch() - curSyncTime,
-            m_usedTimeSyncInfo.timePriorityKey)));
+                m_usedTimeSyncInfo.timePriorityKey) ) );
     }
     lock->unlock();
     {
@@ -895,7 +890,7 @@ void TimeSynchronizationManager::synchronizeWithPeer( const QnUuid& peerID )
 
     if (!commonModule->globalSettings()->isTimeSynchronizationEnabled())
     {
-        peerIter->second.syncTimerID =
+            peerIter->second.syncTimerID = 
             nx::utils::TimerManager::TimerGuard(
                 m_timerManager,
                 m_timerManager->addTimer(
@@ -1006,7 +1001,7 @@ void TimeSynchronizationManager::timeSyncRequestDone(
     //scheduling next synchronization
     if( m_terminated )
         return;
-    peerIter->second.syncTimerID =
+        peerIter->second.syncTimerID = 
         nx::utils::TimerManager::TimerGuard(
             m_timerManager,
             m_timerManager->addTimer(
@@ -1102,7 +1097,7 @@ void TimeSynchronizationManager::syncTimeWithInternet( quint64 taskID )
     if (!isSynchronizingTimeWithInternet)
     {
         NX_LOG(lit("TimeSynchronizationManager. Not synchronizing time with internet"), cl_logDEBUG2);
-        m_internetTimeSynchronizationPeriod =
+            m_internetTimeSynchronizationPeriod = 
             Settings::instance()->internetSyncTimePeriodSec(INTERNET_SYNC_TIME_PERIOD_SEC);
         addInternetTimeSynchronizationTask();
         return;
@@ -1385,7 +1380,7 @@ void TimeSynchronizationManager::onTransactionReceived(
 
         QnMutexLocker lk(&m_mutex);
         if (m_usedTimeSyncInfo.timePriorityKey.hasLessPriorityThan(
-                remotePeerTimeSyncInfo.timePriorityKey,
+            remotePeerTimeSyncInfo.timePriorityKey, 
             settings->isSynchronizingTimeWithInternet()))
         {
             syncTimeWithAllKnownServers(&lk);
@@ -1427,7 +1422,7 @@ void TimeSynchronizationManager::checkSystemTimeForChange()
         NX_LOGX(lm("Local system time change has been detected"),
             cl_logDEBUG1);
 
-        //local OS time has been changed. If system time is set
+        //local OS time has been changed. If system time is set 
         //by local host time then updating system time
         const bool isSystemTimeSynchronizedWithInternet =
             settings->isSynchronizingTimeWithInternet() &&
@@ -1472,7 +1467,7 @@ void TimeSynchronizationManager::handleLocalTimePriorityKeyChange(QnMutexLockerB
             if (manager->saveMiscParamSync(localTimeData) != ec2::ErrorCode::ok)
                 qWarning() << "Failed to save misc param to the local DB";
         }));
-    }
+}
 }
 
 void TimeSynchronizationManager::onTimeSynchronizationSettingsChanged()
@@ -1501,4 +1496,5 @@ void TimeSynchronizationManager::onTimeSynchronizationSettingsChanged()
         switchBackToLocalTime(&lock);
     }
 }
-}
+
+} // namespace ec2

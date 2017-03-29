@@ -1539,13 +1539,6 @@ bool QnPlOnvifResource::mergeResourcesIfNeeded(const QnNetworkResourcePtr &sourc
         result = true;
     }
 
-    QString localParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(this->toSharedPointer());
-    QString sourceParams = QnCameraAdvancedParamsReader::encodedParamsFromResource(source);
-    if (localParams != sourceParams) {
-        QnCameraAdvancedParamsReader::setEncodedParamsToResource(this->toSharedPointer(), sourceParams);
-        result = true;
-    }
-
     return result;
 }
 
@@ -3531,6 +3524,8 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
 
 void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode)
 {
+    using namespace std::placeholders;
+
     auto SCOPED_GUARD_FUNC = [this]( QnPlOnvifResource* ){
         m_asyncPullMessagesCallWrapper.clear();
     };
@@ -3560,20 +3555,7 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
         }
 
         m_renewSubscriptionTimerID = nx::utils::TimerManager::instance()->addTimer(
-            [this]( quint64 timerID )
-            {
-                QnMutexLocker lk( &m_ioPortMutex );
-                if( timerID != m_renewSubscriptionTimerID )
-                    return;
-                m_renewSubscriptionTimerID = 0;
-                if( !m_inputMonitored )
-                    return;
-                lk.unlock();
-                //TODO #ak make removePullPointSubscription and createPullPointSubscription asynchronous, so that it does not block timer thread
-                removePullPointSubscription();
-                createPullPointSubscription();
-                lk.relock();
-            },
+            std::bind(&QnPlOnvifResource::renewPullPointSubscriptionFallback, this, _1),
             std::chrono::milliseconds::zero() );
         return;
     }
@@ -3591,6 +3573,21 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
         m_nextPullMessagesTimerID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&QnPlOnvifResource::pullMessages, this, _1),
             std::chrono::milliseconds(PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND));
+}
+
+void QnPlOnvifResource::renewPullPointSubscriptionFallback(quint64 timerId)
+{
+    QnMutexLocker lk(&m_ioPortMutex);
+    if (timerId != m_renewSubscriptionTimerID)
+        return;
+    if (!m_inputMonitored)
+        return;
+    lk.unlock();
+    //TODO #ak make removePullPointSubscription and createPullPointSubscription asynchronous, so that it does not block timer thread
+    removePullPointSubscription();
+    createPullPointSubscription();
+    lk.relock();
+    m_renewSubscriptionTimerID = 0;
 }
 
 void QnPlOnvifResource::onPullMessagesResponseReceived(

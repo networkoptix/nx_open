@@ -512,8 +512,9 @@ void QnTransactionTransportBase::removeEventHandler( int eventHandlerID )
 
 void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
 {
-    NX_LOG( QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase::doOutgoingConnect. remotePeerUrl = %1").
-        arg(remotePeerUrl.toString(QUrl::RemovePassword)), cl_logDEBUG2 );
+    NX_LOG( QnLog::EC2_TRAN_LOG,
+        lm("QnTransactionTransportBase::doOutgoingConnect. remotePeerUrl = %1").arg(remotePeerUrl),
+        cl_logDEBUG2 );
 
     setState(ConnectingStage1);
 
@@ -1225,11 +1226,11 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
 
         if (m_localPeerProtocolVersion != m_remotePeerEcProtoVersion)
         {
-            NX_LOG( QString::fromLatin1("Cannot connect to server %1 because of different EC2 proto version. "
+            NX_LOG(lm("Cannot connect to server %1 because of different EC2 proto version. "
                 "Local peer version: %2, remote peer version: %3")
-                .arg(client->url().toString(QUrl::RemovePassword))
-                .arg(m_localPeerProtocolVersion).arg(m_remotePeerEcProtoVersion),
-                cl_logWARNING );
+                .arg(client->url()).arg(m_localPeerProtocolVersion)
+                .arg(m_remotePeerEcProtoVersion),
+                cl_logWARNING);
             cancelConnecting();
             return;
         }
@@ -1240,9 +1241,9 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
 
         if (QnAppInfo::defaultCloudHost() != remotePeerCloudHost)
         {
-            NX_LOG(QString::fromLatin1("Cannot connect to server %1 because they have different built in cloud host setting. "
+            NX_LOG(lm("Cannot connect to server %1 because they have different built in cloud host setting. "
                 "Local peer host: %2, remote peer host: %3").
-                arg(client->url().toString(QUrl::RemovePassword)).arg(QnAppInfo::defaultCloudHost()).arg(remotePeerCloudHost),
+                arg(client->url()).arg(QnAppInfo::defaultCloudHost()).arg(remotePeerCloudHost),
                 cl_logWARNING);
             cancelConnecting();
             return;
@@ -1304,16 +1305,16 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
     nx_http::HttpHeaders::const_iterator contentTypeIter = client->response()->headers.find("Content-Type");
     if( contentTypeIter == client->response()->headers.end() )
     {
-        NX_LOG( lit("Remote transaction server (%1) did not specify Content-Type in response. Aborting connection...")
-            .arg(client->url().toString()), cl_logWARNING );
+        NX_LOG( lm("Remote transaction server (%1) did not specify Content-Type in response. Aborting connection...")
+            .arg(client->url()), cl_logWARNING );
         cancelConnecting();
         return;
     }
 
     if( !m_multipartContentParser->setContentType( contentTypeIter->second ) )
     {
-        NX_LOG( lit("Remote transaction server (%1) specified Content-Type (%2) which does not define multipart HTTP content")
-            .arg(client->url().toString()).arg(QLatin1String(contentTypeIter->second)), cl_logWARNING );
+        NX_LOG( lm("Remote transaction server (%1) specified Content-Type (%2) which does not define multipart HTTP content")
+            .arg(client->url()).arg(QLatin1String(contentTypeIter->second)), cl_logWARNING );
         cancelConnecting();
         return;
     }

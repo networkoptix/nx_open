@@ -100,6 +100,8 @@ SslStaticData::SslStaticData():
 
     m_serverContext.reset(SSL_CTX_new(SSLv23_server_method()));
     SSL_CTX_set_options(m_serverContext.get(), s_disabledServerVersions | SSL_OP_SINGLE_DH_USE);
+    if (s_allowedServerCiphers != "-")
+        SSL_CTX_set_cipher_list(m_serverContext.get(), s_allowedServerCiphers.data());
 
     m_clientContext.reset(SSL_CTX_new(SSLv23_client_method()));
     SSL_CTX_set_options(m_clientContext.get(), 0);
@@ -174,8 +176,16 @@ void SslStaticData::setAllowedServerVersions(const String& versions)
     NX_ASSERT(!s_isInitialized, "SSL version does not take effect after first SSL engine usage");
 }
 
+void SslStaticData::setAllowedServerCiphers(const String& ciphers)
+{
+    NX_LOG(lm("Set server SSL ciphers: %1").str(ciphers), cl_logALWAYS);
+    s_allowedServerCiphers = ciphers;
+    NX_ASSERT(!s_isInitialized, "SSL ciphers does not take effect after first SSL engine usage");
+}
+
 std::atomic<bool> SslStaticData::s_isInitialized(false);
 int SslStaticData::s_disabledServerVersions(SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3);
+String SslStaticData::s_allowedServerCiphers("HIGH:!RC4:!3DES");
 
 } // namespace ssl
 } // namespace network

@@ -16,6 +16,11 @@ public:
 
     virtual void accept() override;
 
+signals:
+    void cloudPassowrdValidated(
+        bool success,
+        const QString& password);
+
 private:
     QnDisconnectFromCloudDialogPrivate* d_ptr;
     Q_DECLARE_PRIVATE(QnDisconnectFromCloudDialog)

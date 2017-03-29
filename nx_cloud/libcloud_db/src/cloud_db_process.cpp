@@ -277,13 +277,13 @@ int CloudDBProcess::exec()
         if (!multiAddressHttpServer.listen())
             return 5;
         m_httpEndpoints = multiAddressHttpServer.endpoints();
+        NX_LOGX(lm("Listening on %1").container(m_httpEndpoints), cl_logINFO);
 
         if (m_terminated)
             return 0;
 
-        NX_LOG(lit("%1 has been started")
-                .arg(QnLibCloudDbAppInfo::applicationDisplayName()),
-               cl_logALWAYS);
+        NX_LOG(lm("%1 has been started")
+            .arg(QnLibCloudDbAppInfo::applicationDisplayName()), cl_logALWAYS);
 
         processStartResult = true;
         triggerOnStartedEventHandlerGuard.fire();
@@ -291,9 +291,13 @@ int CloudDBProcess::exec()
         // This is actually the main loop.
         m_processTerminationEvent.get_future().wait();
 
+        NX_LOGX(lm("Stopping..."), cl_logALWAYS);
+
         // First of all, cancelling accepting new requests.
         multiAddressHttpServer.forEachListener(
             [](nx_http::HttpStreamSocketServer* listener) { listener->pleaseStopSync(); });
+
+        NX_LOGX(lm("Http server stopped"), cl_logDEBUG1);
 
         ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
             systemManager.systemMarkedAsDeletedSubscription());
@@ -457,6 +461,11 @@ void CloudDBProcess::registerApiHandlers(
     registerHttpHandler(
         kMaintenanceGetTransactionLog,
         &MaintenanceManager::getTransactionLog, maintenanceManager,
+        EntityType::maintenance, DataActionType::fetch);
+
+    registerHttpHandler(
+        kMaintenanceGetStatistics,
+        &MaintenanceManager::getStatistics, maintenanceManager,
         EntityType::maintenance, DataActionType::fetch);
 
     //---------------------------------------------------------------------------------------------

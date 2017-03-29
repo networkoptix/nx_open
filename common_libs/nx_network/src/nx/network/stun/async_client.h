@@ -46,7 +46,7 @@ public:
     
     virtual void addOnReconnectedHandler(ReconnectHandler handler, void* client = 0) override;
     virtual void sendRequest(Message request, RequestHandler handler, void* client = 0) override;
-    virtual void addConnectionTimer(
+    virtual bool addConnectionTimer(
         std::chrono::milliseconds period, TimerHandler handler, void* client) override;
     
     virtual SocketAddress localAddress() const override;

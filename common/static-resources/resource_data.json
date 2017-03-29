@@ -224,7 +224,8 @@
         },
         {
             "keys":[
-                "Axis|P7216*"
+                "Axis|P7216*",
+                "Axis|AXISP7216*"
             ],
             "ignoreONVIF": true
         },
@@ -1709,6 +1710,17 @@
 			"urlLocalePath": "/cgi-bin/admin/setup_main.cgi",
             "desiredH264Profile": "High"
 		},
+        {
+            "keys":[
+                "DW|DWC-MTT4W*",
+                "DigitalWatchdog|DWC-MTT4W*",
+                "DW|DWC-MVT4W*",
+                "DigitalWatchdog|DWC-MVT4W*",
+                "DW|DWC-MBT4W*",
+                "DigitalWatchdog|DWC-MBT4W*"
+             ],
+             "trustToVideoSourceSize": false
+        },
         {
             "keys":[
                 "Digital_Watchdog|DWC-PF5M1TIR", "DigitalWatchdog|DWC-MD85DiA", "DigitalWatchdog|DWC-MV85DiA", "Digital_Watchdog|DWC-MV85DiA"

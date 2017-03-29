@@ -546,8 +546,14 @@ void AsyncHttpClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t byt
     m_responseBuffer.resize(0);
     if (!m_socket->setRecvTimeout(m_responseReadTimeoutMs))
     {
-        NX_LOGX(lm("Error reading (1) http response from %1. %2")
-            .arg(m_contentLocationUrl).arg(SystemError::getLastOSErrorText()), cl_logDEBUG1);
+        if (reconnectIfAppropriate())
+            return;
+
+        const auto sysErrorCode = SystemError::getLastOSErrorCode();
+        NX_LOGX(lm("Url %1. Error setting receive timeout to %2 ms. %3")
+            .arg(m_contentLocationUrl).arg(m_responseReadTimeoutMs)
+            .arg(SystemError::toString(sysErrorCode)),
+            cl_logDEBUG1);
         m_state = sFailed;
         const auto requestSequenceBak = m_requestSequence;
         emit done(sharedThis);

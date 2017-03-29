@@ -380,7 +380,13 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
             welcomeScreen->setVisible(!checked);
             if (workbench()->layouts().isEmpty())
                 action(QnActions::OpenNewTabAction)->trigger();
-        });
+        }, Qt::QueuedConnection); //< QueuedConnection is needed here because 2 title bars
+                                  // (windowed/welcomescreen and fullscreen) are subscribed
+                                  // to MainMenuAction, and main menu must not change
+                                  // windowed/welcomescreen/fullscreen state
+                                  // BETWEEN their slots processing MainMenuAction.
+                                  //
+                                  //TODO: #vkutin #gdm #ynikitenkov Lift this limitation in the future
 
     connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
         [resourceModeAction]() { resourceModeAction->setChecked(true); });

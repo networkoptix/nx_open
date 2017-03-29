@@ -1,6 +1,10 @@
 'use strict';
 
 angular.module('webadminApp')
+    .run(['$http','$templateCache', function($http,$templateCache) {
+        // Preload content into cache
+        $http.get(Config.viewsDir + 'components/offline.html', {cache: $templateCache});
+    }])
     .controller('OfflineCtrl', function ($scope, $modalInstance, $interval, mediaserver) {
 
         function reload(){

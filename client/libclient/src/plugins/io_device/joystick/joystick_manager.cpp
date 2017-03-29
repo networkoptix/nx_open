@@ -16,7 +16,7 @@ namespace {
 
 const QString kDefaultConfigFileName = lit("joystick_config.json");
 
-} // namespace 
+} // namespace
 
 namespace nx {
 namespace client {
@@ -64,7 +64,7 @@ void Manager::loadDrivers()
 
 bool Manager::loadMappings()
 {
-    const auto path = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + 'L/' + kDefaultConfigFileName;
+    const auto path = QStandardPaths::writableLocation(QStandardPaths::DataLocation) + L'/' + kDefaultConfigFileName;
     bool loaded = m_configHolder.load(path);
 
     if (!loaded)

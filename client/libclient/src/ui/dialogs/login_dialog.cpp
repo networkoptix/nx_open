@@ -308,11 +308,12 @@ void QnLoginDialog::accept()
             const auto status = QnConnectionDiagnosticsHelper::validateConnection(
                 connectionInfo, errorCode, this);
 
+            if (!guard)
+                return;
+
             m_requestHandle = -1;
             updateUsability();
 
-            if (!guard)
-                return;
             switch (status)
             {
                 case Qn::SuccessConnectionResult:

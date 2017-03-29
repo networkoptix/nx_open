@@ -23,18 +23,22 @@ from .server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_
 from .vagrant_box_config import BoxConfigFactory, BoxConfig
 from .cloud_host import CloudHost
 from .camera import Camera, SampleMediaFile
+from .media_stream import open_media_stream
 
 
-MEDIASERVER_CONFIG_PATH = '/opt/{company_name}/mediaserver/etc/mediaserver.conf'
-MEDIASERVER_CONFIG_PATH_INITIAL = '{config_path}.initial'
+MEDIASERVER_DIR = '/opt/{company_name}/mediaserver'
+MEDIASERVER_CONFIG_PATH = 'etc/mediaserver.conf'
+MEDIASERVER_CONFIG_PATH_INITIAL = 'etc/mediaserver.conf.initial'
+MEDIASERVER_CLOUDHOST_PATH = 'lib/libcommon.so'
+MEDIASERVER_STORAGE_PATH = 'var/data'
+MEDIASERVER_LOG_PATH = 'var/log/log_file.log'
+
 MEDIASERVER_SERVICE_NAME = '{company_name}-mediaserver'
 MEDIASERVER_LISTEN_PORT = 7001
 MEDIASERVER_UNSETUP_LOCAL_SYSTEM_ID = '{00000000-0000-0000-0000-000000000000}'  # local system id for not set up server
 
 MEDIASERVER_CLOUDHOST_TAG = 'this_is_cloud_host_name'
 MEDIASERVER_CLOUDHOST_SIZE = 76  # MEDIASERVER_CLOUDHOST_TAG + ' ' + cloud_host + '\0' * required paddings count to 76
-MEDIASERVER_CLOUDHOST_FPATH = '/opt/{company_name}/mediaserver/lib/libcommon.so'
-MEDIASERVER_STORAGE_FPATH = '/opt/{company_name}/mediaserver/var/data'  # hardcoded for now
 
 MEDIASERVER_CREDENTIALS_TIMEOUT_SEC = 60 * 5
 MEDIASERVER_MERGE_TIMEOUT_SEC = MEDIASERVER_CREDENTIALS_TIMEOUT_SEC
@@ -112,45 +116,6 @@ class Service(object):
         self.run_action(is_up and 'start' or 'stop')
 
 
-class ServerPersistentInfo(object):
-
-    _cache_key = 'nx/mediaservers'
-
-    @classmethod
-    def load_from_cache(cls, cache):
-        return map(cls.from_dict, cache.get(cls._cache_key, []))
-
-    @classmethod
-    def save_to_cache(cls, cache, server_persistent_info_list):
-        cache.set(cls._cache_key, [info.to_dict() for into in server_persistent_info_list])
-
-    @classmethod
-    def from_dict(cls, d):
-        return ServerPersistentInfo(
-            name=d['name'],
-            box_name=d['box_name'],
-            storage_url=d['storage_url'],
-            user=d['user'],
-            password=d['password'],
-            )
-
-    def __init__(self, name, box_name, storage_url, user, password):
-        self.name = name
-        self.box_name = box_name
-        self.storage_url = storage_url
-        self.user = user
-        self.password = password
-
-    def to_dict(self):
-        return dict(
-            name=self.name,
-            box_name=self.box_name,
-            storage_url=self.storage_url,
-            user=self.user,
-            password=self.password,
-            )
-
-
 class ServerConfigFactory(object):
 
     def __init__(self, box_config_factory):
@@ -190,8 +155,12 @@ class Server(object):
         self.title = name
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
         self.box = box
+        self.host = box.host
         self.url = url
-        self._config_path = MEDIASERVER_CONFIG_PATH.format(company_name=self._company_name)
+        self.dir = MEDIASERVER_DIR.format(company_name=self._company_name)
+        self._config_path = os.path.join(self.dir, MEDIASERVER_CONFIG_PATH)
+        self._config_path_initial = os.path.join(self.dir, MEDIASERVER_CONFIG_PATH_INITIAL)
+        self._log_path = os.path.join(self.dir, MEDIASERVER_LOG_PATH)
         self.service = Service(box, MEDIASERVER_SERVICE_NAME.format(company_name=self._company_name))
         self.user = REST_API_USER
         self.password = REST_API_PASSWORD
@@ -203,7 +172,10 @@ class Server(object):
         self._is_started = None
 
     def __repr__(self):
-        return 'Server%r@%s' % (self.name, self.url)
+        return 'Server(%s)' % self
+
+    def __str__(self):
+        return '%r@%s' % (self.name, self.url)
 
     def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None, config_file_params=None):
         self._is_started = was_started = self.service.get_status()
@@ -231,9 +203,6 @@ class Server(object):
     def is_started(self):
         assert self._is_started is not None, 'is_started state is still unknown'
         return self._is_started
-
-    def get_persistent_info(self):
-        return ServerPersistentInfo(self.name, self.box.name, self.user, self.password)
 
     def start_service(self):
         self.set_service_status(started=True)
@@ -289,9 +258,7 @@ class Server(object):
         self.restart()
 
     def reset_config(self, **kw):
-        self.box.host.run_command(['cp',
-                                   MEDIASERVER_CONFIG_PATH_INITIAL.format(config_path=self._config_path),
-                                   self._config_path])
+        self.host.run_command(['cp', self._config_path_initial, self._config_path])
         self.change_config(removeDbOnStartup=1, **kw)
 
     def restart(self, timeout=30):
@@ -337,15 +304,18 @@ class Server(object):
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             return False
 
+    def get_log_file(self):
+        return self.host.read_file(self._log_path)
+
     def change_config(self, **kw):
-        old_config = self.box.host.read_file(self._config_path)
+        old_config = self.host.read_file(self._config_path)
         new_config = change_mediaserver_config(old_config, **kw)
-        self.box.host.write_file(self._config_path, new_config)
+        self.host.write_file(self._config_path, new_config)
 
     def patch_binary_set_cloud_host(self, new_host):
         assert not self._is_started, 'Server %s must be stopped first for patching its binaries' % self
-        path_to_patch = MEDIASERVER_CLOUDHOST_FPATH.format(company_name=self._company_name)
-        data = self.box.host.read_file(path_to_patch)
+        path_to_patch = os.path.join(self.dir, MEDIASERVER_CLOUDHOST_PATH)
+        data = self.host.read_file(path_to_patch)
         idx = data.find(MEDIASERVER_CLOUDHOST_TAG)
         assert idx != -1, ('Cloud host tag %r is missing from mediaserver binary file %r'
                            % (MEDIASERVER_CLOUDHOST_TAG, path_to_patch))
@@ -353,16 +323,16 @@ class Server(object):
         assert eidx != -1
         old_host = data[idx + len(MEDIASERVER_CLOUDHOST_TAG) + 1 : eidx]
         if new_host == old_host:
-            log.debug('Server binary %s at %s already has %r in it', path_to_patch, self.box, new_host)
+            log.debug('Server binary %s at %s already has %r in it', path_to_patch, self.host, new_host)
             return
-        log.info('Patching %s at %s with new cloud host %r (was: %r)...', path_to_patch, self.box, new_host, old_host)
+        log.info('Patching %s at %s with new cloud host %r (was: %r)...', path_to_patch, self.host, new_host, old_host)
         new_str = MEDIASERVER_CLOUDHOST_TAG + ' ' + new_host
         assert len(new_str) < MEDIASERVER_CLOUDHOST_SIZE, 'Cloud host name is too long: %r' % new_host
         padded_str = new_str + '\0' * (MEDIASERVER_CLOUDHOST_SIZE - len(new_str))
         assert len(padded_str) == MEDIASERVER_CLOUDHOST_SIZE
         new_data = data[:idx] + padded_str + data[idx + MEDIASERVER_CLOUDHOST_SIZE:]
         assert len(new_data) == len(data)
-        self.box.host.write_file(path_to_patch, new_data)
+        self.host.write_file(path_to_patch, new_data)
         self.set_user_password(REST_API_USER, REST_API_PASSWORD)  # Must be reset to default onces
 
     def set_system_settings(self, **kw):
@@ -477,7 +447,7 @@ class Server(object):
         ## storage_records = [record for record in self.rest_api.ec2.getStorages.GET() if record['parentId'] == self.ecs_guid]
         ## assert len(storage_records) >= 1, 'No storages for server with ecs guid %s is returned by %s' % (self.ecs_guid, self.url)
         ## storage_path = storage_records[0]['url']
-        storage_path = MEDIASERVER_STORAGE_FPATH.format(company_name=self._company_name)
+        storage_path = os.path.join(self.dir, MEDIASERVER_STORAGE_PATH)
         return Storage(self.box, storage_path)
 
     def rebuild_archive(self):
@@ -496,6 +466,11 @@ class Server(object):
         log.info('Server %r returned recorded periods:', self.name)
         log.info('\t%s', '\n\t'.join(map(str, periods)))
         return periods
+
+    def get_media_stream(self, stream_type, camera):
+        assert stream_type in ['rtsp', 'webm', 'hls', 'direct-hls'], repr(stream_type)
+        assert isinstance(camera, Camera), repr(camera)
+        return open_media_stream(self.url, self.user, self.password, stream_type, camera.mac_addr)
 
 
 class Storage(object):
@@ -527,7 +502,7 @@ class Storage(object):
     # server/var/data/data/low_quality/urn_uuid_b0e78864-c021-11d3-a482-f12907312681/2017/01/27/12/1485511093576_21332.mkv
     def _construct_fpath(self, camera_mac_addr, quality_part, start_time, duration):
         local_dt = start_time.astimezone(self.box.timezone)  # box local
-        unixtime_utc_ms = utils.datetime_utc_to_timestamp(start_time)
+        unixtime_utc_ms = int(utils.datetime_utc_to_timestamp(start_time) * 1000)
         duration_ms = int(duration.total_seconds() * 1000)
         return os.path.join(
             self.dir, quality_part, camera_mac_addr,
