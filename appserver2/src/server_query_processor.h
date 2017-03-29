@@ -625,7 +625,7 @@ private:
     {
         NX_ASSERT(ApiCommand::isPersistent(tran.command));
 
-        tran.transactionType = getTransactionDescriptorByTransaction(tran)->getTransactionTypeFunc(tran.params, m_db.db());
+        tran.transactionType = getTransactionDescriptorByTransaction(tran)->getTransactionTypeFunc(m_db.db()->commonModule(), tran.params, m_db.db());
         if (tran.transactionType == TransactionType::Unknown)
             return ErrorCode::forbidden;
 

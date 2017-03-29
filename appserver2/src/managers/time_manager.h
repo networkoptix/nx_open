@@ -55,7 +55,7 @@ namespace ec2 {
 
 class Ec2DirectConnection;
 /**
- * Sequence has less priority than TimeSynchronizationManager::peerIsServer and 
+ * Sequence has less priority than TimeSynchronizationManager::peerIsServer and
  * TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer flags
  */
 class TimePriorityKey
@@ -133,7 +133,7 @@ public:
      * @note Cannot do it in constructor to keep valid object destruction order.
      * TODO #ak look like incapsulation failure. Better remove this method.
      */
-    void start();
+    void start(const std::shared_ptr<Ec2DirectConnection>& connection);
 
     /** Returns synchronized time (millis from epoch, UTC). */
     qint64 getSyncTime() const;
