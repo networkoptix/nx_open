@@ -35,31 +35,34 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) const
 {
     using namespace QnBusiness;
 
-    switch(value) {
-    case UndefinedAction:           return QString();
-    case CameraOutputAction:        return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                        tr("Device output"),
-                                        tr("Camera output")
-                                    );
-    case CameraRecordingAction:     return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                        tr("Device recording"),
-                                        tr("Camera recording")
-                                    );
-    case BookmarkAction:            return tr("Bookmark");
-    case PanicRecordingAction:      return tr("Panic recording");
-    case SendMailAction:            return tr("Send Email");
-    case DiagnosticsAction:         return tr("Write to log");
-    case ShowPopupAction:           return tr("Show notification");
-    case PlaySoundAction:           return tr("Repeat sound");
-    case PlaySoundOnceAction:       return tr("Play sound");
-    case SayTextAction:             return tr("Speak");
-    case ExecutePtzPresetAction:    return tr("Execute PTZ preset");
-    case ShowTextOverlayAction:     return tr("Show text overlay");
-    case ShowOnAlarmLayoutAction:   return tr("Show on Alarm Layout");
-    case ExecHttpRequestAction:     return tr("Do HTTP request");
+    switch (value)
+    {
+        case UndefinedAction:           return QString();
+        case CameraOutputAction:        return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
+            tr("Device output"),
+            tr("Camera output")
+        );
+        case CameraRecordingAction:     return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
+            tr("Device recording"),
+            tr("Camera recording")
+        );
+        case BookmarkAction:            return tr("Bookmark");
+        case PanicRecordingAction:      return tr("Panic recording");
+        case SendMailAction:            return tr("Send Email");
+        case DiagnosticsAction:         return tr("Write to log");
+        case ShowPopupAction:           return tr("Show notification");
+        case PlaySoundAction:           return tr("Repeat sound");
+        case PlaySoundOnceAction:       return tr("Play sound");
+        case SayTextAction:             return tr("Speak");
+        case ExecutePtzPresetAction:    return tr("Execute PTZ preset");
+        case ShowTextOverlayAction:     return tr("Show text overlay");
+        case ShowOnAlarmLayoutAction:   return tr("Show on Alarm Layout");
+        case ExecHttpRequestAction:     return tr("Do HTTP request");
 
-    default:
-        break;
+        default:
+            break;
     }
 
     NX_ASSERT(false, Q_FUNC_INFO, "All enumeration values must be handled here");
@@ -78,37 +81,41 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value, int coun
         return result;
     }
 
-    switch( value )
+    switch (value)
     {
-    case CameraMotionEvent:     return tr("Motion on Cameras", "", count);
-    case CameraInputEvent:      return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    tr("Input Signal on Devices", "", count),
-                                    tr("Input Signal on Cameras", "", count)
-                                );
-    case CameraDisconnectEvent: return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    tr("Devices Disconnected", "", count),
-                                    tr("Cameras Disconnected", "", count)
-                                );
-    case CameraIpConflictEvent: return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    tr("Devices IP Conflict", "", count),
-                                    tr("Cameras IP Conflict", "", count)
-                                );
-    case AnyCameraEvent:        return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    tr("Any Device Issue"),
-                                    tr("Any Camera Issue")
-                                );
-    case StorageFailureEvent:   return tr("Storage Failure");
-    case NetworkIssueEvent:     return tr("Network Issue");
-    case ServerFailureEvent:    return tr("Server Failure");
-    case ServerConflictEvent:   return tr("Server Conflict");
-    case ServerStartEvent:      return tr("Server Started");
-    case LicenseIssueEvent:     return tr("License Issue");
-    case BackupFinishedEvent:   return tr("Archive backup finished");
+        case CameraMotionEvent:     return tr("Motion on Cameras", "", count);
+        case CameraInputEvent:      return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
+            tr("Input Signal on Devices", "", count),
+            tr("Input Signal on Cameras", "", count)
+        );
+        case CameraDisconnectEvent: return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
+            tr("Devices Disconnected", "", count),
+            tr("Cameras Disconnected", "", count)
+        );
+        case CameraIpConflictEvent: return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
+            tr("Devices IP Conflict", "", count),
+            tr("Cameras IP Conflict", "", count)
+        );
+        case AnyCameraEvent:        return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
+            tr("Any Device Issue"),
+            tr("Any Camera Issue")
+        );
+        case StorageFailureEvent:   return tr("Storage Failure");
+        case NetworkIssueEvent:     return tr("Network Issue");
+        case ServerFailureEvent:    return tr("Server Failure");
+        case ServerConflictEvent:   return tr("Server Conflict");
+        case ServerStartEvent:      return tr("Server Started");
+        case LicenseIssueEvent:     return tr("License Issue");
+        case BackupFinishedEvent:   return tr("Archive backup finished");
 
-    case AnyServerEvent:        return tr("Any Server Issue");
-    case AnyBusinessEvent:      return tr("Any Event");
-    default:
-        return QString();
+        case AnyServerEvent:        return tr("Any Server Issue");
+        case AnyBusinessEvent:      return tr("Any Event");
+        default:
+            return QString();
     }
 }
 
@@ -126,6 +133,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
 
     case CameraDisconnectEvent:
         return QnDeviceDependentStrings::getNameFromSet(
+            resourcePool(),
             QnCameraDeviceStringSet(
                 tr("Device %1 was disconnected"),
                 tr("Camera %1 was disconnected"),
@@ -150,6 +158,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
 
     case CameraIpConflictEvent:
         return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
     		//: Device IP Conflict at <server_name>
             tr("Device IP Conflict at %1"),
 
@@ -479,6 +488,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         NX_ASSERT(!disabledCameras.isEmpty(), Q_FUNC_INFO, "At least one camera should be disabled on this event");
 
         result = QnDeviceDependentStrings::getNameFromSet(
+                resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("Not enough licenses. Recording has been disabled on following devices:"),
                     tr("Not enough licenses. Recording has been disabled on following cameras:"),
