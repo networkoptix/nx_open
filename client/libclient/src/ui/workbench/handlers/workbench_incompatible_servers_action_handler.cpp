@@ -179,7 +179,7 @@ bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(
     if (!server)
         return true;
 
-    const auto licenseHelper = QnLicenseListHelper(qnLicensePool->getLicenses());
+    const auto licenseHelper = QnLicenseListHelper(licensePool()->getLicenses());
     if (licenseHelper.totalLicenseByType(Qn::LC_Start) == 0)
         return true; /* We have no start licenses so all is OK. */
 

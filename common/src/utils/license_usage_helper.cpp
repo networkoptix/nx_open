@@ -94,7 +94,7 @@ QnLicenseUsageWatcher::QnLicenseUsageWatcher(QObject* parent):
     connect(resPool,      &QnResourcePool::statusChanged,     this,   updateIfNeeded);
     connect(resPool,      &QnResourcePool::resourceRemoved,   this,   updateIfNeeded);
 
-    connect(qnLicensePool,  &QnLicensePool::licensesChanged,    this,   &QnLicenseUsageWatcher::licenseUsageChanged);
+    connect(licensePool(),  &QnLicensePool::licensesChanged,    this,   &QnLicenseUsageWatcher::licenseUsageChanged);
 }
 
 
@@ -179,7 +179,7 @@ void QnLicenseUsageHelper::updateCache() const {
     /* Need to set flag right here as virtual methods may call various cache-dependent getters. */
     m_dirty = false;
 
-    m_cache.licenses.update(qnLicensePool->getLicenses());
+    m_cache.licenses.update(licensePool()->getLicenses());
 
     /* How many licenses of each type are borrowed. */
     licensesArray borrowedLicenses;

@@ -382,11 +382,11 @@ void QnCommonMessageProcessor::on_cameraHistoryChanged(const ec2::ApiServerFoota
 }
 
 void QnCommonMessageProcessor::on_licenseChanged(const QnLicensePtr &license) {
-    qnLicensePool->addLicense(license);
+    licensePool()->addLicense(license);
 }
 
 void QnCommonMessageProcessor::on_licenseRemoved(const QnLicensePtr &license) {
-    qnLicensePool->removeLicense(license);
+    licensePool()->removeLicense(license);
 }
 
 void QnCommonMessageProcessor::on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &businessRule){
@@ -486,7 +486,7 @@ void QnCommonMessageProcessor::resetResources(const ec2::ApiFullInfoData& fullDa
 
 void QnCommonMessageProcessor::resetLicenses(const ec2::ApiLicenseDataList& licenses)
 {
-    qnLicensePool->replaceLicenses(licenses);
+    licensePool()->replaceLicenses(licenses);
 }
 
 void QnCommonMessageProcessor::resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList& cameraHistoryList)

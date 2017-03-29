@@ -121,7 +121,7 @@ QVariant QnLicenseListModel::textData(const QModelIndex& index, bool fullText) c
             bool fullStatus = fullText || m_extendedStatus;
 
             QnLicense::ErrorCode code;
-            if (qnLicensePool->isLicenseValid(license, &code))
+            if (licensePool()->isLicenseValid(license, &code))
                 return expirationInfo(license, fullStatus).second;
 
             if (fullStatus)
@@ -165,7 +165,7 @@ QVariant QnLicenseListModel::foregroundData(const QModelIndex& index) const
         case QnLicenseListModel::LicenseStatusColumn:
         {
             QnLicense::ErrorCode code;
-            if (!qnLicensePool->isLicenseValid(license, &code))
+            if (!licensePool()->isLicenseValid(license, &code))
             {
                 if (index.column() != QnLicenseListModel::ExpirationDateColumn
                     || code == QnLicense::Expired)

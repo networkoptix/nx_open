@@ -48,7 +48,7 @@ QnWorkbenchLicenseNotifier::QnWorkbenchLicenseNotifier(QObject *parent):
             executeDelayedParented([this]{ checkLicenses(); }, kMessagesDelayMs, this);
         };
 
-    connect(qnLicensePool, &QnLicensePool::licensesChanged, this, checkLicensesDelayed);
+    connect(licensePool(), &QnLicensePool::licensesChanged, this, checkLicensesDelayed);
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
         checkLicensesDelayed);
     connect(context(), &QnWorkbenchContext::userChanged, this,
@@ -89,12 +89,12 @@ void QnWorkbenchLicenseNotifier::checkLicenses()
         }
     }
 
-    for (const auto& license: qnLicensePool->getLicenses())
+    for (const auto& license: licensePool()->getLicenses())
     {
         QnLicense::ErrorCode errorCode;
 
         if (someLicenseWillBeBlocked
-            && !qnLicensePool->isLicenseValid(license, &errorCode)
+            && !licensePool()->isLicenseValid(license, &errorCode)
             && errorCode != QnLicense::Expired)
         {
             licenses.push_back(license);

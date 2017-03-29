@@ -73,7 +73,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     QLocale locale;
     params.addQueryItem(kLang, QLocale::languageToString(locale.language()));
 
-    const QVector<QString> hardwareIds = qnLicensePool->hardwareIds();
+    const QVector<QString> hardwareIds = licensePool()->hardwareIds();
     for (const QString& hwid: hardwareIds)
     {
         int version = LLUtil::hardwareIdVersion(hwid);

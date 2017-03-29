@@ -1,9 +1,10 @@
-#ifndef __SIGN_FRAME_HELPER__
-#define __SIGN_FRAME_HELPER__
+#pragma once
 
 #include <QtCore/QByteArray>
 #include <QtCore/QCoreApplication>
 #include <QtGui/QPainter>
+
+#include <common/common_module_aware.h>
 
 #include <utils/common/cryptographic_hash.h>
 
@@ -15,11 +16,11 @@ static const QnCryptographicHash::Algorithm EXPORT_SIGN_METHOD = QnCryptographic
 class SPSUnit;
 class PPSUnit;
 
-class QnSignHelper
+class QnSignHelper: public QnCommonModuleAware
 {
     Q_DECLARE_TR_FUNCTIONS(QnSignHelper)
 public:
-    QnSignHelper();
+    QnSignHelper(QnCommonModule* commonModule);
     ~QnSignHelper();
     void setLogo(QPixmap logo);
     QnCompressedVideoDataPtr createSignatureFrame(AVCodecContext* srcCodec, QnCompressedVideoDataPtr iFrame);
@@ -45,7 +46,7 @@ public:
     void setSignOpacity(float opacity, QColor color);
 
     /** Return initial signature as filler */
-    static QByteArray getSignPattern();
+    static QByteArray getSignPattern(QnLicensePool* licensePool);
     static int getMaxSignSize();
     static char getSignPatternDelim();
 
@@ -82,5 +83,3 @@ private:
     QString m_licensedToStr;
     AVPacket* m_outPacket;
 };
-
-#endif // __SIGN_FRAME_HELPER__

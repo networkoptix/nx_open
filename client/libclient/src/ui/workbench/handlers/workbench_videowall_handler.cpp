@@ -1455,7 +1455,7 @@ void QnWorkbenchVideoWallHandler::cleanupUnusedLayouts()
 void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 {
 
-    QnLicenseListHelper licenseList(qnLicensePool->getLicenses());
+    QnLicenseListHelper licenseList(licensePool()->getLicenses());
     if (licenseList.totalLicenseByType(Qn::LC_VideoWall) == 0)
     {
         QnMessageBox::warning(mainWindow(),

@@ -5,17 +5,17 @@
 QnLicensePoolScaffold::QnLicensePoolScaffold(bool isArm /* = false */):
     m_arm(isArm)
 {
-    qnLicensePool;
+    licensePool();
 }
 
 QnLicensePoolScaffold::~QnLicensePoolScaffold() {
-    qnLicensePool->reset();
+    licensePool()->reset();
 }
 
 void QnLicensePoolScaffold::addLicenses(Qn::LicenseType licenseType, int count) {
     auto stub = new QnLicenseStub(licenseType, count);
     stub->setArmServer(m_arm);
-    qnLicensePool->addLicense(QnLicensePtr(stub));
+    licensePool()->addLicense(QnLicensePtr(stub));
 }
 
 void QnLicensePoolScaffold::addLicense(Qn::LicenseType licenseType) {
@@ -24,5 +24,5 @@ void QnLicensePoolScaffold::addLicense(Qn::LicenseType licenseType) {
 
 void QnLicensePoolScaffold::addFutureLicenses(int count) {
     auto stub = new QnFutureLicenseStub(count);
-    qnLicensePool->addLicense(QnLicensePtr(stub));
+    licensePool()->addLicense(QnLicensePtr(stub));
 }

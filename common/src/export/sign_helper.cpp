@@ -58,7 +58,8 @@ float getAvgColor(const AVFrame* frame, int plane, const QRect& rect)
     return sum / (rect.width() * rect.height());
 }
 
-QnSignHelper::QnSignHelper():
+QnSignHelper::QnSignHelper(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
     m_cachedMetric(QFont()),
     m_outPacket(av_packet_alloc())
 {
@@ -66,11 +67,11 @@ QnSignHelper::QnSignHelper():
     m_signBackground = Qt::white;
 
     m_versionStr = qApp->applicationName().append(QLatin1String(" v")).append(QCoreApplication::applicationVersion());
-    m_hwIdStr = qnLicensePool->currentHardwareId();
+    m_hwIdStr = licensePool()->currentHardwareId();
     if (m_hwIdStr.isEmpty())
         m_hwIdStr = tr("Unknown");
 
-    QList<QnLicensePtr> list = qnLicensePool->getLicenses();
+    QList<QnLicensePtr> list = licensePool()->getLicenses();
     m_licensedToStr = tr("Trial License");
     for (const QnLicensePtr& license: list)
     {
@@ -747,7 +748,7 @@ int QnSignHelper::getMaxSignSize()
     return 512;
 }
 
-QByteArray QnSignHelper::getSignPattern()
+QByteArray QnSignHelper::getSignPattern(QnLicensePool* licensePool)
 {
     QByteArray result;
     result.append(INITIAL_SIGNATURE_MAGIC);
@@ -755,12 +756,12 @@ QByteArray QnSignHelper::getSignPattern()
 
     result.append(qApp->applicationName().toUtf8()).append(" v").append(QCoreApplication::applicationVersion().toUtf8()).append(SIGN_TEXT_DELIMITER);
 
-    QString hid = qnLicensePool->currentHardwareId();
+    QString hid = licensePool->currentHardwareId();
     if (hid.isEmpty())
         hid = tr("Unknown");
     result.append(hid.toUtf8()).append(SIGN_TEXT_DELIMITER);
 
-    QList<QnLicensePtr> list = qnLicensePool->getLicenses();
+    QList<QnLicensePtr> list = licensePool->getLicenses();
     QString licenseName(tr("FREE License"));
     for (const QnLicensePtr& license: list)
     {

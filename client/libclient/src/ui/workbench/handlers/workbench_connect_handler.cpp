@@ -1088,7 +1088,7 @@ void QnWorkbenchConnectHandler::clearConnection()
     propertyDictionary->clear(idList);
     qnStatusDictionary->clear(idList);
 
-    qnLicensePool->reset();
+    licensePool()->reset();
     qnCommon->setReadOnly(false);
 }
 

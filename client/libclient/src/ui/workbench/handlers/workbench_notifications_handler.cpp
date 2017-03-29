@@ -59,7 +59,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
     connect(context(), &QnWorkbenchContext::userChanged,
         this, &QnWorkbenchNotificationsHandler::at_context_userChanged);
 
-    connect(qnLicensePool, &QnLicensePool::licensesChanged, this,
+    connect(licensePool(), &QnLicensePool::licensesChanged, this,
         [this]
         {
             checkAndAddSystemHealthMessage(QnSystemHealth::NoLicenses);
@@ -333,7 +333,7 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
             return;
 
         case QnSystemHealth::NoLicenses:
-            setSystemHealthEventVisible(message, context()->user() && qnLicensePool->isEmpty());
+            setSystemHealthEventVisible(message, context()->user() && licensePool()->isEmpty());
             return;
 
         case QnSystemHealth::SmtpIsNotSet:

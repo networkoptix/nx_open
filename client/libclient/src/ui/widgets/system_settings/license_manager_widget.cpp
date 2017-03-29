@@ -185,7 +185,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     QnVideoWallLicenseUsageWatcher* videowallUsageWatcher = new QnVideoWallLicenseUsageWatcher(this);
     connect(camerasUsageWatcher,    &QnLicenseUsageWatcher::licenseUsageChanged,    this,   updateLicensesIfNeeded);
     connect(videowallUsageWatcher,  &QnLicenseUsageWatcher::licenseUsageChanged,    this,   updateLicensesIfNeeded);
-    connect(qnLicensePool,          &QnLicensePool::licensesChanged,                this,   updateLicensesIfNeeded);
+    connect(licensePool(),          &QnLicensePool::licensesChanged,                this,   updateLicensesIfNeeded);
 }
 
 QnLicenseManagerWidget::~QnLicenseManagerWidget()
@@ -226,12 +226,12 @@ void QnLicenseManagerWidget::updateLicenses()
 
     setEnabled(connected);
 
-    m_licenses = qnLicensePool->getLicenses();
+    m_licenses = licensePool()->getLicenses();
 
     QnLicenseListHelper licenseListHelper(m_licenses);
 
     /* Update license widget. */
-    ui->licenseWidget->setHardwareId(qnLicensePool->currentHardwareId());
+    ui->licenseWidget->setHardwareId(licensePool()->currentHardwareId());
     ui->licenseWidget->setFreeLicenseAvailable(
         !licenseListHelper.haveLicenseKey(QnAppInfo::freeLicenseKey().toLatin1())
         && (QnAppInfo::freeLicenseCount() > 0));
@@ -330,7 +330,7 @@ void QnLicenseManagerWidget::showMessage(
 
 void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool infoMode, const QUrl &url)
 {
-    const QVector<QString> hardwareIds = qnLicensePool->hardwareIds();
+    const QVector<QString> hardwareIds = licensePool()->hardwareIds();
 
     if (QnRuntimeInfoManager::instance()->remoteInfo().isNull())
     {
@@ -421,7 +421,7 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
     QList<QnLicensePtr> licensesToUpdate;
     QnLicensePtr keyLicense;
 
-    QnLicenseListHelper licenseListHelper(qnLicensePool->getLicenses());
+    QnLicenseListHelper licenseListHelper(licensePool()->getLicenses());
     for (const QnLicensePtr& license: licenses)
     {
         if (!license)
@@ -545,7 +545,7 @@ void QnLicenseManagerWidget::at_licensesReceived(const QByteArray& licenseKey, e
     if (!licenses.isEmpty())
     {
         m_licenses.append(licenses);
-        qnLicensePool->addLicenses(licenses);
+        licensePool()->addLicenses(licenses);
     }
 
     ui->licenseWidget->setSerialKey(QString());

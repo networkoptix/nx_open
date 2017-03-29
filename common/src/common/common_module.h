@@ -1,9 +1,10 @@
-#ifndef QN_COMMON_MODULE_H
-#define QN_COMMON_MODULE_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QDateTime>
+
+#include <common/common_module_aware.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -23,7 +24,6 @@ class QnRouter;
 class QnGlobalSettings;
 class QnCameraHistoryPool;
 class QnGlobalPermissionsManager;
-class QnRuntimeInfoManager;
 class QnCommonMessageProcessor;
 class QnResourceAccessManager;
 class QnResourceAccessProvider;
@@ -69,11 +69,6 @@ public:
     using QnInstanceStorage::store;
 
     void bindModuleinformation(const QnMediaServerResourcePtr &server);
-
-    QnResourceDataPool *dataPool() const
-    {
-        return m_dataPool;
-    }
 
     QnSessionManager* sessionManager() const
     {
@@ -123,6 +118,11 @@ public:
     QnResourceAccessProvider* resourceAccessProvider() const
     {
         return m_resourceAccessProvider;
+    }
+
+    QnLicensePool* licensePool() const
+    {
+        return m_licensePool;
     }
 
     void setModuleGUID(const QnUuid& guid) { m_uuid = guid; }
@@ -199,11 +199,10 @@ private:
     void updateModuleInformationUnsafe();
 private:
     bool m_dirtyModuleInformation;
-    QnResourceDataPool *m_dataPool;
-    QnSessionManager* m_sessionManager;
-    QnResourcePool* m_resourcePool;
-    QnModuleFinder* m_moduleFinder;
-    QnRouter* m_router;
+    QnSessionManager* m_sessionManager = nullptr;
+    QnResourcePool* m_resourcePool = nullptr;
+    QnModuleFinder* m_moduleFinder = nullptr;
+    QnRouter* m_router = nullptr;
 
     QString m_defaultAdminPassword;
     QnUuid m_uuid;
@@ -214,25 +213,21 @@ private:
     QnSoftwareVersion m_engineVersion;
     QnModuleInformation m_moduleInformation;
     mutable QnMutex m_mutex;
-    bool m_transcodingDisabled;
+    bool m_transcodingDisabled = false;
     QSet<QnUuid> m_allowedPeers;
-    qint64 m_systemIdentityTime;
+    qint64 m_systemIdentityTime = 0;
 
     BeforeRestoreDbData m_beforeRestoreDbData;
-    bool m_lowPriorityAdminPassword;
-    Qn::PeerType m_localPeerType;
+    bool m_lowPriorityAdminPassword = false;
+    Qn::PeerType m_localPeerType = Qn::PT_NotDefined;
     QDateTime m_startupTime;
 
-    QnGlobalSettings* m_globalSettings;
-    QnCameraHistoryPool* m_cameraHistory;
-    QnGlobalPermissionsManager* m_globalPermissionManager;
-    QnCommonMessageProcessor* m_messageProcessor;
-    QnRuntimeInfoManager* m_runtimeInfoManager;
-    QnResourceAccessManager* m_resourceAccessManager;
-    QnResourceAccessProvider* m_resourceAccessProvider;
+    QnGlobalSettings* m_globalSettings = nullptr;
+    QnCameraHistoryPool* m_cameraHistory = nullptr;
+    QnGlobalPermissionsManager* m_globalPermissionManager = nullptr;
+    QnCommonMessageProcessor* m_messageProcessor = nullptr;
+    QnRuntimeInfoManager* m_runtimeInfoManager = nullptr;
+    QnResourceAccessManager* m_resourceAccessManager = nullptr;
+    QnResourceAccessProvider* m_resourceAccessProvider = nullptr;
+    QnLicensePool* m_licensePool = nullptr;
 };
-
-//#define qnCommon (QnCommonModule::instance())
-
-#endif // QN_COMMON_MODULE_H
-

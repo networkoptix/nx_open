@@ -33,3 +33,15 @@ QnCommonModule* QnCommonModuleAware::commonModule() const
 {
     return m_commonModule;
 }
+
+QnLicensePool* QnCommonModuleAware::licensePool() const
+{
+    NX_ASSERT(m_commonModule);
+    return m_commonModule ? m_commonModule->licensePool() : nullptr;
+}
+
+QnRuntimeInfoManager* QnCommonModuleAware::runtimeInfoManager() const
+{
+    NX_ASSERT(m_commonModule);
+    return m_commonModule ? m_commonModule->runtimeInfoManager() : nullptr;
+}

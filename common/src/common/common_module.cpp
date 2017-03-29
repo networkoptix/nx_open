@@ -34,6 +34,8 @@
 #include "core/resource/camera_user_attribute_pool.h"
 #include "core/resource/media_server_user_attributes.h"
 
+#include <licensing/license.h>
+
 #include "utils/common/synctime.h"
 #include <utils/common/app_info.h>
 
@@ -120,7 +122,8 @@ qint64 BeforeRestoreDbData::getSpaceLimitForStorage(const QString& url) const
 
 QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
     QObject(parent),
-    m_messageProcessor(nullptr)
+    m_messageProcessor(nullptr),
+    m_licensePool(new QnLicensePool(this))
 {
     Q_INIT_RESOURCE(common);
 
@@ -172,10 +175,6 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
 
     /* Init members. */
     m_runUuid = QnUuid::createUuid();
-    m_transcodingDisabled = false;
-    m_systemIdentityTime = 0;
-    m_lowPriorityAdminPassword = false;
-    m_localPeerType = Qn::PT_NotDefined;
     m_startupTime = QDateTime::currentDateTime();
 }
 
