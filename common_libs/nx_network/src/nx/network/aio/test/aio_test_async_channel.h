@@ -12,6 +12,8 @@ namespace network {
 namespace aio {
 namespace test {
 
+using IoCompletionHandler = std::function<void(SystemError::ErrorCode, size_t)>;
+
 class NX_NETWORK_API AsyncChannel:
     public AbstractAsyncChannel
 {
@@ -22,6 +24,7 @@ public:
     {
         sendConnectionReset,
         ignore,
+        retry,
     };
 
     AsyncChannel(
@@ -33,10 +36,10 @@ public:
     virtual void bindToAioThread(AbstractAioThread* aioThread) override;
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
     virtual void sendAsync(
         const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+        IoCompletionHandler handler) override;
     virtual void cancelIOSync(EventType eventType) override;
     void pauseReadingData();
     void resumeReadingData();
@@ -56,11 +59,11 @@ private:
     mutable QnMutex m_mutex;
     QByteArray m_totalDataRead;
 
-    std::function<void(SystemError::ErrorCode, size_t)> m_readHandler;
+    IoCompletionHandler m_readHandler;
     bool m_readPaused;
     nx::Buffer* m_readBuffer;
 
-    std::function<void(SystemError::ErrorCode, size_t)> m_sendHandler;
+    IoCompletionHandler m_sendHandler;
     bool m_sendPaused;
     const nx::Buffer* m_sendBuffer;
 
@@ -71,10 +74,13 @@ private:
 
     virtual void stopWhileInAioThread() override;
 
-    void handleInputDepletion(
-        std::function<void(SystemError::ErrorCode, size_t)> handler);
+    void handleInputDepletion();
     void performAsyncRead(const QnMutexLockerBase& /*lock*/);
     void performAsyncSend(const QnMutexLockerBase&);
+    void reportIoCompletion(
+        IoCompletionHandler* ioCompletionHandler,
+        SystemError::ErrorCode sysErrorCode,
+        std::size_t bytesTransferred);
 };
 
 } // namespace test

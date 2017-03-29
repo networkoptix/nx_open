@@ -64,13 +64,20 @@ class ChannelReader
 {
 public:
     ChannelReader(aio::AbstractAsyncChannel* channel):
-        m_channel(channel)
+        m_channel(channel),
+        m_totalBytesRead(0)
     {
     }
 
     void start()
     {
         scheduleNextRead();
+    }
+
+    void waitForSomeData()
+    {
+        while (m_totalBytesRead == 0)
+            std::this_thread::yield();
     }
 
     void waitEof()
@@ -88,6 +95,7 @@ private:
     nx::Buffer m_dataRead;
     nx::Buffer m_readBuffer;
     nx::utils::promise<SystemError::ErrorCode> m_readError;
+    std::atomic<std::size_t> m_totalBytesRead;
 
     void scheduleNextRead()
     {
@@ -107,6 +115,7 @@ private:
         if (sysErrorCode == SystemError::noError && bytesRead > 0)
         {
             m_dataRead.push_back(m_readBuffer);
+            m_totalBytesRead += bytesRead;
             scheduleNextRead();
             return;
         }
@@ -167,7 +176,7 @@ private:
         auto rawDataChannel = std::make_unique<AsyncChannel>(
             &m_reflectingPipeline,
             &m_reflectingPipeline,
-            AsyncChannel::InputDepletionPolicy::ignore);
+            AsyncChannel::InputDepletionPolicy::retry);
         m_rawDataChannel = rawDataChannel.get();
 
         auto converter = std::make_unique<Converter>();
@@ -185,6 +194,8 @@ private:
         reader.start();
 
         ASSERT_EQ(SystemError::noError, writer.writeSync(m_inputData));
+        reader.waitForSomeData();
+        m_reflectingPipeline.writeEof();
 
         reader.waitEof();
         m_outputData = reader.dataRead();
@@ -207,6 +218,8 @@ TEST_F(StreamTransformingAsyncChannel, read_write)
 //TEST_F(StreamTransformingAsyncChannel, read_timeout)
 //TEST_F(StreamTransformingAsyncChannel, write_timeout)
 //TEST_F(StreamTransformingAsyncChannel, removing_in_completion_handler)
+//TEST_F(StreamTransformingAsyncChannel, raw_channel_io_method_calls_handler_within_method_call)
+//TEST_F(StreamTransformingAsyncChannel, cancelling_io)
 
 } // namespace test
 } // namespace aio

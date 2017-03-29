@@ -142,16 +142,24 @@ void AsyncChannel::stopWhileInAioThread()
     m_writer.pleaseStopSync();
 }
 
-void AsyncChannel::handleInputDepletion(
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+void AsyncChannel::handleInputDepletion()
 {
     switch (m_inputDepletionPolicy)
     {
         case InputDepletionPolicy::sendConnectionReset:
-            handler(SystemError::connectionReset, (size_t)-1);
+            m_readBuffer = nullptr;
+            reportIoCompletion(&m_readHandler, SystemError::connectionReset, (size_t)-1);
             break;
+
         case InputDepletionPolicy::ignore:
             break;
+
+        case InputDepletionPolicy::retry:
+        {
+            QnMutexLocker lock(&m_mutex);
+            performAsyncRead(lock);
+            break;
+        }
     }
 }
 
@@ -161,42 +169,50 @@ void AsyncChannel::performAsyncRead(const QnMutexLockerBase& /*lock*/)
 
     m_reader.post(
         [this]()
-    {
-        decltype(m_readHandler) handler;
-        handler.swap(m_readHandler);
-
-        auto buffer = m_readBuffer;
-        m_readBuffer = nullptr;
-
-        m_readPosted = false;
-
-        if (m_errorState)
         {
-            handler(SystemError::connectionReset, (size_t)-1);
-            return;
-        }
+            m_readPosted = false;
 
-        int bytesRead = m_input->read(
-            buffer->data() + buffer->size(),
-            buffer->capacity() - buffer->size());
-        if (bytesRead > 0)
-        {
+            if (m_errorState)
+                return reportIoCompletion(&m_readHandler, SystemError::connectionReset, (size_t)-1);
+
+            int bytesRead = m_input->read(
+                m_readBuffer->data() + m_readBuffer->size(),
+                m_readBuffer->capacity() - m_readBuffer->size());
+            if (bytesRead > 0)
             {
-                QnMutexLocker lock(&m_mutex);
-                m_totalDataRead.append(buffer->data() + buffer->size(), bytesRead);
-                m_totalBytesRead += bytesRead;
+                {
+                    QnMutexLocker lock(&m_mutex);
+                    m_totalDataRead.append(m_readBuffer->data() + m_readBuffer->size(), bytesRead);
+                    m_totalBytesRead += bytesRead;
+                }
+                m_readBuffer->resize(m_readBuffer->size() + bytesRead);
+                m_readBuffer = nullptr;
+
+                reportIoCompletion(&m_readHandler, SystemError::noError, bytesRead);
+
+                if (!m_readPosted)
+                    ++m_readSequence;
+                return;
             }
-            buffer->resize(buffer->size() + bytesRead);
 
-            handler(SystemError::noError, bytesRead);
+            if (bytesRead == utils::pipeline::StreamIoError::osError)
+            {
+                reportIoCompletion(&m_readHandler, SystemError::connectionReset, (size_t)-1);
+                return;
+            }
 
-            if (!m_readPosted)
-                ++m_readSequence;
-            return;
-        }
+            handleInputDepletion();
+        });
+}
 
-        handleInputDepletion(std::move(handler));
-    });
+void AsyncChannel::reportIoCompletion(
+    IoCompletionHandler* ioCompletionHandler,
+    SystemError::ErrorCode sysErrorCode,
+    std::size_t bytesTransferred)
+{
+    IoCompletionHandler handler;
+    handler.swap(*ioCompletionHandler);
+    handler(sysErrorCode, bytesTransferred);
 }
 
 void AsyncChannel::performAsyncSend(const QnMutexLockerBase&)
@@ -208,18 +224,18 @@ void AsyncChannel::performAsyncSend(const QnMutexLockerBase&)
 
     m_writer.post(
         [this, buffer, handler = std::move(handler)]()
-    {
-        if (m_errorState)
         {
-            handler(SystemError::connectionReset, (size_t)-1);
-            return;
-        }
+            if (m_errorState)
+            {
+                handler(SystemError::connectionReset, (size_t)-1);
+                return;
+            }
 
-        int bytesWritten = m_output->write(buffer->constData(), buffer->size());
-        handler(
-            bytesWritten >= 0 ? SystemError::noError : SystemError::connectionReset,
-            bytesWritten);
-    });
+            int bytesWritten = m_output->write(buffer->constData(), buffer->size());
+            handler(
+                bytesWritten >= 0 ? SystemError::noError : SystemError::connectionReset,
+                bytesWritten);
+        });
 }
 
 } // namespace test

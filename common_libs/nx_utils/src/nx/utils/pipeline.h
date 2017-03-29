@@ -112,10 +112,16 @@ public:
 
     const QByteArray& internalBuffer() const;
 
+    /**
+     * Subsequent read operation will report read error after depleting internal buffer.
+     */
+    void writeEof();
+
 private:
     QByteArray m_buffer;
     std::size_t m_totalBytesThrough;
     std::size_t m_maxSize;
+    bool m_eof;
 };
 
 //-------------------------------------------------------------------------------------------------

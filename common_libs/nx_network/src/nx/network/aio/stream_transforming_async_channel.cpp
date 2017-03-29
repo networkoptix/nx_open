@@ -49,7 +49,7 @@ void StreamTransformingAsyncChannel::readSomeAsync(
         {
             m_userTaskQueue.push_back(
                 std::make_unique<ReadTask>(buffer, std::move(handler)));
-            tryToCompleteNextUserTask();
+            tryToCompleteUserTasks();
         });
 }
 
@@ -64,13 +64,15 @@ void StreamTransformingAsyncChannel::sendAsync(
         {
             m_userTaskQueue.push_back(
                 std::make_unique<WriteTask>(buffer, std::move(handler)));
-            tryToCompleteNextUserTask();
+            tryToCompleteUserTasks();
         });
 }
 
 void StreamTransformingAsyncChannel::cancelIOSync(
     nx::network::aio::EventType eventType)
 {
+    // TODO: #ak Cancel corresponding task.
+
     m_rawDataChannel->cancelIOSync(eventType);
 }
 
@@ -148,20 +150,24 @@ void StreamTransformingAsyncChannel::readRawChannelAsync()
     m_asyncReadInProgress = true;
 }
 
-void StreamTransformingAsyncChannel::tryToCompleteNextUserTask()
+void StreamTransformingAsyncChannel::tryToCompleteUserTasks()
 {
-    //while (!m_userTaskQueue.empty())
-    {
-        UserTask* task = m_userTaskQueue.front().get();
+    std::vector<UserTask*> tasksToProcess;
+    tasksToProcess.reserve(m_userTaskQueue.size());
+    for (auto& task: m_userTaskQueue)
+        tasksToProcess.push_back(task.get());
 
+    // m_userTaskQueue can be changed during processing.
+
+    for (UserTask* task: tasksToProcess)
+    {
         utils::ObjectDestructionFlag::Watcher watcher(&m_destructionFlag);
         processTask(task);
         if (watcher.objectDestroyed())
             return;
 
-        NX_ASSERT(m_userTaskQueue.front().get() == task);
-        if (m_userTaskQueue.front()->status == UserTaskStatus::done)
-            m_userTaskQueue.pop_front();
+        if (task->status == UserTaskStatus::done)
+            removeUserTask(task);
     }
 }
 
@@ -184,41 +190,41 @@ void StreamTransformingAsyncChannel::processTask(UserTask* task)
 
 void StreamTransformingAsyncChannel::processReadTask(ReadTask* task)
 {
-    processUserTask(
+    SystemError::ErrorCode sysErrorCode = SystemError::noError;
+    int bytesRead = 0;
+    std::tie(sysErrorCode, bytesRead) = invokeConverter(
         std::bind(&utils::pipeline::Converter::read, m_converter.get(),
             task->buffer->data() + task->buffer->size(),
-            task->buffer->capacity() - task->buffer->size()),
-        task);
+            task->buffer->capacity() - task->buffer->size()));
+    if (sysErrorCode == SystemError::wouldBlock)
+        return;
+
+    task->buffer->resize(task->buffer->size() + bytesRead);
+
+    task->status = UserTaskStatus::done;
+    auto userHandler = std::move(task->handler);
+    userHandler(sysErrorCode, bytesRead);
 }
 
 void StreamTransformingAsyncChannel::processWriteTask(WriteTask* task)
 {
-    processUserTask(
+    SystemError::ErrorCode sysErrorCode = SystemError::noError;
+    int bytesWritten = 0;
+    std::tie(sysErrorCode, bytesWritten) = invokeConverter(
         std::bind(&utils::pipeline::Converter::write, m_converter.get(),
             task->buffer.data(),
-            task->buffer.size()),
-        task);
-}
+            task->buffer.size()));
+    if (sysErrorCode == SystemError::wouldBlock)
+        return;
 
-template<typename TransformerFunc>
-void StreamTransformingAsyncChannel::processUserTask(
-    TransformerFunc func,
-    UserTask* task)
-{
-    SystemError::ErrorCode sysErrorCode = SystemError::noError;
-    int bytesTransferred = 0;
-    std::tie(sysErrorCode, bytesTransferred) = invokeTransformer(std::move(func));
-    if (sysErrorCode != SystemError::wouldBlock) //< Operation finished?
-    {
-        auto userHandler = std::move(task->handler);
-        task->status = UserTaskStatus::done;
-        userHandler(sysErrorCode, bytesTransferred);
-    }
+    task->status = UserTaskStatus::done;
+    auto userHandler = std::move(task->handler);
+    userHandler(sysErrorCode, bytesWritten);
 }
 
 template<typename TransformerFunc>
 std::tuple<SystemError::ErrorCode, int /*bytesTransferred*/>
-    StreamTransformingAsyncChannel::invokeTransformer(
+    StreamTransformingAsyncChannel::invokeConverter(
         TransformerFunc func)
 {
     const int result = func();
@@ -242,6 +248,18 @@ std::tuple<SystemError::ErrorCode, int /*bytesTransferred*/>
     return std::make_tuple(SystemError::wouldBlock, -1);
 }
 
+void StreamTransformingAsyncChannel::removeUserTask(UserTask* taskToRemove)
+{
+    for (auto it = m_userTaskQueue.begin(); it != m_userTaskQueue.end(); ++it)
+    {
+        if (it->get() == taskToRemove)
+        {
+            m_userTaskQueue.erase(it);
+            break;
+        }
+    }
+}
+
 void StreamTransformingAsyncChannel::onSomeRawDataRead(
     SystemError::ErrorCode sysErrorCode,
     std::size_t bytesTransferred)
@@ -253,7 +271,7 @@ void StreamTransformingAsyncChannel::onSomeRawDataRead(
         decltype(m_rawDataReadBuffer) buf;
         m_rawDataReadBuffer.swap(buf);
         m_readRawData.push_back(std::move(buf));
-        tryToCompleteNextUserTask();
+        tryToCompleteUserTasks();
         return;
     }
 
@@ -275,7 +293,7 @@ void StreamTransformingAsyncChannel::onRawDataWritten(
     }
 
     if (sysErrorCode == SystemError::noError)
-        tryToCompleteNextUserTask();
+        return tryToCompleteUserTasks();
 
     handleIoError(sysErrorCode);
 }

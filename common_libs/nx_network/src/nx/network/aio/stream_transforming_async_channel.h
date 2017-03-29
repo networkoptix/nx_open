@@ -107,16 +107,15 @@ private:
     void readRawChannelAsync();
     int readRawDataFromCache(void* data, size_t count);
 
-    void tryToCompleteNextUserTask();
+    void tryToCompleteUserTasks();
     void processTask(UserTask* task);
     void processReadTask(ReadTask* task);
     void processWriteTask(WriteTask* task);
-
-    template<typename TransformerFunc>
-        void processUserTask(TransformerFunc func, UserTask* task);
     template<typename TransformerFunc>
     std::tuple<SystemError::ErrorCode, int /*bytesTransferred*/>
-        invokeTransformer(TransformerFunc func);
+        invokeConverter(TransformerFunc func);
+    void removeUserTask(UserTask* task);
+
     void onSomeRawDataRead(SystemError::ErrorCode, std::size_t);
     void onRawDataWritten(SystemError::ErrorCode, std::size_t);
     void handleIoError(SystemError::ErrorCode sysErrorCode);
