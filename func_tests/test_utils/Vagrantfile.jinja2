@@ -1,7 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# This file is generated from {{ template_fpath }}. Don't edit manually, your changes may be lost!
+# This file is generated from {{ template_file_path }}. Don't edit manually, your changes may be lost!
 
 
 Vagrant.configure("2") do |config|
@@ -23,31 +23,24 @@ Vagrant.configure("2") do |config|
 
   {% for box in boxes -%}
 
-  config.vm.define "{{ box.box_name() }}" do |box|
+  config.vm.define "{{ box.box_name }}" do |box|
 
     box.vm.provider :virtualbox do |vb|
-      vb.name = "{{ box.vm_box_name() }}"
+      vb.name = "{{ box.vm_box_name }}"
 
-      {%- for command in box.get_vagrant_config_commands('virtualbox') %}
+      {%- for command in box.vbox_commands %}
 
-      {{ command.expand('vb') }}
+      vb.{{ command }}
 
       {%- endfor %}
     end
 
-    {%- if box.ip_address %}
-    box.ssh.host = "{{ box.ip_address }}"
-    {%- endif %}
+    box.vm.hostname = "{{ box.box_name }}"
+    box.vm.network :forwarded_port, guest: {{ box.rest_api_internal_port }}, host: {{ box.rest_api_forwarded_port }}
 
-    {%- if box.port %}
-    box.ssh.port = "{{ box.port }}"
-    {%- endif %}
+    {% for command in box.vm_commands -%}
 
-    box.vm.hostname = "{{ box.box_name() }}"
-
-    {% for command in box.get_vagrant_config_commands('vm') -%}
-
-    {{ command.expand('box') }}
+    box.{{ command }}
 
     {% endfor %}
   

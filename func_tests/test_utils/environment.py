@@ -13,7 +13,6 @@ from .vagrant_box_config import BoxConfig
 from .vagrant_box import Vagrant
 from .server_rest_api import REST_API_USER, REST_API_PASSWORD
 from .server import (
-    MEDIASERVER_LISTEN_PORT,
     ServerConfig,
     Server,
     )
@@ -91,7 +90,7 @@ class EnvironmentBuilder(object):
 
     def _init_server(self, box_config_to_box, http_schema, config):
         box = box_config_to_box[config.box]
-        url = '%s://%s:%d/' % (http_schema, box.ip_address, MEDIASERVER_LISTEN_PORT)
+        url = '%s://localhost:%d/' % (http_schema, config.box.rest_api_forwarded_port())
         server = Server(self._company_name, config.name, box, url)
         if config.leave_initial_cloud_host:
             patch_set_cloud_host = None
@@ -147,12 +146,10 @@ class EnvironmentBuilder(object):
                     boxes.append(value.box)
 
         self._allocate_boxes(servers_config, boxes)
+        self._save_boxes_config_to_cache()
 
-        try:
-            vagrant.init(self._boxes_config)
-            box_config_to_box = {box.config: box for box in vagrant.boxes.values()}
-        finally:
-            self._save_boxes_config_to_cache()  # vagrant.init may change config, must save it after this
+        vagrant.init(self._boxes_config)
+        box_config_to_box = {box.config: box for box in vagrant.boxes.values()}
 
         for box in vagrant.boxes.values():
             log.info('BOX %s', box)
@@ -163,8 +160,8 @@ class EnvironmentBuilder(object):
         self._run_servers_merge(merge_servers or [], servers)
 
         for name, server in servers.items():
-            log.info('SERVER %s: %r at %s %s ecs_guid=%r local_system_id=%r',
-                     name.upper(), server.name, server.box.name, server.url, server.ecs_guid, server.local_system_id)
+            log.info('SERVER %s: %r at %s, rest_api=%s ecs_guid=%r local_system_id=%r',
+                     name.upper(), server.name, server.box.name, server.rest_api_url, server.ecs_guid, server.local_system_id)
         log.info('----- build environment setup is complete ----------------------------->8 ----------------------------------------------')
         artifact_path_prefix = os.path.join(
             self._work_dir,

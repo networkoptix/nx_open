@@ -12,7 +12,7 @@ import vagrant
 import vagrant.compat
 from .host import RemoteSshHost
 from .vbox_manage import VBoxManage
-from .vagrant_box_config import DEFAULT_NATNET1, DEFAULT_HOSTNET
+from .vagrant_box_config import DEFAULT_NATNET1
 
 
 TEST_UTILS_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -67,7 +67,6 @@ class Vagrant(object):
         if os.path.exists(self._ssh_config_path):
             os.remove(self._ssh_config_path)
 
-    # updates boxes_config: set ip_address and timezone
     def init(self, boxes_config):
         self._write_vagrantfile(boxes_config)
         box2status = {status.name: status.state for status in self._vagrant.status()}
@@ -82,7 +81,6 @@ class Vagrant(object):
             if status != 'running':
                 self._start_box(config)
             self._init_box(config)
-        self._write_vagrantfile(boxes_config)  # now ip_address is known for just-started boxes - write it
         self._write_ssh_config(self.boxes.keys())  # write ssh config for all boxes, with new addresses
         for box in self.boxes.values():
             self._load_box_timezone(box)
@@ -97,9 +95,6 @@ class Vagrant(object):
             self._vm_host.put_file(file_path, self._vagrant_dir)
 
     def _init_box(self, config):
-        config.ip_address = self._load_box_ip_address(config)
-        config.port = 22  # now we can connect directly, not thru port forwarded by vagrant
-        log.info('IP address for %s: %s', config.box_name(), config.ip_address)
         self.boxes[config.box_name()] = VagrantBox(self, config)
 
     def _start_box(self, config):
@@ -116,28 +111,20 @@ class Vagrant(object):
             self._vbox_manage.poweroff_vms(vms_name)
         self._vbox_manage.delete_vms(vms_name)
 
-    def _load_box_ip_address(self, config):
-        adapter_idx = 1  # use ip address from first host network
-        cmd = ['VBoxManage', '--nologo', 'guestproperty', 'get',
-               config.vm_box_name(), '/VirtualBox/GuestInfo/Net/%d/V4/IP' % adapter_idx]
-        output = self._vm_host.run_command(cmd)
-        l = output.strip().split()
-        assert l[0] == 'Value:', repr(output)  # Does interface exist?
-        return l[1]
-
     def _load_box_timezone(self, box):
         tzname = self.box_host(box.name, 'root').run_command(['date', '+%Z'])
         timezone = pytz.timezone(tzname.rstrip())
-        box.timezone = box.config.timezone = timezone
+        box.timezone = timezone
 
     def _write_vagrantfile(self, boxes_config):
+        expanded_boxes_config_list = [config.expand(self._vbox_manage) for config in boxes_config]
         template_file_path = os.path.join(TEST_UTILS_DIR, 'Vagrantfile.jinja2')
         with open(template_file_path) as f:
             template = jinja2.Template(f.read())
         vagrantfile = template.render(
             natnet1=DEFAULT_NATNET1,
             template_file_path=template_file_path,
-            boxes=boxes_config)
+            boxes=expanded_boxes_config_list)
         self._vm_host.write_file(os.path.join(self._vagrant_dir, 'Vagrantfile'), vagrantfile)
 
     # write ssh config with single box in it
@@ -160,20 +147,12 @@ class VagrantBox(object):
         self._vagrant = vagrant
         self.config = config
         self.name = config.box_name()
-        self.ip_address = config.ip_address  # str
         self.timezone = None
         self.servers = []
         self.host = self._vagrant.box_host(self.name, 'root')
 
     def __str__(self):
-        return '%s@%s/%s' % (self.name, self.ip_address, self.timezone)
+        return self.name
 
     def __repr__(self):
-        return 'Box(%s)' % self
-
-    def change_host_name(self, host_name):
-        self.host.run_command(['hostnamectl', 'set-hostname', host_name])
-        file = self.host.read_file('/etc/hosts')
-        lines = [line for line in file.splitlines() if not line.startswith('127.')]
-        lines = ['127.0.0.1\tlocalhost %s' % host_name] + lines
-        self.host.write_file('/etc/hosts', '\n'.join(lines) + '\n')
+        return 'Box(%s, timezone=%s)' % (self, self.timezone)
