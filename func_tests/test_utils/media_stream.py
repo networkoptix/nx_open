@@ -65,7 +65,7 @@ class RtspMediaStream(object):
     def __init__(self, server_url, user, password, camera_mac_addr):
         params = dict(pos=0, speed=RTSP_SPEED)
         self.url = 'rtsp://{user}:{password}@{netloc}/{camera_mac_addr}?{params}'.format( 
-           user=user,
+            user=user,
             password=password,
             netloc=urlparse.urlparse(server_url).netloc,
             camera_mac_addr=camera_mac_addr,

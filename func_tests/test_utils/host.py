@@ -107,6 +107,7 @@ class LocalHost(Host):
         return 'LocalHost'
 
     def run_command(self, args, input=None, cwd=None, log_output=True):
+        args = map(str, args)
         if input:
             log.debug('executing: %s (with %d bytes input)', subprocess.list2cmdline(args), len(input))
             stdin = subprocess.PIPE
