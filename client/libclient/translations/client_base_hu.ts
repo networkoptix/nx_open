@@ -202,7 +202,7 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
     <message>
         <source>Common</source>
-        <translation>Közös</translation>
+        <translation>Általános</translation>
     </message>
     <message>
         <source>This password is in list of the most popular passwords.</source>
@@ -2650,7 +2650,7 @@ eszközzel</translation>
     <message>
         <source>Create %1 Account</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation>Hozza létre %1 fiókot</translation>
+        <translation>Hozzon létre %1 fiókot</translation>
     </message>
     <message>
         <source>Connect System to %1...</source>
@@ -2661,7 +2661,7 @@ eszközzel</translation>
         <source>Create %1
 account</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation>Hozza létre %1 fiókot</translation>
+        <translation>Hozzon létre %1 fiókot</translation>
     </message>
     <message>
         <source>Connect System

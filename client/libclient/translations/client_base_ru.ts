@@ -3527,7 +3527,7 @@ to %1</source>
     </message>
     <message>
         <source>Default state</source>
-        <translation>Состояние по-умолчанию</translation>
+        <translation>По умолчанию</translation>
     </message>
     <message>
         <source>Name</source>
@@ -3570,7 +3570,7 @@ to %1</source>
     </message>
     <message>
         <source>ID</source>
-        <translation>Идентификатор</translation>
+        <translation>ID</translation>
     </message>
     <message>
         <source>On click</source>
@@ -6591,7 +6591,7 @@ to %1</source>
     </message>
     <message>
         <source>Cloud user</source>
-        <translation>Облачный пользователя</translation>
+        <translation>Облачный пользователь</translation>
     </message>
     <message>
         <source>Login</source>
@@ -6787,11 +6787,11 @@ to %1</source>
     <name>QnUserSettingsWidget</name>
     <message>
         <source>Local</source>
-        <translation>Локальные</translation>
+        <translation>Локальный</translation>
     </message>
     <message>
         <source>Cloud</source>
-        <translation>Облако</translation>
+        <translation>Облачный</translation>
     </message>
     <message>
         <source>Login</source>
@@ -7279,7 +7279,7 @@ to %1</source>
     </message>
     <message>
         <source>Export with transcoding?</source>
-        <translation>Экспортировать с перекодировкой?</translation>
+        <translation>Экспортировать с перекодированием?</translation>
     </message>
     <message>
         <source>It will increase CPU usage and may take significant time.</source>
