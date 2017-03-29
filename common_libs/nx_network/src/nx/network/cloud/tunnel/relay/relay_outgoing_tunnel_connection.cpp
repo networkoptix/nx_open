@@ -26,7 +26,7 @@ void OutgoingTunnelConnection::stopWhileInAioThread()
 {
 }
 
-void OutgoingTunnelConnection::bindToAioThread(aio::AbstractAioThread* aioThread)
+void OutgoingTunnelConnection::bindToAioThread(aio::AbstractAioThread* /*aioThread*/)
 {
 }
 
@@ -35,14 +35,14 @@ void OutgoingTunnelConnection::start()
 }
 
 void OutgoingTunnelConnection::establishNewConnection(
-    std::chrono::milliseconds timeout,
-    SocketAttributes socketAttributes,
-    OnNewConnectionHandler handler)
+    std::chrono::milliseconds /*timeout*/,
+    SocketAttributes /*socketAttributes*/,
+    OnNewConnectionHandler /*handler*/)
 {
 }
 
 void OutgoingTunnelConnection::setControlConnectionClosedHandler(
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> /*handler*/)
 {
 }
 

@@ -18,16 +18,16 @@ ClientToRelayConnection::~ClientToRelayConnection()
 }
 
 void ClientToRelayConnection::startSession(
-    const nx::String& desiredSessionId,
-    const nx::String& targetPeerName,
-    nx::utils::MoveOnlyFunc<void(ResultCode, nx::String /*sessionId*/)> handler)
+    const nx::String& /*desiredSessionId*/,
+    const nx::String& /*targetPeerName*/,
+    nx::utils::MoveOnlyFunc<void(ResultCode, nx::String /*sessionId*/)> /*handler*/)
 {
     // TODO
 }
 
 void ClientToRelayConnection::openConnectionToTheTargetHost(
-    nx::String& sessionId,
-    nx::utils::MoveOnlyFunc<void(ResultCode, std::unique_ptr<AbstractStreamSocket>)> handler)
+    nx::String& /*sessionId*/,
+    nx::utils::MoveOnlyFunc<void(ResultCode, std::unique_ptr<AbstractStreamSocket>)> /*handler*/)
 {
     // TODO
 }
