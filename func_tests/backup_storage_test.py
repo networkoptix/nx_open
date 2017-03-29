@@ -47,9 +47,10 @@ def env(env_builder, server, backup_type):
     built_env.one.box.host.run_command(['mkdir', '-p', BACKUP_STORAGE_PATH])
     built_env.one.start_service()
     built_env.one.setup_local_system()
+    built_env.one.set_system_settings(backupQualities=backup_type)
     add_backup_storage(built_env.one)
     change_and_assert_server_backup_type(built_env.one, 'BackupManual')
-    built_env.one.set_system_settings(backupQualities=backup_type)
+    built_env.camera = add_camera(built_env.one, 1, backup_type)
     return built_env
 
 
@@ -148,8 +149,7 @@ def assert_backup_equal_to_archive(server, backup_type):
 
 def test_backup_by_request(env, sample_media_file, backup_type):
     start_time = datetime(2017, 3, 27, tzinfo=pytz.utc)
-    camera = add_camera(env.one, 1, backup_type)
-    env.one.storage.save_media_sample(camera, start_time, sample_media_file)
+    env.one.storage.save_media_sample(env.camera, start_time, sample_media_file)
     env.one.rebuild_archive()
     env.one.rest_api.api.backupControl.GET(action='start')
     wait_backup_finish(env.one, start_time + sample_media_file.duration)
@@ -159,9 +159,8 @@ def test_backup_by_request(env, sample_media_file, backup_type):
 def test_backup_by_schedule(env, sample_media_file, backup_type):
     start_time1 = datetime(2017, 3, 28, 9, 52, 16, tzinfo=pytz.utc)
     start_time2 = start_time1 + sample_media_file.duration*2
-    camera = add_camera(env.one, 1, backup_type)
-    env.one.storage.save_media_sample(camera, start_time1, sample_media_file)
-    env.one.storage.save_media_sample(camera, start_time2, sample_media_file)
+    env.one.storage.save_media_sample(env.camera, start_time1, sample_media_file)
+    env.one.storage.save_media_sample(env.camera, start_time2, sample_media_file)
     env.one.rebuild_archive()
     env.one.rest_api.ec2.saveMediaServerUserAttributes.POST(
         serverId=env.one.ecs_guid, backupType='BackupSchedule',

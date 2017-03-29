@@ -45,9 +45,9 @@ def make_camera_info(parent_id, name, mac_addr):
 
 class Camera(object):
 
-    def __init__(self, name, mac_addr):
-        self.name = name or 'funtest-camera'
-        self.mac_addr = mac_addr or CAMERA_MAC_ADDR
+    def __init__(self, name='funtest-camera', mac_addr=CAMERA_MAC_ADDR):
+        self.name = name
+        self.mac_addr = mac_addr
 
     def __repr__(self):
         return 'Camera(%s)' % self.mac_addr
