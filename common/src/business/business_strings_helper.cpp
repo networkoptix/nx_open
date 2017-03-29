@@ -25,7 +25,14 @@
 #include "events/ip_conflict_business_event.h"
 #include "business_event_rule.h"
 
-QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
+QnBusinessStringsHelper::QnBusinessStringsHelper(QObject* parent):
+    base_type(parent),
+    QnCommonModuleAware(parent)
+{
+}
+
+QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) const
+{
     using namespace QnBusiness;
 
     switch(value) {
@@ -59,7 +66,7 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
     return lit("Unknown (%1)").arg(static_cast<int>(value));
 }
 
-QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value, int count)
+QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value, int count) const
 {
     using namespace QnBusiness;
 
@@ -105,7 +112,8 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value, int coun
     }
 }
 
-QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters &params,  Qn::ResourceInfoLevel detailLevel)
+QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters &params,
+    Qn::ResourceInfoLevel detailLevel) const
 {
     using namespace QnBusiness;
 
@@ -168,18 +176,20 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
     return tr("An unknown event has occurred");
 }
 
-QString QnBusinessStringsHelper::eventAtResources(const QnBusinessEventParameters &params)
+QString QnBusinessStringsHelper::eventAtResources(const QnBusinessEventParameters &params) const
 {
     return lit("Multiple %1 events have occured").arg(eventName(params.eventType));
 }
 
-QString QnBusinessStringsHelper::getResoureNameFromParams(const QnBusinessEventParameters& params, Qn::ResourceInfoLevel detailLevel)
+QString QnBusinessStringsHelper::getResoureNameFromParams(const QnBusinessEventParameters& params,
+    Qn::ResourceInfoLevel detailLevel) const
 {
     QString result = QnResourceDisplayInfo(eventSource(params)).toString(detailLevel);
     return result.isEmpty() ? params.resourceName : result;
 }
 
-QString QnBusinessStringsHelper::getResoureIPFromParams(const QnBusinessEventParameters& params)
+QString QnBusinessStringsHelper::getResoureIPFromParams(
+    const QnBusinessEventParameters& params) const
 {
 	QString result = QnResourceDisplayInfo(eventSource(params)).host();
 	return result.isNull() ? params.resourceName : result;
@@ -187,7 +197,7 @@ QString QnBusinessStringsHelper::getResoureIPFromParams(const QnBusinessEventPar
 
 QStringList QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr& action,
     const QnBusinessAggregationInfo &aggregationInfo,
-    Qn::ResourceInfoLevel detailLevel)
+    Qn::ResourceInfoLevel detailLevel) const
 {
     QStringList result;
 
@@ -212,14 +222,15 @@ QStringList QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAc
     return result;
 }
 
-QStringList QnBusinessStringsHelper::eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount)
+QStringList QnBusinessStringsHelper::eventDetailsWithTimestamp(
+    const QnBusinessEventParameters &params, int aggregationCount) const
 {
     return QStringList()
         << eventTimestamp(params, aggregationCount)
         << eventDetails(params);
 }
 
-QStringList QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters& params)
+QStringList QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters& params) const
 {
     using namespace QnBusiness;
 
@@ -288,7 +299,8 @@ QStringList QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameter
     return result;
 }
 
-QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount)
+QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParameters &params,
+    int aggregationCount) const
 {
     quint64 ts = params.eventTimestampUsec;
     QDateTime time = QDateTime::fromMSecsSinceEpoch(ts/1000);
@@ -304,7 +316,8 @@ QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParame
             .arg(time.date().toString(Qt::DefaultLocaleShortDate));
 }
 
-QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount)
+QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters &params,
+    int aggregationCount) const
 {
     quint64 ts = params.eventTimestampUsec;
     QDateTime time = QDateTime::fromMSecsSinceEpoch(ts/1000);
@@ -320,26 +333,29 @@ QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters 
             .arg(time.date().toString(Qt::DefaultLocaleShortDate));
 }
 
-QString QnBusinessStringsHelper::eventTimestampDate(const QnBusinessEventParameters &params) {
+QString QnBusinessStringsHelper::eventTimestampDate(const QnBusinessEventParameters &params) const
+{
 	quint64 ts = params.eventTimestampUsec;
 	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
 	return time.date().toString(Qt::DefaultLocaleShortDate);
 }
-QString QnBusinessStringsHelper::eventTimestampTime(const QnBusinessEventParameters &params) {
+
+QString QnBusinessStringsHelper::eventTimestampTime(const QnBusinessEventParameters &params) const
+{
 	quint64 ts = params.eventTimestampUsec;
 	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
 	return time.time().toString(Qt::DefaultLocaleShortDate);
 }
 
-QnResourcePtr QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &params)
+QnResourcePtr QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &params) const
 {
     QnUuid id = params.eventResourceId;
     return !id.isNull()
-        ? qnResPool->getResourceById(id)
+        ? resourcePool()->getResourceById(id)
         : QnResourcePtr();
 }
 
-QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& params)
+QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& params) const
 {
     using namespace QnBusiness;
 
@@ -458,7 +474,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     {
         QnVirtualCameraResourceList disabledCameras;
         for (const QString &id: reasonParamsEncoded.split(L';'))
-            if (const QnVirtualCameraResourcePtr &camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
+            if (const QnVirtualCameraResourcePtr &camera = resourcePool()->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
                 disabledCameras << camera;
         NX_ASSERT(!disabledCameras.isEmpty(), Q_FUNC_INFO, "At least one camera should be disabled on this event");
 
@@ -482,7 +498,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
 
 QStringList QnBusinessStringsHelper::aggregatedEventDetails(
     const QnAbstractBusinessActionPtr& action,
-    const QnBusinessAggregationInfo& aggregationInfo)
+    const QnBusinessAggregationInfo& aggregationInfo) const
 {
     QStringList result;
     if (aggregationInfo.isEmpty())
@@ -497,15 +513,16 @@ QStringList QnBusinessStringsHelper::aggregatedEventDetails(
     return result;
 }
 
-QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec, bool isPublic)
+QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec,
+    bool isPublic) const
 {
     QnNetworkResourcePtr res = !id.isNull() ?
-                            qnResPool->getResourceById<QnNetworkResource>(id) :
+                            resourcePool()->getResourceById<QnNetworkResource>(id) :
                             QnNetworkResourcePtr();
     if (id.isNull())
         return QString();
 
-    QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
+    QnVirtualCameraResourcePtr camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
     if (!camera)
         return QString();
 
@@ -514,7 +531,7 @@ QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestamp
         return QString();
 
     quint64 timeStampMs = timestampUsec / 1000;
-    QnMediaServerResourcePtr newServer = qnCameraHistoryPool->getMediaServerOnTime(camera, timeStampMs);
+    QnMediaServerResourcePtr newServer = cameraHistoryPool()->getMediaServerOnTime(camera, timeStampMs);
     if (newServer)
         mserverRes = newServer;
 
@@ -539,7 +556,7 @@ QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestamp
     return result;
 }
 
-QString QnBusinessStringsHelper::toggleStateToString(QnBusiness::EventState state)
+QString QnBusinessStringsHelper::toggleStateToString(QnBusiness::EventState state) const
 {
     switch (state) {
     case QnBusiness::ActiveState:
@@ -558,7 +575,7 @@ QString QnBusinessStringsHelper::eventTypeString(
         QnBusiness::EventType eventType,
         QnBusiness::EventState eventState,
         QnBusiness::ActionType actionType,
-        const QnBusinessActionParameters &actionParams)
+        const QnBusinessActionParameters &actionParams) const
 {
     QString typeStr = QnBusinessStringsHelper::eventName(eventType);
     if (QnBusiness::isActionProlonged(actionType, actionParams))
@@ -568,7 +585,7 @@ QString QnBusinessStringsHelper::eventTypeString(
 }
 
 
-QString QnBusinessStringsHelper::bruleDescriptionText(const QnBusinessEventRulePtr& bRule)
+QString QnBusinessStringsHelper::bruleDescriptionText(const QnBusinessEventRulePtr& bRule) const
 {
     QString eventString = eventTypeString(bRule->eventType(), bRule->eventState(), bRule->actionType(), bRule->actionParams());
     return lit("%1 --> %2").arg(eventString).arg(actionName(bRule->actionType()));

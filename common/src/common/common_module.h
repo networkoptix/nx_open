@@ -22,7 +22,6 @@ class QnSessionManager;
 class QnModuleFinder;
 class QnRouter;
 class QnGlobalSettings;
-class QnCameraHistoryPool;
 class QnCommonMessageProcessor;
 class QnResourceAccessManager;
 class QnResourceAccessProvider;

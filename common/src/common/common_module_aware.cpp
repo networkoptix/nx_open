@@ -91,3 +91,9 @@ QnUserRolesManager* QnCommonModuleAware::userRolesManager() const
     NX_ASSERT(m_commonModule);
     return m_commonModule ? m_commonModule->instance<QnUserRolesManager>() : nullptr;
 }
+
+QnCameraHistoryPool* QnCommonModuleAware::cameraHistoryPool() const
+{
+    NX_ASSERT(m_commonModule);
+    return m_commonModule ? m_commonModule->cameraHistoryPool() : nullptr;
+}

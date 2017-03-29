@@ -9,6 +9,7 @@ class QnResourceAccessSubjectsCache;
 class QnRuntimeInfoManager;
 class QnSharedResourcesManager;
 class QnUserRolesManager;
+class QnCameraHistoryPool;
 
 class QnCommonModuleAware
 {
@@ -26,6 +27,7 @@ public:
     QnGlobalPermissionsManager* globalPermissionsManager() const;
     QnSharedResourcesManager* sharedResourcesManager() const;
     QnUserRolesManager* userRolesManager() const;
+    QnCameraHistoryPool* cameraHistoryPool() const;
 
 private:
     void init(QObject *parent);

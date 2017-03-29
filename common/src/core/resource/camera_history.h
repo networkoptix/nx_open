@@ -191,7 +191,4 @@ private:
     QSet<QnUuid> m_camerasToCheck;
 };
 
-
-#define qnCameraHistoryPool (QnCameraHistoryPool::instance())
-
 #endif // QN_CAMERA_HISTORY_H
