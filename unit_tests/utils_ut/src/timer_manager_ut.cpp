@@ -111,7 +111,7 @@ TEST_F(TimerManager, non_stop_timer)
     startNonStopTimer();
     waitForEventCountToExceed(4);
     killTimer();
-    assertTimerErrorFactorIsNotLargerThan(0.5);
+    assertTimerErrorFactorIsNotLargerThan(1.0);
 }
 
 TEST_F(TimerManager, non_stop_timer_stops_after_cancellation)
