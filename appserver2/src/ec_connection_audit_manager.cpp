@@ -96,7 +96,8 @@ namespace ec2
         auditRecord.resources.push_back(params.id);
         QnBusinessEventRulePtr bRule(new QnBusinessEventRule());
         fromApiToResource(params, bRule);
-        auditRecord.addParam("description", QnBusinessStringsHelper::bruleDescriptionText(bRule).toUtf8());
+        QnBusinessStringsHelper helper(m_connection->commonModule());
+        auditRecord.addParam("description", helper.bruleDescriptionText(bRule).toUtf8());
 
         qnAuditManager->addAuditRecord(auditRecord);
     }
@@ -159,7 +160,10 @@ namespace ec2
                 if (msgProc) {
                     QnBusinessEventRulePtr bRule = msgProc->businessRules().value(params.id);
                     if (bRule)
-                        description = QnBusinessStringsHelper::bruleDescriptionText(bRule);
+                    {
+                        QnBusinessStringsHelper helper(m_connection->commonModule());
+                        description = helper.bruleDescriptionText(bRule);
+                    }
                 }
                 break;
             }
