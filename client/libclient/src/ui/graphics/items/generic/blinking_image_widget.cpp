@@ -1,5 +1,7 @@
 #include "blinking_image_widget.h"
 
+#include <cmath>
+
 #include <ui/graphics/items/generic/particle_item.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 
