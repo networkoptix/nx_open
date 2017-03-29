@@ -845,7 +845,7 @@ int QnMediaServerConnection::doCameraDiagnosticsStepAsync(
 {
     QnRequestParamList params;
     params << QnRequestParam("cameraId", cameraId);
-    params << QnRequestParam("type", CameraDiagnostics::Step::toString(commonModule()->resourcePool(), previousStep));
+    params << QnRequestParam("type", CameraDiagnostics::Step::toString(previousStep));
     return sendAsyncGetRequestLogged(CameraDiagnosticsObject,
         params, QN_STRINGIZE_TYPE(QnCameraDiagnosticsReply), target, slot);
 }

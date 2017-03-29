@@ -10,6 +10,7 @@
 #include <core/resource/device_dependent_strings.h>
 
 #include <nx/utils/log/assert.h>
+#include <core/resource/camera_resource.h>
 
 class QnCameraDiagnosticsErrorCodeStrings
 {
@@ -18,12 +19,12 @@ class QnCameraDiagnosticsErrorCodeStrings
 public:
     //!Returns textual description of error with  parameters
     static QString toString(
-        QnResourcePool* resPool,
         CameraDiagnostics::ErrorCode::Value val,
         const QnVirtualCameraResourcePtr& device,
         const QList<QString>& errorParams)
     {
         using namespace CameraDiagnostics::ErrorCode;
+        QnResourcePool* resPool = device->resourcePool();
 
         QnCameraDeviceStringSet detailsRebootRestore(
             tr("Please try to reboot the device, then restore factory defaults on the web-page."),
@@ -308,7 +309,7 @@ namespace CameraDiagnostics
             const QnVirtualCameraResourcePtr &device,
             const ErrorParams& errorParams)
         {
-            return QnCameraDiagnosticsErrorCodeStrings::toString(resPool, val, device, errorParams);
+            return QnCameraDiagnosticsErrorCodeStrings::toString(val, device, errorParams);
         }
 
         QString toString(int val
