@@ -88,6 +88,10 @@ QPointer<T> QnNonModalDialogConstructor<T>::createAndInitializeDialog(DialogType
         /* Dialog's show() method will reset the geometry, saving it to restore afterwards. */
         m_targetGeometry = output->geometry();
     }
+#if defined(Q_OS_MACX)
+    // Workaround for bug QTBUG-34767
+    output->setWindowFlags(output->windowFlags() | Qt::WindowStaysOnTopHint);
+#endif
     return output;
 }
 
