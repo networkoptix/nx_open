@@ -39,6 +39,8 @@
 
 #include <QtSingleApplication>
 
+#include <common/static_common_module.h>
+
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_module.h>
@@ -126,6 +128,15 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
         if (application->isRunning() && application->sendMessage(argsMessage))
             return kSuccessCode;
     }
+
+    Qn::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
+        ? Qn::PT_DesktopClient
+        : Qn::PT_VideowallClient;
+    const auto brand = startupParams.isDevMode() ? QString() : QnAppInfo::productNameShort();
+    const auto customization = startupParams.isDevMode() ? QString() : QnAppInfo::customizationName();
+
+    //TODO: #GDM #3.1 move to client library
+    QnStaticCommonModule staticCommon(clientPeerType, brand, customization);
 
     QnClientModule client(startupParams);
 

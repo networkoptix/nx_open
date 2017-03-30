@@ -224,10 +224,7 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply)
     }
 
 
-    auto localPeerType = commonModule()->localPeerType();
-    auto localInfo = commonModule()->moduleInformation();
-    QnConnectionValidator validator(localPeerType, localInfo);
-    auto connectionResult = validator.validateConnection(moduleInformation);
+    auto connectionResult = QnConnectionValidator::validateConnection(moduleInformation);
     if (connectionResult == Qn::IncompatibleInternalConnectionResult)
     {
         NX_LOG(lit("QnDirectModuleFinder. Received reply from incompatible server: url %1, "

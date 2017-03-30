@@ -342,16 +342,6 @@ void QnCommonModule::updateRunningInstanceGuid()
     emit runningInstanceGUIDChanged();
 }
 
-void QnCommonModule::setLocalPeerType(Qn::PeerType peerType)
-{
-    m_localPeerType = peerType;
-}
-
-Qn::PeerType QnCommonModule::localPeerType() const
-{
-    return m_localPeerType;
-}
-
 QDateTime QnCommonModule::startupTime() const
 {
     return m_startupTime;

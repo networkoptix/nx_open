@@ -65,9 +65,8 @@ namespace
         const QnModuleInformation &moduleInformation,
         Qn::ResourceStatus currentStatus = Qn::Online)
     {
-        QnConnectionValidator validator(commonModule);
         Qn::ResourceStatus status =
-            validator.isCompatibleToCurrentSystem(moduleInformation)
+            QnConnectionValidator::isCompatibleToCurrentSystem(moduleInformation, commonModule)
             ? Qn::Online
             : Qn::Incompatible;
         if (status == Qn::Online && currentStatus == Qn::Unauthorized)

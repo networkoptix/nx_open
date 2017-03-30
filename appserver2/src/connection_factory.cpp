@@ -4,6 +4,8 @@
 
 #include <api/global_settings.h>
 
+#include <common/static_common_module.h>
+
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/simple_http_client.h>
@@ -1631,10 +1633,9 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     QnConnectionInfo* const connectionInfo,
     nx_http::Response* response)
 {
-    auto localInfo = m_commonModule->runtimeInfoManager()->localInfo().data;
     connectionInfo->version = m_commonModule->engineVersion();
-    connectionInfo->brand = localInfo.brand;
-    connectionInfo->customization = localInfo.customization;
+    connectionInfo->brand = qnStaticCommon->brand();
+    connectionInfo->customization = qnStaticCommon->customization();
     connectionInfo->systemName = m_commonModule->globalSettings()->systemName();
     connectionInfo->ecsGuid = m_commonModule->moduleGUID().toString();
     connectionInfo->cloudSystemId = m_commonModule->globalSettings()->cloudSystemId();

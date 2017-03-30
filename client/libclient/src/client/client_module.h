@@ -16,6 +16,7 @@ public:
 
     void initDesktopCamera(QGLWidget* window);
     void startLocalSearchers();
+
 private:
     void initApplication();
     void initThread();
@@ -26,4 +27,7 @@ private:
     void initNetwork        (const QnStartupParameters& startupParams);
     void initSkin           (const QnStartupParameters& startupParams);
     void initLocalResources (const QnStartupParameters& startupParams);
+
+private:
+    QnCommonModule* m_commonModule;
 };

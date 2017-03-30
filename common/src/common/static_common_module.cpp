@@ -10,8 +10,16 @@
 
 #include "common_meta_types.h"
 
-QnStaticCommonModule::QnStaticCommonModule(QObject *parent):
-    QObject(parent)
+QnStaticCommonModule::QnStaticCommonModule(
+    Qn::PeerType localPeerType,
+    const QString& brand,
+    const QString& customization,
+    QObject *parent)
+    :
+    QObject(parent),
+    m_localPeerType(localPeerType),
+    m_brand(brand),
+    m_customization(customization)
 {
     Q_INIT_RESOURCE(common);
     QnCommonMetaTypes::initialize();
@@ -26,7 +34,6 @@ QnStaticCommonModule::QnStaticCommonModule(QObject *parent):
 
     instance<QnSyncTime>();
     instance<nx_http::ClientPool>();
-
 }
 
 void QnStaticCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required) {
@@ -38,4 +45,24 @@ void QnStaticCommonModule::loadResourceData(QnResourceDataPool *dataPool, const 
 QnStaticCommonModule::~QnStaticCommonModule()
 {
     nx::network::SocketGlobals::deinit();
+}
+
+Qn::PeerType QnStaticCommonModule::localPeerType() const
+{
+    return m_localPeerType;
+}
+
+QString QnStaticCommonModule::brand() const
+{
+    return m_brand;
+}
+
+QString QnStaticCommonModule::customization() const
+{
+    return m_customization;
+}
+
+QnResourceDataPool * QnStaticCommonModule::dataPool() const
+{
+    return m_dataPool;
 }

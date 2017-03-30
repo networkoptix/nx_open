@@ -6,6 +6,8 @@
 #include <QtCore/QDateTime>
 #include <QtNetwork/QNetworkInterface>
 
+#include <common/static_common_module.h>
+
 #include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
 #include <nx/utils/std/cpp14.h>
@@ -283,8 +285,7 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket)
         return true;
     }
 
-    QnConnectionValidator validator(commonModule());
-    auto connectionResult = validator.validateConnection(*response);
+    auto connectionResult = QnConnectionValidator::validateConnection(*response);
     if (connectionResult == Qn::IncompatibleInternalConnectionResult)
     {
         DEBUG_LOG(lm("Ignoring %1 (%2) with different customization %3 on local address %4").strs(
@@ -319,7 +320,7 @@ void QnMulticastModuleFinder::run()
 
     QByteArray revealRequest = RevealRequest(
         commonModule()->moduleGUID(),
-        commonModule()->localPeerType()).serialize();
+        qnStaticCommon->localPeerType()).serialize();
 
     if (!m_clientMode)
     {

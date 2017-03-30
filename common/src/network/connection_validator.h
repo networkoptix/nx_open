@@ -25,26 +25,20 @@ class QnCommonModule;
 class QnConnectionValidator
 {
 public:
-    QnConnectionValidator(Qn::PeerType localPeerType, const QnModuleInformation& localModule);
+    static QnSoftwareVersion minSupportedVersion();
 
-    QnSoftwareVersion minSupportedVersion() const;
+    static Qn::ConnectionResult validateConnection(const QnModuleInformation& info);
+    static Qn::ConnectionResult validateConnection(const QnConnectionInfo& connectionInfo,
+        ec2::ErrorCode networkError);
 
-    Qn::ConnectionResult validateConnection(const QnModuleInformation& info) const;
-    Qn::ConnectionResult validateConnection(const QnConnectionInfo& connectionInfo,
-        ec2::ErrorCode networkError) const;
-
-    bool isCompatibleToCurrentSystem(const QnModuleInformation& info,
-        const QnCommonModule* commonModule) const;
+    static bool isCompatibleToCurrentSystem(const QnModuleInformation& info,
+        const QnCommonModule* commonModule);
 
 protected:
-    Qn::ConnectionResult validateConnectionInternal(
+    static Qn::ConnectionResult validateConnectionInternal(
         const QString& brand,
         const QString& customization,
         int protoVersion,
         const QnSoftwareVersion& version,
-        const QString& cloudHost) const;
-
-private:
-    const Qn::PeerType m_peerType;
-    const QnModuleInformation& m_moduleInformation;
+        const QString& cloudHost);
 };

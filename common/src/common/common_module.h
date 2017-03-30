@@ -201,8 +201,7 @@ public:
     inline void setAllowedPeers(const QSet<QnUuid> &peerList) { m_allowedPeers = peerList; }
     inline QSet<QnUuid> allowedPeers() const { return m_allowedPeers; }
 
-    void setLocalPeerType(Qn::PeerType peerType);
-    Qn::PeerType localPeerType() const;
+
     QDateTime startupTime() const;
 
     QnCommonMessageProcessor* messageProcessor() const;
@@ -250,7 +249,6 @@ private:
 
     BeforeRestoreDbData m_beforeRestoreDbData;
     bool m_lowPriorityAdminPassword = false;
-    Qn::PeerType m_localPeerType = Qn::PT_NotDefined;
     QDateTime m_startupTime;
 
     QnGlobalSettings* m_globalSettings = nullptr;

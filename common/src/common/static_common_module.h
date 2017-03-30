@@ -23,21 +23,29 @@ class QnStaticCommonModule:
 {
     Q_OBJECT
 public:
-    QnStaticCommonModule(QObject *parent = nullptr);
+    QnStaticCommonModule(Qn::PeerType localPeerType,
+        const QString& brand,
+        const QString& customization,
+        QObject *parent = nullptr);
     virtual ~QnStaticCommonModule();
 
     using Singleton<QnStaticCommonModule>::instance;
     using QnInstanceStorage::instance;
     using QnInstanceStorage::store;
 
-    QnResourceDataPool *dataPool() const
-    {
-        return m_dataPool;
-    }
+    Qn::PeerType localPeerType() const;
+    QString brand() const;
+    QString customization() const;
+
+    QnResourceDataPool *dataPool() const;
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 private:
-    QnResourceDataPool *m_dataPool;
+    const Qn::PeerType m_localPeerType;
+    const QString m_brand;
+    const QString m_customization;
+
+    QnResourceDataPool *m_dataPool = nullptr;
 };
 
 #define qnStaticCommon (QnStaticCommonModule::instance())
