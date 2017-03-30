@@ -3,5 +3,5 @@
 #include <core/resource_management/resource_pool.h>
 
 void QnClientResourceProcessor::processResources(const QnResourceList &resources) {
-    qnResPool->addResources(resources);
+    resourcePool()->addResources(resources);
 }

@@ -156,7 +156,7 @@ TEST(IoServerMonitorTest, main)
             allDataProcessed.set_value();
         });
 
-    auto camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(kTestCamPhysicalId);
+    auto camera = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(kTestCamPhysicalId);
     ASSERT_TRUE(camera);
     qnStatusDictionary->setValue(camera->getId(), Qn::Online);
     httpClient->doGet(url);

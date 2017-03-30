@@ -35,21 +35,21 @@ public:
         base_type(parent),
         model(parent)
     {
-        connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        connect(resourcePool(), &QnResourcePool::resourceAdded, this,
             [this](const QnResourcePtr& resource)
             {
                 if (auto user = resource.dynamicCast<QnUserResource>())
                     addUser(user);
             });
 
-        connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
             [this](const QnResourcePtr& resource)
             {
                 if (auto user = resource.dynamicCast<QnUserResource>())
                     removeUser(user);
             });
 
-        connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
+        connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
             [this](const ec2::ApiUserRoleData& userRole)
             {
                 for (auto user: users)
@@ -295,7 +295,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
             {
                 case LoginColumn        : return user->getName();
                 case FullNameColumn     : return user->fullName();
-                case UserRoleColumn     : return qnUserRolesManager->userRoleName(user);
+                case UserRoleColumn     : return userRolesManager()->userRoleName(user);
                 default                 : break;
 
             } // switch (column)

@@ -33,7 +33,7 @@ namespace {
         if (netRes->hasCameraCapabilities(Qn::ShareIpCapability))
             return false; //< don't block
 
-        QnNetworkResourceList existResList = qnResPool->getAllNetResourceByHostAddress(netRes->getHostAddress());
+        QnNetworkResourceList existResList = resourcePool()->getAllNetResourceByHostAddress(netRes->getHostAddress());
         existResList = existResList.filtered(
             [&netRes](const QnNetworkResourcePtr& existRes)
             {

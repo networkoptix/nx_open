@@ -148,7 +148,7 @@ QString QnLayoutTabBar::layoutText(QnWorkbenchLayout* layout) const
     QnUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
     if (!videoWallInstanceGuid.isNull())
     {
-        QnVideoWallItemIndex idx = qnResPool->getVideoWallItemByUuid(videoWallInstanceGuid);
+        QnVideoWallItemIndex idx = resourcePool()->getVideoWallItemByUuid(videoWallInstanceGuid);
         if (!idx.isNull())
             baseName = idx.item().name;
     }
@@ -176,7 +176,7 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout* layout) const
     QnUuid videoWallInstanceGuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
     if (!videoWallInstanceGuid.isNull())
     {
-        QnVideoWallItemIndex idx = qnResPool->getVideoWallItemByUuid(videoWallInstanceGuid);
+        QnVideoWallItemIndex idx = resourcePool()->getVideoWallItemByUuid(videoWallInstanceGuid);
         if (idx.isNull())
             return QIcon();
 

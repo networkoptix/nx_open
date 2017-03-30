@@ -166,7 +166,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     }
 
     QnUuid layoutId = guidFromArbitraryData(filename);
-    QnLayoutResourcePtr existingLayout = qnResPool->getResourceById<QnLayoutResource>(layoutId);
+    QnLayoutResourcePtr existingLayout = resourcePool()->getResourceById<QnLayoutResource>(layoutId);
     if (existingLayout)
         return existingLayout;
     layout->setId(layoutId);
@@ -252,8 +252,8 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
         if (timeZoneOffset != Qn::InvalidUtcOffset)
             aviResource->setTimeZoneOffset(timeZoneOffset);
 
-        qnResPool->addResource(aviResource);
-        aviResource = qnResPool->getResourceByUniqueId<QnAviResource>(aviResource->getUniqueId()); // It may have already been in the pool!
+        resourcePool()->addResource(aviResource);
+        aviResource = resourcePool()->getResourceByUniqueId<QnAviResource>(aviResource->getUniqueId()); // It may have already been in the pool!
         if (!aviResource)
         {
             qnWarning("ACHTUNG! Total mess up in exported layout loading!");

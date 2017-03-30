@@ -40,7 +40,7 @@ namespace
     {
         if (d1->resources.empty())
             return QString();
-        if (QnResourcePtr res = qnResPool->getResourceById(d1->resources[0]))
+        if (QnResourcePtr res = resourcePool()->getResourceById(d1->resources[0]))
             return res->getName();
         else
             return QString();
@@ -50,7 +50,7 @@ namespace
     {
         if (d1->resources.empty())
             return QString();
-        if (QnNetworkResourcePtr res = qnResPool->getResourceById<QnNetworkResource>(d1->resources[0]))
+        if (QnNetworkResourcePtr res = resourcePool()->getResourceById<QnNetworkResource>(d1->resources[0]))
             return res->getHostAddress();
         else
             return QString();
@@ -248,7 +248,7 @@ void QnAuditLogModel::clear() {
 
 QString QnAuditLogModel::getResourceNameById(const QnUuid &id)
 {
-    return QnResourceDisplayInfo(qnResPool->getResourceById(id)).toString(qnSettings->extraInfoInTree());
+    return QnResourceDisplayInfo(resourcePool()->getResourceById(id)).toString(qnSettings->extraInfoInTree());
 }
 
 QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool showTime) const
@@ -354,7 +354,7 @@ QnVirtualCameraResourceList QnAuditLogModel::getCameras(const std::vector<QnUuid
 {
     QnVirtualCameraResourceList result;
     for (const auto& id : resources)
-        if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(id))
+        if (QnVirtualCameraResourcePtr camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id))
             result << camera;
     return result;
 }
@@ -488,7 +488,7 @@ QString QnAuditLogModel::searchData(const Column& column, const QnAuditRecord* d
     if (column == DescriptionColumn && (data->isPlaybackType() || data->eventType == Qn::AR_CameraUpdate || data->eventType == Qn::AR_CameraInsert))
     {
         QString result;
-        for (const auto& res : qnResPool->getResources(data->resources))
+        for (const auto& res : resourcePool()->getResources(data->resources))
         {
             result += res->toSearchString();
             result += lit(" ");

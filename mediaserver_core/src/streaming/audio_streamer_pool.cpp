@@ -25,7 +25,7 @@ namespace
 
     QnVideoCameraPtr getTransmitSource(const QnUuid& clientId)
     {
-        for (const auto& res: qnResPool->getResourcesWithFlag(Qn::desktop_camera))
+        for (const auto& res: resourcePool()->getResourcesWithFlag(Qn::desktop_camera))
         {
             if (QnUuid::fromStringSafe(res->getUniqueId()) == clientId ||
                 res->getId() == clientId)
@@ -38,7 +38,7 @@ namespace
 
     QnSecurityCamResourcePtr getTransmitDestination(const QnUuid& resourceId)
     {
-        auto resource = qnResPool->getResourceById<QnSecurityCamResource>(resourceId);
+        auto resource = resourcePool()->getResourceById<QnSecurityCamResource>(resourceId);
         if (!resource)
             return QnSecurityCamResourcePtr();
         if (!resource->hasCameraCapabilities(Qn::AudioTransmitCapability))

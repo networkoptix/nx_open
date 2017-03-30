@@ -50,7 +50,7 @@ void QnCrossdomainConnectionProcessor::run()
     d->response.messageBody.clear();
 
     QnUuid selfId = qnCommon->moduleGUID();
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(selfId);
+    QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(selfId);
     QFile file(":/static/crossdomain.xml");
     if (!mServer || !file.open(QFile::ReadOnly))
     {

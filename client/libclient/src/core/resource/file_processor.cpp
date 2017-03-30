@@ -59,7 +59,7 @@ QnResourcePtr QnFileProcessor::createResourcesForFile(const QString& fileName)
 {
     QnResourcePtr result = QnResourceDirectoryBrowser::resourceFromFile(fileName);
     if (result)
-        qnResPool->addResource(result);
+        resourcePool()->addResource(result);
     return result;
 }
 
@@ -72,7 +72,7 @@ QnResourceList QnFileProcessor::createResourcesForFiles(const QStringList &files
         if (resource)
             result << resource;
     }
-    qnResPool->addResources(result);
+    resourcePool()->addResources(result);
 
     return result;
 }
@@ -86,7 +86,7 @@ void QnFileProcessor::deleteLocalResources(const QnResourceList &resources_)
     if (resources.isEmpty())
         return;
 
-    qnResPool->removeResources(resources);
+    resourcePool()->removeResources(resources);
     for (const QnResourcePtr& resource: resources)
         QFile::remove(resource->getUrl());
 }

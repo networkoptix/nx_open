@@ -298,7 +298,7 @@ void QnSearchBookmarksDialogPrivate::refresh()
 
 QnVirtualCameraResourceList QnSearchBookmarksDialogPrivate::availableCameras() const
 {
-    return qnResPool->getAllCameras(QnResourcePtr(), true).filtered(
+    return resourcePool()->getAllCameras(QnResourcePtr(), true).filtered(
         [this](const QnVirtualCameraResourcePtr& camera)
         {
             return accessController()->hasPermissions(camera, Qn::ViewContentPermission);
@@ -352,7 +352,7 @@ void QnSearchBookmarksDialogPrivate::chooseCamera()
 
     if (dialog.exec() == QDialog::Accepted)
     {
-        auto selectedCameras = qnResPool->getResources<QnVirtualCameraResource>(
+        auto selectedCameras = resourcePool()->getResources<QnVirtualCameraResource>(
             dialog.selectedResources());
         setCameras(selectedCameras);
         m_model->applyFilter();

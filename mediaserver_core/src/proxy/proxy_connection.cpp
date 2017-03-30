@@ -216,7 +216,7 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
         return true; //< no need to update, it is non server proxy request
     }
 
-    if (auto ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID()))
+    if (auto ownServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID()))
     {
         // it's already authorized request.
         // Update authorization using local system user related to current server
@@ -337,7 +337,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
     else
         cameraGuid = QnUuid::fromStringSafe(d->request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME));
     if (!cameraGuid.isNull()) {
-        if (QnResourcePtr camera = qnResPool->getResourceById(cameraGuid))
+        if (QnResourcePtr camera = resourcePool()->getResourceById(cameraGuid))
             dstRoute.id = camera->getParentId();
     }
 
@@ -352,7 +352,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
         if (!cameraGuid.isNull())
         {
             // TODO: destination device is a camera. Remove proxy headers here as well.
-            if (QnNetworkResourcePtr camera = qnResPool->getResourceById<QnNetworkResource>(cameraGuid))
+            if (QnNetworkResourcePtr camera = resourcePool()->getResourceById<QnNetworkResource>(cameraGuid))
                 dstRoute.addr = SocketAddress(camera->getHostAddress(), camera->httpPort());
         }
         else if (QnUniversalRequestProcessor::needStandardProxy(d->request))

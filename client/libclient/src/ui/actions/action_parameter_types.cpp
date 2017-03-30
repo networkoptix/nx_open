@@ -188,7 +188,7 @@ QnResourceList QnActionParameterTypes::resources(const QnLayoutItemIndexList &la
 
         QnLayoutItemData data = index.layout()->getItem(index.uuid());
 
-        QnResourcePtr resource = qnResPool->getResourceByDescriptor(data.resource);
+        QnResourcePtr resource = resourcePool()->getResourceByDescriptor(data.resource);
         if(resource)
             result.push_back(resource);
     }

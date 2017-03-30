@@ -109,7 +109,7 @@ QnSecurityCamResourcePtr extractCamera(QnWorkbenchItem *item)
 {
     const auto layoutItemData = item->data();
     const auto id = layoutItemData.resource.id;
-    return qnResPool->getResourceById<QnSecurityCamResource>(id);
+    return resourcePool()->getResourceById<QnSecurityCamResource>(id);
 };
 
 }
@@ -174,14 +174,14 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     discardCacheTimer->setInterval(kDiscardCacheIntervalMs);
     discardCacheTimer->setSingleShot(false);
     connect(discardCacheTimer, &QTimer::timeout, m_cameraDataManager, &QnCameraDataManager::clearCache);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& res)
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr& res)
     {
         if (res.dynamicCast<QnStorageResource>())
             m_cameraDataManager->clearCache();	//TODO:#GDM #bookmarks check if should be placed into camera manager
     });
     discardCacheTimer->start();
 
-    connect(qnResPool, &QnResourcePool::statusChanged, this,
+    connect(resourcePool(), &QnResourcePool::statusChanged, this,
         [this](const QnResourcePtr& resource)
         {
             auto cam = resource.dynamicCast<QnSecurityCamResource>();
@@ -260,7 +260,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         updateSyncedPeriods();
     });
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource)
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource)
     {
         if (QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>())
         {

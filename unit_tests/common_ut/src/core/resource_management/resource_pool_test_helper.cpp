@@ -29,7 +29,7 @@ QnUserResourcePtr QnResourcePoolTestHelper::addUser(Qn::GlobalPermissions global
     QnUserType userType)
 {
     auto user = createUser(globalPermissions, name, userType);
-    qnResPool->addResource(user);
+    resourcePool()->addResource(user);
     return user;
 }
 
@@ -43,7 +43,7 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::createLayout()
 QnLayoutResourcePtr QnResourcePoolTestHelper::addLayout()
 {
     auto layout = createLayout();
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
     return layout;
 }
 
@@ -57,14 +57,14 @@ QnVirtualCameraResourcePtr QnResourcePoolTestHelper::createCamera()
 QnVirtualCameraResourcePtr QnResourcePoolTestHelper::addCamera()
 {
     auto camera = createCamera();
-    qnResPool->addResource(camera);
+    resourcePool()->addResource(camera);
     return camera;
 }
 
 QnWebPageResourcePtr QnResourcePoolTestHelper::addWebPage()
 {
     QnWebPageResourcePtr webPage(new QnWebPageResource(QStringLiteral("http://www.ru")));
-    qnResPool->addResource(webPage);
+    resourcePool()->addResource(webPage);
     return webPage;
 }
 
@@ -78,7 +78,7 @@ QnVideoWallResourcePtr QnResourcePoolTestHelper::createVideoWall()
 QnVideoWallResourcePtr QnResourcePoolTestHelper::addVideoWall()
 {
     auto videoWall = createVideoWall();
-    qnResPool->addResource(videoWall);
+    resourcePool()->addResource(videoWall);
     return videoWall;
 }
 
@@ -86,7 +86,7 @@ QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer()
 {
     QnMediaServerResourcePtr server(new QnMediaServerResource());
     server->setId(QnUuid::createUuid());
-    qnResPool->addResource(server);
+    resourcePool()->addResource(server);
     return server;
 }
 
@@ -94,7 +94,7 @@ QnStorageResourcePtr QnResourcePoolTestHelper::addStorage(const QnMediaServerRes
 {
     QnStorageResourcePtr storage(new nx::StorageResourceStub());
     storage->setParentId(server->getId());
-    qnResPool->addResource(storage);
+    resourcePool()->addResource(storage);
     return storage;
 }
 

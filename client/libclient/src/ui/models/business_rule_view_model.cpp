@@ -89,7 +89,7 @@ QList<Columns> allColumns()
 template <class T>
 QnSharedResourcePointerList<T> toResources(const QSet<QnUuid> &idList)
 {
-    return qnResPool->getResources<T>(idList);
+    return resourcePool()->getResources<T>(idList);
 }
 
 QSet<QnUuid> toIds(const QnResourceList& resources)
@@ -104,10 +104,10 @@ QSet<QnUuid> toIds(const QnResourceList& resources)
 QSet<QnUuid> filterEventResources(const QSet<QnUuid>& ids, EventType eventType)
 {
     if (requiresCameraResource(eventType))
-        return toIds(qnResPool->getResources<QnVirtualCameraResource>(ids));
+        return toIds(resourcePool()->getResources<QnVirtualCameraResource>(ids));
 
     if (requiresServerResource(eventType))
-        return toIds(qnResPool->getResources<QnMediaServerResource>(ids));
+        return toIds(resourcePool()->getResources<QnMediaServerResource>(ids));
 
     return QSet<QnUuid>();
 }
@@ -115,12 +115,12 @@ QSet<QnUuid> filterEventResources(const QSet<QnUuid>& ids, EventType eventType)
 QSet<QnUuid> filterActionResources(const QSet<QnUuid>& ids, ActionType actionType)
 {
     if (requiresCameraResource(actionType))
-        return toIds(qnResPool->getResources<QnVirtualCameraResource>(ids));
+        return toIds(resourcePool()->getResources<QnVirtualCameraResource>(ids));
 
     if (requiresUserResource(actionType))
     {
-        auto users = qnResPool->getResources<QnUserResource>(ids);
-        auto roles = qnUserRolesManager->userRoles(ids);
+        auto users = resourcePool()->getResources<QnUserResource>(ids);
+        auto roles = userRolesManager()->userRoles(ids);
         auto result = toIds(users);
         for (auto role: roles)
             result << role.id;
@@ -761,7 +761,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const
         case QnBusiness::SourceColumn:
         {
             //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-            auto resources = qnResPool->getResources(eventResources());
+            auto resources = resourcePool()->getResources(eventResources());
             if (!QnBusiness::isResourceRequired(m_eventType))
             {
                 return qnResIconCache->icon(QnResourceIconCache::CurrentSystem);
@@ -811,7 +811,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const
             }
 
             //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-            QnResourceList resources = qnResPool->getResources(actionResources());
+            QnResourceList resources = resourcePool()->getResources(actionResources());
             if (!QnBusiness::requiresCameraResource(m_actionType))
             {
                 return qnResIconCache->icon(QnResourceIconCache::Servers);
@@ -865,10 +865,10 @@ bool QnBusinessRuleViewModel::isValid(int column) const
             {
                 case QnBusiness::CameraMotionEvent:
                     return isResourcesListValid<QnCameraMotionPolicy>(
-                        qnResPool->getResources<QnCameraMotionPolicy::resource_type>(filtered));
+                        resourcePool()->getResources<QnCameraMotionPolicy::resource_type>(filtered));
                 case QnBusiness::CameraInputEvent:
                     return isResourcesListValid<QnCameraInputPolicy>(
-                        qnResPool->getResources<QnCameraInputPolicy::resource_type>(filtered));
+                        resourcePool()->getResources<QnCameraInputPolicy::resource_type>(filtered));
                 default:
                     return true;
             }
@@ -932,7 +932,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const
             }
 
             //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-            auto resources = qnResPool->getResources(filtered);
+            auto resources = resourcePool()->getResources(filtered);
             if (QnBusiness::requiresCameraResource(m_actionType) && resources.isEmpty())
             {
                 return false;
@@ -974,7 +974,7 @@ void QnBusinessRuleViewModel::updateActionTypesModel()
 
 QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const
 {
-    QnResourceList resources = qnResPool->getResources(eventResources());
+    QnResourceList resources = resourcePool()->getResources(eventResources());
     if (m_eventType == QnBusiness::CameraMotionEvent)
         return QnCameraMotionPolicy::getText(resources, detailed);
 
@@ -1010,7 +1010,7 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const
 
 QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
 {
-    QnResourceList resources = qnResPool->getResources(actionResources());
+    QnResourceList resources = resourcePool()->getResources(actionResources());
     switch (m_actionType)
     {
         case QnBusiness::SendMailAction:

@@ -200,7 +200,7 @@ public:
     virtual QString getMaxServerKey() const override
     {
         QString serverKey;
-        for (const auto server: qnResPool->getAllServers(Qn::AnyStatus))
+        for (const auto server: resourcePool()->getAllServers(Qn::AnyStatus))
             serverKey = qMax(serverKey, server->getAuthKey());
 
         return serverKey;

@@ -143,7 +143,7 @@ void QnFileDeletor::processPostponedFiles()
             internalDeleteFile(itr->fileName);
         else
         {
-            auto storage = qnResPool->getResourceById(itr->storageId);
+            auto storage = resourcePool()->getResourceById(itr->storageId);
             if (!storage) // Unknown storage. Try once and discard.
             {
                 internalDeleteFile(itr->fileName);

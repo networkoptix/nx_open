@@ -50,7 +50,7 @@ void requestRemotePeers(
 {
     const auto systemName = qnGlobalSettings->systemName();
 
-    auto servers = QSet<QnMediaServerResourcePtr>::fromList(qnResPool->getAllServers(Qn::Online));
+    auto servers = QSet<QnMediaServerResourcePtr>::fromList(resourcePool()->getAllServers(Qn::Online));
 
     for (const auto& moduleInformation: QnModuleFinder::instance()->foundModules())
     {
@@ -58,7 +58,7 @@ void requestRemotePeers(
             continue;
 
         const auto server =
-            qnResPool->getResourceById<QnMediaServerResource>(moduleInformation.id);
+            resourcePool()->getResourceById<QnMediaServerResource>(moduleInformation.id);
         if (!server)
             continue;
 

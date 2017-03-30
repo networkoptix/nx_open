@@ -36,9 +36,9 @@ void QnResourceTreeModelOtherSystemsNode::initialize()
     connect(qnSystemsFinder, &QnAbstractSystemsFinder::systemLost,
         this, &QnResourceTreeModelOtherSystemsNode::handleSystemLost);
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnResourceTreeModelOtherSystemsNode::handleResourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnResourceTreeModelOtherSystemsNode::handleResourceRemoved);
 
     connect(context(), &QnWorkbenchContext::userChanged, this,
@@ -55,7 +55,7 @@ void QnResourceTreeModelOtherSystemsNode::deinitialize()
 {
     qnGlobalSettings->disconnect(this);
     context()->disconnect(this);
-    qnResPool->disconnect(this);
+    resourcePool()->disconnect(this);
     qnSystemsFinder->disconnect(this);
 
     clean();
@@ -234,7 +234,7 @@ void QnResourceTreeModelOtherSystemsNode::rebuild()
     if (!canSeeFakeServers())
         return;
 
-    for (const auto& resource: qnResPool->getAllIncompatibleResources())
+    for (const auto& resource: resourcePool()->getAllIncompatibleResources())
     {
         const auto server = resource.dynamicCast<QnFakeMediaServerResource>();
         NX_ASSERT(server);

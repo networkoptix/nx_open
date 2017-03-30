@@ -63,7 +63,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
     //m_needUpdateStreamParams = true;
     m_lastWarningTime = 0;
-    m_mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(getResource()->getParentId()));
+    m_mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (resourcePool()->getResourceById(getResource()->getParentId()));
 
     QnScheduleTask::Data scheduleData;
     scheduleData.m_startTime = 0;
@@ -537,7 +537,7 @@ void QnServerStreamRecorder::setSpecialRecordingMode(QnScheduleTask& task)
 
 bool QnServerStreamRecorder::isPanicMode() const
 {
-    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     return boost::algorithm::any_of(onlineServers
         , [](const QnMediaServerResourcePtr& server)
     {

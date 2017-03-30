@@ -79,7 +79,7 @@ void QnLiteClientController::setServerId(const QString& serverId)
     if (d->serverId == id)
         return;
 
-    d->server = qnResPool->getResourceById<QnMediaServerResource>(id);
+    d->server = resourcePool()->getResourceById<QnMediaServerResource>(id);
     emit serverIdChanged();
 
     if (d->server)
@@ -181,7 +181,7 @@ void QnLiteClientController::stopLiteClient()
     message.operation = QnVideoWallControlMessage::Exit;
     message.videowallGuid = d->serverId;
 
-    const auto connection = QnAppServerConnectionFactory::getConnection2();
+    const auto connection = commonModule()->ec2Connection();
     const auto videowallManager = connection->getVideowallManager(Qn::kSystemAccess);
     videowallManager->sendControlMessage(message, this, []{});
 }

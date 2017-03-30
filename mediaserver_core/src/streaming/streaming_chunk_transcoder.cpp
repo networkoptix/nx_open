@@ -58,7 +58,7 @@ StreamingChunkTranscoder::StreamingChunkTranscoder( Flags flags )
     }
 
     Qn::directConnect(
-        qnResPool, &QnResourcePool::resourceRemoved,
+        resourcePool(), &QnResourcePool::resourceRemoved,
         this, &StreamingChunkTranscoder::onResourceRemoved );
 }
 

@@ -93,7 +93,7 @@ protected:
 TEST_F(QnGlobalPermissionsManagerTest, checkRoleRemoved)
 {
     auto role = createRole(Qn::GlobalAccessAllMediaPermission);
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
     ASSERT_TRUE(hasGlobalPermission(role, Qn::GlobalAccessAllMediaPermission));
 
     auto user = addUser(Qn::NoGlobalPermissions);
@@ -102,26 +102,26 @@ TEST_F(QnGlobalPermissionsManagerTest, checkRoleRemoved)
     user->setUserRoleId(role.id);
     ASSERT_TRUE(hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission));
 
-    qnUserRolesManager->removeUserRole(role.id);
+    userRolesManager()->removeUserRole(role.id);
     ASSERT_FALSE(hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission));
 }
 
 TEST_F(QnGlobalPermissionsManagerTest, checkRoleRemovedSignalRole)
 {
     auto role = createRole(Qn::GlobalAccessAllMediaPermission);
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
     auto user = addUser(Qn::NoGlobalPermissions);
     user->setUserRoleId(role.id);
     awaitPermissions(role, Qn::NoGlobalPermissions);
-    qnUserRolesManager->removeUserRole(role.id);
+    userRolesManager()->removeUserRole(role.id);
 }
 
 TEST_F(QnGlobalPermissionsManagerTest, checkRoleRemovedSignalUser)
 {
     auto role = createRole(Qn::GlobalAccessAllMediaPermission);
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
     auto user = addUser(Qn::NoGlobalPermissions);
     user->setUserRoleId(role.id);
     awaitPermissions(user, Qn::NoGlobalPermissions);
-    qnUserRolesManager->removeUserRole(role.id);
+    userRolesManager()->removeUserRole(role.id);
 }

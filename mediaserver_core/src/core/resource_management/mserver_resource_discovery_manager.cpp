@@ -84,7 +84,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 ++itr;
                 continue;
             }
-            QnSecurityCamResourcePtr existRes = qnResPool->getResourceByUniqueId<QnSecurityCamResource>((*itr)->getUniqueId());
+            QnSecurityCamResourcePtr existRes = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>((*itr)->getUniqueId());
             if (existRes && existRes->hasFlags(Qn::foreigner) && !existRes->hasFlags(Qn::desktop_camera))
             {
                 m_tmpForeignResources.insert(camRes->getUniqueId(), camRes);
@@ -220,7 +220,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     ec2::ApiCameraData apiCamera;
                     fromResourceToApi(existCamRes, apiCamera);
 
-                    ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
+                    ec2::AbstractECConnectionPtr connect = commonModule()->ec2Connection();
                     const ec2::ErrorCode errorCode = connect->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
                     if( errorCode != ec2::ErrorCode::ok )
                         NX_LOG( QString::fromLatin1("Discovery----: Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
@@ -291,7 +291,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
 void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& discoveredResources)
 {
-    const QnResourceList& resources = qnResPool->getResources();
+    const QnResourceList& resources = resourcePool()->getResources();
 
     for(const QnResourcePtr& res: resources)
     {

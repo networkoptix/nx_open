@@ -142,7 +142,7 @@ bool updateUserCredentials(PasswordData data, QnOptionalBool isEnabled, const Qn
 
     ec2::ApiUserData apiUser;
     fromResourceToApi(updatedUser, apiUser);
-    auto errCode = QnAppServerConnectionFactory::getConnection2()
+    auto errCode = commonModule()->ec2Connection()
         ->getUserManager(Qn::kSystemAccess)
         ->saveSync(apiUser, data.password);
     NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
@@ -189,7 +189,7 @@ bool backupDatabase() {
             break;
     }
 
-    const ec2::ErrorCode errorCode = QnAppServerConnectionFactory::getConnection2()->dumpDatabaseToFileSync( fileName );
+    const ec2::ErrorCode errorCode = commonModule()->ec2Connection()->dumpDatabaseToFileSync( fileName );
     if (errorCode != ec2::ErrorCode::ok) {
         NX_LOG(lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)), cl_logERROR);
         return false;
@@ -217,7 +217,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMess
     if (qnGlobalSettings->localSystemId() == data.localSystemId)
         return true;
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server) {
         NX_LOG("Cannot find self server resource!", cl_logERROR);
         return false;
@@ -226,7 +226,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMess
     if (!data.wholeSystem)
         dropConnectionsToRemotePeers(messageBus);
 
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
 
     // add foreign users
     for (const auto& user: data.foreignUsers)
@@ -269,7 +269,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMess
     qnGlobalSettings->setLocalSystemId(data.localSystemId);
     qnGlobalSettings->synchronizeNowSync();
 
-    QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(data.tranLogTime);
+    commonModule()->ec2Connection()->setTransactionLogTime(data.tranLogTime);
 
     // update auth key if system name is changed
     server->setAuthKey(QnUuid::createUuid().toString());
@@ -307,7 +307,7 @@ bool resetSystemToStateNew()
         return false;
     }
 
-    auto adminUserResource = qnResPool->getAdministrator();
+    auto adminUserResource = resourcePool()->getAdministrator();
     PasswordData data;
     data.password = helpers::kFactorySystemPassword;
     return updateUserCredentials(data, QnOptionalBool(true), adminUserResource, nullptr);

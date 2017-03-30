@@ -113,7 +113,7 @@ void QnWorkbenchScreenRecordingHandler::startRecordingCountdown()
     if (!screenRecordingAction)
         return;
 
-    const auto desktop = qnResPool->getResourceById<QnDesktopResource>(
+    const auto desktop = resourcePool()->getResourceById<QnDesktopResource>(
         QnDesktopResource::getDesktopResourceUuid());
     if (!desktop)
     {
@@ -203,7 +203,7 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
     }
 
     const QnDesktopResourcePtr res =
-        qnResPool->getResourceById<QnDesktopResource>(QnDesktopResource::getDesktopResourceUuid());
+        resourcePool()->getResourceById<QnDesktopResource>(QnDesktopResource::getDesktopResourceUuid());
 
     if (!res)
     {

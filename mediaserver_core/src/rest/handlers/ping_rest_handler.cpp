@@ -14,7 +14,7 @@ int QnPingRestHandler::executeGet(const QString &path, const QnRequestParams &pa
     Q_UNUSED(path)
     Q_UNUSED(params)
 
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
 
     QnPingReply reply;
     reply.moduleGuid = qnCommon->moduleGUID();

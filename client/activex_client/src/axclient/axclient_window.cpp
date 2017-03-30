@@ -131,7 +131,7 @@ void QnAxClientWindow::addResourcesToLayout(const QList<QnUuid> &uniqueIds, qint
     QnResourceList resources;
     for(const auto& id: uniqueIds)
     {
-        QnResourcePtr resource = qnResPool->getResourceById(id);
+        QnResourcePtr resource = resourcePool()->getResourceById(id);
         if(resource)
             resources << resource;
     }
@@ -154,7 +154,7 @@ void QnAxClientWindow::addResourcesToLayout(const QList<QnUuid> &uniqueIds, qint
     layout->setParentId(m_context->user()->getId());
     layout->setCellSpacing(0);
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, timeStampMs, 1.0)));
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
 
     QnWorkbenchLayout *wlayout = new QnWorkbenchLayout(layout, this);
     m_context->workbench()->addLayout(wlayout);

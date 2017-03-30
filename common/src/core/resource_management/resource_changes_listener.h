@@ -22,24 +22,24 @@ public:
                 (receiver->*slot)();
         };
 
-        connect(qnResPool, &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
-        connect(qnResPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
+        connect(resourcePool(), &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
+        connect(resourcePool(), &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
 
-        connect(qnResPool, &QnResourcePool::resourceAdded,   this,
+        connect(resourcePool(), &QnResourcePool::resourceAdded,   this,
             [signal, receiver, slot](const QnResourcePtr &resource)
             {
                 if (const ResourceClassPtr &target = resource.dynamicCast<ResourceClass>())
                     connect(target, signal, receiver, slot);
             });
 
-        connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
             [signal, receiver, slot](const QnResourcePtr &resource)
             {
                 if (const ResourceClassPtr &target = resource.dynamicCast<ResourceClass>())
                     Qn::disconnect(target, signal, receiver, slot);
             });
 
-        for (const ResourceClassPtr &target: qnResPool->getResources<ResourceClass>())
+        for (const ResourceClassPtr &target: resourcePool()->getResources<ResourceClass>())
             connect(target, signal, receiver, slot);
     }
 
@@ -53,20 +53,20 @@ public:
                 slot();
         };
 
-        connect(qnResPool, &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
-        connect(qnResPool, &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
+        connect(resourcePool(), &QnResourcePool::resourceAdded,   this,   updateIfNeeded);
+        connect(resourcePool(), &QnResourcePool::resourceRemoved, this,   updateIfNeeded);
 
-        connect(qnResPool, &QnResourcePool::resourceAdded,   this,   [this, signal, slot](const QnResourcePtr &resource) {
+        connect(resourcePool(), &QnResourcePool::resourceAdded,   this,   [this, signal, slot](const QnResourcePtr &resource) {
             if (const ResourceClassPtr &target = resource.dynamicCast<ResourceClass>())
                 connect(target, signal, this, slot);
         });
 
-        connect(qnResPool, &QnResourcePool::resourceRemoved, this,   [this, signal](const QnResourcePtr &resource) {
+        connect(resourcePool(), &QnResourcePool::resourceRemoved, this,   [this, signal](const QnResourcePtr &resource) {
             if (const ResourceClassPtr &target = resource.dynamicCast<ResourceClass>())
                 disconnect(target, signal, this, nullptr); /* cannot directly disconnect from lambda */
         });
 
-        for (const ResourceClassPtr &target: qnResPool->getResources<ResourceClass>())
+        for (const ResourceClassPtr &target: resourcePool()->getResources<ResourceClass>())
             connect(target, signal, this, slot);
     }
 

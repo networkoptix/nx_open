@@ -100,9 +100,9 @@ public:
     static QStringList getLocalUsingCameras()
     {
         QStringList result;
-        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
+        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (resourcePool()->getResourceById(serverGuid()));
         if (mediaServer) {
-            QnResourceList resList = qnResPool->getResourcesWithParentId(mediaServer->getId());
+            QnResourceList resList = resourcePool()->getResourcesWithParentId(mediaServer->getId());
             for (int i = 0; i < resList.size(); ++i) {
                 QnNetworkResourcePtr netRes = resList[i].dynamicCast<QnNetworkResource>();
                 if (netRes && hasRunningLiveProvider(netRes))
@@ -252,7 +252,7 @@ void QnMServerResourceSearcher::readDataFromSocket()
     readSocketInternal(m_receiveSocket.get(), conflicts);
     if (!conflicts.camerasByServer.isEmpty()) {
         conflicts.sourceServer = localAppServerHost();
-        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
+        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (resourcePool()->getResourceById(serverGuid()));
         if (mediaServer)
             qnBusinessRuleConnector->at_mediaServerConflict(mediaServer, qnSyncTime->currentUSecsSinceEpoch(), conflicts);
     }

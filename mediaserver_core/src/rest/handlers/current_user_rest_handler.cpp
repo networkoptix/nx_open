@@ -20,7 +20,7 @@ int QnCurrentUserRestHandler::executeGet(const QString &, const QnRequestParams&
         QnAuthHelper::instance()->doCookieAuthorization("GET", cookie.toUtf8(), *owner->response(), &accessRights);
     }
 
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
     ec2::ApiUserDataList users;
     ec2::ErrorCode errCode =
         ec2Connection->getUserManager(accessRights)

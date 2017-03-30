@@ -41,9 +41,9 @@ QnCameraThumbnailManager::QnCameraThumbnailManager(QObject* parent) :
 
     connect(m_refreshingTimer, &QTimer::timeout, this,
         &QnCameraThumbnailManager::forceRefreshThumbnails);
-    connect(qnResPool, &QnResourcePool::statusChanged, this,
+    connect(resourcePool(), &QnResourcePool::statusChanged, this,
         &QnCameraThumbnailManager::at_resPool_statusChanged);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnCameraThumbnailManager::at_resPool_resourceRemoved);
 
     m_refreshingTimer->start();

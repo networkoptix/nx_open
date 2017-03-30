@@ -274,7 +274,7 @@ bool QnUniversalRequestProcessor::isProxyForCamera(const nx_http::Request& reque
         desiredCameraGuid = request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME);
     }
     if (!desiredCameraGuid.isEmpty()) {
-        QnResourcePtr camera = qnResPool->getResourceById(QnUuid::fromStringSafe(desiredCameraGuid));
+        QnResourcePtr camera = resourcePool()->getResourceById(QnUuid::fromStringSafe(desiredCameraGuid));
         return camera != 0;
     }
 

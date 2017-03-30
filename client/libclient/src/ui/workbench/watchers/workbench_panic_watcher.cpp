@@ -10,22 +10,22 @@ QnWorkbenchPanicWatcher::QnWorkbenchPanicWatcher(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_panicMode(false)
 {
-    connect(qnResPool, SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
-    connect(qnResPool, SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
+    connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+    connect(resourcePool(), SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
 
-    foreach(const QnResourcePtr &resource, qnResPool->getResources())
+    foreach(const QnResourcePtr &resource, resourcePool()->getResources())
         at_resourcePool_resourceAdded(resource);
 }
 
 QnWorkbenchPanicWatcher::~QnWorkbenchPanicWatcher() {
-    foreach(const QnResourcePtr &resource, qnResPool->getResources())
+    foreach(const QnResourcePtr &resource, resourcePool()->getResources())
         at_resourcePool_resourceRemoved(resource);
 
-    disconnect(qnResPool, NULL, this, NULL);
+    disconnect(resourcePool(), NULL, this, NULL);
 }
 
 void QnWorkbenchPanicWatcher::updatePanicMode() {
-    auto servers = qnResPool->getResources<QnMediaServerResource>();
+    auto servers = resourcePool()->getResources<QnMediaServerResource>();
     bool panicMode = std::any_of(servers.cbegin(), servers.cend(), [](const QnMediaServerResourcePtr &server) {
         return server->getPanicMode() != Qn::PM_None && server->getStatus() == Qn::Online;
     });

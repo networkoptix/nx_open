@@ -11,7 +11,7 @@
 QnCameraDataManager::QnCameraDataManager(QObject *parent /*= 0*/):
     QObject(parent)
 {
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
             if (QnMediaResourcePtr mediaResource = resource.dynamicCast<QnMediaResource>())

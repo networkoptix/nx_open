@@ -26,7 +26,7 @@ int QnStatisticsRestHandler::executeGet(
 {
     if (!qnResourceAccessManager->hasPermission(
             owner->accessRights(),
-            qnResPool->getResourceById(qnCommon->moduleGUID()),
+            resourcePool()->getResourceById(qnCommon->moduleGUID()),
             Qn::ViewContentPermission))
     {
         return nx_http::StatusCode::forbidden;

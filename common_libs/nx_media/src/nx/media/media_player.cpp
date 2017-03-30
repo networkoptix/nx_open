@@ -921,7 +921,7 @@ void Player::setSource(const QUrl& url)
     }
     else
     {
-        d->resource = qnResPool->getResourceById(QnUuid(path));
+        d->resource = resourcePool()->getResourceById(QnUuid(path));
     }
 
     if (d->resource && currentState == State::Playing)

@@ -162,7 +162,7 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
     m_resources << videowalls;
     m_resources << webPages;
 
-    m_videoWallItems = qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
+    m_videoWallItems = resourcePool()->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
 
     if (m_resources.empty() && m_videoWallItems.empty()) {
         event->ignore();

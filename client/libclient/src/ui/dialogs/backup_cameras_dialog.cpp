@@ -88,7 +88,7 @@ namespace {
                 tr("Cannot add new devices because they store archive on external storage."),
                 tr("Cannot add new cameras because they store archive on external storage."));
 
-            auto cameras = qnResPool->getResources<QnVirtualCameraResource>(selectedResources);
+            auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(selectedResources);
             if (boost::algorithm::any_of(cameras, isDtsCamera))
             {
                 // If has dts-based cameras then change massage accordingly
@@ -112,7 +112,7 @@ namespace {
 
         virtual bool isValid(const QnUuid& resourceId) const override
         {
-            auto resource = qnResPool->getResourceById(resourceId);
+            auto resource = resourcePool()->getResourceById(resourceId);
             if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
                 return isValidServer(server);
 

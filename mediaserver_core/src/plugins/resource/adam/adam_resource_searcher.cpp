@@ -225,7 +225,7 @@ QnResourceList QnAdamResourceSearcher::findResources()
             if (remoteEndpoint.port != kAdamAutodiscoveryPort)
                 continue;
 
-            auto existingResources = qnResPool->getAllNetResourceByHostAddress(remoteEndpoint.address.toString());
+            auto existingResources = resourcePool()->getAllNetResourceByHostAddress(remoteEndpoint.address.toString());
 
             if (!existingResources.isEmpty())
             {

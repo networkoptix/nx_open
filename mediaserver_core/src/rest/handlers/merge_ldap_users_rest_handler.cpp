@@ -19,7 +19,7 @@
 #include "rest/server/rest_connection_processor.h"
 
 namespace {
-    ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
+    ec2::AbstractECConnectionPtr ec2Connection() { return commonModule()->ec2Connection(); }
 }
 
 int QnMergeLdapUsersRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)

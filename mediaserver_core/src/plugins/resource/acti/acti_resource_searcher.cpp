@@ -355,7 +355,7 @@ void QnActiResourceSearcher::processPacket(
     if(isNx)
         devInfoCopy.friendlyName = NX_VENDOR;
 
-    auto existingRes = qnResPool->getNetResourceByPhysicalId(
+    auto existingRes = resourcePool()->getNetResourceByPhysicalId(
         stringToActiPhysicalID(devInfo.serialNumber));
 
     QAuthenticator cameraAuth;
@@ -388,7 +388,7 @@ void QnActiResourceSearcher::processPacket(
 
         // Possible auth = auth from resources with the same host address + default one.
         QSet<QAuthenticator> possibleAuth;
-        auto sameHostResources = qnResPool->getAllNetResourceByHostAddress(host)
+        auto sameHostResources = resourcePool()->getAllNetResourceByHostAddress(host)
             .filtered<QnActiResource>();
 
         if (!sameHostResources.isEmpty())
@@ -511,17 +511,17 @@ QnNetworkResourcePtr QnActiResourceSearcher::findExistingResource(
     const QString& serialNumber,
     const QString& macAddress)
 {
-    auto existingRes = qnResPool->getNetResourceByPhysicalId(stringToActiPhysicalID(serialNumber));
+    auto existingRes = resourcePool()->getNetResourceByPhysicalId(stringToActiPhysicalID(serialNumber));
 
     if (!existingRes)
-        existingRes = qnResPool->getNetResourceByPhysicalId(stringToActiPhysicalID(macAddress));
+        existingRes = resourcePool()->getNetResourceByPhysicalId(stringToActiPhysicalID(macAddress));
 
     if (!existingRes && !QnMacAddress(macAddress).isNull())
-        existingRes = qnResPool->getResourceByMacAddress(macAddress);
+        existingRes = resourcePool()->getResourceByMacAddress(macAddress);
 
     if (!existingRes && !serialNumber.isEmpty())
     {
-        auto sameHostResources = qnResPool->getAllNetResourceByHostAddress(hostAddress)
+        auto sameHostResources = resourcePool()->getAllNetResourceByHostAddress(hostAddress)
             .filtered<QnActiResource>();
 
         for (const auto& camera: sameHostResources)

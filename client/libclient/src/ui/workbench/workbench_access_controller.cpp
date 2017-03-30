@@ -29,9 +29,9 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
     m_user(),
     m_globalPermissions(Qn::NoGlobalPermissions)
 {
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnWorkbenchAccessController::at_resourcePool_resourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnWorkbenchAccessController::at_resourcePool_resourceRemoved);
 
     connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsChanged, this,
@@ -285,7 +285,7 @@ void QnWorkbenchAccessController::recalculateAllPermissions()
     if (changed)
         emit globalPermissionsChanged();
 
-    for (const QnResourcePtr& resource: qnResPool->getResources())
+    for (const QnResourcePtr& resource: resourcePool()->getResources())
         updatePermissions(resource);
 }
 

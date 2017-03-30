@@ -293,7 +293,7 @@ QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(
     if (!resource)
         return QAuthenticator();
 
-    auto existingResource = qnResPool->getNetResourceByPhysicalId(resource->getPhysicalId());
+    auto existingResource = resourcePool()->getNetResourceByPhysicalId(resource->getPhysicalId());
     if (existingResource)
         return existingResource->getAuth();
 

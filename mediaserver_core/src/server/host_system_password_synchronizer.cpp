@@ -21,10 +21,10 @@
 HostSystemPasswordSynchronizer::HostSystemPasswordSynchronizer()
 {
     Qn::directConnect(
-        qnResPool, &QnResourcePool::resourceAdded,
+        resourcePool(), &QnResourcePool::resourceAdded,
         this, &HostSystemPasswordSynchronizer::at_resourceFound);
 
-    if (QnUserResourcePtr admin = qnResPool->getAdministrator())
+    if (QnUserResourcePtr admin = resourcePool()->getAdministrator())
         setAdmin(admin);
 }
 

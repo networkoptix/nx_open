@@ -207,7 +207,7 @@ QList<QPair<QString, QString>> ServerWriterHandler::properties() const
 
 ComposerHandler* ServerWriterHandler::composerHandler(const QString& cameraId)
 {
-    m_camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraId);
+    m_camera = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(cameraId);
     if (!static_cast<bool>(m_camera))
         return nullptr;
     return this;
@@ -396,7 +396,7 @@ QnUuid ServerReaderHandler::archiveCamTypeId() const
 
 bool ServerReaderHandler::isCameraInResPool(const QnUuid& cameraId) const
 {
-    return static_cast<bool>(qnResPool->getResourceById(cameraId));
+    return static_cast<bool>(resourcePool()->getResourceById(cameraId));
 }
 
 void ServerReaderHandler::handleError(const ReaderErrorInfo& errorInfo) const

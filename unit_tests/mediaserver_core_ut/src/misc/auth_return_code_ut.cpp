@@ -33,7 +33,7 @@ public:
 
     virtual void SetUp() override
     {
-        auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        auto ec2Connection = commonModule()->ec2Connection();
         ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
         userData.id = QnUuid::createUuid();
@@ -59,7 +59,7 @@ public:
 
     void addLocalUser(QString userName, QString password)
     {
-        auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        auto ec2Connection = commonModule()->ec2Connection();
         ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
         userData.id = QnUuid::createUuid();

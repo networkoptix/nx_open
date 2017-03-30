@@ -116,15 +116,15 @@ namespace {
             auto passText =
                 [this, resourcePassText](const QnUuid& id)
                 {
-                    auto resource = qnResPool->getResourceById(id);
+                    auto resource = resourcePool()->getResourceById(id);
                     if (resource)
                         return resourcePassText(resource);
-                    auto role = qnUserRolesManager->userRole(id);
+                    auto role = userRolesManager()->userRole(id);
                     return role.name.contains(m_filterText, Qt::CaseInsensitive);
                 };
 
 
-            bool anyCameraPassFilter = any_of(qnResPool->getAllCameras(QnResourcePtr(), true), resourcePassText);
+            bool anyCameraPassFilter = any_of(resourcePool()->getAllCameras(QnResourcePtr(), true), resourcePassText);
             QnBusiness::EventType eventType = idx.data(Qn::EventTypeRole).value<QnBusiness::EventType>();
             if (QnBusiness::requiresCameraResource(eventType)) {
                 auto eventResources = idx.data(Qn::EventResourcesRole).value<QSet<QnUuid>>();
@@ -413,7 +413,7 @@ void QnBusinessRulesDialog::at_resetDefaultsButton_clicked()
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return;
 
-    QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager(Qn::kSystemAccess)->resetBusinessRules(
+    commonModule()->ec2Connection()->getBusinessEventManager(Qn::kSystemAccess)->resetBusinessRules(
         ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone );
 }
 
@@ -543,7 +543,7 @@ bool QnBusinessRulesDialog::saveAll()
 
     //TODO: #GDM #Business replace with QnAppServerReplyProcessor
     foreach (const QnUuid& id, m_pendingDeleteRules) {
-        int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager(Qn::kSystemAccess)->deleteRule(
+        int handle = commonModule()->ec2Connection()->getBusinessEventManager(Qn::kSystemAccess)->deleteRule(
             id, this, &QnBusinessRulesDialog::at_resources_deleted );
         m_deleting[handle] = id;
     }

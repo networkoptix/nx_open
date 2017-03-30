@@ -186,12 +186,12 @@ bool QnSendEmailActionDelegate::validate(const QSet<QnUuid>& selected)
 
 bool QnSendEmailActionDelegate::isValid(const QnUuid& resourceId) const
 {
-    if (auto user = qnResPool->getResourceById<QnUserResource>(resourceId))
+    if (auto user = resourcePool()->getResourceById<QnUserResource>(resourceId))
         return isValidUser(user);
 
     /* We can get here either user id or role id. User should be checked additionally, role is
      * always counted as valid (if exists). */
-    return !qnUserRolesManager->userRole(resourceId).isNull();
+    return !userRolesManager()->userRole(resourceId).isNull();
 }
 
 bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QString& additional)
@@ -199,7 +199,7 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
     using boost::algorithm::all_of;
 
     /* Return true if there are no invalid emails and there is at least one recipient. */
-    auto users = qnResPool->getResources<QnUserResource>(ids).filtered(
+    auto users = resourcePool()->getResources<QnUserResource>(ids).filtered(
         [](const QnUserResourcePtr& user)
         {
             return user->isEnabled();
@@ -215,14 +215,14 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
     /* Using lazy calculations to avoid counting roles when not needed. */
     return !users.empty()
         || !additionalRecipients.empty()
-        || !qnUserRolesManager->userRoles(ids).empty();
+        || !userRolesManager()->userRoles(ids).empty();
 }
 
 QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool detailed,
     const QString& additionalList)
 {
-    auto roles = qnUserRolesManager->userRoles(ids);
-    auto users = qnResPool->getResources<QnUserResource>(ids).filtered(
+    auto roles = userRolesManager()->userRoles(ids);
+    auto users = resourcePool()->getResources<QnUserResource>(ids).filtered(
         [](const QnUserResourcePtr& user)
         {
             return user->isEnabled();

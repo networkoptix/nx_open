@@ -917,7 +917,7 @@ void QnServerDb::getAndSerializeActions(
         {
             QnUuid eventResId = QnUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes =
-                qnResPool->getResourceById<QnNetworkResource>(eventResId);
+                resourcePool()->getResourceById<QnNetworkResource>(eventResId);
             if (camRes)
             {
                 if (QnStorageManager::isArchiveTimeExists(

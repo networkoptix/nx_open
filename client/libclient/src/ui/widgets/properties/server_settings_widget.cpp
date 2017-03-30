@@ -269,10 +269,10 @@ void QnServerSettingsWidget::updateFailoverLabel()
         if (!m_server)
             return QString();
 
-        if (qnResPool->getResources<QnMediaServerResource>().size() < 2)
+        if (resourcePool()->getResources<QnMediaServerResource>().size() < 2)
             return tr("At least two servers are required for this feature.");
 
-        if (qnResPool->getAllCameras(m_server, true).size() > ui->maxCamerasSpinBox->value())
+        if (resourcePool()->getAllCameras(m_server, true).size() > ui->maxCamerasSpinBox->value())
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 tr("This server already has more than max devices"),
                 tr("This server already has more than max cameras")

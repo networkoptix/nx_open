@@ -67,7 +67,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
             continue; //race condition. manual camera just deleted
 
         QString uniqueId = camera->getUniqueId();
-        if( camera->hasFlags(Qn::search_upd_only) && !qnResPool->getResourceByUniqueId(uniqueId))
+        if( camera->hasFlags(Qn::search_upd_only) && !resourcePool()->getResourceByUniqueId(uniqueId))
             continue;   //ignoring newly discovered camera
 
         addNewCamera(camera);
@@ -78,7 +78,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr& cameraResource)
 {
     bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferredServerId() == qnCommon->moduleGUID(); // return camera back without mutex
-    QnMediaServerResourcePtr ownServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    QnMediaServerResourcePtr ownServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     const bool takeCameraWithoutLock =
         (ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy()) ||
         qnGlobalSettings->takeCameraOwnershipWithoutLock() ||
@@ -101,7 +101,7 @@ void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr
         return; // camera already adding (in progress)
 
     if (!cameraResource->hasFlags(Qn::parent_change)) {
-        if (!qnResPool->getAllNetResourceByPhysicalId(name).isEmpty())
+        if (!resourcePool()->getAllNetResourceByPhysicalId(name).isEmpty())
             return; // already added. Camera has been found twice
     }
 
@@ -123,7 +123,7 @@ void QnAppserverResourceProcessor::at_mutexLocked()
     if (mutex->checkUserData())
     {
         // add camera if and only if it absent on the other server
-        NX_ASSERT(data.cameraResource->hasFlags(Qn::parent_change) || qnResPool->getAllNetResourceByPhysicalId(mutex->name()).isEmpty());
+        NX_ASSERT(data.cameraResource->hasFlags(Qn::parent_change) || resourcePool()->getAllNetResourceByPhysicalId(mutex->name()).isEmpty());
         addNewCameraInternal(data.cameraResource);
     }
 
@@ -151,16 +151,16 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
     const ec2::ApiCameraData& apiCameraData,
     const ec2::ApiResourceParamDataList& properties)
 {
-    QnResourcePtr existCamRes = qnResPool->getResourceById(apiCameraData.id);
+    QnResourcePtr existCamRes = resourcePool()->getResourceById(apiCameraData.id);
     if (existCamRes && existCamRes->getTypeId() != apiCameraData.typeId)
-        qnResPool->removeResource(existCamRes);
+        resourcePool()->removeResource(existCamRes);
 
     /**
      * Save properties before camera to avoid race condition.
      * Camera will start initialization as soon as ApiCameraData object will appear
      */
 
-    ec2::ErrorCode errorCode = QnAppServerConnectionFactory::getConnection2()
+    ec2::ErrorCode errorCode = commonModule()->ec2Connection()
         ->getResourceManager(Qn::kSystemAccess)
         ->saveSync(apiCameraData.id, properties);
     if (errorCode != ec2::ErrorCode::ok)
@@ -169,7 +169,7 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
         return errorCode;
     }
 
-    errorCode = QnAppServerConnectionFactory::getConnection2()
+    errorCode = commonModule()->ec2Connection()
         ->getCameraManager(Qn::kSystemAccess)
         ->addCameraSync(apiCameraData);
     if (errorCode != ec2::ErrorCode::ok)
@@ -182,7 +182,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
 {
     QString uniqueId = cameraResource->getUniqueId();
     bool resourceExists = static_cast<bool>(
-        qnResPool->getResourceByUniqueId(uniqueId)
+        resourcePool()->getResourceByUniqueId(uniqueId)
     );
     if (cameraResource->hasFlags(Qn::search_upd_only) && !resourceExists)
         return;   //ignoring newly discovered camera
@@ -211,7 +211,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         ec2::ApiCameraAttributesDataList attrsList;
         fromResourceListToApi(QnCameraUserAttributesList() << userAttrCopy, attrsList);
 
-        errCode =  QnAppServerConnectionFactory::getConnection2()->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
+        errCode =  commonModule()->ec2Connection()->getCameraManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
         if (errCode != ec2::ErrorCode::ok)
         {
             NX_LOG( QString::fromLatin1("Can't add camera to ec2 (insCamera user attributes query error). %1").arg(ec2::toString(errCode)), cl_logWARNING );
@@ -222,12 +222,12 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
             QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), userAttrCopy->cameraId );
             (*userAttributesLock)->assign( *userAttrCopy, &modifiedFields );
         }
-        const QnResourcePtr& res = qnResPool->getResourceById(userAttrCopy->cameraId);
+        const QnResourcePtr& res = resourcePool()->getResourceById(userAttrCopy->cameraId);
         if( res )   //it is OK if resource is missing
             res->emitModificationSignals( modifiedFields );
     }
 
-    QnResourcePtr rpRes = qnResPool->getResourceById(apiCameraData.id);
+    QnResourcePtr rpRes = resourcePool()->getResourceById(apiCameraData.id);
     if (rpRes)
     {
         rpRes->setStatus(Qn::Offline);

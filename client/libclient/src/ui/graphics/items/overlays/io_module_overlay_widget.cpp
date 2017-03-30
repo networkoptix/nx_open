@@ -296,7 +296,7 @@ void QnIoModuleOverlayWidgetPrivate::toggleState(const QString& port)
     action->setResources({ module->getId() });
     action->setToggleState(it->state.isActive ? QnBusiness::InactiveState : QnBusiness::ActiveState);
 
-    ec2::AbstractECConnectionPtr connection = QnAppServerConnectionFactory::getConnection2();
+    ec2::AbstractECConnectionPtr connection = commonModule()->ec2Connection();
     // we are not interested in client->server transport error code because of real port checking by timer
     if (connection)
         connection->getBusinessEventManager(Qn::kSystemAccess)->sendBusinessAction(action, module->getParentId(), this, [] {});

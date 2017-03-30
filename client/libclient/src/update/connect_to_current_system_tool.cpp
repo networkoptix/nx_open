@@ -53,7 +53,7 @@ void QnConnectToCurrentSystemTool::start(const QnUuid& targetId, const QString& 
     if (targetId.isNull())
         return;
 
-    auto server = qnResPool->getIncompatibleResourceById(targetId, true)
+    auto server = resourcePool()->getIncompatibleResourceById(targetId, true)
         .dynamicCast<QnMediaServerResource>();
     NX_ASSERT(server);
     if (!server)
@@ -116,12 +116,12 @@ void QnConnectToCurrentSystemTool::mergeServer()
     m_mergeError = utils::MergeSystemsStatus::ok;
     m_mergeErrorMessage.clear();
 
-    const auto server = qnResPool->getIncompatibleResourceById(m_targetId, true)
+    const auto server = resourcePool()->getIncompatibleResourceById(m_targetId, true)
         .dynamicCast<QnMediaServerResource>();
     if (!server)
     {
         const auto compatibleServer =
-            qnResPool->getResourceById<QnMediaServerResource>(m_originalTargetId);
+            resourcePool()->getResourceById<QnMediaServerResource>(m_originalTargetId);
         if (compatibleServer && compatibleServer->getStatus() == Qn::Online)
         {
             finish(NoError);
@@ -173,12 +173,12 @@ void QnConnectToCurrentSystemTool::waitServer()
 
     auto finishMerge = [this](bool success)
         {
-            qnResPool->disconnect(this);
+            resourcePool()->disconnect(this);
             delete m_mergeTool;
             finish(success ? NoError : MergeFailed);
         };
 
-    if (qnResPool->getIncompatibleResourceById(m_targetId, true))
+    if (resourcePool()->getIncompatibleResourceById(m_targetId, true))
     {
         finishMerge(true);
         return;
@@ -192,8 +192,8 @@ void QnConnectToCurrentSystemTool::waitServer()
 
     // Receiver object is m_mergeTool.
     // This helps us to break the connection when m_mergeTool is deleted in the cancel() method.
-    connect(qnResPool, &QnResourcePool::resourceAdded, m_mergeTool, handleResourceChanged);
-    connect(qnResPool, &QnResourcePool::statusChanged, m_mergeTool, handleResourceChanged);
+    connect(resourcePool(), &QnResourcePool::resourceAdded, m_mergeTool, handleResourceChanged);
+    connect(resourcePool(), &QnResourcePool::statusChanged, m_mergeTool, handleResourceChanged);
 
     executeDelayedParented(
         [this, finishMerge]()
@@ -208,7 +208,7 @@ void QnConnectToCurrentSystemTool::updateServer()
 {
     NX_ASSERT(!m_updateTool);
 
-    const auto server = qnResPool->getIncompatibleResourceById(m_targetId, true)
+    const auto server = resourcePool()->getIncompatibleResourceById(m_targetId, true)
         .dynamicCast<QnMediaServerResource>();
 
     if (server->getModuleInformation().protoVersion == QnAppInfo::ec2ProtoVersion())

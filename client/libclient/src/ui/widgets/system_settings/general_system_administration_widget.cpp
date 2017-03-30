@@ -132,7 +132,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
         [this] { menu()->trigger(QnActions::OpenBusinessLogAction); });
 
     connect(m_buttons[kHealthMonitorButton], &QPushButton::clicked, this,
-        [this] { menu()->trigger(QnActions::OpenInNewLayoutAction, qnResPool->getResourcesWithFlag(Qn::server)); });
+        [this] { menu()->trigger(QnActions::OpenInNewLayoutAction, resourcePool()->getResourcesWithFlag(Qn::server)); });
 
     connect(m_buttons[kBookmarksButton], &QPushButton::clicked, this,
         [this] { menu()->trigger(QnActions::OpenBookmarksSearchAction); });

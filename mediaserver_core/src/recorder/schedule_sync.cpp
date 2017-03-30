@@ -115,7 +115,7 @@ QnScheduleSync::getOldestChunk(qint64 fromTimeMs) const
     ChunkKeyVector ret;
     int64_t minTime = std::numeric_limits<int64_t>::max();
 
-    for (const QnVirtualCameraResourcePtr &camera : qnResPool->getAllCameras(QnResourcePtr(), true))
+    for (const QnVirtualCameraResourcePtr &camera : resourcePool()->getAllCameras(QnResourcePtr(), true))
     {
         Qn::CameraBackupQualities cameraBackupQualities = camera->getActualBackupQualities();
 
@@ -355,7 +355,7 @@ void QnScheduleSync::addSyncDataKey(
 void QnScheduleSync::initSyncData()
 {
     for (const QnVirtualCameraResourcePtr &camera :
-         qnResPool->getAllCameras(QnResourcePtr(), true))
+         resourcePool()->getAllCameras(QnResourcePtr(), true))
     {
         Qn::CameraBackupQualities cameraBackupQualities =
             camera->getActualBackupQualities();

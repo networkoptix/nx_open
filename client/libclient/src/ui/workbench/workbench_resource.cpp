@@ -77,14 +77,14 @@ namespace {
             QString id, uniqueId;
             stream >> id >> uniqueId;
 
-            QnResourcePtr resource = qnResPool->getResourceById(QnUuid(id));
+            QnResourcePtr resource = resourcePool()->getResourceById(QnUuid(id));
             if(resource && resource->getUniqueId() == uniqueId) {
                 result.push_back(resource);
                 continue;
             }
 
             if(fromOtherApp) {
-                resource = qnResPool->getResourceByUniqueId(uniqueId);
+                resource = resourcePool()->getResourceByUniqueId(uniqueId);
                 if(resource) {
                     result.push_back(resource);
                     continue;

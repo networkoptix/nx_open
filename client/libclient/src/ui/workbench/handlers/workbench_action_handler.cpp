@@ -617,10 +617,10 @@ void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &u
     // TODO: #dklychkov Do not create new empty layout before this method end. See: at_openNewTabAction_triggered()
     if (user && !qnRuntime->isActiveXMode())
     {
-        for (const QnLayoutResourcePtr &layout : qnResPool->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>())
+        for (const QnLayoutResourcePtr &layout : resourcePool()->getResourcesWithParentId(user->getId()).filtered<QnLayoutResource>())
         {
             if (layout->hasFlags(Qn::local) && !layout->isFile())
-                qnResPool->removeResource(layout);
+                resourcePool()->removeResource(layout);
         }
     }
 
@@ -782,7 +782,7 @@ void QnWorkbenchActionHandler::at_openInCurrentLayoutAction_triggered()
     QnUuid videoWallItemGuid = currentLayout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
     if (!videoWallItemGuid.isNull())
     {
-        QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(videoWallItemGuid);
+        QnVideoWallItemIndex index = resourcePool()->getVideoWallItemByUuid(videoWallItemGuid);
         const auto resources = parameters.resources();
 
         // Displaying message delayed to avoid waiting cursor (see drop_instrument.cpp:245)
@@ -1432,7 +1432,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered()
     layout->setCellAspectRatio(desiredCellAspectRatio);
     layout->setLocalRange(period);
 
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
     menu()->trigger(QnActions::OpenSingleLayoutAction, layout);
 }
 
@@ -1590,7 +1590,7 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
     /* Resource cannot have both of these flags at once. */
     NX_ASSERT(checkedFlags == Qn::user || checkedFlags == Qn::videowall);
 
-    foreach(const QnResourcePtr &resource, qnResPool->getResources()) {
+    foreach(const QnResourcePtr &resource, resourcePool()->getResources()) {
         if (!resource->hasFlags(checkedFlags))
             continue;
         if (resource->getName().compare(newName, Qt::CaseInsensitive) != 0)
@@ -1672,7 +1672,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered()
         /* Recorder name should not be validated. */
         QString groupId = camera->getGroupId();
 
-        QnVirtualCameraResourceList modified = qnResPool->getResources().filtered<QnVirtualCameraResource>([groupId](const QnVirtualCameraResourcePtr &camera)
+        QnVirtualCameraResourceList modified = resourcePool()->getResources().filtered<QnVirtualCameraResource>([groupId](const QnVirtualCameraResourcePtr &camera)
         {
             return camera->getGroupId() == groupId;
         });
@@ -1897,7 +1897,7 @@ void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
 }
 
 void QnWorkbenchActionHandler::at_togglePanicModeAction_toggled(bool checked) {
-    QnMediaServerResourceList resources = qnResPool->getAllServers(Qn::AnyStatus);
+    QnMediaServerResourceList resources = resourcePool()->getAllServers(Qn::AnyStatus);
 
     foreach(QnMediaServerResourcePtr resource, resources)
     {
@@ -2091,7 +2091,7 @@ void QnWorkbenchActionHandler::at_betaVersionMessageAction_triggered()
 
 void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
 
-    const QnMediaServerResourceList servers = qnResPool->getResources<QnMediaServerResource>();
+    const QnMediaServerResourceList servers = resourcePool()->getResources<QnMediaServerResource>();
 
     /* Check if we are not connected yet. */
     if (servers.isEmpty())

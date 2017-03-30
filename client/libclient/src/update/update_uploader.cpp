@@ -22,7 +22,7 @@ namespace {
     const int lastChunkTimeout = 20 * 60 * 1000;
 
     ec2::AbstractECConnectionPtr connection2() {
-        return QnAppServerConnectionFactory::getConnection2();
+        return commonModule()->ec2Connection();
     }
 
     QString getPeersString(const QSet<QnUuid> &peers) {
@@ -95,7 +95,7 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
 
     m_progressById.clear();
     foreach (const QnUuid &peerId, peers) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(peerId, true).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = resourcePool()->getIncompatibleResourceById(peerId, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             return false;
 

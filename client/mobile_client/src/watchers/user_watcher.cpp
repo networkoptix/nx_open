@@ -16,7 +16,7 @@ namespace {
 
 QnUserResourcePtr findUser(const QString& userName)
 {
-    const auto users = qnResPool->getResources<QnUserResource>();
+    const auto users = resourcePool()->getResources<QnUserResource>();
 
     /* TODO: Remove this hack which makes QnAvailableCamerasWatcher working.
        Now it always needs a user resource, but when we connect from Lite Client we use
@@ -26,7 +26,7 @@ QnUserResourcePtr findUser(const QString& userName)
    */
     const auto serverId = QnUuid::fromStringSafe(userName);
     if (!serverId.isNull() && qnCommon->remoteGUID() == serverId)
-        return qnResPool->getAdministrator();
+        return resourcePool()->getAdministrator();
 
     for (const auto& user: users)
     {
@@ -50,7 +50,7 @@ QnUserWatcher::QnUserWatcher(QObject* parent) :
         }
     );
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved,
         this, [this](const QnResourcePtr& resource)
         {
             const auto user = resource.dynamicCast<QnUserResource>();

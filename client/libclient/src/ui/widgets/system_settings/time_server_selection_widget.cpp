@@ -153,7 +153,7 @@ void QnTimeServerSelectionWidget::loadDataToUi()
 
 void QnTimeServerSelectionWidget::applyChanges()
 {
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
     if (!connection)
         return;
 

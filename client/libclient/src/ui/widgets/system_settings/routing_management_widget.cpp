@@ -33,7 +33,7 @@
 namespace {
 
     ec2::AbstractECConnectionPtr connection2() {
-        return QnAppServerConnectionFactory::getConnection2();
+        return commonModule()->ec2Connection();
     }
 
     class SortedServersProxyModel : public QSortFilterProxyModel {
@@ -246,10 +246,10 @@ QnRoutingManagementWidget::QnRoutingManagementWidget(QWidget *parent) :
     connect(ui->addButton,                      &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_addButton_clicked);
     connect(ui->removeButton,                   &QPushButton::clicked,                          this,   &QnRoutingManagementWidget::at_removeButton_clicked);
 
-    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnRoutingManagementWidget::at_resourcePool_resourceAdded);
-    connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnRoutingManagementWidget::at_resourcePool_resourceRemoved);
+    connect(resourcePool(),  &QnResourcePool::resourceAdded,     this,   &QnRoutingManagementWidget::at_resourcePool_resourceAdded);
+    connect(resourcePool(),  &QnResourcePool::resourceRemoved,   this,   &QnRoutingManagementWidget::at_resourcePool_resourceRemoved);
 
-    m_serverListModel->setResources(qnResPool->getResourcesWithFlag(Qn::server));
+    m_serverListModel->setResources(resourcePool()->getResourcesWithFlag(Qn::server));
 
     updateUi();
 
@@ -282,7 +282,7 @@ void QnRoutingManagementWidget::applyChanges() {
 
     for (auto it = m_changes->changes.begin(); it != m_changes->changes.end(); ++it) {
         QnUuid serverId = it.key();
-        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(serverId);
+        QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
         if (!server)
             continue;
 

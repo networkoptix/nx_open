@@ -42,7 +42,7 @@ QnPlArecontResourceSearcher::findResourceHelper(const MacArray &mac,
 {
     QnNetworkResourcePtr result;
     QString macAddress = QnMacAddress(mac.data()).toString();
-    auto rpRes = qnResPool->getResourceByUniqueId<QnPlAreconVisionResource>(macAddress);
+    auto rpRes = resourcePool()->getResourceByUniqueId<QnPlAreconVisionResource>(macAddress);
 
     if (rpRes)
         result = QnNetworkResourcePtr(QnPlAreconVisionResource::createResourceByName(rpRes->getModel()));

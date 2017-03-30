@@ -58,7 +58,7 @@ int QnGetNonceRestHandler::executeGet(const QString& path, const QnRequestParams
     QString userName = params.value("userName");
     if (!userName.isEmpty())
     {
-        auto users = qnResPool->getResources<QnUserResource>().filtered(
+        auto users = resourcePool()->getResources<QnUserResource>().filtered(
             [userName](const QnUserResourcePtr& user)
         {
             return user->getName() == userName;

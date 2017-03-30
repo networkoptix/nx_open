@@ -43,7 +43,7 @@ void QnCameraChunkProvider::setResourceId(const QString& id)
     emit bottomBoundChanged();
     emit bottomBoundDateChanged();
 
-    const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id));
+    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(QnUuid(id));
 
     m_loading = !camera.isNull();
     emit loadingChanged();
@@ -152,7 +152,7 @@ void QnCameraChunkProvider::update()
 
     m_loader->load(QString(), 1);
 
-    auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(
+    auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(
         m_loader->resource()->getId());
     qnCameraHistoryPool->updateCameraHistoryAsync(camera, nullptr);
 }

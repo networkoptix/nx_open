@@ -25,13 +25,13 @@ void QnBusinessRulesActualModel::saveRule(const QModelIndex &index) {
     if (m_savingRules.values().contains(ruleModel))
         return;
 
-    if (!QnAppServerConnectionFactory::getConnection2())
+    if (!commonModule()->ec2Connection())
         return;
 
     QnBusinessEventRulePtr rule = ruleModel->createRule();
 
     //TODO: #GDM SafeMode
-    int handle = QnAppServerConnectionFactory::getConnection2()->getBusinessEventManager(Qn::kSystemAccess)->save(
+    int handle = commonModule()->ec2Connection()->getBusinessEventManager(Qn::kSystemAccess)->save(
         rule, this, [this, rule]( int handle, ec2::ErrorCode errorCode ){ at_resources_saved( handle, errorCode, rule ); } );
     m_savingRules[handle] = ruleModel;
 }

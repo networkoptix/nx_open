@@ -88,7 +88,7 @@ void QnAppServerFileCache::clearLocalCache() {
 }
 
 bool QnAppServerFileCache::isConnectedToServer() const {
-    return QnAppServerConnectionFactory::getConnection2() != NULL;
+    return commonModule()->ec2Connection() != NULL;
 }
 
 qint64 QnAppServerFileCache::maximumFileSize() {
@@ -104,7 +104,7 @@ void QnAppServerFileCache::getFileList() {
         return;
     }
 
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
     connection->getStoredFileManager(Qn::kSystemAccess)->listDirectory(m_folderName, this, [this](int handle, ec2::ErrorCode errorCode, const QStringList& filenames) {
         Q_UNUSED(handle);
         bool ok = errorCode == ec2::ErrorCode::ok;
@@ -139,7 +139,7 @@ void QnAppServerFileCache::downloadFile(const QString &filename) {
     if (m_loading.values().contains(filename))
       return;
 
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
     int handle = connection->getStoredFileManager(Qn::kSystemAccess)->getStoredFile(
                 m_folderName + QLatin1Char('/') + filename,
                 this,
@@ -209,7 +209,7 @@ void QnAppServerFileCache::uploadFile(const QString &filename) {
     QByteArray data = file.readAll();
     file.close();
 
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
     int handle = connection->getStoredFileManager(Qn::kSystemAccess)->addStoredFile(
                 m_folderName + QLatin1Char('/') +filename,
                 data,
@@ -263,7 +263,7 @@ void QnAppServerFileCache::deleteFile(const QString &filename) {
     if (m_deleting.values().contains(filename))
       return;
 
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
     int handle = connection->getStoredFileManager(Qn::kSystemAccess)->deleteStoredFile(
                     m_folderName + QLatin1Char('/') +filename,
                     this,

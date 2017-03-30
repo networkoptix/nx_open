@@ -20,15 +20,15 @@ QnWorkbenchDesktopCameraWatcher::QnWorkbenchDesktopCameraWatcher(QObject *parent
     /* Server we are currently connected to MUST exist in the initial resources pool. */
     connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   &QnWorkbenchDesktopCameraWatcher::initialize);
 
-    connect(qnResPool, &QnResourcePool::resourceAdded,   this,   &QnWorkbenchDesktopCameraWatcher::at_resourcePool_resourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,   &QnWorkbenchDesktopCameraWatcher::at_resourcePool_resourceRemoved);
+    connect(resourcePool(), &QnResourcePool::resourceAdded,   this,   &QnWorkbenchDesktopCameraWatcher::at_resourcePool_resourceAdded);
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,   &QnWorkbenchDesktopCameraWatcher::at_resourcePool_resourceRemoved);
 
     initialize();
 }
 
 QnWorkbenchDesktopCameraWatcher::~QnWorkbenchDesktopCameraWatcher() {
     setServer(QnMediaServerResourcePtr());
-    disconnect(qnResPool, NULL, this, NULL);
+    disconnect(resourcePool(), NULL, this, NULL);
 }
 
 void QnWorkbenchDesktopCameraWatcher::initialize() {

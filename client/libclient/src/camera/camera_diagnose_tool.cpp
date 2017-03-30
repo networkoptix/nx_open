@@ -24,7 +24,7 @@ namespace CameraDiagnostics
         m_step( Step::mediaServerAvailability ),
         m_result( false )
     {
-        m_camera = qnResPool->getResourceById<QnVirtualCameraResource>( cameraId );
+        m_camera = resourcePool()->getResourceById<QnVirtualCameraResource>( cameraId );
         if( !m_camera )
             return;
 
@@ -75,7 +75,7 @@ namespace CameraDiagnostics
 
     void DiagnoseTool::onGetServerSystemIdResponse( int status, QString serverSystemId, int /*handle*/ )
     {
-        const ec2::AbstractECConnectionPtr& ecConnection = QnAppServerConnectionFactory::getConnection2();
+        const ec2::AbstractECConnectionPtr& ecConnection = commonModule()->ec2Connection();
         if( (status != 0) || !ecConnection || (serverSystemId != ecConnection->connectionInfo().localSystemId.toString()) )
         {
             m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(m_serverHostAddress).toString();

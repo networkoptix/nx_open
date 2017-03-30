@@ -115,7 +115,7 @@ QModelIndex QnAvailableCameraListModel::indexByResourceId(const QnUuid& resource
 {
     Q_D(const QnAvailableCameraListModel);
 
-    const auto resource = qnResPool->getResourceById(resourceId);
+    const auto resource = resourcePool()->getResourceById(resourceId);
     if (!resource)
         return QModelIndex();
 
@@ -141,7 +141,7 @@ bool QnAvailableCameraListModel::filterAcceptsResource(const QnResourcePtr& reso
 QnAvailableCameraListModelPrivate::QnAvailableCameraListModelPrivate(QnAvailableCameraListModel* parent) :
     q_ptr(parent)
 {
-    connect(qnResPool, &QnResourcePool::resourceChanged,
+    connect(resourcePool(), &QnResourcePool::resourceChanged,
             this, &QnAvailableCameraListModelPrivate::at_resourceChanged);
 
     resetResources();
@@ -176,7 +176,7 @@ void QnAvailableCameraListModelPrivate::resetResources()
     {
         for (const auto& item: layout->getItems())
         {
-            const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(item.resource.id);
+            const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(item.resource.id);
             if (camera)
                 addCamera(camera, true);
         }
@@ -269,7 +269,7 @@ void QnAvailableCameraListModelPrivate::at_layout_itemAdded(
 {
     NX_ASSERT(resource == layout);
 
-    const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(item.resource.id);
+    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(item.resource.id);
     if (camera)
         addCamera(camera);
 }
@@ -279,7 +279,7 @@ void QnAvailableCameraListModelPrivate::at_layout_itemRemoved(
 {
     NX_ASSERT(resource == layout);
 
-    const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(item.resource.id);
+    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(item.resource.id);
     if (camera)
         removeCamera(camera);
 }

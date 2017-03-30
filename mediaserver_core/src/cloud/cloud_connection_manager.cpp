@@ -123,7 +123,7 @@ std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnec
     QString proxyLogin;
     QString proxyPassword;
 
-    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (server)
     {
         proxyLogin = server->getId().toString();
@@ -195,14 +195,14 @@ bool CloudConnectionManager::resetCloudData()
     }
 
     // removing cloud users
-    auto usersToRemove = qnResPool->getResources<QnUserResource>().filtered(
+    auto usersToRemove = resourcePool()->getResources<QnUserResource>().filtered(
         [](const QnUserResourcePtr& user)
         {
             return user->isCloud();
         });
     for (const auto& user: usersToRemove)
     {
-        auto errCode = QnAppServerConnectionFactory::getConnection2()
+        auto errCode = commonModule()->ec2Connection()
             ->getUserManager(Qn::kSystemAccess)->removeSync(user->getId());
         NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
         if (errCode != ec2::ErrorCode::ok)
@@ -223,7 +223,7 @@ bool CloudConnectionManager::makeSystemLocal()
 {
     NX_LOGX(lm("Making system local"), cl_logINFO);
 
-    auto adminUser = qnResPool->getAdministrator();
+    auto adminUser = resourcePool()->getAdministrator();
     if (adminUser && !adminUser->isEnabled() && !qnGlobalSettings->localSystemId().isNull())
     {
         if (!resetSystemToStateNew())

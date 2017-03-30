@@ -126,9 +126,9 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     }
 
     /* Connect to context. */
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnResourceTreeModel::at_resPool_resourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnResourceTreeModel::at_resPool_resourceRemoved);
     connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::flagsChanged, this,
         &QnResourceTreeModel::at_snapshotManager_flagsChanged);
@@ -155,7 +155,7 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
     rebuildTree();
 
     /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
-    for (const QnResourcePtr &resource: qnResPool->getResources())
+    for (const QnResourcePtr &resource: resourcePool()->getResources())
         at_resPool_resourceAdded(resource);
 }
 
@@ -801,7 +801,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
         QnActionParameters parameters;
         if (mimeData->hasFormat(QnVideoWallItem::mimeType()))
             parameters = QnActionParameters(
-                qnResPool->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData)));
+                resourcePool()->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData)));
         else
             parameters = QnActionParameters(sourceResources);
         parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
@@ -905,7 +905,7 @@ void QnResourceTreeModel::at_resPool_resourceAdded(const QnResourcePtr &resource
 
     if (server)
     {
-        for (const QnResourcePtr &camera : qnResPool->getResourcesByParentId(server->getId()))
+        for (const QnResourcePtr &camera : resourcePool()->getResourcesByParentId(server->getId()))
         {
             if (m_resourceNodeByResource.contains(camera))
                 at_resource_parentIdChanged(camera);
@@ -1111,7 +1111,7 @@ void QnResourceTreeModel::at_videoWall_itemAdded(const QnVideoWallResourcePtr &v
 
     QnResourcePtr resource;
     if (!item.layout.isNull())
-        resource = qnResPool->getResourceById(item.layout);
+        resource = resourcePool()->getResourceById(item.layout);
 
     if (node->resource() != resource)
         updateNodeResource(node, resource);
@@ -1150,7 +1150,7 @@ void QnResourceTreeModel::at_server_redundancyChanged(const QnResourcePtr &resou
     /* Update edge nodes if we are the admin. */
     if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
     {
-        for (const QnVirtualCameraResourcePtr &cameraResource : qnResPool->getAllCameras(resource, true))
+        for (const QnVirtualCameraResourcePtr &cameraResource : resourcePool()->getAllCameras(resource, true))
         {
             auto existingNode = m_resourceNodeByResource.take(cameraResource);
             removeNode(existingNode);

@@ -1,5 +1,4 @@
-#ifndef resource_pool_h_1537
-#define resource_pool_h_1537
+#pragma once
 
 #include <functional>
 
@@ -256,8 +255,3 @@ private:
     */
     bool insertOrUpdateResource( const QnResourcePtr &resource, QHash<QnUuid, QnResourcePtr>* const resourcePool );
 };
-
-
-#define qnResPool QnResourcePool::instance()
-
-#endif //resource_pool_h_1537

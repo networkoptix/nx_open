@@ -442,7 +442,7 @@ void QnLicenseManagerWidget::validateLicenses(const QByteArray& licenseKey, cons
             Q_UNUSED(reqID);
             at_licensesReceived(licenseKey, errorCode, licensesToUpdate);
         };
-        QnAppServerConnectionFactory::getConnection2()->getLicenseManager(Qn::kSystemAccess)->addLicenses(
+        commonModule()->ec2Connection()->getLicenseManager(Qn::kSystemAccess)->addLicenses(
             licensesToUpdate, this, addLisencesHandler);
     }
 
@@ -504,7 +504,7 @@ void QnLicenseManagerWidget::removeSelectedLicenses()
             at_licenseRemoved(reqID, errorCode, license);
         };
 
-        QnAppServerConnectionFactory::getConnection2()->getLicenseManager(Qn::kSystemAccess)->removeLicense(license, this, removeLisencesHandler);
+        commonModule()->ec2Connection()->getLicenseManager(Qn::kSystemAccess)->removeLicense(license, this, removeLisencesHandler);
     }
 }
 

@@ -14,7 +14,7 @@ namespace helpers
     QnSharedResourcePointer<ResourceType> extractResource(QnWorkbenchItem *item)
     {
         const auto layoutItemData = item->data();
-        return qnResPool->getResourceByDescriptor(layoutItemData.resource).template dynamicCast<ResourceType>();
+        return resourcePool()->getResourceByDescriptor(layoutItemData.resource).template dynamicCast<ResourceType>();
 
     }
 

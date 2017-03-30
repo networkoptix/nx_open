@@ -17,7 +17,7 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
     QnWorkbenchContextAware(parent),
     m_currentServer()
 {
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr &resource)
         {
             if (resource != m_currentServer)

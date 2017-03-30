@@ -47,12 +47,12 @@ int QnResourceSelectionDialogDelegate::helpTopicId() const
 
 QnResourcePtr QnResourceSelectionDialogDelegate::getResource(const QnUuid& resource) const
 {
-    return qnResPool->getResourceById(resource);
+    return resourcePool()->getResourceById(resource);
 }
 
 QnResourceList QnResourceSelectionDialogDelegate::getResources(const QSet<QnUuid>& resources) const
 {
-    return qnResPool->getResources(resources);
+    return resourcePool()->getResources(resources);
 }
 
 bool QnResourceSelectionDialogDelegate::isMultiChoiceAllowed() const

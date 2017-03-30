@@ -106,7 +106,7 @@ void QnUpdateProcess::run() {
     result.protocolChanged = m_protocolChanged;
 
     for (const QnUuid &id: m_failedPeerIds) {
-        if (QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>())
+        if (QnMediaServerResourcePtr server = resourcePool()->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>())
             result.failedServers.append(server);
     }
 
@@ -238,7 +238,7 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
     m_clientUpdateFile = task->clientUpdateFile();
 
     foreach (const QnUuid &serverId, m_target.targets) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(serverId, true).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = resourcePool()->getIncompatibleResourceById(serverId, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 
@@ -317,7 +317,7 @@ void QnUpdateProcess::checkFreeSpace()
 
     for (const auto& targetId: m_targetPeerIds)
     {
-        const auto server = qnResPool->getResourceById<QnMediaServerResource>(targetId);
+        const auto server = resourcePool()->getResourceById<QnMediaServerResource>(targetId);
         if (!server || server->getStatus() != Qn::Online)
             m_failedPeerIds.insert(targetId);
     }
@@ -439,7 +439,7 @@ void QnUpdateProcess::installIncompatiblePeers() {
 void QnUpdateProcess::at_restUpdateTask_peerUpdateFinished(const QnUuid &incompatibleId, const QnUuid &id) {
     QnPeerUpdateInformation info = m_updateInformationById.take(incompatibleId);
     info.stage = QnPeerUpdateStage::Init;
-    info.server = qnResPool->getResourceById<QnMediaServerResource>(id);
+    info.server = resourcePool()->getResourceById<QnMediaServerResource>(id);
     m_updateInformationById.insert(id, info);
     emit targetsChanged(QSet<QnUuid>::fromList(m_updateInformationById.keys()));
     emit peerStageChanged(id, QnPeerUpdateStage::Init);
@@ -485,7 +485,7 @@ void QnUpdateProcess::prepareToUpload() {
     setStage(QnFullUpdateStage::Push);
 
     foreach (const QnUuid &target, m_targetPeerIds) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(target);
+        QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(target);
         if (!server || server->getStatus() != Qn::Online)
             m_failedPeerIds.insert(target);
     }
@@ -550,7 +550,7 @@ void QnUpdateProcess::uploadUpdatesToServers() {
 
     QPointer<QnUploadUpdatesPeerTask> uploadUpdatesPeerTaskPtr(uploadUpdatesPeerTask);
 
-    connect(qnResPool, &QnResourcePool::statusChanged, this, [this, uploadUpdatesPeerTaskPtr](const QnResourcePtr &resource) {
+    connect(resourcePool(), &QnResourcePool::statusChanged, this, [this, uploadUpdatesPeerTaskPtr](const QnResourcePtr &resource) {
         if (m_stage != QnFullUpdateStage::Push)
             return;
 

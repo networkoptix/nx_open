@@ -197,7 +197,7 @@ QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor():
     QnBusinessRuleProcessor(),
     m_emailManager(new EmailManagerImpl())
 {
-    connect(qnResPool, SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)), Qt::QueuedConnection);
+    connect(resourcePool(), SIGNAL(resourceRemoved(QnResourcePtr)), this, SLOT(onRemoveResource(QnResourcePtr)), Qt::QueuedConnection);
 }
 
 QnMServerBusinessRuleProcessor::~QnMServerBusinessRuleProcessor()
@@ -284,7 +284,7 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
 bool QnMServerBusinessRuleProcessor::executePlaySoundAction(const QnAbstractBusinessActionPtr &action)
 {
     const auto params = action->getParams();
-    const auto resource = qnResPool->getResourceById<QnSecurityCamResource>(params.actionResourceId);
+    const auto resource = resourcePool()->getResourceById<QnSecurityCamResource>(params.actionResourceId);
 
     if (!resource)
         return false;
@@ -340,7 +340,7 @@ bool QnMServerBusinessRuleProcessor::executeSayTextAction(const QnAbstractBusine
 #if !defined(EDGE_SERVER)
     const auto params = action->getParams();
     const auto text = params.sayText;
-    const auto resource = qnResPool->getResourceById<QnSecurityCamResource>(params.actionResourceId);
+    const auto resource = resourcePool()->getResourceById<QnSecurityCamResource>(params.actionResourceId);
     if (!resource)
         return false;
 
@@ -362,7 +362,7 @@ bool QnMServerBusinessRuleProcessor::executeSayTextAction(const QnAbstractBusine
 
 bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessActionPtr& action)
 {
-    const QnResourcePtr& mediaServerRes = qnResPool->getResourceById(serverGuid());
+    const QnResourcePtr& mediaServerRes = resourcePool()->getResourceById(serverGuid());
     QnMediaServerResource* mediaServer = dynamic_cast<QnMediaServerResource*> (mediaServerRes.data());
     if (!mediaServer)
         return false;
@@ -430,7 +430,7 @@ bool QnMServerBusinessRuleProcessor::executeHttpRequestAction(const QnAbstractBu
 
 bool QnMServerBusinessRuleProcessor::executePtzAction(const QnAbstractBusinessActionPtr& action)
 {
-    auto camera = qnResPool->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
+    auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
     if (!camera)
         return false;
     if (camera->getDewarpingParams().enabled)
@@ -445,7 +445,7 @@ bool QnMServerBusinessRuleProcessor::executePtzAction(const QnAbstractBusinessAc
 bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBusinessActionPtr& action)
 {
     NX_ASSERT(action);
-    auto camera = qnResPool->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
+    auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
     //NX_ASSERT(camera);
     bool rez = false;
     if (camera) {
@@ -466,7 +466,7 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
 bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusinessActionPtr &action)
 {
     NX_ASSERT(action);
-    auto camera = qnResPool->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
+    auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
     if (!camera)
         return false;
 
@@ -513,7 +513,7 @@ QnUuid QnMServerBusinessRuleProcessor::getGuid() const {
 
 bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action)
 {
-    auto resource = qnResPool->getResourceById(action->getParams().actionResourceId);
+    auto resource = resourcePool()->getResourceById(action->getParams().actionResourceId);
     if( !resource )
     {
         NX_LOG( lit("Received BA_CameraOutput with no resource reference. Ignoring..."), cl_logWARNING );
@@ -538,8 +538,8 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
 
 QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize)
 {
-    QnVirtualCameraResourcePtr cameraRes = qnResPool->getResourceById<QnVirtualCameraResource>(id);
-    const QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    QnVirtualCameraResourcePtr cameraRes = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
+    const QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!cameraRes || !server)
         return QByteArray();
 
@@ -602,7 +602,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
         contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
         contextMap[tpCloudOwnerEmail] = cloudOwnerAccount;
 
-        const auto allUsers = qnResPool->getResources<QnUserResource>();
+        const auto allUsers = resourcePool()->getResources<QnUserResource>();
         for (const auto& user: allUsers)
         {
             if (user->isCloud() && user->getEmail() == cloudOwnerAccount)
@@ -722,7 +722,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstract
     if (eventType == QnBusiness::CameraMotionEvent ||
         eventType == QnBusiness::CameraInputEvent)
     {
-        auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>( action->getRuntimeParams().eventResourceId);
+        auto camRes = resourcePool()->getResourceById<QnVirtualCameraResource>( action->getRuntimeParams().eventResourceId);
         qnCameraHistoryPool->updateCameraHistorySync(camRes);
         if (camRes->hasVideo(nullptr))
         {
@@ -747,7 +747,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstract
             int screenshotNum = 1;
             for (const QnUuid& cameraId: metadata.cameraRefs)
             {
-                if (QnVirtualCameraResourcePtr camRes = qnResPool->getResourceById<QnVirtualCameraResource>(cameraId))
+                if (QnVirtualCameraResourcePtr camRes = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId))
                 {
                     QVariantMap camera;
 
@@ -870,7 +870,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
                 QVariantList disabledCameras;
 
                 for (const QString &id: params.description.split(L';'))
-                    if (const QnVirtualCameraResourcePtr &camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
+                    if (const QnVirtualCameraResourcePtr &camera = resourcePool()->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
                         disabledCameras << QnResourceDisplayInfo(camera).toString(Qn::RI_WithUrl);
 
                 reasonContext[lit("disabledCameras")] = disabledCameras;
@@ -930,8 +930,8 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
         QString::SkipEmptyParts);
 
     const auto ids = action->getResources();
-    const auto userRoles = qnUserRolesManager->userRoles(ids);
-    const auto users = qnResPool->getResources<QnUserResource>(ids);
+    const auto userRoles = userRolesManager()->userRoles(ids);
+    const auto users = resourcePool()->getResources<QnUserResource>(ids);
 
     QStringList recipients;
     auto addRecipient = [&recipients](const QString& email)

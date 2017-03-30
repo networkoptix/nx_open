@@ -152,7 +152,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, ec2
         return layout && layout->isFile();
     };
 
-    QnResourcePtr ownResource = qnResPool->getResourceById(resource->getId());
+    QnResourcePtr ownResource = resourcePool()->getResourceById(resource->getId());
 
     /* Security check. Local layouts must not be overridden by server's.
     * Really that means GUID conflict, caused by saving of local layouts to server. */
@@ -165,7 +165,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, ec2
     QnCommonMessageProcessor::updateResource(resource, source);
     if (!ownResource)
     {
-        qnResPool->addResource(resource);
+        resourcePool()->addResource(resource);
     }
     else
     {

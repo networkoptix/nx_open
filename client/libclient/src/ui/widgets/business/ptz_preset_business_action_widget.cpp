@@ -48,7 +48,7 @@ void QnExecPtzPresetBusinessActionWidget::at_model_dataChanged(QnBusiness::Field
         ui->presetComboBox->clear();
         m_presets.clear();
         m_ptzController.reset();
-        auto cameras = qnResPool->getResources<QnVirtualCameraResource>(model()->actionResources());
+        auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(model()->actionResources());
         if (cameras.size() != 1)
             return; // single camera only allowed
         setupPtzController(cameras[0]);

@@ -40,7 +40,7 @@ int QnAuditLogRestHandler::executeGet(const QString& path, const QnRequestParamL
             QnLatin1Array playbackFlags;
             for (const auto& id: record.resources) 
             {
-                QnResourcePtr res = qnResPool->getResourceById(id);
+                QnResourcePtr res = resourcePool()->getResourceById(id);
                 QnTimePeriod period;
                 period.startTimeMs = record.rangeStartSec * 1000ll;
                 period.durationMs = (record.rangeEndSec - record.rangeStartSec) * 1000ll;

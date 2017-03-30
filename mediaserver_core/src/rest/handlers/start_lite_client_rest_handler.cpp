@@ -44,7 +44,7 @@ int QnStartLiteClientRestHandler::executeGet(
     QString effectiveUserName;
     if (!connectionProcessor->accessRights().isNull())
     {
-        auto user = qnResPool->getResourceById<QnUserResource>(
+        auto user = resourcePool()->getResourceById<QnUserResource>(
             connectionProcessor->accessRights().userId);
         if (!user)
         {
@@ -57,7 +57,7 @@ int QnStartLiteClientRestHandler::executeGet(
 #endif // 0
     }
 
-    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server)
     {
         NX_ASSERT(false);

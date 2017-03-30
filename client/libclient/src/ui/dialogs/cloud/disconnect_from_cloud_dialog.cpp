@@ -514,7 +514,7 @@ void QnDisconnectFromCloudDialogPrivate::createResetPasswordWidget()
     layout->setSpacing(style::Metrics::kDefaultLayoutSpacing.height());
     layout->setContentsMargins(style::Metrics::kDefaultTopLevelMargins);
 
-    auto owner = qnResPool->getAdministrator();
+    auto owner = resourcePool()->getAdministrator();
     NX_ASSERT(owner);
 
     auto loginField = new QnInputField(resetPasswordWidget);
@@ -569,7 +569,7 @@ QnDisconnectFromCloudDialogPrivate::Scenario QnDisconnectFromCloudDialogPrivate:
     if (user->isLocal())
         return Scenario::LocalOwner;
 
-    auto localOwners = qnResPool->getResources().filtered<QnUserResource>(
+    auto localOwners = resourcePool()->getResources().filtered<QnUserResource>(
         [](const QnUserResourcePtr& user)
         {
             return !user->isCloud()

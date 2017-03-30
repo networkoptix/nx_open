@@ -21,7 +21,7 @@ QnRestUpdatePeerTask::QnRestUpdatePeerTask(QObject* parent):
     connect(m_timer, &QTimer::timeout, this, &QnRestUpdatePeerTask::at_timer_timeout);
 
     connect(this, &QnRestUpdatePeerTask::finished, this,
-        [this]() { disconnect(qnResPool, nullptr, this, nullptr); });
+        [this]() { disconnect(resourcePool(), nullptr, this, nullptr); });
 }
 
 void QnRestUpdatePeerTask::setUpdateId(const QString& updateId)
@@ -48,7 +48,7 @@ void QnRestUpdatePeerTask::doStart()
     for (const auto& id: peers())
     {
         QnFakeMediaServerResourcePtr server =
-            qnResPool->getIncompatibleResourceById(id).dynamicCast<QnFakeMediaServerResource>();
+            resourcePool()->getIncompatibleResourceById(id).dynamicCast<QnFakeMediaServerResource>();
         NX_ASSERT(server,
             Q_FUNC_INFO, "An incompatible server resource is expected here.");
 
@@ -65,7 +65,7 @@ void QnRestUpdatePeerTask::doStart()
         connect(server.data(), &QnMediaServerResource::versionChanged,
             this, &QnRestUpdatePeerTask::at_resourceChanged);
 
-        const auto originalServer = qnResPool->getResourceById<QnMediaServerResource>(originalId);
+        const auto originalServer = resourcePool()->getResourceById<QnMediaServerResource>(originalId);
         if (originalServer)
         {
             connect(originalServer.data(), &QnMediaServerResource::versionChanged,
@@ -79,7 +79,7 @@ void QnRestUpdatePeerTask::doStart()
         return;
     }
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
             const auto server = resource.dynamicCast<QnMediaServerResource>();
@@ -93,7 +93,7 @@ void QnRestUpdatePeerTask::doStart()
                 this, &QnRestUpdatePeerTask::at_resourceChanged);
         });
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
             const auto server = resource.dynamicCast<QnMediaServerResource>();
@@ -103,11 +103,11 @@ void QnRestUpdatePeerTask::doStart()
             disconnect(server.data(), nullptr, this, nullptr);
         });
 
-    connect(qnResPool, &QnResourcePool::resourceChanged,
+    connect(resourcePool(), &QnResourcePool::resourceChanged,
         this, &QnRestUpdatePeerTask::at_resourceChanged);
-    connect(qnResPool, &QnResourcePool::resourceAdded,
+    connect(resourcePool(), &QnResourcePool::resourceAdded,
         this, &QnRestUpdatePeerTask::at_resourceChanged);
-    connect(qnResPool, &QnResourcePool::statusChanged,
+    connect(resourcePool(), &QnResourcePool::statusChanged,
         this, &QnRestUpdatePeerTask::at_resourceChanged);
 
     m_timer->start(checkTimeout);

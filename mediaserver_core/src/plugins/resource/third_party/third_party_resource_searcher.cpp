@@ -218,7 +218,7 @@ QnResourceList ThirdPartyResourceSearcher::findResources()
 QnResourceList ThirdPartyResourceSearcher::doCustomSearch()
 {
     QString dafaultURL;
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if( server )
         dafaultURL = server->getApiUrl().toString();
 
@@ -307,7 +307,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     if( strlen(cameraInfo.firmware) > 0 )
         resource->setProperty( Qn::FIRMWARE_PARAM_NAME, QString::fromLatin1(cameraInfo.firmware) );
 
-    if( !qnResPool->getNetResourceByPhysicalId( resource->getPhysicalId() ) )
+    if( !resourcePool()->getNetResourceByPhysicalId( resource->getPhysicalId() ) )
     {
         //new resource
         //TODO #ak reading MaxFPS here is a workaround of camera integration API defect:

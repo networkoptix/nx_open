@@ -75,7 +75,7 @@ namespace {
     }
 
     ec2::AbstractECConnectionPtr connection2() {
-        return QnAppServerConnectionFactory::getConnection2();
+        return commonModule()->ec2Connection();
     }
 
 } // anonymous namespace

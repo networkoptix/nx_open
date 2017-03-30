@@ -51,7 +51,7 @@ namespace {
 
     QnVirtualCameraResourceList cameras(const QSet<QnUuid>& ids)
     {
-        return qnResPool->getResources<QnVirtualCameraResource>(ids);
+        return resourcePool()->getResources<QnVirtualCameraResource>(ids);
     }
 }
 
@@ -271,7 +271,7 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
     m_requests.clear();
     m_allEvents.clear();
 
-    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     for(const QnMediaServerResourcePtr& mserver: onlineServers)
     {
         int handle = mserver->apiConnection()->getEventLogAsync(

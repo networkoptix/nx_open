@@ -330,7 +330,7 @@ QPair<QnLicenseListModel::ExpirationState, QString> QnLicenseListModel::expirati
 
 QnMediaServerResourcePtr QnLicenseListModel::serverByLicense(const QnLicensePtr& license)
 {
-    return qnResPool->getResourceById<QnMediaServerResource>(license->serverId());
+    return resourcePool()->getResourceById<QnMediaServerResource>(license->serverId());
 }
 
 bool QnLicenseListModel::extendedStatus() const

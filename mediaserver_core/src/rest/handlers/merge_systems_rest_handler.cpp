@@ -57,7 +57,7 @@ namespace {
 
     ec2::AbstractECConnectionPtr ec2Connection()
     {
-        return QnAppServerConnectionFactory::getConnection2();
+        return commonModule()->ec2Connection();
     }
 
     bool isResponseOK(const nx_http::HttpClient& client)
@@ -186,7 +186,7 @@ int QnMergeSystemsRestHandler::execute(
 
     /* Get module information to get system name. */
 
-    QnUserResourcePtr adminUser = qnResPool->getAdministrator();
+    QnUserResourcePtr adminUser = resourcePool()->getAdministrator();
     if (!adminUser)
     {
         NX_LOG(lit("QnMergeSystemsRestHandler. Failed to find admin user"), cl_logDEBUG1);
@@ -298,7 +298,7 @@ int QnMergeSystemsRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     bool isDefaultSystemName;
     if (data.takeRemoteSettings)
         isDefaultSystemName = remoteModuleInformation.serverFlags.testFlag(Qn::SF_NewSystem);
@@ -374,7 +374,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     bool oneServer,
     const QnRestConnectionProcessor* owner)
 {
-    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server)
         return false;
     Q_ASSERT(!server->getAuthKey().isEmpty());
@@ -382,7 +382,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     ConfigureSystemData data;
     data.localSystemId = qnGlobalSettings->localSystemId();
     data.sysIdTime = qnCommon->systemIdentityTime();
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
     data.tranLogTime = ec2Connection->getTransactionLogTime();
     data.wholeSystem = !oneServer;
 
@@ -395,7 +395,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     /**
      * Save current admin and cloud users to the foreign system
      */
-    for (const auto& user: qnResPool->getResources<QnUserResource>())
+    for (const auto& user: resourcePool()->getResources<QnUserResource>())
     {
         if (user->isCloud() || user->isBuiltInAdmin())
         {
@@ -534,7 +534,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         data.localSystemId = systemId;
         data.wholeSystem = true;
         data.sysIdTime = qnCommon->systemIdentityTime();
-        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
         data.tranLogTime = ec2Connection->getTransactionLogTime();
         data.rewriteLocalSettings = true;
 
@@ -569,7 +569,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
 
     // put current server info to a foreign system to allow authorization via server key
     {
-        QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+        QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
         if (!mServer)
             return false;
         ec2::ApiMediaServerData currentServer;

@@ -28,7 +28,7 @@ QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
         &QnWorkbenchUserWatcher::forcedUpdate);
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved);
 
     connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
@@ -124,7 +124,7 @@ void QnWorkbenchUserWatcher::setReconnectOnPasswordChange(bool value)
 
 QnUserResourcePtr QnWorkbenchUserWatcher::calculateCurrentUser() const
 {
-    for (const QnUserResourcePtr &user : qnResPool->getResources<QnUserResource>())
+    for (const QnUserResourcePtr &user : resourcePool()->getResources<QnUserResource>())
     {
         if (user->getName().toLower() != m_userName.toLower())
             continue;

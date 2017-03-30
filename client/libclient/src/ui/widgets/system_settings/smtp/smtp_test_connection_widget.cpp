@@ -91,7 +91,7 @@ bool QnSmtpTestConnectionWidget::testSettings(const QnEmailSettings &value)
     }
 
     QnMediaServerConnectionPtr serverConnection;
-    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     for(const QnMediaServerResourcePtr &server: onlineServers)
     {
         if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))

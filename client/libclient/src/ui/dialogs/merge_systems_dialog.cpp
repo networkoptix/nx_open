@@ -130,7 +130,7 @@ void QnMergeSystemsDialog::updateKnownSystems()
 {
     ui->urlComboBox->clear();
 
-    for (const QnMediaServerResourcePtr& server: qnResPool->getAllIncompatibleResources().filtered<QnMediaServerResource>())
+    for (const QnMediaServerResourcePtr& server: resourcePool()->getAllIncompatibleResources().filtered<QnMediaServerResource>())
     {
         QString url = server->getApiUrl().toString();
         QString label = QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());
@@ -267,7 +267,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
         return;
     }
 
-    const auto server = qnResPool->getResourceById<QnMediaServerResource>(
+    const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
         moduleInformation.id);
     if (server && server->getStatus() == Qn::Online
         && helpers::serverBelongsToCurrentSystem(moduleInformation))

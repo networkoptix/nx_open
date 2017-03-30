@@ -19,7 +19,7 @@ QnStoredFileDataProvider::QnStoredFileDataProvider(const QString &filePath, int 
     m_cyclesCount(cyclesCount)
 
 {
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
 
     connect(
         this, &QnStoredFileDataProvider::fileLoaded,

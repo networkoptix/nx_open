@@ -7,7 +7,7 @@
 QnResourceRuntimeDataManager::QnResourceRuntimeDataManager(QObject* parent):
     base_type(parent)
 {
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
             m_data.remove(resource->getId());

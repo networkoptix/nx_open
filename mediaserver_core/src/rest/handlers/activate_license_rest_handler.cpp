@@ -147,7 +147,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
         }
     }
 
-    ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
+    ec2::AbstractECConnectionPtr connect = commonModule()->ec2Connection();
     QnLicenseList licenses;
     licenses << license;
     auto licenseManager = connect->getLicenseManager(owner->accessRights());

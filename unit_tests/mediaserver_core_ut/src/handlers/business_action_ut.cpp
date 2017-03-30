@@ -27,12 +27,12 @@ TEST(ExecActionAccessRightsTest, main)
         user->setId(QnUuid::createUuid());
         user->setName(name);
         user->setRawPermissions(permissions);
-        qnResPool->addResource(user);
+        resourcePool()->addResource(user);
     };
 
     auto findUserByName = [](const QString& name)
     {
-        for (const auto& user : qnResPool->getResources<QnUserResource>())
+        for (const auto& user : resourcePool()->getResources<QnUserResource>())
             if (user->getName() == name)
                 return user;
         return QnUserResourcePtr();

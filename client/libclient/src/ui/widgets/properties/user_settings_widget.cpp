@@ -391,7 +391,7 @@ void QnUserSettingsWidget::setupInputFields()
             if (text.trimmed().isEmpty())
                 return Qn::ValidationResult(tr("Login cannot be empty."));
 
-            for (const QnUserResourcePtr& user : qnResPool->getResources<QnUserResource>())
+            for (const QnUserResourcePtr& user : resourcePool()->getResources<QnUserResource>())
             {
                 if (user == m_model->user())
                     continue;
@@ -450,7 +450,7 @@ void QnUserSettingsWidget::setupInputFields()
                 return result;
 
             auto email = text.trimmed().toLower();
-            for (const auto& user : qnResPool->getResources<QnUserResource>())
+            for (const auto& user : resourcePool()->getResources<QnUserResource>())
             {
                 if (!user->isCloud())
                     continue;

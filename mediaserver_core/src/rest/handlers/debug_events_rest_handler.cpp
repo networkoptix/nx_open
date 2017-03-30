@@ -25,11 +25,11 @@ int QnDebugEventsRestHandler::executeGet(const QString &path, const QnRequestPar
 
 int QnDebugEventsRestHandler::testNetworkIssue(const QnRequestParams & params, QnJsonRestResult &result) {
 
-    QnVirtualCameraResourcePtr camera = qnResPool->getAllCameras(QnResourcePtr()).first();
+    QnVirtualCameraResourcePtr camera = resourcePool()->getAllCameras(QnResourcePtr()).first();
 
     QString cameraId = params.value("cameraId");
     if (!cameraId.isEmpty())
-        camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(cameraId);
+        camera = resourcePool()->getResourceByUniqueId<QnVirtualCameraResource>(cameraId);
 
     QString param = params.value("param");
 
@@ -80,11 +80,11 @@ int QnDebugEventsRestHandler::testNetworkIssue(const QnRequestParams & params, Q
 
 int QnDebugEventsRestHandler::testCameraDisconnected(const QnRequestParams & params, QnJsonRestResult &/*result*/) {
 
-    QnVirtualCameraResourcePtr camera = qnResPool->getAllCameras(QnResourcePtr()).first();
+    QnVirtualCameraResourcePtr camera = resourcePool()->getAllCameras(QnResourcePtr()).first();
 
     QString cameraId = params.value("cameraId");
     if (!cameraId.isEmpty())
-        camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(cameraId);
+        camera = resourcePool()->getResourceByUniqueId<QnVirtualCameraResource>(cameraId);
 
     QnAbstractBusinessEventPtr event(new QnCameraDisconnectedBusinessEvent(camera, qnSyncTime->currentUSecsSinceEpoch()));
 

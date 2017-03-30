@@ -183,7 +183,7 @@ namespace
             return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
         };
 
-        QnVirtualCameraResourceList serverCameras = qnResPool->getAllCameras(QnResourcePtr(), true);
+        QnVirtualCameraResourceList serverCameras = resourcePool()->getAllCameras(QnResourcePtr(), true);
         QnVirtualCameraResourceList selectedCameras = serverCameras.filtered(isSelectedForBackup);
         return selectedCameras;
     }
@@ -614,7 +614,7 @@ void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, 
             storage->setBackup(storageData.isBackup);
             storage->setSpaceLimit(storageData.reservedSpace);
 
-            qnResPool->addResource(storage);
+            resourcePool()->addResource(storage);
             result << storage;
         }
     }
@@ -628,7 +628,7 @@ bool QnStorageConfigWidget::hasStoragesChanges(const QnStorageModelInfoList& sto
     for (const auto& storageData: storages)
     {
         /* New storage was added. */
-        QnStorageResourcePtr storage = qnResPool->getResourceById<QnStorageResource>(storageData.id);
+        QnStorageResourcePtr storage = resourcePool()->getResourceById<QnStorageResource>(storageData.id);
         if (!storage || storage->getParentId() != m_server->getId())
             return true;
 
@@ -663,7 +663,7 @@ void QnStorageConfigWidget::applyChanges()
         if (!newIdList.contains(storage->getId()))
         {
             storagesToRemove.push_back(storage->getId());
-            qnResPool->removeResource(storage);
+            resourcePool()->removeResource(storage);
         }
     }
 
@@ -1016,7 +1016,7 @@ void QnStorageConfigWidget::applyCamerasToBackup(const QnVirtualCameraResourceLi
         return camera->getBackupQualities() != qualityForCamera(camera);
     };
 
-    const auto modified = qnResPool->getAllCameras(QnResourcePtr(), true).filtered(modifiedFilter);
+    const auto modified = resourcePool()->getAllCameras(QnResourcePtr(), true).filtered(modifiedFilter);
 
     if (modified.isEmpty())
         return;

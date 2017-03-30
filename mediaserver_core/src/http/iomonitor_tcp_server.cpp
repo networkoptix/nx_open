@@ -52,7 +52,7 @@ void QnIOMonitorConnectionProcessor::run()
     {
         parseRequest();
         QString uniqueId = QUrlQuery(getDecodedUrl().query()).queryItemValue(Qn::CAMERA_UNIQUE_ID_HEADER_NAME);
-        QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(uniqueId);
+        QnSecurityCamResourcePtr camera = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(uniqueId);
         if (!camera) {
             sendResponse(CODE_NOT_FOUND, "multipart/x-mixed-replace; boundary=ioboundary");
             return;

@@ -56,7 +56,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     }
 
     QnMediaServerConnectionPtr serverConnection;
-    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     for (const QnMediaServerResourcePtr server: onlineServers)
     {
         if (!(server->getServerFlags() & Qn::SF_HasPublicIP))
@@ -224,11 +224,11 @@ void QnLdapUsersDialog::stopTesting(const QString &text /* = QString()*/) {
 
 void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users)
 {
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
     if (!connection)
         return;
 
-    auto importedUsers = qnResPool->getResources().filtered<QnUserResource>(
+    auto importedUsers = resourcePool()->getResources().filtered<QnUserResource>(
         [](const QnUserResourcePtr &user)
         {
             return user->isLdap();
@@ -260,7 +260,7 @@ void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users)
 
 void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
 
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
     if (!connection)
         return;
 
@@ -294,7 +294,7 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
 
 QnLdapUsers QnLdapUsersDialog::filterExistingUsers(const QnLdapUsers &users) const {
     QSet<QString> logins;
-    for (const auto &user: qnResPool->getResources<QnUserResource>())
+    for (const auto &user: resourcePool()->getResources<QnUserResource>())
         logins.insert(user->getName().toLower());
 
     QnLdapUsers result;

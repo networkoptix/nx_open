@@ -239,8 +239,8 @@ void QnConnectionManager::disconnectFromServer()
     qnCommon->instance<QnUserWatcher>()->setUserName(QString());
 
     // TODO: #dklychkov Move it to a better place
-    QnResourceList remoteResources = qnResPool->getResourcesWithFlag(Qn::remote);
-    qnResPool->removeResources(remoteResources);
+    QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
+    resourcePool()->removeResources(remoteResources);
 }
 
 QnConnectionManagerPrivate::QnConnectionManagerPrivate(QnConnectionManager* parent):

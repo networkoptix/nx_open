@@ -118,7 +118,7 @@ int QnConfigureRestHandler::execute(
         }
         if (data.wholeSystem)
         {
-            auto connection = QnAppServerConnectionFactory::getConnection2();
+            auto connection = commonModule()->ec2Connection();
             auto manager = connection->getMiscManager(owner->accessRights());
             manager->changeSystemId(
                 data.localSystemId,
@@ -132,7 +132,7 @@ int QnConfigureRestHandler::execute(
     // rewrite system settings to update transaction time
     if (data.rewriteLocalSettings)
     {
-        QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(data.tranLogTime);
+        commonModule()->ec2Connection()->setTransactionLogTime(data.tranLogTime);
         qnGlobalSettings->resynchronizeNowSync();
     }
 
@@ -147,14 +147,14 @@ int QnConfigureRestHandler::execute(
     /* set password */
     if (data.hasPassword())
     {
-        if (!updateUserCredentials(data, QnOptionalBool(), qnResPool->getAdministrator()))
+        if (!updateUserCredentials(data, QnOptionalBool(), resourcePool()->getAdministrator()))
         {
             NX_LOG(lit("QnConfigureRestHandler: can't update administrator credentials"), cl_logWARNING);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));
         }
         else
         {
-            auto adminUser = qnResPool->getAdministrator();
+            auto adminUser = resourcePool()->getAdministrator();
             if (adminUser)
             {
                 QnAuditRecord auditRecord = qnAuditManager->prepareRecord(owner->authSession(), Qn::AR_UserUpdate);
@@ -189,7 +189,7 @@ int QnConfigureRestHandler::changePort(const Qn::UserAccessData& accessRights, i
         return ResultFail;
 
     QnMediaServerResourcePtr server =
-        qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+        resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     if (!server)
         return ResultFail;
 
@@ -209,7 +209,7 @@ int QnConfigureRestHandler::changePort(const Qn::UserAccessData& accessRights, i
 
     ec2::ApiMediaServerData apiServer;
     ec2::fromResourceToApi(server, apiServer);
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
     auto manager = connection->getMediaServerManager(accessRights);
     auto errCode = manager->saveSync(apiServer);
     NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");

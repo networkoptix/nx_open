@@ -32,7 +32,7 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject *parent /*= 0*/)
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this, []()
     {
         /* Online status is set by default, page will go offline if will be unreachable on opening. */
-        for (const QnWebPageResourcePtr &webPage: qnResPool->getResources<QnWebPageResource>())
+        for (const QnWebPageResourcePtr &webPage: resourcePool()->getResources<QnWebPageResource>())
             webPage->setStatus(Qn::Online);
     });
 
@@ -61,7 +61,7 @@ void QnWorkbenchWebPageHandler::at_newWebPageAction_triggered()
             continue;
 
         QnWebPageResourcePtr webPage(new QnWebPageResource(url));
-        if (qnResPool->getResourceById(webPage->getId()))
+        if (resourcePool()->getResourceById(webPage->getId()))
         {
             QnMessageBox::warning(mainWindow(), tr("This Web Page already exists"));
             continue;

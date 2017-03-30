@@ -62,7 +62,7 @@ int QnSetupCloudSystemRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    if (!qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID()))
+    if (!resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID()))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error."));
         return nx_http::StatusCode::ok;
@@ -102,7 +102,7 @@ int QnSetupCloudSystemRestHandler::execute(
     if (!updateUserCredentials(
         adminPasswordData,
         QnOptionalBool(false),
-        qnResPool->getAdministrator(),
+        resourcePool()->getAdministrator(),
         &errStr))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);

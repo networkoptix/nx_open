@@ -51,7 +51,7 @@ protected:
         user->setName(name);
         user->setRawPermissions(globalPermissions);
         user->addFlags(Qn::remote);
-        qnResPool->addResource(user);
+        resourcePool()->addResource(user);
 
         return user;
     }
@@ -73,7 +73,7 @@ protected:
 
     void logout()
     {
-        qnResPool->removeResources(qnResPool->getResourcesWithFlag(Qn::remote));
+        resourcePool()->removeResources(resourcePool()->getResourcesWithFlag(Qn::remote));
         m_currentUser.clear();
         m_accessController->setUser(m_currentUser);
     }
@@ -125,7 +125,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayouts)
 {
     auto layout = createLayout(Qn::exported_layout);
     layout->setUrl("path/to/file");
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
 
     ASSERT_TRUE(layout->isFile());
 
@@ -151,7 +151,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayoutsLocked)
 {
     auto layout = createLayout(Qn::exported_layout, true);
     layout->setUrl("path/to/file");
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
 
     ASSERT_TRUE(layout->isFile());
 
@@ -178,7 +178,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayoutsLocked)
 TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsUnlogged)
 {
     auto layout = createLayout(Qn::local);
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
 
     /* Local layouts can be edited when we are not logged id. */
     Qn::Permissions desired = Qn::FullLayoutPermissions;
@@ -199,7 +199,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedIn)
     loginAs(Qn::GlobalLiveViewerPermissionSet);
 
     auto layout = createLayout(Qn::local);
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     Qn::Permissions forbidden = Qn::RemovePermission;
@@ -218,7 +218,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedIn)
     loginAs(Qn::GlobalLiveViewerPermissionSet);
 
     auto layout = createLayout(Qn::local, true);
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     /* Layout still can be saved. */
@@ -243,7 +243,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedInSafeMode)
     qnCommon->setReadOnly(true);
 
     auto layout = createLayout(Qn::local);
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
     Qn::Permissions actual = m_accessController->permissions(layout);
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
@@ -264,7 +264,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedInSafeMode)
     qnCommon->setReadOnly(true);
 
     auto layout = createLayout(Qn::local, true);
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     Qn::Permissions forbidden = Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission | Qn::SavePermission | Qn::EditLayoutSettingsPermission;

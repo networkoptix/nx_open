@@ -33,7 +33,7 @@ QnResourceTreeModelLayoutNodeManager::QnResourceTreeModelLayoutNodeManager(QnRes
             chainCall(primary.data(), &QnResourceTreeModelNode::update);
         });
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnResourceTreeModelLayoutNodeManager::handleResourceAdded);
 }
 

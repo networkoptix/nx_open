@@ -35,7 +35,7 @@ void QnNewSystemServerFlagWatcher::update()
     if (serverFlags != server->getServerFlags())
     {
         server->setServerFlags(serverFlags);
-        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
 
         ec2::ApiMediaServerData apiServer;
         fromResourceToApi(server, apiServer);

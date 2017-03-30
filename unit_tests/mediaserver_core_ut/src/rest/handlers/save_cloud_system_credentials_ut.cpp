@@ -43,7 +43,7 @@ private:
         auto selfServer = QnMediaServerResourcePtr(new QnMediaServerResource());
         selfServer->setId(qnCommon->moduleGUID());
         selfServer->setServerFlags(Qn::SF_HasPublicIP);
-        qnResPool->addResource(selfServer);
+        resourcePool()->addResource(selfServer);
     }
 
     void insertAdminUser()
@@ -53,7 +53,7 @@ private:
         admin->setName("admin");
         admin->setPassword("admin");
         admin->setOwner(true);
-        qnResPool->addResource(admin);
+        resourcePool()->addResource(admin);
     }
 };
 

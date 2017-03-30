@@ -18,7 +18,7 @@ QnWorkbenchServerSafemodeWatcher::QnWorkbenchServerSafemodeWatcher(QObject *pare
         updateServerFlags();
     });
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, [this](const QnResourcePtr &resource) {
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this, [this](const QnResourcePtr &resource) {
         if (m_currentServer || qnCommon->moduleGUID().isNull() || resource->getId() != qnCommon->remoteGUID())
             return;
 
@@ -27,7 +27,7 @@ QnWorkbenchServerSafemodeWatcher::QnWorkbenchServerSafemodeWatcher(QObject *pare
     });
 
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource) {
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource) {
         if (!m_currentServer || m_currentServer != resource)
             return;
         m_currentServer.reset();
@@ -38,7 +38,7 @@ QnWorkbenchServerSafemodeWatcher::QnWorkbenchServerSafemodeWatcher(QObject *pare
 }
 
 void QnWorkbenchServerSafemodeWatcher::updateCurrentServer() {
-    m_currentServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
+    m_currentServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
 }
 
 void QnWorkbenchServerSafemodeWatcher::updateServerFlags() {

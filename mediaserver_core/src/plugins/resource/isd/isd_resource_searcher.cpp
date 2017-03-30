@@ -352,7 +352,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
 
 
     QAuthenticator cameraAuth;
-    if (auto existingRes = qnResPool->getResourceByMacAddress( smac ) )
+    if (auto existingRes = resourcePool()->getResourceByMacAddress( smac ) )
         cameraAuth = existingRes->getAuth();
 
     QnUuid rt = qnResTypePool->getResourceTypeId(manufacture(), name);
@@ -426,7 +426,7 @@ bool QnPlISDResourceSearcher::processPacket(
 
     QnMacAddress cameraMAC(devInfo.serialNumber);
     QString model(devInfo.modelName);
-    QnNetworkResourcePtr existingRes = qnResPool->getResourceByMacAddress( devInfo.serialNumber );
+    QnNetworkResourcePtr existingRes = resourcePool()->getResourceByMacAddress( devInfo.serialNumber );
     QAuthenticator cameraAuth;
 
     if ( existingRes )

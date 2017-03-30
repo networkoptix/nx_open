@@ -29,7 +29,7 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
 
     QnStatisticValuesHash result;
 
-    const auto availableUsers = qnResPool->getResources<QnUserResource>();
+    const auto availableUsers = resourcePool()->getResources<QnUserResource>();
     //NX_ASSERT(!availableUsers.isEmpty(), Q_FUNC_INFO, "Can't gather metrics for empty users list");
     if (availableUsers.isEmpty())
         return result;

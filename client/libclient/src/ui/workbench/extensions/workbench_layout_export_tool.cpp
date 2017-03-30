@@ -125,7 +125,7 @@ QnLayoutExportTool::ItemInfoList QnLayoutExportTool::prepareLayout()
 
     for (const QnLayoutItemData &item: m_layout->getItems())
     {
-        QnResourcePtr resource = qnResPool->getResourceByDescriptor(item.resource);
+        QnResourcePtr resource = resourcePool()->getResourceByDescriptor(item.resource);
         if (!resource)
             continue;
 
@@ -331,7 +331,7 @@ void QnLayoutExportTool::finishExport(bool success)
     if (m_realFilename != m_targetFilename)
         m_storage->renameFile(m_storage->getUrl(), m_targetFilename);
 
-    auto existing = qnResPool->getResourceByUrl(m_targetFilename)
+    auto existing = resourcePool()->getResourceByUrl(m_targetFilename)
         .dynamicCast<QnLayoutResource>();
 
     switch (m_mode)
@@ -352,7 +352,7 @@ void QnLayoutExportTool::finishExport(bool success)
         {
             /* Existing is present if we did 'Save As..' with another existing layout name. */
             if (existing)
-                qnResPool->removeResources(existing->layoutResources().toList() << existing);
+                resourcePool()->removeResources(existing->layoutResources().toList() << existing);
 
             auto layout = QnResourceDirectoryBrowser::layoutFromFile(m_storage->getUrl());
             if (!layout)
@@ -364,7 +364,7 @@ void QnLayoutExportTool::finishExport(bool success)
                 return;
             }
             layout->setStatus(Qn::Online);
-            qnResPool->addResource(layout);
+            resourcePool()->addResource(layout);
             break;
         }
         default:
@@ -380,7 +380,7 @@ void QnLayoutExportTool::finishExport(bool success)
 
         for (const QnLayoutItemData &item : m_layout->getItems())
         {
-            QnAviResourcePtr aviRes = qnResPool->getResourceByUniqueId<QnAviResource>(item.resource.uniqueId);
+            QnAviResourcePtr aviRes = resourcePool()->getResourceByUniqueId<QnAviResource>(item.resource.uniqueId);
             if (aviRes)
             {
                 aviRes->setUniqueId(QnLayoutFileStorageResource::itemUniqueId(newUrl,

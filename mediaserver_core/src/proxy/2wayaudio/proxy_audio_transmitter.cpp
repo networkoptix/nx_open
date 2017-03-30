@@ -57,7 +57,7 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
         QnMediaServerResourcePtr mServer = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
         if (!mServer)
             return false;
-        auto currentServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+        auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
         if (!currentServer)
             return false;
 
@@ -65,7 +65,7 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
         if (route.addr.isNull())
             return false; //< can't find route
         if (!route.gatewayId.isNull())
-            mServer = qnResPool->getResourceById<QnMediaServerResource>(route.gatewayId);
+            mServer = resourcePool()->getResourceById<QnMediaServerResource>(route.gatewayId);
         if (!mServer)
             return false;
 

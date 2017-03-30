@@ -34,7 +34,7 @@ bool QnPermissionsHelper::hasOwnerPermissions(const Qn::UserAccessData& accessRi
     if (accessRights == Qn::kSystemAccess)
         return true; //< serve auth key authrozation
 
-    auto userResource = qnResPool->getResourceById<QnUserResource>(accessRights.userId);
+    auto userResource = resourcePool()->getResourceById<QnUserResource>(accessRights.userId);
     return userResource && userResource->isOwner();
 }
 

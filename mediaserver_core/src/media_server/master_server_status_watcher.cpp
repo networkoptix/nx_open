@@ -9,7 +9,7 @@ namespace {
 
 QnMasterServerStatusWatcher::QnMasterServerStatusWatcher()
 {
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
             auto server = resource.dynamicCast<QnMediaServerResource>();
@@ -30,7 +30,7 @@ QnMasterServerStatusWatcher::QnMasterServerStatusWatcher()
 
 bool QnMasterServerStatusWatcher::localPeerCanBeMaster() const
 {
-    auto mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto mServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     return mServer && mServer->getServerFlags().testFlag(Qn::SF_HasPublicIP);
 }
 

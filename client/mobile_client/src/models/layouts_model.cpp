@@ -132,9 +132,9 @@ QnLayoutsModelUnsorted::QnLayoutsModelUnsorted(QObject* parent):
     connect(camerasWatcher, &QnAvailableCamerasWatcher::cameraRemoved,
             this, updateCamerasCount);
 
-    connect(qnResPool, &QnResourcePool::resourceAdded,
+    connect(resourcePool(), &QnResourcePool::resourceAdded,
             this, &QnLayoutsModelUnsorted::at_resourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved,
             this, &QnLayoutsModelUnsorted::at_resourceRemoved);
 }
 
@@ -228,7 +228,7 @@ void QnLayoutsModelUnsorted::resetModel()
 
     m_itemsList.append(ModelItem());
 
-    const auto layouts = qnResPool->getResources<QnLayoutResource>();
+    const auto layouts = resourcePool()->getResources<QnLayoutResource>();
     for (const auto& layout : layouts)
     {
         connect(layout, &QnLayoutResource::parentIdChanged,
@@ -242,7 +242,7 @@ void QnLayoutsModelUnsorted::resetModel()
 
     if (qnResourceAccessManager->hasGlobalPermission(m_user, Qn::GlobalControlVideoWallPermission))
     {
-        const auto servers = qnResPool->getResources<QnMediaServerResource>();
+        const auto servers = resourcePool()->getResources<QnMediaServerResource>();
         for (const auto& server : servers)
         {
             if (!isServerSuitable(server))

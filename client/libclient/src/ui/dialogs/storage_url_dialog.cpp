@@ -275,7 +275,7 @@ void QnStorageUrlDialog::at_protocolComboBox_currentIndexChanged()
 
 bool QnStorageUrlDialog::storageAlreadyUsed(const QString& path) const
 {
-    QnMediaServerResourceList servers = qnResPool->getResources<QnMediaServerResource>();
+    QnMediaServerResourceList servers = resourcePool()->getResources<QnMediaServerResource>();
     servers.removeOne(m_server);
 
     bool usedOnOtherServers = boost::algorithm::any_of(servers,

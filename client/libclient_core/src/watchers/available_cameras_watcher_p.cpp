@@ -30,9 +30,9 @@ LayoutBasedWatcher::LayoutBasedWatcher(const QnUserResourcePtr& user):
     if (!user)
         return;
 
-    connect(qnResPool, &QnResourcePool::resourceAdded,
+    connect(resourcePool(), &QnResourcePool::resourceAdded,
         this, &LayoutBasedWatcher::at_resourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved,
         this, &LayoutBasedWatcher::at_resourceRemoved);
 
     connect(m_itemAggregator, &QnLayoutItemAggregator::itemAdded,
@@ -40,7 +40,7 @@ LayoutBasedWatcher::LayoutBasedWatcher(const QnUserResourcePtr& user):
     connect(m_itemAggregator, &QnLayoutItemAggregator::itemRemoved,
         this, &LayoutBasedWatcher::at_layoutItemRemoved);
 
-    const auto layouts = qnResPool->getResourcesByParentId(
+    const auto layouts = resourcePool()->getResourcesByParentId(
         user->getId()).filtered<QnLayoutResource>();
 
     for (const auto& layout: layouts)
@@ -85,7 +85,7 @@ void LayoutBasedWatcher::at_resourceRemoved(const QnResourcePtr& resource)
 
 void LayoutBasedWatcher::at_layoutItemAdded(const QnUuid& id)
 {
-    const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
+    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
     if (!camera)
         return;
 
@@ -95,7 +95,7 @@ void LayoutBasedWatcher::at_layoutItemAdded(const QnUuid& id)
 
 void LayoutBasedWatcher::at_layoutItemRemoved(const QnUuid& id)
 {
-    const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
+    const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
 
     m_cameras.remove(id);
     emit cameraRemoved(camera);
@@ -125,7 +125,7 @@ PermissionsBasedWatcher::PermissionsBasedWatcher(const QnUserResourcePtr& user):
                 removeCamera(resource);
         });
 
-    for (const auto& camera: qnResPool->getAllCameras(QnResourcePtr(), true))
+    for (const auto& camera: resourcePool()->getAllCameras(QnResourcePtr(), true))
     {
         if (accessProvider->hasAccess(user, camera))
             addCamera(camera);

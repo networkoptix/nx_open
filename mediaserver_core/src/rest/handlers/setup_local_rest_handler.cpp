@@ -85,7 +85,7 @@ int QnSetupLocalSystemRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    if (!updateUserCredentials(data, QnOptionalBool(true), qnResPool->getAdministrator(), &errStr))
+    if (!updateUserCredentials(data, QnOptionalBool(true), resourcePool()->getAdministrator(), &errStr))
     {
         //changing system name back
         qnGlobalSettings->setSystemName(systemNameBak);

@@ -43,7 +43,7 @@ const int kHeaderFontWeight = QFont::DemiBold;
 
 rest::QnConnectionPtr getPublicServerConnection()
 {
-    for (const QnMediaServerResourcePtr server: qnResPool->getAllServers(Qn::Online))
+    for (const QnMediaServerResourcePtr server: resourcePool()->getAllServers(Qn::Online))
     {
         if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
             continue;
@@ -311,7 +311,7 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
         return;
     }
 
-    const auto& admin = qnResPool->getAdministrator();
+    const auto& admin = resourcePool()->getAdministrator();
     if (!admin)
     {
         q->reject();

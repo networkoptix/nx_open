@@ -791,7 +791,7 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
 void QnServerUpdatesWidget::at_tool_lowFreeSpaceWarning(QnLowFreeSpaceWarning& lowFreeSpaceWarning)
 {
     const auto failedServers =
-        qnResPool->getResources<QnMediaServerResource>(lowFreeSpaceWarning.failedPeers);
+        resourcePool()->getResources<QnMediaServerResource>(lowFreeSpaceWarning.failedPeers);
     QnMessageBox dialog(QnMessageBoxIcon::Warning,
         tr("Not enough free space at %n Servers:", "", failedServers.size()),
         tr("Attempt to update may fail or cause Server malfunction."),

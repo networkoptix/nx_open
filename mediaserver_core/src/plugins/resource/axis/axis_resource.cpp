@@ -1433,7 +1433,7 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
             QThreadPool::globalInstance(),
             [id]()
             {
-                if (auto res = qnResPool->getResourceById<QnPlAxisResource>(id))
+                if (auto res = resourcePool()->getResourceById<QnPlAxisResource>(id))
                     res->asyncUpdateIOSettings();
             });
     }

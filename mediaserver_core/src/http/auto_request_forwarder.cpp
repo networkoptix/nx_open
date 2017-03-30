@@ -52,7 +52,7 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
 
     if (QnUniversalRequestProcessor::isCloudRequest(*request))
     {
-        auto servers = qnResPool->getResources<QnMediaServerResource>().filtered(
+        auto servers = resourcePool()->getResources<QnMediaServerResource>().filtered(
             [](const QnMediaServerResourcePtr server)
             {
                 return server->getServerFlags().testFlag(Qn::SF_HasPublicIP) &&
@@ -150,7 +150,7 @@ bool QnAutoRequestForwarder::findCameraGuid(
     if( cameraGuid.isNull() )
         return false;
 
-    *res = qnResPool->getResourceById( cameraGuid );
+    *res = resourcePool()->getResourceById( cameraGuid );
     return *res;
 }
 
@@ -178,7 +178,7 @@ bool QnAutoRequestForwarder::findCameraUniqueIDInPath(
 
     //resUniqueID could be physical id or mac address
     //trying luck with physical id
-    *res = qnResPool->getResourceByUniqueId(resUniqueID);
+    *res = resourcePool()->getResourceByUniqueId(resUniqueID);
     if( *res )
     {
         NX_LOG(lit("auto_forward. Found resource %1 by unique id %2 from path").
@@ -186,7 +186,7 @@ bool QnAutoRequestForwarder::findCameraUniqueIDInPath(
         return true;
     }
     //searching by mac
-    //*res = qnResPool->getResourceByMacAddress(resUniqueID);
+    //*res = resourcePool()->getResourceByMacAddress(resUniqueID);
     return *res != nullptr;
 }
 
@@ -197,7 +197,7 @@ bool QnAutoRequestForwarder::findCameraUniqueIDInQuery(
     const auto uniqueID = urlQuery.queryItemValue( Qn::CAMERA_UNIQUE_ID_HEADER_NAME );
     if( uniqueID.isEmpty() )
         return false;
-    *res = qnResPool->getResourceByUniqueId( uniqueID );
+    *res = resourcePool()->getResourceByUniqueId( uniqueID );
     return *res;
 }
 

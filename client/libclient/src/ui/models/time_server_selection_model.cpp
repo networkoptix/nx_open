@@ -164,7 +164,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
         });
 
     /* Handle adding new servers (to display name correctly). */
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
             if (!resource.dynamicCast<QnMediaServerResource>())
@@ -265,7 +265,7 @@ QVariant QnTimeServerSelectionModel::data(const QModelIndex& index, int role) co
 
     qint64 currentTime = qnSyncTime->currentMSecsSinceEpoch();
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(item.peerId);
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(item.peerId);
     QString title = serverName(server);
 
     switch (role)
@@ -419,7 +419,7 @@ void QnTimeServerSelectionModel::addItem(const QnPeerRuntimeInfo& info)
 {
     PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is added");
 #ifdef _DEBUG
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(info.uuid);
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(info.uuid);
     QString title = serverName(server);
     PRINT_DEBUG("peer " + info.uuid.toByteArray() + " name is " + title.toUtf8());
 #endif // DEBUG
@@ -546,7 +546,7 @@ bool QnTimeServerSelectionModel::calculateSameTimezone() const
 
     for (const auto& item : m_items)
     {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(item.peerId);
+        QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(item.peerId);
         if (!server || server->getStatus() != Qn::Online)
             continue;
 
@@ -567,7 +567,7 @@ bool QnTimeServerSelectionModel::calculateSameTimezone() const
 
 void QnTimeServerSelectionModel::resetData(qint64 currentSyncTime)
 {
-    if (auto connection = QnAppServerConnectionFactory::getConnection2())
+    if (auto connection = commonModule()->ec2Connection())
     {
         auto timeManager = connection->getTimeManager(Qn::kSystemAccess);
         for (const auto& info : timeManager->getPeerTimeInfoList())

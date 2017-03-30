@@ -18,13 +18,13 @@
 GenericUserDataProvider::GenericUserDataProvider()
 {
     Qn::directConnect(
-        qnResPool, &QnResourcePool::resourceAdded,
+        resourcePool(), &QnResourcePool::resourceAdded,
         this, &GenericUserDataProvider::at_resourcePool_resourceAdded);
     Qn::directConnect(
-        qnResPool, &QnResourcePool::resourceChanged,
+        resourcePool(), &QnResourcePool::resourceChanged,
         this, &GenericUserDataProvider::at_resourcePool_resourceAdded);
     Qn::directConnect(
-        qnResPool, &QnResourcePool::resourceRemoved,
+        resourcePool(), &QnResourcePool::resourceRemoved,
         this, &GenericUserDataProvider::at_resourcePool_resourceRemoved);
 }
 

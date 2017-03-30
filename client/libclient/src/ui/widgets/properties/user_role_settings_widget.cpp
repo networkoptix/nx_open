@@ -33,10 +33,10 @@ public:
         changeRadioButton(nullptr),
         replacementComboBox(nullptr)
     {
-        for (const auto& user: qnResPool->getResources<QnUserResource>())
+        for (const auto& user: resourcePool()->getResources<QnUserResource>())
             connectUserSignals(user);
 
-        connect(qnResPool, &QnResourcePool::resourceAdded, this,
+        connect(resourcePool(), &QnResourcePool::resourceAdded, this,
             [this](const QnResourcePtr& resource)
             {
                 QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
@@ -49,7 +49,7 @@ public:
                     userAddedOrUpdated(user);
             });
 
-        connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+        connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
             [this](const QnResourcePtr& resource)
             {
                 QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
@@ -327,11 +327,11 @@ QnUserRoleSettingsWidget::QnUserRoleSettingsWidget(
                 return Qn::ValidationResult(tr("Role with same name already exists."));
             }
 
-            auto predefined = qnUserRolesManager->predefinedRoles();
+            auto predefined = userRolesManager()->predefinedRoles();
             predefined << Qn::UserRole::CustomPermissions << Qn::UserRole::CustomUserRole;
             for (auto role: predefined)
             {
-                if (qnUserRolesManager->userRoleName(role).trimmed().toLower() != name)
+                if (userRolesManager()->userRoleName(role).trimmed().toLower() != name)
                     continue;
 
                 return Qn::ValidationResult(tr("Role with same name already exists."));

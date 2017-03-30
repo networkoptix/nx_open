@@ -114,7 +114,7 @@ QString QnRecordingStatsModel::displayData(const QModelIndex &index) const {
             return isForeign
                 ? foreignText
                 : nx::utils::elideString(
-                    QnResourceDisplayInfo(qnResPool->getResourceByUniqueId(value.uniqueId)).toString(qnSettings->extraInfoInTree()),
+                    QnResourceDisplayInfo(resourcePool()->getResourceByUniqueId(value.uniqueId)).toString(qnSettings->extraInfoInTree()),
                     maxLength);
         }
     case BytesColumn:
@@ -135,7 +135,7 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
         {
             QnVirtualCameraResourceList cameras;
             for (const QnCamRecordingStatsData &data: m_data)
-                if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(data.uniqueId))
+                if (QnVirtualCameraResourcePtr camera = resourcePool()->getResourceByUniqueId<QnVirtualCameraResource>(data.uniqueId))
                     cameras << camera;
             //NX_ASSERT(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
             static const auto kNDash = QString::fromWCharArray(L"\x2013");
@@ -168,7 +168,7 @@ QnResourcePtr QnRecordingStatsModel::getResource(const QModelIndex &index) const
     switch(index.column())
     {
     case CameraNameColumn:
-        return qnResPool->getResourceByUniqueId(value.uniqueId);
+        return resourcePool()->getResourceByUniqueId(value.uniqueId);
     default:
         return QnResourcePtr();
     }

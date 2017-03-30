@@ -75,7 +75,7 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(const QnThumbnailRequestDat
 
 QnMediaServerResourcePtr QnMultiserverThumbnailRestHandler::targetServer( const QnThumbnailRequestData &request ) const
 {
-    auto currentServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
 
     if (request.isLocal)
         return currentServer;

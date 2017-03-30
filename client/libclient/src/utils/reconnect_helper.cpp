@@ -59,7 +59,7 @@ QnReconnectHelper::QnReconnectHelper(QObject *parent /* = NULL*/):
     m_password = m_currentUrl.password();
 
     /* List of all known servers. Should not be updated as we are disconnected. */
-    m_allServers = qnResPool->getResources<QnMediaServerResource>();
+    m_allServers = resourcePool()->getResources<QnMediaServerResource>();
     if (m_currentServer && !m_allServers.contains(m_currentServer))
         m_allServers << m_currentServer;
 

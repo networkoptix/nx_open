@@ -104,7 +104,7 @@ static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
     const QByteArray H_PATH("/proxy-reverse");
     const QByteArray H_AUTH("auth-int");
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(serverUuid);
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(serverUuid);
     if (!server)
         return QByteArray();
 

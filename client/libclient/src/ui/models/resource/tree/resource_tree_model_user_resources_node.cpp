@@ -145,7 +145,7 @@ void QnResourceTreeModelUserResourcesNode::rebuild()
     if (!context()->user())
         return;
 
-    for (const auto& resource: qnResPool->getResources())
+    for (const auto& resource: resourcePool()->getResources())
     {
         if (isResourceVisible(resource))
             ensureResourceNode(resource);

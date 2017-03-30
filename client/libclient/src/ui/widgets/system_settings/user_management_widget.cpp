@@ -303,7 +303,7 @@ void QnUserManagementWidget::loadDataToUi()
 {
     ui->createUserButton->setEnabled(!qnCommon->isReadOnly());
     updateLdapState();
-    m_usersModel->resetUsers(qnResPool->getResources<QnUserResource>());
+    m_usersModel->resetUsers(resourcePool()->getResources<QnUserResource>());
 }
 
 void QnUserManagementWidget::updateLdapState()
@@ -319,7 +319,7 @@ void QnUserManagementWidget::applyChanges()
 {
     auto modelUsers = m_usersModel->users();
     QnUserResourceList usersToDelete;
-    for (auto user : qnResPool->getResources<QnUserResource>())
+    for (auto user : resourcePool()->getResources<QnUserResource>())
     {
         if (!modelUsers.contains(user))
         {
@@ -342,13 +342,13 @@ void QnUserManagementWidget::applyChanges()
     if (nx::client::messages::Resources::deleteResources(this, usersToDelete))
         qnResourcesChangesManager->deleteResources(usersToDelete);
     else
-        m_usersModel->resetUsers(qnResPool->getResources<QnUserResource>());
+        m_usersModel->resetUsers(resourcePool()->getResources<QnUserResource>());
 }
 
 bool QnUserManagementWidget::hasChanges() const
 {
     using boost::algorithm::any_of;
-    return any_of(qnResPool->getResources<QnUserResource>(),
+    return any_of(resourcePool()->getResources<QnUserResource>(),
         [this, users = m_usersModel->users()](const QnUserResourcePtr& user)
         {
             return !users.contains(user)

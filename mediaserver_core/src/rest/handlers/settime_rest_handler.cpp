@@ -58,7 +58,7 @@ int QnSetTimeRestHandler::execute(
     const QnRestConnectionProcessor* /*owner*/,
     QnJsonRestResult& result)
 {
-    QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(
+    QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(
         qnCommon->moduleGUID());
     if (!mServer)
     {
@@ -105,7 +105,7 @@ int QnSetTimeRestHandler::execute(
         return CODE_OK;
     }
 
-    //ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    //ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
     //ec2Connection->getTimeManager()->forceTimeResync();
 
     return CODE_OK;

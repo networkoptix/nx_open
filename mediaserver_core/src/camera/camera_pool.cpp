@@ -97,7 +97,7 @@ void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)
 std::unique_ptr<VideoCameraLocker> 
     QnVideoCameraPool::getVideoCameraLockerByResourceId(const QnUuid& id) const
 {
-    QnResourcePtr resource = qnResPool->getResourceById(id);
+    QnResourcePtr resource = resourcePool()->getResourceById(id);
     if (!resource)
         return nullptr;
 

@@ -87,7 +87,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
 {
     const QByteArray userName = authorizationHeader.userid().toLower();
 
-    auto cloudUsers = qnResPool->getResources<QnUserResource>().filtered(
+    auto cloudUsers = resourcePool()->getResources<QnUserResource>().filtered(
         [userName](const QnUserResourcePtr& user)
         {
             return user->isCloud() &&
@@ -261,7 +261,7 @@ QnUserResourcePtr CloudUserAuthenticator::getMappedLocalUserForCloudCredentials(
 {
     const auto userNameQString = QString::fromUtf8(userName);
     //if there is user with same name in system, resolving to that user
-    const auto res = qnResPool->getResource(
+    const auto res = resourcePool()->getResource(
         [&userNameQString](const QnResourcePtr& res) {
             return (res.dynamicCast<QnUserResource>() != nullptr) &&
                    (res->getName() == userNameQString);

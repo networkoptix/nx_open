@@ -54,7 +54,7 @@ void QnCameraAccessRightsHelper::setResourceId(const QString &id)
         return;
 
     Q_D(QnCameraAccessRightsHelper);
-    d->camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id));
+    d->camera = resourcePool()->getResourceById<QnVirtualCameraResource>(QnUuid(id));
     d->updateAccessRights();
 }
 

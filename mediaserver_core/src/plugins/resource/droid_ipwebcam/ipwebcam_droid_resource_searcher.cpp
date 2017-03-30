@@ -131,7 +131,7 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
 
         while(curr <= max_ip)
         {
-            QnResourcePtr nd = qnResPool->getResourceByUrl(QHostAddress(curr).toString());
+            QnResourcePtr nd = resourcePool()->getResourceByUrl(QHostAddress(curr).toString());
             if (nd)
             {
                 // such dev alredy exists;

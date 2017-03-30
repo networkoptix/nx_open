@@ -86,7 +86,7 @@ QnWorkbenchLayout *QnWorkbenchLayout::instance(const QnLayoutResourcePtr &layout
 }
 
 QnWorkbenchLayout *QnWorkbenchLayout::instance(const QnVideoWallResourcePtr &videoWall) {
-    foreach (const QnLayoutResourcePtr &layout, qnResPool->getResources<QnLayoutResource>()) {
+    foreach (const QnLayoutResourcePtr &layout, resourcePool()->getResources<QnLayoutResource>()) {
         if (layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>() == videoWall)
             return QnWorkbenchLayout::instance(layout);
     }

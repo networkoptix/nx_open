@@ -1,16 +1,19 @@
 #pragma once
 
+#include <common/common_module_aware.h>
+
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource/resource_fwd.h>
+
 #include <utils/common/connective.h>
 #include <nx_ec/data/api_fwd.h>
-#include <nx/utils/singleton.h>
 
 /**
  * Utility class for saving resources user attributes.
  * Supports changes rollback in case they cannot be saved on server.
  */
-class QnResourcesChangesManager: public Connective<QObject>, public Singleton<QnResourcesChangesManager> {
+class QnResourcesChangesManager: public Connective<QObject>, public QnCommonModuleAware
+{
     Q_OBJECT
     typedef Connective<QObject> base_type;
 
@@ -80,5 +83,3 @@ signals:
     /** This signal is emitted every time when we cannot delete resources. */
     void resourceDeletingFailed(const QnResourceList &resources);
 };
-
-#define qnResourcesChangesManager QnResourcesChangesManager::instance()

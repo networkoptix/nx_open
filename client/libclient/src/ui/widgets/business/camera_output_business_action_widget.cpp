@@ -73,7 +73,7 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields
         QnIOPortDataList outputPorts;
         bool inited = false;
 
-        auto cameras = qnResPool->getResources<QnVirtualCameraResource>(model()->actionResources());
+        auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(model()->actionResources());
         foreach(const QnVirtualCameraResourcePtr &camera, cameras)
         {
             QnIOPortDataList cameraOutputs = camera->getRelayOutputList();

@@ -49,7 +49,7 @@ int QnModuleInformationRestHandler::executeGet(
 
     if (allModules)
     {
-        const auto allServers = qnResPool->getAllServers(Qn::AnyStatus);
+        const auto allServers = resourcePool()->getAllServers(Qn::AnyStatus);
         if (useAddresses)
         {
             QList<QnModuleInformationWithAddresses> modules;
@@ -72,7 +72,7 @@ int QnModuleInformationRestHandler::executeGet(
     else if (useAddresses)
     {
         QnModuleInformationWithAddresses moduleInformation(qnCommon->moduleInformation());
-        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+        QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
         if (server)
             moduleInformation.remoteAddresses = getAddresses(server);
         result.setReply(moduleInformation);

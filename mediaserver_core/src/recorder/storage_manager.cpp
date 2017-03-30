@@ -481,8 +481,8 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
 
     m_oldStorageIndexes = deserializeStorageFile();
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 
 	connect(this, &QnStorageManager::rebuildFinished, 
         [this] (QnSystemHealth::MessageType message) 
@@ -1478,7 +1478,7 @@ void QnStorageManager::updateCameraHistory()
     if (archivedListOld == archivedListNew)
         return;
 
-    const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();
+    const ec2::AbstractECConnectionPtr& appServerConnection = commonModule()->ec2Connection();
 
     ec2::ErrorCode errCode = appServerConnection->getCameraManager(Qn::kSystemAccess)->setServerFootageDataSync(qnCommon->moduleGUID(), archivedListNew);
 
@@ -1785,7 +1785,7 @@ void QnStorageManager::clearMaxDaysData(QnServer::ChunksCatalog catalogIdx)
     }
 
     for(const DeviceFileCatalogPtr& catalog: catalogMap.values()) {
-        QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(catalog->cameraUniqueId());
+        QnSecurityCamResourcePtr camera = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(catalog->cameraUniqueId());
         if (camera && camera->maxDays() > 0) {
             qint64 timeToDelete = qnSyncTime->currentMSecsSinceEpoch() - MSECS_PER_DAY * camera->maxDays();
             deleteRecordsToTime(catalog, timeToDelete);
@@ -1825,7 +1825,7 @@ void QnStorageManager::clearCameraHistory()
     }
 
     QList<QnCameraHistoryItem> itemsToRemove = qnCameraHistoryPool->getUnusedItems(minTimes, qnCommon->moduleGUID());
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
     for(const QnCameraHistoryItem& item: itemsToRemove) {
         ec2::ErrorCode errCode = ec2Connection->getCameraManager()->removeCameraHistoryItemSync(item);
         if (errCode == ec2::ErrorCode::ok)
@@ -1869,7 +1869,7 @@ void QnStorageManager::findTotalMinTime(const bool useMinArchiveDays, const File
         if (curMinTime != (qint64)AV_NOPTS_VALUE && curMinTime < minTime)
         {
             if (useMinArchiveDays) {
-                QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(itr.key());
+                QnSecurityCamResourcePtr camera = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(itr.key());
                 if (camera && camera->minDays() > 0) {
                     qint64 threshold = qnSyncTime->currentMSecsSinceEpoch() - MSECS_PER_DAY * camera->minDays();
                     if (threshold < curMinTime)
@@ -2556,7 +2556,7 @@ std::vector<QnUuid> QnStorageManager::getCamerasWithArchiveHelper() const
     getCamerasWithArchiveInternal(internalData, m_devFileCatalog[QnServer::LowQualityCatalog]);
     getCamerasWithArchiveInternal(internalData, m_devFileCatalog[QnServer::HiQualityCatalog]);
     for(const QString& uniqueId: internalData) {
-        const QnResourcePtr cam = qnResPool->getResourceByUniqueId(uniqueId);
+        const QnResourcePtr cam = resourcePool()->getResourceByUniqueId(uniqueId);
         if (cam)
             result.push_back(cam->getId());
     }

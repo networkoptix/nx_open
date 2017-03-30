@@ -87,10 +87,10 @@ QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObjec
         emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
     });
 
-    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnServerUpdatesModel::at_resourceAdded);
-    connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnServerUpdatesModel::at_resourceRemoved);
-    connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnServerUpdatesModel::at_resourceChanged);
-    connect(qnResPool,  &QnResourcePool::statusChanged,     this,   &QnServerUpdatesModel::at_resourceChanged);
+    connect(resourcePool(),  &QnResourcePool::resourceAdded,     this,   &QnServerUpdatesModel::at_resourceAdded);
+    connect(resourcePool(),  &QnResourcePool::resourceRemoved,   this,   &QnServerUpdatesModel::at_resourceRemoved);
+    connect(resourcePool(),  &QnResourcePool::resourceChanged,   this,   &QnServerUpdatesModel::at_resourceChanged);
+    connect(resourcePool(),  &QnResourcePool::statusChanged,     this,   &QnServerUpdatesModel::at_resourceChanged);
     connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged,  this, &QnServerUpdatesModel::updateVersionColumn);
 
     resetResourses();
@@ -172,11 +172,11 @@ void QnServerUpdatesModel::resetResourses() {
     qDeleteAll(m_items);
     m_items.clear();
 
-    const auto allServers = qnResPool->getAllServers(Qn::AnyStatus);
+    const auto allServers = resourcePool()->getAllServers(Qn::AnyStatus);
     for (const QnMediaServerResourcePtr &server: allServers)
         m_items.append(new Item(server));
 
-    for (const QnResourcePtr &resource: qnResPool->getAllIncompatibleResources())
+    for (const QnResourcePtr &resource: resourcePool()->getAllIncompatibleResources())
     {
         QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
         if (!server || !helpers::serverBelongsToCurrentSystem(server->getModuleInformation()))

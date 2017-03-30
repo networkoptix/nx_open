@@ -232,7 +232,7 @@ ec2::ApiClientInfoData clientInfo()
 
 ec2::AbstractECConnectionPtr connection2()
 {
-    return QnAppServerConnectionFactory::getConnection2();
+    return commonModule()->ec2Connection();
 }
 
 QString logicalToString(QnWorkbenchConnectHandler::LogicalState state)
@@ -1071,10 +1071,10 @@ void QnWorkbenchConnectHandler::clearConnection()
     action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Server..."));
 
     /* Remove all remote resources. */
-    auto resourcesToRemove = qnResPool->getResourcesWithFlag(Qn::remote);
+    auto resourcesToRemove = resourcePool()->getResourcesWithFlag(Qn::remote);
 
     /* Also remove layouts that were just added and have no 'remote' flag set. */
-    for (const auto& layout : qnResPool->getResources<QnLayoutResource>())
+    for (const auto& layout : resourcePool()->getResources<QnLayoutResource>())
     {
         if (layout->hasFlags(Qn::local) && !layout->isFile())  //do not remove exported layouts
             resourcesToRemove.push_back(layout);
@@ -1085,8 +1085,8 @@ void QnWorkbenchConnectHandler::clearConnection()
     for (const auto& res: resourcesToRemove)
         idList.push_back(res->getId());
 
-    qnResPool->removeResources(resourcesToRemove);
-    qnResPool->removeResources(qnResPool->getAllIncompatibleResources());
+    resourcePool()->removeResources(resourcesToRemove);
+    resourcePool()->removeResources(resourcePool()->getAllIncompatibleResources());
 
     QnCameraUserAttributePool::instance()->clear();
     QnMediaServerUserAttributesPool::instance()->clear();

@@ -68,7 +68,7 @@ void QnInstallUpdatesPeerTask::setVersion(const QnSoftwareVersion& version)
 
 void QnInstallUpdatesPeerTask::finish(int errorCode, const QSet<QnUuid>& failedPeers)
 {
-    qnResPool->disconnect(this);
+    resourcePool()->disconnect(this);
     m_ecConnection.reset();
     m_checkTimer->stop();
     m_serverByRequest.clear();
@@ -88,7 +88,7 @@ void QnInstallUpdatesPeerTask::doStart()
 
     m_ecServer = qnCommon->currentServer();
 
-    connect(qnResPool, &QnResourcePool::resourceChanged,
+    connect(resourcePool(), &QnResourcePool::resourceChanged,
         this, &QnInstallUpdatesPeerTask::at_resourceChanged);
 
     m_stoppingPeers = m_restartingPeers = m_pendingPeers = peers();
@@ -122,7 +122,7 @@ void QnInstallUpdatesPeerTask::queryNextGroup()
         const auto id = it->second;
         it = m_peersToQuery.erase(it);
 
-        const auto server = qnResPool->getResourceById<QnMediaServerResource>(id);
+        const auto server = resourcePool()->getResourceById<QnMediaServerResource>(id);
         if (!server)
         {
             finish(InstallationFailed, { id });
@@ -278,7 +278,7 @@ void QnInstallUpdatesPeerTask::at_checkTimer_timeout()
     auto peers = m_pendingPeers; // Copy to safely remove elements from m_pendingPeers.
     for (const auto& id: peers)
     {
-        const auto server = qnResPool->getIncompatibleResourceById(id, true)
+        const auto server = resourcePool()->getIncompatibleResourceById(id, true)
             .dynamicCast<QnMediaServerResource>();
 
         if (!server)
@@ -332,7 +332,7 @@ void QnInstallUpdatesPeerTask::at_gotModuleInformation(
     for (const auto& moduleInformation: modules)
     {
         const auto server =
-            qnResPool->getResourceById<QnMediaServerResource>(moduleInformation.id);
+            resourcePool()->getResourceById<QnMediaServerResource>(moduleInformation.id);
         if (!server)
             continue;
 

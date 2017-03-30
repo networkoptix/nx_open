@@ -149,7 +149,7 @@ bool QnSaveCloudSystemCredentialsHandler::validateInputData(
 bool QnSaveCloudSystemCredentialsHandler::checkInternetConnection(
     QnJsonRestResult* result)
 {
-    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
     bool hasPublicIP = server && server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
     if (!hasPublicIP)
     {
@@ -215,7 +215,7 @@ bool QnSaveCloudSystemCredentialsHandler::insertCloudOwner(
     userData.digest = ec2::ApiUserData::kCloudPasswordStub;
 
     const auto resultCode =
-        QnAppServerConnectionFactory::getConnection2()
+        commonModule()->ec2Connection()
             ->getUserManager(Qn::kSystemAccess)->saveSync(userData);
     if (resultCode != ec2::ErrorCode::ok)
     {
