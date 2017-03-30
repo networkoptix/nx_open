@@ -83,15 +83,18 @@ ScopeHandlerGuard<Handler> createScopeHandlerGuard(ErrorCode& errorCode, Handler
 struct AuditData
 {
     ECConnectionAuditManager* auditManager;
+    AbstractECConnection* ec2Connection;
     QnAuthSession authSession;
     Qn::UserAccessData userAccessData;
 
     AuditData(
         ECConnectionAuditManager* auditManager,
+        AbstractECConnection* ec2Connection,
         const QnAuthSession& authSession,
         const Qn::UserAccessData& userAccessData)
         :
         auditManager(auditManager),
+        ec2Connection(ec2Connection),
         authSession(authSession),
         userAccessData(userAccessData)
     {}
@@ -112,7 +115,7 @@ void triggerNotification(
             auditData.authSession);
     }
 
-    auditData.auditManager->ec2Connection()
+    auditData.ec2Connection
         ->notificationManager()
         ->triggerNotification(tran, NotificationSource::Local);
 }
@@ -356,7 +359,11 @@ public:
 private:
     aux::AuditData createAuditDataCopy()
     {
-        return aux::AuditData(m_auditManager, m_authSession, m_db.userAccessData());
+        return aux::AuditData(
+            m_auditManager,
+            m_owner->commonModule()->ec2Connection().get(),
+            m_authSession,
+            m_db.userAccessData());
     }
 
     /**
