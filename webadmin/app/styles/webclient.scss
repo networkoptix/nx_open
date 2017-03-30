@@ -81,7 +81,7 @@ table.webclient-window>tbody>tr>td.alert{
   width:100%;
   height:100%;
 
-  padding-bottom:210px;
+  padding-bottom:100px;
   padding-top:80px;
 }
 
@@ -215,23 +215,40 @@ table.webclient-window>tbody>tr>td.alert{
 }
 
 
-.webclient-panel>div.text-left,
-.webclient-panel>div.text-right{
-  width:40%;
-  white-space: nowrap;
-  display:inline-block;
+div.text-left{
+  width:168px;
+  height:100px;
 }
-.webclient-panel>div.text-center{
-  width:20%;
-  white-space: nowrap;
-  display:inline-block;
+
+.player-controls{
+  margin: 35px 7px 0 7px;
+}
+
+.zoom-level{
+  height: 100px;
+  margin-top: 13px;
+}
+
+div.text-right{
+  width:104px;
+  height:100px;
+}
+
+div.text-center{
+  margin: 0 104px 0 168px;
+  height:100px;
+}
+
+
+.timeline .text-left,
+.timeline .text-right{
+  background-color: #F0F3F4;
 }
 
 .webclient-button{
   padding:0 10px;
   display: inline-block;
   vertical-align: top;
-  min-width: 40px;
   text-align: center;
   cursor:pointer;
 }
@@ -265,6 +282,35 @@ table.webclient-window>tbody>tr>td.alert{
 .webclient-button .glyphicon{
   top:3px;
 }
+
+.glyphicon-backward,
+.glyphicon-forward,
+.glyphicon-pause,
+.glyphicon-play{
+  color:black;
+}
+
+.glyphicon-minus,
+.glyphicon-plus{
+  color:gray;
+}
+
+.glyphicon-pp{
+  height:40px;
+  width: 40px;
+}
+
+.glyphicon-fwbw{
+  height: 40px;
+  width: 32px;
+}
+
+.glyphicon-pm{
+  height: 44px;
+  width: 40px;
+  display: block !important;
+}
+
 
 .weblcient-hint{
   font-size:78%;
@@ -325,11 +371,10 @@ table.webclient-window>tbody>tr>td.alert{
   border-bottom: 1px solid #263137;
 }
 .webclient-panel-border{
-  height: 30px;
+  height: 100px;
   position: relative;
   vertical-align: top;
-  margin: 5px 10px;
-  border-left: 1px solid #263137;
+  border-left: 1px solid #E1E7EA;
   display: inline-block;
 }
 

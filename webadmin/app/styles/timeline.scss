@@ -3,7 +3,7 @@
   width:100%;
   position:relative;
   overflow:hidden;
-  height:110px;
+  height:100px;
   cursor: default;
   background-color:#171C1F;
 }
@@ -43,7 +43,6 @@ ng-include{
 .viewport > .scroll, .viewport > canvas{
   width: 100%;
   height: 100%;
-  position:absolute;
 }
 .viewport > .scroll{
   overflow-x:scroll;
@@ -94,7 +93,7 @@ ng-include{
 
 .timeline{
   position:relative;
-
+  height:100px;
   -webkit-touch-callout: none;
   user-select: none;
 
