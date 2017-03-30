@@ -10,7 +10,7 @@ import pytest
 from test_utils.utils import SimpleNamespace
 from test_utils.session import TestSession
 from test_utils.customization import read_customization_company_name
-from test_utils.environment import EnvironmentBuilder
+from test_utils.environment import EnvironmentBuilder, Environment
 from test_utils.host import SshHostConfig
 from test_utils.vagrant_box_config import BoxConfigFactory
 from test_utils.cloud_host import resolve_cloud_host_from_registry, create_cloud_host
@@ -25,6 +25,7 @@ DEFAULT_WORK_DIR = os.path.expanduser('/tmp/funtest')
 DEFAULT_BIN_DIR = os.path.expanduser('/tmp/binaries')
 
 DEFAULT_VM_NAME_PREFIX = 'funtest-'
+DEFAULT_REST_API_FORWARDED_PORT_BASE = 17000
 
 DEFAULT_VM_HOST_USER = 'root'
 DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
@@ -57,6 +58,8 @@ def pytest_addoption(parser):
                      help='destroy and create again vagrant boxes')
     parser.addoption('--vm-name-prefix', default=DEFAULT_VM_NAME_PREFIX,
                      help='prefix for virtualenv machine names')
+    parser.addoption('--vm-port-base', type=int, default=DEFAULT_REST_API_FORWARDED_PORT_BASE,
+                     help='base REST API port forwarded to host')
     parser.addoption('--vm-host',
                      help='hostname or IP address for host with virtualbox,'
                           ' used to start virtual machines (by default it is local host)')
@@ -91,6 +94,7 @@ def run_options(request):
         reset_servers=not request.config.getoption('--no-servers-reset'),
         recreate_boxes=request.config.getoption('--recreate-boxes'),
         vm_name_prefix=request.config.getoption('--vm-name-prefix'),
+        vm_port_base=request.config.getoption('--vm-port-base'),
         vm_ssh_host_config=vm_ssh_host_config,
         vm_host_work_dir=request.config.getoption('--vm-host-dir'),
         max_log_width=request.config.getoption('--max-log-width'),
@@ -107,7 +111,7 @@ def http_schema(request):
 
 
 @pytest.fixture
-def box(customization_company_name):
+def box(run_options, customization_company_name):
     return BoxConfigFactory(customization_company_name)
 
 @pytest.fixture
@@ -157,3 +161,20 @@ def env_builder(request, test_session, run_options,
     return EnvironmentBuilder(
         request, test_session, run_options, request.config.cache,
         cloud_host_host, customization_company_name)
+
+
+# pytest teardown does not allow failing the test from it. We have to use pytest hook for this.
+@pytest.mark.hookwrapper
+def pytest_pyfunc_call(pyfuncitem):
+    # look up for Environent fixture
+    env = None
+    for name in pyfuncitem._request.fixturenames:
+        value = pyfuncitem._request.getfixturevalue(name)
+        if isinstance(value, Environment):
+            env = value
+    # run the test
+    outcome = yield
+    # perform post-checks if passed and have our Environment in fixtures
+    passed = outcome.excinfo is None
+    if passed and env:
+        env.perform_post_checks()

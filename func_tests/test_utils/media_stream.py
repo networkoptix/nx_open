@@ -3,6 +3,7 @@ import logging
 import time
 from datetime import datetime, timedelta
 import struct
+import math
 import urllib
 import urlparse
 import requests
@@ -15,7 +16,7 @@ log = logging.getLogger(__name__)
 
 
 CHUNK_SIZE = 1024*100  # bytes
-RTSP_SPEED = 32
+RTSP_SPEED = 4  # maximum is 32, but only 4 is working with opencv shipped with ubuntu 14.04
 
 
 def open_media_stream(server_url, user, password, stream_type, camera_mac_addr):
@@ -65,7 +66,7 @@ class RtspMediaStream(object):
     def __init__(self, server_url, user, password, camera_mac_addr):
         params = dict(pos=0, speed=RTSP_SPEED)
         self.url = 'rtsp://{user}:{password}@{netloc}/{camera_mac_addr}?{params}'.format( 
-           user=user,
+            user=user,
             password=password,
             netloc=urlparse.urlparse(server_url).netloc,
             camera_mac_addr=camera_mac_addr,
@@ -89,7 +90,10 @@ class RtspMediaStream(object):
         start_time = time.time()
         metadata = Metadata(from_cap)
         metadata.log_properties(self.url)
-        to_cap = cv2.VideoWriter(temp_file_path, metadata.fourcc, metadata.fps, (metadata.width, metadata.height))
+        fps = metadata.fps
+        if math.isnan(fps):
+            fps = 15  # Use at least something if we are unable to get it from opencv
+        to_cap = cv2.VideoWriter(temp_file_path, metadata.fourcc, fps, (metadata.width, metadata.height))
         assert to_cap.isOpened(), 'Failed to open OpenCV media writer to file %r' % temp_file_path
         try:
             frame_count = self._copy_cap(from_cap, to_cap, start_time)

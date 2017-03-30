@@ -1,13 +1,11 @@
 import logging
 import pytest
-from test_utils.vagrant_box_config import DEFAULT_HOSTNET
 
 
 log = logging.getLogger(__name__)
 
-# Temporary disable nat, because it leads to pytest hanging up.
-#@pytest.fixture(params=['direct', 'nat'])
-@pytest.fixture(params=['direct'])
+
+@pytest.fixture(params=['direct', 'nat'])
 def nat_schema(request):
     return request.param
 
@@ -26,14 +24,19 @@ def direct_env(env_builder, box, server, http_schema):
     return env_builder(http_schema, merge_servers=[one, two], one=one, two=two)
 
 def nat_env(env_builder, box, server, http_schema):
-    behind_net    = '10.0.7.0'
-    behind_net_gw = '10.0.7.200'
-    nat = box('nat', ip_address_list=[DEFAULT_HOSTNET, behind_net_gw],
-              install_server=False, provision_scripts=['box-provision-nat.sh'])
-    behind = box('behind', ip_address_list=[behind_net], provision_scripts=['box-provision-behind-nat.sh'])
-    one = server()
+    in_front_net    = '10.10.1/24'
+    in_front_net_gw = '10.10.1.1/24'
+    behind_net      = '10.10.2/24'
+    behind_net_gw   = '10.10.2.1/24'
+    router = box('router', ip_address_list=[in_front_net_gw, behind_net_gw],
+                 install_server=False, provision_scripts=['box-provision-nat-router.sh'])
+    behind = box('behind', ip_address_list=[behind_net], provision_scripts=['box-provision-nat-behind.sh'])
+    in_front = box('in-front', ip_address_list=[in_front_net])
+    one = server(box=in_front)
     two = server(box=behind)
-    return env_builder(http_schema, merge_servers=[one, two], boxes=[nat], one=one, two=two)
+    # two must go first in merge_servers, it can reach sever one, but not vise-versa
+    return env_builder(http_schema, merge_servers=[two, one], boxes=[router], one=one, two=two)
+
 
 def test_merged_servers_should_return_same_results_to_certain_api_calls(env):
     test_api_calls = [
