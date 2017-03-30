@@ -26,9 +26,9 @@ QnConnectToCloudWatcher::QnConnectToCloudWatcher(ec2::QnTransactionMessageBus* m
     connect(&m_timer, &QTimer::timeout, this, &QnConnectToCloudWatcher::at_updateConnection);
 
     connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, this, &QnConnectToCloudWatcher::at_updateConnection);
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnConnectToCloudWatcher::at_updateConnection);
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnConnectToCloudWatcher::at_updateConnection);
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoRemoved, this, &QnConnectToCloudWatcher::at_updateConnection);
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnConnectToCloudWatcher::at_updateConnection);
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnConnectToCloudWatcher::at_updateConnection);
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this, &QnConnectToCloudWatcher::at_updateConnection);
 }
 
 QnConnectToCloudWatcher::~QnConnectToCloudWatcher()
@@ -45,7 +45,7 @@ void QnConnectToCloudWatcher::at_updateConnection()
 {
     m_timer.stop();
 
-    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+    QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
     bool needCloudConnect =
         localInfo.data.flags.testFlag(ec2::RF_MasterCloudSync) &&
         !qnGlobalSettings->cloudSystemId().isEmpty() &&

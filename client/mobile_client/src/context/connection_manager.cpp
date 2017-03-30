@@ -7,6 +7,7 @@
 #include <mobile_client/mobile_client_message_processor.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_common_module_aware.h>
+#include <mobile_client/mobile_client_module.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <api/abstract_connection.h>
@@ -20,6 +21,8 @@
 #include <common/common_module.h>
 #include <network/connection_validator.h>
 #include <client_core/client_core_settings.h>
+
+#include <nx_ec/dummy_handler.h>
 
 #include <watchers/user_watcher.h>
 #include <nx/network/socket_global.h>
@@ -318,7 +321,7 @@ bool QnConnectionManagerPrivate::doConnect()
     connectUrl.setScheme(lit("http"));
 
     auto result = new QnEc2ConnectionRequestResult(this);
-    connectionHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
+    connectionHandle = qnMobileClientModule->connectionFactory()->connect(
         connectUrl,
         ec2::ApiClientInfoData(),
         result,
@@ -366,19 +369,24 @@ bool QnConnectionManagerPrivate::doConnect()
 
             const auto ec2Connection = result->connection();
 
-            QnAppServerConnectionFactory::setUrl(connectUrl);
+            //QnAppServerConnectionFactory::setUrl(connectUrl);
             QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
-            QnAppServerConnectionFactory::setConnectionInfo(connectionInfo);
+            //QnAppServerConnectionFactory::setConnectionInfo(connectionInfo);
 
-            QnMobileClientMessageProcessor::instance()->init(ec2Connection);
+            qnMobileClientMessageProcessor->init(ec2Connection);
 
-            QnSessionManager::instance()->start();
+            commonModule()->sessionManager()->start();
 
-            connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged,
+            connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged,
                 this, [this, ec2Connection](const QnPeerRuntimeInfo& info)
                 {
                     if (info.uuid == commonModule()->moduleGUID())
-                        ec2Connection->sendRuntimeData(info.data);
+                    {
+                        ec2Connection->getMiscManager(Qn::kSystemAccess)->saveRuntimeInfo(
+                            info.data,
+                            ec2::DummyHandler::instance(),
+                            &ec2::DummyHandler::onRequestDone);
+                    }
                 });
 
             connect(
@@ -424,13 +432,13 @@ void QnConnectionManagerPrivate::doDisconnect()
 
     qnGlobalSettings->synchronizeNow();
 
-    disconnect(QnRuntimeInfoManager::instance(), nullptr, this, nullptr);
+    disconnect(runtimeInfoManager(), nullptr, this, nullptr);
 
-    QnMobileClientMessageProcessor::instance()->init(nullptr);
-    QnAppServerConnectionFactory::setUrl(QUrl());
+    qnMobileClientMessageProcessor->init(nullptr);
+//    QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(nullptr);
-    QnAppServerConnectionFactory::setConnectionInfo(QnConnectionInfo());
-    QnSessionManager::instance()->stop();
+//    QnAppServerConnectionFactory::setConnectionInfo(QnConnectionInfo());
+    commonModule()->sessionManager()->stop();
 
     setSystemName(QString());
     connectionVersion = QnSoftwareVersion();

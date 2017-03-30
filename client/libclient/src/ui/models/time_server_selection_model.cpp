@@ -111,7 +111,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
         });
 
     /* Handle adding new online server peers. */
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
         [this](const QnPeerRuntimeInfo& info)
         {
             if (info.data.peer.peerType != Qn::PT_Server)
@@ -123,7 +123,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
         });
 
     /* Handle changing server peers priority (selection). */
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
         [this](const QnPeerRuntimeInfo& info)
         {
             if (info.data.peer.peerType != Qn::PT_Server)
@@ -137,7 +137,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
         });
 
     /* Handle removing online server peers. */
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
         [this](const QnPeerRuntimeInfo& info)
         {
             if (info.data.peer.peerType != Qn::PT_Server)
@@ -577,7 +577,7 @@ void QnTimeServerSelectionModel::resetData(qint64 currentSyncTime)
     /* Fill table with current data. */
     ScopedReset modelReset(this);
     m_items.clear();
-    for (const auto& runtimeInfo : qnRuntimeInfoManager->items()->getItems())
+    for (const auto& runtimeInfo : runtimeInfoManager()->items()->getItems())
     {
         if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
             continue;

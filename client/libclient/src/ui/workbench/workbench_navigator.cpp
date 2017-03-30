@@ -195,13 +195,13 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
                 updateFootageState();
         });
 
-    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraHistoryInvalidated, this, [this](const QnSecurityCamResourcePtr &camera)
+    connect(cameraHistoryPool(), &QnCameraHistoryPool::cameraHistoryInvalidated, this, [this](const QnSecurityCamResourcePtr &camera)
     {
         if (hasWidgetWithCamera(camera))
             updateHistoryForCamera(camera);
     });
 
-    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged, this, [this](const QnSecurityCamResourcePtr &camera)
+    connect(cameraHistoryPool(), &QnCameraHistoryPool::cameraFootageChanged, this, [this](const QnSecurityCamResourcePtr &camera)
     {
         if (auto loader =  m_cameraDataManager->loader(camera))
             loader->discardCachedData();
@@ -428,7 +428,7 @@ void QnWorkbenchNavigator::initialize()
     connect(workbench(), &QnWorkbench::currentLayoutChanged,
         this, &QnWorkbenchNavigator::updateSliderOptions);
 
-    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged, this,
+    connect(cameraHistoryPool(), &QnCameraHistoryPool::cameraFootageChanged, this,
         [this](const QnSecurityCamResourcePtr & /* camera */)
         {
             updateFootageState();
@@ -684,7 +684,7 @@ void QnWorkbenchNavigator::updateHasArchive()
             [](const QnMediaResourcePtr& resource)
             {
                 auto camera = resource.dynamicCast<QnSecurityCamResource>();
-                return camera && !qnCameraHistoryPool->getCameraFootageData(camera, true).empty();
+                return camera && !cameraHistoryPool()->getCameraFootageData(camera, true).empty();
             });
 
     if (m_hasArchive == newValue)
@@ -2343,10 +2343,10 @@ void QnWorkbenchNavigator::updateHistoryForCamera(QnSecurityCamResourcePtr camer
 
     m_updateHistoryQueue.remove(camera);
 
-    if (qnCameraHistoryPool->isCameraHistoryValid(camera))
+    if (cameraHistoryPool()->isCameraHistoryValid(camera))
         return;
 
-    QnCameraHistoryPool::StartResult result = qnCameraHistoryPool->updateCameraHistoryAsync(camera, [this, camera](bool success)
+    QnCameraHistoryPool::StartResult result = cameraHistoryPool()->updateCameraHistoryAsync(camera, [this, camera](bool success)
     {
         if (!success)
             m_updateHistoryQueue.insert(camera); //< retry loading

@@ -366,7 +366,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     for (const QnResourcePtr& resource: resourcePool()->getResources())
         at_resPool_resourceAdded(resource);
 
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
         [this](const QnPeerRuntimeInfo &info)
         {
             if (info.data.peer.peerType == Qn::PT_VideowallClient)
@@ -383,7 +383,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
             }
         });
 
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
         [this](const QnPeerRuntimeInfo &info)
         {
             if (info.data.peer.peerType == Qn::PT_VideowallClient)
@@ -397,7 +397,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         });
 
     /* Handle simultaneous control mode enter. */
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
         [this](const QnPeerRuntimeInfo &info)
         {
             /* Ignore own info change. */
@@ -428,7 +428,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         });
 
 
-    foreach(const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
+    foreach(const QnPeerRuntimeInfo &info, runtimeInfoManager()->items()->getItems())
     {
         if (info.data.peer.peerType != Qn::PT_VideowallClient)
             continue;
@@ -1118,13 +1118,13 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
     if (!layout)
         return false;
 
-    foreach(const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
+    foreach(const QnPeerRuntimeInfo &info, runtimeInfoManager()->items()->getItems())
     {
         if (info.data.videoWallControlSession != layout->getId())
             continue;
 
         /* Ignore our control session. */
-        if (info.uuid == QnRuntimeInfoManager::instance()->localInfo().uuid)
+        if (info.uuid == runtimeInfoManager()->localInfo().uuid)
             continue;
 
         showControlledByAnotherUserMessage();
@@ -1182,9 +1182,9 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
         m_controlMode.cacheTimer->start();
         sendMessage(QnVideoWallControlMessage(QnVideoWallControlMessage::ControlStarted));  //TODO: #GDM #VW start control when item goes online
 
-        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+        QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
         localInfo.data.videoWallControlSession = layoutResource->getId();
-        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
+        runtimeInfoManager()->updateLocalItem(localInfo);
 
         setItemControlledBy(localInfo.data.videoWallControlSession, localInfo.uuid, true);
     }
@@ -1209,9 +1209,9 @@ void QnWorkbenchVideoWallHandler::setControlMode(bool active)
         m_controlMode.active = active;
         m_controlMode.cacheTimer->stop();
 
-        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+        QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
         localInfo.data.videoWallControlSession = QnUuid();
-        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
+        runtimeInfoManager()->updateLocalItem(localInfo);
 
         setItemControlledBy(localInfo.data.videoWallControlSession, localInfo.uuid, false);
     }
@@ -2270,7 +2270,7 @@ void QnWorkbenchVideoWallHandler::at_videoWall_itemAdded(const QnVideoWallResour
     QnVideoWallItem updatedItem(item);
     bool hasChanges = false;
 
-    foreach(const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
+    foreach(const QnPeerRuntimeInfo &info, runtimeInfoManager()->items()->getItems())
     {
         if (info.data.videoWallInstanceGuid == item.uuid)
         {
@@ -3066,7 +3066,7 @@ QnUuid QnWorkbenchVideoWallHandler::getLayoutController(const QnUuid &layoutId)
     if (layoutId.isNull())
         return QnUuid();
 
-    foreach(const QnPeerRuntimeInfo &info, QnRuntimeInfoManager::instance()->items()->getItems())
+    foreach(const QnPeerRuntimeInfo &info, runtimeInfoManager()->items()->getItems())
     {
         if (info.data.videoWallControlSession != layoutId)
             continue;

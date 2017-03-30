@@ -146,7 +146,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
      */
     if (QnAppInfo::beta())
     {
-        QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, period.startTimeMs);
+        QnMediaServerResourcePtr server = cameraHistoryPool()->getMediaServerOnTime(camera, period.startTimeMs);
         if (!server || server->getStatus() != Qn::Online)
         {
             QnMessageBox::warning(mainWindow(),
@@ -188,7 +188,7 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered()
 
     QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
-    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
+    QnMediaServerResourcePtr server = cameraHistoryPool()->getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != Qn::Online)
     {
         QnMessageBox::warning(mainWindow(),

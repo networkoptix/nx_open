@@ -29,6 +29,8 @@
 #include <client/system_weights_manager.h>
 #include <utils/media/ffmpeg_initializer.h>
 
+#include <nx_ec/ec2_lib.h>
+
 #include "mobile_client_message_processor.h"
 #include "mobile_client_meta_types.h"
 #include "mobile_client_settings.h"
@@ -109,7 +111,7 @@ QnMobileClientModule::QnMobileClientModule(
     runtimeData.customization = QnAppInfo::customizationName();
     if (!startupParameters.videowallInstanceGuid.isNull())
         runtimeData.videoWallInstanceGuid = startupParameters.videowallInstanceGuid;
-    QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
+    m_commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);
 
     auto moduleFinder = m_commonModule->store(new QnModuleFinder(true));
     moduleFinder->multicastModuleFinder()->setCheckInterfacesTimeout(10 * 1000);
@@ -146,6 +148,10 @@ QnMobileClientModule::QnMobileClientModule(
                     break;
             }
         });
+
+    NX_ASSERT(nx::utils::TimerManager::instance());
+    m_connectionFactory.reset(getConnectionFactory(Qn::PT_MobileClient,
+        nx::utils::TimerManager::instance(), m_commonModule));
 }
 
 QnMobileClientModule::~QnMobileClientModule()
@@ -157,4 +163,9 @@ QnMobileClientModule::~QnMobileClientModule()
 QnCommonModule* QnMobileClientModule::commonModule() const
 {
     return m_commonModule;
+}
+
+ec2::AbstractECConnectionFactory* QnMobileClientModule::connectionFactory() const
+{
+    return m_connectionFactory.get();
 }

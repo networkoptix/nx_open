@@ -171,7 +171,7 @@ QnCameraBookmarkList QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(QnGe
     {
         QSet<QnMediaServerResourcePtr> servers;
         for (const auto& camera: context.request().cameras)
-            servers += qnCameraHistoryPool->getCameraFootageData(camera, true).toSet();
+            servers += cameraHistoryPool()->getCameraFootageData(camera, true).toSet();
 
         for (const auto& server: servers)
         {

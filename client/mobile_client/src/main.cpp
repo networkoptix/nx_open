@@ -13,7 +13,6 @@
 
 #include <nx/utils/log/log.h>
 #include <api/app_server_connection.h>
-#include <nx_ec/ec2_lib.h>
 
 #include <common/common_module.h>
 #include <common/static_common_module.h>
@@ -78,18 +77,20 @@ int runUi(QtSingleGuiApplication* application)
 
     if (qnSettings->isLiteClientModeEnabled())
     {
+        auto commonModule = qnMobileClientModule->commonModule();
+
         auto preparingWebChannel = std::make_unique<webchannel::WebChannelServer>(
             qnSettings->webSocketPort());
 
         if (preparingWebChannel->isValid())
         {
-            auto webChannel = commonModule()->store(preparingWebChannel.release());
+            auto webChannel = commonModule->store(preparingWebChannel.release());
             qnSettings->setWebSocketPort(webChannel->serverPort());
 
-            auto liteClientHandler = commonModule()->store(new QnLiteClientHandler());
+            auto liteClientHandler = commonModule->store(new QnLiteClientHandler());
             liteClientHandler->setUiController(context.uiController());
 
-            auto webAdminController = commonModule()->store(new controllers::WebAdminController());
+            auto webAdminController = commonModule->store(new controllers::WebAdminController());
             webAdminController->setUiController(context.uiController());
 
             webChannel->registerObject(lit("liteClientController"), webAdminController);
@@ -209,17 +210,8 @@ int runUi(QtSingleGuiApplication* application)
 
 int runApplication(QtSingleGuiApplication* application)
 {
-    NX_ASSERT(nx::utils::TimerManager::instance());
-    std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
-        getConnectionFactory(Qn::PT_MobileClient, nx::utils::TimerManager::instance()));
-
-    QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.get());
-
     int result = runUi(application);
-
     QnAppServerConnectionFactory::setEc2Connection(ec2::AbstractECConnectionPtr());
-    QnAppServerConnectionFactory::setUrl(QUrl());
-
     return result;
 }
 

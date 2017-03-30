@@ -2,6 +2,8 @@
 
 #include <functional>
 
+#include <common/common_module.h>
+
 #include <nx/network/url/url_parse_helper.h>
 
 #include <network/module_finder.h>

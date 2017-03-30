@@ -188,7 +188,7 @@ QnUuid QnTimeServerSelectionWidget::selectedServer() const
 {
     PRINT_DEBUG("check selected server by runtime info");
 
-    for (const auto& runtimeInfo : qnRuntimeInfoManager->items()->getItems())
+    for (const auto& runtimeInfo : runtimeInfoManager()->items()->getItems())
     {
         if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
             continue;

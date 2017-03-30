@@ -80,7 +80,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses()
     bool warn = false;
 
     bool someLicenseWillBeBlocked = false;
-    for (const auto& runtimeInfo: QnRuntimeInfoManager::instance()->items()->getItems())
+    for (const auto& runtimeInfo: runtimeInfoManager()->items()->getItems())
     {
         if (runtimeInfo.data.prematureLicenseExperationDate)
         {

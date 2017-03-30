@@ -88,15 +88,15 @@ void QnLiteClientController::setServerId(const QString& serverId)
     {
         d->serverId = d->server->getId();
 
-        connect(qnRuntimeInfoManager, &QnRuntimeInfoManager::runtimeInfoAdded,
+        connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded,
             d, &QnLiteClientControllerPrivate::at_runtimeInfoAdded);
-        connect(qnRuntimeInfoManager, &QnRuntimeInfoManager::runtimeInfoRemoved,
+        connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved,
             d, &QnLiteClientControllerPrivate::at_runtimeInfoRemoved);
 
         connect(d->server, &QnMediaServerResource::statusChanged,
             d, &QnLiteClientControllerPrivate::updateServerStatus);
 
-        const auto items = qnRuntimeInfoManager->items()->getItems();
+        const auto items = runtimeInfoManager()->items()->getItems();
         const auto it = std::find_if(items.begin(), items.end(),
             [d](const QnPeerRuntimeInfo& info)
             {
@@ -109,7 +109,7 @@ void QnLiteClientController::setServerId(const QString& serverId)
     }
     else
     {
-        disconnect(qnRuntimeInfoManager, nullptr, this, nullptr);
+        disconnect(runtimeInfoManager(), nullptr, this, nullptr);
         d->setClientState(State::Stopped);
     }
 

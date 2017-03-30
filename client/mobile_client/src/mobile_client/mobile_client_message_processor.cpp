@@ -41,7 +41,7 @@ void QnMobileClientMessageProcessor::updateResource(
     using namespace nx::common::compatibility::user_permissions;
 
     // TODO: #mshevchenko #3.1 Refactor it to use API versioning instead.
-    const auto& info = QnAppServerConnectionFactory::connectionInfo();
+    const auto& info = commonModule()->ec2Connection()->connectionInfo();
     if (info.version < kUserPermissionsRefactoredVersion)
     {
         if (const auto user = resource.dynamicCast<QnUserResource>())

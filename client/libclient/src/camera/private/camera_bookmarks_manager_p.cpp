@@ -211,7 +211,7 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnCameraBookmark &
         return;
 
     QnVirtualCameraResourcePtr camera = resourcePool()->getResourceById<QnVirtualCameraResource>(bookmark.cameraId);
-    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
+    QnMediaServerResourcePtr server = cameraHistoryPool()->getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != Qn::Online)
         server = commonModule()->currentServer();
 

@@ -49,7 +49,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     QUrl url(QN_LICENSE_URL);
     CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, QAuthenticator());
 
-    ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->items()->getItem(commonModule()->moduleGUID()).data;
+    ec2::ApiRuntimeData runtimeData = runtimeInfoManager()->items()->getItem(commonModule()->moduleGUID()).data;
     QUrlQuery params;
     params.addQueryItem(kLicenseKey, licenseKey);
     params.addQueryItem(kBox, runtimeData.box);

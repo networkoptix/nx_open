@@ -299,10 +299,10 @@ bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
     if (runningInstances.isEmpty())
         return true;
 
-    QnUuid localUserId = qnRuntimeInfoManager->localInfo().data.userId;
+    QnUuid localUserId = runtimeInfoManager()->localInfo().data.userId;
 
     QSet<QnUuid> connectedInstances;
-    for (const QnPeerRuntimeInfo &info: qnRuntimeInfoManager->items()->getItems())
+    for (const QnPeerRuntimeInfo &info: runtimeInfoManager()->items()->getItems())
     {
         if (info.data.userId != localUserId)
             continue;

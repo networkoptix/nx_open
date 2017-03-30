@@ -209,7 +209,7 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
 
 bool QnGeneralSystemAdministrationWidget::isDatabaseBackupAvailable() const
 {
-    return QnRuntimeInfoManager::instance()->remoteInfo().data.box != lit("isd");
+    return runtimeInfoManager()->remoteInfo().data.box != lit("isd");
 }
 
 void QnGeneralSystemAdministrationWidget::setReadOnlyInternal(bool readOnly)

@@ -723,7 +723,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstract
         eventType == QnBusiness::CameraInputEvent)
     {
         auto camRes = resourcePool()->getResourceById<QnVirtualCameraResource>( action->getRuntimeParams().eventResourceId);
-        qnCameraHistoryPool->updateCameraHistorySync(camRes);
+        cameraHistoryPool()->updateCameraHistorySync(camRes);
         if (camRes->hasVideo(nullptr))
         {
             QByteArray screenshotData = getEventScreenshotEncoded(action->getRuntimeParams().eventResourceId, action->getRuntimeParams().eventTimestampUsec, SCREENSHOT_SIZE);
@@ -755,7 +755,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstract
                     camera[tpCameraName] = camInfo.name();
                     camera[tpCameraIP] = camInfo.host();
 
-                    qnCameraHistoryPool->updateCameraHistorySync(camRes);
+                    cameraHistoryPool()->updateCameraHistorySync(camRes);
                     camera[tpUrlInt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, false);
                     camera[tpUrlExt] = QnBusinessStringsHelper::urlForCamera(cameraId, params.eventTimestampUsec, true);
 

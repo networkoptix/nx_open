@@ -20,9 +20,9 @@ QnMasterServerStatusWatcher::QnMasterServerStatusWatcher()
             }
         });
 
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnMasterServerStatusWatcher::at_updateMasterFlag, Qt::QueuedConnection);
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMasterServerStatusWatcher::at_updateMasterFlag, Qt::QueuedConnection);
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoRemoved, this, &QnMasterServerStatusWatcher::at_updateMasterFlag, Qt::QueuedConnection);
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnMasterServerStatusWatcher::at_updateMasterFlag, Qt::QueuedConnection);
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMasterServerStatusWatcher::at_updateMasterFlag, Qt::QueuedConnection);
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this, &QnMasterServerStatusWatcher::at_updateMasterFlag, Qt::QueuedConnection);
     connect(&m_timer, &QTimer::timeout, this, [this]() { setMasterFlag(true); } );
     m_timer.setSingleShot(true);
     m_timer.setInterval(kUpdateMasterFlagTimeoutMs);
@@ -36,7 +36,7 @@ bool QnMasterServerStatusWatcher::localPeerCanBeMaster() const
 
 void QnMasterServerStatusWatcher::at_updateMasterFlag()
 {
-    auto items = QnRuntimeInfoManager::instance()->items()->getItems();
+    auto items = runtimeInfoManager()->items()->getItems();
     bool hasBetterMaster = std::any_of(items.begin(), items.end(),
         [this](const QnPeerRuntimeInfo& item)
     {
@@ -44,7 +44,7 @@ void QnMasterServerStatusWatcher::at_updateMasterFlag()
                item.data.flags.testFlag(ec2::RF_MasterCloudSync);
     });
 
-    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+    QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
     bool isLocalMaster = localInfo.data.flags.testFlag(ec2::RF_MasterCloudSync);
     bool canBeMaster = localPeerCanBeMaster() && !hasBetterMaster;
     if (!canBeMaster && isLocalMaster)
@@ -61,10 +61,10 @@ void QnMasterServerStatusWatcher::at_updateMasterFlag()
 
 void QnMasterServerStatusWatcher::setMasterFlag(bool value)
 {
-    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+    QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
     if (value)
         localInfo.data.flags |= ec2::RF_MasterCloudSync;
     else
         localInfo.data.flags &= ~ec2::RF_MasterCloudSync;
-    QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
+    runtimeInfoManager()->updateLocalItem(localInfo);
 }

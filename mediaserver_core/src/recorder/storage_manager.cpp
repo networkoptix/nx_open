@@ -1472,7 +1472,7 @@ void QnStorageManager::updateCameraHistory()
     auto archivedListNew = getCamerasWithArchive();
 
     std::vector<QnUuid> archivedListOld =
-        qnCameraHistoryPool->getServerFootageData(commonModule()->moduleGUID());
+        cameraHistoryPool()->getServerFootageData(commonModule()->moduleGUID());
     std::sort(archivedListOld.begin(), archivedListOld.end());
 
     if (archivedListOld == archivedListNew)
@@ -1487,7 +1487,7 @@ void QnStorageManager::updateCameraHistory()
                     << ec2::toString(errCode);
         return;
     }
-    qnCameraHistoryPool->setServerFootageData(commonModule()->moduleGUID(),
+    cameraHistoryPool()->setServerFootageData(commonModule()->moduleGUID(),
                                               archivedListNew);
     return;
 }
@@ -1824,12 +1824,12 @@ void QnStorageManager::clearCameraHistory()
             itr.value() == DATETIME_NOW; // delete all history if catalog is empty
     }
 
-    QList<QnCameraHistoryItem> itemsToRemove = qnCameraHistoryPool->getUnusedItems(minTimes, commonModule()->moduleGUID());
+    QList<QnCameraHistoryItem> itemsToRemove = cameraHistoryPool()->getUnusedItems(minTimes, commonModule()->moduleGUID());
     ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
     for(const QnCameraHistoryItem& item: itemsToRemove) {
         ec2::ErrorCode errCode = ec2Connection->getCameraManager()->removeCameraHistoryItemSync(item);
         if (errCode == ec2::ErrorCode::ok)
-            qnCameraHistoryPool->removeCameraHistoryItem(item);
+            cameraHistoryPool()->removeCameraHistoryItem(item);
     }
 }
 

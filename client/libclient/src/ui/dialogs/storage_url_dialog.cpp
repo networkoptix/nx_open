@@ -90,7 +90,7 @@ QnStorageModelInfo QnStorageUrlDialog::storage() const
 QString QnStorageUrlDialog::normalizePath(QString path)
 {
     QString separator = lit("/");
-    //ec2::ApiRuntimeData data = QnRuntimeInfoManager::instance()->item(m_server->getId()).data;
+    //ec2::ApiRuntimeData data = runtimeInfoManager()->item(m_server->getId()).data;
     //if (data.platform.toLower() == lit("windows"))
     //    separator = lit("\\");
     QString result = path.replace(L'/', separator);

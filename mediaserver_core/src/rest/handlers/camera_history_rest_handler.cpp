@@ -121,7 +121,7 @@ int QnCameraHistoryRestHandler::executeGet(
         QnMutexLocker lock(&context->mutex);
 
         if (context->timer.isValid() && !context->timer.hasExpired(kHistoryCacheTimeoutMs))
-            outputRecord.items = qnCameraHistoryPool->getHistoryDetails(outputRecord.cameraId, &isValid);
+            outputRecord.items = cameraHistoryPool()->getHistoryDetails(outputRecord.cameraId, &isValid);
         if (!isValid)
         {
             QnChunksRequestData updatedRequest = request;
@@ -131,7 +131,7 @@ int QnCameraHistoryRestHandler::executeGet(
             updatedRequest.resList.push_back(camera);
             MultiServerPeriodDataList chunks = QnMultiserverChunksRestHandler::loadDataSync(updatedRequest, owner);
             outputRecord.items = buildHistoryData(chunks);
-            if (qnCameraHistoryPool->testAndSetHistoryDetails(outputRecord.cameraId, outputRecord.items))
+            if (cameraHistoryPool()->testAndSetHistoryDetails(outputRecord.cameraId, outputRecord.items))
                 context->timer.restart();
 
             qDebug() << " In progress request QnCameraHistoryRestHandler::executeGet #" << requestNum << "cache miss. exec time=" << timer.elapsed();

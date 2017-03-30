@@ -317,9 +317,9 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     connect(userWatcher, &QnWorkbenchUserWatcher::userChanged, this,
         [this](const QnUserResourcePtr &user)
         {
-            QnPeerRuntimeInfo localInfo = qnRuntimeInfoManager->localInfo();
+            QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
             localInfo.data.userId = user ? user->getId() : QnUuid();
-            qnRuntimeInfoManager->updateLocalItem(localInfo);
+            runtimeInfoManager()->updateLocalItem(localInfo);
         });
 
     connect(action(QnActions::ConnectAction), &QAction::triggered, this,
@@ -737,7 +737,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
 
     action(QnActions::OpenLoginDialogAction)->setText(tr("Connect to Another Server...")); // TODO: #GDM #Common use conditional texts?
 
-    connect(qnRuntimeInfoManager, &QnRuntimeInfoManager::runtimeInfoChanged, this,
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
         [this](const QnPeerRuntimeInfo &info)
         {
             if (info.uuid != commonModule()->moduleGUID())
@@ -747,7 +747,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
             if (auto connection = connection2())
             {
                 connection->getMiscManager(Qn::kSystemAccess)->saveRuntimeInfo(
-                    info.data,
+                    info.data, 
                     ec2::DummyHandler::instance(),
                     &ec2::DummyHandler::onRequestDone);
 
@@ -774,7 +774,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed()
 {
     NX_ASSERT(connection2());
     disconnect(connection2(), nullptr, this, nullptr);
-    disconnect(qnRuntimeInfoManager, &QnRuntimeInfoManager::runtimeInfoChanged, this, nullptr);
+    disconnect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this, nullptr);
 
     /* Don't do anything if we are closing client. */
     if (context()->closingDown())

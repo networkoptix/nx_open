@@ -46,11 +46,11 @@ static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 namespace {
     void updateRuntimeInfoAfterLicenseOverflowTransaction(qint64 prematureLicenseExperationDate)
     {
-        QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+        QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
         if (localInfo.data.prematureLicenseExperationDate != prematureLicenseExperationDate)
         {
             localInfo.data.prematureLicenseExperationDate = prematureLicenseExperationDate;
-            QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
+            runtimeInfoManager()->updateLocalItem(localInfo);
         }
     }
 }
@@ -565,7 +565,7 @@ void QnRecordingManager::at_checkLicenses()
             return; // do not report license problem immediately. Server should wait several minutes, probably other servers will be available soon
 
 
-        qint64 licenseOverflowTime = QnRuntimeInfoManager::instance()->localInfo().data.prematureLicenseExperationDate;
+        qint64 licenseOverflowTime = runtimeInfoManager()->localInfo().data.prematureLicenseExperationDate;
         if (licenseOverflowTime == 0) {
             licenseOverflowTime = qnSyncTime->currentMSecsSinceEpoch();
             auto errCode = commonModule()->ec2Connection()->getMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(true, licenseOverflowTime);
@@ -594,7 +594,7 @@ void QnRecordingManager::at_checkLicenses()
         }
     }
     else {
-        qint64 licenseOverflowTime = QnRuntimeInfoManager::instance()->localInfo().data.prematureLicenseExperationDate;
+        qint64 licenseOverflowTime = runtimeInfoManager()->localInfo().data.prematureLicenseExperationDate;
         if (licenseOverflowTime)
         {
             commonModule()->ec2Connection()->getMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(false, 0);

@@ -33,7 +33,7 @@ void QnCameraChunkProvider::setResourceId(const QString& id)
     if (m_loader)
     {
         m_loader->disconnect(this);
-        qnCameraHistoryPool->disconnect(m_loader);
+        cameraHistoryPool()->disconnect(m_loader);
         m_loader->deleteLater();
         m_loader = nullptr;
     }
@@ -67,9 +67,9 @@ void QnCameraChunkProvider::setResourceId(const QString& id)
             }
         });
 
-    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged,
+    connect(cameraHistoryPool(), &QnCameraHistoryPool::cameraFootageChanged,
         m_loader, [this](){ m_loader->discardCachedData(); } );
-    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraHistoryInvalidated,
+    connect(cameraHistoryPool(), &QnCameraHistoryPool::cameraHistoryInvalidated,
         this, &QnCameraChunkProvider::update);
 
     update();
@@ -154,5 +154,5 @@ void QnCameraChunkProvider::update()
 
     auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(
         m_loader->resource()->getId());
-    qnCameraHistoryPool->updateCameraHistoryAsync(camera, nullptr);
+    cameraHistoryPool()->updateCameraHistoryAsync(camera, nullptr);
 }

@@ -83,7 +83,7 @@ QnMediaServerResourcePtr QnMultiserverThumbnailRestHandler::targetServer( const 
     if (QnThumbnailRequestData::isSpecialTimeValue(request.msecSinceEpoch))
         return request.camera->getParentServer();
 
-    return qnCameraHistoryPool->getMediaServerOnTimeSync(request.camera, request.msecSinceEpoch);
+    return cameraHistoryPool()->getMediaServerOnTimeSync(request.camera, request.msecSinceEpoch);
 }
 
 int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType ) const

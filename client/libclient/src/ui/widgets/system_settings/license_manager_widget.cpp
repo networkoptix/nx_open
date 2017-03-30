@@ -220,7 +220,7 @@ void QnLicenseManagerWidget::showEvent(QShowEvent *event)
 void QnLicenseManagerWidget::updateLicenses()
 {
     bool connected = false;
-    for (const QnPeerRuntimeInfo& info: QnRuntimeInfoManager::instance()->items()->getItems())
+    for (const QnPeerRuntimeInfo& info: runtimeInfoManager()->items()->getItems())
     {
         if (info.data.peer.peerType != Qn::PT_Server)
             continue;
@@ -336,7 +336,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
 {
     const QVector<QString> hardwareIds = licensePool()->hardwareIds();
 
-    if (QnRuntimeInfoManager::instance()->remoteInfo().isNull())
+    if (runtimeInfoManager()->remoteInfo().isNull())
     {
         showMessageLater(QnMessageBoxIcon::Critical,
             networkErrorText(), networkErrorExtras(), CopyToClipboardButton::Hide);
@@ -379,7 +379,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
     if (infoMode)
         params.addQueryItem(lit("mode"), lit("info"));
 
-    ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->remoteInfo().data;
+    ec2::ApiRuntimeData runtimeData = runtimeInfoManager()->remoteInfo().data;
 
     params.addQueryItem(lit("box"), runtimeData.box);
     params.addQueryItem(lit("brand"), runtimeData.brand);

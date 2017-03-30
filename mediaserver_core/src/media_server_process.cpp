@@ -1440,8 +1440,8 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
             if (m_needStop)
                 return;
         }
-        qnCameraHistoryPool->resetServerFootageData(serverFootageData);
-        qnCameraHistoryPool->setHistoryCheckDelay(1000);
+        cameraHistoryPool()->resetServerFootageData(serverFootageData);
+        cameraHistoryPool()->setHistoryCheckDelay(1000);
     }
 
     {
@@ -1592,9 +1592,9 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
     if (isStopping())
         return;
 
-    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+    QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
     localInfo.data.publicIP = publicIP.toString();
-    QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
+    runtimeInfoManager()->updateLocalItem(localInfo);
 
     QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (server)
@@ -2315,7 +2315,7 @@ void MediaServerProcess::run()
 #endif
 
     runtimeData.hardwareIds = m_hardwareGuidList;
-    QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);    // initializing localInfo
+    runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
         getConnectionFactory(
@@ -2369,9 +2369,9 @@ void MediaServerProcess::run()
     }
     QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
 
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &MediaServerProcess::at_runtimeInfoChanged);
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &MediaServerProcess::at_runtimeInfoChanged);
-    at_runtimeInfoChanged(QnRuntimeInfoManager::instance()->localInfo());
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &MediaServerProcess::at_runtimeInfoChanged);
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &MediaServerProcess::at_runtimeInfoChanged);
+    at_runtimeInfoChanged(runtimeInfoManager()->localInfo());
 
     if (needToStop())
         return; //TODO #ak correctly deinitialize what has been initialised
@@ -2849,7 +2849,7 @@ void MediaServerProcess::run()
     disconnect(qnNormalStorageMan, 0, this, 0);
     disconnect(qnBackupStorageMan, 0, this, 0);
     disconnect(commonModule(), 0, this, 0);
-    disconnect(QnRuntimeInfoManager::instance(), 0, this, 0);
+    disconnect(runtimeInfoManager(), 0, this, 0);
     disconnect(ec2Connection->getTimeNotificationManager().get(), 0, this, 0);
     disconnect(ec2Connection.get(), 0, this, 0);
     disconnect(m_updatePiblicIpTimer.get(), 0, this, 0);

@@ -97,7 +97,7 @@ void QnUpdateProcess::run() {
         setAllPeersStage(QnPeerUpdateStage::Init);
     }
 
-    QnRuntimeInfoManager::instance()->disconnect(this);
+    runtimeInfoManager()->disconnect(this);
     clearUpdateFlag();
 
     QnUpdateResult result(m_updateResult);
@@ -495,8 +495,8 @@ void QnUpdateProcess::prepareToUpload() {
         return;
     }
 
-    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoAdded,    this,   &QnUpdateProcess::at_runtimeInfoChanged);
-    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this,   &QnUpdateProcess::at_runtimeInfoChanged);
+    connect(runtimeInfoManager(),   &QnRuntimeInfoManager::runtimeInfoAdded,    this,   &QnUpdateProcess::at_runtimeInfoChanged);
+    connect(runtimeInfoManager(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this,   &QnUpdateProcess::at_runtimeInfoChanged);
 
     if (!setUpdateFlag()) {
         finishUpdate(QnUpdateResult::LockFailed);
@@ -507,7 +507,7 @@ void QnUpdateProcess::prepareToUpload() {
 }
 
 bool QnUpdateProcess::setUpdateFlag() {
-    QnRuntimeInfoManager *runtimeInfoManager = QnRuntimeInfoManager::instance();
+    QnRuntimeInfoManager *runtimeInfoManager = runtimeInfoManager();
     foreach (const QnPeerRuntimeInfo &runtimeInfo, runtimeInfoManager->items()->getItems()) {
         if (runtimeInfo.data.updateStarted)
             return false;
@@ -519,10 +519,10 @@ bool QnUpdateProcess::setUpdateFlag() {
 }
 
 void QnUpdateProcess::clearUpdateFlag() {
-    QnPeerRuntimeInfo runtimeInfo = QnRuntimeInfoManager::instance()->localInfo();
+    QnPeerRuntimeInfo runtimeInfo = runtimeInfoManager()->localInfo();
     if (runtimeInfo.data.updateStarted) {
         runtimeInfo.data.updateStarted = false;
-        QnRuntimeInfoManager::instance()->updateLocalItem(runtimeInfo);
+        runtimeInfoManager()->updateLocalItem(runtimeInfo);
     }
 }
 
