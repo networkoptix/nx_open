@@ -141,7 +141,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     }
 
     indirectAccessDelegate->setCustomPaint(
-        [this](QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index)
+        [](QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index)
         {
             option.widget->style()->drawPrimitive(QStyle::PE_PanelItemViewItem,
                 &option, painter, option.widget);
