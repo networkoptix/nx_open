@@ -826,11 +826,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Layout Settings...</source>
-        <translation>Layout-Einstellungen...</translation>
+        <translation>Layouteinstellungen...</translation>
     </message>
     <message>
         <source>Video Wall Settings...</source>
-        <translation>Videowand-Einstellungen...</translation>
+        <translation>Videowandeinstellungen...</translation>
     </message>
     <message>
         <source>Ping...</source>
@@ -846,7 +846,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Server Settings...</source>
-        <translation>Server-Einstellungen...</translation>
+        <translation>Servereinstellungen...</translation>
     </message>
     <message>
         <source>Merge to Currently Connected System...</source>
@@ -1074,51 +1074,51 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Check Device Issues...</source>
-        <translation>Überprüfen von Geräte-Problemen...</translation>
+        <translation>Überprüfen von Geräteproblemen...</translation>
     </message>
     <message>
         <source>Check Devices Issues...</source>
-        <translation>Überprüfen von Geräte-Problemen...</translation>
+        <translation>Überprüfen von Geräteproblemen...</translation>
     </message>
     <message>
         <source>Check Camera Issues...</source>
-        <translation>Überprüfen von Kamera-Problemen...</translation>
+        <translation>Überprüfen von Kameraproblemen...</translation>
     </message>
     <message>
         <source>Check Cameras Issues...</source>
-        <translation>Überprüfen von Kamera-Problemen...</translation>
+        <translation>Überprüfen von Kameraproblemen...</translation>
     </message>
     <message>
         <source>Device Rules...</source>
-        <translation>Geräte-Regeln...</translation>
+        <translation>Geräteregeln...</translation>
     </message>
     <message>
         <source>Devices Rules...</source>
-        <translation>Geräte-Regeln...</translation>
+        <translation>Geräteregeln...</translation>
     </message>
     <message>
         <source>Camera Rules...</source>
-        <translation>Kamera-Regeln...</translation>
+        <translation>Kameraregeln...</translation>
     </message>
     <message>
         <source>Cameras Rules...</source>
-        <translation>Kamera-Regeln...</translation>
+        <translation>Kameraregeln...</translation>
     </message>
     <message>
         <source>Device Settings...</source>
-        <translation>Geräte-Einstellungen...</translation>
+        <translation>Geräteeinstellungen...</translation>
     </message>
     <message>
         <source>Devices Settings...</source>
-        <translation>Geräte-Einstellungen...</translation>
+        <translation>Geräteeinstellungen...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
-        <translation>Kamera-Einstellungen...</translation>
+        <translation>Kameraeinstellungen...</translation>
     </message>
     <message>
         <source>Cameras Settings...</source>
-        <translation>Kamera-Einstellungen...</translation>
+        <translation>Kameraeinstellungen...</translation>
     </message>
     <message>
         <source>Devices List by Server...</source>
@@ -1170,23 +1170,23 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Check I/O Modules Issues...</source>
-        <translation>I/O-Modul-Probleme prüfen...</translation>
+        <translation>I/O-Modulprobleme prüfen...</translation>
     </message>
     <message>
         <source>I/O Module Rules...</source>
-        <translation>I/O-Modul-Regeln...</translation>
+        <translation>I/O-Modulregeln...</translation>
     </message>
     <message>
         <source>I/O Modules Rules...</source>
-        <translation>I/O-Modul-Regeln...</translation>
+        <translation>I/O-Modulregeln...</translation>
     </message>
     <message>
         <source>I/O Module Settings...</source>
-        <translation>I/O-Modul-Einstellungen...</translation>
+        <translation>I/O-Moduleinstellungen...</translation>
     </message>
     <message>
         <source>I/O Modules Settings...</source>
-        <translation>I/O-Modul-Einstellungen...</translation>
+        <translation>I/O-Moduleinstellungen...</translation>
     </message>
     <message>
         <source>Remove Bookmarks...</source>
@@ -1222,11 +1222,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Event Rules...</source>
-        <translation>Ereignis-Regeln...</translation>
+        <translation>Ereignisregeln...</translation>
     </message>
     <message>
         <source>Disconnect from Server</source>
-        <translation>Server-Verbindung getrennt</translation>
+        <translation>Serververbindung getrennt</translation>
     </message>
     <message>
         <source>Browse Local Files</source>
@@ -1337,15 +1337,15 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>User settings...</source>
-        <translation>Benutzer-Einstellungen...</translation>
+        <translation>Benutzereinstellungen...</translation>
     </message>
     <message>
         <source>Server settings...</source>
-        <translation>Server-Einstellungen...</translation>
+        <translation>Servereinstellungen...</translation>
     </message>
     <message>
         <source>Camera settings...</source>
-        <translation>Kamera-Einstellungen...</translation>
+        <translation>Kameraeinstellungen...</translation>
     </message>
 </context>
 <context>
@@ -1601,7 +1601,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Email settings changed</source>
-        <translation>Email-Einstellungen wurden geändert</translation>
+        <translation>Emaileinstellungen wurden geändert</translation>
     </message>
     <message>
         <source>Filled circle mark means the archive is still available</source>

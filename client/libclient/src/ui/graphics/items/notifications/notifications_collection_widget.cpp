@@ -278,9 +278,27 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         }
     }
 
+    QStringList tooltip = QnBusinessStringsHelper::eventDescription(businessAction,
+        QnBusinessAggregationInfo(), qnSettings->extraInfoInTree());
+
+    //TODO: #GDM #3.1 move this code to ::eventDetails()
+    if (eventType == QnBusiness::LicenseIssueEvent
+        && params.reasonCode == QnBusiness::LicenseRemoved)
+    {
+        QStringList disabledCameras;
+        for (const QString& stringId : params.description.split(L';'))
+        {
+            QnUuid id = QnUuid::fromStringSafe(stringId);
+            NX_ASSERT(!id.isNull());
+            if (auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(id))
+                tooltip << QnResourceDisplayInfo(camera).toString(qnSettings->extraInfoInTree());
+        }
+    }
+
+
     QnNotificationWidget* item = new QnNotificationWidget(m_list);
     item->setText(title);
-    item->setTooltipText(QnBusinessStringsHelper::eventDescription(businessAction, QnBusinessAggregationInfo(), qnSettings->extraInfoInTree(), false));
+    item->setTooltipText(tooltip.join(L'\n'));
     item->setNotificationLevel(QnNotificationLevel::valueOf(businessAction));
     item->setProperty(kItemResourcePropertyName,   QVariant::fromValue<QnResourcePtr>(resource));
     item->setProperty(kItemActionTypePropertyName, businessAction->actionType());

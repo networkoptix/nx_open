@@ -46,13 +46,6 @@
     </message>
 </context>
 <context>
-    <name>CloudSystemInformation</name>
-    <message>
-        <source>OFFLINE</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>CredentialsEditor</name>
     <message>
         <source>Email</source>
@@ -87,7 +80,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Incorrect Email or password</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -307,7 +300,7 @@
 <context>
     <name>OfflineDummy</name>
     <message>
-        <source>You are not connected to any system</source>
+        <source>You are not connected to any System</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -408,6 +401,14 @@
         <source>This server has too old version. Please update it to the latest version.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>OFFLINE</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>INCOMPATIBLE</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>SessionsScreen</name>
@@ -420,19 +421,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No systems found</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot connect to the system &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot connect to the server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -445,6 +434,18 @@
     </message>
     <message>
         <source>Connect to Another Server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No Systems found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to System &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot connect to Server</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -504,10 +505,6 @@
     <name>SystemInformationBlock</name>
     <message>
         <source>Unknown</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>INCOMPATIBLE</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

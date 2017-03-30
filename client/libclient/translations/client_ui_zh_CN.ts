@@ -686,11 +686,6 @@
     </message>
     <message>
         <location/>
-        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation>系统管理中禁用“允许系统更改摄像机配置”.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation>注意！当前视频质量和帧率将无法与录像计划中的录像设置同步.</translation>
     </message>
@@ -703,11 +698,6 @@
         <location/>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
         <translation>注意！选择高画质将会影响CPU和网络性能，可能会导致系统稳定性.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation>注意！请不要改变以下参数，可能会影响系统稳定性.</translation>
     </message>
     <message>
         <location/>
@@ -727,6 +717,16 @@
     <message>
         <location/>
         <source>Keep camera streams and profiles settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -894,7 +894,7 @@
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or password</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1179,7 +1179,7 @@
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots up</source>
+        <source>Run Application when PC Boots up</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1357,16 +1357,6 @@
     </message>
     <message>
         <location/>
-        <source>Select users to import</source>
-        <translation>选择需导入的用户</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Filter...</source>
-        <translation>过滤器...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Loading...</source>
         <translation>加载中...</translation>
     </message>
@@ -1374,6 +1364,16 @@
         <location/>
         <source>Connection error</source>
         <translation>连接错误</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Role to assign to imported users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable imported users</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1898,7 +1898,7 @@
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or password</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1929,11 +1929,6 @@
     </message>
     <message>
         <location/>
-        <source>The new system will have password and name from the system:</source>
-        <translation>新系统需要新的用户名和密码:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Check</source>
         <translation>检查</translation>
     </message>
@@ -1946,6 +1941,11 @@
         <location/>
         <source>Login:</source>
         <translation type="unfinished">登录:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>The new System will have password and name from System:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1998,13 +1998,13 @@
     </message>
     <message>
         <location/>
-        <source>Removing this connection option could lead to system malfunction.</source>
-        <translation>删除此连接项可能导致系统故障。</translation>
+        <source>Add</source>
+        <translation type="unfinished">添加</translation>
     </message>
     <message>
         <location/>
-        <source>Add</source>
-        <translation type="unfinished">添加</translation>
+        <source>Removing this connection option could lead to System malfunction.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2026,11 +2026,6 @@
     </message>
     <message>
         <location/>
-        <source>Applying system updates at the end of the week is not recommended.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Updating to...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2042,6 +2037,11 @@
     <message>
         <location/>
         <source>You have the latest version installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applying System updates at the end of the week is not recommended.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2077,13 +2077,13 @@
     </message>
     <message>
         <location/>
-        <source>Warning: file with same name already exists!</source>
-        <translation>注意: 已有相同名称已经存在!</translation>
+        <source>Options</source>
+        <translation>选项</translation>
     </message>
     <message>
         <location/>
-        <source>Options</source>
-        <translation>选项</translation>
+        <source>Warning: file with the same name already exists!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2782,7 +2782,7 @@
     <message>
         <location/>
         <source>System time is synchronized with the Internet and is independent from server local time.
-Selected server will be used as a time server if the system has no Internet access.</source>
+Selected server will be used as a time server if System has no Internet access.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

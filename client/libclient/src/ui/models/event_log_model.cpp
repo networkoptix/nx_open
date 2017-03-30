@@ -497,6 +497,8 @@ QString QnEventLogModel::tooltip(Column column, const QnBusinessActionData& acti
         return QString();
 
     QString result = textData(column, action);
+    //TODO: #GDM #3.1 following block must be moved to ::eventDetails method. Problem is to display
+    // too long text in the column (::textData() method).
     if (action.eventParams.eventType == QnBusiness::LicenseIssueEvent
         && action.eventParams.reasonCode == QnBusiness::LicenseRemoved)
     {
