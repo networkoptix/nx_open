@@ -22,6 +22,8 @@ class TestSession(object):
     # done once per run, before all tests
     def init(self, run_options):
         if run_options.vm_ssh_host_config:
+            if not os.path.isdir(run_options.work_dir):
+                os.makedirs(run_options.work_dir)
             self.vagrant_private_key_path = os.path.join(run_options.work_dir, 'vagrant_insecure_private_key')
             host = host_from_config(run_options.vm_ssh_host_config)
             log.debug('picking vagrant insecure ssh key:')
