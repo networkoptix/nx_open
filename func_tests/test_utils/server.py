@@ -157,6 +157,7 @@ class Server(object):
         self.host = box.host
         self.rest_api_url = rest_api_url
         self.dir = MEDIASERVER_DIR.format(company_name=self._company_name)
+        self.core_file_path = os.path.join(self.dir, 'bin/core')
         self._config_path = os.path.join(self.dir, MEDIASERVER_CONFIG_PATH)
         self._config_path_initial = os.path.join(self.dir, MEDIASERVER_CONFIG_PATH_INITIAL)
         self._log_path = os.path.join(self.dir, MEDIASERVER_LOG_PATH)
@@ -182,6 +183,8 @@ class Server(object):
         return 'http://%s:%d/' % (self.internal_ip_address, MEDIASERVER_LISTEN_PORT)
 
     def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None, config_file_params=None):
+        if self.host.file_exists(self.core_file_path):
+            self.host.run_command(['rm', self.core_file_path])
         self._is_started = was_started = self.service.get_status()
         log.info('Service for %s %s started', self, self._is_started and 'WAS' or 'was NOT')
         if reset:

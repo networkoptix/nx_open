@@ -196,10 +196,23 @@ class Environment(object):
         for name, server in servers.items():
             setattr(self, name, server)
 
+    def perform_post_checks(self):
+        log.info('----- test is finished, performing post-test checks ------------------------>8 -----------------------------------------')
+        core_dumped_servers = []
+        for name, server in self.servers.items():
+            if server.host.file_exists(server.core_file_path):
+                core_dumped_servers.append(name.upper())
+        assert not core_dumped_servers, 'Following server(s) left core dump: %s' % ', '.join(core_dumped_servers)
+
     def finalizer(self):
         log.info('FINALIZER for %s', self.artifact_path_prefix)
         for name, server in self.servers.items():
-            log_path = '%s-server-%s.log' % (self.artifact_path_prefix, name)
+            path_prefix = '%s-server-%s' % (self.artifact_path_prefix, name)
+            log_path = '%s.log' % path_prefix
             with open(log_path, 'wb') as f:
                 f.write(server.get_log_file())
             log.debug('log file for server %s, %s is stored to %s', name.upper(), server, log_path)
+            if server.host.file_exists(server.core_file_path):
+                local_core_path = '%s.core' % path_prefix
+                server.host.get_file(server.core_file_path, local_core_path)
+                log.debug('core file for server %s, %s is stored to %s', name.upper(), server, local_core_path)

@@ -80,6 +80,10 @@ class Host(object):
         pass
 
     @abc.abstractmethod
+    def file_exists(self, path):
+        pass
+
+    @abc.abstractmethod
     def put_file(self, from_local_path, to_remote_path):
         pass
 
@@ -186,6 +190,9 @@ class LocalHost(Host):
         else:
             return '.'
 
+    def file_exists(self, path):
+        return os.path.isfile(path)
+
     def put_file(self, from_local_path, to_remote_path):
         self._copy(from_local_path, to_remote_path)
 
@@ -240,6 +247,11 @@ class RemoteSshHost(Host):
         if cwd:
             args = [subprocess.list2cmdline(['cd', cwd, '&&'] + args)]
         return self._local_host.run_command(ssh_cmd + args, input, log_output=log_output)
+
+    def file_exists(self, path):
+        output = self.run_command(['[', '-f', path, ']', '&&', 'echo', 'yes', '||', 'echo', 'no']).strip()
+        assert output in ['yes', 'no'], repr(output)
+        return output == 'yes'
 
     def put_file(self, from_local_path, to_remote_path):
         #assert not self._proxy_host, repr(self._proxy_host)  # Can not proxy this... Or can we?

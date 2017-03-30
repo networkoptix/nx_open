@@ -10,7 +10,7 @@ import pytest
 from test_utils.utils import SimpleNamespace
 from test_utils.session import TestSession
 from test_utils.customization import read_customization_company_name
-from test_utils.environment import EnvironmentBuilder
+from test_utils.environment import EnvironmentBuilder, Environment
 from test_utils.host import SshHostConfig
 from test_utils.vagrant_box_config import BoxConfigFactory
 from test_utils.cloud_host import resolve_cloud_host_from_registry, create_cloud_host
@@ -161,3 +161,20 @@ def env_builder(request, test_session, run_options,
     return EnvironmentBuilder(
         request, test_session, run_options, request.config.cache,
         cloud_host_host, customization_company_name)
+
+
+# pytest teardown does not allow failing the test from it. We have to use pytest hook for this.
+@pytest.mark.hookwrapper
+def pytest_pyfunc_call(pyfuncitem):
+    # look up for Environent fixture
+    env = None
+    for name in pyfuncitem._request.fixturenames:
+        value = pyfuncitem._request.getfixturevalue(name)
+        if isinstance(value, Environment):
+            env = value
+    # run the test
+    outcome = yield
+    # perform post-checks if passed and have our Environment in fixtures
+    passed = outcome.excinfo is None
+    if passed and env:
+        env.perform_post_checks()
