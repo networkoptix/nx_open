@@ -290,7 +290,7 @@ void setAutoRunEnabled(const QnUuid& videoWallUuid, bool value)
     QStringList arguments;
     arguments << lit("--videowall");
     arguments << videoWallUuid.toString();
-    QUrl url = QnAppServerConnectionFactory::url();
+    QUrl url = commonModule()->currentUrl();
     url.setUserName(QString());
     url.setPassword(QString());
     arguments << lit("--auth");
@@ -401,7 +401,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         [this](const QnPeerRuntimeInfo &info)
         {
             /* Ignore own info change. */
-            if (info.uuid == qnCommon->moduleGUID())
+            if (info.uuid == commonModule()->moduleGUID())
                 return;
 
             bool isControlled = !info.data.videoWallControlSession.isNull();
@@ -419,7 +419,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
                 return;
 
             /* Order by guid. */
-            if (info.uuid < qnCommon->moduleGUID())
+            if (info.uuid < commonModule()->moduleGUID())
             {
                 setControlMode(false);
                 showControlledByAnotherUserMessage();
@@ -713,7 +713,7 @@ void QnWorkbenchVideoWallHandler::openNewWindow(const QStringList &args)
 {
     QStringList arguments = args;
 
-    QUrl url = QnAppServerConnectionFactory::url();
+    QUrl url = commonModule()->currentUrl();
     url.setUserName(QString());
     url.setPassword(QString());
 
@@ -1228,7 +1228,7 @@ void QnWorkbenchVideoWallHandler::updateMode()
         auto index = resourcePool()->getVideoWallItemByUuid(itemUuid);
         auto item = index.item();
         if (item.runtimeStatus.online
-            && (item.runtimeStatus.controlledBy.isNull() || item.runtimeStatus.controlledBy == qnCommon->moduleGUID())
+            && (item.runtimeStatus.controlledBy.isNull() || item.runtimeStatus.controlledBy == commonModule()->moduleGUID())
             && layout->resource()
             && item.layout == layout->resource()->getId()
             )
@@ -1992,7 +1992,7 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered()
     if (!context()->user())
         return;
 
-    QnVirtualCameraResourcePtr desktopCamera = resourcePool()->getResourceByUniqueId<QnVirtualCameraResource>(qnCommon->moduleGUID().toString());
+    QnVirtualCameraResourcePtr desktopCamera = resourcePool()->getResourceByUniqueId<QnVirtualCameraResource>(commonModule()->moduleGUID().toString());
     if (!desktopCamera || !desktopCamera->hasFlags(Qn::desktop_camera))
         return;
 
@@ -2850,7 +2850,7 @@ void QnWorkbenchVideoWallHandler::setItemControlledBy(const QnUuid &layoutId, co
     }
 
     /* Ignore local changes. */
-    if (controllerId != qnCommon->moduleGUID() && needUpdate)
+    if (controllerId != commonModule()->moduleGUID() && needUpdate)
         updateMode();
 }
 

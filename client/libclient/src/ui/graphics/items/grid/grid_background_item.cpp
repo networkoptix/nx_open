@@ -199,7 +199,7 @@ QnGridBackgroundItem::QnGridBackgroundItem(QGraphicsItem* parent, QnWorkbenchCon
     const auto appServerImageCache = context->instance<QnAppServerImageCache>();
     connect(appServerImageCache, &QnAppServerFileCache::fileDownloaded, this, imageLoaded);
 
-    connect(qnCommon, &QnCommonModule::remoteIdChanged,
+    connect(commonModule(), &QnCommonModule::remoteIdChanged,
         this, &QnGridBackgroundItem::updateConnectedState);
 
     const auto notifier = qnSettings->notifier(QnClientSettings::BACKGROUND_IMAGE);
@@ -411,7 +411,7 @@ void QnGridBackgroundItem::updateGeometry()
 void QnGridBackgroundItem::updateConnectedState()
 {
     Q_D(QnGridBackgroundItem);
-    d->connected = !qnCommon->remoteGUID().isNull();
+    d->connected = !commonModule()->remoteGUID().isNull();
     updateDisplay();
 }
 

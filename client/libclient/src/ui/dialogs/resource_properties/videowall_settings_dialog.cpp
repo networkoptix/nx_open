@@ -95,7 +95,7 @@ bool QnVideowallSettingsDialog::createShortcut(const QnVideoWallResourcePtr &vid
     arguments << lit("--videowall");
     arguments << videowall->getId().toString();
 
-    QUrl url = QnAppServerConnectionFactory::url();
+    QUrl url = commonModule()->currentUrl();
     url.setUserName(QString());
     url.setPassword(QString());
 

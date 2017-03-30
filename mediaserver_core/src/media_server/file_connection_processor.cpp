@@ -137,7 +137,7 @@ bool QnFileConnectionProcessor::loadFile(
         return false;
 
     *outData = file->readAll();
-    *outLastModified = qnCommon->startupTime(); //staticFileLastModified(file);
+    *outLastModified = commonModule()->startupTime(); //staticFileLastModified(file);
     if (outData->size() < cachedFiles.maxCost())
         cachedFiles.insert(path, new CacheEntry(*outData, *outLastModified), outData->size());
     return true;

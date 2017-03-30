@@ -63,7 +63,7 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     connect(ui->addDeviceButton, &QPushButton::clicked, this,
         [this]
         {
-            menu()->trigger(QnActions::ServerAddCameraManuallyAction, qnCommon->currentServer());
+            menu()->trigger(QnActions::ServerAddCameraManuallyAction, commonModule()->currentServer());
         });
 
 

@@ -1043,7 +1043,7 @@ bool QnStorageManager::checkIfMyStorage(const QnStorageResourcePtr &storage) con
 void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
-    if (storage && storage->getParentId() == qnCommon->moduleGUID())
+    if (storage && storage->getParentId() == commonModule()->moduleGUID())
     {
 		m_warnSended = false;
         connect(storage.data(), &QnStorageResource::isBackupChanged, this, &QnStorageManager::at_storageChanged);
@@ -1055,7 +1055,7 @@ void QnStorageManager::onNewResource(const QnResourcePtr &resource)
 void QnStorageManager::onDelResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr storage = qSharedPointerDynamicCast<QnStorageResource>(resource);
-    if (storage && storage->getParentId() == qnCommon->moduleGUID() && checkIfMyStorage(storage)) {
+    if (storage && storage->getParentId() == commonModule()->moduleGUID() && checkIfMyStorage(storage)) {
 		m_warnSended = false;
         removeStorage(storage);
         qnStorageDbPool->removeSDB(storage);
@@ -1472,7 +1472,7 @@ void QnStorageManager::updateCameraHistory()
     auto archivedListNew = getCamerasWithArchive();
 
     std::vector<QnUuid> archivedListOld =
-        qnCameraHistoryPool->getServerFootageData(qnCommon->moduleGUID());
+        qnCameraHistoryPool->getServerFootageData(commonModule()->moduleGUID());
     std::sort(archivedListOld.begin(), archivedListOld.end());
 
     if (archivedListOld == archivedListNew)
@@ -1480,14 +1480,14 @@ void QnStorageManager::updateCameraHistory()
 
     const ec2::AbstractECConnectionPtr& appServerConnection = commonModule()->ec2Connection();
 
-    ec2::ErrorCode errCode = appServerConnection->getCameraManager(Qn::kSystemAccess)->setServerFootageDataSync(qnCommon->moduleGUID(), archivedListNew);
+    ec2::ErrorCode errCode = appServerConnection->getCameraManager(Qn::kSystemAccess)->setServerFootageDataSync(commonModule()->moduleGUID(), archivedListNew);
 
     if (errCode != ec2::ErrorCode::ok) {
         qCritical() << "ECS server error during execute method addCameraHistoryItem: "
                     << ec2::toString(errCode);
         return;
     }
-    qnCameraHistoryPool->setServerFootageData(qnCommon->moduleGUID(),
+    qnCameraHistoryPool->setServerFootageData(commonModule()->moduleGUID(),
                                               archivedListNew);
     return;
 }
@@ -1824,7 +1824,7 @@ void QnStorageManager::clearCameraHistory()
             itr.value() == DATETIME_NOW; // delete all history if catalog is empty
     }
 
-    QList<QnCameraHistoryItem> itemsToRemove = qnCameraHistoryPool->getUnusedItems(minTimes, qnCommon->moduleGUID());
+    QList<QnCameraHistoryItem> itemsToRemove = qnCameraHistoryPool->getUnusedItems(minTimes, commonModule()->moduleGUID());
     ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
     for(const QnCameraHistoryItem& item: itemsToRemove) {
         ec2::ErrorCode errCode = ec2Connection->getCameraManager()->removeCameraHistoryItemSync(item);

@@ -63,7 +63,7 @@ namespace {
         QByteArray preface;
         preface.append("================================================================================\n");
         preface.append(QString(lit(" [%1] Starting system update:\n")).arg(QDateTime::currentDateTime().toString()));
-        preface.append(QString(lit("    Current version: %1\n")).arg(qnCommon->engineVersion().toString()));
+        preface.append(QString(lit("    Current version: %1\n")).arg(commonModule()->engineVersion().toString()));
         preface.append(QString(lit("    Target version: %1\n")).arg(targetVersion));
         preface.append("================================================================================\n");
 
@@ -119,7 +119,7 @@ void QnServerUpdateTool::sendReply(int code) {
     NX_LOG(lit("QnServerUpdateTool: Update chunk reply [id = %1, code = %2].").arg(m_updateId).arg(code), cl_logDEBUG2);
 
     connection2()->getUpdatesManager(Qn::kSystemAccess)->sendUpdateUploadResponce(
-                m_updateId, qnCommon->moduleGUID(), code, this, [this](int, ec2::ErrorCode) {});
+                m_updateId, commonModule()->moduleGUID(), code, this, [this](int, ec2::ErrorCode) {});
 }
 
 bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray &data) {

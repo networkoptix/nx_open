@@ -68,7 +68,7 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
         case QnBusiness::SendMailAction:
         {
             // looking for server with public IP address
-            const QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+            const QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
             if (!mServer || (mServer->getServerFlags() & Qn::SF_HasPublicIP))
                 return QnMediaServerResourcePtr(); // do not proxy
 

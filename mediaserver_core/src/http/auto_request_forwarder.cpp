@@ -116,7 +116,7 @@ bool QnAutoRequestForwarder::addProxyToRequest(
 {
     if (!serverRes)
         return false;
-    if (serverRes->getId() == qnCommon->moduleGUID())
+    if (serverRes->getId() == commonModule()->moduleGUID())
         return false; //target server is this one
     request->headers.emplace(
         Qn::SERVER_GUID_HEADER_NAME,

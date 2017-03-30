@@ -30,9 +30,9 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
     connect(qnClientMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, this,
         [this]()
         {
-            const auto currentServer = qnCommon->currentServer();
+            const auto currentServer = commonModule()->currentServer();
 
-            NX_ASSERT(!currentServer.isNull(), Q_FUNC_INFO, "qnCommon->currentServer() is NULL!");
+            NX_ASSERT(!currentServer.isNull(), Q_FUNC_INFO, "commonModule()->currentServer() is NULL!");
             if (!currentServer)
                 return;
 
@@ -44,7 +44,7 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
                 if (!currentServer)
                     return;
 
-                QUrl url = QnAppServerConnectionFactory::url();
+                QUrl url = commonModule()->currentUrl();
                 if (url.isEmpty() || (url.port() == currentServer->getPort()))
                     return;
 

@@ -189,7 +189,7 @@ int QnConfigureRestHandler::changePort(const Qn::UserAccessData& accessRights, i
         return ResultFail;
 
     QnMediaServerResourcePtr server =
-        resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+        resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (!server)
         return ResultFail;
 

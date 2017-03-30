@@ -30,7 +30,7 @@ namespace ec2 {
         void fillSequence(
             const QnUuid& moduleId,
             const QnUuid& runningInstanceGUID);
-        /** Calls previous method passing it value from \a qnCommon. */
+        /** Calls previous method passing it value from \a commonModule(). */
 
         bool isNull() const;
 

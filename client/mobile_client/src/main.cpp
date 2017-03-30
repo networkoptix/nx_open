@@ -79,13 +79,13 @@ int runUi(QtSingleGuiApplication* application)
 
         if (preparingWebChannel->isValid())
         {
-            auto webChannel = qnCommon->store(preparingWebChannel.release());
+            auto webChannel = commonModule()->store(preparingWebChannel.release());
             qnSettings->setWebSocketPort(webChannel->serverPort());
 
-            auto liteClientHandler = qnCommon->store(new QnLiteClientHandler());
+            auto liteClientHandler = commonModule()->store(new QnLiteClientHandler());
             liteClientHandler->setUiController(context.uiController());
 
-            auto webAdminController = qnCommon->store(new controllers::WebAdminController());
+            auto webAdminController = commonModule()->store(new controllers::WebAdminController());
             webAdminController->setUiController(context.uiController());
 
             webChannel->registerObject(lit("liteClientController"), webAdminController);

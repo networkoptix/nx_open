@@ -81,7 +81,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     const auto updateBookmarkActionsAvailability =
         [this, bookmarksViewer]()
         {
-            const bool readonly = qnCommon->isReadOnly()
+            const bool readonly = commonModule()->isReadOnly()
                 || !accessController()->hasGlobalPermission(Qn::GlobalManageBookmarksPermission);
 
             bookmarksViewer->setReadOnly(readonly);
@@ -89,7 +89,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
 
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
         updateBookmarkActionsAvailability);
-    connect(qnCommon, &QnCommonModule::readOnlyChanged, this, updateBookmarkActionsAvailability);
+    connect(commonModule(), &QnCommonModule::readOnlyChanged, this, updateBookmarkActionsAvailability);
     connect(context(), &QnWorkbenchContext::userChanged, this, updateBookmarkActionsAvailability);
 
     connect(bookmarksViewer, &QnBookmarksViewer::editBookmarkClicked, this,

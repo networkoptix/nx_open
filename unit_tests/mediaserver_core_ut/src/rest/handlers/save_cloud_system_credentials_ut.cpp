@@ -23,7 +23,7 @@ public:
         MSSettings::initializeROSettings();
         MSSettings::initializeRunTimeSettings();
 
-        qnCommon->setModuleGUID(QnUuid::createUuid());
+        commonModule()->setModuleGUID(QnUuid::createUuid());
 
         insertSelfServerResource();
         insertAdminUser();
@@ -41,7 +41,7 @@ private:
     void insertSelfServerResource()
     {
         auto selfServer = QnMediaServerResourcePtr(new QnMediaServerResource());
-        selfServer->setId(qnCommon->moduleGUID());
+        selfServer->setId(commonModule()->moduleGUID());
         selfServer->setServerFlags(Qn::SF_HasPublicIP);
         resourcePool()->addResource(selfServer);
     }

@@ -107,7 +107,7 @@ void QnWorkbenchVersionMismatchWatcher::updateHasMismatches() {
 void QnWorkbenchVersionMismatchWatcher::updateMismatchData() {
     m_mismatchData.clear();
 
-    QnAppInfoMismatchData clientData(Qn::ClientComponent, qnCommon->engineVersion());
+    QnAppInfoMismatchData clientData(Qn::ClientComponent, commonModule()->engineVersion());
     m_mismatchData.push_back(clientData);
 
     if (context()->user())

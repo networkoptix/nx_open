@@ -4,9 +4,11 @@
 
 #include <client/client_startup_parameters.h>
 
+#include <nx/utils/singleton.h>
+
 class QGLWidget;
 
-class QnClientModule: public QObject
+class QnClientModule: public QObject, public Singleton<QnClientModule>
 {
     Q_OBJECT
 
@@ -17,6 +19,7 @@ public:
     void initDesktopCamera(QGLWidget* window);
     void startLocalSearchers();
 
+    QnCommonModule* commonModule();
 private:
     void initApplication();
     void initThread();
@@ -31,3 +34,5 @@ private:
 private:
     QnCommonModule* m_commonModule;
 };
+
+#define qnClientModule QnClientModule::instance();

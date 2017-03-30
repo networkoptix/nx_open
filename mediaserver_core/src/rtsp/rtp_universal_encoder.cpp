@@ -646,7 +646,7 @@ QnUniversalRtpEncoder::QnUniversalRtpEncoder(QnConstAbstractMediaDataPtr media,
         m_transcoder.setAudioCodec(m_codec, method);
     }
 
-    if (qnCommon->isTranscodeDisabled() && method != QnTranscoder::TM_DirectStreamCopy) {
+    if (commonModule()->isTranscodeDisabled() && method != QnTranscoder::TM_DirectStreamCopy) {
         m_isOpened = false;
         qWarning() << "Video transcoding is disabled in the server settings. Feature unavailable.";
     }

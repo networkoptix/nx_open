@@ -236,7 +236,7 @@ void QnConnectionManager::disconnectFromServer()
     d->doDisconnect();
 
     d->setUrl(QUrl());
-    qnCommon->instance<QnUserWatcher>()->setUserName(QString());
+    commonModule()->instance<QnUserWatcher>()->setUserName(QString());
 
     // TODO: #dklychkov Move it to a better place
     QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
@@ -306,7 +306,7 @@ bool QnConnectionManagerPrivate::doConnect()
         return false;
     }
 
-    qnCommon->updateRunningInstanceGuid();
+    commonModule()->updateRunningInstanceGuid();
 
     auto connectUrl = url;
     connectUrl.setScheme(lit("http"));
@@ -371,7 +371,7 @@ bool QnConnectionManagerPrivate::doConnect()
             connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged,
                 this, [this, ec2Connection](const QnPeerRuntimeInfo& info)
                 {
-                    if (info.uuid == qnCommon->moduleGUID())
+                    if (info.uuid == commonModule()->moduleGUID())
                         ec2Connection->sendRuntimeData(info.data);
                 });
 
@@ -381,7 +381,7 @@ bool QnConnectionManagerPrivate::doConnect()
                 QnSyncTime::instance(),
                 static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
 
-            qnCommon->instance<QnUserWatcher>()->setUserName(
+            commonModule()->instance<QnUserWatcher>()->setUserName(
                 connectionInfo.effectiveUserName.isEmpty()
                     ? url.userName()
                     : connectionInfo.effectiveUserName);

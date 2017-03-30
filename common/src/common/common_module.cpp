@@ -200,7 +200,15 @@ QnUuid QnCommonModule::remoteGUID() const {
     return m_remoteUuid;
 }
 
-QnMediaServerResourcePtr QnCommonModule::currentServer() const {
+QUrl QnCommonModule::currentUrl() const
+{
+    if (m_ec2Connection)
+        return m_ec2Connection->connectionInfo().ecUrl;
+    return QUrl();
+}
+
+QnMediaServerResourcePtr QnCommonModule::currentServer() const
+{
     QnUuid serverId = remoteGUID();
     if (serverId.isNull())
         return QnMediaServerResourcePtr();
@@ -356,12 +364,6 @@ void QnCommonModule::setMessageProcessor(QnCommonMessageProcessor* messageProces
 {
     m_messageProcessor = messageProcessor;
 }
-
-void QnCommonModule::setPtzControllerPool(QnPtzControllerPool* ptzPool)
-{
-    m_ptzPool = ptzPool;
-}
-
 
 void QnCommonModule::setEc2Connection(const std::shared_ptr<ec2::AbstractECConnection>& ec2Connection)
 {

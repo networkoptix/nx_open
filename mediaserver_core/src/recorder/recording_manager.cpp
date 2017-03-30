@@ -546,7 +546,7 @@ QnVirtualCameraResourceList QnRecordingManager::getLocalControlledCameras() cons
         QnMediaServerResourcePtr mServer = camRes->getParentServer();
         if (!mServer)
             continue;
-        if (mServer->getId() == qnCommon->moduleGUID() || (mServer->getServerFlags() | Qn::SF_RemoteEC))
+        if (mServer->getId() == commonModule()->moduleGUID() || (mServer->getServerFlags() | Qn::SF_RemoteEC))
             result << camRes;
     }
     return result;
@@ -646,7 +646,7 @@ void QnRecordingManager::at_licenseMutexLocked()
     m_licenseMutex = 0;
 
     if (!disabledCameras.isEmpty()) {
-        QnResourcePtr resource = resourcePool()->getResourceById(qnCommon->moduleGUID());
+        QnResourcePtr resource = resourcePool()->getResourceById(commonModule()->moduleGUID());
         //TODO: #gdm move (de)serializing of encoded reason params to common place
         emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::LicenseRemoved, disabledCameras.join(L';'));
     }

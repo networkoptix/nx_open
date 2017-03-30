@@ -23,22 +23,22 @@ QNetworkProxy QnSimpleNetworkProxyFactory::proxyToResource(const QnResourcePtr &
     if (id.isNull())
         id = server->getId();
 
-    if (qnCommon->remoteGUID() == id)
+    if (commonModule()->remoteGUID() == id)
         return QNetworkProxy(QNetworkProxy::NoProxy);
 
-    QUrl url = QnAppServerConnectionFactory::url();
+    QUrl url = commonModule()->currentUrl();
     if (!url.isValid())
         return QNetworkProxy(QNetworkProxy::NoProxy);
 
     if (via)
-        *via = qnCommon->currentServer();
+        *via = commonModule()->currentServer();
     return QNetworkProxy(QNetworkProxy::HttpProxy, url.host(), url.port(), url.userName(), url.password());
 }
 
 QUrl QnSimpleNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, const QString &proxyQueryParameterName) {
     QUrl url = base_type::urlToResource(baseUrl, resource, proxyQueryParameterName);
 
-    QUrl ecUrl = QnAppServerConnectionFactory::url();
+    QUrl ecUrl = commonModule()->currentUrl();
     if (ecUrl.isValid()) {
         url.setHost(ecUrl.host());
         url.setPort(ecUrl.port());

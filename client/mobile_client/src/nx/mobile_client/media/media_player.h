@@ -30,6 +30,9 @@ public:
     bool playing() const;
     bool failed() const;
 
+protected:
+    virtual QnResourcePool* resourcePool() const override;
+
 signals:
     void resourceIdChanged();
     void loadingChanged();

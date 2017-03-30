@@ -425,7 +425,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     auto storageUrl_2 = *storageWorkDir2.getDirName();
 
     std::unique_ptr<QnCommonModule> commonModule;
-    if (!qnCommon) {
+    if (!commonModule()) {
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
     }
     commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));

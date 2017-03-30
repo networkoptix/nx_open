@@ -49,12 +49,12 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     QUrl url(QN_LICENSE_URL);
     CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, QAuthenticator());
 
-    ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->items()->getItem(qnCommon->moduleGUID()).data;
+    ec2::ApiRuntimeData runtimeData = QnRuntimeInfoManager::instance()->items()->getItem(commonModule()->moduleGUID()).data;
     QUrlQuery params;
     params.addQueryItem(kLicenseKey, licenseKey);
     params.addQueryItem(kBox, runtimeData.box);
     params.addQueryItem(kBrand, runtimeData.brand);
-    params.addQueryItem(kVersion, QnAppInfo::engineVersion()); //TODO: #GDM replace with qnCommon->engineVersion()? And what if --override-version?
+    params.addQueryItem(kVersion, QnAppInfo::engineVersion()); //TODO: #GDM replace with commonModule()->engineVersion()? And what if --override-version?
 
 #ifdef Q_OS_LINUX
     if(QnAppInfo::isBpi() || QnAppInfo::isNx1())

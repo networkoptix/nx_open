@@ -23,7 +23,6 @@ class QnModuleFinder;
 class QnRouter;
 class QnGlobalSettings;
 class QnCommonMessageProcessor;
-class QnPtzControllerPool;
 class QnResourceAccessManager;
 class QnResourceAccessProvider;
 class QnUserRolesManager;
@@ -165,6 +164,9 @@ public:
     void setRemoteGUID(const QnUuid& guid);
     QnUuid remoteGUID() const;
 
+    /** Url we are currently connected to. */
+    QUrl currentUrl() const;
+
     /** Server we are currently connected to. */
     QnMediaServerResourcePtr currentServer() const;
 
@@ -206,9 +208,6 @@ public:
 
     QnCommonMessageProcessor* messageProcessor() const;
     void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
-
-    QnPtzControllerPool* ptzControllerPool() const;
-    void setPtzControllerPool(QnPtzControllerPool* ptzPool);
 
     void setEc2Connection(const std::shared_ptr<ec2::AbstractECConnection> &connection);
     std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
@@ -254,7 +253,6 @@ private:
     QnGlobalSettings* m_globalSettings = nullptr;
     QnCameraHistoryPool* m_cameraHistory = nullptr;
     QnCommonMessageProcessor* m_messageProcessor = nullptr;
-    QnPtzControllerPool* m_ptzPool = nullptr;
     QnRuntimeInfoManager* m_runtimeInfoManager = nullptr;
     QnResourceAccessManager* m_resourceAccessManager = nullptr;
     QnResourceAccessProvider* m_resourceAccessProvider = nullptr;

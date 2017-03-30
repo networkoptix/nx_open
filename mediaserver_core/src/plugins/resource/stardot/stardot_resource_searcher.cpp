@@ -103,7 +103,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
                 if (typeId.isNull())
                     continue;
 
-                QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), QLatin1String(model));
+                QnResourceData resourceData = commonModule()->dataPool()->data(manufacture(), QLatin1String(model));
                 if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
                     continue; // model forced by ONVIF
 
@@ -236,7 +236,7 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
     if (mac.isEmpty())
         return QList<QnResourcePtr>();
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), model);
+    QnResourceData resourceData = commonModule()->dataPool()->data(manufacture(), model);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 

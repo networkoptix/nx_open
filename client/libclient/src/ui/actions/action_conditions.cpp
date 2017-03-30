@@ -141,7 +141,7 @@ Qn::ActionVisibility QnPreviewSearchModeCondition::check(const QnActionParameter
 
 Qn::ActionVisibility QnForbiddenInSafeModeCondition::check(const QnActionParameters &parameters) {
     Q_UNUSED(parameters)
-    if (qnCommon->isReadOnly())
+    if (commonModule()->isReadOnly())
         return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }
@@ -397,7 +397,7 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnActionParam
 
 Qn::ActionVisibility QnStopSharingActionCondition::check(const QnActionParameters &parameters)
 {
-    if (qnCommon->isReadOnly())
+    if (commonModule()->isReadOnly())
         return Qn::InvisibleAction;
 
     Qn::NodeType nodeType = parameters.argument<Qn::NodeType>(Qn::NodeTypeRole, Qn::ResourceNode);
@@ -953,7 +953,7 @@ Qn::ActionVisibility QnSetAsBackgroundActionCondition::check(const QnLayoutItemI
 
 Qn::ActionVisibility QnLoggedInCondition::check(const QnActionParameters &parameters) {
     Q_UNUSED(parameters)
-    return qnCommon->remoteGUID().isNull()
+    return commonModule()->remoteGUID().isNull()
         ? Qn::InvisibleAction
         : Qn::EnabledAction;
 }
@@ -966,7 +966,7 @@ QnBrowseLocalFilesCondition::QnBrowseLocalFilesCondition(QObject* parent) :
 Qn::ActionVisibility QnBrowseLocalFilesCondition::check(const QnActionParameters& parameters)
 {
     Q_UNUSED(parameters);
-    const bool connected = !qnCommon->remoteGUID().isNull();
+    const bool connected = !commonModule()->remoteGUID().isNull();
     return (connected ? Qn::InvisibleAction : Qn::EnabledAction);
 }
 
@@ -1170,7 +1170,7 @@ Qn::ActionVisibility QnDetachFromVideoWallActionCondition::check(const QnActionP
     if (!context()->user() || parameters.videoWallItems().isEmpty())
         return Qn::InvisibleAction;
 
-    if (qnCommon->isReadOnly())
+    if (commonModule()->isReadOnly())
         return Qn::InvisibleAction;
 
     foreach (const QnVideoWallItemIndex &index, parameters.videoWallItems()) {
@@ -1243,9 +1243,9 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
         return Qn::InvisibleAction;
 
     /* Do not check real pointer type to speed up check. */
-    QnResourcePtr desktopCamera = resourcePool()->getResourceByUniqueId(qnCommon->moduleGUID().toString());
+    QnResourcePtr desktopCamera = resourcePool()->getResourceByUniqueId(commonModule()->moduleGUID().toString());
 #ifdef DESKTOP_CAMERA_DEBUG
-    NX_ASSERT(!desktopCamera || (desktopCamera->hasFlags(Qn::desktop_camera) && desktopCamera->getParentId() == qnCommon->remoteGUID()),
+    NX_ASSERT(!desktopCamera || (desktopCamera->hasFlags(Qn::desktop_camera) && desktopCamera->getParentId() == commonModule()->remoteGUID()),
         Q_FUNC_INFO,
         "Desktop camera must have correct flags and parent (if exists)");
 #endif

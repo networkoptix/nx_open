@@ -126,4 +126,4 @@ private:
     int m_selfConflictCount;
 };
 
-#define qnModuleFinder QnModuleFinder::instance()
+#define qnModuleFinder commonModule()->moduleFinder()

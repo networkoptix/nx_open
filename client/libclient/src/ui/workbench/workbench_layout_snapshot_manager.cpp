@@ -127,7 +127,7 @@ bool QnWorkbenchLayoutSnapshotManager::isModified(const QnLayoutResourcePtr &res
 
 bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, SaveLayoutResultFunction callback)
 {
-    if (qnCommon->isReadOnly())
+    if (commonModule()->isReadOnly())
         return false;
 
     NX_ASSERT(!layout->isFile());

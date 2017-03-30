@@ -10,6 +10,8 @@
 
 #include <api/global_settings.h>
 
+#include <common/common_module.h>
+
 #include <client_core/client_core_settings.h>
 
 #include <cloud/cloud_connection.h>
@@ -75,7 +77,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
 
 }
 
-class QnCloudStatusWatcherPrivate : public QObject
+class QnCloudStatusWatcherPrivate : public QObject, public QnCommonModuleAware
 {
     QnCloudStatusWatcher* q_ptr;
     Q_DECLARE_PUBLIC(QnCloudStatusWatcher)
@@ -124,6 +126,7 @@ private:
 
 QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
     base_type(parent),
+    QnCommonModuleAware(parent),
     d_ptr(new QnCloudStatusWatcherPrivate(this))
 {
     setStayConnected(!qnClientCoreSettings->cloudPassword().isEmpty());
@@ -370,6 +373,7 @@ QnCloudSystemList QnCloudStatusWatcher::recentCloudSystems() const
 
 QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *parent):
     QObject(parent),
+    QnCommonModuleAware(parent),
     q_ptr(parent),
     cloudPort(-1),
     credentials(),

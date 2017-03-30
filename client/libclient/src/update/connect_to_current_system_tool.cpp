@@ -133,7 +133,7 @@ void QnConnectToCurrentSystemTool::mergeServer()
         return;
     }
 
-    const auto ecServer = qnCommon->currentServer();
+    const auto ecServer = commonModule()->currentServer();
     if (!ecServer)
         return;
 
@@ -249,8 +249,8 @@ void QnConnectToCurrentSystemTool::updateServer()
             emit progressChanged(updateProgress * kUpdateProgress / 100);
         });
 
-    auto targetVersion = qnCommon->engineVersion();
-    if (const auto ecServer = qnCommon->currentServer())
+    auto targetVersion = commonModule()->engineVersion();
+    if (const auto ecServer = commonModule()->currentServer())
         targetVersion = ecServer->getVersion();
 
     m_updateTool->setTargets({m_targetId});

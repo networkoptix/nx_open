@@ -10,8 +10,8 @@ QnWorkbenchServerSafemodeWatcher::QnWorkbenchServerSafemodeWatcher(QObject *pare
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 {
-    connect(qnCommon, &QnCommonModule::remoteIdChanged, this, &QnWorkbenchServerSafemodeWatcher::updateCurrentServer);
-    connect(qnCommon, &QnCommonModule::readOnlyChanged, this, &QnWorkbenchServerSafemodeWatcher::updateServerFlags);
+    connect(commonModule(), &QnCommonModule::remoteIdChanged, this, &QnWorkbenchServerSafemodeWatcher::updateCurrentServer);
+    connect(commonModule(), &QnCommonModule::readOnlyChanged, this, &QnWorkbenchServerSafemodeWatcher::updateServerFlags);
 
     connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::initialResourcesReceived, this, [this] {
         updateCurrentServer();
@@ -19,7 +19,7 @@ QnWorkbenchServerSafemodeWatcher::QnWorkbenchServerSafemodeWatcher(QObject *pare
     });
 
     connect(resourcePool(), &QnResourcePool::resourceAdded, this, [this](const QnResourcePtr &resource) {
-        if (m_currentServer || qnCommon->moduleGUID().isNull() || resource->getId() != qnCommon->remoteGUID())
+        if (m_currentServer || commonModule()->moduleGUID().isNull() || resource->getId() != commonModule()->remoteGUID())
             return;
 
         m_currentServer = resource.dynamicCast<QnMediaServerResource>();
@@ -38,14 +38,14 @@ QnWorkbenchServerSafemodeWatcher::QnWorkbenchServerSafemodeWatcher(QObject *pare
 }
 
 void QnWorkbenchServerSafemodeWatcher::updateCurrentServer() {
-    m_currentServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
+    m_currentServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->remoteGUID());
 }
 
 void QnWorkbenchServerSafemodeWatcher::updateServerFlags() {
     if (!m_currentServer)
         return;
 
-    if (qnCommon->isReadOnly())
+    if (commonModule()->isReadOnly())
         m_currentServer->addFlags(Qn::read_only);
     else
         m_currentServer->removeFlags(Qn::read_only);

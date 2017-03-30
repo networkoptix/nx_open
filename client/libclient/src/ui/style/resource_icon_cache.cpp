@@ -267,7 +267,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
         switch (resource->getStatus())
         {
             case Qn::Online:
-                if (key == Server && resource->getId() == qnCommon->remoteGUID())
+                if (key == Server && resource->getId() == commonModule()->remoteGUID())
                     status = Control;
                 else
                     status = Online;

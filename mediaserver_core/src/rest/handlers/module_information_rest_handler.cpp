@@ -71,15 +71,15 @@ int QnModuleInformationRestHandler::executeGet(
     }
     else if (useAddresses)
     {
-        QnModuleInformationWithAddresses moduleInformation(qnCommon->moduleInformation());
-        QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+        QnModuleInformationWithAddresses moduleInformation(commonModule()->moduleInformation());
+        QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
         if (server)
             moduleInformation.remoteAddresses = getAddresses(server);
         result.setReply(moduleInformation);
     }
     else
     {
-        result.setReply(qnCommon->moduleInformation());
+        result.setReply(commonModule()->moduleInformation());
     }
     return CODE_OK;
 }

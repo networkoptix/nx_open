@@ -39,8 +39,8 @@ void QnUpdateChecker::at_networkReply_finished() {
     map = map.value(QnAppInfo::customizationName()).toMap();
 
     QString currentRelease = map.value(lit("current_release")).toString();
-    if (qnCommon->engineVersion() > QnSoftwareVersion(currentRelease))
-        currentRelease = qnCommon->engineVersion().toString(QnSoftwareVersion::MinorFormat);
+    if (commonModule()->engineVersion() > QnSoftwareVersion(currentRelease))
+        currentRelease = commonModule()->engineVersion().toString(QnSoftwareVersion::MinorFormat);
 
     if (currentRelease.isEmpty())
         return;

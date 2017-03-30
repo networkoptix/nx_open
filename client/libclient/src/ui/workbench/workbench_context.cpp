@@ -223,7 +223,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
         case SystemUri::ClientCommand::LoginToCloud:
         {
             NX_LOG(lit("Custom URI: Connecting to cloud"), cl_logDEBUG1);
-            qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
+            commonModule()->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
             break;
         }
         case SystemUri::ClientCommand::Client:
@@ -242,7 +242,7 @@ bool QnWorkbenchContext::connectUsingCustomUri(const nx::vms::utils::SystemUri& 
 
             if (systemIsCloud)
             {
-                qnCommon->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
+                commonModule()->instance<QnCloudStatusWatcher>()->setCredentials(credentials, true);
                 NX_LOG(lit("Custom URI: System is cloud, connecting to cloud first"), cl_logDEBUG1);
             }
 

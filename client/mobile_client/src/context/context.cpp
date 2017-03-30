@@ -62,7 +62,7 @@ QnContext::QnContext(QObject* parent) :
     {
         const bool compatibilityMode =
             m_connectionManager->connectionVersion() < kUserRightsRefactoredVersion;
-        const auto camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
+        const auto camerasWatcher = commonModule()->instance<QnAvailableCamerasWatcher>();
         camerasWatcher->setCompatiblityMode(compatibilityMode);
     });
 
@@ -89,12 +89,12 @@ QnContext::~QnContext() {}
 
 QnCloudStatusWatcher* QnContext::cloudStatusWatcher() const
 {
-    return qnCommon->instance<QnCloudStatusWatcher>();
+    return commonModule()->instance<QnCloudStatusWatcher>();
 }
 
 QnUserWatcher* QnContext::userWatcher() const
 {
-    return qnCommon->instance<QnUserWatcher>();
+    return commonModule()->instance<QnUserWatcher>();
 }
 
 QmlSettingsAdaptor* QnContext::settings() const

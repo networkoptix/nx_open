@@ -289,7 +289,7 @@ void QnResourceTreeModelNode::update()
                 {
                     if (item.runtimeStatus.controlledBy.isNull())
                         m_status = Qn::Online;
-                    else if (item.runtimeStatus.controlledBy == qnCommon->moduleGUID())
+                    else if (item.runtimeStatus.controlledBy == commonModule()->moduleGUID())
                         m_status = Qn::Online;
                     else
                         m_status = Qn::Unauthorized;
@@ -1161,7 +1161,7 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
                     if (item.runtimeStatus.controlledBy.isNull())
                         return qnResIconCache->icon(QnResourceIconCache::VideoWallItem);
 
-                    if (item.runtimeStatus.controlledBy == qnCommon->moduleGUID())
+                    if (item.runtimeStatus.controlledBy == commonModule()->moduleGUID())
                     {
                         return qnResIconCache->icon(QnResourceIconCache::VideoWallItem
                             | QnResourceIconCache::Control);

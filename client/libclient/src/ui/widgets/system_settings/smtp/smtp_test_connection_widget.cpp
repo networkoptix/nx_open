@@ -103,7 +103,7 @@ bool QnSmtpTestConnectionWidget::testSettings(const QnEmailSettings &value)
 
     if (!serverConnection)
     {
-        if (auto server = qnCommon->currentServer())
+        if (auto server = commonModule()->currentServer())
             serverConnection = server->apiConnection();
     }
 

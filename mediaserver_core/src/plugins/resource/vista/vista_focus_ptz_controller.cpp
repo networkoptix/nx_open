@@ -75,7 +75,7 @@ void QnVistaFocusPtzController::init() {
     }
 
     if(options.contains(lit("PTZ"))) {
-        QnResourceData data = qnCommon->dataPool()->data(m_resource);
+        QnResourceData data = commonModule()->dataPool()->data(m_resource);
         Qn::PtzCapabilities extraCaps = Qn::NoPtzCapabilities;
         data.value(Qn::PTZ_CAPABILITIES_PARAM_NAME, &extraCaps);
         if(extraCaps & Qn::ContinuousFocusCapability) {

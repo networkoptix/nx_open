@@ -86,7 +86,7 @@ void QnInstallUpdatesPeerTask::doStart()
         return;
     }
 
-    m_ecServer = qnCommon->currentServer();
+    m_ecServer = commonModule()->currentServer();
 
     connect(resourcePool(), &QnResourcePool::resourceChanged,
         this, &QnInstallUpdatesPeerTask::at_resourceChanged);

@@ -217,7 +217,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMess
     if (qnGlobalSettings->localSystemId() == data.localSystemId)
         return true;
 
-    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (!server) {
         NX_LOG("Cannot find self server resource!", cl_logERROR);
         return false;
@@ -262,7 +262,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMess
         }
     }
 
-    qnCommon->setSystemIdentityTime(data.sysIdTime, qnCommon->moduleGUID());
+    commonModule()->setSystemIdentityTime(data.sysIdTime, commonModule()->moduleGUID());
 
     if (data.localSystemId.isNull())
         qnGlobalSettings->resetCloudParams();

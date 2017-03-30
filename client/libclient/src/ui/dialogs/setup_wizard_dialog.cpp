@@ -27,7 +27,7 @@ namespace
         url.setFragment(lit("/setup"));
 
         QUrlQuery q;
-        q.addQueryItem(lit("lang"), qnCommon->instance<QnClientTranslationManager>()->getCurrentLanguage());
+        q.addQueryItem(lit("lang"), commonModule()->instance<QnClientTranslationManager>()->getCurrentLanguage());
         url.setQuery(q);
         return url;
     }

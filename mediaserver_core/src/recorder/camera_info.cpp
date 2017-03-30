@@ -384,7 +384,7 @@ void Reader::addProperty(const ParseResult& result)
 
 QnUuid ServerReaderHandler::moduleGuid() const
 {
-    return qnCommon->moduleGUID();
+    return commonModule()->moduleGUID();
 }
 
 QnUuid ServerReaderHandler::archiveCamTypeId() const

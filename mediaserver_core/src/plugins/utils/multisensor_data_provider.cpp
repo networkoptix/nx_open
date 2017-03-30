@@ -68,7 +68,7 @@ CameraDiagnostics::Result MultisensorDataProvider::openStreamInternal(
 
     auto videoChannelMapping = getVideoChannelMapping();
 
-    auto resData = qnCommon->dataPool()->data(
+    auto resData = commonModule()->dataPool()->data(
         m_resource.dynamicCast<QnSecurityCamResource>());
 
     bool doNotConfigureCamera = resData.value<bool>(
@@ -160,7 +160,7 @@ QList<QnResourceChannelMapping> MultisensorDataProvider::getVideoChannelMapping(
 {
     auto secRes = m_resource.dynamicCast<QnSecurityCamResource>();
 
-    auto resData = qnCommon->dataPool()->data(
+    auto resData = commonModule()->dataPool()->data(
         secRes->getVendor(),
         secRes->getModel());
 

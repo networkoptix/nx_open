@@ -641,7 +641,7 @@ void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& camera
 
 bool QnServerStreamRecorder::isRedundantSyncOn() const
 {
-    auto mediaServer = qnCommon->currentServer();
+    auto mediaServer = commonModule()->currentServer();
     NX_ASSERT(mediaServer);
 
     if (mediaServer->getBackupSchedule().backupType != Qn::Backup_RealTime)

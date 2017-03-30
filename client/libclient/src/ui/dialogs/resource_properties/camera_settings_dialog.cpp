@@ -180,7 +180,7 @@ void QnCameraSettingsDialog::reject()
 void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged()
 {
     bool hasChanges = m_settingsWidget->hasDbChanges();
-    m_applyButton->setEnabled(hasChanges && !qnCommon->isReadOnly());
+    m_applyButton->setEnabled(hasChanges && !commonModule()->isReadOnly());
     m_settingsWidget->setExportScheduleButtonEnabled(!hasChanges);
 }
 
@@ -188,7 +188,7 @@ void QnCameraSettingsDialog::at_settingsWidget_modeChanged()
 {
     QnCameraSettingsWidget::Mode mode = m_settingsWidget->mode();
     bool isValidMode = (mode == QnCameraSettingsWidget::SingleMode || mode == QnCameraSettingsWidget::MultiMode);
-    m_okButton->setEnabled(isValidMode && !qnCommon->isReadOnly());
+    m_okButton->setEnabled(isValidMode && !commonModule()->isReadOnly());
     m_openButton->setVisible(isValidMode);
     m_diagnoseButton->setVisible(isValidMode);
     m_rulesButton->setVisible(mode == QnCameraSettingsWidget::SingleMode);  //TODO: #GDM implement

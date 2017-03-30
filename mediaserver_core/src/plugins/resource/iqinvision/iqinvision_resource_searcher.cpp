@@ -142,7 +142,7 @@ QList<QnNetworkResourcePtr> QnPlIqResourceSearcher::processPacket(
             return localResults; //< Already found.
     }
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = commonModule()->dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return localResults; //< Model forced by ONVIF.
 

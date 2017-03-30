@@ -205,11 +205,11 @@ rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCam
     request.roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
     request.format = Qn::SerializationFormat::UbjsonFormat;
 
-    if (!qnCommon->currentServer())
+    if (!commonModule()->currentServer())
         return kInvalidHandle;
 
     QPointer<QnCameraThumbnailManager> guard(this);
-    return qnCommon->currentServer()->restConnection()->cameraThumbnailAsync(request,
+    return commonModule()->currentServer()->restConnection()->cameraThumbnailAsync(request,
         [guard, this, request] (bool success, rest::Handle id, const QByteArray& imageData)
         {
             if (!guard)

@@ -166,13 +166,13 @@ void QnUserProfileWidget::applyChanges()
         {
             /* Password was changed. Change it in global settings and hope for the best. */
             context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_newPassword);
-            QUrl url = QnAppServerConnectionFactory::url();
+            QUrl url = commonModule()->currentUrl();
             url.setPassword(m_newPassword);
             QnAppServerConnectionFactory::setUrl(url);
 
             using namespace nx::client::core::helpers;
 
-            const auto localSystemId = helpers::getLocalSystemId(qnCommon->moduleInformation());
+            const auto localSystemId = helpers::getLocalSystemId(commonModule()->moduleInformation());
             if (getCredentials(localSystemId, url.userName()).isValid())
                 storeCredentials(localSystemId, QnEncodedCredentials(url));
             qnClientCoreSettings->save();

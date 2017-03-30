@@ -125,7 +125,7 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
 
 bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, const QString& name)
 {
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacturer, name);
+    QnResourceData resourceData = commonModule()->dataPool()->data(manufacturer, name);
 
     if (resourceData.value<bool>(Qn::IGNORE_ONVIF_PARAM_NAME))
         return true;
@@ -286,7 +286,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         return;
 
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(res->getVendor(), res->getModel());
+    QnResourceData resourceData = commonModule()->dataPool()->data(res->getVendor(), res->getModel());
     bool shouldAppearAsSingleChannel =
         resourceData.value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
@@ -348,7 +348,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
     if (uniqId.isEmpty())
         return QnPlOnvifResourcePtr();
 
-    auto resData = qnCommon->dataPool()->data(manufacturer, model);
+    auto resData = commonModule()->dataPool()->data(manufacturer, model);
     auto manufacturerAlias = resData.value<QString>(Qn::ONVIF_VENDOR_SUBTYPE);
 
     manufacturerAlias = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;

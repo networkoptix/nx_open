@@ -102,7 +102,7 @@ void QnMergeSystemsDialog::done(int result)
         context()->instance<QnWorkbenchUserWatcher>()->setUserName(m_remoteOwnerCredentials.user());
         context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_remoteOwnerCredentials.password());
 
-        QUrl url = QnAppServerConnectionFactory::url();
+        QUrl url = commonModule()->currentUrl();
         url.setUserName(m_remoteOwnerCredentials.user());
         url.setPassword(m_remoteOwnerCredentials.password());
         QnAppServerConnectionFactory::setUrl(url);

@@ -86,7 +86,7 @@ bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, cons
     }
 
     QnAudioTransmitterPtr transmitter;
-    if (mServer->getId() == qnCommon->moduleGUID())
+    if (mServer->getId() == commonModule()->moduleGUID())
     {
         transmitter = resource->getAudioTransmitter();
     }

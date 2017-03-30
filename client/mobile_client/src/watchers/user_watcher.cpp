@@ -25,7 +25,7 @@ QnUserResourcePtr findUser(const QString& userName)
        This is enough to make the cameras watcher working but not semantically correct.
    */
     const auto serverId = QnUuid::fromStringSafe(userName);
-    if (!serverId.isNull() && qnCommon->remoteGUID() == serverId)
+    if (!serverId.isNull() && commonModule()->remoteGUID() == serverId)
         return resourcePool()->getAdministrator();
 
     for (const auto& user: users)

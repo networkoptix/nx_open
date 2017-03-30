@@ -553,7 +553,7 @@ namespace nx_hls
             {
                 //TODO #ak check that request has been proxied via media server, not regular Http proxy
                 const QString& currentPath = playlistData.url.path();
-                playlistData.url.setPath( lit("/proxy/%1/%2").arg(formatGUID(qnCommon->moduleGUID())).
+                playlistData.url.setPath( lit("/proxy/%1/%2").arg(formatGUID(commonModule()->moduleGUID())).
                     arg(currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath) );
             }
         }
@@ -679,7 +679,7 @@ namespace nx_hls
             {
                 //TODO #ak check that request has been proxied via media server, not regular Http proxy
                 const QString& currentPath = baseChunkUrl.path();
-                baseChunkUrl.setPath( lit("/proxy/%1/%2").arg(formatGUID(qnCommon->moduleGUID())).
+                baseChunkUrl.setPath( lit("/proxy/%1/%2").arg(formatGUID(commonModule()->moduleGUID())).
                     arg(currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath) );
             }
         }

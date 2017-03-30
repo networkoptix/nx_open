@@ -52,8 +52,8 @@ QnReconnectHelper::InterfaceInfo::InterfaceInfo():
 
 QnReconnectHelper::QnReconnectHelper(QObject *parent /* = NULL*/):
     QObject(parent),
-    m_currentServer(qnCommon->currentServer()),
-    m_currentUrl(QnAppServerConnectionFactory::url())
+    m_currentServer(commonModule()->currentServer()),
+    m_currentUrl(commonModule()->currentUrl())
 {
     m_userName = m_currentUrl.userName();
     m_password = m_currentUrl.password();

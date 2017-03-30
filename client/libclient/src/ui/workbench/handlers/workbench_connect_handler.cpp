@@ -362,7 +362,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
 
 
             /* Check if we need to log out if logged in under this user. */
-            QString currentLogin = QnAppServerConnectionFactory::url().userName();
+            QString currentLogin = commonModule()->currentUrl().userName();
             NX_ASSERT(!currentLogin.isEmpty());
             if (currentLogin.isEmpty())
                 return;
@@ -740,7 +740,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
     connect(qnRuntimeInfoManager, &QnRuntimeInfoManager::runtimeInfoChanged, this,
         [this](const QnPeerRuntimeInfo &info)
         {
-            if (info.uuid != qnCommon->moduleGUID())
+            if (info.uuid != commonModule()->moduleGUID())
                 return;
 
             /* We can get here during disconnect process */
@@ -767,7 +767,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
                 qnSyncTime->updateTime(syncTime);
         });
 
-    qnCommon->setReadOnly(connection->connectionInfo().ecDbReadOnly);
+    commonModule()->setReadOnly(connection->connectionInfo().ecDbReadOnly);
 }
 
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed()
@@ -853,7 +853,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered()
         disconnectFromServer(true);
     }
 
-    qnCommon->updateRunningInstanceGuid();
+    commonModule()->updateRunningInstanceGuid();
 
     QnActionParameters parameters = menu()->currentParameters(sender());
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
@@ -927,7 +927,7 @@ void QnWorkbenchConnectHandler::at_reconnectAction_triggered()
     if (m_logicalState != LogicalState::connected)
         return;
 
-    QUrl currentUrl = QnAppServerConnectionFactory::url();
+    QUrl currentUrl = commonModule()->currentUrl();
     disconnectFromServer(true);
 
     // Do not store connections in case of reconnection
@@ -1095,7 +1095,7 @@ void QnWorkbenchConnectHandler::clearConnection()
     qnStatusDictionary->clear(idList);
 
     licensePool()->reset();
-    qnCommon->setReadOnly(false);
+    commonModule()->setReadOnly(false);
 }
 
 void QnWorkbenchConnectHandler::testConnectionToServer(
@@ -1118,7 +1118,7 @@ void QnWorkbenchConnectHandler::testConnectionToServer(
 
 bool QnWorkbenchConnectHandler::tryToRestoreConnection()
 {
-    QUrl currentUrl = QnAppServerConnectionFactory::url();
+    QUrl currentUrl = commonModule()->currentUrl();
     NX_ASSERT(!currentUrl.isEmpty());
     if (currentUrl.isEmpty())
         return false;

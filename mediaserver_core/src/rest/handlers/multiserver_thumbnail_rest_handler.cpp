@@ -67,7 +67,7 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(const QnThumbnailRequestDat
     }
 
     auto server = targetServer(request);
-    if (!server || server->getId() == qnCommon->moduleGUID() || server->getStatus() != Qn::Online)
+    if (!server || server->getId() == commonModule()->moduleGUID() || server->getStatus() != Qn::Online)
         return getThumbnailLocal(request, result, contentType);
 
     return getThumbnailRemote(server, request, result, contentType, ownerPort);
@@ -75,7 +75,7 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(const QnThumbnailRequestDat
 
 QnMediaServerResourcePtr QnMultiserverThumbnailRestHandler::targetServer( const QnThumbnailRequestData &request ) const
 {
-    auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
 
     if (request.isLocal)
         return currentServer;

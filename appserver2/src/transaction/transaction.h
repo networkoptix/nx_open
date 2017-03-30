@@ -1330,7 +1330,7 @@ APPLY(10101, getMiscParam, ApiMiscData, \
         typedef Timestamp TimestampType;
 
         /**
-         * Sets \a QnAbstractTransaction::peerID to \a qnCommon->moduleGUID().
+         * Sets \a QnAbstractTransaction::peerID to \a commonModule()->moduleGUID().
          */
         QnAbstractTransaction():
             command(ApiCommand::NotDefined),

@@ -559,7 +559,7 @@ void QnMediaResourceWidget::invokeTrigger(const QString& id, const QnUuid& resou
                 cl_logERROR);
         };
 
-    qnCommon->currentServer()->restConnection()->softwareTriggerCommand(
+    commonModule()->currentServer()->restConnection()->softwareTriggerCommand(
         resourceId, id, responseHandler, QThread::currentThread());
 }
 

@@ -460,7 +460,7 @@ void ActionHandler::openNewWindow(const QStringList &args) {
     {
         arguments << lit("--auth");
         arguments << QnStartupParameters::createAuthenticationString(
-            QnAppServerConnectionFactory::url());
+            commonModule()->currentUrl());
     }
 
     if (mainWindow())
@@ -1135,7 +1135,7 @@ void ActionHandler::at_webClientAction_triggered()
     static const auto kPath = lit("/static/index.html");
     static const auto kFragment = lit("/view");
 
-    const auto server = qnCommon->currentServer();
+    const auto server = commonModule()->currentServer();
     if (!server)
         return;
 
@@ -2002,7 +2002,7 @@ void ActionHandler::at_browseUrlAction_triggered() {
 
 void ActionHandler::at_versionMismatchMessageAction_triggered()
 {
-    if (qnCommon->isReadOnly())
+    if (commonModule()->isReadOnly())
         return;
 
     if (qnRuntime->ignoreVersionMismatch())
@@ -2114,7 +2114,7 @@ void ActionHandler::checkIfStatisticsReportAllowed() {
         return;
 
     /* User cannot disable statistics collecting, so don't make him sorrow. */
-    if (qnCommon->isReadOnly())
+    if (commonModule()->isReadOnly())
         return;
 
     /* Suppress notification if no server has internet access. */
@@ -2245,7 +2245,7 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
 
     for (const auto& request: requests)
     {
-        const auto appserverUrl = QnAppServerConnectionFactory::url();
+        const auto appserverUrl = commonModule()->currentUrl();
         const auto authParam = createHttpQueryAuthParam(
             appserverUrl.userName(), appserverUrl.password(),
             auth.realm, nx_http::Method::GET, auth.nonce.toUtf8());

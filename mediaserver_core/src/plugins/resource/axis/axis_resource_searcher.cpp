@@ -117,7 +117,7 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const QUrl& url, co
     if (typeId.isNull())
         return QList<QnResourcePtr>();
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = commonModule()->dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 
@@ -222,7 +222,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
         }
     }
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = commonModule()->dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return local_results; // model forced by ONVIF
 
@@ -297,7 +297,7 @@ QAuthenticator QnPlAxisResourceSearcher::determineResourceCredentials(
     if (existingResource)
         return existingResource->getAuth();
 
-    auto resData = qnCommon->dataPool()->data(resource->getVendor(), resource->getModel());
+    auto resData = commonModule()->dataPool()->data(resource->getVendor(), resource->getModel());
     auto possibleCredentials = resData.value<QList<nx::common::utils::Credentials>>(
         Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 

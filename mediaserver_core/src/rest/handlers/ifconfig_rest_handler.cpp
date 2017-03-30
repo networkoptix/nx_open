@@ -277,7 +277,7 @@ int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParam
     Q_UNUSED(path)
     Q_UNUSED(params)
 
-    QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (!mServer) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error"));
         return CODE_OK;

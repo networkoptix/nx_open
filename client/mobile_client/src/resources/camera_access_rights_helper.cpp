@@ -30,7 +30,7 @@ QnCameraAccessRightsHelper::QnCameraAccessRightsHelper(QObject *parent)
 {
     Q_D(QnCameraAccessRightsHelper);
 
-    QnUserWatcher *userWatcher = qnCommon->instance<QnUserWatcher>();
+    QnUserWatcher *userWatcher = commonModule()->instance<QnUserWatcher>();
     connect(userWatcher, &QnUserWatcher::userChanged, d, &QnCameraAccessRightsHelperPrivate::at_userWatcher_userChanged);
     d->user = userWatcher->user();
 }

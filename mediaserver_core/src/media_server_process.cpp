@@ -430,7 +430,7 @@ void ffmpegInit()
 
 void calculateSpaceLimitOrLoadFromConfig(const QnFileStorageResourcePtr& fileStorage)
 {
-    const BeforeRestoreDbData& beforeRestoreData = qnCommon->beforeRestoreDbData();
+    const BeforeRestoreDbData& beforeRestoreData = commonModule()->beforeRestoreDbData();
     if (!beforeRestoreData.isEmpty() && beforeRestoreData.hasInfoForStorage(fileStorage->getUrl()))
     {
         fileStorage->setSpaceLimit(beforeRestoreData.getSpaceLimitForStorage(fileStorage->getUrl()));
@@ -1147,7 +1147,7 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
         return;
 
     nx::ServerSetting::setSysIdTime(value);
-    if (sender != qnCommon->moduleGUID())
+    if (sender != commonModule()->moduleGUID())
     {
         MSSettings::roSettings()->setValue(QnServer::kRemoveDbParamName, "1");
         // If system Id has been changed, reset 'database restore time' variable
@@ -1596,7 +1596,7 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
     localInfo.data.publicIP = publicIP.toString();
     QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
 
-    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (server)
     {
         Qn::ServerFlags serverFlags = server->getServerFlags();
@@ -1692,7 +1692,7 @@ void MediaServerProcess::at_timer()
     //TODO: #2.4 #GDM This timer make two totally different functions. Split it.
     MSSettings::runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
 
-    QnResourcePtr mServer = resourcePool()->getResourceById(qnCommon->moduleGUID());
+    QnResourcePtr mServer = resourcePool()->getResourceById(commonModule()->moduleGUID());
     if (!mServer)
         return;
 
@@ -2088,7 +2088,7 @@ void MediaServerProcess::moveHandlingCameras()
         {
             ec2::ApiCameraData apiCameraData;
             fromResourceToApi(camera, apiCameraData);
-            apiCameraData.parentId = qnCommon->moduleGUID(); //< move camera
+            apiCameraData.parentId = commonModule()->moduleGUID(); //< move camera
             camerasToUpdate.push_back(apiCameraData);
         }
     }
@@ -2133,12 +2133,12 @@ void MediaServerProcess::run()
     std::unique_ptr<QnMediaServerModule> module(new QnMediaServerModule(m_cmdLineArguments.enforcedMediatorEndpoint));
 
     if (!m_obsoleteGuid.isNull())
-        qnCommon->setObsoleteServerGuid(m_obsoleteGuid);
+        commonModule()->setObsoleteServerGuid(m_obsoleteGuid);
 
     if (!m_cmdLineArguments.engineVersion.isNull())
     {
         qWarning() << "Starting with overridden version: " << m_cmdLineArguments.engineVersion;
-        qnCommon->setEngineVersion(QnSoftwareVersion(m_cmdLineArguments.engineVersion));
+        commonModule()->setEngineVersion(QnSoftwareVersion(m_cmdLineArguments.engineVersion));
     }
 
     QnCallCountStart(std::chrono::milliseconds(5000));
@@ -2280,26 +2280,26 @@ void MediaServerProcess::run()
 
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
-    qnCommon->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());
-    qnCommon->setUseLowPriorityAdminPasswordHack(settings->value(LOW_PRIORITY_ADMIN_PASSWORD, false).toBool());
+    commonModule()->setDefaultAdminPassword(settings->value(APPSERVER_PASSWORD, QLatin1String("")).toString());
+    commonModule()->setUseLowPriorityAdminPasswordHack(settings->value(LOW_PRIORITY_ADMIN_PASSWORD, false).toBool());
 
     BeforeRestoreDbData beforeRestoreDbData;
     beforeRestoreDbData.loadFromSettings(settings);
-    qnCommon->setBeforeRestoreData(beforeRestoreDbData);
+    commonModule()->setBeforeRestoreData(beforeRestoreDbData);
 
-    qnCommon->setModuleGUID(serverGuid());
-    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("ms", qnCommon->moduleGUID());
+    commonModule()->setModuleGUID(serverGuid());
+    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("ms", commonModule()->moduleGUID());
 
     bool compatibilityMode = m_cmdLineArguments.devModeKey == lit("razrazraz");
     const QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
 
-    qnCommon->setSystemIdentityTime(nx::ServerSetting::getSysIdTime(), qnCommon->moduleGUID());
-    qnCommon->setLocalPeerType(Qn::PT_Server);
-    connect(qnCommon, &QnCommonModule::systemIdentityTimeChanged, this, &MediaServerProcess::at_systemIdentityTimeChanged, Qt::QueuedConnection);
+    commonModule()->setSystemIdentityTime(nx::ServerSetting::getSysIdTime(), commonModule()->moduleGUID());
+    commonModule()->setLocalPeerType(Qn::PT_Server);
+    connect(commonModule(), &QnCommonModule::systemIdentityTimeChanged, this, &MediaServerProcess::at_systemIdentityTimeChanged, Qt::QueuedConnection);
 
     ec2::ApiRuntimeData runtimeData;
-    runtimeData.peer.id = qnCommon->moduleGUID();
-    runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
+    runtimeData.peer.id = commonModule()->moduleGUID();
+    runtimeData.peer.instanceId = commonModule()->runningInstanceGUID();
     runtimeData.peer.peerType = Qn::PT_Server;
     runtimeData.box = QnAppInfo::armBox();
     runtimeData.brand = QnAppInfo::productNameShort();
@@ -2339,7 +2339,7 @@ void MediaServerProcess::run()
     while (!needToStop())
     {
         const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync(
-            QnAppServerConnectionFactory::url(), ec2::ApiClientInfoData(), &ec2Connection );
+            commonModule()->currentUrl(), ec2::ApiClientInfoData(), &ec2Connection );
         if (ec2Connection)
         {
             connectInfo = ec2Connection->connectionInfo();
@@ -2379,7 +2379,7 @@ void MediaServerProcess::run()
     MSSettings::roSettings()->setValue(QnServer::kRemoveDbParamName, "0");
 
     connect(ec2Connection.get(), &ec2::AbstractECConnection::databaseDumped, this, &MediaServerProcess::at_databaseDumped);
-    qnCommon->setRemoteGUID(connectInfo.serverId());
+    commonModule()->setRemoteGUID(connectInfo.serverId());
     MSSettings::roSettings()->sync();
     if (MSSettings::roSettings()->value(PENDING_SWITCH_TO_CLUSTER_MODE).toString() == "yes")
     {
@@ -2462,13 +2462,13 @@ void MediaServerProcess::run()
         return;
 
     if (MSSettings::roSettings()->value("disableTranscoding").toBool())
-        qnCommon->setTranscodeDisabled(true);
+        commonModule()->setTranscodeDisabled(true);
 
     QnResource::startCommandProc();
 
     std::unique_ptr<QnRestProcessorPool> restProcessorPool( new QnRestProcessorPool() );
 
-    if( QnAppServerConnectionFactory::url().scheme().toLower() == lit("file") )
+    if( commonModule()->currentUrl().scheme().toLower() == lit("file") )
         ec2ConnectionFactory->registerRestHandlers( restProcessorPool.get() );
 
     std::unique_ptr<StreamingChunkTranscoder> streamingChunkTranscoder(
@@ -2482,7 +2482,7 @@ void MediaServerProcess::run()
         return;
     }
 
-    std::unique_ptr<QnMulticast::HttpServer> multicastHttp(new QnMulticast::HttpServer(qnCommon->moduleGUID().toQUuid(), m_universalTcpListener));
+    std::unique_ptr<QnMulticast::HttpServer> multicastHttp(new QnMulticast::HttpServer(commonModule()->moduleGUID().toQUuid(), m_universalTcpListener));
 
     using namespace std::placeholders;
     m_universalTcpListener->setProxyHandler<QnProxyConnectionProcessor>(
@@ -2542,7 +2542,7 @@ void MediaServerProcess::run()
 
         // used for statistics reported
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
-        server->setVersion(qnCommon->engineVersion());
+        server->setVersion(commonModule()->engineVersion());
 
         QByteArray settingsAuthKey = nx::ServerSetting::getAuthKey();
         QByteArray authKey = settingsAuthKey;
@@ -2564,7 +2564,7 @@ void MediaServerProcess::run()
                 ec2Connection,
                 server,
                 nx::mserver_aux::isNewServerInstance(
-                    qnCommon->beforeRestoreDbData(),
+                    commonModule()->beforeRestoreDbData(),
                     foundOwnServerInDb,
                     MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0));
         }
@@ -2619,21 +2619,21 @@ void MediaServerProcess::run()
         moduleName = moduleName.mid( qApp->organizationName().length() ).trimmed();
 
     QnModuleInformation selfInformation;
-    selfInformation.id = qnCommon->moduleGUID();
+    selfInformation.id = commonModule()->moduleGUID();
     selfInformation.type = QnModuleInformation::nxMediaServerId();
     selfInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
     selfInformation.systemInformation = QnSystemInformation::currentSystemInformation();
 
     selfInformation.brand = compatibilityMode ? QString() : QnAppInfo::productNameShort();
     selfInformation.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
-    selfInformation.version = qnCommon->engineVersion();
+    selfInformation.version = commonModule()->engineVersion();
     selfInformation.sslAllowed = sslAllowed;
-    selfInformation.runtimeId = qnCommon->runningInstanceGUID();
+    selfInformation.runtimeId = commonModule()->runningInstanceGUID();
     selfInformation.serverFlags = m_mediaServer->getServerFlags();
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
 
-    qnCommon->setModuleInformation(selfInformation);
-    qnCommon->bindModuleinformation(m_mediaServer);
+    commonModule()->setModuleInformation(selfInformation);
+    commonModule()->bindModuleinformation(m_mediaServer);
 
     // show our cloud host value in registry in case of installer will check it
     MSSettings::roSettings()->setValue(QnServer::kIsConnectedToCloudKey,
@@ -2647,7 +2647,7 @@ void MediaServerProcess::run()
             if (!peerId.isNull())
                 allowedPeers << peerId;
         }
-        qnCommon->setAllowedPeers(allowedPeers);
+        commonModule()->setAllowedPeers(allowedPeers);
     }
 
     connect(m_moduleFinder, &QnModuleFinder::moduleConflict, this, &MediaServerProcess::at_serverModuleConflict);
@@ -2717,7 +2717,7 @@ void MediaServerProcess::run()
     auto settingsProxy = nx::mserver_aux::createServerSettingsProxy();
     auto systemNameProxy = nx::mserver_aux::createServerSystemNameProxy();
 
-    nx::mserver_aux::setUpSystemIdentity(qnCommon->beforeRestoreDbData(), settingsProxy.get(), std::move(systemNameProxy));
+    nx::mserver_aux::setUpSystemIdentity(commonModule()->beforeRestoreDbData(), settingsProxy.get(), std::move(systemNameProxy));
 
     BeforeRestoreDbData::clearSettings(settings);
 
@@ -2730,7 +2730,7 @@ void MediaServerProcess::run()
     {
         if (nx::mserver_aux::needToResetSystem(
                     nx::mserver_aux::isNewServerInstance(
-                        qnCommon->beforeRestoreDbData(),
+                        commonModule()->beforeRestoreDbData(),
                         foundOwnServerInDb,
                         MSSettings::roSettings()->value(NO_SETUP_WIZARD).toInt() > 0),
                     settingsProxy.get()))
@@ -2834,7 +2834,7 @@ void MediaServerProcess::run()
 #if 1
     if (ec2Connection->connectionInfo().ecUrl.scheme() == "file") {
         // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
-        qnCommon->setCloudMode(true);
+        commonModule()->setCloudMode(true);
         if (!isDiscoveryDisabled)
             m_moduleFinder->start();
     }
@@ -2848,7 +2848,7 @@ void MediaServerProcess::run()
     disconnect(QnResourceDiscoveryManager::instance(), 0, this, 0);
     disconnect(qnNormalStorageMan, 0, this, 0);
     disconnect(qnBackupStorageMan, 0, this, 0);
-    disconnect(qnCommon, 0, this, 0);
+    disconnect(commonModule(), 0, this, 0);
     disconnect(QnRuntimeInfoManager::instance(), 0, this, 0);
     disconnect(ec2Connection->getTimeNotificationManager().get(), 0, this, 0);
     disconnect(ec2Connection.get(), 0, this, 0);
@@ -2965,7 +2965,7 @@ void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeI
 {
     if (isStopping())
         return;
-    if (runtimeInfo.uuid != qnCommon->moduleGUID())
+    if (runtimeInfo.uuid != commonModule()->moduleGUID())
         return;
 
     commonModule()->ec2Connection()

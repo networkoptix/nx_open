@@ -20,7 +20,7 @@ QnNewSystemServerFlagWatcher::QnNewSystemServerFlagWatcher(QObject* parent /*= n
 
 void QnNewSystemServerFlagWatcher::update()
 {
-    auto server = qnCommon->currentServer();
+    auto server = commonModule()->currentServer();
     NX_ASSERT(server);
     if (!server)
         return;

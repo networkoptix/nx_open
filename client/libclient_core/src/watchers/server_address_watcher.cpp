@@ -2,6 +2,8 @@
 
 #include <api/app_server_connection.h>
 
+#include <common/common_module.h>
+
 #include <network/module_finder.h>
 #include <nx/network/socket_global.h>
 #include <network/direct_module_finder.h>
@@ -16,7 +18,8 @@ const int kMaxUrlsToStore = 8;
 } // namespace
 
 QnServerAddressWatcher::QnServerAddressWatcher(QObject* parent):
-    QObject(parent)
+    QObject(parent),
+    QnCommonModuleAware(parent)
 {
 }
 
@@ -25,7 +28,7 @@ QnServerAddressWatcher::QnServerAddressWatcher(
     const Setter& setter,
     QObject* parent)
     :
-    QObject(parent)
+    QnServerAddressWatcher(parent)
 {
     setAccessors(getter, setter);
 }
@@ -63,7 +66,7 @@ void QnServerAddressWatcher::setAccessors(const Getter& getter, const Setter& se
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionOpened,
         this, [this, directModuleFinderHelper, directModuleFinder, setter]()
         {
-            QUrl url = QnAppServerConnectionFactory::url();
+            QUrl url = commonModule()->currentUrl();
             if (nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
                 return;
 

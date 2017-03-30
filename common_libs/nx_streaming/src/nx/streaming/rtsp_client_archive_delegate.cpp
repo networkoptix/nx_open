@@ -85,8 +85,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_flags |= Flag_CanSendMotion;
     m_flags |= Flag_CanSeekImmediatly;
 
-    m_auth.username = QnAppServerConnectionFactory::url().userName();
-    m_auth.password = QnAppServerConnectionFactory::url().password();
+    m_auth.username = commonModule()->currentUrl().userName();
+    m_auth.password = commonModule()->currentUrl().password();
     m_auth.videowall = QnAppServerConnectionFactory::videowallGuid();
 }
 

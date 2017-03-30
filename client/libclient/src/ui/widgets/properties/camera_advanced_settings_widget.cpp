@@ -149,7 +149,7 @@ void QnCameraAdvancedSettingsWidget::updatePage()
             if (!m_camera || !isStatusValid(m_camera->getStatus()))
                 return Page::Unavailable;
 
-        QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
+        QnResourceData resourceData = commonModule()->dataPool()->data(m_camera);
         bool hasWebPage = resourceData.value<bool>(lit("showUrl"), false);
         if (hasWebPage)
             return Page::Web;
@@ -204,8 +204,8 @@ void QnCameraAdvancedSettingsWidget::reloadData()
         // QUrl doesn't work if it isn't constructed from QString and uses credentials.
         // It stays invalid with error code 'AuthorityPresentAndPathIsRelative'
         //  --rvasilenko, Qt 5.2.1
-        const auto currentServerUrl = QnAppServerConnectionFactory::url();
-        QnResourceData resourceData = qnCommon->dataPool()->data(m_camera);
+        const auto currentServerUrl = commonModule()->currentUrl();
+        QnResourceData resourceData = commonModule()->dataPool()->data(m_camera);
         QUrl targetUrl = QString(lit("http://%1:%2/%3"))
             .arg(currentServerUrl.host())
             .arg(currentServerUrl.port())
@@ -306,8 +306,8 @@ void QnCameraAdvancedSettingsWidget::at_proxyAuthenticationRequired(const QNetwo
     if (!m_camera)
         return;
 
-    QString user = QnAppServerConnectionFactory::url().userName();
-    QString password = QnAppServerConnectionFactory::url().password();
+    QString user = commonModule()->currentUrl().userName();
+    QString password = commonModule()->currentUrl().password();
     authenticator->setUser(user);
     authenticator->setPassword(password);
 }

@@ -100,7 +100,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
             // sort foreign resources to add more important cameras first: check if it is an own cameras, then check failOver priority order
             auto foreignResources = m_tmpForeignResources.values();
-            const QnUuid ownGuid = qnCommon->moduleGUID();
+            const QnUuid ownGuid = commonModule()->moduleGUID();
             std::sort(foreignResources.begin(), foreignResources.end(), [&ownGuid](const QnSecurityCamResourcePtr& leftCam, const QnSecurityCamResourcePtr& rightCam)
             {
                 bool leftOwnServer = leftCam->preferredServerId() == ownGuid;
@@ -207,7 +207,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     newNetRes->update(existCamRes);
                     newCamRes->setManuallyAdded( isDiscoveredManually );
 
-                    newNetRes->setParentId(qnCommon->moduleGUID());
+                    newNetRes->setParentId(commonModule()->moduleGUID());
                     newNetRes->setFlags(existCamRes->flags() & ~Qn::foreigner);
                     newNetRes->setId(existCamRes->getId());
                     newNetRes->addFlags(Qn::parent_change);

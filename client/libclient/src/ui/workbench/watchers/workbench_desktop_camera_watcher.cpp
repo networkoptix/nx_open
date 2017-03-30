@@ -32,7 +32,7 @@ QnWorkbenchDesktopCameraWatcher::~QnWorkbenchDesktopCameraWatcher() {
 }
 
 void QnWorkbenchDesktopCameraWatcher::initialize() {
-    setServer(qnCommon->currentServer());
+    setServer(commonModule()->currentServer());
 }
 
 void QnWorkbenchDesktopCameraWatcher::deinitialize() {

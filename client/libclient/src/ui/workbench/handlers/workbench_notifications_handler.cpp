@@ -69,7 +69,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
             checkAndAddSystemHealthMessage(QnSystemHealth::NoLicenses);
         });
 
-    connect(qnCommon, &QnCommonModule::readOnlyChanged, this,
+    connect(commonModule(), &QnCommonModule::readOnlyChanged, this,
         [this]
         {
             checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
@@ -270,7 +270,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(QnSyst
 {
     bool canShow = true;
 
-    bool connected = !qnCommon->remoteGUID().isNull();
+    bool connected = !commonModule()->remoteGUID().isNull();
 
     if (!connected)
     {
@@ -324,7 +324,7 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
             return;
 
         case QnSystemHealth::SystemIsReadOnly:
-            setSystemHealthEventVisible(message, context()->user() && qnCommon->isReadOnly());
+            setSystemHealthEventVisible(message, context()->user() && commonModule()->isReadOnly());
             return;
 
         case QnSystemHealth::EmailIsEmpty:
@@ -394,7 +394,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened()
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed()
 {
     clear();
-    if (!qnCommon->remoteGUID().isNull())
+    if (!commonModule()->remoteGUID().isNull())
         setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, true);
 }
 

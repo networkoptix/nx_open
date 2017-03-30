@@ -65,7 +65,7 @@ boost::optional<nx::hpm::api::SystemCredentials>
 
     nx::hpm::api::SystemCredentials cloudCredentials;
     cloudCredentials.systemId = cloudSystemId.toUtf8();
-    cloudCredentials.serverId = qnCommon->moduleGUID().toByteArray();
+    cloudCredentials.serverId = commonModule()->moduleGUID().toByteArray();
     cloudCredentials.key = cloudAuthKey.toUtf8();
     return cloudCredentials;
 }
@@ -86,7 +86,7 @@ void CloudConnectionManager::setCloudCredentials(
     {
         nx::hpm::api::SystemCredentials credentials(
             cloudSystemId.toUtf8(),
-            qnCommon->moduleGUID().toSimpleString().toUtf8(),
+            commonModule()->moduleGUID().toSimpleString().toUtf8(),
             cloudAuthKey.toUtf8());
 
         nx::network::SocketGlobals::mediatorConnector()
@@ -123,7 +123,7 @@ std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnec
     QString proxyLogin;
     QString proxyPassword;
 
-    auto server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (server)
     {
         proxyLogin = server->getId().toString();

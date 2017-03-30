@@ -339,7 +339,7 @@ CameraDiagnostics::Result QnActiResource::initInternal()
 
     updateDefaultAuthIfEmpty(lit("admin"), lit("123456"));
 
-    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = commonModule()->dataPool()->data(toSharedPointer(this));
 
     auto serverReport = makeActiRequest(
         lit("system"),
@@ -1404,7 +1404,7 @@ void QnActiResource::fetchAndSetAdvancedParameters()
 
 QString QnActiResource::getAdvancedParametersTemplate() const
 {
-    QnResourceData resourceData = qnCommon->dataPool()->data(getVendor(), getModel());
+    QnResourceData resourceData = commonModule()->dataPool()->data(getVendor(), getModel());
     auto advancedParametersTemplate = resourceData.value<QString>(ADVANCED_PARAMETERS_TEMPLATE_PARAMETER_NAME);
     return advancedParametersTemplate.isEmpty() ?
         DEFAULT_ADVANCED_PARAMETERS_TEMPLATE : advancedParametersTemplate;

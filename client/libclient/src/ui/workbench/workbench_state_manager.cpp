@@ -34,7 +34,7 @@ bool QnWorkbenchStateManager::tryClose(bool force)
     *  We can detect it by `workbench()->currentLayoutIndex() == -1` check.
     */
     bool canSaveState =
-        !qnCommon->remoteGUID().isNull()
+        !commonModule()->remoteGUID().isNull()
         && qnRuntime->isDesktopMode()
         && context()->user()
         && !helpers::currentSystemIsNew()

@@ -243,7 +243,7 @@ bool QnUniversalRequestProcessor::isProxy(const nx_http::Request& request)
     {
         // is proxy to other media server
         QnUuid desiredServerGuid(xServerGuidIter->second);
-        if (desiredServerGuid != qnCommon->moduleGUID())
+        if (desiredServerGuid != commonModule()->moduleGUID())
             return true;
     }
 

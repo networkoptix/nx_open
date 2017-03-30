@@ -1657,7 +1657,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
         if (!loginInfo.clientInfo.id.isNull())
         {
             auto clientInfo = loginInfo.clientInfo;
-            clientInfo.parentId = qnCommon->moduleGUID();
+            clientInfo.parentId = commonModule()->moduleGUID();
 
             ApiClientInfoDataList infoList;
             auto result = dbManager(Qn::kSystemAccess).doQuery(clientInfo.id, infoList);

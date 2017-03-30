@@ -218,7 +218,7 @@ QnResourceList ThirdPartyResourceSearcher::findResources()
 QnResourceList ThirdPartyResourceSearcher::doCustomSearch()
 {
     QString dafaultURL;
-    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if( server )
         dafaultURL = server->getApiUrl().toString();
 
@@ -312,7 +312,7 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
         //new resource
         //TODO #ak reading MaxFPS here is a workaround of camera integration API defect:
             //it does not not allow plugin to return hard-coded max fps, it can only be read in initInternal
-        const QnResourceData& resourceData = qnCommon->dataPool()->data(resource);
+        const QnResourceData& resourceData = commonModule()->dataPool()->data(resource);
         const float maxFps = resourceData.value<float>( Qn::MAX_FPS_PARAM_NAME, 0.0 );
         if( maxFps > 0.0 )
             resource->setProperty( Qn::MAX_FPS_PARAM_NAME, maxFps);

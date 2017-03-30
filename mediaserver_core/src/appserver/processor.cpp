@@ -59,7 +59,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         // but now (new version) camera NOT in resource pool!
 
         QString urlStr = camera->getUrl();
-        const QnResourceData resourceData = qnCommon->dataPool()->data(camera);
+        const QnResourceData resourceData = commonModule()->dataPool()->data(camera);
         if (resourceData.contains(QString("ignoreMultisensors")))
             urlStr = urlStr.left(urlStr.indexOf('?'));
 
@@ -77,8 +77,8 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
 
 void QnAppserverResourceProcessor::addNewCamera(const QnVirtualCameraResourcePtr& cameraResource)
 {
-    bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferredServerId() == qnCommon->moduleGUID(); // return camera back without mutex
-    QnMediaServerResourcePtr ownServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    bool isOwnChangeParentId = cameraResource->hasFlags(Qn::parent_change) && cameraResource->preferredServerId() == commonModule()->moduleGUID(); // return camera back without mutex
+    QnMediaServerResourcePtr ownServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     const bool takeCameraWithoutLock =
         (ownServer && (ownServer->getServerFlags() & Qn::SF_Edge) && !ownServer->isRedundancy()) ||
         qnGlobalSettings->takeCameraOwnershipWithoutLock() ||
@@ -142,7 +142,7 @@ void QnAppserverResourceProcessor::readDefaultUserAttrs()
     ec2::ApiCameraAttributesData userAttrsData;
     if (!QJson::deserialize(data, &userAttrsData))
         return;
-    userAttrsData.preferredServerId = qnCommon->moduleGUID();
+    userAttrsData.preferredServerId = commonModule()->moduleGUID();
     m_defaultUserAttrs = QnCameraUserAttributesPtr(new QnCameraUserAttributes());
     fromApiToResource(userAttrsData, m_defaultUserAttrs);
 }

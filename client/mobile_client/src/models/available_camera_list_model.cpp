@@ -162,7 +162,7 @@ void QnAvailableCameraListModelPrivate::setLayout(const QnLayoutResourcePtr& new
 
 void QnAvailableCameraListModelPrivate::resetResources()
 {
-    const auto* camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
+    const auto* camerasWatcher = commonModule()->instance<QnAvailableCamerasWatcher>();
 
     Q_Q(QnAvailableCameraListModel);
 
@@ -183,7 +183,7 @@ void QnAvailableCameraListModelPrivate::resetResources()
     }
     else
     {
-        const auto* camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
+        const auto* camerasWatcher = commonModule()->instance<QnAvailableCamerasWatcher>();
         const auto cameras = camerasWatcher->availableCameras();
         for (const auto& camera: cameras)
             addCamera(camera, true);

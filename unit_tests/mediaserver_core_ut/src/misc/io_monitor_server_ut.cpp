@@ -94,7 +94,7 @@ static void prepareDbTestData(const MediaServerLauncher* const launcher)
     auto resTypePtr = qnResTypePool->getResourceType(resTypeId);
     ASSERT_FALSE(resTypePtr.isNull());
     cameraData.typeId = resTypePtr->getId();
-    cameraData.parentId = qnCommon->moduleGUID();
+    cameraData.parentId = commonModule()->moduleGUID();
     cameraData.vendor = QnTestCameraResource::kManufacturer;
     cameraData.physicalId = kTestCamPhysicalId;
     cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);

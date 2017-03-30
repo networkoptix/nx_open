@@ -93,7 +93,7 @@ void QnCheckFreeSpacePeerTask::doStart()
                 finish(NotEnoughFreeSpaceError, failed);
         };
 
-    const auto currentServer = qnCommon->currentServer();
+    const auto currentServer = commonModule()->currentServer();
     if (!currentServer)
     {
         finish(CheckFailed);
@@ -107,7 +107,7 @@ void QnCheckFreeSpacePeerTask::doCancel()
 {
     if (m_requestId >= 0)
     {
-        const auto currentServer = qnCommon->currentServer();
+        const auto currentServer = commonModule()->currentServer();
         if (currentServer)
             currentServer->restConnection()->cancelRequest(m_requestId);
         m_requestId = -1;

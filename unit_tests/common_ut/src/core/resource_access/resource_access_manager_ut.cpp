@@ -132,7 +132,7 @@ TEST_F(QnResourceAccessManagerTest, checkLockedLayoutAsAdmin)
 TEST_F(QnResourceAccessManagerTest, checkLayoutAsAdminSafeMode)
 {
     loginAsOwner();
-    qnCommon->setReadOnly(true);
+    commonModule()->setReadOnly(true);
 
     auto layout = createLayout(Qn::remote);
     resourcePool()->addResource(layout);
@@ -148,7 +148,7 @@ TEST_F(QnResourceAccessManagerTest, checkLayoutAsAdminSafeMode)
 TEST_F(QnResourceAccessManagerTest, checkLockedLayoutAsAdminSafeMode)
 {
     loginAsOwner();
-    qnCommon->setReadOnly(true);
+    commonModule()->setReadOnly(true);
 
     auto layout = createLayout(Qn::remote, true);
     resourcePool()->addResource(layout);
@@ -197,7 +197,7 @@ TEST_F(QnResourceAccessManagerTest, checkLockedLayoutAsViewer)
 TEST_F(QnResourceAccessManagerTest, checkLayoutAsViewerSafeMode)
 {
     loginAs(Qn::GlobalLiveViewerPermissionSet);
-    qnCommon->setReadOnly(true);
+    commonModule()->setReadOnly(true);
 
     auto layout = createLayout(Qn::remote);
     resourcePool()->addResource(layout);
@@ -213,7 +213,7 @@ TEST_F(QnResourceAccessManagerTest, checkLayoutAsViewerSafeMode)
 TEST_F(QnResourceAccessManagerTest, checkLockedLayoutAsViewerSafeMode)
 {
     loginAs(Qn::GlobalLiveViewerPermissionSet);
-    qnCommon->setReadOnly(true);
+    commonModule()->setReadOnly(true);
 
     auto layout = createLayout(Qn::remote, true);
     resourcePool()->addResource(layout);
@@ -729,7 +729,7 @@ TEST_F(QnResourceAccessManagerTest, checkVideowallAsAdmin)
 TEST_F(QnResourceAccessManagerTest, checkVideowallAsAdminInSafeMode)
 {
     loginAsOwner();
-    qnCommon->setReadOnly(true);
+    commonModule()->setReadOnly(true);
 
     auto videowall = addVideoWall();
 
@@ -757,7 +757,7 @@ TEST_F(QnResourceAccessManagerTest, checkVideowallAsController)
 TEST_F(QnResourceAccessManagerTest, checkVideowallAsControllerInSafeMode)
 {
     loginAs(Qn::GlobalCustomUserPermission | Qn::GlobalControlVideoWallPermission);
-    qnCommon->setReadOnly(true);
+    commonModule()->setReadOnly(true);
 
     auto videowall = addVideoWall();
 

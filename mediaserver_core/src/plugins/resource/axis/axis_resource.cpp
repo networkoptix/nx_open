@@ -1016,7 +1016,7 @@ void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPt
 
 void QnPlAxisResource::onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient )
 {
-    if (getParentId() != qnCommon->moduleGUID() || !isInitialized())
+    if (getParentId() != commonModule()->moduleGUID() || !isInitialized())
         return;
     QnMutexLocker lk( &m_inputPortMutex );
     if (httpClient == m_ioHttpMonitor[0].httpClient) {
@@ -1521,7 +1521,7 @@ void QnPlAxisResource::fetchAndSetAdvancedParameters()
         return;
     }
 
-    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = commonModule()->dataPool()->data(toSharedPointer(this));
     auto overloads = resData.value<std::vector<QnCameraAdvancedParameterOverload>>(
                 Qn::ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME);
 

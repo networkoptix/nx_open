@@ -64,10 +64,10 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     safeModeWatcher->addControlledWidget(smtpWidget, QnWorkbenchSafeModeWatcher::ControlMode::MakeReadOnly);
     safeModeWatcher->addControlledWidget(routingWidget, QnWorkbenchSafeModeWatcher::ControlMode::MakeReadOnly);
 
-    connect(qnCommon, &QnCommonModule::readOnlyChanged, this, [this](bool readOnly){
+    connect(commonModule(), &QnCommonModule::readOnlyChanged, this, [this](bool readOnly){
         setPageEnabled(UpdatesPage, !readOnly);
     });
-    setPageEnabled(UpdatesPage, !qnCommon->isReadOnly());
+    setPageEnabled(UpdatesPage, !commonModule()->isReadOnly());
 }
 
 QnSystemAdministrationDialog::~QnSystemAdministrationDialog()

@@ -59,7 +59,7 @@ int QnSetTimeRestHandler::execute(
     QnJsonRestResult& result)
 {
     QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(
-        qnCommon->moduleGUID());
+        commonModule()->moduleGUID());
     if (!mServer)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error"));

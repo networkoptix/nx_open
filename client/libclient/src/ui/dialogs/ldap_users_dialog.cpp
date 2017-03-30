@@ -71,7 +71,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
 
     if (!serverConnection)
     {
-        QnMediaServerResourcePtr server = qnCommon->currentServer();
+        QnMediaServerResourcePtr server = commonModule()->currentServer();
 
         Q_ASSERT(server);
         if (!server)

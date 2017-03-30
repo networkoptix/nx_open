@@ -232,6 +232,11 @@ void QnClientModule::startLocalSearchers()
     QnResourceDiscoveryManager::instance()->start();
 }
 
+QnCommonModule* QnClientModule::commonModule()
+{
+    return m_commonModule;
+}
+
 void QnClientModule::initMetaInfo()
 {
     Q_INIT_RESOURCE(appserver2);

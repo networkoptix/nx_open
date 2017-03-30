@@ -155,7 +155,7 @@ int QnUpdateInformationRestHandler::executeGet(
     if (path.endsWith(lit("/freeSpaceForUpdateFiles")))
     {
         QnUpdateFreeSpaceReply reply;
-        const auto moduleGuid = qnCommon->moduleGUID();
+        const auto moduleGuid = commonModule()->moduleGUID();
         reply.freeSpaceByServerId[moduleGuid] = freeSpaceForUpdate();
 
         if (!request.isLocal)

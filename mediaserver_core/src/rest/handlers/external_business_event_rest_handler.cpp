@@ -69,7 +69,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const Qn
 
     if (businessParams.eventTimestampUsec == 0)
         businessParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
-    businessParams.sourceServerId = qnCommon->moduleGUID();
+    businessParams.sourceServerId = commonModule()->moduleGUID();
 
     if (businessParams.eventType == QnBusiness::UndefinedEvent)
         businessParams.eventType = QnBusiness::UserDefinedEvent; // default value for type is 'CustomEvent'

@@ -44,7 +44,7 @@ void createData(const Appserver2Ptr& server)
     auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
     ASSERT_TRUE(!resTypePtr.isNull());
     cameraData.typeId = resTypePtr->getId();
-    //cameraData.parentId = qnCommon->moduleGUID();
+    //cameraData.parentId = commonModule()->moduleGUID();
     cameraData.vendor = "Invalid camera";
     cameraData.physicalId = QnUuid::createUuid().toString();
     cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);

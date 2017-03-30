@@ -473,7 +473,7 @@ void QnProgressiveDownloadingConsumer::run()
     Q_D(QnProgressiveDownloadingConsumer);
     initSystemThreadId();
 
-    if (qnCommon->isTranscodeDisabled())
+    if (commonModule()->isTranscodeDisabled())
     {
         d->response.messageBody = QByteArray("Video transcoding is disabled in the server settings. Feature unavailable.");
         sendResponse(CODE_NOT_IMPLEMETED, "text/plain");

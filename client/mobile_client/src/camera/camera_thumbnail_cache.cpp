@@ -120,7 +120,7 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
     if (!camera)
         return;
 
-    QnMediaServerResourcePtr server = qnCommon->currentServer();
+    QnMediaServerResourcePtr server = commonModule()->currentServer();
     if (!server)
         return;
 

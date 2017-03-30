@@ -13,7 +13,7 @@ QnStorageDbPool::QnStorageDbPool():
 
 QString QnStorageDbPool::getLocalGuid()
 {
-    QString simplifiedGUID = qnCommon->moduleGUID().toString();
+    QString simplifiedGUID = commonModule()->moduleGUID().toString();
     simplifiedGUID = simplifiedGUID.replace("{", "");
     simplifiedGUID = simplifiedGUID.replace("}", "");
     return simplifiedGUID;

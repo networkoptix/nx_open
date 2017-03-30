@@ -279,7 +279,7 @@ void QnStatisticsManager::sendStatistics()
     if (totalFiltered.empty())
         return;
 
-    const auto server = qnCommon->currentServer();
+    const auto server = commonModule()->currentServer();
     if (!server)
         return;
 

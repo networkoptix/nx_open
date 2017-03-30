@@ -190,7 +190,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
     //TODO: #GDM Code duplication with QnResourceAccessManager::calculatePermissionsInternal
     auto checkReadOnly = [this](Qn::Permissions permissions)
     {
-        if (!qnCommon->isReadOnly())
+        if (!commonModule()->isReadOnly())
             return permissions;
         return permissions &~ (Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission);
     };

@@ -239,7 +239,7 @@ int SettingsActionHandler::executeGet(const QnRequestParamList &params
 
 nx_http::StatusCode::Value SettingsActionHandler::loadSettingsLocally(QnStatisticsSettings &outputSettings)
 {
-    const auto moduleGuid = qnCommon->moduleGUID();
+    const auto moduleGuid = commonModule()->moduleGUID();
     const auto server = resourcePool()->getResourceById<QnMediaServerResource>(moduleGuid);
     if (!server || !hasInternetConnection(server))
         return nx_http::StatusCode::serviceUnavailable;
@@ -326,7 +326,7 @@ nx_http::StatusCode::Value SendStatisticsActionHandler::sendStatisticsLocally(
     const QByteArray &metricsList
     , const QString &statisticsServerUrl)
 {
-    const auto moduleGuid = qnCommon->moduleGUID();
+    const auto moduleGuid = commonModule()->moduleGUID();
     const auto server = resourcePool()->getResourceById<QnMediaServerResource>(moduleGuid);
     if (!server || !hasInternetConnection(server))
         return nx_http::StatusCode::notAcceptable;

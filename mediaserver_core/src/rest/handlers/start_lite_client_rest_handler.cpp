@@ -57,7 +57,7 @@ int QnStartLiteClientRestHandler::executeGet(
 #endif // 0
     }
 
-    auto server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (!server)
     {
         NX_ASSERT(false);

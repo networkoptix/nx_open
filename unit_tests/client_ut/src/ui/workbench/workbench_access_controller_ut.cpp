@@ -142,7 +142,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayouts)
     checkPermissions(layout, desired, forbidden);
 
     /* ...even in safe mode. */
-    qnCommon->setReadOnly(true);
+    commonModule()->setReadOnly(true);
     checkPermissions(layout, desired, forbidden);
 }
 
@@ -166,7 +166,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayoutsLocked)
     checkPermissions(layout, desired, forbidden);
 
     /* ...even in safe mode. */
-    qnCommon->setReadOnly(true);
+    commonModule()->setReadOnly(true);
     checkPermissions(layout, desired, forbidden);
 }
 
@@ -240,7 +240,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedIn)
 TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedInSafeMode)
 {
     loginAs(Qn::GlobalLiveViewerPermissionSet);
-    qnCommon->setReadOnly(true);
+    commonModule()->setReadOnly(true);
 
     auto layout = createLayout(Qn::local);
     resourcePool()->addResource(layout);
@@ -261,7 +261,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedInSafeMode)
 TEST_F(QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedInSafeMode)
 {
     loginAs(Qn::GlobalLiveViewerPermissionSet);
-    qnCommon->setReadOnly(true);
+    commonModule()->setReadOnly(true);
 
     auto layout = createLayout(Qn::local, true);
     resourcePool()->addResource(layout);

@@ -298,7 +298,7 @@ int QnMergeSystemsRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     bool isDefaultSystemName;
     if (data.takeRemoteSettings)
         isDefaultSystemName = remoteModuleInformation.serverFlags.testFlag(Qn::SF_NewSystem);
@@ -374,14 +374,14 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     bool oneServer,
     const QnRestConnectionProcessor* owner)
 {
-    auto server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (!server)
         return false;
     Q_ASSERT(!server->getAuthKey().isEmpty());
 
     ConfigureSystemData data;
     data.localSystemId = qnGlobalSettings->localSystemId();
-    data.sysIdTime = qnCommon->systemIdentityTime();
+    data.sysIdTime = commonModule()->systemIdentityTime();
     ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
     data.tranLogTime = ec2Connection->getTransactionLogTime();
     data.wholeSystem = !oneServer;
@@ -533,7 +533,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
         ConfigureSystemData data;
         data.localSystemId = systemId;
         data.wholeSystem = true;
-        data.sysIdTime = qnCommon->systemIdentityTime();
+        data.sysIdTime = commonModule()->systemIdentityTime();
         ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
         data.tranLogTime = ec2Connection->getTransactionLogTime();
         data.rewriteLocalSettings = true;
@@ -569,7 +569,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
 
     // put current server info to a foreign system to allow authorization via server key
     {
-        QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+        QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
         if (!mServer)
             return false;
         ec2::ApiMediaServerData currentServer;

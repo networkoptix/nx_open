@@ -84,7 +84,7 @@ void QnLdapSettingsDialogPrivate::testSettings() {
 
     if (!serverConnection)
     {
-        QnMediaServerResourcePtr server = qnCommon->currentServer();
+        QnMediaServerResourcePtr server = commonModule()->currentServer();
 
         if (!server)
         {

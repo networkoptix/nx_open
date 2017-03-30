@@ -174,7 +174,7 @@ void QnServerMessageProcessor::onResourceStatusChanged(
     Qn::ResourceStatus status,
     ec2::NotificationSource source)
 {
-    if (resource->getId() == qnCommon->moduleGUID() && status != Qn::Online)
+    if (resource->getId() == commonModule()->moduleGUID() && status != Qn::Online)
     {
         // it's own server. change status to online
         // it's own server. change status to online
@@ -183,7 +183,7 @@ void QnServerMessageProcessor::onResourceStatusChanged(
         manager->setResourceStatusSync(resource->getId(), Qn::Online);
         resource->setStatus(Qn::Online, Qn::StatusChangeReason::GotFromRemotePeer);
     }
-    else if (resource->getParentId() == qnCommon->moduleGUID() &&
+    else if (resource->getParentId() == commonModule()->moduleGUID() &&
         resource.dynamicCast<QnStorageResource>())
     {
         NX_LOG(lit("%1 Received statusChanged signal for storage %2 from remote peer. This storage is our own resource. Ignoring.")
@@ -205,7 +205,7 @@ bool QnServerMessageProcessor::isLocalAddress(const QString& addr) const
     if (addr == "localhost" || addr == "127.0.0.1")
         return true;
     if( !m_mServer )
-        m_mServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+        m_mServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (m_mServer)
     {
         HostAddress hostAddr(addr);
@@ -258,12 +258,12 @@ void QnServerMessageProcessor::at_remotePeerUnauthorized(const QnUuid& id)
 bool QnServerMessageProcessor::canRemoveResource(const QnUuid& resourceId)
 {
     QnResourcePtr res = resourcePool()->getResourceById(resourceId);
-    bool isOwnServer = (res && res->getId() == qnCommon->moduleGUID());
+    bool isOwnServer = (res && res->getId() == commonModule()->moduleGUID());
     if (isOwnServer)
         return false;
 
     QnStorageResourcePtr storage = res.dynamicCast<QnStorageResource>();
-    bool isOwnStorage = (storage && storage->getParentId() == qnCommon->moduleGUID());
+    bool isOwnStorage = (storage && storage->getParentId() == commonModule()->moduleGUID());
     if (!isOwnStorage)
         return true;
 
@@ -274,8 +274,8 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
 {
     QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(resourceId);
     QnStorageResourcePtr storage = resourcePool()->getResourceById<QnStorageResource>(resourceId);
-    bool isOwnServer = (mServer && mServer->getId() == qnCommon->moduleGUID());
-    bool isOwnStorage = (storage && storage->getParentId() == qnCommon->moduleGUID());
+    bool isOwnServer = (mServer && mServer->getId() == commonModule()->moduleGUID());
+    bool isOwnStorage = (storage && storage->getParentId() == commonModule()->moduleGUID());
     if (isOwnServer)
     {
         ec2::ApiMediaServerData apiServer;

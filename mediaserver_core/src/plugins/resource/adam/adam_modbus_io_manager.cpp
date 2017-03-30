@@ -223,7 +223,7 @@ bool QnAdamModbusIOManager::initializeIO()
 
     auto securityResource = dynamic_cast<QnSecurityCamResource*>(m_resource);
 
-    auto resourceData = qnCommon->dataPool()->data(
+    auto resourceData = commonModule()->dataPool()->data(
         securityResource->getVendor(),
         securityResource->getModel());
 

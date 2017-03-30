@@ -146,7 +146,7 @@ void QnUpdateProcess::downloadUpdates() {
         }
     }
 
-    if (qnCommon->engineVersion() != m_target.version && !m_clientRequiresInstaller) {
+    if (commonModule()->engineVersion() != m_target.version && !m_clientRequiresInstaller) {
         QString fileName = m_clientUpdateFile->fileName;
         if (fileName.isEmpty())
             fileName = updateFilePath(m_clientUpdateFile->baseFileName);
@@ -157,7 +157,7 @@ void QnUpdateProcess::downloadUpdates() {
             downloadTargets.insert(m_clientUpdateFile->url, m_clientUpdateFile->baseFileName);
             hashByUrl.insert(m_clientUpdateFile->url, m_clientUpdateFile->md5);
             fileSizeByUrl.insert(m_clientUpdateFile->url, m_clientUpdateFile->fileSize);
-            peerAssociations.insert(m_clientUpdateFile->url, qnCommon->moduleGUID());
+            peerAssociations.insert(m_clientUpdateFile->url, commonModule()->moduleGUID());
         }
     }
 
@@ -352,7 +352,7 @@ void QnUpdateProcess::installClientUpdate()
     if (m_clientRequiresInstaller
         || m_target.denyClientUpdates
         || qnSettings->isClientUpdateDisabled()
-        || m_clientUpdateFile->version == qnCommon->engineVersion())
+        || m_clientUpdateFile->version == commonModule()->engineVersion())
     {
             NX_LOG(lit("Update: QnUpdateProcess: Client update skipped."), cl_logDEBUG1);
             checkFreeSpace();
@@ -408,7 +408,7 @@ void QnUpdateProcess::at_clientUpdateInstalled()
 }
 
 void QnUpdateProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo &data) {
-    if (data.uuid == qnCommon->moduleGUID())
+    if (data.uuid == commonModule()->moduleGUID())
         return;
 
     if (data.data.updateStarted)

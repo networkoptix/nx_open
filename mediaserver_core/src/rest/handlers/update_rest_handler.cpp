@@ -78,7 +78,7 @@ int QnUpdateRestHandler::executePost(
         }
     }
 
-    if (version == qnCommon->engineVersion()) {
+    if (version == commonModule()->engineVersion()) {
         result.setError(QnJsonRestResult::NoError, lit("UP_TO_DATE"));
         return nx_http::StatusCode::ok;
     }

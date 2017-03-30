@@ -254,9 +254,9 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     if (zone_size<1)
         zone_size = 1;
 
-    if (qnCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayInput"), true))
+    if (commonModule()->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayInput"), true))
         setCameraCapability(Qn::RelayInputCapability, true);
-    if (qnCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayOutput"), true))
+    if (commonModule()->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayOutput"), true))
         setCameraCapability(Qn::RelayOutputCapability, true);
 
     setFirmware(firmwareVersion);
@@ -741,7 +741,7 @@ void QnPlAreconVisionResource::inputPortStateRequestDone(nx_http::AsyncHttpClien
 
 bool QnPlAreconVisionResource::isRTSPSupported() const
 {   
-    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = commonModule()->dataPool()->data(toSharedPointer(this));
     auto arecontRtspIsAllowed = QnGlobalSettings::instance()->arecontRtspEnabled();
     auto cameraSupportsH264 = isH264();
     auto cameraSupportsRtsp = resData.value<bool>(lit("isRTSPSupported"), true);

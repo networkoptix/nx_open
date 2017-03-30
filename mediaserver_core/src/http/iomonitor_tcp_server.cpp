@@ -61,7 +61,7 @@ void QnIOMonitorConnectionProcessor::run()
         Qn::directConnect(camera.data(), &QnSecurityCamResource::cameraInput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
         Qn::directConnect(camera.data(), &QnSecurityCamResource::cameraOutput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
 
-        if (camera->getParentId() != qnCommon->moduleGUID()) {
+        if (camera->getParentId() != commonModule()->moduleGUID()) {
             sendResponse(CODE_NOT_FOUND, "multipart/x-mixed-replace; boundary=ioboundary");
             return;
         }
@@ -83,7 +83,7 @@ void QnIOMonitorConnectionProcessor::run()
         while (!needToStop()
                && d->socket->isConnected()
                && camera->getStatus() >= Qn::Online
-               && camera->getParentId() == qnCommon->moduleGUID())
+               && camera->getParentId() == commonModule()->moduleGUID())
         {
             sendData();
             d->waitCond.wait(&d->waitMutex);

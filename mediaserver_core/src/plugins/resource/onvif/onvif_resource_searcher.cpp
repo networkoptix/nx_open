@@ -170,7 +170,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         if (channel > 0)
             resource->updateToChannel(channel-1);
 
-        auto resData = qnCommon
+        auto resData = commonModule()
             ->dataPool()
             ->data(rpResource->getVendor(), rpResource->getModel());
 
@@ -226,7 +226,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         }
 
         OnvifResourceInformationFetcher fetcher;
-        auto resData = qnCommon->dataPool()->data(manufacturer, modelName);
+        auto resData = commonModule()->dataPool()->data(manufacturer, modelName);
         auto manufacturerAlias = resData.value<QString>(Qn::ONVIF_VENDOR_SUBTYPE);
 
         manufacturer = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;

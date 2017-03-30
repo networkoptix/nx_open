@@ -13,7 +13,7 @@ QnMasterServerStatusWatcher::QnMasterServerStatusWatcher()
         [this](const QnResourcePtr& resource)
         {
             auto server = resource.dynamicCast<QnMediaServerResource>();
-            if (server && resource->getId() == qnCommon->moduleGUID())
+            if (server && resource->getId() == commonModule()->moduleGUID())
             {
                 connect(server.data(), &QnMediaServerResource::serverFlagsChanged, this, &QnMasterServerStatusWatcher::at_updateMasterFlag);
                 at_updateMasterFlag();
@@ -30,7 +30,7 @@ QnMasterServerStatusWatcher::QnMasterServerStatusWatcher()
 
 bool QnMasterServerStatusWatcher::localPeerCanBeMaster() const
 {
-    auto mServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto mServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     return mServer && mServer->getServerFlags().testFlag(Qn::SF_HasPublicIP);
 }
 
@@ -40,7 +40,7 @@ void QnMasterServerStatusWatcher::at_updateMasterFlag()
     bool hasBetterMaster = std::any_of(items.begin(), items.end(),
         [this](const QnPeerRuntimeInfo& item)
     {
-        return item.data.peer.id < qnCommon->moduleGUID() &&
+        return item.data.peer.id < commonModule()->moduleGUID() &&
                item.data.flags.testFlag(ec2::RF_MasterCloudSync);
     });
 

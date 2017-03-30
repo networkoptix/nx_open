@@ -30,12 +30,12 @@ void QnServerInterfaceWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
     if (!resource->hasFlags(Qn::server))
         return;
 
-    QnMediaServerResourcePtr currentServer = qnCommon->currentServer();
+    QnMediaServerResourcePtr currentServer = commonModule()->currentServer();
     if (resource != currentServer)
         return;
 
     const SocketAddress address = 
-        nx::network::url::getEndpoint(QnAppServerConnectionFactory::url());
+        nx::network::url::getEndpoint(commonModule()->currentUrl());
     currentServer->setPrimaryAddress(address);
     NX_LOG(
         lit("QnServerInterfaceWatcher: Set primary address of %1 (%2) to default %3")

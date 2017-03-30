@@ -145,7 +145,7 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
             [&](int socketCount)
             {
                 ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(ec2::ApiCommand::openReverseConnection);
-                tran.params.targetServer = qnCommon->moduleGUID();
+                tran.params.targetServer = commonModule()->moduleGUID();
                 tran.params.socketCount = socketCount;
                 d->messageBus->sendTransaction(tran, target);
             });
@@ -216,7 +216,7 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
         return true; //< no need to update, it is non server proxy request
     }
 
-    if (auto ownServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID()))
+    if (auto ownServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID()))
     {
         // it's already authorized request.
         // Update authorization using local system user related to current server
@@ -347,7 +347,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
     else if (!dstRoute.id.isNull())
         d->request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, dstRoute.id.toByteArray());
 
-    if (dstRoute.id == qnCommon->moduleGUID())
+    if (dstRoute.id == commonModule()->moduleGUID())
     {
         if (!cameraGuid.isNull())
         {
@@ -380,7 +380,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
         cleanupProxyInfo(&d->request);
     }
 
-    if (!dstRoute.id.isNull() && dstRoute.id != qnCommon->moduleGUID())
+    if (!dstRoute.id.isNull() && dstRoute.id != commonModule()->moduleGUID())
     {
         if (!replaceAuthHeader())
             return false;
@@ -416,7 +416,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 
         nx_http::header::Via::ProxyEntry proxyEntry;
         proxyEntry.protoVersion = d->request.requestLine.version.version;
-        proxyEntry.receivedBy = qnCommon->moduleGUID().toByteArray();
+        proxyEntry.receivedBy = commonModule()->moduleGUID().toByteArray();
         via.entries.push_back( proxyEntry );
         nx_http::insertOrReplaceHeader(
             &d->request.headers,

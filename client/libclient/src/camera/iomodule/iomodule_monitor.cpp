@@ -83,8 +83,8 @@ bool QnIOModuleMonitor::open()
         requestUrl.setPort(route.addr.port);
     }
 
-    m_httpClient->setUserName( QnAppServerConnectionFactory::url().userName().toLower() );
-    m_httpClient->setUserPassword( QnAppServerConnectionFactory::url().password() );
+    m_httpClient->setUserName( commonModule()->currentUrl().userName().toLower() );
+    m_httpClient->setUserPassword( commonModule()->currentUrl().password() );
 
     m_httpClient->doGet(requestUrl);
     return true;

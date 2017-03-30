@@ -41,7 +41,7 @@ QnResourceList QnPlPulseSearcher::findResources()
         if (!res)
             continue;
 
-        QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), r.name);
+        QnResourceData resourceData = commonModule()->dataPool()->data(manufacture(), r.name);
         if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
             continue; // model forced by ONVIF
 

@@ -1217,6 +1217,5 @@ void QnResource::setRemovedFromPool(bool value)
 
 QnCommonModule* QnResource::commonModule() const
 {
-    NX_ASSERT(resourcePool());
     return resourcePool() ? resourcePool()->commonModule() : nullptr;
 }

@@ -115,12 +115,12 @@ private:
 QnLayoutsModelUnsorted::QnLayoutsModelUnsorted(QObject* parent):
     base_type(parent)
 {
-    const auto userWatcher = qnCommon->instance<QnUserWatcher>();
+    const auto userWatcher = commonModule()->instance<QnUserWatcher>();
     connect(userWatcher, &QnUserWatcher::userChanged,
             this, &QnLayoutsModelUnsorted::at_userChanged);
     at_userChanged(userWatcher->user());
 
-    const auto camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
+    const auto camerasWatcher = commonModule()->instance<QnAvailableCamerasWatcher>();
     auto updateCamerasCount = [this, camerasWatcher]()
     {
         m_allCamerasCount = camerasWatcher->availableCameras().size();

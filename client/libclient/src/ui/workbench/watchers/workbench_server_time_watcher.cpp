@@ -101,7 +101,7 @@ QDateTime QnWorkbenchServerTimeWatcher::displayTime(qint64 msecsSinceEpoch) cons
     if (qnSettings->timeMode() == Qn::ClientTimeMode)
         return QDateTime::fromMSecsSinceEpoch(msecsSinceEpoch);
 
-    return serverTime(qnCommon->currentServer(), msecsSinceEpoch);
+    return serverTime(commonModule()->currentServer(), msecsSinceEpoch);
 }
 
 

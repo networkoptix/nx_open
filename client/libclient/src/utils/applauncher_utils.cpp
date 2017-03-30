@@ -59,7 +59,7 @@ namespace applauncher
     api::ResultType::Value isVersionInstalled( QnSoftwareVersion version, bool* const installed )
     {
         if (version.isNull())
-            version = qnCommon->engineVersion();
+            version = commonModule()->engineVersion();
 
         api::IsVersionInstalledRequest request;
         request.version = version;
@@ -75,13 +75,13 @@ namespace applauncher
 
     //bool canRestart(QnSoftwareVersion version) {
     //    if (version.isNull())
-    //        version = QnSoftwareVersion(qnCommon->engineVersion());
+    //        version = QnSoftwareVersion(commonModule()->engineVersion());
     //    return QFile::exists(qApp->applicationDirPath() + QLatin1String("/../") + version.toString(QnSoftwareVersion::MinorFormat));
     //}
 
     api::ResultType::Value restartClient(QnSoftwareVersion version, const QString &auth) {
         if (version.isNull())
-            version = QnSoftwareVersion(qnCommon->engineVersion());
+            version = QnSoftwareVersion(commonModule()->engineVersion());
 
         QStringList arguments;
         arguments << QLatin1String("--no-single-application");

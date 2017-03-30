@@ -87,7 +87,7 @@ static void loadRemoteDataAsync(
 static void loadLocalData(MultiServerPeriodDataList& outputData, QnChunksRequestContext* ctx)
 {
     MultiServerPeriodData record;
-    record.guid = qnCommon->moduleGUID();
+    record.guid = commonModule()->moduleGUID();
     record.periods = QnChunksRequestHelper::load(ctx->request());
 
     if (!record.periods.empty())
@@ -151,7 +151,7 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(
 
         for (const auto& server: onlineServers)
         {
-            if (server->getId() == qnCommon->moduleGUID())
+            if (server->getId() == commonModule()->moduleGUID())
             {
                 loadLocalData(outputData, &ctx);
                 qDebug() << " In progress request QnMultiserverChunksRestHandler::executeGet #"

@@ -175,7 +175,7 @@ QnCameraBookmarkList QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(QnGe
 
         for (const auto& server: servers)
         {
-            if (server->getId() == qnCommon->moduleGUID())
+            if (server->getId() == commonModule()->moduleGUID())
                 getBookmarksLocal(outputData, &context);
             else
                 getBookmarksRemoteAsync(outputData, server, &context);
@@ -200,7 +200,7 @@ QnCameraBookmarkTagList QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTag
     {
         for (const auto& server: resourcePool()->getAllServers(Qn::Online))
         {
-            if (server->getId() == qnCommon->moduleGUID())
+            if (server->getId() == commonModule()->moduleGUID())
                 getBookmarkTagsLocal(outputData, &context);
             else
                 getBookmarkTagsRemoteAsync(outputData, server, &context);
@@ -226,7 +226,7 @@ bool QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(QnUpdateBookmarkRe
     {
         for (const auto& server: resourcePool()->getAllServers(Qn::Online))
         {
-            if (server->getId() == qnCommon->moduleGUID())
+            if (server->getId() == commonModule()->moduleGUID())
                 qnServerDb->updateBookmark(request.bookmark);
             else
                 updateBookmarkRemoteAsync(server, &context);
@@ -246,7 +246,7 @@ bool QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(QnDeleteBookmarkRe
     {
         for (const auto& server: resourcePool()->getAllServers(Qn::Online))
         {
-            if (server->getId() == qnCommon->moduleGUID())
+            if (server->getId() == commonModule()->moduleGUID())
                 qnServerDb->deleteBookmark(request.bookmarkId);
             else
                 deleteBookmarkRemoteAsync(server, &context);

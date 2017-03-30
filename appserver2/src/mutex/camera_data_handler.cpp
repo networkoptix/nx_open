@@ -25,11 +25,11 @@ QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
 
     if (name.startsWith(CAM_INS_PREFIX) || name.startsWith(CAM_UPD_PREFIX))
     {
-        QnMediaServerResourcePtr ownServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+        QnMediaServerResourcePtr ownServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
         if (ownServer && !ownServer->isRedundancy()) {
             QString cameraName = name.mid(CAM_INS_PREFIX.length());
             if (cameraName.toLocal8Bit() == QByteArray(mac))
-                return qnCommon->moduleGUID().toRfc4122(); // block edge camera discovered from other PC
+                return commonModule()->moduleGUID().toRfc4122(); // block edge camera discovered from other PC
             else
                 return QByteArray();
         }

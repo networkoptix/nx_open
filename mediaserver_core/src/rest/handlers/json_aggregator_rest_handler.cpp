@@ -28,7 +28,7 @@ bool QnJsonAggregatorRestHandler::executeCommad(
         urlQuery.addQueryItem(itr.key(), itr.value());
     url.setQuery(urlQuery);
 
-    auto server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if (!server)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error while executing request '%1'").arg(command));

@@ -278,7 +278,7 @@ ErrorCode QnTransactionLog::saveToDB(
         return ErrorCode::failure;
     }
     #ifdef TRANSACTION_LOG_DEBUG
-        qDebug() << "add record to transaction log. Transaction=" << toString(tran.command) << "timestamp=" << tran.timestamp << "producedOnCurrentPeer=" << (tran.peerID == qnCommon->moduleGUID());
+        qDebug() << "add record to transaction log. Transaction=" << toString(tran.command) << "timestamp=" << tran.timestamp << "producedOnCurrentPeer=" << (tran.peerID == commonModule()->moduleGUID());
     #endif
 
     QnTranStateKey key(tran.peerID, tran.persistentInfo.dbID);

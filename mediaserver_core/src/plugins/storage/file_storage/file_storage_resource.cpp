@@ -828,7 +828,7 @@ qint64 QnFileStorageResource::getFileSize(const QString& url) const
 bool QnFileStorageResource::testWriteCapInternal() const
 {
     QString fileName(lit("%1%2.tmp"));
-    QString localGuid = qnCommon->moduleGUID().toString();
+    QString localGuid = commonModule()->moduleGUID().toString();
     localGuid = localGuid.mid(1, localGuid.length() - 2);
     fileName = fileName.arg(closeDirPath(translateUrlToLocal(getPath()))).arg(localGuid);
     QFile file(fileName);

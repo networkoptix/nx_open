@@ -129,7 +129,7 @@ void QnDistributedMutex::unlockInternal()
     /*
     ApiLockData data;
     data.name = m_name;
-    data.peer = qnCommon->moduleGUID();
+    data.peer = commonModule()->moduleGUID();
     data.timestamp = NO_MUTEX_LOCK;
     */
 

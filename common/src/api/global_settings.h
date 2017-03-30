@@ -358,4 +358,4 @@ private:
     QnUserResourcePtr m_admin;
 };
 
-#define qnGlobalSettings QnGlobalSettings::instance()
+#define qnGlobalSettings commonModule()->globalSettings()

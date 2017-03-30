@@ -28,7 +28,7 @@ void trace(const QString& message)
 
 }
 
-QnClientMessageProcessor::QnClientMessageProcessor(QObject* parent = nullptr):
+QnClientMessageProcessor::QnClientMessageProcessor(QObject* parent):
     base_type(parent),
     m_status(),
     m_connected(false),
@@ -64,7 +64,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
          * In that case each request may potentially be sent to another server, which may lead
          * to undefined behavior. So we are fixing server which we were connected to in the url.
          */
-        auto currentUrl = QnAppServerConnectionFactory::url();
+        auto currentUrl = commonModule()->currentUrl();
         QString host = currentUrl.host();
         if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host))
         {

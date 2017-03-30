@@ -212,10 +212,10 @@ void QnDisconnectFromCloudDialogPrivate::unbindSystem()
             }
         };
 
-    if (!qnCommon->currentServer())
+    if (!commonModule()->currentServer())
         return;
 
-    auto serverConnection = qnCommon->currentServer()->restConnection();
+    auto serverConnection = commonModule()->currentServer()->restConnection();
     if (!serverConnection)
         return;
 

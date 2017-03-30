@@ -149,7 +149,7 @@ bool QnSaveCloudSystemCredentialsHandler::validateInputData(
 bool QnSaveCloudSystemCredentialsHandler::checkInternetConnection(
     QnJsonRestResult* result)
 {
-    auto server = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     bool hasPublicIP = server && server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
     if (!hasPublicIP)
     {

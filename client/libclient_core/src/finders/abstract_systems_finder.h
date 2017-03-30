@@ -1,12 +1,13 @@
-
 #pragma once
 
 #include <QtCore/QObject>
 
+#include <common/common_module_aware.h>
+
 #include <utils/common/connective.h>
 #include <network/base_system_description.h>
 
-class QnAbstractSystemsFinder : public Connective<QObject>
+class QnAbstractSystemsFinder : public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;

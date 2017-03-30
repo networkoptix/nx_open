@@ -57,7 +57,7 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
         QnMediaServerResourcePtr mServer = m_camera->getParentResource().dynamicCast<QnMediaServerResource>();
         if (!mServer)
             return false;
-        auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+        auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
         if (!currentServer)
             return false;
 

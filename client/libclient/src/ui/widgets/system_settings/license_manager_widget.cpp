@@ -383,8 +383,8 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
 
     params.addQueryItem(lit("box"), runtimeData.box);
     params.addQueryItem(lit("brand"), runtimeData.brand);
-    params.addQueryItem(lit("version"), qnCommon->engineVersion().toString());
-    params.addQueryItem(lit("lang"), qnCommon->instance<QnClientTranslationManager>()->getCurrentLanguage());
+    params.addQueryItem(lit("version"), commonModule()->engineVersion().toString());
+    params.addQueryItem(lit("lang"), commonModule()->instance<QnClientTranslationManager>()->getCurrentLanguage());
 
     if (!runtimeData.nx1mac.isEmpty())
     {
