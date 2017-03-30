@@ -56,11 +56,11 @@
                 <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Diese E-Mail wurde bereits in {{PRODUCT_NAME}} registriert.</span>
             </div>
         </div>
-        <password-input ng-model="account.password" id="'registerPassword'" label="'Password'"></password-input>
+        <password-input ng-model="account.password" id="'registerPassword'" label="$root.L.regActions.passwordLabel"></password-input>
         <div class="form-group" >
             <div class="col-sm-offset-4 col-sm-8">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> E-Mail-Newsletter abonnieren</label>
+                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> E-Mailnewsletter abonnieren</label>
                 </div>
             </div>
         </div>
@@ -69,7 +69,7 @@
                 <process-button process="register"
                                 form="registerForm"
                                 class="pull-left"
-                                button-text="'Create Account'"></process-button>
+                                button-text="$root.L.regActions.createAccount"></process-button>
                 <small class="conditions-note">Wenn Sie auf "Account erstellen" klicken, stimmen Sie <br> den <a href="/content/eula" target="_blank">Geschäftsbedingungen</a> zu</small>
             </div>
         </div>

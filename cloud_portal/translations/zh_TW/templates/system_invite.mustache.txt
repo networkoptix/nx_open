@@ -1,0 +1,13 @@
+歡迎使用 {{PRODUCT_NAME}}
+
+{{#message.sharer_name}}
+{{message.sharer_name}} ({{message.sharer_email}}) 邀請您加入 {{PRODUCT_NAME}} 且與您共用系統 {{message.system_name}}.
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+您被邀請加入 {{PRODUCT_NAME}}.
+與您共用系統 {{message.system_name}}.
+{{/message.sharer_name}}
+
+註冊並查看系統: {{config.portal_url}}/註冊/{{message.code}}
+

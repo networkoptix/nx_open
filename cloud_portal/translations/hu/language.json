@@ -1,12 +1,13 @@
 {
-  "language": "hu",
-  "language_name": "Magyar",
+  "language":"hu",
+  "language_name":"Magyar",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
   "dialogs":{
     "okButton":"Ok",
     "cancelButton":"Mégse",
     "loginTitle":"Bejelentkezés ide: {{PRODUCT_NAME}}",
+    "loginButton":"Bejelentkezés",
     "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"Már bejelentkezett",
     "logoutAuthorisedContinueButton":"Folyatatás",
@@ -150,12 +151,15 @@
     "confirmUnshareTitle":"Törli a felhasználót?",
     "confirmUnshareAction":"Törlés",
     "successDisconnected":"Rendszer sikeresen bontotta {{PRODUCT_NAME}} kapcsolatát",
-    "successDeleted":"{systemName} rendszer sikeresen törölve a fiókból",
-    "permissionsRemoved":"{Email} engedélyei vissavonva"
+    "successDeleted":"System {{systemName}} is successfully deleted from your account",
+    "permissionsRemoved":"Permissions were removed from {{email}}"
   },
   "account":{
     "accountSavedSuccess":"A fiók mentése sikeres",
-    "passwordChangedSuccess":"A fiók mentése sikeres"
+    "passwordChangedSuccess":"A fiók mentése sikeres",
+    "changePassword":"Jelszómódosítás",
+    "newPasswordLabel":"Új jelszó",
+    "saveChanges":"Mentés"
   },
   "downloads":{
     "noClientDetectedTitle":"Telepítse a {{VMS_NAME}} alkalmazást a rendszer megtekintéshez",
@@ -197,5 +201,15 @@
       "bundle":"Kliens és szerver",
       "servertool":"Konfigurációs eszköz"
     }
+  },
+  "activeActions":{
+    "sendConfirm":"Küldés",
+    "resetPassword":"Jelszó visszaállítása",
+    "setNewPassword":"Jelszó mentése",
+    "setNewPasswordLabel":"Új jelszó"
+  },
+  "regActions":{
+    "passwordLabel":"Jelszó",
+    "createAccount":"Fiók létrehozása"
   }
 }

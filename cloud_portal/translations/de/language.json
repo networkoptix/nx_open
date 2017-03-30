@@ -7,6 +7,7 @@
     "okButton":"Ok",
     "cancelButton":"Abbrechen",
     "loginTitle":"Anmelden bei {{PRODUCT_NAME}}",
+    "loginButton":"Log in",
     "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"Sie sind bereits eingeloggt",
     "logoutAuthorisedContinueButton":"Fortfahren",
@@ -150,12 +151,15 @@
     "confirmUnshareTitle":"Benutzer löschen?",
     "confirmUnshareAction":"Löschen",
     "successDisconnected":"Das System wurde erfoglreich von {{PRODUCT_NAME}} getrennt",
-    "successDeleted":"Das System {systemName} wurde erfolgreich von Ihrem Account gelöscht",
-    "permissionsRemoved":"Berechtigungen wurden von {Email} entfernt"
+    "successDeleted":"System {{systemName}} is successfully deleted from your account",
+    "permissionsRemoved":"Permissions were removed from {{email}}"
   },
   "account":{
     "accountSavedSuccess":"Ihr Account wurde erfolgreich gespeichert",
-    "passwordChangedSuccess":"Ihr Account wurde erfolgreich gespeichert"
+    "passwordChangedSuccess":"Ihr Account wurde erfolgreich gespeichert",
+    "changePassword":"Change Password",
+    "newPasswordLabel":"New password",
+    "saveChanges":"Save"
   },
   "downloads":{
     "noClientDetectedTitle":"Installieren Sie {{VMS_NAME}}, um Ihr System anzusehen",
@@ -197,5 +201,15 @@
       "bundle":"Client und Server",
       "servertool":"Konfigurationstool"
     }
+  },
+  "activeActions":{
+    "sendConfirm":"Send",
+    "resetPassword":"Reset Password",
+    "setNewPassword":"Save password",
+    "setNewPasswordLabel":"New password"
+  },
+  "regActions":{
+    "passwordLabel":"Password",
+    "createAccount":"Create Account"
   }
 }

@@ -1,6 +1,6 @@
-New message
+Nuevo mensaje
 
-Type: {{message.type}}
-Data: {{{message.data}}}
+Tipo: {{message.type}}
+Datos: {{{message.data}}}
 
-There is no specific template for this type of message
+No hay ninguna plantilla específica para este tipo de mensaje
