@@ -160,17 +160,17 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         if (!rpResource)
         {
-            if (newCamRes && newCamRes->needCheckIpConflicts())
-            {
-                // do not count 2--N channels of multichannel cameras as conflict
-                quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
-                if (ips)
-                    ipsList[ips].insert(newNetRes);
-            }
-
             ++it; // keep new resource in a list
             continue;
         }
+
+		if (newCamRes && newCamRes->needCheckIpConflicts())
+		{
+			quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
+			if (ips)
+				ipsList[ips].insert(newNetRes);
+		}
+
 
         QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
 
