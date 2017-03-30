@@ -20,9 +20,10 @@ BACKUP_STORAGE_READY_TIMEOUT_SEC = 60  # seconds
 BACKUP_SCHEDULE_TIMEOUT_SEC = 60       # seconds
 
 # Camera backup types
-BACKUP_HIGH = 1  # backup only high quality stream
-BACKUP_LOW = 2   # backup only low quality stream
-BACKUP_BOTH = 3  # backup both (high & low) streams
+BACKUP_DISABLED = 0  # backup disabled
+BACKUP_HIGH = 1      # backup only high quality stream
+BACKUP_LOW = 2       # backup only low quality stream
+BACKUP_BOTH = 3      # backup both (high & low) streams
 
 # Backup and archive subpaths
 HI_QUALITY_PATH = 'hi_quality'
@@ -40,8 +41,12 @@ BACKUP_DURATION_NOT_SET = -1  # -1 means not set.
 BACKUP_BITRATE_NOT_LIMITED = -1  # -1 means not limited.
 
 
+# Global system 'backupQualities' setting parametrization:
+#   * low - CameraBackup_LowQuality, backup only high quality media stream
+#   * high - CameraBackup_HighQuality, backup only low quality media stream
+#   * both - CameraBackup_BothQuality, backup both (high & low quality) media streams
 @pytest.fixture(params=['low', 'high', 'both'])
-def backup_type(request):
+def system_backup_type(request):
     if request.param == 'low':
         return BACKUP_LOW
     elif request.param == 'high':
@@ -50,18 +55,40 @@ def backup_type(request):
         return BACKUP_BOTH
 
 
+# Global system 'backupNewCamerasByDefault' setting parametrization:
+#  * backup - backup new cameras by default
+#  * skip - slip new cameras backup
+@pytest.fixture(params=['backup', 'skip'])
+def backup_new_camera(request):
+    if request.param == 'backup':
+        return True
+    else:
+        return False
+
+
+# Second camera 'backupType' attribute parametrization:
+#   * default - backup attribute isn't set
+#   * disabled - CameraBackup_Disabled
+@pytest.fixture(params=['default', 'disabled'])
+def second_camera_backup_type(request):
+    if request.param == 'disabled':
+        return BACKUP_DISABLED
+    else:
+        return None
+
+
 @pytest.fixture
-def env(env_builder, server, backup_type):
+def env(env_builder, server, system_backup_type):
     one = server(start=False)
     built_env = env_builder(one=one)
     built_env.one.box.host.run_command(['rm', '-rfv', BACKUP_STORAGE_PATH])
     built_env.one.box.host.run_command(['mkdir', '-p', BACKUP_STORAGE_PATH])
     built_env.one.start_service()
     built_env.one.setup_local_system()
-    built_env.one.set_system_settings(backupQualities=backup_type)
+    built_env.one.set_system_settings(
+        backupQualities=system_backup_type)
     add_backup_storage(built_env.one)
     change_and_assert_server_backup_type(built_env.one, 'BackupManual')
-    built_env.camera = add_camera(built_env.one, camera_id=1, backup_type=backup_type)
     return built_env
 
 
@@ -128,10 +155,11 @@ def wait_backup_finish(server, expected_backup_time):
 def add_camera(server, camera_id, backup_type):
     camera = Camera('Camera_%d' % camera_id, generator.generate_mac(camera_id))
     camera_guid = server.add_camera(camera)
-    camera_attr = generator.generate_camera_user_attributes_data(
-        dict(id=camera_guid, name=camera.name),
-        backupType=backup_type)
-    server.rest_api.ec2.saveCameraUserAttributes.POST(**camera_attr)
+    if backup_type:
+        camera_attr = generator.generate_camera_user_attributes_data(
+            dict(id=camera_guid, name=camera.name),
+            backupType=backup_type)
+        server.rest_api.ec2.saveCameraUserAttributes.POST(**camera_attr)
     return camera
 
 
@@ -142,41 +170,58 @@ def assert_path_does_not_exist(server, path):
     assert x_info.value.returncode == 1, assert_message
 
 
-def assert_backup_equal_to_archive(server, backup_type):
-    if backup_type == BACKUP_HIGH:
-        backup_path = os.path.join(BACKUP_STORAGE_PATH, HI_QUALITY_PATH)
-        server_archive_path = os.path.join(server.storage.dir, HI_QUALITY_PATH)
-        assert_path_does_not_exist(server, os.path.join(BACKUP_STORAGE_PATH, LOW_QUALITY_PATH))
-    elif backup_type == BACKUP_LOW:
-        backup_path = os.path.join(BACKUP_STORAGE_PATH, LOW_QUALITY_PATH)
-        server_archive_path = os.path.join(server.storage.dir, LOW_QUALITY_PATH)
-        assert_path_does_not_exist(server, os.path.join(BACKUP_STORAGE_PATH, HI_QUALITY_PATH))
-    elif backup_type == BACKUP_BOTH:
-        backup_path = BACKUP_STORAGE_PATH
-        server_archive_path = server.storage.dir
-    # Compare backup and archive storages
+def assert_paths_are_equal(server, path_1, path_2):
     server.box.host.run_command(['diff',
-                                 '-x', '*.nxdb',  # don't compare storage databases
                                  '-r',            # recursively compare any subdirectories found
                                  '-s',            # report when two files are the same
-                                 backup_path,  server_archive_path])
+                                 path_1,  path_2])
 
 
-def test_backup_by_request(env, sample_media_file, backup_type):
+def assert_backup_equal_to_archive(server, camera, system_backup_type, backup_new_camera, camera_backup_type):
+    hi_quality_backup_path = os.path.join(BACKUP_STORAGE_PATH, HI_QUALITY_PATH, camera.mac_addr)
+    hi_quality_server_archive_path = os.path.join(server.storage.dir, HI_QUALITY_PATH, camera.mac_addr)
+    low_quality_backup_path = os.path.join(BACKUP_STORAGE_PATH, LOW_QUALITY_PATH, camera.mac_addr)
+    low_quality_server_archive_path = os.path.join(server.storage.dir, LOW_QUALITY_PATH, camera.mac_addr)
+    if ((camera_backup_type and camera_backup_type == BACKUP_DISABLED) or
+            (not camera_backup_type and not backup_new_camera)):
+        assert_path_does_not_exist(server, hi_quality_backup_path)
+        assert_path_does_not_exist(server, low_quality_backup_path)
+    elif system_backup_type == BACKUP_HIGH:
+        assert_paths_are_equal(server, hi_quality_backup_path, hi_quality_server_archive_path)
+        assert_path_does_not_exist(server, low_quality_backup_path)
+    elif system_backup_type == BACKUP_LOW:
+        assert_paths_are_equal(server, low_quality_backup_path, low_quality_server_archive_path)
+        assert_path_does_not_exist(server, hi_quality_backup_path)
+    else:
+        assert_paths_are_equal(server, low_quality_backup_path, low_quality_server_archive_path)
+        assert_paths_are_equal(server, low_quality_backup_path, low_quality_server_archive_path)
+
+
+def test_backup_by_request(env, sample_media_file, system_backup_type, backup_new_camera,
+                           second_camera_backup_type):
+    env.one.set_system_settings(
+        backupNewCamerasByDefault=backup_new_camera)
     start_time = datetime(2017, 3, 27, tzinfo=pytz.utc)
-    env.one.storage.save_media_sample(env.camera, start_time, sample_media_file)
+    camera_1 = add_camera(env.one, camera_id=1, backup_type=BACKUP_BOTH)
+    camera_2 = add_camera(env.one, camera_id=2, backup_type=second_camera_backup_type)
+    env.one.storage.save_media_sample(camera_1, start_time, sample_media_file)
+    env.one.storage.save_media_sample(camera_2, start_time, sample_media_file)
     env.one.rebuild_archive()
     env.one.rest_api.api.backupControl.GET(action='start')
-    expected_backup_time=start_time + sample_media_file.duration
+    expected_backup_time = start_time + sample_media_file.duration
     wait_backup_finish(env.one, expected_backup_time)
-    assert_backup_equal_to_archive(env.one, backup_type)
+    assert_backup_equal_to_archive(env.one, camera_1, system_backup_type, backup_new_camera,
+                                   camera_backup_type=BACKUP_BOTH)
+    assert_backup_equal_to_archive(env.one, camera_2, system_backup_type, backup_new_camera,
+                                   second_camera_backup_type)
 
 
-def test_backup_by_schedule(env, sample_media_file, backup_type):
+def test_backup_by_schedule(env, sample_media_file, system_backup_type):
     start_time_1 = datetime(2017, 3, 28, 9, 52, 16, tzinfo=pytz.utc)
     start_time_2 = start_time_1 + sample_media_file.duration*2
-    env.one.storage.save_media_sample(env.camera, start_time_1, sample_media_file)
-    env.one.storage.save_media_sample(env.camera, start_time_2, sample_media_file)
+    camera = add_camera(env.one, camera_id=1, backup_type=BACKUP_LOW)
+    env.one.storage.save_media_sample(camera, start_time_1, sample_media_file)
+    env.one.storage.save_media_sample(camera, start_time_2, sample_media_file)
     env.one.rebuild_archive()
     env.one.rest_api.ec2.saveMediaServerUserAttributes.POST(
         serverId=env.one.ecs_guid, backupType='BackupSchedule',
@@ -184,6 +229,7 @@ def test_backup_by_schedule(env, sample_media_file, backup_type):
         backupStart=0,  # start backup at 00:00:00
         backupDuration=BACKUP_DURATION_NOT_SET,
         backupBitrate=BACKUP_BITRATE_NOT_LIMITED)
-    expected_backup_time=start_time_2 + sample_media_file.duration
+    expected_backup_time = start_time_2 + sample_media_file.duration
     wait_backup_finish(env.one, expected_backup_time)
-    assert_backup_equal_to_archive(env.one, backup_type)
+    assert_backup_equal_to_archive(env.one, camera, system_backup_type,
+                                   backup_new_camera=False, camera_backup_type=BACKUP_BOTH)
