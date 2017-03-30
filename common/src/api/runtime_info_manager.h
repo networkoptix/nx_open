@@ -10,7 +10,10 @@
 #include <utils/common/threadsafe_item_storage.h>
 #include <common/common_module_aware.h>
 
-struct QnPeerRuntimeInfo {
+class QnCommonMessageProcessor;
+
+struct QnPeerRuntimeInfo
+{
     QnPeerRuntimeInfo(){}
     QnPeerRuntimeInfo(const ec2::ApiRuntimeData& runtimeData):
         uuid(runtimeData.peer.id),
@@ -56,6 +59,7 @@ public:
     bool hasItem(const QnUuid& id);
     QnPeerRuntimeInfo item(const QnUuid& id) const;
 
+    void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
     void updateLocalItem(const QnPeerRuntimeInfo& value);
 signals:
     void runtimeInfoAdded(const QnPeerRuntimeInfo &data);

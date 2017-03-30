@@ -127,7 +127,6 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
 
 
     m_sessionManager = new QnSessionManager(this);
-    m_moduleFinder = new QnModuleFinder(this, clientMode);
     m_router = new QnRouter(this, m_moduleFinder);
 
     m_licensePool = new QnLicensePool(this);
@@ -138,6 +137,7 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
     instance<QnServerAdditionalAddressesDictionary>(); // todo: static common or common?
 
     m_resourcePool = new QnResourcePool(this);  /*< Depends on nothing. */
+    m_moduleFinder = new QnModuleFinder(this, clientMode); //< Depend on resPool
     m_userRolesManager = new QnUserRolesManager(this);         /*< Depends on nothing. */
     m_resourceAccessSubjectCache = new QnResourceAccessSubjectsCache(this); /*< Depends on respool and roles. */
     m_sharedResourceManager = new QnSharedResourcesManager(this);   /*< Depends on respool and roles. */
@@ -388,6 +388,8 @@ QnCommonMessageProcessor* QnCommonModule::messageProcessor() const
 void QnCommonModule::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
 {
     m_messageProcessor = messageProcessor;
+    m_runtimeInfoManager->setMessageProcessor(messageProcessor);
+    m_cameraHistory->setMessageProcessor(messageProcessor);
 }
 
 void QnCommonModule::setEc2Connection(const std::shared_ptr<ec2::AbstractECConnection>& ec2Connection)

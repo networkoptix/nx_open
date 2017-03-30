@@ -13,17 +13,21 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
     QnCommonModuleAware(parent),
     m_items(new QnThreadsafeItemStorage<QnPeerRuntimeInfo>(&m_mutex, this))
 {
-    connect(commonModule()->messageProcessor(), &QnCommonMessageProcessor::runtimeInfoChanged, this, [this](const ec2::ApiRuntimeData &runtimeData)
+}
+
+void QnRuntimeInfoManager::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
+{
+    connect(messageProcessor, &QnCommonMessageProcessor::runtimeInfoChanged, this, [this](const ec2::ApiRuntimeData &runtimeData)
     {
         QnPeerRuntimeInfo info(runtimeData);
         m_items->addOrUpdateItem(info);
     });
 
-    connect(commonModule()->messageProcessor(), &QnCommonMessageProcessor::remotePeerLost,     this, [this](const ec2::ApiPeerAliveData &data){
+    connect(messageProcessor, &QnCommonMessageProcessor::remotePeerLost, this, [this](const ec2::ApiPeerAliveData &data) {
         m_items->removeItem(data.peer.id);
     });
 
-    connect(commonModule()->messageProcessor(), &QnCommonMessageProcessor::connectionClosed,   this, [this]{
+    connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed, this, [this] {
         m_items->setItems(QnPeerRuntimeInfoList() << localInfo());
     });
 

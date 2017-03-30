@@ -128,9 +128,12 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
             if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
                 emit cameraFootageChanged(camera);
     });
-    const QnCommonMessageProcessor* messageProcessor = commonModule()->messageProcessor();
-    connect(messageProcessor,   &QnCommonMessageProcessor::businessActionReceived, this,
-            [this] (const QnAbstractBusinessActionPtr &businessAction)
+}
+
+void QnCameraHistoryPool::setMessageProcessor(const QnCommonMessageProcessor* messageProcessor)
+{
+    connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
+        [this](const QnAbstractBusinessActionPtr &businessAction)
     {
         QnBusiness::EventType eventType = businessAction->getRuntimeParams().eventType;
         if (eventType >= QnBusiness::SystemHealthEvent && eventType <= QnBusiness::MaxSystemHealthEvent) {
@@ -138,10 +141,10 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
             if (healthMessage == QnSystemHealth::ArchiveRebuildFinished || healthMessage == QnSystemHealth::ArchiveFastScanFinished)
             {
                 auto cameras = getServerFootageData(businessAction->getRuntimeParams().eventResourceId);
-                for (const auto &cameraId: cameras)
+                for (const auto &cameraId : cameras)
                     invalidateCameraHistory(cameraId);
 
-                for (const auto &cameraId: cameras)
+                for (const auto &cameraId : cameras)
                     if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
                         emit cameraFootageChanged(camera);
             }

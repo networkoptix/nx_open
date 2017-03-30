@@ -66,6 +66,7 @@ namespace ec2 {
         params.offset = offset;
 
         using namespace std::placeholders;
+        // todo: #singletone refactor peers param are lost
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
             ApiCommand::uploadUpdate, params,
             [handler, reqId](ErrorCode errorCode) { handler->done(reqId, errorCode); });

@@ -55,8 +55,10 @@ void createData(const Appserver2Ptr& server)
 
 TEST(SympleSyncTest, main)
 {
+    static const int kInstanceCount = 1;
+
     std::vector<Appserver2Ptr> servers;
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < kInstanceCount; ++i)
         servers.push_back(createAppserver());
     for(const auto& server: servers)
         ASSERT_TRUE(server->waitUntilStarted());
