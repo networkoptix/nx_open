@@ -399,9 +399,9 @@ QString QnLoginDialog::defaultLastUsedConnectionName()
     return tr("* Last used connection *");
 }
 
-QString QnLoginDialog::depricatedLastUsedConnectionName()
+QString QnLoginDialog::deprecatedLastUsedConnectionName()
 {
-    return defaultLastUsedConnectionName();
+    return lit("* Last used connection *");
 }
 
 void QnLoginDialog::resetConnectionsModel()
@@ -456,7 +456,7 @@ void QnLoginDialog::resetSavedSessionsModel()
     for (const auto& connection : customConnections)
     {
         NX_ASSERT(!connection.name.isEmpty());
-        if (connection.name == depricatedLastUsedConnectionName())
+        if (connection.name == deprecatedLastUsedConnectionName())
         {
             /**
               * Client with version which is less than 3.0 stores last used connection in custom

@@ -85,7 +85,7 @@ private:
     /**
      * @brief Returns name of last used connection for versions less than 3.0
      */
-    static QString depricatedLastUsedConnectionName();
+    static QString deprecatedLastUsedConnectionName();
 
 private:
     QScopedPointer<Ui::LoginDialog> ui;
