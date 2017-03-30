@@ -119,9 +119,9 @@ QnMobileClientModule::QnMobileClientModule(
             qnClientCoreSettings->setKnownServerUrls(values);
             qnClientCoreSettings->save();
         };
-    m_commonModule->store(new QnServerAddressWatcher(getter, setter));
+    m_commonModule->store(new QnServerAddressWatcher(getter, setter, m_commonModule));
 
-    m_commonModule->store(new QnSystemsFinder());
+    m_commonModule->instance<QnSystemsFinder>();
     m_commonModule->store(new QnSystemsWeightsManager());
 
     m_commonModule->store(new settings::SessionsMigrationHelper());
