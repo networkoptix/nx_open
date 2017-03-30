@@ -771,6 +771,7 @@
                 <module>macsetup/client-dmg</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>nx_cloud/libtraffic_relay</module>
             </modules>
         </profile>
 
@@ -790,9 +791,11 @@
             <modules>
                 <module>nx_cloud/cloud_db</module>
                 <module>nx_cloud/connection_mediator</module>
+                <module>nx_cloud/traffic_relay</module>
                 <module>nx_cloud/cloud_connect_test_util</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>nx_cloud/libtraffic_relay</module>
                 <module>media_db_util</module>
                 <module>testcamera</module>
                 <module>nx_cloud/libvms_gateway</module>
