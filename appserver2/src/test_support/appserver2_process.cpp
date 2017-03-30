@@ -39,7 +39,7 @@ static int registerQtResources()
 //namespace nx {
 namespace ec2 {
 
-QnStaticCommonModule Appserver2ProcessPublic::staticCommon;
+QnStaticCommonModule Appserver2ProcessPublic::staticCommon(Qn::PT_NotDefined, QString(), QString());
 
 namespace conf {
 

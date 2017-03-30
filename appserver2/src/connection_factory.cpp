@@ -133,7 +133,7 @@ int Ec2DirectConnectionFactory::connectAsync(
     QUrl url = addr;
     url.setUserName(url.userName().toLower());
 
-    if (ApiPeerData::isMobileClient(m_commonModule->localPeerType()))
+    if (ApiPeerData::isMobileClient(qnStaticCommon->localPeerType()))
     {
         QUrlQuery query(url);
         query.removeQueryItem(lit("format"));
