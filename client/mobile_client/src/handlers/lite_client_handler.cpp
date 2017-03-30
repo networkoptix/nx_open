@@ -78,10 +78,12 @@ void QnLiteClientHandlerPrivate::at_videowallControlMessageReceived(
 
 void QnLiteClientHandlerPrivate::at_initialResourcesReceived()
 {
-    layout = QnLiteClientLayoutHelper::findLayoutForServer(videowallGuid);
+    QnLiteClientLayoutHelper helper;
+
+    layout = helper.findLayoutForServer(videowallGuid);
     if (!layout)
     {
-        layout = QnLiteClientLayoutHelper::createLayoutForServer(videowallGuid);
+        layout = helper.createLayoutForServer(videowallGuid);
 
         if (!layout)
             return;

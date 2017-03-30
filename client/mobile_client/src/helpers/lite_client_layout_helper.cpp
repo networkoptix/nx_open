@@ -118,7 +118,7 @@ void QnLiteClientLayoutHelper::setDisplayCell(const QPoint& cell)
 
     d->layout->setProperty(kDisplayCellProperty, pointToString(cell));
 
-    propertyDictionary->saveParams(d->layout->getId());
+    propertyDictionary()->saveParams(d->layout->getId());
 }
 
 QnLiteClientLayoutHelper::DisplayMode QnLiteClientLayoutHelper::displayMode() const

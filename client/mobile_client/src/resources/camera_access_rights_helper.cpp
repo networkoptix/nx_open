@@ -1,5 +1,7 @@
 #include "camera_access_rights_helper.h"
 
+#include <mobile_client/mobile_client_common_module_aware.h>
+
 #include <nx/utils/log/assert.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
@@ -8,7 +10,8 @@
 #include <watchers/user_watcher.h>
 #include <common/common_module.h>
 
-class QnCameraAccessRightsHelperPrivate : public QObject {
+class QnCameraAccessRightsHelperPrivate : public QObject, public QnConnectionContextAware
+{
     QnCameraAccessRightsHelper * const q_ptr;
     Q_DECLARE_PUBLIC(QnCameraAccessRightsHelper)
 

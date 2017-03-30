@@ -6,6 +6,11 @@
 #include "common/common_module.h"
 #include "api/app_server_connection.h"
 
+QnSimpleNetworkProxyFactory::QnSimpleNetworkProxyFactory(QnCommonModule* commonModule):
+    base_type(commonModule)
+{
+}
+
 QNetworkProxy QnSimpleNetworkProxyFactory::proxyToResource(const QnResourcePtr &resource,
     QnMediaServerResourcePtr* const via) const
 {

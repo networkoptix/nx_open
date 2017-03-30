@@ -1,9 +1,11 @@
 #pragma once
 
+#include <mobile_client/mobile_client_common_module_aware.h>
+
 #include <utils/common/connective.h>
 
 class QnMediaResourceHelperPrivate;
-class QnMediaResourceHelper : public Connective<QObject>
+class QnMediaResourceHelper: public Connective<QObject>, public QnConnectionContextAware
 {
     Q_OBJECT
 

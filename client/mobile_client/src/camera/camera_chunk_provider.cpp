@@ -1,5 +1,7 @@
 #include "camera_chunk_provider.h"
 
+#include <common/common_module.h>
+
 #include <camera/loaders/flat_camera_data_loader.h>
 #include <camera/data/abstract_camera_data.h>
 #include <core/resource/camera_resource.h>
@@ -51,7 +53,11 @@ void QnCameraChunkProvider::setResourceId(const QString& id)
     if (!camera)
         return;
 
-    m_loader = new QnFlatCameraDataLoader(camera, Qn::RecordingContent, this);
+    m_loader = new QnFlatCameraDataLoader(
+        camera,
+        commonModule()->currentServer(),
+        Qn::RecordingContent,
+        this);
     connect(m_loader, &QnFlatCameraDataLoader::ready, this,
         [this](const QnAbstractCameraDataPtr& data)
         {

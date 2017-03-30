@@ -1,10 +1,12 @@
 #pragma once
 
+#include <mobile_client/mobile_client_common_module_aware.h>
+
 #include <QtCore/QSortFilterProxyModel>
 
 class QnCameraListModelPrivate;
 
-class QnCameraListModel : public QSortFilterProxyModel
+class QnCameraListModel: public QSortFilterProxyModel, public QnConnectionContextAware
 {
     Q_OBJECT
 

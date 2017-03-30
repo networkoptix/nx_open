@@ -11,6 +11,8 @@
 class QnSimpleNetworkProxyFactory : public QnNetworkProxyFactory {
     typedef QnNetworkProxyFactory base_type;
 public:
+    QnSimpleNetworkProxyFactory(QnCommonModule* commonModule);
+
 
     virtual QNetworkProxy proxyToResource(const QnResourcePtr &resource, QnMediaServerResourcePtr* const via = nullptr) const override;
     virtual QUrl urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, const QString &proxyQueryParameterName = QString()) const override;

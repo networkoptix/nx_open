@@ -237,5 +237,5 @@ void QnCameraListModelPrivate::at_thumbnailUpdated(
 {
     Q_UNUSED(thumbnailId);
 
-    model->refreshResource(resourcePool()->getResourceById(resourceId), Qn::ThumbnailRole);
+    model->refreshResource(model->resourcePool()->getResourceById(resourceId), Qn::ThumbnailRole);
 }

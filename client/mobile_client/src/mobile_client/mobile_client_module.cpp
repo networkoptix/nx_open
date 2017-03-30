@@ -80,12 +80,10 @@ QnMobileClientModule::QnMobileClientModule(
     m_commonModule->store(new QnClientCoreSettings());
     m_commonModule->store(new QnMobileClientSettings);
     settings::migrateSettings();
-    m_commonModule->store(new QnSessionManager());
 
     m_commonModule->store(new QnLongRunnablePool());
     m_commonModule->store(new QnMobileClientMessageProcessor());
     m_commonModule->store(new QnCameraHistoryPool());
-    m_commonModule->store(new QnRuntimeInfoManager());
     m_commonModule->store(new QnMobileClientCameraFactory());
 
     m_commonModule->store(new QnResourcesChangesManager());
@@ -98,9 +96,7 @@ QnMobileClientModule::QnMobileClientModule(
 
     m_commonModule->store(new QnCloudConnectionProvider());
     m_commonModule->store(new QnCloudStatusWatcher());
-    QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
-
-    QnAppServerConnectionFactory::setDefaultFactory(QnMobileClientCameraFactory::instance());
+    QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory(m_commonModule));
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = m_commonModule->moduleGUID();
@@ -113,11 +109,8 @@ QnMobileClientModule::QnMobileClientModule(
         runtimeData.videoWallInstanceGuid = startupParameters.videowallInstanceGuid;
     m_commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);
 
-    auto moduleFinder = m_commonModule->store(new QnModuleFinder(true));
-    moduleFinder->multicastModuleFinder()->setCheckInterfacesTimeout(10 * 1000);
-    moduleFinder->start();
-
-    m_commonModule->store(new QnRouter(moduleFinder));
+    m_commonModule->moduleFinder()->multicastModuleFinder()->setCheckInterfacesTimeout(10 * 1000);
+    m_commonModule->moduleFinder()->start();
 
     const auto getter = []() { return qnClientCoreSettings->knownServerUrls(); };
     const auto setter =
@@ -134,7 +127,7 @@ QnMobileClientModule::QnMobileClientModule(
     m_commonModule->store(new settings::SessionsMigrationHelper());
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this,
-        [moduleFinder](Qt::ApplicationState state)
+        [moduleFinder = m_commonModule->moduleFinder()](Qt::ApplicationState state)
         {
             switch (state)
             {

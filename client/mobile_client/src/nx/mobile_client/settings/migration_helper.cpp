@@ -25,7 +25,7 @@ static QnUuid savedSessionId(const QVariant& sessionVariant)
     return QnLoginSession::fromVariant(sessionVariant.toMap()).id;
 }
 
-class SessionsMigrationHelperPrivate: public QObject
+class SessionsMigrationHelperPrivate: public QObject, public QnConnectionContextAware
 {
 public:
     void at_moduleFinder_moduleAddressFound(
