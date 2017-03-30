@@ -202,7 +202,7 @@ QnUuid QnCommonModule::remoteGUID() const {
 
 QUrl QnCommonModule::currentUrl() const
 {
-    if (m_ec2Connection)
+    if (!m_ec2Connection)
         return m_ec2Connection->connectionInfo().ecUrl;
     return QUrl();
 }

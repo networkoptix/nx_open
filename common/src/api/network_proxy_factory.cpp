@@ -30,7 +30,7 @@ QnNetworkProxyFactory::~QnNetworkProxyFactory()
 QUrl QnNetworkProxyFactory::urlToResource(
     const QUrl &baseUrl,
     const QnResourcePtr &resource,
-    const QString &proxyQueryParameterName)
+    const QString &proxyQueryParameterName) const
 {
     QnMediaServerResourcePtr via;
     const QNetworkProxy &proxy = proxyToResource(resource, &via);
@@ -95,10 +95,9 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
 
 QNetworkProxy QnNetworkProxyFactory::proxyToResource(
     const QnResourcePtr &resource,
-    QnMediaServerResourcePtr* const via )
+    QnMediaServerResourcePtr* const via ) const
 {
-    const auto& commonModule = resource->resourcePool()->commonModule();
-    if (!commonModule->router())
+    if (!commonModule()->router())
         return QNetworkProxy(QNetworkProxy::NoProxy);
 
     QnMediaServerResourcePtr server;
@@ -114,12 +113,11 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
         server = resource.dynamicCast<QnMediaServerResource>();
     }
 
-    const auto& connection = commonModule->ec2Connection();
+    const auto& connection = commonModule()->ec2Connection();
     if (server && connection)
     {
         QnUuid id = server->getOriginalGuid();
-        QnCommonModule* commonModule = server->resourcePool()->commonModule();
-        QnRoute route = commonModule->router()->routeTo(id);
+        QnRoute route = commonModule()->router()->routeTo(id);
         if (!route.gatewayId.isNull() || camera) {
             NX_ASSERT(!route.addr.isNull() || route.reverseConnect);
 

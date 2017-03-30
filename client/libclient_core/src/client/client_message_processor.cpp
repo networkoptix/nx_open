@@ -55,7 +55,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
 
     if (connection)
     {
-        const auto& info = connection->connectionInfo();
+        auto info = connection->connectionInfo();
         const auto serverId = info.serverId();
         trace(lit("Connection established to %1").arg(serverId.toString()));
 
@@ -64,7 +64,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
          * In that case each request may potentially be sent to another server, which may lead
          * to undefined behavior. So we are fixing server which we were connected to in the url.
          */
-        auto currentUrl = commonModule()->currentUrl();
+        auto currentUrl = info.ecUrl;
         QString host = currentUrl.host();
         if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host))
         {
@@ -73,8 +73,11 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
             if (host != fullHost)
             {
                 trace(lit("Url fixed from %1 to %2").arg(host).arg(fullHost));
-                currentUrl.setHost(fullHost);
-                QnAppServerConnectionFactory::setUrl(currentUrl);
+                NX_ASSERT(false, "Correct url must be filled in ecUrl");
+//                 info.ecUrl.setHost(fullHost);
+//                 connection->setConnectionInfo(info);
+//
+//                 QnAppServerConnectionFactory::setUrl(currentUrl);
             }
         }
 

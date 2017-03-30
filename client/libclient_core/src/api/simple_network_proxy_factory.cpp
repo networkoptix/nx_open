@@ -6,7 +6,9 @@
 #include "common/common_module.h"
 #include "api/app_server_connection.h"
 
-QNetworkProxy QnSimpleNetworkProxyFactory::proxyToResource(const QnResourcePtr &resource, QnMediaServerResourcePtr* const via) {
+QNetworkProxy QnSimpleNetworkProxyFactory::proxyToResource(const QnResourcePtr &resource,
+    QnMediaServerResourcePtr* const via) const
+{
     Q_UNUSED(via)
 
     QnMediaServerResourcePtr server;
@@ -35,7 +37,9 @@ QNetworkProxy QnSimpleNetworkProxyFactory::proxyToResource(const QnResourcePtr &
     return QNetworkProxy(QNetworkProxy::HttpProxy, url.host(), url.port(), url.userName(), url.password());
 }
 
-QUrl QnSimpleNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, const QString &proxyQueryParameterName) {
+QUrl QnSimpleNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource,
+    const QString &proxyQueryParameterName) const
+{
     QUrl url = base_type::urlToResource(baseUrl, resource, proxyQueryParameterName);
 
     QUrl ecUrl = commonModule()->currentUrl();

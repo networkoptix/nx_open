@@ -22,17 +22,17 @@ public:
     QnNetworkProxyFactory(QnCommonModule* commonModule);
     virtual ~QnNetworkProxyFactory();
 
-    static QUrl urlToResource(
+    virtual QUrl urlToResource(
         const QUrl &baseUrl,
         const QnResourcePtr &resource,
-        const QString &proxyQueryParameterName = QString());
+        const QString &proxyQueryParameterName = QString()) const;
 
     /*!
         \param via In not NULL filled with server, request is to be sent to
     */
-    static QNetworkProxy proxyToResource(
+    virtual QNetworkProxy proxyToResource(
         const QnResourcePtr &resource,
-        QnMediaServerResourcePtr* const via = nullptr );
+        QnMediaServerResourcePtr* const via = nullptr ) const;
 
 protected:
     virtual QList<QNetworkProxy> queryProxy(const QNetworkProxyQuery &query) override;
