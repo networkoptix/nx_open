@@ -60,7 +60,7 @@ public:
                 }
             });
 
-        connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
+        connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
             this,
             [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions /*value*/)
             {
@@ -121,7 +121,7 @@ QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr& user)
 {
     QStringList permissionStrings;
 
-    Qn::GlobalPermissions permissions = qnGlobalPermissionsManager->globalPermissions(user);
+    Qn::GlobalPermissions permissions = globalPermissionsManager()->globalPermissions(user);
 
     if (user->isOwner())
         return tr("Owner");

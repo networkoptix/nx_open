@@ -44,7 +44,7 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
             updatePermissions(resource);
         });
 
-    connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
+    connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
         this,
         [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions /*value*/)
         {

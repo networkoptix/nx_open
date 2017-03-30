@@ -37,7 +37,7 @@ protected:
 
     QnResourceAccessProvider* accessProvider() const
     {
-        return qnResourceAccessProvider;
+        return resourceAccessProvider();
     }
 
     QnLayoutResourcePtr addLayoutForVideoWall(const QnVideoWallResourcePtr& videoWall)

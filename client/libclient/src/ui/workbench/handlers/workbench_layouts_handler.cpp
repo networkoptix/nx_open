@@ -108,7 +108,7 @@ QnResourceList calculateResourcesToShare(const QnResourceList& resources,
             if (!QnResourceAccessFilter::isShareableMedia(resource))
                 return false;
 
-            return !qnResourceAccessProvider->hasAccess(user, resource);
+            return !resourceAccessProvider()->hasAccess(user, resource);
         };
     return resources.filtered(sharingRequired);
 }
@@ -530,7 +530,7 @@ bool LayoutsHandler::confirmChangeSharedLayout(const LayoutChange& change)
         allUsers,
         [layout = change.layout](const QnUserResourcePtr& user)
         {
-            return qnResourceAccessProvider->accessibleVia(user, layout) ==
+            return resourceAccessProvider()->accessibleVia(user, layout) ==
                 QnAbstractResourceAccessProvider::Source::shared;
         });
 
@@ -551,7 +551,7 @@ bool LayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layo
             return any_of(layouts,
                 [user](const QnLayoutResourcePtr& layout)
                 {
-                    return qnResourceAccessProvider->accessibleVia(user, layout) ==
+                    return resourceAccessProvider()->accessibleVia(user, layout) ==
                         QnAbstractResourceAccessProvider::Source::shared;
                 });
         });
@@ -644,7 +644,7 @@ bool LayoutsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& su
             continue;
 
         QnResourceList providers;
-        auto accessSource = qnResourceAccessProvider->accessibleVia(subject, resource, &providers);
+        auto accessSource = resourceAccessProvider()->accessibleVia(subject, resource, &providers);
         if (accessSource != QnAbstractResourceAccessProvider::Source::layout)
             continue;
 
@@ -976,7 +976,7 @@ void LayoutsHandler::at_stopSharingLayoutAction_triggered()
     QnLayoutResourceList sharedLayouts;
     for (auto resource: params.resources().filtered<QnLayoutResource>())
     {
-        if (qnResourceAccessProvider->accessibleVia(subject, resource) == QnAbstractResourceAccessProvider::Source::shared)
+        if (resourceAccessProvider()->accessibleVia(subject, resource) == QnAbstractResourceAccessProvider::Source::shared)
             sharedLayouts << resource;
     }
     if (sharedLayouts.isEmpty())

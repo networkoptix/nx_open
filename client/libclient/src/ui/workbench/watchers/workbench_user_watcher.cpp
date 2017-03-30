@@ -31,7 +31,7 @@ QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved);
 
-    connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
+    connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
         this,
         [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions /*value*/)
         {

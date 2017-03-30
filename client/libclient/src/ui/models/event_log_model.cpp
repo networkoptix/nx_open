@@ -532,7 +532,7 @@ bool QnEventLogModel::hasAccessToCamera(const QnUuid& cameraId) const
     NX_ASSERT(camera, "Resource is not a camera");
     if (!camera)
         return false;
-    return qnResourceAccessProvider->hasAccess(context()->user(), camera);
+    return resourceAccessProvider()->hasAccess(context()->user(), camera);
 }
 
 bool QnEventLogModel::hasAccessToArchive(const QnUuid& cameraId) const
@@ -542,7 +542,7 @@ bool QnEventLogModel::hasAccessToArchive(const QnUuid& cameraId) const
     if (!camera)
         return false;
 
-    return qnResourceAccessProvider->hasAccess(context()->user(), camera)
+    return resourceAccessProvider()->hasAccess(context()->user(), camera)
         && accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission);
 }
 

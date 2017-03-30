@@ -2696,7 +2696,7 @@ void MediaServerProcess::run()
     QElapsedTimer tt;
     tt.start();
     qnResourceAccessManager->beginUpdate();
-    qnResourceAccessProvider->beginUpdate();
+    resourceAccessProvider()->beginUpdate();
     loadResourcesFromECS(messageProcessor.data());
     saveServerInfo(m_mediaServer);
     m_mediaServer->setStatus(Qn::Online);
@@ -2705,7 +2705,7 @@ void MediaServerProcess::run()
         moveHandlingCameras();
 
     qDebug() << "resources loaded for" << tt.elapsed();
-    qnResourceAccessProvider->endUpdate();
+    resourceAccessProvider()->endUpdate();
     qDebug() << "access ready" << tt.elapsed();
     qnResourceAccessManager->endUpdate();
     qDebug() << "permissions ready" << tt.elapsed();

@@ -260,7 +260,7 @@ bool QnLayoutsModelUnsorted::isLayoutSuitable(const QnLayoutResourcePtr& layout)
     if (!m_user)
         return false;
 
-    return qnResourceAccessProvider->hasAccess(m_user, layout);
+    return resourceAccessProvider()->hasAccess(m_user, layout);
 }
 
 bool QnLayoutsModelUnsorted::isServerSuitable(const QnMediaServerResourcePtr& server) const

@@ -28,7 +28,7 @@ QnAccessibleResourcesModel::QnAccessibleResourcesModel(QObject* parent) :
     m_allChecked(false),
     m_subject()
 {
-    connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
+    connect(resourceAccessProvider(), &QnResourceAccessProvider::accessChanged, this,
         [this](const QnResourceAccessSubject& subject)
         {
             if (subject == m_subject)
@@ -131,7 +131,7 @@ QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) co
             {
                 case Qt::DecorationRole:
                 {
-                    const auto accessLevels = qnResourceAccessProvider->accessLevels(m_subject,
+                    const auto accessLevels = resourceAccessProvider()->accessLevels(m_subject,
                         resource);
 
                     if (accessLevels.contains(QnAbstractResourceAccessProvider::Source::layout))
@@ -146,7 +146,7 @@ QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) co
                 case Qt::ToolTipRole:
                 {
                     QnResourceList providers;
-                    qnResourceAccessProvider->accessibleVia(m_subject, resource, &providers);
+                    resourceAccessProvider()->accessibleVia(m_subject, resource, &providers);
                     return getTooltip(providers);
                 }
 

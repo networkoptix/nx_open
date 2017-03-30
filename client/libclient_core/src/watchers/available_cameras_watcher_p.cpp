@@ -10,7 +10,8 @@
 
 namespace detail {
 
-Watcher::Watcher(const QnUserResourcePtr& user):
+Watcher::Watcher(const QnUserResourcePtr& user, QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
     m_user(user)
 {
 }
@@ -22,8 +23,10 @@ QnUserResourcePtr Watcher::user() const
 
 // LayoutBasedWatcher
 
-LayoutBasedWatcher::LayoutBasedWatcher(const QnUserResourcePtr& user):
-    Watcher(user),
+LayoutBasedWatcher::LayoutBasedWatcher(const QnUserResourcePtr& user,
+    QnCommonModule* commonModule)
+    :
+    Watcher(user, commonModule),
     m_itemAggregator(new QnLayoutItemAggregator(this))
 {
     NX_ASSERT(user);
@@ -103,14 +106,16 @@ void LayoutBasedWatcher::at_layoutItemRemoved(const QnUuid& id)
 
 // PermissionsBasedWatcher
 
-PermissionsBasedWatcher::PermissionsBasedWatcher(const QnUserResourcePtr& user):
-    Watcher(user)
+PermissionsBasedWatcher::PermissionsBasedWatcher(const QnUserResourcePtr& user,
+    QnCommonModule* commonModule)
+    :
+    Watcher(user, commonModule)
 {
     NX_ASSERT(user);
     if (!user)
         return;
 
-    const auto accessProvider = qnResourceAccessProvider;
+    const auto accessProvider = resourceAccessProvider();
 
     connect(accessProvider, &QnResourceAccessProvider::accessChanged, this,
         [this, accessProvider, user]

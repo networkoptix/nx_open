@@ -27,7 +27,7 @@ protected:
     virtual void SetUp()
     {
         m_module.reset(new QnCommonModule());
-        QObject::connect(qnGlobalPermissionsManager,
+        QObject::connect(globalPermissionsManager(),
             &QnGlobalPermissionsManager::globalPermissionsChanged,
             [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions value)
         {
@@ -46,7 +46,7 @@ protected:
     bool hasGlobalPermission(const QnResourceAccessSubject& subject,
         Qn::GlobalPermission requiredPermission)
     {
-        return qnGlobalPermissionsManager->hasGlobalPermission(subject, requiredPermission);
+        return globalPermissionsManager()->hasGlobalPermission(subject, requiredPermission);
     }
 
     void awaitPermissions(const QnResourceAccessSubject& subject, Qn::GlobalPermissions value)

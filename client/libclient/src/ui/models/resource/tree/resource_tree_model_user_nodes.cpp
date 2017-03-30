@@ -35,13 +35,13 @@ QnResourceTreeModelUserNodes::QnResourceTreeModelUserNodes(
     m_shared(),
     m_recorders()
 {
-    connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
+    connect(resourceAccessProvider(), &QnResourceAccessProvider::accessChanged, this,
         &QnResourceTreeModelUserNodes::handleAccessChanged);
 
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnResourceTreeModelUserNodes::handleUserChanged);
 
-    connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
+    connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
         this, &QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged);
 
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
@@ -168,9 +168,9 @@ bool QnResourceTreeModelUserNodes::placeholderAllowedForSubject(
         return false;
 
     bool isRole = !subject.user();
-    bool hasAllMedia = qnGlobalPermissionsManager->hasGlobalPermission(subject,
+    bool hasAllMedia = globalPermissionsManager()->hasGlobalPermission(subject,
         Qn::GlobalAccessAllMediaPermission);
-    bool isAdmin = qnGlobalPermissionsManager->hasGlobalPermission(subject,
+    bool isAdmin = globalPermissionsManager()->hasGlobalPermission(subject,
         Qn::GlobalAdminPermission);
 
     switch (nodeType)
@@ -223,7 +223,7 @@ bool QnResourceTreeModelUserNodes::showLayoutForSubject(const QnResourceAccessSu
     if (layout->isShared())
     {
         /* Admins see all shared layouts. */
-        if (qnGlobalPermissionsManager->hasGlobalPermission(subject, Qn::GlobalAdminPermission))
+        if (globalPermissionsManager()->hasGlobalPermission(subject, Qn::GlobalAdminPermission))
         {
             NX_ASSERT(subject.user());
             if (subject.user())
@@ -234,7 +234,7 @@ bool QnResourceTreeModelUserNodes::showLayoutForSubject(const QnResourceAccessSu
         if (subject.user() && subject.user()->userRole() == Qn::UserRole::CustomUserRole)
             return false;
 
-        return qnResourceAccessProvider->hasAccess(subject, layout);
+        return resourceAccessProvider()->hasAccess(subject, layout);
     }
 
     return subject.user()
@@ -252,7 +252,7 @@ bool QnResourceTreeModelUserNodes::showMediaForSubject(const QnResourceAccessSub
         return false;
 
     /* Hide media for users who has access to all media. */
-    if (qnGlobalPermissionsManager->hasGlobalPermission(subject,
+    if (globalPermissionsManager()->hasGlobalPermission(subject,
         Qn::GlobalAccessAllMediaPermission))
             return false;
 
@@ -260,7 +260,7 @@ bool QnResourceTreeModelUserNodes::showMediaForSubject(const QnResourceAccessSub
     if (subject.user() && subject.user()->userRole() == Qn::UserRole::CustomUserRole)
         return false;
 
-    return qnResourceAccessProvider->hasAccess(subject, media);
+    return resourceAccessProvider()->hasAccess(subject, media);
 }
 
 QnResourceTreeModelNodePtr QnResourceTreeModelUserNodes::ensureSubjectNode(
@@ -593,7 +593,7 @@ void QnResourceTreeModelUserNodes::handleResourceAdded(const QnResourcePtr& reso
 void QnResourceTreeModelUserNodes::handleUserChanged(const QnUserResourcePtr& user)
 {
     m_valid = !user.isNull()
-        && qnGlobalPermissionsManager->hasGlobalPermission(user, Qn::GlobalAdminPermission);
+        && globalPermissionsManager()->hasGlobalPermission(user, Qn::GlobalAdminPermission);
 
     clean();
     if (m_valid)
@@ -606,7 +606,7 @@ void QnResourceTreeModelUserNodes::handleAccessChanged(const QnResourceAccessSub
     if (!m_valid)
         return;
 
-    if (qnResourceAccessProvider->hasAccess(subject, resource))
+    if (resourceAccessProvider()->hasAccess(subject, resource))
     {
         if (auto node = ensureResourceNode(subject, resource))
         {

@@ -20,7 +20,7 @@ QnResourceTreeModelLayoutNodeManager::QnResourceTreeModelLayoutNodeManager(QnRes
                 snapshotManager()->isModified(layout));
         });
 
-    connect(qnResourceAccessProvider, &QnResourceAccessProvider::accessChanged, this,
+    connect(resourceAccessProvider(), &QnResourceAccessProvider::accessChanged, this,
         [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource)
         {
             auto primary = nodeForResource(resource).objectCast<QnResourceTreeModelLayoutNode>();

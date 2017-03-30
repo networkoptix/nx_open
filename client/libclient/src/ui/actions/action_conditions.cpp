@@ -418,7 +418,7 @@ Qn::ActionVisibility QnStopSharingActionCondition::check(const QnActionParameter
 
     for (auto resource: parameters.resources())
     {
-        if (qnResourceAccessProvider->accessibleVia(subject, resource) == QnAbstractResourceAccessProvider::Source::shared)
+        if (resourceAccessProvider()->accessibleVia(subject, resource) == QnAbstractResourceAccessProvider::Source::shared)
             return Qn::EnabledAction;
     }
 
