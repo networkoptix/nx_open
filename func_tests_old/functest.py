@@ -1315,8 +1315,6 @@ SimpleTestKeys = {
 BoxTestKeys = OrderedDict([
     ('--ts-noinet', TimeSyncNoInetTest),
     ('--ts-inet', TimeSyncWithInetTest),
-    ('--bstorage', BackupStorageTest),
-    ('--msarch', MultiserverArchiveTest),
     ('--stream', StreamingTest),
     ('--hlso', HlsOnlyTest),
     ('--dbup', DBTest),
