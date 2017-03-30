@@ -92,25 +92,6 @@ QnSystemHostsModel::HostsModel::HostsModel(QnSystemHostsModel* parent):
 {
     connect(m_owner, &QnSystemHostsModel::systemIdChanged, this, &HostsModel::reloadHosts);
     connect(m_owner, &QnSystemHostsModel::localSystemIdChanged, this, &HostsModel::forceResort);
-
-    const auto rowsChangedHandler =
-        [this](const QModelIndex& /* parent */, int first, int /* last */)
-        {
-            if (first == 0)
-                emit m_owner->firstHostChanged();
-        };
-
-    connect(this, &HostsModel::modelReset, m_owner, &QnSystemHostsModel::firstHostChanged);
-    connect(this, &HostsModel::rowsInserted, this, rowsChangedHandler);
-    connect(this, &HostsModel::rowsRemoved, this, rowsChangedHandler);
-
-    connect(this, &HostsModel::rowsMoved, this,
-        [this](const QModelIndex& /* parent*/, int start, int /* end */,
-            const QModelIndex& /* destination */, int row)
-        {
-            if ((row == 0) || (start == 0))
-                emit m_owner->firstHostChanged();
-        });
 }
 
 void QnSystemHostsModel::HostsModel::forceResort()
@@ -361,6 +342,30 @@ QnSystemHostsModel::QnSystemHostsModel(QObject* parent):
     base_type(parent)
 {
     setSourceModel(new HostsModel(this));
+
+    const auto rowsChangedHandler =
+        [this](const QModelIndex& /* parent */, int first, int /* last */)
+        {
+            if (first == 0)
+                emit firstHostChanged();
+        };
+
+    connect(this, &QnSystemHostsModel::modelReset, this, &QnSystemHostsModel::firstHostChanged);
+    connect(this, &QnSystemHostsModel::rowsInserted, this,
+            [this](const QModelIndex& /* parent */, int first, int /* last */)
+            {
+                if (first == 0)
+                    emit firstHostChanged();
+            });
+    connect(this, &QnSystemHostsModel::rowsRemoved, this, rowsChangedHandler);
+
+    connect(this, &QnSystemHostsModel::rowsMoved, this,
+        [this](const QModelIndex& /* parent*/, int start, int /* end */,
+            const QModelIndex& /* destination */, int row)
+        {
+            if ((row == 0) || (start == 0))
+                emit firstHostChanged();
+        });
 }
 
 bool QnSystemHostsModel::lessThan(
