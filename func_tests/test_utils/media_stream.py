@@ -16,7 +16,7 @@ log = logging.getLogger(__name__)
 
 
 CHUNK_SIZE = 1024*100  # bytes
-RTSP_SPEED = 32
+RTSP_SPEED = 4  # maximum is 32, but only 4 is working with opencv shipped with ubuntu 14.04
 
 
 def open_media_stream(server_url, user, password, stream_type, camera_mac_addr):
