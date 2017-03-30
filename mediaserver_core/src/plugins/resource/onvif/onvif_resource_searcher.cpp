@@ -32,7 +32,7 @@ const static std::array<int, 5> kOnvifDeviceAltPorts =
     9988 // Dahui default port
 };
 static const int kDefaultOnvifPort = 80;
-static const std::chrono::milliseconds kManualDiscoveryConnectTimeout(3000);
+static const std::chrono::milliseconds kManualDiscoveryConnectTimeout(5000);
 
 } // namespace
 
