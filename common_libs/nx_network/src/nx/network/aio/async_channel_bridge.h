@@ -45,21 +45,21 @@ public:
     virtual void start(nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> doneHandler) = 0;
 };
 
-template<typename LeftFile, typename RightFile>
+template<typename LeftChannel, typename RightChannel>
 class AsyncChannelBridgeImpl:
     public AsyncChannelBridge
 {
     using base_type = AsyncChannelBridge;
 
 public:
-    AsyncChannelBridgeImpl(LeftFile leftFile, RightFile rightFile):
+    AsyncChannelBridgeImpl(LeftChannel leftChannel, RightChannel rightChannel):
         m_closedChannelCount(0)
     {
-        m_leftFile = std::move(leftFile);
-        m_rightFile = std::move(rightFile);
+        m_leftChannel = std::move(leftChannel);
+        m_rightChannel = std::move(rightChannel);
 
-        initializeOneWayChannel(&m_leftToRight, &m_leftFile, &m_rightFile);
-        initializeOneWayChannel(&m_rightToLeft, &m_rightFile, &m_leftFile);
+        initializeOneWayChannel(&m_leftToRight, &m_leftChannel, &m_rightChannel);
+        initializeOneWayChannel(&m_rightToLeft, &m_rightChannel, &m_leftChannel);
 
         bindToAioThread(getAioThread());
     }
@@ -73,8 +73,8 @@ public:
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
     {
         base_type::bindToAioThread(aioThread);
-        m_leftFile->bindToAioThread(aioThread);
-        m_rightFile->bindToAioThread(aioThread);
+        m_leftChannel->bindToAioThread(aioThread);
+        m_rightChannel->bindToAioThread(aioThread);
         m_timer.bindToAioThread(aioThread);
     }
 
@@ -112,11 +112,11 @@ public:
     }
 
 private:
-    std::unique_ptr<detail::AsyncChannelUnidirectionalBridge<LeftFile, RightFile>> m_leftToRight;
-    std::unique_ptr<detail::AsyncChannelUnidirectionalBridge<RightFile, LeftFile>> m_rightToLeft;
+    std::unique_ptr<detail::AsyncChannelUnidirectionalBridge<LeftChannel, RightChannel>> m_leftToRight;
+    std::unique_ptr<detail::AsyncChannelUnidirectionalBridge<RightChannel, LeftChannel>> m_rightToLeft;
 
-    LeftFile m_leftFile;
-    RightFile m_rightFile;
+    LeftChannel m_leftChannel;
+    RightChannel m_rightChannel;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_onDoneHandler;
     int m_closedChannelCount;
     boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
@@ -129,15 +129,15 @@ private:
         m_leftToRight.reset();
         m_rightToLeft.reset();
 
-        if (m_leftFile)
+        if (m_leftChannel)
         {
-            m_leftFile->pleaseStopSync();
-            m_leftFile = nullptr;
+            m_leftChannel->pleaseStopSync();
+            m_leftChannel = nullptr;
         }
-        if (m_rightFile)
+        if (m_rightChannel)
         {
-            m_rightFile->pleaseStopSync();
-            m_rightFile = nullptr;
+            m_rightChannel->pleaseStopSync();
+            m_rightChannel = nullptr;
         }
     }
 
@@ -195,8 +195,8 @@ private:
     
     void reportFailure(SystemError::ErrorCode sysErrorCode)
     {
-        m_leftFile->cancelIOSync(aio::EventType::etNone);
-        m_rightFile->cancelIOSync(aio::EventType::etNone);
+        m_leftChannel->cancelIOSync(aio::EventType::etNone);
+        m_rightChannel->cancelIOSync(aio::EventType::etNone);
 
         if (m_onDoneHandler)
             m_onDoneHandler(sysErrorCode);
@@ -204,16 +204,16 @@ private:
 };
 
 /**
- * LeftFile and RightFile types must be at least movable.
+ * LeftChannel and RightChannel types must be at least movable.
  * That allows them to be std::unique_ptr<Something>.
  */
-template<typename LeftFile, typename RightFile>
-std::unique_ptr<AsyncChannelBridgeImpl<LeftFile, RightFile>> makeAsyncChannelBridge(
-    LeftFile leftFile, RightFile rightFile)
+template<typename LeftChannel, typename RightChannel>
+std::unique_ptr<AsyncChannelBridgeImpl<LeftChannel, RightChannel>>
+    makeAsyncChannelBridge(LeftChannel leftChannel, RightChannel rightChannel)
 {
-    return std::make_unique<AsyncChannelBridgeImpl<LeftFile, RightFile>>(
-        std::move(leftFile),
-        std::move(rightFile));
+    return std::make_unique<AsyncChannelBridgeImpl<LeftChannel, RightChannel>>(
+        std::move(leftChannel),
+        std::move(rightChannel));
 }
 
 } // namespace aio

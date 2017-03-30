@@ -18,7 +18,9 @@ enum class NatTraversalResultCode
     noSynFromTargetPeer,
     udtConnectFailed,
     tcpConnectFailed,
-    endpointVerificationFailure
+    endpointVerificationFailure,
+    errorConnectingToRelay,
+    notFoundOnRelay,
 };
 
 class NX_NETWORK_API ConnectionResultRequest:
