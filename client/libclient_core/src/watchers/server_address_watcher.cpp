@@ -60,7 +60,7 @@ void QnServerAddressWatcher::setAccessors(const Getter& getter, const Setter& se
     for (const auto& url: m_urls)
         directModuleFinder->checkUrl(url);
 
-    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened,
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionOpened,
         this, [this, directModuleFinderHelper, directModuleFinder, setter]()
         {
             QUrl url = QnAppServerConnectionFactory::url();

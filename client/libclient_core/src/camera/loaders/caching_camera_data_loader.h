@@ -26,7 +26,9 @@ class QnCachingCameraDataLoader: public Connective<QObject> {
 public:
     virtual ~QnCachingCameraDataLoader();
 
-    QnCachingCameraDataLoader(const QnMediaResourcePtr &resource, QObject *parent = NULL);
+    QnCachingCameraDataLoader(const QnMediaResourcePtr &resource,
+        const QnMediaServerResourcePtr& server,
+        QObject *parent = NULL);
 
     QnMediaResourcePtr resource() const;
 
@@ -42,6 +44,9 @@ public:
 
     void setEnabled(bool value);
     bool enabled() const;
+
+    void updateServer(const QnMediaServerResourcePtr& server);
+
 signals:
     void periodsChanged(Qn::TimePeriodContent type, qint64 startTimeMs = 0);
     void loadingFailed();
@@ -60,9 +65,10 @@ private:
     void trace(const QString& message, Qn::TimePeriodContent periodType = Qn::RecordingContent);
 
 private:
-    bool m_enabled;
+    bool m_enabled = false;
 
-    QnMediaResourcePtr m_resource;
+    const QnMediaResourcePtr m_resource;
+    QnMediaServerResourcePtr m_server;
 
     QElapsedTimer m_previousRequestTime[Qn::TimePeriodContentCount];
 

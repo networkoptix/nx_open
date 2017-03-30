@@ -440,7 +440,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         setItemOnline(info.data.videoWallInstanceGuid, true);
     }
 
-    const auto clientMessageProcessor = QnClientMessageProcessor::instance();
+    const auto clientMessageProcessor = qnClientMessageProcessor;
     connect(clientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
         &QnWorkbenchVideoWallHandler::cleanupUnusedLayouts);
 

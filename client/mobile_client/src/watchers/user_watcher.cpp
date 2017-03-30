@@ -42,7 +42,7 @@ QnUserResourcePtr findUser(const QString& userName)
 QnUserWatcher::QnUserWatcher(QObject* parent) :
     base_type(parent)
 {
-    connect(QnClientMessageProcessor::instance(),
+    connect(qnClientMessageProcessor,
         &QnClientMessageProcessor::initialResourcesReceived, this,
         [this]
         {

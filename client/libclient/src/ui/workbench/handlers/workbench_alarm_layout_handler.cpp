@@ -79,7 +79,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
             openCamerasInAlarmLayout(cameras, true);
         });
 
-    const auto messageProcessor = QnClientMessageProcessor::instance();
+    const auto messageProcessor = qnClientMessageProcessor;
 
     auto allowedForUser =
         [this](const std::vector<QnUuid>& ids)

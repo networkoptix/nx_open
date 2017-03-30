@@ -558,7 +558,7 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
     QUrl url = connectionInfo.effectiveUrl();
     QnAppServerConnectionFactory::setUrl(url);
     QnAppServerConnectionFactory::setEc2Connection(connection);
-    QnClientMessageProcessor::instance()->init(connection);
+    qnClientMessageProcessor->init(connection);
 
     QnSessionManager::instance()->start();
     QnResource::startCommandProc();

@@ -28,10 +28,8 @@ void trace(const QString& message)
 
 }
 
-QnClientMessageProcessor::QnClientMessageProcessor()
-    :
-    base_type(),
-
+QnClientMessageProcessor::QnClientMessageProcessor(QObject* parent = nullptr):
+    base_type(parent),
     m_status(),
     m_connected(false),
     m_holdConnection(false)
@@ -80,20 +78,20 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
             }
         }
 
-        qnCommon->setRemoteGUID(serverId);
+        commonModule()->setRemoteGUID(serverId);
     }
     else if (m_connected)
     { // double init by null is allowed
-        NX_ASSERT(!qnCommon->remoteGUID().isNull());
+        NX_ASSERT(!commonModule()->remoteGUID().isNull());
         ec2::ApiPeerAliveData data;
-        data.peer.id = qnCommon->remoteGUID();
-        qnCommon->setRemoteGUID(QnUuid());
+        data.peer.id = commonModule()->remoteGUID();
+        commonModule()->setRemoteGUID(QnUuid());
         m_connected = false;
         emit connectionClosed();
     }
-    else if (!qnCommon->remoteGUID().isNull())
+    else if (!commonModule()->remoteGUID().isNull())
     { // we are trying to reconnect to server now
-        qnCommon->setRemoteGUID(QnUuid());
+        commonModule()->setRemoteGUID(QnUuid());
     }
 
     QnCommonMessageProcessor::init(connection);
@@ -111,7 +109,7 @@ void QnClientMessageProcessor::setHoldConnection(bool holdConnection)
 
     m_holdConnection = holdConnection;
 
-    if (!m_holdConnection && !m_connected && !qnCommon->remoteGUID().isNull())
+    if (!m_holdConnection && !m_connected && !commonModule()->remoteGUID().isNull())
         emit connectionClosed();
 }
 
@@ -189,13 +187,13 @@ void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData
     if (m_connected)
         return;
 
-    if (qnCommon->remoteGUID().isNull())
+    if (commonModule()->remoteGUID().isNull())
     {
         qWarning() << "at_remotePeerFound received while disconnected";
         return;
     }
 
-    if (data.peer.id != qnCommon->remoteGUID())
+    if (data.peer.id != commonModule()->remoteGUID())
         return;
 
     trace(lit("peer found, state -> Connected"));
@@ -208,13 +206,13 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
 {
     base_type::handleRemotePeerLost(data);
 
-    if (qnCommon->remoteGUID().isNull())
+    if (commonModule()->remoteGUID().isNull())
     {
         qWarning() << "at_remotePeerLost received while disconnected";
         return;
     }
 
-    if (data.peer.id != qnCommon->remoteGUID())
+    if (data.peer.id != commonModule()->remoteGUID())
         return;
 
     /*
@@ -229,7 +227,7 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
     m_status.setState(QnConnectionState::Reconnecting);
 
     /* Mark server as offline, so user will understand why is he reconnecting. */
-    if (auto server = qnCommon->currentServer())
+    if (auto server = commonModule()->currentServer())
         server->setStatus(Qn::Offline);
 
     m_connected = false;
@@ -244,8 +242,8 @@ void QnClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     QnCommonMessageProcessor::onGotInitialNotification(fullData);
     m_status.setState(QnConnectionState::Ready);
     trace(lit("Received initial notification while connected to %1")
-        .arg(qnCommon->remoteGUID().toString()));
-    NX_EXPECT(qnCommon->currentServer());
+        .arg(commonModule()->remoteGUID().toString()));
+    NX_EXPECT(commonModule()->currentServer());
 
     /* Get server time as soon as we setup connection. */
     qnSyncTime->currentMSecsSinceEpoch();

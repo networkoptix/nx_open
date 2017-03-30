@@ -17,9 +17,9 @@
 
 namespace {
 
-QnSoftwareVersion minSupportedVersion(const ec2::ApiRuntimeData& localInfo)
+QnSoftwareVersion minSupportedVersion(Qn::PeerType localPeerType)
 {
-    if (localInfo.peer.isMobileClient())
+    if (ec2::ApiPeerData::isMobileClient(localPeerType))
         return QnSoftwareVersion("2.5");
 
     if (QnAppInfo::applicationPlatform() == lit("macosx"))
@@ -45,15 +45,17 @@ bool compatibleCustomization(const QString& c1, const QString& c2, bool isMobile
 
 } // namespace
 
-QnConnectionValidator::QnConnectionValidator(QnCommonModule* commonModule) :
-    QnCommonModuleAware(commonModule)
+QnConnectionValidator::QnConnectionValidator(Qn::PeerType localPeerType,
+    const QnModuleInformation& localModule):
+    m_peerType(localPeerType),
+    m_moduleInformation(localModule)
 {
 
 }
 
 QnSoftwareVersion QnConnectionValidator::minSupportedVersion() const
 {
-    return ::minSupportedVersion(commonModule()->runtimeInfoManager()->localInfo().data);
+    return ::minSupportedVersion(m_peerType);
 }
 
 Qn::ConnectionResult QnConnectionValidator::validateConnection(
@@ -93,10 +95,11 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
         connectionInfo.cloudHost);
 }
 
-bool QnConnectionValidator::isCompatibleToCurrentSystem(const QnModuleInformation& info) const
+bool QnConnectionValidator::isCompatibleToCurrentSystem(const QnModuleInformation& info,
+    const QnCommonModule* commonModule) const
 {
     return !info.localSystemId.isNull()
-        && helpers::serverBelongsToCurrentSystem(info, commonModule())
+        && helpers::serverBelongsToCurrentSystem(info, commonModule)
         && validateConnection(info) == Qn::SuccessConnectionResult;
 }
 
@@ -107,13 +110,12 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     const QnSoftwareVersion& version,
     const QString& cloudHost) const
 {
-    auto localInfo = commonModule()->runtimeInfoManager()->localInfo().data;
-    bool isMobile = localInfo.peer.isMobileClient();
+    bool isMobile = ec2::ApiPeerData::isMobileClient(m_peerType);
 
-    if (!compatibleCustomization(brand, localInfo.brand, isMobile))
+    if (!compatibleCustomization(brand, m_moduleInformation.brand, isMobile))
         return Qn::IncompatibleInternalConnectionResult;
 
-    if (!compatibleCustomization(customization, localInfo.customization, isMobile))
+    if (!compatibleCustomization(customization, m_moduleInformation.customization, isMobile))
         return Qn::IncompatibleInternalConnectionResult;
 
     if (!cloudHost.isEmpty() && cloudHost != QnAppInfo::defaultCloudHost())

@@ -3,7 +3,6 @@
 #include <common/common_globals.h>
 
 #include <nx_ec/ec_api_fwd.h>
-#include <common/common_module_aware.h>
 
 struct QnConnectionInfo;
 struct QnModuleInformation;
@@ -23,10 +22,10 @@ class QnCommonModule;
 *   * Otherwise, compatibility mode is enabled.
 *   * Internal 'ServerError' is for all other cases.
 */
-class QnConnectionValidator: public QnCommonModuleAware
+class QnConnectionValidator
 {
 public:
-    QnConnectionValidator(QnCommonModule* commonModule);
+    QnConnectionValidator(Qn::PeerType localPeerType, const QnModuleInformation& localModule);
 
     QnSoftwareVersion minSupportedVersion() const;
 
@@ -34,7 +33,8 @@ public:
     Qn::ConnectionResult validateConnection(const QnConnectionInfo& connectionInfo,
         ec2::ErrorCode networkError) const;
 
-    bool isCompatibleToCurrentSystem(const QnModuleInformation& info) const;
+    bool isCompatibleToCurrentSystem(const QnModuleInformation& info,
+        const QnCommonModule* commonModule) const;
 
 protected:
     Qn::ConnectionResult validateConnectionInternal(
@@ -43,4 +43,8 @@ protected:
         int protoVersion,
         const QnSoftwareVersion& version,
         const QString& cloudHost) const;
+
+private:
+    const Qn::PeerType m_peerType;
+    const QnModuleInformation& m_moduleInformation;
 };

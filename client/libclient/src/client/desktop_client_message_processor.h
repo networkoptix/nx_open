@@ -5,14 +5,12 @@
 
 class QnIncompatibleServerWatcher;
 
-class QnDesktopClientMessageProcessor : public QnClientMessageProcessor
+class QnDesktopClientMessageProcessor: public QnClientMessageProcessor
 {
     Q_OBJECT
-
-    typedef QnClientMessageProcessor base_type;
-
+    using base_type = QnClientMessageProcessor;
 public:
-    QnDesktopClientMessageProcessor();
+    explicit QnDesktopClientMessageProcessor(QObject* parent = nullptr);
 
     QnIncompatibleServerWatcher *incompatibleServerWatcher() const;
 
@@ -31,4 +29,4 @@ private:
 };
 
 #define qnDesktopClientMessageProcessor \
-    static_cast<QnDesktopClientMessageProcessor*>(QnDesktopClientMessageProcessor::instance())
+    static_cast<QnDesktopClientMessageProcessor*>(commonModule()->messageProcessor())

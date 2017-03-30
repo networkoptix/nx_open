@@ -223,7 +223,10 @@ void QnDirectModuleFinder::at_reply_finished(QnAsyncHttpClientReply *reply)
         return;
     }
 
-    QnConnectionValidator validator(commonModule());
+
+    auto localPeerType = commonModule()->localPeerType();
+    auto localInfo = commonModule()->moduleInformation();
+    QnConnectionValidator validator(localPeerType, localInfo);
     auto connectionResult = validator.validateConnection(moduleInformation);
     if (connectionResult == Qn::IncompatibleInternalConnectionResult)
     {

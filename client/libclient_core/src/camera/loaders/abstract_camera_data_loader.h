@@ -35,7 +35,7 @@ public:
 
     /**
      * Discards cached data, if any.
-     * 
+     *
      * \param resolutionMs              Resolution, data for which should be discarded. All data should be discarded if parameter equals to 0 (default).
      */
     Q_SLOT virtual void discardCachedData(const qint64 resolutionMs = 0);
@@ -52,7 +52,7 @@ signals:
 
     /**
      * This signal is emitted whenever the reader was unable to load motion periods.
-     * 
+     *
      * \param status                    Error code.
      * \param handle                    Request handle.
      */

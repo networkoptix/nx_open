@@ -95,9 +95,9 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
     m_statisticsModule.reset(new QnControlsStatisticsModule());
     qnStatisticsManager->registerStatisticsModule(lit("controls"), m_statisticsModule.data());
 
-    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::connectionOpened
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionOpened
                      , qnStatisticsManager, &QnStatisticsManager::resetStatistics);
-    connect(QnClientMessageProcessor::instance(), &QnClientMessageProcessor::initialResourcesReceived
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived
                      , qnStatisticsManager, &QnStatisticsManager::sendStatistics);
 
     initWorkarounds();
