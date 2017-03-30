@@ -2695,7 +2695,7 @@ void MediaServerProcess::run()
     qDebug() << "start loading resources";
     QElapsedTimer tt;
     tt.start();
-    qnResourceAccessManager->beginUpdate();
+    resourceAccessManager()->beginUpdate();
     resourceAccessProvider()->beginUpdate();
     loadResourcesFromECS(messageProcessor.data());
     saveServerInfo(m_mediaServer);
@@ -2707,7 +2707,7 @@ void MediaServerProcess::run()
     qDebug() << "resources loaded for" << tt.elapsed();
     resourceAccessProvider()->endUpdate();
     qDebug() << "access ready" << tt.elapsed();
-    qnResourceAccessManager->endUpdate();
+    resourceAccessManager()->endUpdate();
     qDebug() << "permissions ready" << tt.elapsed();
 
     qnGlobalSettings->initialize();

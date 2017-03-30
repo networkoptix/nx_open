@@ -4,6 +4,10 @@
 #include <QtGui/QGuiApplication>
 #include <QtCore/QMetaEnum>
 
+#include <mobile_client/mobile_client_message_processor.h>
+#include <mobile_client/mobile_client_settings.h>
+#include <mobile_client/mobile_client_common_module_aware.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <api/abstract_connection.h>
 #include <api/app_server_connection.h>
@@ -16,8 +20,7 @@
 #include <common/common_module.h>
 #include <network/connection_validator.h>
 #include <client_core/client_core_settings.h>
-#include <mobile_client/mobile_client_message_processor.h>
-#include <mobile_client/mobile_client_settings.h>
+
 #include <watchers/user_watcher.h>
 #include <nx/network/socket_global.h>
 #include <network/system_helpers.h>
@@ -45,7 +48,7 @@ namespace {
 
 } // namespace
 
-class QnConnectionManagerPrivate : public Connective<QObject>
+class QnConnectionManagerPrivate : public Connective<QObject>, public QnConnectionContextAware
 {
     QnConnectionManager* q_ptr;
     Q_DECLARE_PUBLIC(QnConnectionManager)
@@ -87,13 +90,16 @@ QnConnectionManager::QnConnectionManager(QObject* parent):
 {
     Q_D(QnConnectionManager);
 
-    connect(qnGlobalSettings, &QnGlobalSettings::systemNameChanged, this,
-        [d]()
+    QPointer<QnGlobalSettings> settings(qnGlobalSettings);
+    connect(settings, &QnGlobalSettings::systemNameChanged, this,
+        [d, settings]()
         {
+
+
             /* 2.6 servers use another property name for systemName, so in 3.0 it's always empty.
                However we fill system name in doConnect().
                This value won't change, but it's not so critical. */
-            const auto systemName = qnGlobalSettings->systemName();
+            const auto systemName = settings->systemName();
             if (!systemName.isEmpty())
                 d->setSystemName(systemName);
         });

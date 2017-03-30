@@ -24,9 +24,9 @@ public:
     bool canViewArchive;
 };
 
-QnCameraAccessRightsHelper::QnCameraAccessRightsHelper(QObject *parent)
-    : QObject(parent)
-    , d_ptr(new QnCameraAccessRightsHelperPrivate(this))
+QnCameraAccessRightsHelper::QnCameraAccessRightsHelper(QObject *parent):
+    QObject(parent),
+    d_ptr(new QnCameraAccessRightsHelperPrivate(this))
 {
     Q_D(QnCameraAccessRightsHelper);
 
@@ -75,7 +75,7 @@ void QnCameraAccessRightsHelperPrivate::updateAccessRights()
 {
     if (camera && user)
     {
-        canViewArchive = qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalViewArchivePermission);
+        canViewArchive = resourceAccessManager()->hasGlobalPermission(user, Qn::GlobalViewArchivePermission);
     }
     else
     {

@@ -1,5 +1,7 @@
 #include "lite_client_controller.h"
 
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/resources_changes_manager.h>
@@ -20,7 +22,7 @@ namespace {
 
 } // namespace
 
-class QnLiteClientControllerPrivate: public QObject
+class QnLiteClientControllerPrivate: public QObject, public QnConnectionContextAware
 {
     Q_DECLARE_PUBLIC(QnLiteClientController)
     QnLiteClientController* q_ptr;

@@ -52,7 +52,7 @@ bool QnSystemSettingsHandler::updateSettings(
             accessRights,
             setting->key());
 
-        writeAllowed &= qnResourceAccessManager->hasGlobalPermission(
+        writeAllowed &= resourceAccessManager()->hasGlobalPermission(
             accessRights,
             Qn::GlobalPermission::GlobalAdminPermission);
 

@@ -1,18 +1,21 @@
 #pragma once
 
-#include <common/common_module_aware.h>
-
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource/resource_fwd.h>
 
 #include <utils/common/connective.h>
 #include <nx_ec/data/api_fwd.h>
 
+#include <nx/utils/singleton.h>
+
+class QnCommonModule;
+
 /**
  * Utility class for saving resources user attributes.
  * Supports changes rollback in case they cannot be saved on server.
  */
-class QnResourcesChangesManager: public Connective<QObject>, public QnCommonModuleAware
+class QnResourcesChangesManager: public Connective<QObject>,
+    public Singleton<QnResourcesChangesManager>
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;
@@ -62,10 +65,11 @@ public:
     void saveUser(const QnUserResourcePtr &user, UserChangesFunction applyChanges);
 
     /** Save accessible resources for the given user */
-    void saveAccessibleResources(const QnResourceAccessSubject& subject, const QSet<QnUuid>& accessibleResources);
+    void saveAccessibleResources(const QnResourceAccessSubject& subject,
+        const QSet<QnUuid>& accessibleResources, QnCommonModule* commonModule);
 
-    void saveUserRole(const ec2::ApiUserRoleData& role);
-    void removeUserRole(const QnUuid& id);
+    void saveUserRole(const ec2::ApiUserRoleData& role, QnCommonModule* commonModule);
+    void removeUserRole(const QnUuid& id, QnCommonModule* commonModule);
 
     /** Apply changes to the given videoWall. */
     void saveVideoWall(const QnVideoWallResourcePtr &videoWall, VideoWallChangesFunction applyChanges);
@@ -83,3 +87,5 @@ signals:
     /** This signal is emitted every time when we cannot delete resources. */
     void resourceDeletingFailed(const QnResourceList &resources);
 };
+
+#define qnResourcesChangesManager QnResourcesChangesManager::instance()

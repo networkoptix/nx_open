@@ -558,7 +558,7 @@ void QnProgressiveDownloadingConsumer::run()
             return;
         }
 
-        if (!qnResourceAccessManager->hasPermission(d->accessRights, resource, Qn::ReadPermission))
+        if (!resourceAccessManager()->hasPermission(d->accessRights, resource, Qn::ReadPermission))
         {
             sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
             return;

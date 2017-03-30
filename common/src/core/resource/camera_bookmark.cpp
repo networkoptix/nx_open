@@ -183,7 +183,6 @@ namespace
     }
 
     QnCameraBookmarkList getSparseBookmarks(
-        QnCommonModule* commonModule,
         const QnCameraBookmarkList &bookmarks,
         const QnBookmarkSparsingOptions &sparsing,
         int limit,
@@ -305,7 +304,7 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(
     if (!sparsing.used)
         return result;
 
-    return getSparseBookmarks(commonModule, result, sparsing, limit, pred);
+    return getSparseBookmarks(result, sparsing, limit, pred);
 }
 
 QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMultiServerCameraBookmarkTagList &source, int limit) {

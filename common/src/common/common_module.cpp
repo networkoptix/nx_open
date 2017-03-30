@@ -335,6 +335,31 @@ bool QnCommonModule::useLowPriorityAdminPasswordHack() const
     return m_lowPriorityAdminPassword;
 }
 
+QnLicensePool* QnCommonModule::licensePool() const
+{
+    return m_licensePool;
+}
+
+QnUserRolesManager* QnCommonModule::userRolesManager() const
+{
+    return m_userRolesManager;
+}
+
+QnResourceAccessSubjectsCache* QnCommonModule::resourceAccessSubjectsCache() const
+{
+    return m_resourceAccessSubjectCache;
+}
+
+QnGlobalPermissionsManager* QnCommonModule::globalPermissionsManager() const
+{
+    return m_globalPermissionsManager;
+}
+
+QnSharedResourcesManager* QnCommonModule::sharedResourcesManager() const
+{
+    return m_sharedResourceManager;
+}
+
 QnUuid QnCommonModule::runningInstanceGUID() const
 {
     QnMutexLocker lock(&m_mutex);

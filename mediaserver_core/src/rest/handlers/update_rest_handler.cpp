@@ -29,7 +29,7 @@ int QnUpdateRestHandler::executePost(
 {
     Q_UNUSED(path)
 
-    bool remotePeerHasAdminRights = qnResourceAccessManager->hasGlobalPermission(
+    bool remotePeerHasAdminRights = resourceAccessManager()->hasGlobalPermission(
         processor->accessRights(),
         Qn::GlobalAdminPermission);
 

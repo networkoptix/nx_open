@@ -4,6 +4,8 @@
 #include <QtGui/QDesktopServices>
 
 #include <common/common_module.h>
+#include <common/static_common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/mobile_client_camera_factory.h>
@@ -101,9 +103,9 @@ QnMobileClientModule::QnMobileClientModule(
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = m_commonModule->moduleGUID();
     runtimeData.peer.instanceId = m_commonModule->runningInstanceGUID();
-    runtimeData.peer.peerType = Qn::PT_MobileClient;
+    runtimeData.peer.peerType = qnStaticCommon->localPeerType();
     runtimeData.peer.dataFormat = Qn::JsonFormat;
-    runtimeData.brand = QnAppInfo::productNameShort();
+    runtimeData.brand = qnStaticCommon->brand();
     runtimeData.customization = QnAppInfo::customizationName();
     if (!startupParameters.videowallInstanceGuid.isNull())
         runtimeData.videoWallInstanceGuid = startupParameters.videowallInstanceGuid;

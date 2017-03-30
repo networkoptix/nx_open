@@ -26,7 +26,6 @@ class QnCommonMessageProcessor;
 class QnResourceAccessManager;
 class QnResourceAccessProvider;
 class QnUserRolesManager;
-class QnResourceAccessSubjectsCache;
 class QnSharedResourcesManager;
 class QnCameraUserAttributePool;
 class QnMediaServerUserAttributesPool;
@@ -144,6 +143,12 @@ public:
         return m_mediaServerUserAttributesPool;
     }
 
+    QnLicensePool* licensePool() const;
+    QnUserRolesManager* userRolesManager() const;
+    QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
+    QnGlobalPermissionsManager* globalPermissionsManager() const;
+    QnSharedResourcesManager* sharedResourcesManager() const;
+
     void setModuleGUID(const QnUuid& guid) { m_uuid = guid; }
     QnUuid moduleGUID() const{ return m_uuid; }
 
@@ -223,11 +228,11 @@ signals:
 private:
     void resetCachedValue();
     void updateModuleInformationUnsafe();
+
 private:
     bool m_dirtyModuleInformation;
     QnSessionManager* m_sessionManager = nullptr;
     QnResourcePool* m_resourcePool = nullptr;
-    QnUserRolesManager* m_userRolesManager = nullptr;
     QnResourceAccessSubjectsCache* m_resourceAccessSubjectCache = nullptr;
     QnSharedResourcesManager* m_sharedResourceManager = nullptr;
     QnModuleFinder* m_moduleFinder = nullptr;
@@ -262,6 +267,7 @@ private:
     QnResourcePropertyDictionary* m_resourcePropertyDictionary = nullptr;
     QnResourceStatusDictionary* m_resourceStatusDictionary = nullptr;
     QnGlobalPermissionsManager* m_globalPermissionsManager = nullptr;
+    QnUserRolesManager* m_userRolesManager = nullptr;
 
     std::shared_ptr<ec2::AbstractECConnection> m_ec2Connection = nullptr;
     QnUuid m_videowallGuid;

@@ -2,6 +2,8 @@
 
 #include <QtCore/QCoreApplication>
 
+#include <mobile_client/mobile_client_common_module_aware.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -70,7 +72,7 @@ struct ModelItem
 
 } // anonymous namespace
 
-class QnLayoutsModelUnsorted : public Connective<QAbstractListModel>
+class QnLayoutsModelUnsorted: public Connective<QAbstractListModel>, public QnConnectionContextAware
 {
     Q_DECLARE_TR_FUNCTIONS(QnLayoutsModelUnsorted)
 
@@ -240,7 +242,7 @@ void QnLayoutsModelUnsorted::resetModel()
         addLayout(layout);
     }
 
-    if (qnResourceAccessManager->hasGlobalPermission(m_user, Qn::GlobalControlVideoWallPermission))
+    if (resourceAccessManager()->hasGlobalPermission(m_user, Qn::GlobalControlVideoWallPermission))
     {
         const auto servers = resourcePool()->getResources<QnMediaServerResource>();
         for (const auto& server : servers)

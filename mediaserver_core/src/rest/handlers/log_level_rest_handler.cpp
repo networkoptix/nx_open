@@ -42,7 +42,7 @@ int QnLogLevelRestHandler::executeGet(
     auto setValue = params.find(valueParam);
     if (setValue != params.cend())
     {
-        if (!qnResourceAccessManager->hasGlobalPermission(
+        if (!resourceAccessManager()->hasGlobalPermission(
                 processor->accessRights(),
                 Qn::GlobalPermission::GlobalAdminPermission))
         {

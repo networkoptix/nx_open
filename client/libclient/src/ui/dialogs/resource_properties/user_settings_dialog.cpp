@@ -40,7 +40,7 @@ public:
 
     void addPermissionsRow(const QnResourceAccessSubject& subject)
     {
-        auto permissions = qnResourceAccessManager->globalPermissions(subject);
+        auto permissions = resourceAccessManager()->globalPermissions(subject);
         addRow(makePermissionsRow(permissions));
     }
 
@@ -54,7 +54,7 @@ public:
     {
         auto allResources = resourcePool()->getResources();
         auto accessibleResources = sharedResourcesManager()->sharedResources(subject);
-        auto permissions = qnResourceAccessManager->globalPermissions(subject);
+        auto permissions = resourceAccessManager()->globalPermissions(subject);
 
         int count = 0;
         int total = currentUserIsAdmin ? 0 : -1;
@@ -209,7 +209,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     addPage(CamerasPage, m_camerasPage, tr("Cameras && Resources"));
     addPage(LayoutsPage, m_layoutsPage, tr("Layouts"));
 
-    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsChanged, this,
+    connect(resourceAccessManager(), &QnResourceAccessManager::permissionsChanged, this,
         [this](const QnResourceAccessSubject& subject)
         {
             if (m_user && subject.user() == m_user)

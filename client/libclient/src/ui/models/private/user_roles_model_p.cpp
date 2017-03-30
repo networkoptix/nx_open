@@ -131,7 +131,7 @@ void QnUserRolesModelPrivate::updateStandardRoles()
     {
         for (auto role : allStandardRoles())
         {
-            if (qnResourceAccessManager->canCreateUser(user, role))
+            if (resourceAccessManager()->canCreateUser(user, role))
                 available << role;
         }
     }

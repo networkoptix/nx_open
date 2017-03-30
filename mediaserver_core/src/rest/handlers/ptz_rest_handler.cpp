@@ -39,7 +39,7 @@ bool checkUserAccess(const Qn::UserAccessData& accessRights, const QnSecurityCam
         case Qn::RunAuxilaryCommandPtzCommand:
         case Qn::ActivatePresetPtzCommand:
         {
-            if (!qnResourceAccessManager->hasPermission(accessRights, camera, Qn::WritePtzPermission))
+            if (!resourceAccessManager()->hasPermission(accessRights, camera, Qn::WritePtzPermission))
                 return false;
             return true;
         }
@@ -50,8 +50,8 @@ bool checkUserAccess(const Qn::UserAccessData& accessRights, const QnSecurityCam
         case Qn::UpdatePresetPtzCommand:
         case Qn::RemovePresetPtzCommand:
         {
-            if (!qnResourceAccessManager->hasPermission(accessRights, camera, Qn::SavePermission) ||
-                !qnResourceAccessManager->hasPermission(accessRights, camera, Qn::WritePtzPermission))
+            if (!resourceAccessManager()->hasPermission(accessRights, camera, Qn::SavePermission) ||
+                !resourceAccessManager()->hasPermission(accessRights, camera, Qn::WritePtzPermission))
             {
                 return false;
             }

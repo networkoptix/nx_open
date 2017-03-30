@@ -47,7 +47,7 @@ static int checkPermissions(
         }
         requiredPermission = Qn::GlobalManageBookmarksPermission;
     }
-    if (!qnResourceAccessManager->hasGlobalPermission(
+    if (!resourceAccessManager()->hasGlobalPermission(
         processor->accessRights(), requiredPermission))
     {
         const QnMultiserverRequestData request(params);

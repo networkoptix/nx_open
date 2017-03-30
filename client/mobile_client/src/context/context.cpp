@@ -13,6 +13,7 @@
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_app_info.h>
 #include <mobile_client/mobile_client_ui_controller.h>
+#include <mobile_client/mobile_client_module.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
 #include <watchers/user_watcher.h>
@@ -33,6 +34,7 @@ const auto kUserRightsRefactoredVersion = QnSoftwareVersion(3, 0);
 
 QnContext::QnContext(QObject* parent) :
     base_type(parent),
+    QnCommonModuleAware(qnMobileClientModule->commonModule()),
     m_nxGlobals(new NxGlobalsObject(this)),
     m_connectionManager(new QnConnectionManager(this)),
     m_settings(new QmlSettingsAdaptor(this)),

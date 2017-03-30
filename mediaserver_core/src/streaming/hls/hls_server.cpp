@@ -272,7 +272,7 @@ namespace nx_hls
             return nx_http::StatusCode::notFound;
         }
 
-        if (!qnResourceAccessManager->hasPermission(d_ptr->accessRights, resource, Qn::ReadPermission))
+        if (!resourceAccessManager()->hasPermission(d_ptr->accessRights, resource, Qn::ReadPermission))
             return nx_http::StatusCode::forbidden;
 
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();

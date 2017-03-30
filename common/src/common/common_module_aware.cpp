@@ -1,16 +1,6 @@
 #include "common_module_aware.h"
 #include "common_module.h"
 
-//TODO: #GDM #3.1 think how to get rid of these includes
-#include <core/resource_access/resource_access_subjects_cache.h>
-#include <core/resource_access/global_permissions_manager.h>
-#include <core/resource_access/shared_resources_manager.h>
-
-#include <core/resource_management/user_roles_manager.h>
-#include <core/resource_management/resource_pool.h>
-
-#include <licensing/license.h>
-
 QnCommonModuleAware::QnCommonModuleAware(QnCommonModule* commonModule)
 {
     init(commonModule);
@@ -47,7 +37,7 @@ QnCommonModule* QnCommonModuleAware::commonModule() const
 QnLicensePool* QnCommonModuleAware::licensePool() const
 {
     NX_ASSERT(m_commonModule);
-    return m_commonModule ? m_commonModule->instance<QnLicensePool>() : nullptr;
+    return m_commonModule ? m_commonModule->licensePool() : nullptr;
 }
 
 QnRuntimeInfoManager* QnCommonModuleAware::runtimeInfoManager() const
@@ -77,25 +67,25 @@ QnResourceAccessProvider* QnCommonModuleAware::resourceAccessProvider() const
 QnResourceAccessSubjectsCache* QnCommonModuleAware::resourceAccessSubjectsCache() const
 {
     NX_ASSERT(m_commonModule);
-    return m_commonModule ? m_commonModule->instance<QnResourceAccessSubjectsCache>() : nullptr;
+    return m_commonModule ? m_commonModule->resourceAccessSubjectsCache() : nullptr;
 }
 
 QnGlobalPermissionsManager* QnCommonModuleAware::globalPermissionsManager() const
 {
     NX_ASSERT(m_commonModule);
-    return m_commonModule ? m_commonModule->instance<QnGlobalPermissionsManager>() : nullptr;
+    return m_commonModule ? m_commonModule->globalPermissionsManager() : nullptr;
 }
 
 QnSharedResourcesManager* QnCommonModuleAware::sharedResourcesManager() const
 {
     NX_ASSERT(m_commonModule);
-    return m_commonModule ? m_commonModule->instance<QnSharedResourcesManager>() : nullptr;
+    return m_commonModule ? m_commonModule->sharedResourcesManager() : nullptr;
 }
 
 QnUserRolesManager* QnCommonModuleAware::userRolesManager() const
 {
     NX_ASSERT(m_commonModule);
-    return m_commonModule ? m_commonModule->instance<QnUserRolesManager>() : nullptr;
+    return m_commonModule ? m_commonModule->userRolesManager() : nullptr;
 }
 
 QnCameraHistoryPool* QnCommonModuleAware::cameraHistoryPool() const

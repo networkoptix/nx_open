@@ -144,7 +144,7 @@ int QnImageRestHandler::executeGet(
         return CODE_INVALID_PARAMETER;
     }
 
-    if (!qnResourceAccessManager->hasPermission(
+    if (!resourceAccessManager()->hasPermission(
         owner->accessRights(), camera, Qn::Permission::ReadPermission))
     {
         return nx_http::StatusCode::forbidden;

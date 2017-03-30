@@ -468,7 +468,7 @@ void LayoutsHandler::shareLayoutWith(const QnLayoutResourcePtr &layout,
         return;
 
     /* Admins anyway have all shared layouts. */
-    if (qnResourceAccessManager->hasGlobalPermission(subject, Qn::GlobalAdminPermission))
+    if (resourceAccessManager()->hasGlobalPermission(subject, Qn::GlobalAdminPermission))
         return;
 
     auto accessible = sharedResourcesManager()->sharedResources(subject);
@@ -595,7 +595,7 @@ bool LayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
     if (!user)
         return true;
 
-    if (qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
+    if (resourceAccessManager()->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
         return true;
 
     /* Never ask for own layouts. */
@@ -625,7 +625,7 @@ bool LayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
 bool LayoutsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& subject,
     const QnLayoutResourceList& layouts)
 {
-    if (qnResourceAccessManager->hasGlobalPermission(subject, Qn::GlobalAccessAllMediaPermission))
+    if (resourceAccessManager()->hasGlobalPermission(subject, Qn::GlobalAccessAllMediaPermission))
         return true;
 
     /* Calculate all resources that were available through these layouts. */
@@ -676,7 +676,7 @@ void LayoutsHandler::grantMissingAccessRights(const QnUserResourcePtr& user,
     if (!user)
         return;
 
-    if (qnResourceAccessManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
+    if (resourceAccessManager()->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission))
         return;
 
     auto accessible = sharedResourcesManager()->sharedResources(user);

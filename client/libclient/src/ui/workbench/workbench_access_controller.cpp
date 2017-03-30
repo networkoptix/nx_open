@@ -34,7 +34,7 @@ QnWorkbenchAccessController::QnWorkbenchAccessController(QObject* parent) :
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnWorkbenchAccessController::at_resourcePool_resourceRemoved);
 
-    connect(qnResourceAccessManager, &QnResourceAccessManager::permissionsChanged, this,
+    connect(resourceAccessManager(), &QnResourceAccessManager::permissionsChanged, this,
         [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
             Qn::Permissions /*permissions*/)
         {
@@ -125,35 +125,35 @@ bool QnWorkbenchAccessController::canCreateStorage(const QnUuid& serverId) const
 {
     if (!m_user)
         return false;
-    return qnResourceAccessManager->canCreateStorage(m_user, serverId);
+    return resourceAccessManager()->canCreateStorage(m_user, serverId);
 }
 
 bool QnWorkbenchAccessController::canCreateLayout(const QnUuid& layoutParentId) const
 {
     if (!m_user)
         return false;
-    return qnResourceAccessManager->canCreateLayout(m_user, layoutParentId);
+    return resourceAccessManager()->canCreateLayout(m_user, layoutParentId);
 }
 
 bool QnWorkbenchAccessController::canCreateUser(Qn::GlobalPermissions targetPermissions, bool isOwner) const
 {
     if (!m_user)
         return false;
-    return qnResourceAccessManager->canCreateUser(m_user, targetPermissions, isOwner);
+    return resourceAccessManager()->canCreateUser(m_user, targetPermissions, isOwner);
 }
 
 bool QnWorkbenchAccessController::canCreateVideoWall() const
 {
     if (!m_user)
         return false;
-    return qnResourceAccessManager->canCreateVideoWall(m_user);
+    return resourceAccessManager()->canCreateVideoWall(m_user);
 }
 
 bool QnWorkbenchAccessController::canCreateWebPage() const
 {
     if (!m_user)
         return false;
-    return qnResourceAccessManager->canCreateWebPage(m_user);
+    return resourceAccessManager()->canCreateWebPage(m_user);
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResourcePtr& resource) const
@@ -180,7 +180,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(const QnResour
             return hasGlobalPermission(Qn::GlobalAdminPermission) ? Qn::FullUserPermissions : Qn::NoPermissions;
     }
 
-    return qnResourceAccessManager->permissions(m_user, resource);
+    return resourceAccessManager()->permissions(m_user, resource);
 }
 
 Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const QnLayoutResourcePtr& layout) const
@@ -234,7 +234,7 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissionsInternal(const 
     if (!m_user)
         return Qn::NoPermissions;
 
-    return qnResourceAccessManager->permissions(m_user, layout);
+    return resourceAccessManager()->permissions(m_user, layout);
 }
 
 Qn::GlobalPermissions QnWorkbenchAccessController::calculateGlobalPermissions() const
@@ -248,7 +248,7 @@ Qn::GlobalPermissions QnWorkbenchAccessController::calculateGlobalPermissions() 
     if (!m_user)
         return Qn::NoGlobalPermissions;
 
-    return qnResourceAccessManager->globalPermissions(m_user);
+    return resourceAccessManager()->globalPermissions(m_user);
 }
 
 void QnWorkbenchAccessController::updatePermissions(const QnResourcePtr& resource)

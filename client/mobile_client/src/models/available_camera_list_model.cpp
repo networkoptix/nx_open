@@ -1,5 +1,7 @@
 #include "available_camera_list_model.h"
 
+#include <mobile_client/mobile_client_common_module_aware.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
@@ -7,7 +9,7 @@
 #include <common/common_module.h>
 #include <watchers/available_cameras_watcher.h>
 
-class QnAvailableCameraListModelPrivate : public Connective<QObject>
+class QnAvailableCameraListModelPrivate : public Connective<QObject>, public QnConnectionContextAware
 {
     QnAvailableCameraListModel* q_ptr;
     Q_DECLARE_PUBLIC(QnAvailableCameraListModel)

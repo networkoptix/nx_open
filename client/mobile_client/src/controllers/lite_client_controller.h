@@ -2,13 +2,15 @@
 
 #include <QtCore/QObject>
 
+#include <mobile_client/mobile_client_common_module_aware.h>
+
 #include <utils/common/connective.h>
 
 class QnLiteClientLayoutHelper;
 
 class QnLiteClientControllerPrivate;
 
-class QnLiteClientController : public Connective<QObject>
+class QnLiteClientController: public Connective<QObject>, public QnConnectionContextAware
 {
     Q_OBJECT
 

@@ -225,7 +225,7 @@ void QnLiteClientLayoutHelper::setCameraIdOnCell(int x, int y, const QString& ca
     qnResourcesChangesManager->saveLayout(d->layout, [](const QnLayoutResourcePtr&){});
 }
 
-QnLayoutResourcePtr QnLiteClientLayoutHelper::createLayoutForServer(const QnUuid& serverId)
+QnLayoutResourcePtr QnLiteClientLayoutHelper::createLayoutForServer(const QnUuid& serverId) const
 {
     const auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
     if (!server)
@@ -244,7 +244,7 @@ QnLayoutResourcePtr QnLiteClientLayoutHelper::createLayoutForServer(const QnUuid
     return layout;
 }
 
-QnLayoutResourcePtr QnLiteClientLayoutHelper::findLayoutForServer(const QnUuid& serverId)
+QnLayoutResourcePtr QnLiteClientLayoutHelper::findLayoutForServer(const QnUuid& serverId) const
 {
     if (serverId.isNull())
         return QnLayoutResourcePtr();

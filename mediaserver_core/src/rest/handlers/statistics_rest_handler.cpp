@@ -24,7 +24,7 @@ int QnStatisticsRestHandler::executeGet(
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner)
 {
-    if (!qnResourceAccessManager->hasPermission(
+    if (!resourceAccessManager()->hasPermission(
             owner->accessRights(),
             resourcePool()->getResourceById(commonModule()->moduleGUID()),
             Qn::ViewContentPermission))

@@ -62,7 +62,7 @@ int QnCameraSettingsRestHandler::executeGet(
             return CODE_NOT_FOUND;
     }
 
-    if (!qnResourceAccessManager->hasPermission(owner->accessRights(), camera, Qn::Permission::ReadPermission))
+    if (!resourceAccessManager()->hasPermission(owner->accessRights(), camera, Qn::Permission::ReadPermission))
         return nx_http::StatusCode::forbidden;
 
     // Clean params that are not keys.

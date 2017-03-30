@@ -14,11 +14,15 @@
 #include <nx/utils/log/log.h>
 #include <api/app_server_connection.h>
 #include <nx_ec/ec2_lib.h>
+
 #include <common/common_module.h>
+#include <common/static_common_module.h>
+
 #include <utils/common/app_info.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <context/context.h>
+
 #include <mobile_client/mobile_client_module.h>
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_uri_handler.h>
@@ -182,7 +186,7 @@ int runUi(QtSingleGuiApplication* application)
         if (initialIntentData.isValid())
             QDesktopServices::openUrl(initialIntentData);
     #endif
-    
+
     QObject::connect(application, &QtSingleGuiApplication::messageReceived, mainWindow,
         [&context, mainWindow](const QString& message)
         {
@@ -316,6 +320,10 @@ int main(int argc, char *argv[])
 
     conf.reload();
     initLog(startupParams.logLevel);
+
+    QnStaticCommonModule staticModule(Qn::PT_MobileClient, QnAppInfo::brand(),
+        QnAppInfo::customizationName());
+    Q_UNUSED(staticModule);
 
     QnMobileClientModule mobile_client(startupParams);
     Q_UNUSED(mobile_client);

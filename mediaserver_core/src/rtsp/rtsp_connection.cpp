@@ -314,7 +314,7 @@ void QnRtspConnectionProcessor::parseRequest()
 
         d->mediaRes = qSharedPointerDynamicCast<QnMediaResource>(resource);
 
-        d->peerHasAccess = qnResourceAccessManager->hasPermission(d->accessRights, resource, Qn::ReadPermission);
+        d->peerHasAccess = resourceAccessManager()->hasPermission(d->accessRights, resource, Qn::ReadPermission);
         if (!d->peerHasAccess)
             return;
     }
@@ -344,7 +344,7 @@ void QnRtspConnectionProcessor::parseRequest()
         d->startTime = nx::utils::parseDateTime( pos ); //pos.toLongLong();
 
     if (getStreamingMode() != Mode_Live)
-        d->peerHasAccess = qnResourceAccessManager->hasGlobalPermission(d->accessRights, Qn::GlobalViewArchivePermission);
+        d->peerHasAccess = resourceAccessManager()->hasGlobalPermission(d->accessRights, Qn::GlobalViewArchivePermission);
 
     if (!d->peerHasAccess)
         return;
