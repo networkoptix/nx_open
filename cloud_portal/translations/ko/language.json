@@ -1,6 +1,6 @@
 {
-  "language":"LANGUAGE_CODE",
-  "language_name":"LANGUAGE_NAME",
+  "language":"ko",
+  "language_name":"국어",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
   "dialogs":{

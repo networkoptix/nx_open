@@ -1,6 +1,6 @@
 {
-  "language":"LANGUAGE_CODE",
-  "language_name":"LANGUAGE_NAME",
+  "language":"th",
+  "language_name":"ภาษาไทย",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
   "dialogs":{
