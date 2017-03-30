@@ -16,8 +16,8 @@ const QnSoftwareVersion kUserPermissionsRefactoredVersion(3, 0);
 
 } using namespace detail;
 
-QnMobileClientMessageProcessor::QnMobileClientMessageProcessor() :
-    base_type()
+QnMobileClientMessageProcessor::QnMobileClientMessageProcessor(QObject* parent):
+    base_type(parent)
 {
 }
 

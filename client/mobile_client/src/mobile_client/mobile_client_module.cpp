@@ -82,7 +82,7 @@ QnMobileClientModule::QnMobileClientModule(
     settings::migrateSettings();
 
     m_commonModule->store(new QnLongRunnablePool());
-    m_commonModule->store(new QnMobileClientMessageProcessor());
+    m_commonModule->instance<QnMobileClientMessageProcessor>();
     m_commonModule->instance<QnCameraHistoryPool>();
     m_commonModule->store(new QnMobileClientCameraFactory());
 
@@ -90,12 +90,12 @@ QnMobileClientModule::QnMobileClientModule(
 
     auto userWatcher = m_commonModule->store(new QnUserWatcher());
 
-    auto availableCamerasWatcher = m_commonModule->store(new QnAvailableCamerasWatcher());
+    auto availableCamerasWatcher = m_commonModule->instance<QnAvailableCamerasWatcher>();
     connect(userWatcher, &QnUserWatcher::userChanged,
         availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
 
     m_commonModule->store(new QnCloudConnectionProvider());
-    m_commonModule->store(new QnCloudStatusWatcher());
+    m_commonModule->instance<QnCloudStatusWatcher>();
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory(m_commonModule));
 
     ec2::ApiRuntimeData runtimeData;

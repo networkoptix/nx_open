@@ -9,7 +9,7 @@ class QnMobileClientMessageProcessor : public QnClientMessageProcessor {
     typedef QnClientMessageProcessor base_type;
 
 public:
-    QnMobileClientMessageProcessor();
+    QnMobileClientMessageProcessor(QObject* parent = nullptr);
 
     bool isConnected() const;
 

@@ -43,5 +43,5 @@ private:
     void init(QObject *parent);
 
 private:
-    QnCommonModule* m_commonModule;
+    QnCommonModule* m_commonModule = nullptr;
 };
