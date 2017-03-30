@@ -5,7 +5,7 @@
 #include <deque>
 
 #include <QTimer>
-#include <QElapsedTimer>
+#include <QtCore/QElapsedTimer>
 
 #include <nx/utils/thread/mutex.h>
 

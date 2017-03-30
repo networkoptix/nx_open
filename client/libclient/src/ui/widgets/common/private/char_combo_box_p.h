@@ -1,14 +1,17 @@
-#ifndef QN_CHAR_COMBO_BOX_P_H
-#define QN_CHAR_COMBO_BOX_P_H
+#pragma once
+
+#include <QtGui/QPainter>
+#include <QtGui/QPaintEvent>
 
 #include <QtWidgets/QComboBox>
+#include <QtWidgets/QListView>
 
 // -------------------------------------------------------------------------- //
 // QComboBoxListView
 // -------------------------------------------------------------------------- //
 /**
  * Combo box list view as implemented in <tt>qcombobox_p.h</tt>.
- * 
+ *
  * Note that it is important for this class to have metainformation generated
  * as some styles include special handling of <tt>QComboBoxListView</tt> class name.
  */
@@ -82,5 +85,3 @@ public:
         base_type::keyboardSearch(search);
     }
 };
-
-#endif // QN_CHAR_COMBO_BOX_P_H

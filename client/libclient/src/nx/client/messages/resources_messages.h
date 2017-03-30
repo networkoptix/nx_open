@@ -1,11 +1,14 @@
 #pragma once
 
+#include <QtCore/QCoreApplication>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <client/client_globals.h>
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace messages {
 
 class Resources
@@ -32,7 +35,7 @@ public:
     static bool deleteResources(QWidget* parent, const QnResourceList& resources);
 };
 
-
 } // namespace messages
+} // namespace desktop
 } // namespace client
 } // namespace nx

@@ -1,5 +1,7 @@
 #include "customization.h"
 
+#include <QtCore/QFile>
+
 #include <nx/fusion/serialization/json_functions.h>
 #include <utils/common/warnings.h>
 

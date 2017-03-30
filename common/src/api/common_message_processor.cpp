@@ -1,5 +1,7 @@
 #include "common_message_processor.h"
 
+#include <QtCore/QElapsedTimer>
+
 #include <nx_ec/ec_api.h>
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx_ec/managers/abstract_layout_manager.h>
@@ -626,9 +628,6 @@ void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataL
 
 void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
 {
-    qDebug() << "start loading resources";
-    QElapsedTimer tt;
-    tt.start();
 
     resourceAccessManager()->beginUpdate();
     resourceAccessProvider()->beginUpdate();
@@ -647,11 +646,8 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     resetLicenses(fullData.licenses);
     resetTime();
 
-    qDebug() << "resources loaded for" << tt.elapsed();
     resourceAccessProvider()->endUpdate();
-    qDebug() << "access ready" << tt.elapsed();
     resourceAccessManager()->endUpdate();
-    qDebug() << "permissions ready" << tt.elapsed();
 
     emit initialResourcesReceived();
 }

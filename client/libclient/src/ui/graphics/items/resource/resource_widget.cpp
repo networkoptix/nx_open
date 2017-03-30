@@ -59,6 +59,8 @@
 namespace {
 const qreal kButtonsSize = 24.0;
 
+static constexpr int kTriggersSpacing = 4;
+
 /** Default timeout before the video is displayed as "loading", in milliseconds. */
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
 const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION;
@@ -160,7 +162,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     setPaletteColor(this, QPalette::WindowText, overlayTextColor);
 
-    addInfoOverlay();
+    addHudOverlays();
     addMainOverlay();
     createButtons();
     /* Handle layout permissions if an item is placed on the common layout. Otherwise, it can be Motion Widget, for example. */
@@ -225,7 +227,7 @@ QnResourceWidget::~QnResourceWidget()
 }
 
 //TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
-void QnResourceWidget::addInfoOverlay()
+void QnResourceWidget::addHudOverlays()
 {
     QnHtmlTextItemOptions infoOptions;
     infoOptions.backgroundColor = infoBackgroundColor;
@@ -240,10 +242,9 @@ void QnResourceWidget::addInfoOverlay()
     detailsOverlay->addItem(m_overlayWidgets->detailsItem);
     detailsOverlay->setMaxFillCoeff(QSizeF(0.3, 0.8));
     addOverlayWidget(detailsOverlay
-                     , detail::OverlayParams(UserVisible, true, true, InfoLayer));
+        , detail::OverlayParams(UserVisible, true, true, InfoLayer));
     m_overlayWidgets->detailsOverlay = detailsOverlay;
     setOverlayWidgetVisible(m_overlayWidgets->detailsOverlay, false, false);
-
 
     m_overlayWidgets->positionItem->setOptions(infoOptions);
     auto positionOverlay = new QnScrollableOverlayWidget(Qt::AlignRight, this);
@@ -251,10 +252,36 @@ void QnResourceWidget::addInfoOverlay()
     positionOverlay->addItem(m_overlayWidgets->positionItem);
     positionOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
     addOverlayWidget(positionOverlay
-                     , detail::OverlayParams(UserVisible, true, true, InfoLayer));
+        , detail::OverlayParams(UserVisible, true, true, InfoLayer));
     m_overlayWidgets->positionOverlay = positionOverlay;
     setOverlayWidgetVisible(m_overlayWidgets->positionOverlay, false, false);
 
+    auto triggersOverlay = new QnScrollableOverlayWidget(Qt::AlignRight, this);
+    triggersOverlay->setContentsMargins(kMargin, 0, 0, kMargin);
+    triggersOverlay->setItemSpacing(kTriggersSpacing);
+    triggersOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
+
+    addOverlayWidget(triggersOverlay
+        , detail::OverlayParams(UserVisible, true, true, HudLayer));
+    m_overlayWidgets->triggersOverlay = triggersOverlay;
+    setOverlayWidgetVisible(m_overlayWidgets->triggersOverlay, false, false);
+
+    const auto updateTriggersOverlayGeometry =
+        [this]()
+        {
+            auto margins = m_overlayWidgets->positionOverlay->contentsMargins();
+            margins.setBottom(margins.bottom() + 1
+                + m_overlayWidgets->triggersOverlay->itemSpacing()
+                + m_overlayWidgets->positionOverlay->contentSize().height());
+            m_overlayWidgets->triggersOverlay->setContentsMargins(margins);
+        };
+
+    updateTriggersOverlayGeometry();
+
+    connect(positionOverlay, &QnScrollableOverlayWidget::geometryChanged,
+        this, updateTriggersOverlayGeometry);
+    connect(positionOverlay, &QnScrollableOverlayWidget::contentSizeChanged,
+        this, updateTriggersOverlayGeometry);
 }
 
 //TODO: #ynikitenkov #high emplace back headerLayout->setContentsMargins(0, 0, 0, 1);
@@ -893,9 +920,9 @@ void QnResourceWidget::updateHud(bool animate)
 
     const bool showButtonsOverlay = (showOnlyCameraName || showCameraNameWithButtons);
 
-
     bool updatePositionTextRequired = (showPosition && !isOverlayWidgetVisible(m_overlayWidgets->positionOverlay));
     setOverlayWidgetVisible(m_overlayWidgets->positionOverlay, showPosition, animate);
+    setOverlayWidgetVisible(m_overlayWidgets->triggersOverlay, showPosition, animate);
     if (updatePositionTextRequired)
         updatePositionText();
 

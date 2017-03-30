@@ -1,5 +1,6 @@
-
 #pragma once
+
+#include <QtWidgets/QGraphicsWidget>
 
 #include <client/client_color_types.h>
 #include <core/resource/camera_bookmark_fwd.h>

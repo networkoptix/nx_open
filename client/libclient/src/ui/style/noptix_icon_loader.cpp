@@ -1,5 +1,7 @@
 #include "noptix_icon_loader.h"
 
+#include <QtCore/QFileInfo>
+
 #include "skin.h"
 #include "icon_pixmap_accessor.h"
 
@@ -112,10 +114,6 @@ QIcon QnNoptixIconLoader::load(
     const QnIcon::SuffixesList* suffixes)
 {
     static const QString kSeparator = lit("=^_^=");
-
-    QGuiApplication* guiApp = qobject_cast<QGuiApplication*>(qApp);
-    if (!guiApp)
-        return QIcon();
 
     QString key = name + kSeparator + checkedName;
     if (!suffixes)

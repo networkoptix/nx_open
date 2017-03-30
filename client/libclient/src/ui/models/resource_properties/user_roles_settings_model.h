@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QAbstractListModel>
+
 #include <nx_ec/data/api_user_role_data.h>
 
 #include <ui/models/abstract_permissions_model.h>

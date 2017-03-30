@@ -4,6 +4,8 @@
 
 #include <api/model/api_model_fwd.h>
 
+#include <common/common_globals.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <nx_ec/data/api_fwd.h>

@@ -5,6 +5,8 @@
 
 #include <nx/utils/uuid.h>
 
+class QGraphicsLinearLayout;
+
 class QnScrollableOverlayWidgetPrivate
 {
     Q_DECLARE_PUBLIC(QnScrollableOverlayWidget)
@@ -52,4 +54,6 @@ private:
     bool m_updating;
 
     QSizeF m_maxFillCoeff;
+
+    int m_itemSpacing;
 };

@@ -2,6 +2,8 @@
 
 #include <QtCore/QEvent>
 
+#include <QtWidgets/QPushButton>
+
 #include <utils/common/warnings.h>
 #include <ui/style/custom_style.h>
 

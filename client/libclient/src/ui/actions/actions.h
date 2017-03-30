@@ -925,6 +925,11 @@ enum IDType
      */
     ToggleTourModeAction,
 
+    OpenLayoutTourAction,
+    StartLayoutTourAction,
+    StopLayoutTourAction,
+    RemoveLayoutTourAction,
+
     /* Timeline actions. */
 
     /**

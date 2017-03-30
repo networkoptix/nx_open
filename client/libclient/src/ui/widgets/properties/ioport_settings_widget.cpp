@@ -1,6 +1,8 @@
 #include "ioport_settings_widget.h"
 #include "ui_ioport_settings_widget.h"
 
+#include <QtCore/QSortFilterProxyModel>
+
 #include <core/resource/param.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/string.h>

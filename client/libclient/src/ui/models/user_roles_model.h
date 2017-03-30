@@ -3,9 +3,11 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QAbstractItemModel>
 
-#include <utils/common/connective.h>
+#include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
+
+#include <utils/common/connective.h>
 
 #include <nx_ec/data/api_fwd.h>
 

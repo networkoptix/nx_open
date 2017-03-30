@@ -1,11 +1,10 @@
-#include "proxy_video_decoder_private.h"
+#include "proxy_video_decoder_impl.h"
 #if defined(ENABLE_PROXY_DECODER)
 
+#include <nx/utils/debug_utils.h>
 #include <nx/utils/string.h>
 
-#define OUTPUT_PREFIX "ProxyVideoDecoder<display>: "
 #include "proxy_video_decoder_utils.h"
-
 #include "proxy_video_decoder_gl_utils.h"
 
 namespace nx {
@@ -13,13 +12,15 @@ namespace media {
 
 namespace {
 
+static constexpr const char* OUTPUT_PREFIX = "ProxyVideoDecoder<display>: ";
+
 static const QRect kUndefinedVideoGeometry{-1, -1, -1, -1};
 static const QRect kFullscreenVideoGeometry{0, 0, 0, 0};
 
-class Impl: public ProxyVideoDecoderPrivate
+class Impl: public ProxyVideoDecoderImpl
 {
 public:
-    using ProxyVideoDecoderPrivate::ProxyVideoDecoderPrivate;
+    using ProxyVideoDecoderImpl::ProxyVideoDecoderImpl;
 
     virtual int decode(
         const QnConstCompressedVideoDataPtr& compressedVideoData,
@@ -39,15 +40,13 @@ private:
     QRect prevVideoGeometry = kUndefinedVideoGeometry;
 };
 
-class Impl::VideoBuffer
-:
-    public QAbstractVideoBuffer
+class Impl::VideoBuffer: public QAbstractVideoBuffer
 {
 public:
     VideoBuffer(
         void* frameHandle,
-        const std::shared_ptr<ProxyVideoDecoderPrivate>& owner)
-    :
+        const std::shared_ptr<ProxyVideoDecoderImpl>& owner)
+        :
         QAbstractVideoBuffer(GLTextureHandle),
         m_frameHandle(frameHandle),
         m_owner(std::dynamic_pointer_cast<Impl>(owner))
@@ -211,7 +210,7 @@ void Impl::doDisplayDecodedFrame(void* frameHandle)
 
 //-------------------------------------------------------------------------------------------------
 
-ProxyVideoDecoderPrivate* ProxyVideoDecoderPrivate::createImplDisplay(const Params& params)
+ProxyVideoDecoderImpl* ProxyVideoDecoderImpl::createImplDisplay(const Params& params)
 {
     PRINT << "Using this impl";
     return new Impl(params);

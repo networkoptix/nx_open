@@ -1,5 +1,7 @@
 #include "business_rule_item_delegate.h"
 
+#include <QtGui/QPainter>
+
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QComboBox>

@@ -1,5 +1,9 @@
 #include "dialog.h"
 
+#include <QtCore/QEvent>
+
+#include <QtWidgets/QLayout>
+
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/helper.h>

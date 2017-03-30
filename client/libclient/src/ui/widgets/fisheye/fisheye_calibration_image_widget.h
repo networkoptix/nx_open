@@ -1,5 +1,7 @@
-#ifndef FISHEYE_CALIBRATION_IMAGE_WIDGET_H
-#define FISHEYE_CALIBRATION_IMAGE_WIDGET_H
+#pragma once
+
+#include <QtCore/QPointer>
+#include <QtCore/QAbstractAnimation>
 
 #include <QtWidgets/QWidget>
 
@@ -124,5 +126,3 @@ private:
     qreal   m_stretch;
     int     m_lineWidth;
 };
-
-#endif // FISHEYE_CALIBRATION_IMAGE_WIDGET_H

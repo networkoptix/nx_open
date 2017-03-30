@@ -29,11 +29,7 @@ public:
     QnAdamResource();
     virtual ~QnAdamResource();
 
-    virtual void setIframeDistance(int frames, int timeMs) override
-    {
-        QN_UNUSED(frames);
-        QN_UNUSED(timeMs);
-    }
+    virtual void setIframeDistance(int frames, int timeMs) override;
 
     virtual QString getDriverName() const override;
 

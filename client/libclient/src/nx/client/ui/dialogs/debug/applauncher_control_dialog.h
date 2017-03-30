@@ -8,6 +8,7 @@ class ApplauncherControlDialog;
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace dialogs {
 
@@ -23,5 +24,6 @@ private:
 
 } // namespace dialogs
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx

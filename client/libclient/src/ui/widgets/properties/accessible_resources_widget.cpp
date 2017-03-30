@@ -2,6 +2,9 @@
 #include "accessible_resources_model_p.h"
 #include "ui_accessible_resources_widget.h"
 
+#include <QtGui/QKeyEvent>
+#include <QtGui/QMouseEvent>
+
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
 

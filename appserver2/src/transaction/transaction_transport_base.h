@@ -5,7 +5,7 @@
 #include <deque>
 
 #include <QByteArray>
-#include <QElapsedTimer>
+#include <QtCore/QElapsedTimer>
 #include <QSet>
 
 #include <transaction/transaction.h>

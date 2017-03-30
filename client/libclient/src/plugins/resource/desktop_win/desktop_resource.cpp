@@ -1,5 +1,7 @@
 #include "desktop_resource.h"
 
+#include <QtOpenGL/QGLWidget>
+
 #include "plugins/resource/desktop_win/desktop_data_provider.h"
 #include "ui/screen_recording/video_recorder_settings.h"
 #include "core/resource/media_server_resource.h"

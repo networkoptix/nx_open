@@ -10,8 +10,10 @@
 class VariantAnimator;
 class WidgetAnimator;
 
+
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace workbench {
 
@@ -97,7 +99,8 @@ private:
 
 } // namespace workbench
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx
 
-#define qnWorkbenchAnimations nx::client::ui::workbench::Animations::instance()
+#define qnWorkbenchAnimations nx::client::desktop::ui::workbench::Animations::instance()

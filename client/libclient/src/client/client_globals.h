@@ -189,6 +189,16 @@ namespace Qn
         CurrentLayoutResourceRole,
         CurrentLayoutMediaItemsRole,
 
+        /**
+          * Special layout roles
+          */
+
+        IsSpecialLayoutRole,
+        LayoutIconRole,
+        CustomPanelTitleRole,
+        CustomPanelDescriptionRole,
+        CustomPanelActionsRoleRole,
+
         /* Arguments. */
         ActionIdRole,
         SerializedDataRole,
@@ -435,12 +445,13 @@ namespace Qn
     */
     enum class WorkbenchPane
     {
-        Title,          /**< title pane         */
-        Tree,           /**< resource tree pane */
-        Notifications,  /**< notifications pane */
-        Navigation,     /**< navigation pane    */
-        Calendar,       /**< calendar pane      */
-        Thumbnails      /**< thumbnails pane    */
+        Title,          /**< title pane          */
+        Tree,           /**< resource tree pane  */
+        Notifications,  /**< notifications pane  */
+        Navigation,     /**< navigation pane     */
+        Calendar,       /**< calendar pane       */
+        Thumbnails,     /**< thumbnails pane     */
+        SpecialLayout   /**< special layout pane */
     };
 
     enum class ThumbnailStatus

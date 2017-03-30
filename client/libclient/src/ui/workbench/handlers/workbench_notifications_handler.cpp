@@ -1,5 +1,9 @@
 #include "workbench_notifications_handler.h"
 
+#include <QtGui/QGuiApplication>
+
+#include <QtWidgets/QAction>
+
 #include <api/global_settings.h>
 #include <api/app_server_connection.h>
 

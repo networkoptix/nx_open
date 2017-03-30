@@ -45,7 +45,12 @@ QnUpdateUploader::QnUpdateUploader(QObject *parent) :
     connect(m_chunkTimer, &QTimer::timeout, this, &QnUpdateUploader::at_chunkTimer_timeout);
 }
 
-QString QnUpdateUploader::updateId() const {
+QnUpdateUploader::~QnUpdateUploader()
+{
+}
+
+QString QnUpdateUploader::updateId() const
+{
     return m_updateId;
 }
 

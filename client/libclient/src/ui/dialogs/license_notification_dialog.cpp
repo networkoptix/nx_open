@@ -1,6 +1,8 @@
 #include "license_notification_dialog.h"
 #include "ui_license_notification_dialog.h"
 
+#include <QtCore/QSortFilterProxyModel>
+
 #include <ui/delegates/license_list_item_delegate.h>
 #include <ui/models/license_list_model.h>
 #include <ui/style/helper.h>

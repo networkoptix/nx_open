@@ -1,15 +1,21 @@
 #include "animations_control_dialog.h"
 
+#include <QtWidgets/QComboBox>
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QSpinBox>
+#include <QtWidgets/QBoxLayout>
+
 #include <nx/client/ui/workbench/workbench_animations.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace dialogs {
 
-using namespace nx::client::ui::workbench;
+using namespace workbench;
 
 namespace {
 
@@ -154,6 +160,7 @@ AnimationsControlDialog::AnimationsControlDialog(QWidget* parent):
 
 } // namespace dialogs
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx
 

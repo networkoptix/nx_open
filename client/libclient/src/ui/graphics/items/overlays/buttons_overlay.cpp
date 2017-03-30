@@ -1,5 +1,6 @@
-
 #include "buttons_overlay.h"
+
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>

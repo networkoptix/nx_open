@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QAbstractListModel>
+#include <QtCore/QSortFilterProxyModel>
 #include <QtCore/QVariant>
 #include <QtCore/QList>
 

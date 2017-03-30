@@ -1,8 +1,9 @@
-#ifndef CAMERA_DATA_MANAGER_H
-#define CAMERA_DATA_MANAGER_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
+
+#include <common/common_globals.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
@@ -25,5 +26,3 @@ signals:
 private:
     mutable QHash<QnMediaResourcePtr, QnCachingCameraDataLoaderPtr> m_loaderByResource;
 };
-
-#endif // CAMERA_DATA_MANAGER_H

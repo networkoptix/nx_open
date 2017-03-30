@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
+#include <QtWidgets/QLineEdit>
 
 #include <ui/utils/validators.h>
 #include <utils/common/connective.h>

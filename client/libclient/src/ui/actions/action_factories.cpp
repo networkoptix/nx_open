@@ -1,6 +1,8 @@
 #include "action_factories.h"
 
 #include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QWidget>
 
 #include <nx/utils/string.h>
 #include <utils/resource_property_adaptors.h>

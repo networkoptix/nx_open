@@ -3,6 +3,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <QtCore/QElapsedTimer>
+
 #include <vector>
 
 #include <core/dataprovider/abstract_media_stream_provider.h>

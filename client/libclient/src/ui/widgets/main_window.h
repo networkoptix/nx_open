@@ -1,5 +1,4 @@
-#ifndef QN_MAIN_WINDOW_H
-#define QN_MAIN_WINDOW_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QMainWindow>
@@ -15,6 +14,7 @@ class QTabBar;
 class QBoxLayout;
 class QSpacerItem;
 class QToolButton;
+class QStackedWidget;
 
 class QnActionManager;
 class QnLayoutTabBar;
@@ -29,7 +29,12 @@ class QnWorkbenchDisplay;
 class QnWorkbenchLayout;
 class QnMainWindowTitleBarWidget;
 
-class QnMainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware {
+namespace nx {
+namespace client {
+namespace desktop {
+namespace ui {
+
+class MainWindow: public QnEmulatedFrameWidget, public QnWorkbenchContextAware {
     Q_OBJECT;
 
     typedef QnEmulatedFrameWidget base_type;
@@ -40,8 +45,8 @@ public:
     };
     Q_DECLARE_FLAGS(Options, Option);
 
-    QnMainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WindowFlags flags = 0);
-    virtual ~QnMainWindow();
+    MainWindow(QnWorkbenchContext *context, QWidget *parent = 0, Qt::WindowFlags flags = 0);
+    virtual ~MainWindow();
 
     bool isTitleVisible() const;
 
@@ -121,6 +126,9 @@ private:
     bool m_inFullscreenTransition;
 };
 
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnMainWindow::Options);
+Q_DECLARE_OPERATORS_FOR_FLAGS(MainWindow::Options);
 
-#endif // QN_MAIN_WINDOW_H
+} // namespace ui
+} // namespace desktop
+} // namespace client
+} // namespace nx

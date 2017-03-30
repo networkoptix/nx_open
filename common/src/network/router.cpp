@@ -1,7 +1,5 @@
 #include "router.h"
 
-#include <QtCore/QElapsedTimer>
-
 // #include <nx/utils/log/log.h>
 // #include "nx_ec/dummy_handler.h"
 // #include "nx_ec/ec_api.h"

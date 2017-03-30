@@ -173,7 +173,15 @@
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\progress.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\progress.h" />
+    <ClInclude Include="src\resource.h" />
+  </ItemGroup>
+  <ItemGroup>
     <ResourceCompile Include="..\x64\hdwitness.rc" />
+    <ResourceCompile Include="src\launcher.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,5 +1,6 @@
 #include "workbench_screen_recording_handler.h"
 
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
 

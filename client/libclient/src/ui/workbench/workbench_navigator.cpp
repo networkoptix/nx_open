@@ -6,6 +6,7 @@
 #include <QtCore/QTimer>
 
 #include <QtWidgets/QAction>
+#include <QtWidgets/QCompleter>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QGraphicsSceneContextMenuEvent>
 #include <QtWidgets/QApplication>

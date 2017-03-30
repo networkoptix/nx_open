@@ -95,7 +95,7 @@ QString QnAboutDialog::connectedServers() const
         if (!server)
             continue;
 
-        /* Consistency with QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered */
+        /* Consistency with ActionHandler::at_versionMismatchMessageAction_triggered */
         QString version = L'v' + data.version.toString();
         bool updateRequested = QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
         if (updateRequested)

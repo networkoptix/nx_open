@@ -1,5 +1,7 @@
 #include "scrollable_overlay_widget.h"
 
+#include <QtWidgets/QGraphicsLinearLayout>
+
 #include <ui/graphics/items/overlays/private/scrollable_overlay_widget_p.h>
 
 QnScrollableOverlayWidget::QnScrollableOverlayWidget(Qt::Alignment alignment, QGraphicsWidget *parent /*= nullptr*/ )
@@ -83,4 +85,22 @@ QSizeF QnScrollableOverlayWidget::contentSize() const
 {
     Q_D(const QnScrollableOverlayWidget);
     return d->contentSize();
+}
+
+int QnScrollableOverlayWidget::itemSpacing() const
+{
+    Q_D(const QnScrollableOverlayWidget);
+    return d->m_itemSpacing;
+}
+
+void QnScrollableOverlayWidget::setItemSpacing(int spacing)
+{
+    Q_D(QnScrollableOverlayWidget);
+    if (d->m_itemSpacing == spacing)
+        return;
+
+    d->m_itemSpacing = spacing;
+    d->updatePositions();
+
+    emit contentSizeChanged();
 }

@@ -1,10 +1,4 @@
-/**********************************************************
-* 24 oct 2012
-* a.kolesnikov
-***********************************************************/
-
-#ifndef AGGREGATIONSURFACE_H
-#define AGGREGATIONSURFACE_H
+#pragma once
 
 #include <map>
 #include <vector>
@@ -14,13 +8,16 @@ extern "C"
     #include <libavutil/pixfmt.h>
 }
 
-#include <nx/utils/thread/mutex.h>
+
 #include <QtCore/QRect>
-#include <QtGui/QRegion>
 #include <QtCore/QScopedPointer>
-#include <QSharedPointer>
+#include <QtCore/QSharedPointer>
 #include <QtCore/QSize>
 
+#include <QtGui/QRegion>
+#include <QtGui/QOpenGLFunctions>
+
+#include <nx/utils/thread/mutex.h>
 
 class QnGlRendererTexture1;
 class GLContext;
@@ -163,5 +160,3 @@ private:
     QnMutex m_mutex;
     AggregationSurfaceContainer m_surfaces;
 };
-
-#endif  //AGGREGATIONSURFACE_H

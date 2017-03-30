@@ -1,6 +1,7 @@
 #include "overlayed.h"
 
 #include <QtWidgets/QGraphicsScene>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
@@ -177,7 +178,7 @@ void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, boo
 
     if (animate)
     {
-        using namespace nx::client::ui::workbench;
+        using namespace nx::client::desktop::ui::workbench;
         auto animator = opacityAnimator(widget);
 
         qnWorkbenchAnimations->setupAnimator(animator, visible

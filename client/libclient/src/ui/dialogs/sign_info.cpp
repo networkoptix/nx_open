@@ -1,4 +1,7 @@
 #include "sign_info.h"
+
+#include <QtCore/QDateTime>
+
 #include "ui/style/skin.h"
 #include "sign_dialog.h"
 

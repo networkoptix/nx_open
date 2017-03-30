@@ -9,6 +9,7 @@
 #include <business/events/mserver_failure_business_event.h>
 #include <business/events/ip_conflict_business_event.h>
 #include <business/events/mserver_conflict_business_event.h>
+#include <business/events/software_trigger_business_event.h>
 
 #include "core/resource/resource.h"
 #include <core/resource_management/resource_pool.h>
@@ -33,7 +34,7 @@ QnBusinessEventConnector::~QnBusinessEventConnector()
 void QnBusinessEventConnector::onNewResource(const QnResourcePtr &resource)
 {
     QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(resource);
-    if (camera) 
+    if (camera)
     {
         connect(camera.data(), &QnSecurityCamResource::networkIssue, this, &QnBusinessEventConnector::at_networkIssue );
         connect(camera.data(), &QnSecurityCamResource::cameraInput, this, &QnBusinessEventConnector::at_cameraInput );
@@ -53,7 +54,7 @@ QnBusinessEventConnector* QnBusinessEventConnector::instance()
 
 void QnBusinessEventConnector::at_motionDetected(const QnResourcePtr &resource, bool value, qint64 timeStamp, const QnConstAbstractDataPacketPtr& metadata)
 {
-    QnMotionBusinessEventPtr motionEvent(new QnMotionBusinessEvent(resource, value ? QnBusiness::ActiveState : QnBusiness::InactiveState, timeStamp, metadata)); 
+    QnMotionBusinessEventPtr motionEvent(new QnMotionBusinessEvent(resource, value ? QnBusiness::ActiveState : QnBusiness::InactiveState, timeStamp, metadata));
     qnBusinessRuleProcessor->processBusinessEvent(motionEvent);
 }
 
@@ -123,7 +124,16 @@ void QnBusinessEventConnector::at_cameraInput(const QnResourcePtr &resource, con
     );
 }
 
-void QnBusinessEventConnector::at_customEvent(const QString &resourceName, const QString& caption, const QString& description, 
+void QnBusinessEventConnector::at_softwareTrigger(const QnResourcePtr& resource, const QString& triggerId, qint64 timeStamp)
+{
+    if (!resource)
+        return;
+
+    auto triggerEvent = new QnSoftwareTriggerEvent(resource->toSharedPointer(), timeStamp, triggerId);
+    qnBusinessRuleProcessor->processBusinessEvent(QnSoftwareTriggerEventPtr(triggerEvent));
+}
+
+void QnBusinessEventConnector::at_customEvent(const QString &resourceName, const QString& caption, const QString& description,
                                               const QnEventMetaData& metadata, QnBusiness::EventState eventState, qint64 timeStampUsec)
 {
     QnCustomBusinessEvent* customEvent = new QnCustomBusinessEvent(eventState, timeStampUsec, resourceName, caption, description, metadata);
@@ -192,6 +202,14 @@ bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParame
                 return false;
             }
             at_cameraInput(resource, params.inputPortId, isOnState, params.eventTimestampUsec);
+            break;
+        case QnBusiness::SoftwareTriggerEvent:
+            if (!resource) {
+                if (errMessage)
+                    *errMessage = "'SoftwareTriggerEvent' requires 'resource' parameter";
+                return false;
+            }
+            at_softwareTrigger(resource, params.inputPortId, params.eventTimestampUsec);
             break;
         case QnBusiness::CameraDisconnectEvent:
             if (!resource) {

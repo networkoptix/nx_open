@@ -1,5 +1,6 @@
 #include "cloud_status_panel.h"
 
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QMenu>
 
 #include <ui/common/palette.h>

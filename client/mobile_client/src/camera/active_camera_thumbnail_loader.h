@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QtCore/QObject>
-#include <QtCore/QElapsedTimer>
 
 #include <camera/thumbnail_cache_base.h>
 

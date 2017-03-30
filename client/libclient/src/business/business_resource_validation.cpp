@@ -1,5 +1,7 @@
 #include "business_resource_validation.h"
 
+#include <QtWidgets/QLayout>
+
 #include <core/resource/resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/device_dependent_strings.h>

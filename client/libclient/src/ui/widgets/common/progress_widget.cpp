@@ -1,5 +1,7 @@
 #include "progress_widget.h"
 
+#include <QtWidgets/QBoxLayout>
+
 #include <ui/style/skin.h>
 #include <ui/workaround/hidpi_workarounds.h>
 

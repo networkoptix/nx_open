@@ -2,7 +2,6 @@
 #define __RUNTIME_TRANSACTION_LOG_H_
 
 #include <QtCore/QSet>
-#include <QtCore/QElapsedTimer>
 #include <nx/utils/thread/mutex.h>
 
 #include "transaction.h"

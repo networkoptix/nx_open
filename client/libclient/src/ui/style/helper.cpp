@@ -85,6 +85,7 @@ namespace style
     const char* Properties::kItemViewRadioButtons = "_qn_itemViewRadioButtons";
     const char* Properties::kPushButtonMargin = "_qn_pushButtonMargin";
     const char* Properties::kMenuNoMouseReplayRect = "_qn_menuNoMouseReplayRect";
+    const char* Properties::kComboBoxPopupWidth = "_qn_comboBoxPopupWidth";
 
 
     bool isDark(const QColor& color)

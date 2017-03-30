@@ -1,6 +1,8 @@
 #include "widget_table_delegate.h"
 #include "widget_table_p.h"
 
+#include <QtWidgets/QLabel>
+
 #include <ui/common/palette.h>
 #include <ui/style/helper.h>
 

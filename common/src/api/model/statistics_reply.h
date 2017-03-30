@@ -1,11 +1,11 @@
-#ifndef QN_STATISTICS_REPLY_H
-#define QN_STATISTICS_REPLY_H
+#pragma once
 
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QHash>
 #include <QtCore/QLinkedList>
 
+#include <common/common_globals.h>
 
 struct QnStatisticsDataItem {
     QnStatisticsDataItem() {}
@@ -33,7 +33,7 @@ typedef QList<QnStatisticsDataItem> QnStatisticsDataList;
 
 struct QnStatisticsReply {
     QnStatisticsReply(): updatePeriod(0), uptimeMs(0) {}
-    
+
     QnStatisticsDataList statistics;
     qint64 updatePeriod;
     qint64 uptimeMs;
@@ -55,7 +55,3 @@ Q_DECLARE_METATYPE(QnStatisticsData)
 #define QnStatisticsReply_Fields (statistics)(updatePeriod)(uptimeMs)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnStatisticsReply, (json)(metatype))
-
-
-
-#endif // QN_STATISTICS_REPLY_H

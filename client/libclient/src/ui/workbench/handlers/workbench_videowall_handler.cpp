@@ -102,6 +102,7 @@
 #include <utils/unity_launcher_workaround.h>
 
 #include <nx/vms/utils/platform/autorun.h>
+#include <nx/client/ui/workbench/layouts/layout_factory.h>
 
 //#define SENDER_DEBUG
 //#define RECEIVER_DEBUG
@@ -691,7 +692,7 @@ void QnWorkbenchVideoWallHandler::switchToVideoWallMode(const QnVideoWallResourc
         return;
 
     bool closeCurrentInstance = false;
-    if (!nx::client::messages::VideoWall::switchToVideoWallMode(mainWindow(), &closeCurrentInstance))
+    if (!nx::client::desktop::messages::VideoWall::switchToVideoWallMode(mainWindow(), &closeCurrentInstance))
         return;
 
     if (closeCurrentInstance)
@@ -1494,7 +1495,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 
         if (usedNames.contains(proposedName.toLower()))
         {
-            nx::client::messages::VideoWall::anotherVideoWall(mainWindow());
+            nx::client::desktop::messages::VideoWall::anotherVideoWall(mainWindow());
             continue;
         }
 
@@ -1787,7 +1788,7 @@ void QnWorkbenchVideoWallHandler::at_startVideoWallControlAction_triggered()
         layout = QnWorkbenchLayout::instance(layoutResource);
         if (!layout)
         {
-            layout = new QnWorkbenchLayout(layoutResource, workbench());
+            layout = qnWorkbenchLayoutsFactory->create(layoutResource, workbench());
             workbench()->addLayout(layout);
         }
         layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(item.uuid));
@@ -2904,7 +2905,7 @@ void QnWorkbenchVideoWallHandler::updateControlLayout(const QnVideoWallResourceP
 
             QnWorkbenchLayout* layout = QnWorkbenchLayout::instance(layoutResource);
             if (!layout)
-                layout = new QnWorkbenchLayout(layoutResource, workbench());
+                layout = qnWorkbenchLayoutsFactory->create(layoutResource, workbench());
 
             if (workbench()->layoutIndex(layout) < 0)
                 workbench()->insertLayout(layout, layoutIndex);
@@ -3045,7 +3046,7 @@ bool QnWorkbenchVideoWallHandler::checkLocalFiles(const QnVideoWallItemIndex& in
     if (!layout)
         return true;
 
-    return nx::client::messages::VideoWall::checkLocalFiles(mainWindow(), index,
+    return nx::client::desktop::messages::VideoWall::checkLocalFiles(mainWindow(), index,
         layout->layoutResources().toList());
 }
 

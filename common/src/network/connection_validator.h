@@ -1,5 +1,7 @@
 #pragma once
 
+#include <common/common_globals.h>
+
 #include <nx_ec/ec_api_fwd.h>
 #include <common/common_module_aware.h>
 

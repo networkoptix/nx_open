@@ -1,5 +1,4 @@
-#ifndef QN_TOOL_TIP_WIDGET_H
-#define QN_TOOL_TIP_WIDGET_H
+#pragma once
 
 #include <QtGui/QPen>
 #include <QtGui/QBrush>
@@ -37,7 +36,7 @@ public:
      * \returns                         Widget's side to which balloon's tail is attached, or zero if
      *                                  there is no tail.
      */
-    Qn::Border tailBorder() const;
+    Qt::Edges tailBorder() const;
 
     /**
      * \returns                         Width of the base of balloon's tail.
@@ -116,6 +115,3 @@ private:
     qreal m_roundingRadius;
     bool m_autoSize;
 };
-
-
-#endif // QN_TOOL_TIP_WIDGET_H

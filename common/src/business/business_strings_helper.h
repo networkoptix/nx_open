@@ -78,4 +78,8 @@ public:
         Qn::ResourceInfoLevel detailLevel) const;
 
 	QString getResoureIPFromParams(const QnBusinessEventParameters& params) const;
+
+    static QString defaultSoftwareTriggerName();
+    static QString getSoftwareTriggerName(const QString& id);
+    static QString getSoftwareTriggerName(const QnBusinessEventParameters& params);
 };

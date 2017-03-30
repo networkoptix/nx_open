@@ -1,10 +1,10 @@
-#ifndef VSYNC_WORKAROUND_H
-#define VSYNC_WORKAROUND_H
+#pragma once
 
-#include <QObject>
+#include <QtCore/QObject>
+#include <QtCore/QElapsedTimer>
 
 /**
- *  This class ensures that update() events are passed to widget 
+ *  This class ensures that update() events are passed to widget
  *  no more often than once in a 16ms (~60 fps)
   **/
 class QnVSyncWorkaround : public QObject {
@@ -22,5 +22,3 @@ private:
     QEvent *m_updateEventToPass;
     QElapsedTimer m_elapsedTimer;
 };
-
-#endif // VSYNC_WORKAROUND_H

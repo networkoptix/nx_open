@@ -2,7 +2,10 @@
 #include "ui_multiple_camera_settings_widget.h"
 
 #include <limits>
+
 #include <QtCore/QScopedValueRollback>
+
+#include <QtWidgets/QPushButton>
 
 //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>

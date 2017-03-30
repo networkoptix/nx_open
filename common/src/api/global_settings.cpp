@@ -812,6 +812,11 @@ bool QnGlobalSettings::isSynchronizingTimeWithInternet() const
     return m_synchronizeTimeWithInternetAdaptor->value();
 }
 
+void QnGlobalSettings::setSynchronizingTimeWithInternet(bool value)
+{
+    m_synchronizeTimeWithInternetAdaptor->setValue(value);
+}
+
 QString QnGlobalSettings::cloudAccountName() const
 {
     return m_cloudAccountNameAdaptor->value();

@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <QtGui/QGuiApplication>
+
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QGraphicsItem>
@@ -1743,6 +1745,31 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Alt+T")).
         autoRepeat(false).
         condition(new QnToggleTourActionCondition(this));
+
+    factory(QnActions::OpenLayoutTourAction).
+        flags(Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Open Layouts Tour")).
+        shortcut(lit("Alt+L")).
+        autoRepeat(false);
+
+    factory(QnActions::StartLayoutTourAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Start Layouts Tour")).
+        icon(qnSkin->icon("slider/navigation/play.png")).
+        checkable().
+        checked(false);
+
+    factory(QnActions::StopLayoutTourAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        icon(qnSkin->icon("slider/navigation/pause.png"));
+
+    factory(QnActions::RemoveLayoutTourAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Delete Layouts Tour"));
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).

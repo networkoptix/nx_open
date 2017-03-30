@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <array>
 
 #include "resource_widget.h"
@@ -28,6 +29,7 @@ typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
 #include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
 #include <utils/media/sse_helper.h>
+#include <nx/utils/string.h>
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
@@ -189,6 +191,10 @@ protected:
     void ensureTwoWayAudioWidget();
     bool animationAllowed() const;
 
+    void resetSoftwareTriggerButtons();
+
+    void invokeTrigger(const QString& id, const QnUuid& resourceId);
+
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
     void at_screenshotButton_clicked();
@@ -307,6 +313,12 @@ private:
     QVector<QColor> m_motionSensitivityColors;
 
     QnTwoWayAudioWidget* m_twoWayAudioWidget;
+
+    /* Software triggers map: ID -> icon name */
+    using SoftwareTriggers = std::map<QString, QString, decltype(&nx::utils::naturalStringLess)>;
+    SoftwareTriggers m_softwareTriggers = SoftwareTriggers(&nx::utils::naturalStringLess);
+
+    QList<QnUuid> m_softwareTriggerIds; // UUIDs of overlay items
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

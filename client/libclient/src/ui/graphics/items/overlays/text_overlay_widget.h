@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QPointer>
+
 #include <nx/utils/uuid.h>
 
 #include <core/resource/resource_fwd.h>
@@ -9,6 +11,8 @@
 #include <ui/graphics/items/overlays/scrollable_overlay_widget.h>
 
 #include <nx/fusion/model_functions_fwd.h>
+
+class QTimer;
 
 struct QnOverlayTextItemData
 {

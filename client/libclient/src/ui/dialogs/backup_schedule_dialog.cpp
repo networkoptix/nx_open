@@ -2,6 +2,9 @@
 #include "ui_backup_schedule_dialog.h"
 
 #include <QtCore/QLocale>
+#include <QtCore/QTime>
+
+#include <QtWidgets/QComboBox>
 
 #include <core/resource/server_backup_schedule.h>
 

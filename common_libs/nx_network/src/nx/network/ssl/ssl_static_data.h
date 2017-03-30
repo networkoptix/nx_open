@@ -1,7 +1,7 @@
 #pragma once
 
-#include <memory>
 #include <atomic>
+#include <memory>
 
 #include <openssl/ssl.h>
 

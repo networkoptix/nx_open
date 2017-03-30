@@ -1,7 +1,7 @@
-#ifndef QN_TOOL_TIP_SLIDER_H
-#define QN_TOOL_TIP_SLIDER_H
+#pragma once
 
 #include <QtCore/QBasicTimer>
+#include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
 
 #include <ui/common/tool_tip_queryable.h>
@@ -83,5 +83,3 @@ private:
     bool m_toolTipEnabled;
     int m_toolTipHideDelayMs;
 };
-
-#endif // QN_TOOL_TIP_SLIDER_H

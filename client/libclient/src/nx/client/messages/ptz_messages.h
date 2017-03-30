@@ -1,7 +1,12 @@
 #pragma once
 
+#include <QtCore/QCoreApplication>
+
+class QWidget;
+
 namespace nx {
 namespace client {
+namespace desktop {
 namespace messages {
 
 class Ptz
@@ -16,5 +21,6 @@ public:
 };
 
 } // namespace messages
+} // namespace desktop
 } // namespace client
 } // namespace nx
