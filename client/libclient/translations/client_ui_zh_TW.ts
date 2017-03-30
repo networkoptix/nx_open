@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_TW" sourcelanguage="en">
+<TS version="2.1" language="zh-TW" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -100,7 +100,7 @@
     <message>
         <location/>
         <source>Browse Logs</source>
-        <translation>瀏覽記錄</translation>
+        <translation>瀏覽日誌</translation>
     </message>
     <message>
         <location/>
@@ -589,7 +589,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
         <source>about:blank</source>
-        <translation>空白</translation>
+        <translation type="unfinished">about:blank</translation>
     </message>
     <message>
         <location/>
@@ -707,7 +707,7 @@
     <message>
         <location/>
         <source>Force motion detection for stream:</source>
-        <translation>強制位移偵測由串流:</translation>
+        <translation>強制位移偵測由以下串流判斷:</translation>
     </message>
     <message>
         <location/>
@@ -1064,7 +1064,7 @@
     <message>
         <location/>
         <source>Frames Interval</source>
-        <translation>幀數區間</translation>
+        <translation>兩張影像間隔</translation>
     </message>
 </context>
 <context>
@@ -1247,7 +1247,7 @@
     <message>
         <location/>
         <source>Layout is Locked</source>
-        <translation>佈局已鎖定</translation>
+        <translation>鎖定佈局</translation>
     </message>
     <message>
         <location/>
@@ -1391,12 +1391,12 @@
     <message>
         <location/>
         <source>License Type:</source>
-        <translation>金鑰類型:</translation>
+        <translation>授權類型:</translation>
     </message>
     <message>
         <location/>
         <source>License Key:</source>
-        <translation>授權金鑰:</translation>
+        <translation>授權序號:</translation>
     </message>
     <message>
         <location/>
@@ -1480,7 +1480,7 @@
     <message>
         <location/>
         <source>License will be bound to the current server</source>
-        <translation>授權金鑰將綁定在本伺服器上</translation>
+        <translation>授權序號將綁定在本伺服器上</translation>
     </message>
     <message>
         <location/>
@@ -1500,7 +1500,7 @@
     <message>
         <location/>
         <source>License Key</source>
-        <translation>授權金鑰:</translation>
+        <translation>授權序號:</translation>
     </message>
     <message>
         <location/>
@@ -1515,7 +1515,7 @@
     <message>
         <location/>
         <source>Activation Key File</source>
-        <translation>啟動金鑰檔案:</translation>
+        <translation>離線授權啟動檔案:</translation>
     </message>
 </context>
 <context>
@@ -2759,7 +2759,7 @@
     <message>
         <location/>
         <source>Enable audit trail</source>
-        <translation>啟用審查追蹤</translation>
+        <translation>啟用使用者行為記錄</translation>
     </message>
     <message>
         <location/>

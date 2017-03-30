@@ -41,8 +41,7 @@ include(rdep)
 include(mercurial)
 include(project_utils)
 
-find_package(PythonInterp 2 REQUIRED)
-
+find_python()
 detect_platform()
 rdep_configure()
 

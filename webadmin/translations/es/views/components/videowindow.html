@@ -1,0 +1,54 @@
+<div class="videowindow">
+
+    <div class="camera-view-informer camera-loading" ng-if="loading">
+        <div class="camera-view-preloader camera-view-message-icon"></div>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashRequired">
+        El vídeo no se puede reproducir.<br>
+        Porfavor <a href="https://get.adobe.com/flashplayer/" target="_blank">instale Adobe Flash</a>para reproducir vídeo desde servidores basados en ARM.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="flashOrWebmRequired">
+        El vídeo no se puede reproducir.<br>
+        Porfavor<a href="https://get.adobe.com/flashplayer/" target="_blank"> instale Adobe Flash</a> o <a href="https://tools.google.com/dlpage/webmmf/" target="_blank">WebM codec</a>para reproducción el vídeo en Internet Explorer.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noArmSupport">
+        El vídeo no se puede reproducir.<br>
+        Este navegador o dispositivo no admite la reproducción de vídeo desde los servidores basados en ARM.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="noFormat">
+        El vídeo no se puede reproducir.<br>
+        Este explorador o el dispositivo no admite la reproducción de vídeo de esta cámara.<br>
+    </div>
+
+
+    <div class="camera-view-informer" ng-if="ieNoWebm">
+        El vídeo no se puede reproducir.<br>
+        Porfavor, instale<a href="https://tools.google.com/dlpage/webmmf/" target="_blank">WebM codec</a>para Internet Explorer.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ieWin10">
+        El vídeo no se puede reproducir.<br>
+        Por favor, utilice los navegadores Edge Microsoft o Google Chrome.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="ubuntuNX">
+        El vídeo no se puede reproducir.<br>
+        Este navegador no soporta video de servidores basados en ARM. Por favor, utilice explorador de chrome.<br>
+    </div>
+
+    <div class="camera-view-informer" ng-if="errorLoading">
+        El vídeo no se puede reproducir.<br>
+        Error a ocurrido.<br>
+    </div>
+
+
+    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}" ng-include="Config.viewsDir + 'components/flashls.html'">
+    </div>
+
+    <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading}">
+    </div>
+</div>
