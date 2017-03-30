@@ -3,6 +3,7 @@ import logging
 import time
 from datetime import datetime, timedelta
 import struct
+import math
 import urllib
 import urlparse
 import requests
@@ -89,7 +90,10 @@ class RtspMediaStream(object):
         start_time = time.time()
         metadata = Metadata(from_cap)
         metadata.log_properties(self.url)
-        to_cap = cv2.VideoWriter(temp_file_path, metadata.fourcc, metadata.fps, (metadata.width, metadata.height))
+        fps = metadata.fps
+        if math.isnan(fps):
+            fps = 15  # Use at least something if we are unable to get it from opencv
+        to_cap = cv2.VideoWriter(temp_file_path, metadata.fourcc, fps, (metadata.width, metadata.height))
         assert to_cap.isOpened(), 'Failed to open OpenCV media writer to file %r' % temp_file_path
         try:
             frame_count = self._copy_cap(from_cap, to_cap, start_time)

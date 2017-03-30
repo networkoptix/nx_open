@@ -112,7 +112,7 @@ def http_schema(request):
 
 @pytest.fixture
 def box(run_options, customization_company_name):
-    return BoxConfigFactory(run_options.vm_port_base, customization_company_name)
+    return BoxConfigFactory(customization_company_name)
 
 @pytest.fixture
 def server(box):

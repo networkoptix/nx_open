@@ -71,8 +71,7 @@ def make_vbox_host_time_disabled_command():
 
 class BoxConfigFactory(object):
 
-    def __init__(self, vm_port_base, company_name):
-        self._vm_port_base = vm_port_base
+    def __init__(self, company_name):
         self._company_name = company_name
 
     # ip_address may end with .0 (like 1.2.3.0); this will be treated as network address, and dhcp will be used for it
@@ -93,27 +92,26 @@ class BoxConfigFactory(object):
         for script in provision_scripts or []:
             vm_commands += [make_vm_provision_command(script)]
             required_file_list.append('{test_dir}/' + script)
-        return BoxConfig(self._vm_port_base, name, ip_address_list, required_file_list, vm_commands, vbox_commands)
+        return BoxConfig(name, ip_address_list, required_file_list, vm_commands, vbox_commands)
 
 
 class BoxConfig(object):
 
     @classmethod
-    def from_dict(cls, d, vm_name_prefix):
+    def from_dict(cls, d):
         return cls(
-            vm_port_base=d['vm_port_base'],
             name=d['name'],
             ip_address_list=map(IPNetwork, d['ip_address_list']),
             required_file_list=d['required_file_list'],
             vm_commands=[ConfigCommand.from_dict(command) for command in d['vm_commands']],
             vbox_commands=[ConfigCommand.from_dict(command) for command in d['vbox_commands']],
             idx=d['idx'],
-            vm_name_prefix=vm_name_prefix,
+            vm_name_prefix=d['vm_name_prefix'],
+            vm_port_base=d['vm_port_base'],
             )
 
-    def __init__(self, vm_port_base, name, ip_address_list, required_file_list, vm_commands, vbox_commands, idx=None, vm_name_prefix=None):
+    def __init__(self, name, ip_address_list, required_file_list, vm_commands, vbox_commands, idx=None, vm_name_prefix=None, vm_port_base=None):
         assert is_list_inst(ip_address_list, IPNetwork), repr(ip_address_list)
-        self.vm_port_base = vm_port_base
         self.name = name
         self.ip_address_list = ip_address_list
         self.required_file_list = required_file_list
@@ -121,6 +119,7 @@ class BoxConfig(object):
         self.vbox_commands = vbox_commands
         self.idx = idx
         self.vm_name_prefix = vm_name_prefix
+        self.vm_port_base = vm_port_base
         self.must_be_recreated = False  # this test requires fresh box
         self.is_allocated = False
 
@@ -132,13 +131,26 @@ class BoxConfig(object):
 
     def to_dict(self):
         return dict(
-            vm_port_base=self.vm_port_base,
             name=self.name,
             ip_address_list=map(str, self.ip_address_list),
             required_file_list=self.required_file_list,
             vm_commands=[command.to_dict() for command in self.vm_commands],
             vbox_commands=[command.to_dict() for command in self.vbox_commands],
             idx=self.idx,
+            vm_name_prefix=self.vm_name_prefix,
+            vm_port_base=self.vm_port_base,
+            )
+
+    def clone(self, idx, vm_name_prefix, vm_port_base):
+        return BoxConfig(
+            name=self.name,
+            ip_address_list=self.ip_address_list,
+            required_file_list=self.required_file_list,
+            vm_commands=self.vm_commands,
+            vbox_commands=self.vbox_commands,
+            idx=idx,
+            vm_name_prefix=vm_name_prefix,
+            vm_port_base=vm_port_base,
             )
 
     def matches(self, other):

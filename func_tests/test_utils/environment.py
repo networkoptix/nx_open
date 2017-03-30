@@ -40,6 +40,7 @@ class EnvironmentBuilder(object):
         self._reset_servers = options.reset_servers
         self._recreate_boxes = options.recreate_boxes
         self._vm_name_prefix = options.vm_name_prefix
+        self._vm_port_base = options.vm_port_base
         self._vm_is_local_host = options.vm_ssh_host_config is None
         self._vm_host = host_from_config(options.vm_ssh_host_config)
         self._vm_host_work_dir = options.vm_host_work_dir
@@ -49,7 +50,7 @@ class EnvironmentBuilder(object):
 
     def _load_boxes_config_from_cache(self):
         try:
-            self._boxes_config = [BoxConfig.from_dict(d, self._vm_name_prefix)
+            self._boxes_config = [BoxConfig.from_dict(d)
                                   for d in self._cache.get(self.vagrant_boxes_cache_key, [])]
             self._boxes_config_is_loaded = True
         except KeyError as x:  # may be due to changed version
@@ -76,10 +77,11 @@ class EnvironmentBuilder(object):
         if config:
             config.name = required_config.name
         else:
-            config = required_config
             self._last_box_idx += 1
-            config.idx = self._last_box_idx
-            config.vm_name_prefix = self._vm_name_prefix
+            config = required_config.clone(
+                idx=self._last_box_idx,
+                vm_name_prefix=self._vm_name_prefix,
+                vm_port_base=self._vm_port_base)
             self._boxes_config.append(config)
         config.is_allocated = True
         log.info('BOX CONFIG %s: %s', config.box_name(), config)
