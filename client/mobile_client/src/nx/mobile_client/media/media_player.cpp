@@ -85,9 +85,9 @@ bool MediaPlayer::failed() const
     return m_failed;
 }
 
-QnResourcePool* MediaPlayer::resourcePool() const
+QnCommonModule* MediaPlayer::commonModule() const
 {
-    return qnMobileClientModule->commonModule()->resourcePool();
+    return qnMobileClientModule->commonModule();
 }
 
 } // namespace mobile

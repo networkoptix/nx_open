@@ -2,6 +2,8 @@
 #include "rtsp_client_archive_delegate.h"
 
 #include <QtCore/QBuffer>
+#include <QtCore/QUrl>
+
 #include <QtNetwork/QNetworkCookie>
 
 extern "C"
@@ -13,6 +15,8 @@ extern "C"
 #include <api/app_server_connection.h>
 #include <api/session_manager.h>
 #include <api/network_proxy_factory.h>
+
+#include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
@@ -27,7 +31,6 @@ extern "C"
 #include <network/ffmpeg_sdp.h>
 #include <QtConcurrent/QtConcurrentFilter>
 #include "http/custom_headers.h"
-#include "common/common_module.h"
 
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client.h>
@@ -53,7 +56,8 @@ namespace
     }
 }
 
-QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader):
+QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader)
+    :
     QnAbstractArchiveDelegate(),
 	m_rtspSession(new QnRtspClient),
     m_rtpData(0),
@@ -84,10 +88,6 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_flags |= Flag_CanProcessMediaStep;
     m_flags |= Flag_CanSendMotion;
     m_flags |= Flag_CanSeekImmediatly;
-
-    m_auth.username = commonModule()->currentUrl().userName();
-    m_auth.password = commonModule()->currentUrl().password();
-    m_auth.videowall = QnAppServerConnectionFactory::videowallGuid();
 }
 
 void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &camera)
@@ -99,9 +99,20 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &came
         disconnect(m_camera->commonModule()->cameraHistoryPool(), nullptr, this, nullptr);
 
     m_camera = camera;
+
+    NX_ASSERT(camera);
+    if (!m_camera)
+        return;
+
     m_server = camera->getParentServer();
 
-    connect(camera->commonModule()->cameraHistoryPool(),
+    auto commonModule = camera->commonModule();
+
+    m_auth.username = commonModule->currentUrl().userName();
+    m_auth.password = commonModule->currentUrl().password();
+    m_auth.videowall = commonModule->videowallGuid();
+
+    connect(commonModule->cameraHistoryPool(),
         &QnCameraHistoryPool::cameraHistoryChanged,
         this,
         [this](const QnSecurityCamResourcePtr &camera)
@@ -118,7 +129,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr &came
             reopen();
     });
 
-    connect(camera->commonModule()->cameraHistoryPool(),
+    connect(commonModule->cameraHistoryPool(),
         &QnCameraHistoryPool::cameraFootageChanged,
         this,
         [this](const QnSecurityCamResourcePtr &camera) {
@@ -910,7 +921,8 @@ void QnRtspClientArchiveDelegate::setupRtspSession(const QnSecurityCamResourcePt
     /* We can get here while client is already closing. */
     if (server)
     {
-        QNetworkProxy proxy = QnNetworkProxyFactory::proxyToResource(server);
+        QnNetworkProxyFactory factory(server->commonModule());
+        QNetworkProxy proxy = factory.proxyToResource(server);
         if (proxy.type() != QNetworkProxy::NoProxy)
             session->setProxyAddr(proxy.hostName(), proxy.port());
         session->setAdditionAttribute(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());

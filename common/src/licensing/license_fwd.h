@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QSharedPointer>
+
 class QnLicense;
 using QnLicensePtr = QSharedPointer<QnLicense>;
 using QnLicenseList = QList<QnLicensePtr> ;

@@ -27,6 +27,7 @@ void QnCommonModuleAware::init(QObject* parent)
         if (m_commonModule)
             break;
     }
+    NX_ASSERT(m_commonModule);
 }
 
 QnCommonModule* QnCommonModuleAware::commonModule() const

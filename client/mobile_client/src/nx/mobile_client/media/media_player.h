@@ -31,7 +31,7 @@ public:
     bool failed() const;
 
 protected:
-    virtual QnResourcePool* resourcePool() const override;
+    virtual QnCommonModule* commonModule() const override;
 
 signals:
     void resourceIdChanged();

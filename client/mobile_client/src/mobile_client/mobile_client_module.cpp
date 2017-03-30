@@ -83,10 +83,10 @@ QnMobileClientModule::QnMobileClientModule(
 
     m_commonModule->store(new QnLongRunnablePool());
     m_commonModule->store(new QnMobileClientMessageProcessor());
-    m_commonModule->store(new QnCameraHistoryPool());
+    m_commonModule->instance<QnCameraHistoryPool>();
     m_commonModule->store(new QnMobileClientCameraFactory());
 
-    m_commonModule->store(new QnResourcesChangesManager());
+    m_commonModule->instance<QnResourcesChangesManager>();
 
     auto userWatcher = m_commonModule->store(new QnUserWatcher());
 
