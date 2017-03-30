@@ -1,6 +1,6 @@
-New message
+Új üzenet
 
-Type: {{message.type}}
-Data: {{{message.data}}}
+Típus: {{message.type}}
+Adat: {{{message.data}}}
 
-There is no specific template for this type of message
+Ehhez az üzenettípushoz nincs minta

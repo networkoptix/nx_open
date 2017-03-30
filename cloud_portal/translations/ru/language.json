@@ -7,6 +7,7 @@
     "okButton":"Ok",
     "cancelButton":"Отмена",
     "loginTitle":"Войти в {{PRODUCT_NAME}}",
+    "loginButton":"Войти",
     "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"Вы уже выполнили вход",
     "logoutAuthorisedContinueButton":"Продолжить",
@@ -150,12 +151,15 @@
     "confirmUnshareTitle":"Удалить пользователя?",
     "confirmUnshareAction":"Удалить",
     "successDisconnected":"Система успешно отключена от {{PRODUCT_NAME}}",
-    "successDeleted":"Система {systemName} успешно удалена из вашей учетной записи",
-    "permissionsRemoved":"{Email} был лишен полномочий"
+    "successDeleted":"Система {{systemName}} успешно удалена из вашей учетной записи",
+    "permissionsRemoved":"{{email}} был лишен полномочий"
   },
   "account":{
     "accountSavedSuccess":"Ваша учетная запись успешно сохранена",
-    "passwordChangedSuccess":"Ваша учетная запись успешно сохранена"
+    "passwordChangedSuccess":"Ваша учетная запись успешно сохранена",
+    "changePassword":"Изменить пароль",
+    "newPasswordLabel":"Новый пароль",
+    "saveChanges":"Сохранить"
   },
   "downloads":{
     "noClientDetectedTitle":"Установите {{VMS_NAME}} для работы с системой",
@@ -197,5 +201,15 @@
       "bundle":"Клиент и сервер",
       "servertool":"Инструмент настройки"
     }
+  },
+  "activeActions":{
+    "sendConfirm":"Отправить",
+    "resetPassword":"Сброс пароля",
+    "setNewPassword":"Сохранить пароль",
+    "setNewPasswordLabel":"Новый пароль"
+  },
+  "regActions":{
+    "passwordLabel":"Пароль",
+    "createAccount":"Зарегистрироваться"
   }
 }

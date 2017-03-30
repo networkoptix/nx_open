@@ -1,12 +1,13 @@
 {
-  "language": "fr",
-  "language_name": "Français",
+  "language":"fr",
+  "language_name":"Français",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
   "dialogs":{
     "okButton":"Ok",
     "cancelButton":"Annuler",
     "loginTitle":"Connexion à {{PRODUCT_NAME}}",
+    "loginButton":"Log in",
     "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"Vous êtes déjà connecté",
     "logoutAuthorisedContinueButton":"Continuer",
@@ -150,12 +151,15 @@
     "confirmUnshareTitle":"Supprimer usager?",
     "confirmUnshareAction":"Supprimer",
     "successDisconnected":"Système correctement déconnecté de {{PRODUCT_NAME}}",
-    "successDeleted":"Système {systemName} a correctement été supprimé de votre compte",
-    "permissionsRemoved":"Autorisations retirées de {Email}"
+    "successDeleted":"System {{systemName}} is successfully deleted from your account",
+    "permissionsRemoved":"Permissions were removed from {{email}}"
   },
   "account":{
     "accountSavedSuccess":"Votre compte est enregistré avec succès",
-    "passwordChangedSuccess":"Votre compte est enregistré avec succès"
+    "passwordChangedSuccess":"Votre compte est enregistré avec succès",
+    "changePassword":"Change Password",
+    "newPasswordLabel":"New password",
+    "saveChanges":"Save"
   },
   "downloads":{
     "noClientDetectedTitle":"Installer {{VMS_NAME}} pour visionner votre Système",
@@ -197,5 +201,15 @@
       "bundle":"Client et serveur",
       "servertool":"Outil de configuration"
     }
+  },
+  "activeActions":{
+    "sendConfirm":"Send",
+    "resetPassword":"Reset Password",
+    "setNewPassword":"Save password",
+    "setNewPasswordLabel":"New password"
+  },
+  "regActions":{
+    "passwordLabel":"Password",
+    "createAccount":"Create Account"
   }
 }
