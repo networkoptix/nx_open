@@ -29,6 +29,7 @@
 #include <utils/common/event_processors.h>
 
 #include <nx/utils/string.h>
+#include <nx/utils/app_info.h>
 
 namespace {
 
@@ -126,7 +127,20 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
             return qnSkin->maximumSize(option.icon);
         });
 
-    const auto basePainter =
+    if (nx::utils::AppInfo::isMacOsX())
+    {
+        indirectAccessDelegate->setCustomInitStyleOption(
+            [this](QStyleOptionViewItem* option, const QModelIndex& index)
+            {
+                const auto selectionModel = ui->resourcesTreeView->selectionModel();
+                const auto nameIndex = index.sibling(index.row(),
+                    QnAccessibleResourcesModel::NameColumn);
+                if (selectionModel->isSelected(nameIndex))
+                    option->state |= QStyle::State_Selected;
+            });
+    }
+
+    indirectAccessDelegate->setCustomPaint(
         [this](QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index)
         {
             option.widget->style()->drawPrimitive(QStyle::PE_PanelItemViewItem,
@@ -135,36 +149,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
                 option.state.testFlag(QStyle::State_Selected)
                     ? QIcon::Normal
                     : QIcon::Disabled);
-        };
-
-    #if defined(Q_OS_MACX)
-        /**
-          * Workaround for incorrect selection behaviour on MacOS. For some reason QTreeview
-          * assumes that column 0 and 2 are selected, but column 1 is not.
-          */
-        const auto painter =
-            [this, basePainter](QPainter* painter,
-                const QStyleOptionViewItem& option,
-                const QModelIndex& index)
-            {
-                QStyleOptionViewItem fixedOption = option;
-                const auto indices = ui->resourcesTreeView->selectionModel()->selectedIndexes();
-                for (const auto selected: indices)
-                {
-                    if (selected.row() == index.row())
-                    {
-                        fixedOption.state |= QStyle::State_Selected;
-                        break;
-                    }
-                }
-
-                basePainter(painter, fixedOption, index);
-            };
-    #else
-        const auto& painter = base;
-    #endif
-
-    indirectAccessDelegate->setCustomPaint(painter);
+        });
 
     ui->resourcesTreeView->setItemDelegateForColumn(
         QnAccessibleResourcesModel::IndirectAccessColumn,
