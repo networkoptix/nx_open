@@ -55,7 +55,7 @@ class VBoxManage(object):
         return vms_name in vms_list
 
     def get_vms_state(self, vms_name):
-        output = self._run_command(['showvminfo', vms_name, '--machinereadable'])
+        output = self._run_command(['showvminfo', vms_name, '--machinereadable'], log_output=False)
         properties = {}
         for line in output.splitlines():
             name, value = line.split('=')
@@ -127,5 +127,5 @@ class VBoxManage(object):
                            '--enable',
                            ])
 
-    def _run_command(self, args):
-        return self._host.run_command(['VBoxManage', '--nologo'] + args)
+    def _run_command(self, args, log_output=True):
+        return self._host.run_command(['VBoxManage', '--nologo'] + args, log_output=log_output)
