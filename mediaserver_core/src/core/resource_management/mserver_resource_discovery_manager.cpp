@@ -164,6 +164,15 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             continue;
         }
 
+		if (rpResource->hasFlags(Qn::foreigner))
+		{
+			if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
+			{
+				it = resources.erase(it); // do not touch foreign resource
+				continue;
+			}
+		}
+
 		if (newCamRes && newCamRes->needCheckIpConflicts())
 		{
 			quint32 ips = resolveAddress(newNetRes->getHostAddress()).toIPv4Address();
@@ -171,19 +180,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 				ipsList[ips].insert(newNetRes);
 		}
 
-
         QnNetworkResourcePtr rpNetRes = rpResource.dynamicCast<QnNetworkResource>();
-
-        // if such res in ResourcePool
-
-        if (rpResource->hasFlags(Qn::foreigner))
-        {
-            if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
-            {
-                it = resources.erase(it); // do not touch foreign resource
-                continue;
-            }
-        }
 
         const bool isForeign = rpResource->hasFlags(Qn::foreigner);
         QnVirtualCameraResourcePtr existCamRes = rpNetRes.dynamicCast<QnVirtualCameraResource>();
