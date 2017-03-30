@@ -36,6 +36,7 @@ void QnResourceTreeModelNodeManager::primaryNodeAdded(QnResourceTreeModelNode* n
     connect(resource, &QnResource::nameChanged,   node, chainUpdate);
     connect(resource, &QnResource::urlChanged,    node, chainUpdate);
     connect(resource, &QnResource::flagsChanged,  node, chainUpdate);
+    connect(resource, &QnResource::parentIdChanged,  node, chainUpdate);
 
     connect(resource, &QnResource::statusChanged, node,
         [node]() { chainCall(node, &QnResourceTreeModelNode::updateResourceStatus); });

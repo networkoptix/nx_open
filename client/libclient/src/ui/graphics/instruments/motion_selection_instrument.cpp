@@ -135,6 +135,14 @@ void MotionSelectionInstrument::ensureSelectionItem() {
         scene()->addItem(selectionItem());
 }
 
+void MotionSelectionInstrument::updateWidgetUnderCursor(QWidget *viewport, QMouseEvent* event)
+{
+    auto view = this->view(viewport);
+    auto widget = dynamic_cast<QnMediaResourceWidget*>(
+        this->item(view, event->pos(), widgetWithMotion));
+    setWidget(widget);
+}
+
 void MotionSelectionInstrument::updateCursor()
 {
     if (!m_itemUnderMouse)
@@ -191,6 +199,9 @@ bool MotionSelectionInstrument::mousePressEvent(QWidget *viewport, QMouseEvent *
     if (event->button() != Qt::LeftButton)
         return false;
 
+    // Handle situation when we stopped drag over another widget
+    updateWidgetUnderCursor(viewport, event);
+
     if (!m_widget)
         return false;
 
@@ -208,20 +219,29 @@ bool MotionSelectionInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* e
 {
     auto view = this->view(viewport);
 
-    // Really UiElementsWidget always getting here for main scene, resource widget for motion tab
+    // Really UiElementsWidget always getting here for main scene, resource widget for motion tab.
     auto item = dynamic_cast<QGraphicsWidget*>(
         this->item(view, event->pos(), [](QGraphicsItem* item){ return item->isWidget(); }));
     setItemUnderMouse(item);
 
-    auto widget = dynamic_cast<QnMediaResourceWidget*>(
-        this->item(view, event->pos(), widgetWithMotion));
-    setWidget(widget);
+    // Make sure selection will not stop while we are dragging over widget.
+    const bool isDrag = dragProcessor()->isRunning() && event->buttons().testFlag(Qt::LeftButton);
+    if (!isDrag)
+        updateWidgetUnderCursor(viewport, event);
 
     event->accept();
     return false;
 }
 
-bool MotionSelectionInstrument::paintEvent(QWidget *viewport, QPaintEvent *event) {
+bool MotionSelectionInstrument::mouseReleaseEvent(QWidget* viewport, QMouseEvent* event)
+{
+    const auto result = base_type::mouseReleaseEvent(viewport, event);
+    updateWidgetUnderCursor(viewport, event);
+    return result;
+}
+
+bool MotionSelectionInstrument::paintEvent(QWidget *viewport, QPaintEvent *event)
+{
     if(target() == NULL) {
         dragProcessor()->reset();
         return false;
