@@ -7,11 +7,15 @@
 #include <utils/common/app_info.h>
 #include <utils/common/warnings.h>
 
-namespace {
-    const QString defaultSearchPath(lit(":/translations"));
+#include <nx/utils/log/assert.h>
 
-    const QString defaultPrefix(lit("common"));
-}
+namespace {
+
+static const QString defaultSearchPath(lit(":/translations"));
+static const QString defaultPrefix(lit("common"));
+static const QString extension(lit(".qm"));
+
+} // namespace
 
 QnTranslationManager::QnTranslationManager(QObject *parent):
     QObject(parent),
@@ -153,7 +157,9 @@ QList<QnTranslation> QnTranslationManager::loadTranslationsInternal() const {
 
 QnTranslation QnTranslationManager::loadTranslationInternal(const QString &translationDir, const QString &translationName) const {
     QString filePath = translationDir + L'/' + translationName;
-    QString suffix = translationName.mid(m_prefixes[0].size());
+    QString suffix = translationName.mid(defaultPrefix.size());
+    NX_ASSERT(suffix.endsWith(extension));
+    NX_ASSERT(suffix.startsWith(L'_'));
 
     if (!QFileInfo(filePath).exists())
         return QnTranslation();
@@ -162,13 +168,11 @@ QnTranslation QnTranslationManager::loadTranslationInternal(const QString &trans
     if (!translator.load(filePath))
         return QnTranslation();
 
-    /* Note that '//:' denotes a comment for translators that will appear in TS files. */
+    // Suffix loocs like '_en_US.qm'
+    QString localeCode = suffix.mid(1, suffix.length() - extension.length() - 1);
 
     //: Language name that will be displayed to user. Must not be empty.
     QString languageName = translator.translate("Language", "Language Name");
-
-    //: Internal. Please don't change existing translation.
-    QString localeCode = translator.translate("Language", "Locale Code");
 
     if(languageName.isEmpty() || localeCode.isEmpty())
         return QnTranslation(); /* Invalid translation. */
