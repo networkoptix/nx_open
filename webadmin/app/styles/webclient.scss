@@ -245,7 +245,7 @@ div.text-right{
 live-circle{
   padding: 3px;
   margin: 2px 8px 2px 0;
-  background-color: gray;
+  background-color: #CDD7DC;
   display: inline-block;
   -moz-border-radius: 100px;
   -webkit-border-radius: 100px;
@@ -290,7 +290,7 @@ live-circle{
 }
 
 .live-button.active live-circle{
-  background-color: green !important;
+  background-color: chartreuse !important;
 }
 
 .volume{
