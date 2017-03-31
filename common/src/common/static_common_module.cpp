@@ -44,6 +44,7 @@ void QnStaticCommonModule::loadResourceData(QnResourceDataPool *dataPool, const 
 
 QnStaticCommonModule::~QnStaticCommonModule()
 {
+    clear();
     nx::network::SocketGlobals::deinit();
 }
 
