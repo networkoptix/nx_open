@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 #include <nx/utils/move_only_func.h>
 
 namespace nx {

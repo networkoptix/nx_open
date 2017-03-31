@@ -10,7 +10,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 
 //namespace nx {
 namespace ec2 {

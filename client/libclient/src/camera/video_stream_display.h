@@ -8,7 +8,7 @@ extern "C"
 #include <QtCore/QQueue>
 
 #include "decoders/video/abstract_video_decoder.h"
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 #include "frame_scaler.h"
 #include "transcoding/filters/filter_helper.h"
 

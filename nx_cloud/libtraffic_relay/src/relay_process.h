@@ -2,7 +2,7 @@
 
 #include <nx/utils/std/future.h>
 
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 
 namespace nx {
 namespace cloud {

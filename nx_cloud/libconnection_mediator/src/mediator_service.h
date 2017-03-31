@@ -8,7 +8,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/future.h>
 
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 
 namespace nx_http {
 
