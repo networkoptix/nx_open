@@ -5,8 +5,6 @@
 
 #include <QtCore/QDateTime>
 
-#include <utils/common/util.h>
-
 #include "http_message_dispatcher.h"
 #include "http_stream_socket_server.h"
 
@@ -222,7 +220,7 @@ void HttpServerConnection::prepareAndSendResponse(
         nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString() ) );
     nx_http::insertOrReplaceHeader(
         &msg.response->headers,
-        nx_http::HttpHeader( "Date", dateTimeToHTTPFormat( QDateTime::currentDateTime() ) ) );
+        nx_http::HttpHeader( "Date", nx_http::dateTimeToHttpFormat( QDateTime::currentDateTime() ) ) );
 
     //TODO #ak connection persistency
 
