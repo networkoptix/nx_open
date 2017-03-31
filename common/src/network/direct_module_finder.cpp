@@ -135,7 +135,10 @@ void QnDirectModuleFinder::pleaseStop() {
     m_activeRequests.clear();
 }
 
-void QnDirectModuleFinder::enqueRequest(const QUrl &url) {
+void QnDirectModuleFinder::enqueRequest(const QUrl &url)
+{
+    NX_ASSERT(!url.host().isEmpty());
+
     QUrl reqUrl = requestUrl(url);
     if (m_activeRequests.contains(reqUrl) || m_requestQueue.contains(reqUrl))
         return;

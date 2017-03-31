@@ -76,6 +76,11 @@ void QnCommonMessageProcessor::init(const ec2::AbstractECConnectionPtr& connecti
 }
 
 
+ec2::AbstractECConnectionPtr QnCommonMessageProcessor::connection() const
+{
+    return m_connection;
+}
+
 void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection)
 {
     /* //TODO: #GDM #c++14 re-enable when generic lambdas will be supported

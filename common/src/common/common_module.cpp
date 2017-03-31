@@ -9,6 +9,7 @@
 
 #include <api/global_settings.h>
 #include "api/runtime_info_manager.h"
+#include <api/common_message_processor.h>
 
 #include <common/common_meta_types.h>
 
@@ -127,7 +128,6 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
 
 
     m_sessionManager = new QnSessionManager(this);
-    m_router = new QnRouter(this, m_moduleFinder);
 
     m_licensePool = new QnLicensePool(this);
     m_cameraUserAttributesPool = new QnCameraUserAttributePool(this);
@@ -138,6 +138,8 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
 
     m_resourcePool = new QnResourcePool(this);  /*< Depends on nothing. */
     m_moduleFinder = new QnModuleFinder(this, clientMode); //< Depend on resPool
+    m_router = new QnRouter(this, m_moduleFinder); //< Depend on moduleFinder
+
     m_userRolesManager = new QnUserRolesManager(this);         /*< Depends on nothing. */
     m_resourceAccessSubjectCache = new QnResourceAccessSubjectsCache(this); /*< Depends on respool and roles. */
     m_sharedResourceManager = new QnSharedResourcesManager(this);   /*< Depends on respool and roles. */
@@ -202,8 +204,8 @@ QnUuid QnCommonModule::remoteGUID() const {
 
 QUrl QnCommonModule::currentUrl() const
 {
-    if (m_ec2Connection)
-        return m_ec2Connection->connectionInfo().ecUrl;
+    if (auto connection = ec2Connection())
+        return connection->connectionInfo().ecUrl;
     return QUrl();
 }
 
@@ -392,14 +394,12 @@ void QnCommonModule::setMessageProcessor(QnCommonMessageProcessor* messageProces
     m_cameraHistory->setMessageProcessor(messageProcessor);
 }
 
-void QnCommonModule::setEc2Connection(const std::shared_ptr<ec2::AbstractECConnection>& ec2Connection)
-{
-    m_ec2Connection = ec2Connection;
-}
-
 std::shared_ptr<ec2::AbstractECConnection> QnCommonModule::ec2Connection() const
 {
-    return m_ec2Connection;
+    if (m_messageProcessor)
+        return m_messageProcessor->connection();
+
+    return nullptr;
 }
 
 QnUuid QnCommonModule::videowallGuid() const

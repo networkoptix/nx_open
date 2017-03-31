@@ -105,6 +105,8 @@ public:
     QString getAuthKey() const;
     void setAuthKey(const QString& value);
 
+    virtual void setResourcePool(QnResourcePool *resourcePool) override;
+
     //!Returns realm to use in HTTP authentication
     QString realm() const;
 

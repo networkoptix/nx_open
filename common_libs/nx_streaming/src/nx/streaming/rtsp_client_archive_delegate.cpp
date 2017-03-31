@@ -689,7 +689,7 @@ QnConstResourceVideoLayoutPtr QnRtspClientArchiveDelegate::getVideoLayout()
 {
     if (m_customVideoLayout)
         return m_customVideoLayout;
-    else if (m_camera)
+    else if (m_camera && m_camera->resourcePool())
         return m_camera->getVideoLayout();
     else
         return QnMediaResource::getDefaultVideoLayout();

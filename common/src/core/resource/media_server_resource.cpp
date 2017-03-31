@@ -58,25 +58,11 @@ QnMediaServerResource::QnMediaServerResource():
 
     m_statusTimer.restart();
 
-    QnResourceList resList = resourcePool()->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
-    if (!resList.isEmpty())
-        m_firstCamera = resList.first();
-
-    connect(resourcePool(), &QnResourcePool::resourceAdded,
-        this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
-
-    connect(resourcePool(), &QnResourcePool::resourceRemoved,
-        this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
-
     connect(this, &QnResource::resourceChanged,
         this, &QnMediaServerResource::atResourceChanged, Qt::DirectConnection);
 
     connect(this, &QnResource::propertyChanged,
         this, &QnMediaServerResource::at_propertyChanged, Qt::DirectConnection);
-
-    const auto& settings = resourcePool()->commonModule()->globalSettings();
-    connect(settings, &QnGlobalSettings::cloudSettingsChanged,
-        this, &QnMediaServerResource::at_cloudSettingsChanged, Qt::DirectConnection);
 }
 
 QnMediaServerResource::~QnMediaServerResource()
@@ -632,4 +618,33 @@ void QnMediaServerResource::setAuthKey(const QString& authKey)
 QString QnMediaServerResource::realm() const
 {
     return QnAppInfo::realm();
+}
+
+void QnMediaServerResource::setResourcePool(QnResourcePool *resourcePool)
+{
+    if (auto oldPool = this->resourcePool())
+    {
+        oldPool->disconnect(this);
+        oldPool->commonModule()->globalSettings()->disconnect(this);
+        m_firstCamera.clear();
+    }
+
+    base_type::setResourcePool(resourcePool);
+
+    if (auto pool = this->resourcePool())
+    {
+        connect(pool, &QnResourcePool::resourceAdded,
+            this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
+
+        connect(pool, &QnResourcePool::resourceRemoved,
+            this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
+
+        QnResourceList resList = pool->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
+        if (!resList.isEmpty())
+            m_firstCamera = resList.first();
+
+        const auto& settings = pool->commonModule()->globalSettings();
+        connect(settings, &QnGlobalSettings::cloudSettingsChanged,
+            this, &QnMediaServerResource::at_cloudSettingsChanged, Qt::DirectConnection);
+    }
 }

@@ -113,7 +113,7 @@ public:
     void setLastDiscoveredTime(const QDateTime &time);
 
     QnResourcePool *resourcePool() const;
-    void setResourcePool(QnResourcePool *resourcePool);
+    virtual void setResourcePool(QnResourcePool *resourcePool);
 
     virtual QString toSearchString() const;
 

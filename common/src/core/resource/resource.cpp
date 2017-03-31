@@ -226,7 +226,6 @@ QnResourcePool *QnResource::resourcePool() const
 void QnResource::setResourcePool(QnResourcePool *resourcePool)
 {
     QnMutexLocker mutexLocker(&m_mutex);
-
     m_resourcePool = resourcePool;
 }
 
@@ -846,7 +845,7 @@ QString QnResource::getProperty(const QString &key) const
             if (itr != m_locallySavedProperties.end())
                 value = itr->second.value;
         }
-        else
+        else if (commonModule())
         {
             value = commonModule()->propertyDictionary()->value(m_id, key);
         }

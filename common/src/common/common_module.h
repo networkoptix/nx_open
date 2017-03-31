@@ -214,7 +214,6 @@ public:
     QnCommonMessageProcessor* messageProcessor() const;
     void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
 
-    void setEc2Connection(const std::shared_ptr<ec2::AbstractECConnection> &connection);
     std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
 
     QnUuid videowallGuid() const;
@@ -269,6 +268,5 @@ private:
     QnGlobalPermissionsManager* m_globalPermissionsManager = nullptr;
     QnUserRolesManager* m_userRolesManager = nullptr;
 
-    std::shared_ptr<ec2::AbstractECConnection> m_ec2Connection = nullptr;
     QnUuid m_videowallGuid;
 };
