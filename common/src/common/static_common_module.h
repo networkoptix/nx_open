@@ -8,6 +8,7 @@
 
 #include <nx/utils/singleton.h>
 #include <utils/common/instance_storage.h>
+#include "common_globals.h"
 
 class QnResourceDataPool;
 
