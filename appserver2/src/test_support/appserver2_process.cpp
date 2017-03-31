@@ -262,7 +262,9 @@ int Appserver2Process::exec()
     //QnAppServerConnectionFactory appServerConnectionFactory;
     //appServerConnectionFactory.setUrl(dbUrl);
     //appServerConnectionFactory.setEC2ConnectionFactory(ec2ConnectionFactory.get());
-    commonModule->setEc2Connection(ec2Connection);
+
+    //Must call messageProcessor->init(ec2Connection)
+    //commonModule->setEc2Connection(ec2Connection);
 
     nx_http::HttpModManager httpModManager;
     QnSimpleHttpConnectionListener tcpListener(
@@ -273,7 +275,8 @@ int Appserver2Process::exec()
         true);
     if (!tcpListener.bindToLocalAddress())
     {
-        commonModule->setEc2Connection(nullptr);
+        //Must call messageProcessor->init(ec2Connection)
+        //commonModule->setEc2Connection(nullptr);
         //appServerConnectionFactory.setEC2ConnectionFactory(nullptr);
         return 1;
     }
@@ -309,8 +312,8 @@ int Appserver2Process::exec()
 
     ec2Connection.reset();
 
-
-    commonModule->setEc2Connection(nullptr);
+    //Must call messageProcessor->init(ec2Connection)
+    //commonModule->setEc2Connection(nullptr);
     //appServerConnectionFactory.setEC2ConnectionFactory(nullptr);
 
     m_ecConnection = nullptr;
