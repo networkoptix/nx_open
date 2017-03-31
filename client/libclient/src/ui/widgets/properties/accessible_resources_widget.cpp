@@ -129,6 +129,10 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
 
     if (nx::utils::AppInfo::isMacOsX())
     {
+        /**
+          * Workaround for incorrect selection behaviour on MacOS. For some reason QTreeview
+          * assumes that column 0 and 2 are selected, but column 1 is not.
+          */
         indirectAccessDelegate->setCustomInitStyleOption(
             [this](QStyleOptionViewItem* option, const QModelIndex& index)
             {
