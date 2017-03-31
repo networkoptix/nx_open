@@ -6,6 +6,7 @@
 #include <QTime>
 
 #include <common/common_module.h>
+
 #include <utils/common/enable_multi_thread_direct_connection.h>
 
 #include <nx_ec/ec_api.h>
@@ -33,11 +34,15 @@ class TimeSynchronizationManager;
 class QnTransactionMessageBus
     :
     public QObject,
-    public EnableMultiThreadDirectConnection<QnTransactionMessageBus>
+    public EnableMultiThreadDirectConnection<QnTransactionMessageBus>,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 public:
-    QnTransactionMessageBus(detail::QnDbManager* db, Qn::PeerType peerType);
+    QnTransactionMessageBus(detail::QnDbManager* db,
+        Qn::PeerType peerType,
+        QnCommonModule* commonModule);
+
     virtual ~QnTransactionMessageBus();
 
     void addConnectionToPeer(const QUrl& url);
@@ -146,8 +151,6 @@ public:
     QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const;
 
     ConnectionGuardSharedState* connectionGuardSharedState();
-
-    QnCommonModule* commonModule() const;
 
     void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager);
 signals:
@@ -278,13 +281,12 @@ private slots:
     void onEc2ConnectionSettingsChanged(const QString& key);
 
 private:
-    detail::QnDbManager* m_db;
-    TimeSynchronizationManager* m_timeSyncManager;
+    detail::QnDbManager* m_db = nullptr;
+    TimeSynchronizationManager* m_timeSyncManager = nullptr;
 
     /** Info about us. */
     Qn::PeerType m_localPeerType;
 
-    //QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
     QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
     QScopedPointer<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
 

@@ -72,7 +72,7 @@ namespace ec2
         return Timestamp();
     }
 
-    void RemoteEC2Connection::setTransactionLogTime(Timestamp value)
+    void RemoteEC2Connection::setTransactionLogTime(Timestamp /*value*/)
     {
         NX_ASSERT(true); //< not implemented
     }

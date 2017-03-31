@@ -1,5 +1,6 @@
-
 #include "transaction_transport.h"
+
+#include <common/common_module.h>
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>

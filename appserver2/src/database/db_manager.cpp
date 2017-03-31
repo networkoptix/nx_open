@@ -4,6 +4,8 @@
 
 #include <QtSql/QtSql>
 
+#include <common/common_module.h>
+
 #include "utils/common/util.h"
 #include "managers/time_manager.h"
 #include "nx_ec/data/api_business_rule_data.h"
@@ -183,6 +185,7 @@ QnUuid QnDbManager::getType(const QString& typeName)
 }
 
 QnDbManager::QnDbManager(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
     m_licenseOverflowMarked(false),
     m_initialized(false),
     m_tranStatic(m_sdbStatic, m_mutexStatic),
@@ -191,7 +194,6 @@ QnDbManager::QnDbManager(QnCommonModule* commonModule):
     m_dbReadOnly(false),
     m_resyncFlags(),
     m_tranLog(nullptr),
-    m_commonModule(commonModule),
     m_timeSyncManager(nullptr)
 {
 }
@@ -209,8 +211,8 @@ bool QnDbManager::migrateServerGUID(const QString& table, const QString& field)
 {
     QSqlQuery updateGuidQuery( m_sdb );
     updateGuidQuery.prepare(lit("UPDATE %1 SET %2=? WHERE %2=?").arg(table).arg(field) );
-    updateGuidQuery.addBindValue(m_commonModule->moduleGUID().toRfc4122() );
-    updateGuidQuery.addBindValue(m_commonModule->obsoleteServerGuid().toRfc4122() );
+    updateGuidQuery.addBindValue(commonModule()->moduleGUID().toRfc4122() );
+    updateGuidQuery.addBindValue(commonModule()->obsoleteServerGuid().toRfc4122() );
     if( !updateGuidQuery.exec() )
     {
         qWarning() << "can't initialize sqlLite database!" << updateGuidQuery.lastError().text();
@@ -251,12 +253,7 @@ bool createCorruptedDbBackup(const QString& dbFileName)
 
 QString QnDbManager::getDatabaseName(const QString& baseName)
 {
-    return baseName + m_commonModule->moduleGUID().toString();
-}
-
-QnCommonModule* QnDbManager::commonModule() const
-{
-    return m_commonModule;
+    return baseName + commonModule()->moduleGUID().toString();
 }
 
 bool QnDbManager::init(const QUrl& dbUrl)
@@ -317,8 +314,8 @@ bool QnDbManager::init(const QUrl& dbUrl)
                     return false;
                 }
 
-                qint64 currentIdentityTime = m_commonModule->systemIdentityTime();
-                m_commonModule->setSystemIdentityTime(qMax(currentIdentityTime + 1, dbRestoreTime), m_commonModule->moduleGUID());
+                qint64 currentIdentityTime = commonModule()->systemIdentityTime();
+                commonModule()->setSystemIdentityTime(qMax(currentIdentityTime + 1, dbRestoreTime), commonModule()->moduleGUID());
             }
         }
 
@@ -351,7 +348,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
 
         QnDbManager::QnDbTransactionLocker locker(getTransaction());
 
-        if (!m_commonModule->obsoleteServerGuid().isNull())
+        if (!commonModule()->obsoleteServerGuid().isNull())
         {
             if (!migrateServerGUID("vms_resource", "guid"))
                 return false;
@@ -563,12 +560,12 @@ bool QnDbManager::init(const QUrl& dbUrl)
             NX_ASSERT(userResource->isOwner(), Q_FUNC_INFO, "Admin must be admin as it is found by name");
         }
 
-        QString defaultAdminPassword = m_commonModule->defaultAdminPassword();
+        QString defaultAdminPassword = commonModule()->defaultAdminPassword();
         if ((userResource->getHash().isEmpty() || m_dbJustCreated) && defaultAdminPassword.isEmpty())
         {
             defaultAdminPassword = helpers::kFactorySystemPassword;
             if (m_dbJustCreated)
-                m_commonModule->setUseLowPriorityAdminPasswordHack(true);
+                commonModule()->setUseLowPriorityAdminPasswordHack(true);
         }
 
 
@@ -587,16 +584,16 @@ bool QnDbManager::init(const QUrl& dbUrl)
             }
         }
 
-        updateUserResource |= aux::applyRestoreDbData(m_commonModule->beforeRestoreDbData(), userResource);
+        updateUserResource |= aux::applyRestoreDbData(commonModule()->beforeRestoreDbData(), userResource);
 
         if (updateUserResource)
         {
             // admin user resource has been updated
             QnTransaction<ApiUserData> userTransaction(
                 ApiCommand::saveUser,
-                m_commonModule->moduleGUID());
+                commonModule()->moduleGUID());
             m_tranLog->fillPersistentInfo(userTransaction);
-            if (m_commonModule->useLowPriorityAdminPasswordHack())
+            if (commonModule()->useLowPriorityAdminPasswordHack())
                 userTransaction.persistentInfo.timestamp = Timestamp::fromInteger(1); // use hack to declare this change with low proprity in case if admin has been changed in other system (keep other admin user fields unchanged)
             fromResourceToApi(userResource, userTransaction.params);
             executeTransactionNoLock(userTransaction, QnUbjson::serialized(userTransaction));
@@ -618,7 +615,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
                              WHERE coalesce(rs.status,0) != ? %1").arg(serverCondition));
         queryCameras.bindValue(0, Qn::Offline);
         if (!m_isBackupRestore)
-            queryCameras.bindValue(1, m_commonModule->moduleGUID().toRfc4122());
+            queryCameras.bindValue(1, commonModule()->moduleGUID().toRfc4122());
         if (!queryCameras.exec()) {
             qWarning() << Q_FUNC_INFO << __LINE__ << queryCameras.lastError();
             NX_ASSERT(0);
@@ -628,7 +625,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
         {
             QnTransaction<ApiResourceStatusData> tran(
                 ApiCommand::setResourceStatus,
-                m_commonModule->moduleGUID());
+                commonModule()->moduleGUID());
             m_tranLog->fillPersistentInfo(tran);
             tran.params.id = QnUuid::fromRfc4122(queryCameras.value(0).toByteArray());
             tran.params.status = Qn::Offline;
@@ -708,7 +705,7 @@ bool QnDbManager::fillTransactionLogInternal(ApiCommand::Value command, std::fun
     {
         QnTransaction<ObjectType> transaction(
             command,
-            m_commonModule->moduleGUID(),
+            commonModule()->moduleGUID(),
             object);
         auto transactionDescriptor = ec2::getActualTransactionDescriptorByValue<ObjectType>(command);
 

@@ -1,9 +1,10 @@
-#ifndef __DB_MANAGER_H_
-#define __DB_MANAGER_H_
+#pragma once
 
 #include <memory>
 
 #include <QtSql/QSqlError>
+
+#include <common/common_module_aware.h>
 
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
@@ -20,8 +21,8 @@
 #include "core/resource_access/user_access_data.h"
 #include "core/resource_access/resource_access_manager.h"
 #include "core/resource/user_resource.h"
-#include <common/common_module.h>
 
+struct BeforeRestoreDbData;
 
 namespace ec2
 {
@@ -74,7 +75,8 @@ namespace detail
     class QnDbManager
     :
         public QObject,
-        public QnDbHelper
+        public QnDbHelper,
+        public QnCommonModuleAware
     {
         Q_OBJECT
 
@@ -88,8 +90,6 @@ namespace detail
 
         bool init(const QUrl& dbUrl);
         bool isInitialized() const;
-
-        QnCommonModule* commonModule() const;
 
         template <class T>
         ErrorCode executeTransactionNoLock(const QnTransaction<T>& tran, const QByteArray& serializedTran)
@@ -672,7 +672,6 @@ namespace detail
         bool m_dbReadOnly;
         ResyncFlags m_resyncFlags;
         QnTransactionLog* m_tranLog;
-        QnCommonModule* m_commonModule;
         TimeSynchronizationManager* m_timeSyncManager;
     };
 } // namespace detail
@@ -839,5 +838,3 @@ private:
 } // namespace ec2
 
 #define dbManager(db, userAccessData) QnDbManagerAccess(db, userAccessData)
-
-#endif // __DB_MANAGER_H_

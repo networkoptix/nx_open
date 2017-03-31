@@ -203,19 +203,20 @@ bool handleTransaction(
 
 // --------------------------------- QnTransactionMessageBus ------------------------------
 
-QnTransactionMessageBus::QnTransactionMessageBus(detail::QnDbManager* db, Qn::PeerType peerType)
+QnTransactionMessageBus::QnTransactionMessageBus(detail::QnDbManager* db,
+    Qn::PeerType peerType,
+    QnCommonModule* commonModule)
     :
+    QnCommonModuleAware(commonModule),
     m_db(db),
-    m_timeSyncManager(nullptr),
     m_localPeerType(peerType),
-    //m_binaryTranSerializer(new QnBinaryTransactionSerializer()),
     m_jsonTranSerializer(new QnJsonTransactionSerializer()),
     m_ubjsonTranSerializer(new QnUbjsonTransactionSerializer()),
     m_handler(nullptr),
     m_timer(nullptr),
     m_mutex(QnMutex::Recursive),
     m_thread(nullptr),
-    m_runtimeTransactionLog(new QnRuntimeTransactionLog(db->commonModule())),
+    m_runtimeTransactionLog(new QnRuntimeTransactionLog(commonModule)),
     m_restartPending(false)
 {
     if (m_thread)
@@ -236,7 +237,7 @@ QnTransactionMessageBus::QnTransactionMessageBus(detail::QnDbManager* db, Qn::Pe
     m_relativeTimer.restart();
 
     connect(
-        commonModule()->globalSettings(), &QnGlobalSettings::ec2ConnectionSettingsChanged,
+        commonModule->globalSettings(), &QnGlobalSettings::ec2ConnectionSettingsChanged,
         this, &QnTransactionMessageBus::onEc2ConnectionSettingsChanged);
 }
 
@@ -1963,11 +1964,6 @@ int QnTransactionMessageBus::distanceToPeer(const QnUuid& dstPeer) const
     for (const RoutingRecord& rec : m_alivePeers.value(dstPeer).routingInfo)
         minDistance = qMin(minDistance, rec.distance);
     return minDistance;
-}
-
-QnCommonModule* QnTransactionMessageBus::commonModule() const
-{
-    return m_db->commonModule();
 }
 
 void QnTransactionMessageBus::setTimeSyncManager(TimeSynchronizationManager* timeSyncManager)

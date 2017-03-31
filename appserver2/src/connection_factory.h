@@ -3,6 +3,8 @@
 #include <memory>
 #include <map>
 
+#include <common/common_module_aware.h>
+
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/timer_manager.h>
 
@@ -26,7 +28,8 @@ namespace ec2 {
     class Ec2DirectConnectionFactory :
         public AbstractECConnectionFactory,
         public QnStoppable,
-        public QnJoinable
+        public QnJoinable,
+        public QnCommonModuleAware
     {
     public:
         Ec2DirectConnectionFactory(
@@ -62,9 +65,6 @@ namespace ec2 {
         virtual QnTransactionMessageBus* messageBus() const override;
         virtual QnDistributedMutexManager* distributedMutex() const override;
         virtual TimeSynchronizationManager* timeSyncManager() const override;
-
-        QnCommonModule* commonModule() const { return m_commonModule; }
-
 private:
     std::unique_ptr<detail::QnDbManager> m_dbManager;
     std::unique_ptr<QnTransactionLog> m_transactionLog;
@@ -75,7 +75,6 @@ private:
     bool m_terminated;
     int m_runningRequests;
     bool m_sslEnabled;
-    QnCommonModule* m_commonModule;
 
     ClientQueryProcessor m_remoteQueryProcessor;
     QnMutex m_mutex;
