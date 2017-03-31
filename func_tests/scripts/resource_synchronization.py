@@ -115,4 +115,5 @@ def main():
     for test_name in tests:
         run_test(test_name, env)
 
-main()
+if __name__ == "__main__":
+    main()
