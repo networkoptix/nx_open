@@ -132,7 +132,7 @@ class EnvironmentBuilder(object):
             vagrant_dir = os.path.join(self._work_dir, 'vagrant')
         else:
             vagrant_dir = os.path.join(self._vm_host_work_dir, 'vagrant')
-        vagrant = Vagrant(self._test_dir, self._vm_host, self._bin_dir, vagrant_dir,
+        vagrant = Vagrant(self._test_dir, self._vm_name_prefix, self._vm_host, self._bin_dir, vagrant_dir,
                           self._test_session.vagrant_private_key_path, ssh_config_path)
 
         if not self._boxes_config_is_loaded:

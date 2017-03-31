@@ -6,65 +6,90 @@ from hashlib import md5
 import uuid
 
 
-BASE_CAMERA_IP_ADDRESS=0xC0A80000 # 192.168.0.0
-BASE_SERVER_IP_ADDRESS=0xA0A0000  # 10.10.0.0
-BASE_STORAGE_IP_ADDRESS=0xA002000 # 10.2.0.0
-CAMERA_SERVER_GUID_PREFIX="ca14e2a0-8e25-e200-0000"
-SERVER_GUID_PREFIX="8e25e200-0000-0000-0000"
-USER_GUID_PREFIX="58e20000-0000-0000-0000"
-STORAGE_GUID_PREFIX="81012a6e-0000-0000-0000"
-CAMERA_MAC_PREFIX="CA:14:"
+BASE_CAMERA_IP_ADDRESS = 0xC0A80000  # 192.168.0.0
+BASE_SERVER_IP_ADDRESS = 0xA0A0000   # 10.10.0.0
+BASE_STORAGE_IP_ADDRESS = 0xA002000  # 10.2.0.0
+CAMERA_SERVER_GUID_PREFIX = "ca14e2a0-8e25-e200-0000"
+SERVER_GUID_PREFIX = "8e25e200-0000-0000-0000"
+USER_GUID_PREFIX = "58e20000-0000-0000-0000"
+STORAGE_GUID_PREFIX = "81012a6e-0000-0000-0000"
+LAYOUT_GUID_PREFIX = "1a404100-0000-0000-0000"
+LAYOUT_ITEM_GUID_PREFIX = "1a404100-11e1-1000-0000"
+CAMERA_MAC_PREFIX = "CA:14:"
 
 
 def generate_camera_server_guid(id, quoted=True):
     guid = "%s-%012d" % (CAMERA_SERVER_GUID_PREFIX, id)
     return "{%s}" % guid if quoted else guid
 
+
 def generate_server_guid(id, quoted=True):
     guid = "%s-%012d" % (SERVER_GUID_PREFIX, id)
     return "{%s}" % guid if quoted else guid
+
 
 def generate_user_guid(id, quoted=True):
     guid = "%s-%012d" % (USER_GUID_PREFIX, id)
     return "{%s}" % guid if quoted else guid
 
+
 def generate_storage_guid(id, quoted=True):
     guid = "%s-%012d" % (STORAGE_GUID_PREFIX, id)
     return "{%s}" % guid if quoted else guid
 
+
+def generate_layout_guid(id, quoted=True):
+    guid = "%s-%012d" % (LAYOUT_GUID_PREFIX, id)
+    return "{%s}" % guid if quoted else guid
+
+
+def generate_layout_item_guid(id):
+    guid = "%s-%012d" % (LAYOUT_ITEM_GUID_PREFIX, id)
+    return "{%s}" % guid
+
+
 def generate_mac(id):
-    return CAMERA_MAC_PREFIX + ":".join(map(lambda n: "%02X" % (id>>n & 0xFF), [24,16,8,0]))
+    return CAMERA_MAC_PREFIX + ":".join(map(lambda n: "%02X" % (id >> n & 0xFF), [24, 16, 8, 0]))
+
 
 def generate_name(prefix, id):
     return "%s_%s" % (prefix, id)
 
+
 def generate_user_name(id):
     return "User_%s" % id
+
 
 def generate_uuid_from_string(salt):
     v = md5(salt).digest()
     return "{%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x}" % tuple(ord(b) for b in v)
 
+
 def generate_email(name):
     return "%s@gmail.com" % name.lower()
 
+
 def generate_ip_v4(id, base_address):
     ip = base_address + id
-    return ".".join(map(lambda n: str(ip>>n & 0xFF), [24,16,8,0]))
+    return ".".join(map(lambda n: str(ip >> n & 0xFF), [24, 16, 8, 0]))
+
 
 def generate_ip_v4_endpoint(id):
     return "%s:7001" % generate_ip_v4(id, BASE_SERVER_IP_ADDRESS)
+
 
 def generate_password_and_digest(name):
     password = name
     d = md5("%s:NetworkOptix:%s" % (name, password)).digest()
     return (password, ''.join('%02x' % ord(i) for i in d))
 
+
 def generate_password_hash(password):
     salt = 'd0d7971d'
     d = md5(salt + password).digest()
     md5_digest = ''.join('%02x' % ord(i) for i in d)
     return "md5$%s$%s" % (salt, md5_digest)
+
 
 def generate_camera_data(camera_id, **kw):
     mac = kw.get('physicalId', generate_mac(camera_id))
@@ -88,15 +113,15 @@ def generate_camera_data(camera_id, **kw):
        physicalId=mac,
        preferedServerId='{00000000-0000-0000-0000-000000000000}',
        scheduleEnabled=False,
-       scheduleTasks=[ ],
+       scheduleTasks=[],
        secondaryStreamQuality='SSQualityLow',
        status='Unauthorized',
        statusFlags='CSF_NoFlags',
        typeId='{7d2af20d-04f2-149f-ef37-ad585281e3b7}',
        url=generate_ip_v4(camera_id, BASE_CAMERA_IP_ADDRESS),
-       vendor="NetworkOptix"
-       )
+       vendor="NetworkOptix")
     return dict(default_camera_data, **kw)
+
 
 def generate_user_data(user_id, **kw):
     user_name = kw.get('name', generate_name('User', user_id))
@@ -112,9 +137,9 @@ def generate_user_data(user_id, **kw):
         permissions='NoGlobalPermissions',
         userRoleId='{00000000-0000-0000-0000-000000000000}',
         typeId='{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}',
-        url = ''
-        )
+        url='')
     return dict(default_user_data, **kw)
+
 
 def generate_mediaserver_data(server_id, **kw):
     server_address = kw.get('networkAddresses', generate_ip_v4_endpoint(server_id))
@@ -135,10 +160,11 @@ def generate_mediaserver_data(server_id, **kw):
         )
     return dict(default_server_data, **kw)
 
+
 def generate_camera_user_attributes_data(camera, **kw):
     dewarpingParams = '''{"enabled":false,"fovRot":0,
     "hStretch":1,"radius":0.5,"viewMode":"1","xCenter":0.5,"yCenter":0.5}'''
-    default_camera_data =  dict(
+    default_camera_data = dict(
         cameraId=camera['id'],
         cameraName=camera['name'],
         dewarpingParams=dewarpingParams,
@@ -147,10 +173,11 @@ def generate_camera_user_attributes_data(camera, **kw):
         motionMask='5,0,0,44,32:5,0,0,44,32:5,0,0,44,32:5,0,0,44,32',
         motionType='MT_SoftwareGrid',
         scheduleEnabled=False,
-        scheduleTasks=[ ],
+        scheduleTasks=[],
         secondaryStreamQuality='SSQualityMedium'
         )
     return dict(default_camera_data, **kw)
+
 
 def generate_storage_data(storage_id, **kw):
     default_storage_data = dict(
@@ -163,12 +190,25 @@ def generate_storage_data(storage_id, **kw):
         isBackup=False)
     return dict(default_storage_data, **kw)
 
+
+def generate_layout_item(item_id, resource_id):
+    return dict(
+        id=generate_layout_item_guid(item_id),
+        left=0.0, top=0.0, right=0.0, bottom=0.0,
+        rotation=0.0,
+        resourceId=resource_id,
+        resourcePath='', zoomLeft='', zoomTop='', zoomRight='',
+        zoomBottom='', zoomTargetId='', displayInfo=False)
+
+
 def generate_layout_data(layout_id, **kw):
     default_layout_data = dict(
         id=generate_layout_guid(layout_id),
         name=generate_name('Layout', layout_id),
+        locked=False,
         items=[])
     return dict(default_layout_data, **kw)
+
 
 def generate_mediaserver_user_attributes_data(server, **kw):
     return dict(
@@ -177,11 +217,21 @@ def generate_mediaserver_user_attributes_data(server, **kw):
         serverId=server['id'],
         serverName=server['name'])
 
-def generate_resource_params_data(resource_id, **kw):
+
+def get_resource_id(resource):
+    if isinstance(resource, dict):
+        return resource['id']
+    return resource
+
+
+def generate_resource_params_data(resource, **kw):
+    resource_id = get_resource_id(resource)
     return [dict(
         name='Resource_%s' % resource_id,
         resourceId=resource_id,
         value='Value_%s' % resource_id)]
 
-def generate_remove_resource_data(resource_id):
+
+def generate_remove_resource_data(resource):
+    resource_id = get_resource_id(resource)
     return dict(id=resource_id)
