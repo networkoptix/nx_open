@@ -1,5 +1,6 @@
 #pragma once
 
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/std/future.h>
 #include <utils/common/stoppable.h>
 

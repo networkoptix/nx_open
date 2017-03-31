@@ -7,12 +7,12 @@
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/async_stoppable.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_factory.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <utils/common/stoppable.h>
 
 template<class _ConnectionType>
 class StreamConnectionHolder

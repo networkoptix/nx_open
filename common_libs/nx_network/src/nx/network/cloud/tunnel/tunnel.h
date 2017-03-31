@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <utils/common/stoppable.h>
+#include <nx/network/async_stoppable.h>
 
 #include "nx/network/cloud/address_resolver.h"
 #include "nx/network/socket_attributes_cache.h"

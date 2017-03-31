@@ -9,10 +9,9 @@
 #include <boost/optional.hpp>
 #endif
 
+#include <nx/network/async_stoppable.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/thread/mutex.h>
-
-#include <utils/common/stoppable.h>
 
 #include "asynchttpclient.h"
 
@@ -26,8 +25,7 @@ namespace nx_http {
  * @warning Message body is read ascynhronously to some internal buffer.
  */
 class NX_NETWORK_API HttpClient:
-    public QObject,
-    public QnStoppable
+    public QObject
 {
     Q_OBJECT
 
@@ -35,7 +33,7 @@ public:
     HttpClient();
     ~HttpClient();
 
-    virtual void pleaseStop() override;
+    void pleaseStop();
 
     /**
         Returns on receiving response

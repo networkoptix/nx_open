@@ -1,8 +1,9 @@
-#include "stoppable.h"
+#include "async_stoppable.h"
 
-#include <nx/network/socket_global.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/mutex_lock_analyzer.h>
+
+#include "socket_global.h"
 
 void QnStoppableAsync::pleaseStopSync(bool checkForLocks)
 {
