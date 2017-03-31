@@ -32,7 +32,7 @@ public:
      * After successful call socket provided represents connection to the requested peer.
      */
     virtual void openConnectionToTheTargetHost(
-        nx::String& sessionId,
+        const nx::String& sessionId,
         OpenRelayConnectionHandler handler) = 0;
 
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const = 0;
@@ -68,7 +68,7 @@ public:
         StartClientConnectSessionHandler handler) override;
 
     virtual void openConnectionToTheTargetHost(
-        nx::String& sessionId,
+        const nx::String& sessionId,
         OpenRelayConnectionHandler handler) override;
 
     virtual SystemError::ErrorCode prevRequestSysErrorCode() const override;

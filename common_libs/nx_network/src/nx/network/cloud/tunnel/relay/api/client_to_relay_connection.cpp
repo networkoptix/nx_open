@@ -51,7 +51,7 @@ void ClientToRelayConnectionImpl::startSession(
 }
 
 void ClientToRelayConnectionImpl::openConnectionToTheTargetHost(
-    nx::String& /*sessionId*/,
+    const nx::String& /*sessionId*/,
     OpenRelayConnectionHandler /*handler*/)
 {
     // TODO
