@@ -7,6 +7,10 @@
 
 class QGraphicsLinearLayout;
 
+/*
+*  This class is DEPRECATED
+*/
+
 class QnScrollableOverlayWidgetPrivate
 {
     Q_DECLARE_PUBLIC(QnScrollableOverlayWidget)

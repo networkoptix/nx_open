@@ -24,7 +24,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/resource/button_ids.h>
-#include <ui/graphics/items/overlays/buttons_overlay.h>
+#include <ui/graphics/items/overlays/resource_title_item.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/style/globals.h>
@@ -495,7 +495,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     setHelpTopic(showLogButton, Qn::MainWindow_MonitoringItem_Log_Help);
     connect(showLogButton, &QnImageButtonWidget::clicked, this,
         [this] {menu()->trigger(QnActions::ServerLogsAction, m_resource);});
-    buttonsOverlay()->rightButtonsBar()->addButton(Qn::ShowLogButton, showLogButton);
+    titleBar()->rightButtonsBar()->addButton(Qn::ShowLogButton, showLogButton);
 
     auto checkIssuesButton = createStatisticAwareButton(lit("server_widget_check_issues"));
     checkIssuesButton->setIcon(qnSkin->icon("item/issues.png"));
@@ -503,7 +503,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     checkIssuesButton->setToolTip(tr("Check Issues"));
     connect(checkIssuesButton, &QnImageButtonWidget::clicked, this,
         [this] { menu()->trigger(QnActions::ServerIssuesAction, m_resource); });
-    buttonsOverlay()->rightButtonsBar()->addButton(Qn::CheckIssuesButton, checkIssuesButton);
+    titleBar()->rightButtonsBar()->addButton(Qn::CheckIssuesButton, checkIssuesButton);
 
     /* Run handlers. */
     updateButtonsVisibility();

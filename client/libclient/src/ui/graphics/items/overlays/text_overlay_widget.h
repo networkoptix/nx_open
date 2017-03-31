@@ -8,7 +8,7 @@
 
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/controls/html_text_item.h>
-#include <ui/graphics/items/overlays/scrollable_overlay_widget.h>
+#include <ui/graphics/items/overlays/scrollable_items_widget.h>
 
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -39,16 +39,15 @@ typedef QList<QnOverlayTextItemData> QnOverlayTextItemDataList;
  *  Container class, that displays QnHtmlTextItems on the scrollable area.
  *  Supports items auto-removing by timeout.
  */
-class QnTextOverlayWidget : public QnScrollableOverlayWidget
+class QnTextOverlayWidget : public QnScrollableItemsWidget
     //TODO: #GDM refactor to normal logic:
     // * replace class with QnScrollableOverlayWidget
     // * move 'remove-by-timeout' logic to controller class
 {
+    using base_type = QnScrollableItemsWidget;
 
-    typedef QnScrollableOverlayWidget base_type;
 public:
     QnTextOverlayWidget(QGraphicsWidget *parent = nullptr);
-
     ~QnTextOverlayWidget();
 
     void addTextItem(const QnOverlayTextItemData &data);

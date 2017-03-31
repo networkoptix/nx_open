@@ -6,6 +6,10 @@
 
 class QnScrollableOverlayWidgetPrivate;
 
+/*
+*  This class is DEPRECATED. It is superseded by QnScrollableItemWidget.
+*/
+
 /**
  *  Container overlay class, that displays items on the scrollable area.
  */

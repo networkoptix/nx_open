@@ -36,6 +36,8 @@ class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
 class QnIoModuleOverlayWidget;
 class QnCompositeTextOverlay;
+class QnScrollableItemsWidget;
+class QnTextOverlayWidget;
 class QnTwoWayAudioWidget;
 
 class QnMediaResourceWidget: public Customized<QnResourceWidget>
@@ -186,7 +188,7 @@ protected:
     void suspendHomePtzController();
     void resumeHomePtzController();
 
-    virtual void updateHud(bool animate);
+    virtual void updateHud(bool animate) override;
 
     void ensureTwoWayAudioWidget();
     bool animationAllowed() const;
@@ -237,6 +239,8 @@ private:
     qint64 getUtcCurrentTimeMs() const;
 
     void updateCurrentUtcPosMs();
+
+    void setupHud();
 
 private:
     struct ResourceStates
@@ -312,7 +316,9 @@ private:
 
     QVector<QColor> m_motionSensitivityColors;
 
-    QnTwoWayAudioWidget* m_twoWayAudioWidget;
+    QnScrollableItemsWidget* m_triggersContainer = nullptr;
+
+    QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
 
     /* Software triggers map: ID -> icon name */
     using SoftwareTriggers = std::map<QString, QString, decltype(&nx::utils::naturalStringLess)>;

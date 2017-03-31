@@ -33,10 +33,10 @@ class QnImageButtonWidget;
 class QnImageButtonBar;
 class QnProxyLabel;
 class QnHtmlTextItem;
-class QnScrollableOverlayWidget;
-class QnButtonsOverlay;
+class QnResourceTitleItem;
 class GraphicsLabel;
 class QnStatusOverlayWidget;
+class QnHudOverlayWidget;
 
 class QnResourceWidget:
     public Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>,
@@ -237,7 +237,7 @@ public:
     bool isLocalActive() const;
     void setLocalActive(bool localActive);
 
-    QnButtonsOverlay *buttonsOverlay() const;
+    QnResourceTitleItem* titleBar() const;
 
     void setCheckedButtons(int buttons);
 
@@ -328,34 +328,14 @@ protected:
 
     float defaultAspectRatio() const;
 
-protected:
-    struct OverlayWidgets
-	{
-	    QnButtonsOverlay* buttonsOverlay; /**< Overlay containing item title buttons. */
-
-	    QnScrollableOverlayWidget* detailsOverlay; /**< Overlay containing info item. */
-	    QnHtmlTextItem* detailsItem; /**< Detailed camera info (resolution, stream, etc). */
-
-	    QnScrollableOverlayWidget* positionOverlay; /**< Overlay containing position item. */
-	    QnHtmlTextItem* positionItem; /**< Current camera position. */
-
-        QnScrollableOverlayWidget* triggersOverlay; /**< Overlay containing software trigger buttons. */
-
-	    OverlayWidgets();
-	};
-
-    OverlayWidgets* overlayWidgets() const;
-
 private:
     QColor calculateFrameColor() const;
     qreal calculateFrameWidth() const;
 
+    void setupHud();
     void createButtons();
 
     void setTitleTextInternal(const QString &titleText);
-
-    void addHudOverlays();
-    void addMainOverlay();
 
     /*
     void setupIconButton(QGraphicsLinearLayout *layout
@@ -381,8 +361,11 @@ private:
     void updateSelectedState();
 
     QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
+
 protected:
+    QnHudOverlayWidget* m_hudOverlay;
     QnStatusOverlayWidget* m_statusOverlay;
+
 private:
     friend class QnWorkbenchDisplay;
 
@@ -422,8 +405,6 @@ private:
     /* Widgets for overlaid stuff. */
 
     QnStatusOverlayController* m_statusController;
-
-    QScopedPointer<OverlayWidgets> m_overlayWidgets;
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;

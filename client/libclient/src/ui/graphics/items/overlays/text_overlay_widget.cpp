@@ -25,7 +25,7 @@ QnOverlayTextItemData::QnOverlayTextItemData(const QnUuid &initId
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnOverlayTextItemData, (eq), QnOverlayTextItemData_Fields);
 
 QnTextOverlayWidget::QnTextOverlayWidget(QGraphicsWidget *parent)
-    : base_type(Qt::AlignRight, parent)
+    : base_type(Qt::AlignRight | Qt::AlignBottom, parent)
 {
     enum
     {
@@ -71,7 +71,7 @@ void QnTextOverlayWidget::removeTextItem(const QnUuid &id)
     }
 
     m_textItems.remove(id);
-    removeItem(id);
+    deleteItem(id);
 }
 
 void QnTextOverlayWidget::setTextItems(const QnOverlayTextItemDataList &data) {
