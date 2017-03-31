@@ -1,7 +1,7 @@
 #pragma once
 
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/std/future.h>
-
 #include <nx/utils/thread/stoppable.h>
 
 namespace nx {
