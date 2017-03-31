@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/utils/app_info.h>
+
 class QnShowDialogHelper {
 public:
     static void show(QWidget* dialog, const QRect &targetGeometry);
@@ -87,6 +89,12 @@ QPointer<T> QnNonModalDialogConstructor<T>::createAndInitializeDialog(DialogType
     {
         /* Dialog's show() method will reset the geometry, saving it to restore afterwards. */
         m_targetGeometry = output->geometry();
+    }
+
+    if (nx::utils::AppInfo::isMacOsX())
+    {
+        // Workaround for bug QTBUG-34767
+        output->setWindowFlags(output->windowFlags() | Qt::WindowStaysOnTopHint);
     }
     return output;
 }

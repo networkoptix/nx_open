@@ -66,15 +66,22 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 rdep_add_package(qt)
 get_full_package_name(qt QT_DIR)
-set(QT_DIR ${PACKAGES_DIR}/${QT_DIR})
+set(QT_DIR "${PACKAGES_DIR}/${QT_DIR}")
+if(CMAKE_CROSSCOMPILING)
+    set(QT_PREFIX "..")
+else()
+    set(QT_PREFIX "${QT_DIR}")
+endif()
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
     set(CMAKE_FRAMEWORK_PATH "${QT_DIR}/lib")
 endif()
-set(CMAKE_EXE_LINKER_FLAGS
-    "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
-set(CMAKE_SHARED_LINKER_FLAGS
-    "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
+if(NOT WIN32)
+    set(CMAKE_EXE_LINKER_FLAGS
+        "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
+    set(CMAKE_SHARED_LINKER_FLAGS
+        "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
+endif()
 
 rdep_add_package(any/boost)
 rdep_add_package(any/qtservice)

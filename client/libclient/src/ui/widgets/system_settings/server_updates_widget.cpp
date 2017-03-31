@@ -212,6 +212,10 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget* parent):
 
 QnServerUpdatesWidget::~QnServerUpdatesWidget()
 {
+    /* When QnServerUpdatesWidget gets to QObject destructo it destroys m_updateTool.
+       QnMediaServerUpdateTool stops in destructor and emits state change signals
+       which cannot be handled in already destroyed QnServerUpdatesWidget.
+       Also there's no need to handle them, so just disconnect. */
     m_updateTool->disconnect(this);
 }
 
