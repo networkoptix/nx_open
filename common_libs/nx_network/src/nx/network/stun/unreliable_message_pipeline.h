@@ -9,10 +9,10 @@
 #include <functional>
 #include <memory>
 
+#include <nx/network/async_stoppable.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/std/cpp14.h>
-#include <utils/common/stoppable.h>
 #include <utils/common/systemerror.h>
 
 #include "nx/network/aio/basic_pollable.h"

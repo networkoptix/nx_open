@@ -8,6 +8,7 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/ssl_socket.h>
 #include <nx/utils/string.h>
+#include <nx/utils/thread/barrier_handler.h>
 
 #include <utils/common/command_line_parser.h>
 

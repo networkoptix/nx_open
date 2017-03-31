@@ -10,7 +10,7 @@
 
 #include <QtCore/QUrl>
 
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 
 
 namespace detail

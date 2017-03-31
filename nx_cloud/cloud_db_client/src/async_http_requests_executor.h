@@ -13,7 +13,7 @@
 #include <nx/utils/std/cpp14.h>
 
 #include <http/custom_headers.h>
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 
 #include "data/account_data.h"
 #include "data/types.h"

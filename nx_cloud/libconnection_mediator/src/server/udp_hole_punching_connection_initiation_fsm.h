@@ -14,7 +14,7 @@
 #include <nx/network/cloud/data/connection_ack_data.h>
 #include <nx/network/cloud/data/connection_result_data.h>
 #include <nx/network/cloud/data/result_code.h>
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 
 #include "listening_peer_pool.h"
 #include "statistics/connection_statistics_info.h"

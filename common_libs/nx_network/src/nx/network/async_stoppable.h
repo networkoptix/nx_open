@@ -1,29 +1,9 @@
-/**********************************************************
-* 28 jan 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef QNSTOPPABLE_H
-#define QNSTOPPABLE_H
-
-#include <functional>
-#include <vector>
+#pragma once
 
 #include <nx/utils/move_only_func.h>
-#include <nx/utils/thread/barrier_handler.h>
-
-
-/** Abstract class providing interface to stop doing anything without object destruction */
-class QN_EXPORT QnStoppable
-{
-public:
-    virtual ~QnStoppable() = default;
-
-    virtual void pleaseStop() = 0;
-};
 
 /** Abstract interface to interrupt asynchronous operation with completion notification */
-class QN_EXPORT QnStoppableAsync
+class NX_NETWORK_API QnStoppableAsync
 {
 public:
     virtual ~QnStoppableAsync() = default;
@@ -42,5 +22,3 @@ public:
     */
     virtual void pleaseStopSync(bool checkForLocks = true);
 };
-
-#endif  //QNSTOPPABLE_H
