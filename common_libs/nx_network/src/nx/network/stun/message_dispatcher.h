@@ -11,7 +11,7 @@
 #include <unordered_map>
 
 #include <nx/utils/singleton.h>
-#include <utils/common/stoppable.h>
+#include <nx/network/async_stoppable.h>
 
 #include "abstract_server_connection.h"
 

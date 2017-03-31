@@ -16,6 +16,7 @@
 #include <QDir>
 
 #include <nx/network/socket_global.h>
+#include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>

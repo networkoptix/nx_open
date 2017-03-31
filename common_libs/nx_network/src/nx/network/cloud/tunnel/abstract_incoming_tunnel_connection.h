@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utils/common/stoppable.h>
+#include <nx/network/async_stoppable.h>
 #include <utils/common/systemerror.h>
 
 #include <nx/network/abstract_socket.h>

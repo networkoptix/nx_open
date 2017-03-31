@@ -4,12 +4,12 @@
 #include <functional>
 #include <memory>
 
+#include <nx/network/async_stoppable.h>
+#include <nx/network/aio/basic_pollable.h>
+#include <nx/network/cloud/data/connect_data.h>
 #include <nx/utils/move_only_func.h>
-#include <utils/common/stoppable.h>
 
-#include "nx/network/aio/basic_pollable.h"
 #include "abstract_outgoing_tunnel_connection.h"
-#include "nx/network/cloud/data/connect_data.h"
 #include "tunnel.h"
 
 namespace nx {
