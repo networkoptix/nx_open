@@ -17,7 +17,7 @@ namespace aio {
 
 /**
  * Bridge between two asynchronous channels (e.g., sockets).
- * Reads data from both channels and writes to another one.
+ * Reads data from first channel and writes to the second and vice versa.
  * Seeks for loading both channels simultaneously regardless 
  *   of channel speed difference to maximize throughput.
  * Supports:
