@@ -10,7 +10,7 @@
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/semaphore.h>
 #include <utils/common/safe_direct_connection.h>
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 
 class QnLongRunnablePoolPrivate;
 

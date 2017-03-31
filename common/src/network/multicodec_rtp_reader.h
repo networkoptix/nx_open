@@ -12,7 +12,7 @@
 #include <core/resource/resource_media_layout.h>
 #include <nx/streaming/media_data_packet.h>
 #include <utils/camera/camera_diagnostics.h>
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 #include <utils/common/safe_direct_connection.h>
 
 #include <nx/streaming/rtsp_client.h>

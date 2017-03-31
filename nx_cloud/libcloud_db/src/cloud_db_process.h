@@ -10,7 +10,7 @@
 #include <functional>
 #include <memory>
 
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 #include <utils/db/async_sql_query_executor.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/http/abstract_msg_body_source.h>
