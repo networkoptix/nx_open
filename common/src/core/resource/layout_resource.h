@@ -109,7 +109,10 @@ public:
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
     void itemRemoved(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
-    void itemChanged(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
+    void itemChanged(
+        const QnLayoutResourcePtr& resource,
+        const QnLayoutItemData& item,
+        const QnLayoutItemData& oldItem);
 
     void cellAspectRatioChanged(const QnLayoutResourcePtr &resource);
     void cellSpacingChanged(const QnLayoutResourcePtr &resource);
@@ -123,7 +126,9 @@ signals:
 protected:
     virtual Qn::Notifier storedItemAdded(const QnLayoutItemData& item) override;
     virtual Qn::Notifier storedItemRemoved(const QnLayoutItemData& item) override;
-    virtual Qn::Notifier storedItemChanged(const QnLayoutItemData& item) override;
+    virtual Qn::Notifier storedItemChanged(
+        const QnLayoutItemData& item,
+        const QnLayoutItemData& oldItem) override;
 
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;
 

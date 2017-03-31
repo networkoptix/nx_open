@@ -4,6 +4,14 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
 
+namespace {
+QnVirtualCameraResourcePtr getCamera(const QnLayoutItemData& item)
+{
+    return qnResPool->getResourceById<QnVirtualCameraResource>(item.resource.id);
+}
+
+} // namespace
+
 namespace nx {
 namespace client {
 namespace mobile {
@@ -44,26 +52,34 @@ void LayoutCamerasWatcher::setLayout(const QnLayoutResourcePtr& layout)
     if (!layout)
         return;
 
-    for (const auto& item: layout->getItems())
-    {
-        const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(item.resource.id);
-        if (camera)
-            addCamera(camera);
-    }
-
-    connect(layout, &QnLayoutResource::itemAdded, this,
+    const auto itemAddedHandler =
         [this](const QnLayoutResourcePtr&, const QnLayoutItemData& item)
         {
-            if (const auto camera =
-                qnResPool->getResourceById<QnVirtualCameraResource>(item.resource.id))
-            {
+            if (const auto camera = getCamera(item))
                 addCamera(camera);
-            }
-        });
-    connect(layout, &QnLayoutResource::itemRemoved, this,
+        };
+
+    const auto itemRemovedHandler =
         [this](const QnLayoutResourcePtr&, const QnLayoutItemData& item)
         {
-            removeCamera(item.resource.id);
+            if (getCamera(item))
+                removeCamera(item.resource.id);
+        };
+
+    static const auto kNullLayoutResource = QnLayoutResourcePtr();
+    for (const auto& item: layout->getItems())
+        itemAddedHandler(kNullLayoutResource, item);
+
+    connect(layout, &QnLayoutResource::itemAdded, this, itemAddedHandler);
+    connect(layout, &QnLayoutResource::itemRemoved, this, itemRemovedHandler);
+
+    connect(layout, &QnLayoutResource::itemChanged, this,
+        [this, itemAddedHandler, itemRemovedHandler](const QnLayoutResourcePtr& /* resource */,
+            const QnLayoutItemData& item,
+            const QnLayoutItemData& oldItem)
+        {
+            itemRemovedHandler(kNullLayoutResource, oldItem);
+            itemAddedHandler(kNullLayoutResource, item);
         });
 }
 
