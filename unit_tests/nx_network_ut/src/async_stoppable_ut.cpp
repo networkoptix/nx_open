@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <utils/common/stoppable.h>
+#include <nx/network/async_stoppable.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/std/future.h>
