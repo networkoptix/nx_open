@@ -48,6 +48,7 @@ angular.module('webadminApp')
                     if( scope.debugMode){
                         console.log("playing",src?src.src:null);
                     }
+                    //return "http://184.72.239.149/vod/smil:BigBuckBunny.smil/playlist.m3u8";
                     return src?src.src:null;
                 }
 

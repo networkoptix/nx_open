@@ -37,16 +37,21 @@ angular.module('webadminApp')
                     var linkTemplates = {
                         'preview': 'http://{{host}}/api/image?physicalId={{physicalId}}{{previewPosition}}{{auth}}',
                         'hls':'http://{{host}}/hls/{{physicalId}}.m3u8?{{streamLetter}}{{position}}{{auth}}',
+                        'rtsp':'rtsp://{{host}}/{{physicalId}}?stream={{streamIndex}}{{position}}{{auth}}',
+                        'transrtsp':'rtsp://{{host}}/{{physicalId}}?stream={{streamIndex}}{{position}}&resolution={{resolution}}{{auth}}',
                         'webm':'http://{{host}}/media/{{physicalId}}.webm?pos={{position}}&resolution={{resolution}}{{auth}}',
                         'mjpeg':'http://{{host}}/media/{{physicalId}}.mpjpeg?pos={{position}}&resolution={{resolution}}{{auth}}',
                         'download':'http://{{host}}/hls/{{physicalId}}.mkv?{{streamLetter}}{{position}}&duration={{duration}}{{auth}}'
                     };
+
+                    
 
                     return linkTemplates[transport].
                         replace("{{host}}", window.location.host).
                         replace("{{physicalId}}", camera.physicalId).
                         replace("{{streamIndex}}", stream).
                         replace("{{streamLetter}}", stream?'lo':'hi').
+                        replace("{{auth}}", !scope.useAuth?'':'&auth=' + (transport=='rtsp'?mediaserver.authForRtsp():mediaserver.authForMedia())).
                         replace("{{auth}}", !scope.useAuth?'':'&auth=' + (mediaserver.authForMedia())).
                         replace("{{position}}", scope.liveMode || !scope.position?'':'&pos=' + scope.position).
                         replace("{{previewPosition}}", scope.liveMode || !scope.position?'&time=LATEST':'&time=' + scope.position).
