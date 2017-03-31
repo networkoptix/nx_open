@@ -561,6 +561,10 @@ void QnResourceTreeModelUserNodes::cleanupRecorders()
 
 void QnResourceTreeModelUserNodes::handleResourceAdded(const QnResourcePtr& resource)
 {
+    // Resource was added and instantly removed, data will be processed in handleResourceRemoved
+    if (!resource->resourcePool())
+        return;
+
     if (auto user = resource.dynamicCast<QnUserResource>())
     {
         connect(user, &QnUserResource::enabledChanged, this,
@@ -645,6 +649,10 @@ void QnResourceTreeModelUserNodes::handleGlobalPermissionsChanged(
         /* Rebuild will occur on context user change. */
         return;
     }
+
+    // We got globalPermissionsChanged on user removing.
+    if (subject.user() && !subject.user()->resourcePool())
+        return;
 
     auto subjectNode = ensureSubjectNode(subject);
     removeNode(subjectNode);

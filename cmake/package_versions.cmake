@@ -17,6 +17,10 @@ function(detect_package_versions)
     set(_gmock_version "1.7.0")
     set(_gcc_version "4.9.4")
 
+    if(WIN32)
+        set(_qt_version "5.6.1")
+    endif()
+
     if(MACOSX)
         set(_quazip_version "0.7.2")
         set(_festival_version "2.1")

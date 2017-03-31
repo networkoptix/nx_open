@@ -267,7 +267,7 @@ void QnLiteClientControllerPrivate::updateServerStatus()
 
 bool QnLiteClientControllerPrivate::initLayout()
 {
-    if (!layoutHelper->layout())
+    if (!layoutHelper->layout() || layoutHelper->layout()->getParentId() != serverId)
         layoutHelper->setLayout(layoutHelper->findLayoutForServer(serverId));
 
     if (!layoutHelper->layout())

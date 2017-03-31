@@ -589,7 +589,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
         <source>about:blank</source>
-        <translation>névjegy: üres</translation>
+        <translation type="unfinished">about:blank</translation>
     </message>
     <message>
         <location/>

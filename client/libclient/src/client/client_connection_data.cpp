@@ -78,7 +78,3 @@ int QnConnectionDataList::getIndexByName(const QString& name) const
         [name](const QnConnectionData& value) { return (name == value.name); });
     return (it == end() ? -1 : it - begin());
 }
-
-QString QnConnectionDataList::defaultLastUsedNameKey(){
-    return lit("* Last used connection *");
-}
