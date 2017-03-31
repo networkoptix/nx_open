@@ -351,12 +351,7 @@ QnSystemHostsModel::QnSystemHostsModel(QObject* parent):
         };
 
     connect(this, &QnSystemHostsModel::modelReset, this, &QnSystemHostsModel::firstHostChanged);
-    connect(this, &QnSystemHostsModel::rowsInserted, this,
-            [this](const QModelIndex& /* parent */, int first, int /* last */)
-            {
-                if (first == 0)
-                    emit firstHostChanged();
-            });
+    connect(this, &QnSystemHostsModel::rowsInserted, this, rowsChangedHandler);
     connect(this, &QnSystemHostsModel::rowsRemoved, this, rowsChangedHandler);
 
     connect(this, &QnSystemHostsModel::rowsMoved, this,
