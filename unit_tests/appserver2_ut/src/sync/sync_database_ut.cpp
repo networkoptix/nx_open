@@ -5,6 +5,7 @@
 #include <nx_ec/data/api_camera_data.h>
 #include <core/resource_access/user_access_data.h>
 #include <nx_ec/ec_api.h>
+#include <transaction/transaction_message_bus.h>
 
 void initResourceTypes(ec2::AbstractECConnection* ec2Connection)
 {
@@ -55,7 +56,7 @@ void createData(const Appserver2Ptr& server)
 
 TEST(SympleSyncTest, main)
 {
-    static const int kInstanceCount = 1;
+    static const int kInstanceCount = 3;
 
     std::vector<Appserver2Ptr> servers;
     for (int i = 0; i < kInstanceCount; ++i)
@@ -65,4 +66,12 @@ TEST(SympleSyncTest, main)
 
     for (const auto& server: servers)
         createData(server);
+    for (int i = 1; i < servers.size(); ++i)
+    {
+        const auto addr = servers[i]->moduleInstance()->endpoint();
+        QUrl url = lit("http://%1:%2/ec2/events").arg(addr.address.toString()).arg(addr.port);
+        servers[i - 1]->moduleInstance()->ecConnection()->messageBus()->addConnectionToPeer(url);
+    }
+
+    std::this_thread::sleep_for(std::chrono::seconds(10));
 }
