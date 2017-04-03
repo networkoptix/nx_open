@@ -1,5 +1,4 @@
-#ifndef QN_PTZ_CONTROLLER_POOL_H
-#define QN_PTZ_CONTROLLER_POOL_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -61,8 +60,3 @@ private:
     friend class QnPtzControllerPoolPrivate;
     QScopedPointer<QnPtzControllerPoolPrivate> d;
 };
-
-#define qnPtzPool (QnPtzControllerPool::instance())
-
-
-#endif // QN_PTZ_CONTROLLER_POOL_H

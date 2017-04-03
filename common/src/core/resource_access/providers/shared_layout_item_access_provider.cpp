@@ -10,25 +10,6 @@
 #include <core/resource/user_resource.h>
 #include <common/common_module.h>
 
-namespace {
-
-QSet<QnUuid> layoutItems(const QnLayoutResourcePtr& layout)
-{
-    QSet<QnUuid> result;
-    for (const auto& item : layout->getItems())
-    {
-        /* Only remote resources with correct id can be accessed. */
-        auto id = item.resource.id;
-        if (id.isNull())
-            continue;
-
-        result << id;
-    }
-    return result;
-}
-
-}
-
 QnSharedLayoutItemAccessProvider::QnSharedLayoutItemAccessProvider(QObject* parent):
     base_type(parent)
 {

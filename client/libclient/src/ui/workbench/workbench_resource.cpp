@@ -3,6 +3,9 @@
 #include <QtWidgets/QApplication>
 #include <QtCore/QMimeData>
 
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
+
 #include <utils/common/warnings.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -77,14 +80,14 @@ namespace {
             QString id, uniqueId;
             stream >> id >> uniqueId;
 
-            QnResourcePtr resource = resourcePool()->getResourceById(QnUuid(id));
+            QnResourcePtr resource = qnClientCoreModule->commonModule()->resourcePool()->getResourceById(QnUuid(id));
             if(resource && resource->getUniqueId() == uniqueId) {
                 result.push_back(resource);
                 continue;
             }
 
             if(fromOtherApp) {
-                resource = resourcePool()->getResourceByUniqueId(uniqueId);
+                resource = qnClientCoreModule->commonModule()->resourcePool()->getResourceByUniqueId(uniqueId);
                 if(resource) {
                     result.push_back(resource);
                     continue;

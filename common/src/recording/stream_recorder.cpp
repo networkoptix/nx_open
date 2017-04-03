@@ -80,9 +80,9 @@ QString QnStreamRecorder::errorString(StreamRecorderError errCode)
     }
 }
 
-QnStreamRecorder::QnStreamRecorder(QnCommonModule* commonModule, const QnResourcePtr& dev):
+QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
-    QnCommonModuleAware(commonModule),
+    QnCommonModuleAware(dev->commonModule()),
     QnResourceConsumer(dev),
     m_device(dev),
     m_firstTime(true),

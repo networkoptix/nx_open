@@ -1,5 +1,4 @@
-#ifndef QN_WORKBENCH_RESOURCE_H
-#define QN_WORKBENCH_RESOURCE_H
+#pragma once
 
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
@@ -15,6 +14,3 @@ public:
 
     static QnResourceList deserializeResources(const QMimeData *mimeData);
 };
-
-
-#endif // QN_WORKBENCH_RESOURCE_H

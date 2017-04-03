@@ -1,5 +1,4 @@
-#ifndef _STREAM_RECORDER_H__
-#define _STREAM_RECORDER_H__
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -48,7 +47,7 @@ class QnStreamRecorder:
 public:
     static QString errorString(StreamRecorderError errCode);
 
-    QnStreamRecorder(QnCommonModule* commonModule, const QnResourcePtr& dev);
+    QnStreamRecorder(const QnResourcePtr& dev);
     virtual ~QnStreamRecorder();
 
     /*
@@ -210,5 +209,3 @@ private:
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif // _STREAM_RECORDER_H__

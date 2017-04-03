@@ -8,6 +8,7 @@
 
 class QGLWidget;
 class QnClientCoreModule;
+class QnPtzControllerPool;
 
 class QnClientModule: public QObject, public Singleton<QnClientModule>
 {
@@ -19,6 +20,8 @@ public:
 
     void initDesktopCamera(QGLWidget* window);
     void startLocalSearchers();
+
+    QnPtzControllerPool* ptzControllerPool() const;
 
 private:
     void initApplication();
@@ -35,4 +38,4 @@ private:
     QnClientCoreModule* m_clientCoreModule;
 };
 
-#define qnClientModule QnClientModule::instance();
+#define qnClientModule QnClientModule::instance()

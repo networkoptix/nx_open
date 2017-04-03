@@ -4,6 +4,9 @@
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
+
 #include <QtWidgets/QApplication>
 
 #include <core/resource/resource_directory_browser.h>
@@ -59,7 +62,7 @@ QnResourcePtr QnFileProcessor::createResourcesForFile(const QString& fileName)
 {
     QnResourcePtr result = QnResourceDirectoryBrowser::resourceFromFile(fileName);
     if (result)
-        resourcePool()->addResource(result);
+        qnClientCoreModule->commonModule()->resourcePool()->addResource(result);
     return result;
 }
 
@@ -72,7 +75,7 @@ QnResourceList QnFileProcessor::createResourcesForFiles(const QStringList &files
         if (resource)
             result << resource;
     }
-    resourcePool()->addResources(result);
+    qnClientCoreModule->commonModule()->resourcePool()->addResources(result);
 
     return result;
 }
@@ -86,7 +89,7 @@ void QnFileProcessor::deleteLocalResources(const QnResourceList &resources_)
     if (resources.isEmpty())
         return;
 
-    resourcePool()->removeResources(resources);
+    qnClientCoreModule->commonModule()->resourcePool()->removeResources(resources);
     for (const QnResourcePtr& resource: resources)
         QFile::remove(resource->getUrl());
 }

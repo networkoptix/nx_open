@@ -223,7 +223,7 @@ void QnClientModule::initApplication()
 void QnClientModule::initDesktopCamera(QGLWidget* window)
 {
     /* Initialize desktop camera searcher. */
-    auto desktopSearcher = commonModule()->store(new QnDesktopResourceSearcher(window));
+    auto desktopSearcher = commonModule->store(new QnDesktopResourceSearcher(window));
     desktopSearcher->setLocal(true);
     QnResourceDiscoveryManager::instance()->addDeviceServer(desktopSearcher);
 }
@@ -233,9 +233,10 @@ void QnClientModule::startLocalSearchers()
     QnResourceDiscoveryManager::instance()->start();
 }
 
-QnCommonModule* QnClientModule::commonModule()
+QnPtzControllerPool* QnClientModule::ptzControllerPool() const
 {
-    return m_clientCoreModule->commonModule();
+    auto commonModule = m_clientCoreModule->commonModule();
+    return commonModule->instance<QnClientPtzControllerPool>();
 }
 
 void QnClientModule::initMetaInfo()
@@ -262,57 +263,58 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     /* Init singletons. */
 
     m_clientCoreModule = new QnClientCoreModule(this);
+    auto commonModule = m_clientCoreModule->commonModule();
 
-    commonModule()->store(new QnResourceRuntimeDataManager());
-    commonModule()->store(translationManager.release());
-    commonModule()->store(new QnClientRuntimeSettings());
-    commonModule()->store(clientSettingsPtr.take()); /* Now common owns the link. */
+    commonModule->store(new QnResourceRuntimeDataManager());
+    commonModule->store(translationManager.release());
+    commonModule->store(new QnClientRuntimeSettings());
+    commonModule->store(clientSettingsPtr.take()); /* Now common owns the link. */
 
     /* Shorted initialization if run in self-update mode. */
     if (startupParams.selfUpdateMode)
         return;
 
     /* Depends on QnClientSettings. */
-    auto clientInstanceManager = commonModule()->store(new QnClientInstanceManager());
+    auto clientInstanceManager = commonModule->store(new QnClientInstanceManager());
 
     /* Depends on nothing. */
-    commonModule()->store(new QnClientShowOnceSettings());
+    commonModule->store(new QnClientShowOnceSettings());
 
     /* Depends on QnClientSettings, QnClientInstanceManager and QnClientShowOnceSettings, never used directly. */
-    commonModule()->store(new QnClientSettingsWatcher());
+    commonModule->store(new QnClientSettingsWatcher());
 
     /* Depends on QnClientSettings, never used directly. */
-    commonModule()->store(new QnClientAutoRunWatcher());
+    commonModule->store(new QnClientAutoRunWatcher());
 
-    commonModule()->setModuleGUID(clientInstanceManager->instanceGuid());
+    commonModule->setModuleGUID(clientInstanceManager->instanceGuid());
     nx::network::SocketGlobals::outgoingTunnelPool()
-        .assignOwnPeerId("dc", commonModule()->moduleGUID());
+        .assignOwnPeerId("dc", commonModule->moduleGUID());
 
-    commonModule()->store(new QnGlobals());
-    commonModule()->store(new QnSessionManager());
+    commonModule->store(new QnGlobals());
+    commonModule->store(new QnSessionManager());
 
-    commonModule()->store(new QnRedAssController());
+    commonModule->store(new QnRedAssController());
 
-    commonModule()->store(new QnPlatformAbstraction());
+    commonModule->store(new QnPlatformAbstraction());
 
-    commonModule()->store(new QnClientPtzControllerPool());
-    commonModule()->setMessageProcessor(new QnDesktopClientMessageProcessor(common));
-    commonModule()->store(new QnClientResourceFactory());
+    commonModule->setMessageProcessor(new QnDesktopClientMessageProcessor());
+    commonModule->store(new QnClientResourceFactory());
 
-    commonModule()->store(new QnResourcesChangesManager());
-    commonModule()->store(new QnCameraBookmarksManager());
-    commonModule()->store(new QnServerStorageManager());
+    commonModule->store(new QnResourcesChangesManager());
+    commonModule->store(new QnCameraBookmarksManager());
+    commonModule->store(new QnServerStorageManager());
 
-    commonModule()->store(new QnVoiceSpectrumAnalyzer());
+    commonModule->store(new QnVoiceSpectrumAnalyzer());
+    commonModule->instance<QnClientPtzControllerPool>()
 
-    initializeStatisticsManager(common);
+    initializeStatisticsManager();
 
     /* Long runnables depend on QnCameraHistoryPool and other singletons. */
-    commonModule()->store(new QnLongRunnablePool());
+    commonModule->store(new QnLongRunnablePool());
 
     /* Just to feel safe */
-    commonModule()->store(new QnCloudConnectionProvider());
-    commonModule()->store(new QnCloudStatusWatcher());
+    commonModule->store(new QnCloudConnectionProvider());
+    commonModule->store(new QnCloudStatusWatcher());
 
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
@@ -320,11 +322,11 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     QnAppServerConnectionFactory::setDefaultFactory(QnClientResourceFactory::instance());
 
 #ifdef Q_OS_WIN
-    commonModule()->store(new QnIexploreUrlHandler());
-    commonModule()->store(new QnQtbugWorkaround());
+    commonModule->store(new QnIexploreUrlHandler());
+    commonModule->store(new QnQtbugWorkaround());
 #endif
 
-    commonModule()->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
+    commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
@@ -342,7 +344,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
         if (!version.isNull())
         {
             qWarning() << "Starting with overridden version: " << version.toString();
-            commonModule()->setEngineVersion(version);
+            m_clientCoreModule->commonModule()->setEngineVersion(version);
         }
     }
 
@@ -454,9 +456,11 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
 
 void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
 {
+    auto commonModule = m_clientCoreModule->commonModule();
+
     //TODO #ak get rid of this class!
-    commonModule()->store(new ec2::DummyHandler());
-    commonModule()->store(new nx_http::HttpModManager());
+    commonModule->store(new ec2::DummyHandler());
+    commonModule->store(new nx_http::HttpModManager());
     if (!startupParams.enforceSocketType.isEmpty())
         SocketFactory::enforceStreamSocketType(startupParams.enforceSocketType);
 
@@ -467,42 +471,32 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     // TODO: #mu ON/OFF switch in settings?
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
-    /* Initialize connections. */
-
-
-
-    NX_ASSERT(nx::utils::TimerManager::instance());
-    QScopedPointer<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
-        getConnectionFactory(clientPeerType, nx::utils::TimerManager::instance()));
-    QnAppServerConnectionFactory::setEC2ConnectionFactory(ec2ConnectionFactory.data());
-    commonModule()->store(ec2ConnectionFactory.take());
-
     if (!startupParams.videoWallGuid.isNull())
     {
-        commonModule()->setVideowallGuid(startupParams.videoWallGuid);
-        commonModule()->setInstanceGuid(startupParams.videoWallItemGuid);
+        commonModule->setVideowallGuid(startupParams.videoWallGuid);
+        commonModule->setInstanceGuid(startupParams.videoWallItemGuid);
     }
 
     ec2::ApiRuntimeData runtimeData;
-    runtimeData.peer.id = commonModule()->moduleGUID();
-    runtimeData.peer.instanceId = commonModule()->runningInstanceGUID();
+    runtimeData.peer.id = commonModule->moduleGUID();
+    runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = qnStaticCommon->localPeerType();
     runtimeData.brand = qnStaticCommon->brand();
     runtimeData.customization = qnStaticCommon->customization();
     runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
-    commonModule()->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
+    commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
-    auto moduleFinder = commonModule()->store(new QnModuleFinder(true)); //TODO: #GDM make it common way via scoped pointer somehow
+    auto moduleFinder = commonModule->store(new QnModuleFinder(true)); //TODO: #GDM make it common way via scoped pointer somehow
     moduleFinder->start();
 
-    commonModule()->store(new QnSystemsFinder());
-    commonModule()->store(new QnForgottenSystemsManager());
+    commonModule->store(new QnSystemsFinder());
+    commonModule->store(new QnForgottenSystemsManager());
 
     // Depends on qnSystemsFinder
-    commonModule()->store(new QnStartupTileManager());
+    commonModule->store(new QnStartupTileManager());
 
-    auto router = commonModule()->store(new QnRouter(moduleFinder));
-    commonModule()->store(new QnServerInterfaceWatcher(router));
+    auto router = commonModule->store(new QnRouter(moduleFinder));
+    commonModule->store(new QnServerInterfaceWatcher(router));
 }
 
 //#define ENABLE_DYNAMIC_CUSTOMIZATION
@@ -542,13 +536,15 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
         QApplication::setStyle(skin->newStyle(customizer->genericPalette()));
     }
 
-    commonModule()->store(skin.take());
-    commonModule()->store(customizer.take());
+    auto commonModule = m_clientCoreModule->commonModule();
+    commonModule->store(skin.take());
+    commonModule->store(customizer.take());
 }
 
 void QnClientModule::initLocalResources(const QnStartupParameters& startupParams)
 {
-    commonModule()->store(new PluginManager());
+    auto commonModule = m_clientCoreModule->commonModule();
+    commonModule->store(new PluginManager());
     // client uses ordinary QT file to access file system
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("file"), QnQtFileStorageResource::instance, true);
     QnStoragePluginFactory::instance()->registerStoragePlugin(QLatin1String("qtfile"), QnQtFileStorageResource::instance);
@@ -556,15 +552,15 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 
     QnVideoDecoderFactory::setCodecManufacture(QnVideoDecoderFactory::AUTO);
 
-    auto resourceProcessor = commonModule()->store(new QnClientResourceProcessor());
+    auto resourceProcessor = commonModule->store(new QnClientResourceProcessor());
 
-    auto resourceDiscoveryManager = commonModule()->store(new QnResourceDiscoveryManager(commonModule()));
+    auto resourceDiscoveryManager = commonModule->store(new QnResourceDiscoveryManager(commonModule));
     resourceProcessor->moveToThread(resourceDiscoveryManager);
     resourceDiscoveryManager->setResourceProcessor(resourceProcessor);
 
     if (!startupParams.skipMediaFolderScan)
     {
-        auto localFilesSearcher = commonModule()->store(new QnResourceDirectoryBrowser());
+        auto localFilesSearcher = commonModule->store(new QnResourceDirectoryBrowser());
 
         localFilesSearcher->setLocal(true);
         QStringList dirs;
@@ -574,5 +570,5 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
         resourceDiscoveryManager->addDeviceServer(localFilesSearcher);
     }
     resourceDiscoveryManager->setReady(true);
-    commonModule()->store(new QnSystemsWeightsManager());
+    commonModule->store(new QnSystemsWeightsManager());
 }
