@@ -385,6 +385,11 @@ private:
         data::SystemAttributesUpdate data,
         std::function<void(api::ResultCode)> completionHandler);
 
+    template<typename SystemDictionary>
+    void activateSystemIfNeeded(
+        const QnMutexLockerBase& lock,
+        SystemDictionary& systemByIdIndex,
+        typename SystemDictionary::iterator systemIter);
     void systemActivated(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,

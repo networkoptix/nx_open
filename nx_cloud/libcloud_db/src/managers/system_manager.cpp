@@ -124,7 +124,7 @@ void SystemManager::authenticateByName(
     auto scopedGuard = makeScopedGuard(
         [&completionHandler, &result]() { completionHandler(result); });
 
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
     const auto systemIter = systemByIdIndex.find(
@@ -155,20 +155,9 @@ void SystemManager::authenticateByName(
         cdb::attr::authSystemId,
         QString::fromStdString(systemIter->id));
 
-    systemByIdIndex.modify(
-        systemIter,
-        [](data::SystemData& system){ system.status = api::SystemStatus::ssActivated; });
-
-    using namespace std::placeholders;
-
-    m_dbManager->executeUpdate<std::string>(
-        std::bind(&dao::rdb::SystemDataObject::activateSystem, &m_systemDao, _1, _2),
-        systemIter->id,
-        std::bind(&SystemManager::systemActivated, this,
-            m_startedAsyncCallsCounter.getScopedIncrement(),
-            _1, _2, _3, [](api::ResultCode){}));
-
     result = api::ResultCode::ok;
+
+    activateSystemIfNeeded(lock, systemByIdIndex, systemIter);
 }
 
 void SystemManager::bindSystemToAccount(
@@ -1510,6 +1499,36 @@ void SystemManager::systemNameUpdated(
         : api::ResultCode::dbError);
 }
 
+template<typename SystemDictionary>
+void SystemManager::activateSystemIfNeeded(
+    const QnMutexLockerBase& /*lock*/,
+    SystemDictionary& systemByIdIndex,
+    typename SystemDictionary::iterator systemIter)
+{
+    if (systemIter->status == api::SystemStatus::ssActivated &&
+        !systemIter->activationInDbNeeded)
+    {
+        return;
+    }
+
+    systemByIdIndex.modify(
+        systemIter,
+        [](data::SystemData& system)
+        {
+            system.status = api::SystemStatus::ssActivated;
+            system.activationInDbNeeded = false;
+        });
+
+    using namespace std::placeholders;
+
+    m_dbManager->executeUpdate<std::string>(
+        std::bind(&dao::rdb::SystemDataObject::activateSystem, &m_systemDao, _1, _2),
+        systemIter->id,
+        std::bind(&SystemManager::systemActivated, this,
+            m_startedAsyncCallsCounter.getScopedIncrement(),
+            _1, _2, _3, [](api::ResultCode) {}));
+}
+
 void SystemManager::systemActivated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
@@ -1517,7 +1536,6 @@ void SystemManager::systemActivated(
     std::string systemId,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    if (dbResult == nx::db::DBResult::ok)
     {
         QnMutexLocker lk(&m_mutex);
 
@@ -1527,9 +1545,18 @@ void SystemManager::systemActivated(
         {
             systemByIdIndex.modify(
                 systemIter,
-                [](data::SystemData& system) {
-                    system.status = api::SystemStatus::ssActivated;
-                    system.expirationTimeUtc = std::numeric_limits<int>::max();
+                [dbResult](data::SystemData& system)
+                {
+                    if (dbResult == nx::db::DBResult::ok)
+                    {
+                        system.status = api::SystemStatus::ssActivated;
+                        system.expirationTimeUtc = std::numeric_limits<int>::max();
+                        system.activationInDbNeeded = false;
+                    }
+                    else
+                    {
+                        system.activationInDbNeeded = true;
+                    }
                 });
         }
     }
