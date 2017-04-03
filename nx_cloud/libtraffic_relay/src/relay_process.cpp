@@ -4,7 +4,7 @@
 #include <nx/network/time/time_protocol_client.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 #include <utils/common/systemerror.h>
 
 #include "settings.h"
@@ -39,7 +39,7 @@ void RelayProcess::setOnStartedEventHandler(
 int RelayProcess::exec()
 {
     bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
+    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
         [this, &processStartResult]
         {
             if (m_startedEventHandler)

@@ -13,7 +13,7 @@
 #include <nx/utils/test_support/sync_queue.h>
 
 #include <common/common_globals.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace stun {
@@ -146,7 +146,7 @@ TEST_F(StunClientServerTest, Connectivity)
     const auto address = startServer();
     server.reset();
     client->connect(address);
-    auto clientGuard = makeScopedGuard([this]() { client->pleaseStopSync(); });
+    auto clientGuard = makeScopeGuard([this]() { client->pleaseStopSync(); });
 
     EXPECT_THAT(sendTestRequestSync(), testing::AnyOf(
         SystemError::connectionRefused, SystemError::connectionReset,
@@ -316,7 +316,7 @@ TEST_F(StunClientServerTest, cancellation)
     const auto incrementTimer = [&timerTicks]() { ++timerTicks; };
     const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
 
-    auto clientGuard = makeScopedGuard([this]() { client->pleaseStopSync(); });
+    auto clientGuard = makeScopeGuard([this]() { client->pleaseStopSync(); });
     client->connect(address);
     client->addOnReconnectedHandler(reconnectHandler);
     client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);

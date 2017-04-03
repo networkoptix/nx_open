@@ -17,7 +17,7 @@
 
 #include <http/custom_headers.h>
 #include <utils/common/app_info.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 
@@ -52,7 +52,7 @@ void AuthenticationManager::authenticate(
     boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate;
     nx_http::HttpHeaders responseHeaders;
     std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
-    auto scopedGuard = makeScopedGuard(
+    auto scopedGuard = makeScopeGuard(
         [&authenticationResult, &authInfo, &wwwAuthenticate,
             &responseHeaders, &msgBody, &completionHandler]() mutable
         {

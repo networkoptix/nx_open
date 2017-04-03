@@ -2,7 +2,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 #include <utils/common/systemerror.h>
 
 namespace nx {
@@ -50,7 +50,7 @@ SystemError::ErrorCode SystemResolver::resolve(
     std::deque<HostAddress>* resolvedAddresses)
 {
     auto resultCode = SystemError::noError;
-    const auto guard = makeScopedGuard([&]() { SystemError::setLastErrorCode(resultCode); });
+    const auto guard = makeScopeGuard([&]() { SystemError::setLastErrorCode(resultCode); });
     if (hostName.isEmpty())
         return SystemError::invalidData;
 

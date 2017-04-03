@@ -16,7 +16,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/time.h>
 #include <utils/common/app_info.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include "access_control/authentication_manager.h"
 #include "email_manager.h"

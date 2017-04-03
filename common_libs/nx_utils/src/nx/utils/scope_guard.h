@@ -7,24 +7,24 @@
 
 /** RAII wrapper for @class std::function<void()> */
 template<typename Callback>
-class ScopedGuard
+class ScopeGuard
 {
 public:
     /** Creates disarmed guard */
-    ScopedGuard()
+    ScopeGuard()
         : m_fired(true)
     {
     }
 
     /** Creates guard holding @param callback */
-    ScopedGuard(Callback callback)
+    ScopeGuard(Callback callback)
     :
         m_callback(std::move(callback)),
         m_fired(false)
     {
     }
 
-    ScopedGuard(ScopedGuard&& rhs)
+    ScopeGuard(ScopeGuard&& rhs)
     :
         m_callback(std::move(rhs.m_callback)),
         m_fired(rhs.m_fired)
@@ -33,13 +33,13 @@ public:
     }
 
     /** Fires this guard */
-    ~ScopedGuard() //noexcept
+    ~ScopeGuard() //noexcept
     {
         fire();
     }
 
     /** Fires this guard and moves @param rhs */
-    ScopedGuard& operator=(ScopedGuard&& rhs)
+    ScopeGuard& operator=(ScopeGuard&& rhs)
     {
         fire();
         m_callback = std::move(rhs.m_callback);
@@ -65,29 +65,29 @@ public:
         m_fired = true;
     }
 
-    typedef void (ScopedGuard< Callback >::*safe_bool_type)() const;
+    typedef void (ScopeGuard< Callback >::*safe_bool_type)() const;
     void safe_bool_type_retval() const {}
 
     /** Checks if guard is armed */
     operator safe_bool_type() const
     {
-        return m_fired ? 0 : &ScopedGuard< Callback >::safe_bool_type_retval;
+        return m_fired ? 0 : &ScopeGuard< Callback >::safe_bool_type_retval;
     }
 
 private:
     Callback m_callback;
     bool m_fired;
 
-    ScopedGuard(const ScopedGuard&);
-    ScopedGuard& operator=(const ScopedGuard&);
+    ScopeGuard(const ScopeGuard&);
+    ScopeGuard& operator=(const ScopeGuard&);
 };
 
-typedef ScopedGuard<std::function<void()>> Guard;
+typedef ScopeGuard<std::function<void()>> Guard;
 
 template<class Func>
-ScopedGuard<Func> makeScopedGuard(Func func)
+ScopeGuard<Func> makeScopeGuard(Func func)
 {
-    return ScopedGuard<Func>(std::move(func));
+    return ScopeGuard<Func>(std::move(func));
 }
 
 template<typename Func>

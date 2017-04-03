@@ -117,7 +117,7 @@ TEST_F(UdpHolePunching, loadTest)
 
     server.setServerSocket(cloudServerSocket());
     ASSERT_TRUE(server.start());
-    auto serverGuard = makeScopedGuard([&server]() { server.pleaseStopSync(); });
+    auto serverGuard = makeScopeGuard([&server]() { server.pleaseStopSync(); });
 
     test::ConnectionsGenerator connectionsGenerator(
         SocketAddress(QString::fromUtf8(m_server->fullName()), 0),
