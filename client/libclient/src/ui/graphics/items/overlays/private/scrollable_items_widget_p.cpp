@@ -1,11 +1,12 @@
 #include "scrollable_items_widget_p.h"
-#include <ui/graphics/items/overlays/scrollable_items_widget.h>
 
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsWidget>
 
-#include <ui/graphics/items/generic/graphics_scroll_area.h>
 #include <nx/utils/math/fuzzy.h>
+
+#include <ui/graphics/items/generic/graphics_scroll_area.h>
+#include <ui/graphics/items/overlays/scrollable_items_widget.h>
 
 QnScrollableItemsWidgetPrivate::QnScrollableItemsWidgetPrivate(
     QnScrollableItemsWidget* parent)

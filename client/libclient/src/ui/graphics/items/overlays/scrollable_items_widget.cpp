@@ -1,5 +1,5 @@
 #include "scrollable_items_widget.h"
-#include <ui/graphics/items/overlays/private/scrollable_items_widget_p.h>
+#include "private/scrollable_items_widget_p.h"
 
 QnScrollableItemsWidget::QnScrollableItemsWidget(Qt::Alignment alignment, QGraphicsItem* parent):
     base_type(parent),
