@@ -223,7 +223,7 @@ protected:
             .arg(httpServer->serverAddress().toString())
             .arg(kRestHandlerPath));
 
-        ASSERT_TRUE(httpClient->doGet(url)) << "Failed to perform GET request "<<i;
+        ASSERT_TRUE(httpClient->doGet(url)) << "Failed to perform GET request";
 
         std::unique_ptr<AbstractStreamSocket> tcpSocket;
         {
