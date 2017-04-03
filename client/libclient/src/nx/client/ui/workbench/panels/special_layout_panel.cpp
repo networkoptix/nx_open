@@ -52,7 +52,7 @@ SpecialLayoutPanelPrivate::SpecialLayoutPanelPrivate(
     handleCurrentLayoutChanged(workbench()->currentLayout());
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
         [this](){ handleCurrentLayoutChanged(workbench()->currentLayout());});
-    }
+}
 
 void SpecialLayoutPanelPrivate::handleCurrentLayoutChanged(QnWorkbenchLayout* layout)
 {
@@ -145,7 +145,6 @@ bool SpecialLayoutPanel::isOpened() const
 
 void SpecialLayoutPanel::setOpened(bool /* opened */, bool /* animate */)
 {
-
 }
 
 bool SpecialLayoutPanel::isVisible() const
@@ -156,7 +155,6 @@ bool SpecialLayoutPanel::isVisible() const
 
 void SpecialLayoutPanel::setVisible(bool /* visible */, bool /* animate */)
 {
-
 }
 
 qreal SpecialLayoutPanel::opacity() const
@@ -166,7 +164,6 @@ qreal SpecialLayoutPanel::opacity() const
 
 void SpecialLayoutPanel::setOpacity(qreal /* opacity */ , bool /* animate */)
 {
-
 }
 
 bool SpecialLayoutPanel::isHovered() const
