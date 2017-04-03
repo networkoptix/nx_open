@@ -122,7 +122,7 @@ int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &met
         {
             auto eventWidth = [metrics](QnBusiness::EventType eventType)
             {
-                return metrics.width(QnBusinessStringsHelper::eventName(eventType));
+                return 100; //metrics.width(m_helper->eventName(eventType)); //this will be redone anyway
             };
             int result = -1;
             for (QnBusiness::EventType eventType : QnBusiness::allEvents())
@@ -133,7 +133,7 @@ int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &met
         {
             auto actionWidth = [metrics](QnBusiness::ActionType actionType)
             {
-                return metrics.width(QnBusinessStringsHelper::actionName(actionType));
+                return 100; // metrics.width(m_helper->actionName(actionType)); //this will be redone anyway
             };
             int result = -1;
             for (QnBusiness::ActionType actionType : QnBusiness::allActions())
@@ -255,8 +255,8 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         {
             QComboBox* comboBox = new QComboBox(parent);
             comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-            for (QnBusiness::EventType eventType : m_lexComparator->lexSortedEvents())
-                comboBox->addItem(QnBusinessStringsHelper::eventName(eventType), eventType);
+//             for (QnBusiness::EventType eventType : m_lexComparator->lexSortedEvents())
+//                 comboBox->addItem(QnBusinessStringsHelper::eventName(eventType), eventType);
             return comboBox;
         }
         case QnBusiness::ActionColumn:
@@ -268,7 +268,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             {
                 if (instantOnly && !QnBusiness::canBeInstant(actionType))
                     continue;
-                comboBox->addItem(QnBusinessStringsHelper::actionName(actionType), actionType);
+//                comboBox->addItem(QnBusinessStringsHelper::actionName(actionType), actionType);
             }
             return comboBox;
         }

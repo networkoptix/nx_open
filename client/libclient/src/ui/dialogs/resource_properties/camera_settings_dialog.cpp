@@ -125,6 +125,7 @@ void QnCameraSettingsDialog::retranslateUi()
     static const QString kWindowTitlePattern = lit("%1 - %2");
 
     const QString caption = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+        resourcePool(),
         tr("Device Settings"), tr("Devices Settings"),
         tr("Camera Settings"), tr("Cameras Settings"),
         tr("I/O Module Settings"), tr("I/O Modules Settings")
@@ -137,6 +138,7 @@ void QnCameraSettingsDialog::retranslateUi()
     setWindowTitle(kWindowTitlePattern.arg(caption).arg(description));
 
     const QString rulesTitle = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+        resourcePool(),
         tr("Device Rules..."), tr("Devices Rules..."),
         tr("Camera Rules..."), tr("Cameras Rules..."),
         tr("I/O Module Rules..."), tr("I/O Modules Rules...")
@@ -239,7 +241,9 @@ bool QnCameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& camer
     {
         auto unsavedCameras = m_settingsWidget->cameras();
 
-        const auto extras = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+        const auto extras = QnDeviceDependentStrings::getNameFromSet(
+            resourcePool(),
+            QnCameraDeviceStringSet(
             tr("Changes to the following %n devices are not saved:", "", unsavedCameras.size()),
             tr("Changes to the following %n cameras are not saved:", "", unsavedCameras.size()),
             tr("Changes to the following %n I/O Modules are not saved:", "", unsavedCameras.size())

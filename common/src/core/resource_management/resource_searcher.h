@@ -27,7 +27,7 @@ enum class DiscoveryMode
 class QnAbstractResourceSearcher: public QnResourceFactory, public QnCommonModuleAware
 {
 protected:
-    QnAbstractResourceSearcher(QnCommonModule* commonModule);
+    explicit QnAbstractResourceSearcher(QnCommonModule* commonModule);
 
 public:
     virtual ~QnAbstractResourceSearcher();
@@ -124,7 +124,7 @@ public:
 class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher // TODO: #Elric why virtual inheritance? -- because of rombic ThirdPartyResourceSearcher
 {
 protected:
-    QnAbstractFileResourceSearcher(QnCommonModule* commonModule);
+    explicit QnAbstractFileResourceSearcher(QnCommonModule* commonModule);
 
 public:
     QStringList getPathCheckList() const;

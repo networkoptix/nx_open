@@ -42,9 +42,11 @@ namespace {
 
 QnResourceDirectoryBrowser::QnResourceDirectoryBrowser(QObject* parent) :
     base_type(parent),
+    QnAbstractResourceSearcher(qnClientCoreModule->commonModule()),
     QnAbstractFileResourceSearcher(qnClientCoreModule->commonModule()),
     m_resourceReady(false)
-{}
+{
+}
 
 QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) {
     QnResourcePtr result;

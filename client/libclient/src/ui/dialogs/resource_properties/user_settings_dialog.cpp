@@ -3,6 +3,8 @@
 
 #include <QtWidgets/QPushButton>
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -30,7 +32,7 @@
 
 namespace {
 
-class PermissionsInfoTable
+class PermissionsInfoTable: public QnConnectionContextAware
 {
     Q_DECLARE_TR_FUNCTIONS(PermissionsInfoTable)
 public:

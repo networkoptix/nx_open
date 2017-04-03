@@ -1,5 +1,7 @@
 #pragma once
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource/resource_fwd.h>
 
@@ -8,14 +10,13 @@
 
 #include <nx/utils/singleton.h>
 
-class QnCommonModule;
-
 /**
  * Utility class for saving resources user attributes.
  * Supports changes rollback in case they cannot be saved on server.
  */
 class QnResourcesChangesManager: public Connective<QObject>,
-    public Singleton<QnResourcesChangesManager>
+    public Singleton<QnResourcesChangesManager>,
+    public QnConnectionContextAware
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;
@@ -66,10 +67,10 @@ public:
 
     /** Save accessible resources for the given user */
     void saveAccessibleResources(const QnResourceAccessSubject& subject,
-        const QSet<QnUuid>& accessibleResources, QnCommonModule* commonModule);
+        const QSet<QnUuid>& accessibleResources);
 
-    void saveUserRole(const ec2::ApiUserRoleData& role, QnCommonModule* commonModule);
-    void removeUserRole(const QnUuid& id, QnCommonModule* commonModule);
+    void saveUserRole(const ec2::ApiUserRoleData& role);
+    void removeUserRole(const QnUuid& id);
 
     /** Apply changes to the given videoWall. */
     void saveVideoWall(const QnVideoWallResourcePtr &videoWall, VideoWallChangesFunction applyChanges);

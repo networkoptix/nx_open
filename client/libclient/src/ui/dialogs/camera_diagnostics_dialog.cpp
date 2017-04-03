@@ -107,6 +107,7 @@ void QnCameraDiagnosticsDialog::retranslateUi()
     }
 
     ui->titleLabel->setText(QnDeviceDependentStrings::getNameFromSet(
+        resourcePool(),
         QnCameraDeviceStringSet(
             tr("Diagnostics for device %1"),
             tr("Diagnostics for camera %1"),
@@ -116,6 +117,7 @@ void QnCameraDiagnosticsDialog::retranslateUi()
 
 
     setWindowTitle(QnDeviceDependentStrings::getNameFromSet(
+        resourcePool(),
         QnCameraDeviceStringSet(
             tr("Device Diagnostics"),
             tr("Camera Diagnostics"),

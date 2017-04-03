@@ -13,7 +13,6 @@
 
 
 #include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/mobile_client_camera_factory.h>
 #include <api/session_manager.h>
 #include <api/global_settings.h>
@@ -89,7 +88,7 @@ QnMobileClientModule::QnMobileClientModule(
     commonModule->instance<QnCameraHistoryPool>();
     commonModule->store(new QnMobileClientCameraFactory());
 
-    commonModule->instance<QnResourcesChangesManager>();
+
 
     auto userWatcher = commonModule->store(new QnUserWatcher());
 
