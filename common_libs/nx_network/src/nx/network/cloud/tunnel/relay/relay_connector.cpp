@@ -18,8 +18,7 @@ Connector::Connector(
     m_relayEndpoint(relayEndpoint),
     m_targetHostAddress(std::move(targetHostAddress)),
     m_connectSessionId(std::move(connectSessionId)),
-    m_clientToRelayConnection(
-        std::make_unique<api::ClientToRelayConnection>(relayEndpoint))
+    m_clientToRelayConnection(api::ClientToRelayConnectionFactory::create(relayEndpoint))
 {
     bindToAioThread(getAioThread());
 }
@@ -50,7 +49,8 @@ void Connector::connect(
 {
     m_handler = std::move(handler);
 
-    m_timer.start(timeout, std::bind(&Connector::connectTimedOut, this));
+    if (timeout > std::chrono::milliseconds::zero())
+        m_timer.start(timeout, std::bind(&Connector::connectTimedOut, this));
 
     m_clientToRelayConnection->startSession(
         m_connectSessionId,
@@ -87,6 +87,8 @@ void Connector::onStartRelaySessionResponse(
 
     if (resultCode != api::ResultCode::ok)
     {
+        m_clientToRelayConnection.reset();
+        m_timer.pleaseStopSync();
         return handler(
             toNatTraversalResultCode(resultCode),
             sysErrorCode,
