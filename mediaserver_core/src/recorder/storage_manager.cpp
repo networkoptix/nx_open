@@ -2128,26 +2128,6 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
     QnStorageResourcePtr result;
     std::vector<int> allowedIndexes;
 
-    for (const auto& storage: getUsedWritableStorages())
-    {
-        if (pred(storage) && 
-            storage->getFreeSpace() > kMinStorageFreeSpace)
-        {
-            allowedIndexes.push_back(qnStorageDbPool->getStorageIndex(storage));
-        }
-    }
-
-    auto optimalStorageIndex = m_spaceInfo.getOptimalStorageIndex(allowedIndexes);
-    if (optimalStorageIndex == -1)
-        return result;
-
-    result = getStorageByIndex(optimalStorageIndex);
-    if (result)
-    {
-        NX_LOG(lit("[Storage, Selection] Selected storage %1").arg(result->getUrl()), cl_logDEBUG2);
-        return result;
-    }
-
     auto hasFastScanned = [this]
     {
         auto allStorages = getAllStorages();
@@ -2159,8 +2139,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
         return false;
     };
 
-
-    if (!result)
+    auto emitFailureAndReturnNullStorage = [this, hasFastScanned](int optimalStorageIndex)
     {
         NX_LOG(lit("[Storage, Selection] Failed to find storage for index %1").arg(optimalStorageIndex),
                cl_logDEBUG2);
@@ -2177,9 +2156,31 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
             }
             m_warnSended = true;
         }
+
+        return QnStorageResourcePtr();
+    };
+
+    for (const auto& storage: getUsedWritableStorages())
+    {
+        if (pred(storage) && 
+            storage->getFreeSpace() > kMinStorageFreeSpace)
+        {
+            allowedIndexes.push_back(qnStorageDbPool->getStorageIndex(storage));
+        }
     }
 
-    return result;
+    auto optimalStorageIndex = m_spaceInfo.getOptimalStorageIndex(allowedIndexes);
+    if (optimalStorageIndex == -1)
+        return emitFailureAndReturnNullStorage(optimalStorageIndex);
+
+    result = getStorageByIndex(optimalStorageIndex);
+    if (result)
+    {
+        NX_LOG(lit("[Storage, Selection] Selected storage %1").arg(result->getUrl()), cl_logDEBUG2);
+        return result;
+    }
+
+    return emitFailureAndReturnNullStorage(optimalStorageIndex);
 }
 
 QString QnStorageManager::getFileName(const qint64& dateTime, qint16 timeZone, const QnNetworkResourcePtr &camera, const QString& prefix, const QnStorageResourcePtr& storage)

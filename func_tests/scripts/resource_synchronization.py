@@ -5,8 +5,8 @@ sys.path.append('..')
 
 import logging
 import traceback
+import argparse
 import resource_synchronization_test as test
-from optparse import OptionParser
 from ConfigParser import ConfigParser
 from test_utils.server_rest_api import ServerRestApi
 from test_utils.utils import SimpleNamespace
@@ -66,54 +66,42 @@ def run_test(test_name, env):
 
 
 def main():
-    usage = "usage: %prog [options]"
-    parser = OptionParser(usage)
-    parser.add_option("--config-file-path",
-                      help="Test configuration file.")
-    parser.add_option('--max-log-width', default=DEFAULT_MAX_LOG_WIDTH, type=int,
-                      help='Change maximum log message width. Default is %d' % DEFAULT_MAX_LOG_WIDTH)
-    parser.add_option('--verbosity', '-v', action='count')
-    (options, args) = parser.parse_args()
-
-    if not options.config_file_path:
-        print >> sys.stderr, "%s: --config-file-path parameter required" % sys.argv[0]
-        parser.print_help()
-        exit(1)
+    parser = argparse.ArgumentParser(usage='%(prog)s [options]')
+    parser.add_argument("config_file_path", nargs=1, help="Test configuration file.")
+    parser.add_argument('--max-log-width', default=DEFAULT_MAX_LOG_WIDTH, type=int,
+                        help='Change maximum log message width. Default is %d' % DEFAULT_MAX_LOG_WIDTH)
+    parser.add_argument('--verbosity', '-v', action='count')
+    args = parser.parse_args()
 
     config = ConfigParser()
-    config.read(options.config_file_path)
+    config.read(args.config_file_path)
 
     log_level = {
         1: logging.ERROR,
         2: logging.WARNING,
         3: logging.INFO,
-        4: logging.DEBUG}.get(options.verbosity, logging.ERROR)
+        4: logging.DEBUG}.get(args.verbosity, logging.ERROR)
 
     log_format = '%%(asctime)-15s %%(threadName)-15s %%(levelname)-7s %%(message).%ds' % 1000
     logging.basicConfig(level=log_level, format=log_format)
+    username = config.get(DEFAULT_CONFIG_SECTION, CONFIG_USERNAME)
+    password = config.get(DEFAULT_CONFIG_SECTION, CONFIG_PASSWORD)
+    test_size = config.getint(DEFAULT_CONFIG_SECTION, CONFIG_TESTSIZE)
+    thread_number = config.getint(DEFAULT_CONFIG_SECTION, CONFIG_THREADS)
     servers = {'srv_%d' % idx:
                RemoteServer('srv-%d' % idx,
                             srv,
-                            config.get(DEFAULT_CONFIG_SECTION, CONFIG_USERNAME),
-                            config.get(DEFAULT_CONFIG_SECTION, CONFIG_PASSWORD))
+                            username,
+                            password)
                for idx, srv in enumerate(read_servers(config))}
     env = SimpleNamespace(servers=servers,
-                          test_size=config.getint(DEFAULT_CONFIG_SECTION, CONFIG_TESTSIZE),
-                          thread_number=config.getint(DEFAULT_CONFIG_SECTION, CONFIG_THREADS),
-                          system_merged=True,
+                          test_size=test_size,
+                          thread_number=thread_number,
+                          system_is_merged=True,
                           resource_generators=test.resource_generators())
-    tests = ['test_initial_merge',
-             'test_api_get_methods',
-             'test_camera_data_syncronization',
-             'test_user_data_syncronization',
-             'test_mediaserver_data_syncronization',
-             'test_storage_data_synchronization',
-             'test_layout_data_syncronization',
-             'test_resource_params_data_syncronization',
-             'test_remove_resource_params_data_syncronization',
-             'test_resource_remove_update_conflict',]
-    for test_name in tests:
-        run_test(test_name, env)
+    for name in dir(test):
+        if name.startswith('test_'):
+            run_test(name, env)
 
 if __name__ == "__main__":
     main()
