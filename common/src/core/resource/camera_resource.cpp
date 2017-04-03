@@ -455,16 +455,6 @@ void QnVirtualCameraResource::forceDisableAudio()
     saveParams();
 }
 
-void QnVirtualCameraResource::saveParams()
-{
-    resourcePool()->commonModule()->propertyDictionary()->saveParams(getId());
-}
-
-void QnVirtualCameraResource::saveParamsAsync()
-{
-    resourcePool()->commonModule()->propertyDictionary()->saveParamsAsync(getId());
-}
-
 void QnVirtualCameraResource::updateDefaultAuthIfEmpty(const QString& login, const QString& password)
 {
     auto decodedCredentials = nx::utils::decodeStringFromHexStringAES128CBC(

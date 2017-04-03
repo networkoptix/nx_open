@@ -58,7 +58,8 @@ public:
 // -------------------------------------------------------------------------- //
 // QnPtzControllerPoolPrivate
 // -------------------------------------------------------------------------- //
-class QnPtzControllerCreationCommand: public QRunnable {
+class QnPtzControllerCreationCommand: public QRunnable
+{
 public:
     QnPtzControllerCreationCommand(const QnResourcePtr &resource, QnPtzControllerPool *pool):
         m_resource(resource),

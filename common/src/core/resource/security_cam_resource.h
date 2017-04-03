@@ -28,7 +28,8 @@ static const int PRIMARY_ENCODER_INDEX = 0;
 static const int SECONDARY_ENCODER_INDEX = 1;
 
 
-class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
+class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
+{
     typedef QnNetworkResource base_type;
     Q_OBJECT
 

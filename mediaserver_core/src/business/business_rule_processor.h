@@ -20,6 +20,8 @@
 
 #include <nx_ec/ec_api.h>
 #include <utils/common/request_param.h>
+#include <common/common_module_aware.h>
+#include <nx/utils/singleton.h>
 
 class EmailManagerImpl;
 
@@ -38,13 +40,13 @@ public:
         else
             return true;
     }
-    
+
     void init(const QnAbstractBusinessEventPtr& event, const QnBusinessEventRulePtr& rule) {
         m_event = event;
         m_rule = rule;
         m_initialized = true;
     }
-    
+
     /** Restores the initial state. */
     void reset(){
         m_timer.restart();
@@ -91,16 +93,19 @@ private:
 /*
 * This class route business event and generate business action
 */
-class QnBusinessRuleProcessor: public QThread
+class QnBusinessRuleProcessor:
+    public QThread,
+    public Singleton<QnBusinessRuleProcessor>,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 public:
-    QnBusinessRuleProcessor();
+    QnBusinessRuleProcessor(QnCommonModule* commonModule);
     virtual ~QnBusinessRuleProcessor();
 
     void addBusinessRule(const QnBusinessEventRulePtr& value);
-    
-    
+
+
     /*
     * Return module GUID. if destination action intended for current module, no route through message bus is required
     */
@@ -176,7 +181,7 @@ private:
     struct RunningRuleInfo
     {
         RunningRuleInfo() {}
-        QMap<QnUuid, QnAbstractBusinessEventPtr> resources; 
+        QMap<QnUuid, QnAbstractBusinessEventPtr> resources;
         QSet<QnUuid> isActionRunning; // actions that has been started by resource. Continues action starts only onces for all event resources.
     };
     typedef QMap<QString, RunningRuleInfo> RunningRuleMap;
@@ -188,7 +193,7 @@ private:
 
 
     /**
-     * @brief match resources between event and rule. 
+     * @brief match resources between event and rule.
      * @return false if business rule isn't match to a source event
      */
     bool checkEventCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);

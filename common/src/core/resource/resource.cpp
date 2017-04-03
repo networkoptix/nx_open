@@ -1218,3 +1218,14 @@ QnCommonModule* QnResource::commonModule() const
 {
     return resourcePool() ? resourcePool()->commonModule() : nullptr;
 }
+
+void QnResource::saveParams()
+{
+    resourcePool()->commonModule()->propertyDictionary()->saveParams(getId());
+}
+
+void QnResource::saveParamsAsync()
+{
+    resourcePool()->commonModule()->propertyDictionary()->saveParamsAsync(getId());
+}
+

@@ -2,7 +2,8 @@
 
 #include <core/ptz/ptz_controller_pool.h>
 
-class QnClientPtzControllerPool: public QnPtzControllerPool {
+class QnClientPtzControllerPool: public QnPtzControllerPool
+{
     Q_OBJECT
     typedef QnPtzControllerPool base_type;
 

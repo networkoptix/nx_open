@@ -14,18 +14,22 @@ class QThreadPool;
 
 class QnPtzControllerPoolPrivate;
 
-class QnPtzControllerPool: public Connective<QObject>, public QnCommonModuleAware
+class QnPtzControllerPool:
+    public Connective<QObject>,
+    public QnCommonModuleAware,
+    public Singleton<QnPtzControllerPool>
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;
 
 public:
-    enum ControllerConstructionMode {
+    enum ControllerConstructionMode
+    {
         NormalControllerConstruction,
         ThreadedControllerConstruction
     };
 
-    QnPtzControllerPool(QObject* parent = nullptr);
+    QnPtzControllerPool(QObject* parent);
     virtual ~QnPtzControllerPool();
 
     QThread *executorThread() const;
@@ -60,3 +64,5 @@ private:
     friend class QnPtzControllerPoolPrivate;
     QScopedPointer<QnPtzControllerPoolPrivate> d;
 };
+
+#define qnPtzPool (QnPtzControllerPool::instance())

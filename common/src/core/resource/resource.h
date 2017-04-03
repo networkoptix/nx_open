@@ -234,6 +234,9 @@ public:
     static QnInitResPool* initAsyncPoolInstance();
     static bool isStopping() { return m_appStopping; }
     void setRemovedFromPool(bool value);
+
+    virtual void saveParams();
+    virtual void saveParamsAsync();
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QString &param) const;
     void statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason);

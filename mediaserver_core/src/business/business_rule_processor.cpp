@@ -26,10 +26,10 @@
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "database/server_db.h"
+#include <common/common_module.h>
 
-QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
-
-QnBusinessRuleProcessor::QnBusinessRuleProcessor()
+QnBusinessRuleProcessor::QnBusinessRuleProcessor(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDelivered, this, &QnBusinessRuleProcessor::at_actionDelivered);
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDeliveryFail, this, &QnBusinessRuleProcessor::at_actionDeliveryFailed);
@@ -45,11 +45,11 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor()
         this, static_cast<void (QnBusinessRuleProcessor::*)(const QnAbstractBusinessActionPtr&)>(&QnBusinessRuleProcessor::executeAction),
 		Qt::QueuedConnection);
 
-    connect(QnCommonMessageProcessor::instance(),       &QnCommonMessageProcessor::businessRuleChanged,
+    connect(commonModule->messageProcessor(),       &QnCommonMessageProcessor::businessRuleChanged,
             this, &QnBusinessRuleProcessor::at_businessRuleChanged);
-    connect(QnCommonMessageProcessor::instance(),       &QnCommonMessageProcessor::businessRuleDeleted,
+    connect(commonModule->messageProcessor(),       &QnCommonMessageProcessor::businessRuleDeleted,
             this, &QnBusinessRuleProcessor::at_businessRuleDeleted);
-    connect(QnCommonMessageProcessor::instance(),       &QnCommonMessageProcessor::businessRuleReset,
+    connect(commonModule->messageProcessor(),       &QnCommonMessageProcessor::businessRuleReset,
             this, &QnBusinessRuleProcessor::at_businessRuleReset);
 
     connect(&m_timer, &QTimer::timeout, this, &QnBusinessRuleProcessor::at_timer, Qt::QueuedConnection);
@@ -259,26 +259,6 @@ public:
 
 static QnBusinessRuleProcessorInstanceDeleter qnBusinessRuleProcessorInstanceDeleter;
 
-QnBusinessRuleProcessor* QnBusinessRuleProcessor::instance()
-{
-    // this call is not thread safe! You should init from main thread e.t.c
-    NX_ASSERT(m_instance, Q_FUNC_INFO, "QnBusinessRuleProcessor::init must be called first!");
-    return m_instance;
-}
-
-void QnBusinessRuleProcessor::init(QnBusinessRuleProcessor* instance)
-{
-    // this call is not thread safe! You should init from main thread e.t.c
-    NX_ASSERT(!m_instance, Q_FUNC_INFO, "QnBusinessRuleProcessor::init must be called once!");
-    m_instance = instance;
-}
-
-void QnBusinessRuleProcessor::fini()
-{
-    delete m_instance;
-    m_instance = NULL;
-}
-
 void QnBusinessRuleProcessor::addBusinessRule(const QnBusinessEventRulePtr& value)
 {
     at_businessRuleChanged(value);
@@ -330,12 +310,21 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(const Q
         // if toggled action is used and condition is no longer valid - stop action
         // Or toggle event goes to 'off'. stop action
         if (!condOK || bEvent->getToggleState() == QnBusiness::InactiveState)
-            action = QnBusinessActionFactory::instantiateAction(rule, bEvent, QnBusiness::InactiveState);
+            action = QnBusinessActionFactory::instantiateAction(
+                rule,
+                bEvent,
+                commonModule()->moduleGUID(),
+                QnBusiness::InactiveState);
         else
             return QnAbstractBusinessActionPtr(); // ignore repeating 'On' event
     }
     else if (condOK)
-        action = QnBusinessActionFactory::instantiateAction(rule, bEvent);
+    {
+        action = QnBusinessActionFactory::instantiateAction(
+            rule,
+            bEvent,
+            commonModule()->moduleGUID());
+    }
 
     bool isActionRunning = action && action->getToggleState() == QnBusiness::ActiveState;
     if (isActionRunning)
@@ -346,7 +335,9 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(const Q
     return action;
 }
 
-QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule)
+QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(
+    const QnAbstractBusinessEventPtr& bEvent,
+    const QnBusinessEventRulePtr& rule)
 {
     bool condOK = checkRuleCondition(bEvent, rule);
     RunningRuleMap::iterator itr = m_rulesInProgress.find(rule->getUniqueId());
@@ -374,7 +365,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(const 
 
 
     if (rule->aggregationPeriod() == 0 || !QnBusiness::allowsAggregation(rule->actionType()))
-        return QnBusinessActionFactory::instantiateAction(rule, bEvent);
+        return QnBusinessActionFactory::instantiateAction(rule, bEvent, commonModule()->moduleGUID());
 
     QString eventKey = rule->getUniqueId();
     if (bEvent->getResource())
@@ -388,9 +379,11 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(const 
 
     if (aggInfo.isExpired())
     {
-        QnAbstractBusinessActionPtr result = QnBusinessActionFactory::instantiateAction(aggInfo.rule(),
-                                                                                        aggInfo.event(),
-                                                                                        aggInfo.info());
+        QnAbstractBusinessActionPtr result = QnBusinessActionFactory::instantiateAction(
+            aggInfo.rule(),
+            aggInfo.event(),
+            commonModule()->moduleGUID(),
+            aggInfo.info());
         aggInfo.reset();
         return result;
     }
@@ -407,9 +400,11 @@ void QnBusinessRuleProcessor::at_timer()
         QnProcessorAggregationInfo& aggInfo = itr.value();
         if (aggInfo.totalCount() > 0 && aggInfo.isExpired())
         {
-            executeAction(QnBusinessActionFactory::instantiateAction(aggInfo.rule(),
-                                                                     aggInfo.event(),
-                                                                     aggInfo.info()));
+            executeAction(QnBusinessActionFactory::instantiateAction(
+                aggInfo.rule(),
+                aggInfo.event(),
+                commonModule()->moduleGUID(),
+                aggInfo.info()));
             aggInfo.reset();
         }
         ++itr;
@@ -583,8 +578,13 @@ void QnBusinessRuleProcessor::terminateRunningRule(const QnBusinessEventRulePtr&
                 bEvent = runtimeRule.resources.value(resId);
             else
                 bEvent = runtimeRule.resources.begin().value(); // for continues action resourceID is not specified and only one record is used
-            if (bEvent) {
-                QnAbstractBusinessActionPtr action = QnBusinessActionFactory::instantiateAction(rule, bEvent, QnBusiness::InactiveState);
+            if (bEvent)
+            {
+                QnAbstractBusinessActionPtr action = QnBusinessActionFactory::instantiateAction(
+                    rule,
+                    bEvent,
+                    commonModule()->moduleGUID(),
+                    QnBusiness::InactiveState);
                 if (action)
                     executeAction(action);
             }

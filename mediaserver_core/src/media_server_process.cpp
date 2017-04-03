@@ -303,7 +303,7 @@ bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
     return true;
 }
 
-void addFakeVideowallUser()
+void addFakeVideowallUser(QnCommonModule* commonModule)
 {
     ec2::ApiUserData fakeUserData;
     fakeUserData.permissions = Qn::GlobalVideoWallModePermissionSet;
@@ -311,7 +311,7 @@ void addFakeVideowallUser()
     auto fakeUser = ec2::fromApiToResource(fakeUserData);
     fakeUser->setId(Qn::kVideowallUserAccess.userId);
     fakeUser->setName(lit("Video wall"));
-    resourcePool()->addResource(fakeUser);
+    commonModule->resourcePool()->addResource(fakeUser);
 }
 
 } // namespace
@@ -428,9 +428,11 @@ void ffmpegInit()
     QnStoragePluginFactory::instance()->registerStoragePlugin("dbfile", QnDbStorageResource::instance, false);
 }
 
-void calculateSpaceLimitOrLoadFromConfig(const QnFileStorageResourcePtr& fileStorage)
+void calculateSpaceLimitOrLoadFromConfig(
+    QnCommonModule* commonModule,
+    const QnFileStorageResourcePtr& fileStorage)
 {
-    const BeforeRestoreDbData& beforeRestoreData = commonModule()->beforeRestoreDbData();
+    const BeforeRestoreDbData& beforeRestoreData = commonModule->beforeRestoreDbData();
     if (!beforeRestoreData.isEmpty() && beforeRestoreData.hasInfoForStorage(fileStorage->getUrl()))
     {
         fileStorage->setSpaceLimit(beforeRestoreData.getSpaceLimitForStorage(fileStorage->getUrl()));
@@ -440,7 +442,10 @@ void calculateSpaceLimitOrLoadFromConfig(const QnFileStorageResourcePtr& fileSto
     fileStorage->setSpaceLimit(fileStorage->calcInitialSpaceLimit());
 }
 
-QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
+QnStorageResourcePtr createStorage(
+    QnCommonModule* commonModule,
+    const QnUuid& serverId,
+    const QString& path)
 {
     NX_LOG(lit("%1 Attempting to create storage %2")
             .arg(Q_FUNC_INFO)
@@ -463,7 +468,7 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     if (auto fileStorage = storage.dynamicCast<QnFileStorageResource>())
     {
         const qint64 totalSpace = fileStorage->calculateAndSetTotalSpaceWithoutInit();
-        calculateSpaceLimitOrLoadFromConfig(fileStorage);
+        calculateSpaceLimitOrLoadFromConfig(commonModule, fileStorage);
 
         if (totalSpace < fileStorage->getSpaceLimit())
         {
@@ -579,7 +584,9 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
 }
 
 
-QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer)
+QnStorageResourceList createStorages(
+    QnCommonModule* commonModule,
+    const QnMediaServerResourcePtr& mServer)
 {
     QnStorageResourceList storages;
     QStringList availablePaths;
@@ -606,7 +613,7 @@ QnStorageResourceList createStorages(const QnMediaServerResourcePtr& mServer)
             continue;
         }
         // Create new storage because of new partition found that missing in the database
-        QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
+        QnStorageResourcePtr storage = createStorage(commonModule, mServer->getId(), folderPath);
         if (!storage)
             continue;
 
@@ -700,7 +707,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
     QtConcurrent::run([messageProcessor, this]
     {
         //read server's storages
-        ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
+        ec2::AbstractECConnectionPtr ec2Connection = messageProcessor->commonModule()->ec2Connection();
         ec2::ErrorCode rez;
         ec2::ApiStorageDataList storages;
 
@@ -752,10 +759,10 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
                 idList.push_back(value->getId());
             if (ec2Connection->getMediaServerManager(Qn::kSystemAccess)->removeStoragesSync(idList) != ec2::ErrorCode::ok)
                 qWarning() << "Failed to remove deprecated storage on startup. Postpone removing to the next start...";
-            resourcePool()->removeResources(storagesToRemove);
+            messageProcessor->commonModule()->resourcePool()->removeResources(storagesToRemove);
         }
 
-        QnStorageResourceList modifiedStorages = createStorages(m_mediaServer);
+        QnStorageResourceList modifiedStorages = createStorages(messageProcessor->commonModule(), m_mediaServer);
         modifiedStorages.append(updateStorages(m_mediaServer));
         saveStorages(ec2Connection, modifiedStorages);
         for(const QnStorageResourcePtr &storage: modifiedStorages)
@@ -844,7 +851,7 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
 
     ec2::ApiMediaServerUserAttributesDataList attrsList;
     attrsList.push_back(userAttrsData);
-    rez =  commonModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
+    rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributesSync(attrsList);
     if (rez != ec2::ErrorCode::ok)
     {
         qWarning() << "registerServer(): Call to registerServer failed. Reason: " << ec2::toString(rez);
@@ -854,7 +861,9 @@ QnMediaServerResourcePtr registerServer(ec2::AbstractECConnectionPtr ec2Connecti
     return server;
 }
 
-void MediaServerProcess::saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages)
+void MediaServerProcess::saveStorages(
+    ec2::AbstractECConnectionPtr ec2Connection,
+    const QnStorageResourceList& storages)
 {
     ec2::ApiStorageDataList apiStorages;
     fromResourceListToApi(storages, apiStorages);
@@ -889,7 +898,7 @@ void MediaServerProcess::dumpSystemUsageStats()
 
     const auto networkIfInfo = networkIfList.join(lit(", "));
     if (m_mediaServer->setProperty(Qn::NETWORK_INTERFACES, networkIfInfo))
-        propertyDictionary->saveParams(m_mediaServer->getId());
+        m_mediaServer->saveParams();
 
     QnMutexLocker lk( &m_mutex );
     if( m_dumpSystemResourceUsageTaskID == 0 )  //monitoring cancelled
@@ -1134,7 +1143,7 @@ void MediaServerProcess::at_databaseDumped()
         return;
 
     nx::mserver_aux::savePersistentDataBeforeDbRestore(
-                resourcePool()->getAdministrator(),
+                m_mediaServer->resourcePool()->getAdministrator(),
                 m_mediaServer,
                 nx::mserver_aux::createServerSettingsProxy().get()
             ).saveToSettings(MSSettings::roSettings());
@@ -2227,7 +2236,7 @@ void MediaServerProcess::run()
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), AuthMethod::noAuth );
 
-    QnBusinessRuleProcessor::init(new QnMServerBusinessRuleProcessor());
+    std::unique_ptr<QnBusinessRuleProcessor> mserverBusinessRuleProcessor(new QnMServerBusinessRuleProcessor(commonModule()));
 
     QnVideoCameraPool::initStaticInstance( new QnVideoCameraPool() );
 
@@ -2248,7 +2257,7 @@ void MediaServerProcess::run()
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 
-    QScopedPointer<QnServerPtzControllerPool> ptzPool(new QnServerPtzControllerPool());
+    QScopedPointer<QnServerPtzControllerPool> ptzPool(new QnServerPtzControllerPool(commonModule));
 
     std::unique_ptr<QnStorageManager> normalStorageManager(
         new QnStorageManager(
@@ -2717,7 +2726,7 @@ void MediaServerProcess::run()
 
     BeforeRestoreDbData::clearSettings(settings);
 
-    addFakeVideowallUser();
+    addFakeVideowallUser(commonModule);
 
     if (!MSSettings::roSettings()->value(QnServer::kNoInitStoragesOnStartup, false).toBool())
         initStoragesAsync(messageProcessor.data());
@@ -2908,7 +2917,7 @@ void MediaServerProcess::run()
     delete QnBusinessEventConnector::instance();
     QnBusinessEventConnector::initStaticInstance( NULL );
 
-    QnBusinessRuleProcessor::fini();
+    mserverBusinessRuleProcessor.reset();
 
     delete QnMotionHelper::instance();
     QnMotionHelper::initStaticInstance( NULL );
