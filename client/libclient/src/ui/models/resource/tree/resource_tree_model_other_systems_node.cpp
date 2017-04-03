@@ -2,6 +2,8 @@
 
 #include <api/global_settings.h>
 
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/fake_media_server.h>
 #include <core/resource/user_resource.h>

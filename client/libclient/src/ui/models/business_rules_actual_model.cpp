@@ -3,6 +3,8 @@
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 
+#include <common/common_module.h>
+
 #include "ui/workbench/workbench_context.h"
 
 QnBusinessRulesActualModel::QnBusinessRulesActualModel(QObject *parent):

@@ -2,7 +2,7 @@
 
 #include <ui/actions/actions.h>
 
-#include <common/common_module_aware.h>
+#include <client_core/connection_context_aware.h>
 
 class QAction;
 class QObject;
@@ -23,9 +23,8 @@ class QnWorkbenchCustomizer;
  * it can simply derive from <tt>QnWorkbenchContextAware</tt> and
  * pass its context-aware parent into constructor.
  */
-class QnWorkbenchContextAware: public QnCommonModuleAware
+class QnWorkbenchContextAware: public QnConnectionContextAware
 {
-    using base_type = QnCommonModuleAware;
 public:
     /**
      * Constructor.

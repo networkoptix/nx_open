@@ -4,7 +4,7 @@
 #include <QtCore/QVariant>
 #include <QtCore/QUrl>
 
-#include <mobile_client/mobile_client_common_module_aware.h>
+#include <client_core/connection_context_aware.h>
 
 #include <utils/common/software_version.h>
 #include <common/common_globals.h>

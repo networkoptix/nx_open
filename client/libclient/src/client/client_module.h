@@ -7,6 +7,7 @@
 #include <nx/utils/singleton.h>
 
 class QGLWidget;
+class QnClientCoreModule;
 
 class QnClientModule: public QObject, public Singleton<QnClientModule>
 {
@@ -32,7 +33,7 @@ private:
     void initLocalResources (const QnStartupParameters& startupParams);
 
 private:
-    QnCommonModule* m_commonModule;
+    QnClientCoreModule* m_clientCoreModule;
 };
 
 #define qnClientModule QnClientModule::instance();

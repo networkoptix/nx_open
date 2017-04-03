@@ -1,6 +1,6 @@
 #include "camera_access_rights_helper.h"
 
-#include <mobile_client/mobile_client_common_module_aware.h>
+#include <client_core/connection_context_aware.h>
 
 #include <nx/utils/log/assert.h>
 #include <core/resource/camera_resource.h>

@@ -2,7 +2,7 @@
 
 #include <mobile_client/mobile_client_message_processor.h>
 #include <mobile_client/mobile_client_ui_controller.h>
-#include <mobile_client/mobile_client_common_module_aware.h>
+#include <client_core/connection_context_aware.h>
 
 #include <api/runtime_info_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>

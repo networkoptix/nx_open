@@ -17,6 +17,8 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 
+#include <client_core/client_core_module.h>
+
 #include <utils/common/app_info.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -77,7 +79,7 @@ int runUi(QtSingleGuiApplication* application)
 
     if (qnSettings->isLiteClientModeEnabled())
     {
-        auto commonModule = qnMobileClientModule->commonModule();
+        auto commonModule = qnClientCoreModule->commonModule();
 
         auto preparingWebChannel = std::make_unique<webchannel::WebChannelServer>(
             qnSettings->webSocketPort());

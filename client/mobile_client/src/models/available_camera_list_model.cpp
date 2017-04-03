@@ -1,6 +1,6 @@
 #include "available_camera_list_model.h"
 
-#include <mobile_client/mobile_client_common_module_aware.h>
+#include <client_core/connection_context_aware.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>

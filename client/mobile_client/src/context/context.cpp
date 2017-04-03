@@ -34,7 +34,6 @@ const auto kUserRightsRefactoredVersion = QnSoftwareVersion(3, 0);
 
 QnContext::QnContext(QObject* parent) :
     base_type(parent),
-    QnCommonModuleAware(qnMobileClientModule->commonModule()),
     m_nxGlobals(new NxGlobalsObject(this)),
     m_connectionManager(new QnConnectionManager(this)),
     m_settings(new QmlSettingsAdaptor(this)),

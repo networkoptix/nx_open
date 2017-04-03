@@ -3,7 +3,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
 
-#include <mobile_client/mobile_client_common_module_aware.h>
+#include <client_core/connection_context_aware.h>
 
 #include <core/resource/resource_fwd.h>
 #include <api/helpers/thumbnail_request_data.h>

@@ -3,7 +3,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 
-#include <mobile_client/mobile_client_common_module_aware.h>
+#include <client_core/connection_context_aware.h>
 
 namespace nx {
 namespace mobile_client {

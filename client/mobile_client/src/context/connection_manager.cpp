@@ -4,9 +4,12 @@
 #include <QtGui/QGuiApplication>
 #include <QtCore/QMetaEnum>
 
+#include <client_core/connection_context_aware.h>
+#include <client_core/client_core_module.h>
+#include <client_core/client_core_settings.h>
+
 #include <mobile_client/mobile_client_message_processor.h>
 #include <mobile_client/mobile_client_settings.h>
-#include <mobile_client/mobile_client_common_module_aware.h>
 #include <mobile_client/mobile_client_module.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -20,7 +23,6 @@
 #include <utils/common/app_info.h>
 #include <common/common_module.h>
 #include <network/connection_validator.h>
-#include <client_core/client_core_settings.h>
 
 #include <nx_ec/dummy_handler.h>
 
@@ -321,7 +323,7 @@ bool QnConnectionManagerPrivate::doConnect()
     connectUrl.setScheme(lit("http"));
 
     auto result = new QnEc2ConnectionRequestResult(this);
-    connectionHandle = qnMobileClientModule->connectionFactory()->connect(
+    connectionHandle = qnClientCoreModule->connectionFactory()->connect(
         connectUrl,
         ec2::ApiClientInfoData(),
         result,
