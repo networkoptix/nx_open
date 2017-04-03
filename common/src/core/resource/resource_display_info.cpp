@@ -71,11 +71,8 @@ const QString kFormatTemplate = lit("%1 (%2)");
 
 };
 
-QnResourceDisplayInfo::QnResourceDisplayInfo(
-    QnCommonModule* commonModule,
-    const QnResourcePtr& resource)
+QnResourceDisplayInfo::QnResourceDisplayInfo(const QnResourcePtr& resource)
 :
-    QnCommonModuleAware(commonModule),
     m_resource(resource),
     m_detailLevel(Qn::RI_Invalid),
     m_name(),
@@ -180,7 +177,10 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
     if (flags.testFlag(Qn::user))
     {
         if (const QnUserResourcePtr& user = m_resource.dynamicCast<QnUserResource>())
-            m_extraInfo = userRolesManager()->userRoleName(user);
+        {
+            if (auto common = user->commonModule())
+                m_extraInfo = common->userRolesManager()->userRoleName(user);
+        }
     }
     else
     {

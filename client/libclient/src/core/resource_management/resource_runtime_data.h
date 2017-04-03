@@ -1,12 +1,17 @@
 #pragma once
 
+#include <client_core/connection_context_aware.h>
+
 #include <client/client_globals.h>
 
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/singleton.h>
 
-class QnResourceRuntimeDataManager: public QObject, public Singleton<QnResourceRuntimeDataManager>
+class QnResourceRuntimeDataManager:
+    public QObject,
+    public Singleton<QnResourceRuntimeDataManager>,
+    public QnConnectionContextAware
 {
     Q_OBJECT
     using base_type = QObject;
