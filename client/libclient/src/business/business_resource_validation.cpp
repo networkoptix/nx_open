@@ -93,7 +93,9 @@ QString genericCameraText(const QnVirtualCameraResourceList &cameras, const bool
         );
     if (cameras.size() == 1)
         return getShortResourceName(cameras.first());
-    return QnDeviceDependentStrings::getNumericName(cameras);
+    return QnDeviceDependentStrings::getNumericName(
+        qnClientCoreModule->commonModule()->resourcePool(),
+        cameras);
 }
 
 }
@@ -165,6 +167,7 @@ QString QnCameraAudioTransmitPolicy::getText(const QnResourceList &resources, co
     int invalid = invalidResourcesCount<QnCameraAudioTransmitPolicy>(cameras);
     if (cameras.isEmpty())
         return QnDeviceDependentStrings::getDefaultNameFromSet(
+            qnClientCoreModule->commonModule()->resourcePool(),
             tr("Select device"),
             tr("Select camera"));
     else
@@ -222,8 +225,10 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
 {
     using boost::algorithm::all_of;
 
+    auto module = qnClientCoreModule->commonModule();
+
     /* Return true if there are no invalid emails and there is at least one recipient. */
-    auto users = resourcePool()->getResources<QnUserResource>(ids).filtered(
+    auto users = module->resourcePool()->getResources<QnUserResource>(ids).filtered(
         [](const QnUserResourcePtr& user)
     {
         return user->isEnabled();
@@ -239,14 +244,16 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
     /* Using lazy calculations to avoid counting roles when not needed. */
     return !users.empty()
         || !additionalRecipients.empty()
-        || !userRolesManager()->userRoles(ids).empty();
+        || !module->userRolesManager()->userRoles(ids).empty();
 }
 
 QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool detailed,
     const QString& additionalList)
 {
-    auto roles = userRolesManager()->userRoles(ids);
-    auto users = resourcePool()->getResources<QnUserResource>(ids).filtered(
+    auto module = qnClientCoreModule->commonModule();
+
+    auto roles = module->userRolesManager()->userRoles(ids);
+    auto users = module->resourcePool()->getResources<QnUserResource>(ids).filtered(
         [](const QnUserResourcePtr& user)
     {
         return user->isEnabled();

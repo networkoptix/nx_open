@@ -8,9 +8,13 @@
 #include <QtNetwork/QNetworkReply>
 
 #include <api/app_server_connection.h>
+
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
+
 #include <nx/network/http/httptypes.h>
 
 

@@ -4,6 +4,10 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QThread>
 
+
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
+
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/proto_message.h>
 #include <nx/utils/log/log.h>
@@ -38,6 +42,7 @@ namespace {
 
 QnResourceDirectoryBrowser::QnResourceDirectoryBrowser(QObject* parent) :
     base_type(parent),
+    QnAbstractFileResourceSearcher(qnClientCoreModule->commonModule()),
     m_resourceReady(false)
 {}
 

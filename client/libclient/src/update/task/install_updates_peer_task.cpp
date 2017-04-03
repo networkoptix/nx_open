@@ -30,7 +30,7 @@ namespace detail {
     {
         QnInstallUpdatesPeerTask::PeersToQueryMap result;
 
-        const auto router = QnRouter::instance();
+        const auto router = commonModule()->router();
         if (!router)
             return result;
 

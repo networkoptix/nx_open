@@ -62,7 +62,7 @@ void LayoutToursHandler::openTousLayout()
         [startLayoutTourAction]() { startLayoutTourAction->setChecked(false); });
 
     resource->setId(QnUuid::createUuid());
-    qnResPool->addResource(resource);
+    resourcePool()->addResource(resource);
     menu()->trigger(QnActions::OpenSingleLayoutAction, resource);
 }
 

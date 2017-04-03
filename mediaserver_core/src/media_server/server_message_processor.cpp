@@ -237,7 +237,7 @@ void QnServerMessageProcessor::at_updateInstallationRequested(const QString &upd
 
 void QnServerMessageProcessor::at_reverseConnectionRequested(const ec2::ApiReverseConnectionData &data) {
     if (m_universalTcpListener) {
-        QnRoute route = QnRouter::instance()->routeTo(data.targetServer);
+        QnRoute route = commonModule()->router()->routeTo(data.targetServer);
 
         // just to be sure that we have direct access to the server
         if (route.gatewayId.isNull() && !route.addr.isNull())

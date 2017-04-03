@@ -474,7 +474,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     if (!startupParams.videoWallGuid.isNull())
     {
         commonModule->setVideowallGuid(startupParams.videoWallGuid);
-        commonModule->setInstanceGuid(startupParams.videoWallItemGuid);
+        //commonModule->setInstanceGuid(startupParams.videoWallItemGuid);
     }
 
     ec2::ApiRuntimeData runtimeData;
@@ -486,8 +486,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
     commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
-    auto moduleFinder = commonModule->store(new QnModuleFinder(true)); //TODO: #GDM make it common way via scoped pointer somehow
-    moduleFinder->start();
+    commonModule->moduleFinder()->start();
 
     commonModule->store(new QnSystemsFinder());
     commonModule->store(new QnForgottenSystemsManager());
@@ -495,7 +494,7 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
     // Depends on qnSystemsFinder
     commonModule->store(new QnStartupTileManager());
 
-    auto router = commonModule->store(new QnRouter(moduleFinder));
+    auto router = commonModule->router();
     commonModule->store(new QnServerInterfaceWatcher(router));
 }
 

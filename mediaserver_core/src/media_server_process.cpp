@@ -2498,7 +2498,8 @@ void MediaServerProcess::run()
             nx_ms_conf::DEFAULT_ALLOW_SSL_CONNECTIONS).toBool();
 
     bool foundOwnServerInDb = false;
-    m_moduleFinder = new QnModuleFinder(false);
+
+    m_moduleFinder = new QnModuleFinder(false); #I_MUST_NOT_COMPILE_ALREADY_IN_COMMON_MODULE#
     std::unique_ptr<QnModuleFinder> moduleFinderScopedPointer( m_moduleFinder );
     while (m_mediaServer.isNull() && !needToStop())
     {
@@ -2656,6 +2657,7 @@ void MediaServerProcess::run()
 
     // ------------------------------------------
 
+    #I_MUST_NOT_COMPILE_ALREADY_IN_COMMON_MODULE#
     QScopedPointer<QnRouter> router(new QnRouter(m_moduleFinder));
 
     QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
@@ -2692,9 +2694,6 @@ void MediaServerProcess::run()
 
     auto upnpPortMapper = initializeUpnpPortMapper();
 
-    qDebug() << "start loading resources";
-    QElapsedTimer tt;
-    tt.start();
     resourceAccessManager()->beginUpdate();
     resourceAccessProvider()->beginUpdate();
     loadResourcesFromECS(messageProcessor.data());
@@ -2704,11 +2703,8 @@ void MediaServerProcess::run()
     if (m_cmdLineArguments.moveHandlingCameras)
         moveHandlingCameras();
 
-    qDebug() << "resources loaded for" << tt.elapsed();
     resourceAccessProvider()->endUpdate();
-    qDebug() << "access ready" << tt.elapsed();
     resourceAccessManager()->endUpdate();
-    qDebug() << "permissions ready" << tt.elapsed();
 
     qnGlobalSettings->initialize();
 

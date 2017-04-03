@@ -1,8 +1,10 @@
 #include "incompatible_server_watcher.h"
 
-#include <api/common_message_processor.h>
+#include <common/common_module.h>
 
 #include <client_core/connection_context_aware.h>
+
+#include <client/client_message_processor.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -78,7 +80,7 @@ void QnIncompatibleServerWatcher::start()
 {
     Q_D(QnIncompatibleServerWatcher);
 
-    connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::discoveredServerChanged,
+    connect(qnClientMessageProcessor, &QnCommonMessageProcessor::discoveredServerChanged,
             d, &QnIncompatibleServerWatcherPrivate::at_discoveredServerChanged);
 
     connect(resourcePool(), &QnResourcePool::statusChanged,
@@ -89,12 +91,9 @@ void QnIncompatibleServerWatcher::stop()
 {
     Q_D(QnIncompatibleServerWatcher);
 
-    if (QnCommonMessageProcessor::instance())
-    {
-        disconnect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::discoveredServerChanged,
-                   d, &QnIncompatibleServerWatcherPrivate::at_discoveredServerChanged);
-    }
-    disconnect(resourcePool(), 0, d, 0);
+    if (qnClientMessageProcessor)
+        qnClientMessageProcessor->disconnect(this);
+    resourcePool()->disconnect(this);
 
     QList<QnUuid> ids;
 
@@ -168,7 +167,8 @@ void QnIncompatibleServerWatcherPrivate::at_resourcePool_statusChanged(const QnR
 
     Qn::ResourceStatus status = server->getStatus();
     if (status != Qn::Offline
-        && QnConnectionValidator::isCompatibleToCurrentSystem(server->getModuleInformation()))
+        && QnConnectionValidator::isCompatibleToCurrentSystem(server->getModuleInformation(),
+            commonModule()))
     {
         removeResource(getFakeId(id));
     }

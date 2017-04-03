@@ -1,12 +1,8 @@
-/**********************************************************
-* 23 jul 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef CAMERA_DIAGNOSE_TOOL_H
-#define CAMERA_DIAGNOSE_TOOL_H
+#pragma once
 
 #include <QObject>
+
+#include <client_core/connection_context_aware.h>
 
 #include <api/model/camera_diagnostics_reply.h>
 #include <core/resource/resource_fwd.h>
@@ -37,7 +33,8 @@ namespace CameraDiagnostics
     */
     class DiagnoseTool
     :
-        public QObject
+        public QObject,
+        public QnConnectionContextAware
     {
         Q_OBJECT
 
@@ -106,5 +103,3 @@ namespace CameraDiagnostics
         void doMediaServerAvailabilityStep();
     };
 }
-
-#endif  //CAMERA_DIAGNOSE_TOOL_H

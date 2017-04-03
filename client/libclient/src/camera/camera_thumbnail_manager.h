@@ -6,6 +6,8 @@
 
 #include <api/server_rest_connection_fwd.h>
 
+#include <client_core/connection_context_aware.h>
+
 #include <client/client_globals.h>
 
 #include <core/resource/resource_fwd.h>
@@ -14,7 +16,7 @@
 
 #include <nx/utils/uuid.h>
 
-class QnCameraThumbnailManager: public QnImageProvider
+class QnCameraThumbnailManager: public QnImageProvider, public QnConnectionContextAware
 {
     Q_OBJECT
 

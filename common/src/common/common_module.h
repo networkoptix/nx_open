@@ -68,7 +68,7 @@ class QnCommonModule: public QObject, public QnInstanceStorage
 {
     Q_OBJECT
 public:
-    QnCommonModule(bool clientMode, QObject *parent = nullptr);
+    explicit QnCommonModule(bool clientMode, QObject *parent = nullptr);
     virtual ~QnCommonModule();
 
     //using Singleton<QnCommonModule>::instance;

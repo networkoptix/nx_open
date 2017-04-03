@@ -18,7 +18,7 @@ void runMultiserverRequest(QUrl url
 {
     nx_http::HttpHeaders headers;
     headers.emplace(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
-    const QnRoute route = QnRouter::instance()->routeTo(server->getId());
+    const QnRoute route = commonModule()->router()->routeTo(server->getId());
     if (route.reverseConnect)
     {
         static const auto kLocalHost = "127.0.0.1";

@@ -369,7 +369,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
     }
     else if (!dstRoute.id.isNull())
     {
-        dstRoute = QnRouter::instance()->routeTo(dstRoute.id);
+        dstRoute = commonModule()->router()->routeTo(dstRoute.id);
     }
     else
     {
