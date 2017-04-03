@@ -54,7 +54,8 @@ TransactionConnectionHelper::ConnectionId
             localPeerInfo,
             login,
             password,
-            protocolVersion);
+            protocolVersion,
+            ++m_transactionConnectionIdSequence);
     connectionContext.connection->bindToAioThread(m_aioTimer.getAioThread());
     if (keepAlivePolicy == KeepAlivePolicy::noKeepAlive)
         connectionContext.connection->setKeepAliveEnabled(false);
@@ -70,9 +71,8 @@ TransactionConnectionHelper::ConnectionId
 
     QnMutexLocker lk(&m_mutex);
     auto transactionConnectionPtr = connectionContext.connection.get();
-    const ConnectionId connectionId = ++m_transactionConnectionIdSequence;
     m_connections.emplace(
-        connectionId,
+        transactionConnectionPtr->connectionId(),
         std::move(connectionContext));
 
     // TODO: #ak TransactionTransport should do that. But somehow it doesn't...
@@ -83,7 +83,7 @@ TransactionConnectionHelper::ConnectionId
     url.setPath(api::kEc2EventsPath);
     transactionConnectionPtr->doOutgoingConnect(url);
 
-    return connectionId;
+    return transactionConnectionPtr->connectionId();
 }
 
 bool TransactionConnectionHelper::waitForState(
@@ -246,14 +246,7 @@ TransactionConnectionHelper::ConnectionId
     TransactionConnectionHelper::getConnectionId(
         ec2::QnTransactionTransportBase* connection) const
 {
-    QnMutexLocker lk(&m_mutex);
-    for (const auto& val: m_connections)
-    {
-        if (val.second.connection.get() == connection)
-            return val.first;
-    }
-
-    return ConnectionId();
+    return static_cast<test::TransactionTransport*>(connection)->connectionId();
 }
 
 } // namespace test
