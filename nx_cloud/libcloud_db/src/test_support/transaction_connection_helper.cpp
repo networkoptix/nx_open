@@ -14,6 +14,7 @@ namespace test {
 TransactionConnectionHelper::TransactionConnectionHelper():
     m_moduleGuid(QnUuid::createUuid()),
     m_runningInstanceGuid(QnUuid::createUuid()),
+    m_totalConnectionsFailed(0),
     m_transactionConnectionIdSequence(0),
     m_removeConnectionAfterClosure(false)
 {
@@ -170,6 +171,17 @@ std::size_t TransactionConnectionHelper::activeConnectionCount() const
     return m_connections.size();
 }
 
+std::size_t TransactionConnectionHelper::totalFailedConnections() const
+{
+    return m_totalConnectionsFailed.load();
+}
+
+std::size_t TransactionConnectionHelper::connectedConnections() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_connectedConnections.size();
+}
+
 OnConnectionBecomesActiveSubscription& 
     TransactionConnectionHelper::onConnectionBecomesActiveSubscription()
 {
@@ -194,6 +206,9 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
     ec2::QnTransactionTransportBase* connection,
     ec2::QnTransactionTransportBase::State newState)
 {
+    const auto connectionId =
+        static_cast<test::TransactionTransport*>(connection)->connectionId();
+
     switch (newState)
     {
         case ec2::QnTransactionTransportBase::Connected:
@@ -201,11 +216,16 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
 
         case ec2::QnTransactionTransportBase::NeedStartStreaming:
         case ec2::QnTransactionTransportBase::ReadyForStreaming:
+            {
+                QnMutexLocker lk(&m_mutex);
+                m_connectedConnections.insert(connectionId);
+            }
             m_onConnectionBecomesActiveSubscription.notify(newState);
             break;
 
         case ec2::QnTransactionTransportBase::Error:
         case ec2::QnTransactionTransportBase::Closed:
+            ++m_totalConnectionsFailed;
             if (m_removeConnectionAfterClosure)
                 removeConnection(connection);
             m_onConnectionFailureSubscription.notify(newState);
@@ -239,6 +259,7 @@ void TransactionConnectionHelper::removeConnection(
         {
             QnMutexLocker lk(&m_mutex);
             m_connections.erase(connectionId);
+            m_connectedConnections.erase(connectionId);
         });
 }
 

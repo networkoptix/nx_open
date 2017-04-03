@@ -34,9 +34,9 @@ public:
     {
         ::ec2::ApiPeerData peerInfo;
         /**
-        * Keeping separate instance with each connection to allow
-        * multiple connections to same peer be created.
-        */
+         * Keeping separate instance with each connection to allow
+         * multiple connections to same peer be created.
+         */
         std::unique_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState;
         std::unique_ptr<test::TransactionTransport> connection;
     };
@@ -88,6 +88,8 @@ public:
     void closeAllConnections();
 
     std::size_t activeConnectionCount() const;
+    std::size_t totalFailedConnections() const;
+    std::size_t connectedConnections() const;
 
     OnConnectionBecomesActiveSubscription& onConnectionBecomesActiveSubscription();
     OnConnectionFailureSubscription& onConnectionFailureSubscription();
@@ -96,6 +98,8 @@ private:
     QnUuid m_moduleGuid;
     QnUuid m_runningInstanceGuid;
     std::map<ConnectionId, ConnectionContext> m_connections;
+    std::set<ConnectionId> m_connectedConnections;
+    std::atomic<std::size_t> m_totalConnectionsFailed;
     mutable QnMutex m_mutex;
     QnWaitCondition m_condition;
     std::atomic<ConnectionId> m_transactionConnectionIdSequence;

@@ -26,8 +26,11 @@ int establishManyConnections(
     for (;;)
     {
         std::this_thread::sleep_for(std::chrono::seconds(5));
-        std::cout << "Active connection count " << 
-            loadEmulator->activeConnectionCount() << std::endl;
+        std::cout << "Connections: "
+            "active: " << loadEmulator->activeConnectionCount() << ", "
+            "failed: " << loadEmulator->totalFailedConnections() << ", "
+            "connected: " << loadEmulator->connectedConnections() << ". "
+            << std::endl;
     }
 
     return 0;

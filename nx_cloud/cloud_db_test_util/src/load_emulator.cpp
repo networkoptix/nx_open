@@ -40,6 +40,16 @@ std::size_t LoadEmulator::activeConnectionCount() const
     return m_connectionHelper.activeConnectionCount();
 }
 
+std::size_t LoadEmulator::totalFailedConnections() const
+{
+    return m_connectionHelper.totalFailedConnections();
+}
+
+std::size_t LoadEmulator::connectedConnections() const
+{
+    return m_connectionHelper.connectedConnections();
+}
+
 void LoadEmulator::onSystemListReceived(
     api::ResultCode resultCode,
     api::SystemDataExList systems)
