@@ -153,16 +153,18 @@ void StatisticsCollector::removeValue(
     DurationStatisticsCalculationContext* calculationContext,
     std::chrono::milliseconds value)
 {
+    using namespace std::chrono;
+
     calculationContext->currentSum -= value;
     if (calculationContext->result->min == value || calculationContext->result->max == value)
         calculationContext->recalcMinMax = true;
 
+    NX_ASSERT(calculationContext->count > 0);
     --calculationContext->count;
-    NX_ASSERT(calculationContext->count >= 0);
     calculationContext->result->average =
         calculationContext->count > 0
-        ? calculationContext->currentSum / calculationContext->count
-        : std::chrono::milliseconds::zero();
+        ? duration_cast<milliseconds>(calculationContext->currentSum / calculationContext->count)
+        : milliseconds::zero();
 }
 
 void StatisticsCollector::recalcIfNeeded()
