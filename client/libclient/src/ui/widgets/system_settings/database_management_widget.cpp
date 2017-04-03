@@ -5,6 +5,8 @@
 
 #include <nx/utils/log/log.h>
 
+#include <common/common_module.h>
+
 #include "client/client_settings.h"
 #include "api/app_server_connection.h"
 

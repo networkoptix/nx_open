@@ -20,7 +20,6 @@ public:
     void initDesktopCamera(QGLWidget* window);
     void startLocalSearchers();
 
-    QnCommonModule* commonModule();
 private:
     void initApplication();
     void initThread();

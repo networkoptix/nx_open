@@ -4,6 +4,8 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 

@@ -8,6 +8,8 @@
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
 
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_type.h>
 #include <core/resource/camera_resource.h>

@@ -1,5 +1,7 @@
 #include "workbench_webpage_handler.h"
 
+#include <common/common_module.h>
+
 #include <client/client_message_processor.h>
 
 #include <core/resource/webpage_resource.h>

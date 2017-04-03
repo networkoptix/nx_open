@@ -4,6 +4,8 @@
 #include <api/common_message_processor.h>
 #include <api/runtime_info_manager.h>
 
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>

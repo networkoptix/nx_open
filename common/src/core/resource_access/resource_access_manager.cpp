@@ -402,6 +402,9 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(
     if (subject.user() && !subject.user()->isEnabled())
         return Qn::NoPermissions;
 
+    if (!target || !target->resourcePool())
+        return Qn::NoPermissions;
+
     if (QnUserResourcePtr targetUser = target.dynamicCast<QnUserResource>())
         return calculatePermissionsInternal(subject, targetUser);
 

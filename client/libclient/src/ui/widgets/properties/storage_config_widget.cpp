@@ -12,6 +12,8 @@
 #include <api/model/backup_status_reply.h>
 #include <api/model/rebuild_archive_reply.h>
 
+#include <common/common_module.h>
+
 #include <camera/camera_data_manager.h>
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/camera_resource.h>

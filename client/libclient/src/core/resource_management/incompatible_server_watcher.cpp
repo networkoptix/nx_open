@@ -1,6 +1,9 @@
 #include "incompatible_server_watcher.h"
 
 #include <api/common_message_processor.h>
+
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
@@ -19,7 +22,7 @@ namespace
 
 } // anonymous namespace
 
-class QnIncompatibleServerWatcherPrivate : public QObject
+class QnIncompatibleServerWatcherPrivate : public QObject, public QnConnectionContextAware
 {
     Q_DECLARE_PUBLIC(QnIncompatibleServerWatcher)
     QnIncompatibleServerWatcher *q_ptr;

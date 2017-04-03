@@ -3,6 +3,8 @@
 
 #include <api/global_settings.h>
 
+#include <common/common_module.h>
+
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 

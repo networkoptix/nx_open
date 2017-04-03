@@ -208,7 +208,8 @@ void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(const QnSecurityCamResour
 
 void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnSecurityCamResourcePtr &camera)
 {
-    if (!camera) {
+    if (!camera && !camera->resourcePool())
+    {
         m_globalMinArchiveTime = qint64(AV_NOPTS_VALUE);
         return;
     }
