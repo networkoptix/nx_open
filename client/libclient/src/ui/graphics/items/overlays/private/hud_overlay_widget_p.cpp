@@ -1,11 +1,11 @@
 #include "hud_overlay_widget_p.h"
-#include <ui/graphics/items/overlays/hud_overlay_widget.h>
 
 #include <QtWidgets/QGraphicsWidget>
 #include <QtWidgets/QGraphicsLinearLayout>
 
-#include <ui/graphics/items/overlays/resource_title_item.h>
 #include <ui/graphics/items/controls/html_text_item.h>
+#include <ui/graphics/items/overlays/resource_title_item.h>
+#include <ui/graphics/items/overlays/hud_overlay_widget.h>
 
 QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
     q_ptr(main),

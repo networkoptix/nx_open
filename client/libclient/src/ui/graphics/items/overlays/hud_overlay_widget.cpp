@@ -1,7 +1,7 @@
 #include "hud_overlay_widget.h"
-#include <ui/graphics/items/overlays/private/hud_overlay_widget_p.h>
+#include "private/hud_overlay_widget_p.h"
 
-QnHudOverlayWidget::QnHudOverlayWidget(QGraphicsItem* parent) :
+QnHudOverlayWidget::QnHudOverlayWidget(QGraphicsItem* parent):
     base_type(parent),
     d_ptr(new QnHudOverlayWidgetPrivate(this))
 {
