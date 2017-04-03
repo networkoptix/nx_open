@@ -1688,6 +1688,8 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
                     }
                 });
         }
+    #else
+        Q_UNUSED(loginInfo);
     #endif
 
     return ErrorCode::ok;
