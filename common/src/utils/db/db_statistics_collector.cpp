@@ -158,6 +158,7 @@ void StatisticsCollector::removeValue(
     calculationContext->currentSum -= value;
     if (calculationContext->result->min == value || calculationContext->result->max == value)
         calculationContext->recalcMinMax = true;
+    // TODO: #ak apply min_max_queue here.
 
     NX_ASSERT(calculationContext->count > 0);
     --calculationContext->count;
