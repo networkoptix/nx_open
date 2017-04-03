@@ -3,12 +3,13 @@
 """
 
 from hashlib import md5
+from netaddr import IPAddress
 import uuid
 
 
-BASE_CAMERA_IP_ADDRESS = 0xC0A80000  # 192.168.0.0
-BASE_SERVER_IP_ADDRESS = 0xA0A0000   # 10.10.0.0
-BASE_STORAGE_IP_ADDRESS = 0xA002000  # 10.2.0.0
+BASE_CAMERA_IP_ADDRESS = IPAddress('192.168.0.0')
+BASE_SERVER_IP_ADDRESS = IPAddress('10.10.0.0')
+BASE_STORAGE_IP_ADDRESS = IPAddress('10.2.0.0')
 CAMERA_SERVER_GUID_PREFIX = "ca14e2a0-8e25-e200-0000"
 SERVER_GUID_PREFIX = "8e25e200-0000-0000-0000"
 USER_GUID_PREFIX = "58e20000-0000-0000-0000"
@@ -49,7 +50,7 @@ def generate_layout_item_guid(id):
 
 
 def generate_mac(id):
-    return CAMERA_MAC_PREFIX + ":".join(map(lambda n: "%02X" % (id >> n & 0xFF), [24, 16, 8, 0]))
+    return CAMERA_MAC_PREFIX + ":".join(  map(lambda n: "%02X" % (id >> n & 0xFF), [24, 16, 8, 0]))
 
 
 def generate_name(prefix, id):
@@ -70,7 +71,7 @@ def generate_email(name):
 
 
 def generate_ip_v4(id, base_address):
-    ip = base_address + id
+    ip = int(base_address) + id
     return ".".join(map(lambda n: str(ip >> n & 0xFF), [24, 16, 8, 0]))
 
 

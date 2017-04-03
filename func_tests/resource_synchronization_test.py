@@ -184,7 +184,7 @@ def env(env_builder, server, merge_schema):
         boxes_env = env_builder(one=one, two=two)
     boxes_env.test_size = DEFAULT_TEST_SIZE
     boxes_env.thread_number = DEFAULT_THREAD_NUMBER
-    boxes_env.system_merged = merge_schema == 'merged'
+    boxes_env.system_is_merged = merge_schema == 'merged'
     boxes_env.resource_generators = resource_generators()
     return boxes_env
 
@@ -211,8 +211,8 @@ def wait_entity_merge_done(servers, method, api_object, api_method):
         if not result:
             return
         if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
-            log.error("'%s' unsynchronized data: '%r' and '%r'" % (
-                api_method, servers[0].box, result[0].box))
+            log.error("'%s' was not synchronized in %d seconds: '%r' and '%r'" % (
+                api_method, MEDIASERVER_MERGE_TIMEOUT_SEC, servers[0].box, result[0].box))
             assert result[1] == result_expected
         time.sleep(MEDIASERVER_MERGE_TIMEOUT_SEC / 10.)
 
@@ -254,12 +254,13 @@ def server_api_post((server, api_method, data)):
 
 
 def merge_system_if_unmerged(env):
-    if not env.system_merged:
-        servers = env.servers.values()
-        assert len(servers) >= 2
-        for i in range(len(servers) - 1):
-            servers[i+1].merge_systems(servers[i])
-        env.system_merged = True
+    if env.system_is_merged:
+        return
+    servers = env.servers.values()
+    assert len(servers) >= 2
+    for i in range(len(servers) - 1):
+        servers[i+1].merge_systems(servers[i])
+        env.system_is_merged = True
 
 
 def get_servers_admins(env):
@@ -281,7 +282,7 @@ def get_server_by_index(env, i):
     return servers[server_i]
 
 
-def prepare_calls_list(env, api_method, sequence=None):
+def prepare_call_list(env, api_method, sequence=None):
     '''Return list of tupples (mediaserver, REST API function name, data to POST).
 
     Prepare data for the NX media server POST request:
@@ -291,38 +292,54 @@ def prepare_calls_list(env, api_method, sequence=None):
     '''
     data_generator = env.resource_generators[api_method]
     sequence = sequence or [(None, i) for i in range(env.test_size)]
-    calls_list = []
+    call_list = []
 
-    def get_server(env, i, server):
-        if not server or env.system_merged:
-            return get_server_by_index(env, i)
+    # The function is used to select server for modification request.
+    # If we have already merged system, we can use any server to create/remove/modify resource,
+    # otherwise we have to use only resource owner for modification.
+    def get_server_for_modification(env, i, server):
+        '''Return server for modification.
+
+        * env - test environment
+        * i - index for getting server by index
+        * server - server where resource have been created
+        '''
+        if not server or env.system_is_merged:
+            # If the resource's server isn't specified or system is already merged,
+            # get server for modification request by index
+            return get_server_by_index(env, i) 
         else:
+            # Otherwise, get the resource's owner for modification.
             return server
 
     for i, v in enumerate(sequence[:env.test_size]):
-        srv, val = v
-        server = get_server(env, i, srv)
-        server_for_resources = None if env.system_merged else srv
-        data = data_generator.get(server_for_resources, val)
-        calls_list.append((server, api_method, data))
-    return calls_list
+        server, val = v
+        # Get server for the modification request.
+        server_for_modification = get_server_for_modification(env, i, server)
+        # Get server for resource data generation,
+        # data generator object should use only the server's resources for unmerged system.
+        # 'None' means that any server can be used for generation.
+        resource_owner = None if env.system_is_merged else server
+        resource_data = data_generator.get(resource_owner, val)
+        call_list.append((server_for_modification, api_method, resource_data))
+    return call_list
 
 
-def make_async_post_calls(env, calls_list):
+def make_async_post_calls(env, call_list):
     '''Return list of pairs (mediaserver, posted data).
 
     Make async NX media server REST API POST requests.
     '''
     pool = ThreadPool(env.thread_number)
-    pool.map(server_api_post, calls_list)
+    pool.map(server_api_post, call_list)
     pool.close()
     pool.join()
-    return map(lambda d: (d[0], d[2]), calls_list)
+    return map(lambda d: (d[0], d[2]), call_list)
 
 
 def prepare_and_make_async_post_calls(env, api_method, sequence=None):
     return make_async_post_calls(env,
-                                 prepare_calls_list(env, api_method, sequence))
+                                 prepare_call_list(env, api_method, sequence))
 
 
 @pytest.mark.parametrize('merge_schema', ['merged'])
@@ -399,9 +416,9 @@ def test_mediaserver_data_syncronization(env):
 
 def test_storage_data_synchronization(env):
     env_servers = env.servers.values()
-    server_seq = [env_servers[i % len(env_servers)] for i in range(env.test_size)]
-    servers = map(lambda s: (s, s.ecs_guid), server_seq)
-    storages = prepare_and_make_async_post_calls(env, 'saveStorage', servers)
+    servers = [env_servers[i % len(env_servers)] for i in range(env.test_size)]
+    server_with_guid_list = map(lambda s: (s, s.ecs_guid), servers)
+    storages = prepare_and_make_async_post_calls(env, 'saveStorage', server_with_guid_list)
     merge_system_if_unmerged(env)
     check_api_calls(
         env,
