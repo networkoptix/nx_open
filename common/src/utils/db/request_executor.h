@@ -1,16 +1,22 @@
 #pragma once
 
+#include <chrono>
 #include <functional>
+
+#include <boost/optional.hpp>
 
 #include <QtSql/QSqlDatabase>
 
 #include <nx/utils/move_only_func.h>
 
+#include "db_statistics_collector.h"
 #include "types.h"
 #include "query_context.h"
 
 namespace nx {
 namespace db {
+
+class StatisticsCollector;
 
 class AbstractExecutor
 {
@@ -28,12 +34,28 @@ public:
 class BaseExecutor:
     public AbstractExecutor
 {
+public:
+    BaseExecutor();
+    virtual ~BaseExecutor() override;
+
+    virtual DBResult execute(QSqlDatabase* const connection) override;
+
+    void setStatisticsCollector(StatisticsCollector* statisticsCollector);
+
 protected:
+    virtual DBResult executeQuery(QSqlDatabase* const connection) = 0;
+
     /**
      * Returns more detailed result code if appropriate. Otherwise returns initial one.
      */
     DBResult detailResultCode(QSqlDatabase* const connection, DBResult result) const;
     DBResult lastDBError(QSqlDatabase* const connection) const;
+
+private:
+    StatisticsCollector* m_statisticsCollector;
+    std::chrono::steady_clock::time_point m_creationTime;
+    QueryExecutionInfo m_queryStatistics;
+    bool m_queryExecuted;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -58,7 +80,7 @@ public:
     {
     }
 
-    virtual DBResult execute(QSqlDatabase* const connection) override
+    virtual DBResult executeQuery(QSqlDatabase* const connection) override
     {
         Transaction transaction(connection);
         QueryContext queryContext(connection, &transaction);
@@ -127,7 +149,7 @@ public:
     {
     }
 
-    virtual DBResult execute(QSqlDatabase* const connection) override
+    virtual DBResult executeQuery(QSqlDatabase* const connection) override
     {
         Transaction transaction(connection);
         QueryContext queryContext(connection, &transaction);
@@ -186,7 +208,7 @@ public:
         nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler);
 
-    virtual DBResult execute(QSqlDatabase* const connection) override;
+    virtual DBResult executeQuery(QSqlDatabase* const connection) override;
     virtual void reportErrorWithoutExecution(DBResult errorCode) override;
 
 private:
@@ -205,7 +227,7 @@ public:
         nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler);
 
-    virtual DBResult execute(QSqlDatabase* const connection) override;
+    virtual DBResult executeQuery(QSqlDatabase* const connection) override;
     virtual void reportErrorWithoutExecution(DBResult errorCode) override;
 
 private:
@@ -225,7 +247,7 @@ public:
         nx::utils::MoveOnlyFunc<DBResult(QueryContext*)> dbSelectFunc,
         nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> completionHandler);
 
-    virtual DBResult execute(QSqlDatabase* const connection) override;
+    virtual DBResult executeQuery(QSqlDatabase* const connection) override;
     virtual void reportErrorWithoutExecution(DBResult errorCode) override;
 
 private:

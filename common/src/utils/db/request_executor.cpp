@@ -2,8 +2,56 @@
 
 #include <QtSql/QSqlError>
 
+#include <nx/utils/time.h>
+
 namespace nx {
 namespace db {
+
+//-------------------------------------------------------------------------------------------------
+// BaseExecutor
+
+BaseExecutor::BaseExecutor():
+    m_statisticsCollector(nullptr),
+    m_creationTime(nx::utils::monotonicTime()),
+    m_queryExecuted(false)
+{
+}
+
+BaseExecutor::~BaseExecutor()
+{
+    using namespace std::chrono;
+
+    if (!m_queryExecuted)
+    {
+        m_queryStatistics.waitForExecutionDuration =
+            duration_cast<milliseconds>(nx::utils::monotonicTime() - m_creationTime);
+    }
+
+    if (m_statisticsCollector)
+        m_statisticsCollector->recordQuery(m_queryStatistics);
+}
+
+DBResult BaseExecutor::execute(QSqlDatabase* const connection)
+{
+    using namespace std::chrono;
+
+    const auto executionStartTime = nx::utils::monotonicTime();
+
+    m_queryStatistics.waitForExecutionDuration =
+        duration_cast<milliseconds>(executionStartTime - m_creationTime);
+    m_queryExecuted = true;
+
+    m_queryStatistics.result = executeQuery(connection);
+
+    m_queryStatistics.executionDuration = 
+        duration_cast<milliseconds>(nx::utils::monotonicTime() - executionStartTime);
+    return *m_queryStatistics.result;
+}
+
+void BaseExecutor::setStatisticsCollector(StatisticsCollector* statisticsCollector)
+{
+    m_statisticsCollector = statisticsCollector;
+}
 
 DBResult BaseExecutor::detailResultCode(
     QSqlDatabase* const connection,
@@ -51,7 +99,7 @@ UpdateWithoutAnyDataExecutor::UpdateWithoutAnyDataExecutor(
 {
 }
 
-DBResult UpdateWithoutAnyDataExecutor::execute(QSqlDatabase* const connection)
+DBResult UpdateWithoutAnyDataExecutor::executeQuery(QSqlDatabase* const connection)
 {
     Transaction transaction(connection);
     QueryContext queryContext(connection, &transaction);
@@ -104,7 +152,7 @@ UpdateWithoutAnyDataExecutorNoTran::UpdateWithoutAnyDataExecutorNoTran(
 {
 }
 
-DBResult UpdateWithoutAnyDataExecutorNoTran::execute(QSqlDatabase* const connection)
+DBResult UpdateWithoutAnyDataExecutorNoTran::executeQuery(QSqlDatabase* const connection)
 {
     auto completionHandler = std::move(m_completionHandler);
     QueryContext queryContext(connection, nullptr);
@@ -131,7 +179,7 @@ SelectExecutor::SelectExecutor(
 {
 }
 
-DBResult SelectExecutor::execute(QSqlDatabase* const connection)
+DBResult SelectExecutor::executeQuery(QSqlDatabase* const connection)
 {
     auto completionHandler = std::move(m_completionHandler);
     QueryContext queryContext(connection, nullptr);

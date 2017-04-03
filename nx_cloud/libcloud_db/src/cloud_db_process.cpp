@@ -162,14 +162,14 @@ int CloudDBProcess::exec()
 
         TemporaryAccountPasswordManager tempPasswordManager(
             settings,
-            dbInstanceController.queryExecutor().get());
+            &dbInstanceController.queryExecutor());
         m_tempPasswordManager = &tempPasswordManager;
 
         AccountManager accountManager(
             settings,
             streeManager,
             &tempPasswordManager,
-            dbInstanceController.queryExecutor().get(),
+            &dbInstanceController.queryExecutor(),
             emailManager.get());
         m_accountManager = &accountManager;
 
@@ -179,18 +179,18 @@ int CloudDBProcess::exec()
         ec2::SyncronizationEngine ec2SyncronizationEngine(
             kCdbGuid,
             settings.p2pDb(),
-            dbInstanceController.queryExecutor().get());
+            &dbInstanceController.queryExecutor());
 
         SystemHealthInfoProvider systemHealthInfoProvider(
             &ec2SyncronizationEngine.connectionManager(),
-            dbInstanceController.queryExecutor().get());
+            &dbInstanceController.queryExecutor());
 
         SystemManager systemManager(
             settings,
             &timerManager,
             &accountManager,
             systemHealthInfoProvider,
-            dbInstanceController.queryExecutor().get(),
+            &dbInstanceController.queryExecutor(),
             emailManager.get(),
             &ec2SyncronizationEngine);
         m_systemManager = &systemManager;
@@ -230,7 +230,8 @@ int CloudDBProcess::exec()
 
         MaintenanceManager maintenanceManager(
             kCdbGuid,
-            &ec2SyncronizationEngine);
+            &ec2SyncronizationEngine,
+            dbInstanceController);
 
         CloudModuleUrlProvider cloudModuleUrlProvider(
             settings.moduleFinder().cloudModulesXmlTemplatePath);
