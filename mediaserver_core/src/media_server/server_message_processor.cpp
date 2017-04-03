@@ -30,9 +30,8 @@
 #include "http/custom_headers.h"
 #include "resource_status_watcher.h"
 
-QnServerMessageProcessor::QnServerMessageProcessor()
-:
-    base_type(),
+QnServerMessageProcessor::QnServerMessageProcessor(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_serverPort( MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt() )
 {
 }
@@ -148,7 +147,7 @@ void QnServerMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData
     else
         m_delayedOnlineStatus << data.peer.id;
 
-    if (QnModuleFinder *moduleFinder = QnModuleFinder::instance())
+    if (QnModuleFinder *moduleFinder = commonModule()->moduleFinder())
         moduleFinder->setModuleStatus(data.peer.id, Qn::Online);
 }
 
@@ -165,7 +164,7 @@ void QnServerMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
     }
     m_delayedOnlineStatus.remove(data.peer.id);
 
-    if (QnModuleFinder *moduleFinder = QnModuleFinder::instance())
+    if (QnModuleFinder *moduleFinder = commonModule()->moduleFinder())
         moduleFinder->setModuleStatus(data.peer.id, Qn::Offline);
 }
 
@@ -251,7 +250,7 @@ void QnServerMessageProcessor::at_remotePeerUnauthorized(const QnUuid& id)
     if (mServer)
         mServer->setStatus(Qn::Unauthorized);
 
-    if (QnModuleFinder *moduleFinder = QnModuleFinder::instance())
+    if (QnModuleFinder *moduleFinder = commonModule()->moduleFinder())
         moduleFinder->setModuleStatus(id, Qn::Unauthorized);
 }
 

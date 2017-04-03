@@ -39,8 +39,11 @@ void installTranslations()
 
 } // namespace
 
-QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint, QObject *parent):
-    QObject(parent)
+QnMediaServerModule::QnMediaServerModule(
+    const QString& enforcedMediatorEndpoint,
+    QObject* parent)
+:
+    QnCommonModule(/*clientMode*/ false, parent)
 {
     instance<QnLongRunnablePool>();
 
@@ -62,14 +65,13 @@ QnMediaServerModule::QnMediaServerModule(const QString& enforcedMediatorEndpoint
     }
 #endif //ENABLE_ONVIF
 
-    m_common = new QnCommonModule(this);
-    m_common->store(new QnFfmpegInitializer());
+    store(new QnFfmpegInitializer());
 
     if (!enforcedMediatorEndpoint.isEmpty())
         nx::network::SocketGlobals::mediatorConnector().mockupAddress(enforcedMediatorEndpoint);
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
-    m_common->store(new QnNewSystemServerFlagWatcher());
+    store(new QnNewSystemServerFlagWatcher());
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());

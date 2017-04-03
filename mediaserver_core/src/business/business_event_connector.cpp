@@ -22,7 +22,9 @@
 
 static QnBusinessEventConnector* _instance = NULL;
 
-QnBusinessEventConnector::QnBusinessEventConnector()
+QnBusinessEventConnector::QnBusinessEventConnector(QObject* parent):
+    QObject(parent),
+    QnCommonModuleAware(parent)
 {
     connect(resourcePool(), &QnResourcePool::resourceAdded, this, &QnBusinessEventConnector::onNewResource);
 }

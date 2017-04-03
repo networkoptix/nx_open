@@ -155,13 +155,13 @@ private:
     void updateAllowedInterfaces();
     void addCommandLineParametersFromConfig();
     void saveServerInfo(const QnMediaServerResourcePtr& server);
+    QnCommonModule* commonModule() const { return m_serverModule.get();  }
 private:
     int m_argc;
     char** m_argv;
     bool m_startMessageSent;
     qint64 m_firstRunningTime;
 
-    QnModuleFinder* m_moduleFinder;
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
     std::unique_ptr<nx_http::HttpModManager> m_httpModManager;
     QnUniversalTcpListener* m_universalTcpListener;
@@ -180,6 +180,7 @@ private:
     std::unique_ptr<QnPlatformAbstraction> m_platform;
     CmdLineArguments m_cmdLineArguments;
     QnUuid m_obsoleteGuid;
+    std::unique_ptr<QnMediaServerModule> m_serverModule;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

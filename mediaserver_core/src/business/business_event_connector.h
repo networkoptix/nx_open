@@ -10,6 +10,8 @@
 #include "business/business_event_parameters.h"
 #include <server/server_globals.h>
 #include "health/system_health.h"
+#include <common/common_module_aware.h>
+#include <nx/utils/singleton.h>
 
 struct QnModuleInformation;
 
@@ -17,12 +19,15 @@ struct QnModuleInformation;
 * This class listening various logic events, covert these events to business events and send it to businessRuleProcessor
 */
 
-class QnBusinessEventConnector: public QObject
+class QnBusinessEventConnector:
+    public QObject,
+    public QnCommonModuleAware,
+    public Singleton<QnBusinessEventConnector>
 {
     Q_OBJECT
 
 public:
-    QnBusinessEventConnector();
+    QnBusinessEventConnector(QObject* parent);
     ~QnBusinessEventConnector();
 
     static void initStaticInstance( QnBusinessEventConnector* );

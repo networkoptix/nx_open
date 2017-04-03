@@ -27,8 +27,6 @@ public:
     QnMServerResourceSearcher(QnCommonModule* commonModule);
     virtual ~QnMServerResourceSearcher();
 
-    static void initStaticInstance( QnMServerResourceSearcher* inst );
-    static QnMServerResourceSearcher* instance();
     /** find other servers in current networks. Actually, this function do not instantiate other mServer as resources. Function just check if they are presents */
     virtual void run() override;
 private:

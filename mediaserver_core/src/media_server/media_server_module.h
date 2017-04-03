@@ -1,23 +1,20 @@
-#ifndef QN_MEDIA_SERVER_MODULE_H
-#define QN_MEDIA_SERVER_MODULE_H
+#pragma once
 
 #include <QtCore/QObject>
 
 #include <nx/utils/singleton.h>
 #include <utils/common/instance_storage.h>
+#include <common/common_module.h>
 
 class QnCommonModule;
 
-class QnMediaServerModule: public QObject, public QnInstanceStorage, public Singleton<QnMediaServerModule> {
+class QnMediaServerModule:
+    public QnCommonModule
+{
     Q_OBJECT;
 public:
-    QnMediaServerModule(const QString& enforcedMediatorEndpoint = QString(), QObject *parent = NULL);
+    QnMediaServerModule(
+        const QString& enforcedMediatorEndpoint = QString(),
+        QObject *parent = nullptr);
     virtual ~QnMediaServerModule();
-
-    using Singleton<QnMediaServerModule>::instance;
-    using QnInstanceStorage::instance;
-private:
-    QnCommonModule *m_common;
 };
-
-#endif // QN_MEDIA_SERVER_MODULE_H
