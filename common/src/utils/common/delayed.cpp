@@ -56,7 +56,10 @@ QTimer *executeDelayedParented(const Callback &callback
 
 void executeInThread(QThread* thread, const Callback& callback)
 {
-    if (callback && QThread::currentThread() == thread)
+    if (!callback)
+        return;
+
+    if (QThread::currentThread() == thread)
         callback();
     else
         executeDelayedImpl(callback, 0, thread, nullptr);

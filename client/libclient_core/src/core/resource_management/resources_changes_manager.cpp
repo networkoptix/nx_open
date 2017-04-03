@@ -89,7 +89,7 @@ void QnResourcesChangesManager::deleteResources(
                 || qnCommon->runningInstanceGUID() != sessionGuid;
 
             if (thread)
-                executeInThread(thread, [safeCallback, success](){ safeCallback(success); });
+                executeInThread(thread, [safeCallback, success]() { safeCallback(success); });
 
             if (!success)
                 emit resourceDeletingFailed(resources);
