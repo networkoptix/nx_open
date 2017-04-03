@@ -1765,7 +1765,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/setCameraParam", new QnCameraSettingsRestHandler());
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
     reg("api/ptz", new QnPtzRestHandler());
-    reg("api/image", new QnImageRestHandler());
+    reg("api/image", new QnImageRestHandler()); //< deprecated
     reg("api/createEvent", new QnExternalBusinessEventRestHandler());
     reg("api/gettime", new QnTimeRestHandler());
     reg("api/getTimeZones", new QnGetTimeZonesRestHandler());
