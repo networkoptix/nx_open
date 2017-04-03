@@ -15,6 +15,7 @@ class QnResourcePropertyDictionary;
 class QnCameraUserAttributePool;
 class QnMediaServerUserAttributesPool;
 class QnResourceStatusDictionary;
+class QnGlobalSettings;
 
 class QnCommonModuleAware
 {
@@ -38,7 +39,7 @@ public:
     QnCameraUserAttributePool* cameraUserAttributesPool() const;
     QnMediaServerUserAttributesPool* mediaServerUserAttributesPool() const;
     QnResourceStatusDictionary* statusDictionary() const;
-
+    QnGlobalSettings* globalSettings() const;
 private:
     void init(QObject *parent);
 

@@ -8,6 +8,7 @@
 
 #include "api/app_server_connection.h"
 #include "mutex/distributed_mutex.h"
+#include <common/common_module_aware.h>
 
 namespace ec2 {
     class QnMutexCameraDataHandler;
@@ -15,12 +16,16 @@ namespace ec2 {
     struct QnCameraUserAttributes;
 }
 
-class QnAppserverResourceProcessor : public QObject, public QnResourceProcessor
+class QnAppserverResourceProcessor:
+    public QObject,
+    public QnResourceProcessor,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
 public:
     QnAppserverResourceProcessor(
+        QnCommonModule* commonModule,
         ec2::QnDistributedMutexManager* distributedMutexManager,
         QnUuid serverId);
     virtual ~QnAppserverResourceProcessor();
@@ -28,10 +33,10 @@ public:
     virtual bool isBusy() const override;
     virtual void processResources(const QnResourceList &resources) override;
 
-    static ec2::ErrorCode addAndPropagateCamResource(
+    ec2::ErrorCode addAndPropagateCamResource(
         const ec2::ApiCameraData& apiCameraData,
         const ec2::ApiResourceParamDataList& properties
-    );
+    ) const;
 
 private:
     ec2::AbstractECConnectionPtr m_ec2Connection;

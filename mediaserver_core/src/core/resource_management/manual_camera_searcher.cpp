@@ -90,7 +90,7 @@ namespace {
     {
         QList<QnAbstractNetworkResourceSearcher*> result;
 
-        for(QnAbstractResourceSearcher* as: commonModule()->instance<QnResourceDiscoveryManager>()->plugins())
+        for(QnAbstractResourceSearcher* as: commonModule()->resourceDiscoveryManager()->plugins())
         {
             QnAbstractNetworkResourceSearcher* ns =
                 dynamic_cast<QnAbstractNetworkResourceSearcher*>(as);

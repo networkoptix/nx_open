@@ -4,14 +4,18 @@
 #include <business/business_fwd.h>
 #include <core/dataprovider/spush_media_stream_provider.h>
 #include <utils/common/request_param.h>
+#include <common/common_module_aware.h>
+#include <camera/video_camera.h>
 
 class QnAbstractAudioTransmitter;
 
-class QnAudioStreamerPool : public Singleton<QnAudioStreamerPool>
+class QnAudioStreamerPool:
+    public Singleton<QnAudioStreamerPool>,
+    public QnCommonModuleAware
 {
 
 public:
-    QnAudioStreamerPool();
+    QnAudioStreamerPool(QnCommonModule* commonModule);
 
     enum class Action
     {
@@ -28,6 +32,8 @@ public:
 private:
     QString calcActionUniqueKey(const QnAbstractBusinessActionPtr &action) const;
 
+    QnVideoCameraPtr getTransmitSource(const QnUuid& clientId) const;
+    QnSecurityCamResourcePtr getTransmitDestination(const QnUuid& resourceId) const;
 private:
     QnMutex m_prolongedProvidersMutex;
     QMap<QString, QnAbstractStreamDataProviderPtr> m_actionDataProviders;

@@ -35,7 +35,6 @@
 
 #include "cloud/cloud_manager_group.h"
 
-
 ////////////////////////////////////////////////////////////
 //// class QnAuthHelper
 ////////////////////////////////////////////////////////////
@@ -62,9 +61,11 @@ static const QString TEMP_AUTH_KEY_NAME = lit("authKey");
 const unsigned int QnAuthHelper::MAX_AUTHENTICATION_KEY_LIFE_TIME_MS = 60 * 60 * 1000;
 
 QnAuthHelper::QnAuthHelper(
+    QnCommonModule* commonModule,
     TimeBasedNonceProvider* timeBasedNonceProvider,
     CloudManagerGroup* cloudManagerGroup)
-    :
+:
+    QnCommonModuleAware(commonModule),
     m_timeBasedNonceProvider(timeBasedNonceProvider),
     m_nonceProvider(&cloudManagerGroup->authenticationNonceFetcher),
     m_userDataProvider(&cloudManagerGroup->userAuthenticator)

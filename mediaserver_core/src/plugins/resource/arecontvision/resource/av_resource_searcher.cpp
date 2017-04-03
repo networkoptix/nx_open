@@ -21,10 +21,10 @@
 
 #define CL_BROAD_CAST_RETRY 1
 
-
 extern QString getValueFromString(const QString& line);
 
-QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
+QnPlArecontResourceSearcher::QnPlArecontResourceSearcher(QnCommonModule* commonModule):
+    base_type(commonModule)
 {
     // everything related to Arecont must be initialized here
     AVJpeg::Header::Initialize("ArecontVision", "CamLabs", "ArecontVision");
@@ -36,7 +36,7 @@ QString QnPlArecontResourceSearcher::manufacture() const
     return QnPlAreconVisionResource::MANUFACTURE;
 }
 
-QnNetworkResourcePtr 
+QnNetworkResourcePtr
 QnPlArecontResourceSearcher::findResourceHelper(const MacArray &mac,
                                                 const SocketAddress &addr)
 {
@@ -55,7 +55,7 @@ QnPlArecontResourceSearcher::findResourceHelper(const MacArray &mac,
         result->setName(rpRes->getName());
         result->setFlags(rpRes->flags());
     }
-    else 
+    else
     {
         QString model;
         QString model_release;
@@ -181,9 +181,9 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
 
                 // in any case let's HTTP do it's job at very end of discovery
                 bool need_to_continue = false;
-                for(const QnResourcePtr& res: result) 
+                for(const QnResourcePtr& res: result)
                 {
-                    if (memcmp(res->getUniqueId().toLatin1().constData(), mac.data(), 6) == 0) 
+                    if (memcmp(res->getUniqueId().toLatin1().constData(), mac.data(), 6) == 0)
                     {
                         need_to_continue = true; //already has such
                         break;
@@ -269,7 +269,7 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const QUrl& url,
     else
     {
         QString modelFull = QLatin1String(downloadFileWithRetry(status, QLatin1String("get?model=fullname"), host, port, timeout, auth));
-        if (!modelFull.isEmpty())        
+        if (!modelFull.isEmpty())
             model = modelFull;
     }
 

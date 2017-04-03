@@ -22,34 +22,34 @@ namespace
             value.reset(new QnMutex());
         return value.get();
     }
-
-    QnVideoCameraPtr getTransmitSource(const QnUuid& clientId)
-    {
-        for (const auto& res: resourcePool()->getResourcesWithFlag(Qn::desktop_camera))
-        {
-            if (QnUuid::fromStringSafe(res->getUniqueId()) == clientId ||
-                res->getId() == clientId)
-            {
-                return qnCameraPool->getVideoCamera(res);
-            }
-        }
-        return QnVideoCameraPtr();
-    }
-
-    QnSecurityCamResourcePtr getTransmitDestination(const QnUuid& resourceId)
-    {
-        auto resource = resourcePool()->getResourceById<QnSecurityCamResource>(resourceId);
-        if (!resource)
-            return QnSecurityCamResourcePtr();
-        if (!resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
-            return QnSecurityCamResourcePtr();
-        return resource;
-    }
 }
 
-QnAudioStreamerPool::QnAudioStreamerPool()
+QnAudioStreamerPool::QnAudioStreamerPool(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
+}
 
+QnVideoCameraPtr QnAudioStreamerPool::getTransmitSource(const QnUuid& clientId) const
+{
+    for (const auto& res : resourcePool()->getResourcesWithFlag(Qn::desktop_camera))
+    {
+        if (QnUuid::fromStringSafe(res->getUniqueId()) == clientId ||
+            res->getId() == clientId)
+        {
+            return qnCameraPool->getVideoCamera(res);
+        }
+    }
+    return QnVideoCameraPtr();
+}
+
+QnSecurityCamResourcePtr QnAudioStreamerPool::getTransmitDestination(const QnUuid& resourceId) const
+{
+    auto resource = resourcePool()->getResourceById<QnSecurityCamResource>(resourceId);
+    if (!resource)
+        return QnSecurityCamResourcePtr();
+    if (!resource->hasCameraCapabilities(Qn::AudioTransmitCapability))
+        return QnSecurityCamResourcePtr();
+    return resource;
 }
 
 bool QnAudioStreamerPool::startStopStreamToResource(const QnUuid& clientId, const QnUuid& resourceId, Action action, QString &error, const QnRequestParams &params)

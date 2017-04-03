@@ -15,6 +15,10 @@ const QString QnMutexCameraDataHandler::CAM_INS_PREFIX(lit("CAMERA_INS_"));
 const QString QnMutexCameraDataHandler::CAM_UPD_PREFIX(lit("CAMERA_UPD_"));
 const QString QnMutexCameraDataHandler::CAM_HISTORY_PREFIX(lit("CAMERA_HISTORY_"));
 
+QnMutexCameraDataHandler::QnMutexCameraDataHandler(QnCommonModule* commonModule):
+    QnMutexUserDataHandler(commonModule)
+{
+}
 
 QByteArray QnMutexCameraDataHandler::getUserData(const QString& name)
 {

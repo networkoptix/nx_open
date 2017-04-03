@@ -16,17 +16,18 @@
 #include <nx/utils/thread/mutex.h>
 #include <utils/common/safe_direct_connection.h>
 #include <utils/common/subscription.h>
-
+#include <common/common_module_aware.h>
 
 class CloudConnectionManager:
     public QObject,
     public Qn::EnableSafeDirectConnection,
-    public nx::hpm::api::AbstractCloudSystemCredentialsProvider
+    public nx::hpm::api::AbstractCloudSystemCredentialsProvider,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
 public:
-    CloudConnectionManager();
+    CloudConnectionManager(QnCommonModule* commonModule);
     ~CloudConnectionManager();
 
     virtual boost::optional<nx::hpm::api::SystemCredentials>

@@ -160,9 +160,6 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
     m_globalSettings = new QnGlobalSettings(this);
     m_cameraHistory = new QnCameraHistoryPool(this);
 
-    // Depends on resource pool and global settings.
-    instance<QnResourceDiscoveryManager>();
-
     /* Init members. */
     m_runUuid = QnUuid::createUuid();
     m_startupTime = QDateTime::currentDateTime();
@@ -401,4 +398,11 @@ QnUuid QnCommonModule::videowallGuid() const
 void QnCommonModule::setVideowallGuid(const QnUuid &uuid)
 {
     m_videowallGuid = uuid;
+}
+
+void QnCommonModule::setResourceDiscoveryManager(QnResourceDiscoveryManager* discoveryManager)
+{
+    if (m_resourceDiscoveryManager)
+        delete m_resourceDiscoveryManager;
+    m_resourceDiscoveryManager = discoveryManager;
 }

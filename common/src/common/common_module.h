@@ -30,6 +30,7 @@ class QnCameraUserAttributePool;
 class QnMediaServerUserAttributesPool;
 class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
+class QnResourceDiscoveryManager;
 
 namespace ec2 {
     class AbstractECConnection;
@@ -140,6 +141,13 @@ public:
     QnMediaServerUserAttributesPool* mediaServerUserAttributesPool() const
     {
         return m_mediaServerUserAttributesPool;
+    }
+
+    void setResourceDiscoveryManager(QnResourceDiscoveryManager* discoveryManager);
+
+    QnResourceDiscoveryManager* resourceDiscoveryManager() const
+    {
+        return m_resourceDiscoveryManager;
     }
 
     QnLicensePool* licensePool() const;
@@ -262,6 +270,7 @@ private:
     QnResourceStatusDictionary* m_resourceStatusDictionary = nullptr;
     QnGlobalPermissionsManager* m_globalPermissionsManager = nullptr;
     QnUserRolesManager* m_userRolesManager = nullptr;
+    QnResourceDiscoveryManager* m_resourceDiscoveryManager = nullptr;
 
     QnUuid m_videowallGuid;
 };

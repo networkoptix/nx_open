@@ -8,8 +8,14 @@
 #include "rest/server/json_rest_result.h"
 #include "core/resource_management/resource_pool.h"
 #include "recorder/storage_manager.h"
+#include <rest/server/rest_connection_processor.h>
 
-int QnAuditLogRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& contentBody, QByteArray& contentType, const QnRestConnectionProcessor*)
+int QnAuditLogRestHandler::executeGet(
+    const QString& path,
+    const QnRequestParamList& params,
+    QByteArray& contentBody,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
 
@@ -38,9 +44,9 @@ int QnAuditLogRestHandler::executeGet(const QString& path, const QnRequestParamL
     {
         if (record.isPlaybackType()) {
             QnLatin1Array playbackFlags;
-            for (const auto& id: record.resources) 
+            for (const auto& id: record.resources)
             {
-                QnResourcePtr res = resourcePool()->getResourceById(id);
+                QnResourcePtr res = owner->resourcePool()->getResourceById(id);
                 QnTimePeriod period;
                 period.startTimeMs = record.rangeStartSec * 1000ll;
                 period.durationMs = (record.rangeEndSec - record.rangeStartSec) * 1000ll;

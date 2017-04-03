@@ -39,7 +39,8 @@ const int kCacheExpirationInterval = 60 * 1000;
 
 const QString QnActiResourceSearcher::kSystemInfoProductionIdParamName("production id");
 
-QnActiResourceSearcher::QnActiResourceSearcher()
+QnActiResourceSearcher::QnActiResourceSearcher(QnCommonModule* commonModule):
+    base_type(commonModule)
 {
     QnMdnsListener::instance()->registerConsumer((std::uintptr_t) this);
     m_resTypeId = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));

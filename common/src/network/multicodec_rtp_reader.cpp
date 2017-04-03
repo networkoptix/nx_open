@@ -60,8 +60,6 @@ static Value defaultTransportToUse( RtpTransport::_auto );
 
 QnMulticodecRtpReader::QnMulticodecRtpReader(
     const QnResourcePtr& res,
-    int rtpFrameTimeoutMs,
-    int maxRtpRetryCount,
     std::unique_ptr<AbstractStreamSocket> tcpSock)
 :
     QnResourceConsumer(res),
@@ -73,9 +71,12 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_gotData(false),
     m_rtpStarted(false),
     m_prefferedAuthScheme(nx_http::header::AuthScheme::basic),
-    m_rtpFrameTimeoutMs(rtpFrameTimeoutMs),
-    m_maxRtpRetryCount(maxRtpRetryCount)
+    m_rtpFrameTimeoutMs(0),
+    m_maxRtpRetryCount(0)
 {
+    const auto& globalSettings = res->commonModule()->globalSettings();
+    m_rtpFrameTimeoutMs = globalSettings->rtpFrameTimeoutMs();
+    m_maxRtpRetryCount = globalSettings->maxRtpRetryCount();
 
     QnNetworkResourcePtr netRes = qSharedPointerDynamicCast<QnNetworkResource>(res);
     if (netRes)

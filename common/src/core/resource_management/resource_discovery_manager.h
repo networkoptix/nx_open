@@ -102,7 +102,7 @@ public:
 
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
-    QnResourceDiscoveryManager(QObject* parent = nullptr);
+    QnResourceDiscoveryManager(QObject* parent);
     ~QnResourceDiscoveryManager();
 
     // this function returns only new devices( not in all_devices list);

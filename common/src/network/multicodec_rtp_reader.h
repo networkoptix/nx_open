@@ -55,8 +55,6 @@ private:
 public:
     QnMulticodecRtpReader(
         const QnResourcePtr& res,
-        int rtpFrameTimeoutMs,
-        int maxRtpRetryCount,
         std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>() );
     virtual ~QnMulticodecRtpReader();
 

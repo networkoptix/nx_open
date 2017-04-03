@@ -27,16 +27,19 @@
 #include <api/global_settings.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
-
+#include <common/static_common_module.h>
+#include <common/common_module.h>
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(
+    QnCommonModule* commonModule,
     ec2::QnDistributedMutexManager* distributedMutexManager,
     QnUuid serverId)
-    :
+:
+    QnCommonModuleAware(commonModule),
     m_distributedMutexManager(distributedMutexManager),
     m_serverId(serverId)
 {
-    m_cameraDataHandler = new ec2::QnMutexCameraDataHandler();
+    m_cameraDataHandler = new ec2::QnMutexCameraDataHandler(commonModule);
     m_distributedMutexManager->setUserDataHandler(m_cameraDataHandler);
     readDefaultUserAttrs();
 }
@@ -63,7 +66,7 @@ void QnAppserverResourceProcessor::processResources(const QnResourceList &resour
         if (resourceData.contains(QString("ignoreMultisensors")))
             urlStr = urlStr.left(urlStr.indexOf('?'));
 
-        if (camera->isManuallyAdded() && !commonModule()->instance<QnResourceDiscoveryManager>()->containManualCamera(urlStr))
+        if (camera->isManuallyAdded() && !commonModule()->resourceDiscoveryManager()->containManualCamera(urlStr))
             continue; //race condition. manual camera just deleted
 
         QString uniqueId = camera->getUniqueId();
@@ -149,7 +152,7 @@ void QnAppserverResourceProcessor::readDefaultUserAttrs()
 
 ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
     const ec2::ApiCameraData& apiCameraData,
-    const ec2::ApiResourceParamDataList& properties)
+    const ec2::ApiResourceParamDataList& properties) const
 {
     QnResourcePtr existCamRes = resourcePool()->getResourceById(apiCameraData.id);
     if (existCamRes && existCamRes->getTypeId() != apiCameraData.typeId)
@@ -201,7 +204,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
     {
         QnCameraUserAttributesPtr userAttrCopy(new QnCameraUserAttributes(*m_defaultUserAttrs.data()));
         if (!userAttrCopy->scheduleDisabled) {
-            QnCamLicenseUsageHelper helper;
+            QnCamLicenseUsageHelper helper(commonModule());
             helper.propose(QnVirtualCameraResourceList() << cameraResource, true);
             if (!helper.isValid())
                 userAttrCopy->scheduleDisabled = true;
@@ -219,7 +222,7 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
         }
         QSet<QByteArray> modifiedFields;
         {
-            QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), userAttrCopy->cameraId );
+            QnCameraUserAttributePool::ScopedLock userAttributesLock(commonModule()->cameraUserAttributesPool(), userAttrCopy->cameraId );
             (*userAttributesLock)->assign( *userAttrCopy, &modifiedFields );
         }
         const QnResourcePtr& res = resourcePool()->getResourceById(userAttrCopy->cameraId);

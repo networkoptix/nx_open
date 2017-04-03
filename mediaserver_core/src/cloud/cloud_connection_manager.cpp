@@ -23,7 +23,8 @@ namespace {
 constexpr const auto kMaxEventConnectionStartRetryPeriod = std::chrono::minutes(1);
 }
 
-CloudConnectionManager::CloudConnectionManager():
+CloudConnectionManager::CloudConnectionManager(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
     m_cdbConnectionFactory(createConnectionFactory(), destroyConnectionFactory)
 {
     const auto cdbEndpoint = MSSettings::roSettings()->value(
@@ -33,11 +34,11 @@ CloudConnectionManager::CloudConnectionManager():
         m_cdbConnectionFactory->setCloudUrl(lm("http://%1").arg(cdbEndpoint).toStdString());
 
     Qn::directConnect(
-        qnGlobalSettings, &QnGlobalSettings::initialized,
+        globalSettings(), &QnGlobalSettings::initialized,
         this, &CloudConnectionManager::cloudSettingsChanged);
 
     Qn::directConnect(
-        qnGlobalSettings, &QnGlobalSettings::cloudCredentialsChanged,
+        globalSettings(), &QnGlobalSettings::cloudCredentialsChanged,
         this, &CloudConnectionManager::cloudSettingsChanged);
 }
 

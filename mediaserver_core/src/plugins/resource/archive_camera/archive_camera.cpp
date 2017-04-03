@@ -2,7 +2,8 @@
 
 const QString kArchiveCamName = QLatin1String("ARCHIVE_CAMERA");
 
-QnArchiveCamResourceSearcher::QnArchiveCamResourceSearcher()
+QnArchiveCamResourceSearcher::QnArchiveCamResourceSearcher(QnCommonModule* commonModule):
+    base_type(commonModule)
 {
     setDiscoveryMode(DiscoveryMode::disabled);
 }
@@ -33,17 +34,17 @@ QnArchiveCamResource::QnArchiveCamResource(const QnResourceParams &params)
     setVendor(params.vendor);
 }
 
-void QnArchiveCamResource::checkIfOnlineAsync(std::function<void(bool)> completionHandler) 
+void QnArchiveCamResource::checkIfOnlineAsync(std::function<void(bool)> completionHandler)
 {
     completionHandler(false);
 }
 
-QString QnArchiveCamResource::cameraName() 
+QString QnArchiveCamResource::cameraName()
 {
     return kArchiveCamName;
 }
 
-QString QnArchiveCamResource::getDriverName() const 
+QString QnArchiveCamResource::getDriverName() const
 {
     return kArchiveCamName;
 }
@@ -56,12 +57,12 @@ void QnArchiveCamResource::setMotionMaskPhysical(int /*channel*/)
 {
 }
 
-CameraDiagnostics::Result QnArchiveCamResource::initInternal() 
+CameraDiagnostics::Result QnArchiveCamResource::initInternal()
 {
     return CameraDiagnostics::BadMediaStreamResult();
 }
 
-QnAbstractStreamDataProvider* QnArchiveCamResource::createLiveDataProvider() 
+QnAbstractStreamDataProvider* QnArchiveCamResource::createLiveDataProvider()
 {
     return nullptr;
 }

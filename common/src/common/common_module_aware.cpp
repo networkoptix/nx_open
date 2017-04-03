@@ -118,3 +118,9 @@ QnResourceStatusDictionary* QnCommonModuleAware::statusDictionary() const
     NX_ASSERT(m_commonModule);
     return m_commonModule ? m_commonModule->statusDictionary() : nullptr;
 }
+
+QnGlobalSettings* QnCommonModuleAware::globalSettings() const
+{
+    NX_ASSERT(m_commonModule);
+    return m_commonModule ? m_commonModule->globalSettings() : nullptr;
+}

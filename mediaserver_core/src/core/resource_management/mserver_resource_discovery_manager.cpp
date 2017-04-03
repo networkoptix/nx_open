@@ -31,7 +31,8 @@
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
 
-QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
+QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnCommonModule* commonModule):
+    QnResourceDiscoveryManager(commonModule)
 {
     netStateTime.restart();
     connect(this, &QnMServerResourceDiscoveryManager::cameraDisconnected, qnBusinessRuleConnector, &QnBusinessEventConnector::at_cameraDisconnected);
@@ -224,7 +225,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     const ec2::ErrorCode errorCode = connect->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
                     if( errorCode != ec2::ErrorCode::ok )
                         NX_LOG( QString::fromLatin1("Discovery----: Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
-                    propertyDictionary->saveParams( existCamRes->getId() );
+                    existCamRes->saveParams();
                 }
             }
         }

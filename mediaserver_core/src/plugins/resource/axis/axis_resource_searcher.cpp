@@ -21,7 +21,8 @@ namespace
     const int kDefaultAxisTimeout = 4000;
 }
 
-QnPlAxisResourceSearcher::QnPlAxisResourceSearcher()
+QnPlAxisResourceSearcher::QnPlAxisResourceSearcher(QnCommonModule* commonModule):
+    base_type(commonModule)
 {
 }
 

@@ -21,9 +21,14 @@
 
 #include "streaming/streaming_params.h"
 #include <network/universal_request_processor.h>
-
+#include <common/common_module.h>
 
 static const qint64 USEC_PER_MS = 1000;
+
+QnAutoRequestForwarder::QnAutoRequestForwarder(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
+{
+}
 
 void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
 {
@@ -94,7 +99,7 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
                 if( virtualCameraRes )
                 {
                     QnMediaServerResourcePtr mediaServer =
-                        cameraHistoryPool()->getMediaServerOnTimeSync( virtualCameraRes, timestampMs );
+                        commonModule()->cameraHistoryPool()->getMediaServerOnTimeSync( virtualCameraRes, timestampMs );
                     if( mediaServer )
                         serverRes = mediaServer;
                 }

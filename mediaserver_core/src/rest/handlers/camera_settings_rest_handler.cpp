@@ -53,7 +53,10 @@ int QnCameraSettingsRestHandler::executeGet(
 
     QString notFoundCameraId = QString::null;
     auto camera = nx::camera_id_helper::findCameraByFlexibleIds(
-        &notFoundCameraId, params, {kCameraIdParam, kDeprecatedResIdParam});
+        owner->resourcePool(),
+        &notFoundCameraId,
+        params,
+        {kCameraIdParam, kDeprecatedResIdParam});
     if (!camera)
     {
         if (notFoundCameraId.isNull())
@@ -62,8 +65,13 @@ int QnCameraSettingsRestHandler::executeGet(
             return CODE_NOT_FOUND;
     }
 
-    if (!resourceAccessManager()->hasPermission(owner->accessRights(), camera, Qn::Permission::ReadPermission))
+    if (!owner->resourceAccessManager()->hasPermission(
+        owner->accessRights(),
+        camera,
+        Qn::Permission::ReadPermission))
+    {
         return nx_http::StatusCode::forbidden;
+    }
 
     // Clean params that are not keys.
     QnRequestParams locParams = params;
