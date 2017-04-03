@@ -1,6 +1,8 @@
 #include "delayed.h"
 
 #include <QtCore/QTimer>
+#include <QtCore/QThread>
+
 #include <nx/utils/log/assert.h>
 
 namespace
@@ -50,5 +52,13 @@ QTimer *executeDelayedParented(const Callback &callback
     , QObject *parent)
 {
     return executeDelayedImpl(callback, delayMs, nullptr, parent);
+}
+
+void executeInThread(QThread* thread, const Callback& callback)
+{
+    if (callback && QThread::currentThread() == thread)
+        callback();
+    else
+        executeDelayedImpl(callback, 0, thread, nullptr);
 }
 
