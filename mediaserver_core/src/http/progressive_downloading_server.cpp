@@ -650,6 +650,14 @@ void QnProgressiveDownloadingConsumer::run()
         auto camera = qnCameraPool->getVideoCamera(resource);
 
         bool isLive = position.isEmpty() || position == "now";
+		
+        if (!isLive && 
+            !qnResourceAccessManager->hasGlobalPermission(d->accessRights, Qn::GlobalViewArchivePermission))
+        {
+            sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
+            return;
+        }
+		
 
         QnProgressiveDownloadingDataConsumer dataConsumer(
             this,
