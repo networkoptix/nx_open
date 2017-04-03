@@ -31,7 +31,7 @@ std::unique_ptr<api::ClientToRelayConnection>
     result->setOnBeforeDestruction(
         std::bind(&CloudRelayFixtureBase::onClientToRelayConnectionDestroyed, this, result.get()));
     onClientToRelayConnectionInstanciated(result.get());
-    return result;
+    return std::move(result);
 }
 
 } // namespace test

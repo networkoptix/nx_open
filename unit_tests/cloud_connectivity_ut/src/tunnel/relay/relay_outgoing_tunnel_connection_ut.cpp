@@ -22,8 +22,8 @@ class CloudRelayOutgoingTunnelConnection:
 public:
     CloudRelayOutgoingTunnelConnection():
         m_clientToRelayConnectionCounter(0),
-        m_relayType(RelayType::happy),
         m_destroyTunnelConnectionOnConnectFailure(false),
+        m_relayType(RelayType::happy),
         m_connectTimeout(std::chrono::milliseconds::zero())
     {
     }
