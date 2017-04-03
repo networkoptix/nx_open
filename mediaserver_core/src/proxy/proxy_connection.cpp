@@ -54,7 +54,7 @@ QnProxyConnectionProcessor::QnProxyConnectionProcessor(
 {
     Q_D(QnProxyConnectionProcessor);
     d->owner = static_cast<QnUniversalTcpListener*>(owner);
-    d->connectTimeout = QnGlobalSettings::instance()->proxyConnectTimeout();
+    d->connectTimeout = qnGlobalSettings->proxyConnectTimeout();
     d->messageBus = messageBus;
 }
 
@@ -67,7 +67,7 @@ QnProxyConnectionProcessor::QnProxyConnectionProcessor(
 {
     Q_D(QnProxyConnectionProcessor);
     d->owner = static_cast<QnUniversalTcpListener*>(owner);
-    d->connectTimeout = QnGlobalSettings::instance()->proxyConnectTimeout();
+    d->connectTimeout = qnGlobalSettings->proxyConnectTimeout();
 }
 
 

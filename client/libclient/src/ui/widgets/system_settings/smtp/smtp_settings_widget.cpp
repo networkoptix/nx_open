@@ -74,7 +74,7 @@ void QnSmtpSettingsWidget::loadDataToUi() {
 
     finishTesting();
 
-    QnEmailSettings settings = QnGlobalSettings::instance()->emailSettings();
+    QnEmailSettings settings = qnGlobalSettings->emailSettings();
 
     m_simpleSettingsWidget->setSettings(QnSimpleSmtpSettings::fromSettings(settings));
     m_advancedSettingsWidget->setSettings(settings);
@@ -151,7 +151,7 @@ void QnSmtpSettingsWidget::at_testButton_clicked() {
 
 bool QnSmtpSettingsWidget::hasChanges() const  {
     QnEmailSettings local = settings();
-    QnEmailSettings remote = QnGlobalSettings::instance()->emailSettings();
+    QnEmailSettings remote = qnGlobalSettings->emailSettings();
 
     /* Do not notify about changes if no valid settings are provided. */
     if (!local.isValid() && !remote.isValid())

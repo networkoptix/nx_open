@@ -33,7 +33,7 @@ bool QnSystemSettingsHandler::updateSettings(
 {
     QnSystemSettingsReply reply;
     bool dirty = false;
-    const auto& settings = QnGlobalSettings::instance()->allSettings();
+    const auto& settings = qnGlobalSettings->allSettings();
 
     QnRequestParams filteredParams(params);
     filteredParams.remove("auth");
@@ -76,7 +76,7 @@ bool QnSystemSettingsHandler::updateSettings(
             reply.settings.insert(setting->key(), setting->serializedValue());
     }
     if (dirty)
-        QnGlobalSettings::instance()->synchronizeNow();
+        qnGlobalSettings->synchronizeNow();
 
     result.setReply(std::move(reply));
     return true;

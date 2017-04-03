@@ -105,7 +105,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
         &QnPropertyNotifier::valueChanged, this,
         &QnWorkbenchNotificationsHandler::at_settings_valueChanged);
 
-    connect(QnGlobalSettings::instance(), &QnGlobalSettings::emailSettingsChanged, this,
+    connect(qnGlobalSettings, &QnGlobalSettings::emailSettingsChanged, this,
         &QnWorkbenchNotificationsHandler::at_emailSettingsChanged);
 }
 
@@ -469,6 +469,6 @@ void QnWorkbenchNotificationsHandler::at_settings_valueChanged(int id)
 
 void QnWorkbenchNotificationsHandler::at_emailSettingsChanged()
 {
-    QnEmailSettings settings = QnGlobalSettings::instance()->emailSettings();
+    QnEmailSettings settings = qnGlobalSettings->emailSettings();
     setSystemHealthEventVisible(QnSystemHealth::SmtpIsNotSet, context()->user() && !settings.isValid());
 }

@@ -411,7 +411,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(
     /**
      * Save current system settings to the foreign system.
      */
-    const auto& settings = QnGlobalSettings::instance()->allSettings();
+    const auto& settings = qnGlobalSettings->allSettings();
     for (QnAbstractResourcePropertyAdaptor* setting : settings)
     {
         ec2::ApiResourceParamData param(setting->key(), setting->serializedValue());

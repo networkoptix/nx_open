@@ -56,7 +56,7 @@ QnAboutDialog::QnAboutDialog(QWidget *parent):
 
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QnAboutDialog::reject);
     connect(m_copyButton, &QPushButton::clicked, this, &QnAboutDialog::at_copyButton_clicked);
-    connect(QnGlobalSettings::instance(), &QnGlobalSettings::emailSettingsChanged, this, &QnAboutDialog::retranslateUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::emailSettingsChanged, this, &QnAboutDialog::retranslateUi);
     connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged, this, &QnAboutDialog::retranslateUi);
 
     retranslateUi();
@@ -163,7 +163,7 @@ void QnAboutDialog::retranslateUi()
     ui->gpuLabel->setText(gpu.join(lineSeparator));
     ui->serversLabel->setText(servers);
 
-    QString supportAddress = QnGlobalSettings::instance()->emailSettings().supportEmail;
+    QString supportAddress = qnGlobalSettings->emailSettings().supportEmail;
     QString supportLink = supportAddress;
     QnEmailAddress supportEmail(supportAddress);
 

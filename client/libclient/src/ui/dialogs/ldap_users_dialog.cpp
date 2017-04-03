@@ -51,7 +51,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
     ui->userRoleComboBox->setModel(m_rolesModel);
     ui->userRoleComboBox->setCurrentIndex(m_rolesModel->rowForRole(Qn::UserRole::LiveViewer)); // sensible default
 
-    const QnLdapSettings &settings = QnGlobalSettings::instance()->ldapSettings();
+    const QnLdapSettings &settings = qnGlobalSettings->ldapSettings();
 
     if (!settings.isValid()) {
         stopTesting(tr("The provided settings are not valid.") + lit("\n") + tr("Could not perform a test."));

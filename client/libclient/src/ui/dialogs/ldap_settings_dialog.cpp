@@ -55,7 +55,7 @@ QnLdapSettingsDialogPrivate::QnLdapSettingsDialogPrivate(QnLdapSettingsDialog *p
     , testHandle(kTestInvalidHandle)
     , timeoutTimer(new QTimer(parent))
 {
-    connect(QnGlobalSettings::instance(), &QnGlobalSettings::ldapSettingsChanged, this, &QnLdapSettingsDialogPrivate::updateFromSettings);
+    connect(qnGlobalSettings, &QnGlobalSettings::ldapSettingsChanged, this, &QnLdapSettingsDialogPrivate::updateFromSettings);
     connect(timeoutTimer, &QTimer::timeout, this, &QnLdapSettingsDialogPrivate::at_timeoutTimer_timeout);
 }
 
@@ -160,7 +160,7 @@ void QnLdapSettingsDialogPrivate::updateFromSettings() {
 
     stopTesting();
 
-    const QnLdapSettings &settings = QnGlobalSettings::instance()->ldapSettings();
+    const QnLdapSettings &settings = qnGlobalSettings->ldapSettings();
 
     QUrl url = settings.uri;
     if (url.port() == QnLdapSettings::defaultPort(url.scheme() == lit("ldaps")))

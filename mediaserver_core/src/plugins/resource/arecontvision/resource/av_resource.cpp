@@ -742,7 +742,7 @@ void QnPlAreconVisionResource::inputPortStateRequestDone(nx_http::AsyncHttpClien
 bool QnPlAreconVisionResource::isRTSPSupported() const
 {   
     auto resData = commonModule()->dataPool()->data(toSharedPointer(this));
-    auto arecontRtspIsAllowed = QnGlobalSettings::instance()->arecontRtspEnabled();
+    auto arecontRtspIsAllowed = qnGlobalSettings->arecontRtspEnabled();
     auto cameraSupportsH264 = isH264();
     auto cameraSupportsRtsp = resData.value<bool>(lit("isRTSPSupported"), true);
     auto rtspIsForcedOnCamera = resData.value<bool>(lit("forceRtspSupport"), false);

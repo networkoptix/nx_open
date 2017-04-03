@@ -249,7 +249,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMess
     }
 
     // apply remove settings
-    const auto& settings = QnGlobalSettings::instance()->allSettings();
+    const auto& settings = qnGlobalSettings->allSettings();
     for(const auto& foreignSetting: data.foreignSettings)
     {
         for(QnAbstractResourcePropertyAdaptor* setting: settings)

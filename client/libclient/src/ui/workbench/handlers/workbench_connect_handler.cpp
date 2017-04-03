@@ -975,7 +975,7 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force, bool isErrorRea
     }
 
     if (!force)
-        QnGlobalSettings::instance()->synchronizeNow();
+        qnGlobalSettings->synchronizeNow();
 
     if (isErrorReason && qnRuntime->isDesktopMode())
     {

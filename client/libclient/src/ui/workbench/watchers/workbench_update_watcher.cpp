@@ -100,7 +100,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
         return;
 
     /* Administrator disabled update notifications globally. */
-    if (!QnGlobalSettings::instance()->isUpdateNotificationsEnabled())
+    if (!qnGlobalSettings->isUpdateNotificationsEnabled())
         return;
 
     /* Do not show notifications near the end of the week or on our holidays. */
