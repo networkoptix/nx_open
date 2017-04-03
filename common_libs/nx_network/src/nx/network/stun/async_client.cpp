@@ -351,7 +351,7 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
         .str(remoteAddress()).arg(SystemError::toString(code)), cl_logDEBUG2);
 
     ConnectHandler connectCompletionHandler;
-    const auto executeOnConnectedHandlerGuard = makeScopedGuard(
+    const auto executeOnConnectedHandlerGuard = makeScopeGuard(
         [&connectCompletionHandler, code]()
         {
             if (connectCompletionHandler)

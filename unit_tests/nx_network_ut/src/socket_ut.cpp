@@ -23,7 +23,7 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/test_support/test_options.h>
 
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace network {
@@ -51,7 +51,7 @@ static void runCancelAsyncIOTest()
     auto& dnsResolver = SocketGlobals::addressResolver().dnsResolver();
     dnsResolver.addEtcHost(kTestHost, kTestAddresses);
 
-    auto onExit = makeScopedGuard([&]() { dnsResolver.removeEtcHost(kTestHost); });
+    auto onExit = makeScopeGuard([&]() { dnsResolver.removeEtcHost(kTestHost); });
 
     for (int i = 0; i < TEST_RUNS; ++i)
     {

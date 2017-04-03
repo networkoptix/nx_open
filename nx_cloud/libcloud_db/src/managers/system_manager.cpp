@@ -14,7 +14,7 @@
 #include <api/global_settings.h>
 #include <core/resource/param.h>
 #include <core/resource/user_resource.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 #include <utils/common/id.h>
 #include <utils/common/sync_call.h>
 
@@ -121,7 +121,7 @@ void SystemManager::authenticateByName(
     nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
     api::ResultCode result = api::ResultCode::notAuthorized;
-    auto scopedGuard = makeScopedGuard(
+    auto scopedGuard = makeScopeGuard(
         [&completionHandler, &result]() { completionHandler(result); });
 
     QnMutexLocker lk(&m_mutex);

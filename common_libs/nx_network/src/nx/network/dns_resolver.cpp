@@ -18,7 +18,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/time.h>
 
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace network {

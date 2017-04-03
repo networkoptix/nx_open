@@ -23,7 +23,7 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <common/common_globals.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 #include <utils/common/long_runnable.h>
 #include <utils/media/custom_output_stream.h>
 

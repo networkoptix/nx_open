@@ -12,7 +12,7 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 #include <utils/common/sync_call.h>
 
 #include <server/hole_punching_processor.h>
@@ -93,7 +93,7 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
 
         //requesting connect to the server
         nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
-        auto udpClientGuard = makeScopedGuard([&udpClient]() { udpClient.pleaseStopSync(); });
+        auto udpClientGuard = makeScopeGuard([&udpClient]() { udpClient.pleaseStopSync(); });
 
         nx::utils::promise<api::ResultCode> connectResultPromise;
 
@@ -213,7 +213,7 @@ TEST_F(FtHolePunchingProcessorServerFailure, server_failure)
 
         //requesting connect to the server 
         nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
-        auto udpClientGuard = makeScopedGuard([&udpClient]() { udpClient.pleaseStopSync(); });
+        auto udpClientGuard = makeScopeGuard([&udpClient]() { udpClient.pleaseStopSync(); });
 
         boost::optional<api::ResultCode> connectResult;
 
@@ -277,7 +277,7 @@ TEST_F(FtHolePunchingProcessor, destruction)
     for (int i = 0; i < 100; ++i)
     {
         nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
-        auto udpClientGuard = makeScopedGuard([&udpClient]() { udpClient.pleaseStopSync(); });
+        auto udpClientGuard = makeScopeGuard([&udpClient]() { udpClient.pleaseStopSync(); });
 
         api::ConnectRequest connectRequest;
         connectRequest.originatingPeerId = QnUuid::createUuid().toByteArray();
