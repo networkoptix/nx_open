@@ -19,6 +19,7 @@
 #include <utils/common/app_info.h>
 #include "rest/server/rest_connection_processor.h"
 #include <llutil/hardware_id.h>
+#include <licensing/license_validator.h>
 
 static const int TCP_TIMEOUT = 1000 * 5;
 
@@ -43,13 +44,17 @@ namespace
     const QString kKey = lit("key");
 }
 
-CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey, bool infoMode, QByteArray& response)
+CLHttpStatus QnActivateLicenseRestHandler::makeRequest(
+    QnCommonModule* commonModule,
+    const QString& licenseKey,
+    bool infoMode,
+    QByteArray& response)
 {
     // make check license request
     QUrl url(QN_LICENSE_URL);
     CLSimpleHTTPClient client(url.host(), url.port(80), TCP_TIMEOUT, QAuthenticator());
 
-    ec2::ApiRuntimeData runtimeData = runtimeInfoManager()->items()->getItem(commonModule()->moduleGUID()).data;
+    ec2::ApiRuntimeData runtimeData = commonModule->runtimeInfoManager()->items()->getItem(commonModule->moduleGUID()).data;
     QUrlQuery params;
     params.addQueryItem(kLicenseKey, licenseKey);
     params.addQueryItem(kBox, runtimeData.box);
@@ -73,7 +78,7 @@ CLHttpStatus QnActivateLicenseRestHandler::makeRequest(const QString& licenseKey
     QLocale locale;
     params.addQueryItem(kLang, QLocale::languageToString(locale.language()));
 
-    const QVector<QString> hardwareIds = licensePool()->hardwareIds();
+    const QVector<QString> hardwareIds = commonModule->licensePool()->hardwareIds();
     for (const QString& hwid: hardwareIds)
     {
         int version = LLUtil::hardwareIdVersion(hwid);
@@ -103,6 +108,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
 {
     ec2::ApiDetailedLicenseData reply;
 
+
     QString licenseKey = requestParams.value(kKey);
     if (licenseKey.isEmpty())
     {
@@ -120,7 +126,7 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
     {
         QByteArray response;
         bool isCheckMode = (i == 0);
-        CLHttpStatus errCode = makeRequest(licenseKey, isCheckMode, response);
+        CLHttpStatus errCode = makeRequest(owner->commonModule(), licenseKey, isCheckMode, response);
         if (errCode != CL_HTTP_SUCCESS || response.isEmpty())
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("Network error has occurred during license activation. Error code: %1").arg(errCode));
@@ -139,15 +145,18 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
         is.setCodec("UTF-8");
 
         license = QnLicense::readFromStream(is);
-        QnLicense::ErrorCode licenseErrCode;
-        if (!license->isValid(&licenseErrCode, QnLicense::VM_CheckInfo))
+        QnLicenseErrorCode licenseErrCode;
+        QnLicenseValidator validator(owner->commonModule());
+        if (!validator.isValid(license, QnLicenseValidator::VM_CheckInfo, &licenseErrCode))
         {
-            result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't activate license:  %1").arg(QnLicense::errorMessage(licenseErrCode)));
+            result.setError(
+                QnJsonRestResult::CantProcessRequest,
+                lit("Can't activate license:  %1").arg(QnLicenseValidator::errorMessage(licenseErrCode)));
             return CODE_OK;
         }
     }
 
-    ec2::AbstractECConnectionPtr connect = commonModule()->ec2Connection();
+    ec2::AbstractECConnectionPtr connect = owner->commonModule()->ec2Connection();
     QnLicenseList licenses;
     licenses << license;
     auto licenseManager = connect->getLicenseManager(owner->accessRights());
