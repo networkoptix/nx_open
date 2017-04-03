@@ -327,7 +327,7 @@ public:
                     const qreal totalProgress = totalProgressValue + storageProgress * totalProgressStep;
 
                     m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_PartialScan, scanData.storage->getUrl(), storageProgress, totalProgress));
-                    DeviceFileCatalog::ScanFilter filter;
+                    DeviceFileCatalog::ScanFilter filter(/*fullScan*/false);
                     filter.scanPeriod.startTimeMs = itr.value();
                     qint64 endScanTime = qnSyncTime->currentMSecsSinceEpoch();
                     qint64 scanPeriodDuration = qMax(1ll, endScanTime - filter.scanPeriod.startTimeMs);

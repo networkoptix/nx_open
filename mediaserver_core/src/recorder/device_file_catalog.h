@@ -187,10 +187,15 @@ public:
 
     struct ScanFilter
     {
-        ScanFilter() {}
-        ScanFilter(const QnTimePeriod& period): scanPeriod(period) {}
+        ScanFilter(bool isFullScan): isFullScan(isFullScan) {}
+        ScanFilter(const QnTimePeriod& period, bool isFullScan):
+            scanPeriod(period),
+            isFullScan(isFullScan)
+        {
+        }
 
         QnTimePeriod scanPeriod;
+        bool isFullScan;
 
         bool isEmpty() const { return scanPeriod.durationMs == 0; }
         bool intersects(const QnTimePeriod& period) const;
