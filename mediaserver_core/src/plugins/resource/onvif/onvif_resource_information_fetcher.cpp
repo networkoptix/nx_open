@@ -24,6 +24,7 @@
 #include <common/common_module.h>
 #include <plugins/resource/hikvision/hikvision_onvif_resource.h>
 #include <nx/utils/log/log.h>
+#include <common/static_common_module.h>
 
 using namespace nx::plugins::onvif;
 
@@ -125,7 +126,7 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
 
 bool OnvifResourceInformationFetcher::ignoreCamera(const QString& manufacturer, const QString& name)
 {
-    QnResourceData resourceData = commonModule()->dataPool()->data(manufacturer, name);
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacturer, name);
 
     if (resourceData.value<bool>(Qn::IGNORE_ONVIF_PARAM_NAME))
         return true;
@@ -286,7 +287,7 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
         return;
 
 
-    QnResourceData resourceData = commonModule()->dataPool()->data(res->getVendor(), res->getModel());
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(res->getVendor(), res->getModel());
     bool shouldAppearAsSingleChannel =
         resourceData.value<bool>(Qn::SHOULD_APPEAR_AS_SINGLE_CHANNEL_PARAM_NAME);
 
@@ -348,7 +349,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
     if (uniqId.isEmpty())
         return QnPlOnvifResourcePtr();
 
-    auto resData = commonModule()->dataPool()->data(manufacturer, model);
+    auto resData = qnStaticCommon->dataPool()->data(manufacturer, model);
     auto manufacturerAlias = resData.value<QString>(Qn::ONVIF_VENDOR_SUBTYPE);
 
     manufacturerAlias = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;

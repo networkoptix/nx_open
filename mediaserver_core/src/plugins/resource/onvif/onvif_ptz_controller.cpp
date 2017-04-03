@@ -11,6 +11,7 @@
 #include <onvif/soapPTZBindingProxy.h>
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <nx/utils/math/fuzzy.h>
+#include <common/static_common_module.h>
 
 #include "soap_wrapper.h"
 
@@ -47,7 +48,7 @@ static QString fromLatinStdString(const std::string& value)
 // -------------------------------------------------------------------------- //
 // QnOnvifPtzController
 // -------------------------------------------------------------------------- //
-QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource): 
+QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource):
     base_type(resource),
     m_resource(resource),
     m_capabilities(Qn::NoPtzCapabilities),
@@ -64,8 +65,8 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     SpeedLimits defaultLimits(-QnAbstractPtzController::MaxPtzSpeed, QnAbstractPtzController::MaxPtzSpeed);
     m_panSpeedLimits = m_tiltSpeedLimits = m_zoomSpeedLimits = m_focusSpeedLimits = defaultLimits;
 
-    QnResourceData data = commonModule()->dataPool()->data(resource);
-    m_stopBroken = commonModule()->dataPool()->data(resource).value<bool>(lit("onvifPtzStopBroken"), false);
+    QnResourceData data = qnStaticCommon->dataPool()->data(resource);
+    m_stopBroken = qnStaticCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzStopBroken"), false);
     bool absoluteMoveBroken = data.value<bool>(lit("onvifPtzAbsoluteMoveBroken"),   false);
     bool focusEnabled       = data.value<bool>(lit("onvifPtzFocusEnabled"),         false);
     bool presetsEnabled     = data.value<bool>(lit("onvifPtzPresetsEnabled"),       false);
@@ -131,10 +132,10 @@ Qn::PtzCapabilities QnOnvifPtzController::initMove() {
     if (ptz.doGetNode(nodeRequest, nodeResponse) != SOAP_OK)
         return Qn::NoPtzCapabilities;
 
-    if (!nodeResponse.PTZNode || !nodeResponse.PTZNode->SupportedPTZSpaces) 
+    if (!nodeResponse.PTZNode || !nodeResponse.PTZNode->SupportedPTZSpaces)
         return Qn::NoPtzCapabilities;
     onvifXsd__PTZSpaces *spaces = nodeResponse.PTZNode->SupportedPTZSpaces;
-        
+
     Qn::PtzCapabilities nodeCapabilities = Qn::NoPtzCapabilities;
     if(!spaces->ContinuousPanTiltVelocitySpace.empty() && spaces->ContinuousPanTiltVelocitySpace[0]) {
         if(spaces->ContinuousPanTiltVelocitySpace[0]->XRange) {
@@ -182,7 +183,7 @@ Qn::PtzCapabilities QnOnvifPtzController::initMove() {
         if(nodeCapabilities & Qn::AbsolutePtzCapabilities)
             result |= Qn::LimitsPtzCapability;
     }
-        
+
     return result;
 }
 
@@ -210,16 +211,16 @@ bool QnOnvifPtzController::readBuiltinPresets() {
     {
         if (!preset || !preset->token)
             return false;
-        
+
         QString id = QString::fromStdString(*preset->token);
         QString name = lit("Preset %1").arg(id);
 
         if (preset->Name)
             name = fromLatinStdString(*preset->Name);
-            
+
         m_presetNameByToken.insert(id, name);
     }
-    
+
     m_ptzPresetsReaded = true;
     return true;
 }
@@ -281,7 +282,7 @@ bool QnOnvifPtzController::stopInternal() {
         qnWarning("Execution of PTZ stop command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());
         return false;
     }
-    
+
     return true;
 }
 
@@ -339,7 +340,7 @@ bool QnOnvifPtzController::continuousFocus(qreal speed) {
 
     onvifXsd__ContinuousFocus onvifContinuousFocus;
     onvifContinuousFocus.Speed = normalizeSpeed(speed, m_focusSpeedLimits);
-    
+
     onvifXsd__FocusMove onvifFocus;
     onvifFocus.Continuous = &onvifContinuousFocus;
 

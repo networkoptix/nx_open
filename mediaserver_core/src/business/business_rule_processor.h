@@ -153,7 +153,6 @@ private slots:
 protected:
     bool containResource(const QnResourceList& resList, const QnUuid& resId) const;
     QnAbstractBusinessActionList matchActions(const QnAbstractBusinessEventPtr& bEvent);
-    //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
 
     /*
     * Some actions can be executed on server only. In this case, function returns server where action must be executed
@@ -175,7 +174,6 @@ protected:
     mutable QnMutex m_mutex;
 private:
     QList<QnBusinessEventRulePtr> m_rules;
-    //QnBusinessMessageBus m_messageBus;
     static QnBusinessRuleProcessor* m_instance;
 
     struct RunningRuleInfo

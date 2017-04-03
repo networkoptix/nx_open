@@ -4,6 +4,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <plugins/resource/onvif/dataprovider/rtp_stream_provider.h>
 #include <nx/utils/log/log.h>
+#include <common/static_common_module.h>
 
 const QString QnFlirEIPResource::MANUFACTURE(lit("FLIR"));
 
@@ -28,7 +29,7 @@ QnFlirEIPResource::~QnFlirEIPResource()
 }
 
 QByteArray QnFlirEIPResource::PASSTHROUGH_EPATH()
-{    
+{
     return MessageRouterRequest::buildEPath(
         FlirEIPClass::kPassThrough,
         0x01);
@@ -384,7 +385,7 @@ bool QnFlirEIPResource::getParamPhysical(const QString &id, QString &value)
 
     auto client = std::unique_ptr<SimpleEIPClient>(new SimpleEIPClient(getHostAddress()));
     if (!client->registerSession())
-        return false;    
+        return false;
 
     const auto response = client->doServiceRequest(eipRequest);
 
@@ -544,7 +545,7 @@ bool QnFlirEIPResource::findAlarmInputByTypeAndId(int id, const QString& type, Q
 void QnFlirEIPResource::initializeIO()
 {
     QnMutexLocker lock(&m_ioMutex);
-    auto resData = commonModule()->dataPool()->data(MANUFACTURE, getModel());
+    auto resData = qnStaticCommon->dataPool()->data(MANUFACTURE, getModel());
     auto portList = resData.value<QnIOPortDataList>(Qn::IO_SETTINGS_PARAM_NAME);
     auto alarmsCount = resData.value<int>(kAlarmsCountParamName);
 
@@ -565,7 +566,7 @@ void QnFlirEIPResource::initializeIO()
         {
             m_outputPorts.push_back(port);
         }
-    
+
     for (size_t i = 0; i < alarmsCount; i++)
         m_alarmStates.push_back(false);
 

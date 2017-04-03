@@ -8,7 +8,7 @@
 #include <utils/common/sleep.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_data_pool.h>
-
+#include <common/static_common_module.h>
 
 namespace
 {
@@ -68,7 +68,7 @@ CameraDiagnostics::Result MultisensorDataProvider::openStreamInternal(
 
     auto videoChannelMapping = getVideoChannelMapping();
 
-    auto resData = commonModule()->dataPool()->data(
+    auto resData = qnStaticCommon->dataPool()->data(
         m_resource.dynamicCast<QnSecurityCamResource>());
 
     bool doNotConfigureCamera = resData.value<bool>(
@@ -160,7 +160,7 @@ QList<QnResourceChannelMapping> MultisensorDataProvider::getVideoChannelMapping(
 {
     auto secRes = m_resource.dynamicCast<QnSecurityCamResource>();
 
-    auto resData = commonModule()->dataPool()->data(
+    auto resData = qnStaticCommon->dataPool()->data(
         secRes->getVendor(),
         secRes->getModel());
 

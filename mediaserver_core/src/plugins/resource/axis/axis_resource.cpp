@@ -27,6 +27,7 @@
 #include <core/resource_management/resource_data_pool.h>
 
 #include <motion/motion_detection.h>
+#include <common/static_common_module.h>
 
 using namespace std;
 
@@ -551,9 +552,9 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
         if (m_resolutions[SECONDARY_ENCODER_INDEX].size.isEmpty())
             m_resolutions[SECONDARY_ENCODER_INDEX] = getNearestResolution(QSize(480,316), 0.0); // try to get secondary resolution again (ignore aspect ratio)
     }
-    
+
     enableDuplexMode();
-    
+
     //root.Image.MotionDetection=no
     //root.Image.I0.TriggerData.MotionDetectionEnabled=yes
     //root.Image.I1.TriggerData.MotionDetectionEnabled=yes
@@ -1431,7 +1432,7 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
         QnUuid id = res->getId();
         QnConcurrent::run(
             QThreadPool::globalInstance(),
-            [id]()
+            [id, this]()
             {
                 if (auto res = resourcePool()->getResourceById<QnPlAxisResource>(id))
                     res->asyncUpdateIOSettings();
@@ -1521,7 +1522,7 @@ void QnPlAxisResource::fetchAndSetAdvancedParameters()
         return;
     }
 
-    auto resData = commonModule()->dataPool()->data(toSharedPointer(this));
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     auto overloads = resData.value<std::vector<QnCameraAdvancedParameterOverload>>(
                 Qn::ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME);
 

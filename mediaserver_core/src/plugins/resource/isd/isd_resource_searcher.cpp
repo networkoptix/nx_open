@@ -10,6 +10,7 @@
 #include "common/common_module.h"
 #include <utils/common/credentials.h>
 #include <plugins/resource/mdns/mdns_packet.h>
+#include <common/static_common_module.h>
 
 using nx::common::utils::Credentials;
 
@@ -92,7 +93,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
     else
     {
         QList<QnResourcePtr> resList;
-        auto resData = commonModule()->dataPool()->data(manufacture(), lit("*"));
+        auto resData = qnStaticCommon->dataPool()->data(manufacture(), lit("*"));
         auto possibleCreds = resData.value<DefaultCredentialsList>(
             Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
@@ -116,7 +117,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddr(
 
 QnResourceList QnPlISDResourceSearcher::findResources(void)
 {
-	
+
 	QnResourceList upnpResults;
     QnResourceList mdnsResults;
 
@@ -211,7 +212,7 @@ QList<QnResourcePtr> QnPlISDResourceSearcher::checkHostAddrInternal(
             return QList<QnResourcePtr>();
     }
 
-    QnResourceData resourceData = commonModule()->dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
 
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return QList<QnResourcePtr>();
@@ -268,7 +269,7 @@ bool QnPlISDResourceSearcher::isDwOrIsd(const QString &vendorName, const QString
     else if(vendorName.toLower().trimmed() == lit("digital watchdog") ||
         vendorName.toLower().trimmed() == lit("digitalwatchdog"))
     {
-        QnResourceData resourceData = commonModule()->dataPool()->data("DW", model);
+        QnResourceData resourceData = qnStaticCommon->dataPool()->data("DW", model);
         if (resourceData.value<bool>(Qn::DW_REBRANDED_TO_ISD_MODEL))
             return true;
     }
@@ -363,7 +364,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
             return QnResourcePtr();
     }
 
-    QnResourceData resourceData = commonModule()->dataPool()->data(manufacture(), name);
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), name);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return QnResourcePtr();
 
@@ -391,7 +392,7 @@ QnResourcePtr QnPlISDResourceSearcher::processMdnsResponse(
     }
     else
     {
-        auto resData = commonModule()->dataPool()->data(manufacture(), name);
+        auto resData = qnStaticCommon->dataPool()->data(manufacture(), name);
         auto possibleCreds = resData.value<DefaultCredentialsList>(
             Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
@@ -439,7 +440,7 @@ bool QnPlISDResourceSearcher::processPacket(
     }
     else
     {
-        auto resData = commonModule()->dataPool()->data(manufacture(), model);
+        auto resData = qnStaticCommon->dataPool()->data(manufacture(), model);
         auto possibleCreds = resData.value<DefaultCredentialsList>(
             Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
@@ -486,7 +487,7 @@ void QnPlISDResourceSearcher::createResource(
             return;
     }
 
-    QnResourceData resourceData = commonModule()->dataPool()->data(devInfo.manufacturer, devInfo.modelName);
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(devInfo.manufacturer, devInfo.modelName);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return;
 

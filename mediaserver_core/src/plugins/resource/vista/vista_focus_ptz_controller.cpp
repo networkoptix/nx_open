@@ -12,6 +12,7 @@
 #include <common/common_module.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <common/static_common_module.h>
 
 #include "vista_resource.h"
 
@@ -48,10 +49,10 @@ QnVistaFocusPtzController::~QnVistaFocusPtzController() {
 void QnVistaFocusPtzController::init() {
     QnIniSection config;
 
-    /* Note that there is no point locking a mutex here as this function is called 
+    /* Note that there is no point locking a mutex here as this function is called
      * only from the constructor. */
     if(!queryLocked(lit("config.txt"), &config)) {
-        qnWarning("Could not initialize VISTA PTZ for camera '%1'.", m_resource->getName());        
+        qnWarning("Could not initialize VISTA PTZ for camera '%1'.", m_resource->getName());
         return;
     }
 
@@ -75,7 +76,7 @@ void QnVistaFocusPtzController::init() {
     }
 
     if(options.contains(lit("PTZ"))) {
-        QnResourceData data = commonModule()->dataPool()->data(m_resource);
+        QnResourceData data = qnStaticCommon->dataPool()->data(m_resource);
         Qn::PtzCapabilities extraCaps = Qn::NoPtzCapabilities;
         data.value(Qn::PTZ_CAPABILITIES_PARAM_NAME, &extraCaps);
         if(extraCaps & Qn::ContinuousFocusCapability) {
@@ -113,7 +114,7 @@ bool QnVistaFocusPtzController::queryLocked(const QString &request, QByteArray *
 
     CLHttpStatus status = m_client->doGET(request.toLatin1());
     if(status == CL_TRANSPORT_ERROR) {
-        /* This happens when connection is aborted by the local host. 
+        /* This happens when connection is aborted by the local host.
          * Http client doesn't handle this case automatically, so we have to work it around. */
         m_client.reset();
         ensureClientLocked();
@@ -122,7 +123,7 @@ bool QnVistaFocusPtzController::queryLocked(const QString &request, QByteArray *
     }
     if(status != CL_HTTP_SUCCESS)
         return false;
-    
+
     if(body)
         m_client->readAll(*body);
     return true;

@@ -27,6 +27,7 @@
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
 #include "media_server/settings.h"
+#include <common/static_common_module.h>
 
 using nx::common::utils::Credentials;
 
@@ -410,7 +411,7 @@ QAuthenticator DeviceSoapWrapper::getDefaultPassword(const QString& manufacturer
 {
     QAuthenticator result;
 
-    QnResourceData resourceData = commonModule()->dataPool()->data(manufacturer, model);
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacturer, model);
     QString credentials = resourceData.value<QString>(lit("defaultCredentials"));
     QStringList parts = credentials.split(L':');
     if (parts.size() == 2) {
@@ -425,7 +426,7 @@ std::list<nx::common::utils::Credentials> DeviceSoapWrapper::getPossibleCredenti
     const QString& manufacturer,
     const QString& model) const
 {
-    QnResourceData resData = commonModule()->dataPool()->data(manufacturer, model);
+    QnResourceData resData = qnStaticCommon->dataPool()->data(manufacturer, model);
     auto credentials = resData.value<QList<nx::common::utils::Credentials>>(
         Qn::POSSIBLE_DEFAULT_CREDENTIALS_PARAM_NAME);
 
@@ -436,7 +437,7 @@ nx::common::utils::Credentials DeviceSoapWrapper::getForcedCredentials(
     const QString& manufacturer,
     const QString& model)
 {
-    QnResourceData resData = commonModule()->dataPool()->data(manufacturer, model);
+    QnResourceData resData = qnStaticCommon->dataPool()->data(manufacturer, model);
     auto credentials = resData.value<nx::common::utils::Credentials>(
         Qn::FORCED_DEFAULT_CREDENTIALS_PARAM_NAME);
 

@@ -18,6 +18,7 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
+#include <common/static_common_module.h>
 
 namespace {
 
@@ -226,7 +227,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         }
 
         OnvifResourceInformationFetcher fetcher;
-        auto resData = commonModule()->dataPool()->data(manufacturer, modelName);
+        auto resData = qnStaticCommon->dataPool()->data(manufacturer, modelName);
         auto manufacturerAlias = resData.value<QString>(Qn::ONVIF_VENDOR_SUBTYPE);
 
         manufacturer = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;
