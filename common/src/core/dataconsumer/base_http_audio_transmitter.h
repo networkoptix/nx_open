@@ -39,8 +39,8 @@ protected:
     virtual nx_http::StringType contentType() const = 0;  
 
     virtual void pleaseStop() override;
-
-protected: 
+    virtual void endOfRun() override;
+protected:
     bool sendBuffer(AbstractStreamSocket* socket, const char* buffer, size_t size);
     std::unique_ptr<AbstractStreamSocket> takeSocket(
         const nx_http::AsyncHttpClientPtr& httpClient) const;
