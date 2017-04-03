@@ -11,6 +11,7 @@
 #include "core/resource_management/resource_searcher.h"
 #include "utils/common/long_runnable.h"
 #include <nx/network/socket.h>
+#include "common/common_module_aware.h"
 
 
 namespace nx {
@@ -20,10 +21,10 @@ class UDPSocket;
 }   //nx
 struct QnCameraConflictList;
 
-class QnMServerResourceSearcher : public QnLongRunnable
+class QnMServerResourceSearcher: public QnLongRunnable, public QnCommonModuleAware
 {
 public:
-    QnMServerResourceSearcher();
+    QnMServerResourceSearcher(QnCommonModule* commonModule);
     virtual ~QnMServerResourceSearcher();
 
     static void initStaticInstance( QnMServerResourceSearcher* inst );
