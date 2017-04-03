@@ -137,7 +137,8 @@ void QnResourceDirectoryBrowser::findResources(const QString& directory, QnResou
     }
 }
 
-QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& filename)
+QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& filename,
+    QnResourcePool* resourcePool)
 {
     QnLayoutFileStorageResource layoutStorage;
     layoutStorage.setUrl(filename);
@@ -173,7 +174,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     }
 
     QnUuid layoutId = guidFromArbitraryData(filename);
-    QnLayoutResourcePtr existingLayout = resourcePool()->getResourceById<QnLayoutResource>(layoutId);
+    QnLayoutResourcePtr existingLayout = resourcePool->getResourceById<QnLayoutResource>(layoutId);
     if (existingLayout)
         return existingLayout;
     layout->setId(layoutId);
@@ -306,16 +307,18 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     return layout;
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::resourceFromFile(const QString &filename)
+QnResourcePtr QnResourceDirectoryBrowser::resourceFromFile(const QString &filename,
+    QnResourcePool* resourcePool)
 {
     QFile file(filename);
     if (!file.exists())
         return QnResourcePtr();
 
-    return createArchiveResource(filename);
+    return createArchiveResource(filename, resourcePool);
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& filename)
+QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& filename,
+    QnResourcePool* resourcePool)
 {
     if (QnAviDvdResource::isAcceptedUrl(filename))
         return QnResourcePtr(new QnAviDvdResource(filename));
@@ -335,7 +338,7 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& f
     }
 
     if (FileTypeSupport::isLayoutFileExt(filename))
-        return layoutFromFile(filename);
+        return layoutFromFile(filename, resourcePool);
 
     return QnResourcePtr();
 }
