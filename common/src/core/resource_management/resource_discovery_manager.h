@@ -1,5 +1,4 @@
-#ifndef QN_RESOURCE_DISCOVERY_MANAGER_H
-#define QN_RESOURCE_DISCOVERY_MANAGER_H
+#pragma once
 
 #include <memory> // for auto_ptr
 #include <atomic>
@@ -103,7 +102,7 @@ public:
 
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
-    QnResourceDiscoveryManager(QnCommonModule* commonModule);
+    QnResourceDiscoveryManager(QObject* parent = nullptr);
     ~QnResourceDiscoveryManager();
 
     // this function returns only new devices( not in all_devices list);
@@ -197,5 +196,3 @@ private:
 protected:
     int m_serverOfflineTimeout;
 };
-
-#endif //QN_RESOURCE_DISCOVERY_MANAGER_H

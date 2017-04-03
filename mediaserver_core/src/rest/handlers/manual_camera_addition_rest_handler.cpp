@@ -215,7 +215,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
         infoMap.insert(camera.url, info);
     }
 
-    int registered = QnResourceDiscoveryManager::instance()->registerManualCameras(infoMap);
+    int registered = commonModule()->instance<QnResourceDiscoveryManager>()->registerManualCameras(infoMap);
     if (registered > 0)
     {
         QnAuditRecord auditRecord =

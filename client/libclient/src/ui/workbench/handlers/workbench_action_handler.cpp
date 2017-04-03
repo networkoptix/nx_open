@@ -574,7 +574,7 @@ void ActionHandler::submitDelayedDrops() {
 
 void ActionHandler::submitInstantDrop() {
 
-    if (QnResourceDiscoveryManager::instance()->state() == QnResourceDiscoveryManager::InitialSearch) {
+    if (commonModule()->instance<QnResourceDiscoveryManager>()->state() == QnResourceDiscoveryManager::InitialSearch) {
         // local resources are not ready yet
         QTimer::singleShot(100, this, SLOT(submitInstantDrop()));
         return;

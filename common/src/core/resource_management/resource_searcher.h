@@ -124,9 +124,7 @@ public:
 class QnAbstractFileResourceSearcher : virtual public QnAbstractResourceSearcher // TODO: #Elric why virtual inheritance? -- because of rombic ThirdPartyResourceSearcher
 {
 protected:
-    QnAbstractFileResourceSearcher(QnCommonModule* commonModule):
-        QnAbstractResourceSearcher(commonModule)
-    {}
+    QnAbstractFileResourceSearcher(QnCommonModule* commonModule);
 
 public:
     QStringList getPathCheckList() const;

@@ -998,7 +998,7 @@ void initAppServerConnection(QSettings &settings)
 
     NX_LOG(lit("Connect to server %1").arg(appServerUrl.toString(QUrl::RemovePassword)), cl_logINFO);
     QnAppServerConnectionFactory::setUrl(appServerUrl);
-    QnAppServerConnectionFactory::setDefaultFactory(QnResourceDiscoveryManager::instance());
+    QnAppServerConnectionFactory::setDefaultFactory(commonModule()->instance<QnResourceDiscoveryManager>());
 }
 
 
@@ -1428,7 +1428,7 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
                     QnManualCameraInfo(QUrl(camera.url), QnNetworkResource::getResourceAuth(camera.id, camera.typeId), resType->getName()));
             }
         }
-        QnResourceDiscoveryManager::instance()->registerManualCameras(manualCameras);
+        commonModule()->instance<QnResourceDiscoveryManager>()->registerManualCameras(manualCameras);
     }
 
     {
@@ -2264,7 +2264,7 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnFileDeletor> fileDeletor( new QnFileDeletor() );
 
-    connect(QnResourceDiscoveryManager::instance(), &QnResourceDiscoveryManager::CameraIPConflict, this, &MediaServerProcess::at_cameraIPConflict);
+    connect(commonModule()->instance<QnResourceDiscoveryManager>(), &QnResourceDiscoveryManager::CameraIPConflict, this, &MediaServerProcess::at_cameraIPConflict);
     connect(qnNormalStorageMan, &QnStorageManager::noStoragesAvailable, this, &MediaServerProcess::at_storageManager_noStoragesAvailable);
     connect(qnNormalStorageMan, &QnStorageManager::storageFailure, this, &MediaServerProcess::at_storageManager_storageFailure);
     connect(qnNormalStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
@@ -2678,7 +2678,7 @@ void MediaServerProcess::run()
         m_mediaServer->getId()) );
     std::unique_ptr<QnRecordingManager> recordingManager(new QnRecordingManager(ec2ConnectionFactory->distributedMutex()));
     serverResourceProcessor->moveToThread( mserverResourceDiscoveryManager.get() );
-    QnResourceDiscoveryManager::instance()->setResourceProcessor(serverResourceProcessor.get());
+    commonModule()->instance<QnResourceDiscoveryManager>()->setResourceProcessor(serverResourceProcessor.get());
 
     std::unique_ptr<QnResourceStatusWatcher> statusWatcher( new QnResourceStatusWatcher());
 
@@ -2780,17 +2780,17 @@ void MediaServerProcess::run()
     std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager());
 
 
-    QnResourceDiscoveryManager::instance()->setReady(true);
+    commonModule()->instance<QnResourceDiscoveryManager>()->setReady(true);
     const bool isDiscoveryDisabled =
         MSSettings::roSettings()->value(QnServer::kNoResourceDiscovery, false).toBool();
     if( !ec2Connection->connectionInfo().ecDbReadOnly && !isDiscoveryDisabled)
-        QnResourceDiscoveryManager::instance()->start();
+        commonModule()->instance<QnResourceDiscoveryManager>()->start();
     //else
     //    we are not able to add cameras to DB anyway, so no sense to do discover
 
 
     connect(
-        QnResourceDiscoveryManager::instance(),
+        commonModule()->instance<QnResourceDiscoveryManager>(),
         &QnResourceDiscoveryManager::localInterfacesChanged,
         this,
         &MediaServerProcess::updateAddressesList);
@@ -2841,7 +2841,7 @@ void MediaServerProcess::run()
 
 
     disconnect(QnAuthHelper::instance(), 0, this, 0);
-    disconnect(QnResourceDiscoveryManager::instance(), 0, this, 0);
+    disconnect(commonModule()->instance<QnResourceDiscoveryManager>(), 0, this, 0);
     disconnect(qnNormalStorageMan, 0, this, 0);
     disconnect(qnBackupStorageMan, 0, this, 0);
     disconnect(commonModule(), 0, this, 0);
@@ -2869,7 +2869,7 @@ void MediaServerProcess::run()
     nx::utils::TimerManager::instance()->joinAndDeleteTimer( dumpSystemResourceUsageTaskID );
 
     m_ipDiscovery.reset(); // stop it before IO deinitialized
-    QnResourceDiscoveryManager::instance()->pleaseStop();
+    commonModule()->instance<QnResourceDiscoveryManager>()->pleaseStop();
     QnResource::pleaseStopAsyncTasks();
     multicastHttp.reset();
     stopObjects();
@@ -2891,7 +2891,7 @@ void MediaServerProcess::run()
     delete QnVideoCameraPool::instance();
     QnVideoCameraPool::initStaticInstance( NULL );
 
-    QnResourceDiscoveryManager::instance()->stop();
+    commonModule()->instance<QnResourceDiscoveryManager>()->stop();
     QnResource::stopAsyncTasks();
 
     //since mserverResourceDiscoveryManager instance is dead no events can be delivered to serverResourceProcessor: can delete it now

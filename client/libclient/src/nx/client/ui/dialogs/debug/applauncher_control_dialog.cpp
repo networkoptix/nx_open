@@ -1,7 +1,7 @@
 #include "applauncher_control_dialog.h"
 #include "ui_applauncher_control_dialog.h"
 
-#include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #include <utils/applauncher_utils.h>
 

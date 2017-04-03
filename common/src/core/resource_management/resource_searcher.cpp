@@ -66,6 +66,12 @@ bool QnAbstractResourceSearcher::isResourceTypeSupported(QnUuid resourceTypeId) 
 }
 
 
+QnAbstractFileResourceSearcher::QnAbstractFileResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule)
+{
+
+}
+
 // =============================================================================
 
 QStringList QnAbstractFileResourceSearcher::getPathCheckList() const

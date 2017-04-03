@@ -28,6 +28,7 @@
 #include "core/resource_management/resource_properties.h"
 #include "core/resource_management/status_dictionary.h"
 #include "core/resource_management/server_additional_addresses_dictionary.h"
+#include <core/resource_management/resource_discovery_manager.h>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -158,6 +159,9 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
 
     m_globalSettings = new QnGlobalSettings(this);
     m_cameraHistory = new QnCameraHistoryPool(this);
+
+    // Depends on resource pool and global settings.
+    instance<QnResourceDiscoveryManager>();
 
     /* Init members. */
     m_runUuid = QnUuid::createUuid();

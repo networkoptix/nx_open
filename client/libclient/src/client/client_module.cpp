@@ -223,14 +223,16 @@ void QnClientModule::initApplication()
 void QnClientModule::initDesktopCamera(QGLWidget* window)
 {
     /* Initialize desktop camera searcher. */
+    auto commonModule = m_clientCoreModule->commonModule();
     auto desktopSearcher = commonModule->store(new QnDesktopResourceSearcher(window));
     desktopSearcher->setLocal(true);
-    QnResourceDiscoveryManager::instance()->addDeviceServer(desktopSearcher);
+    commonModule->instance<QnResourceDiscoveryManager>()->addDeviceServer(desktopSearcher);
 }
 
 void QnClientModule::startLocalSearchers()
 {
-    QnResourceDiscoveryManager::instance()->start();
+    auto commonModule = m_clientCoreModule->commonModule();
+    commonModule->instance<QnResourceDiscoveryManager>()->start();
 }
 
 QnPtzControllerPool* QnClientModule::ptzControllerPool() const

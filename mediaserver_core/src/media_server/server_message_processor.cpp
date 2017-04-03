@@ -294,5 +294,5 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
 
 QnResourceFactory* QnServerMessageProcessor::getResourceFactory() const
 {
-    return QnResourceDiscoveryManager::instance();
+    return commonModule()->instance<QnResourceDiscoveryManager>();
 }

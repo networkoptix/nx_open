@@ -81,7 +81,7 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QObject* parent /
 #endif
 
     for (auto searcher : m_searchers)
-        QnResourceDiscoveryManager::instance()->addDeviceServer(searcher);
+        commonModule()->instance<QnResourceDiscoveryManager>()->addDeviceServer(searcher);
 }
 
 QnMediaServerResourceSearchers::~QnMediaServerResourceSearchers()

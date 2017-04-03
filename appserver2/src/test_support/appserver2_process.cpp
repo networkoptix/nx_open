@@ -115,12 +115,8 @@ class Appserver2MessageProcessor:
     public QnCommonMessageProcessor
 {
 public:
-    Appserver2MessageProcessor(
-        QObject *parent,
-        QnResourceDiscoveryManager* resourceDiscoveryManager)
-    :
+    Appserver2MessageProcessor(QObject* parent):
         QnCommonMessageProcessor(parent),
-        m_resourceDiscoveryManager(resourceDiscoveryManager),
         m_factory(new nx::TestResourceFactory())
     {
     }
@@ -147,7 +143,6 @@ protected:
 
 protected:
     std::unique_ptr<nx::TestResourceFactory> m_factory;
-    QnResourceDiscoveryManager* m_resourceDiscoveryManager;
 };
 
 Appserver2Process::Appserver2Process(int argc, char** argv)
@@ -199,8 +194,7 @@ int Appserver2Process::exec()
     QnResourceDiscoveryManager resourceDiscoveryManager(m_commonModule.get());
     // Starting receiving notifications.
     m_commonModule->setMessageProcessor(new Appserver2MessageProcessor(
-        m_commonModule.get(),
-        &resourceDiscoveryManager));
+        m_commonModule.get()));
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = m_commonModule->moduleGUID();

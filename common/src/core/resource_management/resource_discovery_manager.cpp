@@ -72,21 +72,23 @@ void QnResourceDiscoveryManagerTimeoutDelegate::onTimeout()
 
 // ------------------------------------ QnResourceDiscoveryManager -----------------------------
 
-QnResourceDiscoveryManager::QnResourceDiscoveryManager(QnCommonModule* commonModule)
+QnResourceDiscoveryManager::QnResourceDiscoveryManager(QObject* parent)
 :
-    base_type(),
-    QnCommonModuleAware(commonModule),
+    base_type(parent),
+    QnCommonModuleAware(parent),
     m_ready( false ),
     m_state( InitialSearch ),
     m_discoveryUpdateIdx(0),
     m_serverOfflineTimeout(20 * 1000)
 {
-    const auto& resPool = commonModule->resourcePool();
-
-    connect(resPool, &QnResourcePool::resourceRemoved, this, &QnResourceDiscoveryManager::at_resourceDeleted, Qt::DirectConnection);
-    connect(resPool, &QnResourcePool::resourceAdded, this, &QnResourceDiscoveryManager::at_resourceAdded, Qt::DirectConnection);
-    connect(commonModule->globalSettings(), &QnGlobalSettings::disabledVendorsChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
-    connect(commonModule->globalSettings(), &QnGlobalSettings::autoDiscoveryChanged, this, &QnResourceDiscoveryManager::updateSearchersUsage);
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+        &QnResourceDiscoveryManager::at_resourceDeleted, Qt::DirectConnection);
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
+        &QnResourceDiscoveryManager::at_resourceAdded, Qt::DirectConnection);
+    connect(commonModule()->globalSettings(), &QnGlobalSettings::disabledVendorsChanged, this,
+        &QnResourceDiscoveryManager::updateSearchersUsage);
+    connect(commonModule()->globalSettings(), &QnGlobalSettings::autoDiscoveryChanged, this,
+        &QnResourceDiscoveryManager::updateSearchersUsage);
 }
 
 QnResourceDiscoveryManager::~QnResourceDiscoveryManager()
