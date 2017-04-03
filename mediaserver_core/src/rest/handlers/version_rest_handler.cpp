@@ -14,7 +14,7 @@ int QnAppInfoRestHandler::executeGet(const QString& path, const QnRequestParamLi
     Q_UNUSED(params)
     Q_UNUSED(contentType)
 
-    result.append(QString("<root><engineVersion>%1</engineVersion><revision>%2</revision></root>\n").arg(commonModule()->engineVersion().toString()).arg(QCoreApplication::applicationVersion()).toUtf8());
+    result.append(QString("<root><engineVersion>%1</engineVersion><revision>%2</revision></root>\n").arg(qnStaticCommon->engineVersion().toString()).arg(QCoreApplication::applicationVersion()).toUtf8());
     return CODE_OK;
 }
 

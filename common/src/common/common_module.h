@@ -10,7 +10,6 @@
 
 #include <nx/utils/singleton.h>
 #include <utils/common/instance_storage.h>
-#include <utils/common/software_version.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
 #include "network/module_information.h"
@@ -196,9 +195,6 @@ public:
     void setCloudMode(bool value) { m_cloudMode = value; }
     bool isCloudMode() const { return m_cloudMode; }
 
-    QnSoftwareVersion engineVersion() const;
-    void setEngineVersion(const QnSoftwareVersion &version);
-
     void setModuleInformation(const QnModuleInformation& moduleInformation);
     QnModuleInformation moduleInformation();
 
@@ -207,7 +203,6 @@ public:
 
     inline void setAllowedPeers(const QSet<QnUuid> &peerList) { m_allowedPeers = peerList; }
     inline QSet<QnUuid> allowedPeers() const { return m_allowedPeers; }
-
 
     QDateTime startupTime() const;
 

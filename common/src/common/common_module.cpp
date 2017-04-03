@@ -124,8 +124,6 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
 {
     m_dirtyModuleInformation = true;
     m_cloudMode = false;
-    m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());
-
 
     m_sessionManager = new QnSessionManager(this);
 
@@ -215,17 +213,6 @@ QnMediaServerResourcePtr QnCommonModule::currentServer() const
     if (serverId.isNull())
         return QnMediaServerResourcePtr();
     return m_resourcePool->getResourceById(serverId).dynamicCast<QnMediaServerResource>();
-}
-
-QnSoftwareVersion QnCommonModule::engineVersion() const {
-    QnMutexLocker lk( &m_mutex );
-    return m_engineVersion;
-}
-
-void QnCommonModule::setEngineVersion(const QnSoftwareVersion &version)
-{
-    QnMutexLocker lk( &m_mutex );
-    m_engineVersion = version;
 }
 
 void QnCommonModule::setReadOnly(bool value)

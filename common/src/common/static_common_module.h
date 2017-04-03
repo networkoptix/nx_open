@@ -4,11 +4,14 @@
 #include <QtCore/QUrl>
 #include <QtCore/QDateTime>
 
+#include <common/common_globals.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/singleton.h>
+
 #include <utils/common/instance_storage.h>
-#include "common_globals.h"
+#include <utils/common/software_version.h>
 
 class QnResourceDataPool;
 
@@ -38,6 +41,9 @@ public:
     QString brand() const;
     QString customization() const;
 
+    QnSoftwareVersion engineVersion() const;
+    void setEngineVersion(const QnSoftwareVersion &version);
+
     QnResourceDataPool *dataPool() const;
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
@@ -45,6 +51,7 @@ private:
     const Qn::PeerType m_localPeerType;
     const QString m_brand;
     const QString m_customization;
+    QnSoftwareVersion m_engineVersion;
 
     QnResourceDataPool *m_dataPool = nullptr;
 };

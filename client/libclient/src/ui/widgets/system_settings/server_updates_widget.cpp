@@ -272,7 +272,7 @@ void QnServerUpdatesWidget::initDropdownActions()
                 return;
 
             setMode(Mode::SpecificBuild);
-            QnSoftwareVersion version = commonModule()->engineVersion();
+            QnSoftwareVersion version = qnStaticCommon->engineVersion();
             m_targetVersion = QnSoftwareVersion(version.major(), version.minor(), version.bugfix(), dialog.buildNumber());
             m_localFileName = QString();
             m_updatesModel->setLatestVersion(m_targetVersion);
@@ -845,7 +845,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult& result)
         {
             case QnUpdateResult::Successful:
             {
-                const bool clientUpdated = (result.targetVersion != commonModule()->engineVersion());
+                const bool clientUpdated = (result.targetVersion != qnStaticCommon->engineVersion());
                 if (clientUpdated)
                 {
                     if (result.clientInstallerRequired)

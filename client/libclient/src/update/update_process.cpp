@@ -146,7 +146,7 @@ void QnUpdateProcess::downloadUpdates() {
         }
     }
 
-    if (commonModule()->engineVersion() != m_target.version && !m_clientRequiresInstaller) {
+    if (qnStaticCommon->engineVersion() != m_target.version && !m_clientRequiresInstaller) {
         QString fileName = m_clientUpdateFile->fileName;
         if (fileName.isEmpty())
             fileName = updateFilePath(m_clientUpdateFile->baseFileName);
@@ -352,7 +352,7 @@ void QnUpdateProcess::installClientUpdate()
     if (m_clientRequiresInstaller
         || m_target.denyClientUpdates
         || qnSettings->isClientUpdateDisabled()
-        || m_clientUpdateFile->version == commonModule()->engineVersion())
+        || m_clientUpdateFile->version == qnStaticCommon->engineVersion())
     {
             NX_LOG(lit("Update: QnUpdateProcess: Client update skipped."), cl_logDEBUG1);
             checkFreeSpace();

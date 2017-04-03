@@ -92,7 +92,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnUpdateInfo &in
         return;
 
     /* Current version is greater or equal to latest. */
-    if (commonModule()->engineVersion() >= info.currentRelease)
+    if (qnStaticCommon->engineVersion() >= info.currentRelease)
         return;
 
     /* User is not interested in this update. */
@@ -136,7 +136,7 @@ void QnWorkbenchUpdateWatcher::showUpdateNotification(const QnUpdateInfo &info)
 {
     m_notifiedVersion = info.currentRelease;
 
-    const QnSoftwareVersion current = commonModule()->engineVersion();
+    const QnSoftwareVersion current = qnStaticCommon->engineVersion();
     const bool majorVersionChange = ((info.currentRelease.major() > current.major())
         || (info.currentRelease.minor() > current.minor()));
 

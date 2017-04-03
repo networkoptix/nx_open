@@ -19,7 +19,8 @@ QnStaticCommonModule::QnStaticCommonModule(
     QObject(parent),
     m_localPeerType(localPeerType),
     m_brand(brand),
-    m_customization(customization)
+    m_customization(customization),
+    m_engineVersion(QnAppInfo::engineVersion())
 {
     Q_INIT_RESOURCE(common);
     QnCommonMetaTypes::initialize();
@@ -61,6 +62,16 @@ QString QnStaticCommonModule::brand() const
 QString QnStaticCommonModule::customization() const
 {
     return m_customization;
+}
+
+QnSoftwareVersion QnStaticCommonModule::engineVersion() const
+{
+    return m_engineVersion;
+}
+
+void QnStaticCommonModule::setEngineVersion(const QnSoftwareVersion &version)
+{
+    m_engineVersion = version;
 }
 
 QnResourceDataPool * QnStaticCommonModule::dataPool() const

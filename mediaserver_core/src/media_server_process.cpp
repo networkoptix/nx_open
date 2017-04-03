@@ -2138,7 +2138,7 @@ void MediaServerProcess::run()
     if (!m_cmdLineArguments.engineVersion.isNull())
     {
         qWarning() << "Starting with overridden version: " << m_cmdLineArguments.engineVersion;
-        commonModule()->setEngineVersion(QnSoftwareVersion(m_cmdLineArguments.engineVersion));
+        qnStaticCommon->setEngineVersion(QnSoftwareVersion(m_cmdLineArguments.engineVersion));
     }
 
     QnCallCountStart(std::chrono::milliseconds(5000));
@@ -2542,7 +2542,7 @@ void MediaServerProcess::run()
 
         // used for statistics reported
         server->setSystemInfo(QnSystemInformation::currentSystemInformation());
-        server->setVersion(commonModule()->engineVersion());
+        server->setVersion(qnStaticCommon->engineVersion());
 
         QByteArray settingsAuthKey = nx::ServerSetting::getAuthKey();
         QByteArray authKey = settingsAuthKey;
@@ -2626,7 +2626,7 @@ void MediaServerProcess::run()
 
     selfInformation.brand = compatibilityMode ? QString() : QnAppInfo::productNameShort();
     selfInformation.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
-    selfInformation.version = commonModule()->engineVersion();
+    selfInformation.version = qnStaticCommon->engineVersion();
     selfInformation.sslAllowed = sslAllowed;
     selfInformation.runtimeId = commonModule()->runningInstanceGUID();
     selfInformation.serverFlags = m_mediaServer->getServerFlags();

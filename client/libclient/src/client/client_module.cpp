@@ -344,7 +344,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
         if (!version.isNull())
         {
             qWarning() << "Starting with overridden version: " << version.toString();
-            m_clientCoreModule->commonModule()->setEngineVersion(version);
+            qnStaticCommon->setEngineVersion(version);
         }
     }
 

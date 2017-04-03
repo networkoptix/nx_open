@@ -176,7 +176,7 @@ QnCheckForUpdateResult::Value QnCheckForUpdatesPeerTask::checkUpdateCoverage()
 
     if (!m_target.denyClientUpdates && !m_clientRequiresInstaller)
     {
-        bool updateClient = isUpdateNeed(commonModule()->engineVersion(), m_target.version);
+        bool updateClient = isUpdateNeed(qnStaticCommon->engineVersion(), m_target.version);
 
         if (updateClient && !m_clientUpdateFile)
         {
@@ -320,8 +320,8 @@ void QnCheckForUpdatesPeerTask::at_updateReply_finished(QnAsyncHttpClientReply* 
     }
 
     QString currentRelease = customizationInfo.current_release;
-    if (QnSoftwareVersion(currentRelease) < commonModule()->engineVersion())
-        currentRelease = commonModule()->engineVersion().toString(QnSoftwareVersion::MinorFormat);
+    if (QnSoftwareVersion(currentRelease) < qnStaticCommon->engineVersion())
+        currentRelease = qnStaticCommon->engineVersion().toString(QnSoftwareVersion::MinorFormat);
 
     const auto latestVersion = customizationInfo.releases[currentRelease];
     const QString updatesPrefix = customizationInfo.updates_prefix;

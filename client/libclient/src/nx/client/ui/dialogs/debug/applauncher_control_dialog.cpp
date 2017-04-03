@@ -24,7 +24,7 @@ QnApplauncherControlDialog::QnApplauncherControlDialog(QWidget* parent):
         {
             QnSoftwareVersion v(ui->checkVersionlineEdit->text());
             if (v.isNull())
-                v = commonModule()->engineVersion();
+                v = qnStaticCommon->engineVersion();
 
             bool isInstalled = false;
             auto errCode = isVersionInstalled(v, &isInstalled);

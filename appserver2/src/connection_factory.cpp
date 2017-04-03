@@ -1633,7 +1633,7 @@ ErrorCode Ec2DirectConnectionFactory::fillConnectionInfo(
     QnConnectionInfo* const connectionInfo,
     nx_http::Response* response)
 {
-    connectionInfo->version = commonModule()->engineVersion();
+    connectionInfo->version = qnStaticCommon->engineVersion();
     connectionInfo->brand = qnStaticCommon->brand();
     connectionInfo->customization = qnStaticCommon->customization();
     connectionInfo->systemName = commonModule()->globalSettings()->systemName();

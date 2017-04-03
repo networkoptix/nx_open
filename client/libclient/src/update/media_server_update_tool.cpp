@@ -29,7 +29,7 @@ namespace {
 
     QnSoftwareVersion getCurrentVersion()
     {
-        QnSoftwareVersion minimalVersion = commonModule()->engineVersion();
+        QnSoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
         const auto allServers = resourcePool()->getAllServers(Qn::AnyStatus);
         for(const QnMediaServerResourcePtr &server: allServers)
         {
