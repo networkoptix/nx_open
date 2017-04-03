@@ -110,8 +110,9 @@ public:
 QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
     void* sslContext,
-    QnDesktopResource* desktop):
-  QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(), socket)
+    QnDesktopResource* desktop)
+    :
+    QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(), socket, desktop)
 {
     Q_UNUSED(sslContext)
     Q_D(QnDesktopCameraConnectionProcessor);

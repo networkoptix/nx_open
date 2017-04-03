@@ -2,13 +2,15 @@
 
 #include <map>
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource/resource.h>
 
 #include <nx/streaming/abstract_archive_resource.h>
 #include <core/resource/resource_fwd.h>
 #include <plugins/resource/desktop_camera/desktop_camera_connection.h>
 
-class QnDesktopResource: public QnAbstractArchiveResource
+class QnDesktopResource: public QnAbstractArchiveResource, public QnConnectionContextAware
 {
     Q_OBJECT;
 

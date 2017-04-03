@@ -31,25 +31,26 @@
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
-    QnTcpListener* owner)
+    QObject* parent)
 :
+    QnCommonModuleAware(parent),
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
-    d->owner = owner;
     d->chunkedMode = false;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTCPConnectionProcessorPrivate* dptr,
     QSharedPointer<AbstractStreamSocket> socket,
-    QnTcpListener* owner):
+    QObject* parent)
+    :
+    QnCommonModuleAware(parent),
     d_ptr(dptr)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
-    d->owner = owner;
     d->chunkedMode = false;
 }
 
@@ -539,7 +540,7 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
         result.fromByteArray(existSession);
         return result;
     }
-    if (const auto& userRes = d->owner->commonModule()->resourcePool()->getResourceById(d->accessRights.userId))
+    if (const auto& userRes = commonModule()->resourcePool()->getResourceById(d->accessRights.userId))
         result.userName = userRes->getName();
     else if (!nx_http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
         result.userName = lit("Video wall");
@@ -589,7 +590,7 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx_http::StatusCode::Val
         d->response.messageBody = messageBody;
     }
     if (nx_http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).isEmpty())
-        d->response.headers.insert(nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, d->owner->commonModule()->moduleGUID().toByteArray()));
+        d->response.headers.insert(nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, commonModule()->moduleGUID().toByteArray()));
 
     auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
     QByteArray contentEncoding;

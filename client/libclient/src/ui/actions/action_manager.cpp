@@ -481,6 +481,7 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::ResourceTarget | Qn::SingleTarget | Qn::MultiTarget).
         requiredTargetPermissions(Qn::RemovePermission).
         text(QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Move Devices"),
             tr("Move Cameras")
         )).
@@ -1020,6 +1021,7 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         requiredGlobalPermission(Qn::GlobalAdminPermission).
         text(QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Devices List"),
             tr("Cameras List")
         )).
@@ -1619,6 +1621,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(QnActions::CameraListByServerAction).
         flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget | Qn::LayoutItemTarget).
         text(QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Devices List by Server..."),
             tr("Cameras List by Server...")
         )).

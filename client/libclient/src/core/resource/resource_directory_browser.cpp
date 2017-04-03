@@ -257,8 +257,9 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
         if (timeZoneOffset != Qn::InvalidUtcOffset)
             aviResource->setTimeZoneOffset(timeZoneOffset);
 
-        resourcePool()->addResource(aviResource);
-        aviResource = resourcePool()->getResourceByUniqueId<QnAviResource>(aviResource->getUniqueId()); // It may have already been in the pool!
+        auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+        resourcePool->addResource(aviResource);
+        aviResource = resourcePool->getResourceByUniqueId<QnAviResource>(aviResource->getUniqueId()); // It may have already been in the pool!
         if (!aviResource)
         {
             qnWarning("ACHTUNG! Total mess up in exported layout loading!");

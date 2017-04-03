@@ -67,18 +67,11 @@ QnRestConnectionProcessor::QnRestConnectionProcessor(QSharedPointer<AbstractStre
     QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket, _owner),
     m_noAuth(false)
 {
-    Q_D(QnRestConnectionProcessor);
 }
 
 QnRestConnectionProcessor::~QnRestConnectionProcessor()
 {
     stop();
-}
-
-QnTcpListener* QnRestConnectionProcessor::owner() const
-{
-    Q_D(const QnRestConnectionProcessor);
-    return d->owner;
 }
 
 void QnRestConnectionProcessor::run()
@@ -106,14 +99,13 @@ void QnRestConnectionProcessor::run()
     {
         if (!m_noAuth && d->accessRights != Qn::kSystemAccess)
         {
-            const auto& commonModule = d->owner->commonModule();
-            QnUserResourcePtr user = commonModule->resourcePool()->getResourceById<QnUserResource>(d->accessRights.userId);
+            QnUserResourcePtr user = resourcePool()->getResourceById<QnUserResource>(d->accessRights.userId);
             if (!user)
             {
                 sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
                 return;
             }
-            if (!commonModule->resourceAccessManager()->hasGlobalPermission(user, handler->permissions()))
+            if (!resourceAccessManager()->hasGlobalPermission(user, handler->permissions()))
             {
                 sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
                 return;
