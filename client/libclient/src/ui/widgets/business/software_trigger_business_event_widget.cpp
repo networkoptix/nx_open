@@ -1,6 +1,7 @@
 #include "software_trigger_business_event_widget.h"
 #include "ui_software_trigger_business_event_widget.h"
 
+#include <QtCore/QtMath>
 #include <QtCore/QScopedValueRollback>
 
 #include <business/business_strings_helper.h>

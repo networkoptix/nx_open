@@ -332,7 +332,10 @@ void QnGenericTabbedDialog::buttonBoxClicked(QDialogButtonBox::StandardButton bu
     {
     case QDialogButtonBox::Apply:
         if (canApplyChanges() && hasChanges())
+        {
             applyChanges();
+            updateButtonBox();
+        }
         break;
     default:
         break;

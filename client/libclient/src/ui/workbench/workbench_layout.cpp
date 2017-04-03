@@ -2,6 +2,8 @@
 
 #include <limits>
 
+#include <QtWidgets/QGraphicsWidget>
+
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
@@ -49,12 +51,21 @@ QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObjec
     if(resource.isNull())
         return;
 
+    m_icon = resource->data(Qn::LayoutIconRole).value<QIcon>();
     QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(this, resource, this);
     synchronizer->setAutoDeleting(true);
     synchronizer->update();
+
+    connect(this, &QnWorkbenchLayout::dataChanged, this,
+        [this](int role)
+        {
+            if (role == Qn::LayoutIconRole)
+                emit iconChanged();
+        });
 }
 
-QnWorkbenchLayout::~QnWorkbenchLayout() {
+QnWorkbenchLayout::~QnWorkbenchLayout()
+{
     bool signalsBlocked = blockSignals(false);
     emit aboutToBeDestroyed();
     blockSignals(signalsBlocked);
@@ -72,12 +83,6 @@ QIcon QnWorkbenchLayout::icon() const
     return m_icon;
 }
 
-void QnWorkbenchLayout::setIcon(const QIcon& value)
-{
-    m_icon = value;
-    emit iconChanged();
-}
-
 void QnWorkbenchLayout::setFlags(QnLayoutFlags value)
 {
     if (m_flags == value)
@@ -85,20 +90,6 @@ void QnWorkbenchLayout::setFlags(QnLayoutFlags value)
 
     m_flags = value;
     emit flagsChanged();
-}
-
-NxUi::AbstractWorkbenchPanel* QnWorkbenchLayout::panel() const
-{
-    return m_panel;
-}
-
-void QnWorkbenchLayout::setPanel(NxUi::AbstractWorkbenchPanel* value)
-{
-    if (m_panel == value)
-        return;
-
-    m_panel = value;
-    emit panelChanged();
 }
 
 QnLayoutResourcePtr QnWorkbenchLayout::resource() const {

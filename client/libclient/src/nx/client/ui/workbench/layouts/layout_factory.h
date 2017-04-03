@@ -6,13 +6,14 @@
 #include <common/common_globals.h>
 #include <nx/utils/singleton.h>
 
+class QnWorkbench;
 class QnWorkbenchLayout;
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace workbench {
-namespace layouts {
 
 class LayoutsFactory:
     public QObject,
@@ -24,6 +25,8 @@ class LayoutsFactory:
 public:
     using LayoutCreator =
         std::function<QnWorkbenchLayout* (const QnLayoutResourcePtr& resource, QObject* parent)>;
+
+    static LayoutsFactory* instance(QnWorkbench* workbench);
 
     LayoutsFactory(QObject* parent = nullptr);
 
@@ -45,10 +48,11 @@ private:
     CreatorsList m_creators;
 };
 
-} // namespace layouts
 } // namespace workbench
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx
 
-#define qnLayoutFactory nx::client::ui::workbench::layouts::LayoutsFactory::instance()
+#define qnWorkbenchLayoutsFactory \
+    nx::client::desktop::ui::workbench::LayoutsFactory::instance(workbench())

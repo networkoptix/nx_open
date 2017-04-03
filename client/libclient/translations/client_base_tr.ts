@@ -6009,7 +6009,7 @@ to %1</source>
     <name>QnStorageUrlDialog</name>
     <message>
         <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-        <translation>&lt;Computer Name&gt;&lt;Folder&gt;</translation>
+        <translation>\\&lt;Computer adı&gt;\&lt;Klasör&gt;</translation>
     </message>
     <message>
         <source>Network Shared Resource</source>

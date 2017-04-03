@@ -5,6 +5,7 @@
 #include <boost/optional.hpp>
 
 #include <nx/network/abstract_socket.h>
+#include <nx/network/async_stoppable.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
@@ -12,8 +13,8 @@
 #include <nx/utils/test_support/sync_queue.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/test_support/utils.h>
+#include <nx/utils/thread/barrier_handler.h>
 #include <utils/common/guard.h>
-#include <utils/common/stoppable.h>
 #include <utils/common/systemerror.h>
 
 namespace nx {

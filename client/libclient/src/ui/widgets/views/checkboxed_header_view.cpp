@@ -1,5 +1,7 @@
 #include "checkboxed_header_view.h"
 
+#include <QtGui/QMouseEvent>
+
 #include <ui/style/helper.h>
 #include <utils/common/scoped_painter_rollback.h>
 

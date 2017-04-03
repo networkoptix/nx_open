@@ -1,5 +1,7 @@
 ﻿#include "resource_item_delegate.h"
 
+#include <QtCore/QtMath>
+
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QApplication>
 

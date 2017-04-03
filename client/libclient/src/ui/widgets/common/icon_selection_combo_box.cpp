@@ -1,5 +1,7 @@
 #include "icon_selection_combo_box.h"
 
+#include <QtCore/QtMath>
+
 #include <QtGui/QStandardItemModel>
 
 #include <QtWidgets/QListView>

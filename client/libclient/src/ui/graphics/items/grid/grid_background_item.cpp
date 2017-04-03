@@ -73,7 +73,7 @@ struct BackgroundImageData
 {
     QString fileName;
     QSize size = kDefaultImageSize;
-    qreal opacity = 0.7;
+    qreal opacity = 1;
     Qn::ImageBehaviour mode = Qn::ImageBehaviour::Stretch;
     bool isLocal = true;
 
@@ -275,7 +275,7 @@ void QnGridBackgroundItem::updateDisplay()
 
     if (d->backgroundType == BackgroundType::Special)
     {
-        setOpacity(1.0);
+        setOpacity(d->imageData.opacity);
         updateGeometry();
         return;
     }
@@ -361,7 +361,6 @@ void QnGridBackgroundItem::update(const QnLayoutResourcePtr& layout)
             return BackgroundImageData();
         }();
 
-    setOpacity(d->imageData.opacity);
     if (d->backgroundType == type && d->imageData == data)
         return;
 
@@ -551,7 +550,7 @@ void QnGridBackgroundItem::paint(
 
     if (d->backgroundType == BackgroundType::Special)
     {
-        painter->setBrush(Qt::gray);
+        painter->setBrush(Qt::red);
         painter->drawRect(display()->boundedViewportGeometry());
         return;
     }

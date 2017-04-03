@@ -1,5 +1,7 @@
 #include "notifications_workbench_panel.h"
 
+#include <QtCore/QTimer>
+
 #include <QtWidgets/QAction>
 
 #include <nx/client/ui/workbench/workbench_animations.h>
@@ -136,7 +138,7 @@ bool NotificationsWorkbenchPanel::isOpened() const
 
 void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
 {
-    using namespace nx::client::ui::workbench;
+    using namespace nx::client::desktop::ui::workbench;
 
     ensureAnimationAllowed(&animate);
 

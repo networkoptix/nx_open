@@ -686,11 +686,6 @@
     </message>
     <message>
         <location/>
-        <source>&quot;Allow system to optimize camera settings&quot; is disabled in System Administration.</source>
-        <translation>A opção &quot;Permitir ao sistema que optimize as definições das câmaras&quot; está desabilitada na Administração do Sistema.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation>Aviso! Esta opção iá tornar irrelevante as definições de Qualidade e Frame Rate (FPS) na Agenda de Gravação.</translation>
     </message>
@@ -703,11 +698,6 @@
         <location/>
         <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
         <translation>Aviso! Seleccionar Alta Qualidade vai causar um impacto na performance do seu CPU e da rede e pode causar problemas adicionais.</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-        <translation>Aviso! Não altere estas definições a não ser que tenha noção do seu possível impacto na performance do seu sistema.</translation>
     </message>
     <message>
         <location/>
@@ -727,6 +717,16 @@
     <message>
         <location/>
         <source>Keep camera streams and profiles settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -894,7 +894,7 @@
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or password</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1179,7 +1179,7 @@
     </message>
     <message>
         <location/>
-        <source>Run application when PC Boots up</source>
+        <source>Run Application when PC Boots up</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1358,16 +1358,6 @@
     </message>
     <message>
         <location/>
-        <source>Select users to import</source>
-        <translation>Seleccionar Utilizador a importar</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Filter...</source>
-        <translation>Filtro...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Loading...</source>
         <translation>A Carregar...</translation>
     </message>
@@ -1375,6 +1365,16 @@
         <location/>
         <source>Connection error</source>
         <translation>Erro de ligação</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Role to assign to imported users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Disable imported users</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1899,7 +1899,7 @@
     </message>
     <message>
         <location/>
-        <source>Incorrect Email or password</source>
+        <source>Incorrect Email or Password</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1930,11 +1930,6 @@
     </message>
     <message>
         <location/>
-        <source>The new system will have password and name from the system:</source>
-        <translation>O novo sistema terá a password e nome to sistema:</translation>
-    </message>
-    <message>
-        <location/>
         <source>Check</source>
         <translation>Verificar</translation>
     </message>
@@ -1947,6 +1942,11 @@
         <location/>
         <source>Login:</source>
         <translation type="unfinished">Login:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>The new System will have password and name from System:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1999,13 +1999,13 @@
     </message>
     <message>
         <location/>
-        <source>Removing this connection option could lead to system malfunction.</source>
-        <translation>Remover esta opção de ligação poderá criar um mau funcionamento do sistema</translation>
+        <source>Add</source>
+        <translation type="unfinished">Adicionar</translation>
     </message>
     <message>
         <location/>
-        <source>Add</source>
-        <translation type="unfinished">Adicionar</translation>
+        <source>Removing this connection option could lead to System malfunction.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2027,11 +2027,6 @@
     </message>
     <message>
         <location/>
-        <source>Applying system updates at the end of the week is not recommended.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Updating to...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2043,6 +2038,11 @@
     <message>
         <location/>
         <source>You have the latest version installed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Applying System updates at the end of the week is not recommended.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2078,13 +2078,13 @@
     </message>
     <message>
         <location/>
-        <source>Warning: file with same name already exists!</source>
-        <translation>Aviso: já existe ficheiro com o mesmo nome!</translation>
+        <source>Options</source>
+        <translation>Opções</translation>
     </message>
     <message>
         <location/>
-        <source>Options</source>
-        <translation>Opções</translation>
+        <source>Warning: file with the same name already exists!</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2783,7 +2783,7 @@
     <message>
         <location/>
         <source>System time is synchronized with the Internet and is independent from server local time.
-Selected server will be used as a time server if the system has no Internet access.</source>
+Selected server will be used as a time server if System has no Internet access.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

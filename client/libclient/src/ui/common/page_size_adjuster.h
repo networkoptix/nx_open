@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QEvent>
+
 #include <ui/common/widget_limits_backup.h>
 #include <utils/common/object_companion.h>
 

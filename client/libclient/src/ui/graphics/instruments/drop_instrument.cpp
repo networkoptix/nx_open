@@ -3,6 +3,7 @@
 #include <limits>
 
 #include <QtCore/QMimeData>
+#include <QtCore/QFile>
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsSceneDragDropEvent>

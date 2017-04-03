@@ -8,6 +8,7 @@ class QWidget;
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace messages {
 
 class VideoWall
@@ -29,7 +30,7 @@ public:
         bool displayDelayed = false);
 };
 
-
 } // namespace messages
+} // namespace desktop
 } // namespace client
 } // namespace nx

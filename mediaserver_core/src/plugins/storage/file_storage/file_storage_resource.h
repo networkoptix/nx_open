@@ -56,7 +56,7 @@ public:
     qint64 calculateAndSetTotalSpaceWithoutInit();
 
     // true if storage is located on local disks
-    static bool isLocal(const QString &url);
+    bool isLocal();
     // calculate space limit judging by partition type
     static qint64 calcSpaceLimit(QnPlatformMonitor::PartitionType ptype);
 

@@ -20,6 +20,7 @@
 #include <ui/models/business_rules_view_model.h>
 #include <ui/models/notification_sound_model.h>
 #include <ui/style/globals.h>
+#include <ui/style/helper.h>
 #include <ui/widgets/business/aggregation_widget.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -111,7 +112,10 @@ QnBusinessRuleItemDelegate::~QnBusinessRuleItemDelegate()
 
 int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &metrics)
 {
-    const int dropDownSpacer = 40;  /* Leave some space for the drop-down indicator. */
+    const int kExtraSpace =
+        style::Metrics::kStandardPadding //< dropdown text indent
+      + style::Metrics::kButtonHeight; //< dropdown arrow
+
     switch (column)
     {
         case QnBusiness::EventColumn:
@@ -123,7 +127,7 @@ int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &met
             int result = -1;
             for (QnBusiness::EventType eventType : QnBusiness::allEvents())
                 result = qMax(result, eventWidth(eventType));
-            return dropDownSpacer + result;
+            return kExtraSpace + result;
         }
         case QnBusiness::ActionColumn:
         {
@@ -134,7 +138,7 @@ int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &met
             int result = -1;
             for (QnBusiness::ActionType actionType : QnBusiness::allActions())
                 result = qMax(result, actionWidth(actionType));
-            return dropDownSpacer + result;
+            return kExtraSpace + result;
         }
         case QnBusiness::AggregationColumn:
         {
@@ -422,4 +426,19 @@ void QnBusinessRuleItemDelegate::at_editor_commit()
 {
     if (QWidget* w = dynamic_cast<QWidget*> (sender()))
         emit commitData(w);
+}
+
+void QnBusinessRuleItemDelegate::updateEditorGeometry(QWidget* editor,
+    const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    switch (index.column())
+    {
+        case QnBusiness::EventColumn:
+        case QnBusiness::ActionColumn:
+            editor->setGeometry(option.rect);
+            break;
+
+        default:
+            base_type::updateEditorGeometry(editor, option, index);
+    }
 }

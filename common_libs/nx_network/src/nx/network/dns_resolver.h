@@ -6,6 +6,7 @@
 #include <functional>
 #include <memory>
 
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>

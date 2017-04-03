@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh_TW" sourcelanguage="en">
+<TS version="2.1" language="zh-TW" sourcelanguage="en">
 <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -550,11 +550,11 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Start Screen Recording</source>
-        <translation>開始螢幕擷取錄影</translation>
+        <translation>開始螢幕錄影</translation>
     </message>
     <message>
         <source>Stop Screen Recording</source>
-        <translation>停止螢幕擷取錄影</translation>
+        <translation>停止螢幕錄影</translation>
     </message>
     <message>
         <source>Stop current action</source>
@@ -1042,7 +1042,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Audit Trail...</source>
-        <translation>審查追蹤...</translation>
+        <translation>使用者行為記錄...</translation>
     </message>
     <message>
         <source>Failover Priority...</source>
@@ -1226,7 +1226,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Disconnect from Server</source>
-        <translation>從伺服器中斷連線</translation>
+        <translation>中斷連線</translation>
     </message>
     <message>
         <source>Browse Local Files</source>
@@ -1826,7 +1826,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Every %1</source>
-        <translation>每個 %1</translation>
+        <translation>每隔 %1</translation>
     </message>
     <message>
         <source>System</source>
@@ -1961,7 +1961,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Interval of Action</source>
-        <translation>動作間隔</translation>
+        <translation>動作間隔時間</translation>
     </message>
 </context>
 <context>
@@ -2113,7 +2113,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Camera has no secondary stream</source>
-        <translation>攝影機有沒有次串流</translation>
+        <translation>攝影機沒有次串流</translation>
     </message>
     <message>
         <source>I/O Module ID</source>
@@ -2438,7 +2438,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>based on server time</source>
-        <translation>基於伺服器時間</translation>
+        <translation>以伺服器時間為準</translation>
     </message>
     <message>
         <source>High minimum value can lead to archive length decrease on other devices.</source>
@@ -2679,7 +2679,7 @@ to %1</source>
     <message>
         <source>Learn more about %1</source>
         <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-        <translation>瞭解更多關於 %1</translation>
+        <translation>瞭解更多 %1</translation>
     </message>
 </context>
 <context>
@@ -3278,7 +3278,7 @@ to %1</source>
     <name>QnExportScheduleResourceSelectionDialogDelegate</name>
     <message>
         <source>Copy archive length settings</source>
-        <translation>複製錄影天數設定</translation>
+        <translation>複製錄影設定</translation>
     </message>
     <message>
         <source>Schedule motion type is not supported by some cameras.</source>
@@ -3404,7 +3404,7 @@ to %1</source>
     </message>
     <message>
         <source>Bookmarks</source>
-        <translation>書簽</translation>
+        <translation>書籤</translation>
     </message>
     <message>
         <source>Device List</source>
@@ -3737,7 +3737,7 @@ to %1</source>
     </message>
     <message>
         <source>License Key</source>
-        <translation>授權金鑰</translation>
+        <translation>授權序號</translation>
     </message>
     <message>
         <source>Locked to Hardware ID</source>
@@ -3756,7 +3756,7 @@ to %1</source>
     </message>
     <message>
         <source>License Key</source>
-        <translation>授權金鑰</translation>
+        <translation>授權序號</translation>
     </message>
     <message>
         <source>Status</source>
@@ -3788,7 +3788,7 @@ to %1</source>
     </message>
     <message>
         <source>Expires</source>
-        <translation>過期</translation>
+        <translation>到期日</translation>
     </message>
     <message>
         <source>License is active</source>
@@ -3865,7 +3865,7 @@ to %1</source>
     </message>
     <message>
         <source>License activated</source>
-        <translation>已啟動的授權</translation>
+        <translation>授權已成功啟動</translation>
     </message>
     <message>
         <source>Failed to remove license from Server</source>
@@ -4124,7 +4124,7 @@ to %1</source>
     </message>
     <message>
         <source>Learn more about</source>
-        <translation>瞭解更多關於</translation>
+        <translation>瞭解更多</translation>
     </message>
     <message>
         <source>Log in to %1</source>
@@ -4758,7 +4758,7 @@ to %1</source>
     </message>
     <message>
         <source>Space</source>
-        <translation>空白</translation>
+        <translation>所佔空間</translation>
     </message>
     <message>
         <source>Calendar Days</source>
@@ -4806,7 +4806,7 @@ to %1</source>
     </message>
     <message>
         <source>Cameras from other servers and removed cameras</source>
-        <translation>&lt;其它伺服器的攝影機已被移除&gt;</translation>
+        <translation>&lt;在其它伺服器的攝影機或已被移除的攝影機&gt;</translation>
     </message>
     <message>
         <source>%1 TB</source>
@@ -5024,7 +5024,7 @@ to %1</source>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
         <source>Export Bookmark...</source>
-        <translation>匯出書籤...</translation>
+        <translation>匯出書籤及影像...</translation>
     </message>
     <message>
         <source>No bookmarks</source>
@@ -5160,12 +5160,12 @@ to %1</source>
     </message>
     <message>
         <source>User %1 has invalid Email address</source>
-        <translation>使用者 %1 具有不正確電子郵件地址</translation>
+        <translation>使用者 %1 的電子郵件有誤</translation>
     </message>
     <message numerus="yes">
         <source>%n of %1 users have invalid Email address</source>
         <translation>
-            <numerusform>%1 個使用者中有 %n 個有不正確電子郵件地址</numerusform>
+            <numerusform>%1 個使用者中有 %n 個使用者的電子郵件地址有誤</numerusform>
         </translation>
     </message>
     <message>
@@ -7312,11 +7312,11 @@ to %1</source>
     <name>QnWorkbenchScreenRecordingHandler</name>
     <message>
         <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-        <translation>螢幕擷取子系統尚未初始化。請重試一次。</translation>
+        <translation>螢幕擷取子系統尚未初始化. 請重試一次.</translation>
     </message>
     <message>
         <source>Recording in %1...</source>
-        <translation>在 %1 中錄影...</translation>
+        <translation>%1 秒後開始錄影...</translation>
     </message>
     <message>
         <source>Recorded Video</source>

@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/utils/log/log.h>
 #include <nx/utils/test_support/utils.h>
 
 #include "email_manager_mocked.h"
@@ -16,6 +17,10 @@ namespace cdb {
 
 CdbFunctionalTest::CdbFunctionalTest()
 {
+    NX_LOG(lm("============== Running test %1.%2 ==============")
+        .arg(::testing::UnitTest::GetInstance()->current_test_info()->test_case_name())
+        .arg(::testing::UnitTest::GetInstance()->current_test_info()->name()),
+        cl_logDEBUG1);
 }
 
 CdbFunctionalTest::~CdbFunctionalTest()

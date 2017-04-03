@@ -20,22 +20,24 @@ import requests.exceptions
 import pytest
 import utils
 from .server_rest_api import REST_API_USER, REST_API_PASSWORD, REST_API_TIMEOUT_SEC, HttpError, ServerRestApi
-from .vagrant_box_config import BoxConfigFactory, BoxConfig
+from .vagrant_box_config import MEDIASERVER_LISTEN_PORT, BoxConfigFactory, BoxConfig
 from .cloud_host import CloudHost
 from .camera import Camera, SampleMediaFile
 from .media_stream import open_media_stream
 
 
-MEDIASERVER_CONFIG_PATH = '/opt/{company_name}/mediaserver/etc/mediaserver.conf'
-MEDIASERVER_CONFIG_PATH_INITIAL = '{config_path}.initial'
+MEDIASERVER_DIR = '/opt/{company_name}/mediaserver'
+MEDIASERVER_CONFIG_PATH = 'etc/mediaserver.conf'
+MEDIASERVER_CONFIG_PATH_INITIAL = 'etc/mediaserver.conf.initial'
+MEDIASERVER_CLOUDHOST_PATH = 'lib/libcommon.so'
+MEDIASERVER_STORAGE_PATH = 'var/data'
+MEDIASERVER_LOG_PATH = 'var/log/log_file.log'
+
 MEDIASERVER_SERVICE_NAME = '{company_name}-mediaserver'
-MEDIASERVER_LISTEN_PORT = 7001
 MEDIASERVER_UNSETUP_LOCAL_SYSTEM_ID = '{00000000-0000-0000-0000-000000000000}'  # local system id for not set up server
 
 MEDIASERVER_CLOUDHOST_TAG = 'this_is_cloud_host_name'
 MEDIASERVER_CLOUDHOST_SIZE = 76  # MEDIASERVER_CLOUDHOST_TAG + ' ' + cloud_host + '\0' * required paddings count to 76
-MEDIASERVER_CLOUDHOST_FPATH = '/opt/{company_name}/mediaserver/lib/libcommon.so'
-MEDIASERVER_STORAGE_FPATH = '/opt/{company_name}/mediaserver/var/data'  # hardcoded for now
 
 MEDIASERVER_CREDENTIALS_TIMEOUT_SEC = 60 * 5
 MEDIASERVER_MERGE_TIMEOUT_SEC = MEDIASERVER_CREDENTIALS_TIMEOUT_SEC
@@ -147,13 +149,18 @@ class ServerConfig(object):
 
 class Server(object):
 
-    def __init__(self, company_name, name, box, url):
+    def __init__(self, company_name, name, box, rest_api_url):
         self._company_name = company_name
         self.title = name
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
         self.box = box
-        self.url = url
-        self._config_path = MEDIASERVER_CONFIG_PATH.format(company_name=self._company_name)
+        self.host = box.host
+        self.rest_api_url = rest_api_url
+        self.dir = MEDIASERVER_DIR.format(company_name=self._company_name)
+        self.core_file_path = os.path.join(self.dir, 'bin/core')
+        self._config_path = os.path.join(self.dir, MEDIASERVER_CONFIG_PATH)
+        self._config_path_initial = os.path.join(self.dir, MEDIASERVER_CONFIG_PATH_INITIAL)
+        self._log_path = os.path.join(self.dir, MEDIASERVER_LOG_PATH)
         self.service = Service(box, MEDIASERVER_SERVICE_NAME.format(company_name=self._company_name))
         self.user = REST_API_USER
         self.password = REST_API_PASSWORD
@@ -161,13 +168,23 @@ class Server(object):
         self.settings = None
         self.local_system_id = None
         self.ecs_guid = None
+        self.internal_ip_address = None
         self.storage = self._get_storage()
         self._is_started = None
 
     def __repr__(self):
-        return 'Server%r@%s' % (self.name, self.url)
+        return 'Server(%s)' % self
+
+    def __str__(self):
+        return '%r@%s' % (self.name, self.rest_api_url)
+
+    @property
+    def internal_url(self):
+        return 'http://%s:%d/' % (self.internal_ip_address, MEDIASERVER_LISTEN_PORT)
 
     def init(self, must_start, reset, log_level=DEFAULT_SERVER_LOG_LEVEL, patch_set_cloud_host=None, config_file_params=None):
+        if self.host.file_exists(self.core_file_path):
+            self.host.run_command(['rm', self.core_file_path])
         self._is_started = was_started = self.service.get_status()
         log.info('Service for %s %s started', self, self._is_started and 'WAS' or 'was NOT')
         if reset:
@@ -188,7 +205,7 @@ class Server(object):
             assert not reset or not self.is_system_set_up(), 'Failed to properly reinit server - it reported to be already set up'
 
     def _init_rest_api(self):
-        self.rest_api = ServerRestApi(self.title, self.url, self.user, self.password)
+        self.rest_api = ServerRestApi(self.title, self.rest_api_url, self.user, self.password)
 
     def is_started(self):
         assert self._is_started is not None, 'is_started state is still unknown'
@@ -220,6 +237,8 @@ class Server(object):
         self.settings = self.get_system_settings()
         self.local_system_id = self.settings['localSystemId']
         self.cloud_system_id = self.settings['cloudSystemID']
+        iflist = self.rest_api.api.iflist.GET()
+        self.internal_ip_address = iflist[-1]['ipAddr']
         self.ecs_guid = self.rest_api.ec2.testConnection.GET()['ecsGuid']
 
     def _safe_api_call(self, fn, *args, **kw):
@@ -248,9 +267,7 @@ class Server(object):
         self.restart()
 
     def reset_config(self, **kw):
-        self.box.host.run_command(['cp',
-                                   MEDIASERVER_CONFIG_PATH_INITIAL.format(config_path=self._config_path),
-                                   self._config_path])
+        self.host.run_command(['cp', self._config_path_initial, self._config_path])
         self.change_config(removeDbOnStartup=1, **kw)
 
     def restart(self, timeout=30):
@@ -296,15 +313,18 @@ class Server(object):
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
             return False
 
+    def get_log_file(self):
+        return self.host.read_file(self._log_path)
+
     def change_config(self, **kw):
-        old_config = self.box.host.read_file(self._config_path)
+        old_config = self.host.read_file(self._config_path)
         new_config = change_mediaserver_config(old_config, **kw)
-        self.box.host.write_file(self._config_path, new_config)
+        self.host.write_file(self._config_path, new_config)
 
     def patch_binary_set_cloud_host(self, new_host):
         assert not self._is_started, 'Server %s must be stopped first for patching its binaries' % self
-        path_to_patch = MEDIASERVER_CLOUDHOST_FPATH.format(company_name=self._company_name)
-        data = self.box.host.read_file(path_to_patch)
+        path_to_patch = os.path.join(self.dir, MEDIASERVER_CLOUDHOST_PATH)
+        data = self.host.read_file(path_to_patch)
         idx = data.find(MEDIASERVER_CLOUDHOST_TAG)
         assert idx != -1, ('Cloud host tag %r is missing from mediaserver binary file %r'
                            % (MEDIASERVER_CLOUDHOST_TAG, path_to_patch))
@@ -312,16 +332,16 @@ class Server(object):
         assert eidx != -1
         old_host = data[idx + len(MEDIASERVER_CLOUDHOST_TAG) + 1 : eidx]
         if new_host == old_host:
-            log.debug('Server binary %s at %s already has %r in it', path_to_patch, self.box, new_host)
+            log.debug('Server binary %s at %s already has %r in it', path_to_patch, self.host, new_host)
             return
-        log.info('Patching %s at %s with new cloud host %r (was: %r)...', path_to_patch, self.box, new_host, old_host)
+        log.info('Patching %s at %s with new cloud host %r (was: %r)...', path_to_patch, self.host, new_host, old_host)
         new_str = MEDIASERVER_CLOUDHOST_TAG + ' ' + new_host
         assert len(new_str) < MEDIASERVER_CLOUDHOST_SIZE, 'Cloud host name is too long: %r' % new_host
         padded_str = new_str + '\0' * (MEDIASERVER_CLOUDHOST_SIZE - len(new_str))
         assert len(padded_str) == MEDIASERVER_CLOUDHOST_SIZE
         new_data = data[:idx] + padded_str + data[idx + MEDIASERVER_CLOUDHOST_SIZE:]
         assert len(new_data) == len(data)
-        self.box.host.write_file(path_to_patch, new_data)
+        self.host.write_file(path_to_patch, new_data)
         self.set_user_password(REST_API_USER, REST_API_PASSWORD)  # Must be reset to default onces
 
     def set_system_settings(self, **kw):
@@ -365,7 +385,7 @@ class Server(object):
             digest = generate_auth_key(method, other_server.user.lower(), other_server.password, nonce, realm)
             return urllib.quote(base64.urlsafe_b64encode(':'.join([other_server.user.lower(), nonce, digest])))
         self.rest_api.api.mergeSystems.GET(
-            url=other_server.url,
+            url=other_server.internal_url,
             getKey=make_key('GET'),
             postKey=make_key('POST'),
             takeRemoteSettings=take_remote_settings,
@@ -434,9 +454,9 @@ class Server(object):
         ## # following code requires server is started, which is not always the case;
         ## #  so was commented-out and replaced with hardcoded one
         ## storage_records = [record for record in self.rest_api.ec2.getStorages.GET() if record['parentId'] == self.ecs_guid]
-        ## assert len(storage_records) >= 1, 'No storages for server with ecs guid %s is returned by %s' % (self.ecs_guid, self.url)
+        ## assert len(storage_records) >= 1, 'No storages for server with ecs guid %s is returned by %s' % (self.ecs_guid, self.rest_api_url)
         ## storage_path = storage_records[0]['url']
-        storage_path = MEDIASERVER_STORAGE_FPATH.format(company_name=self._company_name)
+        storage_path = os.path.join(self.dir, MEDIASERVER_STORAGE_PATH)
         return Storage(self.box, storage_path)
 
     def rebuild_archive(self):
@@ -459,7 +479,7 @@ class Server(object):
     def get_media_stream(self, stream_type, camera):
         assert stream_type in ['rtsp', 'webm', 'hls', 'direct-hls'], repr(stream_type)
         assert isinstance(camera, Camera), repr(camera)
-        return open_media_stream(self.url, self.user, self.password, stream_type, camera.mac_addr)
+        return open_media_stream(self.rest_api_url, self.user, self.password, stream_type, camera.mac_addr)
 
 
 class Storage(object):

@@ -18,7 +18,6 @@ QnTranslationManager::QnTranslationManager(QObject *parent):
     m_translationsValid(false)
 {
     addPrefix(defaultPrefix);
-    addPrefix(lit("qt"));
     addPrefix(lit("qtbase"));
 
     addSearchPath(defaultSearchPath);

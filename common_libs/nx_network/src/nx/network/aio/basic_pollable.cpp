@@ -88,6 +88,22 @@ bool BasicPollable::isInSelfAioThread() const
     return getAioThread() == m_aioService->getCurrentAioThread();
 }
 
+void BasicPollable::cancelPostedCalls(nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    post(
+        [this, completionHandler = std::move(completionHandler)]()
+        {
+            m_aioService->cancelPostedCalls(&m_pollable, true);
+            completionHandler();
+        });
+}
+
+void BasicPollable::cancelPostedCallsSync()
+{
+    executeInAioThreadSync(
+        [this]() { m_aioService->cancelPostedCalls(&m_pollable, true); });
+}
+
 void BasicPollable::stopWhileInAioThread()
 {
 }

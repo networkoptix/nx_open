@@ -50,12 +50,17 @@ int ProxyPipeline::write(const void* data, size_t count)
 
 ReflectingPipeline::ReflectingPipeline(QByteArray initialData):
     m_buffer(std::move(initialData)),
-    m_totalBytesThrough(0)
+    m_totalBytesThrough(0),
+    m_maxSize(0),
+    m_eof(false)
 {
 }
 
 int ReflectingPipeline::write(const void* data, size_t count)
 {
+    if (m_maxSize > 0 && m_buffer.size() >= m_maxSize)
+        return StreamIoError::wouldBlock;
+
     m_buffer.append(static_cast<const char*>(data), count);
     m_totalBytesThrough += count;
     return count;
@@ -64,13 +69,18 @@ int ReflectingPipeline::write(const void* data, size_t count)
 int ReflectingPipeline::read(void* data, size_t count)
 {
     if (m_buffer.isEmpty())
-        return StreamIoError::wouldBlock;
+        return m_eof ? StreamIoError::osError : StreamIoError::wouldBlock;
 
     const auto bytesToRead = std::min<size_t>(count, m_buffer.size());
     memcpy(data, m_buffer.data(), bytesToRead);
     m_buffer.remove(0, bytesToRead);
     m_totalBytesThrough += bytesToRead;
     return bytesToRead;
+}
+
+void ReflectingPipeline::setMaxBufferSize(std::size_t maxSize)
+{
+    m_maxSize = maxSize;
 }
 
 std::size_t ReflectingPipeline::totalBytesThrough() const
@@ -81,6 +91,11 @@ std::size_t ReflectingPipeline::totalBytesThrough() const
 const QByteArray& ReflectingPipeline::internalBuffer() const
 {
     return m_buffer;
+}
+
+void ReflectingPipeline::writeEof()
+{
+    m_eof = true;
 }
 
 //-------------------------------------------------------------------------------------------------

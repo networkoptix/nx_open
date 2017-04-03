@@ -16,7 +16,7 @@ from test_utils.host import ProcessError
 log = logging.getLogger(__name__)
 
 POSIX_RFC868_DIFF_SEC = 2208988800 # difference between POSIX and RFC868 time, seconds
-RFC868_SERVER_ADDRESS = 'instance1.rfc868server.com'
+RFC868_SERVER_ADDRESS = 'time.rfc868server.com'
 RFC868_SERVER_PORT = 37
 
 MAX_TIME_DIFF = timedelta(seconds=2) # Max time difference (system<->server or server<->server), milliseconds
@@ -72,8 +72,8 @@ def env(env_builder, box, server, time_server):
     built_env.time_server = time_server
     set_time_on_server(built_env.one, BASE_TIME)
     set_time_on_server(built_env.two, BASE_TIME - timedelta(hours=20))
-    turn_rfc868_off_and_check_time_server(built_env.one.box, built_env.time_server)
-    turn_rfc868_off_and_check_time_server(built_env.two.box, built_env.time_server)
+    turn_rfc868_off_and_assert_time_server(built_env.one.box, built_env.time_server)
+    turn_rfc868_off_and_assert_time_server(built_env.two.box, built_env.time_server)
     built_env.one.start_service()
     built_env.two.start_service()
     built_env.one.setup_local_system()
@@ -181,14 +181,14 @@ def does_iptables_rfc868_rule_exist(box):
     except ProcessError:
         return False
 
-def turn_rfc868_on_and_check_time_server(box, time_server):
+def turn_rfc868_on_and_assert_time_server(box, time_server):
     if does_iptables_rfc868_rule_exist(box):
         box.host.run_command(get_iptables_rfc868_rule_command('-D'))
         box.host.run_command(
             ['nc', '-w', str(TIME_SERVER_WAIT_TIMEOUT_SEC),
              time_server.address, str(time_server.port)])
 
-def turn_rfc868_off_and_check_time_server(box, time_server):
+def turn_rfc868_off_and_assert_time_server(box, time_server):
     if not does_iptables_rfc868_rule_exist(box):
         box.host.run_command(get_iptables_rfc868_rule_command('-A'))
         assert_rfc868_server_is_unreachable(box, time_server)
@@ -269,7 +269,7 @@ def test_primary_server_temporary_offline(env):
 
 def test_secondary_server_temporary_inet_on(env):
     # Turn on RFC868 (time protocol) on secondary box
-    turn_rfc868_on_and_check_time_server(env.secondary.box, env.time_server)
+    turn_rfc868_on_and_assert_time_server(env.secondary.box, env.time_server)
     wait_for_server_and_rfc868_time_synced(env, env.primary)
     wait_for_server_and_rfc868_time_synced(env, env.secondary)
     # Change system time on primary box
@@ -277,7 +277,7 @@ def test_secondary_server_temporary_inet_on(env):
     time.sleep(SYNC_TIMEOUT_SEC / 2.0)
     assert_server_and_rfc868_time_match(env, env.primary)
     # Turn off RFC868 (time protocol)
-    turn_rfc868_off_and_check_time_server(env.secondary.box, env.time_server)
+    turn_rfc868_off_and_assert_time_server(env.secondary.box, env.time_server)
     time.sleep(SYNC_TIMEOUT_SEC / 2.0)
     assert_server_and_rfc868_time_match(env, env.primary)
     # Stop secondary server

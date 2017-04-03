@@ -5,22 +5,24 @@
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace workbench {
-namespace handlers {
 
-class LayoutToursHandler: public QnWorkbenchContextAware, public QObject
+class LayoutToursHandler: public QObject, public QnWorkbenchContextAware
 {
-    using base_type = QnWorkbenchContextAware;
+    Q_OBJECT
+    using base_type = QObject;
+
 public:
     LayoutToursHandler(QObject* parent = nullptr);
 
 private:
+    void openTousLayout();
 };
 
-} // namespace handlers
 } // namespace workbench
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx
-

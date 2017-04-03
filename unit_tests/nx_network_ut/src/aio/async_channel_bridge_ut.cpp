@@ -6,267 +6,15 @@
 
 #include <nx/network/aio/async_channel_bridge.h>
 #include <nx/network/aio/abstract_async_channel.h>
+#include <nx/network/aio/test/aio_test_async_channel.h>
 #include <nx/utils/pipeline.h>
 #include <nx/utils/random.h>
-#include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
 namespace nx {
 namespace network {
 namespace aio {
 namespace test {
-
-class TestAsyncChannel:
-    public AbstractAsyncChannel
-{
-    using base_type = BasicPollable;
-
-public:
-    enum class InputDepletionPolicy
-    {
-        sendConnectionReset,
-        ignore,
-    };
-
-    TestAsyncChannel(
-        utils::pipeline::AbstractInput* input,
-        utils::pipeline::AbstractOutput* output,
-        InputDepletionPolicy inputDepletionPolicy)
-        :
-        m_input(input),
-        m_output(output),
-        m_inputDepletionPolicy(inputDepletionPolicy),
-        m_errorState(false),
-        m_totalBytesRead(0),
-        m_readPaused(false),
-        m_readBuffer(nullptr),
-        m_sendPaused(false),
-        m_sendBuffer(nullptr),
-        m_readPosted(false),
-        m_readSequence(0)
-    {
-        bindToAioThread(getAioThread());
-    }
-
-    virtual ~TestAsyncChannel() override
-    {
-        if (isInSelfAioThread())
-            stopWhileInAioThread();
-    }
-
-    virtual void bindToAioThread(AbstractAioThread* aioThread) override
-    {
-        base_type::bindToAioThread(aioThread);
-
-        m_reader.bindToAioThread(aioThread);
-        m_writer.bindToAioThread(aioThread);
-    }
-
-    virtual void readSomeAsync(
-        nx::Buffer* const buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override
-    {
-        NX_ASSERT(buffer->capacity() > buffer->size());
-        
-        QnMutexLocker lock(&m_mutex);
-        m_readHandler = std::move(handler);
-        m_readBuffer = buffer;
-        if (m_readPaused)
-            return;
-        
-        performAsyncRead(lock);
-    }
-
-    virtual void sendAsync(
-        const nx::Buffer& buffer,
-        std::function<void(SystemError::ErrorCode, size_t)> handler) override
-    {
-        QnMutexLocker lock(&m_mutex);
-
-        m_sendHandler = std::move(handler);
-        m_sendBuffer = &buffer;
-        if (m_sendPaused)
-            return;
-
-        performAsyncSend(lock);
-    }
-
-    virtual void cancelIOSync(EventType eventType) override
-    {
-        if (eventType == EventType::etRead ||
-            eventType == EventType::etNone)
-        {
-            m_reader.pleaseStopSync();
-        }
-
-        if (eventType == EventType::etWrite ||
-            eventType == EventType::etNone)
-        {
-            m_writer.pleaseStopSync();
-        }
-    }
-
-    void pauseReadingData()
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_readPaused = true;
-    }
-
-    void resumeReadingData()
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_readPaused = false;
-        if (m_readHandler)
-            performAsyncRead(lock);
-    }
-
-    void pauseSendingData()
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_sendPaused = true;
-    }
-
-    void resumeSendingData()
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_sendPaused = false;
-        if (m_sendHandler)
-            performAsyncSend(lock);
-    }
-
-    void waitForSomeDataToBeRead()
-    {
-        auto totalBytesReadBak = m_totalBytesRead.load();
-        while (totalBytesReadBak == m_totalBytesRead)
-            std::this_thread::yield();
-    }
-
-    void waitForReadSequenceToBreak()
-    {
-        auto readSequenceBak = m_readSequence.load();
-        while (readSequenceBak == m_readSequence)
-            std::this_thread::yield();
-    }
-
-    QByteArray dataRead() const
-    {
-        QnMutexLocker lock(&m_mutex);
-        return m_totalDataRead;
-    }
-
-    void setErrorState()
-    {
-        m_errorState = true;
-    }
-
-private:
-    utils::pipeline::AbstractInput* m_input;
-    utils::pipeline::AbstractOutput* m_output;
-    InputDepletionPolicy m_inputDepletionPolicy;
-    std::atomic<bool> m_errorState;
-    std::atomic<std::size_t> m_totalBytesRead;
-    mutable QnMutex m_mutex;
-    QByteArray m_totalDataRead;
-
-    std::function<void(SystemError::ErrorCode, size_t)> m_readHandler;
-    bool m_readPaused;
-    nx::Buffer* m_readBuffer;
-
-    std::function<void(SystemError::ErrorCode, size_t)> m_sendHandler;
-    bool m_sendPaused;
-    const nx::Buffer* m_sendBuffer;
-
-    BasicPollable m_reader;
-    BasicPollable m_writer;
-    bool m_readPosted;
-    std::atomic<int> m_readSequence;
-
-    virtual void stopWhileInAioThread() override
-    {
-        m_reader.pleaseStopSync();
-        m_writer.pleaseStopSync();
-    }
-
-    void handleInputDepletion(
-        std::function<void(SystemError::ErrorCode, size_t)> handler)
-    {
-        switch (m_inputDepletionPolicy)
-        {
-            case InputDepletionPolicy::sendConnectionReset:
-                handler(SystemError::connectionReset, (size_t)-1);
-                break;
-            case InputDepletionPolicy::ignore:
-                break;
-        }
-    }
-
-    void performAsyncRead(const QnMutexLockerBase& /*lock*/)
-    {
-        m_readPosted = true;
-      
-        m_reader.post(
-            [this]()
-            {
-                decltype(m_readHandler) handler;
-                handler.swap(m_readHandler);
-
-                auto buffer = m_readBuffer;
-                m_readBuffer = nullptr;
-
-                m_readPosted = false;
-
-                if (m_errorState)
-                {
-                    handler(SystemError::connectionReset, (size_t)-1);
-                    return;
-                }
-
-                int bytesRead = m_input->read(
-                    buffer->data() + buffer->size(),
-                    buffer->capacity() - buffer->size());
-                if (bytesRead > 0)
-                {
-                    {
-                        QnMutexLocker lock(&m_mutex);
-                        m_totalDataRead.append(buffer->data() + buffer->size(), bytesRead);
-                        m_totalBytesRead += bytesRead;
-                    }
-                    buffer->resize(buffer->size() + bytesRead);
-
-                    handler(SystemError::noError, bytesRead);
-
-                    if (!m_readPosted)
-                        ++m_readSequence;
-                    return;
-                }
-
-                handleInputDepletion(std::move(handler));
-            });
-    }
-
-    void performAsyncSend(const QnMutexLockerBase&)
-    {
-        decltype(m_sendHandler) handler;
-        m_sendHandler.swap(handler);
-        auto buffer = m_sendBuffer;
-        m_sendBuffer = nullptr;
-
-        m_writer.post(
-            [this, buffer, handler = std::move(handler)]()
-            {
-                if (m_errorState)
-                {
-                    handler(SystemError::connectionReset, (size_t)-1);
-                    return;
-                }
-
-                int bytesWritten = m_output->write(buffer->constData(), buffer->size());
-                handler(
-                    bytesWritten >= 0 ? SystemError::noError : SystemError::connectionReset,
-                    bytesWritten);
-            });
-    }
-};
 
 class NotifyingOutput:
     public utils::pipeline::AbstractOutput
@@ -441,18 +189,18 @@ private:
     std::unique_ptr<utils::pipeline::AbstractInput> m_rightSource;
     NotifyingOutput m_rightDest;
     std::unique_ptr<aio::AsyncChannelBridge> m_bridge;
-    std::unique_ptr<TestAsyncChannel> m_leftFile;
-    std::unique_ptr<TestAsyncChannel> m_rightFile;
+    std::unique_ptr<AsyncChannel> m_leftFile;
+    std::unique_ptr<AsyncChannel> m_rightFile;
     nx::utils::promise<SystemError::ErrorCode> m_bridgeDone;
     boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_additionalOnBridgeDoneHandler;
 
     void createChannel()
     {
-        m_leftFile = std::make_unique<TestAsyncChannel>(
-            m_leftSource.get(), &m_leftDest, TestAsyncChannel::InputDepletionPolicy::ignore);
-        m_rightFile = std::make_unique<TestAsyncChannel>(
-            m_rightSource.get(), &m_rightDest, TestAsyncChannel::InputDepletionPolicy::ignore);
+        m_leftFile = std::make_unique<AsyncChannel>(
+            m_leftSource.get(), &m_leftDest, AsyncChannel::InputDepletionPolicy::ignore);
+        m_rightFile = std::make_unique<AsyncChannel>(
+            m_rightSource.get(), &m_rightDest, AsyncChannel::InputDepletionPolicy::ignore);
 
         m_bridge = makeAsyncChannelBridge(m_leftFile.get(), m_rightFile.get());
         if (m_inactivityTimeout)

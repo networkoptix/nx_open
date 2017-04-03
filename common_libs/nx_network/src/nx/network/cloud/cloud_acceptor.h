@@ -3,7 +3,7 @@
 
 #include <functional>
 
-#include <utils/common/stoppable.h>
+#include <nx/network/async_stoppable.h>
 
 #include "cc_common.h"
 #include "../abstract_socket.h"

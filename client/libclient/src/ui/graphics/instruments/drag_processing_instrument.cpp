@@ -1,6 +1,10 @@
 #include "drag_processing_instrument.h"
-#include <QtWidgets/QGraphicsSceneMouseEvent>
+
+#include <QtCore/QTimer>
+
 #include <QtGui/QMouseEvent>
+
+#include <QtWidgets/QGraphicsSceneMouseEvent>
 
 void DragProcessingInstrument::initialize()
 {

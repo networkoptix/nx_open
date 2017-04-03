@@ -240,7 +240,7 @@ QByteArray QnTCPConnectionProcessor::createResponse(int httpStatusCode, const QB
     }
     nx_http::insertOrReplaceHeader(
         &d->response.headers,
-        nx_http::HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())) );
+        nx_http::HttpHeader("Date", nx_http::dateTimeToHttpFormat(QDateTime::currentDateTime())) );
 
     // this header required to perform new HTTP requests if server port has been on the fly changed
     nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Access-Control-Allow-Origin", "*" ) );
