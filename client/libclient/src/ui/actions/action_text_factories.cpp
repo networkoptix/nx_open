@@ -45,6 +45,10 @@ QString QnActionTextFactory::text(const QnActionParameters &parameters) const {
     }
 }
 
-QString QnDevicesNameActionTextFactory::text(const QnResourceList &resources) const {
-    return QnDeviceDependentStrings::getNameFromSet(m_stringSet, resources.filtered<QnVirtualCameraResource>());
+QString QnDevicesNameActionTextFactory::text(const QnResourceList &resources) const
+{
+    return QnDeviceDependentStrings::getNameFromSet(
+        resourcePool(),
+        m_stringSet,
+        resources.filtered<QnVirtualCameraResource>());
 }

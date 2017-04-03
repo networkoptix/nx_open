@@ -111,7 +111,7 @@ private:
 class QnAbstractNetworkResourceSearcher : virtual public QnAbstractResourceSearcher
 {
 protected:
-    QnAbstractNetworkResourceSearcher (){};
+    QnAbstractNetworkResourceSearcher(QnCommonModule* commonModule);
 public:
 
     // checks this QHostAddress and creates a QnResource in case of success

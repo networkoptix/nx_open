@@ -1,13 +1,16 @@
-
 #pragma once
 
 #include <QtCore/QObject>
+
+#include <client_core/connection_context_aware.h>
 
 #include <utils/common/connective.h>
 #include <api/server_rest_connection_fwd.h>
 #include <statistics/abstract_statistics_settings_loader.h>
 
-class QnStatisticsSettingsWatcher : public Connective<QnAbstractStatisticsSettingsLoader>
+class QnStatisticsSettingsWatcher:
+    public Connective<QnAbstractStatisticsSettingsLoader>,
+    public QnConnectionContextAware
 {
     Q_OBJECT
 

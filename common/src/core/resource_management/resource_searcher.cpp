@@ -96,3 +96,9 @@ QnResourceList QnAbstractFileResourceSearcher::checkFiles(const QStringList &fil
 
     return result;
 }
+
+QnAbstractNetworkResourceSearcher::QnAbstractNetworkResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule)
+{
+
+}

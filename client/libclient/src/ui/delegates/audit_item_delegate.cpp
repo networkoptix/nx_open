@@ -487,7 +487,7 @@ void QnAuditItemDelegate::paintDescription(const QStyle* style, QPainter* painte
     QString linkText;
     if (!cameras.empty())
     {
-        linkText = QnDeviceDependentStrings::getNumericName(cameras);
+        linkText = QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
         if (!mainText.isEmpty())
             mainText += lit(",  ");
     }

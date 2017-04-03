@@ -6,6 +6,8 @@
 #include <api/model/rebuild_archive_reply.h>
 #include <api/model/storage_space_reply.h>
 
+#include <common/common_module.h>
+
 #include <nx_ec/managers/abstract_server_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
 
