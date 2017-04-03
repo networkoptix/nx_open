@@ -44,7 +44,8 @@ bool QnWorkbenchStateManager::tryClose(bool force)
     if (canSaveState)
     {
         saveState();
-        qnStatisticsManager->saveCurrentStatistics();
+        if (auto statisticsManager = commonModule()->instance<QnStatisticsManager>())
+            statisticsManager->saveCurrentStatistics();
     }
 
     /* Order should be backward, so more recently opened dialogs will ask first. */

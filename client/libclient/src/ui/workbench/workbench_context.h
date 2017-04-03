@@ -7,6 +7,8 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
+#include <common/common_module_aware.h>
+
 #include <utils/common/instance_storage.h>
 #include <core/resource/resource_fwd.h>
 #include <ui/actions/actions.h>
@@ -30,9 +32,10 @@ class QnControlsStatisticsModule;
 /**
  * This is a class that ties together all objects comprising the global visual scene state
  */
-class QnWorkbenchContext: public QObject, public QnInstanceStorage
+class QnWorkbenchContext: public QObject, public QnInstanceStorage, public QnCommonModuleAware
 {
     Q_OBJECT
+    using base_type = QObject;
 public:
     QnWorkbenchContext(QnWorkbenchAccessController* accessController, QObject *parent = NULL);
 

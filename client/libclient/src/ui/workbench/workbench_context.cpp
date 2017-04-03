@@ -44,6 +44,7 @@
 
 QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessController, QObject* parent):
     QObject(parent),
+    QnCommonModuleAware(parent),
     m_accessController(accessController),
     m_userWatcher(nullptr),
     m_layoutWatcher(nullptr),
@@ -79,26 +80,28 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
 
     // Adds statistics modules
 
+    auto statisticsManager = commonModule()->instance<QnStatisticsManager>();
+
     const auto actionsStatModule = instance<QnActionsStatisticsModule>();
     actionsStatModule->setActionManager(m_menu.data()); // TODO: #ynikitenkov refactor QnActionManager to singleton
-    qnStatisticsManager->registerStatisticsModule(lit("actions"), actionsStatModule);
+    statisticsManager->registerStatisticsModule(lit("actions"), actionsStatModule);
 
     const auto userStatModule = instance<QnUsersStatisticsModule>();
-    qnStatisticsManager->registerStatisticsModule(lit("users"), userStatModule);
+    statisticsManager->registerStatisticsModule(lit("users"), userStatModule);
 
     const auto graphicsStatModule = instance<QnGraphicsStatisticsModule>();
-    qnStatisticsManager->registerStatisticsModule(lit("graphics"), graphicsStatModule);
+    statisticsManager->registerStatisticsModule(lit("graphics"), graphicsStatModule);
 
     const auto durationStatModule = instance<QnDurationStatisticsModule>();
-    qnStatisticsManager->registerStatisticsModule(lit("durations"), durationStatModule);
+    statisticsManager->registerStatisticsModule(lit("durations"), durationStatModule);
 
     m_statisticsModule.reset(new QnControlsStatisticsModule());
-    qnStatisticsManager->registerStatisticsModule(lit("controls"), m_statisticsModule.data());
+    statisticsManager->registerStatisticsModule(lit("controls"), m_statisticsModule.data());
 
-    connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionOpened
-                     , qnStatisticsManager, &QnStatisticsManager::resetStatistics);
-    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived
-                     , qnStatisticsManager, &QnStatisticsManager::sendStatistics);
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionOpened,
+        statisticsManager, &QnStatisticsManager::resetStatistics);
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived,
+        statisticsManager, &QnStatisticsManager::sendStatistics);
 
     initWorkarounds();
 }

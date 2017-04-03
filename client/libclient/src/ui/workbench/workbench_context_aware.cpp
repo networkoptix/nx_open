@@ -8,29 +8,30 @@
 
 #include "workbench_context.h"
 
-QnWorkbenchContextAware::QnWorkbenchContextAware(QObject *parent, bool lazyInitialization)
-    : m_context(nullptr)
-    , m_initialized(false)
+QnWorkbenchContextAware::QnWorkbenchContextAware(QObject* parent, bool lazyInitialization):
+    base_type(parent),
+    m_context(nullptr),
+    m_initialized(false)
 {
     init(parent, lazyInitialization);
 }
 
-QnWorkbenchContextAware::QnWorkbenchContextAware(QnWorkbenchContext *context)
-    : m_context(nullptr)
-    , m_initialized(false)
+QnWorkbenchContextAware::QnWorkbenchContextAware(QnWorkbenchContext *context):
+    base_type(context),
+    m_context(nullptr),
+    m_initialized(false)
 {
     init(context);
 }
 
-QnWorkbenchContextAware::QnWorkbenchContextAware(QObject *parent, QnWorkbenchContext *context)
-    : m_context(nullptr)
-    , m_initialized(false)
+QnWorkbenchContextAware::QnWorkbenchContextAware(QObject *parent,
+    QnWorkbenchContext *context)
+    :
+    base_type(context ? context : parent),
+    m_context(nullptr),
+    m_initialized(false)
 {
-    if(context) {
-        init(context);
-    } else {
-        init(parent);
-    }
+    init(context ? context : parent);
 }
 
 void QnWorkbenchContextAware::initializeContext(QObject *parent) {
