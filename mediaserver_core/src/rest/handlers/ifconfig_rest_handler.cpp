@@ -8,7 +8,8 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "utils/common/app_info.h"
-
+#include <rest/server/rest_connection_processor.h>
+#include <common/common_module.h>
 
 class IfconfigReply
 {
@@ -272,12 +273,16 @@ bool QnIfConfigRestHandler::checkData(const QnNetworkAddressEntryList& newSettin
     return true;
 }
 
-int QnIfConfigRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnIfConfigRestHandler::executePost(
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
+    const QByteArray &body,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner)
 {
-    Q_UNUSED(path)
-    Q_UNUSED(params)
-
-    QnMediaServerResourcePtr mServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+    const auto& resPool = owner->commonModule()->resourcePool();
+    const auto& moduleGuid = owner->commonModule()->moduleGUID();
+    QnMediaServerResourcePtr mServer = resPool->getResourceById<QnMediaServerResource>(moduleGuid);
     if (!mServer) {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error"));
         return CODE_OK;

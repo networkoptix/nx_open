@@ -7,7 +7,9 @@ namespace {
     static const int kUpdateMasterFlagTimeoutMs = 1000 * 30;
 }
 
-QnMasterServerStatusWatcher::QnMasterServerStatusWatcher()
+QnMasterServerStatusWatcher::QnMasterServerStatusWatcher(QObject* parent):
+    QObject(parent),
+    QnCommonModuleAware(parent)
 {
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)

@@ -12,15 +12,16 @@
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
 #include "utils/common/long_runnable.h"
+#include <common/common_module_aware.h>
 
-class QnFileDeletor: public QnLongRunnable
+class QnFileDeletor: public QnLongRunnable, public QnCommonModuleAware
 {
 public:
     void init(const QString& tmpRoot);
     static QnFileDeletor* instance();
     void deleteFile(const QString& fileName, const QnUuid &storageId);
-    
-    QnFileDeletor();
+
+    QnFileDeletor(QnCommonModule* commonModule);
     ~QnFileDeletor();
 
     virtual void run() override;

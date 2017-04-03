@@ -1,6 +1,7 @@
 #include "ldap_manager.h"
 
-#include "api/global_settings.h"
+#include <api/global_settings.h>
+#include <common/common_module.h>
 #include <nx/utils/log/log.h>
 #include <utils/crypt/symmetrical.h>
 #include <iostream>
@@ -194,7 +195,8 @@ namespace {
     }
 }
 
-QnLdapManager::QnLdapManager()
+QnLdapManager::QnLdapManager(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
 }
 

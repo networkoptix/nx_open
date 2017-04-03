@@ -11,12 +11,16 @@
 
 #include <nx_ec/managers/abstract_layout_manager.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
+#include <common/common_module.h>
 
 namespace {
     const int timeout = 60*1000;    //check once a minute
 }
 
-QnDesktopCameraDeleter::QnDesktopCameraDeleter(QObject *parent): QObject(parent) {
+QnDesktopCameraDeleter::QnDesktopCameraDeleter(QObject *parent):
+    QObject(parent),
+    QnCommonModuleAware(parent)
+{
     QTimer *timer = new QTimer(this);
     connect(timer, &QTimer::timeout, this, [this] {
         deleteQueuedResources();
@@ -25,7 +29,8 @@ QnDesktopCameraDeleter::QnDesktopCameraDeleter(QObject *parent): QObject(parent)
     timer->start(timeout);
 }
 
-void QnDesktopCameraDeleter::deleteQueuedResources() {
+void QnDesktopCameraDeleter::deleteQueuedResources()
+{
     for (const QnResourcePtr &resource: m_queuedToDelete) {
         if (resource->getStatus() != Qn::Offline)
             continue;
@@ -42,7 +47,8 @@ void QnDesktopCameraDeleter::deleteQueuedResources() {
     m_queuedToDelete.clear();
 }
 
-void QnDesktopCameraDeleter::updateQueue() {
+void QnDesktopCameraDeleter::updateQueue()
+{
 
     QnResourceList desktopCameras = resourcePool()->getResourcesWithFlag(Qn::desktop_camera);
     for(const QnResourcePtr &resource: desktopCameras) {

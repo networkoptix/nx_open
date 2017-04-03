@@ -14,6 +14,7 @@
 #include <rest/server/rest_connection_processor.h>
 
 #include <nx/fusion/serialization/json_functions.h>
+#include <common/common_module.h>
 
 class ManualSearchThreadPoolHolder
 {
@@ -215,7 +216,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
         infoMap.insert(camera.url, info);
     }
 
-    int registered = commonModule()->resourceDiscoveryManager()->registerManualCameras(infoMap);
+    int registered = owner->commonModule()->resourceDiscoveryManager()->registerManualCameras(infoMap);
     if (registered > 0)
     {
         QnAuditRecord auditRecord =

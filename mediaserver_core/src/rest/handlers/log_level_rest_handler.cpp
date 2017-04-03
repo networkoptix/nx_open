@@ -6,6 +6,7 @@
 #include <nx/network/http/httptypes.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <rest/server/rest_connection_processor.h>
+#include <common/common_module.h>
 
 namespace {
     const QString idParam = lit("id");
@@ -14,9 +15,9 @@ namespace {
 
 int QnLogLevelRestHandler::executeGet(
     const QString &path,
-    const QnRequestParams &params, 
-    QnJsonRestResult &result, 
-    const QnRestConnectionProcessor *processor) 
+    const QnRequestParams &params,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor *processor)
 {
     QN_UNUSED(path, processor);
 
@@ -32,7 +33,7 @@ int QnLogLevelRestHandler::executeGet(
     int logID = QnLog::MAIN_LOG_ID;
     requireParameter(params, idParam, result, &logID, true);
 
-    if (!_nx_logs->exists(logID)) 
+    if (!_nx_logs->exists(logID))
     {
         result.setError(QnJsonRestResult::InvalidParameter,
             lit("Parameter '%1' has invalid value '%2'").arg(idParam).arg(logID));
@@ -42,7 +43,7 @@ int QnLogLevelRestHandler::executeGet(
     auto setValue = params.find(valueParam);
     if (setValue != params.cend())
     {
-        if (!resourceAccessManager()->hasGlobalPermission(
+        if (!processor->commonModule()->resourceAccessManager()->hasGlobalPermission(
                 processor->accessRights(),
                 Qn::GlobalPermission::GlobalAdminPermission))
         {
@@ -61,7 +62,7 @@ int QnLogLevelRestHandler::executeGet(
         }
         QnLog::instance(logID)->setLogLevel(logLevel);
     }
-            
+
     const QnLogLevel resultLevel = QnLog::instance(logID)->logLevel();
     result.setReply(QnLog::logLevelToString(resultLevel));
 

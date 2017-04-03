@@ -19,7 +19,7 @@ public:
     virtual int executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 private:
     int execute(const ConfigureSystemData& data, QnJsonRestResult &result, const QnRestConnectionProcessor* owner);
-    int changePort(const Qn::UserAccessData& accessRights, int port);
+    int changePort(const QnRestConnectionProcessor* owner, int port);
 private:
     ec2::QnTransactionMessageBus* m_messageBus;
 };

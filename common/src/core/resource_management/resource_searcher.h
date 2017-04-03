@@ -27,7 +27,7 @@ enum class DiscoveryMode
 class QnAbstractResourceSearcher: public QnResourceFactory, public QnCommonModuleAware
 {
 protected:
-    explicit QnAbstractResourceSearcher(QnCommonModule* commonModule);
+    explicit QnAbstractResourceSearcher(QnCommonModule* commonModule = nullptr);
 
 public:
     virtual ~QnAbstractResourceSearcher();
@@ -108,10 +108,10 @@ private:
 
 
 // =====================================================================
-class QnAbstractNetworkResourceSearcher : virtual public QnAbstractResourceSearcher
+class QnAbstractNetworkResourceSearcher: virtual public QnAbstractResourceSearcher
 {
 protected:
-    QnAbstractNetworkResourceSearcher(QnCommonModule* commonModule);
+    QnAbstractNetworkResourceSearcher(QnCommonModule* commonModule = nullptr);
 public:
 
     // checks this QHostAddress and creates a QnResource in case of success

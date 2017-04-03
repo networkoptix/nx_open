@@ -2210,7 +2210,7 @@ void MediaServerProcess::run()
         QnAppInfo::organizationName().toUtf8());
 
     m_serverModule->setMessageProcessor(new QnServerMessageProcessor(m_serverModule.get()));
-    QScopedPointer<QnMasterServerStatusWatcher> masterServerWatcher(new QnMasterServerStatusWatcher());
+    QScopedPointer<QnMasterServerStatusWatcher> masterServerWatcher(new QnMasterServerStatusWatcher(commonModule()));
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb());
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager(m_serverModule.get()) );
@@ -2281,7 +2281,7 @@ void MediaServerProcess::run()
         )
     );
 
-    std::unique_ptr<QnFileDeletor> fileDeletor( new QnFileDeletor() );
+    std::unique_ptr<QnFileDeletor> fileDeletor( new QnFileDeletor(commonModule()) );
 
     connect(commonModule()->resourceDiscoveryManager(), &QnResourceDiscoveryManager::CameraIPConflict, this, &MediaServerProcess::at_cameraIPConflict);
     connect(qnNormalStorageMan, &QnStorageManager::noStoragesAvailable, this, &MediaServerProcess::at_storageManager_noStoragesAvailable);
@@ -2794,7 +2794,7 @@ void MediaServerProcess::run()
     qnGlobalSettings->synchronizeNowSync(); //TODO: #GDM double sync
 #endif
 
-    std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager());
+    std::unique_ptr<QnLdapManager> ldapManager(new QnLdapManager(commonModule()));
 
 
     commonModule()->resourceDiscoveryManager()->setReady(true);

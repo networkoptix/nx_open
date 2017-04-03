@@ -25,9 +25,9 @@ QnCrossdomainConnectionProcessor::QnCrossdomainConnectionProcessor(
     :
     QnTCPConnectionProcessor(
         new QnCrossdomainConnectionProcessorPrivate,
-        socket)
+        socket,
+        (QObject*) owner)
 {
-    Q_UNUSED(owner);
 }
 
 QnCrossdomainConnectionProcessor::~QnCrossdomainConnectionProcessor()

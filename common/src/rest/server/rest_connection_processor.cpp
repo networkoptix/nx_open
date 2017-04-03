@@ -61,17 +61,26 @@ const QnRestProcessorPool::Handlers& QnRestProcessorPool::handlers() const
 class QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
+    QnTcpListener* owner = nullptr;
 };
 
 QnRestConnectionProcessor::QnRestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
     QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket, _owner),
     m_noAuth(false)
 {
+    Q_D(QnRestConnectionProcessor);
+    d->owner = _owner;
 }
 
 QnRestConnectionProcessor::~QnRestConnectionProcessor()
 {
     stop();
+}
+
+QnTcpListener* QnRestConnectionProcessor::owner() const
+{
+    Q_D(const QnRestConnectionProcessor);
+    return d->owner;
 }
 
 void QnRestConnectionProcessor::run()
