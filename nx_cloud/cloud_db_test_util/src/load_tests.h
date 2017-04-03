@@ -10,6 +10,12 @@ int establishManyConnections(
     const std::string& password,
     int connectionCount);
 
+int makeApiRequests(
+    const std::string& cdbUrl,
+    const std::string& login,
+    const std::string& password,
+    int connectionCount);
+
 } // namespace client
 } // namespace cdb
 } // namespace nx

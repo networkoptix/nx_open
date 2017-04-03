@@ -21,6 +21,7 @@ int main(int argc, char* argv[])
     bool loadMode = false;
     int connectionCount = 100;
     int testSystemsToGenerate = -1;
+    int testRequestCount = 0;
     QString fetchRequest;
 
     QnCommandLineParser commandLineParser;
@@ -32,6 +33,7 @@ int main(int argc, char* argv[])
     commandLineParser.addParameter(
         &testSystemsToGenerate, "--generate-systems", "-s", "Number of random systems to generate");
     commandLineParser.addParameter(&fetchRequest, "--fetch", nullptr, "Fetch data. Values: systems");
+    commandLineParser.addParameter(&testRequestCount, "--api-requests", nullptr, "Make api requests");
 
     commandLineParser.parse(argc, (const char**)argv, stderr);
 
@@ -67,6 +69,15 @@ int main(int argc, char* argv[])
             accountEmail.toStdString(),
             accountPassword.toStdString(),
             fetchRequest.toStdString());
+    }
+
+    if (testRequestCount > 0)
+    {
+        return nx::cdb::client::makeApiRequests(
+            cdbUrl.toStdString(),
+            accountEmail.toStdString(),
+            accountPassword.toStdString(),
+            testRequestCount);
     }
 
     return 0;
