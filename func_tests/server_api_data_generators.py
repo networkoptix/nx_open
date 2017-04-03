@@ -71,8 +71,8 @@ def generate_email(name):
 
 
 def generate_ip_v4(id, base_address):
-    ip = int(base_address) + id
-    return ".".join(map(lambda n: str(ip >> n & 0xFF), [24, 16, 8, 0]))
+    assert isinstance(base_address, IPAddress)
+    return str(base_address + id)
 
 
 def generate_ip_v4_endpoint(id):
