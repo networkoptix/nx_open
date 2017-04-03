@@ -1,12 +1,6 @@
-/**********************************************************
-* Jun 1, 2016
-* a.kolesnikov
-***********************************************************/
-
 #include "request_executor.h"
 
 #include <QtSql/QSqlError>
-
 
 namespace nx {
 namespace db {

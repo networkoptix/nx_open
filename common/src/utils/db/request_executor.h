@@ -1,10 +1,4 @@
-/**********************************************************
-* Aug 11, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_CLOUD_DB_REQUEST_EXECUTOR_H
-#define NX_CLOUD_DB_REQUEST_EXECUTOR_H
+#pragma once
 
 #include <functional>
 
@@ -14,7 +8,6 @@
 
 #include "types.h"
 #include "query_context.h"
-
 
 namespace nx {
 namespace db {
@@ -29,8 +22,7 @@ public:
     virtual void reportErrorWithoutExecution(DBResult errorCode) = 0;
 };
 
-class BaseExecutor
-:
+class BaseExecutor:
     public AbstractExecutor
 {
 protected:
@@ -43,8 +35,7 @@ protected:
  * Executor of data update requests without output data.
  */
 template<typename InputData>
-class UpdateExecutor
-:
+class UpdateExecutor:
     public BaseExecutor
 {
 public:
@@ -110,8 +101,7 @@ private:
  * Executor of data update requests with output data.
  */
 template<typename InputData, typename OutputData>
-class UpdateWithOutputExecutor
-:
+class UpdateWithOutputExecutor:
     public BaseExecutor
 {
 public:
@@ -174,8 +164,7 @@ private:
     nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult, InputData, OutputData&&)> m_completionHandler;
 };
 
-class UpdateWithoutAnyDataExecutor
-:
+class UpdateWithoutAnyDataExecutor:
     public BaseExecutor
 {
 public:
@@ -234,9 +223,7 @@ private:
     nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> m_completionHandler;
 };
 
-
-class UpdateWithoutAnyDataExecutorNoTran
-:
+class UpdateWithoutAnyDataExecutorNoTran:
     public BaseExecutor
 {
 public:
@@ -268,7 +255,6 @@ private:
     nx::utils::MoveOnlyFunc<DBResult(QueryContext* const)> m_dbUpdateFunc;
     nx::utils::MoveOnlyFunc<void(QueryContext*, DBResult)> m_completionHandler;
 };
-
 
 //!Executor of SELECT requests
 class SelectExecutor:
@@ -306,5 +292,3 @@ private:
 
 } // namespace db
 } // namespace nx
-
-#endif  //NX_CLOUD_DB_REQUEST_EXECUTOR_H
