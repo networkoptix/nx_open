@@ -1,7 +1,7 @@
 #include "async_client.h"
 
 #include "common/common_globals.h"
-#include "utils/common/guard.h"
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log.h>
 
 namespace nx {
