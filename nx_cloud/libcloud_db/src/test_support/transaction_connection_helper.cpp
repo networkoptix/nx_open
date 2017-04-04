@@ -216,10 +216,14 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
 
         case ec2::QnTransactionTransportBase::NeedStartStreaming:
         case ec2::QnTransactionTransportBase::ReadyForStreaming:
-            {
-                QnMutexLocker lk(&m_mutex);
-                m_connectedConnections.insert(connectionId);
-            }
+            // Transaction transport invokes this handler with mutex locked, 
+            // so have to do some work around this misbehavior.
+            m_aioTimer.post(
+                [this, connectionId]()
+                {
+                    QnMutexLocker lk(&m_mutex);
+                    m_connectedConnections.insert(connectionId);
+                });
             m_onConnectionBecomesActiveSubscription.notify(newState);
             break;
 
