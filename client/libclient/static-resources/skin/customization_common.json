@@ -466,14 +466,6 @@
         }
     },
 
-    "QnNotificationsCollectionWidget": {
-        "palette": {
-            "default": {
-                "mid": "dark8"
-            }
-        }
-    },
-
     "QnResourceWidget": {
         "palette": {
             "default": {
@@ -762,12 +754,20 @@
         }
     },
 
+    "QnNotificationsCollectionWidget": {
+        "palette": {
+            "default": {
+                "mid": "dark8",
+                "windowText": "light10"
+            }
+        }
+    },
+
     "QnNotificationWidget" : {
         "_": "'dark' is used to paint horizontal line, 'alternateBase' - to paint More Notifications",
         "palette": {
             "default": {
                 "dark": "dark6",
-                "windowText": "light10",
                 "alternateBase": "dark17"
             }
         }
@@ -814,9 +814,17 @@
         "palette": {
             "default": {
                 "window": "dark1.setAlpha(128)",
-                "highlight": "brand_core.setAlpha(179)",
+                "midlight": "brand_core.setAlpha(179)",
+                "highlight": "red_l2.setAlpha(179)",
                 "dark": "brand_core.setAlpha(128)"
             }
+        }
+    },
+
+    "QnHudOverlayWidget": {
+        "colors": {
+            "detailsBackgroundColor": "dark1.setAlpha(128)",
+            "positionBackgroundColor": "dark1.setAlpha(128)"
         }
     },
 
