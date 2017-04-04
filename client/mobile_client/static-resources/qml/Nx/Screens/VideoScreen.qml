@@ -356,6 +356,8 @@ PageBase
         model: camerasModel
     }
 
+    Component.onDestruction: exitFullscreen()
+
     function hideUi()
     {
         d.uiOpacity = 0.0
