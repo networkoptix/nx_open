@@ -13,13 +13,15 @@ int establishManyConnections(
     const std::string& cdbUrl,
     const std::string& login,
     const std::string& password,
-    int connectionCount)
+    int connectionCount,
+    std::chrono::milliseconds maxDelayBeforeConnect)
 {
     auto loadEmulator = std::make_unique<test::LoadEmulator>(
         cdbUrl, //"https://cloud-dev.hdw.mx",
         login,
         password);
 
+    loadEmulator->setMaxDelayBeforeConnect(maxDelayBeforeConnect);
     loadEmulator->setTransactionConnectionCount(connectionCount);
     loadEmulator->start();
 
@@ -40,7 +42,8 @@ int makeApiRequests(
     const std::string& cdbUrl,
     const std::string& login,
     const std::string& password,
-    const int connectionCount)
+    const int connectionCount,
+    std::chrono::milliseconds /*maxDelayBeforeConnect*/)
 {
     using namespace std::chrono;
 

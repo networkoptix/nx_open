@@ -39,7 +39,7 @@ bool UdpServer::bind(const SocketAddress& localAddress)
     return m_messagePipeline.bind(localAddress);
 }
 
-bool UdpServer::listen()
+bool UdpServer::listen(int /*backlogSize*/)
 {
     if (!m_boundToLocalAddress)
     {

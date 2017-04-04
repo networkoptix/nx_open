@@ -21,6 +21,11 @@ LoadEmulator::LoadEmulator(
     m_connectionHelper.setRemoveConnectionAfterClosure(true);
 }
 
+void LoadEmulator::setMaxDelayBeforeConnect(std::chrono::milliseconds delay)
+{
+    m_connectionHelper.setMaxDelayBeforeConnect(delay);
+}
+
 void LoadEmulator::setTransactionConnectionCount(int connectionCount)
 {
     m_transactionConnectionCount = connectionCount;
