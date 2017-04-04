@@ -275,7 +275,7 @@ int CloudDBProcess::exec()
         // process privilege reduction
         CurrentProcess::changeUser(settings.changeUser());
 
-        if (!multiAddressHttpServer.listen())
+        if (!multiAddressHttpServer.listen(settings.http().tcpBacklogSize))
             return 5;
         m_httpEndpoints = multiAddressHttpServer.endpoints();
         NX_LOGX(lm("Listening on %1").container(m_httpEndpoints), cl_logINFO);
