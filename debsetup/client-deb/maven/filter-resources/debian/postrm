@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+for HOME_U in /home/*?; do
+    USER=$( basename ${HOME_U} )
+    if [ -f "$HOME_U/Desktop/${installer.name}.desktop" ]; then
+        rm -f "$HOME_U/Desktop/${installer.name}.desktop"
+    fi    
+done

@@ -154,7 +154,8 @@ class BoxConfig(object):
             )
 
     def matches(self, other):
-        return (self.ip_address_list == other.ip_address_list
+        return (self.name == other.name
+                and self.ip_address_list == other.ip_address_list
                 and sorted(self.required_file_list) == sorted(other.required_file_list)
                 and self.vm_commands == other.vm_commands
                 and self.vbox_commands == other.vbox_commands)

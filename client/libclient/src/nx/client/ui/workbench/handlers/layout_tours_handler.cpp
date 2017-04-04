@@ -19,10 +19,10 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
     QnWorkbenchContextAware(parent)
 {
     connect(action(QnActions::OpenLayoutTourAction), &QAction::triggered,
-        this, &LayoutToursHandler::openTousLayout);
+        this, &LayoutToursHandler::openToursLayout);
 }
 
-void LayoutToursHandler::openTousLayout()
+void LayoutToursHandler::openToursLayout()
 {
     const auto actions = QList<QnActions::IDType>()
         << QnActions::StartLayoutTourAction

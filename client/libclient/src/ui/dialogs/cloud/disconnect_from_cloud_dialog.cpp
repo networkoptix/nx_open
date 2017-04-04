@@ -27,13 +27,6 @@
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
 
-namespace {
-
-/** Setup width manually to correctly handle word-wrapped labels. */
-const int kDialogWidth = 400;
-
-}
-
 class QnDisconnectFromCloudDialogPrivate : public QObject, public QnWorkbenchContextAware
 {
     QnDisconnectFromCloudDialog *q_ptr;
@@ -258,7 +251,6 @@ void QnDisconnectFromCloudDialogPrivate::setVisibleButton(VisibleButton button)
 void QnDisconnectFromCloudDialogPrivate::setupUi()
 {
     Q_Q(QnDisconnectFromCloudDialog);
-    q->setFixedWidth(kDialogWidth);
     q->setStandardButtons(QDialogButtonBox::Cancel);
 
     okButton = new QnBusyIndicatorButton(q);

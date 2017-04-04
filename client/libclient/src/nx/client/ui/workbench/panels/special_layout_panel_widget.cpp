@@ -8,7 +8,6 @@
 #include <client/client_globals.h>
 #include <ui/actions/action_manager.h>
 
-
 namespace {
 
 QString getString(int role, const QnLayoutResourcePtr& resource)
@@ -16,7 +15,7 @@ QString getString(int role, const QnLayoutResourcePtr& resource)
     return resource->data(role).toString();
 }
 
-}
+} // namespace
 
 namespace nx {
 namespace client {

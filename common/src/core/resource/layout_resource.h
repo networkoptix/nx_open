@@ -50,6 +50,9 @@ public:
 
     void removeItem(const QnUuid &itemUuid);
 
+    /**
+     * @note Resource replacement is not supported for item.
+     */
     void updateItem(const QnLayoutItemData &item);
 
     float cellAspectRatio() const;
