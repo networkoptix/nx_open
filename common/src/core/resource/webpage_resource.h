@@ -20,7 +20,8 @@ public:
     static QString nameForUrl(const QUrl& url);
 
     virtual Qn::ResourceStatus getStatus() const override;
-    virtual void setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason) override;
+    virtual void setStatus(Qn::ResourceStatus newStatus,
+        Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override;
 
 private:
     Qn::ResourceStatus m_status { Qn::NotDefined }; //< This class must not store its status on server side
