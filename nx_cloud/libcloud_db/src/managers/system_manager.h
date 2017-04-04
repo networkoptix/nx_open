@@ -28,7 +28,7 @@
 #include "access_control/abstract_authentication_data_provider.h"
 #include "cache.h"
 #include "dao/rdb/system_sharing_data_object.h"
-#include "dao/rdb/system_data_object.h"
+#include "dao/abstract_system_data_object.h"
 #include "data/account_data.h"
 #include "data/data_filter.h"
 #include "data/system_data.h"
@@ -232,7 +232,7 @@ private:
     uint64_t m_dropSystemsTimerId;
     std::atomic<bool> m_dropExpiredSystemsTaskStillRunning;
     nx::utils::Subscription<std::string> m_systemMarkedAsDeletedSubscription;
-    dao::rdb::SystemDataObject m_systemDao;
+    std::unique_ptr<dao::AbstractSystemDataObject> m_systemDao;
     dao::rdb::SystemSharingDataObject m_systemSharingDao;
 
     nx::db::DBResult insertSystemToDB(
