@@ -1173,34 +1173,31 @@ void QnCameraScheduleWidget::at_exportScheduleButton_clicked()
         }
 
         camera->setScheduleDisabled(!recordingEnabled);
-        if (recordingEnabled)
+        int maxFps = camera->getMaxFps();
+
+        //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
+        // or just use camera->reservedSecondStreamFps();
+
+        int decreaseAlways = 0;
+        if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing && camera->getMotionType() == Qn::MT_SoftwareGrid)
+            decreaseAlways = MIN_SECOND_STREAM_FPS;
+
+        int decreaseIfMotionPlusLQ = 0;
+        if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
+            decreaseIfMotionPlusLQ = MIN_SECOND_STREAM_FPS;
+
+        QnScheduleTaskList tasks;
+        for (auto task: scheduleTasks())
         {
-            int maxFps = camera->getMaxFps();
-
-            //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
-            // or just use camera->reservedSecondStreamFps();
-
-            int decreaseAlways = 0;
-            if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing && camera->getMotionType() == Qn::MT_SoftwareGrid)
-                decreaseAlways = MIN_SECOND_STREAM_FPS;
-
-            int decreaseIfMotionPlusLQ = 0;
-            if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
-                decreaseIfMotionPlusLQ = MIN_SECOND_STREAM_FPS;
-
-            QnScheduleTaskList tasks;
-            for (auto task: scheduleTasks())
-            {
-                if (task.getRecordingType() == Qn::RT_MotionAndLowQuality)
-                    task.setFps(qMin(task.getFps(), maxFps - decreaseIfMotionPlusLQ));
-                else
-                    task.setFps(qMin(task.getFps(), maxFps - decreaseAlways));
-                tasks.append(task);
-            }
-            updateRecordThresholds(tasks);
-
-            camera->setScheduleTasks(tasks);
+            if (task.getRecordingType() == Qn::RT_MotionAndLowQuality)
+                task.setFps(qMin(task.getFps(), maxFps - decreaseIfMotionPlusLQ));
+            else
+                task.setFps(qMin(task.getFps(), maxFps - decreaseAlways));
+            tasks.append(task);
         }
+        updateRecordThresholds(tasks);
+
+        camera->setScheduleTasks(tasks);
     };
 
     auto selectedCameras = qnResPool->getResources<QnVirtualCameraResource>(
