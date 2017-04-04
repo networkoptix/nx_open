@@ -293,10 +293,12 @@ private:
                                                                lit("/"));
             pathString = lit("%2/%1/%3").arg(cameraFolder).arg(quality).arg(pathString);
             auto fullDirPath = QDir(root).absoluteFilePath(pathString);
+            decltype(curStartTime + curDuration) error = -1;
+            
             if (!QDir().mkpath(fullDirPath))
             {
                 qDebug() << "Create directory" << fullDirPath << "failed";
-                return -1LL;
+                return error;
             }
             QString fullFileName = closeDirPath(root) + closeDirPath(pathString)
                                                       + fileName;
@@ -307,7 +309,7 @@ private:
                     qDebug() << "Copy file" << fullFileName << "failed";
                     if (QFile(fullFileName).exists())
                         qDebug() << "Already exsits";
-                    return -1LL;
+                    return error;
                 }
             }
             else
@@ -318,7 +320,7 @@ private:
                     qDebug() << "Copy file" << fullFileName << "failed";
                     if (QFile(fullFileName).exists())
                         qDebug() << "Already exsits";
-                    return -1LL;
+                    return error;
                 }
             }
 
