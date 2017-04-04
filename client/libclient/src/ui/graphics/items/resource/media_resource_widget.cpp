@@ -762,8 +762,8 @@ void QnMediaResourceWidget::suspendHomePtzController()
 
 void QnMediaResourceWidget::setupHud()
 {
-    m_triggersContainer = new QnScrollableItemsWidget(
-        Qt::AlignRight | Qt::AlignBottom, m_hudOverlay->right());
+    m_triggersContainer = new QnScrollableItemsWidget(m_hudOverlay->right());
+    m_triggersContainer->setAlignment(Qt::AlignRight | Qt::AlignBottom);
 
     m_triggersContainer->setSpacing(kTriggersSpacing);
     m_triggersContainer->setMaximumWidth(kTriggerButtonSize);

@@ -19,6 +19,7 @@ QnScrollableItemsWidgetPrivate::QnScrollableItemsWidgetPrivate(
     auto contentWidget = new QGraphicsWidget(parent);
     contentWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     contentWidget->setLayout(m_contentLayout);
+    contentWidget->setAcceptedMouseButtons(Qt::NoButton);
     m_scrollArea->setContentWidget(contentWidget);
 
     auto mainLayout = new QGraphicsLinearLayout(parent);

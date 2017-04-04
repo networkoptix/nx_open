@@ -9,7 +9,10 @@ class QnScrollableItemsWidget: public QGraphicsWidget
     using base_type = QGraphicsWidget;
 
 public:
-    QnScrollableItemsWidget(Qt::Alignment alignment, QGraphicsItem* parent = nullptr);
+    QnScrollableItemsWidget(QGraphicsItem* parent = nullptr);
+
+    Qt::Alignment alignment() const;
+    void setAlignment(Qt::Alignment alignment);
 
     /** Add item to scrollable area. Will take ownership of the item. */
     QnUuid addItem(QGraphicsWidget* item, const QnUuid& externalId = QnUuid());

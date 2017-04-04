@@ -11,10 +11,13 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
-#include <utils/common/warnings.h>
+#include <utils/common/aspect_ratio.h>
+#include <utils/common/delayed.h>
 #include <utils/common/scoped_painter_rollback.h>
-#include <utils/common/util.h>
 #include <utils/common/synctime.h>
+#include <utils/common/util.h>
+#include <utils/common/warnings.h>
+#include <utils/license_usage_helper.h>
 #include <utils/math/color_transformations.h>
 #include <utils/math/linear_combination.h>
 
@@ -52,8 +55,6 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/style/nx_style.h>
-#include <utils/common/aspect_ratio.h>
-#include <utils/license_usage_helper.h>
 #include <nx/utils/string.h>
 
 namespace {
@@ -152,6 +153,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     setupHud();
     createButtons();
+
+    executeDelayedParented([this]() { updateHud(false); }, 0, this);
 
     /* Handle layout permissions if an item is placed on the common layout. Otherwise, it can be Motion Widget, for example. */
     if (itemBelongsToValidLayout(item))

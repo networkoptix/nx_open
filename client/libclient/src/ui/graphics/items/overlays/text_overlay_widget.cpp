@@ -24,22 +24,25 @@ QnOverlayTextItemData::QnOverlayTextItemData(const QnUuid &initId
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnOverlayTextItemData, (eq), QnOverlayTextItemData_Fields);
 
-QnTextOverlayWidget::QnTextOverlayWidget(QGraphicsWidget *parent)
-    : base_type(Qt::AlignRight | Qt::AlignBottom, parent)
+QnTextOverlayWidget::QnTextOverlayWidget(QGraphicsWidget* parent):
+    base_type(parent)
 {
     enum
     {
-        kDefaultHorMargin = 2
-        , kDefaultBottomMargin = 2
-        , kDefaultTopMargin = 28
+        kDefaultHorMargin = 2,
+        kDefaultBottomMargin = 2,
+        kDefaultTopMargin = 28
     };
 
-    setContentsMargins(kDefaultHorMargin, kDefaultTopMargin
-        , kDefaultHorMargin, kDefaultBottomMargin);
+    setContentsMargins(kDefaultHorMargin, kDefaultTopMargin,
+        kDefaultHorMargin, kDefaultBottomMargin);
+
+    setAlignment(Qt::AlignRight | Qt::AlignBottom);
 }
 
 QnTextOverlayWidget::~QnTextOverlayWidget()
-{}
+{
+}
 
 void QnTextOverlayWidget::addTextItem(const QnOverlayTextItemData &data)
 {

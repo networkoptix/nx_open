@@ -1,11 +1,22 @@
 #include "scrollable_items_widget.h"
 #include "private/scrollable_items_widget_p.h"
 
-QnScrollableItemsWidget::QnScrollableItemsWidget(Qt::Alignment alignment, QGraphicsItem* parent):
+QnScrollableItemsWidget::QnScrollableItemsWidget(QGraphicsItem* parent):
     base_type(parent),
     d_ptr(new QnScrollableItemsWidgetPrivate(this))
 {
-    d_ptr->setAlignment(alignment);
+}
+
+Qt::Alignment QnScrollableItemsWidget::alignment() const
+{
+    Q_D(const QnScrollableItemsWidget);
+    return d->alignment();
+}
+
+void QnScrollableItemsWidget::setAlignment(Qt::Alignment alignment)
+{
+    Q_D(QnScrollableItemsWidget);
+    d->setAlignment(alignment);
 }
 
 QnUuid QnScrollableItemsWidget::addItem(QGraphicsWidget* item, const QnUuid& externalId)
