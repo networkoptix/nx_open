@@ -7,6 +7,10 @@
 #include "io_module_form_overlay_contents.h"
 #include "io_module_grid_overlay_contents.h"
 
+#include <client_core/connection_context_aware.h>
+
+#include <common/common_module.h>
+
 #include <api/app_server_connection.h>
 #include <core/resource/camera_resource.h>
 #include <camera/iomodule/iomodule_monitor.h>
@@ -26,7 +30,8 @@ constexpr int kStateCheckIntervalMs = 1000;
 
 } // namespace
 
-class QnIoModuleOverlayWidgetPrivate: public Connective<QObject>
+class QnIoModuleOverlayWidgetPrivate: public Connective<QObject>,
+    public QnConnectionContextAware
 {
     using base_type = Connective<QObject>;
 

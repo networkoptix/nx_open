@@ -110,7 +110,8 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
 
 QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString &filename) const
 {
-    return resourceFromFile(filename);
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    return resourceFromFile(filename, resourcePool); //TODO: #GDM #3.1 refactor all the scheme. Adding must not be here
 }
 
 // =============================================================================================

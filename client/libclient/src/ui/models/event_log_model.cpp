@@ -179,7 +179,8 @@ QnEventLogModel::QnEventLogModel(QObject* parent):
     QnWorkbenchContextAware(parent),
     m_columns(),
     m_linkBrush(QPalette().link()),
-    m_index(new DataIndex(this))
+    m_index(new DataIndex(this)),
+    m_helper(new QnBusinessStringsHelper(this))
 {
 }
 
@@ -374,7 +375,7 @@ QString QnEventLogModel::textData(Column column, const QnBusinessActionData& act
             return dt.toString(Qt::DefaultLocaleShortDate);
         }
         case EventColumn:
-            return QnBusinessStringsHelper::eventName(action.eventParams.eventType);
+            return m_helper->eventName(action.eventParams.eventType);
         case EventCameraColumn:
         {
             QString result = getResourceNameString(action.eventParams.eventResourceId);
@@ -383,7 +384,7 @@ QString QnEventLogModel::textData(Column column, const QnBusinessActionData& act
             return result;
         }
         case ActionColumn:
-            return QnBusinessStringsHelper::actionName(action.actionType);
+            return m_helper->actionName(action.actionType);
         case ActionCameraColumn:
         {
             QnBusiness::ActionType actionType = action.actionType;
@@ -440,7 +441,7 @@ QString QnEventLogModel::textData(Column column, const QnBusinessActionData& act
             }
             else
             {
-                result = QnBusinessStringsHelper::eventDetails(action.eventParams).join(L'\n');
+                result = m_helper->eventDetails(action.eventParams).join(L'\n');
             }
 
             if (!QnBusiness::hasToggleState(eventType))
@@ -571,7 +572,7 @@ QString QnEventLogModel::motionUrl(Column column, const QnBusinessActionData& ac
     if (column != DescriptionColumn || !action.hasFlags(QnBusinessActionData::VideoLinkExists))
         return QString();
 
-    return QnBusinessStringsHelper::urlForCamera(action.eventParams.eventResourceId, action.eventParams.eventTimestampUsec, true);
+    return m_helper->urlForCamera(action.eventParams.eventResourceId, action.eventParams.eventTimestampUsec, true);
 }
 
 QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) const

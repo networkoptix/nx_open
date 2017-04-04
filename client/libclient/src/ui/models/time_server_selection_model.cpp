@@ -78,7 +78,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
     m_sameTimezone(false),
     m_sameTimezoneValid(false)
 {
-    auto processor = QnCommonMessageProcessor::instance();
+    auto processor = qnCommonMessageProcessor;
 
     /* Handle peer time updates. */
     connect(processor, &QnCommonMessageProcessor::peerTimeChanged, this,

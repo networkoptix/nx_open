@@ -10,15 +10,15 @@
 QnBusinessRulesActualModel::QnBusinessRulesActualModel(QObject *parent):
     QnBusinessRulesViewModel(parent)
 {
-    connect(QnCommonMessageProcessor::instance(),           &QnCommonMessageProcessor::businessRuleChanged, this, &QnBusinessRulesActualModel::at_message_ruleChanged);
-    connect(QnCommonMessageProcessor::instance(),           &QnCommonMessageProcessor::businessRuleDeleted, this, &QnBusinessRulesActualModel::at_message_ruleDeleted);
-    connect(QnCommonMessageProcessor::instance(),           &QnCommonMessageProcessor::businessRuleReset,   this, &QnBusinessRulesActualModel::at_message_ruleReset);
+    connect(qnCommonMessageProcessor,           &QnCommonMessageProcessor::businessRuleChanged, this, &QnBusinessRulesActualModel::at_message_ruleChanged);
+    connect(qnCommonMessageProcessor,           &QnCommonMessageProcessor::businessRuleDeleted, this, &QnBusinessRulesActualModel::at_message_ruleDeleted);
+    connect(qnCommonMessageProcessor,           &QnCommonMessageProcessor::businessRuleReset,   this, &QnBusinessRulesActualModel::at_message_ruleReset);
 
     reset();
 }
 
 void QnBusinessRulesActualModel::reset() {
-    at_message_ruleReset(QnCommonMessageProcessor::instance()->businessRules().values());
+    at_message_ruleReset(qnCommonMessageProcessor->businessRules().values());
 }
 
 void QnBusinessRulesActualModel::saveRule(const QModelIndex &index) {

@@ -51,7 +51,9 @@ using boost::algorithm::any_of;
 
 namespace {
 
-    class SortRulesProxyModel: public QSortFilterProxyModel {
+    class SortRulesProxyModel: public QSortFilterProxyModel,
+        public QnConnectionContextAware
+    {
     public:
         explicit SortRulesProxyModel(QObject *parent = 0)
             : QSortFilterProxyModel(parent)
@@ -595,7 +597,9 @@ void QnBusinessRulesDialog::retranslateUi()
 {
     ui->retranslateUi(this);
 
-    ui->filterLineEdit->lineEdit()->setPlaceholderText(QnDeviceDependentStrings::getDefaultNameFromSet(
+    ui->filterLineEdit->lineEdit()->setPlaceholderText(
+        QnDeviceDependentStrings::getDefaultNameFromSet(
+        resourcePool(),
         tr("Filter by devices..."),
         tr("Filter by cameras...")
     ));

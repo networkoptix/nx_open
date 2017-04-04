@@ -1,5 +1,4 @@
-#ifndef COMMON_MESSAGE_PROCESSOR_H
-#define COMMON_MESSAGE_PROCESSOR_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -148,4 +147,4 @@ protected:
     QMap<QnUuid, QnBusinessEventRulePtr> m_rules;
 };
 
-#endif // COMMON_MESSAGE_PROCESSOR_H
+#define qnCommonMessageProcessor commonModule()->messageProcessor()

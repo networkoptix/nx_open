@@ -27,7 +27,8 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     m_businessRulesCheckBoxes(),
     m_systemHealthCheckBoxes(),
     m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this)),
-    m_updating(false)
+    m_updating(false),
+    m_helper(new QnBusinessStringsHelper(this))
 {
     ui->setupUi(this);
 
@@ -39,7 +40,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     for (QnBusiness::EventType eventType : QnBusiness::allEvents())
     {
         QCheckBox* checkbox = new QCheckBox(this);
-        checkbox->setText(QnBusinessStringsHelper::eventName(eventType));
+        checkbox->setText(m_helper->eventName(eventType));
         ui->businessEventsLayout->addWidget(checkbox);
         m_businessRulesCheckBoxes[eventType] = checkbox;
 

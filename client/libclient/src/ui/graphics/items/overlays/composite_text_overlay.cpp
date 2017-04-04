@@ -3,7 +3,9 @@
 
 #include <api/common_message_processor.h>
 
-#include <utils/common/html.h>
+#include <common/common_module.h>
+
+#include <client_core/client_core_module.h>
 
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
@@ -13,6 +15,8 @@
 
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/common/search_query_strategy.h>
+
+#include <utils/common/html.h>
 
 namespace
 {
@@ -43,7 +47,8 @@ QnCompositeTextOverlay::QnCompositeTextOverlay(const QnVirtualCameraResourcePtr 
     , m_currentMode(kUndefinedMode)
     , m_data()
 
-    , m_colors()
+    , m_colors(),
+    m_helper(new QnBusinessStringsHelper(this))
 {
     m_counter.start();
     initTextMode();
@@ -155,7 +160,7 @@ void QnCompositeTextOverlay::initTextMode()
         return;
 
     const auto cameraId = m_camera->getId();
-    const auto messageProcessor = QnCommonMessageProcessor::instance();
+    const auto messageProcessor = qnClientCoreModule->commonModule()->messageProcessor();
 
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived
         , this, [this, cameraId](const QnAbstractBusinessActionPtr &businessAction)
@@ -205,10 +210,10 @@ void QnCompositeTextOverlay::initTextMode()
         {
             const auto runtimeParams = businessAction->getRuntimeParams();
 
-            const auto caption = QnBusinessStringsHelper::eventAtResource(runtimeParams, Qn::RI_WithUrl);
+            const auto caption = m_helper->eventAtResource(runtimeParams, Qn::RI_WithUrl);
             const auto htmlCaption = htmlFormattedParagraph(caption, kCaptionPixelFontSize, true);
 
-            const auto desc = QnBusinessStringsHelper::eventDetails(runtimeParams).join(L'\n');
+            const auto desc = m_helper->eventDetails(runtimeParams).join(L'\n');
             const auto htmlDesc = htmlFormattedParagraph(desc, kDescriptionPixelFontSize);
 
             if (caption.trimmed().isEmpty() && desc.trimmed().isEmpty())  // Do not add empty text items

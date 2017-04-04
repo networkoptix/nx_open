@@ -122,7 +122,7 @@ int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &met
         {
             auto eventWidth = [metrics](QnBusiness::EventType eventType)
             {
-                return 100; //metrics.width(m_helper->eventName(eventType)); //this will be redone anyway
+                return 100; //metrics.width(m_helper->eventName(eventType)); //TODO: #GDM #3.1 #refactor table
             };
             int result = -1;
             for (QnBusiness::EventType eventType : QnBusiness::allEvents())
@@ -133,7 +133,7 @@ int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &met
         {
             auto actionWidth = [metrics](QnBusiness::ActionType actionType)
             {
-                return 100; // metrics.width(m_helper->actionName(actionType)); //this will be redone anyway
+                return 100; // metrics.width(m_helper->actionName(actionType)); //TODO: #GDM #3.1 #refactor table
             };
             int result = -1;
             for (QnBusiness::ActionType actionType : QnBusiness::allActions())
@@ -255,6 +255,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         {
             QComboBox* comboBox = new QComboBox(parent);
             comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
+            //TODO: #GDM #3.1 #refactor table
 //             for (QnBusiness::EventType eventType : m_lexComparator->lexSortedEvents())
 //                 comboBox->addItem(QnBusinessStringsHelper::eventName(eventType), eventType);
             return comboBox;
@@ -268,6 +269,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             {
                 if (instantOnly && !QnBusiness::canBeInstant(actionType))
                     continue;
+                //TODO: #GDM #3.1 #refactor table
 //                comboBox->addItem(QnBusinessStringsHelper::actionName(actionType), actionType);
             }
             return comboBox;

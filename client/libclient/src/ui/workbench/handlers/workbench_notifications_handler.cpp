@@ -75,7 +75,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
             checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
         });
 
-    QnCommonMessageProcessor *messageProcessor = QnCommonMessageProcessor::instance();
+    QnCommonMessageProcessor *messageProcessor = qnCommonMessageProcessor;
     connect(messageProcessor, &QnCommonMessageProcessor::connectionOpened, this,
         &QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened);
     connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed, this,

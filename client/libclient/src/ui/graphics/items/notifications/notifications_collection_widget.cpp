@@ -77,7 +77,8 @@ const char* kItemTimeStampPropertyName = "_qn_itemTimeStamp";
 QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
     base_type(parent, flags),
     QnWorkbenchContextAware(context),
-    m_headerWidget(new GraphicsWidget(this))
+    m_headerWidget(new GraphicsWidget(this)),
+    m_helper(new QnBusinessStringsHelper(this))
 {
     int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
     auto newButton = [this, maxIconSize](QnActions::IDType actionId, int helpTopicId)
@@ -233,7 +234,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
     QnUuid ruleId = businessAction->getBusinessRuleId();
-    QString title = QnBusinessStringsHelper::eventAtResource(params, qnSettings->extraInfoInTree());
+    QString title = m_helper->eventAtResource(params, qnSettings->extraInfoInTree());
     qint64 timestampMs = params.eventTimestampUsec / 1000;
 
     auto alarmCameras = resourcePool()->getResources<QnVirtualCameraResource>(businessAction->getResources());
@@ -281,7 +282,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         }
     }
 
-    QStringList tooltip = QnBusinessStringsHelper::eventDescription(businessAction,
+    QStringList tooltip = m_helper->eventDescription(businessAction,
         QnBusinessAggregationInfo(), qnSettings->extraInfoInTree());
 
     //TODO: #GDM #3.1 move this code to ::eventDetails()

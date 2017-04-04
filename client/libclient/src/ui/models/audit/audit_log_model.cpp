@@ -8,6 +8,10 @@
 
 #include "business/business_strings_helper.h"
 
+#include <client_core/client_core_module.h>
+
+#include <common/common_module.h>
+
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/network_resource.h>
@@ -38,9 +42,11 @@ namespace
 {
     QString firstResourceName(const QnAuditRecord *d1)
     {
+        auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+
         if (d1->resources.empty())
             return QString();
-        if (QnResourcePtr res = resourcePool()->getResourceById(d1->resources[0]))
+        if (QnResourcePtr res = resourcePool->getResourceById(d1->resources[0]))
             return res->getName();
         else
             return QString();
@@ -48,9 +54,11 @@ namespace
 
     QString firstResourceIp(const QnAuditRecord *d1)
     {
+        auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+
         if (d1->resources.empty())
             return QString();
-        if (QnNetworkResourcePtr res = resourcePool()->getResourceById<QnNetworkResource>(d1->resources[0]))
+        if (QnNetworkResourcePtr res = resourcePool->getResourceById<QnNetworkResource>(d1->resources[0]))
             return res->getHostAddress();
         else
             return QString();
@@ -397,7 +405,9 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data) const
         //fall-through
     case Qn::AR_CameraUpdate:
     case Qn::AR_CameraInsert:
-        result += QnDeviceDependentStrings::getNumericName(getCameras(data->resources));
+        result += QnDeviceDependentStrings::getNumericName(
+            resourcePool(),
+            getCameras(data->resources));
         break;
 
     default:
@@ -426,7 +436,9 @@ QString QnAuditLogModel::htmlData(const Column& column, const QnAuditRecord* dat
         case Qn::AR_CameraInsert:
         case Qn::AR_CameraUpdate:
         {
-            QString txt = QnDeviceDependentStrings::getNumericName(getCameras(data->resources));
+            QString txt = QnDeviceDependentStrings::getNumericName(
+                resourcePool(),
+                getCameras(data->resources));
             QString linkColor = lit("#%1").arg(QString::number(m_colors.httpLink.rgb(), 16));
             if (hovered)
                 result += lit("<font color=%1><u><b>%2</b></u></font>").arg(linkColor).arg(txt);
@@ -599,7 +611,10 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
         case EventTypeColumn:
             return tr("Activity");
         case CameraNameColumn:
-            return QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device name"), tr("Camera name"));
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool(),
+                tr("Device name"),
+                tr("Camera name"));
         case CameraIpColumn:
             return tr("IP");
         case DateColumn:

@@ -11,6 +11,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
+class QnBusinessStringsHelper;
 
 class QnEventLogModel: public QAbstractItemModel, public QnWorkbenchContextAware
 {
@@ -79,4 +80,5 @@ private:
     QList<Column> m_columns;
     QBrush m_linkBrush;
     QScopedPointer<DataIndex> m_index;
+    QnBusinessStringsHelper* m_helper;
 };

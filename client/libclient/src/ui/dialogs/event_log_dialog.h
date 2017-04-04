@@ -1,5 +1,4 @@
-#ifndef QN_EVENT_LOG_DIALOG_H
-#define QN_EVENT_LOG_DIALOG_H
+#pragma once
 
 #include <QtWidgets/QDialog>
 #include <QtGui/QStandardItem>
@@ -14,6 +13,7 @@
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 class QnEventLogModel;
+class QnBusinessStringsHelper;
 
 namespace Ui {
     class EventLogDialog;
@@ -88,6 +88,6 @@ private:
     QAction *m_exportAction;
     QAction *m_clipboardAction;
     Qt::MouseButton m_lastMouseButton;
-};
 
-#endif // QN_EVENT_LOG_DIALOG_H
+    QnBusinessStringsHelper* m_helper {nullptr};
+};

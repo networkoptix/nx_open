@@ -2,17 +2,21 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include <utils/common/connective.h>
+#include <client_core/connection_context_aware.h>
 #include <client/client_color_types.h>
+
+#include <utils/common/connective.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <ui/customization/customized.h>
 #include <ui/graphics/items/overlays/text_overlay_widget.h>
 
 class QnWorkbenchNavigator;
+class QnBusinessStringsHelper;
 
 /// @brief Class manages bookmarks and texts that are related to owners' media widget
 /// TODO: #ynikitenkov Refactor it. Should be separated to complex overlay and distinct single watcher (for data gathering)
-class QnCompositeTextOverlay : public Connective< Customized<QnTextOverlayWidget> >
+class QnCompositeTextOverlay : public Connective< Customized<QnTextOverlayWidget> >,
+    public QnConnectionContextAware
 {
 public:
     enum Mode
@@ -90,4 +94,6 @@ private:
     ModeInternalDataHash m_data;
 
     QnCompositeTextOverlayColors m_colors;
+
+    QnBusinessStringsHelper* m_helper;
 };

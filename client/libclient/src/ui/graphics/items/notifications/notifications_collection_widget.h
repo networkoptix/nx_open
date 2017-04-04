@@ -23,6 +23,7 @@ class QnNotificationWidget;
 class QnParticleItem;
 class QnToolTipWidget;
 class QnBlinkingImageButtonWidget;
+class QnBusinessStringsHelper;
 
 class QnNotificationsCollectionWidget: public Connective<GraphicsWidget>, public QnWorkbenchContextAware {
     Q_OBJECT
@@ -91,6 +92,7 @@ private:
     QMultiHash<QString, QnNotificationWidget*> m_itemsByLoadingSound;
     QMultiHash<QnUuid, QnNotificationWidget*> m_itemsByBusinessRuleId;
     QPointer<QnBlinkingImageButtonWidget> m_blinker;
+    QnBusinessStringsHelper* m_helper;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

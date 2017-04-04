@@ -5,8 +5,7 @@
 #include <QtCore/QTimer>
 #include "export/sign_helper.h"
 
-// TODO: #Elric not a dialog, a label! move to widgets!
-
+// TODO: #GDM #3.1 not a dialog, a label! move to widgets!
 class QnSignInfo: public QLabel
 {
     Q_OBJECT

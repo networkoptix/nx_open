@@ -1,8 +1,9 @@
-#ifndef QN_DROP_INSTRUMENT_H
-#define QN_DROP_INSTRUMENT_H
+#pragma once
 
 #include "instrument.h"
 #include "scene_event_filter.h"
+
+#include <client_core/connection_context_aware.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/videowall_item_index.h>
@@ -12,7 +13,8 @@ class QnWorkbenchContext;
 class DropSurfaceItem;
 class DestructionGuardItem;
 
-class DropInstrument: public Instrument, public SceneEventFilter {
+class DropInstrument: public Instrument, public SceneEventFilter, public QnConnectionContextAware
+{
     Q_OBJECT
 public:
     DropInstrument(bool intoNewLayout, QnWorkbenchContext *context, QObject *parent = NULL);
@@ -57,5 +59,3 @@ private:
 
 /** Name of the mimetype to add to a drag object to forbid its dropping on the scene. */
 #define NoSceneDrop _id(lit("_qn_noSceneDrop"))
-
-#endif // QN_DROP_INSTRUMENT_H

@@ -10,6 +10,8 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/resource_display_info.h>
 
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
 #include <client/client_settings.h>
 
 #include <business/business_action_parameters.h>
@@ -103,24 +105,28 @@ QSet<QnUuid> toIds(const QnResourceList& resources)
 
 QSet<QnUuid> filterEventResources(const QSet<QnUuid>& ids, EventType eventType)
 {
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+
     if (requiresCameraResource(eventType))
-        return toIds(resourcePool()->getResources<QnVirtualCameraResource>(ids));
+        return toIds(resourcePool->getResources<QnVirtualCameraResource>(ids));
 
     if (requiresServerResource(eventType))
-        return toIds(resourcePool()->getResources<QnMediaServerResource>(ids));
+        return toIds(resourcePool->getResources<QnMediaServerResource>(ids));
 
     return QSet<QnUuid>();
 }
 
 QSet<QnUuid> filterActionResources(const QSet<QnUuid>& ids, ActionType actionType)
 {
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+
     if (requiresCameraResource(actionType))
-        return toIds(resourcePool()->getResources<QnVirtualCameraResource>(ids));
+        return toIds(resourcePool->getResources<QnVirtualCameraResource>(ids));
 
     if (requiresUserResource(actionType))
     {
         auto users = resourcePool()->getResources<QnUserResource>(ids);
-        auto roles = userRolesManager()->userRoles(ids);
+        auto roles = qnClientCoreModule->commonModule()->userRolesManager()->userRoles(ids);
         auto result = toIds(users);
         for (auto role: roles)
             result << role.id;
@@ -154,13 +160,14 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent)
     , m_disabled(false)
     , m_eventTypesModel(new QStandardItemModel(this))
     , m_eventStatesModel(new QStandardItemModel(this))
-    , m_actionTypesModel(new QStandardItemModel(this))
+    , m_actionTypesModel(new QStandardItemModel(this)),
+    m_helper(new QnBusinessStringsHelper(this))
 {
 
     QnBusinessTypesComparator lexComparator;
     for (QnBusiness::EventType eventType : lexComparator.lexSortedEvents())
     {
-        QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::eventName(eventType));
+        QStandardItem *item = new QStandardItem(m_helper->eventName(eventType));
         item->setData(eventType);
 
         QList<QStandardItem *> row;
@@ -170,7 +177,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent)
 
     for (QnBusiness::ActionType actionType : lexComparator.lexSortedActions())
     {
-        QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(actionType));
+        QStandardItem *item = new QStandardItem(m_helper->actionName(actionType));
         item->setData(actionType);
         item->setData(!QnBusiness::canBeInstant(actionType), ProlongedActionRole);
 
@@ -713,13 +720,13 @@ QString QnBusinessRuleViewModel::getText(const int column, const bool detailed) 
         case QnBusiness::ModifiedColumn:
             return (m_modified ? QLatin1String("*") : QString());
         case QnBusiness::EventColumn:
-            return QnBusinessStringsHelper::eventTypeString(m_eventType, m_eventState, m_actionType, m_actionParams);
+            return m_helper->eventTypeString(m_eventType, m_eventState, m_actionType, m_actionParams);
         case QnBusiness::SourceColumn:
             return getSourceText(detailed);
         case QnBusiness::SpacerColumn:
             return QString();
         case QnBusiness::ActionColumn:
-            return QnBusinessStringsHelper::actionName(m_actionType);
+            return m_helper->actionName(m_actionType);
         case QnBusiness::TargetColumn:
             return getTargetText(detailed);
         case QnBusiness::AggregationColumn:

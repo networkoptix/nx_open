@@ -293,7 +293,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
         .assignOwnPeerId("dc", commonModule->moduleGUID());
 
     commonModule->store(new QnGlobals());
-    commonModule->store(new QnSessionManager());
+    commonModule->instance<QnSessionManager>();
 
     commonModule->store(new QnRedAssController());
 
@@ -308,7 +308,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new QnVoiceSpectrumAnalyzer());
     commonModule->instance<QnClientPtzControllerPool>();
 
-    initializeStatisticsManager();
+    initializeStatisticsManager(commonModule);
 
     /* Long runnables depend on QnCameraHistoryPool and other singletons. */
     commonModule->store(new QnLongRunnablePool());

@@ -124,8 +124,9 @@ void QnCameraSettingsDialog::retranslateUi()
 
     static const QString kWindowTitlePattern = lit("%1 - %2");
 
-    const QString caption = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+    const QString caption = QnDeviceDependentStrings::getNameFromSet(
         resourcePool(),
+        QnCameraDeviceStringSet(
         tr("Device Settings"), tr("Devices Settings"),
         tr("Camera Settings"), tr("Cameras Settings"),
         tr("I/O Module Settings"), tr("I/O Modules Settings")
@@ -133,12 +134,13 @@ void QnCameraSettingsDialog::retranslateUi()
 
     const QString description = cameras.size() == 1
         ? cameras.first()->getName()
-        : QnDeviceDependentStrings::getNumericName(cameras);
+        : QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
 
     setWindowTitle(kWindowTitlePattern.arg(caption).arg(description));
 
-    const QString rulesTitle = QnDeviceDependentStrings::getNameFromSet(QnCameraDeviceStringSet(
+    const QString rulesTitle = QnDeviceDependentStrings::getNameFromSet(
         resourcePool(),
+        QnCameraDeviceStringSet(
         tr("Device Rules..."), tr("Devices Rules..."),
         tr("Camera Rules..."), tr("Cameras Rules..."),
         tr("I/O Module Rules..."), tr("I/O Modules Rules...")

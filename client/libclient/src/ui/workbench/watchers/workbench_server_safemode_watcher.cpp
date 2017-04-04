@@ -13,7 +13,7 @@ QnWorkbenchServerSafemodeWatcher::QnWorkbenchServerSafemodeWatcher(QObject *pare
     connect(commonModule(), &QnCommonModule::remoteIdChanged, this, &QnWorkbenchServerSafemodeWatcher::updateCurrentServer);
     connect(commonModule(), &QnCommonModule::readOnlyChanged, this, &QnWorkbenchServerSafemodeWatcher::updateServerFlags);
 
-    connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::initialResourcesReceived, this, [this] {
+    connect(qnCommonMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, this, [this] {
         updateCurrentServer();
         updateServerFlags();
     });

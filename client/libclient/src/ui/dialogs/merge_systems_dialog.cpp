@@ -102,10 +102,11 @@ void QnMergeSystemsDialog::done(int result)
         context()->instance<QnWorkbenchUserWatcher>()->setUserName(m_remoteOwnerCredentials.user());
         context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_remoteOwnerCredentials.password());
 
-        QUrl url = commonModule()->currentUrl();
-        url.setUserName(m_remoteOwnerCredentials.user());
-        url.setPassword(m_remoteOwnerCredentials.password());
-        QnAppServerConnectionFactory::setUrl(url);
+        //TODO: #GDM #FIXME #3.1
+//         QUrl url = commonModule()->currentUrl();
+//         url.setUserName(m_remoteOwnerCredentials.user());
+//         url.setPassword(m_remoteOwnerCredentials.password());
+//         QnAppServerConnectionFactory::setUrl(url);
 
         menu()->trigger(QnActions::ReconnectAction);
         context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
@@ -270,7 +271,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
     const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
         moduleInformation.id);
     if (server && server->getStatus() == Qn::Online
-        && helpers::serverBelongsToCurrentSystem(moduleInformation))
+        && helpers::serverBelongsToCurrentSystem(moduleInformation, commonModule()))
     {
         if (m_url.host() == lit("localhost") || QHostAddress(m_url.host()).isLoopback())
         {

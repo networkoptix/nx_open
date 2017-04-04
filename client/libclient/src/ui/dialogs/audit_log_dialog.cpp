@@ -720,6 +720,7 @@ void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, QnActions::IDT
         {
             case QnActions::CameraSettingsAction:
                 QnMessageBox::warning(this, QnDeviceDependentStrings::getDefaultNameFromSet(
+                    resourcePool(),
                     tr("These devices are removed from System", "", count),
                     tr("These cameras are removed from System", "", count)));
                 break;
@@ -961,11 +962,14 @@ void QnAuditLogDialog::retranslateUi()
     ui->retranslateUi(this);
 
     enum { kDevicesTabIndex = 1 };
-    ui->mainTabWidget->setTabText(kDevicesTabIndex, QnDeviceDependentStrings::getDefaultNameFromSet(
-        tr("Devices"),
-        tr("Cameras")
-    ));
+    ui->mainTabWidget->setTabText(kDevicesTabIndex,
+        QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
+            tr("Devices"),
+            tr("Cameras")
+        ));
     ui->checkBoxCameras->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        resourcePool(),
         tr("Device actions"),
         tr("Camera actions")
     ));

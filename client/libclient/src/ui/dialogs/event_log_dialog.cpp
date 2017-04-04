@@ -6,6 +6,9 @@
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
+
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -51,7 +54,8 @@ namespace {
 
     QnVirtualCameraResourceList cameras(const QSet<QnUuid>& ids)
     {
-        return resourcePool()->getResources<QnVirtualCameraResource>(ids);
+        auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+        return resourcePool->getResources<QnVirtualCameraResource>(ids);
     }
 }
 
@@ -63,7 +67,8 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     m_actionTypesModel(new QStandardItemModel()),
     m_updateDisabled(false),
     m_dirty(false),
-    m_lastMouseButton(Qt::NoButton)
+    m_lastMouseButton(Qt::NoButton),
+    m_helper(new QnBusinessStringsHelper(this))
 {
     ui->setupUi(this);
 
@@ -103,7 +108,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
 
 
         for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {
-            QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(actionType));
+            QStandardItem *item = new QStandardItem(m_helper->actionName(actionType));
             item->setData(actionType);
             item->setData(QnBusiness::hasToggleState(actionType), ProlongedActionRole);
 
@@ -173,7 +178,7 @@ QnEventLogDialog::~QnEventLogDialog() {
 
 QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, QnBusiness::EventType value)
 {
-    QStandardItem* item = new QStandardItem(QnBusinessStringsHelper::eventName(value));
+    QStandardItem* item = new QStandardItem(m_helper->eventName(value));
     item->setData(value);
 
     if (rootItem)
@@ -312,7 +317,7 @@ void QnEventLogDialog::retranslateUi()
         if (type == QnBusiness::UndefinedAction)
             continue;
 
-        const QString actionName = QnBusinessStringsHelper::actionName(type);
+        const QString actionName = m_helper->actionName(type);
         item->setText(actionName);
     }
 

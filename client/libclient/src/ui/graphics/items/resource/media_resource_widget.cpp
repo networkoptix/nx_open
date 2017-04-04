@@ -297,7 +297,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged, this,
         &QnMediaResourceWidget::updateCompositeOverlayMode);
 
-    const auto messageProcessor = QnCommonMessageProcessor::instance();
+    const auto messageProcessor = qnCommonMessageProcessor;
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         [this](const QnAbstractBusinessActionPtr &businessAction)
         {
@@ -506,7 +506,7 @@ void QnMediaResourceWidget::resetSoftwareTriggerButtons()
     const auto currentUserId = accessController()->user()->getId();
 
     /* Gather software trigger ids relevant to this camera from all business rules: */
-    const auto rules = QnCommonMessageProcessor::instance()->businessRules();
+    const auto rules = qnCommonMessageProcessor->businessRules();
     for (auto iter = rules.begin(); iter != rules.end(); ++iter)
     {
         const auto& rule = iter.value();

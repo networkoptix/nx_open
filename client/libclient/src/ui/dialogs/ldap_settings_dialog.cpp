@@ -5,6 +5,8 @@
 
 #include <QtWidgets/QPushButton>
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <api/app_server_connection.h>
@@ -27,7 +29,8 @@ namespace {
     const int kTestInvalidHandle = -1;
 }
 
-class QnLdapSettingsDialogPrivate: public QObject {
+class QnLdapSettingsDialogPrivate: public QObject, public QnConnectionContextAware
+{
     Q_DECLARE_PUBLIC(QnLdapSettingsDialog)
     Q_DECLARE_TR_FUNCTIONS(QnLdapSettingsDialogPrivate)
 
