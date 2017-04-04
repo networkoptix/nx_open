@@ -57,7 +57,7 @@ SystemManager::SystemManager(
     m_ec2SyncronizationEngine(ec2SyncronizationEngine),
     m_dropSystemsTimerId(0),
     m_dropExpiredSystemsTaskStillRunning(false),
-    m_systemDao(settings)
+    m_systemDao(dao::SystemDataObjectFactory::create(settings))
 {
     using namespace std::placeholders;
 
@@ -124,7 +124,7 @@ void SystemManager::authenticateByName(
     auto scopedGuard = makeScopedGuard(
         [&completionHandler, &result]() { completionHandler(result); });
 
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     auto& systemByIdIndex = m_systems.get<kSystemByIdIndex>();
     const auto systemIter = systemByIdIndex.find(
@@ -155,20 +155,9 @@ void SystemManager::authenticateByName(
         cdb::attr::authSystemId,
         QString::fromStdString(systemIter->id));
 
-    systemByIdIndex.modify(
-        systemIter,
-        [](data::SystemData& system){ system.status = api::SystemStatus::ssActivated; });
-
-    using namespace std::placeholders;
-
-    m_dbManager->executeUpdate<std::string>(
-        std::bind(&dao::rdb::SystemDataObject::activateSystem, &m_systemDao, _1, _2),
-        systemIter->id,
-        std::bind(&SystemManager::systemActivated, this,
-            m_startedAsyncCallsCounter.getScopedIncrement(),
-            _1, _2, _3, [](api::ResultCode){}));
-
     result = api::ResultCode::ok;
+
+    activateSystemIfNeeded(lock, systemByIdIndex, systemIter);
 }
 
 void SystemManager::bindSystemToAccount(
@@ -759,11 +748,11 @@ nx::db::DBResult SystemManager::insertNewSystemDataToDb(
         std::chrono::duration_cast<std::chrono::seconds>(
             m_settings.systemManager().notActivatedSystemLivePeriod).count();
     result->systemData.registrationTime = nx::utils::utcTime();
-    dbResult = m_systemDao.insert(queryContext, result->systemData, account.id);
+    dbResult = m_systemDao->insert(queryContext, result->systemData, account.id);
     if (dbResult != db::DBResult::ok)
         return dbResult;
 
-    return m_systemDao.selectSystemSequence(
+    return m_systemDao->selectSystemSequence(
         queryContext,
         result->systemData.id,
         &result->systemData.systemSequence);
@@ -827,7 +816,7 @@ nx::db::DBResult SystemManager::markSystemAsDeleted(
     nx::db::QueryContext* const queryContext,
     const std::string& systemId)
 {
-    auto dbResult = m_systemDao.markSystemAsDeleted(queryContext, systemId);
+    auto dbResult = m_systemDao->markSystemAsDeleted(queryContext, systemId);
     if (dbResult != nx::db::DBResult::ok)
         return dbResult;
 
@@ -887,7 +876,7 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
     if (dbResult != nx::db::DBResult::ok)
         return nx::db::DBResult::ioError;
 
-    dbResult = m_systemDao.deleteSystem(queryContext, systemId.systemId);
+    dbResult = m_systemDao->deleteSystem(queryContext, systemId.systemId);
     if (dbResult != nx::db::DBResult::ok)
         return nx::db::DBResult::ioError;
 
@@ -1432,7 +1421,7 @@ nx::db::DBResult SystemManager::updateSystem(
 
     if (data.opaque)
     {
-        dbResult = m_systemDao.execSystemOpaqueUpdate(queryContext, data);
+        dbResult = m_systemDao->execSystemOpaqueUpdate(queryContext, data);
         if (dbResult != nx::db::DBResult::ok)
             return dbResult;
     }
@@ -1453,7 +1442,7 @@ nx::db::DBResult SystemManager::renameSystem(
     NX_LOGX(lm("Renaming system %1 to %2")
         .arg(data.systemId).arg(data.name.get()), cl_logDEBUG2);
 
-    const auto result = m_systemDao.execSystemNameUpdate(queryContext, data);
+    const auto result = m_systemDao->execSystemNameUpdate(queryContext, data);
     if (result != db::DBResult::ok)
         return result;
 
@@ -1510,6 +1499,36 @@ void SystemManager::systemNameUpdated(
         : api::ResultCode::dbError);
 }
 
+template<typename SystemDictionary>
+void SystemManager::activateSystemIfNeeded(
+    const QnMutexLockerBase& /*lock*/,
+    SystemDictionary& systemByIdIndex,
+    typename SystemDictionary::iterator systemIter)
+{
+    if (systemIter->status == api::SystemStatus::ssActivated &&
+        !systemIter->activationInDbNeeded)
+    {
+        return;
+    }
+
+    systemByIdIndex.modify(
+        systemIter,
+        [](data::SystemData& system)
+        {
+            system.status = api::SystemStatus::ssActivated;
+            system.activationInDbNeeded = false;
+        });
+
+    using namespace std::placeholders;
+
+    m_dbManager->executeUpdate<std::string>(
+        std::bind(&dao::AbstractSystemDataObject::activateSystem, m_systemDao.get(), _1, _2),
+        systemIter->id,
+        std::bind(&SystemManager::systemActivated, this,
+            m_startedAsyncCallsCounter.getScopedIncrement(),
+            _1, _2, _3, [](api::ResultCode) {}));
+}
+
 void SystemManager::systemActivated(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
@@ -1517,7 +1536,6 @@ void SystemManager::systemActivated(
     std::string systemId,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    if (dbResult == nx::db::DBResult::ok)
     {
         QnMutexLocker lk(&m_mutex);
 
@@ -1527,9 +1545,18 @@ void SystemManager::systemActivated(
         {
             systemByIdIndex.modify(
                 systemIter,
-                [](data::SystemData& system) {
-                    system.status = api::SystemStatus::ssActivated;
-                    system.expirationTimeUtc = std::numeric_limits<int>::max();
+                [dbResult](data::SystemData& system)
+                {
+                    if (dbResult == nx::db::DBResult::ok)
+                    {
+                        system.status = api::SystemStatus::ssActivated;
+                        system.expirationTimeUtc = std::numeric_limits<int>::max();
+                        system.activationInDbNeeded = false;
+                    }
+                    else
+                    {
+                        system.activationInDbNeeded = true;
+                    }
                 });
         }
     }
@@ -1662,7 +1689,7 @@ nx::db::DBResult SystemManager::fillCache()
 
     std::vector<data::SystemData> systems;
     auto result = doBlockingDbQuery(
-        std::bind(&dao::rdb::SystemDataObject::fetchSystems, m_systemDao,
+        std::bind(&dao::AbstractSystemDataObject::fetchSystems, m_systemDao.get(),
             _1, db::InnerJoinFilterFields(), &systems));
     if (result != db::DBResult::ok)
         return result;
@@ -1712,7 +1739,7 @@ nx::db::DBResult SystemManager::fetchSystemById(
         {{"system.id", ":systemId", QnSql::serialized_field(systemId)}};
 
     std::vector<data::SystemData> systems;
-    auto dbResult = m_systemDao.fetchSystems(queryContext, sqlFilter, &systems);
+    auto dbResult = m_systemDao->fetchSystems(queryContext, sqlFilter, &systems);
     if (dbResult != db::DBResult::ok)
         return dbResult;
     if (systems.empty())
@@ -1757,7 +1784,7 @@ void SystemManager::dropExpiredSystems(uint64_t /*timerId*/)
 
     using namespace std::placeholders;
     m_dbManager->executeUpdate(
-        std::bind(&dao::rdb::SystemDataObject::deleteExpiredSystems, m_systemDao, _1),
+        std::bind(&dao::AbstractSystemDataObject::deleteExpiredSystems, m_systemDao.get(), _1),
         std::bind(&SystemManager::expiredSystemsDeletedFromDb, this,
             m_startedAsyncCallsCounter.getScopedIncrement(),
             _1, _2));
@@ -1934,7 +1961,7 @@ nx::db::DBResult SystemManager::processSetResourceParam(
 
     systemNameUpdate->systemId = systemId.toStdString();
     systemNameUpdate->name = data.value.toStdString();
-    return m_systemDao.execSystemNameUpdate(queryContext, *systemNameUpdate);
+    return m_systemDao->execSystemNameUpdate(queryContext, *systemNameUpdate);
 }
 
 void SystemManager::onEc2SetResourceParamDone(

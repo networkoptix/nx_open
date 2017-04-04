@@ -26,6 +26,8 @@ public:
     void start();
 
     std::size_t activeConnectionCount() const;
+    std::size_t totalFailedConnections() const;
+    std::size_t connectedConnections() const;
 
 private:
     const std::string m_cdbUrl;

@@ -14,6 +14,7 @@ namespace test {
 TransactionConnectionHelper::TransactionConnectionHelper():
     m_moduleGuid(QnUuid::createUuid()),
     m_runningInstanceGuid(QnUuid::createUuid()),
+    m_totalConnectionsFailed(0),
     m_transactionConnectionIdSequence(0),
     m_removeConnectionAfterClosure(false)
 {
@@ -54,7 +55,8 @@ TransactionConnectionHelper::ConnectionId
             localPeerInfo,
             login,
             password,
-            protocolVersion);
+            protocolVersion,
+            ++m_transactionConnectionIdSequence);
     connectionContext.connection->bindToAioThread(m_aioTimer.getAioThread());
     if (keepAlivePolicy == KeepAlivePolicy::noKeepAlive)
         connectionContext.connection->setKeepAliveEnabled(false);
@@ -70,9 +72,8 @@ TransactionConnectionHelper::ConnectionId
 
     QnMutexLocker lk(&m_mutex);
     auto transactionConnectionPtr = connectionContext.connection.get();
-    const ConnectionId connectionId = ++m_transactionConnectionIdSequence;
     m_connections.emplace(
-        connectionId,
+        transactionConnectionPtr->connectionId(),
         std::move(connectionContext));
 
     // TODO: #ak TransactionTransport should do that. But somehow it doesn't...
@@ -83,7 +84,7 @@ TransactionConnectionHelper::ConnectionId
     url.setPath(api::kEc2EventsPath);
     transactionConnectionPtr->doOutgoingConnect(url);
 
-    return connectionId;
+    return transactionConnectionPtr->connectionId();
 }
 
 bool TransactionConnectionHelper::waitForState(
@@ -170,6 +171,17 @@ std::size_t TransactionConnectionHelper::activeConnectionCount() const
     return m_connections.size();
 }
 
+std::size_t TransactionConnectionHelper::totalFailedConnections() const
+{
+    return m_totalConnectionsFailed.load();
+}
+
+std::size_t TransactionConnectionHelper::connectedConnections() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_connectedConnections.size();
+}
+
 OnConnectionBecomesActiveSubscription& 
     TransactionConnectionHelper::onConnectionBecomesActiveSubscription()
 {
@@ -194,6 +206,9 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
     ec2::QnTransactionTransportBase* connection,
     ec2::QnTransactionTransportBase::State newState)
 {
+    const auto connectionId =
+        static_cast<test::TransactionTransport*>(connection)->connectionId();
+
     switch (newState)
     {
         case ec2::QnTransactionTransportBase::Connected:
@@ -201,11 +216,20 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
 
         case ec2::QnTransactionTransportBase::NeedStartStreaming:
         case ec2::QnTransactionTransportBase::ReadyForStreaming:
+            // Transaction transport invokes this handler with mutex locked, 
+            // so have to do some work around this misbehavior.
+            m_aioTimer.post(
+                [this, connectionId]()
+                {
+                    QnMutexLocker lk(&m_mutex);
+                    m_connectedConnections.insert(connectionId);
+                });
             m_onConnectionBecomesActiveSubscription.notify(newState);
             break;
 
         case ec2::QnTransactionTransportBase::Error:
         case ec2::QnTransactionTransportBase::Closed:
+            ++m_totalConnectionsFailed;
             if (m_removeConnectionAfterClosure)
                 removeConnection(connection);
             m_onConnectionFailureSubscription.notify(newState);
@@ -239,6 +263,7 @@ void TransactionConnectionHelper::removeConnection(
         {
             QnMutexLocker lk(&m_mutex);
             m_connections.erase(connectionId);
+            m_connectedConnections.erase(connectionId);
         });
 }
 
@@ -246,14 +271,7 @@ TransactionConnectionHelper::ConnectionId
     TransactionConnectionHelper::getConnectionId(
         ec2::QnTransactionTransportBase* connection) const
 {
-    QnMutexLocker lk(&m_mutex);
-    for (const auto& val: m_connections)
-    {
-        if (val.second.connection.get() == connection)
-            return val.first;
-    }
-
-    return ConnectionId();
+    return static_cast<test::TransactionTransport*>(connection)->connectionId();
 }
 
 } // namespace test
