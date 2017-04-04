@@ -200,116 +200,124 @@ PageBase
     {
         id: screenshot
         width: parent.width
-        height: sourceSize.height == 0 ? 0 : width * sourceSize.height / sourceSize.width
+        height: width * sourceSize.height / sourceSize.width
         y: (mainWindow.height - height) / 3 - header.height
         visible: status == Image.Ready
         opacity: d.cameraUiOpacity
     }
 
-    Loader
+    Item
     {
-        id: informationLabelLoader
-        anchors.right: parent.right
-        anchors.rightMargin: 8
-        y: header.y
-        opacity: Math.min(d.uiOpacity, d.cameraUiOpacity)
-        active: showCameraInfo
-        sourceComponent: InformationLabel
+        id: content
+
+        width: mainWindow.availableWidth
+        height: mainWindow.availableHeight - header.height - toolBar.statusBarHeight
+        y: toolBar.statusBarHeight
+
+        Loader
         {
-            videoScreenController: d.controller
-        }
-    }
-
-    Loader
-    {
-        id: dummyLoader
-        anchors.fill: parent
-        visible: active
-        sourceComponent: dummyComponent
-        active: d.cameraWarningVisible
-    }
-
-    Component
-    {
-        id: dummyComponent
-
-        VideoDummy
-        {
-            y: -header.height
-            width: mainWindow.width
-            height: mainWindow.height
-            state: videoScreenController.dummyState
-
-            MouseArea
+            id: informationLabelLoader
+            anchors.right: parent.right
+            anchors.rightMargin: 8
+            opacity: Math.min(d.uiOpacity, d.cameraUiOpacity)
+            active: showCameraInfo
+            sourceComponent: InformationLabel
             {
-                anchors.fill: parent
-                onClicked: toggleUi()
+                videoScreenController: d.controller
             }
         }
-    }
 
-    Loader
-    {
-        id: navigationLoader
-
-        anchors.bottom: parent.bottom
-        width: parent.width
-
-        visible: opacity > 0
-        opacity: Math.min(d.uiOpacity, d.navigationOpacity)
-
-        sourceComponent: (videoScreenController.accessRightsHelper.canViewArchive
-            ? navigationComponent : liveNavigationComponent)
-
-        Button
+        Loader
         {
-            anchors.verticalCenter: parent.bottom
-            anchors.verticalCenterOffset: -150 - 64
-            padding: 8
-            width: 56
-            height: width
-            color: ColorTheme.transparent(ColorTheme.base5, 0.2)
-            icon: lp("/images/previous.png")
-            radius: width / 2
-            z: 1
-            onClicked: switchToPreviousCamera()
+            id: dummyLoader
+            anchors.fill: parent
+            visible: active
+            active: d.cameraWarningVisible
+
+            sourceComponent: Component
+            {
+                VideoDummy
+                {
+                    y: -header.height
+                    width: mainWindow.width
+                    height: mainWindow.height
+                    state: videoScreenController.dummyState
+
+                    MouseArea
+                    {
+                        anchors.fill: parent
+                        onClicked: toggleUi()
+                    }
+                }
+            }
         }
 
-        Button
+        Loader
         {
-            anchors.verticalCenter: parent.bottom
-            anchors.verticalCenterOffset: -150 - 64
-            anchors.right: parent.right
-            padding: 8
-            width: 56
-            height: width
-            color: ColorTheme.transparent(ColorTheme.base5, 0.2)
-            icon: lp("/images/next.png")
-            radius: width / 2
-            z: 1
-            onClicked: switchToNextCamera()
+            id: navigationLoader
+
+            anchors.bottom: parent.bottom
+            width: parent.width
+
+            visible: opacity > 0
+            opacity: Math.min(d.uiOpacity, d.navigationOpacity)
+
+            sourceComponent:
+                videoScreenController.accessRightsHelper.canViewArchive
+                    ? navigationComponent
+                    : liveNavigationComponent
+
+            Button
+            {
+                anchors.verticalCenter: parent.bottom
+                anchors.verticalCenterOffset: -150 - 64
+                padding: 8
+                width: 56
+                height: width
+                color: ColorTheme.transparent(ColorTheme.base5, 0.2)
+                icon: lp("/images/previous.png")
+                radius: width / 2
+                z: 1
+                onClicked: switchToPreviousCamera()
+            }
+
+            Button
+            {
+                anchors.verticalCenter: parent.bottom
+                anchors.verticalCenterOffset: -150 - 64
+                anchors.right: parent.right
+                padding: 8
+                width: 56
+                height: width
+                color: ColorTheme.transparent(ColorTheme.base5, 0.2)
+                icon: lp("/images/next.png")
+                radius: width / 2
+                z: 1
+                onClicked: switchToNextCamera()
+            }
+
+            Component
+            {
+                id: navigationComponent
+
+                VideoNavigation
+                {
+                    videoScreenController: d.controller
+                    controlsOpacity: d.cameraUiOpacity
+                }
+            }
+
+            Component
+            {
+                id: liveNavigationComponent
+
+                LiveVideoNavigation
+                {
+                    videoScreenController: d.controller
+                }
+            }
         }
-    }
 
-    Component
-    {
-        id: navigationComponent
-
-        VideoNavigation
-        {
-            videoScreenController: d.controller
-            controlsOpacity: d.cameraUiOpacity
-        }
-    }
-
-    Component
-    {
-        id: liveNavigationComponent
-
-        LiveVideoNavigation
-        {
-            videoScreenController: d.controller
-        }
     }
 
     Rectangle
