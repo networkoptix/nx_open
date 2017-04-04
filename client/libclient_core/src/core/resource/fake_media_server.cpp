@@ -55,11 +55,24 @@ QnModuleInformation QnFakeMediaServerResource::getModuleInformation() const
     return m_serverData;
 }
 
-void QnFakeMediaServerResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
+Qn::ResourceStatus QnFakeMediaServerResource::getStatus() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_status;
+}
+
+void QnFakeMediaServerResource::setStatus(Qn::ResourceStatus newStatus,
+    Qn::StatusChangeReason reason)
 {
     NX_ASSERT(newStatus == Qn::Incompatible || newStatus == Qn::Unauthorized,
         "Incompatible servers should not take any status but incompatible or unauthorized");
-    base_type::setStatus(newStatus, reason);
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_status == newStatus)
+            return;
+        m_status = newStatus;
+    }
+    emit statusChanged(toSharedPointer(), reason);
 }
 
 QUrl QnFakeMediaServerResource::getApiUrl() const

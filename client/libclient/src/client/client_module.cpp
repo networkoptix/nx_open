@@ -304,7 +304,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     commonModule->store(new QnPlatformAbstraction());
 
-    commonModule->setMessageProcessor(new QnDesktopClientMessageProcessor());
+    commonModule->setMessageProcessor(commonModule->instance<QnDesktopClientMessageProcessor>());
     commonModule->store(new QnClientResourceFactory());
 
     commonModule->store(new QnCameraBookmarksManager());
@@ -320,7 +320,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     /* Just to feel safe */
     commonModule->store(new QnCloudConnectionProvider());
-    commonModule->store(new QnCloudStatusWatcher());
+    commonModule->instance<QnCloudStatusWatcher>();
 
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     m_networkProxyFactory = new QnNetworkProxyFactory(commonModule);
@@ -493,14 +493,12 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
 
     commonModule->moduleFinder()->start();
 
-    commonModule->store(new QnSystemsFinder());
+    commonModule->instance<QnSystemsFinder>();
     commonModule->store(new QnForgottenSystemsManager());
 
     // Depends on qnSystemsFinder
     commonModule->store(new QnStartupTileManager());
-
-    auto router = commonModule->router();
-    commonModule->store(new QnServerInterfaceWatcher(router));
+    commonModule->instance<QnServerInterfaceWatcher>();
 }
 
 //#define ENABLE_DYNAMIC_CUSTOMIZATION

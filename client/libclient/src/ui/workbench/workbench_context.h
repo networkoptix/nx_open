@@ -7,7 +7,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtWidgets/QWidget>
 
-#include <common/common_module_aware.h>
+#include <client_core/connection_context_aware.h>
 
 #include <utils/common/instance_storage.h>
 #include <core/resource/resource_fwd.h>
@@ -32,7 +32,7 @@ class QnControlsStatisticsModule;
 /**
  * This is a class that ties together all objects comprising the global visual scene state
  */
-class QnWorkbenchContext: public QObject, public QnInstanceStorage, public QnCommonModuleAware
+class QnWorkbenchContext: public QObject, public QnInstanceStorage, public QnConnectionContextAware
 {
     Q_OBJECT
     using base_type = QObject;

@@ -334,7 +334,7 @@ auto offlineItemOnThisPc = []
 QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    m_licensesHelper(new QnVideoWallLicenseUsageHelper())
+    m_licensesHelper(new QnVideoWallLicenseUsageHelper(this))
 #ifdef _DEBUG
     /* Limit by reasonable size. */
     , m_uuidPool(new QnUuidPool(uuidPoolBase, 256))
@@ -1113,7 +1113,7 @@ bool QnWorkbenchVideoWallHandler::canStartControlMode() const
     }
 
 
-    QnVideoWallLicenseUsageProposer proposer(m_licensesHelper.data(), 0, 1);
+    QnVideoWallLicenseUsageProposer proposer(m_licensesHelper, 0, 1);
     if (!validateLicenses(tr("Activate one more license to start Video Wall control session.")))
         return false;
 

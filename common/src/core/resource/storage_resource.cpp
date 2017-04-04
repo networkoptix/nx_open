@@ -17,7 +17,6 @@ QnStorageResource::QnStorageResource():
     m_isBackup(false)
 {
     addFlags(Qn::remote);
-    setStatus(Qn::Offline);
 }
 
 QnStorageResource::~QnStorageResource()
@@ -132,7 +131,7 @@ QString QnStorageResource::urlWithoutCredentials(const QString& url)
 {
     if (!url.contains(lit("://")))
         return url;
-    
+
     QUrl result(url);
     result.setUserName(QString());
     result.setPassword(QString());

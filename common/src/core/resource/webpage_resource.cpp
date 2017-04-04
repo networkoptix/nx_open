@@ -37,3 +37,20 @@ QString QnWebPageResource::nameForUrl(const QUrl& url)
         name += L'/' + url.path();
     return name;
 }
+
+Qn::ResourceStatus QnWebPageResource::getStatus() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_status;
+}
+
+void QnWebPageResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_status == newStatus)
+            return;
+        m_status = newStatus;
+    }
+    emit statusChanged(toSharedPointer(), reason);
+}

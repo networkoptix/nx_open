@@ -44,7 +44,6 @@
 
 QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessController, QObject* parent):
     QObject(parent),
-    QnCommonModuleAware(parent),
     m_accessController(accessController),
     m_userWatcher(nullptr),
     m_layoutWatcher(nullptr),
