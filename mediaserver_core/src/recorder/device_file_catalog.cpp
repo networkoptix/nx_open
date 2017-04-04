@@ -455,12 +455,8 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
 
     for(const QnAbstractStorageResource::FileInfo& fi: storage->getFileList(folder))
     {
-        if (filter.isFullScan)
-        {
-            // Full rebuild
-            while (!getMyStorageMan()->needToStopMediaScan() && needRebuildPause())
-                QnLongRunnable::msleep(100);
-        }
+        while (!getMyStorageMan()->needToStopMediaScan() && needRebuildPause())
+            QnLongRunnable::msleep(100);
 
         if (getMyStorageMan()->needToStopMediaScan() || QnResource::isStopping())
         {
@@ -579,7 +575,7 @@ bool DeviceFileCatalog::doRebuildArchive(const QnStorageResourcePtr &storage, co
         m_catalog,
         allChunks,
         emptyFileList,
-        ScanFilter(period, /*fullScan*/true)
+        period
     );
 
     for(const EmptyFileInfo& emptyFile: emptyFileList) {
