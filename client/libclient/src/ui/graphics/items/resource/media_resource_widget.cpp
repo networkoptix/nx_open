@@ -1566,8 +1566,6 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (qnRuntime->isDevMode())
         result |= Qn::DbgScreenshotButton;
 
-    const bool isVideoWall = qnRuntime->isVideoWallMode();
-
     if (hasVideo && !resource()->toResource()->hasFlags(Qn::still_image))
         result |= Qn::ScreenshotButton;
 
