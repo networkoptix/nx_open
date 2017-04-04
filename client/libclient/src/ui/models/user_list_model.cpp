@@ -1,5 +1,7 @@
 #include "user_list_model.h"
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource_access/global_permissions_manager.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -18,7 +20,7 @@
 
 #include <nx/utils/string.h>
 
-class QnUserListModelPrivate : public Connective<QObject>
+class QnUserListModelPrivate : public Connective<QObject>, public QnConnectionContextAware
 {
     Q_DECLARE_TR_FUNCTIONS(QnUserListModelPrivate)
 
@@ -133,6 +135,7 @@ QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr& user)
 
     if (permissions.testFlag(Qn::GlobalEditCamerasPermission))
         permissionStrings.append(QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Adjust device settings"),
             tr("Adjust camera settings")
         ));

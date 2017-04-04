@@ -120,25 +120,13 @@ int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics &met
     {
         case QnBusiness::EventColumn:
         {
-            auto eventWidth = [metrics](QnBusiness::EventType eventType)
-            {
-                return 100; //metrics.width(m_helper->eventName(eventType)); //TODO: #GDM #3.1 #refactor table
-            };
-            int result = -1;
-            for (QnBusiness::EventType eventType : QnBusiness::allEvents())
-                result = qMax(result, eventWidth(eventType));
-            return kExtraSpace + result;
+            //TODO: #GDM #3.1 #refactor table
+            return kExtraSpace + 100;
         }
         case QnBusiness::ActionColumn:
         {
-            auto actionWidth = [metrics](QnBusiness::ActionType actionType)
-            {
-                return 100; // metrics.width(m_helper->actionName(actionType)); //TODO: #GDM #3.1 #refactor table
-            };
-            int result = -1;
-            for (QnBusiness::ActionType actionType : QnBusiness::allActions())
-                result = qMax(result, actionWidth(actionType));
-            return kExtraSpace + result;
+            //TODO: #GDM #3.1 #refactor table
+            return kExtraSpace + 100;
         }
         case QnBusiness::AggregationColumn:
         {

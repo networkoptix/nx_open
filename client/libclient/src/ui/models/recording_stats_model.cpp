@@ -140,6 +140,7 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
             //NX_ASSERT(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
             static const auto kNDash = QString::fromWCharArray(L"\x2013");
             return QnDeviceDependentStrings::getNameFromSet(
+                resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("Total %1 %n devices", "%1 is long dash, do not replace",
                         cameras.size()).arg(kNDash),

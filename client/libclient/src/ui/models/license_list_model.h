@@ -2,11 +2,14 @@
 
 #include <QtCore/QAbstractListModel>
 
+#include <client_core/connection_context_aware.h>
+
 #include <licensing/license.h> // TODO: #Elric use fwd
 #include <nx/utils/scoped_model_operations.h>
 
 
-class QnLicenseListModel : public ScopedModelOperations<QAbstractListModel>
+class QnLicenseListModel : public ScopedModelOperations<QAbstractListModel>,
+    public QnConnectionContextAware
 {
     Q_OBJECT
     using base_type = ScopedModelOperations<QAbstractListModel>;

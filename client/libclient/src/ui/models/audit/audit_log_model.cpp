@@ -256,7 +256,8 @@ void QnAuditLogModel::clear() {
 
 QString QnAuditLogModel::getResourceNameById(const QnUuid &id)
 {
-    return QnResourceDisplayInfo(resourcePool()->getResourceById(id)).toString(qnSettings->extraInfoInTree());
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    return QnResourceDisplayInfo(resourcePool->getResourceById(id)).toString(qnSettings->extraInfoInTree());
 }
 
 QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool showTime) const
@@ -296,6 +297,7 @@ QString QnAuditLogModel::formatDuration(int durationSecs)
 
 QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
 {
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
     switch (eventType)
     {
     case Qn::AR_NotDefined:
@@ -314,11 +316,13 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
         return tr("Exporting video");
     case Qn::AR_CameraUpdate:
         return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool,
             tr("Device updated"),
             tr("Camera updated")
             );
     case Qn::AR_CameraInsert:
         return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool,
             tr("Device added"),
             tr("Camera added")
             );
@@ -336,6 +340,7 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
         return tr("Email settings changed");
     case Qn::AR_CameraRemove:
         return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool,
             tr("Device removed"),
             tr("Camera removed")
             );
@@ -360,9 +365,10 @@ QnVirtualCameraResourceList QnAuditLogModel::getCameras(const QnAuditRecord* rec
 
 QnVirtualCameraResourceList QnAuditLogModel::getCameras(const std::vector<QnUuid>& resources)
 {
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
     QnVirtualCameraResourceList result;
     for (const auto& id : resources)
-        if (QnVirtualCameraResourcePtr camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id))
+        if (QnVirtualCameraResourcePtr camera = resourcePool->getResourceById<QnVirtualCameraResource>(id))
             result << camera;
     return result;
 }

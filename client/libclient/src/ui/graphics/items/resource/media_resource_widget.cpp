@@ -20,6 +20,7 @@
 #include <client/client_settings.h>
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_module.h>
 
 #include <common/common_module.h>
 
@@ -663,13 +664,22 @@ void QnMediaResourceWidget::createButtons()
 
 void QnMediaResourceWidget::createPtzController()
 {
+    auto threadPool = qnClientModule->ptzControllerPool()->commandThreadPool();
+    auto executorThread = qnClientModule->ptzControllerPool()->executorThread();
+
     /* Set up PTZ controller. */
     QnPtzControllerPtr fisheyeController;
     fisheyeController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
     fisheyeController.reset(new QnViewportPtzController(fisheyeController));
     fisheyeController.reset(new QnPresetPtzController(fisheyeController));
-    fisheyeController.reset(new QnTourPtzController(fisheyeController));
-    fisheyeController.reset(new QnActivityPtzController(QnActivityPtzController::Local, fisheyeController));
+    fisheyeController.reset(new QnTourPtzController(
+        fisheyeController,
+        threadPool,
+        executorThread));
+    fisheyeController.reset(new QnActivityPtzController(
+        commonModule(),
+        QnActivityPtzController::Local,
+        fisheyeController));
 
     // Small hack because widget's zoomRect is set only in Synchronize method, not instantly --gdm
     if (item() && item()->zoomRect().isNull())

@@ -8,6 +8,9 @@
 #include <business/business_strings_helper.h>
 #include <business/business_types_comparator.h>
 
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
+
 #include <core/resource_management/resource_pool.h>
 
 #include <core/resource/resource.h>
@@ -290,7 +293,8 @@ QString QnEventLogModel::getUserNameById(const QnUuid& id)
 {
     static const auto kRemovedUserName = L'<' + tr("User removed") + L'>';
 
-    const auto userResource = resourcePool()->getResourceById(id).dynamicCast<QnUserResource>();
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    const auto userResource = resourcePool->getResourceById(id).dynamicCast<QnUserResource>();
     return (userResource.isNull() ? kRemovedUserName : userResource->getName());
 }
 
@@ -340,12 +344,14 @@ QVariant QnEventLogModel::iconData(Column column, const QnBusinessActionData& ac
             break;
     }
 
-    return qnResIconCache->icon(resourcePool()->getResourceById(resId));
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    return qnResIconCache->icon(resourcePool->getResourceById(resId));
 }
 
 QString QnEventLogModel::getResourceNameString(const QnUuid& id)
 {
-    return QnResourceDisplayInfo(resourcePool()->getResourceById(id))
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    return QnResourceDisplayInfo(resourcePool->getResourceById(id))
         .toString(qnSettings->extraInfoInTree());
 }
 

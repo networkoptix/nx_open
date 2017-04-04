@@ -1,5 +1,7 @@
-
 #include "workbench_item_helper.h"
+
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
 
 #include <core/resource/camera_resource.h>
 

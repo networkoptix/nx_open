@@ -125,7 +125,7 @@ QSet<QnUuid> filterActionResources(const QSet<QnUuid>& ids, ActionType actionTyp
 
     if (requiresUserResource(actionType))
     {
-        auto users = resourcePool()->getResources<QnUserResource>(ids);
+        auto users = resourcePool->getResources<QnUserResource>(ids);
         auto roles = qnClientCoreModule->commonModule()->userRolesManager()->userRoles(ids);
         auto result = toIds(users);
         for (auto role: roles)
@@ -1008,12 +1008,13 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const
     if (cameras.isEmpty())
     {
         return braced(QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Any Device"),
             tr("Any Camera")
         ));
     }
 
-    return QnDeviceDependentStrings::getNumericName(cameras);
+    return QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
 
 }
 
@@ -1085,11 +1086,12 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
 
     if (cameras.isEmpty())
         return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Select at least one device"),
             tr("Select at least one camera")
         );
 
-    return QnDeviceDependentStrings::getNumericName(cameras);
+    return QnDeviceDependentStrings::getNumericName(resourcePool(), cameras);
 }
 
 QString QnBusinessRuleViewModel::getAggregationText() const
