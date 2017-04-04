@@ -30,7 +30,6 @@ VideoCameraLocker::~VideoCameraLocker()
 //-------------------------------------------------------------------------------------------------
 // QnVideoCameraPool
 
-QnMutex QnVideoCameraPool::m_staticMtx;
 
 void QnVideoCameraPool::stop()
 {
@@ -44,24 +43,14 @@ void QnVideoCameraPool::stop()
     m_cameras.clear();
 }
 
+QnVideoCameraPool::QnVideoCameraPool(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
+{
+}
+
 QnVideoCameraPool::~QnVideoCameraPool()
 {
     stop();
-}
-
-static QnVideoCameraPool* globalInstance = NULL;
-
-void QnVideoCameraPool::initStaticInstance( QnVideoCameraPool* inst )
-{
-    globalInstance = inst;
-}
-
-QnVideoCameraPool* QnVideoCameraPool::instance()
-{
-    return globalInstance;
-    //QnMutexLocker lock( &m_staticMtx );
-    //static QnVideoCameraPool inst;
-    //return &inst;
 }
 
 void QnVideoCameraPool::updateActivity()
@@ -94,7 +83,7 @@ void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)
     m_cameras.remove( res );
 }
 
-std::unique_ptr<VideoCameraLocker> 
+std::unique_ptr<VideoCameraLocker>
     QnVideoCameraPool::getVideoCameraLockerByResourceId(const QnUuid& id) const
 {
     QnResourcePtr resource = resourcePool()->getResourceById(id);

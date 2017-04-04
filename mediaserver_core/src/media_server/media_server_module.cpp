@@ -75,7 +75,6 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnNewSystemServerFlagWatcher(this));
     store(new QnBusinessMessageBus(this));
 
-
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
 }

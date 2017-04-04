@@ -78,9 +78,8 @@ bool OnvifResourceInformationFetcher::isModelContainVendor(const QString& vendor
         return false;
 }
 
-OnvifResourceInformationFetcher::OnvifResourceInformationFetcher()
-:
-    /*passwordsData(PasswordHelper::instance()),*/
+OnvifResourceInformationFetcher::OnvifResourceInformationFetcher(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
     camersNamesData(NameHelper::instance()),
     m_shouldStop(false)
 {
@@ -100,17 +99,6 @@ OnvifResourceInformationFetcher::OnvifResourceInformationFetcher()
 
     m_hookChain.registerHook(searcher_hooks::commonHooks);
     m_hookChain.registerHook(searcher_hooks::hikvisionManufacturerReplacement);
-}
-
-static std::unique_ptr<OnvifResourceInformationFetcher> OnvifResourceInformationFetcher_instance;
-static std::once_flag OnvifResourceInformationFetcher_onceFlag;
-
-OnvifResourceInformationFetcher& OnvifResourceInformationFetcher::instance()
-{
-    std::call_once(
-        OnvifResourceInformationFetcher_onceFlag,
-        [](){ OnvifResourceInformationFetcher_instance.reset( new OnvifResourceInformationFetcher() ); } );
-    return *OnvifResourceInformationFetcher_instance.get();
 }
 
 void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const
@@ -179,7 +167,11 @@ bool OnvifResourceInformationFetcher::needIgnoreCamera(
     return false;
 }
 
-void OnvifResourceInformationFetcher::findResources(const QString& endpoint, const EndpointAdditionalInfo& originalInfo, QnResourceList& result, DiscoveryMode discoveryMode) const
+void OnvifResourceInformationFetcher::findResources(
+    const QString& endpoint,
+    const EndpointAdditionalInfo& originalInfo,
+    QnResourceList& result,
+    DiscoveryMode discoveryMode) const
 {
     if (endpoint.isEmpty()) {
         qDebug() << "OnvifResourceInformationFetcher::findResources: response packet was received, but appropriate URL was not found.";

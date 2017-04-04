@@ -3,7 +3,8 @@
 const QString kArchiveCamName = QLatin1String("ARCHIVE_CAMERA");
 
 QnArchiveCamResourceSearcher::QnArchiveCamResourceSearcher(QnCommonModule* commonModule):
-    base_type(commonModule)
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule)
 {
     setDiscoveryMode(DiscoveryMode::disabled);
 }

@@ -46,7 +46,7 @@ namespace ec2
         QSharedPointer<AbstractStreamSocket> socket,
         QnTcpListener* owner )
     :
-        QnTCPConnectionProcessor( new QnHttpTransactionReceiverPrivate, socket, owner)
+        QnTCPConnectionProcessor( new QnHttpTransactionReceiverPrivate, socket, owner->commonModule())
     {
         setObjectName( "QnHttpTransactionReceiver" );
         Q_D(QnHttpTransactionReceiver);

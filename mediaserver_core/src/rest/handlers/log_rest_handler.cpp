@@ -27,7 +27,7 @@ int QnLogRestHandler::executeGet(
 {
     Q_UNUSED(path);
 
-    if (!resourceAccessManager()->hasGlobalPermission(
+    if (!processor->resourceAccessManager()->hasGlobalPermission(
             processor->accessRights(),
             Qn::GlobalPermission::GlobalAdminPermission))
     {

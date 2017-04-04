@@ -60,7 +60,9 @@ bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
 
 OnvifResourceSearcher::OnvifResourceSearcher(QnCommonModule* commonModule):
     QnAbstractNetworkResourceSearcher(commonModule),
-    QnAbstractResourceSearcher(commonModule)
+    QnAbstractResourceSearcher(commonModule),
+    m_informationFetcher(new OnvifResourceInformationFetcher(commonModule)),
+    m_wsddSearcher(new OnvifResourceSearcherWsdd(m_informationFetcher.get()))
 {
 }
 
@@ -228,13 +230,12 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
             }
         }
 
-        OnvifResourceInformationFetcher fetcher;
         auto resData = qnStaticCommon->dataPool()->data(manufacturer, modelName);
         auto manufacturerAlias = resData.value<QString>(Qn::ONVIF_VENDOR_SUBTYPE);
 
         manufacturer = manufacturerAlias.isEmpty() ? manufacturer : manufacturerAlias;
 
-        QnUuid rt = fetcher.getOnvifResourceType(manufacturer, modelName);
+        QnUuid rt = m_informationFetcher->getOnvifResourceType(manufacturer, modelName);
         resource->setVendor( manufacturer );
         if (!modelName.isEmpty())
             resource->setName( modelName );
@@ -291,7 +292,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
 void OnvifResourceSearcher::pleaseStop()
 {
     QnAbstractNetworkResourceSearcher::pleaseStop();
-    m_wsddSearcher.pleaseStop();
+    m_wsddSearcher->pleaseStop();
 }
 
 QnResourceList OnvifResourceSearcher::findResources()
@@ -304,7 +305,7 @@ QnResourceList OnvifResourceSearcher::findResources()
     if (shouldStop())
          return QnResourceList();
 
-    m_wsddSearcher.findResources( result, discoveryMode() );
+    m_wsddSearcher->findResources( result, discoveryMode() );
 
     return result;
 }

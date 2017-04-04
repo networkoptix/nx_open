@@ -62,7 +62,7 @@ int QnDetachFromCloudRestHandler::execute(
             .arg(owner->globalSettings()->cloudSystemId()), cl_logDEBUG1);
         return QnPermissionsHelper::safeModeError(result);
     }
-    if (!QnPermissionsHelper::hasOwnerPermissions(accessRights))
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), accessRights))
     {
         NX_LOGX(lm("Cannot detach from cloud. Owner permissions are required. cloudSystemId %1")
             .arg(owner->globalSettings()->cloudSystemId()), cl_logDEBUG1);

@@ -42,7 +42,7 @@ QnTransactionTcpProcessor::QnTransactionTcpProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
     QnTcpListener* owner)
     :
-    QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket, owner)
+    QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket, owner->commonModule())
 {
     Q_D(QnTransactionTcpProcessor);
 

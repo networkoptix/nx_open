@@ -21,6 +21,7 @@ class QnCommonModuleAware
 {
 public:
     QnCommonModuleAware(QnCommonModule* commonModule);
+    QnCommonModuleAware(QnCommonModuleAware* commonModuleAware);
     QnCommonModuleAware(QObject* parent);
 
     QnCommonModule* commonModule() const;

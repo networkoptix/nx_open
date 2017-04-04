@@ -2212,7 +2212,7 @@ void MediaServerProcess::run()
 
     m_serverModule->setMessageProcessor(new QnServerMessageProcessor(m_serverModule.get()));
     QScopedPointer<QnMasterServerStatusWatcher> masterServerWatcher(new QnMasterServerStatusWatcher(commonModule()));
-    std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
+    std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer(commonModule()) );
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb(commonModule()));
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager(m_serverModule.get()) );
 
@@ -2249,7 +2249,7 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnBusinessRuleProcessor> mserverBusinessRuleProcessor(new QnMServerBusinessRuleProcessor(m_serverModule.get()));
 
-    QnVideoCameraPool::initStaticInstance( new QnVideoCameraPool() );
+    std::unique_ptr<QnVideoCameraPool> videoCameraPool( new QnVideoCameraPool(commonModule()) );
 
     QnMotionHelper::initStaticInstance( new QnMotionHelper() );
 
@@ -2911,7 +2911,7 @@ void MediaServerProcess::run()
     mserverResourceSearcher.reset();
 
     delete QnVideoCameraPool::instance();
-    QnVideoCameraPool::initStaticInstance( NULL );
+    videoCameraPool.reset();
 
     commonModule()->resourceDiscoveryManager()->stop();
     QnResource::stopAsyncTasks();

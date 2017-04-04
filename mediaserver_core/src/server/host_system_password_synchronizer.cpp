@@ -18,7 +18,8 @@
 #include "platform/platform_abstraction.h"
 #include "platform/monitoring/platform_monitor.h"
 
-HostSystemPasswordSynchronizer::HostSystemPasswordSynchronizer()
+HostSystemPasswordSynchronizer::HostSystemPasswordSynchronizer(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
     Qn::directConnect(
         resourcePool(), &QnResourcePool::resourceAdded,

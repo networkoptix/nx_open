@@ -6,6 +6,11 @@ QnCommonModuleAware::QnCommonModuleAware(QnCommonModule* commonModule)
     init(commonModule);
 }
 
+QnCommonModuleAware::QnCommonModuleAware(QnCommonModuleAware* commonModuleAware)
+{
+    init(commonModuleAware->commonModule());
+}
+
 QnCommonModuleAware::QnCommonModuleAware(QObject* parent)
 {
     init(parent);

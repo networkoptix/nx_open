@@ -7,6 +7,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <api/global_settings.h>
 #include <utils/common/app_info.h>
+#include <network/tcp_listener.h>
 
 
 namespace {
@@ -26,7 +27,7 @@ QnCrossdomainConnectionProcessor::QnCrossdomainConnectionProcessor(
     QnTCPConnectionProcessor(
         new QnCrossdomainConnectionProcessorPrivate,
         socket,
-        (QObject*) owner)
+        owner->commonModule())
 {
 }
 

@@ -13,6 +13,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <network/tcp_listener.h>
 
 class QnIOMonitorConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
@@ -27,7 +28,7 @@ public:
 };
 
 QnIOMonitorConnectionProcessor::QnIOMonitorConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
-    QnTCPConnectionProcessor(new QnIOMonitorConnectionProcessorPrivate, socket, (QObject*) owner)
+    QnTCPConnectionProcessor(new QnIOMonitorConnectionProcessorPrivate, socket, owner->commonModule())
 {
     QN_UNUSED(owner);
 }

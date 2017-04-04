@@ -7,6 +7,7 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
+#include <common/static_common_module.h>
 
 #if !defined(Q_OS_WIN)
     #include <arpa/inet.h>
@@ -30,8 +31,9 @@ static const QString kDefaultResourceType(lit("IQA32N"));
 } // namespace
 
 QnPlIqResourceSearcher::QnPlIqResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
     QnAbstractNetworkResourceSearcher(commonModule),
-    QnAbstractResourceSearcher(commonModule)
+    QnMdnsResourceSearcher(commonModule)
 {
 }
 

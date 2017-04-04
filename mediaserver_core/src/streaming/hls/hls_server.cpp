@@ -38,6 +38,7 @@
 #include "streaming/streaming_chunk_cache.h"
 #include "streaming/streaming_params.h"
 #include "network/tcp_connection_priv.h"
+#include <network/tcp_listener.h>
 
 //TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 
@@ -64,9 +65,9 @@ namespace nx_hls
 
     size_t QnHttpLiveStreamingProcessor::m_minPlaylistSizeToStartStreaming = nx_ms_conf::DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS;
 
-    QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* /*owner*/ )
+    QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner )
     :
-        QnTCPConnectionProcessor( socket ),
+        QnTCPConnectionProcessor( socket, owner->commonModule() ),
         m_state( sReceiving ),
         m_switchToChunkedTransfer( false ),
         m_useChunkedTransfer( false ),

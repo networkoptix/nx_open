@@ -22,7 +22,9 @@ namespace
 }
 
 QnPlAxisResourceSearcher::QnPlAxisResourceSearcher(QnCommonModule* commonModule):
-    base_type(commonModule)
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
+    QnMdnsResourceSearcher(commonModule)
 {
 }
 

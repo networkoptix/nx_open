@@ -31,9 +31,9 @@
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
-    QObject* parent)
+    QnCommonModule* commonModule)
 :
-    QnCommonModuleAware(parent),
+    QnCommonModuleAware(commonModule),
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
     Q_D(QnTCPConnectionProcessor);
@@ -44,9 +44,9 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QnTCPConnectionProcessorPrivate* dptr,
     QSharedPointer<AbstractStreamSocket> socket,
-    QObject* parent)
+    QnCommonModule* commonModule)
 :
-    QnCommonModuleAware(parent),
+    QnCommonModuleAware(commonModule),
     d_ptr(dptr)
 {
     Q_D(QnTCPConnectionProcessor);

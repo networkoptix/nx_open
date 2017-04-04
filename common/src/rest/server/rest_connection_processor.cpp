@@ -65,7 +65,7 @@ public:
 };
 
 QnRestConnectionProcessor::QnRestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket, _owner),
+    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket, _owner->commonModule()),
     m_noAuth(false)
 {
     Q_D(QnRestConnectionProcessor);

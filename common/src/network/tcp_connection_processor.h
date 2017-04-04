@@ -22,7 +22,7 @@ class QnTCPConnectionProcessor: public QnLongRunnable, public QnCommonModuleAwar
 public:
     static const int KEEP_ALIVE_TIMEOUT = 5  * 1000;
 
-    QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QObject* parent);
+    QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnCommonModule* commonModule);
     virtual ~QnTCPConnectionProcessor();
 
     /**
@@ -90,7 +90,7 @@ protected:
     QnTCPConnectionProcessor(
         QnTCPConnectionProcessorPrivate* d_ptr,
         QSharedPointer<AbstractStreamSocket> socket,
-        QObject* parent);
+        QnCommonModule* commonModule);
 
     bool sendData(const char* data, int size);
     inline bool sendData(const QByteArray& data) { return sendData(data.constData(), data.size()); }
