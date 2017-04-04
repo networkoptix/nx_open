@@ -42,3 +42,16 @@ QGraphicsWidget* QnHudOverlayWidget::right() const
     Q_D(const QnHudOverlayWidget);
     return d->right;
 }
+
+QnResourceHudColors QnHudOverlayWidget::colors() const
+{
+    Q_D(const QnHudOverlayWidget);
+    return d->colors;
+}
+
+void QnHudOverlayWidget::setColors(const QnResourceHudColors& colors)
+{
+    Q_D(QnHudOverlayWidget);
+    d->colors = colors;
+    d->updateTextOptions();
+}

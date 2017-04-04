@@ -73,8 +73,7 @@ void QnScrollableItemsWidgetPrivate::updateContentPosition()
                 case Qt::AlignRight:
                     return m_scrollArea->size().width() - contentGeometry.width();
 
-                case Qt::AlignHCenter:
-                default:
+                default: // everything else is handled as Qt::AlignHCenter
                     return (m_scrollArea->size().width() - contentGeometry.width()) / 2.0;
             }
         }();

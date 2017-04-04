@@ -39,4 +39,21 @@ QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
     auto mainLayout = new QGraphicsLinearLayout(Qt::Vertical, main);
     mainLayout->addItem(title);
     mainLayout->addItem(columnsLayout);
+
+    updateTextOptions();
+}
+
+void QnHudOverlayWidgetPrivate::updateTextOptions()
+{
+    static constexpr int kBorderRadius = 2;
+
+    QnHtmlTextItemOptions options;
+    options.borderRadius = kBorderRadius;
+    options.autosize = true;
+
+    options.backgroundColor = colors.detailsBackgroundColor;
+    details->setOptions(options);
+
+    options.backgroundColor = colors.positionBackgroundColor;
+    position->setOptions(options);
 }

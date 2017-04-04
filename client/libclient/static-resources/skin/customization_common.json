@@ -820,6 +820,13 @@
         }
     },
 
+    "QnHudOverlayWidget": {
+        "colors": {
+            "detailsBackgroundColor": "dark1.setAlpha(128)",
+            "positionBackgroundColor": "dark1.setAlpha(128)"
+        }
+    },
+
     "QnAuditLogModel": {
         "colors": {
             "httpLink": "brand_d2",

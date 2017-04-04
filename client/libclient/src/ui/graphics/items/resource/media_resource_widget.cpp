@@ -767,16 +767,16 @@ void QnMediaResourceWidget::setupHud()
 
     m_triggersContainer->setSpacing(kTriggersSpacing);
     m_triggersContainer->setMaximumWidth(kTriggerButtonSize);
-    m_triggersContainer->setAcceptedMouseButtons(Qt::NoButton);
-    setOverlayWidgetVisible(m_triggersContainer, false, false);
+    m_triggersContainer->setFlag(QGraphicsItem::ItemClipsChildrenToShape, false);
+    setOverlayWidgetVisible(m_triggersContainer, false, /*animate=*/false);
 
-    setOverlayWidgetVisible(m_hudOverlay->right(), true, false);
-    m_compositeTextOverlay->setFlag(QGraphicsItem::ItemClipsChildrenToShape);
-    m_compositeTextOverlay->setAcceptedMouseButtons(Qt::NoButton);
+    setOverlayWidgetVisible(m_hudOverlay->right(), true, /*animate=*/false);
 
     auto rightLayout = new QGraphicsLinearLayout(Qt::Horizontal, m_hudOverlay->right());
     rightLayout->addItem(m_compositeTextOverlay);
     rightLayout->addItem(m_triggersContainer);
+
+    m_compositeTextOverlay->stackBefore(m_triggersContainer);
 }
 
 void QnMediaResourceWidget::updateHud(bool animate)

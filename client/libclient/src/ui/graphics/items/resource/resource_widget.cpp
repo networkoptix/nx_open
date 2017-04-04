@@ -69,8 +69,6 @@ const qint64 defaultLoadingTimeoutMSec = MAX_FRAME_DURATION * 3;
 
 /** Background color for overlay panels. */
 
-const QColor infoBackgroundColor = QColor(0, 0, 0, 127); // TODO: #gdm #customization
-
 const QColor overlayTextColor = QColor(255, 255, 255); // TODO: #gdm #customization
 
 const qreal kSelectionOpacity = 0.2;
@@ -221,20 +219,9 @@ QnResourceWidget::~QnResourceWidget()
 void QnResourceWidget::setupHud()
 {
     addOverlayWidget(m_hudOverlay, detail::OverlayParams(UserVisible, true, true, InfoLayer));
-    setOverlayWidgetVisible(m_hudOverlay, true, false);
-
-    //TODO: #vkutin #gdm Options probably belong to QnHudOverlayWidget.
-    // They still need color customization, think where to do it better.
-    QnHtmlTextItemOptions infoOptions;
-    infoOptions.backgroundColor = infoBackgroundColor;
-    infoOptions.borderRadius = 2;
-    infoOptions.autosize = true;
-
-    m_hudOverlay->details()->setOptions(infoOptions);
-    setOverlayWidgetVisible(m_hudOverlay->details(), false, false);
-
-    m_hudOverlay->position()->setOptions(infoOptions);
-    setOverlayWidgetVisible(m_hudOverlay->position(), false, false);
+    setOverlayWidgetVisible(m_hudOverlay, true, /*animate=*/false);
+    setOverlayWidgetVisible(m_hudOverlay->details(), false, /*animate=*/false);
+    setOverlayWidgetVisible(m_hudOverlay->position(), false, /*animate=*/false);
 }
 
 void QnResourceWidget::createButtons()

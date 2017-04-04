@@ -38,6 +38,8 @@ QnTextOverlayWidget::QnTextOverlayWidget(QGraphicsWidget* parent):
         kDefaultHorMargin, kDefaultBottomMargin);
 
     setAlignment(Qt::AlignRight | Qt::AlignBottom);
+
+    setFlag(QGraphicsItem::ItemClipsChildrenToShape);
 }
 
 QnTextOverlayWidget::~QnTextOverlayWidget()

@@ -5,6 +5,7 @@ QnScrollableItemsWidget::QnScrollableItemsWidget(QGraphicsItem* parent):
     base_type(parent),
     d_ptr(new QnScrollableItemsWidgetPrivate(this))
 {
+    setAcceptedMouseButtons(Qt::NoButton);
 }
 
 Qt::Alignment QnScrollableItemsWidget::alignment() const
