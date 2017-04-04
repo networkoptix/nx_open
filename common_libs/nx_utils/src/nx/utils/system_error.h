@@ -80,12 +80,12 @@ namespace SystemError
 #endif
 
     //!Returns error code of previous system call
-    ErrorCode getLastOSErrorCode();
+    NX_UTILS_API ErrorCode getLastOSErrorCode();
     //!Returns text description of \a errorCode
-    QString toString( ErrorCode errorCode );
+    NX_UTILS_API QString toString( ErrorCode errorCode );
     //!Same as toString(getLastOSErrorCode())
-    QString getLastOSErrorText();
-    void setLastErrorCode( ErrorCode errorCode );
+    NX_UTILS_API QString getLastOSErrorText();
+    NX_UTILS_API void setLastErrorCode( ErrorCode errorCode );
 }
 
 #endif  //SYSTEMERROR_H
