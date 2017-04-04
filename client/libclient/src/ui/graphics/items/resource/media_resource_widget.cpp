@@ -1710,7 +1710,11 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     }
 
     if (m_display->camDisplay()->isEOFReached())
-        return Qn::NoDataOverlay;
+    {
+        return resource->getStatus() == Qn::Online && states.isRealTimeSource
+            ? Qn::LoadingOverlay
+            : Qn::NoDataOverlay;
+    }
 
     if (resource->hasFlags(Qn::local_image))
     {

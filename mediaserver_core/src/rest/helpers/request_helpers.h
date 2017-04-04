@@ -3,7 +3,7 @@
 #include <network/router.h>
 #include <http/custom_headers.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>

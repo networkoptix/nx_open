@@ -26,8 +26,8 @@
 #include <common/common_module.h>
 #include <platform/process/current_process.h>
 #include <utils/common/app_info.h>
-#include <utils/common/guard.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/system_error.h>
 #include <utils/db/db_structure_updater.h>
 
 #include <cloud_db_client/src/cdb_request_path.h>
@@ -101,7 +101,7 @@ static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 int CloudDBProcess::exec()
 {
     bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
+    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
         [this, &processStartResult]
         {
             if (m_startedEventHandler)

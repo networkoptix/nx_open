@@ -60,20 +60,31 @@ private:
 
     bool isFilteredOut(int sourceRow) const;
 
-    int indexToInsert(int sourceRow);
+    using RowsList = QList<int>;
+    int indexToInsert(int sourceRow, const RowsList& list);
 
     void shiftMappedRows(int fromSourceRow, int difference);
 
 private:
-    using RowsList = QList<int>;
+    using LessPred = std::function<bool (int left, int right)>;
 
+    const LessPred m_lessPred;
     RowsList m_mapped;
     QnSortFilterListModel::RolesSet m_triggeringRoles;
 };
 
 QnSortFilterListModelPrivate::QnSortFilterListModelPrivate(QnSortFilterListModel* parent):
     base_type(),
-    q_ptr(parent)
+    q_ptr(parent),
+    m_lessPred(
+        [this](int left, int right)
+        {
+            Q_Q(QnSortFilterListModel);
+            const auto model = q->sourceModel();
+            return (model
+                ? q->lessThan(model->index(left, 0), model->index(right, 0))
+                : left < right);
+        })
 {
 }
 
@@ -98,6 +109,12 @@ void QnSortFilterListModelPrivate::refresh()
     if (!sourceSize)
         return;
 
+    auto sortedMapped = m_mapped;
+    std::sort(sortedMapped.begin(), sortedMapped.end(), m_lessPred);
+
+    RowsList forRemove;
+    RowsList forAdd;
+
     for (int sourceRow = 0; sourceRow != sourceSize; ++sourceRow)
     {
         const int currentIndex = m_mapped.indexOf(sourceRow);
@@ -107,30 +124,35 @@ void QnSortFilterListModelPrivate::refresh()
         if (shouldBeFilteredOut != currentFilteredOut)
         {
             if (shouldBeFilteredOut)
-                removeSourceRow(sourceRow);
+                forRemove.append(sourceRow);
             else
-                insertSourceRow(sourceRow); // Here row is placed in right position.
+                forAdd.append(sourceRow);
 
             continue;
         }
         else if (currentIndex == -1) //< It is new row.
         {
-            insertSourceRow(sourceRow);
+            forAdd.append(sourceRow);
             continue;
         }
 
-        const int newIndex = indexToInsert(sourceRow);
+        const int newIndex = indexToInsert(sourceRow, sortedMapped);
         if (newIndex == currentIndex)
             continue; //< Row is in right place.
 
-        const int updatedNewIndex = newIndex + (currentIndex < newIndex ? -1 : 0);
-
         Q_Q(QnSortFilterListModel);
-        q->beginMoveRows(QModelIndex(), currentIndex, currentIndex, QModelIndex(), newIndex);
-        m_mapped.removeAt(currentIndex);
-        m_mapped.insert(m_mapped.begin() + updatedNewIndex, sourceRow);
+
+        const auto moveIndex = newIndex + (currentIndex < newIndex ? 1 : 0);
+        q->beginMoveRows(QModelIndex(), currentIndex, currentIndex, QModelIndex(), moveIndex);
+        m_mapped.move(currentIndex, newIndex);
         q->endMoveRows();
     }
+
+    for (const auto rowForAdd: forAdd)
+        insertSourceRow(rowForAdd);
+
+    for (const auto rowForRemove: forRemove)
+        removeSourceRow(rowForRemove);
 }
 
 int QnSortFilterListModelPrivate::rowCount() const
@@ -144,18 +166,10 @@ bool QnSortFilterListModelPrivate::isFilteredOut(int sourceRow) const
     return !q->filterAcceptsRow(sourceRow, QModelIndex());
 }
 
-int QnSortFilterListModelPrivate::indexToInsert(int sourceRow)
+int QnSortFilterListModelPrivate::indexToInsert(int sourceRow, const RowsList& mapped)
 {
-    const auto it = std::lower_bound(m_mapped.begin(), m_mapped.end(), sourceRow,
-        [this](int left, int right)
-        {
-            Q_Q(QnSortFilterListModel);
-            const auto model = q->sourceModel();
-            return (model
-                ? q->lessThan(model->index(left, 0), model->index(right, 0))
-                : left < right);
-        });
-    return std::distance(m_mapped.begin(), it);
+    const auto it = std::lower_bound(mapped.begin(), mapped.end(), sourceRow, m_lessPred);
+    return std::distance(mapped.begin(), it);
 }
 
 void QnSortFilterListModelPrivate::insertSourceRow(int sourceRow)
@@ -171,7 +185,7 @@ void QnSortFilterListModelPrivate::insertSourceRow(int sourceRow)
     }
 
     Q_Q(QnSortFilterListModel);
-    const auto index = indexToInsert(sourceRow);
+    const auto index = indexToInsert(sourceRow, m_mapped);
     q->beginInsertRows(QModelIndex(), index, index);
     m_mapped.insert(index, sourceRow);
     q->endInsertRows();

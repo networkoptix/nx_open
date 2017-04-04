@@ -9,8 +9,7 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/thread_util.h>
-
-#include "guard.h"
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace utils {

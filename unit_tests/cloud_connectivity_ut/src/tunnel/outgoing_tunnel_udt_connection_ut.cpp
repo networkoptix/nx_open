@@ -7,7 +7,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/test_options.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace network {
@@ -330,9 +330,9 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
             controlConnectionClosedPromise.set_value();
         });
 
-    auto tunnelConnectionGuard = makeScopedGuard(
+    auto tunnelConnectionGuard = makeScopeGuard(
         [&tunnelConnection]{ tunnelConnection.pleaseStopSync(); });
-    auto controlConnectionGuard = makeScopedGuard(
+    auto controlConnectionGuard = makeScopeGuard(
         [this]
         {
             if (!m_controlConnection)

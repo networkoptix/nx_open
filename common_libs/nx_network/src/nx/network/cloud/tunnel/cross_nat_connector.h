@@ -14,7 +14,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/result_counter.h>
 #include <nx/utils/type_utils.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "abstract_cross_nat_connector.h"
 #include "abstract_outgoing_tunnel_connection.h"

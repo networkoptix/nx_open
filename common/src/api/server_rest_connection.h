@@ -3,7 +3,7 @@
 #include "server_rest_connection_fwd.h"
 
 #include <nx/network/http/httptypes.h>
-#include "utils/common/systemerror.h"
+#include <nx/utils/system_error.h>
 #include "utils/common/request_param.h"
 #include "nx_ec/data/api_fwd.h"
 #include <api/helpers/request_helpers_fwd.h>

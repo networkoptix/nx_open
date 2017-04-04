@@ -30,7 +30,7 @@
 #include <nx/network/http/httptypes.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/timer_manager.h>
-#include "utils/common/systemerror.h"
+#include <nx/utils/system_error.h>
 #include "api/app_server_connection.h"
 #include "soap/soapserver.h"
 #include "onvif_ptz_controller.h"

@@ -16,6 +16,12 @@
 
 #include <ui/workaround/cancel_drag.h>
 
+namespace {
+
+static constexpr int kMinimumWidth = 400;
+
+} // namespace
+
 class QnMessageBoxPrivate : public QObject
 {
     QnMessageBox* q_ptr;
@@ -754,13 +760,11 @@ void QnMessageBox::showEvent(QShowEvent* event)
 
 void QnMessageBox::afterLayout()
 {
+    auto size = sizeHint();
+
+    size.setWidth(std::max({ kMinimumWidth, size.width(), minimumSizeHint().width() }));
     if (hasHeightForWidth())
-    {
-        setFixedHeight(heightForWidth(width()));
-    }
-    else
-    {
-        /* This dialog must have height-for-width, but just in case handle otherwise: */
-        setFixedHeight(sizeHint().height());
-    }
+        size.setHeight(heightForWidth(size.width()));
+
+    setFixedSize(size);
 }
