@@ -5,6 +5,9 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 
+#include <QtGui/QPainter>
+#include <QtGui/QPixmapCache>
+
 #include <ui/style/skin.h>
 #include <nx/utils/string.h>
 
