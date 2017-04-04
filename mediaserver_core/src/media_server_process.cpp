@@ -101,6 +101,7 @@
 #include <recorder/storage_manager.h>
 #include <recorder/schedule_sync.h>
 
+#include <rest/handlers/runtime_info_rest_handler.h>
 #include <rest/handlers/acti_event_rest_handler.h>
 #include <rest/handlers/business_event_log_rest_handler.h>
 #include "rest/handlers/business_log2_rest_handler.h"
@@ -1504,6 +1505,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("ec2/recordedTimePeriods", new QnMultiserverChunksRestHandler("ec2/recordedTimePeriods"));
     QnRestProcessorPool::instance()->registerHandler("ec2/cameraHistory", new QnCameraHistoryRestHandler());
     QnRestProcessorPool::instance()->registerHandler("ec2/bookmarks", new QnMultiserverBookmarksRestHandler("ec2/bookmarks"));
+    QnRestProcessorPool::instance()->registerHandler("ec2/runtimeInfo", new QnRuntimeInfoRestHandler());
     QnRestProcessorPool::instance()->registerHandler("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
 
     //TODO: #rvasilenko this url is used in 3 different places. Where can we store it? Static member of QnThumbnailRequestData? New common module?

@@ -1,31 +1,45 @@
 #include "json_rest_handler.h"
+#include <utils/common/util.h>
 
-QnJsonRestHandler::QnJsonRestHandler(): 
-    m_contentType("application/json") 
-{}
+namespace {
+    const static QLatin1String kExtraFormatting("extraFormatting");
+} // namespace
 
-QnJsonRestHandler::~QnJsonRestHandler() {
+QnJsonRestHandler::QnJsonRestHandler():
+    m_contentType("application/json")
+{
+}
+
+QnJsonRestHandler::~QnJsonRestHandler()
+{
     return;
 }
 
-int QnJsonRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType, const QnRestConnectionProcessor* owner) 
+int QnJsonRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &result, QByteArray &contentType, const QnRestConnectionProcessor* owner)
 {
     QnJsonRestResult jsonResult;
-    int returnCode = executeGet(path, processParams(params), jsonResult, owner);
+    const auto paramsMap = processParams(params);
+    int returnCode = executeGet(path, paramsMap, jsonResult, owner);
 
     result = QJson::serialized(jsonResult);
+    if (paramsMap.contains(kExtraFormatting))
+        result  = formatJSonString(result);
+
     contentType = m_contentType;
 
     return returnCode;
 }
 
-int QnJsonRestHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, const QByteArray& /*srcBodyContentType*/, QByteArray &result, 
+int QnJsonRestHandler::executePost(const QString &path, const QnRequestParamList &params, const QByteArray &body, const QByteArray& /*srcBodyContentType*/, QByteArray &result,
                                    QByteArray &contentType, const QnRestConnectionProcessor* owner)
 {
     QnJsonRestResult jsonResult;
-    int returnCode = executePost(path, processParams(params), body, jsonResult, owner);
+    const auto paramsMap = processParams(params);
+    int returnCode = executePost(path, paramsMap, body, jsonResult, owner);
 
     result = QJson::serialized(jsonResult);
+    if (paramsMap.contains(kExtraFormatting))
+        result  = formatJSonString(result);
     contentType = m_contentType;
 
     return returnCode;
