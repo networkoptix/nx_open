@@ -160,7 +160,7 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
 
     foreach (const QnMediaServerResourcePtr &server, resourcePool()->getAllIncompatibleResources().filtered<QnMediaServerResource>())
     {
-        if (helpers::serverBelongsToCurrentSystem(server->getModuleInformation()) &&
+        if (helpers::serverBelongsToCurrentSystem(server) &&
             server.dynamicCast<QnFakeMediaServerResource>())
         {
             result.append(server);

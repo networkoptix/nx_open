@@ -4,6 +4,8 @@
 #include <ui/style/skin.h>
 #include <ui/style/custom_style.h>
 
+#include <common/common_module.h>
+
 #include <client/client_globals.h>
 
 #include <api/global_settings.h>

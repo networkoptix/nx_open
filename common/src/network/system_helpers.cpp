@@ -1,5 +1,7 @@
 #include "system_helpers.h"
 
+#include <core/resource/media_server_resource.h>
+
 #include <network/cloud_system_data.h>
 #include <network/module_information.h>
 #include <api/model/connection_info.h>
@@ -133,6 +135,11 @@ QnUuid currentSystemLocalId(const QnCommonModule* commonModule)
 bool serverBelongsToCurrentSystem(const QnModuleInformation& info, const QnCommonModule* commonModule)
 {
     return (getLocalSystemId(info) == currentSystemLocalId(commonModule));
+}
+
+bool serverBelongsToCurrentSystem(const QnMediaServerResourcePtr& server)
+{
+    return serverBelongsToCurrentSystem(server->getModuleInformation(), server->commonModule());
 }
 
 bool currentSystemIsNew(const QnCommonModule* commonModule)

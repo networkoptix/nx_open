@@ -202,7 +202,7 @@ bool QnCheckForUpdatesPeerTask::isDowngradeAllowed()
 
     // Check if all server's version is not higher then target. Server downgrade is prohibited.
     return boost::algorithm::all_of(m_target.targets,
-        [targetVersion = m_target.version]
+        [targetVersion = m_target.version, this]
         (const QnUuid& serverId)
         {
             const auto server = resourcePool()->getIncompatibleResourceById(serverId, true)

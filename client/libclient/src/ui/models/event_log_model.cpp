@@ -573,7 +573,7 @@ void QnEventLogModel::sort(int column, Qt::SortOrder order)
     endResetModel();
 }
 
-QString QnEventLogModel::motionUrl(Column column, const QnBusinessActionData& action)
+QString QnEventLogModel::motionUrl(Column column, const QnBusinessActionData& action) const
 {
     if (column != DescriptionColumn || !action.hasFlags(QnBusinessActionData::VideoLinkExists))
         return QString();

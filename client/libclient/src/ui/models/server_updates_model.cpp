@@ -179,7 +179,7 @@ void QnServerUpdatesModel::resetResourses() {
     for (const QnResourcePtr &resource: resourcePool()->getAllIncompatibleResources())
     {
         QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (!server || !helpers::serverBelongsToCurrentSystem(server->getModuleInformation(), commonModule()))
+        if (!server || !helpers::serverBelongsToCurrentSystem(server))
             continue;
 
         // Adds newly added to system server which is not authorized
@@ -233,7 +233,7 @@ void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource)
         return;
 
     if (server->hasFlags(Qn::fake_server)
-        && !helpers::serverBelongsToCurrentSystem(server->getModuleInformation(), commonModule()))
+        && !helpers::serverBelongsToCurrentSystem(server))
     {
         return;
     }
@@ -268,7 +268,7 @@ void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
     QModelIndex idx = index(server);
     bool exists = idx.isValid();
     bool isOurServer = !server->hasFlags(Qn::fake_server)
-        || helpers::serverBelongsToCurrentSystem(server->getModuleInformation(), commonModule());
+        || helpers::serverBelongsToCurrentSystem(server);
 
     if (exists == isOurServer) {
         emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));

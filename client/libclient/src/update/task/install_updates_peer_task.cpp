@@ -309,7 +309,7 @@ void QnInstallUpdatesPeerTask::at_pingTimer_timeout()
     if (!m_ecConnection)
     {
         m_ecConnection = QnMediaServerConnectionPtr(
-            new QnMediaServerConnection(m_ecServer, QnUuid(), true), &qnDeleteLater);
+            new QnMediaServerConnection(commonModule(), m_ecServer, QnUuid(), true), &qnDeleteLater);
     }
 
     m_ecConnection->modulesInformation(

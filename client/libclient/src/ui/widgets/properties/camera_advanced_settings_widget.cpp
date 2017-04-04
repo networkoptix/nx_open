@@ -8,6 +8,7 @@
 
 #include <api/network_proxy_factory.h>
 
+#include <common/static_common_module.h>
 #include <common/common_module.h>
 
 #include <core/resource/camera_resource.h>
@@ -149,7 +150,7 @@ void QnCameraAdvancedSettingsWidget::updatePage()
             if (!m_camera || !isStatusValid(m_camera->getStatus()))
                 return Page::Unavailable;
 
-        QnResourceData resourceData = commonModule()->dataPool()->data(m_camera);
+        QnResourceData resourceData = qnStaticCommon->dataPool()->data(m_camera);
         bool hasWebPage = resourceData.value<bool>(lit("showUrl"), false);
         if (hasWebPage)
             return Page::Web;
@@ -205,7 +206,7 @@ void QnCameraAdvancedSettingsWidget::reloadData()
         // It stays invalid with error code 'AuthorityPresentAndPathIsRelative'
         //  --rvasilenko, Qt 5.2.1
         const auto currentServerUrl = commonModule()->currentUrl();
-        QnResourceData resourceData = commonModule()->dataPool()->data(m_camera);
+        QnResourceData resourceData = qnStaticCommon->dataPool()->data(m_camera);
         QUrl targetUrl = QString(lit("http://%1:%2/%3"))
             .arg(currentServerUrl.host())
             .arg(currentServerUrl.port())

@@ -244,7 +244,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     {
         auto server = resource.dynamicCast<QnMediaServerResource>();
         NX_ASSERT(server);
-        status = helpers::serverBelongsToCurrentSystem(server->getModuleInformation(), server->commonModule())
+        status = helpers::serverBelongsToCurrentSystem(server)
             ? Incompatible
             : Online;
     }

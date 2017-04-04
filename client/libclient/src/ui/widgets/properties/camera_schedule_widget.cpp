@@ -210,7 +210,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
         &QnCameraScheduleWidget::updateColors);
     updateColors();
 
-    QnCamLicenseUsageHelper helper;
+    QnCamLicenseUsageHelper helper(this);
     ui->licensesUsageWidget->init(&helper);
 
     QnCheckbox::autoCleanTristate(ui->enableRecordingCheckBox);
@@ -930,7 +930,7 @@ void QnCameraScheduleWidget::updateGridEnabledState()
 
 void QnCameraScheduleWidget::updateLicensesLabelText()
 {
-    QnCamLicenseUsageHelper helper;
+    QnCamLicenseUsageHelper helper(this);
 
     switch (ui->enableRecordingCheckBox->checkState())
     {

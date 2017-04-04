@@ -4,6 +4,8 @@
 #include <QtCore/QFileInfo>
 #include <nx/utils/uuid.h>
 
+#include <common/common_module.h>
+
 #include <client/client_message_processor.h>
 
 #include <transcoding/file_transcoder.h>

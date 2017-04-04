@@ -2,6 +2,8 @@
 
 #include <nx/utils/uuid.h>
 
+#include <core/resource/resource_fwd.h>
+
 class QUrl;
 
 struct QnCloudSystem;
@@ -42,6 +44,8 @@ QnUuid currentSystemLocalId(const QnCommonModule* commonModule);
 bool currentSystemIsNew(const QnCommonModule* commonModule);
 
 bool serverBelongsToCurrentSystem(const QnModuleInformation& info, const QnCommonModule* commonModule);
+
+bool serverBelongsToCurrentSystem(const QnMediaServerResourcePtr& server);
 
 /**
  * Checks whether user login is local or cloud.

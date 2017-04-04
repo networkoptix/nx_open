@@ -146,7 +146,7 @@ void QnResourceTreeModelOtherSystemsNode::updateFakeServerNode(
         ? tr("New System")
         : info.systemName;
 
-    const bool isCurrentSystemServer = helpers::serverBelongsToCurrentSystem(info, commonModule());
+    const bool isCurrentSystemServer = helpers::serverBelongsToCurrentSystem(server);
 
     const auto parent = isCurrentSystemServer
         ? model()->rootNode(Qn::ServersNode)

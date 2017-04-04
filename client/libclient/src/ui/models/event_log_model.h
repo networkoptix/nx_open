@@ -68,7 +68,7 @@ private:
 
     static int helpTopicIdData(Column column, const QnBusinessActionData& action);
 
-    static QString motionUrl(Column column, const QnBusinessActionData& action);
+    QString motionUrl(Column column, const QnBusinessActionData& action) const;
     static QString getUserNameById(const QnUuid& id);
     static QString getResourceNameString(const QnUuid& id);
     static QString getUserGroupString(QnBusiness::UserGroup value);
