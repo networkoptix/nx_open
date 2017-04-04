@@ -8,11 +8,11 @@
 #include "core/resource_management/resource_searcher.h"
 #include <nx/network/socket.h>
 
-class QnTestCameraResourceSearcher : public QnAbstractNetworkResourceSearcher
+class QnTestCameraResourceSearcher: public QnAbstractNetworkResourceSearcher
 {
     Q_DECLARE_TR_FUNCTIONS(QnTestCameraResourceSearcher)
 public:
-    QnTestCameraResourceSearcher();
+    QnTestCameraResourceSearcher(QnCommonModule* commonModule);
     virtual ~QnTestCameraResourceSearcher();
 
     QnResourceList findResources(void);

@@ -19,7 +19,7 @@ void setUseAlternativeGuid(bool value);
 
 QString getDataDirectory();
 void syncStoragesToSettings(const QnMediaServerResourcePtr &server);
-bool backupDatabase();
+bool backupDatabase(QnCommonModule* commonModule);
 
 namespace ec2 {
     class QnTransactionMessageBus;
@@ -68,7 +68,12 @@ namespace nx
 
 void resetTransactionTransportConnections();
 
-bool updateUserCredentials(PasswordData data, QnOptionalBool isEnabled, const QnUserResourcePtr& userRes, QString* errString = nullptr);
+bool updateUserCredentials(
+    QnCommonModule* commonModule,
+    PasswordData data,
+    QnOptionalBool isEnabled,
+    const QnUserResourcePtr& userRes,
+    QString* errString = nullptr);
 bool validatePasswordData(const PasswordData& passwordData, QString* errStr);
 
 
@@ -129,7 +134,7 @@ QByteArray autoDetectHttpContentType(const QByteArray& msgBody);
 /**
  * @return false if failed to save some data.
  */
-bool resetSystemToStateNew();
+bool resetSystemToStateNew(QnCommonModule* commonModule);
 
 
 #define ConfigureSystemData_Fields PasswordData_Fields (localSystemId)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUsers)(foreignSettings)(additionParams)(rewriteLocalSettings)

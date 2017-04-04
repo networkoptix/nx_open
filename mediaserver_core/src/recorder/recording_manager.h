@@ -17,6 +17,7 @@
 #include "camera/video_camera.h"
 #include "core/misc/schedule_task.h"
 #include <nx/utils/singleton.h>
+#include <common/common_module_aware.h>
 
 class QnServerStreamRecorder;
 class QnVideoCamera;
@@ -79,6 +80,7 @@ protected: // 'protected' -> enable access for ut
 
 class QnRecordingManager:
     public QThread,
+    public QnCommonModuleAware,
     public Singleton<QnRecordingManager>
 {
     Q_OBJECT
@@ -86,7 +88,9 @@ public:
     static const int RECORDING_CHUNK_LEN = 60; // seconds
     static const int MIN_SECONDARY_FPS = 2;
 
-    QnRecordingManager(ec2::QnDistributedMutexManager* mutexManager);
+    QnRecordingManager(
+        QnCommonModule* commonModule,
+        ec2::QnDistributedMutexManager* mutexManager);
     virtual ~QnRecordingManager();
 
     void start();
@@ -111,6 +115,7 @@ private slots:
     void at_checkLicenses();
     void at_serverPropertyChanged(const QnResourcePtr &, const QString &key);
 private:
+    void updateRuntimeInfoAfterLicenseOverflowTransaction(qint64 prematureLicenseExperationDate);
     void updateCamera(const QnSecurityCamResourcePtr& camera);
 
     QnServerStreamRecorder* createRecorder(const QnResourcePtr &res, const QSharedPointer<QnAbstractMediaStreamDataProvider>& reader,

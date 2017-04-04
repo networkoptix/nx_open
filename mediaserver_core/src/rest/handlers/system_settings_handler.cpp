@@ -14,6 +14,7 @@
 #include <rest/server/rest_connection_processor.h>
 #include <transaction/transaction_descriptor.h>
 #include <core/resource_access/resource_access_manager.h>
+#include <common/common_module.h>
 
 int QnSystemSettingsHandler::executeGet(
     const QString& /*path*/,
@@ -21,11 +22,12 @@ int QnSystemSettingsHandler::executeGet(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
-    bool status = updateSettings(params, result, owner->accessRights(), owner->authSession());
+    bool status = updateSettings(owner->commonModule(), params, result, owner->accessRights(), owner->authSession());
     return status ? nx_http::StatusCode::ok : nx_http::StatusCode::forbidden;
 }
 
 bool QnSystemSettingsHandler::updateSettings(
+    QnCommonModule* commonModule,
     const QnRequestParams& params,
     QnJsonRestResult& result,
     const Qn::UserAccessData& accessRights,
@@ -33,7 +35,7 @@ bool QnSystemSettingsHandler::updateSettings(
 {
     QnSystemSettingsReply reply;
     bool dirty = false;
-    const auto& settings = qnGlobalSettings->allSettings();
+    const auto& settings = commonModule->globalSettings()->allSettings();
 
     QnRequestParams filteredParams(params);
     filteredParams.remove("auth");
@@ -52,7 +54,7 @@ bool QnSystemSettingsHandler::updateSettings(
             accessRights,
             setting->key());
 
-        writeAllowed &= resourceAccessManager()->hasGlobalPermission(
+        writeAllowed &= commonModule->resourceAccessManager()->hasGlobalPermission(
             accessRights,
             Qn::GlobalPermission::GlobalAdminPermission);
 
@@ -76,7 +78,7 @@ bool QnSystemSettingsHandler::updateSettings(
             reply.settings.insert(setting->key(), setting->serializedValue());
     }
     if (dirty)
-        qnGlobalSettings->synchronizeNow();
+        commonModule->globalSettings()->synchronizeNow();
 
     result.setReply(std::move(reply));
     return true;

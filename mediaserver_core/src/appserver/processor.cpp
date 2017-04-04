@@ -151,19 +151,20 @@ void QnAppserverResourceProcessor::readDefaultUserAttrs()
 }
 
 ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
+    QnCommonModule* commonModule,
     const ec2::ApiCameraData& apiCameraData,
-    const ec2::ApiResourceParamDataList& properties) const
+    const ec2::ApiResourceParamDataList& properties)
 {
-    QnResourcePtr existCamRes = resourcePool()->getResourceById(apiCameraData.id);
+    QnResourcePtr existCamRes = commonModule->resourcePool()->getResourceById(apiCameraData.id);
     if (existCamRes && existCamRes->getTypeId() != apiCameraData.typeId)
-        resourcePool()->removeResource(existCamRes);
+        commonModule->resourcePool()->removeResource(existCamRes);
 
     /**
      * Save properties before camera to avoid race condition.
      * Camera will start initialization as soon as ApiCameraData object will appear
      */
 
-    ec2::ErrorCode errorCode = commonModule()->ec2Connection()
+    ec2::ErrorCode errorCode = commonModule->ec2Connection()
         ->getResourceManager(Qn::kSystemAccess)
         ->saveSync(apiCameraData.id, properties);
     if (errorCode != ec2::ErrorCode::ok)
@@ -172,7 +173,7 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
         return errorCode;
     }
 
-    errorCode = commonModule()->ec2Connection()
+    errorCode = commonModule->ec2Connection()
         ->getCameraManager(Qn::kSystemAccess)
         ->addCameraSync(apiCameraData);
     if (errorCode != ec2::ErrorCode::ok)
@@ -196,7 +197,10 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
     fromResourceToApi(cameraResource, apiCameraData);
     apiCameraData.id = cameraResource->physicalIdToId(uniqueId);
 
-    ec2::ErrorCode errCode = addAndPropagateCamResource(apiCameraData, cameraResource->getRuntimeProperties());
+    ec2::ErrorCode errCode = addAndPropagateCamResource(
+        commonModule(),
+        apiCameraData,
+        cameraResource->getRuntimeProperties());
     if (errCode != ec2::ErrorCode::ok)
         return;
 

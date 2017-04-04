@@ -33,7 +33,7 @@ QnHttpConnectionListener::~QnHttpConnectionListener()
 
 bool QnHttpConnectionListener::isProxy(const nx_http::Request& request)
 {
-    return (m_proxyInfo.proxyHandler && m_proxyInfo.proxyCond(request));
+    return (m_proxyInfo.proxyHandler && m_proxyInfo.proxyCond(commonModule(), request));
 }
 
 bool QnHttpConnectionListener::needAuth() const

@@ -7,6 +7,7 @@
 #include "utils/common/util.h"
 #include "common/common_module.h"
 #include <utils/common/app_info.h>
+#include <common/static_common_module.h>
 
 int QnAppInfoRestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
 {
@@ -18,7 +19,7 @@ int QnAppInfoRestHandler::executeGet(const QString& path, const QnRequestParamLi
     return CODE_OK;
 }
 
-int QnAppInfoRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray&, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 
+int QnAppInfoRestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray&, const QByteArray& /*srcBodyContentType*/, QByteArray& result,
                                       QByteArray& contentType, const QnRestConnectionProcessor* owner)
 {
     return executeGet(path, params, result, contentType, owner);

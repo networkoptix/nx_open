@@ -12,7 +12,7 @@ CloudManagerGroup::CloudManagerGroup(
     authenticationNonceFetcher(&connectionManager, defaultNonceFetcher),
     userAuthenticator(
         &connectionManager,
-        std::make_unique<GenericUserDataProvider>(),
+        std::make_unique<GenericUserDataProvider>(commonModule),
         authenticationNonceFetcher)
 {
 }

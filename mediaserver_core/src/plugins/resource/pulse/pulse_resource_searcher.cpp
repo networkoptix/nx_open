@@ -12,20 +12,10 @@
 #include "common/common_module.h"
 #include <common/static_common_module.h>
 
-QnPlPulseSearcher::QnPlPulseSearcher()
+QnPlPulseSearcher::QnPlPulseSearcher(QnCommonModule* commonModule):
+    QnAbstractNetworkResourceSearcher(commonModule),
+    QnAbstractResourceSearcher(commonModule)
 {
-
-}
-
-static std::unique_ptr<QnPlPulseSearcher> QnPlPulseSearcher_instance;
-static std::once_flag QnPlPulseSearcher_onceFlag;
-
-QnPlPulseSearcher& QnPlPulseSearcher::instance()
-{
-    std::call_once(
-        QnPlPulseSearcher_onceFlag,
-        [](){ QnPlPulseSearcher_instance.reset( new QnPlPulseSearcher() ); } );
-    return *QnPlPulseSearcher_instance.get();
 }
 
 QnResourceList QnPlPulseSearcher::findResources()

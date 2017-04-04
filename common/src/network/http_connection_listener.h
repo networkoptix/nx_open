@@ -74,7 +74,7 @@ public:
         m_handlers.append(handler);
     }
 
-    typedef std::function<bool(const nx_http::Request&)> ProxyCond;
+    typedef std::function<bool(QnCommonModule* commonModule, const nx_http::Request&)> ProxyCond;
     struct ProxyInfo
     {
         ProxyInfo(): proxyHandler(0) {}

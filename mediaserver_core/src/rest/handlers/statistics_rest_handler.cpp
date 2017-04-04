@@ -19,26 +19,23 @@ QnStatisticsRestHandler::~QnStatisticsRestHandler() {
 }
 
 int QnStatisticsRestHandler::executeGet(
-    const QString &path, 
-    const QnRequestParams &params, 
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner)
 {
-    if (!resourceAccessManager()->hasPermission(
+    if (!owner->resourceAccessManager()->hasPermission(
             owner->accessRights(),
-            resourcePool()->getResourceById(commonModule()->moduleGUID()),
+            owner->resourcePool()->getResourceById(owner->commonModule()->moduleGUID()),
             Qn::ViewContentPermission))
     {
         return nx_http::StatusCode::forbidden;
     }
 
-    Q_UNUSED(params)
-    Q_UNUSED(path)
-
     QnStatisticsReply reply;
     reply.updatePeriod = m_monitor->updatePeriod();
     reply.uptimeMs = m_monitor->upTimeMs();
-    
+
     QnStatisticsDataList cpuInfo;
     cpuInfo.append(QnStatisticsDataItem(lit("CPU"), m_monitor->totalCpuUsage(), Qn::StatisticsCPU));
     //cpuInfo.append(QnStatisticsDataItem(lit("CPU-CORES"), QThread::idealThreadCount(), Qn::StatisticsCPU));
@@ -55,7 +52,7 @@ int QnStatisticsRestHandler::executeGet(
     reply.statistics << storages;
 
     QnStatisticsDataList network;
-    for(const QnPlatformMonitor::NetworkLoad &networkLoad: m_monitor->totalNetworkLoad()) 
+    for(const QnPlatformMonitor::NetworkLoad &networkLoad: m_monitor->totalNetworkLoad())
     {
         qint64 bytesIn = networkLoad.bytesPerSecIn;
         qint64 bytesOut = networkLoad.bytesPerSecOut;

@@ -58,7 +58,9 @@ bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
     return rez;
 }
 
-OnvifResourceSearcher::OnvifResourceSearcher()
+OnvifResourceSearcher::OnvifResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractNetworkResourceSearcher(commonModule),
+    QnAbstractResourceSearcher(commonModule)
 {
 }
 
@@ -171,7 +173,7 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         if (channel > 0)
             resource->updateToChannel(channel-1);
 
-        auto resData = commonModule()
+        auto resData = qnStaticCommon
             ->dataPool()
             ->data(rpResource->getVendor(), rpResource->getModel());
 

@@ -33,10 +33,11 @@ public:
     virtual bool isBusy() const override;
     virtual void processResources(const QnResourceList &resources) override;
 
-    ec2::ErrorCode addAndPropagateCamResource(
+    static ec2::ErrorCode addAndPropagateCamResource(
+        QnCommonModule* commonModule,
         const ec2::ApiCameraData& apiCameraData,
         const ec2::ApiResourceParamDataList& properties
-    ) const;
+    );
 
 private:
     ec2::AbstractECConnectionPtr m_ec2Connection;

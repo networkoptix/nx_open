@@ -17,14 +17,15 @@
 
 #include <numeric>
 
-QnScheduleSync::QnScheduleSync()
-    : m_syncing(false),
-      m_forced(false),
-      m_interrupted(false),
-      m_failReported(false),
-      m_curDow(ec2::backup::Never),
-      m_syncTimePoint(0),
-      m_syncEndTimePoint(0)
+QnScheduleSync::QnScheduleSync(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
+    m_syncing(false),
+    m_forced(false),
+    m_interrupted(false),
+    m_failReported(false),
+    m_curDow(ec2::backup::Never),
+    m_syncTimePoint(0),
+    m_syncEndTimePoint(0)
 {
 }
 

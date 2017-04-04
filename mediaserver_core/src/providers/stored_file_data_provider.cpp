@@ -9,9 +9,13 @@
 
 namespace {
     const QString kNotificationsPathPrefix("notifications/");
-}
+} // namespace
 
-QnStoredFileDataProvider::QnStoredFileDataProvider(const QString &filePath, int cyclesCount) :
+QnStoredFileDataProvider::QnStoredFileDataProvider(
+    ec2::AbstractECConnectionPtr connection,
+    const QString &filePath,
+    int cyclesCount)
+:
     QnAbstractStreamDataProvider(QnResourcePtr(new QnResource())),
     m_state(StoredFileDataProviderState::Waiting),
     m_filePath(kNotificationsPathPrefix + filePath),
@@ -19,8 +23,6 @@ QnStoredFileDataProvider::QnStoredFileDataProvider(const QString &filePath, int 
     m_cyclesCount(cyclesCount)
 
 {
-    auto connection = commonModule()->ec2Connection();
-
     connect(
         this, &QnStoredFileDataProvider::fileLoaded,
         this, &QnStoredFileDataProvider::at_fileLoaded);

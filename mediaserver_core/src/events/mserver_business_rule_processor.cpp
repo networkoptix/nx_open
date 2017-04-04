@@ -757,7 +757,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDescriptionMap(
                 {
                     QVariantMap camera;
 
-                    QnResourceDisplayInfo camInfo(commonModule(), camRes);
+                    QnResourceDisplayInfo camInfo(camRes);
                     camera[tpCameraName] = camInfo.name();
                     camera[tpCameraIP] = camInfo.host();
 
@@ -878,7 +878,7 @@ QVariantMap QnMServerBusinessRuleProcessor::eventDetailsMap(
 
                 for (const QString &id: params.description.split(L';'))
                     if (const QnVirtualCameraResourcePtr &camera = resourcePool()->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
-                        disabledCameras << QnResourceDisplayInfo(commonModule(), camera).toString(Qn::RI_WithUrl);
+                        disabledCameras << QnResourceDisplayInfo(camera).toString(Qn::RI_WithUrl);
 
                 reasonContext[lit("disabledCameras")] = disabledCameras;
             }

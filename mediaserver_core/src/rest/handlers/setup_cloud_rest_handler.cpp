@@ -45,11 +45,11 @@ int QnSetupCloudSystemRestHandler::execute(
 {
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
 
 
-    if (!qnGlobalSettings->isNewSystem())
+    if (!owner->globalSettings()->isNewSystem())
     {
         result.setError(QnJsonRestResult::Forbidden, lit("This method is allowed at initial state only. Use 'api/detachFromSystem' method first."));
         return nx_http::StatusCode::ok;
@@ -62,21 +62,21 @@ int QnSetupCloudSystemRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    if (!resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID()))
+    if (!owner->resourcePool()->getResourceById<QnMediaServerResource>(owner->commonModule()->moduleGUID()))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error."));
         return nx_http::StatusCode::ok;
     }
 
-    const auto systemNameBak = qnGlobalSettings->systemName();
+    const auto systemNameBak = owner->globalSettings()->systemName();
 
-    qnGlobalSettings->setSystemName(data.systemName);
-    qnGlobalSettings->setLocalSystemId(QnUuid::createUuid());
-    if (!qnGlobalSettings->synchronizeNowSync())
+    owner->globalSettings()->setSystemName(data.systemName);
+    owner->globalSettings()->setLocalSystemId(QnUuid::createUuid());
+    if (!owner->globalSettings()->synchronizeNowSync())
     {
         //changing system name back
-        qnGlobalSettings->setSystemName(systemNameBak);
-        qnGlobalSettings->setLocalSystemId(QnUuid()); //< revert
+        owner->globalSettings()->setSystemName(systemNameBak);
+        owner->globalSettings()->setLocalSystemId(QnUuid()); //< revert
         result.setError(
             QnJsonRestResult::CantProcessRequest,
             lit("Internal server error."));
@@ -88,11 +88,11 @@ int QnSetupCloudSystemRestHandler::execute(
     if (result.error != QnJsonRestResult::NoError)
     {
         //changing system name back
-        qnGlobalSettings->setSystemName(systemNameBak);
-        qnGlobalSettings->setLocalSystemId(QnUuid()); //< revert
+        owner->globalSettings()->setSystemName(systemNameBak);
+        owner->globalSettings()->setLocalSystemId(QnUuid()); //< revert
         return httpResult;
     }
-    qnGlobalSettings->synchronizeNowSync();
+    owner->globalSettings()->synchronizeNowSync();
 
 
     QString errStr;
@@ -100,9 +100,10 @@ int QnSetupCloudSystemRestHandler::execute(
     // reset admin password to random value to prevent NX1 root login via default password
     adminPasswordData.password = QnUuid::createUuid().toString();
     if (!updateUserCredentials(
+        owner->commonModule(),
         adminPasswordData,
         QnOptionalBool(false),
-        resourcePool()->getAdministrator(),
+        owner->resourcePool()->getAdministrator(),
         &errStr))
     {
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);

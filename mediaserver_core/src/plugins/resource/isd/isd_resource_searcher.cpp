@@ -34,7 +34,9 @@ namespace
     const QLatin1String kDefaultIsdPassword( "admin" );
 }
 
-QnPlISDResourceSearcher::QnPlISDResourceSearcher()
+QnPlISDResourceSearcher::QnPlISDResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractNetworkResourceSearcher(commonModule),
+    QnAbstractResourceSearcher(commonModule)
 {
     QnMdnsListener::instance()->registerConsumer((std::uintptr_t) this);
 	nx_upnp::DeviceSearcher::instance()->registerHandler(this, kUpnpBasicDeviceType);

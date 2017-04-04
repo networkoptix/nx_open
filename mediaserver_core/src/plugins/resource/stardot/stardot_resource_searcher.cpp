@@ -18,7 +18,9 @@ static const int STARDOT_DISCOVERY_PORT = 7364;
 
 extern QString getValueFromString(const QString& line);
 
-QnStardotResourceSearcher::QnStardotResourceSearcher()
+QnStardotResourceSearcher::QnStardotResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractNetworkResourceSearcher(commonModule),
+    QnAbstractResourceSearcher(commonModule)
 {
 }
 

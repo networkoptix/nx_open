@@ -22,7 +22,11 @@
 
 static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
 
-ThirdPartyResourceSearcher::ThirdPartyResourceSearcher()
+ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
+    QnMdnsResourceSearcher(commonModule),
+    QnUpnpResourceSearcherAsync(commonModule)
 {
     QList<nxcip::CameraDiscoveryManager*> pluginList = PluginManager::instance()->findNxPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
     std::copy(

@@ -19,8 +19,7 @@ QnAuditRecord filteredRecord(QnAuditRecord record)
 
 
 QnMServerAuditManager::QnMServerAuditManager(QObject* parent):
-    QnAuditManager(),
-    QnCommonModuleAware(parent)
+    QnAuditManager(parent),
     m_internalId(-1)
 {
     m_internalId = qnServerDb->auditRecordMaxId();

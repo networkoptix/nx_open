@@ -147,7 +147,7 @@ int QnConfigureRestHandler::execute(
     /* set password */
     if (data.hasPassword())
     {
-        if (!updateUserCredentials(data, QnOptionalBool(), owner->resourcePool()->getAdministrator()))
+        if (!updateUserCredentials(owner->commonModule(), data, QnOptionalBool(), owner->resourcePool()->getAdministrator()))
         {
             NX_LOG(lit("QnConfigureRestHandler: can't update administrator credentials"), cl_logWARNING);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));

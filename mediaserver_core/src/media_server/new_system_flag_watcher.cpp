@@ -11,11 +11,12 @@
 
 #include <core/resource/media_server_resource.h>
 
-QnNewSystemServerFlagWatcher::QnNewSystemServerFlagWatcher(QObject* parent /*= nullptr*/):
-    base_type(parent)
+QnNewSystemServerFlagWatcher::QnNewSystemServerFlagWatcher(QObject* parent):
+    base_type(parent),
+    QnCommonModuleAware(parent)
 {
-    connect(qnGlobalSettings, &QnGlobalSettings::initialized, this, &QnNewSystemServerFlagWatcher::update);
-    connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this, &QnNewSystemServerFlagWatcher::update);
+    connect(globalSettings(), &QnGlobalSettings::initialized, this, &QnNewSystemServerFlagWatcher::update);
+    connect(globalSettings(), &QnGlobalSettings::localSystemIdChanged, this, &QnNewSystemServerFlagWatcher::update);
 }
 
 void QnNewSystemServerFlagWatcher::update()

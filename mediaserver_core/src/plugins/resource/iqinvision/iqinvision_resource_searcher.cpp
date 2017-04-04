@@ -29,7 +29,9 @@ static const QString kDefaultResourceType(lit("IQA32N"));
 
 } // namespace
 
-QnPlIqResourceSearcher::QnPlIqResourceSearcher()
+QnPlIqResourceSearcher::QnPlIqResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractNetworkResourceSearcher(commonModule),
+    QnAbstractResourceSearcher(commonModule)
 {
 }
 

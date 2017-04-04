@@ -6,11 +6,14 @@
 #include "flir_eip_resource.h"
 
 QnFlirResourceSearcher::QnFlirResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
     base_type(commonModule)
 {
     m_eipFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR-AX8"), true);
     m_cgiFlirResTypeId = qnResTypePool->getResourceTypeId(manufacture(), lit("FLIR_COMMON"), true);
 }
+
 QnFlirResourceSearcher::~QnFlirResourceSearcher()
 {
 }

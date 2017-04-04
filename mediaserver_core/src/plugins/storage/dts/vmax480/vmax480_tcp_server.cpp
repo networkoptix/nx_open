@@ -36,7 +36,7 @@ public:
 QnMutex QnVMax480ConnectionProcessorPrivate::connectMutex;
 
 QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket)
+    QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket, _owner)
 {
     Q_D(QnVMax480ConnectionProcessor);
     d->streamFetcher = 0;
@@ -76,7 +76,7 @@ void QnVMax480ConnectionProcessor::vMaxDisconnect()
 
     QElapsedTimer t;
     t.restart();
-    if (d->socket->isConnected() && !d->tcpID.isEmpty()) 
+    if (d->socket->isConnected() && !d->tcpID.isEmpty())
     {
         QByteArray data = QnVMax480Helper::serializeCommand(Command_CloseConnect, 0, VMaxParamList());
         d->socket->send(data);
@@ -190,7 +190,7 @@ bool QnVMax480ConnectionProcessor::readBuffer(quint8* buffer, int size)
     Q_D(QnVMax480ConnectionProcessor);
 
     int done = 0;
-    while (!needToStop() && done < size) 
+    while (!needToStop() && done < size)
     {
         int readed = d->socket->recv(buffer + done, size - done);
         if (readed < 1)

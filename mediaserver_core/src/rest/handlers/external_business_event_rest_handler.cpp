@@ -12,12 +12,17 @@
 #include <business/business_event_parameters.h>
 #include <nx/fusion/model_functions.h>
 #include "common/common_module.h"
+#include <rest/server/rest_connection_processor.h>
 
 QnExternalBusinessEventRestHandler::QnExternalBusinessEventRestHandler()
 {
 }
 
-int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnExternalBusinessEventRestHandler::executeGet(
+    const QString &path,
+    const QnRequestParams &params,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path)
 
@@ -69,7 +74,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const Qn
 
     if (businessParams.eventTimestampUsec == 0)
         businessParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
-    businessParams.sourceServerId = commonModule()->moduleGUID();
+    businessParams.sourceServerId = owner->commonModule()->moduleGUID();
 
     if (businessParams.eventType == QnBusiness::UndefinedEvent)
         businessParams.eventType = QnBusiness::UserDefinedEvent; // default value for type is 'CustomEvent'

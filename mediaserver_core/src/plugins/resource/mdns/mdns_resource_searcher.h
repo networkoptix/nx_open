@@ -10,7 +10,7 @@ class QnMdnsResourceSearcher: virtual public QnAbstractNetworkResourceSearcher
 {
     using base_type = QnAbstractNetworkResourceSearcher;
 public:
-    QnMdnsResourceSearcher(QnCommonModule* commonModule = nullptr);
+    QnMdnsResourceSearcher(QnCommonModule* commonModule);
     ~QnMdnsResourceSearcher();
 
     bool isProxy() const;

@@ -43,18 +43,6 @@ static const qint64 LICENSE_RECORDING_STOP_TIME = 60 * 24 * 30;
 static const qint64 UPDATE_CAMERA_HISTORY_PERIOD_MSEC = 60 * 1000;
 static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 
-namespace {
-    void updateRuntimeInfoAfterLicenseOverflowTransaction(qint64 prematureLicenseExperationDate)
-    {
-        QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
-        if (localInfo.data.prematureLicenseExperationDate != prematureLicenseExperationDate)
-        {
-            localInfo.data.prematureLicenseExperationDate = prematureLicenseExperationDate;
-            runtimeInfoManager()->updateLocalItem(localInfo);
-        }
-    }
-}
-
 class QnServerDataProviderFactory: public QnDataProviderFactory
 {
 public:
@@ -62,7 +50,11 @@ public:
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(const QnResourcePtr& res, Qn::ConnectionRole role) override;
 };
 
-QnRecordingManager::QnRecordingManager(ec2::QnDistributedMutexManager* mutexManager):
+QnRecordingManager::QnRecordingManager(
+    QnCommonModule* commonModule,
+    ec2::QnDistributedMutexManager* mutexManager)
+:
+    QnCommonModuleAware(commonModule),
     m_mutex(QnMutex::Recursive),
     m_mutexManager(mutexManager)
 {
@@ -86,6 +78,16 @@ QnRecordingManager::~QnRecordingManager()
         camera->disconnect(camera.data(), nullptr, this, nullptr);
 
     stop();
+}
+
+void QnRecordingManager::updateRuntimeInfoAfterLicenseOverflowTransaction(qint64 prematureLicenseExperationDate)
+{
+    QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
+    if (localInfo.data.prematureLicenseExperationDate != prematureLicenseExperationDate)
+    {
+        localInfo.data.prematureLicenseExperationDate = prematureLicenseExperationDate;
+        runtimeInfoManager()->updateLocalItem(localInfo);
+    }
 }
 
 void QnRecordingManager::start()
@@ -557,7 +559,7 @@ void QnRecordingManager::at_checkLicenses()
     if (m_licenseMutex)
         return;
 
-    QnCamLicenseUsageHelper helper;
+    QnCamLicenseUsageHelper helper(commonModule());
 
     if (!helper.isValid())
     {
@@ -597,8 +599,8 @@ void QnRecordingManager::at_checkLicenses()
         qint64 licenseOverflowTime = runtimeInfoManager()->localInfo().data.prematureLicenseExperationDate;
         if (licenseOverflowTime)
         {
-            commonModule()->ec2Connection()->getMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(false, 0);
-            if (errorCode == ErrorCode::ok)
+            auto errorCode = commonModule()->ec2Connection()->getMiscManager(Qn::kSystemAccess)->markLicenseOverflowSync(false, 0);
+            if (errorCode == ec2::ErrorCode::ok)
                 updateRuntimeInfoAfterLicenseOverflowTransaction(0);
         }
 
@@ -608,7 +610,7 @@ void QnRecordingManager::at_checkLicenses()
 
 void QnRecordingManager::at_licenseMutexLocked()
 {
-    QnCamLicenseUsageHelper helper;
+    QnCamLicenseUsageHelper helper(commonModule());
 
     QStringList disabledCameras;
 
@@ -625,7 +627,7 @@ void QnRecordingManager::at_licenseMutexLocked()
             QList<QnUuid> idList;
             idList << camera->getId();
 
-            QnCameraUserAttributesList userAttributes = QnCameraUserAttributePool::instance()->getAttributesList(idList);
+            QnCameraUserAttributesList userAttributes = commonModule()->cameraUserAttributesPool()->getAttributesList(idList);
             ec2::ApiCameraAttributesDataList apiAttributes;
             fromResourceListToApi(userAttributes, apiAttributes);
 
@@ -636,7 +638,7 @@ void QnRecordingManager::at_licenseMutexLocked()
                 camera->setScheduleDisabled(false); // rollback
                 continue;
             }
-            propertyDictionary()->saveParams( camera->getId() );
+            camera->saveParams();
             disabledCameras << camera->getId().toString();
             helper.invalidate();
         }

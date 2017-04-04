@@ -25,6 +25,7 @@
 #include "settings.h"
 
 #include <utils/common/delayed.h>
+#include <business/business_message_bus.h>
 
 namespace {
 
@@ -71,7 +72,9 @@ QnMediaServerModule::QnMediaServerModule(
         nx::network::SocketGlobals::mediatorConnector().mockupAddress(enforcedMediatorEndpoint);
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
-    store(new QnNewSystemServerFlagWatcher());
+    store(new QnNewSystemServerFlagWatcher(this));
+    store(new QnBusinessMessageBus(this));
+
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());

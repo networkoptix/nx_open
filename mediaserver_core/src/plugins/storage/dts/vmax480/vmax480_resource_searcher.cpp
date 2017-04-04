@@ -19,7 +19,9 @@ static const int TCP_TIMEOUT = 3000;
 static const QString NAME_PREFIX(QLatin1String("VMAX-"));
 
 // ====================================================================
-QnPlVmax480ResourceSearcher::QnPlVmax480ResourceSearcher()
+QnPlVmax480ResourceSearcher::QnPlVmax480ResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractNetworkResourceSearcher(commonModule),
+    QnAbstractResourceSearcher(commonModule)
 {
 
 }

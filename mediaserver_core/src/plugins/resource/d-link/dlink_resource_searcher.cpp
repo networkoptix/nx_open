@@ -20,7 +20,9 @@ extern QString getValueFromString(const QString& line);
 
 #define CL_BROAD_CAST_RETRY 1
 
-QnPlDlinkResourceSearcher::QnPlDlinkResourceSearcher()
+QnPlDlinkResourceSearcher::QnPlDlinkResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractNetworkResourceSearcher(commonModule),
+    QnAbstractResourceSearcher(commonModule)
 {
 }
 

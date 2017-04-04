@@ -9,10 +9,10 @@
 //#include "onvif_resource_searcher_mdns.h"
 
 
-class OnvifResourceSearcher : public QnAbstractNetworkResourceSearcher
+class OnvifResourceSearcher: public QnAbstractNetworkResourceSearcher
 {
 public:
-    OnvifResourceSearcher();
+    OnvifResourceSearcher(QnCommonModule* commonModule);
     virtual ~OnvifResourceSearcher();
 
     virtual void pleaseStop() override;

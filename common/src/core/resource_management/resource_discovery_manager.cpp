@@ -525,13 +525,13 @@ QnResourceList QnResourceDiscoveryManager::findNewResources()
     }
 }
 
-QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetworkResourcePtr& netRes) const
+QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetworkResourcePtr& netRes)
 {
     auto camRes = netRes.dynamicCast<QnVirtualCameraResource>();
     if (!camRes)
         return QnNetworkResourcePtr();
 
-    const auto& resPool = commonModule()->resourcePool();
+    const auto& resPool = netRes->resourcePool();
     auto existResource = resPool->getResourceByUniqueId<QnVirtualCameraResource>(camRes->getUniqueId());
     if (existResource)
         return existResource;

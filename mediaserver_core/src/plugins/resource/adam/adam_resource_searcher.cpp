@@ -47,7 +47,9 @@ QnAdamResourceSearcher::QnAdamAsciiCommand::QnAdamAsciiCommand(const QString& co
     wordNum = byteNum / 2;
 }
 
-QnAdamResourceSearcher::QnAdamResourceSearcher()
+QnAdamResourceSearcher::QnAdamResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule)
 {
 }
 

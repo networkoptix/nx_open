@@ -21,15 +21,17 @@ namespace {
 }
 #endif
 
-QnServerConnector::QnServerConnector(QnModuleFinder *moduleFinder, QObject *parent) :
-    QObject(parent),
-    m_moduleFinder(moduleFinder)
+QnServerConnector::QnServerConnector(QnCommonModule* commonModule):
+    QObject(),
+    QnCommonModuleAware(commonModule)
 {
 }
 
 void QnServerConnector::at_moduleFinder_moduleAddressFound(const QnModuleInformation &moduleInformation, const SocketAddress &address)
 {
-    if (!QnConnectionValidator::isCompatibleToCurrentSystem(moduleInformation))
+    if (!QnConnectionValidator::isCompatibleToCurrentSystem(
+        moduleInformation,
+        commonModule()))
     {
         bool used;
         {
@@ -64,14 +66,15 @@ void QnServerConnector::at_moduleFinder_moduleAddressLost(const QnModuleInformat
 
 void QnServerConnector::at_moduleFinder_moduleChanged(const QnModuleInformation &moduleInformation)
 {
-    if (QnConnectionValidator::isCompatibleToCurrentSystem(moduleInformation))
+    const auto& moduleFinder = commonModule()->moduleFinder();
+    if (QnConnectionValidator::isCompatibleToCurrentSystem(moduleInformation, commonModule()))
     {
-        for (const SocketAddress &address: m_moduleFinder->moduleAddresses(moduleInformation.id))
+        for (const SocketAddress &address: moduleFinder->moduleAddresses(moduleInformation.id))
             addConnection(moduleInformation, address);
     }
     else
     {
-        for (const SocketAddress &address: m_moduleFinder->moduleAddresses(moduleInformation.id))
+        for (const SocketAddress &address: moduleFinder->moduleAddresses(moduleInformation.id))
         {
             NX_LOG(lit("QnServerConnector. Removing address %1 from module %2 since module has been changed")
                 .arg(address.toString()).arg(moduleInformation.id.toString()),
@@ -126,22 +129,27 @@ void QnServerConnector::removeConnection(const QnModuleInformation &moduleInform
         mServer->setStatus(Qn::Offline);
 }
 
-void QnServerConnector::start() {
-    connect(m_moduleFinder,     &QnModuleFinder::moduleAddressFound,    this,   &QnServerConnector::at_moduleFinder_moduleAddressFound);
-    connect(m_moduleFinder,     &QnModuleFinder::moduleAddressLost,     this,   &QnServerConnector::at_moduleFinder_moduleAddressLost);
-    connect(m_moduleFinder,     &QnModuleFinder::moduleChanged,     this,   &QnServerConnector::at_moduleFinder_moduleChanged);
+void QnServerConnector::start()
+{
+    const auto& moduleFinder = commonModule()->moduleFinder();
+    connect(moduleFinder,     &QnModuleFinder::moduleAddressFound,    this,   &QnServerConnector::at_moduleFinder_moduleAddressFound);
+    connect(moduleFinder,     &QnModuleFinder::moduleAddressLost,     this,   &QnServerConnector::at_moduleFinder_moduleAddressLost);
+    connect(moduleFinder,     &QnModuleFinder::moduleChanged,     this,   &QnServerConnector::at_moduleFinder_moduleChanged);
 
-    for (const QnModuleInformation &moduleInformation: m_moduleFinder->foundModules()) {
-        if (!QnConnectionValidator::isCompatibleToCurrentSystem(moduleInformation))
+    for (const QnModuleInformation &moduleInformation: moduleFinder->foundModules())
+    {
+        if (!QnConnectionValidator::isCompatibleToCurrentSystem(moduleInformation, commonModule()))
             continue;
 
-        for (const SocketAddress &address: m_moduleFinder->moduleAddresses(moduleInformation.id))
+        for (const SocketAddress &address: moduleFinder->moduleAddresses(moduleInformation.id))
             addConnection(moduleInformation, address);
     }
 }
 
-void QnServerConnector::stop() {
-    m_moduleFinder->disconnect(this);
+void QnServerConnector::stop()
+{
+    const auto& moduleFinder = commonModule()->moduleFinder();
+    moduleFinder->disconnect(this);
 
     QHash<QString, AddressInfo> usedUrls;
     {
@@ -154,7 +162,7 @@ void QnServerConnector::stop() {
         NX_LOG(lit("QnServerConnector. Removing address %1 from module %2 since stopping...")
             .arg(it.key()).arg(it->peerId.toString()),
             cl_logDEBUG1);
-        removeConnection(m_moduleFinder->moduleInformation(it->peerId), it.key());
+        removeConnection(moduleFinder->moduleInformation(it->peerId), it.key());
     }
 
     {

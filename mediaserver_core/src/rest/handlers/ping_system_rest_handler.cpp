@@ -11,6 +11,8 @@
 #include "utils/common/app_info.h"
 #include <nx/network/simple_http_client.h>
 #include <http/custom_headers.h>
+#include <rest/server/rest_connection_processor.h>
+#include <licensing/license_validator.h>
 
 //#define START_LICENSES_DEBUG
 
@@ -23,7 +25,7 @@ int QnPingSystemRestHandler::executeGet(
         const QString &path,
         const QnRequestParams &params,
         QnJsonRestResult &result,
-        const QnRestConnectionProcessor* /*owner*/)
+        const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path)
 

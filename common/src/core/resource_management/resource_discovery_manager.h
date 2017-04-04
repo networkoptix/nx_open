@@ -133,7 +133,7 @@ public:
     QSet<QString> lastDiscoveredIds() const;
     void addResourcesImmediatly(QnResourceList& resources);
 
-    QnNetworkResourcePtr findSameResource(const QnNetworkResourcePtr& netRes) const;
+    static QnNetworkResourcePtr findSameResource(const QnNetworkResourcePtr& netRes);
 
 public slots:
     virtual void start( Priority priority = InheritPriority ) override;

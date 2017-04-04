@@ -246,6 +246,7 @@
 #include "misc/migrate_oldwin_dir.h"
 #include "media_server_process_aux.h"
 #include <common/static_common_module.h>
+#include <recorder/storage_db_pool.h>
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
@@ -1145,7 +1146,7 @@ void MediaServerProcess::at_databaseDumped()
     nx::mserver_aux::savePersistentDataBeforeDbRestore(
                 commonModule()->resourcePool()->getAdministrator(),
                 m_mediaServer,
-                nx::mserver_aux::createServerSettingsProxy().get()
+                nx::mserver_aux::createServerSettingsProxy(commonModule()).get()
             ).saveToSettings(MSSettings::roSettings());
     restartServer(500);
 }
@@ -1163,7 +1164,7 @@ void MediaServerProcess::at_systemIdentityTimeChanged(qint64 value, const QnUuid
         nx::mserver_aux::savePersistentDataBeforeDbRestore(
                     commonModule()->resourcePool()->getAdministrator(),
                     m_mediaServer,
-                    nx::mserver_aux::createServerSettingsProxy().get()
+                    nx::mserver_aux::createServerSettingsProxy(commonModule()).get()
                 ).saveToSettings(MSSettings::roSettings());
         restartServer(0);
     }
@@ -2052,7 +2053,7 @@ void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectio
             continue;
         }
 
-        if (!resetSystemToStateNew())
+        if (!resetSystemToStateNew(commonModule()))
         {
             qWarning() << "Error while resetting system to state \"new \". Trying again...";
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
@@ -2212,7 +2213,7 @@ void MediaServerProcess::run()
     m_serverModule->setMessageProcessor(new QnServerMessageProcessor(m_serverModule.get()));
     QScopedPointer<QnMasterServerStatusWatcher> masterServerWatcher(new QnMasterServerStatusWatcher(commonModule()));
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
-    std::unique_ptr<QnServerDb> serverDB(new QnServerDb());
+    std::unique_ptr<QnServerDb> serverDB(new QnServerDb(commonModule()));
     std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager(m_serverModule.get()) );
 
     TimeBasedNonceProvider timeBasedNonceProvider;
@@ -2269,14 +2270,17 @@ void MediaServerProcess::run()
 
     QScopedPointer<QnServerPtzControllerPool> ptzPool(new QnServerPtzControllerPool(m_serverModule.get()));
 
+    std::unique_ptr<QnStorageDbPool> storageDbPool(new QnStorageDbPool(commonModule()));
     std::unique_ptr<QnStorageManager> normalStorageManager(
         new QnStorageManager(
+            commonModule(),
             QnServer::StoragePool::Normal
         )
     );
 
     std::unique_ptr<QnStorageManager> backupStorageManager(
         new QnStorageManager(
+            commonModule(),
             QnServer::StoragePool::Backup
         )
     );
@@ -2341,7 +2345,7 @@ void MediaServerProcess::run()
             nx::utils::TimerManager::instance(),
             commonModule()));
 
-    MediaServerStatusWatcher mediaServerStatusWatcher;
+    MediaServerStatusWatcher mediaServerStatusWatcher(commonModule());
     QScopedPointer<QnConnectToCloudWatcher> connectToCloudWatcher(new QnConnectToCloudWatcher(ec2ConnectionFactory->messageBus()));
 
     //passing settings
@@ -2672,11 +2676,11 @@ void MediaServerProcess::run()
 
     connect(commonModule()->moduleFinder(), &QnModuleFinder::moduleConflict, this, &MediaServerProcess::at_serverModuleConflict);
 
-    QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(commonModule()->moduleFinder()));
+    QScopedPointer<QnServerConnector> serverConnector(new QnServerConnector(commonModule()));
 
     // ------------------------------------------
 
-    QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool());
+    QScopedPointer<QnServerUpdateTool> serverUpdateTool(new QnServerUpdateTool(commonModule()));
     serverUpdateTool->removeUpdateFiles(m_mediaServer->getVersion().toString());
 
     // ===========================================================================
@@ -2693,11 +2697,13 @@ void MediaServerProcess::run()
         commonModule(),
         ec2ConnectionFactory->distributedMutex(),
         m_mediaServer->getId()) );
-    std::unique_ptr<QnRecordingManager> recordingManager(new QnRecordingManager(ec2ConnectionFactory->distributedMutex()));
+    std::unique_ptr<QnRecordingManager> recordingManager(new QnRecordingManager(
+        commonModule(),
+        ec2ConnectionFactory->distributedMutex()));
     serverResourceProcessor->moveToThread(commonModule()->resourceDiscoveryManager());
     commonModule()->resourceDiscoveryManager()->setResourceProcessor(serverResourceProcessor.get());
 
-    std::unique_ptr<QnResourceStatusWatcher> statusWatcher( new QnResourceStatusWatcher());
+    std::unique_ptr<QnResourceStatusWatcher> statusWatcher( new QnResourceStatusWatcher(commonModule()));
 
     nx::network::SocketGlobals::addressPublisher().setRetryInterval(
         nx::utils::parseTimerDuration(
@@ -2705,7 +2711,7 @@ void MediaServerProcess::run()
             nx::network::cloud::MediatorAddressPublisher::kDefaultRetryInterval));
 
     /* Searchers must be initialized before the resources are loaded as resources instances are created by searchers. */
-    QnMediaServerResourceSearchers searchers;
+    QnMediaServerResourceSearchers searchers(commonModule());
 
     std::unique_ptr<QnAudioStreamerPool> audioStreamerPool(new QnAudioStreamerPool(commonModule()));
 
@@ -2727,7 +2733,7 @@ void MediaServerProcess::run()
 
     updateAddressesList();
 
-    auto settingsProxy = nx::mserver_aux::createServerSettingsProxy();
+    auto settingsProxy = nx::mserver_aux::createServerSettingsProxy(commonModule());
     auto systemNameProxy = nx::mserver_aux::createServerSystemNameProxy();
 
     nx::mserver_aux::setUpSystemIdentity(commonModule()->beforeRestoreDbData(), settingsProxy.get(), std::move(systemNameProxy));

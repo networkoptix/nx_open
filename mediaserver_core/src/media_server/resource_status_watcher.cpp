@@ -5,10 +5,12 @@
 
 #include "api/app_server_connection.h"
 #include "core/resource/media_server_resource.h"
+#include <common/common_module.h>
 
-QnResourceStatusWatcher::QnResourceStatusWatcher()
+QnResourceStatusWatcher::QnResourceStatusWatcher(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
-    connect(resourcePool(), &QnResourcePool::statusChanged, this, &QnResourceStatusWatcher::at_resource_statusChanged);
+    connect(commonModule->resourcePool(), &QnResourcePool::statusChanged, this, &QnResourceStatusWatcher::at_resource_statusChanged);
     connect(this, &QnResourceStatusWatcher::statusChanged, this, &QnResourceStatusWatcher::updateResourceStatusInternal, Qt::QueuedConnection);
 }
 

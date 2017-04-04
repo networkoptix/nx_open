@@ -13,18 +13,20 @@
 #include <network/authenticate_helper.h>
 
 #include <utils/common/app_info.h>
+#include <common/common_module.h>
 
 
-GenericUserDataProvider::GenericUserDataProvider()
+GenericUserDataProvider::GenericUserDataProvider(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
     Qn::directConnect(
-        resourcePool(), &QnResourcePool::resourceAdded,
+        commonModule->resourcePool(), &QnResourcePool::resourceAdded,
         this, &GenericUserDataProvider::at_resourcePool_resourceAdded);
     Qn::directConnect(
-        resourcePool(), &QnResourcePool::resourceChanged,
+        commonModule->resourcePool(), &QnResourcePool::resourceChanged,
         this, &GenericUserDataProvider::at_resourcePool_resourceAdded);
     Qn::directConnect(
-        resourcePool(), &QnResourcePool::resourceRemoved,
+        commonModule->resourcePool(), &QnResourcePool::resourceRemoved,
         this, &GenericUserDataProvider::at_resourcePool_resourceRemoved);
 }
 
