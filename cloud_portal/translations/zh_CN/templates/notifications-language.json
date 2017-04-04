@@ -1,0 +1,14 @@
+{
+  "activate_account":{
+    "emailSubject":"确认您的帐户"
+  },
+  "restore_password":{
+    "emailSubject":"恢复您的密码"
+  },
+  "system_invite":{
+    "emailSubject":"与你分享了视频系统 {{message.system_name}}"
+  },
+  "system_shared":{
+    "emailSubject":"与你分享了视频系统 {{message.system_name}}"
+  }
+}

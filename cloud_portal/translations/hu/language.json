@@ -151,8 +151,8 @@
     "confirmUnshareTitle":"Törli a felhasználót?",
     "confirmUnshareAction":"Törlés",
     "successDisconnected":"Rendszer sikeresen bontotta {{PRODUCT_NAME}} kapcsolatát",
-    "successDeleted":"System {{systemName}} is successfully deleted from your account",
-    "permissionsRemoved":"Permissions were removed from {{email}}"
+    "successDeleted":"{{systemName}} rendszer sikeresen törölve a fiókból",
+    "permissionsRemoved":"{{email}} engedélyei vissavonva"
   },
   "account":{
     "accountSavedSuccess":"A fiók mentése sikeres",
