@@ -2,12 +2,12 @@
 
 #include <QtWidgets/QWidget>
 
-#include <nx_ec/ec_api.h>
+#include <client_core/connection_context_aware.h>
 
-#include <licensing/license.h>
+#include <nx_ec/ec_api_fwd.h>
+#include <licensing/license_fwd.h>
 
 #include <ui/widgets/common/abstract_preferences_widget.h>
-
 #include <utils/common/connective.h>
 
 class QModelIndex;
@@ -16,12 +16,15 @@ class QNetworkReply;
 class QPushButton;
 
 class QnLicenseListModel;
+class QnLicenseValidator;
 
 namespace Ui {
 class LicenseManagerWidget;
 }
 
-class QnLicenseManagerWidget : public Connective<QnAbstractPreferencesWidget>
+class QnLicenseManagerWidget:
+    public Connective<QnAbstractPreferencesWidget>,
+    public QnConnectionContextAware
 {
     Q_OBJECT
     typedef Connective<QnAbstractPreferencesWidget> base_type;
@@ -49,7 +52,8 @@ private slots:
     void updateButtons();
 
     void at_downloadError();
-    void at_licensesReceived(const QByteArray& licenseKey, ec2::ErrorCode errorCode, const QnLicenseList& licenses);
+    void at_licensesReceived(const QByteArray& licenseKey, ec2::ErrorCode errorCode,
+        const QnLicenseList& licenses);
     void at_licenseWidget_stateChanged();
 
     void licenseDetailsRequested(const QModelIndex& index);
@@ -96,8 +100,9 @@ private:
     Q_DISABLE_COPY(QnLicenseManagerWidget)
 
     QScopedPointer<Ui::LicenseManagerWidget> ui;
-    QnLicenseListModel* m_model;
-    QNetworkAccessManager* m_httpClient;
-    QPushButton* m_exportLicensesButton;
+    QnLicenseListModel* m_model {nullptr};
+    QNetworkAccessManager* m_httpClient {nullptr};
+    QPushButton* m_exportLicensesButton {nullptr};
     QnLicenseList m_licenses;
+    QnLicenseValidator* m_validator {nullptr};
 };

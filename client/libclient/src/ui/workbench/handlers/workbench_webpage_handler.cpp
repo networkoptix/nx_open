@@ -26,19 +26,21 @@ namespace
     }
 }
 
-QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject *parent /*= 0*/)
-    : base_type(parent)
-    , QnWorkbenchContextAware(parent)
+QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject *parent /*= 0*/):
+    base_type(parent),
+    QnWorkbenchContextAware(parent)
 {
 
-    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this, []()
-    {
-        /* Online status is set by default, page will go offline if will be unreachable on opening. */
-        for (const QnWebPageResourcePtr &webPage: resourcePool()->getResources<QnWebPageResource>())
-            webPage->setStatus(Qn::Online);
-    });
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this,
+        [this]
+        {
+            // Online status by default, page will go offline if will be unreachable on opening.
+            for (auto webPage : resourcePool()->getResources<QnWebPageResource>())
+                webPage->setStatus(Qn::Online);
+        });
 
-    connect(action(QnActions::NewWebPageAction),   &QAction::triggered,        this,   &QnWorkbenchWebPageHandler::at_newWebPageAction_triggered);
+    connect(action(QnActions::NewWebPageAction), &QAction::triggered, this,
+        &QnWorkbenchWebPageHandler::at_newWebPageAction_triggered);
 }
 
 QnWorkbenchWebPageHandler::~QnWorkbenchWebPageHandler()

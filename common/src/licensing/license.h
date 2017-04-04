@@ -167,14 +167,15 @@ public:
 
     QVector<QString> hardwareIds() const;
     QString currentHardwareId() const;
-    bool isLicenseValid(const QnLicensePtr& license, QnLicenseErrorCode* errCode = 0) const;
+
+    QnLicenseErrorCode validateLicense(const QnLicensePtr& license) const;
+    bool isLicenseValid(const QnLicensePtr& license) const;
 signals:
     void licensesChanged();
 
 private slots:
     void at_timer();
 private:
-    bool isLicenseMatchesCurrentSystem(const QnLicensePtr &license);
     bool addLicense_i(const QnLicensePtr &license);
     bool addLicenses_i(const QnLicenseList &licenses);
 private:

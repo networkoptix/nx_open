@@ -135,6 +135,7 @@ private:
         placeholder->setAutoFillBackground(true);
 
         const QString hint = QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Select devices to setup failover priority"),
             tr("Select cameras to setup failover priority")
         );

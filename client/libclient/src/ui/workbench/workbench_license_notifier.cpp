@@ -7,6 +7,7 @@
 #include <core/resource/user_resource.h>
 
 #include <licensing/license.h>
+#include <licensing/license_validator.h>
 
 #include <ui/dialogs/license_notification_dialog.h>
 #include <ui/workbench/workbench_context.h>
@@ -91,11 +92,11 @@ void QnWorkbenchLicenseNotifier::checkLicenses()
 
     for (const auto& license: licensePool()->getLicenses())
     {
-        QnLicense::ErrorCode errorCode;
+        QnLicenseErrorCode errorCode;
 
         if (someLicenseWillBeBlocked
             && !licensePool()->isLicenseValid(license, &errorCode)
-            && errorCode != QnLicense::Expired)
+            && errorCode != QnLicenseErrorCode::Expired)
         {
             licenses.push_back(license);
             licenseWarningStates[license->key()].lastWarningTime = currentTime;

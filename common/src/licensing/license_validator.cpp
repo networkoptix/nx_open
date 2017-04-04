@@ -29,8 +29,13 @@ QnLicenseValidator::~QnLicenseValidator()
 
 }
 
-bool QnLicenseValidator::isValid(const QnLicensePtr& license, ValidationMode mode,
-    QnLicenseErrorCode* errCode) const
+bool QnLicenseValidator::isValid(const QnLicensePtr& license, ValidationMode mode) const
+{
+    return validate(license, mode) == QnLicenseErrorCode::NoError;
+}
+
+QnLicenseErrorCode QnLicenseValidator::validate(const QnLicensePtr& license,
+    ValidationMode mode) const
 {
     /**
      * >= v1.5, shoud have hwid1, hwid2 or hwid3, and have brand
@@ -38,7 +43,7 @@ bool QnLicenseValidator::isValid(const QnLicensePtr& license, ValidationMode mod
      * We just allow empty brand for all, because we believe license is correct.
      */
     if (!license->isValidSignature() && mode != VM_CheckInfo)
-        return gotError(errCode, QnLicenseErrorCode::InvalidSignature);
+        return QnLicenseErrorCode::InvalidSignature;
 
     const auto& manager = runtimeInfoManager();
     QnPeerRuntimeInfo info = manager->items()->getItem(mode == VM_Regular
@@ -48,35 +53,35 @@ bool QnLicenseValidator::isValid(const QnLicensePtr& license, ValidationMode mod
     // #TODO: #ynikitenkov It does not make sense in case of VM_JustAdded. #refactor
     // peer where license was activated not found
     if (info.uuid.isNull())
-        return gotError(errCode, QnLicenseErrorCode::InvalidHardwareID);
+        return QnLicenseErrorCode::InvalidHardwareID;
 
     if (!license->brand().isEmpty() && license->brand() != info.data.brand)
-        return gotError(errCode, QnLicenseErrorCode::InvalidBrand);
+        return QnLicenseErrorCode::InvalidBrand;
 
     // TODO: #rvasilenko make NEVER an INT64_MAX
     if (license->expirationTime() > 0 && qnSyncTime->currentMSecsSinceEpoch() > license->expirationTime())
-        return gotError(errCode, QnLicenseErrorCode::Expired);
+        return QnLicenseErrorCode::Expired;
 
     bool isArmBox = checkForARMBox(info.data.box);
     if (isArmBox && !isAllowedForArm(license))
-        return gotError(errCode, QnLicenseErrorCode::InvalidType); // strict allowed license type for ARM devices
+        return QnLicenseErrorCode::InvalidType; // strict allowed license type for ARM devices
 
     if (isArmBox && license->type() == Qn::LC_Edge)
-        return isValidEdgeLicense(license, errCode, mode);
+        return isValidEdgeLicense(license, mode);
 
     if (license->type() == Qn::LC_Start)
-        return isValidStartLicense(license, errCode);
+        return isValidStartLicense(license);
 
     if (license->type() == Qn::LC_Invalid)
-        return gotError(errCode, QnLicenseErrorCode::FutureLicense);
+        return QnLicenseErrorCode::FutureLicense;
 
-    return gotError(errCode, QnLicenseErrorCode::NoError);
+    return QnLicenseErrorCode::NoError;
 }
 
 QString QnLicenseValidator::validationInfo(const QnLicensePtr& license, ValidationMode mode) const
 {
-    QnLicenseErrorCode code = QnLicenseErrorCode::NoError;
-    if (isValid(license, mode, &code))
+    QnLicenseErrorCode code = validate(license, mode);
+    if (code == QnLicenseErrorCode::NoError)
         return lit("Ok");
 
     return errorMessage(code);
@@ -124,7 +129,7 @@ QnUuid QnLicenseValidator::serverId(const QnLicensePtr& license) const
     return QnUuid();
 }
 
-bool QnLicenseValidator::isValidEdgeLicense(const QnLicensePtr& license, QnLicenseErrorCode* errCode,
+QnLicenseErrorCode QnLicenseValidator::isValidEdgeLicense(const QnLicensePtr& license,
     ValidationMode mode) const
 {
     for (const QnLicensePtr& otherLicense: licensePool()->getLicenses())
@@ -138,17 +143,17 @@ bool QnLicenseValidator::isValidEdgeLicense(const QnLicensePtr& license, QnLicen
         {
             // mark current as invalid for any of special (non regular) mode
             if (mode != VM_Regular)
-                return gotError(errCode, QnLicenseErrorCode::TooManyLicensesPerDevice);
+                return QnLicenseErrorCode::TooManyLicensesPerDevice;
             // mark the most least license as valid
             else if (otherLicense->key() < license->key())
-                return gotError(errCode, QnLicenseErrorCode::TooManyLicensesPerDevice);
+                return QnLicenseErrorCode::TooManyLicensesPerDevice;
         }
     }
 
-    return gotError(errCode, QnLicenseErrorCode::NoError);
+    return QnLicenseErrorCode::NoError;
 }
 
-bool QnLicenseValidator::isValidStartLicense(const QnLicensePtr& license, QnLicenseErrorCode* errCode) const
+QnLicenseErrorCode QnLicenseValidator::isValidStartLicense(const QnLicensePtr& license) const
 {
     // Only single Start license per system is allowed
     for (const QnLicensePtr& otherLicense: licensePool()->getLicenses())
@@ -163,25 +168,18 @@ bool QnLicenseValidator::isValidStartLicense(const QnLicensePtr& license, QnLice
 
         // mark current as invalid if it has less channels
         if (otherLicense->cameraCount() > license->cameraCount())
-            return gotError(errCode, QnLicenseErrorCode::TooManyLicensesPerDevice);
+            return QnLicenseErrorCode::TooManyLicensesPerDevice;
 
         // we found another license with the same number of channels
         // mark the most least license as valid
         if (otherLicense->key() < license->key())
-            return gotError(errCode, QnLicenseErrorCode::TooManyLicensesPerDevice);
+            return QnLicenseErrorCode::TooManyLicensesPerDevice;
     }
 
-    return gotError(errCode, QnLicenseErrorCode::NoError);
+    return QnLicenseErrorCode::NoError;
 }
 
 bool QnLicenseValidator::isAllowedForArm(const QnLicensePtr& license) const
 {
     return QnLicense::licenseTypeInfo(license->type()).allowedForARM;
-}
-
-bool QnLicenseValidator::gotError(QnLicenseErrorCode* errCode, QnLicenseErrorCode errorCodeValue) const
-{
-    if (errCode)
-        *errCode = errorCodeValue;
-    return errorCodeValue == QnLicenseErrorCode::NoError;
 }

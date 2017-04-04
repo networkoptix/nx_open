@@ -37,10 +37,14 @@ public:
     virtual ~QnLicenseValidator();
 
     /**
+    * Check if signature matches other fields, also check hardwareId and brand
+    */
+    bool isValid(const QnLicensePtr& license, ValidationMode mode = VM_Regular) const;
+
+    /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    bool isValid(const QnLicensePtr& license, ValidationMode mode = VM_Regular,
-        QnLicenseErrorCode* errCode = nullptr) const;
+    QnLicenseErrorCode validate(const QnLicensePtr& license, ValidationMode mode = VM_Regular) const;
 
     QString validationInfo(const QnLicensePtr& license, ValidationMode mode = VM_Regular) const;
 
@@ -50,10 +54,8 @@ public:
     QnUuid serverId(const QnLicensePtr& license) const;
 
 private:
-    bool isValidEdgeLicense(const QnLicensePtr& license, QnLicenseErrorCode* errCode = 0,
+    QnLicenseErrorCode isValidEdgeLicense(const QnLicensePtr& license,
         ValidationMode mode = VM_Regular) const;
-    bool isValidStartLicense(const QnLicensePtr& license, QnLicenseErrorCode* errCode = 0) const;
+    QnLicenseErrorCode isValidStartLicense(const QnLicensePtr& license) const;
     bool isAllowedForArm(const QnLicensePtr& license) const;
-
-    bool gotError(QnLicenseErrorCode* errCode, QnLicenseErrorCode errorCodeValue) const;
 };

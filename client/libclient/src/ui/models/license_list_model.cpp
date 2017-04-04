@@ -8,6 +8,8 @@
 
 #include <client/client_settings.h>
 
+#include <licensing/license_validator.h>
+
 #include <ui/style/globals.h>
 #include <ui/style/resource_icon_cache.h>
 
@@ -120,14 +122,14 @@ QVariant QnLicenseListModel::textData(const QModelIndex& index, bool fullText) c
         {
             bool fullStatus = fullText || m_extendedStatus;
 
-            QnLicense::ErrorCode code;
+            QnLicenseErrorCode code;
             if (licensePool()->isLicenseValid(license, &code))
                 return expirationInfo(license, fullStatus).second;
 
             if (fullStatus)
                 return license->errorMessage(code);
 
-            return code == QnLicense::Expired
+            return code == QnLicenseErrorCode::Expired
                 ? tr("Expired")
                 : tr("Error");
         }
@@ -164,11 +166,11 @@ QVariant QnLicenseListModel::foregroundData(const QModelIndex& index) const
         case QnLicenseListModel::ExpirationDateColumn:
         case QnLicenseListModel::LicenseStatusColumn:
         {
-            QnLicense::ErrorCode code;
+            QnLicenseErrorCode code;
             if (!licensePool()->isLicenseValid(license, &code))
             {
                 if (index.column() != QnLicenseListModel::ExpirationDateColumn
-                    || code == QnLicense::Expired)
+                    || code == QnLicenseErrorCode::Expired)
                 {
                     return QBrush(qnGlobals->errorTextColor());
                 }

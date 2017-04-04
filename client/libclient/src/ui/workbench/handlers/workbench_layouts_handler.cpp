@@ -528,7 +528,7 @@ bool LayoutsHandler::confirmChangeSharedLayout(const LayoutChange& change)
     auto allUsers = resourcePool()->getResources<QnUserResource>();
     auto accessibleToCustomUsers = any_of(
         allUsers,
-        [layout = change.layout](const QnUserResourcePtr& user)
+        [this, layout = change.layout](const QnUserResourcePtr& user)
         {
             return resourceAccessProvider()->accessibleVia(user, layout) ==
                 QnAbstractResourceAccessProvider::Source::shared;
@@ -546,7 +546,7 @@ bool LayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layo
     /* Checking if custom users have access to this shared layout. */
     auto allUsers = resourcePool()->getResources<QnUserResource>();
     auto accessibleToCustomUsers = any_of(allUsers,
-        [layouts](const QnUserResourcePtr& user)
+        [this, layouts](const QnUserResourcePtr& user)
         {
             return any_of(layouts,
                 [user](const QnLayoutResourcePtr& layout)

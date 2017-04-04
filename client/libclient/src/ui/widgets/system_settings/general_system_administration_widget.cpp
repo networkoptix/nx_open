@@ -202,7 +202,10 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
         tr("Monitor All Servers on a Single Layout"));
 
     m_buttons[kCameraListButton]->setToolTip(shortcutString(QnActions::CameraListAction,
-        QnDeviceDependentStrings::getDefaultNameFromSet(tr("Open Device List"), tr("Open Camera List"))));
+        QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
+            tr("Open Device List"),
+            tr("Open Camera List"))));
 
     ui->systemSettingsWidget->retranslateUi();
 }

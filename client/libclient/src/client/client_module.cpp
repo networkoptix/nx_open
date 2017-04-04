@@ -226,13 +226,13 @@ void QnClientModule::initDesktopCamera(QGLWidget* window)
     auto commonModule = m_clientCoreModule->commonModule();
     auto desktopSearcher = commonModule->store(new QnDesktopResourceSearcher(window));
     desktopSearcher->setLocal(true);
-    commonModule->instance<QnResourceDiscoveryManager>()->addDeviceServer(desktopSearcher);
+    commonModule->resourceDiscoveryManager()->addDeviceServer(desktopSearcher);
 }
 
 void QnClientModule::startLocalSearchers()
 {
     auto commonModule = m_clientCoreModule->commonModule();
-    commonModule->instance<QnResourceDiscoveryManager>()->start();
+    commonModule->resourceDiscoveryManager()->start();
 }
 
 QnPtzControllerPool* QnClientModule::ptzControllerPool() const
@@ -306,7 +306,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new QnServerStorageManager());
 
     commonModule->store(new QnVoiceSpectrumAnalyzer());
-    commonModule->instance<QnClientPtzControllerPool>()
+    commonModule->instance<QnClientPtzControllerPool>();
 
     initializeStatisticsManager();
 
@@ -318,9 +318,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new QnCloudStatusWatcher());
 
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
-    QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory());
-
-    QnAppServerConnectionFactory::setDefaultFactory(QnClientResourceFactory::instance());
+    QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory(commonModule));
 
 #ifdef Q_OS_WIN
     commonModule->store(new QnIexploreUrlHandler());
@@ -554,7 +552,8 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 
     auto resourceProcessor = commonModule->store(new QnClientResourceProcessor());
 
-    auto resourceDiscoveryManager = commonModule->store(new QnResourceDiscoveryManager(commonModule));
+    auto resourceDiscoveryManager = new QnResourceDiscoveryManager(commonModule);
+    commonModule->setResourceDiscoveryManager(resourceDiscoveryManager);
     resourceProcessor->moveToThread(resourceDiscoveryManager);
     resourceDiscoveryManager->setResourceProcessor(resourceProcessor);
 

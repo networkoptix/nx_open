@@ -469,9 +469,7 @@ void QnLicensePool::at_timer()
 {
     for(const QnLicensePtr& license: m_licenseDict)
     {
-        QnLicenseErrorCode errCode;
-        isLicenseValid(license, &errCode);
-        if (errCode == QnLicenseErrorCode::Expired)
+        if (validateLicense(license) == QnLicenseErrorCode::Expired)
         {
             qint64 experationDelta = qnSyncTime->currentMSecsSinceEpoch() - license->expirationTime();
             if (experationDelta < m_timer.interval()) {
@@ -489,14 +487,9 @@ QnLicenseList QnLicensePool::getLicenses() const
     return m_licenseDict.values();
 }
 
-bool QnLicensePool::isLicenseMatchesCurrentSystem(const QnLicensePtr &license)
+bool QnLicensePool::isLicenseValid(const QnLicensePtr& license) const
 {
     return m_licenseValidator->isValid(license);
-}
-
-bool QnLicensePool::isLicenseValid(const QnLicensePtr& license, QnLicenseErrorCode* errCode) const
-{
-    return m_licenseValidator->isValid(license, QnLicenseValidator::VM_Regular, errCode);
 }
 
 bool QnLicensePool::addLicense_i(const QnLicensePtr &license)
@@ -506,7 +499,7 @@ bool QnLicensePool::addLicense_i(const QnLicensePtr &license)
 
     m_licenseDict[license->key()] = license;
     // We check if m_brand is empty to allow v1.4 licenses to still work
-    return isLicenseMatchesCurrentSystem(license);
+    return isLicenseValid(license);
 }
 
 void QnLicensePool::addLicense(const QnLicensePtr &license)
@@ -600,6 +593,12 @@ QString QnLicensePool::currentHardwareId() const
     return hardwareId;
 }
 
-int QnLicensePool::camerasPerAnalogEncoder() {
+QnLicenseErrorCode QnLicensePool::validateLicense(const QnLicensePtr& license) const
+{
+    return m_licenseValidator->validate(license);
+}
+
+int QnLicensePool::camerasPerAnalogEncoder()
+{
     return camerasPerAnalogEncoderCount;
 }

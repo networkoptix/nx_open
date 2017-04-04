@@ -48,14 +48,17 @@ QnResourceDirectoryBrowser::QnResourceDirectoryBrowser(QObject* parent) :
 {
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) {
+QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnUuid &resourceTypeId,
+    const QnResourceParams& params)
+{
     QnResourcePtr result;
 
     if (!isResourceTypeSupported(resourceTypeId)) {
         return result;
     }
 
-    result = createArchiveResource(params.url);
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    result = createArchiveResource(params.url, resourcePool);
     result->setTypeId(resourceTypeId);
 
     return result;

@@ -15,6 +15,8 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
+#include <common/common_module.h>
+
 #include <core/resource/resource_display_info.h>
 #include "core/resource/resource_type.h"
 #include "core/resource_management/resource_pool.h"

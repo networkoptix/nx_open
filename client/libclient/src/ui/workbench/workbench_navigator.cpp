@@ -681,7 +681,7 @@ void QnWorkbenchNavigator::updateHasArchive()
 {
     bool newValue = accessController()->hasGlobalPermission(Qn::GlobalViewArchivePermission)
         && std::any_of(m_syncedResources.keyBegin(), m_syncedResources.keyEnd(),
-            [](const QnMediaResourcePtr& resource)
+            [this](const QnMediaResourcePtr& resource)
             {
                 auto camera = resource.dynamicCast<QnSecurityCamResource>();
                 return camera && !cameraHistoryPool()->getCameraFootageData(camera, true).empty();

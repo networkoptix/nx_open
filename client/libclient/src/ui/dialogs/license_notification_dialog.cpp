@@ -20,8 +20,7 @@ static const int kLabelFontWeight = QFont::Bold;
 auto licenseSortPriority =
     [](QnLicenseValidator* validator, const QnLicensePtr& license) -> int
     {
-        QnLicenseErrorCode code;
-        validator->isValid(license, QnLicenseValidator::VM_Regular, &code);
+        auto code = validator->validate(license);
         switch (code)
         {
             case QnLicenseErrorCode::NoError:
@@ -55,8 +54,8 @@ protected:
         if (!left || !right)
             return left < right;
 
-        auto leftPriority = licenseSortPriority(left);
-        auto rightPriority = licenseSortPriority(right);
+        auto leftPriority = licenseSortPriority(validator, left);
+        auto rightPriority = licenseSortPriority(validator, right);
 
         if (leftPriority != rightPriority)
             return leftPriority < rightPriority;

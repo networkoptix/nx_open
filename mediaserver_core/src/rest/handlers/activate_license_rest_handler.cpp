@@ -145,9 +145,9 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
         is.setCodec("UTF-8");
 
         license = QnLicense::readFromStream(is);
-        QnLicenseErrorCode licenseErrCode;
         QnLicenseValidator validator(owner->commonModule());
-        if (!validator.isValid(license, QnLicenseValidator::VM_CheckInfo, &licenseErrCode))
+        auto licenseErrCode = validator.validate(license, QnLicenseValidator::VM_CheckInfo);
+        if (licenseErrCode != QnLicenseErrorCode::NoError)
         {
             result.setError(
                 QnJsonRestResult::CantProcessRequest,

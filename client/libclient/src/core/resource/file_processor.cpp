@@ -60,22 +60,24 @@ QStringList QnFileProcessor::findAcceptedFiles(const QList<QUrl> &urls)
 
 QnResourcePtr QnFileProcessor::createResourcesForFile(const QString& fileName)
 {
-    QnResourcePtr result = QnResourceDirectoryBrowser::resourceFromFile(fileName);
+    auto pool = qnClientCoreModule->commonModule()->resourcePool();
+    QnResourcePtr result = QnResourceDirectoryBrowser::resourceFromFile(fileName, pool);
     if (result)
-        qnClientCoreModule->commonModule()->resourcePool()->addResource(result);
+        pool->addResource(result);
     return result;
 }
 
 QnResourceList QnFileProcessor::createResourcesForFiles(const QStringList &files)
 {
+    auto pool = qnClientCoreModule->commonModule()->resourcePool();
     QnResourceList result;
-    for (const QString& fileName : files)
+    for (const QString& fileName: files)
     {
-        QnResourcePtr resource = QnResourceDirectoryBrowser::resourceFromFile(fileName);
+        QnResourcePtr resource = QnResourceDirectoryBrowser::resourceFromFile(fileName, pool);
         if (resource)
             result << resource;
     }
-    qnClientCoreModule->commonModule()->resourcePool()->addResources(result);
+    pool->addResources(result);
 
     return result;
 }
