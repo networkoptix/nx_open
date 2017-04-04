@@ -20,7 +20,7 @@
 #include "nettools.h"
 #include "socket_factory.h"
 #include "utils/common/byte_array.h"
-#include "utils/common/systemerror.h"
+#include <nx/utils/system_error.h>
 
 namespace nx {
 namespace network {

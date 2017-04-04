@@ -27,7 +27,7 @@
 #include <platform/process/current_process.h>
 #include <utils/common/app_info.h>
 #include <nx/utils/scope_guard.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <utils/db/db_structure_updater.h>
 
 #include <cloud_db_client/src/cdb_request_path.h>

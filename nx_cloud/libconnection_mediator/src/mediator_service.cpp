@@ -19,7 +19,7 @@
 #include <platform/process/current_process.h>
 #include <utils/common/command_line_parser.h>
 #include <nx/utils/scope_guard.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <utils/common/app_info.h>
 
 #include "business_logic_composite.h"

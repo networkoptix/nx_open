@@ -17,7 +17,7 @@
 
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <utils/common/util.h>
 #include <utils/media/bitStream.h>
 

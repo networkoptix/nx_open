@@ -15,7 +15,7 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/scope_guard.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 namespace nx {
 namespace network {

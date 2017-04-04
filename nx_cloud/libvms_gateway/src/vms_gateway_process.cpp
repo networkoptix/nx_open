@@ -23,7 +23,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/scope_guard.h>
 #include <utils/common/public_ip_discovery.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "access_control/authentication_manager.h"
 #include "http/connect_handler.h"

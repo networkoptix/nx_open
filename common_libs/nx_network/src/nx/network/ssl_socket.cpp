@@ -21,7 +21,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/type_utils.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "ssl/ssl_static_data.h"
 
