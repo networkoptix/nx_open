@@ -292,7 +292,8 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId, UpdateType updat
         return false;
     }
 
-    if (!backupDatabase()) {
+    if (!backupDatabase(commonModule()->ec2Connection()))
+    {
         NX_LOG("QnServerUpdateTool: Could not create database backup.", cl_logERROR);
         return false;
     }

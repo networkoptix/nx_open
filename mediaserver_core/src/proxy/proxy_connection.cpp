@@ -50,7 +50,7 @@ QnProxyConnectionProcessor::QnProxyConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(new QnProxyConnectionProcessorPrivate, std::move(socket))
+    QnTCPConnectionProcessor(new QnProxyConnectionProcessorPrivate, std::move(socket), owner->commonModule())
 {
     Q_D(QnProxyConnectionProcessor);
     d->owner = static_cast<QnUniversalTcpListener*>(owner);
@@ -63,7 +63,7 @@ QnProxyConnectionProcessor::QnProxyConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(priv, std::move(socket))
+    QnTCPConnectionProcessor(priv, std::move(socket), owner->commonModule())
 {
     Q_D(QnProxyConnectionProcessor);
     d->owner = static_cast<QnUniversalTcpListener*>(owner);
@@ -144,7 +144,9 @@ QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, co
             d->connectTimeout.count(),
             [&](int socketCount)
             {
-                ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(ec2::ApiCommand::openReverseConnection);
+                ec2::QnTransaction<ec2::ApiReverseConnectionData> tran(
+                    ec2::ApiCommand::openReverseConnection,
+                    commonModule()->moduleGUID());
                 tran.params.targetServer = commonModule()->moduleGUID();
                 tran.params.socketCount = socketCount;
                 d->messageBus->sendTransaction(tran, target);
@@ -211,7 +213,7 @@ bool QnProxyConnectionProcessor::replaceAuthHeader()
     nx_http::header::DigestAuthorization originalAuthHeader;
     if (!originalAuthHeader.parse(nx_http::getHeaderValue(d->request.headers, authHeaderName)))
         return false;
-    if (QnUniversalRequestProcessor::needStandardProxy(d->request))
+    if (QnUniversalRequestProcessor::needStandardProxy(commonModule(), d->request))
     {
         return true; //< no need to update, it is non server proxy request
     }
@@ -266,7 +268,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
 {
     Q_D(QnProxyConnectionProcessor);
 
-    if (QnUniversalRequestProcessor::needStandardProxy(d->request))
+    if (QnUniversalRequestProcessor::needStandardProxy(commonModule(), d->request))
     {
         dstUrl = d->request.requestLine.url;
     }
@@ -355,7 +357,7 @@ bool QnProxyConnectionProcessor::updateClientRequest(QUrl& dstUrl, QnRoute& dstR
             if (QnNetworkResourcePtr camera = resourcePool()->getResourceById<QnNetworkResource>(cameraGuid))
                 dstRoute.addr = SocketAddress(camera->getHostAddress(), camera->httpPort());
         }
-        else if (QnUniversalRequestProcessor::needStandardProxy(d->request))
+        else if (QnUniversalRequestProcessor::needStandardProxy(commonModule(), d->request))
         {
             QUrl url = d->request.requestLine.url;
             int defaultPort = getDefaultPortByProtocol(url.scheme());

@@ -26,8 +26,9 @@ public:
     virtual QString manufacture() const override;
 
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
-private:
+protected:
     std::unique_ptr<OnvifResourceInformationFetcher> m_informationFetcher;
+private:
     std::unique_ptr<OnvifResourceSearcherWsdd> m_wsddSearcher;
     int autoDetectDevicePort(const QUrl& url);
     //OnvifResourceSearcherMdns m_mdnsSearcher;

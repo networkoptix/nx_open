@@ -22,6 +22,7 @@ private:
     QByteArray readProxyResponse();
     void doDelay();
     int sendRequest(const QByteArray& data);
+    QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url) const;
 private:
     Q_DECLARE_PRIVATE(QnProxySenderConnection);
 };

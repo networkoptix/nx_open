@@ -147,7 +147,7 @@ int QnMergeSystemsRestHandler::execute(
 
     if (QnPermissionsHelper::isSafeMode())
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
 
     if (data.mergeOneServer)
@@ -305,7 +305,7 @@ int QnMergeSystemsRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    if (!backupDatabase())
+    if (!backupDatabase(owner->commonModule()->ec2Connection()))
     {
         NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to backup database")
             .arg(data.takeRemoteSettings), cl_logDEBUG1);

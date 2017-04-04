@@ -17,13 +17,16 @@
 QnUuid serverGuid();
 void setUseAlternativeGuid(bool value);
 
-QString getDataDirectory();
-void syncStoragesToSettings(const QnMediaServerResourcePtr &server);
-bool backupDatabase(QnCommonModule* commonModule);
+class QnCommonModule;
 
 namespace ec2 {
     class QnTransactionMessageBus;
+    class AbstractECConnection;
 }
+
+QString getDataDirectory();
+void syncStoragesToSettings(const QnMediaServerResourcePtr &server);
+bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection);
 
 namespace nx
 {
@@ -69,7 +72,7 @@ namespace nx
 void resetTransactionTransportConnections();
 
 bool updateUserCredentials(
-    QnCommonModule* commonModule,
+    std::shared_ptr<ec2::AbstractECConnection> connection,
     PasswordData data,
     QnOptionalBool isEnabled,
     const QnUserResourcePtr& userRes,

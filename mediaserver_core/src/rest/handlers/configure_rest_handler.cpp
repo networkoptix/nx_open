@@ -103,7 +103,7 @@ int QnConfigureRestHandler::execute(
     const auto oldSystemId = owner->globalSettings()->localSystemId();
     if (!data.localSystemId.isNull() && data.localSystemId != owner->globalSettings()->localSystemId())
     {
-        if (!backupDatabase())
+        if (!backupDatabase(owner->commonModule()->ec2Connection()))
         {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("SYSTEM_NAME"));
             NX_LOG(lit("QnConfigureRestHandler: database backup error"), cl_logWARNING);
@@ -147,7 +147,11 @@ int QnConfigureRestHandler::execute(
     /* set password */
     if (data.hasPassword())
     {
-        if (!updateUserCredentials(owner->commonModule(), data, QnOptionalBool(), owner->resourcePool()->getAdministrator()))
+        if (!updateUserCredentials(
+            owner->commonModule()->ec2Connection(),
+            data,
+            QnOptionalBool(),
+            owner->resourcePool()->getAdministrator()))
         {
             NX_LOG(lit("QnConfigureRestHandler: can't update administrator credentials"), cl_logWARNING);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("PASSWORD"));

@@ -28,7 +28,7 @@ QnMediaServerResourceSearchers::QnMediaServerResourceSearchers(QnCommonModule* c
     QnCommonModuleAware(commonModule)
 {
     //NOTE plugins have higher priority than built-in drivers
-    m_searchers << new ThirdPartyResourceSearcher();
+    m_searchers << new ThirdPartyResourceSearcher(commonModule);
 
 #ifdef ENABLE_DESKTOP_CAMERA
     m_searchers << new QnDesktopCameraResourceSearcher(commonModule);

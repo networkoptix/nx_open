@@ -30,7 +30,7 @@ QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(
         QSharedPointer<AbstractStreamSocket> socket,
         QnUniversalTcpListener* owner, bool needAuth)
-    : QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner)
+    : QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner->commonModule())
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
@@ -43,7 +43,7 @@ QnUniversalRequestProcessor::QnUniversalRequestProcessor(
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(
         QnUniversalRequestProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket,
         QnUniversalTcpListener* owner, bool needAuth)
-    : QnTCPConnectionProcessor(priv, socket, owner)
+    : QnTCPConnectionProcessor(priv, socket, owner->commonModule())
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;

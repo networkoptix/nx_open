@@ -84,8 +84,8 @@ static int performAddOrUpdate(
 
     QnUpdateBookmarkRequestContext context(request, ownerPort);
     bool ok = (op == QnBookmarkOperation::Add)
-        ? QnMultiserverBookmarksRestHandlerPrivate::addBookmark(context)
-        : QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(context);
+        ? QnMultiserverBookmarksRestHandlerPrivate::addBookmark(commonModule, context)
+        : QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(commonModule, context);
     if (!ok)
     {
         return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
@@ -118,7 +118,7 @@ static int performDelete(
     }
 
     QnDeleteBookmarkRequestContext context(request, ownerPort);
-    if (!QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(context))
+    if (!QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(commonModule, context))
     {
         return QnFusionRestHandler::makeError(nx_http::StatusCode::internalServerError,
             lit("Can't delete bookmark"),
@@ -147,7 +147,7 @@ static int performGetTags(
 
     QnGetBookmarkTagsRequestContext context(request, ownerPort);
     QnCameraBookmarkTagList outputData =
-        QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTags(context);
+        QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTags(commonModule, context);
     QnFusionRestHandlerDetail::serialize(
         outputData, *outBody, *outContentType, request.format, request.extraFormatting);
     return nx_http::StatusCode::ok;
@@ -172,7 +172,7 @@ static int performGet(
 
     QnGetBookmarksRequestContext context(request, ownerPort);
     QnCameraBookmarkList outputData =
-        QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(context);
+        QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(commonModule, context);
     QnFusionRestHandlerDetail::serialize(
         outputData, *outBody, *outContentType, request.format, request.extraFormatting);
     return nx_http::StatusCode::ok;

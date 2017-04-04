@@ -43,7 +43,7 @@ int QnModuleInformationRestHandler::executeGet(
 
     if (checkOwnerPermissions)
     {
-        if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
+        if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
             return QnPermissionsHelper::notOwnerError(result);
     }
 

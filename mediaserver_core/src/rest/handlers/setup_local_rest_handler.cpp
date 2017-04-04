@@ -86,7 +86,7 @@ int QnSetupLocalSystemRestHandler::execute(
     }
 
     if (!updateUserCredentials(
-        owner->commonModule(),
+        owner->commonModule()->ec2Connection(),
         data,
         QnOptionalBool(true),
         owner->resourcePool()->getAdministrator(), &errStr))
@@ -99,6 +99,7 @@ int QnSetupLocalSystemRestHandler::execute(
 
     QnSystemSettingsHandler settingsHandler;
     if (!settingsHandler.updateSettings(
+        owner->commonModule(),
         data.systemSettings,
         result,
         Qn::kSystemAccess,

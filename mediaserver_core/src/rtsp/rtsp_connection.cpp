@@ -256,7 +256,7 @@ public:
 static const AVCodecID DEFAULT_VIDEO_CODEC = AV_CODEC_ID_H263P;
 
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, _owner)
+    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, _owner->commonModule())
 {
 }
 
@@ -672,7 +672,12 @@ QnRtspEncoderPtr QnRtspConnectionProcessor::createEncoderByMediaData(QnConstAbst
         case AV_CODEC_ID_VP8:
         case AV_CODEC_ID_ADPCM_G722:
         case AV_CODEC_ID_ADPCM_G726:
-            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(media, dstCodec, resolution, extraTranscodeParams)); // transcode src codec to MPEG4/AAC
+            universalEncoder = QSharedPointer<QnUniversalRtpEncoder>(new QnUniversalRtpEncoder(
+                commonModule(),
+                media,
+                dstCodec,
+                resolution,
+                extraTranscodeParams)); // transcode src codec to MPEG4/AAC
             if (MSSettings::roSettings()->value(StreamingParams::FFMPEG_REALTIME_OPTIMIZATION, true).toBool())
                 universalEncoder->setUseRealTimeOptimization(true);
             if (universalEncoder->isOpened())

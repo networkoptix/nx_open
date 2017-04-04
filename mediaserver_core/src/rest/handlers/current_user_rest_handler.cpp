@@ -8,8 +8,13 @@
 
 #include <nx/network/http/httptypes.h>
 #include <network/authenticate_helper.h>
+#include <common/common_module.h>
 
-int QnCurrentUserRestHandler::executeGet(const QString &, const QnRequestParams&, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
+int QnCurrentUserRestHandler::executeGet(
+    const QString&,
+    const QnRequestParams&,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner)
 {
     ec2::ApiUserData user;
 
@@ -20,7 +25,7 @@ int QnCurrentUserRestHandler::executeGet(const QString &, const QnRequestParams&
         QnAuthHelper::instance()->doCookieAuthorization("GET", cookie.toUtf8(), *owner->response(), &accessRights);
     }
 
-    ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
+    ec2::AbstractECConnectionPtr ec2Connection = owner->commonModule()->ec2Connection();
     ec2::ApiUserDataList users;
     ec2::ErrorCode errCode =
         ec2Connection->getUserManager(accessRights)

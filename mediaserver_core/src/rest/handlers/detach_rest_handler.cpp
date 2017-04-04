@@ -82,7 +82,11 @@ int QnDetachFromCloudRestHandler::execute(
 
     // first of all, enable admin user and changing its password
     //      so that there is always a way to connect to the system
-    if (!updateUserCredentials(owner->commonModule(), data, QnOptionalBool(true), owner->resourcePool()->getAdministrator(), &errStr))
+    if (!updateUserCredentials(
+        owner->commonModule()->ec2Connection(),
+        data,
+        QnOptionalBool(true),
+        owner->resourcePool()->getAdministrator(), &errStr))
     {
         NX_LOGX(lm("Cannot detach from cloud. Failed to re-enable local admin. cloudSystemId %1")
             .arg(owner->globalSettings()->cloudSystemId()), cl_logDEBUG1);

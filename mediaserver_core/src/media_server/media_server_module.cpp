@@ -26,6 +26,7 @@
 
 #include <utils/common/delayed.h>
 #include <business/business_message_bus.h>
+#include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
 
 namespace {
 
@@ -74,6 +75,9 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new QnNewSystemServerFlagWatcher(this));
     store(new QnBusinessMessageBus(this));
+#ifdef ENABLE_VMAX
+    store(new QnVMax480Server(this));
+#endif
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());

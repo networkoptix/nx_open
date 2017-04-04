@@ -227,7 +227,7 @@ bool CloudConnectionManager::makeSystemLocal()
     auto adminUser = resourcePool()->getAdministrator();
     if (adminUser && !adminUser->isEnabled() && !qnGlobalSettings->localSystemId().isNull())
     {
-        if (!resetSystemToStateNew())
+        if (!resetSystemToStateNew(commonModule()))
         {
             NX_LOGX(lit("Error resetting system state to new"), cl_logWARNING);
             return false;

@@ -97,7 +97,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields)
 
 bool updateUserCredentials(
-    QnCommonModule* commonModule,
+    std::shared_ptr<ec2::AbstractECConnection> connection,
     PasswordData data,
     QnOptionalBool isEnabled,
     const QnUserResourcePtr& userRes,
@@ -147,9 +147,7 @@ bool updateUserCredentials(
 
     ec2::ApiUserData apiUser;
     fromResourceToApi(updatedUser, apiUser);
-    auto errCode = commonModule->ec2Connection()
-        ->getUserManager(Qn::kSystemAccess)
-        ->saveSync(apiUser, data.password);
+    auto errCode = connection->getUserManager(Qn::kSystemAccess)->saveSync(apiUser, data.password);
     NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errCode != ec2::ErrorCode::ok)
     {
@@ -184,7 +182,7 @@ bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
 }
 
 
-bool backupDatabase(QnCommonModule* commonModule)
+bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection)
 {
     QString dir = getDataDirectory() + lit("/");
     QString fileName;
@@ -195,7 +193,7 @@ bool backupDatabase(QnCommonModule* commonModule)
             break;
     }
 
-    const ec2::ErrorCode errorCode = commonModule->ec2Connection()->dumpDatabaseToFileSync( fileName );
+    const ec2::ErrorCode errorCode = connection->dumpDatabaseToFileSync( fileName );
     if (errorCode != ec2::ErrorCode::ok) {
         NX_LOG(lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)), cl_logERROR);
         return false;
@@ -317,7 +315,7 @@ bool resetSystemToStateNew(QnCommonModule* commonModule)
     auto adminUserResource = commonModule->resourcePool()->getAdministrator();
     PasswordData data;
     data.password = helpers::kFactorySystemPassword;
-    return updateUserCredentials(commonModule, data, QnOptionalBool(true), adminUserResource, nullptr);
+    return updateUserCredentials(commonModule->ec2Connection(), data, QnOptionalBool(true), adminUserResource, nullptr);
 }
 
 // -------------- nx::ServerSetting -----------------------

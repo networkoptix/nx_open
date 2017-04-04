@@ -554,7 +554,8 @@ QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnUui
     QnMultiserverThumbnailRestHandler handler;
     QByteArray frame;
     QByteArray contentType;
-    if (handler.getScreenshot(request, frame, contentType, server->getPort()) != nx_http::StatusCode::ok)
+    auto result = handler.getScreenshot(commonModule(), request, frame, contentType, server->getPort());
+    if (result != nx_http::StatusCode::ok)
         return QByteArray();
     return frame;
 

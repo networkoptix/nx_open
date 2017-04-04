@@ -22,7 +22,6 @@ QnVMax480Server::~QnVMax480Server()
     stop();
 }
 
-
 class QnVMax480ConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
@@ -36,7 +35,7 @@ public:
 QnMutex QnVMax480ConnectionProcessorPrivate::connectMutex;
 
 QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket, _owner)
+    QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket, _owner->commonModule())
 {
     Q_D(QnVMax480ConnectionProcessor);
     d->streamFetcher = 0;
@@ -357,17 +356,11 @@ void QnVMax480ConnectionProcessor::run()
 
 }
 
-// ---------------------------- QnVMax480Server -------------------------
-
-Q_GLOBAL_STATIC(QnVMax480Server, QnVMax480Server_instance)
-
-
-QnVMax480Server* QnVMax480Server::instance()
-{
-    return QnVMax480Server_instance();
-}
-
-QnVMax480Server::QnVMax480Server(): QnTcpListener(QHostAddress(QLatin1String("127.0.0.1")), 0)
+QnVMax480Server::QnVMax480Server(QnCommonModule* commonModule):
+    QnTcpListener(
+        commonModule,
+        QHostAddress(QLatin1String("127.0.0.1")),
+        0)
 {
     start();
 }

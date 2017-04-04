@@ -137,7 +137,7 @@ QnAudioProxyReceiver::QnAudioProxyReceiver(
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(new QnAudioProxyReceiverPrivate, socket, owner)
+    QnTCPConnectionProcessor(new QnAudioProxyReceiverPrivate, socket, owner->commonModule())
 {
     Q_D(QnAudioProxyReceiver);
     setObjectName( lit("QnAudioProxyReceiver") );

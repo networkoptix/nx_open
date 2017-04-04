@@ -93,8 +93,8 @@ int QnPingSystemRestHandler::executeGet(
     }
 
     /* Check if there is a valid starter license in the local system. */
-    QnLicenseListHelper helper(licensePool()->getLicenses());
-    if (helper.totalLicenseByType(Qn::LC_Start, licensePool()->validator()) > 0)
+    QnLicenseListHelper helper(owner->licensePool()->getLicenses());
+    if (helper.totalLicenseByType(Qn::LC_Start, owner->licensePool()->validator()) > 0)
     {
 
         /* Check if there is a valid starter license in the remote system. */

@@ -97,7 +97,7 @@ int QnProxySenderConnection::sendRequest(const QByteArray& data)
     return totalSend;
 }
 
-static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
+QByteArray QnProxySenderConnection::makeProxyRequest(const QnUuid& serverUuid, const QUrl& url) const
 {
     const QByteArray H_REALM("NX");
     const QByteArray H_METHOD("CONNECT");
