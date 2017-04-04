@@ -2,34 +2,42 @@
 
 #include <nx/fusion/model_functions.h>
 
-TEST(UbJsonRectTest, float)
+TEST(UbJsonTest, qint8)
 {
-    float value = 17.2f;
-    QByteArray data = QnUbjson::serialized(value);
-    float result = QnUbjson::deserialized<float>(data);
-    ASSERT_TRUE(qFuzzyEquals(value, result));
+    const qint8 value = -128;
+    const QByteArray data = QnUbjson::serialized(value);
+    const qint8 result = QnUbjson::deserialized<qint8>(data);
+    ASSERT_EQ(value, result);
 }
 
-TEST(UbJsonRectTest, double)
+TEST(UbJsonTest, float)
+{
+    const float value = 17.2f;
+    const QByteArray data = QnUbjson::serialized(value);
+    const float result = QnUbjson::deserialized<float>(data);
+    ASSERT_EQ(value, result);
+}
+
+TEST(UbJsonTest, double)
 {
     const double value = 17.2;
-    QByteArray data = QnUbjson::serialized(value);
+    const QByteArray data = QnUbjson::serialized(value);
     const double result = QnUbjson::deserialized<double>(data);
     ASSERT_EQ(value, result);
 }
 
-TEST(UbJsonRectTest, QRect)
+TEST(UbJsonTest, QRect)
 {
-    QRect value(1, 2, 5, 17);
-    QByteArray data = QnUbjson::serialized(value);
-    QRect result = QnUbjson::deserialized<QRect>(data);
+    const QRect value(1, 2, 5, 17);
+    const QByteArray data = QnUbjson::serialized(value);
+    const QRect result = QnUbjson::deserialized<QRect>(data);
     ASSERT_EQ(value, result);
 }
 
-TEST(UbJsonRectTest, QRectF)
+TEST(UbJsonTest, QRectF)
 {
-    QRectF value(1, 2, 5.5, 17.2);
-    QByteArray data = QnUbjson::serialized(value);
-    QRectF result = QnUbjson::deserialized<QRectF>(data);
+    const QRectF value(1, 2, 5.5, 17.2);
+    const QByteArray data = QnUbjson::serialized(value);
+    const QRectF result = QnUbjson::deserialized<QRectF>(data);
     ASSERT_EQ(value, result);
 }
