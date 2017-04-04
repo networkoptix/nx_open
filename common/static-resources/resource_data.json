@@ -224,8 +224,7 @@
         },
         {
             "keys":[
-                "Axis|P7216*",
-                "Axis|AXISP7216*"
+                "Axis|P7216*"
             ],
             "ignoreONVIF": true
         },
