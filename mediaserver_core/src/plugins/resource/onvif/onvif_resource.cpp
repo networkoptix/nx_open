@@ -1122,7 +1122,7 @@ void QnPlOnvifResource::notificationReceived(
 
     //parsing Message
     QXmlSimpleReader reader;
-    NotificationMessageParseHandler handler;
+    NotificationMessageParseHandler handler( m_cameraTimeZone );
     reader.setContentHandler( &handler );
     QBuffer srcDataBuffer;
     srcDataBuffer.setData(
@@ -1435,11 +1435,11 @@ void QnPlOnvifResource::setTimeDrift(int value)
 
 void QnPlOnvifResource::calcTimeDrift(int* outSoapRes) const
 {
-    m_timeDrift = calcTimeDrift(getDeviceOnvifUrl(), outSoapRes);
+    m_timeDrift = calcTimeDrift(getDeviceOnvifUrl(), outSoapRes, &m_cameraTimeZone);
     m_timeDriftTimer.restart();
 }
 
-int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl, int* outSoapRes)
+int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl, int* outSoapRes, QTimeZone* timeZone)
 {
     DeviceSoapWrapper soapWrapper(deviceUrl.toStdString(), QString(), QString(), 0);
 
@@ -1451,6 +1451,9 @@ int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl, int* outSoapRes)
 
     if (soapRes == SOAP_OK && response.SystemDateAndTime && response.SystemDateAndTime->UTCDateTime)
     {
+        if (timeZone && response.SystemDateAndTime->TimeZone)
+            *timeZone = QTimeZone(response.SystemDateAndTime->TimeZone->TZ.c_str());
+
         onvifXsd__Date* date = response.SystemDateAndTime->UTCDateTime->Date;
         onvifXsd__Time* time = response.SystemDateAndTime->UTCDateTime->Time;
         if (!date || !time)
@@ -1847,7 +1850,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         }
 
         if( response.SubscriptionReference->Address )
-            m_onvifNotificationSubscriptionReference = QString::fromStdString(response.SubscriptionReference->Address->__item);
+            m_onvifNotificationSubscriptionReference = fromOnvifDiscoveredUrl(response.SubscriptionReference->Address->__item);
     }
 
     //launching renew-subscription timer
@@ -3265,7 +3268,8 @@ bool QnPlOnvifResource::SubscriptionReferenceParametersParseHandler::endElement(
 // QnPlOnvifResource::NotificationMessageParseHandler
 //////////////////////////////////////////////////////////
 
-QnPlOnvifResource::NotificationMessageParseHandler::NotificationMessageParseHandler()
+QnPlOnvifResource::NotificationMessageParseHandler::NotificationMessageParseHandler(QTimeZone timeZone):
+    timeZone(timeZone)
 {
     m_parseStateStack.push( init );
 }
@@ -3285,7 +3289,14 @@ bool QnPlOnvifResource::NotificationMessageParseHandler::startElement(
             int utcTimeIndex = atts.index( lit("UtcTime") );
             if( utcTimeIndex == -1 )
                 return false;   //missing required attribute
+
             utcTime = QDateTime::fromString( atts.value(utcTimeIndex), Qt::ISODate );
+            if( utcTime.timeSpec() != Qt::UTC )
+            {
+                utcTime.setTimeZone( timeZone );
+                utcTime = utcTime.toUTC();
+            }
+
             propertyOperation = atts.value( lit("PropertyOperation") );
             m_parseStateStack.push( readingMessage );
             break;
@@ -3405,7 +3416,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
         }
 
         if( response.SubscriptionReference->Address )
-            m_onvifNotificationSubscriptionReference = QString::fromStdString(response.SubscriptionReference->Address->__item);
+            m_onvifNotificationSubscriptionReference = fromOnvifDiscoveredUrl(response.SubscriptionReference->Address->__item);
     }
 
     //adding task to refresh subscription
@@ -4039,7 +4050,10 @@ void QnPlOnvifResource::fillFullUrlInfo( const CapabilitiesResp& response )
         return;
 
     if (response.Capabilities->Events)
-        m_eventCapabilities.reset( new onvifXsd__EventCapabilities( *response.Capabilities->Events ) );
+    {
+        m_eventCapabilities.reset(new onvifXsd__EventCapabilities(*response.Capabilities->Events));
+        m_eventCapabilities->XAddr = fromOnvifDiscoveredUrl(m_eventCapabilities->XAddr).toStdString();
+    }
 
     if (response.Capabilities->Media)
     {
@@ -4057,9 +4071,15 @@ void QnPlOnvifResource::fillFullUrlInfo( const CapabilitiesResp& response )
     {
         setPtzUrl(fromOnvifDiscoveredUrl(response.Capabilities->PTZ->XAddr));
     }
-    m_deviceIOUrl = response.Capabilities->Extension && response.Capabilities->Extension->DeviceIO
-        ? response.Capabilities->Extension->DeviceIO->XAddr
-        : getDeviceOnvifUrl().toStdString();
+    if (response.Capabilities->Extension && response.Capabilities->Extension->DeviceIO)
+    {
+        m_deviceIOUrl = fromOnvifDiscoveredUrl(response.Capabilities->Extension->DeviceIO->XAddr)
+            .toStdString();
+    }
+    else
+    {
+        m_deviceIOUrl = getDeviceOnvifUrl().toStdString();
+    }
 }
 
 /**

@@ -222,7 +222,7 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
     void calcTimeDrift(int* outSoapRes = nullptr) const; // calculate clock diff between camera and local clock at seconds
-    static int calcTimeDrift(const QString& deviceUrl, int* outSoapRes = nullptr);
+    static int calcTimeDrift(const QString& deviceUrl, int* outSoapRes = nullptr, QTimeZone* timeZone = nullptr);
 
     virtual bool getParamPhysical(const QString &id, QString &value) override;
     virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result);
@@ -406,12 +406,13 @@ private:
             }
         };
 
+        const QTimeZone timeZone;
         QString propertyOperation;
         QDateTime utcTime;
         std::list<SimpleItem> source;
         SimpleItem data;
 
-        NotificationMessageParseHandler();
+        NotificationMessageParseHandler(QTimeZone timeZone);
 
         virtual bool startElement( const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& atts ) override;
         virtual bool endElement( const QString& namespaceURI, const QString& localName, const QString& qName ) override;
@@ -493,6 +494,7 @@ private:
     QString m_ptzConfigurationToken;
     mutable int m_timeDrift;
     mutable QElapsedTimer m_timeDriftTimer;
+    mutable QTimeZone m_cameraTimeZone;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
     std::map<QString, bool> m_relayInputStates;
     std::string m_deviceIOUrl;
