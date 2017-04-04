@@ -20,11 +20,11 @@
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>http://tricomresearch.com/support.html</translation>
+      <translation>http://tricomresearch.com/contact-us/</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
-      <translation>http://tricomresearch.com/support.html</translation>
+      <translation>http://tricomresearch.com/contact-us/</translation>
     </message>
     <message>
       <source>{{companyUrl}}</source>

@@ -1,5 +1,7 @@
 customization: '$CUSTOMIZATION'
 
+host: '$CLOUD_PORTAL_HOST'
+
 cloud_database:
     host: '$DB_HOST'
     port: '$DB_PORT'
@@ -37,3 +39,5 @@ languages:
     - zh_CN
 
 queue_name: '$INSTANCE_NAME'
+
+max_retries: 10

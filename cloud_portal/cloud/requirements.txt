@@ -14,7 +14,7 @@ django-cors-headers==1.1.0
 djangorestframework==3.3.3
 email==4.0.2
 enum34==1.1.4
-gunicorn==19.4.5
+gunicorn==19.7.1
 htmlmin==0.1.10
 inlinestyler==0.2.1
 jsonfield==1.0.3

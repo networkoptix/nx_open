@@ -1,5 +1,7 @@
 customization: vmsdemoorange
 
+host: '$CLOUD_PORTAL_HOST'
+
 cloud_database:
     host: '$DB_HOST'
     port: '$DB_PORT'

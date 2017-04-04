@@ -40,7 +40,7 @@
         <div class="form-group">
             <div class="col-sm-offset-4 col-sm-4">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> E-Mail-Newsletter abonnieren</label>
+                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> E-Mailnewsletter abonnieren</label>
                 </div>
             </div>
         </div>
@@ -49,7 +49,7 @@
             <div class="col-sm-offset-4 col-sm-4">
                 <process-button process="save"
                                 form="accountForm"
-                                button-text="'Save'"></process-button>
+                                button-text="$root.L.account.saveChanges"></process-button>
             </div>
         </div>
     </form>
@@ -70,13 +70,13 @@
             </div>
         </div>
 
-        <password-input ng-model="pass.newPassword" id="'newPassword'" label="'New password'"></password-input>
+        <password-input ng-model="pass.newPassword" id="'newPassword'" label="$root.L.account.newPasswordLabel"></password-input>
 
         <div class="form-group">
             <div class="col-sm-offset-4 col-sm-4">
                 <process-button process="changePassword"
                                 form="passwordForm"
-                                button-text="'Change Password'"></process-button>
+                                button-text="$root.L.account.changePassword"></process-button>
             </div>
         </div>
     </form>

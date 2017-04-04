@@ -99,7 +99,7 @@ angular.module('cloudApp')
                         $scope.deletingSystem = process.init(function(){
                             return $scope.system.deleteFromCurrentAccount();
                         },{
-                            successMessage: L.system.successDeleted.replace('{systemName}', $scope.system.info.name),
+                            successMessage: L.system.successDeleted.replace('{{systemName}}', $scope.system.info.name),
                             errorPrefix: L.errorCodes.cantUnshareWithMeSystemPrefix
                         }).then(reloadSystems);
                         $scope.deletingSystem.run();
@@ -133,7 +133,7 @@ angular.module('cloudApp')
                     $scope.unsharing = process.init(function(){
                         return $scope.system.deleteUser(user);
                     },{
-                        successMessage: L.system.permissionsRemoved.replace('{Email}',user.email),
+                        successMessage: L.system.permissionsRemoved.replace('{{email}}',user.email),
                         errorPrefix: L.errorCodes.cantSharePrefix
                     });
                     $scope.unsharing.run();

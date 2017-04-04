@@ -45,7 +45,7 @@
                 <div class="col-sm-offset-4 col-sm-8">
                     <process-button process="reactivate"
                                     form="reactivateAccount"
-                                    button-text="'Send'"></process-button>
+                                    button-text="$root.L.activeActions.sendConfirm"></process-button>
                 </div>
             </div>
         </form>
@@ -78,7 +78,7 @@
                 <div class="col-sm-offset-4 col-sm-8">
                     <process-button process="restore"
                                     form="restorePassword"
-                                    button-text="'Reset Password'"></process-button>
+                                    button-text="$root.L.activeActions.resetPassword"></process-button>
                 </div>
             </div>
         </form>
@@ -91,13 +91,13 @@
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success && !changeSuccess" novalidate>
             <h1>Neues Passwort setzen</h1>
-            <password-input ng-model="data.newPassword" id="'newPassword'" label="'New password'"></password-input>
+            <password-input ng-model="data.newPassword" id="'newPassword'" label="$root.L.activeActions.setNewPasswordLabel"></password-input>
 
             <div class="form-group">
                 <div class="col-sm-offset-4 col-sm-8">
                     <process-button process="change"
                                     form="restorePasswordWithCode"
-                                    button-text="'Save password'"></process-button>
+                                    button-text="$root.L.activeActions.setNewPassword"></process-button>
                 </div>
             </div>
         </form>
