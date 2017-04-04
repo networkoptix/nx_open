@@ -57,6 +57,8 @@ PageBase
                 || videoScreenController.failed)
             && !videoScreenController.mediaPlayer.playing
 
+        readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
+
         property real uiOpacity: 1.0
         Behavior on uiOpacity
         {
@@ -97,6 +99,12 @@ PageBase
             {
                 d.navigationOpacity = 1.0
             }
+        }
+
+        onApplicationActiveChanged:
+        {
+            if (!applicationActive)
+                showUi()
         }
     }
 
