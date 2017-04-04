@@ -8,6 +8,7 @@
 
 #include <camera/camera_bookmarks_manager_fwd.h>
 
+#include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>
 
 struct QnMetaDataV1;
@@ -35,6 +36,7 @@ class QnFisheyeHomePtzController;
 class QnIoModuleOverlayWidget;
 class QnCompositeTextOverlay;
 class QnTwoWayAudioWidget;
+class QnSoftwareTriggerButton;
 
 class QnMediaResourceWidget: public Customized<QnResourceWidget>
 {
@@ -189,9 +191,8 @@ protected:
     void ensureTwoWayAudioWidget();
     bool animationAllowed() const;
 
-    void resetSoftwareTriggerButtons();
-
-    void invokeTrigger(const QString& id, const QnUuid& resourceId);
+    void invokeTrigger(const QString& id,
+        QnBusiness::EventState toggleState = QnBusiness::UndefinedState);
 
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
@@ -211,6 +212,9 @@ private slots:
 
     void at_item_imageEnhancementChanged();
     void at_videoLayoutChanged();
+
+    void at_businessRuleChanged(const QnBusinessEventRulePtr& rule);
+    void at_businessRuleDeleted(const QnUuid& ruleId);
 
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
@@ -235,6 +239,34 @@ private:
     qint64 getUtcCurrentTimeMs() const;
 
     void updateCurrentUtcPosMs();
+
+private:
+    struct SoftwareTriggerInfo
+    {
+        QString triggerId;
+        QString name;
+        QString icon;
+        bool prolonged;
+
+        bool operator == (const SoftwareTriggerInfo& other) const
+        {
+            return triggerId == other.triggerId
+                && name == other.name
+                && icon == other.icon
+                && prolonged == other.prolonged;
+        }
+    };
+
+    struct SoftwareTrigger
+    {
+        SoftwareTriggerInfo info;
+        QnUuid overlayItemId;
+    };
+
+    SoftwareTrigger* createTriggerIfRelevant(const QnBusinessEventRulePtr& rule);
+    bool isRelevantTriggerRule(const QnBusinessEventRulePtr& rule) const;
+    void configureTriggerButton(QnSoftwareTriggerButton* button, const SoftwareTriggerInfo& info);
+    void resetTriggers();
 
 private:
     struct ResourceStates
@@ -312,15 +344,7 @@ private:
 
     QnTwoWayAudioWidget* m_twoWayAudioWidget;
 
-    struct SoftwareTriggerInfo
-    {
-        QString name;
-        QString icon;
-    };
-
-    QHash<QString, SoftwareTriggerInfo> m_softwareTriggers;
-
-    QList<QnUuid> m_softwareTriggerIds; // UUIDs of overlay items
+    QHash<QnUuid, SoftwareTrigger> m_softwareTriggers; //< ruleId -> softwareTrigger
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

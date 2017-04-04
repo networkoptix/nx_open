@@ -112,6 +112,11 @@ static constexpr qreal kMotionRegionAlpha = 0.4;
 static constexpr qreal kMaxForwardSpeed = 16.0;
 static constexpr qreal kMaxBackwardSpeed = 16.0;
 
+template<class Cont, class Item>
+bool contains(const Cont& cont, const Item& item)
+{
+    return std::find(cont.cbegin(), cont.cend(), item) != cont.cend();
+}
 
 bool isSpecialDateTimeValueUsec(qint64 dateTimeUsec)
 {
@@ -459,15 +464,16 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     updateOverlayButton();
     setImageEnhancement(item->imageEnhancement());
 
-    resetSoftwareTriggerButtons();
+    resetTriggers();
 
     connect(messageProcessor, &QnCommonMessageProcessor::businessRuleReset,
-        this, &QnMediaResourceWidget::resetSoftwareTriggerButtons);
-    //TODO: #vkutin Optimize. No need to rebuild the whole list each time.
+        this, &QnMediaResourceWidget::resetTriggers);
+
     connect(messageProcessor, &QnCommonMessageProcessor::businessRuleChanged,
-        this, &QnMediaResourceWidget::resetSoftwareTriggerButtons);
+        this, &QnMediaResourceWidget::at_businessRuleChanged);
+
     connect(messageProcessor, &QnCommonMessageProcessor::businessRuleDeleted,
-        this, &QnMediaResourceWidget::resetSoftwareTriggerButtons);
+        this, &QnMediaResourceWidget::at_businessRuleDeleted);
 
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
@@ -485,81 +491,6 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     for (auto* data : m_binaryMotionMask)
         qFreeAligned(data);
     m_binaryMotionMask.clear();
-}
-
-void QnMediaResourceWidget::resetSoftwareTriggerButtons()
-{
-    /* Delete existing buttons: */
-    for (const auto& id: m_softwareTriggerIds)
-        overlayWidgets()->triggersOverlay->removeItem(id);
-
-    m_softwareTriggers.clear();
-    m_softwareTriggerIds.clear();
-
-    if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
-        return;
-
-    /* Obtain camera id: */
-    const auto resourceId = m_resource->toResource()->getId();
-
-    /* Obtain current user id: */
-    const auto currentUserId = accessController()->user()->getId();
-
-    /* Gather software trigger ids relevant to this camera from all business rules: */
-    const auto rules = QnCommonMessageProcessor::instance()->businessRules();
-    for (auto iter = rules.begin(); iter != rules.end(); ++iter)
-    {
-        const auto& rule = iter.value();
-
-        if (rule->isDisabled() || rule->eventType() != QnBusiness::SoftwareTriggerEvent)
-            continue;
-
-        const auto users = rule->eventParams().metadata.instigators;
-        if (!users.empty() && std::find(users.cbegin(), users.cend(), currentUserId) == users.end())
-            continue;
-
-        if (!rule->eventResources().empty() && !rule->eventResources().contains(resourceId))
-            continue;
-
-        m_softwareTriggers[rule->eventParams().inputPortId] = SoftwareTriggerInfo({
-            rule->eventParams().caption, rule->eventParams().description });
-    }
-
-    int pos = 0;
-    for (auto iter = m_softwareTriggers.cbegin(); iter != m_softwareTriggers.cend(); ++iter)
-    {
-        const auto trigger = new QnSoftwareTriggerButton(this);
-        trigger->setIcon(iter.value().icon);
-        trigger->setToolTip(QnBusinessStringsHelper::getSoftwareTriggerName(iter.value().name));
-
-        m_softwareTriggerIds << overlayWidgets()->triggersOverlay->insertItem(pos++, trigger);
-
-        connect(trigger, &QnImageButtonWidget::clicked, this,
-            [this, id = iter.key(), resourceId]()
-            {
-                invokeTrigger(id, resourceId);
-            });
-    }
-}
-
-void QnMediaResourceWidget::invokeTrigger(const QString& id, const QnUuid& resourceId)
-{
-    if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
-        return;
-
-    const auto responseHandler =
-        [this, id](bool success, rest::Handle handle, const QnJsonRestResult& result)
-        {
-            Q_UNUSED(handle);
-            if (success && result.error == QnRestResult::NoError)
-                return;
-
-            NX_LOG(tr("Failed to invoke trigger %1 (%2)").arg(id).arg(result.errorString),
-                cl_logERROR);
-        };
-
-    qnCommon->currentServer()->restConnection()->softwareTriggerCommand(
-        resourceId, id, responseHandler, QThread::currentThread());
 }
 
 void QnMediaResourceWidget::createButtons()
@@ -2282,4 +2213,153 @@ const QnSpeedRange& QnMediaResourceWidget::availableSpeedRange()
 {
     static const QnSpeedRange kAvailableSpeedRange(kMaxForwardSpeed, kMaxBackwardSpeed);
     return kAvailableSpeedRange;
+}
+
+/*
+* Software Triggers
+*/
+
+QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRelevant(
+    const QnBusinessEventRulePtr& rule)
+{
+    NX_ASSERT(!m_softwareTriggers.contains(rule->id()));
+
+    if (!isRelevantTriggerRule(rule))
+        return nullptr;
+
+    const SoftwareTriggerInfo info({
+        rule->eventParams().inputPortId,
+        rule->eventParams().caption,
+        rule->eventParams().description,
+        rule->isActionProlonged() });
+
+    const auto button = new QnSoftwareTriggerButton(this);
+    configureTriggerButton(button, info);
+
+    //TODO: #vkutin For now rule buttons are NOT sorted. Implement some sane sorting later.
+    const auto overlayItemId = overlayWidgets()->triggersOverlay->insertItem(0, button);
+
+    auto& trigger = m_softwareTriggers[rule->id()];
+    trigger = SoftwareTrigger({ info, overlayItemId });
+    return &trigger;
+}
+
+bool QnMediaResourceWidget::isRelevantTriggerRule(const QnBusinessEventRulePtr& rule) const
+{
+    if (rule->isDisabled() || rule->eventType() != QnBusiness::SoftwareTriggerEvent)
+        return false;
+
+    const auto users = rule->eventParams().metadata.instigators;
+    if (!users.empty() && !::contains(users, accessController()->user()->getId()))
+        return false;
+
+    const auto resourceId = m_resource->toResource()->getId();
+    if (!rule->eventResources().empty() && !rule->eventResources().contains(resourceId))
+        return false;
+
+    return true;
+}
+
+void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* button,
+    const SoftwareTriggerInfo& info)
+{
+    NX_EXPECT(button);
+
+    const auto name = QnBusinessStringsHelper::getSoftwareTriggerName(info.name);
+    button->setIcon(info.icon);
+    button->setProlonged(info.prolonged);
+    button->setToolTip(info.prolonged
+        ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Software Trigger"))
+        : name);
+
+    if (info.prolonged)
+    {
+        connect(button, &QnImageButtonWidget::pressed, this,
+            [this, id = info.triggerId]()
+            {
+                invokeTrigger(id, QnBusiness::ActiveState);
+            });
+
+        connect(button, &QnImageButtonWidget::released, this,
+            [this, id = info.triggerId]()
+            {
+                invokeTrigger(id, QnBusiness::InactiveState);
+            });
+    }
+    else
+    {
+        connect(button, &QnImageButtonWidget::clicked, this,
+            [this, id = info.triggerId]()
+            {
+                invokeTrigger(id);
+            });
+    }
+}
+
+void QnMediaResourceWidget::resetTriggers()
+{
+    /* Delete all buttons: */
+    for (const auto& trigger: m_softwareTriggers)
+        overlayWidgets()->triggersOverlay->removeItem(trigger.overlayItemId);
+
+    /* Clear triggers information: */
+    m_softwareTriggers.clear();
+
+    if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
+        return;
+
+    /* Create new relevant triggers: */
+    for (const auto& rule: QnCommonMessageProcessor::instance()->businessRules())
+        createTriggerIfRelevant(rule); //< creates a trigger only if the rule is relevant
+}
+
+void QnMediaResourceWidget::at_businessRuleDeleted(const QnUuid& id)
+{
+    const auto iter = m_softwareTriggers.find(id);
+    if (iter == m_softwareTriggers.end())
+        return;
+
+    overlayWidgets()->triggersOverlay->removeItem(iter->overlayItemId);
+    m_softwareTriggers.erase(iter);
+};
+
+void QnMediaResourceWidget::at_businessRuleChanged(const QnBusinessEventRulePtr& rule)
+{
+    const auto iter = m_softwareTriggers.find(rule->id());
+    if (iter == m_softwareTriggers.end())
+    {
+        /* Create trigger if the rule is relevant: */
+        createTriggerIfRelevant(rule);
+    }
+    else
+    {
+        /* Delete trigger: */
+        at_businessRuleDeleted(rule->id());
+
+        /* Recreate trigger if the rule is still relevant: */
+        createTriggerIfRelevant(rule);
+    }
+};
+
+void QnMediaResourceWidget::invokeTrigger(
+    const QString& id,
+    QnBusiness::EventState toggleState)
+{
+    if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
+        return;
+
+    const auto responseHandler =
+        [this, id](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        {
+            Q_UNUSED(handle);
+            if (success && result.error == QnRestResult::NoError)
+                return;
+
+            NX_LOG(tr("Failed to invoke trigger %1 (%2)").arg(id).arg(result.errorString),
+                cl_logERROR);
+        };
+
+    qnCommon->currentServer()->restConnection()->softwareTriggerCommand(
+        m_resource->toResource()->getId(), id, toggleState,
+        responseHandler, QThread::currentThread());
 }

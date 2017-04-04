@@ -12,6 +12,7 @@
 #include <rest/server/json_rest_result.h>
 #include <utils/common/safe_direct_connection.h>
 #include <api/http_client_pool.h>
+#include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>
 
 /*
@@ -65,7 +66,7 @@ namespace rest
         Handle twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread = 0);
 
         Handle softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
-            GetCallback callback, QThread* targetThread = 0);
+            QnBusiness::EventState toggleState, GetCallback callback, QThread* targetThread = nullptr);
 
         Handle getStatisticsSettingsAsync(Result<QByteArray>::type callback
             , QThread *targetThread = nullptr);
