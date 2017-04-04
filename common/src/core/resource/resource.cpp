@@ -831,6 +831,9 @@ void QnResource::initializationDone()
 
 bool QnResource::hasProperty(const QString &key) const
 {
+    if (!commonModule())
+        return false;
+
     return commonModule()->propertyDictionary()->hasProperty(getId(), key);
 }
 

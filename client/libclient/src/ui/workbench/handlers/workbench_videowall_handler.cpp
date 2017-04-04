@@ -1599,6 +1599,9 @@ void QnWorkbenchVideoWallHandler::at_deleteVideoWallItemAction_triggered()
     if (result == QDialogButtonBox::Cancel)
         return;
 
+    for (auto resource : resources)
+        qnResIconCache->clearKey(resource);
+
     QSet<QnVideoWallResourcePtr> videoWalls;
     for (const auto& index: items)
     {
@@ -2127,6 +2130,9 @@ void QnWorkbenchVideoWallHandler::at_deleteVideowallMatrixAction_triggered()
 
     if (messageBox.exec() == QDialogButtonBox::Cancel)
         return;
+
+    for (auto resource: resources)
+        qnResIconCache->clearKey(resource);
 
     QSet<QnVideoWallResourcePtr> videoWalls;
     for (const auto& matrix: matrices)

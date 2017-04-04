@@ -7,6 +7,8 @@
 
 #include <common/common_module.h>
 
+#include <core/resource_management/resource_runtime_data.h>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -198,17 +200,23 @@ QIcon QnResourceIconCache::icon(const QnResourcePtr& resource)
 
 void QnResourceIconCache::setKey(const QnResourcePtr& resource, Key key)
 {
-    resource->setProperty(customKeyProperty, QString::number(static_cast<int>(key), 16));
+    qnResourceRuntimeDataManager->setResourceData(resource, Qn::ResourceIconKeyRole, (int)key);
+}
+
+void QnResourceIconCache::clearKey(const QnResourcePtr& resource)
+{
+    qnResourceRuntimeDataManager->cleanupResourceData(resource, Qn::ResourceIconKeyRole);
 }
 
 QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
 {
     Key key = Unknown;
 
-    if (resource->hasProperty(customKeyProperty))
+    auto customIconKey = qnResourceRuntimeDataManager->resourceData(resource, Qn::ResourceIconKeyRole);
+    if (customIconKey.isValid())
     {
         bool ok = true;
-        key = static_cast<Key>(resource->getProperty(customKeyProperty).toInt(&ok, 16));
+        key = static_cast<Key>(customIconKey.toInt());
         if (ok)
             return key;
     }

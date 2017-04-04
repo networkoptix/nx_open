@@ -20,9 +20,14 @@ public:
 
     QVariant resourceData(const QnResourcePtr& resource, Qn::ItemDataRole role) const;
     void setResourceData(const QnResourcePtr& resource, Qn::ItemDataRole role, const QVariant& data);
+    void cleanupResourceData(const QnResourcePtr& resource, Qn::ItemDataRole role);
+    void cleanupResourceData(const QnResourcePtr& resource);
 
     QVariant layoutItemData(const QnUuid& id, Qn::ItemDataRole role) const;
     void setLayoutItemData(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+
+    void cleanupData(const QnUuid& id, Qn::ItemDataRole role);
+    void cleanupData(const QnUuid& id);
 
     template<class T>
     void setLayoutItemData(const QnUuid& id, Qn::ItemDataRole role, const T &value)

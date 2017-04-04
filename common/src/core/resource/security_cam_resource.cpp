@@ -604,8 +604,9 @@ void QnSecurityCamResource::recordingEventDetached() {
     m_recActionCnt = qMax(0, m_recActionCnt-1);
 }
 
-QString QnSecurityCamResource::getUserDefinedName() const {
-    if( !getId().isNull() )
+QString QnSecurityCamResource::getUserDefinedName() const
+{
+    if (!getId().isNull() && commonModule())
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
         if( !(*userAttributesLock)->name.isEmpty() )
@@ -616,8 +617,9 @@ QString QnSecurityCamResource::getUserDefinedName() const {
 }
 
 
-QString QnSecurityCamResource::getGroupName() const {
-    if( !getId().isNull() )
+QString QnSecurityCamResource::getGroupName() const
+{
+    if (!getId().isNull() && commonModule())
     {
         QnCameraUserAttributePool::ScopedLock userAttributesLock(
             userAttributesPool(),

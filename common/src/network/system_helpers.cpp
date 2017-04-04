@@ -127,6 +127,9 @@ bool isCloudSystem(const QnModuleInformation& info)
 
 QnUuid currentSystemLocalId(const QnCommonModule* commonModule)
 {
+    if (!commonModule)
+        return QnUuid();
+
     const auto& settings = commonModule->globalSettings();
     const auto localId = settings->localSystemId();
     return (localId.isNull() ? commonModule->remoteGUID() : localId);
