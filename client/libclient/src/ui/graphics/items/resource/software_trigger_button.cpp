@@ -48,15 +48,19 @@ QnSoftwareTriggerButton::QnSoftwareTriggerButton(QGraphicsItem* parent):
     base_type(parent),
     m_toolTip(new QnSliderTooltipWidget(this)),
     m_toolTipHoverProcessor(new HoverFocusProcessor(this)),
-    m_toolTipEdge(Qt::LeftEdge),
-    m_buttonSize(kDefaultButtonSize)
+    m_toolTipEdge(Qt::LeftEdge)
 {
-    setFixedSize(m_buttonSize);
+    setButtonSize(kDefaultButtonSize);
 
     connect(this, &QnSoftwareTriggerButton::geometryChanged,
         this, &QnSoftwareTriggerButton::updateToolTipPosition);
-    installEventHandler(this, QEvent::PaletteChange,
-        this, &QnSoftwareTriggerButton::generateIcon);
+
+    installEventHandler(this, QEvent::PaletteChange, this,
+        [this]()
+        {
+            m_iconDirty = true;
+            update();
+        });
 
     m_toolTipHoverProcessor->addTargetItem(this);
     m_toolTipHoverProcessor->addTargetItem(m_toolTip);
@@ -76,6 +80,11 @@ QnSoftwareTriggerButton::QnSoftwareTriggerButton(QGraphicsItem* parent):
 
 QnSoftwareTriggerButton::~QnSoftwareTriggerButton()
 {
+    if (!isPressed() || !isEnabled())
+        return;
+
+    setPressed(false);
+    emit released();
 }
 
 QString QnSoftwareTriggerButton::toolTip() const
@@ -107,11 +116,11 @@ void QnSoftwareTriggerButton::updateToolTipVisibility()
     static constexpr qreal kTransparent = 0.0;
     static constexpr qreal kOpaque = 1.0;
 
-    const qreal targetOpacity =
-        m_toolTipHoverProcessor->isHovered() && !m_toolTip->text().isEmpty()
-            ? kOpaque
-            : kTransparent;
+    const bool showToolTip = m_toolTipHoverProcessor->isHovered()
+        && !m_toolTip->text().isEmpty()
+        && !(m_prolonged && isPressed());
 
+    const qreal targetOpacity = showToolTip ? kOpaque : kTransparent;
     opacityAnimator(m_toolTip, kToolTipAnimationSpeedFactor)->animateTo(targetOpacity);
 }
 
@@ -158,30 +167,74 @@ void QnSoftwareTriggerButton::setButtonSize(const QSize& size)
         return;
 
     m_buttonSize = size;
+    m_iconDirty = true;
+
     setFixedSize(size);
-    generateIcon();
 }
 
 void QnSoftwareTriggerButton::setIcon(const QString& name)
 {
-    const QString iconName = QnSoftwareTriggerPixmaps::effectivePixmapName(name);
-
+    const auto iconName = QnSoftwareTriggerPixmaps::effectivePixmapName(name);
     if (m_iconName == iconName)
         return;
 
     m_iconName = iconName;
-    generateIcon();
+    m_iconDirty = true;
 }
 
-void QnSoftwareTriggerButton::generateIcon()
+bool QnSoftwareTriggerButton::prolonged() const
 {
-    if (m_iconName.isEmpty())
+    return m_prolonged;
+}
+
+void QnSoftwareTriggerButton::setProlonged(bool value)
+{
+    if (m_prolonged == value)
         return;
+
+    m_prolonged = value;
+    m_iconDirty = true;
+
+    if (m_prolonged)
+    {
+        connect(this, &QnSoftwareTriggerButton::pressed,
+            this, &QnSoftwareTriggerButton::updateToolTipVisibility);
+        connect(this, &QnSoftwareTriggerButton::released,
+            this, &QnSoftwareTriggerButton::updateToolTipVisibility);
+    }
+    else
+    {
+        disconnect(this, &QnSoftwareTriggerButton::pressed,
+            this, &QnSoftwareTriggerButton::updateToolTipVisibility);
+        disconnect(this, &QnSoftwareTriggerButton::released,
+            this, &QnSoftwareTriggerButton::updateToolTipVisibility);
+    }
+}
+
+void QnSoftwareTriggerButton::paint(QPainter* painter,
+    const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    ensureIcon();
+    base_type::paint(painter, option, widget);
+}
+
+void QnSoftwareTriggerButton::ensureIcon()
+{
+    if (!m_iconDirty)
+        return;
+
+    m_iconDirty = false;
+
+    if (m_iconName.isEmpty())
+    {
+        setIcon(QIcon());
+        return;
+    }
 
     const auto buttonPixmap = QnSoftwareTriggerPixmaps::pixmapByName(m_iconName);
 
     const auto generateStatePixmap =
-        [this, buttonPixmap](const QBrush& background) -> QPixmap
+        [this, buttonPixmap](QPalette::ColorRole role) -> QPixmap
         {
             const auto pixelRatio = qApp->devicePixelRatio();
             QPixmap target(m_buttonSize * pixelRatio);
@@ -196,7 +249,7 @@ void QnSoftwareTriggerButton::generateIcon()
 
             QPainter painter(&target);
             painter.setPen(Qt::NoPen);
-            painter.setBrush(background);
+            painter.setBrush(palette().brush(role));
             painter.setRenderHint(QPainter::Antialiasing);
             painter.drawEllipse(buttonRect);
             painter.drawPixmap(pixmapRect, buttonPixmap);
@@ -204,9 +257,15 @@ void QnSoftwareTriggerButton::generateIcon()
             return target;
         };
 
+    //TODO: #vkutin This is a temporary solution: paint pressed prolonged button with a different background
+    const auto pressedRole = m_prolonged
+        ? QPalette::Highlight
+        : QPalette::Dark;
+
     QIcon icon;
-    icon.addPixmap(generateStatePixmap(palette().window()), QIcon::Normal);
-    icon.addPixmap(generateStatePixmap(palette().highlight()), QIcon::Active);
-    icon.addPixmap(generateStatePixmap(palette().dark()), QnIcon::Pressed);
+    icon.addPixmap(generateStatePixmap(QPalette::Window), QIcon::Normal);
+    icon.addPixmap(generateStatePixmap(QPalette::Midlight), QIcon::Active);
+    icon.addPixmap(generateStatePixmap(pressedRole), QnIcon::Pressed);
+
     setIcon(icon);
 }

@@ -1,8 +1,13 @@
 #include "software_trigger_business_event.h"
 
 
-QnSoftwareTriggerEvent::QnSoftwareTriggerEvent(const QnResourcePtr& resource, qint64 timeStampUs, const QString& triggerId):
-    base_type(QnBusiness::SoftwareTriggerEvent, resource, QnBusiness::UndefinedState, timeStampUs),
+QnSoftwareTriggerEvent::QnSoftwareTriggerEvent(
+    const QnResourcePtr& resource,
+    const QString& triggerId,
+    qint64 timeStampUs,
+    QnBusiness::EventState toggleState)
+    :
+    base_type(QnBusiness::SoftwareTriggerEvent, resource, toggleState, timeStampUs),
     m_triggerId(triggerId)
 {
 }
@@ -19,13 +24,16 @@ QnBusinessEventParameters QnSoftwareTriggerEvent::getRuntimeParams() const
     return params;
 }
 
+QnBusinessEventParameters QnSoftwareTriggerEvent::getRuntimeParamsEx(
+    const QnBusinessEventParameters& ruleEventParams) const
+{
+    auto params = getRuntimeParams();
+    params.caption = ruleEventParams.caption;
+    params.description = ruleEventParams.description;
+    return params;
+}
+
 bool QnSoftwareTriggerEvent::checkEventParams(const QnBusinessEventParameters& params) const
 {
     return m_triggerId == params.inputPortId;
-}
-
-bool QnSoftwareTriggerEvent::isEventStateMatched(QnBusiness::EventState state,
-    QnBusiness::ActionType /*actionType*/) const
-{
-    return state == QnBusiness::UndefinedState;
 }
