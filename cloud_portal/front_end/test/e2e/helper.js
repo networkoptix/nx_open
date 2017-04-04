@@ -19,7 +19,7 @@ var Helper = function () {
     var h = this;
 
     this.basePassword = 'qweasd123';
-    this.systemLink = '/fbe3ada7-85d0-4b4f-9d7b-4857aab0954f';
+    this.systemLink = '/17c7acef-14c5-4a14-8a71-40cf1385de71';
     this.systemName = 'ek-U16';
 
     this.get = function (opt_url) {
@@ -56,11 +56,11 @@ var Helper = function () {
 
     this.forms = {
         login: {
-            openLink: element(by.linkText('Log In')),
+            openLink: element(by.css('a[href="/login"]')),
             dialog: element(by.css('.modal-dialog')),
             emailInput: element(by.css('.modal-dialog')).element(by.model('auth.email')),
             passwordInput: element(by.css('.modal-dialog')).element(by.model('auth.password')),
-            submitButton: element(by.css('.modal-dialog')).element(by.buttonText('Log In')),
+            submitButton: element(by.css('.modal-dialog')).element(by.css('process-button[process="login"]')),
             forgotPasswordLink: element(by.css('.modal-dialog')).element(by.linkText('Forgot password?')),
             messageLoginLink: element(by.css('h1')).element(by.linkText('Log In'))
         },
@@ -71,7 +71,8 @@ var Helper = function () {
             emailInput: element(by.model('account.email')),
             passwordGroup: element(by.css('password-input')),
             passwordInput: element(by.css('password-input')).element(by.css('input[type=password]')),
-            submitButton: element(by.css('[form=registerForm]')).element(by.buttonText('Create Account'))
+            submitButton: element(by.css('[form=registerForm]')).element(by.buttonText('Create Account')),
+            processSuccess: element(by.css('.process-success[ng-if="activate.success"]'))
         },
         account: {
             firstNameInput: element(by.model('account.first_name')),
@@ -84,18 +85,18 @@ var Helper = function () {
             submitButton: element(by.css('[form=passwordForm]')).element(by.buttonText('Change Password'))
         },
         share: {
-            shareButton: element(by.partialButtonText('Share')),
+            shareButton: element(by.css('button[ng-click="share()"]')),
             emailField: element(by.model('user.email')),
             roleField: element(by.model('user.role')),
-            submitButton: element(by.css('process-button')).element(by.buttonText('Share'))
+            submitButton: element(by.css('process-button[process="sharing"]'))
         },
         logout: {
             navbar: element(by.css('header')).element(by.css('.navbar')),
             dropdownToggle: element(by.css('header')).element(by.css('.navbar')).element(by.css('.dropdown-toggle')),
             dropdownMenu: element(by.css('header')).element(by.css('.navbar')).element(by.css('[uib-dropdown-menu]')),
-            logoutLink: element(by.css('header')).element(by.css('.navbar')).element(by.linkText('Log Out')),
-            alreadyLoggedIn: element(by.cssContainingText('.modal-dialog', 'You are already logged in')),
-            logOut: element(by.buttonText('Log Out'))
+            logoutLink: element(by.css('header')).element(by.css('.navbar')).all(by.css('a[ng-click="logout()"]')).first(),
+            alreadyLoggedIn: element(by.css('.authorized.modal-open')),
+            logOut: element(by.css('button[ng-click="cancel()"]'))
         },
         restorePassEmail: {
             emailInput: element(by.model('data.email')),
@@ -170,9 +171,9 @@ var Helper = function () {
     this.userPasswordHierog = '您都可以享受源源不絕的好禮及優惠';
     this.userPasswordWrong = 'qweqwe123';
 
-    this.loginSuccessElement = element(by.cssContainingText('a','Systems')); // some element on page, that is only visible when user is authenticated
+    this.loginSuccessElement = element(by.css('.auth-visible')); // some element on page, that is only visible when user is authenticated
     this.loginNoSysSuccessElement = element(by.cssContainingText('span','You have no Systems connected to')); // some element on page, that is only visible when user is authenticated
-    this.loginSysPageSuccessElement = element(by.cssContainingText('h2','Users')); // some element on page, that is only visible when user is authenticated
+    this.loginSysPageSuccessElement = element.all(by.css('[ng-if="gettingSystem.success"]')).get(0); // some element on page, that is only visible when user is authenticated
     this.loginSysPageClosedSuccessElement = element(by.cssContainingText('.no-data-panel-body','You do not have access to the system information.')); // some element on page, that is only visible when user is authenticated
     //this.loggedOutElement = element(by.css('.container.ng-scope')).all(by.css('.auth-hidden')).first(); // some element on page visible to not auth user
     this.htmlBody = element(by.css('body'));
@@ -217,7 +218,7 @@ var Helper = function () {
     };
 
     this.loginFromCurrPage = function(email, password) {
-        var usrEmail = email || this.userEmail;
+        var usrEmail = email || this.userEmailOwner;
         var usrPassword = password || this.userPassword;
 
         h.forms.login.emailInput.sendKeys(usrEmail);
@@ -326,6 +327,31 @@ var Helper = function () {
         return deferred.promise;
     };
 
+    this.registerAnyLang = function(firstName, lastName, email, password) {
+        var deferred = protractor.promise.defer();
+        var alreadyRegisteredElement = element(by.css('.help-block[ng-if="registerForm.registerEmail.$error.alreadyExists"]'));
+
+        h.get(h.urls.register);
+
+        h.fillRegisterForm(firstName, lastName, email, password);
+        h.alert.successMessageElem.isPresent().then(function (isPresent) {
+            if(isPresent) {
+                expect(h.alert.successMessageElem.getText()).toContain(email);
+                deferred.fulfill();
+            }
+            else {
+                alreadyRegisteredElement.isDisplayed().then( function (isDisplayed) {
+                    if (isDisplayed) {
+                        deferred.reject('Registration failed: user is already registered. Continue without failing test.');
+                    }
+                    else deferred.reject('Registration failed, or wrong success message is shown');
+                });
+            }
+        });
+
+        return deferred.promise;
+    };
+
     this.getUrlFromEmail = function(email, userEmail, subject, where) {
         expect(email.subject).toContain(subject);
         expect(email.headers.to).toEqual(userEmail);
@@ -349,11 +375,32 @@ var Helper = function () {
         return ('/' + where + '/' + regCode); // url
     };
 
+    this.getUrlFromEmailAndCheckPortalAnyLang = function(email, portalText, userEmail, where) {
+        expect(email.subject).toContain(portalText);
+        expect(email.headers.to).toEqual(userEmail);
+
+        // extract registration token from the link in the email message
+        var pattern = new RegExp(where + '/([\\w=]+)', 'g');
+        var regCode = pattern.exec(email.html)[1];
+        console.log(regCode);
+        return ('/' + where + '/' + regCode); // url
+    };
+
     this.getEmailedLink = function(userEmail, subject, where) {
         var deferred = protractor.promise.defer();
 
         browser.controlFlow().wait(this.getEmailTo(userEmail, subject).then(function (email) {
             deferred.fulfill(h.getUrlFromEmail(email, userEmail, subject, where));
+        }));
+
+        return deferred.promise;
+    };
+
+    this.getEmailedLinkCustomAnyLang = function(userEmail, portalText, where) {
+        var deferred = protractor.promise.defer();
+
+        browser.controlFlow().wait(this.getEmailToAnyLang(userEmail, where).then(function (email) {
+            deferred.fulfill(h.getUrlFromEmailAndCheckPortalAnyLang(email, portalText, userEmail, where));
         }));
 
         return deferred.promise;
@@ -404,6 +451,25 @@ var Helper = function () {
 
         return deferred.promise;
     };
+
+    this.createUserAnyLang = function(portalText, firstName, lastName, email, password) {
+        var deferred = protractor.promise.defer();
+        var userEmail = email || h.getRandomEmail();
+
+        h.registerAnyLang(firstName, lastName, userEmail, password).then(function () {
+            h.getEmailedLinkCustomAnyLang(userEmail, portalText, 'activate').then( function(url) {
+                h.get(url);
+                expect((h.forms.register.processSuccess).isPresent()).toBe(true);
+                deferred.fulfill(userEmail);
+            });
+        }, function(errorMessage) { // on reject
+            console.log(errorMessage);
+            deferred.fulfill(userEmail);
+        });
+
+        return deferred.promise;
+    };
+
 
     this.changeAccountNames = function(firstName, lastName) {
         h.get(h.urls.account);
@@ -459,6 +525,18 @@ var Helper = function () {
         // return deferred.promise;
     };
 
+    this.registerByInviteAllLang = function (portalText, firstName, lastName, email, password) {
+        var userEmail = email || h.getRandomEmail();
+        var password = password || h.password;
+
+        h.shareSystemWith(userEmail);
+        h.getEmailedLinkCustomAnyLang(userEmail, portalText , 'register').then( function(url) {
+            h.get(url);
+            h.fillRegisterFormWithEmail(firstName, lastName, password);
+            browser.sleep(1000);
+        });
+    };
+
     this.emailSubjects = {
         register: "Confirm your account",
         invite: " was shared with you",
@@ -501,6 +579,28 @@ var Helper = function () {
         return deferred.promise;
     };
 
+    this.getEmailToAnyLang = function(emailAddress, emailSubject) {
+        var deferred = protractor.promise.defer();
+        console.log("Waiting for an email...");
+
+        function onMail(mail) {
+            if((emailAddress === mail.headers.to) && (mail.html.includes(emailSubject))) {
+                console.log("Catch email to: " + mail.headers.to);
+                deferred.fulfill(mail);
+                notifier.stop();
+                notifier.removeListener("mail", onMail);
+                return;
+            }
+            console.log("Ignore email to: " + mail.headers.to);
+        }
+
+        notifier.on("mail", onMail);
+
+        notifier.start();
+
+        return deferred.promise;
+    };
+
     this.restorePassword = function(userEmail, newPassword) {
         var password = newPassword || h.userPassword;
         var email = userEmail || h.userEmail;
@@ -512,6 +612,23 @@ var Helper = function () {
             h.get(url);
             h.forms.restorePassPassword.setNewPassword(password);
         });
+    };
+
+    this.restorePasswordAnyLang = function(portalText, userEmail, newPassword) {
+        var deferred = protractor.promise.defer();
+
+        var password = newPassword || h.userPassword;
+        var email = userEmail || h.userEmail;
+        h.forms.restorePassEmail.sendLinkToEmail(email);
+        expect(h.alert.successMessageElem.isDisplayed()).toBe(true);
+        expect(h.alert.successMessageElem.getText()).toContain(email);
+
+        h.getEmailedLinkCustomAnyLang(email, portalText, 'restore_password').then(function(url) {
+            h.get(url);
+            h.forms.restorePassPassword.setNewPasswordAnyLang(password);
+            deferred.fulfill(userEmail);
+        });
+        return deferred.promise;
     };
 
     this.forms.restorePassEmail.sendLinkToEmail = function(userEmail) {
@@ -533,6 +650,20 @@ var Helper = function () {
         here.submitButton.click();
         expect(h.alert.successMessageElem.isDisplayed()).toBe(true);
         expect(h.alert.successMessageElem.getText()).toContain(h.alert.alertMessages.restorePassSuccess);
+    };
+
+    this.forms.restorePassPassword.setNewPasswordAnyLang = function(newPassword) {
+        var here = h.forms.restorePassPassword;
+
+        // Log out if logged in
+        h.checkPresent(h.forms.logout.alreadyLoggedIn).then( function () {
+            h.forms.logout.logOut.click()
+        }, function () {});
+
+        expect(here.passwordInput.isPresent()).toBe(true);
+        here.passwordInput.sendKeys(newPassword);
+        here.submitButton.click();
+        expect(h.alert.successMessageElem.isDisplayed()).toBe(true);
     };
 
     this.checkPresent = function(elem) {

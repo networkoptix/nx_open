@@ -18,6 +18,27 @@ describe('Smoke test:', function () {
         helper.login();
     });
 
+    it("can view system list", function () {
+        var systemsList = element.all(by.repeater('system in systems'));
+
+        helper.login();
+        expect(browser.getCurrentUrl()).toContain('systems');
+        expect(helper.htmlBody.getText()).toContain('Systems');
+        expect(systemsList.first().isDisplayed()).toBe(true);
+        expect(element(by.cssContainingText('h2', helper.systemName)).isDisplayed()).toBe(true);
+    });
+
+    it("can view system page", function () {
+        var userList = helper.getParentOf(element.all(by.repeater('user in system.users')).first());
+
+        helper.login();
+        expect(browser.getCurrentUrl()).toContain('systems');
+        expect(element(by.cssContainingText('h2', helper.systemName)).isDisplayed()).toBe(true);
+
+        element.all(by.cssContainingText('h2', helper.systemName)).first().click();
+        expect(userList.isDisplayed()).toBe(true);
+    });
+
     it("can create new user", function () {
         helper.createUser(null, null, newUserEmail4RestorePass);
         helper.login(newUserEmail4RestorePass);
@@ -62,7 +83,7 @@ describe('Smoke test:', function () {
     it("can change user account data", function () {
         var here = helper.forms.account;
 
-        helper.login(helper.userEmail);
+        helper.login();
         helper.get(helper.urls.account);
 
         here.firstNameInput.clear().sendKeys(helper.userFirstName);
@@ -78,7 +99,7 @@ describe('Smoke test:', function () {
     it("can change user password", function () {
         var here = helper.forms.password;
 
-        helper.login(helper.userEmail);
+        helper.login();
         helper.get(helper.urls.password_change);
 
         here.currentPasswordInput.sendKeys(helper.userPassword);
@@ -86,7 +107,7 @@ describe('Smoke test:', function () {
         here.submitButton.click();
 
         helper.logout();
-        helper.login(helper.userEmail, helper.userPasswordNew);
+        helper.login(helper.userEmailOwner, helper.userPasswordNew);
 
         helper.get(helper.urls.password_change);
         here.currentPasswordInput.sendKeys(helper.userPasswordNew);
