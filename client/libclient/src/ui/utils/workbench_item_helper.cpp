@@ -12,7 +12,7 @@ QnSharedResourcePointer<ResourceType> extractResource(QnWorkbenchItem *item)
 {
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
     const auto layoutItemData = item->data();
-    return resourcePool()->getResourceByDescriptor(layoutItemData.resource).template dynamicCast<ResourceType>();
+    return resourcePool->getResourceByDescriptor(layoutItemData.resource).template dynamicCast<ResourceType>();
 
 }
 

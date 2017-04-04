@@ -12,6 +12,8 @@
 
 #include <common/common_module.h>
 
+#include <client_core/client_core_module.h>
+
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -230,11 +232,6 @@ ec2::ApiClientInfoData clientInfo()
     return clientData;
 }
 
-ec2::AbstractECConnectionPtr connection2()
-{
-    return commonModule()->ec2Connection();
-}
-
 QString logicalToString(QnWorkbenchConnectHandler::LogicalState state)
 {
     switch (state)
@@ -301,7 +298,8 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
     QnWorkbenchContextAware(parent),
     m_logicalState(LogicalState::disconnected),
     m_physicalState(PhysicalState::disconnected),
-    m_warnMessagesDisplayed(false)
+    m_warnMessagesDisplayed(false),
+    m_crashReporter(commonModule())
 {
     connect(this, &QnWorkbenchConnectHandler::stateChanged, this,
         &QnWorkbenchConnectHandler::handleStateChanged);
@@ -556,11 +554,12 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
 
     setPhysicalState(PhysicalState::waiting_peer);
     QUrl url = connectionInfo.effectiveUrl();
-    QnAppServerConnectionFactory::setUrl(url);
+    //TODO: #GDM #FIXME #3.1 Restore functionality
+    //QnAppServerConnectionFactory::setUrl(url);
     QnAppServerConnectionFactory::setEc2Connection(connection);
     qnClientMessageProcessor->init(connection);
 
-    QnSessionManager::instance()->start();
+    commonModule()->sessionManager()->start();
     QnResource::startCommandProc();
 
     context()->setUserName(
@@ -744,10 +743,10 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
                 return;
 
             /* We can get here during disconnect process */
-            if (auto connection = connection2())
+            if (auto connection = commonModule()->ec2Connection())
             {
                 connection->getMiscManager(Qn::kSystemAccess)->saveRuntimeInfo(
-                    info.data, 
+                    info.data,
                     ec2::DummyHandler::instance(),
                     &ec2::DummyHandler::onRequestDone);
 
@@ -755,7 +754,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
         });
 
 
-    auto connection = connection2();
+    auto connection = commonModule()->ec2Connection();
     NX_ASSERT(connection);
     connect(connection->getTimeNotificationManager(),
         &ec2::AbstractTimeNotificationManager::timeChanged,
@@ -772,8 +771,8 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened()
 
 void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed()
 {
-    NX_ASSERT(connection2());
-    disconnect(connection2(), nullptr, this, nullptr);
+    NX_ASSERT(commonModule()->ec2Connection());
+    disconnect(commonModule()->ec2Connection(), nullptr, this, nullptr);
     disconnect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this, nullptr);
 
     /* Don't do anything if we are closing client. */
@@ -961,7 +960,7 @@ void QnWorkbenchConnectHandler::connectToServer(const QUrl &url)
         return;
 
     setPhysicalState(PhysicalState::testing);
-    m_connecting.handle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
+    m_connecting.handle = qnClientCoreModule->connectionFactory()->connect(
         url, clientInfo(), this, &QnWorkbenchConnectHandler::handleConnectReply);
     m_connecting.url = url;
 }
@@ -1059,8 +1058,8 @@ void QnWorkbenchConnectHandler::clearConnection()
 
     qnClientMessageProcessor->init(nullptr);
     QnAppServerConnectionFactory::setEc2Connection(nullptr);
-    QnAppServerConnectionFactory::setUrl(QUrl());
-    QnSessionManager::instance()->stop();
+
+    commonModule()->sessionManager()->stop();
     QnResource::stopCommandProc();
 
     context()->setUserName(QString());
@@ -1088,11 +1087,10 @@ void QnWorkbenchConnectHandler::clearConnection()
     resourcePool()->removeResources(resourcesToRemove);
     resourcePool()->removeResources(resourcePool()->getAllIncompatibleResources());
 
-    QnCameraUserAttributePool::instance()->clear();
-    QnMediaServerUserAttributesPool::instance()->clear();
-
-    propertyDictionary->clear(idList);
-    qnStatusDictionary->clear(idList);
+    cameraUserAttributesPool()->clear();
+    mediaServerUserAttributesPool()->clear();
+    propertyDictionary()->clear(idList);
+    statusDictionary()->clear(idList);
 
     licensePool()->reset();
     commonModule()->setReadOnly(false);
@@ -1106,7 +1104,7 @@ void QnWorkbenchConnectHandler::testConnectionToServer(
     setLogicalState(force ? LogicalState::connecting_to_target : LogicalState::testing);
 
     setPhysicalState(PhysicalState::testing);
-    m_connecting.handle = QnAppServerConnectionFactory::ec2ConnectionFactory()->testConnection(
+    m_connecting.handle = qnClientCoreModule->connectionFactory()->testConnection(
         url, this,
         [this, options, url, force]
         (int handle, ec2::ErrorCode errorCode, const QnConnectionInfo& connectionInfo)

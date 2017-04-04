@@ -6,6 +6,8 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QRadioButton>
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 
@@ -19,7 +21,7 @@
 #include <ui/style/helper.h>
 #include <ui/style/resource_icon_cache.h>
 
-class QnUserRoleSettingsWidgetPrivate: public Connective<QObject>
+class QnUserRoleSettingsWidgetPrivate: public Connective<QObject>, public QnConnectionContextAware
 {
     using base_type = Connective<QObject>;
 

@@ -246,11 +246,13 @@ QString QnRecordingStatsModel::tooltipText(Columns column) const
     {
         case CameraNameColumn:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool(),
                 tr("Devices with non-empty archive"),
                 tr("Cameras with non-empty archive")
                 );
         case BytesColumn:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
+                resourcePool(),
                 tr("Storage space occupied by devices"),
                 tr("Storage space occupied by cameras")
                 );
@@ -308,7 +310,11 @@ QVariant QnRecordingStatsModel::headerData(int section, Qt::Orientation orientat
     {
         switch (section)
         {
-            case CameraNameColumn: return QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device"), tr("Camera"));
+            case CameraNameColumn:
+                return QnDeviceDependentStrings::getDefaultNameFromSet(
+                    resourcePool(),
+                    tr("Device"),
+                    tr("Camera"));
             case BytesColumn:      return tr("Space");
             case DurationColumn:   return tr("Calendar Days");
             case BitrateColumn:    return tr("Bitrate");

@@ -88,10 +88,14 @@ QString generateUniqueLayoutName(
  * @param layout                    Layout that we want to rename (if any).
  * @return                          List of existing layouts with same name.
  */
-QnLayoutResourceList alreadyExistingLayouts(const QString &name, const QnUuid &parentId, const QnLayoutResourcePtr &layout = QnLayoutResourcePtr())
+QnLayoutResourceList alreadyExistingLayouts(
+    QnResourcePool* resourcePool,
+    const QString &name,
+    const QnUuid &parentId,
+    const QnLayoutResourcePtr &layout = QnLayoutResourcePtr())
 {
     QnLayoutResourceList result;
-    for (const auto& existingLayout : resourcePool()->getResourcesWithParentId(parentId).filtered<QnLayoutResource>())
+    for (const auto& existingLayout : resourcePool->getResourcesWithParentId(parentId).filtered<QnLayoutResource>())
     {
         if (existingLayout == layout)
             continue;
@@ -112,7 +116,8 @@ QnResourceList calculateResourcesToShare(const QnResourceList& resources,
             if (!QnResourceAccessFilter::isShareableMedia(resource))
                 return false;
 
-            return !resourceAccessProvider()->hasAccess(user, resource);
+            auto accessProvider = resource->commonModule()->resourceAccessProvider();
+            return !accessProvider->hasAccess(user, resource);
         };
     return resources.filtered(sharingRequired);
 }
@@ -171,7 +176,8 @@ LayoutsHandler::~LayoutsHandler()
 
 void LayoutsHandler::renameLayout(const QnLayoutResourcePtr &layout, const QString &newName)
 {
-    QnLayoutResourceList existing = alreadyExistingLayouts(newName, layout->getParentId(), layout);
+    QnLayoutResourceList existing = alreadyExistingLayouts(resourcePool(),
+        newName, layout->getParentId(), layout);
     if (!canRemoveLayouts(existing))
     {
         messages::Resources::layoutAlreadyExists(mainWindow());
@@ -307,7 +313,7 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
 
             /* Check if we have rights to overwrite the layout */
             QnLayoutResourcePtr excludingSelfLayout = hasSavePermission ? layout : QnLayoutResourcePtr();
-            QnLayoutResourceList existing = alreadyExistingLayouts(name, user->getId(), excludingSelfLayout);
+            QnLayoutResourceList existing = alreadyExistingLayouts(resourcePool(), name, user->getId(), excludingSelfLayout);
             if (!canRemoveLayouts(existing))
             {
                 messages::Resources::layoutAlreadyExists(mainWindow());
@@ -328,7 +334,7 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
     }
     else
     {
-        QnLayoutResourceList existing = alreadyExistingLayouts(name, user->getId(), layout);
+        QnLayoutResourceList existing = alreadyExistingLayouts(resourcePool(), name, user->getId(), layout);
         if (!canRemoveLayouts(existing))
         {
             messages::Resources::layoutAlreadyExists(mainWindow());
@@ -808,7 +814,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
     if (!dialog->exec())
         return;
 
-    QnLayoutResourceList existing = alreadyExistingLayouts(dialog->name(), user->getId());
+    QnLayoutResourceList existing = alreadyExistingLayouts(resourcePool(), dialog->name(), user->getId());
     if (!canRemoveLayouts(existing))
     {
         messages::Resources::layoutAlreadyExists(mainWindow());

@@ -174,7 +174,7 @@ void QnGeneralSystemAdministrationWidget::retranslateUi()
     m_buttons[kHealthMonitorButton]->setText(tr("Health Monitoring"));
     m_buttons[kBookmarksButton    ]->setText(tr("Bookmarks"));
     m_buttons[kCameraListButton   ]->setText(
-        QnDeviceDependentStrings::getDefaultNameFromSet(tr("Device List"), tr("Camera List")));
+        QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(), tr("Device List"), tr("Camera List")));
 
     auto shortcutString = [this](const QnActions::IDType actionId, const QString &baseString) -> QString
     {

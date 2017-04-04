@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QWidget>
 
+#include <client_core/connection_context_aware.h>
+
 #include <ui/widgets/common/abstract_preferences_widget.h>
 
 namespace Ui
@@ -9,7 +11,7 @@ namespace Ui
     class SystemSettingsWidget;
 }
 
-class QnSystemSettingsWidget: public QnAbstractPreferencesWidget
+class QnSystemSettingsWidget: public QnAbstractPreferencesWidget, public QnConnectionContextAware
 {
     Q_OBJECT
 

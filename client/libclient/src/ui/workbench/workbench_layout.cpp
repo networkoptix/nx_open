@@ -4,6 +4,9 @@
 
 #include <QtWidgets/QGraphicsWidget>
 
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
+
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
@@ -108,8 +111,11 @@ QnWorkbenchLayout *QnWorkbenchLayout::instance(const QnLayoutResourcePtr &layout
     return synchronizer->layout();
 }
 
-QnWorkbenchLayout *QnWorkbenchLayout::instance(const QnVideoWallResourcePtr &videoWall) {
-    foreach (const QnLayoutResourcePtr &layout, resourcePool()->getResources<QnLayoutResource>()) {
+QnWorkbenchLayout *QnWorkbenchLayout::instance(const QnVideoWallResourcePtr &videoWall)
+{
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    for (const QnLayoutResourcePtr &layout: resourcePool->getResources<QnLayoutResource>())
+    {
         if (layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>() == videoWall)
             return QnWorkbenchLayout::instance(layout);
     }

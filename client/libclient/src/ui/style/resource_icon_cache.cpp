@@ -244,7 +244,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
     {
         auto server = resource.dynamicCast<QnMediaServerResource>();
         NX_ASSERT(server);
-        status = helpers::serverBelongsToCurrentSystem(server->getModuleInformation())
+        status = helpers::serverBelongsToCurrentSystem(server->getModuleInformation(), server->commonModule())
             ? Incompatible
             : Online;
     }
@@ -267,7 +267,7 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr& resource)
         switch (resource->getStatus())
         {
             case Qn::Online:
-                if (key == Server && resource->getId() == commonModule()->remoteGUID())
+                if (key == Server && resource->getId() == resource->commonModule()->remoteGUID())
                     status = Control;
                 else
                     status = Online;

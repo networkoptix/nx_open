@@ -371,9 +371,7 @@ bool QnConnectionManagerPrivate::doConnect()
 
             const auto ec2Connection = result->connection();
 
-            //QnAppServerConnectionFactory::setUrl(connectUrl);
             QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
-            //QnAppServerConnectionFactory::setConnectionInfo(connectionInfo);
 
             qnMobileClientMessageProcessor->init(ec2Connection);
 
@@ -437,9 +435,7 @@ void QnConnectionManagerPrivate::doDisconnect()
     disconnect(runtimeInfoManager(), nullptr, this, nullptr);
 
     qnMobileClientMessageProcessor->init(nullptr);
-//    QnAppServerConnectionFactory::setUrl(QUrl());
     QnAppServerConnectionFactory::setEc2Connection(nullptr);
-//    QnAppServerConnectionFactory::setConnectionInfo(QnConnectionInfo());
     commonModule()->sessionManager()->stop();
 
     setSystemName(QString());

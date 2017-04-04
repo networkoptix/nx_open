@@ -82,7 +82,7 @@ void QnSoftwareTriggerBusinessEventWidget::at_model_dataChanged(QnBusiness::Fiel
         }
         else
         {
-            auto users = qnResPool->getResources<QnUserResource>(params.metadata.instigators);
+            auto users = resourcePool()->getResources<QnUserResource>(params.metadata.instigators);
             ui->usersButton->selectUsers(users);
         }
     }

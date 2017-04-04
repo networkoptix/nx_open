@@ -182,14 +182,14 @@ namespace
         int m_editedRow;
     };
 
-    QnVirtualCameraResourceList getCurrentSelectedCameras()
+    QnVirtualCameraResourceList getCurrentSelectedCameras(QnResourcePool* resourcePool)
     {
         const auto isSelectedForBackup = [](const QnVirtualCameraResourcePtr& camera)
         {
             return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
         };
 
-        QnVirtualCameraResourceList serverCameras = resourcePool()->getAllCameras(QnResourcePtr(), true);
+        QnVirtualCameraResourceList serverCameras = resourcePool->getAllCameras(QnResourcePtr(), true);
         QnVirtualCameraResourceList selectedCameras = serverCameras.filtered(isSelectedForBackup);
         return selectedCameras;
     }
@@ -404,7 +404,7 @@ QnStorageConfigWidget::~QnStorageConfigWidget()
 
 void QnStorageConfigWidget::restoreCamerasToBackup()
 {
-    updateCamerasForBackup(getCurrentSelectedCameras());
+    updateCamerasForBackup(getCurrentSelectedCameras(resourcePool()));
 }
 
 void QnStorageConfigWidget::setReadOnlyInternal(bool readOnly)
@@ -448,7 +448,7 @@ bool QnStorageConfigWidget::hasChanges() const
         return true;
 
     // Check if cameras on !all! servers are different with selected
-    if (getCurrentSelectedCameras().toSet() != m_camerasToBackup.toSet())
+    if (getCurrentSelectedCameras(resourcePool()).toSet() != m_camerasToBackup.toSet())
         return true;
 
     return (m_server->getBackupSchedule() != m_backupSchedule);
@@ -488,7 +488,7 @@ void QnStorageConfigWidget::loadDataToUi()
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     loadStoragesFromResources();
     m_backupSchedule = m_server->getBackupSchedule();
-    m_camerasToBackup = getCurrentSelectedCameras();
+    m_camerasToBackup = getCurrentSelectedCameras(resourcePool());
 
     updateDisabledStoragesWarning(false);
 
@@ -799,6 +799,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data,
     if (selectedCamerasCount == 0)
     {
         const auto text = QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Select at least one device in the Backup Settings to start backup."),
             tr("Select at least one camera in the Backup Settings to start backup."));
         return error(text);

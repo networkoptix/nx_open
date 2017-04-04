@@ -48,10 +48,12 @@ QnSystemSettingsWidget::~QnSystemSettingsWidget()
 void QnSystemSettingsWidget::retranslateUi()
 {
     ui->autoDiscoveryCheckBox->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        resourcePool(),
         tr("Enable devices and servers auto discovery"),
         tr("Enable cameras and servers auto discovery")));
 
     ui->autoSettingsCheckBox->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        resourcePool(),
         tr("Allow System to optimize device settings"),
         tr("Allow System to optimize camera settings")));
 }

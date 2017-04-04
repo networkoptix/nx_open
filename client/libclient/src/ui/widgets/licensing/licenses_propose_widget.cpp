@@ -124,6 +124,7 @@ void QnLicensesProposeWidget::updateFromResources()
     else
     {
         title = QnDeviceDependentStrings::getNameFromSet(
+            resourcePool(),
             QnCameraDeviceStringSet(
                 tr("Use licenses for selected %n devices", "", m_cameras.size()),
                 tr("Use licenses for selected %n cameras", "", m_cameras.size()),

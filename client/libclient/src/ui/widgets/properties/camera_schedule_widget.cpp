@@ -1278,6 +1278,7 @@ void QnCameraScheduleWidget::validateArchiveLength()
     if (alertVisible)
     {
         alertText = QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("High minimum value can lead to archive length decrease on other devices."),
             tr("High minimum value can lead to archive length decrease on other cameras."));
     }

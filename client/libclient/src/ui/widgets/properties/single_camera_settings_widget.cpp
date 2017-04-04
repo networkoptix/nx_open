@@ -210,6 +210,7 @@ QnSingleCameraSettingsWidget::~QnSingleCameraSettingsWidget()
 void QnSingleCameraSettingsWidget::retranslateUi()
 {
     setWindowTitle(QnDeviceDependentStrings::getNameFromSet(
+        resourcePool(),
         QnCameraDeviceStringSet(
             tr("Device Settings"),
             tr("Camera Settings"),

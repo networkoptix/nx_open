@@ -872,6 +872,7 @@ void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& re
     if (status != 0)
     {
         const auto text = QnDeviceDependentStrings::getNameFromSet(
+            resourcePool(),
             QnCameraDeviceStringSet(
                 tr("Failed to move %n devices", "", modifiedResources.size()),
                 tr("Failed to move %n cameras", "", modifiedResources.size()),
@@ -905,6 +906,7 @@ void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& re
     if (!errorResources.empty())
     {
         const auto text = QnDeviceDependentStrings::getNameFromSet(
+            resourcePool(),
             QnCameraDeviceStringSet(
                 tr("Server \"%1\" cannot access %n devices. Move them anyway?",
                     "", errorResources.size()),

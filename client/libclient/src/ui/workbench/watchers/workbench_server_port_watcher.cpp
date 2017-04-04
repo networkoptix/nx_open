@@ -37,21 +37,22 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
                 return;
 
             m_currentServer = currentServer;
-            connect(currentServer, &QnMediaServerResource::portChanged, this
-                , [this](const QnResourcePtr &resource)
-            {
-                const auto currentServer = resource.dynamicCast<QnMediaServerResource>();
-                if (!currentServer)
-                    return;
+            connect(currentServer, &QnMediaServerResource::portChanged, this,
+                [this](const QnResourcePtr &resource)
+                {
+                    const auto currentServer = resource.dynamicCast<QnMediaServerResource>();
+                    if (!currentServer)
+                        return;
 
-                QUrl url = commonModule()->currentUrl();
-                if (url.isEmpty() || (url.port() == currentServer->getPort()))
-                    return;
+                    QUrl url = commonModule()->currentUrl();
+                    if (url.isEmpty() || (url.port() == currentServer->getPort()))
+                        return;
 
-                url.setPort(currentServer->getPort());
-                QnAppServerConnectionFactory::setUrl(url);
-                menu()->trigger(QnActions::ReconnectAction);
-            });
+                       //TODO: #GDM #FIXME #3.1 Restore functionality
+    //                 url.setPort(currentServer->getPort());
+    //                 QnAppServerConnectionFactory::setUrl(url);
+    //                 menu()->trigger(QnActions::ReconnectAction);
+                });
         });
 }
 

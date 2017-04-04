@@ -32,10 +32,6 @@
 
 namespace {
 
-    ec2::AbstractECConnectionPtr connection2() {
-        return commonModule()->ec2Connection();
-    }
-
     class SortedServersProxyModel : public QSortFilterProxyModel {
     public:
         SortedServersProxyModel(QObject *parent = 0) : QSortFilterProxyModel(parent) {}
@@ -295,6 +291,7 @@ void QnRoutingManagementWidget::applyChanges() {
         QHash<QUrl, bool> additional = it->addresses;
         QHash<QUrl, bool> ignored = it->ignoredAddresses;
 
+        auto connection = commonModule()->ec2Connection();
         for (auto it = additional.begin(); it != additional.end(); ++it) {
             QUrl url = it.key();
 
@@ -303,22 +300,22 @@ void QnRoutingManagementWidget::applyChanges() {
                 if (ignored.contains(url))
                     ign = ignored.take(url);
 
-                connection2()->getDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, ign, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                connection->getDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, ign, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
             } else {
                 ignored.remove(url);
-                connection2()->getDiscoveryManager(Qn::kSystemAccess)->removeDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                connection->getDiscoveryManager(Qn::kSystemAccess)->removeDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
             }
         }
         for (auto it = ignored.begin(); it != ignored.end(); ++it) {
             QUrl url = it.key();
 
             if (it.value())
-                connection2()->getDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                connection->getDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, true, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
             else {
                 if (autoUrls.contains(url))
-                    connection2()->getDiscoveryManager(Qn::kSystemAccess)->removeDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                    connection->getDiscoveryManager(Qn::kSystemAccess)->removeDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
                 else
-                    connection2()->getDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+                    connection->getDiscoveryManager(Qn::kSystemAccess)->addDiscoveryInformation(serverId, url, false, ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
             }
         }
     }

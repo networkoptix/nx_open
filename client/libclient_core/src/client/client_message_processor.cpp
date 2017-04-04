@@ -74,6 +74,7 @@ void QnClientMessageProcessor::init(const ec2::AbstractECConnectionPtr &connecti
             {
                 trace(lit("Url fixed from %1 to %2").arg(host).arg(fullHost));
                 NX_ASSERT(false, "Correct url must be filled in ecUrl");
+                //TODO: #GDM #FIXME #3.1 Restore functionality
 //                 info.ecUrl.setHost(fullHost);
 //                 connection->setConnectionInfo(info);
 //

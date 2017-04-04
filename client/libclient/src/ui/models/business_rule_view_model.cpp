@@ -88,12 +88,6 @@ QList<Columns> allColumns()
     return result;
 }
 
-template <class T>
-QnSharedResourcePointerList<T> toResources(const QSet<QnUuid> &idList)
-{
-    return resourcePool()->getResources<T>(idList);
-}
-
 QSet<QnUuid> toIds(const QnResourceList& resources)
 {
     QSet<QnUuid> result;
@@ -891,31 +885,31 @@ bool QnBusinessRuleViewModel::isValid(int column) const
                     return QnSendEmailActionDelegate::isValidList(filtered, m_actionParams.emailAddress);
                 case QnBusiness::CameraRecordingAction:
                     return isResourcesListValid<QnCameraRecordingPolicy>(
-                        QnBusiness::toResources<QnCameraRecordingPolicy::resource_type>(filtered));
+                        resourcePool()->getResources<QnCameraRecordingPolicy::resource_type>(filtered));
                 case QnBusiness::BookmarkAction:
                     return isResourcesListValid<QnCameraRecordingPolicy>(
-                        QnBusiness::toResources<QnBookmarkActionPolicy::resource_type>(filtered));
+                        resourcePool()->getResources<QnBookmarkActionPolicy::resource_type>(filtered));
                 case QnBusiness::CameraOutputAction:
                     return isResourcesListValid<QnCameraOutputPolicy>(
-                        QnBusiness::toResources<QnCameraOutputPolicy::resource_type>(filtered));
+                        resourcePool()->getResources<QnCameraOutputPolicy::resource_type>(filtered));
                 case QnBusiness::PlaySoundAction:
                 case QnBusiness::PlaySoundOnceAction:
 		            return !m_actionParams.url.isEmpty()
 		                && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
-		                    QnBusiness::toResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
+		                    resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
 		                    || m_actionParams.playToClient
 		                );
 
                 case QnBusiness::SayTextAction:
 		            return !m_actionParams.sayText.isEmpty()
 		                && (isResourcesListValid<QnCameraAudioTransmitPolicy>(
-		                    QnBusiness::toResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
+		                    resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
 		                    || m_actionParams.playToClient
 		                );
 
                 case QnBusiness::ExecutePtzPresetAction:
                     return isResourcesListValid<QnExecPtzPresetPolicy>(
-                        QnBusiness::toResources<QnExecPtzPresetPolicy::resource_type>(filtered))
+                        resourcePool()->getResources<QnExecPtzPresetPolicy::resource_type>(filtered))
                         && m_actionResources.size() == 1
                         && !m_actionParams.presetId.isEmpty();
                 case QnBusiness::ShowTextOverlayAction:
@@ -1061,7 +1055,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
 
             if (canUseSource)
             {
-                QnVirtualCameraResourceList targetCameras = QnBusiness::toResources<QnVirtualCameraResource>(m_actionResources);
+                QnVirtualCameraResourceList targetCameras = resourcePool()->getResources<QnVirtualCameraResource>(m_actionResources);
 
                 if (targetCameras.isEmpty())
                     return tr("Source camera");

@@ -293,7 +293,6 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
         .assignOwnPeerId("dc", commonModule->moduleGUID());
 
     commonModule->store(new QnGlobals());
-    commonModule->instance<QnSessionManager>();
 
     commonModule->store(new QnRedAssController());
 
