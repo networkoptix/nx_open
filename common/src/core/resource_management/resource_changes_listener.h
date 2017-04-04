@@ -1,15 +1,19 @@
 #pragma once
 
+#include <common/common_module_aware.h>
+
 #include <core/resource_management/resource_pool.h>
 
 #include <utils/common/connective.h>
 
 // TODO: #ynikitenkov add versions with add/remove/specified resource slot handlers
-class QnResourceChangesListener: public Connective<QObject> {
+class QnResourceChangesListener: public Connective<QObject>, public QnCommonModuleAware
+{
     typedef Connective<QObject> base_type;
 public:
-    QnResourceChangesListener(QObject *parent = nullptr)
-        : base_type(parent)
+    QnResourceChangesListener(QObject *parent = nullptr):
+        base_type(parent),
+        QnCommonModuleAware(parent)
     {}
 
     template<class ResourceClass, class ResourceSignalClass, class TargetClass, class TargetSlotClass>

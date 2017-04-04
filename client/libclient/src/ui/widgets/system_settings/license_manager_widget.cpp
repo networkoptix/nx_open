@@ -257,8 +257,8 @@ void QnLicenseManagerWidget::updateLicenses()
 
         QStringList messages;
 
-        QnCamLicenseUsageHelper camUsageHelper;
-        QnVideoWallLicenseUsageHelper vwUsageHelper;
+        QnCamLicenseUsageHelper camUsageHelper(this);
+        QnVideoWallLicenseUsageHelper vwUsageHelper(this);
         QList<QnLicenseUsageHelper*> helpers{ &camUsageHelper, &vwUsageHelper };
 
         for (auto helper: helpers)
@@ -497,8 +497,8 @@ bool QnLicenseManagerWidget::canRemoveLicense(const QnLicensePtr &license) const
     if (!license)
         return false;
 
-    QnLicenseErrorCode errCode = QnLicenseErrorCode::NoError;
-    return !license->isValid(&errCode) && errCode != QnLicenseErrorCode::FutureLicense;
+    QnLicenseErrorCode errCode = m_validator->validate(license);
+    return errCode != QnLicenseErrorCode::NoError && errCode != QnLicenseErrorCode::FutureLicense;
 }
 
 void QnLicenseManagerWidget::removeSelectedLicenses()
@@ -606,14 +606,14 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
         if (!license)
             break;
 
-        QnLicenseErrorCode errCode = QnLicenseErrorCode::NoError;
-
         if (infoMode)
         {
-            if (!license->isValid(&errCode, QnLicenseErrorCode::VM_CheckInfo)
-                && errCode != QnLicenseErrorCode::Expired)
+            QnLicenseErrorCode errCode = m_validator->validate(license,
+                QnLicenseValidator::VM_CheckInfo);
+
+            if (errCode != QnLicenseErrorCode::NoError && errCode != QnLicenseErrorCode::Expired)
             {
-                showFailedToActivateLicenseLater(QnLicense::errorMessage(errCode));
+                showFailedToActivateLicenseLater(QnLicenseValidator::errorMessage(errCode));
                 ui->licenseWidget->setState(QnLicenseWidget::Normal);
             }
             else
@@ -625,7 +625,10 @@ void QnLicenseManagerWidget::processReply(QNetworkReply *reply, const QByteArray
         }
         else
         {
-            if (license->isValid(&errCode, QnLicenseErrorCode::VM_JustCreated))
+            QnLicenseErrorCode errCode = m_validator->validate(license,
+                QnLicenseValidator::VM_JustCreated);
+
+            if (errCode == QnLicenseErrorCode::NoError)
                 licenses.append(license);
             else if (errCode == QnLicenseErrorCode::Expired)
                 licenses.append(license); // ignore expired error code
@@ -673,9 +676,8 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
     {
         QnLicensePtr license(new QnLicense(ui->licenseWidget->activationKey()));
 
-        QnLicenseErrorCode errCode = QnLicenseErrorCode::NoError;
-        if (license->isValid(&errCode, QnLicenseErrorCode::VM_JustCreated)
-            || errCode == QnLicenseErrorCode::Expired)
+        QnLicenseErrorCode errCode = m_validator->validate(license, QnLicenseValidator::VM_JustCreated);
+        if (errCode == QnLicenseErrorCode::NoError || errCode == QnLicenseErrorCode::Expired)
         {
             validateLicenses(license->key(), QList<QnLicensePtr>() << license);
         }

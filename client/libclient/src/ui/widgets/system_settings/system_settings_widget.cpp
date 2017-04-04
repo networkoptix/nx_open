@@ -3,6 +3,8 @@
 
 #include <api/global_settings.h>
 
+#include <common/common_module.h>
+
 #include <core/resource/device_dependent_strings.h>
 
 #include <ui/common/read_only.h>

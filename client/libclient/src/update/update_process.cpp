@@ -509,14 +509,14 @@ void QnUpdateProcess::prepareToUpload() {
 }
 
 bool QnUpdateProcess::setUpdateFlag() {
-    QnRuntimeInfoManager *runtimeInfoManager = runtimeInfoManager();
-    foreach (const QnPeerRuntimeInfo &runtimeInfo, runtimeInfoManager->items()->getItems()) {
+    for (const QnPeerRuntimeInfo &runtimeInfo: runtimeInfoManager()->items()->getItems())
+    {
         if (runtimeInfo.data.updateStarted)
             return false;
     }
-    QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
+    QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
     localInfo.data.updateStarted = true;
-    runtimeInfoManager->updateLocalItem(localInfo);
+    runtimeInfoManager()->updateLocalItem(localInfo);
     return true;
 }
 

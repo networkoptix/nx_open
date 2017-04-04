@@ -111,7 +111,7 @@ class QnAbstractConnection: public Connective<QObject>, public QnCommonModuleAwa
 
 public:
     QnAbstractConnection(
-        QObject* parent,
+        QnCommonModule* commonModule,
         const QnResourcePtr& targetRes = QnResourcePtr());
     virtual ~QnAbstractConnection();
 

@@ -60,7 +60,7 @@ private:
         Good
     };
     QPair<ExpirationState, QString> expirationInfo(const QnLicensePtr& license, bool fullText) const;
-    static QnMediaServerResourcePtr serverByLicense(const QnLicensePtr& license);
+    QnMediaServerResourcePtr serverByLicense(const QnLicensePtr& license) const;
 
 private:
     QnLicenseList m_licenses;

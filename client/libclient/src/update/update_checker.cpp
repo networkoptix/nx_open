@@ -5,7 +5,7 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 
-#include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #include <update/update_info.h>
 

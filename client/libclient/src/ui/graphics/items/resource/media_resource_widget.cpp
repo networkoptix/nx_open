@@ -693,7 +693,8 @@ void QnMediaResourceWidget::createPtzController()
     {
         if (QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera))
         {
-            serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
+            serverController.reset(new QnActivityPtzController(commonModule(),
+                QnActivityPtzController::Client, serverController));
             m_ptzController.reset(new QnFallbackPtzController(fisheyeController, serverController));
         }
         else

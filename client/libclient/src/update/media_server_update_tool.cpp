@@ -29,10 +29,10 @@ namespace {
 
     const bool defaultEnableClientUpdates = true;
 
-    QnSoftwareVersion getCurrentVersion()
+    QnSoftwareVersion getCurrentVersion(QnResourcePool* resourcePool)
     {
         QnSoftwareVersion minimalVersion = qnStaticCommon->engineVersion();
-        const auto allServers = resourcePool()->getAllServers(Qn::AnyStatus);
+        const auto allServers = resourcePool->getAllServers(Qn::AnyStatus);
         for(const QnMediaServerResourcePtr &server: allServers)
         {
             if (server->getVersion() < minimalVersion)
@@ -182,7 +182,7 @@ QUrl QnMediaServerUpdateTool::generateUpdatePackageUrl(const QnSoftwareVersion &
     QString versionSuffix;
     if (targetVersion.isNull()) {
         query.addQueryItem(lit("version"), lit("latest"));
-        query.addQueryItem(lit("current"), getCurrentVersion().toString());
+        query.addQueryItem(lit("current"), getCurrentVersion(resourcePool()).toString());
     } else {
         query.addQueryItem(lit("version"), targetVersion.toString());
         query.addQueryItem(lit("password"), passwordForBuild(static_cast<unsigned>(targetVersion.build())));

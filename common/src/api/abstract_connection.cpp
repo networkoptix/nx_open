@@ -30,11 +30,11 @@ bool QnAbstractReplyProcessor::connect(const char *signal, QObject *receiver, co
 }
 
 QnAbstractConnection::QnAbstractConnection(
-    QObject *parent,
+    QnCommonModule* commonModule,
     const QnResourcePtr& targetRes)
     :
-    base_type(parent),
-    QnCommonModuleAware(parent),
+    base_type(),
+    QnCommonModuleAware(commonModule),
     m_targetRes(targetRes)
 {}
 
