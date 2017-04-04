@@ -21,6 +21,7 @@ public:
         const std::string& accountEmail,
         const std::string& accountPassword);
 
+    void setMaxDelayBeforeConnect(std::chrono::milliseconds delay);
     void setTransactionConnectionCount(int connectionCount);
 
     void start();

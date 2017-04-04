@@ -23,6 +23,7 @@ int main(int argc, char* argv[])
     int testSystemsToGenerate = -1;
     int testRequestCount = 0;
     QString fetchRequest;
+    QString maxDelayBeforeConnectStr;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cdbUrl, "--cdb", "-c", "Cloud db url");
@@ -30,6 +31,10 @@ int main(int argc, char* argv[])
     commandLineParser.addParameter(&accountPassword, "--password", "-p", "Account password");
     commandLineParser.addParameter(&loadMode, "--load", "-l", "Establish many connections");
     commandLineParser.addParameter(&connectionCount, "--connections", "", "Test connection count");
+    commandLineParser.addParameter(
+        &maxDelayBeforeConnectStr,
+        "--max-delay", "",
+        "Maximum delay before starting connection. By default, no delay");
     commandLineParser.addParameter(
         &testSystemsToGenerate, "--generate-systems", "-s", "Number of random systems to generate");
     commandLineParser.addParameter(&fetchRequest, "--fetch", nullptr, "Fetch data. Values: systems");
@@ -44,13 +49,16 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    const auto maxDelayBeforeConnect = nx::utils::parseTimerDuration(maxDelayBeforeConnectStr);
+
     if (loadMode)
     {
         return nx::cdb::client::establishManyConnections(
             cdbUrl.toStdString(),
             accountEmail.toStdString(),
             accountPassword.toStdString(),
-            connectionCount);
+            connectionCount,
+            maxDelayBeforeConnect);
     }
 
     if (testSystemsToGenerate > 0)
@@ -77,7 +85,8 @@ int main(int argc, char* argv[])
             cdbUrl.toStdString(),
             accountEmail.toStdString(),
             accountPassword.toStdString(),
-            testRequestCount);
+            testRequestCount,
+            maxDelayBeforeConnect);
     }
 
     return 0;

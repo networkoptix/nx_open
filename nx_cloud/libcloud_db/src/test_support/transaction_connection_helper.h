@@ -39,6 +39,7 @@ public:
          */
         std::unique_ptr<::ec2::ConnectionGuardSharedState> connectionGuardSharedState;
         std::unique_ptr<test::TransactionTransport> connection;
+        std::unique_ptr<nx::network::aio::Timer> timer;
     };
 
     using ConnectionId = int;
@@ -47,6 +48,7 @@ public:
     ~TransactionConnectionHelper();
 
     void setRemoveConnectionAfterClosure(bool val);
+    void setMaxDelayBeforeConnect(std::chrono::milliseconds delay);
 
     /**
      * @return New connection id.
@@ -57,7 +59,7 @@ public:
         const std::string& password,
         KeepAlivePolicy keepAlivePolicy,
         int protocolVersion,
-        QnUuid peerId = QnUuid());
+        const QnUuid& peerId = QnUuid());
     
     bool waitForState(
         const std::vector<::ec2::QnTransactionTransportBase::State> desiredStates,
@@ -105,14 +107,27 @@ private:
     std::atomic<ConnectionId> m_transactionConnectionIdSequence;
     nx::network::aio::Timer m_aioTimer;
     bool m_removeConnectionAfterClosure;
+    std::chrono::milliseconds m_maxDelayBeforeConnect;
     OnConnectionBecomesActiveSubscription m_onConnectionBecomesActiveSubscription;
     OnConnectionFailureSubscription m_onConnectionFailureSubscription;
+
+    ConnectionContext prepareConnectionContext(
+        const std::string& login,
+        const std::string& password,
+        KeepAlivePolicy keepAlivePolicy,
+        int protocolVersion,
+        const QnUuid& peerId);
+    void startConnection(
+        ConnectionContext* connectionContext,
+        const QUrl& appserver2BaseUrl);
 
     ::ec2::ApiPeerData localPeer() const;
 
     void onTransactionConnectionStateChanged(
         ::ec2::QnTransactionTransportBase* /*connection*/,
         ::ec2::QnTransactionTransportBase::State /*newState*/);
+
+    QUrl prepareTargetUrl(const QUrl& appserver2BaseUrl, const QnUuid& localPeerId);
 
     void moveConnectionToReadyForStreamingState(
         ::ec2::QnTransactionTransportBase* connection);
