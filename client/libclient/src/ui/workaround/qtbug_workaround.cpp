@@ -1,5 +1,11 @@
 #include "qtbug_workaround.h"
 
+
+#include <QtGui/QGuiApplication>
+#include <QtGui/QWindow>
+
+#include <nx/utils/app_info.h>
+
 #ifdef Q_OS_WIN
 #   include <Windows.h>
 
@@ -77,7 +83,32 @@ class QnQtbugWorkaroundPrivate {};
 
 QnQtbugWorkaround::QnQtbugWorkaround(QObject *parent):
     QObject(parent)
-{}
+{
+    if (nx::utils::AppInfo::isMacOsX())
+    {
+        // Workaround of QTBUG-34767
+        static const auto kWorkaroundForQtBug34767Initialized =
+            []() -> bool
+            {
+                QObject::connect(qApp, &QGuiApplication::focusWindowChanged, qApp,
+                    []()
+                    {
+                        const auto modalWindow = qApp->modalWindow();
+                        if (!modalWindow)
+                            return;
+
+                        const auto focused = qApp->focusWindow();
+                        if (!focused || focused == modalWindow)
+                            return;
+
+                        modalWindow->requestActivate();
+                    });
+
+                return true;
+            }();
+    }
+
+}
 
 QnQtbugWorkaround::~QnQtbugWorkaround() {
     return;
