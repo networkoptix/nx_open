@@ -20,8 +20,9 @@ static const QString NAME_PREFIX(QLatin1String("VMAX-"));
 
 // ====================================================================
 QnPlVmax480ResourceSearcher::QnPlVmax480ResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
     QnAbstractNetworkResourceSearcher(commonModule),
-    QnAbstractResourceSearcher(commonModule)
+    QnUpnpResourceSearcherAsync(commonModule)
 {
 
 }

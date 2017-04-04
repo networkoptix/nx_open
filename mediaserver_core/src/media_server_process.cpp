@@ -1885,6 +1885,7 @@ bool MediaServerProcess::initTcpListener(
     NX_LOG(QString("Using maxConnections = %1.").arg(maxConnections), cl_logINFO);
 
     m_universalTcpListener = new QnUniversalTcpListener(
+        commonModule(),
         cloudManagerGroup->connectionManager,
         QHostAddress::Any,
         rtspPort,
@@ -2495,7 +2496,9 @@ void MediaServerProcess::run()
         ec2ConnectionFactory->registerRestHandlers( restProcessorPool.get() );
 
     std::unique_ptr<StreamingChunkTranscoder> streamingChunkTranscoder(
-        new StreamingChunkTranscoder( StreamingChunkTranscoder::fBeginOfRangeInclusive ) );
+        new StreamingChunkTranscoder(
+            commonModule()->resourcePool(),
+            StreamingChunkTranscoder::fBeginOfRangeInclusive ) );
     std::unique_ptr<nx_hls::HLSSessionPool> hlsSessionPool( new nx_hls::HLSSessionPool() );
 
     if (!initTcpListener(&cloudManagerGroup, ec2ConnectionFactory->messageBus()))
