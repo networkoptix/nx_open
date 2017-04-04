@@ -100,8 +100,8 @@ bool QnGenericTabbedDialog::forcefullyClose()
     if (!canDiscardChanges())
         return false;
 
-    discardChanges();
     hide();
+    discardChanges();
     loadDataToUi();
     return true;
 }
@@ -281,7 +281,7 @@ bool QnGenericTabbedDialog::canApplyChanges() const
     });
 }
 
-bool QnGenericTabbedDialog::canDiscardChanges() const
+bool QnGenericTabbedDialog::canDiscardChanges()
 {
     if (isReadOnly())
         return true;

@@ -15,7 +15,7 @@ bool QnAbstractPreferencesWidget::canApplyChanges() const
     return true;
 }
 
-bool QnAbstractPreferencesWidget::canDiscardChanges() const
+bool QnAbstractPreferencesWidget::canDiscardChanges()
 {
     return true;
 }
