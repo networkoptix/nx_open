@@ -109,6 +109,7 @@ bool itemBelongsToValidLayout(QnWorkbenchItem *item)
 QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent) :
     base_type(parent),
     QnWorkbenchContextAware(context),
+    m_hudOverlay(new QnHudOverlayWidget(this)),
     m_statusOverlay(new QnStatusOverlayWidget(this)),
     m_item(item),
     m_options(DisplaySelection),
@@ -117,7 +118,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_frameDistinctionColor(),
     m_titleTextFormat(lit("%1")),
     m_titleTextFormatHasPlaceholder(true),
-    m_hudOverlay(new QnHudOverlayWidget()),
     m_aboutToBeDestroyedEmitted(false),
     m_mouseInWidget(false),
     m_renderStatus(Qn::NothingRendered),
