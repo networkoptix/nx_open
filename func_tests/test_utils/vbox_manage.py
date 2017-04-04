@@ -5,7 +5,7 @@ from netaddr import IPNetwork
 from .host import Host
 
 
-INTERNAL_NETWORK_NAME_PREFIX = 'funtest-net-'
+INTERNAL_NETWORK_NAME_INFIX = 'net-'
 
 
 def make_network(ip_address, prefixlen):
@@ -44,8 +44,9 @@ class DhcpServer(object):
 
 class VBoxManage(object):
 
-    def __init__(self, host):
+    def __init__(self, vm_name_prefix, host):
         assert isinstance(host, Host), repr(host)
+        self._vm_net_prefix = vm_name_prefix + INTERNAL_NETWORK_NAME_INFIX
         self._host = host
         self._dhcp_server_list, self._dhcp_net_index = self._load_dhcp_server_list()
 
@@ -74,7 +75,7 @@ class VBoxManage(object):
         if l:
             return l[0].name
         self._dhcp_net_index += 1
-        name = INTERNAL_NETWORK_NAME_PREFIX + str(self._dhcp_net_index)
+        name = self._vm_net_prefix + str(self._dhcp_net_index)
         dhcp_server = funtest_dhcp_server(name, network)
         self._add_dhcp_server(dhcp_server)
         self._dhcp_server_list.append(dhcp_server)
@@ -110,11 +111,10 @@ class VBoxManage(object):
                     server.enabled = value == 'Yes'
                 else:
                     assert False, 'VBoxManage list dhcpservers returned unknown dhcp server attribute: %r' % name
-            if server.name.startswith('HostInterfaceNetworking-'):
-                continue  # skip dhcp servers for host-only networks
+            if not server.name.startswith(self._vm_net_prefix):
+                continue
             servers.append(server)
-            if server.name.startswith(INTERNAL_NETWORK_NAME_PREFIX):
-                last_index = max(last_index, int(server.name[len(INTERNAL_NETWORK_NAME_PREFIX):]))
+            last_index = max(last_index, int(server.name[len(self._vm_net_prefix):]))
         return (servers, last_index)
 
     def _add_dhcp_server(self, dhcp_server):

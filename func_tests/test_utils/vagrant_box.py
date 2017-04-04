@@ -48,10 +48,10 @@ class RemotableVagrant(vagrant.Vagrant):
 
 class Vagrant(object):
 
-    def __init__(self, test_dir, vm_host, bin_dir, vagrant_dir, vagrant_private_key_path, ssh_config_path):
+    def __init__(self, test_dir, vm_name_prefix, vm_host, bin_dir, vagrant_dir, vagrant_private_key_path, ssh_config_path):
         self._test_dir = test_dir
         self._vm_host = vm_host
-        self._vbox_manage = VBoxManage(vm_host)
+        self._vbox_manage = VBoxManage(vm_name_prefix, vm_host)
         self._bin_dir = bin_dir
         self._vagrant_dir = vagrant_dir  # on vm_host
         self._vagrant_file_path = os.path.join(self._vagrant_dir, 'Vagrantfile')

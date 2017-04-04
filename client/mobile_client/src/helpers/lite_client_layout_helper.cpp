@@ -9,22 +9,35 @@
 
 namespace {
 
-    const QString kDisplayCellProperty(lit("liteClientDisplayCell"));
-    const QPoint kInvalidPoint(-1, -1);
+const QString kDisplayCellProperty(lit("liteClientDisplayCell"));
+const QPoint kInvalidPoint(-1, -1);
 
-    QString pointToString(const QPoint& point)
-    {
-        return lit("%1,%2").arg(point.x()).arg(point.y());
-    }
+QString pointToString(const QPoint& point)
+{
+    return lit("%1,%2").arg(point.x()).arg(point.y());
+}
 
-    QPoint pointFromString(const QString& str)
-    {
-        const auto components = str.split(L',');
-        if (components.size() != 2)
-            return kInvalidPoint;
+QPoint pointFromString(const QString& str)
+{
+    const auto components = str.split(L',');
+    if (components.size() != 2)
+        return kInvalidPoint;
 
-        return QPoint(components.first().toInt(), components.last().toInt());
-    }
+    return QPoint(components.first().toInt(), components.last().toInt());
+}
+
+QnLayoutItemData createItem(
+    const QnUuid& resourceId,
+    const QString& cameraUniqueId,
+    const QRectF& combinedGeomtry)
+{
+    QnLayoutItemData result;
+    result.uuid = QnUuid::createUuid();
+    result.resource.id = resourceId;
+    result.resource.uniqueId = cameraUniqueId;
+    result.combinedGeometry = combinedGeomtry;
+    return result;
+};
 
 } // namespace
 
@@ -197,12 +210,7 @@ void QnLiteClientLayoutHelper::setCameraIdOnCell(int x, int y, const QString& ca
         if (id.isNull() || camera.isNull())
             return;
 
-        QnLayoutItemData item;
-        item.uuid = QnUuid::createUuid();
-        item.resource.id = id;
-        item.resource.uniqueId = camera->getUniqueId();
-        item.combinedGeometry = QRectF(x, y, 1, 1);
-        d->layout->addItem(item);
+        d->layout->addItem(createItem(id, camera->getUniqueId(), QRectF(x, y, 1, 1)));
     }
     else
     {
@@ -215,10 +223,10 @@ void QnLiteClientLayoutHelper::setCameraIdOnCell(int x, int y, const QString& ca
             if (it->resource.id == id)
                 return;
 
-            QnLayoutItemData item = *it;
-            item.resource.id = id;
-            item.resource.uniqueId = camera->getUniqueId();
-            d->layout->updateItem(item);
+            const auto current = *it;
+            d->layout->removeItem(current);
+            const auto newItem = createItem(id, camera->getUniqueId(), current.combinedGeometry);
+            d->layout->addItem(newItem);
         }
     }
 
