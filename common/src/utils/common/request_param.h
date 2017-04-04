@@ -12,7 +12,7 @@
 #include <nx/network/http/httptypes.h>
 #include <nx/utils/uuid.h>
 
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 
 class QnRequestParam: public QPair<QString, QString> {

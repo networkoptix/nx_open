@@ -20,7 +20,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "stun_attributes.h"
 

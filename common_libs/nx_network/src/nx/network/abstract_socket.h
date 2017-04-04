@@ -8,7 +8,7 @@
 #include <nx/network/async_stoppable.h>
 #include <nx/utils/move_only_func.h>
 #include <utils/common/byte_array.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "aio/event_type.h"
 #include "buffer.h"

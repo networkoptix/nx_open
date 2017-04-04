@@ -5,7 +5,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/scope_guard.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "settings.h"
 #include "libtraffic_relay_app_info.h"

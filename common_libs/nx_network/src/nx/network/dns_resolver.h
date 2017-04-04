@@ -12,7 +12,7 @@
 #include <nx/utils/thread/wait_condition.h>
 
 #include <utils/common/long_runnable.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "resolve/predefined_host_resolver.h"
 #include "resolve/system_resolver.h"

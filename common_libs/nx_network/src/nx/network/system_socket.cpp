@@ -6,7 +6,7 @@
 #include <boost/type_traits/is_same.hpp>
 
 #include <common/common_globals.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <utils/common/warnings.h>
 
 #include <nx/utils/log/log.h>

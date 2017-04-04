@@ -13,7 +13,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <utils/crypt/linux_passwd_crypt.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <utils/common/util.h>
 
 #include "auth_tools.h"
