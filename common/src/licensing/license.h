@@ -168,6 +168,7 @@ public:
     QVector<QString> hardwareIds() const;
     QString currentHardwareId() const;
 
+    QnLicenseValidator* validator() const;
     QnLicenseErrorCode validateLicense(const QnLicensePtr& license) const;
     bool isLicenseValid(const QnLicensePtr& license) const;
 signals:

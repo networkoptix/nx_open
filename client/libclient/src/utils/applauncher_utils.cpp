@@ -4,6 +4,7 @@
 #include <QtWidgets/QDesktopWidget>
 
 #include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #include <client/client_startup_parameters.h>
 #include <client/self_updater.h>

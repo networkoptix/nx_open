@@ -5,6 +5,7 @@
 #include <api/model/connection_info.h>
 
 #include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>

@@ -13,6 +13,7 @@
 #include <api/global_settings.h>
 
 #include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>

@@ -9,12 +9,15 @@
 #include <quazip/quazipfile.h>
 
 #include <api/global_settings.h>
+
+#include <common/common_module.h>
+#include <common/static_common_module.h>
+
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <common/common_module.h>
 
 #include <utils/update/update_utils.h>
 #include <utils/update/zip_utils.h>

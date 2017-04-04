@@ -4,6 +4,8 @@
 
 #include <QtCore/QTimer>
 
+#include <common/common_module.h>
+
 #include <api/app_server_connection.h>
 #include <api/model/upload_update_reply.h>
 #include <nx_ec/ec_proto_version.h>
@@ -11,7 +13,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <client/client_message_processor.h>
-#include <common/common_module.h>
 #include <utils/common/delete_later.h>
 #include <nx/utils/log/log.h>
 #include <network/router.h>
@@ -26,11 +27,10 @@ namespace detail {
 
     const QnSoftwareVersion kUnauthenticatedUpdateMinVersion(3, 0);
 
-    QnInstallUpdatesPeerTask::PeersToQueryMap sortedPeers(const QSet<QnUuid>& peers)
+    QnInstallUpdatesPeerTask::PeersToQueryMap sortedPeers(QnRouter* router, const QSet<QnUuid>& peers)
     {
         QnInstallUpdatesPeerTask::PeersToQueryMap result;
 
-        const auto router = commonModule()->router();
         if (!router)
             return result;
 
@@ -98,7 +98,7 @@ void QnInstallUpdatesPeerTask::doStart()
 
     m_serverByRequest.clear();
 
-    m_peersToQuery = sortedPeers(peers());
+    m_peersToQuery = sortedPeers(commonModule()->router(), peers());
 
     NX_LOG(lit("Update: QnInstallUpdatesPeerTask: Start installing update [%1].").arg(m_updateId),
         cl_logDEBUG1);

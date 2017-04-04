@@ -354,7 +354,7 @@ void QnLayoutExportTool::finishExport(bool success)
             if (existing)
                 resourcePool()->removeResources(existing->layoutResources().toList() << existing);
 
-            auto layout = QnResourceDirectoryBrowser::layoutFromFile(m_storage->getUrl());
+            auto layout = QnResourceDirectoryBrowser::layoutFromFile(m_storage->getUrl(), resourcePool());
             if (!layout)
             {
                 /* Something went wrong */
@@ -474,6 +474,7 @@ void QnLayoutExportTool::at_camera_exportFinished(const StreamRecorderErrorStruc
         NX_ASSERT(camRes, Q_FUNC_INFO, "Make sure camera exists");
         //: "Could not export camera AXIS1334"
         m_errorMessage = QnDeviceDependentStrings::getNameFromSet(
+            resourcePool(),
             QnCameraDeviceStringSet(
                 tr("Could not export device %1."),
                 tr("Could not export camera %1."),

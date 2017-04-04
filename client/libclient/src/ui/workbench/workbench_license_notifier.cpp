@@ -92,10 +92,10 @@ void QnWorkbenchLicenseNotifier::checkLicenses()
 
     for (const auto& license: licensePool()->getLicenses())
     {
-        QnLicenseErrorCode errorCode;
+        QnLicenseErrorCode errorCode = licensePool()->validateLicense(license);
 
         if (someLicenseWillBeBlocked
-            && !licensePool()->isLicenseValid(license, &errorCode)
+            && errorCode != QnLicenseErrorCode::NoError
             && errorCode != QnLicenseErrorCode::Expired)
         {
             licenses.push_back(license);

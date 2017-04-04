@@ -64,11 +64,15 @@ namespace ui {
 namespace workbench {
 
 namespace {
-QString generateUniqueLayoutName(const QnUserResourcePtr &user, const QString &defaultName, const QString &nameTemplate)
+QString generateUniqueLayoutName(
+    QnResourcePool* resourcePool,
+    const QnUserResourcePtr &user,
+    const QString &defaultName,
+    const QString &nameTemplate)
 {
     QStringList usedNames;
     QnUuid parentId = user ? user->getId() : QnUuid();
-    for (const auto layout : resourcePool()->getResources<QnLayoutResource>())
+    for (const auto layout : resourcePool->getResources<QnLayoutResource>())
     {
         if (layout->isShared() || layout->getParentId() == parentId)
             usedNames.push_back(layout->getName());
@@ -271,7 +275,7 @@ void LayoutsHandler::saveLayoutAs(const QnLayoutResourcePtr &layout, const QnUse
 
         QString proposedName = hasSavePermission
             ? layout->getName()
-            : generateUniqueLayoutName(context()->user(), layout->getName(), layout->getName() + lit(" %1"));
+            : generateUniqueLayoutName(resourcePool(), context()->user(), layout->getName(), layout->getName() + lit(" %1"));
 
         dialog->setName(proposedName);
         setHelpTopic(dialog.data(), Qn::SaveLayout_Help);
@@ -487,8 +491,8 @@ LayoutsHandler::LayoutChange LayoutsHandler::calculateLayoutChange(
 
     /* Share added resources. */
     auto snapshot = snapshotManager()->snapshot(layout);
-    auto oldResources = QnLayoutResource::layoutResources(snapshot.items);
-    auto newResources = QnLayoutResource::layoutResources(layout->getItems());
+    auto oldResources = QnLayoutResource::layoutResources(resourcePool(), snapshot.items);
+    auto newResources = layout->layoutResources();
 
     result.added = (newResources - oldResources).toList();
     result.removed = (oldResources - newResources).toList();
@@ -549,7 +553,7 @@ bool LayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layo
         [this, layouts](const QnUserResourcePtr& user)
         {
             return any_of(layouts,
-                [user](const QnLayoutResourcePtr& layout)
+                [this, user](const QnLayoutResourcePtr& layout)
                 {
                     return resourceAccessProvider()->accessibleVia(user, layout) ==
                         QnAbstractResourceAccessProvider::Source::shared;
@@ -607,7 +611,7 @@ bool LayoutsHandler::confirmDeleteLocalLayouts(const QnUserResourcePtr& user,
     for (const auto& layout : layouts)
     {
         auto snapshot = snapshotManager()->snapshot(layout);
-        removedResources += QnLayoutResource::layoutResources(snapshot.items);
+        removedResources += QnLayoutResource::layoutResources(resourcePool(), snapshot.items);
     }
 
     auto accessible = sharedResourcesManager()->sharedResources(user);
@@ -798,7 +802,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
     QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
     dialog->setWindowTitle(tr("New Layout"));
     dialog->setText(tr("Enter the name of the layout to create:"));
-    dialog->setName(generateUniqueLayoutName(user, tr("New Layout"), tr("New Layout %1")));
+    dialog->setName(generateUniqueLayoutName(resourcePool(), user, tr("New Layout"), tr("New Layout %1")));
     dialog->setWindowModality(Qt::ApplicationModal);
 
     if (!dialog->exec())
@@ -998,7 +1002,7 @@ void LayoutsHandler::at_openNewTabAction_triggered()
 {
     QnWorkbenchLayout *layout = qnWorkbenchLayoutsFactory->create(this);
 
-    layout->setName(generateUniqueLayoutName(context()->user(), tr("New Layout"), tr("New Layout %1")));
+    layout->setName(generateUniqueLayoutName(resourcePool(), context()->user(), tr("New Layout"), tr("New Layout %1")));
 
     workbench()->addLayout(layout);
     workbench()->setCurrentLayout(layout);

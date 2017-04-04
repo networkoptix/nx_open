@@ -5,12 +5,23 @@
 
 #include <core/resource/camera_resource.h>
 
-QnVirtualCameraResourcePtr helpers::extractCameraResource(QnWorkbenchItem *item)
+namespace helpers {
+
+template<typename ResourceType>
+QnSharedResourcePointer<ResourceType> extractResource(QnWorkbenchItem *item)
+{
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    const auto layoutItemData = item->data();
+    return resourcePool()->getResourceByDescriptor(layoutItemData.resource).template dynamicCast<ResourceType>();
+
+}
+
+QnVirtualCameraResourcePtr extractCameraResource(QnWorkbenchItem *item)
 {
     return extractResource<QnVirtualCameraResource>(item);
 }
 
-QnTimePeriod helpers::extractItemTimeWindow(QnWorkbenchItem *item)
+QnTimePeriod extractItemTimeWindow(QnWorkbenchItem *item)
 {
     QnTimePeriod window = item->data(Qn::ItemSliderWindowRole).value<QnTimePeriod>();
 
@@ -21,3 +32,5 @@ QnTimePeriod helpers::extractItemTimeWindow(QnWorkbenchItem *item)
     qint64 windowEndMs = (window.isInfinite() ? QnTimePeriod::kMaxTimeValue : window.endTimeMs());
     return QnTimePeriod::fromInterval(windowStartMs, windowEndMs);
 }
+
+} // namespace helpers

@@ -6,11 +6,14 @@
 #include <QtGui/QDesktopServices>
 
 #include <api/global_settings.h>
+
+#include <common/common_module.h>
+#include <common/static_common_module.h>
+
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <client/client_settings.h>
-#include <common/common_module.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>

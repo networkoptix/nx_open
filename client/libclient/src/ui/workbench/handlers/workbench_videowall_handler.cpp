@@ -15,6 +15,8 @@
 
 #include <common/common_module.h>
 
+#include <client_core/client_core_module.h>
+
 #include <client/client_message_processor.h>
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
@@ -281,6 +283,7 @@ QString binaryPath()
 //TODO: #GDM #VW clean nonexistent videowalls sometimes
 void setAutoRunEnabled(const QnUuid& videoWallUuid, bool value)
 {
+    auto commonModule = qnClientCoreModule->commonModule();
     const QString key = qApp->applicationName() + L' ' + videoWallUuid.toString();
 
     const QString path = binaryPath();
@@ -290,7 +293,7 @@ void setAutoRunEnabled(const QnUuid& videoWallUuid, bool value)
     QStringList arguments;
     arguments << lit("--videowall");
     arguments << videoWallUuid.toString();
-    QUrl url = commonModule()->currentUrl();
+    QUrl url = commonModule->currentUrl();
     url.setUserName(QString());
     url.setPassword(QString());
     arguments << lit("--auth");
@@ -570,7 +573,7 @@ void QnWorkbenchVideoWallHandler::resetLayout(const QnVideoWallItemIndexList &it
                 updateMode();
             };
         snapshotManager()->save(layout, callback);
-        propertyDictionary->saveParamsAsync(layout->getId());
+        propertyDictionary()->saveParamsAsync(layout->getId());
     }
     else
     {
@@ -1463,7 +1466,7 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered()
 {
 
     QnLicenseListHelper licenseList(licensePool()->getLicenses());
-    if (licenseList.totalLicenseByType(Qn::LC_VideoWall) == 0)
+    if (licenseList.totalLicenseByType(Qn::LC_VideoWall, licensePool()->validator()) == 0)
     {
         QnMessageBox::warning(mainWindow(),
             tr("Video Wall license required"),

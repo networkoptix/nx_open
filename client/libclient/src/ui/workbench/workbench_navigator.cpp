@@ -105,14 +105,6 @@ enum { kMinimalSymbolsCount = 3, kDelayMs = 750 };
 
 QAtomicInt qn_threadedMergeHandle(1);
 
-
-QnSecurityCamResourcePtr extractCamera(QnWorkbenchItem *item)
-{
-    const auto layoutItemData = item->data();
-    const auto id = layoutItemData.resource.id;
-    return resourcePool()->getResourceById<QnSecurityCamResource>(id);
-};
-
 }
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):

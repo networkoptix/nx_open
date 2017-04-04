@@ -3,9 +3,11 @@
 #include <QtCore/QFutureWatcher>
 #include <QtConcurrent/QtConcurrent>
 
-#include <client/client_settings.h>
 #include <common/common_module.h>
 #include <common/common_globals.h>
+#include <common/static_common_module.h>
+
+#include <client/client_settings.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>

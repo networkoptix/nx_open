@@ -593,6 +593,11 @@ QString QnLicensePool::currentHardwareId() const
     return hardwareId;
 }
 
+QnLicenseValidator* QnLicensePool::validator() const
+{
+    return m_licenseValidator;
+}
+
 QnLicenseErrorCode QnLicensePool::validateLicense(const QnLicensePtr& license) const
 {
     return m_licenseValidator->validate(license);

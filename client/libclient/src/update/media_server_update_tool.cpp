@@ -7,10 +7,12 @@
 
 #include <QtConcurrent/QtConcurrent>
 
+#include <common/common_module.h>
+#include <common/static_common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/incompatible_server_watcher.h>
-#include <common/common_module.h>
 #include <utils/update/update_utils.h>
 #include <update/task/check_update_peer_task.h>
 #include <update/low_free_space_warning.h>
