@@ -68,7 +68,16 @@ private:
 
     void connectToServer(const QUrl& url);
 
-    bool disconnectFromServer(bool force, bool isErrorReason = false);
+    enum DisconnectFlag
+    {
+        kNoFlags = 0x0,
+        kForce = 0x1,
+        kErrorReason = 0x2,
+        kClearAutoLogin = 0x4
+    };
+    Q_DECLARE_FLAGS(DisconnectFlags, DisconnectFlag)
+
+    bool disconnectFromServer(DisconnectFlags flags);
 
     void handleTestConnectionReply(
         int handle,
