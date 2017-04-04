@@ -20,9 +20,8 @@ public:
     void setFakeServerModuleInformation(const ec2::ApiDiscoveredServerData& serverData);
     virtual QnModuleInformation getModuleInformation() const override;
 
+    virtual QString getName() const override;
     virtual Qn::ResourceStatus getStatus() const override;
-    virtual void setStatus(Qn::ResourceStatus newStatus,
-        Qn::StatusChangeReason reason = Qn::StatusChangeReason::Local) override;
 
     virtual QUrl getApiUrl() const override;
 
@@ -37,6 +36,5 @@ signals:
 private:
     ec2::ApiDiscoveredServerData m_serverData;
     QAuthenticator m_authenticator;
-    Qn::ResourceStatus m_status { Qn::NotDefined }; //< This class must not store its status on server side
 };
 

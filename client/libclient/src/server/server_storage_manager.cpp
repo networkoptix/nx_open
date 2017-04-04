@@ -462,8 +462,8 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
         QnClientStorageResourcePtr storage = QnClientStorageResource::newStorage(requestKey.server, spaceInfo.url);
         storage->setStorageType(spaceInfo.storageType);
 
-        processStorage(storage, spaceInfo);
         resourcePool()->addResource(storage);
+        processStorage(storage, spaceInfo);
 
         existingStorages.insert(spaceInfo.url);
     }
