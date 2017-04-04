@@ -26,19 +26,11 @@ class Connection :
 public:
     Connection(
         StreamConnectionHolder<Connection>* socketServer, 
-        std::unique_ptr<AbstractStreamSocket> sock,
-        int version,
-        bool isSecure,
-        bool isServer);
+        std::unique_ptr<AbstractStreamSocket> sock);
     virtual ~Connection();
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler) override;
     void processMessage(Message&& request);
 
-private:
-private:
-    ProcessorBaseTypePtr m_processor;
-    ConnectionMessageManagerTypePtr<MessageType> m_conMessageManager;
-    RandomGenType m_randomGen;
 };
 
 }

@@ -7,20 +7,9 @@ namespace nx {
 namespace network {
 namespace websocket {
 
-class Message
+struct Message
 {
-public:
-    Message(
-        ProcessorImplType* processorImpl,
-        ConnectionMessageManagerImplType<MessageImplType>* conMessageManager,
-        ws::frame::opcode::value operationCode, 
-        const void* payload, 
-        std::size_t payloadLen);
-    void serialize(nx::Buffer* buf, std::size_t* bytesWritten);
-
-private:
-    ProcessorImplType* m_processor;
-    MessageImplTypePtr m_message;
+    nx::Buffer buffer;
 };
 
 }
