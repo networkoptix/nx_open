@@ -21,6 +21,7 @@ public:
     static bool isAndroid() { return applicationPlatform() == lit("android"); }
     static bool isIos() { return applicationPlatform() == lit("ios"); }
     static bool isMobile() { return isAndroid() || isIos(); }
+    static bool isLinux() { return applicationPlatform() == lit("linux"); }
     static bool isWindows() { return applicationPlatform() == lit("windows"); }
     static bool isMacOsX() { return applicationPlatform() == lit("macosx"); }
 };

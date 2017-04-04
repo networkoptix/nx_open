@@ -131,10 +131,9 @@ INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 
 cat debian/control.template | sed "s/INSTALLED_SIZE/$INSTALLED_SIZE/g" | sed "s/VERSION/$VERSION/g" | sed "s/ARCHITECTURE/$ARCHITECTURE/g" > $STAGE/DEBIAN/control
 
-install -m 755 debian/prerm $STAGE/DEBIAN
-install -m 755 debian/preinst $STAGE/DEBIAN
-install -m 755 debian/postinst $STAGE/DEBIAN
-install -m 644 debian/templates $STAGE/DEBIAN
+for f in $(ls debian); do 
+    if [ $f != 'control.template' ]; then install -m 755 debian/$f $STAGE/DEBIAN; fi
+done
 
 (cd $STAGE; find * -type f -not -regex '^DEBIAN/.*' -print0 | xargs -0 md5sum > DEBIAN/md5sums; chmod 644 DEBIAN/md5sums)
 
