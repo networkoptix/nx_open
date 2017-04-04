@@ -213,7 +213,10 @@ bool QnAccessibleResourcesWidget::hasChanges() const
             return true;
     }
 
-    return m_resourcesModel->checkedResources() != QnResourceAccessFilter::filteredResources(m_filter, m_permissionsModel->accessibleResources());
+    return m_resourcesModel->checkedResources() != QnResourceAccessFilter::filteredResources(
+        resourcePool(),
+        m_filter,
+        m_permissionsModel->accessibleResources());
 }
 
 void QnAccessibleResourcesWidget::loadDataToUi()
@@ -242,7 +245,9 @@ void QnAccessibleResourcesWidget::loadDataToUi()
         m_controlsModel->setCheckedResources(checkedControls);
     }
 
-    m_resourcesModel->setCheckedResources(QnResourceAccessFilter::filteredResources(m_filter,
+    m_resourcesModel->setCheckedResources(QnResourceAccessFilter::filteredResources(
+        resourcePool(),
+        m_filter,
         m_permissionsModel->accessibleResources()));
 }
 
@@ -269,7 +274,10 @@ QSet<QnUuid> QnAccessibleResourcesWidget::checkedResources() const
 void QnAccessibleResourcesWidget::applyChanges()
 {
     auto accessibleResources = m_permissionsModel->accessibleResources();
-    auto oldFiltered = QnResourceAccessFilter::filteredResources(m_filter, accessibleResources);
+    auto oldFiltered = QnResourceAccessFilter::filteredResources(
+        resourcePool(),
+        m_filter,
+        accessibleResources);
     auto newFiltered = m_resourcesModel->checkedResources();
 
     accessibleResources.subtract(oldFiltered);

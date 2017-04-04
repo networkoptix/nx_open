@@ -897,7 +897,7 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
             //saving property to some internal dictionary. Will apply to global dictionary when id is known
             m_locallySavedProperties[key] = LocalPropertyValue(value, markDirty, replaceIfExists);
 
-            //calling propertyDictionary->saveParams(...) does not make any sense
+            //calling propertyDictionary()->saveParams(...) does not make any sense
             return false;
         }
     }

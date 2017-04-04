@@ -31,6 +31,7 @@
 #include <client/client_startup_parameters.h>
 #include <client/desktop_client_message_processor.h>
 #include <client/client_show_once_settings.h>
+#include <client/client_module.h>
 
 #include <common/common_module.h>
 
@@ -1921,7 +1922,7 @@ void ActionHandler::at_togglePanicModeAction_toggled(bool checked) {
             if (checked)
                 val = Qn::PM_User;
             resource->setPanicMode(val);
-            propertyDictionary->saveParamsAsync(resource->getId());
+            propertyDictionary()->saveParamsAsync(resource->getId());
         }
     }
 }
@@ -2190,7 +2191,7 @@ void ActionHandler::openInBrowserDirectly(const QnMediaServerResourcePtr& server
     url.setScheme(lit("http"));
     url.setPath(path);
     url.setFragment(fragment);
-    url = QnNetworkProxyFactory::instance()->urlToResource(url, server, lit("proxy"));
+    url = qnClientModule->networkProxyFactory()->urlToResource(url, server, lit("proxy"));
     QDesktopServices::openUrl(url);
 }
 
@@ -2204,7 +2205,7 @@ void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
     QUrl serverUrl(server->getApiUrl().toString() + path);
     serverUrl.setFragment(fragment);
 
-    QUrl proxyUrl = QnNetworkProxyFactory::instance()->urlToResource(serverUrl, server);
+    QUrl proxyUrl = qnClientModule->networkProxyFactory()->urlToResource(serverUrl, server);
     proxyUrl.setPath(lit("/api/getNonce"));
 
     if (m_serverRequests.find(proxyUrl) == m_serverRequests.end())
@@ -2257,7 +2258,7 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
         urlQuery.addQueryItem(lit("auth"), QLatin1String(authParam));
         targetUrl.setQuery(urlQuery);
 
-        targetUrl = QnNetworkProxyFactory::instance()->urlToResource(targetUrl, request.server);
+        targetUrl = qnClientModule->networkProxyFactory()->urlToResource(targetUrl, request.server);
 
         auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
         targetUrl = QUrl(lit("http://%1/%2:%3:%4%5?%6")

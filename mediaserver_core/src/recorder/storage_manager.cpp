@@ -432,7 +432,7 @@ public:
             {
                 const auto space = QString::number(storage->getTotalSpace());
                 if (storage->setProperty(Qn::SPACE, space))
-                    propertyDictionary->saveParams(storage->getId());
+                    propertyDictionary()->saveParams(storage->getId());
             }
         }
 

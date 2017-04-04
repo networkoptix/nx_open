@@ -9,6 +9,7 @@
 class QGLWidget;
 class QnClientCoreModule;
 class QnPtzControllerPool;
+class QnNetworkProxyFactory;
 
 class QnClientModule: public QObject, public Singleton<QnClientModule>
 {
@@ -22,6 +23,7 @@ public:
     void startLocalSearchers();
 
     QnPtzControllerPool* ptzControllerPool() const;
+    QnNetworkProxyFactory* networkProxyFactory() const;
 
 private:
     void initApplication();
@@ -36,6 +38,7 @@ private:
 
 private:
     QnClientCoreModule* m_clientCoreModule;
+    QnNetworkProxyFactory* m_networkProxyFactory;
 };
 
 #define qnClientModule QnClientModule::instance()

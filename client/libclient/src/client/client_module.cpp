@@ -185,6 +185,7 @@ QnClientModule::~QnClientModule()
 
     QnResource::stopAsyncTasks();
 
+    m_networkProxyFactory = nullptr; // Object will be deleted by QNetworkProxyFactory
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
 
     QApplication::setOrganizationName(QString());
@@ -239,6 +240,11 @@ QnPtzControllerPool* QnClientModule::ptzControllerPool() const
 {
     auto commonModule = m_clientCoreModule->commonModule();
     return commonModule->instance<QnClientPtzControllerPool>();
+}
+
+QnNetworkProxyFactory* QnClientModule::networkProxyFactory() const
+{
+    return m_networkProxyFactory;
 }
 
 void QnClientModule::initMetaInfo()
@@ -317,7 +323,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     commonModule->store(new QnCloudStatusWatcher());
 
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
-    QNetworkProxyFactory::setApplicationProxyFactory(new QnNetworkProxyFactory(commonModule));
+    m_networkProxyFactory = new QnNetworkProxyFactory(commonModule);
+    QNetworkProxyFactory::setApplicationProxyFactory(m_networkProxyFactory);
 
 #ifdef Q_OS_WIN
     commonModule->store(new QnIexploreUrlHandler());
