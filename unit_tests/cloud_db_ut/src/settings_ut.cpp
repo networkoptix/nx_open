@@ -97,9 +97,9 @@ private:
 
 TEST_F(SettingsHttp, tcpBacklogSize_applied)
 {
-    const int backLogSize = nx::utils::random::number<int>(100, 60000);
+    const int backlogSize = nx::utils::random::number<int>(100, 60000);
 
-    setTcpBacklogSizeTo(backLogSize);
+    setTcpBacklogSizeTo(backlogSize);
     startCdb();
     assertTcpBacklogSizeHasBeenAppliedToServerSocket();
 }

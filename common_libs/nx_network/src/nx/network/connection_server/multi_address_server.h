@@ -89,11 +89,11 @@ public:
     }
 
     //!Returns true, if all binded addresses are successfully listened
-    bool listen(int backLogSize = AbstractStreamServerSocket::kDefaultBacklogSize)
+    bool listen(int backlogSize = AbstractStreamServerSocket::kDefaultBacklogSize)
     {
         for (auto it = m_listeners.cbegin(); it != m_listeners.cend(); )
         {
-            if (!(*it)->listen(backLogSize))
+            if (!(*it)->listen(backlogSize))
             {
                 const auto& errorText = SystemError::getLastOSErrorText();
                 NX_LOG(QString::fromLatin1("Failed to listen address %1. %2")

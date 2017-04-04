@@ -146,12 +146,12 @@ public:
             m_socket->bind(socketAddress);
     }
 
-    bool listen(int backLogSize = AbstractStreamServerSocket::kDefaultBacklogSize)
+    bool listen(int backlogSize = AbstractStreamServerSocket::kDefaultBacklogSize)
     {
         using namespace std::placeholders;
 
         if (!m_socket->setNonBlockingMode(true) ||
-            !m_socket->listen(backLogSize))
+            !m_socket->listen(backlogSize))
         {
             return false;
         }
