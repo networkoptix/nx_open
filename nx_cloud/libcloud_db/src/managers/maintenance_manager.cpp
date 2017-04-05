@@ -10,10 +10,12 @@ namespace cdb {
 
 MaintenanceManager::MaintenanceManager(
     const QnUuid& moduleGuid,
-    ec2::SyncronizationEngine* const syncronizationEngine)
+    ec2::SyncronizationEngine* const syncronizationEngine,
+    const db::InstanceController& dbInstanceController)
     :
     m_moduleGuid(moduleGuid),
-    m_syncronizationEngine(syncronizationEngine)
+    m_syncronizationEngine(syncronizationEngine),
+    m_dbInstanceController(dbInstanceController)
 {
 }
 
@@ -62,16 +64,20 @@ void MaintenanceManager::getTransactionLog(
 
 void MaintenanceManager::getStatistics(
     const AuthorizationInfo& /*authzInfo*/,
-    std::function<void(api::ResultCode, api::Statistics)> completionHandler)
+    std::function<void(api::ResultCode, data::Statistics)> completionHandler)
 {
     m_timer.post(
         [this,
             lock = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler)]()
         {
-            api::Statistics statistics;
+            data::Statistics statistics;
             statistics.onlineServerCount = 
                 (int)m_syncronizationEngine->connectionManager().getVmsConnectionCount();
+            statistics.dbQueryStatistics =
+                m_dbInstanceController.statisticsCollector().getQueryStatistics();
+            statistics.pendingSqlQueryCount =
+                m_dbInstanceController.queryExecutor().pendingQueryCount();
 
             completionHandler(api::ResultCode::ok, std::move(statistics));
         });

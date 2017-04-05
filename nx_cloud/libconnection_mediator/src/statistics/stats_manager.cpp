@@ -13,7 +13,7 @@ StatsManager::StatsManager(const conf::Settings& settings):
         throw std::runtime_error("Could not connect to DB");
     m_collector = std::make_unique<Collector>(
         settings.statistics(),
-        m_instanceController.queryExecutor().get());
+        &m_instanceController.queryExecutor());
 }
 
 Collector& StatsManager::collector()
