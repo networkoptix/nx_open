@@ -505,7 +505,7 @@ namespace nx_hls
         }
 
         if (!session->isLive() &&
-            !qnResourceAccessManager->hasGlobalPermission(accessRights, Qn::GlobalViewArchivePermission))
+            !commonModule()->resourceAccessManager()->hasGlobalPermission(accessRights, Qn::GlobalViewArchivePermission))
         {
             return nx_http::StatusCode::forbidden;
         }
@@ -821,7 +821,7 @@ namespace nx_hls
             requestParams );
 
         if (!currentChunkKey.live() &&
-            !qnResourceAccessManager->hasGlobalPermission(d_ptr->accessRights, Qn::GlobalViewArchivePermission))
+            !commonModule()->resourceAccessManager()->hasGlobalPermission(d_ptr->accessRights, Qn::GlobalViewArchivePermission))
         {
             return nx_http::StatusCode::forbidden;
         }
