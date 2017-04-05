@@ -29,6 +29,7 @@
 #include <recording/time_period_list.h>
 
 #include <boost/array.hpp>
+#include <iterator>
 #include "utils/common/concurrent.h"
 #include "storage_db_pool.h"
 
@@ -114,7 +115,7 @@ QString getDirName(const QString& prefix, int currentParts[4], int i)
 
 bool DeviceFileCatalog::csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage)
 {
-	QString prefix = rootFolder(storage, m_catalog);
+    QString prefix = rootFolder(storage, m_catalog);
 
     QDateTime fileDate = QDateTime::fromMSecsSinceEpoch(chunk.startTimeMs);
     if (chunk.timeZone != -1)
@@ -300,10 +301,9 @@ void DeviceFileCatalog::addChunks(const std::deque<Chunk>& chunks)
 
     std::deque<Chunk> existChunks;
     existChunks.swap( m_chunks );
-    m_chunks.resize(existChunks.size() + chunks.size());
-    auto itr = std::set_union(existChunks.begin(), existChunks.end(), chunks.begin(), chunks.end(), m_chunks.begin());
-    if (!m_chunks.empty())
-        m_chunks.resize(itr - m_chunks.begin());
+    auto itr = std::set_union(
+        existChunks.begin(), existChunks.end(), 
+        chunks.begin(), chunks.end(), std::back_inserter(m_chunks));
 }
 
 std::deque<DeviceFileCatalog::Chunk> DeviceFileCatalog::mergeChunks(const std::deque<Chunk>& chunk1, const std::deque<Chunk>& chunk2)
