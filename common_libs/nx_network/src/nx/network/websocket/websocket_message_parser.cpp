@@ -5,6 +5,11 @@ namespace nx {
 namespace network {
 namespace websocket {
 
+MessageParser::MessageParser(bool isServer, MessageParserHandler* handler):
+    m_isServer(isServer),
+    m_handler(handler)
+{
+}
 
 void MessageParser::consume(const char* data, int len)
 {
@@ -66,8 +71,59 @@ void MessageParser::consume(const char* data, int len)
     }
 }
 
-bool parseHeader(const char* data, int len)
+bool MessageParser::parseHeader(const char* data, int len)
 {
+    char opCode = data[0] & 0x0F;
+    bool fin = (data[0] >> 7) & 0x01;
+    bool masked = (data[1] >> 7) & 0x01;
+
+    int lengthTypeField = data[1] & (~0x80);
+    unsigned int mask = 0;
+    int pos = 0;
+
+    if (lengthTypeField <= 125) 
+    {
+        m_payloadLen = lengthTypeField;
+    }
+    else if (lengthTypeField == 126) 
+    { 
+        m_payloadLen = data[2] + (data[3] << 8);
+        pos += 2;
+    }
+    else if (lengthTypeField == 127) { 
+        m_payloadLen = data[2] + (data[3] << 8);
+        pos += 8;
+    }
+
+    if (msg_masked) {
+        mask = *((unsigned int*)(in_buffer + pos));
+        //printf("MASK: %08x\n", mask);
+        pos += 4;
+
+        // unmask data:
+        unsigned char* c = in_buffer + pos;
+        for (int i = 0; i < payload_length; i++) {
+            c[i] = c[i] ^ ((unsigned char*)(&mask))[i % 4];
+        }
+    }
+
+    if (payload_length > out_size) {
+        //TODO: if output buffer is too small -- ERROR or resize(free and allocate bigger one) the buffer ?
+    }
+
+    memcpy((void*)out_buffer, (void*)(in_buffer + pos), payload_length);
+    out_buffer[payload_length] = 0;
+    *out_length = payload_length + 1;
+
+    //printf("TEXT: %s\n", out_buffer);
+
+    if (msg_opcode == 0x0) return (msg_fin) ? TEXT_FRAME : INCOMPLETE_TEXT_FRAME; // continuation frame ?
+    if (msg_opcode == 0x1) return (msg_fin) ? TEXT_FRAME : INCOMPLETE_TEXT_FRAME;
+    if (msg_opcode == 0x2) return (msg_fin) ? BINARY_FRAME : INCOMPLETE_BINARY_FRAME;
+    if (msg_opcode == 0x9) return PING_FRAME;
+    if (msg_opcode == 0xA) return PONG_FRAME;
+
+    return ERROR_FRAME;
 }
 
 void MessageParser::reset()

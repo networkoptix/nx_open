@@ -8,6 +8,7 @@ namespace websocket {
 
 class MessageParserHandler
 {
+public:
     virtual void payloadReceived(const char* data, int len, bool done) = 0;
     virtual void pingReceived(const char* data, int len) = 0;
     virtual void pongReceived(const char* data, int len) = 0;
@@ -25,7 +26,7 @@ class MessageParser
         readingPongPayload,
     };
 
-    const size_t kHeaderLen = 3;
+    const int kHeaderLen = 3;
 public:
     MessageParser(bool isServer, MessageParserHandler* handler);
     void consume(const char* data, int len);
