@@ -102,7 +102,11 @@ void QnStatusOverlayController::updateWidgetItems()
 
     auto items = visibleItems();
     m_widget->setVisibleControls(items);
-    m_widget->setIconOverlayPixmap(qnSkin->pixmap(statusIcon(statusOverlay())));
+
+    const auto pixmapPath = statusIcon(statusOverlay());
+    m_widget->setIconOverlayPixmap(pixmapPath.isEmpty()
+        ? QPixmap()
+        : qnSkin->pixmap(pixmapPath));
 }
 
 void QnStatusOverlayController::onStatusOverlayChanged(bool /*animated*/)

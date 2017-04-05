@@ -294,9 +294,10 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     /* Create viewport animator. */
     m_viewportAnimator = new ViewportAnimator(this); // ANIMATION: viewport.
+    static constexpr qreal kDefaultScalingSpeed = 1.01; // cannot be 1.0
     m_viewportAnimator->setAbsoluteMovementSpeed(0.0); /* Viewport movement speed in scene coordinates. */
     m_viewportAnimator->setRelativeMovementSpeed(1.0); /* Viewport movement speed in viewports per second. */
-    m_viewportAnimator->setScalingSpeed(1.0); /* Viewport scaling speed, scale factor per second. */
+    m_viewportAnimator->setScalingSpeed(kDefaultScalingSpeed); /* Viewport scaling speed, scale factor per second. */
     m_viewportAnimator->setTimer(animationTimer);
     connect(m_viewportAnimator, SIGNAL(started()), this, SIGNAL(viewportGrabbed()));
     connect(m_viewportAnimator, SIGNAL(started()), m_boundingInstrument, SLOT(recursiveDisable()));

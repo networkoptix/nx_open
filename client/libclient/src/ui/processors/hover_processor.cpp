@@ -1,5 +1,6 @@
 #include "hover_processor.h"
 #include <QtCore/QTimerEvent>
+#include <utils/common/delayed.h>
 #include <utils/common/warnings.h>
 
 HoverFocusProcessor::HoverFocusProcessor(QGraphicsItem *parent):
@@ -167,23 +168,60 @@ void HoverFocusProcessor::timerEvent(QTimerEvent *event) {
     }
 }
 
-QVariant HoverFocusProcessor::itemChange(GraphicsItemChange change, const QVariant &value) {
-    if(parentItem() != NULL) {
-        switch(change) {
-        case ItemSceneChange:
-            if(scene() != NULL)
-                foreach(const WeakGraphicsItemPointer &item, m_items)
-                    if(item)
+QVariant HoverFocusProcessor::itemChange(GraphicsItemChange change, const QVariant& value)
+{
+    if (parentItem())
+    {
+        switch(change)
+        {
+            case ItemSceneChange:
+            {
+                if (!scene())
+                    break;
+
+                for (const auto& item: m_items)
+                {
+                    if (item && item.data()->scene() == scene())
                         item.data()->removeSceneEventFilter(this);
-            break;
-        case ItemSceneHasChanged:
-            if(scene() != NULL)
-                foreach(const WeakGraphicsItemPointer &item, m_items)
-                    if(item)
+                }
+
+                break;
+            }
+
+            case ItemSceneHasChanged:
+            {
+                if (!scene())
+                    break;
+
+                for (const auto& item: m_items)
+                {
+                    if (!item)
+                        continue;
+
+                    if (item.data()->scene() == scene())
+                    {
                         item.data()->installSceneEventFilter(this);
-            break;
-        default:
-            break;
+                    }
+                    else
+                    {
+                        /*
+                         * In case this notification has been called from QGraphicsScene::addItem()
+                         * and the hover processor was added to the scene before its watched items.
+                         */
+                        executeDelayed(
+                            [this, item]()
+                            {
+                                if (item && scene() && item.data()->scene() == scene())
+                                    item.data()->installSceneEventFilter(this);
+                            });
+                    }
+                }
+
+                break;
+            }
+
+            default:
+                break;
         }
     }
 
@@ -229,7 +267,7 @@ void HoverFocusProcessor::processFocusLeave() {
 void HoverFocusProcessor::killHoverEnterTimer() {
     if(m_hoverEnterTimerId == 0)
         return;
-    
+
     killTimer(m_hoverEnterTimerId);
     m_hoverEnterTimerId = 0;
 }
