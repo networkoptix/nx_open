@@ -87,14 +87,14 @@ const char* QnTransactionTransportBase::TUNNEL_MULTIPART_BOUNDARY = "ec2boundary
 const char* QnTransactionTransportBase::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
 
 QnTransactionTransportBase::QnTransactionTransportBase(
-    QnCommonModule* commonModule,
+    const QnUuid& localSystemId,
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer,
     PeerRole peerRole,
     std::chrono::milliseconds tcpKeepAliveTimeout,
     int keepAliveProbeCount)
 :
-    QnCommonModuleAware(commonModule),
+    m_localSystemId(localSystemId),
     m_localPeer(localPeer),
     m_peerRole(peerRole),
     m_connectionGuardSharedState(connectionGuardSharedState),
@@ -131,7 +131,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 }
 
 QnTransactionTransportBase::QnTransactionTransportBase(
-    QnCommonModule* commonModule,
+    const QnUuid& localSystemId,
     const QnUuid& connectionGuid,
     ConnectionLockGuard connectionLockGuard,
     const ApiPeerData& localPeer,
@@ -143,7 +143,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     int keepAliveProbeCount)
 :
     QnTransactionTransportBase(
-        commonModule,
+        localSystemId,
         nullptr,
         localPeer,
         prAccepting,
@@ -212,14 +212,14 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 }
 
 QnTransactionTransportBase::QnTransactionTransportBase(
-    QnCommonModule* commonModule,
+    const QnUuid& localSystemId,
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer,
     std::chrono::milliseconds tcpKeepAliveTimeout,
     int keepAliveProbeCount)
 :
     QnTransactionTransportBase(
-        commonModule,
+        localSystemId,
         connectionGuardSharedState,
         localPeer,
         prOriginating,
@@ -542,11 +542,10 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
         m_httpClient->setUserPassword(remotePeerUrl.password());
     }
 
-    const auto localSystemId = commonModule()->globalSettings()->localSystemId();
     if (m_localPeer.isServer())
         m_httpClient->addAdditionalHeader(
             Qn::EC2_SYSTEM_ID_HEADER_NAME,
-            localSystemId.toByteArray());
+            m_localSystemId.toByteArray());
     if (m_base64EncodeOutgoingTransactions)    //requesting server to encode transactions
         m_httpClient->addAdditionalHeader(
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,

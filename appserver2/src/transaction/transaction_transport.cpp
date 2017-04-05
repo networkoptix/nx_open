@@ -24,8 +24,9 @@ QnTransactionTransport::QnTransactionTransport(
     const QByteArray& contentEncoding,
     const Qn::UserAccessData &userAccessData)
 :
+    QnCommonModuleAware(commonModule),
     QnTransactionTransportBase(
-        commonModule,
+        commonModule->globalSettings()->localSystemId(),
         connectionGuid,
         std::move(connectionLockGuard),
         localPeer,
@@ -45,8 +46,9 @@ QnTransactionTransport::QnTransactionTransport(
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer)
 :
+    QnCommonModuleAware(commonModule),
     QnTransactionTransportBase(
-        commonModule,
+        commonModule->globalSettings()->localSystemId(),
         connectionGuardSharedState,
         localPeer,
         commonModule->globalSettings()->connectionKeepAliveTimeout(),

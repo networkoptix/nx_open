@@ -55,8 +55,7 @@ namespace ConnectionType
 
 class QnTransactionTransportBase:
     public QObject,
-    public nx::network::aio::BasicPollable,
-    public QnCommonModuleAware
+    public nx::network::aio::BasicPollable
 {
     Q_OBJECT
 
@@ -105,7 +104,7 @@ public:
 
     /** Initializer for incoming connection. */
     QnTransactionTransportBase(
-        QnCommonModule* commonModule,
+        const QnUuid& localSystemId,
         const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
@@ -117,7 +116,7 @@ public:
         int keepAliveProbeCount);
     //!Initializer for outgoing connection
     QnTransactionTransportBase(
-        QnCommonModule* commonModule,
+        const QnUuid& localSystemId,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer,
         std::chrono::milliseconds tcpKeepAliveTimeout,
@@ -229,7 +228,7 @@ protected:
     {
         QnTransactionTransportHeader header(_header);
         NX_ASSERT(header.processedPeers.contains(m_localPeer.id));
-        header.fillSequence(commonModule()->moduleGUID(), commonModule()->runningInstanceGUID());
+        header.fillSequence(m_localPeer.id, m_localPeer.instanceId);
 #ifdef _DEBUG
 
         for (const QnUuid& peer : header.dstPeers)
@@ -294,6 +293,7 @@ private:
         none,
     };
 
+    QnUuid m_localSystemId;
     const ApiPeerData m_localPeer;
     ApiPeerData m_remotePeer;
 
@@ -361,7 +361,7 @@ private:
 
 private:
     QnTransactionTransportBase(
-        QnCommonModule* commonModule,
+        const QnUuid& localSystemId,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer,
         PeerRole peerRole,

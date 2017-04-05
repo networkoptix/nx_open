@@ -9,7 +9,8 @@ namespace ec2 {
 
 class QnTransactionTransport
 :
-    public QnTransactionTransportBase
+    public QnTransactionTransportBase,
+    public QnCommonModuleAware
 {
 public:
     /** Initializer for incoming connection */
