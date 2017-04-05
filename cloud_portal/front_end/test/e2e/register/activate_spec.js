@@ -38,23 +38,9 @@ describe('User activation', function () {
             p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
             browser.get(url);
-            p.alert.catchAlert(p.alert.alertMessages.registerConfirmError, p.alert.alertTypes.danger);
+            expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmError);
         });
     });
-
-    p.alert.checkAlert(function(){
-        var deferred = protractor.promise.defer();
-        var userEmail = p.helper.getRandomEmail();
-
-        p.helper.register(null, null, userEmail);
-        p.getActivationLink(userEmail).then( function(url) {
-            p.helper.get(url);
-            expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
-            browser.get(url);
-            deferred.fulfill();
-        });
-        return deferred.promise;
-    }, p.alert.alertMessages.registerConfirmError, p.alert.alertTypes.danger, true);
 
     it("should save user data to user account correctly", function () {
         var userEmail = p.helper.getRandomEmail();
@@ -126,7 +112,7 @@ describe('User activation', function () {
         p.getActivationLink(userEmail).then( function(url) {
             p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
-            expect(p.openInClientButton.isDisplayed()).toBe(true);
+            expect(p.helper.forms.login.messageLoginLink.isDisplayed()).toBe(true);
         });
     });
 
@@ -143,7 +129,7 @@ describe('User activation', function () {
         p.getActivationLink(userEmail).then( function(url) {
             p.helper.get(url);
             expect(p.helper.htmlBody.getText()).toContain(p.alert.alertMessages.registerConfirmSuccess);
-            expect(p.openInClientButton.isDisplayed()).toBe(true);
+            expect(p.helper.forms.login.messageLoginLink.isDisplayed()).toBe(true);
         });
     });
 

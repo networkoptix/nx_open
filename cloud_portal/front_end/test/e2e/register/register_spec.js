@@ -191,11 +191,15 @@ describe('Registration suite', function () {
 
         // Switch to just opened new tab
         browser.getAllWindowHandles().then(function (handles) {
+            browser.sleep(2000);
             var newWindowHandle = handles[1];
+            var oldWindowHandle = handles[0];
             browser.switchTo().window(newWindowHandle).then(function () {
                 expect(browser.getCurrentUrl()).toContain('content/eula'); // Check that url is correct
-                expect(p.helper.htmlBody.getText()).toContain('Terms and conditions'); // Check that it is Terms and conditions page
+                expect(p.helper.htmlBody.getText()).toContain('END USER LICENSE AGREEMENT'); // Check that it is Terms and conditions page
+                browser.close();
             });
+            browser.switchTo().window(oldWindowHandle);
         });
     });
 
@@ -216,10 +220,10 @@ describe('Registration suite', function () {
 
         expect(p.helper.forms.logout.alreadyLoggedIn.isDisplayed()).toBe(true);
         p.helper.forms.logout.logOut.click(); // log out
-
+        browser.sleep(2000);
 
         // Check that element that is visible only for authorized user is NOT displayed on page
-        expect(p.helper.loginSuccessElement.isPresent()).toBe(false);
+        expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false);
         // Check that register form is opened
         expect(browser.getCurrentUrl()).toContain('register');
         expect(p.helper.htmlBody.getText()).toContain(p.preRegisterMessage);
