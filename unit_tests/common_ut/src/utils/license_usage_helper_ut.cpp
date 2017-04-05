@@ -9,6 +9,7 @@
 #include <core/resource/media_server_resource.h>
 
 #include <licensing/license_pool_scaffold.h>
+#include <licensing/license_stub.h>
 
 #include <utils/license_usage_helper.h>
 
@@ -29,12 +30,15 @@ protected:
         m_server->setStatus(Qn::Online);
         m_licenses.reset(new QnLicensePoolScaffold(licensePool()));
         m_helper.reset(new QnCamLicenseUsageHelper(commonModule()));
+        m_validator.reset(new QLicenseStubValidator(commonModule()));
+        m_helper->setCustomValidator(m_validator.data());
     }
 
     // virtual void TearDown() will be called after each test is run.
     virtual void TearDown()
     {
         deinitializeContext();
+        m_validator.reset();
         m_helper.reset();
         m_licenses.reset();
         m_module.clear();
@@ -88,6 +92,7 @@ protected:
     QnMediaServerResourcePtr m_server;
     QScopedPointer<QnLicensePoolScaffold> m_licenses;
     QScopedPointer<QnCamLicenseUsageHelper> m_helper;
+    QScopedPointer<QLicenseStubValidator> m_validator;
 };
 
 /** Initial test. Check if empty helper is valid. */
@@ -100,7 +105,6 @@ TEST_F(QnLicenseUsageHelperTest, init)
 TEST_F(QnLicenseUsageHelperTest, checkSingleLicenseType)
 {
     addRecordingCamera();
-
 
     ASSERT_FALSE(m_helper->isValid());
 

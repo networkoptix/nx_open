@@ -1,7 +1,9 @@
-#ifndef LICENSE_USAGE_HELPER_H
-#define LICENSE_USAGE_HELPER_H
+#pragma once
 
 #include <array>
+
+#include <QtCore/QPointer>
+
 #include <core/resource/resource_fwd.h>
 #include <licensing/license.h>
 
@@ -15,8 +17,7 @@ struct LicenseCompatibility;
 class QnLicenseUsageWatcher: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
-
-   typedef Connective<QObject> base_type;
+    using base_type = Connective<QObject>;
 public:
     QnLicenseUsageWatcher(QObject* parent);
 signals:
@@ -28,7 +29,7 @@ typedef std::array<int, Qn::LC_Count> licensesArray;
 class QnLicenseUsageHelper: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
-    typedef  Connective<QObject> base_type;
+    using base_type = Connective<QObject>;
 public:
     QnLicenseUsageHelper(QObject *parent);
 
@@ -95,6 +96,9 @@ public:
     /** Mark data as invalid and needs to be recalculated. */
     void invalidate();
 
+    /** Custom validator (e.g. for unit tests). Does not take ownership.  */
+    void setCustomValidator(QnLicenseValidator* validator);
+
 protected:
     virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const = 0;
     virtual int calculateOverflowLicenses(Qn::LicenseType licenseType, int borrowedLicenses) const;
@@ -109,7 +113,8 @@ private:
     mutable bool m_dirty;
     mutable QList<Qn::LicenseType> m_licenseTypes;
 
-    struct Cache {
+    struct Cache
+    {
         Cache();
 
         QnLicenseListHelper licenses;
@@ -121,34 +126,28 @@ private:
 
     mutable Cache m_cache;
 
-    QnLicenseValidator* m_validator;
+    QPointer<QnLicenseValidator> m_validator;
 };
 
-class QnCamLicenseUsageWatcher: public QnLicenseUsageWatcher {
+class QnCamLicenseUsageWatcher: public QnLicenseUsageWatcher
+{
     Q_OBJECT
-
-    typedef QnLicenseUsageWatcher base_type;
+    using base_type = QnLicenseUsageWatcher;
 public:
     QnCamLicenseUsageWatcher(QObject *parent = nullptr);
     QnCamLicenseUsageWatcher(const QnVirtualCameraResourcePtr &camera, QObject *parent = nullptr);
-
-private:
-    void init(const QnVirtualCameraResourcePtr &camera);
 };
 
 class QnCamLicenseUsageHelper: public QnLicenseUsageHelper
 {
     Q_OBJECT
-
-    typedef QnLicenseUsageHelper base_type;
+    using base_type = QnLicenseUsageHelper;
 public:
     /*
         Constructors. Each one uses specified watcher or create a new one if parameter is empty.
         With empty watcher parameter creates instance which tracks all cameras.
     */
-
-    QnCamLicenseUsageHelper(
-        QObject* parent);
+    QnCamLicenseUsageHelper(QObject* parent);
 
     QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras,
         bool proposedEnable, QObject* parent = nullptr);
@@ -170,12 +169,15 @@ protected:
     virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
 
 private:
-    QnCamLicenseUsageWatcher* m_watcher;
+    void initWatcher(const QnVirtualCameraResourcePtr& camera = QnVirtualCameraResourcePtr());
+
+private:
+    QnCamLicenseUsageWatcher* m_watcher{nullptr};
     QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
 };
 
-class QnSingleCamLicenceStatusHelper : public Connective<QObject>
+class QnSingleCamLicenceStatusHelper: public Connective<QObject>
 {
     Q_OBJECT
 
@@ -201,20 +203,21 @@ private:
     typedef QScopedPointer<QnCamLicenseUsageHelper> QnCamLicenseUsageHelperPtr;
 
     const QnVirtualCameraResourcePtr m_camera;
-    const QnCamLicenseUsageHelperPtr m_helper;
+    QnCamLicenseUsageHelperPtr m_helper;
 };
 
 class QnVideoWallLicenseUsageWatcher: public QnLicenseUsageWatcher
 {
     Q_OBJECT
-
-    typedef QnLicenseUsageWatcher base_type;
+    using base_type = QnLicenseUsageWatcher;
 public:
     QnVideoWallLicenseUsageWatcher(QObject* parent);
 };
 
-class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper {
+class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper
+{
     Q_OBJECT
+    using base_type = QnLicenseUsageHelper;
 public:
     QnVideoWallLicenseUsageHelper(QObject *parent = NULL);
 
@@ -243,5 +246,3 @@ private:
     QPointer<QnVideoWallLicenseUsageHelper> m_helper;
     int m_count;
 };
-
-#endif // LICENSE_USAGE_HELPER_H

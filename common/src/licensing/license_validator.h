@@ -44,7 +44,7 @@ public:
     /**
      * Check if signature matches other fields, also check hardwareId and brand
      */
-    QnLicenseErrorCode validate(const QnLicensePtr& license, ValidationMode mode = VM_Regular) const;
+    virtual QnLicenseErrorCode validate(const QnLicensePtr& license, ValidationMode mode = VM_Regular) const;
 
     QString validationInfo(const QnLicensePtr& license, ValidationMode mode = VM_Regular) const;
 
@@ -53,7 +53,7 @@ public:
     /** Id of the server this license attached to (if it is present in the current system). */
     QnUuid serverId(const QnLicensePtr& license) const;
 
-private:
+protected:
     QnLicenseErrorCode isValidEdgeLicense(const QnLicensePtr& license,
         ValidationMode mode = VM_Regular) const;
     QnLicenseErrorCode isValidStartLicense(const QnLicensePtr& license) const;
