@@ -8,6 +8,12 @@ QnScrollableItemsWidget::QnScrollableItemsWidget(QGraphicsItem* parent):
     setAcceptedMouseButtons(Qt::NoButton);
 }
 
+QnScrollableItemsWidget::~QnScrollableItemsWidget()
+{
+    /* This is needed for correct layout cleanup. */
+    clear();
+}
+
 Qt::Alignment QnScrollableItemsWidget::alignment() const
 {
     Q_D(const QnScrollableItemsWidget);

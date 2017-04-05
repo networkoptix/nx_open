@@ -14,6 +14,7 @@ class QnScrollableItemsWidget: public QGraphicsWidget
 
 public:
     QnScrollableItemsWidget(QGraphicsItem* parent = nullptr);
+    virtual ~QnScrollableItemsWidget();
 
     /** Alignment of items inside scrollable area. */
     Qt::Alignment alignment() const;
