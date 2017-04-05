@@ -70,10 +70,10 @@ private:
 
     enum DisconnectFlag
     {
-        kNoFlags = 0x0,
-        kForce = 0x1,
-        kErrorReason = 0x2,
-        kClearAutoLogin = 0x4
+        NoFlags = 0x0,
+        Force = 0x1,
+        ErrorReason = 0x2,
+        ClearAutoLogin = 0x4
     };
     Q_DECLARE_FLAGS(DisconnectFlags, DisconnectFlag)
 
