@@ -44,6 +44,19 @@ using boost::algorithm::any_of;
 
 namespace {
 
+void setLayoutEnabled(QLayout* layout, bool enabled)
+{
+    const auto count = layout->count();
+    for (int i = 0; i != count; ++i)
+    {
+        const auto layoutItem = layout->itemAt(i);
+        if (const auto widget = layoutItem->widget())
+            widget->setEnabled(enabled);
+        if (const auto childLayout = layoutItem->layout())
+            setLayoutEnabled(childLayout, enabled);
+    }
+}
+
 class QnExportScheduleResourceSelectionDialogDelegate: public QnResourceSelectionDialogDelegate
 {
     Q_DECLARE_TR_FUNCTIONS(QnExportScheduleResourceSelectionDialogDelegate);
@@ -836,6 +849,21 @@ int QnCameraScheduleWidget::qualityToComboIndex(const Qn::StreamQuality& q)
     return 0;
 }
 
+void QnCameraScheduleWidget::updateScheduleTypeControls()
+{
+    const bool recordingEnabled = ui->enableRecordingCheckBox->isChecked();
+    const auto labels =
+        {ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord};
+    for (auto label: labels)
+    {
+        const auto button = qobject_cast<QAbstractButton*>(label->buddy());
+        const QPalette::ColorRole foreground = button && button->isChecked() && recordingEnabled
+            ? QPalette::Highlight
+            : QPalette::WindowText;
+        label->setForegroundRole(foreground);
+    }
+}
+
 void QnCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
 {
     if (m_disableUpdateGridParams)
@@ -853,13 +881,7 @@ void QnCameraScheduleWidget::updateGridParams(bool pickedFromGrid)
     else
         qWarning() << "QnCameraScheduleWidget::No record type is selected!";
 
-    for (auto label : {ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord})
-    {
-        auto button = qobject_cast<QAbstractButton*>(label->buddy());
-        QPalette::ColorRole foreground = button && button->isChecked() ? QPalette::Highlight : QPalette::WindowText;
-        label->setForegroundRole(foreground);
-    }
-
+    updateScheduleTypeControls();
     bool enabled = !ui->noRecordButton->isChecked();
     ui->fpsSpinBox->setEnabled(enabled && m_recordingParamsAvailable);
     ui->qualityComboBox->setEnabled(enabled && m_recordingParamsAvailable);
@@ -924,7 +946,12 @@ void QnCameraScheduleWidget::updateArchiveRangeEnabledState()
 
 void QnCameraScheduleWidget::updateGridEnabledState()
 {
+    const bool recordingEnabled = ui->enableRecordingCheckBox->isChecked();
     ui->motionGroupBox->setEnabled(m_recordingParamsAvailable);
+    setLayoutEnabled(ui->recordingScheduleLayout, recordingEnabled);
+    setLayoutEnabled(ui->scheduleSettingsLayout, recordingEnabled);
+    setLayoutEnabled(ui->bottomParametersLayout, recordingEnabled);
+    updateScheduleTypeControls();
     updateArchiveRangeEnabledState();
 }
 
