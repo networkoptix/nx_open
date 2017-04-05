@@ -86,7 +86,7 @@ void QnResourcesChangesManager::deleteResources(
         {
             // Check if all OK or we have already changed session or attributes pool was recreated.
             const bool success = errorCode == ec2::ErrorCode::ok
-                || qnCommon->runningInstanceGUID() != sessionGuid;
+                || commonModule()->runningInstanceGUID() != sessionGuid;
 
             if (thread)
                 executeInThread(thread, [safeCallback, success]() { safeCallback(success); });

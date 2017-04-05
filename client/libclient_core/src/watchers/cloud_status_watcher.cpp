@@ -13,6 +13,7 @@
 #include <common/common_module.h>
 
 #include <client_core/client_core_settings.h>
+#include <client_core/connection_context_aware.h>
 
 #include <cloud/cloud_connection.h>
 
@@ -77,7 +78,7 @@ QnCloudSystemList getCloudSystemList(const api::SystemDataExList &systemsList)
 
 }
 
-class QnCloudStatusWatcherPrivate : public QObject, public QnCommonModuleAware
+class QnCloudStatusWatcherPrivate : public QObject, public QnConnectionContextAware
 {
     QnCloudStatusWatcher* q_ptr;
     Q_DECLARE_PUBLIC(QnCloudStatusWatcher)
@@ -373,7 +374,6 @@ QnCloudSystemList QnCloudStatusWatcher::recentCloudSystems() const
 
 QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *parent):
     QObject(parent),
-    QnCommonModuleAware(parent),
     q_ptr(parent),
     cloudPort(-1),
     credentials(),

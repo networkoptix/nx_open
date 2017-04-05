@@ -2322,7 +2322,7 @@ void QnMediaResourceWidget::resetTriggers()
         return;
 
     /* Create new relevant triggers: */
-    for (const auto& rule: QnCommonMessageProcessor::instance()->businessRules())
+    for (const auto& rule: qnCommonMessageProcessor->businessRules())
         createTriggerIfRelevant(rule); //< creates a trigger only if the rule is relevant
 }
 
@@ -2372,7 +2372,7 @@ void QnMediaResourceWidget::invokeTrigger(
                 cl_logERROR);
         };
 
-    qnCommon->currentServer()->restConnection()->softwareTriggerCommand(
+    commonModule()->currentServer()->restConnection()->softwareTriggerCommand(
         m_resource->toResource()->getId(), id, toggleState,
         responseHandler, QThread::currentThread());
 }

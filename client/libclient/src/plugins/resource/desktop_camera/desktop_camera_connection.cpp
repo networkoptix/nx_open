@@ -112,7 +112,9 @@ QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(
     void* sslContext,
     QnDesktopResource* desktop)
     :
-    QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(), socket, desktop)
+    QnTCPConnectionProcessor(new QnDesktopCameraConnectionProcessorPrivate(),
+        socket,
+        desktop->commonModule())
 {
     Q_UNUSED(sslContext)
     Q_D(QnDesktopCameraConnectionProcessor);
