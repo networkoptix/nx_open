@@ -853,7 +853,7 @@ void QnCameraScheduleWidget::updateScheduleTypeControls()
 {
     const bool recordingEnabled = ui->enableRecordingCheckBox->isChecked();
     const auto labels =
-        {ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord};
+        { ui->labelAlways, ui->labelMotionOnly, ui->labelMotionPlusLQ, ui->labelNoRecord };
     for (auto label: labels)
     {
         const auto button = qobject_cast<QAbstractButton*>(label->buddy());
