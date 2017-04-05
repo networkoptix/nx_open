@@ -599,6 +599,7 @@ void QnModuleFinder::sendModuleInformation(
     if (const auto& connection = commonModule()->ec2Connection())
     {
         connection->getDiscoveryManager(Qn::kSystemAccess)->sendDiscoveredServer(
+            connection->messageBus(),
             std::move(serverData),
             ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
     }

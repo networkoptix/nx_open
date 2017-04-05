@@ -498,13 +498,23 @@ namespace ec2
             return impl::doSyncCall<impl::GetDiscoveryDataHandler>(std::bind(fn, this, std::placeholders::_1), discoveryDataList);
         }
 
-        template<class TargetType, class HandlerType> int sendDiscoveredServer(const ApiDiscoveredServerData &discoveredServer, TargetType *target, HandlerType handler) {
-            return sendDiscoveredServer(discoveredServer, std::static_pointer_cast<impl::SimpleHandler>(
+        template<class TargetType, class HandlerType> int sendDiscoveredServer(
+            QnTransactionMessageBus* messageBus,
+            const ApiDiscoveredServerData &discoveredServer,
+            TargetType *target,
+            HandlerType handler)
+        {
+            return sendDiscoveredServer(messageBus, discoveredServer, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int sendDiscoveredServersList(const ApiDiscoveredServerDataList &discoveredServersList, TargetType *target, HandlerType handler) {
-            return sendDiscoveredServersList(discoveredServersList, std::static_pointer_cast<impl::SimpleHandler>(
+        template<class TargetType, class HandlerType> int sendDiscoveredServersList(
+            QnTransactionMessageBus* messageBus,
+            const ApiDiscoveredServerDataList &discoveredServersList,
+            TargetType *target,
+            HandlerType handler)
+        {
+            return sendDiscoveredServersList(messageBus, discoveredServersList, std::static_pointer_cast<impl::SimpleHandler>(
                  std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
@@ -513,8 +523,14 @@ namespace ec2
         virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
         virtual int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
         virtual int getDiscoveryData(impl::GetDiscoveryDataHandlerPtr handler) = 0;
-        virtual int sendDiscoveredServer(const ApiDiscoveredServerData &discoveredServer, impl::SimpleHandlerPtr handler) = 0;
-        virtual int sendDiscoveredServersList(const ApiDiscoveredServerDataList &discoveredServersList, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendDiscoveredServer(
+            QnTransactionMessageBus* messageBus,
+            const ApiDiscoveredServerData &discoveredServer,
+            impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendDiscoveredServersList(
+            QnTransactionMessageBus* messageBus,
+            const ApiDiscoveredServerDataList &discoveredServersList,
+            impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractDiscoveryManager> AbstractDiscoveryManagerPtr;
 

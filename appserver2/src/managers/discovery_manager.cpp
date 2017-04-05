@@ -8,11 +8,11 @@
 
 namespace {
 
-ec2::QnPeerSet getDirectClientPeers()
+ec2::QnPeerSet getDirectClientPeers(ec2::QnTransactionMessageBus* messageBus)
 {
     ec2::QnPeerSet result;
 
-    auto clients = ec2::QnTransactionMessageBus::instance()->aliveClientPeers();
+    auto clients = messageBus->aliveClientPeers();
     for (auto it = clients.begin(); it != clients.end(); ++it)
     {
         const auto& clientId = it.key();
@@ -183,10 +183,11 @@ int QnDiscoveryManager<QueryProcessorType>::getDiscoveryData(impl::GetDiscoveryD
 
 template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
-        const ApiDiscoveredServerData &discoveredServer,
-        impl::SimpleHandlerPtr handler)
+    QnTransactionMessageBus* messageBus,
+    const ApiDiscoveredServerData &discoveredServer,
+    impl::SimpleHandlerPtr handler)
 {
-    const auto peers = getDirectClientPeers();
+    const auto peers = getDirectClientPeers(messageBus);
     if (peers.isEmpty())
         return -1;
 
@@ -195,7 +196,7 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
 
     const int reqId = generateRequestID();
 
-    QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
+    messageBus->sendTransaction(transaction, peers);
     QnConcurrent::run(Ec2ThreadPool::instance(),
         [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });
 
@@ -204,10 +205,11 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
 
 template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServersList(
-        const ApiDiscoveredServerDataList &discoveredServersList,
-        impl::SimpleHandlerPtr handler)
+    QnTransactionMessageBus* messageBus,
+    const ApiDiscoveredServerDataList &discoveredServersList,
+    impl::SimpleHandlerPtr handler)
 {
-    const auto peers = getDirectClientPeers();
+    const auto peers = getDirectClientPeers(messageBus);
     if (peers.isEmpty())
         return -1;
 
@@ -216,7 +218,7 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServersList(
 
     const int reqId = generateRequestID();
 
-    QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
+    messageBus->sendTransaction(transaction, peers);
     QnConcurrent::run(Ec2ThreadPool::instance(),
         [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });
 

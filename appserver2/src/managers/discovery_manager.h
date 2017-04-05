@@ -39,8 +39,14 @@ namespace ec2
         virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) override;
         virtual int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) override;
         virtual int getDiscoveryData(impl::GetDiscoveryDataHandlerPtr handler) override;
-        virtual int sendDiscoveredServer(const ApiDiscoveredServerData &discoveredServer, impl::SimpleHandlerPtr handler) override;
-        virtual int sendDiscoveredServersList(const ApiDiscoveredServerDataList &discoveredServersList, impl::SimpleHandlerPtr handler) override;
+        virtual int sendDiscoveredServer(
+            QnTransactionMessageBus* messageBus,
+            const ApiDiscoveredServerData &discoveredServer,
+            impl::SimpleHandlerPtr handler) override;
+        virtual int sendDiscoveredServersList(
+            QnTransactionMessageBus* messageBus,
+            const ApiDiscoveredServerDataList &discoveredServersList,
+            impl::SimpleHandlerPtr handler) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
