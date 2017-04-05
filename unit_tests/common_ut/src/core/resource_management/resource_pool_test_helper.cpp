@@ -10,7 +10,7 @@
 #include <core/resource/videowall_resource.h>
 
 QnResourcePoolTestHelper::QnResourcePoolTestHelper():
-    QnCommonModuleAware(nullptr, false)
+    QnCommonModuleAware(nullptr, true)
 {
 }
 
