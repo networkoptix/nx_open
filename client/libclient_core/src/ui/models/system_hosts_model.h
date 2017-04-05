@@ -37,7 +37,6 @@ public: // properties
 signals:
     void systemIdChanged();
     void localSystemIdChanged();
-    void firstHostChanged();
 
 private:
     class HostsModel;
