@@ -1,5 +1,4 @@
-#ifndef EC2_LAYOUT_DATA_H
-#define EC2_LAYOUT_DATA_H
+#pragma once
 
 #include "api_globals.h"
 #include "api_data.h"
@@ -62,5 +61,3 @@ namespace ec2
                                 (backgroundImageFilename)(backgroundWidth)(backgroundHeight)(backgroundOpacity)
 
 }
-
-#endif  //EC2_LAYOUT_DATA_H
