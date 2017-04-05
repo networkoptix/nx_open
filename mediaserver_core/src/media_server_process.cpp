@@ -174,6 +174,7 @@
 #include <rest/handlers/system_settings_handler.h>
 #include <rest/handlers/audio_transmission_rest_handler.h>
 #include <rest/handlers/start_lite_client_rest_handler.h>
+#include <rest/handlers/runtime_info_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -1841,6 +1842,9 @@ void MediaServerProcess::registerRestHandlers(
     #ifdef _DEBUG
         reg("api/debugEvent", new QnDebugEventsRestHandler());
     #endif
+
+    reg("ec2/runtimeInfo", new QnRuntimeInfoRestHandler());
+
 }
 
 bool MediaServerProcess::initTcpListener(
