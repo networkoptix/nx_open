@@ -1,25 +1,45 @@
 #pragma once
 
-#include <nx/network/websocket/websocket_types.h>
+#include <nx/network/buffer.h>
 
 namespace nx {
 namespace network {
 namespace websocket {
 
+class MessageParserHandler
+{
+    virtual void payloadReceived(const char* data, int len, bool done) = 0;
+    virtual void pingReceived(const char* data, int len) = 0;
+    virtual void pongReceived(const char* data, int len) = 0;
+    virtual void handleError() = 0;
+};
+
 class MessageParser
 {
+    enum class ParseState
+    {
+        waitingHeader,
+        readingHeader,
+        readingApplicationPayload,
+        readingPingPayload,
+        readingPongPayload,
+    };
+
+    const size_t kHeaderLen = 3;
 public:
-    MessageParser(bool isServer);
-    void setMessage(Message* const msg);
-    nx_api::ParserState parse(const nx::Buffer& buf, size_t* bytesProcessed);
-    nx_api::ParserState processEof();
+    MessageParser(bool isServer, MessageParserHandler* handler);
+    void consume(const char* data, int len);
     void reset();
 
 private:
-    ProcessorBaseTypePtr m_processor;
-    RandomGenType m_randomGen;
-    Message* const m_msg;
+    bool parseHeader(const char* data, int len);
+private:
     bool m_isServer;
+    MessageParserHandler* m_handler;
+    nx::Buffer m_buf;
+    ParseState m_state = ParseState::waitingHeader;
+    int m_pos = 0;
+    int m_payloadLen = 0;
 };
 
 }

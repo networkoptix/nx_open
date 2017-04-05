@@ -52,13 +52,10 @@ public:
 
     BaseStreamProtocolConnection(
         StreamConnectionHolder<CustomConnectionType>* connectionManager,
-        std::unique_ptr<AbstractStreamSocket> streamSocket,
-        bool isServer)
+        std::unique_ptr<AbstractStreamSocket> streamSocket )
     :
         BaseType( connectionManager, std::move(streamSocket) ),
-        m_serializerState( SerializerState::done ),
-        m_parser(isServer),
-        m_serializer(isServer)
+        m_serializerState( SerializerState::done )
     {
         static const size_t DEFAULT_SEND_BUFFER_SIZE = 4*1024;
         m_writeBuffer.reserve( DEFAULT_SEND_BUFFER_SIZE );

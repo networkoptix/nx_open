@@ -4,22 +4,23 @@ namespace nx {
 namespace network {
 namespace websocket {
 
-Connection::Connection(
-    StreamConnectionHolder<Connection>* socketServer,
-    std::unique_ptr<AbstractStreamSocket> sock) 
+WebsocketBaseConnection::WebsocketBaseConnection(
+    StreamConnectionHolder<WebsocketBaseConnection>* connectionManager,
+    std::unique_ptr<AbstractStreamSocket> streamSocket,
+    bool isServer,
+    const nx::Buffer& requestData)
     :
-    BaseType(socketServer, std::move(sock))
+    nx_api::BaseServerConnection<WebsocketBaseConnection>(
+        connectionManager,
+        std::move(streamSocket)),
+    m_parser(isServer, this)
 {
-
+    m_parser.consume(requestData.constData(), requestData.size());
 }
 
-void Connection::pleaseStop(nx::utils::MoveOnlyFunc<void()> completionHandler)
+void WebsocketBaseConnection::bytesReceived(const nx::Buffer& buf)
 {
-
-}
-
-void Connection::processMessage(Message&& request)
-{
+    m_parser.consume(buf.constData(), buf.size());
 }
 
 }
