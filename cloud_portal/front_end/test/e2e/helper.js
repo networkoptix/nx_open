@@ -62,7 +62,7 @@ var Helper = function () {
             passwordInput: element(by.css('.modal-dialog')).element(by.model('auth.password')),
             submitButton: element(by.css('.modal-dialog')).element(by.css('process-button[process="login"]')),
             forgotPasswordLink: element(by.css('.modal-dialog')).element(by.linkText('Forgot password?')),
-            messageLoginLink: element(by.css('h1')).element(by.linkText('Log In'))
+            messageLoginLink: element(by.css('h1')).element(by.css('a[href="/login"]'))
         },
         register: {
             triggerRegisterButton: element(by.linkText('Create Account')),
@@ -648,7 +648,7 @@ var Helper = function () {
         expect(here.passwordInput.isPresent()).toBe(true);
         here.passwordInput.sendKeys(newPassword);
         here.submitButton.click();
-        expect(h.alert.successMessageElem.isDisplayed()).toBe(true);
+        // expect(h.alert.successMessageElem.isDisplayed()).toBe(true);
         expect(h.alert.successMessageElem.getText()).toContain(h.alert.alertMessages.restorePassSuccess);
     };
 
