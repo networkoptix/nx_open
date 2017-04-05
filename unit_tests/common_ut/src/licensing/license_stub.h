@@ -1,13 +1,11 @@
-#ifndef QN_LICENSE_STUB_H
-#define QN_LICENSE_STUB_H
+#pragma once
 
 #include <licensing/license.h>
 
-class QnLicenseStub: public QnLicense {
+class QnLicenseStub: public QnLicense
+{
 public:
     QnLicenseStub(Qn::LicenseType licenseType, int count);
-
-    virtual bool isValid(ErrorCode* errCode /* = 0 */, ValidationMode mode /* = VM_Regular */) const;
 
     virtual Qn::LicenseType type() const override;
 
@@ -20,11 +18,8 @@ private:
     bool m_armServer;
 };
 
-class QnFutureLicenseStub: public QnLicense {
+class QnFutureLicenseStub: public QnLicense
+{
 public:
     QnFutureLicenseStub(int count);
-
-    virtual bool isValid(ErrorCode* errCode /* = 0 */, ValidationMode mode /* = VM_Regular */) const;
 };
-
-#endif //QN_LICENSE_STUB_H

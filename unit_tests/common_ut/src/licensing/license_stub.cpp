@@ -15,16 +15,16 @@ QnLicenseStub::QnLicenseStub(Qn::LicenseType licenseType, int count):
     setCameraCount(count);
 }
 
-bool QnLicenseStub::isValid(ErrorCode* /*errCode = 0 */, ValidationMode /* mode = VM_Regular */) const {
-    if (isArmServer() && !isAllowedForArm())
-        return false;
-
-    // Only single Start license per system is allowed
-    if (type() == Qn::LC_Start)
-        return isValidStartLicense();
-
-    return true;
-}
+// bool QnLicenseStub::isValid(ErrorCode* /*errCode = 0 */, ValidationMode /* mode = VM_Regular */) const {
+//     if (isArmServer() && !isAllowedForArm())
+//         return false;
+//
+//     // Only single Start license per system is allowed
+//     if (type() == Qn::LC_Start)
+//         return isValidStartLicense();
+//
+//     return true;
+// }
 
 Qn::LicenseType QnLicenseStub::type() const  {
     return m_type;
@@ -48,10 +48,10 @@ QnFutureLicenseStub::QnFutureLicenseStub(int count) {
     setClass("some-future-class");
     setCameraCount(count);
 }
-
-bool QnFutureLicenseStub::isValid(
-    ErrorCode* /*errCode  = 0 */,
-    ValidationMode /* mode = VM_Regular */) const
-{
-    return true;
-}
+//
+// bool QnFutureLicenseStub::isValid(
+//     ErrorCode* /*errCode  = 0 */,
+//     ValidationMode /* mode = VM_Regular */) const
+// {
+//     return true;
+// }
