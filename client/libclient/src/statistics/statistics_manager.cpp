@@ -174,7 +174,7 @@ void QnStatisticsManager::setStorage(QnStatisticsStoragePtr storage)
     m_storage = std::move(storage);
 }
 
-void QnStatisticsManager::setSettings(QnStatisticsSettingsPtr settings)
+void QnStatisticsManager::setSettings(QnStatisticsLoaderPtr settings)
 {
     if (m_settings)
     {

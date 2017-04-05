@@ -150,7 +150,7 @@ namespace
 
         statManager->setClientId(qnSettings->pcUuid());
         statManager->setStorage(QnStatisticsStoragePtr(new QnStatisticsFileStorage()));
-        statManager->setSettings(QnStatisticsSettingsPtr(new QnStatisticsSettingsWatcher()));
+        statManager->setSettings(QnStatisticsLoaderPtr(new QnStatisticsSettingsWatcher()));
     }
 }
 

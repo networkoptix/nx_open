@@ -35,7 +35,7 @@ public:
     /*!
      *  Sets settings source. Note: it will takes ownership under settings object
      */
-    void setSettings(QnStatisticsSettingsPtr settings);
+    void setSettings(QnStatisticsLoaderPtr settings);
 
 public:
     void sendStatistics();
@@ -62,7 +62,7 @@ private:
 
     rest::Handle m_handle;
 
-    QnStatisticsSettingsPtr m_settings;
+    QnStatisticsLoaderPtr m_settings;
     QnStatisticsStoragePtr m_storage;
 
     ModulesMap m_modules;

@@ -1,4 +1,3 @@
-
 #include "multiserver_statistics_rest_handler.h"
 
 #include <QtGlobal>
@@ -15,9 +14,10 @@
 #include <rest/server/rest_connection_processor.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <statistics/abstract_statistics_settings_loader.h>
 #include <ec2_statictics_reporter.h>
 #include <api/global_settings.h>
+
+#include <statistics/statistics_settings.h>
 
 namespace
 {
