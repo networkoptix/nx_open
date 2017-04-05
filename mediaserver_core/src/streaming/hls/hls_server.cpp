@@ -22,7 +22,7 @@
 #include <network/authenticate_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/av_codec_helper.h>
 #include <utils/media/media_stream_cache.h>
@@ -504,6 +504,12 @@ namespace nx_hls
             }
         }
 
+        if (!session->isLive() &&
+            !qnResourceAccessManager->hasGlobalPermission(accessRights, Qn::GlobalViewArchivePermission))
+        {
+            return nx_http::StatusCode::forbidden;
+        }
+
         ensureChunkCacheFilledEnoughForPlayback(session, session->streamQuality());
 
         QByteArray serializedPlaylist;
@@ -813,6 +819,12 @@ namespace nx_hls
             chunkDuration,
             streamQuality,
             requestParams );
+
+        if (!currentChunkKey.live() &&
+            !qnResourceAccessManager->hasGlobalPermission(d_ptr->accessRights, Qn::GlobalViewArchivePermission))
+        {
+            return nx_http::StatusCode::forbidden;
+        }
 
         //retrieving streaming chunk
         StreamingChunkPtr chunk;

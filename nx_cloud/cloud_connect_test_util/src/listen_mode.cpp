@@ -8,6 +8,7 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/ssl_socket.h>
 #include <nx/utils/string.h>
+#include <nx/utils/thread/barrier_handler.h>
 
 #include <utils/common/command_line_parser.h>
 
@@ -167,7 +168,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
 
     auto multiServerSocket = new network::MultipleServerSocket();
     std::unique_ptr<AbstractStreamServerSocket> serverSocket(multiServerSocket);
-    const auto guard = makeScopedGuard([&serverSocket]()
+    const auto guard = makeScopeGuard([&serverSocket]()
     {
         if (serverSocket)
             serverSocket->pleaseStopSync();

@@ -4,7 +4,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 #include <QtCore/QHash>
-#include <QtCore/QPointer>
 
 #include <client_core/connection_context_aware.h>
 

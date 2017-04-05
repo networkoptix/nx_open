@@ -9,7 +9,7 @@
 #include <common/static_common_module.h>
 
 #include <nx/utils/log/log.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <nx/utils/std/cpp14.h>
 
 #include <nx/network/socket.h>

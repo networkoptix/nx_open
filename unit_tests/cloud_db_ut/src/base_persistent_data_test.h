@@ -44,7 +44,7 @@ protected:
     nx::db::DBResult executeUpdateQuerySync(QueryFunc queryFunc)
     {
         nx::utils::promise<nx::db::DBResult> queryDonePromise;
-        m_persistentDbManager->queryExecutor()->executeUpdate(
+        m_persistentDbManager->queryExecutor().executeUpdate(
             queryFunc,
             [&queryDonePromise](
                 nx::db::QueryContext*,
@@ -60,7 +60,7 @@ protected:
     nx::db::DBResult executeSelectQuerySync(QueryFunc queryFunc)
     {
         nx::utils::promise<nx::db::DBResult> queryDonePromise;
-        m_persistentDbManager->queryExecutor()->executeSelect(
+        m_persistentDbManager->queryExecutor().executeSelect(
             queryFunc,
             [&queryDonePromise](
                 nx::db::QueryContext*,

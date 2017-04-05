@@ -12,6 +12,7 @@ namespace {
 
 const qreal kReserveFactor = 1.2;
 const qreal kWindowsReservedFreeSpace = 500 * 1024 * 1024;
+const QnSoftwareVersion kRequireFreeSpaceVersion(3, 0);
 
 qint64 spaceRequiredForUpdate(
     const QnSystemInformation& systemInformation, const QString& fileName)
@@ -78,12 +79,23 @@ void QnCheckFreeSpacePeerTask::doStart()
                     return;
                 }
 
-                const auto systemInformation = server->getModuleInformation().systemInformation;
                 const auto freeSpaceAvailable = reply.freeSpaceByServerId.value(id, -1);
+                if (freeSpaceAvailable < 0)
+                {
+                    if (server->getVersion() >= kRequireFreeSpaceVersion)
+                    {
+                        finish(CheckFailed, { id });
+                        return;
+                    }
+
+                    continue;
+                }
+
+                const auto systemInformation = server->getModuleInformation().systemInformation;
                 const auto freeSpaceRequired =
                     m_requiredSpaceBySystemInformation.value(systemInformation);
 
-                if (freeSpaceAvailable >= 0 && freeSpaceAvailable < freeSpaceRequired)
+                if (freeSpaceAvailable < freeSpaceRequired)
                     failed.insert(id);
             }
 

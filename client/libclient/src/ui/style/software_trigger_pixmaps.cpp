@@ -5,13 +5,15 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 
+#include <QtGui/QPainter>
+#include <QtGui/QPixmapCache>
+
 #include <ui/style/skin.h>
 #include <nx/utils/string.h>
 
 namespace {
 
 static const QString kPixmapExtension = lit(".png");
-static const QString kPixmapFilter = lit("*") + kPixmapExtension;
 
 QPixmap getTriggerPixmap(const QString& name)
 {
@@ -48,7 +50,9 @@ const QStringList& QnSoftwareTriggerPixmaps::pixmapNames()
             for (const auto path: qnSkin->paths())
             {
                 const auto fullPath = path + QDir::separator() + pixmapsPath();
-                const auto entries = QDir(fullPath).entryList({ kPixmapFilter }, QDir::Files);
+                const QStringList pixmapFilter({ lit("*") + kPixmapExtension });
+
+                const auto entries = QDir(fullPath).entryList(pixmapFilter, QDir::Files);
 
                 for (const auto entry: entries)
                 {
@@ -79,4 +83,27 @@ QPixmap QnSoftwareTriggerPixmaps::pixmapByName(const QString& name)
     return pixmap.isNull()
         ? getTriggerPixmap(defaultPixmapName())
         : pixmap;
+}
+
+QPixmap QnSoftwareTriggerPixmaps::colorizedPixmap(const QString& name, const QColor& color)
+{
+    static QPixmapCache staticCache;
+
+    const auto effectiveName = effectivePixmapName(name);
+    const auto key = effectiveName + lit("\n") + color.name();
+
+    QPixmap result;
+    if (staticCache.find(key, &result))
+        return result;
+
+    result = getTriggerPixmap(effectiveName);
+    result.detach();
+
+    QPainter painter(&result);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceAtop);
+    painter.fillRect(QRect(QPoint(), result.size() / result.devicePixelRatio()), color);
+    painter.end();
+
+    staticCache.insert(key, result);
+    return result;
 }

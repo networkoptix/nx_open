@@ -52,13 +52,14 @@ MenuItem
         elide: Text.ElideRight
         font: control.font
         color: control.enabled ? ColorTheme.base4 : ColorTheme.base6
+        visible: enabled
     }
 
     indicator: CheckIndicator
     {
         x: control.width - control.rightPadding - width
         anchors.verticalCenter: parent.verticalCenter
-        visible: control.checkable
+        visible: control.checkable && enabled
         checked: control.checked
         color: control.enabled ? ColorTheme.base4 : ColorTheme.base6
     }

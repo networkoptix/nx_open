@@ -21,7 +21,8 @@ namespace desktop {
 namespace ui {
 namespace workbench {
 
-class SpecialLayoutPanelWidget: public Connective<QGraphicsProxyWidget>,
+class SpecialLayoutPanelWidget:
+    public Connective<QGraphicsProxyWidget>,
     public QnWorkbenchContextAware
 {
     Q_OBJECT

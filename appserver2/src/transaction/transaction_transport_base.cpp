@@ -20,7 +20,7 @@
 #include <utils/gzip/gzip_uncompressor.h>
 #include <utils/media/custom_output_stream.h>
 #include <utils/common/util.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <http/custom_headers.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>

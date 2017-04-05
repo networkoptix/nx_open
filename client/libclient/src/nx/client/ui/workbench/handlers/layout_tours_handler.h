@@ -18,7 +18,7 @@ public:
     LayoutToursHandler(QObject* parent = nullptr);
 
 private:
-    void openTousLayout();
+    void openToursLayout();
 };
 
 } // namespace workbench

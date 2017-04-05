@@ -21,7 +21,7 @@
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "network/universal_tcp_listener.h"
 #include "api/app_server_connection.h"

@@ -8,7 +8,7 @@
 
 #include <cdb/ec2_request_paths.h>
 #include <http/custom_headers.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include "access_control/authorization_manager.h"
 #include "compatible_ec2_protocol_version.h"

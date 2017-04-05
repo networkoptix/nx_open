@@ -70,8 +70,17 @@ class Host(object):
 
     __metaclass__ = abc.ABCMeta
 
+    @property
     @abc.abstractmethod
-    def run_command(self, args, input=None, cwd=None, log_output=True):
+    def host(self):
+        pass
+
+    @abc.abstractmethod
+    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True):
+        pass
+
+    @abc.abstractmethod
+    def file_exists(self, path):
         pass
 
     @abc.abstractmethod
@@ -106,7 +115,12 @@ class LocalHost(Host):
     def __repr__(self):
         return 'LocalHost'
 
-    def run_command(self, args, input=None, cwd=None, log_output=True):
+    @property
+    def host(self):
+        return 'localhost'
+
+    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True):
+        args = map(str, args)
         if input:
             log.debug('executing: %s (with %d bytes input)', subprocess.list2cmdline(args), len(input))
             stdin = subprocess.PIPE
@@ -154,7 +168,7 @@ class LocalHost(Host):
             pipe.stdout.close()
             pipe.stderr.close()
         retcode = pipe.wait()
-        if retcode:
+        if check_retcode and retcode:
             raise ProcessError(retcode, args[0], output=''.join(stderr_buffer))
         return ''.join(stdout_buffer)
 
@@ -175,6 +189,9 @@ class LocalHost(Host):
             return ch
         else:
             return '.'
+
+    def file_exists(self, path):
+        return os.path.isfile(path)
 
     def put_file(self, from_local_path, to_remote_path):
         self._copy(from_local_path, to_remote_path)
@@ -221,11 +238,20 @@ class RemoteSshHost(Host):
     def __repr__(self):
         return 'RemoteSshHost(%s)' % self
 
-    def run_command(self, args, input=None, cwd=None, log_output=True):
+    @property
+    def host(self):
+        return self._host
+
+    def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True):
         ssh_cmd = self._make_ssh_cmd() + ['{user}@{host}'.format(user=self._user, host=self._host)]
         if cwd:
             args = [subprocess.list2cmdline(['cd', cwd, '&&'] + args)]
-        return self._local_host.run_command(ssh_cmd + args, input, log_output=log_output)
+        return self._local_host.run_command(ssh_cmd + args, input, check_retcode=check_retcode, log_output=log_output)
+
+    def file_exists(self, path):
+        output = self.run_command(['[', '-f', path, ']', '&&', 'echo', 'yes', '||', 'echo', 'no']).strip()
+        assert output in ['yes', 'no'], repr(output)
+        return output == 'yes'
 
     def put_file(self, from_local_path, to_remote_path):
         #assert not self._proxy_host, repr(self._proxy_host)  # Can not proxy this... Or can we?

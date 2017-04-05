@@ -278,6 +278,13 @@ void QnSystemDescriptionAggregator::updateServers()
 
     for (const auto& server : toAdd)
         emit serverAdded(server.id);
+
+    /**
+     * Updates server host in case we remove cloud system but have accesible local one.
+     * See VMS-5884.
+     */
+    for (const auto& server: subtractLists(m_servers, toAdd))
+        emit serverChanged(server.id, QnServerField::Host);
 }
 
 QnBaseSystemDescription::ServersList QnSystemDescriptionAggregator::gatherServers() const

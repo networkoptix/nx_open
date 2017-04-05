@@ -1486,6 +1486,17 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree).
         separator();
 
+    factory(QnActions::WebPageSettingsAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        text(tr("Edit...")).
+        autoRepeat(false).
+        condition(new QnConjunctionActionCondition(
+            new QnResourceActionCondition(hasFlags(Qn::web_page), Qn::ExactlyOne, this),
+            new QnForbiddenInSafeModeCondition(this),
+            this)
+        );
+
     factory(QnActions::RenameResourceAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous).
         requiredTargetPermissions(Qn::WritePermission | Qn::WriteNamePermission).

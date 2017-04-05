@@ -88,7 +88,11 @@ public:
     /** Have to introduce this method because we do not use exceptions. */
     bool init();
 
+    void setStatisticsCollector(StatisticsCollector* statisticsCollector);
+
     void reserveConnections(int count);
+
+    std::size_t pendingQueryCount() const;
 
     /**
      * Executes data modification request that spawns some output data.
@@ -143,6 +147,7 @@ private:
     nx::utils::thread m_dropConnectionThread;
     QnSafeQueue<std::unique_ptr<BaseRequestExecutor>> m_connectionsToDropQueue;
     bool m_terminated;
+    StatisticsCollector* m_statisticsCollector;
 
     bool isNewConnectionNeeded(const QnMutexLockerBase& /*lk*/) const;
     void openNewConnection(const QnMutexLockerBase& /*lk*/);
@@ -166,12 +171,15 @@ private:
         if (isNewConnectionNeeded(lk))
             openNewConnection(lk);
 
-        auto ctx = std::make_unique<Executor>(
+        auto executor = std::make_unique<Executor>(
             std::move(updateFunc),
             std::move(input)...,
             std::move(completionHandler));
 
-        m_requestQueue.push(std::move(ctx));
+        if (m_statisticsCollector)
+            executor->setStatisticsCollector(m_statisticsCollector);
+
+        m_requestQueue.push(std::move(executor));
     }
 };
 

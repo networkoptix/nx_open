@@ -2,6 +2,8 @@
 
 #include "base_http_audio_transmitter.h"
 
+#include <nx/utils/std/future.h>
+
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_server_resource.h>
 
@@ -50,6 +52,13 @@ void BaseHttpAudioTransmitter::pleaseStop()
 {
     base_type::pleaseStop();
     m_wait.wakeOne();
+}
+
+void BaseHttpAudioTransmitter::endOfRun()
+{
+    base_type::endOfRun();
+    m_socket.reset();
+    m_state = TransmitterState::WaitingForConnection;
 }
 
 void BaseHttpAudioTransmitter::setOutputFormat(const QnAudioFormat& format)

@@ -126,20 +126,20 @@ void QnBusinessEventConnector::at_cameraInput(const QnResourcePtr &resource, con
     );
 }
 
-void QnBusinessEventConnector::at_softwareTrigger(const QnResourcePtr& resource, const QString& triggerId, qint64 timeStamp)
+void QnBusinessEventConnector::at_softwareTrigger(const QnResourcePtr& resource, const QString& triggerId, qint64 timeStamp, QnBusiness::EventState toggleState)
 {
     if (!resource)
         return;
 
-    auto triggerEvent = new QnSoftwareTriggerEvent(resource->toSharedPointer(), timeStamp, triggerId);
-    qnBusinessRuleProcessor->processBusinessEvent(QnSoftwareTriggerEventPtr(triggerEvent));
+    QnSoftwareTriggerEventPtr triggerEvent(new QnSoftwareTriggerEvent(resource->toSharedPointer(), triggerId, timeStamp, toggleState));
+    qnBusinessRuleProcessor->processBusinessEvent(triggerEvent);
 }
 
 void QnBusinessEventConnector::at_customEvent(const QString &resourceName, const QString& caption, const QString& description,
                                               const QnEventMetaData& metadata, QnBusiness::EventState eventState, qint64 timeStampUsec)
 {
-    QnCustomBusinessEvent* customEvent = new QnCustomBusinessEvent(eventState, timeStampUsec, resourceName, caption, description, metadata);
-    qnBusinessRuleProcessor->processBusinessEvent(QnCustomBusinessEventPtr(customEvent));
+    QnCustomBusinessEventPtr customEvent(new QnCustomBusinessEvent(eventState, timeStampUsec, resourceName, caption, description, metadata));
+    qnBusinessRuleProcessor->processBusinessEvent(customEvent);
 }
 
 void QnBusinessEventConnector::at_mediaServerConflict(const QnResourcePtr& resource, qint64 timeStamp, const QnCameraConflictList& conflicts)
@@ -211,7 +211,7 @@ bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParame
                     *errMessage = "'SoftwareTriggerEvent' requires 'resource' parameter";
                 return false;
             }
-            at_softwareTrigger(resource, params.inputPortId, params.eventTimestampUsec);
+            at_softwareTrigger(resource, params.inputPortId, params.eventTimestampUsec, eventState);
             break;
         case QnBusiness::CameraDisconnectEvent:
             if (!resource) {

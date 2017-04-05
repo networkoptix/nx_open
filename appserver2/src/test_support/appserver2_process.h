@@ -5,11 +5,12 @@
 #include <QtCore/QCoreApplication>
 
 #include <nx/network/socket_common.h>
+#include <nx/utils/move_only_func.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 #include <common/static_common_module.h>
 #include <common/common_module.h>
 

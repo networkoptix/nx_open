@@ -83,7 +83,7 @@ public slots:
 
     void at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
 
-    void at_softwareTrigger(const QnResourcePtr& resource, const QString& triggerId, qint64 timeStamp);
+    void at_softwareTrigger(const QnResourcePtr& resource, const QString& triggerId, qint64 timeStamp, QnBusiness::EventState toggleState);
 
     bool createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage = 0);
 private slots:

@@ -186,7 +186,7 @@ void QnFileConnectionProcessor::run()
         return;
     }
 
-    nx_http::HttpHeader modifiedHeader("Last-Modified", dateTimeToHTTPFormat(lastModified));
+    nx_http::HttpHeader modifiedHeader("Last-Modified", nx_http::dateTimeToHttpFormat(lastModified));
     d->response.headers.insert(modifiedHeader);
     QString modifiedSinceStr = nx_http::getHeaderValue(d->request.headers, "If-Modified-Since");
     if (!modifiedSinceStr.isEmpty())

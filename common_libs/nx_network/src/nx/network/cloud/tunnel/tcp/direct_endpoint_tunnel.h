@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "../abstract_outgoing_tunnel_connection.h"
 

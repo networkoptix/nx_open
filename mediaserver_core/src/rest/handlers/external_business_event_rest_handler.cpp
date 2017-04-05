@@ -43,7 +43,7 @@ int QnExternalBusinessEventRestHandler::executeGet(
     if (params.contains("eventResourceId"))
         businessParams.eventResourceId = QnUuid::fromStringSafe(params["eventResourceId"]);
     if (params.contains("state")) {
-        eventState = QnLexical::deserialized<QnBusiness::EventState>(params["state"], QnBusiness::EventState(), &ok);
+        eventState = QnLexical::deserialized<QnBusiness::EventState>(params["state"], QnBusiness::UndefinedState, &ok);
         if (!ok) {
             result.setError(QnRestResult::InvalidParameter, "Invalid value for parameter 'state'.");
             return CODE_OK;

@@ -27,7 +27,7 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(
     const QnUuid& moduleGuid,
     QnBusiness::EventState state)
 {
-    QnBusinessEventParameters runtimeParams = event->getRuntimeParams();
+    QnBusinessEventParameters runtimeParams = event->getRuntimeParamsEx(rule->eventParams());
     runtimeParams.sourceServerId = moduleGuid;
 
     QnAbstractBusinessActionPtr result = createAction(rule->actionType(), runtimeParams);

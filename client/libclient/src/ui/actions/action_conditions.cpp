@@ -467,7 +467,6 @@ Qn::ActionVisibility QnRenameResourceActionCondition::check(const QnActionParame
     return Qn::InvisibleAction;
 }
 
-
 Qn::ActionVisibility QnLayoutItemRemovalActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
     foreach(const QnLayoutItemIndex &item, layoutItems)
         if(!accessController()->hasPermissions(item.layout(), Qn::WritePermission | Qn::AddRemoveItemsPermission))

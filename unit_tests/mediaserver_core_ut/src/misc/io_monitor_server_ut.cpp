@@ -112,7 +112,7 @@ TEST(IoServerMonitorTest, main)
     auto testData = genTestData();
 
     auto httpClient = nx_http::AsyncHttpClient::create();
-    auto httpClientGuard = makeScopedGuard([&httpClient]() { httpClient->pleaseStopSync(); });
+    auto httpClientGuard = makeScopeGuard([&httpClient]() { httpClient->pleaseStopSync(); });
 
     httpClient->setUserName("admin");
     httpClient->setUserPassword("admin");

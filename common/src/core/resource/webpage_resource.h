@@ -13,8 +13,6 @@ public:
 
     virtual ~QnWebPageResource();
 
-    virtual QString getUniqueId() const override;
-
     virtual void setUrl(const QString& url) override;
 
     static QString nameForUrl(const QUrl& url);

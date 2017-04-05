@@ -1,14 +1,14 @@
 #pragma once
 
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
+#include <nx/utils/thread/barrier_handler.h>
 
 namespace nx {
 namespace cdb {
 
 class CloudDBProcess;
 
-class CloudDBProcessPublic
-:
+class CloudDBProcessPublic:
     public QnStoppable
 {
 public:

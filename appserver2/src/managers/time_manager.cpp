@@ -25,7 +25,7 @@
 #include <nx_ec/data/api_runtime_data.h>
 #include <nx_ec/data/api_misc_data.h>
 
-#include <utils/common/joinable.h>
+#include <nx/utils/thread/joinable.h>
 #include <utils/common/rfc868_servers.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
@@ -1393,13 +1393,13 @@ void TimeSynchronizationManager::forgetSynchronizedTimeNonSafe( QnMutexLockerBas
 {
     m_systemTimeByPeer.clear();
     m_timeSynchronized = false;
-    ++m_localTimePriorityKey.sequence;
     switchBackToLocalTime(lock);
 }
 
 void TimeSynchronizationManager::switchBackToLocalTime(QnMutexLockerBase* const lock)
 {
     m_localSystemTimeDelta = std::numeric_limits<qint64>::min();
+    ++m_localTimePriorityKey.sequence;
     m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
     m_usedTimeSyncInfo = TimeSyncInfo(
         m_monotonicClock.elapsed(),
@@ -1494,6 +1494,7 @@ void TimeSynchronizationManager::onTimeSynchronizationSettingsChanged()
         // Forgetting Internet time.
         QnMutexLocker lock(&m_mutex);
         switchBackToLocalTime(&lock);
+        syncTimeWithAllKnownServers(&lock);
     }
 }
 

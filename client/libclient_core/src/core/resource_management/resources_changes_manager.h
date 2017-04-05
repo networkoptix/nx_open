@@ -36,8 +36,12 @@ public:
     typedef std::function<void ()> BatchChangesFunction;
     typedef std::function<void ()> RollbackFunction;
 
+    using ActionResultCallback = std::function<void (bool success)>;
+
     /** Generic function to delete resources. */
-    void deleteResources(const QnResourceList &resources);
+    void deleteResources(
+        const QnResourceList& resources,
+        const ActionResultCallback& callback = ActionResultCallback());
 
     /** Apply changes to the given camera. */
     void saveCamera(const QnVirtualCameraResourcePtr &camera, CameraChangesFunction applyChanges);

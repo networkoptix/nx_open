@@ -53,7 +53,7 @@ Page
                 hostsModel: SystemHostsModel
                 {
                     id: systemHostsModel
-                    localSystemId: control.localSystemId
+                    localSystemId: customConnectionScreen.localSystemId
                 }
 
                 authenticationDataModel: AuthenticationDataModel

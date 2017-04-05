@@ -23,7 +23,7 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <common/common_globals.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 #include <utils/common/long_runnable.h>
 #include <utils/media/custom_output_stream.h>
 
@@ -524,7 +524,7 @@ protected:
 
     void whenIssuedRequestWithEncodedSequenceInQueryAndFragment()
     {
-        const auto query = QUrl::toPercentEncoding("test#%20#");
+        const auto query = QUrl::toPercentEncoding("param1=test#%20#&param2");
         const auto fragment = QUrl::toPercentEncoding("#frag%20ment");
 
         m_testUrl = QUrl(lit("http://%1%2?%3#%4")

@@ -10,11 +10,15 @@
 namespace nx {
 namespace db {
 
+constexpr static std::chrono::minutes kDefaultStatisticsAggregationPeriod = std::chrono::minutes(1);
+
 InstanceController::InstanceController(const ConnectionOptions& dbConnectionOptions):
     m_dbConnectionOptions(dbConnectionOptions),
     m_queryExecutor(std::make_unique<AsyncSqlQueryExecutor>(dbConnectionOptions)),
+    m_statisticsCollector(kDefaultStatisticsAggregationPeriod),
     m_dbStructureUpdater(m_queryExecutor.get())
 {
+    m_queryExecutor->setStatisticsCollector(&m_statisticsCollector);
 }
 
 bool InstanceController::initialize()
@@ -40,9 +44,19 @@ bool InstanceController::initialize()
     return true;
 }
 
-const std::unique_ptr<AsyncSqlQueryExecutor>& InstanceController::queryExecutor()
+AsyncSqlQueryExecutor& InstanceController::queryExecutor()
 {
-    return m_queryExecutor;
+    return *m_queryExecutor;
+}
+
+const AsyncSqlQueryExecutor& InstanceController::queryExecutor() const
+{
+    return *m_queryExecutor;
+}
+
+const StatisticsCollector& InstanceController::statisticsCollector() const
+{
+    return m_statisticsCollector;
 }
 
 DbStructureUpdater& InstanceController::dbStructureUpdater()

@@ -12,7 +12,8 @@ TransactionTransport::TransactionTransport(
     ec2::ApiPeerData localPeer,
     const std::string& systemId,
     const std::string& systemAuthKey,
-    int protocolVersion)
+    int protocolVersion,
+    int connectionId)
 :
     ec2::QnTransactionTransportBase(
         connectionGuardSharedState,
@@ -20,9 +21,15 @@ TransactionTransport::TransactionTransport(
         kTcpKeepAliveTimeout,
         kKeepAliveProbeCount),
     m_systemId(systemId),
-    m_systemAuthKey(systemAuthKey)
+    m_systemAuthKey(systemAuthKey),
+    m_connectionId(connectionId)
 {
     setLocalPeerProtocolVersion(protocolVersion);
+}
+
+int TransactionTransport::connectionId() const
+{
+    return m_connectionId;
 }
 
 void TransactionTransport::fillAuthInfo(

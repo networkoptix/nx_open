@@ -3,9 +3,9 @@
 
 #include <functional>
 
-#include <nx/utils/singleton.h>
-#include <utils/common/stoppable.h>
+#include <nx/network/async_stoppable.h>
 #include <nx/network/cloud/cloud_tunnel.h>
+#include <nx/utils/singleton.h>
 
 #include "cc_common.h"
 #include "../abstract_socket.h"

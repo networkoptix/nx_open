@@ -23,7 +23,7 @@
 #include <network/http_connection_listener.h>
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 #include <nx1/info.h>
 
 #include "ec2_connection_processor.h"
@@ -179,7 +179,7 @@ int Appserver2Process::exec()
     timerManager.start();
 
     bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
+    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
         [this, &processStartResult]
         {
             if (m_onStartedEventHandler)

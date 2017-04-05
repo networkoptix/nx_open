@@ -7,6 +7,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 #include <nx/network/http/httptypes.h>
 
 #include "core/resource/camera_resource.h"
@@ -19,13 +20,16 @@
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
 #include <common/static_common_module.h>
+#include "soap_wrapper.h"
+#include <onvif/soapStub.h>
+#include "gsoap_async_call_wrapper.h"
 
 namespace {
 
 /*
  *  Port list used for manual camera add
  */
-const static std::array<int, 5> kOnvifDeviceAltPorts =
+const static std::array<int, 4> kOnvifDeviceAltPorts =
 {
     8081, //FLIR default port
     8032, // DW default port
@@ -33,7 +37,7 @@ const static std::array<int, 5> kOnvifDeviceAltPorts =
     9988 // Dahui default port
 };
 static const int kDefaultOnvifPort = 80;
-static const std::chrono::milliseconds kManualDiscoveryConnectTimeout(3000);
+static const std::chrono::milliseconds kManualDiscoveryConnectTimeout(5000);
 
 } // namespace
 
@@ -83,7 +87,13 @@ QString OnvifResourceSearcher::manufacture() const
 
 int OnvifResourceSearcher::autoDetectDevicePort(const QUrl& url)
 {
-    std::vector<std::unique_ptr<AbstractStreamSocket>> socketList;
+    typedef GSoapAsyncCallWrapper <
+        DeviceSoapWrapper,
+        _onvifDevice__GetSystemDateAndTime,
+        _onvifDevice__GetSystemDateAndTimeResponse
+    > GSoapDeviceGetSystemDateAndTimeAsyncWrapper;
+
+    std::vector<std::unique_ptr<GSoapDeviceGetSystemDateAndTimeAsyncWrapper>> requestList;
     int result = -1;
 
     QnMutex mutex;
@@ -94,29 +104,36 @@ int OnvifResourceSearcher::autoDetectDevicePort(const QUrl& url)
     int workers = kOnvifDeviceAltPorts.size();
     for (auto port: kOnvifDeviceAltPorts)
     {
-        std::unique_ptr<AbstractStreamSocket> sock(SocketFactory::createStreamSocket());
-        sock->setNonBlockingMode(true);
-        sock->setSendTimeout(kManualDiscoveryConnectTimeout);
-        SocketAddress addr(url.host(), port);
-        sock->connectAsync(addr,
-            [&, port = addr.port](SystemError::ErrorCode errorCode)
-            {
-                QnMutexLocker lock(&mutex);
-                if (errorCode == SystemError::noError && result == -1)
-                    result = port;
-                --workers;
-                waitCond.wakeAll();
-            }
+        std::unique_ptr<DeviceSoapWrapper> soapWrapper(new DeviceSoapWrapper(
+            lit("http://%1:%2/onvif/device_service").arg(url.host()).arg(port).toStdString(),
+            /*login*/ QString(),
+            /*password*/ QString(),
+            /*timeDrift*/ 0));
+
+        auto asyncWrapper = std::make_unique<GSoapDeviceGetSystemDateAndTimeAsyncWrapper>(
+            std::move(soapWrapper),
+            &DeviceSoapWrapper::GetSystemDateAndTime);
+
+        _onvifDevice__GetSystemDateAndTime request;
+        asyncWrapper->callAsync(
+            request,
+            [&, port](int soapResultCode)
+        {
+            QnMutexLocker lock(&mutex);
+            if (soapResultCode == SOAP_OK && result == -1)
+                result = port;
+            --workers;
+            waitCond.wakeAll();
+        }
         );
-        socketList.push_back(std::move(sock));
+        requestList.push_back(std::move(asyncWrapper));
     }
 
     while (workers > 0 && result == -1)
         waitCond.wait(&mutex);
 
     lock.unlock();
-    for (const auto& socket: socketList)
-        socket->pleaseStopSync();
+    requestList.clear();
     return result > 0 ? result : kDefaultOnvifPort;
 }
 

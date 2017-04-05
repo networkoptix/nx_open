@@ -101,17 +101,6 @@ ComboBox
                     overflowCurrentIndex = newCurrenIndex;
             }
         }
-        onRowsMoved:
-        {
-            if (currentIndex == -1)
-                return;
-            else if (currentIndex >= start && currentIndex <= end)
-                currentIndex += (row - start);
-            else if ((currentIndex < start) && (row <= currentIndex))
-                currentIndex += (end - start + 1);
-            else if ((currentIndex > end) && (row >= currentIndex))
-                currentIndex -= (end - start + 1);
-        }
     }
 
     textRole: "display";

@@ -34,9 +34,12 @@ QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(QWidg
     connect(ui->usersButton, &QPushButton::clicked, this,
         &QnSoftwareTriggerBusinessEventWidget::at_usersButton_clicked);
 
-    auto columnCount = qCeil(qSqrt(QnSoftwareTriggerPixmaps::pixmapNames().size()));
-    if (columnCount % 2) //< ensure the number of columns is even
-        ++columnCount;
+    const auto nextEvenValue =
+        [](int value) { return value + (value & 1); };
+
+    const auto columnCount = nextEvenValue(qCeil(qSqrt(
+        QnSoftwareTriggerPixmaps::pixmapNames().size())));
+
     ui->iconComboBox->setColumnCount(columnCount);
 
     ui->iconComboBox->setItemSize({ kDropdownIconSize, kDropdownIconSize });
@@ -71,10 +74,9 @@ void QnSoftwareTriggerBusinessEventWidget::at_model_dataChanged(QnBusiness::Fiel
     if (fields.testFlag(QnBusiness::EventParamsField))
     {
         const auto params = model()->eventParams();
-        const auto text = params.inputPortId.trimmed();
-        ui->triggerIdLineEdit->setText(text);
+        ui->triggerIdLineEdit->setText(params.caption);
         ui->iconComboBox->setCurrentIcon(
-            QnSoftwareTriggerPixmaps::effectivePixmapName(params.caption));
+            QnSoftwareTriggerPixmaps::effectivePixmapName(params.description));
 
         if (params.metadata.instigators.empty())
         {
@@ -97,8 +99,8 @@ void QnSoftwareTriggerBusinessEventWidget::paramsChanged()
 
     auto eventParams = model()->eventParams();
 
-    eventParams.inputPortId = ui->triggerIdLineEdit->text().trimmed();
-    eventParams.caption = ui->iconComboBox->currentIcon();
+    eventParams.caption = ui->triggerIdLineEdit->text().trimmed();
+    eventParams.description = ui->iconComboBox->currentIcon();
 
     model()->setEventParams(eventParams);
 }
@@ -120,9 +122,10 @@ void QnSoftwareTriggerBusinessEventWidget::at_usersButton_clicked()
 
     selected = dialog.selectedResources();
 
-    params.metadata.instigators = decltype(params.metadata.instigators)(
-        selected.constBegin(),
-        selected.constEnd());
+    params.metadata.instigators.clear();
+    params.metadata.instigators.reserve(selected.size());
+    params.metadata.instigators.insert(params.metadata.instigators.end(),
+        selected.constBegin(), selected.constEnd());
 
     model()->setEventParams(params);
 }

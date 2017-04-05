@@ -396,6 +396,16 @@ void QnLoginDialog::hideEvent(QHideEvent *event)
     m_renderingWidget->stopPlayback();
 }
 
+QString QnLoginDialog::defaultLastUsedConnectionName()
+{
+    return tr("* Last used connection *");
+}
+
+QString QnLoginDialog::deprecatedLastUsedConnectionName()
+{
+    return lit("* Last used connection *");
+}
+
 void QnLoginDialog::resetConnectionsModel()
 {
     if (m_lastUsedItem != NULL)
@@ -406,7 +416,7 @@ void QnLoginDialog::resetConnectionsModel()
     const auto url = qnSettings->lastLocalConnectionUrl();
     m_lastUsedItem = (url.host().isEmpty()
         ? nullptr
-        : ::newConnectionItem(tr("* Last used connection *"), url));
+        : ::newConnectionItem(defaultLastUsedConnectionName(), url));
 
     if (m_lastUsedItem != NULL)
     {
@@ -427,7 +437,6 @@ void QnLoginDialog::resetConnectionsModel()
 void QnLoginDialog::resetSavedSessionsModel()
 {
     auto customConnections = qnSettings->customConnections();
-
     if (!m_lastUsedItem || customConnections.isEmpty())
     {
         QUrl url;
@@ -449,6 +458,16 @@ void QnLoginDialog::resetSavedSessionsModel()
     for (const auto& connection : customConnections)
     {
         NX_ASSERT(!connection.name.isEmpty());
+        if (connection.name == deprecatedLastUsedConnectionName())
+        {
+            /**
+              * Client with version which is less than 3.0 stores last used connection in custom
+              * connections. To prevent placing two "* Last Used Connection *" items in the
+              * connections combobox we have to filter out this item from saved connections.
+              * See VMS-5889.
+              */
+            continue;
+        }
         m_savedSessionsItem->appendRow(newConnectionItem(connection));
     }
 }

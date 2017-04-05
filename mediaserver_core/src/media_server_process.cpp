@@ -1849,7 +1849,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/saveCloudSystemCredentials", new QnSaveCloudSystemCredentialsHandler(cloudManagerGroup));
 
     reg("favicon.ico", new QnFavIconRestHandler());
-    reg("api/dev-mode-key", new QnCrashServerHandler());
+    reg("api/dev-mode-key", new QnCrashServerHandler(), kAdmin);
 
     reg("api/startLiteClient", new QnStartLiteClientRestHandler());
 

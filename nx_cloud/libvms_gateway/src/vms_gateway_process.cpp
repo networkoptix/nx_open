@@ -21,9 +21,9 @@
 #include <plugins/videodecoder/stree/stree_manager.h>
 #include <utils/common/app_info.h>
 #include <nx/utils/std/cpp14.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 #include <utils/common/public_ip_discovery.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "access_control/authentication_manager.h"
 #include "http/connect_handler.h"
@@ -80,7 +80,7 @@ int VmsGatewayProcess::exec()
     using namespace std::placeholders;
 
     bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
+    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
         [this, &processStartResult]
         {
             if (m_startedEventHandler)
