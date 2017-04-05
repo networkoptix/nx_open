@@ -128,19 +128,18 @@ describe('Restore password page', function () {
         p.helper.login(p.helper.userEmail, p.helper.userPassword);
         p.helper.get(p.helper.urls.restore_password); 
         p.getRestorePassLink(p.helper.userEmail).then(function(url) {
-            /* Please leave then() in browser.get(url).then(function(){});
-            * Otherwise, exception is sometimes thrown
-            * The problem is: inside .then() browser.wait()/ .sleep() / .pause() do not work.
-            * Thus, this hack is used to avoid UNCAUGHT_EXCEPTION
-            * (see info about exception here
-            * http://definitelytyped.org/docs/selenium-webdriver--selenium-webdriver/classes/webdriver.promise.controlflow.html#static-eventtype )
-            */
-            browser.get(url).then(function(){});
+            browser.get(url);
+            browser.sleep(1000);
+
+            // Log out if logged in
+            p.helper.checkPresent(p.helper.forms.logout.alreadyLoggedIn).then( function () {
+                p.helper.forms.logout.logOut.click()
+            }, function () {});
         });
         browser.sleep(1000);
         p.setNewPassword(p.helper.userPassword);
         p.helper.get();
-        expect(p.helper.loginSuccessElement.isPresent()).toBe(false);
+        expect(p.helper.loginSuccessElement.isDisplayed()).toBe(false);
     });
 
     it("should handle click I forgot my password link at restore password page", function () {
