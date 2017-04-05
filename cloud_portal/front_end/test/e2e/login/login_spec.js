@@ -54,7 +54,7 @@ describe('Login dialog', function () {
         p.userAccountDropdownToggle.click();
         expect(p.userAccountDropdownMenu.getText()).toContain('Account Settings');
         expect(p.userAccountDropdownMenu.getText()).toContain('Change Password');
-        expect(p.userAccountDropdownMenu.getText()).toContain('Log out');
+        expect(p.userAccountDropdownMenu.getText()).toContain('Log Out');
         p.userAccountDropdownToggle.click();
 
         p.helper.logout();
@@ -267,6 +267,7 @@ describe('Login dialog', function () {
         expect(accountElem.isDisplayed()).toBe(true);
         p.helper.logout();
         p.helper.sleepInIgnoredSync(1000);
+        browser.sleep(1000);
         expect(accountElem.isPresent()).toBe(false);
     });
 
@@ -309,7 +310,7 @@ describe('Login dialog', function () {
         p.emailInput.sendKeys(p.helper.userEmail);
         p.passwordInput.sendKeys(p.helper.userPassword)
             .sendKeys(protractor.Key.ENTER);
-        p.helper.sleepInIgnoredSync(1000);
+        p.helper.sleepInIgnoredSync(2000);
         expect(p.helper.loginSuccessElement.isPresent()).toBe(true);
         p.helper.logout();
     });
@@ -317,6 +318,7 @@ describe('Login dialog', function () {
     it("should respond to Tab key", function () {
         // Navigate to next field using TAB key
         p.helper.sleepInIgnoredSync(2000);
+        browser.sleep(1000);
         p.emailInput.sendKeys(protractor.Key.TAB);
         p.helper.checkElementFocusedBy(p.passwordInput, 'id');
     });
@@ -374,6 +376,7 @@ describe('Login dialog', function () {
         var termsConditions = element(by.linkText('Terms and Conditions'));
         // Open Terms and Conditions link allows to open new tab. Opening new browser Tab is not supported in Selenium
         p.helper.get(p.helper.urls.register);
+        browser.sleep(2000);
         termsConditions.click();
         p.helper.get(); // moving away from register page (because it logs out)
         p.helper.login();
