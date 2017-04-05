@@ -18,10 +18,10 @@ var SystemPage = function () {
     };
 
     this.roleHints = {
-        admin: 'Unrestricted access including the ability to share.',
-        viewer: 'Can view live video and browse the archive.',
-        advViewer: 'Can view live video, browse the archive, configure cameras, control PTZ etc.',
-        liveViewer: 'Can only view live video.'
+        admin: 'Unrestricted access including the ability to share',
+        viewer: 'Can view live video and browse the archive',
+        advViewer: 'Can view live video, browse the archive, configure cameras, control PTZ etc',
+        liveViewer: 'Can only view live video'
     };
 
     this.systemsList = element.all(by.repeater('system in systems'));
