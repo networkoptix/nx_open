@@ -594,8 +594,10 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
     const auto localId = helpers::getLocalSystemId(info);
     nx::client::core::helpers::updateWeightData(localId);
 
+    const bool cloudConnection = isConnectionToCloud(url);
+
     // Stores local credentials for successful connection
-    if (helpers::isLocalUser(url.userName()))
+    if (helpers::isLocalUser(url.userName()) && !cloudConnection)
     {
         const auto credentials = (storePassword
             ? QnEncodedCredentials(url)
@@ -613,7 +615,6 @@ void QnWorkbenchConnectHandler::storeConnectionRecord(
         qnSettings->save();
     }
 
-    const bool cloudConnection = isConnectionToCloud(url);
     if (cloudConnection)
     {
         qnCloudStatusWatcher->logSession(info.cloudSystemId);
