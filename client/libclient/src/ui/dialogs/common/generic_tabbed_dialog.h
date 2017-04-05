@@ -120,7 +120,7 @@ protected:
      *                                          Usually is called before dialog is closed by "Cancel" button.
      * @return                                  False if closing must be aborted, true otherwise.
      */
-    virtual bool canDiscardChanges();
+    virtual bool canDiscardChanges() const;
 
     /**
      * @brief hasChanges                        Check if there are any unsaved changes in the dialog.

@@ -440,6 +440,35 @@ void QnServerUpdatesWidget::applyChanges()
     qnGlobalSettings->synchronizeNow();
 }
 
+void QnServerUpdatesWidget::discardChanges()
+{
+    if (!m_updateTool->isUpdating())
+        return;
+
+    if (canCancelUpdate())
+    {
+        QnMessageBox dialog(QnMessageBoxIcon::Information,
+            tr("System update in process"), QString(),
+            QDialogButtonBox::NoButton, QDialogButtonBox::NoButton,
+            this);
+
+        const auto cancelUpdateButton = dialog.addButton(
+            tr("Cancel Update"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
+        dialog.addButton(
+            tr("Continue in Background"), QDialogButtonBox::RejectRole);
+
+        dialog.exec();
+        if (dialog.clickedButton() == cancelUpdateButton)
+            cancelUpdate();
+    }
+    else
+    {
+        QnMessageBox::warning(this,
+            tr("Update cannot be canceled at this stage"),
+            tr("Please wait until it is finished."));
+    }
+}
+
 bool QnServerUpdatesWidget::hasChanges() const
 {
     if (isReadOnly())
@@ -454,35 +483,10 @@ bool QnServerUpdatesWidget::canApplyChanges() const
     return !isUpdating();
 }
 
-bool QnServerUpdatesWidget::canDiscardChanges()
+bool QnServerUpdatesWidget::canDiscardChanges() const
 {
     //TODO: #GDM now this prevents other tabs from discarding their changes
-    if (!canCancelUpdate())
-    {
-        QnMessageBox::warning(this,
-            tr("Update cannot be canceled at this stage"),
-            tr("Please wait until it is finished."));
-        return false;
-    }
-
-    if (!m_updateTool->isUpdating())
-        return true;
-
-    QnMessageBox dialog(QnMessageBoxIcon::Information,
-        tr("System update in process"), QString(),
-        QDialogButtonBox::NoButton, QDialogButtonBox::NoButton,
-        this);
-
-    const auto cancelUpdateButton = dialog.addButton(
-        tr("Cancel Update"), QDialogButtonBox::AcceptRole, QnButtonAccent::Standard);
-    dialog.addButton(
-        tr("Continue in Background"), QDialogButtonBox::RejectRole);
-
-    dialog.exec();
-    if (dialog.clickedButton() == cancelUpdateButton)
-        cancelUpdate();
-
-    return true;
+    return canCancelUpdate();
 }
 
 void QnServerUpdatesWidget::autoCheckForUpdates()

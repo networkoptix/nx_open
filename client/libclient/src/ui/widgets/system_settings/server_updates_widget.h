@@ -40,11 +40,12 @@ public:
     QnMediaServerUpdateTool* updateTool() const;
 
     virtual void applyChanges() override;
+    virtual void discardChanges() override;
     virtual void loadDataToUi() override;
     virtual bool hasChanges() const override;
 
     virtual bool canApplyChanges() const override;
-    virtual bool canDiscardChanges() override;
+    virtual bool canDiscardChanges() const override;
 
     void at_updateFinished(const QnUpdateResult& result);
 

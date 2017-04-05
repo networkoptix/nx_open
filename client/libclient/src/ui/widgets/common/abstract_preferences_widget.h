@@ -45,7 +45,7 @@ public:
      *                                          This method is optional, usually it shouldn't be reimplemented.
      * @return                                  False if discarding should be aborted, true otherwise.
      */
-    virtual bool canDiscardChanges();
+    virtual bool canDiscardChanges() const;
 
     /**
      * @brief retranslateUi                     Update ui strings (if required).

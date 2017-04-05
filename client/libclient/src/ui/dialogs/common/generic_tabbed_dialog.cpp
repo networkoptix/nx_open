@@ -281,7 +281,7 @@ bool QnGenericTabbedDialog::canApplyChanges() const
     });
 }
 
-bool QnGenericTabbedDialog::canDiscardChanges()
+bool QnGenericTabbedDialog::canDiscardChanges() const
 {
     if (isReadOnly())
         return true;
