@@ -248,17 +248,6 @@ bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActi
     return false;
 }
 
-class QnBusinessRuleProcessorInstanceDeleter
-{
-public:
-    ~QnBusinessRuleProcessorInstanceDeleter()
-    {
-        QnBusinessRuleProcessor::fini();
-    }
-};
-
-static QnBusinessRuleProcessorInstanceDeleter qnBusinessRuleProcessorInstanceDeleter;
-
 void QnBusinessRuleProcessor::addBusinessRule(const QnBusinessEventRulePtr& value)
 {
     at_businessRuleChanged(value);

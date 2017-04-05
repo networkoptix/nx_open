@@ -27,6 +27,7 @@
 #include <utils/common/delayed.h>
 #include <business/business_message_bus.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
+#include <streaming/streaming_chunk_cache.h>
 
 namespace {
 
@@ -45,7 +46,7 @@ QnMediaServerModule::QnMediaServerModule(
     const QString& enforcedMediatorEndpoint,
     QObject* parent)
 :
-    QnCommonModule(/*clientMode*/ false, parent)
+    m_commonModule(new QnCommonModule(/*clientMode*/ false, parent))
 {
     instance<QnLongRunnablePool>();
 
@@ -73,15 +74,27 @@ QnMediaServerModule::QnMediaServerModule(
         nx::network::SocketGlobals::mediatorConnector().mockupAddress(enforcedMediatorEndpoint);
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
-    store(new QnNewSystemServerFlagWatcher(this));
-    store(new QnBusinessMessageBus(this));
+    store(new QnNewSystemServerFlagWatcher(commonModule()));
+    store(new QnBusinessMessageBus(commonModule()));
 #ifdef ENABLE_VMAX
-    store(new QnVMax480Server(this));
+    store(new QnVMax480Server(commonModule()));
 #endif
+    m_streamingChunkCache = new StreamingChunkCache(commonModule());
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
 }
 
-QnMediaServerModule::~QnMediaServerModule() {
+QnMediaServerModule::~QnMediaServerModule()
+{
+}
+
+QnCommonModule* QnMediaServerModule::commonModule() const
+{
+    return m_commonModule;
+}
+
+StreamingChunkCache* QnMediaServerModule::streamingChunkCache() const
+{
+    return m_streamingChunkCache;
 }

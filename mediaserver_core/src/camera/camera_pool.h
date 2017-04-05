@@ -49,7 +49,7 @@ public:
 private:
     typedef QMap<QnResourcePtr, QnVideoCameraPtr> CameraMap;
     CameraMap m_cameras;
-    static QnMutex m_staticMtx;
+    mutable QnMutex m_mutex;
 };
 
 #endif //  __CAMERA_POOL_H__

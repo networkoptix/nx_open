@@ -39,6 +39,7 @@
 #include "streaming/streaming_params.h"
 #include "network/tcp_connection_priv.h"
 #include <network/tcp_listener.h>
+#include <media_server/media_server_module.h>
 
 //TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 
@@ -89,7 +90,7 @@ namespace nx_hls
         {
             //disconnecting and waiting for already-emitted signals from m_currentChunk to be delivered and processed
             //TODO #ak cancel on-going transcoding. Currently, it just wastes CPU time
-            StreamingChunkCache::instance()->putBackUsedItem( m_currentChunk->params(), m_currentChunk );
+            QnMediaServerModule::instance()->streamingChunkCache()->putBackUsedItem( m_currentChunk->params(), m_currentChunk );
             m_chunkInputStream.reset();
             m_currentChunk.reset();
         }
@@ -828,7 +829,8 @@ namespace nx_hls
 
         //retrieving streaming chunk
         StreamingChunkPtr chunk;
-        if( !StreamingChunkCache::instance()->takeForUse( currentChunkKey, &chunk ) )
+        const auto& chunkCache = QnMediaServerModule::instance()->streamingChunkCache();
+        if( !chunkCache->takeForUse( currentChunkKey, &chunk ) )
         {
             NX_LOG( lit("Could not get chunk %1 of resource %2 requested by %3").
                 arg(request.requestLine.url.query()).arg(uniqueResourceID.toString()).arg(remoteHostAddress().toString()), cl_logDEBUG1 );
@@ -839,7 +841,7 @@ namespace nx_hls
         if( m_currentChunk )
         {
             //disconnecting and waiting for already-emitted signals from m_currentChunk to be delivered and processed
-            StreamingChunkCache::instance()->putBackUsedItem( currentChunkKey, m_currentChunk );
+            chunkCache->putBackUsedItem( currentChunkKey, m_currentChunk );
             m_currentChunk.reset();
         }
 

@@ -55,7 +55,7 @@ QnVideoCameraPool::~QnVideoCameraPool()
 
 void QnVideoCameraPool::updateActivity()
 {
-    QnMutexLocker lock(&m_staticMtx);
+    QnMutexLocker lock(&m_mutex);
     for (const auto&camera: m_cameras)
         camera->updateActivity();
 }
@@ -64,7 +64,7 @@ QnVideoCameraPtr QnVideoCameraPool::getVideoCamera(const QnResourcePtr& res) con
 {
     if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
         return QnVideoCameraPtr();
-    QnMutexLocker lock(&m_staticMtx);
+    QnMutexLocker lock(&m_mutex);
     CameraMap::const_iterator itr = m_cameras.find(res);
     return itr == m_cameras.cend() ? QnVideoCameraPtr() : itr.value();
 }
@@ -73,13 +73,13 @@ QnVideoCameraPtr QnVideoCameraPool::addVideoCamera(const QnResourcePtr& res)
 {
     if (!dynamic_cast<const QnSecurityCamResource*>(res.data()))
         return QnVideoCameraPtr();
-    QnMutexLocker lock(&m_staticMtx);
+    QnMutexLocker lock(&m_mutex);
     return m_cameras.insert(res, QnVideoCameraPtr(new QnVideoCamera(res))).value();
 }
 
 void QnVideoCameraPool::removeVideoCamera(const QnResourcePtr& res)
 {
-    QnMutexLocker lock( &m_staticMtx );
+    QnMutexLocker lock( &m_mutex );
     m_cameras.remove( res );
 }
 

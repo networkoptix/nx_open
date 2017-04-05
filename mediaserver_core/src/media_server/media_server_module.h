@@ -7,9 +7,12 @@
 #include <common/common_module.h>
 
 class QnCommonModule;
+class StreamingChunkCache;
 
 class QnMediaServerModule:
-    public QnCommonModule
+    public QObject,
+    public QnInstanceStorage,
+    public Singleton<QnMediaServerModule>
 {
     Q_OBJECT;
 public:
@@ -17,4 +20,13 @@ public:
         const QString& enforcedMediatorEndpoint = QString(),
         QObject *parent = nullptr);
     virtual ~QnMediaServerModule();
+
+    using Singleton<QnMediaServerModule>::instance;
+    using QnInstanceStorage::instance;
+
+    QnCommonModule* commonModule() const;
+    StreamingChunkCache* streamingChunkCache() const;
+private:
+    StreamingChunkCache* m_streamingChunkCache = nullptr;
+    QnCommonModule* m_commonModule = nullptr;
 };

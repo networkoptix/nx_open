@@ -2211,11 +2211,11 @@ void MediaServerProcess::run()
         QnAppInfo::productName().toUtf8(), "US",
         QnAppInfo::organizationName().toUtf8());
 
-    m_serverModule->setMessageProcessor(new QnServerMessageProcessor(m_serverModule.get()));
+    commonModule()->setMessageProcessor(new QnServerMessageProcessor(commonModule()));
     QScopedPointer<QnMasterServerStatusWatcher> masterServerWatcher(new QnMasterServerStatusWatcher(commonModule()));
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer(commonModule()) );
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb(commonModule()));
-    std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager(m_serverModule.get()) );
+    std::unique_ptr<QnMServerAuditManager> auditManager( new QnMServerAuditManager(commonModule()) );
 
     TimeBasedNonceProvider timeBasedNonceProvider;
     CloudManagerGroup cloudManagerGroup(commonModule(), &timeBasedNonceProvider);
@@ -2248,13 +2248,13 @@ void MediaServerProcess::run()
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), AuthMethod::noAuth );
 
-    std::unique_ptr<QnBusinessRuleProcessor> mserverBusinessRuleProcessor(new QnMServerBusinessRuleProcessor(m_serverModule.get()));
+    std::unique_ptr<QnBusinessRuleProcessor> mserverBusinessRuleProcessor(new QnMServerBusinessRuleProcessor(commonModule()));
 
     std::unique_ptr<QnVideoCameraPool> videoCameraPool( new QnVideoCameraPool(commonModule()) );
 
     QnMotionHelper::initStaticInstance( new QnMotionHelper() );
 
-    std::unique_ptr<QnBusinessEventConnector> businessEventConnector(new QnBusinessEventConnector(m_serverModule.get()) );
+    std::unique_ptr<QnBusinessEventConnector> businessEventConnector(new QnBusinessEventConnector(commonModule()) );
     auto stopQThreadFunc = []( QThread* obj ){ obj->quit(); obj->wait(); delete obj; };
     std::unique_ptr<QThread, decltype(stopQThreadFunc)> connectorThread( new QThread(), stopQThreadFunc );
     connectorThread->start();
@@ -2269,7 +2269,7 @@ void MediaServerProcess::run()
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 
-    QScopedPointer<QnServerPtzControllerPool> ptzPool(new QnServerPtzControllerPool(m_serverModule.get()));
+    QScopedPointer<QnServerPtzControllerPool> ptzPool(new QnServerPtzControllerPool(commonModule()));
 
     std::unique_ptr<QnStorageDbPool> storageDbPool(new QnStorageDbPool(commonModule()));
     std::unique_ptr<QnStorageManager> normalStorageManager(

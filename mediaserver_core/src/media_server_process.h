@@ -155,7 +155,7 @@ private:
     void updateAllowedInterfaces();
     void addCommandLineParametersFromConfig();
     void saveServerInfo(const QnMediaServerResourcePtr& server);
-    QnCommonModule* commonModule() const { return m_serverModule.get();  }
+    QnCommonModule* commonModule() const { return m_serverModule->commonModule();  }
 private:
     int m_argc;
     char** m_argv;
