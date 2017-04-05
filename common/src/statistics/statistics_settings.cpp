@@ -13,7 +13,7 @@ static const int kDefaultMinSendPeriodSecs = 60 * 60;   // 1 hour
 QnStatisticsSettings::QnStatisticsSettings():
     limit(kDefaultLimit),
     storeDays(kDefaultStoreDays),
-    minSendPeriodSecs(kDefaultMinSendPeriodSecs),
+    minSendPeriodSecs(kDefaultMinSendPeriodSecs)
 {
 }
 
