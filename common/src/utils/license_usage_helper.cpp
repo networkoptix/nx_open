@@ -367,40 +367,36 @@ void QnCamLicenseUsageWatcher::init(const QnVirtualCameraResourcePtr &camera)
 /************************************************************************/
 /* QnCamLicenseUsageHelper                                              */
 /************************************************************************/
-QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(
-    QObject* parent,
-    const QnCamLicenseUsageWatcherPtr &watcher)
-    :
-    base_type(parent)
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(QObject* parent):
+    base_type(parent),
+    m_watcher(new QnCamLicenseUsageWatcher(this))
 {
-    init(watcher);
+    connect(m_watcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this,
+        [this]()
+        {
+            invalidate();
+            emit licenseUsageChanged();
+        });
 }
 
-QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable
-    , const QnCamLicenseUsageWatcherPtr &watcher, QObject *parent):
-    base_type(parent)
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(
+    const QnVirtualCameraResourceList& proposedCameras,
+    bool proposedEnable,
+    QObject* parent)
+    :
+    QnCamLicenseUsageHelper(parent)
 {
-    init(watcher);
     propose(proposedCameras, proposedEnable);
 }
 
-QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable
-    , const QnCamLicenseUsageWatcherPtr &watcher, QObject *parent):
-    base_type(parent)
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(
+    const QnVirtualCameraResourcePtr& proposedCamera,
+    bool proposedEnable,
+    QObject* parent)
+    :
+    QnCamLicenseUsageHelper(parent)
 {
-    init(watcher);
     propose(proposedCamera, proposedEnable);
-}
-
-void QnCamLicenseUsageHelper::init(const QnCamLicenseUsageWatcherPtr &watcher) {
-    m_watcher = (watcher ? watcher
-        : QnCamLicenseUsageWatcherPtr(new QnCamLicenseUsageWatcher()));
-
-    connect(m_watcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this, [this]()
-    {
-        invalidate();
-        emit licenseUsageChanged();
-    });
 }
 
 void QnCamLicenseUsageHelper::propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable) {

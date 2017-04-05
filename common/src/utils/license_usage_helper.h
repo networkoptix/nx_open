@@ -136,8 +136,6 @@ private:
     void init(const QnVirtualCameraResourcePtr &camera);
 };
 
-typedef QSharedPointer<QnCamLicenseUsageWatcher> QnCamLicenseUsageWatcherPtr;
-
 class QnCamLicenseUsageHelper: public QnLicenseUsageHelper
 {
     Q_OBJECT
@@ -150,14 +148,13 @@ public:
     */
 
     QnCamLicenseUsageHelper(
-        QObject* parent,
-        const QnCamLicenseUsageWatcherPtr &watcher = QnCamLicenseUsageWatcherPtr());
+        QObject* parent);
 
-    QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable
-        , const QnCamLicenseUsageWatcherPtr &watcher = QnCamLicenseUsageWatcherPtr(), QObject *parent = NULL);
+    QnCamLicenseUsageHelper(const QnVirtualCameraResourceList &proposedCameras,
+        bool proposedEnable, QObject* parent = nullptr);
 
-    QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable
-        , const QnCamLicenseUsageWatcherPtr &watcher = QnCamLicenseUsageWatcherPtr(), QObject *parent = NULL);
+    QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable,
+        QObject* parent = nullptr);
 
 public:
     void propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable);
@@ -173,9 +170,7 @@ protected:
     virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
 
 private:
-    void init(const QnCamLicenseUsageWatcherPtr &watcher);
-
-    QnCamLicenseUsageWatcherPtr m_watcher;
+    QnCamLicenseUsageWatcher* m_watcher;
     QSet<QnVirtualCameraResourcePtr> m_proposedToEnable;
     QSet<QnVirtualCameraResourcePtr> m_proposedToDisable;
 };

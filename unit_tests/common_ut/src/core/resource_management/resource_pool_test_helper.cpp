@@ -1,5 +1,7 @@
 #include "resource_pool_test_helper.h"
 
+#include <common/static_common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
@@ -9,13 +11,19 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
 
-QnResourcePoolTestHelper::QnResourcePoolTestHelper():
-    QnCommonModuleAware(nullptr, true)
-{
-}
-
 QString QnResourcePoolTestHelper::kTestUserName = QStringLiteral("user");
 QString QnResourcePoolTestHelper::kTestUserName2 = QStringLiteral("user_2");
+
+QnResourcePoolTestHelper::QnResourcePoolTestHelper():
+    QnCommonModuleAware(nullptr, true),
+    m_staticCommon(new QnStaticCommonModule(Qn::PT_NotDefined, QString(), QString()))
+{
+
+}
+
+QnResourcePoolTestHelper::~QnResourcePoolTestHelper()
+{
+}
 
 QnUserResourcePtr QnResourcePoolTestHelper::createUser(Qn::GlobalPermissions globalPermissions,
     const QString& name,

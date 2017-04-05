@@ -18,7 +18,7 @@ class QnSharedLayoutItemAccessProviderTest: public QnBaseAccessProviderTestFixtu
 protected:
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new QnSharedLayoutItemAccessProvider();
+        return new QnSharedLayoutItemAccessProvider(commonModule());
     }
 };
 

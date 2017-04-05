@@ -12,6 +12,8 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
 
+#include <common/common_module.h>
+
 namespace {
 
 static const auto kSource = QnAbstractResourceAccessProvider::Source::permissions;
@@ -32,7 +34,7 @@ protected:
 
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new QnPermissionsResourceAccessProvider();
+        return new QnPermissionsResourceAccessProvider(commonModule());
     }
 };
 

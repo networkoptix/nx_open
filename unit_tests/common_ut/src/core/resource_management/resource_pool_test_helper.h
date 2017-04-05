@@ -8,10 +8,13 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h> //not so good but we can allow it for test module
 
+class QnStaticCommonModule;
+
 class QnResourcePoolTestHelper: public QnCommonModuleAware
 {
 public:
     QnResourcePoolTestHelper();
+    virtual ~QnResourcePoolTestHelper();
 
     static QString kTestUserName;
     static QString kTestUserName2;
@@ -41,4 +44,8 @@ public:
     QnStorageResourcePtr addStorage(const QnMediaServerResourcePtr& server);
 
     ec2::ApiUserRoleData createRole(Qn::GlobalPermissions permissions);
+
+private:
+    QScopedPointer<QnStaticCommonModule> m_staticCommon;
+
 };

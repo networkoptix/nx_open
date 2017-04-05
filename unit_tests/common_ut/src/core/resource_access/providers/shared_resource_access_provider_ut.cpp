@@ -31,7 +31,7 @@ protected:
 
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new QnSharedResourceAccessProvider();
+        return new QnSharedResourceAccessProvider(commonModule());
     }
 };
 

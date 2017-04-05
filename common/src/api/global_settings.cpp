@@ -93,9 +93,9 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
 
 QnGlobalSettings::~QnGlobalSettings()
 {
-    disconnect(commonModule()->resourcePool(), NULL, this, NULL);
-    if(m_admin)
-        at_resourcePool_resourceRemoved(m_admin);
+//     disconnect(commonModule()->resourcePool(), NULL, this, NULL);
+//     if(m_admin)
+//         at_resourcePool_resourceRemoved(m_admin);
 }
 
 void QnGlobalSettings::initialize()

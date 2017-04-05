@@ -5,6 +5,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 
+#include <common/static_common_module.h>
 #include <common/common_module.h>
 
 #include <recording/time_period_list.h>
@@ -75,9 +76,10 @@ protected:
 
 TEST( TcpConnectionProcessor, sendAsyncData )
 {
-    QScopedPointer<QnCommonModule> commonModule(new QnCommonModule(true));
+    QnStaticCommonModule staticCommon(Qn::PT_NotDefined, QString(), QString());
+    QnCommonModule commonModule(true);
 
-    TestTcpListener tcpListener(commonModule.data(), QHostAddress::Any, 0);
+    TestTcpListener tcpListener(&commonModule, QHostAddress::Any, 0);
     tcpListener.start();
 
     QElapsedTimer timer;
