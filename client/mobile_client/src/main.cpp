@@ -338,7 +338,7 @@ int main(int argc, char *argv[])
         if (startupParams.autoLoginMode == AutoLoginMode::Enabled)
             sendApplicationMessage(InterClientMessage::Command::startCamerasMode);
         else
-            sendApplicationMessage(InterClientMessage::Command::startCamerasMode);
+            sendApplicationMessage(InterClientMessage::Command::refresh);
 
         return 0;
     }

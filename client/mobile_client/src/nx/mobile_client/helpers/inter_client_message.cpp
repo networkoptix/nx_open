@@ -17,7 +17,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
 
 InterClientMessage::InterClientMessage()
 {
-
 }
 
 InterClientMessage::InterClientMessage(
