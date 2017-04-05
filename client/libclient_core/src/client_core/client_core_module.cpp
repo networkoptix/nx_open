@@ -18,7 +18,7 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
 {
     Q_INIT_RESOURCE(appserver2);
 
-    m_commonModule = new QnCommonModule(this);
+    m_commonModule = new QnCommonModule(true, this);
 
     commonModule()->store(new QnClientCoreSettings());
     commonModule()->store(new QnFfmpegInitializer());

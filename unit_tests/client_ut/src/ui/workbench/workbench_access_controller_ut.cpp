@@ -1,8 +1,10 @@
 #include <gtest/gtest.h>
 
 #include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #include <client/client_runtime_settings.h>
+#include <client_core/client_core_module.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
@@ -30,19 +32,24 @@ protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
-        m_module.reset(new QnCommonModule());
+        m_staticCommon.reset(new QnStaticCommonModule(Qn::PT_NotDefined, QString(), QString()));
+        m_module.reset(new QnClientCoreModule());
         m_runtime.reset(new QnClientRuntimeSettings());
-        m_accessController.reset(new QnWorkbenchAccessController());
+        m_accessController.reset(new QnWorkbenchAccessController(m_module.data()));
     }
 
     // virtual void TearDown() will be called after each test is run.
     virtual void TearDown()
     {
         m_currentUser.clear();
+        m_accessController.clear();
         m_runtime.clear();
         m_module.clear();
-        m_accessController.clear();
+        m_staticCommon.reset();
     }
+
+    QnCommonModule* commonModule() const { return m_module->commonModule(); }
+    QnResourcePool* resourcePool() const { return commonModule()->resourcePool(); }
 
     QnUserResourcePtr addUser(const QString &name, Qn::GlobalPermissions globalPermissions, QnUserType userType = QnUserType::Local)
     {
@@ -110,7 +117,8 @@ protected:
     }
 
     // Declares the variables your tests want to use.
-    QSharedPointer<QnCommonModule> m_module;
+    QScopedPointer<QnStaticCommonModule> m_staticCommon;
+    QSharedPointer<QnClientCoreModule> m_module;
     QSharedPointer<QnWorkbenchAccessController> m_accessController;
     QSharedPointer<QnClientRuntimeSettings> m_runtime;
     QnUserResourcePtr m_currentUser;
