@@ -61,7 +61,7 @@ public:
 
     static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
-    QnStorageManager(QObject* parent, QnServer::StoragePool kind);
+    QnStorageManager(QnCommonModule* commonModule, QnServer::StoragePool kind);
     virtual ~QnStorageManager();
     static QnStorageManager* normalInstance();
     static QnStorageManager* backupInstance();

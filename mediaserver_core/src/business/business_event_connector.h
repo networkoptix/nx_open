@@ -30,9 +30,6 @@ public:
     QnBusinessEventConnector(QObject* parent);
     ~QnBusinessEventConnector();
 
-    static void initStaticInstance( QnBusinessEventConnector* );
-    static QnBusinessEventConnector* instance();
-
 public slots:
     /*!
         \param metadata region where is motion occured

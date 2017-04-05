@@ -20,8 +20,6 @@
 
 //#define REDUCE_NET_ISSUE_HACK
 
-static QnBusinessEventConnector* _instance = NULL;
-
 QnBusinessEventConnector::QnBusinessEventConnector(QObject* parent):
     QObject(parent),
     QnCommonModuleAware(parent)
@@ -41,17 +39,6 @@ void QnBusinessEventConnector::onNewResource(const QnResourcePtr &resource)
         connect(camera.data(), &QnSecurityCamResource::networkIssue, this, &QnBusinessEventConnector::at_networkIssue );
         connect(camera.data(), &QnSecurityCamResource::cameraInput, this, &QnBusinessEventConnector::at_cameraInput );
     }
-}
-
-void QnBusinessEventConnector::initStaticInstance( QnBusinessEventConnector* inst )
-{
-    _instance = inst;
-}
-
-QnBusinessEventConnector* QnBusinessEventConnector::instance()
-{
-    //return static_instance();
-    return _instance;
 }
 
 void QnBusinessEventConnector::at_motionDetected(const QnResourcePtr &resource, bool value, qint64 timeStamp, const QnConstAbstractDataPacketPtr& metadata)

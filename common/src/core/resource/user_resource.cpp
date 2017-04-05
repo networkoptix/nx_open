@@ -298,7 +298,9 @@ void QnUserResource::setEmail(const QString& email)
 
 QString QnUserResource::fullName() const
 {
-    QString result = commonModule()->propertyDictionary()->value(getId(), Qn::USER_FULL_NAME);
+    QString result;
+    if (commonModule())
+        result = commonModule()->propertyDictionary()->value(getId(), Qn::USER_FULL_NAME);
     QnMutexLocker locker(&m_mutex);
     return result.isNull() ? m_fullName : result;
 }

@@ -954,7 +954,7 @@ void initLog(const QString& _logLevel)
     NX_LOG(QLatin1String("================================================================================="), cl_logALWAYS);
 }
 
-void initAppServerConnection(QSettings &settings)
+QUrl appServerConnectionUrl(QSettings &settings)
 {
     // migrate appserverPort settings from version 2.2 if exist
     if (!MSSettings::roSettings()->value("appserverPort").isNull())
@@ -1008,6 +1008,7 @@ void initAppServerConnection(QSettings &settings)
     appServerUrl.setQuery(params);
 
     NX_LOG(lit("Connect to server %1").arg(appServerUrl.toString(QUrl::RemovePassword)), cl_logINFO);
+    return appServerUrl;
     //QnAppServerConnectionFactory::setUrl(appServerUrl);
     //QnAppServerConnectionFactory::setDefaultFactory(commonModule()->instance<QnResourceDiscoveryManager>());
 }
@@ -2265,7 +2266,7 @@ void MediaServerProcess::run()
     QSettings* settings = MSSettings::roSettings();
 
     commonModule()->setResourceDiscoveryManager(new QnMServerResourceDiscoveryManager(commonModule()));
-    initAppServerConnection(*settings);
+    QUrl appServerUrl = appServerConnectionUrl(*settings);
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 
@@ -2344,7 +2345,7 @@ void MediaServerProcess::run()
     while (!needToStop())
     {
         const ec2::ErrorCode errorCode = ec2ConnectionFactory->connectSync(
-            commonModule()->currentUrl(), ec2::ApiClientInfoData(), &ec2Connection );
+            appServerUrl, ec2::ApiClientInfoData(), &ec2Connection );
         if (ec2Connection)
         {
             connectInfo = ec2Connection->connectionInfo();
@@ -2911,8 +2912,7 @@ void MediaServerProcess::run()
     connectorThread->wait();
 
     //deleting object from wrong thread, but its no problem, since object's thread has been stopped and no event can be delivered to the object
-    delete QnBusinessEventConnector::instance();
-    QnBusinessEventConnector::initStaticInstance( NULL );
+    businessEventConnector.reset();
 
     mserverBusinessRuleProcessor.reset();
 
@@ -2968,8 +2968,7 @@ void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeI
         return;
     if (runtimeInfo.uuid != commonModule()->moduleGUID())
         return;
-
-    commonModule()->ec2Connection()
+    QnAppServerConnectionFactory::ec2Connection()
         ->getMiscManager(Qn::kSystemAccess)
         ->saveRuntimeInfo(
             runtimeInfo.data,

@@ -9,12 +9,13 @@
 class QnCommonModule;
 class StreamingChunkCache;
 class QnStorageManager;
+class QnStaticCommonModule;
+class QnStorageDbPool;
 
 class QnMediaServerModule:
     public QObject,
     public QnInstanceStorage,
-    public Singleton<QnMediaServerModule>,
-    public QnCommonModuleAware
+    public Singleton<QnMediaServerModule>
 {
     Q_OBJECT;
 public:
@@ -27,9 +28,15 @@ public:
     using QnInstanceStorage::instance;
 
     StreamingChunkCache* streamingChunkCache() const;
+    QnCommonModule* commonModule() const;
 private:
-    StreamingChunkCache* m_streamingChunkCache = nullptr;
+    QnStaticCommonModule* m_staticCommon = nullptr;
+    QnCommonModule* m_commonModule = nullptr;
 
-    QnStorageManager* m_normalStorageManager = nullptr;
-    QnStorageManager* m_backupStorageManager = nullptr;
+    std::shared_ptr<StreamingChunkCache> m_streamingChunkCache;
+
+    std::shared_ptr<QnStorageManager> m_normalStorageManager;
+    std::shared_ptr<QnStorageManager> m_backupStorageManager;
 };
+
+#define qnServerModule QnMediaServerModule::instance()

@@ -10,6 +10,7 @@ class QnStorageDbPool:
     public Singleton<QnStorageDbPool>,
     public QnCommonModuleAware
 {
+    Q_OBJECT
 public:
     QnStorageDbPool(QnCommonModule* commonModule);
 

@@ -32,6 +32,8 @@
 #include <core/ptz/server_ptz_controller_pool.h>
 #include <recorder/storage_db_pool.h>
 #include <recorder/storage_manager.h>
+#include <common/static_common_module.h>
+#include <utils/common/app_info.h>
 
 namespace {
 
@@ -50,7 +52,12 @@ QnMediaServerModule::QnMediaServerModule(
     const QString& enforcedMediatorEndpoint,
     QObject* parent)
 :
-    QnCommonModuleAware(new QnCommonModule(/*clientMode*/ false, this))
+    m_staticCommon(new QnStaticCommonModule(
+        Qn::PT_Server,
+        QnAppInfo::productNameShort(),
+        QnAppInfo::customizationName(),
+        this)),
+    m_commonModule(new QnCommonModule(/*clientMode*/ false, this))
 {
     instance<QnLongRunnablePool>();
 
@@ -83,23 +90,24 @@ QnMediaServerModule::QnMediaServerModule(
 #ifdef ENABLE_VMAX
     store(new QnVMax480Server(commonModule()));
 #endif
-    m_streamingChunkCache = new StreamingChunkCache(commonModule());
 
     store(new QnServerPtzControllerPool(commonModule()));
 
     store(new QnStorageDbPool(commonModule()));
 
-    m_normalStorageManager =
-        new QnStorageManager(
-            this,
-            QnServer::StoragePool::Normal
-        );
+    m_streamingChunkCache.reset(new StreamingChunkCache(commonModule()));
 
-    m_backupStorageManager =
+    m_normalStorageManager.reset(
         new QnStorageManager(
-            this,
+            commonModule(),
+            QnServer::StoragePool::Normal
+        ));
+
+    m_backupStorageManager.reset(
+        new QnStorageManager(
+            commonModule(),
             QnServer::StoragePool::Backup
-        );
+        ));
 
     store(new QnFileDeletor(commonModule()));
 
@@ -113,5 +121,10 @@ QnMediaServerModule::~QnMediaServerModule()
 
 StreamingChunkCache* QnMediaServerModule::streamingChunkCache() const
 {
-    return m_streamingChunkCache;
+    return m_streamingChunkCache.get();
+}
+
+QnCommonModule* QnMediaServerModule::commonModule() const
+{
+    return m_commonModule;
 }
