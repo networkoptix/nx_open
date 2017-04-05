@@ -303,13 +303,9 @@ int Appserver2Process::exec()
     tcpListener.pleaseStop();
 
     ec2Connection->stopReceivingNotifications();
-
-    ec2Connection.reset();
-
     //Must call messageProcessor->init(ec2Connection)
-    //commonModule->setEc2Connection(nullptr);
-    //appServerConnectionFactory.setEC2ConnectionFactory(nullptr);
-
+    m_commonModule->messageProcessor()->init(nullptr);
+    ec2Connection.reset();
     m_ecConnection = nullptr;
 
     return 0;
