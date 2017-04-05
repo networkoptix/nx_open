@@ -10,6 +10,8 @@
 #include <nx_ec/data/api_data.h>
 
 #include "mock_stream_socket.h"
+#include <network/tcp_listener.h>
+#include "network/http_connection_listener.h"
 
 namespace ec2 {
 namespace test {
@@ -18,6 +20,21 @@ namespace {
 
 //-------------------------------------------------------------------------------------------------
 // Test/mock classes.
+
+class MockTcpListener: public QnTcpListener
+{
+public:
+    MockTcpListener(QnCommonModule* commonModule):
+        QnTcpListener(commonModule, QHostAddress::Any, /*port*/ 0)
+    {
+    }
+
+    virtual QnTCPConnectionProcessor* createRequestProcessor(
+        QSharedPointer<AbstractStreamSocket> clientSocket) override
+    {
+        return nullptr;
+    }
+};
 
 struct ApiMockInnerData
 {
@@ -302,7 +319,9 @@ private:
         }
     )};
 
-    QnRestConnectionProcessor m_restConnectionProcessor{m_socket, /*owner*/ nullptr};
+    QnCommonModule m_commonModule{/*clientMode*/ false};
+    MockTcpListener m_tcpListener{&m_commonModule};
+    QnRestConnectionProcessor m_restConnectionProcessor{m_socket, /*owner*/ &m_tcpListener};
 
     std::unique_ptr<TestUpdateHttpHandler> m_updateHttpHandler{new TestUpdateHttpHandler(
         m_connection)};
