@@ -52,14 +52,14 @@ protected:
     }
 
     QnVirtualCameraResourceList addRecordingCameras(
-        Qn::LicenseType cameraType = Qn::LC_Professional,
+        Qn::LicenseType licenseType = Qn::LC_Professional,
         int count = 1,
         bool licenseRequired = true)
     {
         QnVirtualCameraResourceList result;
         for (int i = 0; i < count; ++i)
         {
-            auto camera = addCamera();
+            auto camera = addCamera(licenseType);
             camera->setParentId(m_server->getId());
             camera->setLicenseUsed(licenseRequired);
             result << camera;

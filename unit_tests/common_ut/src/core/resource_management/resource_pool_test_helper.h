@@ -30,9 +30,8 @@ public:
     QnLayoutResourcePtr createLayout();
     QnLayoutResourcePtr addLayout();
 
-    QnVirtualCameraResourcePtr createCamera();
-
-    QnVirtualCameraResourcePtr addCamera();
+    QnVirtualCameraResourcePtr createCamera(Qn::LicenseType licenseType = Qn::LC_Professional);
+    QnVirtualCameraResourcePtr addCamera(Qn::LicenseType licenseType = Qn::LC_Professional);
 
     QnWebPageResourcePtr addWebPage();
 

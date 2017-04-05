@@ -60,16 +60,16 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::addLayout()
     return layout;
 }
 
-QnVirtualCameraResourcePtr QnResourcePoolTestHelper::createCamera()
+QnVirtualCameraResourcePtr QnResourcePoolTestHelper::createCamera(Qn::LicenseType licenseType)
 {
-    QnVirtualCameraResourcePtr camera(new nx::CameraResourceStub());
+    QnVirtualCameraResourcePtr camera(new nx::CameraResourceStub(licenseType));
     camera->setName(QStringLiteral("camera"));
     return camera;
 }
 
-QnVirtualCameraResourcePtr QnResourcePoolTestHelper::addCamera()
+QnVirtualCameraResourcePtr QnResourcePoolTestHelper::addCamera(Qn::LicenseType licenseType)
 {
-    auto camera = createCamera();
+    auto camera = createCamera(licenseType);
     resourcePool()->addResource(camera);
     return camera;
 }
