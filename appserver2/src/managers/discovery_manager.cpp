@@ -192,7 +192,9 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
         return -1;
 
     QnTransaction<ApiDiscoveredServerData> transaction(
-        ApiCommand::discoveredServerChanged, discoveredServer);
+        ApiCommand::discoveredServerChanged,
+        messageBus->commonModule()->moduleGUID(),
+        discoveredServer);
 
     const int reqId = generateRequestID();
 
@@ -214,7 +216,9 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServersList(
         return -1;
 
     QnTransaction<ApiDiscoveredServerDataList> transaction(
-        ApiCommand::discoveredServersList, discoveredServersList);
+        ApiCommand::discoveredServersList,
+        messageBus->commonModule()->moduleGUID(),
+        discoveredServersList);
 
     const int reqId = generateRequestID();
 

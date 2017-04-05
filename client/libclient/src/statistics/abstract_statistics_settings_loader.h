@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 
-#include <statistics/statistics_fwd.h>
+#include <statistics/statistics_settings.h>
 
 class QnAbstractStatisticsSettingsLoader : public QObject
 {
