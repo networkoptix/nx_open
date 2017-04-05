@@ -18,12 +18,13 @@ namespace test {
 class MediaServerRestHandlerTestBase
 {
 public:
-    MediaServerRestHandlerTestBase()
+    MediaServerRestHandlerTestBase():
+        m_commonModule(false)
     {
         MSSettings::initializeROSettings();
         MSSettings::initializeRunTimeSettings();
 
-        commonModule()->setModuleGUID(QnUuid::createUuid());
+        m_commonModule.setModuleGUID(QnUuid::createUuid());
 
         insertSelfServerResource();
         insertAdminUser();
@@ -32,18 +33,17 @@ public:
     ~MediaServerRestHandlerTestBase()
     {
     }
-
-private:
+protected:
     QnCommonModule m_commonModule;
+private:
     ec2::Settings m_ec2Settings;
-    QnGlobalSettings m_globalSettings;
 
     void insertSelfServerResource()
     {
         auto selfServer = QnMediaServerResourcePtr(new QnMediaServerResource());
-        selfServer->setId(commonModule()->moduleGUID());
+        selfServer->setId(m_commonModule.moduleGUID());
         selfServer->setServerFlags(Qn::SF_HasPublicIP);
-        resourcePool()->addResource(selfServer);
+        m_commonModule.resourcePool()->addResource(selfServer);
     }
 
     void insertAdminUser()
@@ -53,7 +53,7 @@ private:
         admin->setName("admin");
         admin->setPassword("admin");
         admin->setOwner(true);
-        resourcePool()->addResource(admin);
+        m_commonModule.resourcePool()->addResource(admin);
     }
 };
 
@@ -63,7 +63,7 @@ class QnSaveCloudSystemCredentialsHandler:
 {
 public:
     QnSaveCloudSystemCredentialsHandler():
-        m_cloudManagerGroup(&m_timeBasedNonceProvider),
+        m_cloudManagerGroup(&m_commonModule, &m_timeBasedNonceProvider),
         m_restHandler(&m_cloudManagerGroup)
     {
     }

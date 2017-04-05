@@ -28,6 +28,10 @@
 #include <business/business_message_bus.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
 #include <streaming/streaming_chunk_cache.h>
+#include <recorder/file_deletor.h>
+#include <core/ptz/server_ptz_controller_pool.h>
+#include <recorder/storage_db_pool.h>
+#include <recorder/storage_manager.h>
 
 namespace {
 
@@ -46,7 +50,7 @@ QnMediaServerModule::QnMediaServerModule(
     const QString& enforcedMediatorEndpoint,
     QObject* parent)
 :
-    m_commonModule(new QnCommonModule(/*clientMode*/ false, parent))
+    QnCommonModuleAware(new QnCommonModule(/*clientMode*/ false, this))
 {
     instance<QnLongRunnablePool>();
 
@@ -81,17 +85,30 @@ QnMediaServerModule::QnMediaServerModule(
 #endif
     m_streamingChunkCache = new StreamingChunkCache(commonModule());
 
+    store(new QnServerPtzControllerPool(commonModule()));
+
+    store(new QnStorageDbPool(commonModule()));
+
+    m_normalStorageManager =
+        new QnStorageManager(
+            this,
+            QnServer::StoragePool::Normal
+        );
+
+    m_backupStorageManager =
+        new QnStorageManager(
+            this,
+            QnServer::StoragePool::Backup
+        );
+
+    store(new QnFileDeletor(commonModule()));
+
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
 }
 
 QnMediaServerModule::~QnMediaServerModule()
 {
-}
-
-QnCommonModule* QnMediaServerModule::commonModule() const
-{
-    return m_commonModule;
 }
 
 StreamingChunkCache* QnMediaServerModule::streamingChunkCache() const

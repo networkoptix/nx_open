@@ -17,7 +17,9 @@
 #include <rest/server/json_rest_result.h>
 #include "utils/common/sleep.h"
 
-class AuthReturnCodeTest : public ::testing::Test
+class AuthReturnCodeTest:
+    public ::testing::Test,
+    public QnMediaServerModule
 {
 public:
     static void SetUpTestCase()

@@ -5,7 +5,10 @@
 #include <QSharedPointer>
 #include <common/common_module_aware.h>
 
-class QnStorageDbPool: public Singleton<QnStorageDbPool>, public QnCommonModuleAware
+class QnStorageDbPool:
+    public QObject,
+    public Singleton<QnStorageDbPool>,
+    public QnCommonModuleAware
 {
 public:
     QnStorageDbPool(QnCommonModule* commonModule);

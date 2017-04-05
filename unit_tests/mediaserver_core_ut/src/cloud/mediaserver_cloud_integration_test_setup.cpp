@@ -35,7 +35,8 @@ bool MediaServerCloudIntegrationTest::startMediaServer()
         return false;
 
     // TODO: #ak Remove it from here when mediaserver does it from QnMain::run, not from application's main thread.
-    qnCommonMessageProcessor->init(commonModule()->ec2Connection());
+    m_mediaServerLauncher.commonModule()->messageProcessor()->init(
+        m_mediaServerLauncher.commonModule()->ec2Connection());
 
     m_mserverClient = std::make_unique<MediaServerClient>(
         m_mediaServerLauncher.endpoint());

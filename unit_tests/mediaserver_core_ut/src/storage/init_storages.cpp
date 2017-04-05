@@ -22,7 +22,7 @@ TEST(InitStoragesTest, main)
         nx_ms_conf::MIN_STORAGE_SPACE,
         (qint64)std::numeric_limits<int64_t>::max());
     ASSERT_TRUE(launcher.start());
-    auto storages = resourcePool()->getResources<QnStorageResource>();
+    auto storages = launcher.commonModule()->resourcePool()->getResources<QnStorageResource>();
     ASSERT_TRUE(storages.isEmpty());
 }
 

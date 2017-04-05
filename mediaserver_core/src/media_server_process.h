@@ -103,7 +103,7 @@ public:
 
     const CmdLineArguments cmdLineArguments() const;
     void setObsoleteGuid(const QnUuid& obsoleteGuid) { m_obsoleteGuid = obsoleteGuid; }
-
+    QnCommonModule* commonModule() const { return m_serverModule->commonModule(); }
 signals:
     void started();
 public slots:
@@ -128,7 +128,6 @@ private slots:
     void at_databaseDumped();
     void at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void at_updatePublicAddress(const QHostAddress& publicIP);
-
 private:
 
     void updateDisabledVendorsIfNeeded();
@@ -155,7 +154,6 @@ private:
     void updateAllowedInterfaces();
     void addCommandLineParametersFromConfig();
     void saveServerInfo(const QnMediaServerResourcePtr& server);
-    QnCommonModule* commonModule() const { return m_serverModule->commonModule();  }
 private:
     int m_argc;
     char** m_argv;

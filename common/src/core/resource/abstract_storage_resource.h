@@ -5,8 +5,8 @@
 #include <QtCore/QtCore>
 #include <memory>
 
-class QnAbstractStorageResource
-    : public QnResource
+class QnAbstractStorageResource: public QnResource
+
 {
 public:
     enum cap

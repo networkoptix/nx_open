@@ -416,10 +416,11 @@ static QnStorageManager* QnNormalStorageManager_instance = nullptr;
 static QnStorageManager* QnBackupStorageManager_instance = nullptr;
 
 QnStorageManager::QnStorageManager(
-    QnCommonModule* commonModule,
+    QObject* parent,
     QnServer::StoragePool role)
 :
-    QnCommonModuleAware(commonModule),
+    QObject(parent),
+    QnCommonModuleAware(parent),
     m_role(role),
     m_mutexStorages(QnMutex::Recursive),
     m_mutexCatalog(QnMutex::Recursive),
@@ -429,7 +430,7 @@ QnStorageManager::QnStorageManager(
     m_rebuildArchiveThread(0),
     m_firstStoragesTestDone(false),
     m_isRenameDisabled(MSSettings::roSettings()->value("disableRename").toInt()),
-    m_camInfoWriterHandler(this, commonModule->resourcePool()),
+    m_camInfoWriterHandler(this, commonModule()->resourcePool()),
     m_camInfoWriter(&m_camInfoWriterHandler)
 {
     NX_ASSERT(m_role == QnServer::StoragePool::Normal || m_role == QnServer::StoragePool::Backup);
@@ -470,8 +471,9 @@ QnStorageManager::QnStorageManager(
             }
     	});
 
-    if (m_role == QnServer::StoragePool::Backup) {
-        m_scheduleSync.reset(new QnScheduleSync(commonModule));
+    if (m_role == QnServer::StoragePool::Backup)
+    {
+        m_scheduleSync.reset(new QnScheduleSync(commonModule()));
         connect(m_scheduleSync.get(), &QnScheduleSync::backupFinished, this, &QnStorageManager::backupFinished, Qt::DirectConnection);
     }
 
@@ -2169,7 +2171,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
 
     for (const auto& storage: getUsedWritableStorages())
     {
-        if (pred(storage) && 
+        if (pred(storage) &&
             storage->getFreeSpace() > kMinStorageFreeSpace)
         {
             allowedIndexes.push_back(qnStorageDbPool->getStorageIndex(storage));

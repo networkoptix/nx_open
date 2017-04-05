@@ -18,7 +18,6 @@ public:
     QnStorageResourcePtr createStorage(const QString& url, qint64 spaceLimit);
 
 private:
-    std::unique_ptr<QnResourcePool> m_resourcePool;
     std::unique_ptr<QnCommonModule> m_commonModule;
     std::unique_ptr<QnPlatformAbstraction> m_platformAbstraction;
 };

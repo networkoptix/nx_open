@@ -2252,7 +2252,7 @@ void MediaServerProcess::run()
 
     std::unique_ptr<QnVideoCameraPool> videoCameraPool( new QnVideoCameraPool(commonModule()) );
 
-    QnMotionHelper::initStaticInstance( new QnMotionHelper() );
+    QnMotionHelper::initStaticInstance(new QnMotionHelper());
 
     std::unique_ptr<QnBusinessEventConnector> businessEventConnector(new QnBusinessEventConnector(commonModule()) );
     auto stopQThreadFunc = []( QThread* obj ){ obj->quit(); obj->wait(); delete obj; };
@@ -2269,25 +2269,6 @@ void MediaServerProcess::run()
 
     QnMulticodecRtpReader::setDefaultTransport( MSSettings::roSettings()->value(QLatin1String("rtspTransport"), RtpTransport::_auto).toString().toUpper() );
 
-    QScopedPointer<QnServerPtzControllerPool> ptzPool(new QnServerPtzControllerPool(commonModule()));
-
-    std::unique_ptr<QnStorageDbPool> storageDbPool(new QnStorageDbPool(commonModule()));
-    std::unique_ptr<QnStorageManager> normalStorageManager(
-        new QnStorageManager(
-            commonModule(),
-            QnServer::StoragePool::Normal
-        )
-    );
-
-    std::unique_ptr<QnStorageManager> backupStorageManager(
-        new QnStorageManager(
-            commonModule(),
-            QnServer::StoragePool::Backup
-        )
-    );
-
-    std::unique_ptr<QnFileDeletor> fileDeletor( new QnFileDeletor(commonModule()) );
-
     connect(commonModule()->resourceDiscoveryManager(), &QnResourceDiscoveryManager::CameraIPConflict, this, &MediaServerProcess::at_cameraIPConflict);
     connect(qnNormalStorageMan, &QnStorageManager::noStoragesAvailable, this, &MediaServerProcess::at_storageManager_noStoragesAvailable);
     connect(qnNormalStorageMan, &QnStorageManager::storageFailure, this, &MediaServerProcess::at_storageManager_storageFailure);
@@ -2300,7 +2281,7 @@ void MediaServerProcess::run()
     QString dataLocation = getDataDirectory();
     QDir stateDirectory;
     stateDirectory.mkpath(dataLocation + QLatin1String("/state"));
-    fileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
+    qnFileDeletor->init(dataLocation + QLatin1String("/state")); // constructor got root folder for temp files
 
 
     // If adminPassword is set by installer save it and create admin user with it if not exists yet
@@ -2941,7 +2922,7 @@ void MediaServerProcess::run()
     qnNormalStorageMan->stopAsyncTasks();
     qnBackupStorageMan->stopAsyncTasks();
 
-    ptzPool.reset();
+    //ptzPool.reset();
 
     commonModule()->setMessageProcessor(nullptr); // stop receiving notifications
 
@@ -2959,9 +2940,9 @@ void MediaServerProcess::run()
     MSSettings::runTimeSettings()->setValue("lastRunningTime", 0);
 
     authHelper.reset();
-    fileDeletor.reset();
-    normalStorageManager.reset();
-    backupStorageManager.reset();
+    //fileDeletor.reset();
+    //qnNormalStorageMan.reset();
+    //qnBackupStorageMan.reset();
 
     if (m_mediaServer)
         m_mediaServer->beforeDestroy();
