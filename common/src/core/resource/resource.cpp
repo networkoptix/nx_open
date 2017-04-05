@@ -825,6 +825,11 @@ QnAbstractPtzController *QnResource::createPtzControllerInternal()
     return NULL;
 }
 
+CameraDiagnostics::Result QnResource::initInternal()
+{
+    return CameraDiagnostics::NoErrorResult();
+}
+
 void QnResource::initializationDone()
 {
 }

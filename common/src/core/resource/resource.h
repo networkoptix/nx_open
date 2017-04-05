@@ -310,7 +310,7 @@ protected:
 
     virtual QnAbstractPtzController *createPtzControllerInternal(); // TODO: #Elric does not belong here
 
-    virtual CameraDiagnostics::Result initInternal() { return CameraDiagnostics::NoErrorResult(); };
+    virtual CameraDiagnostics::Result initInternal();;
     //!Called just after successful \a initInternal()
     /*!
         Inherited class implementation MUST call base class method first

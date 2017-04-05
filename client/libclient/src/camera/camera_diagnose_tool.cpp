@@ -82,7 +82,7 @@ namespace CameraDiagnostics
         const ec2::AbstractECConnectionPtr& ecConnection = commonModule()->ec2Connection();
         if( (status != 0) || !ecConnection || (serverSystemId != ecConnection->connectionInfo().localSystemId.toString()) )
         {
-            m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(m_serverHostAddress).toString();
+            m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(m_serverHostAddress).toString(resourcePool());
 
             m_result = false;
             emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
@@ -92,7 +92,7 @@ namespace CameraDiagnostics
         }
 
         m_result = true;
-        m_errorMessage = ErrorCode::toString(ErrorCode::noError, m_camera, QList<QString>());
+        m_errorMessage = ErrorCode::toString(ErrorCode::noError, resourcePool(), m_camera, QList<QString>());
 
         emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
 
@@ -103,7 +103,7 @@ namespace CameraDiagnostics
                 this,
                 SLOT(onCameraDiagnosticsStepResponse( int, QnCameraDiagnosticsReply, int )) ) == -1 )
         {
-            m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(m_serverHostAddress).toString();
+            m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(m_serverHostAddress).toString(resourcePool());
 
             m_result = false;
             emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
@@ -120,20 +120,25 @@ namespace CameraDiagnostics
             {
                 case QNetworkReply::ContentAccessDenied:
                 case QNetworkReply::AuthenticationRequiredError:
-                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QLatin1String("Unauthorized")).toString();    //401
+                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(
+                        m_serverHostAddress, QLatin1String("Unauthorized")).toString(resourcePool());    //401
                     break;
                 case QNetworkReply::ContentOperationNotPermittedError:
-                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QLatin1String("Forbidden")).toString();       //403
+                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(
+                        m_serverHostAddress, QLatin1String("Forbidden")).toString(resourcePool());       //403
                     break;
                 case QNetworkReply::ContentNotFoundError:
-                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QLatin1String("Not Found")).toString();       //404
+                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(
+                        m_serverHostAddress, QLatin1String("Not Found")).toString(resourcePool());       //404
                     break;
                 case QNetworkReply::ProtocolFailure:
-                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(m_serverHostAddress, QString()).toString();
+                    m_errorMessage = CameraDiagnostics::MediaServerBadResponseResult(
+                        m_serverHostAddress, QString()).toString(resourcePool());
                     break;
 
                 default:
-                    m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(m_serverHostAddress).toString();
+                    m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(
+                        m_serverHostAddress).toString(resourcePool());
             }
 
             m_result = false;
@@ -144,7 +149,7 @@ namespace CameraDiagnostics
         }
 
         m_result = reply.errorCode == ErrorCode::noError;
-        m_errorMessage = ErrorCode::toString(reply.errorCode, m_camera, reply.errorParams);
+        m_errorMessage = ErrorCode::toString(reply.errorCode, resourcePool(), m_camera, reply.errorParams);
         emit diagnosticsStepResult( static_cast<Step::Value>(reply.performedStep), m_result, m_errorMessage );
 
         const Step::Value nextStep = static_cast<Step::Value>(reply.performedStep+1);
@@ -165,7 +170,8 @@ namespace CameraDiagnostics
                 this,
                 SLOT(onCameraDiagnosticsStepResponse( int, QnCameraDiagnosticsReply, int )) ) == -1 )
         {
-            m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(m_serverHostAddress).toString();
+            m_errorMessage = CameraDiagnostics::MediaServerUnavailableResult(m_serverHostAddress)
+                .toString(resourcePool());
 
             m_result = false;
             emit diagnosticsStepResult( m_step, m_result, m_errorMessage );
