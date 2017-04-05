@@ -9,6 +9,11 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
 
+QnResourcePoolTestHelper::QnResourcePoolTestHelper():
+    QnCommonModuleAware(nullptr, false)
+{
+}
+
 QString QnResourcePoolTestHelper::kTestUserName = QStringLiteral("user");
 QString QnResourcePoolTestHelper::kTestUserName2 = QStringLiteral("user_2");
 

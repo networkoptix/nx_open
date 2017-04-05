@@ -540,7 +540,7 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
         result.fromByteArray(existSession);
         return result;
     }
-    if (const auto& userRes = commonModule()->resourcePool()->getResourceById(d->accessRights.userId))
+    if (const auto& userRes = resourcePool()->getResourceById(d->accessRights.userId))
         result.userName = userRes->getName();
     else if (!nx_http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
         result.userName = lit("Video wall");

@@ -1,13 +1,18 @@
 #pragma once
 
 #include <common/common_globals.h>
+
+#include <common/common_module_aware.h>
+
 #include <nx_ec/data/api_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h> //not so good but we can allow it for test module
 
-class QnResourcePoolTestHelper
+class QnResourcePoolTestHelper: public QnCommonModuleAware
 {
 public:
+    QnResourcePoolTestHelper();
+
     static QString kTestUserName;
     static QString kTestUserName2;
 

@@ -21,8 +21,15 @@ class QnCommonModuleAware
 {
 public:
     QnCommonModuleAware(QnCommonModule* commonModule);
-    QnCommonModuleAware(QnCommonModuleAware* commonModuleAware);
-    QnCommonModuleAware(QObject* parent);
+    QnCommonModuleAware(QObject* parent, bool lazyInitialization = false);
+
+    /** Delayed initialization call. */
+    void initializeContext(QObject *parent);
+
+    /** Delayed initialization call. */
+    void initializeContext(QnCommonModule* commonModule);
+
+    void deinitializeContext();
 
     QnCommonModule* commonModule() const;
 
@@ -45,5 +52,6 @@ private:
     void init(QObject *parent);
 
 private:
-    QnCommonModule* m_commonModule = nullptr;
+    QnCommonModule* m_commonModule {nullptr};
+    bool m_initialized {false};
 };

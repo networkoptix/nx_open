@@ -26,18 +26,21 @@ protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
-        m_module.reset(new QnCommonModule());
+        m_module.reset(new QnCommonModule(true));
+        initializeContext(m_module.data());
+
         QObject::connect(globalPermissionsManager(),
             &QnGlobalPermissionsManager::globalPermissionsChanged,
             [this](const QnResourceAccessSubject& subject, Qn::GlobalPermissions value)
-        {
-            at_globalPermissionsChanged(subject, value);
-        });
+            {
+                at_globalPermissionsChanged(subject, value);
+            });
     }
 
     // virtual void TearDown() will be called after each test is run.
     virtual void TearDown()
     {
+        deinitializeContext();
         ASSERT_TRUE(m_awaitedAccessQueue.empty());
         m_currentUser.clear();
         m_module.clear();

@@ -5,6 +5,8 @@
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 
+#include <common/common_module.h>
+
 #include <recording/time_period_list.h>
 #include <nx/utils/test_support/test_options.h>
 #include <network/tcp_connection_processor.h>
@@ -22,8 +24,11 @@ namespace {
 class TestConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
-    TestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket):
-        QnTCPConnectionProcessor(socket)
+    TestConnectionProcessor(
+        QnCommonModule* commonModule,
+        QSharedPointer<AbstractStreamSocket> socket)
+        :
+        QnTCPConnectionProcessor(socket, commonModule)
     {
     }
     virtual ~TestConnectionProcessor() override
@@ -49,8 +54,8 @@ protected:
 class TestTcpListener: public QnTcpListener
 {
 public:
-    TestTcpListener(const QHostAddress& address, int port):
-        QnTcpListener(address, port, DEFAULT_MAX_CONNECTIONS, /*useSSL*/ false)
+    TestTcpListener(QnCommonModule* commonModule, const QHostAddress& address, int port):
+        QnTcpListener(commonModule, address, port, DEFAULT_MAX_CONNECTIONS, /*useSSL*/ false)
     {
     }
 
@@ -63,14 +68,16 @@ protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
         QSharedPointer<AbstractStreamSocket> clientSocket) override
     {
-        return new TestConnectionProcessor(clientSocket);
+        return new TestConnectionProcessor(commonModule(), clientSocket);
     }
 };
 
 
 TEST( TcpConnectionProcessor, sendAsyncData )
 {
-    TestTcpListener tcpListener(QHostAddress::Any, 0);
+    QScopedPointer<QnCommonModule> commonModule(new QnCommonModule(true));
+
+    TestTcpListener tcpListener(commonModule.data(), QHostAddress::Any, 0);
     tcpListener.start();
 
     QElapsedTimer timer;

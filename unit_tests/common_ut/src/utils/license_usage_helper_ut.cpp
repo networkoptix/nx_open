@@ -24,21 +24,21 @@ protected:
     virtual void SetUp()
     {
         m_module.reset(new QnCommonModule(true));
+        initializeContext(m_module.data());
         m_server = addServer();
         m_server->setStatus(Qn::Online);
-        m_licenses.reset(new QnLicensePoolScaffold(m_module->licensePool()));
-        m_helper.reset(new QnCamLicenseUsageHelper(module()));
+        m_licenses.reset(new QnLicensePoolScaffold(licensePool()));
+        m_helper.reset(new QnCamLicenseUsageHelper(commonModule()));
     }
 
     // virtual void TearDown() will be called after each test is run.
     virtual void TearDown()
     {
+        deinitializeContext();
         m_helper.reset();
         m_licenses.reset();
         m_module.clear();
     }
-
-    QnCommonModule* module() const { return m_module.data(); }
 
     QnVirtualCameraResourcePtr addRecordingCamera(
         Qn::LicenseType cameraType = Qn::LC_Professional,

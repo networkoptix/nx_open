@@ -30,12 +30,14 @@ protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
-        m_module.reset(new QnCommonModule());
+        m_module.reset(new QnCommonModule(true));
+        initializeContext(m_module.data());
     }
 
     // virtual void TearDown() will be called after each test is run.
     virtual void TearDown()
     {
+        deinitializeContext();
         m_currentUser.clear();
         m_module.clear();
     }
