@@ -10,7 +10,7 @@
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <utils/common/subscription.h>
+#include <nx/utils/subscription.h>
 
 #include "outgoing_tunnel.h"
 

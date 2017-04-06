@@ -4,7 +4,7 @@
 #include <thread>
 
 #include <nx/utils/std/thread.h>
-#include <utils/common/subscription.h>
+#include <nx/utils/subscription.h>
 
 TEST(UtilsCommon, SubscriptionGuard)
 {
