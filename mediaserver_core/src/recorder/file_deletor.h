@@ -16,6 +16,7 @@
 
 class QnFileDeletor: public QnLongRunnable, public QnCommonModuleAware
 {
+    Q_OBJECT
 public:
     void init(const QString& tmpRoot);
     static QnFileDeletor* instance();

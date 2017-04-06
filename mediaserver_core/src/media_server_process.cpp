@@ -2943,6 +2943,8 @@ void MediaServerProcess::run()
 
     performActionsOnExit();
 
+    m_serverModule.reset();
+
     nx::network::SocketGlobals::outgoingTunnelPool().clearOwnPeerId();
 }
 
