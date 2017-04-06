@@ -74,5 +74,6 @@ private:
     mutable QnMutex m_mutex;
     mutable QnMutex m_updateMutex;
     QScopedPointer<QnThreadsafeItemStorage<QnPeerRuntimeInfo> > m_items;
+    QnCommonMessageProcessor* m_messageProcessor = nullptr;
 };
 

@@ -173,7 +173,7 @@ typedef std::shared_ptr<QnResourceSetParamsCommand> QnResourceSetParamsCommandPt
 // -------------------------------------------------------------------------- //
 // QnResource
 // -------------------------------------------------------------------------- //
-QnResource::QnResource():
+QnResource::QnResource(QnCommonModule* commonModule):
     QObject(),
     m_mutex(QnMutex::Recursive),
     m_initMutex(QnMutex::Recursive),
@@ -184,7 +184,8 @@ QnResource::QnResource():
     m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
     m_lastMediaIssue(CameraDiagnostics::NoErrorResult()),
     m_removedFromPool(false),
-    m_initInProgress(false)
+    m_initInProgress(false),
+    m_commonModule(commonModule)
 {
 }
 
@@ -207,7 +208,8 @@ QnResource::QnResource(const QnResource& right)
     m_initializationAttemptCount(right.m_initializationAttemptCount),
     m_locallySavedProperties(right.m_locallySavedProperties),
     m_removedFromPool(right.m_removedFromPool),
-    m_initInProgress(right.m_initInProgress)
+    m_initInProgress(right.m_initInProgress),
+    m_commonModule(right.m_commonModule)
 {
 }
 
@@ -1222,18 +1224,28 @@ void QnResource::setRemovedFromPool(bool value)
     m_removedFromPool = value;
 }
 
+void QnResource::setCommonModule(QnCommonModule* commonModule)
+{
+    m_commonModule = commonModule;
+}
+
 QnCommonModule* QnResource::commonModule() const
 {
-    return resourcePool() ? resourcePool()->commonModule() : nullptr;
+    if (m_commonModule)
+        return m_commonModule;
+    else if (resourcePool())
+        return resourcePool()->commonModule();
+    else
+        return nullptr;
 }
 
 void QnResource::saveParams()
 {
-    resourcePool()->commonModule()->propertyDictionary()->saveParams(getId());
+    commonModule()->propertyDictionary()->saveParams(getId());
 }
 
 void QnResource::saveParamsAsync()
 {
-    resourcePool()->commonModule()->propertyDictionary()->saveParamsAsync(getId());
+    commonModule()->propertyDictionary()->saveParamsAsync(getId());
 }
 

@@ -667,7 +667,7 @@ void QnCommonMessageProcessor::updateResource(const QnResourcePtr&, ec2::Notific
 
 void QnCommonMessageProcessor::updateResource(const ec2::ApiUserData& user, ec2::NotificationSource source)
 {
-    QnUserResourcePtr qnUser(fromApiToResource(user));
+    QnUserResourcePtr qnUser(fromApiToResource(user, commonModule()));
     updateResource(qnUser, source);
 }
 
@@ -722,7 +722,7 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, 
 
 void QnCommonMessageProcessor::updateResource(const ec2::ApiMediaServerData& server, ec2::NotificationSource source)
 {
-    QnMediaServerResourcePtr qnServer(new QnMediaServerResource());
+    QnMediaServerResourcePtr qnServer(new QnMediaServerResource(commonModule()));
     fromApiToResource(server, qnServer);
     updateResource(qnServer, source);
 }

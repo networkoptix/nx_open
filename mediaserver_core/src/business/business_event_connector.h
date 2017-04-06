@@ -27,7 +27,7 @@ class QnBusinessEventConnector:
     Q_OBJECT
 
 public:
-    QnBusinessEventConnector(QObject* parent);
+    QnBusinessEventConnector(QnCommonModule* commonModule);
     ~QnBusinessEventConnector();
 
 public slots:

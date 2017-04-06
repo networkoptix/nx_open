@@ -64,13 +64,6 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource, ec2
                 commonModule()->ec2Connection()->getMediaServerManager(Qn::kSystemAccess)->saveSync(ownData);
                 return;
             }
-
-            // We are always online
-            if (resource->getStatus() != Qn::Online && resource->getStatus() != Qn::NotDefined)
-            {
-                qWarning() << "ServerMessageProcessor: Received message that our status is " << resource->getStatus() << ". change to online";
-                resource->setStatus(Qn::Online);
-            }
         }
         else
         {

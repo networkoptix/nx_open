@@ -18,6 +18,7 @@
 #include <common/common_module_aware.h>
 
 class QnCommonMessageProcessor;
+class QnCommonMessageProcessor;
 
 /**
  *  Class for maintaining camera history - what server contains which part of the camera archive.
@@ -191,6 +192,7 @@ private:
     mutable QnMutex m_syncLoadMutex;
     QnWaitCondition m_syncLoadWaitCond;
     QSet<QnUuid> m_camerasToCheck;
+    const QnCommonMessageProcessor* m_messageProcessor = nullptr;
 };
 
 #endif // QN_CAMERA_HISTORY_H

@@ -45,8 +45,8 @@ QString QnMediaServerResource::apiUrlScheme(bool sslAllowed)
     return sslAllowed ? lit("https") : lit("http");
 }
 
-QnMediaServerResource::QnMediaServerResource():
-    base_type(),
+QnMediaServerResource::QnMediaServerResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_serverFlags(Qn::SF_None),
     m_panicModeCache(
         std::bind(&QnMediaServerResource::calculatePanicMode, this),

@@ -20,9 +20,8 @@
 
 //#define REDUCE_NET_ISSUE_HACK
 
-QnBusinessEventConnector::QnBusinessEventConnector(QObject* parent):
-    QObject(parent),
-    QnCommonModuleAware(parent)
+QnBusinessEventConnector::QnBusinessEventConnector(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
     connect(resourcePool(), &QnResourcePool::resourceAdded, this, &QnBusinessEventConnector::onNewResource);
 }

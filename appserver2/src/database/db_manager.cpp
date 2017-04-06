@@ -556,7 +556,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
             if (iter == users.cend())
                 return false;
 
-            userResource = fromApiToResource(*iter);
+            userResource = fromApiToResource(*iter, commonModule());
             NX_ASSERT(userResource->isOwner(), Q_FUNC_INFO, "Admin must be admin as it is found by name");
         }
 

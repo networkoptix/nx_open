@@ -51,7 +51,7 @@ class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource
     Q_PROPERTY(Qn::PtzCapabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
 public:
 
-    QnResource();
+    QnResource(QnCommonModule* commonModule = nullptr);
     QnResource(const QnResource&);
     virtual ~QnResource();
 
@@ -300,6 +300,8 @@ public:
 
     void getParamsPhysicalAsync(const QSet<QString> &ids);
     void setParamsPhysicalAsync(const QnCameraAdvancedParamValueList &values);
+
+    void setCommonModule(QnCommonModule* commonModule);
     QnCommonModule* commonModule() const;
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers);
@@ -410,6 +412,7 @@ private:
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
     bool m_removedFromPool;
     bool m_initInProgress;
+    QnCommonModule* m_commonModule;
 };
 
 template<class Resource>

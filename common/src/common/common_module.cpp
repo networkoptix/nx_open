@@ -377,6 +377,14 @@ QnCommonMessageProcessor* QnCommonModule::messageProcessor() const
 
 void QnCommonModule::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
 {
+    if (m_messageProcessor)
+    {
+        m_messageProcessor->init(nullptr); // stop receiving notifications
+        m_runtimeInfoManager->setMessageProcessor(nullptr);
+        m_cameraHistory->setMessageProcessor(nullptr);
+        delete m_messageProcessor;
+    }
+
     m_messageProcessor = messageProcessor;
     m_runtimeInfoManager->setMessageProcessor(messageProcessor);
     m_cameraHistory->setMessageProcessor(messageProcessor);

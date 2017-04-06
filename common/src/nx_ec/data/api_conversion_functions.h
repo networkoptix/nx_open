@@ -12,6 +12,7 @@
 
 class SocketAddress;
 class QnCameraUserAttributePool;
+class QnCommonModule;
 
 namespace ec2
 {
@@ -91,7 +92,7 @@ namespace ec2
     void fromApiToResource(const ApiResourceTypeData& src, QnResourceTypePtr& dst);
     void fromApiToResourceList(const ApiResourceTypeDataList& src, QnResourceTypeList& dst);
 
-    QnUserResourcePtr fromApiToResource(const ApiUserData& src);
+    QnUserResourcePtr fromApiToResource(const ApiUserData& src, QnCommonModule* commonModule = nullptr);
     void fromApiToResource(const ApiUserData& src, QnUserResourcePtr& dst);
     void fromResourceToApi(const QnUserResourcePtr& resource, ApiUserData& data);
     void fromApiToResourceList(const ApiUserDataList& src, QnResourceList& dst);

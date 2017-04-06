@@ -741,9 +741,11 @@ static QnUserType userResourceType(bool isLdap, bool isCloud)
                      QnUserType::Local;
 }
 
-QnUserResourcePtr fromApiToResource(const ApiUserData& src)
+QnUserResourcePtr fromApiToResource(const ApiUserData& src, QnCommonModule* commonModule)
 {
     QnUserResourcePtr dst(new QnUserResource(userResourceType(src.isLdap, src.isCloud)));
+    if (commonModule)
+        dst->setCommonModule(commonModule);
     fromApiToResource(src, dst);
     return dst;
 }

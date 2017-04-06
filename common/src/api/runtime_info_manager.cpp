@@ -17,27 +17,36 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
 
 void QnRuntimeInfoManager::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
 {
-    connect(messageProcessor, &QnCommonMessageProcessor::runtimeInfoChanged, this, [this](const ec2::ApiRuntimeData &runtimeData)
+    if (m_messageProcessor)
+        disconnect(m_messageProcessor, nullptr, this, nullptr);
+
+    if (messageProcessor)
     {
-        QnPeerRuntimeInfo info(runtimeData);
-        m_items->addOrUpdateItem(info);
-    });
+        connect(messageProcessor, &QnCommonMessageProcessor::runtimeInfoChanged, this, [this](const ec2::ApiRuntimeData &runtimeData)
+        {
+            QnPeerRuntimeInfo info(runtimeData);
+            m_items->addOrUpdateItem(info);
+        });
 
-    connect(messageProcessor, &QnCommonMessageProcessor::remotePeerLost, this, [this](const ec2::ApiPeerAliveData &data) {
-        m_items->removeItem(data.peer.id);
-    });
+        connect(messageProcessor, &QnCommonMessageProcessor::remotePeerLost, this, [this](const ec2::ApiPeerAliveData &data)
+        {
+            m_items->removeItem(data.peer.id);
+        });
 
-    connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed, this, [this] {
-        m_items->setItems(QnPeerRuntimeInfoList() << localInfo());
-    });
+        connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed, this, [this]
+        {
+            m_items->setItems(QnPeerRuntimeInfoList() << localInfo());
+        });
 
-    /* Client updates running instance guid on each connect to server */
-    connect(commonModule(), &QnCommonModule::runningInstanceGUIDChanged, this, [this]()
-    {
-        ec2::ApiRuntimeData item = localInfo().data;
-        item.peer.instanceId = commonModule()->runningInstanceGUID();
-        updateLocalItem(item);
-    }, Qt::DirectConnection);
+        /* Client updates running instance guid on each connect to server */
+        connect(commonModule(), &QnCommonModule::runningInstanceGUIDChanged, this, [this]()
+        {
+            ec2::ApiRuntimeData item = localInfo().data;
+            item.peer.instanceId = commonModule()->runningInstanceGUID();
+            updateLocalItem(item);
+        }, Qt::DirectConnection);
+    }
+    m_messageProcessor = messageProcessor;
 }
 
 const QnThreadsafeItemStorage<QnPeerRuntimeInfo> * QnRuntimeInfoManager::items() const {

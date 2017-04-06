@@ -111,8 +111,8 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     if (!compatibleCustomization(customization, qnStaticCommon->customization(), isMobile))
         return Qn::IncompatibleInternalConnectionResult;
 
-    if (!cloudHost.isEmpty() && cloudHost != QnAppInfo::defaultCloudHost())
-        return Qn::IncompatibleCloudHostConnectionResult;
+    //if (!cloudHost.isEmpty() && cloudHost != QnAppInfo::defaultCloudHost())
+    //    return Qn::IncompatibleCloudHostConnectionResult;
 
     if (version < minSupportedVersion())
         return Qn::IncompatibleVersionConnectionResult;
