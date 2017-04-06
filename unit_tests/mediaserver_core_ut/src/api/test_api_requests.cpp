@@ -58,7 +58,8 @@ std::unique_ptr<nx_http::HttpClient> createHttpClient()
 QUrl createUrl(const MediaServerLauncher* const launcher, const QString& urlStr)
 {
     // NOTE: urlStr contains a URL part starting after the origin: slash, path, query, etc.
-    return QUrl(launcher->apiUrl().toString() + urlStr);
+    return QUrl(launcher->apiUrl().toString(
+        QUrl::RemovePath | QUrl::RemoveQuery | QUrl::RemoveFragment) + urlStr);
 }
 
 void doExecutePost(
