@@ -9,14 +9,30 @@ namespace nx {
 namespace network {
 namespace websocket {
 
-class WebsocketAsyncChannel : 
+class AsyncChannel : 
     public aio::AbstractAsyncChannel,
-    private nx_api::BaseServerConnection<WebsocketAsyncChannel>
+    private nx_api::BaseServerConnection<AsyncChannel>
 {
 public:
-    enum class Mode
+    /** frameSingle     - wrap whole buffer in a websocket message
+        frameMultiple   - subsequent frames is a part of one multi-framed message (except the last frame)
+        frameFin        - next frame will be marked as a final in a message
+    */
+    enum class SendMode
+    {
+        frameSingle,
+        frameMultiple,
+        frameFin,
+    };
+
+    /** frame   - readSomeAsync() callback will be called when the whole frame is buffered 
+        message - readSomeAsync() callback will be called when the whole message is buffered
+        stream  - readSomeAsync() callback will be called when any amount of payload has been read from the socket
+    */
+    enum class ReceiveMode
     {
         frame,
+        message,
         stream
     };
 
@@ -26,18 +42,27 @@ public:
         text
     };
 
-public:
-    WebsocketAsyncChannel(
-        StreamConnectionHolder<WebsocketAsyncChannel>* connectionManager,
-        std::unique_ptr<AbstractStreamSocket> streamSocket,
-        bool isServer,
-        const nx::Buffer& requestData);
+    enum class Role
+    {
+        Client,
+        Server,
+        Undefined
+    };
 
-    void setMode(Mode mode);
-    Mode getMode() const;
+public:
+    AsyncChannel(
+        std::unique_ptr<AbstractStreamSocket> streamSocket,
+        const nx::Buffer& requestData,
+        Role role = Role::Undefined); //< if role is undefined, payload won't be masked (unmasked)
+
+    void setSendMode(SendMode mode);
+    SendMode sendMode() const;
+
+    void setReceiveMode(ReceiveMode mode);
+    ReceiveMode receiveMode() const;
 
     void setPayloadType(PayloadType type);
-    PayloadType getPayloadType() const;
+    PayloadType prevFramePayloadType() const;
 
     /** Needed by BaseServerConnection */
     void bytesReceived(const nx::Buffer& buf);
