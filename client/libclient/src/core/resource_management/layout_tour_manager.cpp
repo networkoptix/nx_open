@@ -6,6 +6,8 @@
 
 #include <nx_ec/data/api_layout_tour_data.h>
 
+#include <nx/utils/log/assert.h>
+
 QnLayoutTourManager::QnLayoutTourManager(QObject* parent)
 {
 
@@ -56,11 +58,9 @@ QnLayoutTourItemList QnLayoutTourManager::tourItems(const ec2::ApiLayoutTourData
     return result;
 }
 
-
-//TODO: #GDM #3.1 #high think about semantics: who will save on server and who update locally
-void QnLayoutTourManager::saveTour(const ec2::ApiLayoutTourData& tour)
+void QnLayoutTourManager::addOrUpdateTour(const ec2::ApiLayoutTourData& tour)
 {
-    for (auto& existing: m_tours)
+    for (auto& existing : m_tours)
     {
         if (existing.id == tour.id)
         {
@@ -69,6 +69,11 @@ void QnLayoutTourManager::saveTour(const ec2::ApiLayoutTourData& tour)
         }
     }
     m_tours.push_back(tour);
+}
+
+void QnLayoutTourManager::saveTour(const ec2::ApiLayoutTourData& tour)
+{
+    NX_EXPECT(this->tour(tour.id).isValid());
 
 //     const auto connection = QnAppServerConnectionFactory::getConnection2();
 //     if (!connection)

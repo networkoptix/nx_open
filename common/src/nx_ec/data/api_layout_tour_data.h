@@ -26,6 +26,8 @@ struct ApiLayoutTourData: ApiIdData
 {
     QString name;
     std::vector<ApiLayoutTourItemData> items;
+
+    bool isValid() const;
 };
 
 #define ApiLayoutTourData_Fields ApiIdData_Fields (name)(items)

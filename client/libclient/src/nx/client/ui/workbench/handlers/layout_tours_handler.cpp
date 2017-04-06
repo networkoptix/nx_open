@@ -2,11 +2,14 @@
 
 #include <QtWidgets/QAction>
 
-#include <ui/style/skin.h>
-#include <ui/workbench/workbench.h>
-#include <ui/actions/action_manager.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/layout_tour_manager.h>
+
+#include <core/resource/layout_resource.h>
+
+#include <ui/actions/action_manager.h>
+#include <ui/workbench/workbench.h>
+#include <ui/style/skin.h>
 
 namespace nx {
 namespace client {

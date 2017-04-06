@@ -30,6 +30,7 @@ public:
     QnLayoutTourItemList tourItems(const QnUuid& id) const;
     QnLayoutTourItemList tourItems(const ec2::ApiLayoutTourData& tour) const;
 
+    void addOrUpdateTour(const ec2::ApiLayoutTourData& tour);
     void saveTour(const ec2::ApiLayoutTourData& tour);
 private:
     mutable QnMutex m_mutex;

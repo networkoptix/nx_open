@@ -9,4 +9,9 @@ namespace ec2 {
      (ubjson)(xml)(json)(sql_record)(csv_record),
      _Fields)
 
+bool ApiLayoutTourData::isValid() const
+{
+    return !id.isNull();
+}
+
 } // namespace ec2
