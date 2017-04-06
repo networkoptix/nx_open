@@ -751,6 +751,22 @@ QnActionManager::QnActionManager(QObject *parent):
             ).
             autoRepeat(false);
 
+        factory(QnActions::NewLayoutTourAction).
+            flags(Qn::Main | Qn::Tree | Qn::NoTarget).
+            requiredGlobalPermission(Qn::GlobalAdminPermission).
+            text(tr("Layout Tour...")).
+            pulledText(tr("New Layout Tour...")).
+            condition(new QnConjunctionActionCondition(
+                new QnDisjunctionActionCondition(
+                    new QnTreeNodeTypeCondition(Qn::LayoutsNode, this),
+                    new QnTreeNodeTypeCondition(Qn::LayoutToursNode, this),
+                    this
+                ),
+                new QnForbiddenInSafeModeCondition(this),
+                this)
+            ).
+            autoRepeat(false);
+
     }
     factory.endSubMenu();
 
@@ -1781,6 +1797,13 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
         text(tr("Delete Layouts Tour"));
+
+    factory(QnActions::LayoutTourSettingsAction).
+        flags(Qn::Tree | Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Layout Tour Settings...")).
+        requiredGlobalPermission(Qn::GlobalAdminPermission). //TODO: #GDM #3.1 #tbd
+        condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this));
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).

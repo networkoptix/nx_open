@@ -4,6 +4,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <core/resource_management/layout_tour_manager.h>
 
 #include <core/resource_access/resource_access_manager.h>
 
@@ -46,6 +47,7 @@ bool nodeRequiresChildren(Qn::NodeType nodeType)
         << Qn::SystemNode
         << Qn::RoleUsersNode
         << Qn::LayoutsNode
+        << Qn::LayoutToursNode
         << Qn::SharedLayoutsNode
         << Qn::SharedResourcesNode
         ;
@@ -119,6 +121,9 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
         break;
     case Qn::LayoutsNode:
         setNameInternal(tr("Layouts"));
+        break;
+    case Qn::LayoutToursNode:
+        setNameInternal(tr("Layout Tours"));
         break;
     case Qn::RecorderNode:
         m_state = Invalid;
@@ -314,6 +319,12 @@ void QnResourceTreeModelNode::update()
             }
             break;
         }
+        case Qn::LayoutTourNode:
+        {
+            auto tour = qnLayoutTourManager->tour(m_uuid);
+            setNameInternal(tour.name.isEmpty() ? tr("Layout Tour") : tour.name);
+            break;
+        }
         case Qn::CurrentSystemNode:
         {
             setNameInternal(qnGlobalSettings->systemName());
@@ -459,6 +470,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         case Qn::RoleUsersNode:
         case Qn::SharedResourceNode:
         case Qn::RoleNode:
+        case Qn::LayoutTourNode: //TODO: #GDM #3.1 #tbd
         case Qn::SharedLayoutNode:
         case Qn::RecorderNode:
         case Qn::SystemNode:
@@ -678,6 +690,10 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
         case Qn::VideoWallItemNode:
         case Qn::VideoWallMatrixNode:
             m_editable.value = accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission);
+            break;
+        case Qn::LayoutTourNode:
+            //TODO: #GDM #3.1 #tbd
+            m_editable.value = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
             break;
         case Qn::RecorderNode:
             m_editable.value = true;
@@ -1109,6 +1125,7 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
             return qnResIconCache->icon(QnResourceIconCache::Cameras);
 
         case Qn::LayoutsNode:
+        case Qn::LayoutTourNode:
             return qnResIconCache->icon(QnResourceIconCache::Layouts);
 
         case Qn::AllLayoutsAccessNode:

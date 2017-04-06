@@ -58,15 +58,23 @@ QnLayoutTourItemList QnLayoutTourManager::tourItems(const ec2::ApiLayoutTourData
 
 void QnLayoutTourManager::addOrUpdateTour(const ec2::ApiLayoutTourData& tour)
 {
+    QnMutexLocker lock(&m_mutex);
     for (auto& existing : m_tours)
     {
         if (existing.id == tour.id)
         {
+            if (existing == tour)
+                return;
+
             existing = tour;
+            lock.unlock();
+            emit tourChanged(tour);
             return;
         }
     }
     m_tours.push_back(tour);
+    lock.unlock();
+    emit tourAdded(tour);
 }
 
 void QnLayoutTourManager::saveTour(const ec2::ApiLayoutTourData& tour)

@@ -5,6 +5,7 @@
 #include <nx_ec/data/api_layout_tour_data.h>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 
 struct QnLayoutTourItem
@@ -19,7 +20,7 @@ struct QnLayoutTourItem
 
 using QnLayoutTourItemList = std::vector<QnLayoutTourItem>;
 
-class QnLayoutTourManager: public QObject
+class QnLayoutTourManager: public QObject, public Singleton<QnLayoutTourManager>
 {
     Q_OBJECT
     using base_type = QObject;
@@ -36,7 +37,15 @@ public:
 
     void addOrUpdateTour(const ec2::ApiLayoutTourData& tour);
     void saveTour(const ec2::ApiLayoutTourData& tour);
+
+signals:
+    void tourAdded(const ec2::ApiLayoutTourData& tour);
+    void tourChanged(const ec2::ApiLayoutTourData& tour);
+    void tourRemoved(const ec2::ApiLayoutTourData& tour);
+
 private:
     mutable QnMutex m_mutex;
     ec2::ApiLayoutTourDataList m_tours;
 };
+
+#define qnLayoutTourManager QnLayoutTourManager::instance()

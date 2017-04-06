@@ -8,8 +8,10 @@
 #include <core/resource/layout_resource.h>
 
 #include <ui/actions/action_manager.h>
+#include <ui/dialogs/layout_tour_dialog.h>
 #include <ui/workbench/workbench.h>
 #include <ui/style/skin.h>
+
 
 namespace nx {
 namespace client {
