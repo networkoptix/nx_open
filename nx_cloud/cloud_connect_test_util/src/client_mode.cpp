@@ -25,9 +25,9 @@ void printConnectOptions(std::ostream* const outStream)
         "  --total-connections={"<< kDefaultTotalConnections <<"}\n"
         "                       Number of connections to try\n"
         "  --max-concurrent-connections={"<< kDefaultMaxConcurrentConnections <<"}\n"
-        "  --bytes-to-receive={" << nx::utils::bytesToString(kDefaultBytesToReceive).toStdString() << "}\n"
-        "                       Bytes to receive before closing connection\n"
-        "  --bytes-to-send={N}  Bytes to send before closing connection\n"
+        "  --bytes-to-receive={N}\n"
+        "                       Bytes to receive before closing connection. No limit by default\n"
+        "  --bytes-to-send={N}  Bytes to send before closing connection. No limit by default\n"
         "  --forward-address    Use only forwarded address for connect"
         "  --udt                Force using udt socket. Disables cloud connect\n"
         "  --ssl                Use SSL on top of client sockets\n";

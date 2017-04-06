@@ -57,24 +57,23 @@ std::unique_ptr<nx_http::HttpClient> createHttpClient()
 
 QUrl createUrl(const MediaServerLauncher* const launcher, const QString& urlStr)
 {
-    QUrl url = launcher->apiUrl();
-    url.setPath(urlStr);
-    return url;
+    // NOTE: urlStr contains a URL part starting after the origin: slash, path, query, etc.
+    return QUrl(launcher->apiUrl().toString() + urlStr);
 }
 
 void doExecutePost(
     const MediaServerLauncher* const launcher,
-    const QString& urlPath,
+    const QString& urlStr,
     const QByteArray& request,
     PreprocessRequestFunc preprocessRequestFunc,
     int httpStatus)
 {
     auto httpClient = createHttpClient();
-    QUrl url = createUrl(launcher, urlPath);
+    QUrl url = createUrl(launcher, urlStr);
 
     const auto& actualRequest = preprocessRequestFunc ? preprocessRequestFunc(request) : request;
 
-    NX_LOG(lm("[TEST] POST %1").arg(urlPath), cl_logINFO);
+    NX_LOG(lm("[TEST] POST %1").arg(urlStr), cl_logINFO);
     NX_LOG(lm("[TEST] POST_REQUEST: %2").arg(actualRequest), cl_logINFO);
 
     httpClient->doPost(url, "application/json", actualRequest);
@@ -89,14 +88,14 @@ void doExecutePost(
 
 void doExecuteGet(
     const MediaServerLauncher* const launcher,
-    const QString& urlPath,
+    const QString& urlStr,
     nx_http::BufferType* outResponse,
     int httpStatus)
 {
     auto httpClient = createHttpClient();
-    QUrl url = createUrl(launcher, urlPath);
+    QUrl url = createUrl(launcher, urlStr);
 
-    NX_LOG(lm("[TEST] GET %1").arg(urlPath), cl_logINFO);
+    NX_LOG(lm("[TEST] GET %1").arg(urlStr), cl_logINFO);
 
     ASSERT_TRUE(httpClient->doGet(url));
 

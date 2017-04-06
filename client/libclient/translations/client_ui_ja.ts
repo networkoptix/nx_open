@@ -6,7 +6,7 @@
     <message>
         <location filename="../src/ui/dialogs/about_dialog.ui"/>
         <source>About</source>
-        <translation>Nx Witnessについて</translation>
+        <translation>について</translation>
     </message>
     <message>
         <location/>
