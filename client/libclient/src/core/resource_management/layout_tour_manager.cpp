@@ -4,8 +4,6 @@
 
 #include <core/resource/layout_resource.h>
 
-#include <nx_ec/data/api_layout_tour_data.h>
-
 #include <nx/utils/log/assert.h>
 
 QnLayoutTourManager::QnLayoutTourManager(QObject* parent)
@@ -30,7 +28,7 @@ void QnLayoutTourManager::resetTours(const ec2::ApiLayoutTourDataList& tours)
     m_tours = tours;
 }
 
-const ec2::ApiLayoutTourData& QnLayoutTourManager::tour(const QnUuid& id) const
+ec2::ApiLayoutTourData QnLayoutTourManager::tour(const QnUuid& id) const
 {
     QnMutexLocker lock(&m_mutex);
     auto iter = std::find_if(m_tours.cbegin(), m_tours.cend(),
