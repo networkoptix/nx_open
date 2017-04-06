@@ -43,6 +43,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_runtime_data.h>
+#include <core/resource_management/layout_tour_manager.h>
 
 #include <decoders/video/abstract_video_decoder.h>
 
@@ -302,6 +303,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
     common->store(new QnResourcesChangesManager());
     common->store(new QnCameraBookmarksManager());
     common->store(new QnServerStorageManager());
+    common->instance<QnLayoutTourManager>();
 
     common->store(new QnVoiceSpectrumAnalyzer());
 

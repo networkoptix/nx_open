@@ -195,7 +195,9 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, con
     NX_ASSERT(nodeType == Qn::LayoutItemNode
         || nodeType == Qn::VideoWallItemNode
         || nodeType == Qn::VideoWallMatrixNode
-        || nodeType == Qn::RoleNode);
+        || nodeType == Qn::RoleNode
+        || nodeType == Qn::LayoutTourNode
+    );
 
     m_state = Invalid;
     m_status = Qn::Offline;
@@ -206,6 +208,12 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, con
         {
             auto role = qnUserRolesManager->userRole(m_uuid);
             setNameInternal(role.name);
+            break;
+        }
+        case Qn::LayoutTourNode:
+        {
+            auto tour = qnLayoutTourManager->tour(m_uuid);
+            setNameInternal(tour.name);
             break;
         }
         default:
@@ -499,6 +507,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         return !isLoggedIn || isAdmin;
 
     case Qn::LayoutsNode:
+    case Qn::LayoutToursNode:
         return !isLoggedIn;
 
     case Qn::EdgeNode:

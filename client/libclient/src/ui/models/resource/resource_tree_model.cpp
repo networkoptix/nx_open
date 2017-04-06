@@ -85,6 +85,7 @@ QList<Qn::NodeType> rootNodeTypes()
             << Qn::ServersNode
             << Qn::UserResourcesNode
             << Qn::LayoutsNode
+            << Qn::LayoutToursNode
             << Qn::WebPagesNode
             << Qn::LocalResourcesNode
             << Qn::LocalSeparatorNode
@@ -340,23 +341,17 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
             return rootNode;
         return bastardNode;
 
-    case Qn::CurrentSystemNode:
-    case Qn::CurrentUserNode:
-        if (m_scope == FullScope && isLoggedIn)
-            return rootNode;
-        return bastardNode;
-
-    case Qn::SeparatorNode:
-        if (m_scope == FullScope && isLoggedIn)
-            return rootNode;
-        return bastardNode;
-
     case Qn::LocalSeparatorNode:
         if (m_scope == FullScope && !isLoggedIn)
             return rootNode;
         return bastardNode;
 
+    case Qn::CurrentSystemNode:
+    case Qn::CurrentUserNode:
+    case Qn::SeparatorNode:
     case Qn::LayoutsNode:
+    case Qn::LayoutToursNode:
+    case Qn::WebPagesNode:
         if (m_scope == FullScope && isLoggedIn)
             return rootNode;
         return bastardNode;
@@ -365,11 +360,6 @@ QnResourceTreeModelNodePtr QnResourceTreeModel::expectedParent(const QnResourceT
         if (m_scope == CamerasScope && !isAdmin)
             return QnResourceTreeModelNodePtr(); /*< Be the root node in this scope. */
         if (m_scope == FullScope && isLoggedIn && !isAdmin)
-            return rootNode;
-        return bastardNode;
-
-    case Qn::WebPagesNode:
-        if (m_scope == FullScope && isLoggedIn)
             return rootNode;
         return bastardNode;
 

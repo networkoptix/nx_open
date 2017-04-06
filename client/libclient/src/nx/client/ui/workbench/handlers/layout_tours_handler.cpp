@@ -23,6 +23,15 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
+    connect(action(QnActions::NewLayoutTourAction), &QAction::triggered, this,
+        [this]()
+        {
+            ec2::ApiLayoutTourData tour;
+            tour.id = QnUuid::createUuid();
+            tour.name = tour.id.toSimpleString();
+            qnLayoutTourManager->addOrUpdateTour(tour);
+        });
+
     connect(action(QnActions::OpenLayoutTourAction), &QAction::triggered,
         this, &LayoutToursHandler::openToursLayout);
 }
