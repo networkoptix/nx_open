@@ -9,9 +9,22 @@ namespace ec2 {
      (ubjson)(xml)(json)(sql_record)(csv_record),
      _Fields)
 
+bool ApiLayoutTourItemData::operator==(const ApiLayoutTourItemData& rhs) const
+{
+     return layoutId == rhs.layoutId
+         && delayMs == rhs.delayMs;
+}
+
 bool ApiLayoutTourData::isValid() const
 {
     return !id.isNull();
+}
+
+bool ApiLayoutTourData::operator==(const ApiLayoutTourData& rhs) const
+{
+    return id == rhs.id
+        && name == rhs.name
+        && items == rhs.items;
 }
 
 } // namespace ec2

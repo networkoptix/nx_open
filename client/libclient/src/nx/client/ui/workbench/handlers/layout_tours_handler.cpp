@@ -32,6 +32,18 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             qnLayoutTourManager->addOrUpdateTour(tour);
         });
 
+    connect(action(QnActions::RenameLayoutTourAction), &QAction::triggered, this,
+        [this]()
+        {
+            QnActionParameters parameters = menu()->currentParameters(sender());
+            auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+            auto tour = qnLayoutTourManager->tour(id);
+            if (!tour.isValid())
+                return;
+            tour.name = parameters.argument<QString>(Qn::ResourceNameRole);
+            qnLayoutTourManager->addOrUpdateTour(tour);
+        });
+
     connect(action(QnActions::OpenLayoutTourAction), &QAction::triggered,
         this, &LayoutToursHandler::openToursLayout);
 }

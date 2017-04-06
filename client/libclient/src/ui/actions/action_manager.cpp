@@ -1527,6 +1527,18 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnForbiddenInSafeModeCondition(this)).
         autoRepeat(false);
 
+    //TODO: #GDM #3.1 #tbd
+    factory(QnActions::RenameLayoutTourAction).
+        flags(Qn::Tree | Qn::NoTarget | Qn::IntentionallyAmbiguous).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        text(tr("Rename")).
+        shortcut(lit("F2")).
+        condition(new QnConjunctionActionCondition(
+            new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this),
+            new QnForbiddenInSafeModeCondition(this),
+            this)).
+        autoRepeat(false);
+
     factory().
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         separator();

@@ -701,8 +701,7 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
             m_editable.value = accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission);
             break;
         case Qn::LayoutTourNode:
-            //TODO: #GDM #3.1 #tbd
-            m_editable.value = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
+            m_editable.value = menu()->canTrigger(QnActions::RenameLayoutTourAction, QnActionParameters());
             break;
         case Qn::RecorderNode:
             m_editable.value = true;
@@ -897,6 +896,7 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
     bool isVideoWallEntity = false;
     if (m_type == Qn::VideoWallItemNode)
     {
+        //TODO: #GDM #3.1 get rid of all this logic, just pass uuid
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(m_uuid);
         if (index.isNull())
             return false;
@@ -928,8 +928,11 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
     }
     parameters.setArgument(Qn::ResourceNameRole, value.toString());
     parameters.setArgument(Qn::NodeTypeRole, m_type);
+    parameters.setArgument(Qn::UuidRole, m_uuid);
 
-    if (isVideoWallEntity)
+    if (m_type == Qn::LayoutTourNode)
+        menu()->trigger(QnActions::RenameLayoutTourAction, parameters);
+    else if (isVideoWallEntity)
         menu()->trigger(QnActions::RenameVideowallEntityAction, parameters);
     else
         menu()->trigger(QnActions::RenameResourceAction, parameters);

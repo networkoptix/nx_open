@@ -12,6 +12,8 @@ struct ApiLayoutTourItemData: ApiData
 {
     QnUuid layoutId;
     int delayMs = 0;
+
+    bool operator==(const ApiLayoutTourItemData& rhs) const;
 };
 
 #define ApiLayoutTourItemData_Fields (layoutId)(delayMs)
@@ -28,6 +30,8 @@ struct ApiLayoutTourData: ApiIdData
     std::vector<ApiLayoutTourItemData> items;
 
     bool isValid() const;
+
+    bool operator==(const ApiLayoutTourData& rhs) const;
 };
 
 #define ApiLayoutTourData_Fields ApiIdData_Fields (name)(items)

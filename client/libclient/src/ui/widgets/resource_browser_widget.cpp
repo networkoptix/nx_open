@@ -138,6 +138,7 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
 
     m_renameActions.insert(QnActions::RenameResourceAction, new QAction(this));
     m_renameActions.insert(QnActions::RenameVideowallEntityAction, new QAction(this));
+    m_renameActions.insert(QnActions::RenameLayoutTourAction, new QAction(this));
 
     setHelpTopic(this, Qn::MainWindow_Tree_Help);
     setHelpTopic(ui->searchTab, Qn::MainWindow_Tree_Search_Help);
