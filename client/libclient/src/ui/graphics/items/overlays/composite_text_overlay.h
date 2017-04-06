@@ -49,25 +49,18 @@ public:
 
     void setColors(const QnCompositeTextOverlayColors &colors);
 
-    void addModeData(Mode mode
-        , const QnOverlayTextItemData &data);
-
+    void addModeData(Mode mode, const QnOverlayTextItemData &data);
+    void removeModeData(Mode mode, const QnUuid &id);
     void resetModeData(Mode mode);
 
 private:
     typedef QPair<qint64, QnOverlayTextItemData> InternalData;
     typedef QHash<QnUuid, InternalData> InternalDataHash;
 
-    void removeModeData(Mode mode
-        , const QnUuid &id);
-
-    void setModeData(Mode mode
-        , const InternalDataHash &data);
+    void setModeData(Mode mode, const InternalDataHash &data);
 
     InternalDataHash::Iterator findModeData(Mode mode
         , const QnUuid &id);
-
-    void initTextMode();
 
     QnOverlayTextItemDataList removeOutdatedItems(Mode mode);
 

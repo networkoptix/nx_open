@@ -14,19 +14,6 @@
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/common/search_query_strategy.h>
 
-namespace
-{
-    const auto kHtmlPageTemplate = lit("<html><head><style>* {text-ident: 0; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; color: white;}</style></head><body>%1</body></html>");
-    const auto kComplexHtml = lit("%1%2");
-
-    enum
-    {
-        kCaptionMaxLength = 64
-        , kDescriptionMaxLength = 160
-        , kMaxItemWidth = 250
-    };
-}
-
 QnCompositeTextOverlay::QnCompositeTextOverlay(const QnVirtualCameraResourcePtr &camera
     , QnWorkbenchNavigator *navigator
     , const GetUtcCurrentTimeMsFunc &getCurrentUtcTimeMs
@@ -46,7 +33,6 @@ QnCompositeTextOverlay::QnCompositeTextOverlay(const QnVirtualCameraResourcePtr 
     , m_colors()
 {
     m_counter.start();
-    initTextMode();
 }
 
 QnCompositeTextOverlay::~QnCompositeTextOverlay()
@@ -147,94 +133,6 @@ QnCompositeTextOverlay::InternalDataHash::Iterator QnCompositeTextOverlay::findM
 {
     auto &currentData = m_data[mode];
     return currentData.find(id);
-}
-
-void QnCompositeTextOverlay::initTextMode()
-{
-    if (!m_camera)
-        return;
-
-    const auto cameraId = m_camera->getId();
-    const auto messageProcessor = QnCommonMessageProcessor::instance();
-
-    connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived
-        , this, [this, cameraId](const QnAbstractBusinessActionPtr &businessAction)
-    {
-        if (businessAction->actionType() != QnBusiness::ShowTextOverlayAction)
-            return;
-
-        const auto &actionParams = businessAction->getParams();
-        if (actionParams.actionResourceId != cameraId)
-            return;
-
-        const auto state = businessAction->getToggleState();
-        // Text Overlay actions with defined duration are for instant events,
-        // otherwise they are for prolonged.
-        const bool isProlongedAction = (actionParams.durationMs <= 0);
-
-        const bool couldBeInstantEvent = (state == QnBusiness::UndefinedState);
-        if (isProlongedAction && couldBeInstantEvent)
-        {
-            // Do not accept instant events for prolonged actions
-            return;
-        }
-
-        const int timeout = (isProlongedAction ? QnOverlayTextItemData::kInfinite
-            : actionParams.durationMs);
-
-        const auto actionId = businessAction->getBusinessRuleId();
-
-        if (isProlongedAction && (state == QnBusiness::InactiveState))
-        {
-            removeModeData(QnCompositeTextOverlay::kTextOutputMode, actionId);
-            return;
-        }
-
-        enum
-        {
-            kDescriptionPixelFontSize = 13
-            , kCaptionPixelFontSize = 16
-            , kHorPaddings = 12
-            , kVertPaddings = 8
-            , kBorderRadius = 2
-        };
-
-        QString text;
-
-        if (actionParams.text.isEmpty())
-        {
-            const auto runtimeParams = businessAction->getRuntimeParams();
-
-            const auto caption = QnBusinessStringsHelper::eventAtResource(runtimeParams, Qn::RI_WithUrl);
-            const auto htmlCaption = htmlFormattedParagraph(caption, kCaptionPixelFontSize, true);
-
-            const auto desc = QnBusinessStringsHelper::eventDetails(runtimeParams).join(L'\n');
-            const auto htmlDesc = htmlFormattedParagraph(desc, kDescriptionPixelFontSize);
-
-            if (caption.trimmed().isEmpty() && desc.trimmed().isEmpty())  // Do not add empty text items
-                return;
-
-            text = kComplexHtml.arg(elideHtml(htmlCaption, kCaptionMaxLength)
-                , elideHtml(htmlDesc, kDescriptionMaxLength));
-
-            text = kHtmlPageTemplate.arg(text);
-        }
-        else
-        {
-            if (actionParams.text.trimmed().isEmpty()) // Do not add empty text items
-                return;
-
-            const auto elided = elideHtml(htmlFormattedParagraph(
-                actionParams.text, kDescriptionPixelFontSize), kDescriptionMaxLength);
-            text = kHtmlPageTemplate.arg(elided);
-        }
-
-        const QnHtmlTextItemOptions options(m_colors.textOverlayItemColor, true
-            , kBorderRadius, kHorPaddings, kVertPaddings, kMaxItemWidth);
-
-        const QnOverlayTextItemData data(actionId, text, options, timeout);
-        addModeData(QnCompositeTextOverlay::kTextOutputMode, data);
-    });
 }
 
 QnCompositeTextOverlayColors QnCompositeTextOverlay::colors() const

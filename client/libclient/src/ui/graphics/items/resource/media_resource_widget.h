@@ -125,6 +125,9 @@ public:
 
     QnCompositeTextOverlay *compositeTextOverlay();
 
+    void showTextOverlay(const QnUuid& id, bool show, const QString& captionHtml,
+        const QString& descriptionHtml, int timeout);
+
     QVector<QColor> motionSensitivityColors() const;
     void setMotionSensitivityColors(const QVector<QColor>& value);
 

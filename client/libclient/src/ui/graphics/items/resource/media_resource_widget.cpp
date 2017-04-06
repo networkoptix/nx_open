@@ -690,6 +690,46 @@ void QnMediaResourceWidget::suspendHomePtzController()
         m_homePtzController->suspend();
 }
 
+void QnMediaResourceWidget::showTextOverlay(const QnUuid& id, bool show, const QString& captionHtml,
+    const QString& descriptionHtml, int timeout)
+{
+    if (!show)
+    {
+        m_compositeTextOverlay->removeModeData(QnCompositeTextOverlay::kTextOutputMode, id);
+        return;
+    }
+
+    /* Do not add empty text items: */
+    if (captionHtml.trimmed().isEmpty() && descriptionHtml.trimmed().isEmpty())
+        return;
+
+    const auto kHtmlPageTemplate = lit("<html><head><style>* {text-ident: 0; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; color: white;}</style></head><body>%1</body></html>");
+    const auto kComplexHtml = lit("%1%2");
+
+    static constexpr int kCaptionMaxLength = 64;
+    static constexpr int kDescriptionMaxLength = 160;
+    static constexpr int kMaxItemWidth = 250;
+    static constexpr int kDescriptionPixelFontSize = 13;
+    static constexpr int kCaptionPixelFontSize = 16;
+    static constexpr int kHorPaddings = 12;
+    static constexpr int kVertPaddings = 8;
+    static constexpr int kBorderRadius = 2;
+
+    const auto caption = htmlFormattedParagraph(captionHtml, kCaptionPixelFontSize, true);
+    const auto description = htmlFormattedParagraph(descriptionHtml, kDescriptionPixelFontSize);
+
+    const QString text = kHtmlPageTemplate.arg(kComplexHtml.arg(
+        elideHtml(caption, kCaptionMaxLength),
+        elideHtml(description, kDescriptionMaxLength)));
+
+    //TODO: #vkutin Think where to put this color (or options altogether).
+    const QnHtmlTextItemOptions options(m_compositeTextOverlay->colors().textOverlayItemColor,
+        true, kBorderRadius, kHorPaddings, kVertPaddings, kMaxItemWidth);
+
+    const QnOverlayTextItemData data(id, text, options, timeout);
+    m_compositeTextOverlay->addModeData(QnCompositeTextOverlay::kTextOutputMode, data);
+}
+
 void QnMediaResourceWidget::setupHud()
 {
     m_triggersContainer = new QnScrollableItemsWidget(m_hudOverlay->right());
