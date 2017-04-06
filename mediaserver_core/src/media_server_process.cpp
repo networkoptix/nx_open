@@ -174,6 +174,7 @@
 #include <rest/handlers/system_settings_handler.h>
 #include <rest/handlers/audio_transmission_rest_handler.h>
 #include <rest/handlers/start_lite_client_rest_handler.h>
+#include <rest/handlers/runtime_info_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -1765,7 +1766,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/setCameraParam", new QnCameraSettingsRestHandler());
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
     reg("api/ptz", new QnPtzRestHandler());
-    reg("api/image", new QnImageRestHandler());
+    reg("api/image", new QnImageRestHandler()); //< deprecated
     reg("api/createEvent", new QnExternalBusinessEventRestHandler());
     reg("api/gettime", new QnTimeRestHandler());
     reg("api/getTimeZones", new QnGetTimeZonesRestHandler());
@@ -1841,6 +1842,9 @@ void MediaServerProcess::registerRestHandlers(
     #ifdef _DEBUG
         reg("api/debugEvent", new QnDebugEventsRestHandler());
     #endif
+
+    reg("ec2/runtimeInfo", new QnRuntimeInfoRestHandler());
+
 }
 
 bool MediaServerProcess::initTcpListener(

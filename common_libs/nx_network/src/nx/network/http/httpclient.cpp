@@ -1,8 +1,3 @@
-/**********************************************************
-* 26 nov 2012
-* a.kolesnikov
-***********************************************************/
-
 #include "httpclient.h"
 
 #include <nx/utils/thread/mutex.h>
@@ -23,7 +18,7 @@ HttpClient::HttpClient():
     m_terminated(false),
     m_maxInternalBufferSize(kDefaultMaxInternalBufferSize)
 {
-    instanciateHttpClient();
+    instantiateHttpClient();
 }
 
 HttpClient::~HttpClient()
@@ -207,7 +202,8 @@ const std::unique_ptr<AbstractStreamSocket>& HttpClient::socket()
 
 std::unique_ptr<AbstractStreamSocket> HttpClient::takeSocket()
 {
-    //NOTE m_asyncHttpClient->takeSocket() can only be called within m_asyncHttpClient's aio thread
+    // NOTE: m_asyncHttpClient->takeSocket() can only be called within m_asyncHttpClient's aio
+    // thread.
     std::unique_ptr<AbstractStreamSocket> sock;
     nx::utils::promise<void> socketTakenPromise;
     m_asyncHttpClient->dispatch(
@@ -228,7 +224,7 @@ std::unique_ptr<AbstractStreamSocket> HttpClient::takeSocket()
     return sock;
 }
 
-void HttpClient::instanciateHttpClient()
+void HttpClient::instantiateHttpClient()
 {
     m_asyncHttpClient = nx_http::AsyncHttpClient::create();
     connect(
@@ -254,13 +250,13 @@ bool HttpClient::doRequest(AsyncClientFunc func)
     {
         lk.unlock();
 
-        //have to re-establish connection if previous message has not been read up to the end
+        // Have to re-establish connection if the previous message has not been read up to the end.
         if (m_asyncHttpClient)
         {
             m_asyncHttpClient->pleaseStopSync();
             m_asyncHttpClient.reset();
         }
-        instanciateHttpClient();
+        instantiateHttpClient();
 
         //setting up attributes
         for (const auto& keyValue : m_additionalHeaders)
@@ -303,13 +299,13 @@ bool HttpClient::doRequest(AsyncClientFunc func)
 void HttpClient::onResponseReceived()
 {
     QnMutexLocker lk(&m_mutex);
-    //message body buffer can be non-empty
+    // Message body buffer can be non-empty.
     m_msgBodyBuffer += m_asyncHttpClient->fetchMessageBodyBuffer();
     if ((std::size_t)m_msgBodyBuffer.size() > m_maxInternalBufferSize)
     {
         NX_LOG(
             lit("Sync HttpClient: internal buffer overflow. Max buffer size: %1, current buffer size: %2, requested url: %3.")
-            .arg(m_maxInternalBufferSize).arg(m_msgBodyBuffer.size()).arg(url().toString()),
+                .arg(m_maxInternalBufferSize).arg(m_msgBodyBuffer.size()).arg(url().toString()),
             cl_logWARNING);
         m_done = true;
         m_error = true;
@@ -326,7 +322,7 @@ void HttpClient::onSomeMessageBodyAvailable()
     {
         NX_LOG(
             lit("Sync HttpClient: internal buffer overflow. Max buffer size: %1, current buffer size: %2, requested url: %3.")
-            .arg(m_maxInternalBufferSize).arg(m_msgBodyBuffer.size()).arg(url().toString()),
+                .arg(m_maxInternalBufferSize).arg(m_msgBodyBuffer.size()).arg(url().toString()),
             cl_logWARNING);
         m_done = true;
         m_error = true;
@@ -344,7 +340,7 @@ void HttpClient::onDone()
 
 void HttpClient::onReconnected()
 {
-    //TODO #ak
+    // TODO: #ak
 }
 
 } // namespace nx_http

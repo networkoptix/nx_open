@@ -269,7 +269,7 @@
         <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
         <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
-        <nxcloud.version>1.0.133</nxcloud.version>
+        <nxcloud.version>1.0.134</nxcloud.version>
     </properties>
 
     <build>
@@ -772,6 +772,7 @@
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>nx_cloud/libtraffic_relay</module>
+                <module>client/mobile_client</module>
             </modules>
         </profile>
 

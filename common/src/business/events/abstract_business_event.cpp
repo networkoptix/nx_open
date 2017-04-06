@@ -27,7 +27,6 @@ namespace QnBusiness
         case CameraDisconnectEvent:
         case NetworkIssueEvent:
         case CameraIpConflictEvent:
-        case SoftwareTriggerEvent:
             return AnyCameraEvent;
 
         case StorageFailureEvent:
@@ -100,6 +99,7 @@ namespace QnBusiness
         case CameraMotionEvent:
         case CameraInputEvent:
         case UserDefinedEvent:
+        case SoftwareTriggerEvent:
             return true;
         default:
             return false;
@@ -109,7 +109,7 @@ namespace QnBusiness
     QList<EventState> allowedEventStates(EventType eventType)
     {
         QList<EventState> result;
-        if (!hasToggleState(eventType) || eventType == UserDefinedEvent)
+        if (!hasToggleState(eventType) || eventType == UserDefinedEvent || eventType == SoftwareTriggerEvent)
             result << QnBusiness::UndefinedState;
         if (hasToggleState(eventType))
             result << QnBusiness::ActiveState << QnBusiness::InactiveState;
@@ -192,6 +192,12 @@ QnBusinessEventParameters QnAbstractBusinessEvent::getRuntimeParams() const {
     params.eventResourceId = m_resource ? m_resource->getId() : QnUuid();
 
     return params;
+}
+
+QnBusinessEventParameters QnAbstractBusinessEvent::getRuntimeParamsEx(
+    const QnBusinessEventParameters& /*ruleEventParams*/) const
+{
+    return getRuntimeParams();
 }
 
 bool QnAbstractBusinessEvent::checkEventParams(const QnBusinessEventParameters &params) const

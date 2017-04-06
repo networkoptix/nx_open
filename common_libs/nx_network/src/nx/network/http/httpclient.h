@@ -1,12 +1,7 @@
-/**********************************************************
-* 26 nov 2012
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
-#ifndef Q_MOC_RUN
-#include <boost/optional.hpp>
+#if !defined(Q_MOC_RUN)
+    #include <boost/optional.hpp>
 #endif
 
 #include <nx/network/async_stoppable.h>
@@ -14,7 +9,6 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "asynchttpclient.h"
-
 
 namespace nx_http {
 
@@ -36,15 +30,24 @@ public:
     void pleaseStop();
 
     /**
-        Returns on receiving response
-        @return \a true if response has been received
-    */
+     * Return on receiving response.
+     * @return True if response has been received.
+     */
     bool doGet(const QUrl& url);
+
+    /**
+     * Return on receiving response.
+     * @return True if response has been received.
+     */
     bool doPost(
         const QUrl& url,
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody);
 
+    /**
+     * Return on receiving response.
+     * @return True if response has been received.
+     */
     bool doPut(
         const QUrl& url,
         const nx_http::StringType& contentType,
@@ -67,17 +70,21 @@ public:
     const QUrl& contentLocationUrl() const;
     StringType contentType() const;
 
-    /** See \a AsyncHttpClient::setSubsequentReconnectTries */
+    /** See AsyncHttpClient::setSubsequentReconnectTries */
     void setSubsequentReconnectTries(int reconnectTries);
-    /** See \a AsyncHttpClient::setTotalReconnectTries */
+
+    /** See AsyncHttpClient::setTotalReconnectTries */
     void setTotalReconnectTries(int reconnectTries);
 
-    /** See \a AsyncHttpClient::setSendTimeoutMs */
+    /** See AsyncHttpClient::setSendTimeoutMs */
     void setSendTimeoutMs(unsigned int sendTimeoutMs);
-    /** See \a AsyncHttpClient::setResponseReadTimeoutMs */
+
+    /** See AsyncHttpClient::setResponseReadTimeoutMs */
     void setResponseReadTimeoutMs(unsigned int messageBodyReadTimeoutMs);
-    /** See \a AsyncHttpClient::setMessageBodyReadTimeoutMs */
+    
+    /** See AsyncHttpClient::setMessageBodyReadTimeoutMs */
     void setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTimeoutMs);
+    
     void setUserAgent(const QString& userAgent);
     void setUserName(const QString& userAgent);
     void setUserPassword(const QString& userAgent);
@@ -85,7 +92,8 @@ public:
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
     const std::unique_ptr<AbstractStreamSocket>& socket();
-    /** Returns socket in blocking mode */
+
+    /** @return Socket in blocking mode. */
     std::unique_ptr<AbstractStreamSocket> takeSocket();
 
 private:
@@ -109,7 +117,7 @@ private:
     boost::optional<SocketAddress> m_proxyEndpoint;
     boost::optional<AsyncHttpClient::AuthType> m_authType;
 
-    void instanciateHttpClient();
+    void instantiateHttpClient();
     template<typename AsyncClientFunc>
         bool doRequest(AsyncClientFunc func);
 

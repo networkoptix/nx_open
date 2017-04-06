@@ -445,7 +445,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value FP_Low Low priority against other cameras.
      *     %value FP_Medium Medium priority against other cameras.
      *     %value FP_High High priority against other cameras.
-     * %param backupType Combination (via "|") of flags defining backup options.
+     * %param backupType Combination (via "|") of the flags defining backup options.
      *     %value CameraBackup_Disabled Backup is disabled.
      *     %value CameraBackup_HighQuality Backup is in high quality.
      *     %value CameraBackup_LowQuality Backup is in low quality.
@@ -548,7 +548,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *     %value FP_Low Low priority against other cameras.
      *     %value FP_Medium Medium priority against other cameras.
      *     %value FP_High High priority against other cameras.
-     * %param backupType Combination (via "|") of flags defining backup options.
+     * %param backupType Combination (via "|") of the flags defining backup options.
      *     %value CameraBackup_Disabled Backup is disabled.
      *     %value CameraBackup_HighQuality Backup is in high quality.
      *     %value CameraBackup_LowQuality Backup is in low quality.
@@ -649,7 +649,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value FP_Low Low priority against other cameras.
      *         %value FP_Medium Medium priority against other cameras.
      *         %value FP_High High priority against other cameras.
-     *     %param backupType Combination (via "|") of flags defining backup options.
+     *     %param backupType Combination (via "|") of the flags defining backup options.
      *         %value CameraBackup_Disabled Backup is disabled.
      *         %value CameraBackup_HighQuality Backup is in high quality.
      *         %value CameraBackup_LowQuality Backup is in low quality.
@@ -788,7 +788,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      *         %value FP_Low Low priority against other cameras.
      *         %value FP_Medium Medium priority against other cameras.
      *         %value FP_High High priority against other cameras.
-     *     %param backupType Combination (via "|") of flags defining backup options.
+     *     %param backupType Combination (via "|") of the flags defining backup options.
      *         %value CameraBackup_Disabled Backup is disabled.
      *         %value CameraBackup_HighQuality Backup is in high quality.
      *         %value CameraBackup_LowQuality Backup is in low quality.

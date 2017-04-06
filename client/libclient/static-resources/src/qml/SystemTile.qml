@@ -150,7 +150,7 @@ BaseTile
                 break;
 
             case control.impl.kCloudSystemTileType:
-                var cloudHost = control.impl.hostsModel.firstHost;
+                var cloudHost = control.impl.hostsModelAccessor.getData(0, "url") || "";
                 console.log("Connecting to cloud system <", systemName,
                     ">, through the host <", cloudHost, ">");
                 context.connectToCloudSystem(control.systemId, cloudHost);
