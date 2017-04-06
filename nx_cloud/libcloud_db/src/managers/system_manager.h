@@ -20,7 +20,7 @@
 #include <nx_ec/data/api_data.h>
 #include <nx_ec/data/api_user_data.h>
 #include <utils/common/counter.h>
-#include <utils/common/subscription.h>
+#include <nx/utils/subscription.h>
 #include <utils/db/async_sql_query_executor.h>
 #include <utils/db/filter.h>
 
