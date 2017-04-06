@@ -105,22 +105,28 @@ QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType Action
         /** Two or more servers are running. */
         ServerConflictEvent = 8,
 
-        /** Server started */
+        /** Server started. */
         ServerStartEvent = 9,
 
-        /** Not enough licenses */
+        /** Not enough licenses. */
         LicenseIssueEvent = 10,
 
-        /** Archive backup done */
+        /** Archive backup done. */
         BackupFinishedEvent = 11,
 
         /** System health message. */
         SystemHealthEvent = 500,
+
+        /** System health message. */
         MaxSystemHealthEvent = 599,
 
         /** Event group. */
         AnyCameraEvent = 600,
+
+        /** Event group. */
         AnyServerEvent = 601,
+
+        /** Event group. */
         AnyBusinessEvent = 602,
 
         /** Base index for the user defined events. */
