@@ -1,6 +1,6 @@
 #include "custom_business_event.h"
 #include <nx/fusion/model_functions.h>
-#include "network/authutil.h"
+#include <nx/utils/string.h>
 #include <business/actions/abstract_business_action.h>
 
 QnCustomBusinessEvent::QnCustomBusinessEvent(QnBusiness::EventState toggleState,
@@ -32,9 +32,9 @@ bool QnCustomBusinessEvent::checkEventParams(const QnBusinessEventParameters &pa
         return result;
     };
 
-    QStringList resourceNameKeywords = unquote(smartSplit(params.resourceName, L' ', QString::SkipEmptyParts));
-    QStringList captionKeywords      = unquote(smartSplit(params.caption, L' ', QString::SkipEmptyParts));
-    QStringList descriptionKeywords  = unquote(smartSplit(params.description, L' ', QString::SkipEmptyParts));
+    QStringList resourceNameKeywords = unquote(nx::utils::smartSplit(params.resourceName, L' ', QString::SkipEmptyParts));
+    QStringList captionKeywords      = unquote(nx::utils::smartSplit(params.caption, L' ', QString::SkipEmptyParts));
+    QStringList descriptionKeywords  = unquote(nx::utils::smartSplit(params.description, L' ', QString::SkipEmptyParts));
 
     auto mathKeywords = [](const QStringList& keywords, const QString& pattern)
     {

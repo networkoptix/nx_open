@@ -162,5 +162,28 @@ NX_UTILS_API void serializeNameValuePairs(
     const QMap<QByteArray, QByteArray>& params,
     QByteArray* const dstBuffer);
 
+//!Splits \a data by \a delimiter not closed within quotes
+/*!
+    E.g.:
+    \code
+    one, two, "three, four"
+    \endcode
+
+    will be splitted to
+    \code
+    one
+    two
+    "three, four"
+    \endcode
+*/
+NX_UTILS_API QList<QByteArray> smartSplit(
+    const QByteArray& data,
+    const char delimiter);
+
+NX_UTILS_API QStringList smartSplit(
+    const QString& data,
+    const QChar delimiter,
+    QString::SplitBehavior splitBehavior = QString::KeepEmptyParts);
+
 } // namespace utils
 } // namespace nx

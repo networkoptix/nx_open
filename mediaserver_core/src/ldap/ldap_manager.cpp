@@ -1,13 +1,17 @@
 #include "ldap_manager.h"
 
-#include "api/global_settings.h"
-#include <nx/utils/log/log.h>
-#include <utils/crypt/symmetrical.h>
 #include <iostream>
+#include <cstdio>
 #include <sstream>
 
 #include <QtCore/QCryptographicHash>
-#include <stdio.h>
+
+#include <nx/utils/log/log.h>
+#include <nx/utils/string.h>
+
+#include <utils/crypt/symmetrical.h>
+
+#include "api/global_settings.h"
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -385,7 +389,7 @@ Qn::AuthResult LdapSession::authenticateWithDigest(const QString &login, const Q
 
     QMap<QByteArray, QByteArray> responseDictionary;
     QByteArray initialResponse(servresp->bv_val, servresp->bv_len);
-    for (QByteArray line : smartSplit(initialResponse, ',')) {
+    for (QByteArray line : nx::utils::smartSplit(initialResponse, ',')) {
         line = line.trimmed();
         int eqIndex = line.indexOf('=');
         if (eqIndex == -1)
@@ -467,7 +471,7 @@ QString LdapSession::getRealm()
 
     QMap<QByteArray, QByteArray> responseDictionary;
     QByteArray initialResponse(servresp->bv_val, servresp->bv_len);
-    for (QByteArray line : smartSplit(initialResponse, ',')) {
+    for (QByteArray line : nx::utils::smartSplit(initialResponse, ',')) {
         line = line.trimmed();
         int eqIndex = line.indexOf('=');
         if (eqIndex == -1)

@@ -588,5 +588,54 @@ void serializeNameValuePairs(
     }
 }
 
+template <class T, class T2>
+static QList<T> smartSplitInternal(
+    const T& data,
+    const T2 delimiter,
+    const T2 quoteChar, 
+    bool keepEmptyParts)
+{
+    bool quoted = false;
+    QList<T> rez;
+    if (data.isEmpty())
+        return rez;
+
+    int lastPos = 0;
+    for (int i = 0; i < data.size(); ++i)
+    {
+        if (data[i] == quoteChar)
+            quoted = !quoted;
+        else if (data[i] == delimiter && !quoted)
+        {
+            T value = data.mid(lastPos, i - lastPos);
+            if (!value.isEmpty() || keepEmptyParts)
+                rez << value;
+            lastPos = i + 1;
+        }
+    }
+    rez << data.mid(lastPos, data.size() - lastPos);
+
+    return rez;
+}
+
+QList<QByteArray> smartSplit(
+    const QByteArray& data,
+    const char delimiter)
+{
+    return smartSplitInternal(data, delimiter, '\"', true);
+}
+
+QStringList smartSplit(
+    const QString& data,
+    const QChar delimiter,
+    QString::SplitBehavior splitBehavior)
+{
+    return smartSplitInternal(
+        data, 
+        delimiter,
+        QChar(L'\"'),
+        splitBehavior == QString::KeepEmptyParts);
+}
+
 } // namespace utils
 } // namespace nx
