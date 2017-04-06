@@ -28,7 +28,7 @@ bool QnCustomBusinessEvent::checkEventParams(const QnBusinessEventParameters &pa
     {
         QStringList result;
         for (const auto& data: dataList)
-            result << unquoteStr(data);
+            result << nx::utils::unquoteStr(data);
         return result;
     };
 

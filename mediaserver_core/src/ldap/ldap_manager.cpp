@@ -395,7 +395,7 @@ Qn::AuthResult LdapSession::authenticateWithDigest(const QString &login, const Q
         if (eqIndex == -1)
             continue;
 
-        responseDictionary[line.mid(0, eqIndex)] = unquoteStr(line.mid(eqIndex + 1));
+        responseDictionary[line.mid(0, eqIndex)] = nx::utils::unquoteStr(line.mid(eqIndex + 1));
     }
 
     if (!responseDictionary.contains("realm") || !responseDictionary.contains("nonce"))
@@ -478,7 +478,7 @@ QString LdapSession::getRealm()
             continue;
 
         if (line.mid(0, eqIndex) == "realm") {
-            result = QString::fromLatin1(unquoteStr(line.mid(eqIndex + 1)));
+            result = QString::fromLatin1(nx::utils::unquoteStr(line.mid(eqIndex + 1)));
             break;
         }
     }

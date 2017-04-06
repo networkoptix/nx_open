@@ -637,5 +637,24 @@ QStringList smartSplit(
         splitBehavior == QString::KeepEmptyParts);
 }
 
+template <class T, class T2>
+static T unquoteStrInternal(const T& v, T2 quoteChar)
+{
+    T value = v.trimmed();
+    int pos1 = value.startsWith(quoteChar) ? 1 : 0;
+    int pos2 = value.endsWith(quoteChar) ? 1 : 0;
+    return value.mid(pos1, value.length() - pos1 - pos2);
+}
+
+QByteArray unquoteStr(const QByteArray& v)
+{
+    return unquoteStrInternal(v, '\"');
+}
+
+QString unquoteStr(const QString& v)
+{
+    return unquoteStrInternal(v, L'\"');
+}
+
 } // namespace utils
 } // namespace nx

@@ -6,9 +6,6 @@
 #include <QStringList>
 #include <nx/fusion/model_functions_fwd.h>
 
-QByteArray unquoteStr(const QByteArray& v);
-QString unquoteStr(const QString& v);
-
 QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char delimiter);
 
 class HttpAuthenticationClientContext;

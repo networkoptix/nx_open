@@ -4,25 +4,6 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/string.h>
 
-template <class T, class T2>
-T unquoteStrInternal(const T& v, T2 quoteChar)
-{
-    T value = v.trimmed();
-    int pos1 = value.startsWith(quoteChar) ? 1 : 0;
-    int pos2 = value.endsWith(quoteChar) ? 1 : 0;
-    return value.mid(pos1, value.length()-pos1-pos2);
-}
-
-QByteArray unquoteStr(const QByteArray& v)
-{
-    return unquoteStrInternal(v, '\"');
-}
-
-QString unquoteStr(const QString& v)
-{
-    return unquoteStrInternal(v, L'\"');
-}
-
 QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char delimiter) {
     QMap<QByteArray, QByteArray> result;
 
@@ -36,7 +17,7 @@ QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char deli
             return QMap<QByteArray, QByteArray>();
 
         QByteArray key = data.left(pos);
-        QByteArray value = unquoteStr(data.mid(pos+1));
+        QByteArray value = nx::utils::unquoteStr(data.mid(pos+1));
 
         result[key] = value;
     }

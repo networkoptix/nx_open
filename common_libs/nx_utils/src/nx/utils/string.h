@@ -185,5 +185,9 @@ NX_UTILS_API QStringList smartSplit(
     const QChar delimiter,
     QString::SplitBehavior splitBehavior = QString::KeepEmptyParts);
 
+NX_UTILS_API QByteArray unquoteStr(const QByteArray& v);
+
+NX_UTILS_API QString unquoteStr(const QString& v);
+
 } // namespace utils
 } // namespace nx
