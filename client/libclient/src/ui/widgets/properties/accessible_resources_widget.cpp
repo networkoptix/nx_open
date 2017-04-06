@@ -127,7 +127,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
             return qnSkin->maximumSize(option.icon);
         });
 
-    if (nx::utils::AppInfo::isMacOsX())
+    if (nx::utils::AppInfo::isLinux() || nx::utils::AppInfo::isMacOsX())
     {
         /**
           * Workaround for incorrect selection behaviour on MacOS. For some reason QTreeview

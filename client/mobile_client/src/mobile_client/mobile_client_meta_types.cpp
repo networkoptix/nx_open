@@ -3,6 +3,8 @@
 #include <QtQml/QtQml>
 #include <private/qqmlvaluetype_p.h>
 
+#include <nx/fusion/model_functions.h>
+
 #include <context/connection_manager.h>
 #include <ui/timeline/timeline.h>
 #include <ui/qml/quick_item_mouse_tracker.h>
@@ -29,6 +31,7 @@
 #include <helpers/cloud_url_helper.h>
 #include <utils/developer_settings_helper.h>
 #include <settings/qml_settings_adaptor.h>
+#include <nx/mobile_client/helpers/inter_client_message.h>
 
 using namespace nx::client::mobile;
 
@@ -43,6 +46,7 @@ void QnMobileClientMetaTypes::initialize()
 void QnMobileClientMetaTypes::registerMetaTypes()
 {
     qRegisterMetaType<nx::media::PlayerStatistics>();
+    QnJsonSerializer::registerSerializer<InterClientMessage::Command>();
 }
 
 void QnMobileClientMetaTypes::registerQmlTypes() {
