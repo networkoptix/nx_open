@@ -1,5 +1,7 @@
 #include "workbench_text_overlays_handler.h"
 
+#include <algorithm>
+
 #include <business/actions/abstract_business_action.h>
 #include <business/business_strings_helper.h>
 
