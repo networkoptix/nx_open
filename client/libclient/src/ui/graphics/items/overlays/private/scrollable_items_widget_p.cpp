@@ -3,6 +3,7 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsWidget>
 
+#include <nx/utils/log/assert.h>
 #include <nx/utils/math/fuzzy.h>
 
 #include <ui/graphics/items/generic/graphics_scroll_area.h>
@@ -106,6 +107,13 @@ QnUuid QnScrollableItemsWidgetPrivate::insertItem(int index, QGraphicsWidget* it
     item->setParent(m_scrollArea->contentWidget());
     item->setParentItem(m_scrollArea->contentWidget());
 
+    connect(item, &QObject::destroyed, this,
+        [this, id]()
+        {
+            if (m_items[id] == sender())
+                m_items.remove(id);
+        });
+
     m_items[id] = item;
     m_contentLayout->insertItem(index, item);
     m_contentLayout->setAlignment(item, m_alignment);
@@ -128,6 +136,7 @@ QGraphicsWidget* QnScrollableItemsWidgetPrivate::takeItem(const QnUuid& id)
 
     m_contentLayout->removeItem(result);
 
+    result->disconnect(this);
     result->setParent(nullptr);
     result->setParentItem(nullptr);
     return result;
@@ -135,9 +144,12 @@ QGraphicsWidget* QnScrollableItemsWidgetPrivate::takeItem(const QnUuid& id)
 
 void QnScrollableItemsWidgetPrivate::clear()
 {
-    for (auto item: m_items)
+    /* Do not iterate through m_items because each item
+       being deleted will remove itself from m_items. */
+    for (auto item: m_items.values())
         delete item;
 
+    NX_EXPECT(m_items.empty());
     m_items.clear();
 }
 
