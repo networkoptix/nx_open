@@ -174,4 +174,4 @@ plugins/acs/paxton-plugin/CustomProperties.cs
 syntax: regexp
 ^core$
 ^Makefile$
-
+^app_process$
