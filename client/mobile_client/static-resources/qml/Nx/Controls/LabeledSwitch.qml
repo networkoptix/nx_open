@@ -40,6 +40,7 @@ Control
             width: parent.width - indicator.width - spacing
             color: ColorTheme.windowText
             font.pixelSize: 16
+            elide: Text.ElideRight
         }
 
         SwitchIndicator
