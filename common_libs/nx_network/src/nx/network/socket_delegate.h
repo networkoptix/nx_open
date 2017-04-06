@@ -175,76 +175,76 @@ public:
 
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
-        unsigned int timeoutMillis = kDefaultTimeoutMillis) override
+        unsigned int timeoutMillis = AbstractCommunicatingSocket::kDefaultTimeoutMillis) override
     {
-        return m_target->connect(remoteSocketAddress, timeoutMillis);
+        return this->m_target->connect(remoteSocketAddress, timeoutMillis);
     }
 
     virtual int recv(void* buffer, unsigned int bufferLen, int flags) override
     {
-        return m_target->recv(buffer, bufferLen, flags);
+        return this->m_target->recv(buffer, bufferLen, flags);
     }
 
     virtual int send(const void* buffer, unsigned int bufferLen) override
     {
-        return m_target->send(buffer, bufferLen);
+        return this->m_target->send(buffer, bufferLen);
     }
 
     virtual SocketAddress getForeignAddress() const override
     {
-        return m_target->getForeignAddress();
+        return this->m_target->getForeignAddress();
     }
 
     virtual bool isConnected() const override
     {
-        return m_target->isConnected();
+        return this->m_target->isConnected();
     }
 
     virtual void connectAsync(
         const SocketAddress& address,
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override
     {
-        return m_target->connectAsync(address, std::move(handler));
+        return this->m_target->connectAsync(address, std::move(handler));
     }
 
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override
     {
-        return m_target->readSomeAsync(buffer, std::move(handler));
+        return this->m_target->readSomeAsync(buffer, std::move(handler));
     }
 
     void readAsyncAtLeast(
         nx::Buffer* const buffer, size_t minimalSize,
         std::function<void(SystemError::ErrorCode, size_t)> handler)
     {
-        return m_target->readAsyncAtLeast(buffer, minimalSize, std::move(handler));
+        return this->m_target->readAsyncAtLeast(buffer, minimalSize, std::move(handler));
     }
 
     virtual void sendAsync(
         const nx::Buffer& buffer,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override
     {
-        return m_target->sendAsync(buffer, std::move(handler));
+        return this->m_target->sendAsync(buffer, std::move(handler));
     }
 
     virtual void registerTimer(
         std::chrono::milliseconds timeout,
         nx::utils::MoveOnlyFunc<void()> handler) override
     {
-        return m_target->registerTimer(timeout, std::move(handler));
+        return this->m_target->registerTimer(timeout, std::move(handler));
     }
 
     virtual void cancelIOAsync(
         nx::network::aio::EventType eventType,
         nx::utils::MoveOnlyFunc<void()> handler) override
     {
-        return m_target->cancelIOAsync(eventType, std::move(handler));
+        return this->m_target->cancelIOAsync(eventType, std::move(handler));
     }
 
     virtual void cancelIOSync(nx::network::aio::EventType eventType) override
     {
-        return m_target->cancelIOSync(eventType);
+        return this->m_target->cancelIOSync(eventType);
     }
 };
 
@@ -261,37 +261,37 @@ public:
 
     virtual bool reopen() override
     {
-        return m_target->reopen();
+        return this->m_target->reopen();
     }
 
     virtual bool setNoDelay(bool value) override
     {
-        return m_target->setNoDelay(value);
+        return this->m_target->setNoDelay(value);
     }
 
     virtual bool getNoDelay(bool* value) const override
     {
-        return m_target->getNoDelay(value);
+        return this->m_target->getNoDelay(value);
     }
 
     virtual bool toggleStatisticsCollection(bool val) override
     {
-        return m_target->toggleStatisticsCollection(val);
+        return this->m_target->toggleStatisticsCollection(val);
     }
 
     virtual bool getConnectionStatistics(StreamSocketInfo* info) override
     {
-        return m_target->getConnectionStatistics(info);
+        return this->m_target->getConnectionStatistics(info);
     }
 
     virtual bool setKeepAlive(boost::optional< KeepAliveOptions > info) override
     {
-        return m_target->setKeepAlive(info);
+        return this->m_target->setKeepAlive(info);
     }
 
     virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* result) const override
     {
-        return m_target->getKeepAlive(result);
+        return this->m_target->getKeepAlive(result);
     }
 };
 
