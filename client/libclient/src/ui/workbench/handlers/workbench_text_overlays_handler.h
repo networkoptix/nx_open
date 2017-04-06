@@ -8,6 +8,8 @@
 
 #include <utils/common/connective.h>
 
+class QnMediaResourceWidget;
+
 class QnWorkbenchTextOverlaysHandler:
     public Connective<QObject>,
     public QnWorkbenchContextAware
@@ -21,4 +23,7 @@ public:
 
 private:
     void at_businessActionReceived(const QnAbstractBusinessActionPtr& businessAction);
+
+    void showTextOverlay(QnMediaResourceWidget* widget, const QnUuid& id,
+        const QString& captionHtml, const QString& descriptionHtml, int timeoutMs);
 };

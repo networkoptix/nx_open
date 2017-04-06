@@ -822,9 +822,11 @@
     },
 
     "QnHudOverlayWidget": {
-        "colors": {
-            "detailsBackgroundColor": "dark1.setAlpha(128)",
-            "positionBackgroundColor": "dark1.setAlpha(128)"
+        "palette": {
+            "default": {
+                "_": "background color for html text items",
+                "window": "dark1.setAlpha(128)"
+            }
         }
     },
 

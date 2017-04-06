@@ -52,6 +52,7 @@
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
+#include <ui/graphics/items/controls/html_text_item.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
@@ -61,12 +62,11 @@
 #include <ui/graphics/items/resource/two_way_audio_widget.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
-#include <ui/graphics/items/overlays/composite_text_overlay.h>
-#include <ui/graphics/items/overlays/text_overlay_widget.h>
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_title_item.h>
-#include <ui/graphics/items/overlays/scrollable_items_widget.h>
+#include <ui/graphics/items/overlays/scrollable_text_items_widget.h>
 #include <ui/graphics/items/overlays/status_overlay_controller.h>
+#include <ui/graphics/items/standard/graphics_stacked_widget.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
@@ -102,6 +102,8 @@
 namespace {
 
 static constexpr int kMicroInMilliSeconds = 1000;
+
+static constexpr int kMinimumTextOverlayDurationMs = 5000;
 
 // TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
 // Note: -1 is used for invalid time
@@ -267,8 +269,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     m_ptzController(nullptr),
     m_homePtzController(nullptr),
     m_dewarpingParams(),
-    m_compositeTextOverlay(new QnCompositeTextOverlay(m_camera, navigator(),
-        [this]() { return getUtcCurrentTimeMs(); }, this)),
     m_ioModuleOverlayWidget(nullptr),
     m_ioCouldBeShown(false),
     m_ioLicenceStatusHelper(), /// Will be created only for I/O modules
@@ -690,44 +690,72 @@ void QnMediaResourceWidget::suspendHomePtzController()
         m_homePtzController->suspend();
 }
 
-void QnMediaResourceWidget::showTextOverlay(const QnUuid& id, bool show, const QString& captionHtml,
-    const QString& descriptionHtml, int timeout)
+void QnMediaResourceWidget::hideTextOverlay(const QnUuid& id)
 {
+    showHideTextOverlay(id, false, QString(), QnHtmlTextItemOptions(), -1);
+}
+
+void QnMediaResourceWidget::showTextOverlay(const QnUuid& id, const QString& text,
+    const QnHtmlTextItemOptions& options, int timeoutMs)
+{
+    showHideTextOverlay(id, true, text, options, timeoutMs);
+}
+
+void QnMediaResourceWidget::showHideTextOverlay(const QnUuid& id, bool show,
+    const QString& text, const QnHtmlTextItemOptions& options, int timeoutMs)
+{
+    if (!m_textOverlayWidget)
+        return;
+
+    static QElapsedTimer referenceTimer =
+        []()
+        {
+            QElapsedTimer timer;
+            timer.start();
+            return timer;
+        }();
+
+    const auto scheduleTimedDelete =
+        [this](QPointer<QGraphicsWidget> item, int timeoutMs)
+        {
+            executeDelayedParented([item] { delete item; }, timeoutMs, this);
+        };
+
+    static const char* kReferenceTimePropertyName = "_qn_textOverlayReferenceTime";
+
     if (!show)
     {
-        m_compositeTextOverlay->removeModeData(QnCompositeTextOverlay::kTextOutputMode, id);
+        auto item = m_textOverlayWidget->item(id);
+        if (!item)
+            return;
+
+        const auto elapsed = referenceTimer.elapsed()
+            - item->property(kReferenceTimePropertyName).value<qint64>();
+
+        if (elapsed > kMinimumTextOverlayDurationMs)
+            delete item;
+        else
+            scheduleTimedDelete(item, kMinimumTextOverlayDurationMs - elapsed);
+
         return;
     }
 
+    m_textOverlayWidget->deleteItem(id);
+
     /* Do not add empty text items: */
-    if (captionHtml.trimmed().isEmpty() && descriptionHtml.trimmed().isEmpty())
+    if (text.trimmed().isEmpty())
         return;
 
-    const auto kHtmlPageTemplate = lit("<html><head><style>* {text-ident: 0; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; color: white;}</style></head><body>%1</body></html>");
-    const auto kComplexHtml = lit("%1%2");
+    m_textOverlayWidget->addItem(text, options, id);
+    auto item = m_textOverlayWidget->item(id);
+    NX_EXPECT(item);
+    if (!item)
+        return;
 
-    static constexpr int kCaptionMaxLength = 64;
-    static constexpr int kDescriptionMaxLength = 160;
-    static constexpr int kMaxItemWidth = 250;
-    static constexpr int kDescriptionPixelFontSize = 13;
-    static constexpr int kCaptionPixelFontSize = 16;
-    static constexpr int kHorPaddings = 12;
-    static constexpr int kVertPaddings = 8;
-    static constexpr int kBorderRadius = 2;
+    item->setProperty(kReferenceTimePropertyName, referenceTimer.elapsed());
 
-    const auto caption = htmlFormattedParagraph(captionHtml, kCaptionPixelFontSize, true);
-    const auto description = htmlFormattedParagraph(descriptionHtml, kDescriptionPixelFontSize);
-
-    const QString text = kHtmlPageTemplate.arg(kComplexHtml.arg(
-        elideHtml(caption, kCaptionMaxLength),
-        elideHtml(description, kDescriptionMaxLength)));
-
-    //TODO: #vkutin Think where to put this color (or options altogether).
-    const QnHtmlTextItemOptions options(m_compositeTextOverlay->colors().textOverlayItemColor,
-        true, kBorderRadius, kHorPaddings, kVertPaddings, kMaxItemWidth);
-
-    const QnOverlayTextItemData data(id, text, options, timeout);
-    m_compositeTextOverlay->addModeData(QnCompositeTextOverlay::kTextOutputMode, data);
+    if (timeoutMs >= 0)
+        scheduleTimedDelete(item, qMax(kMinimumTextOverlayDurationMs, timeoutMs));
 }
 
 void QnMediaResourceWidget::setupHud()
@@ -740,13 +768,25 @@ void QnMediaResourceWidget::setupHud()
     m_triggersContainer->setFlag(QGraphicsItem::ItemClipsChildrenToShape, false);
     setOverlayWidgetVisible(m_triggersContainer, false, /*animate=*/false);
 
-    setOverlayWidgetVisible(m_hudOverlay->right(), true, /*animate=*/false);
+    m_compositeOverlay = new QnGraphicsStackedWidget(m_hudOverlay->right());
+
+    m_textOverlayWidget = new QnScrollableTextItemsWidget(m_compositeOverlay);
+    m_textOverlayWidget->setAlignment(Qt::AlignRight | Qt::AlignBottom);
+
+    m_bookmarksContainer = new QnScrollableTextItemsWidget(m_compositeOverlay);
+    m_bookmarksContainer->setAlignment(Qt::AlignRight | Qt::AlignBottom);
+    m_bookmarksContainer->hide();
+
+    m_compositeOverlay->addWidget(m_textOverlayWidget);
+    m_compositeOverlay->addWidget(m_bookmarksContainer);
 
     auto rightLayout = new QGraphicsLinearLayout(Qt::Horizontal, m_hudOverlay->right());
-    rightLayout->addItem(m_compositeTextOverlay);
+    rightLayout->addItem(m_compositeOverlay);
     rightLayout->addItem(m_triggersContainer);
 
-    m_compositeTextOverlay->stackBefore(m_triggersContainer);
+    m_compositeOverlay->stackBefore(m_triggersContainer);
+
+    setOverlayWidgetVisible(m_hudOverlay->right(), true, /*animate=*/false);
 }
 
 void QnMediaResourceWidget::updateHud(bool animate)
@@ -754,7 +794,9 @@ void QnMediaResourceWidget::updateHud(bool animate)
     const auto compositeOverlayCouldBeVisible
         = !options().testFlag(QnResourceWidget::InfoOverlaysForbidden);
 
-    setOverlayWidgetVisible(m_compositeTextOverlay, compositeOverlayCouldBeVisible, animate);
+    animate &= (scene() != nullptr);
+
+    setOverlayWidgetVisible(m_compositeOverlay, compositeOverlayCouldBeVisible, animate);
 
     base_type::updateHud(animate);
 
@@ -2144,13 +2186,26 @@ void QnMediaResourceWidget::at_item_imageEnhancementChanged()
 
 void QnMediaResourceWidget::updateCompositeOverlayMode()
 {
+    if (!m_compositeOverlay || m_camera.isNull())
+        return;
+
+    bool visible = true;
+
     const bool isLive = (m_display && m_display->camDisplay()
         ? m_display->camDisplay()->isRealTimeSource() : false);
 
-    const bool bookmarksEnabled = (!isLive && navigator()->bookmarksModeEnabled() && !m_camera.isNull());
-    const auto mode = (bookmarksEnabled ? QnCompositeTextOverlay::kBookmarksMode
-        : (isLive ? QnCompositeTextOverlay::kTextOutputMode : QnCompositeTextOverlay::kUndefinedMode));
-    m_compositeTextOverlay->setMode(mode);
+    const bool bookmarksEnabled = !isLive
+        && navigator()->bookmarksModeEnabled();
+
+    if (bookmarksEnabled)
+        m_compositeOverlay->setCurrentWidget(m_bookmarksContainer);
+    else if (isLive)
+        m_compositeOverlay->setCurrentWidget(m_textOverlayWidget);
+    else
+        visible = false;
+
+    const bool animate = m_compositeOverlay->scene() != nullptr;
+    setOverlayWidgetVisible(m_compositeOverlay, visible, animate);
 }
 
 qint64 QnMediaResourceWidget::getUtcCurrentTimeUsec() const
@@ -2187,9 +2242,9 @@ qint64 QnMediaResourceWidget::getDisplayTimeUsec() const
     return result;
 }
 
-QnCompositeTextOverlay *QnMediaResourceWidget::compositeTextOverlay()
+QnScrollableTextItemsWidget* QnMediaResourceWidget::bookmarksContainer()
 {
-    return m_compositeTextOverlay;
+    return m_bookmarksContainer;
 }
 
 QVector<QColor> QnMediaResourceWidget::motionSensitivityColors() const

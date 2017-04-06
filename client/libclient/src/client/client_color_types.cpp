@@ -145,12 +145,6 @@ QnBookmarkColors::QnBookmarkColors()
 {
 }
 
-QnCompositeTextOverlayColors::QnCompositeTextOverlayColors()
-    : bookmarkColors()
-    , textOverlayItemColor(0, 0, 0, 128)
-{
-}
-
 QnRoutingManagementColors::QnRoutingManagementColors():
     readOnly("#E1E7EA")
 {
