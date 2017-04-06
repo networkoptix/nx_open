@@ -99,6 +99,7 @@ public:
         m_streamSocket->dispatch(
             [this, inactivityTimeout]()
             {
+                m_receiving = true;
                 setInactivityTimeout(inactivityTimeout);
                 if (!m_streamSocket->setNonBlockingMode(true))
                     return onBytesRead(SystemError::getLastOSErrorCode(), (size_t)-1);
@@ -107,6 +108,12 @@ public:
                     &m_readBuffer,
                     std::bind(&SelfType::onBytesRead, this, _1, _2));
             });
+    }
+
+    void stopReading()
+    {
+        NX_ASSERT(isInSelfAioThread());
+        m_receiving = false;
     }
 
     /**
@@ -228,7 +235,7 @@ private:
         {
             nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
             static_cast<CustomConnectionType*>(this)->bytesReceived(m_readBuffer);
-            if (watcher.objectDestroyed())
+            if (watcher.objectDestroyed() || !m_receiving)
                 return; //< Connection has been removed by handler.
         }
 

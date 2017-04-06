@@ -11,34 +11,95 @@ MessageParser::MessageParser(bool isServer, MessageParserHandler* handler):
 {
 }
 
-void MessageParser::consume(const char* data, int len)
+MessageParser::BufferedState MessageParser::bufferDataIfNeeded(const char* data, int64_t len, int64_t neededLen)
+{
+    if (neededLen < len - m_pos)
+    {
+        m_pos += neededLen;
+        return BufferedState::notNeeded;
+    }
+
+    auto appendLen = std::min(neededLen - (int64_t)m_buf.size(), len - m_pos);
+    m_buf.append(data + m_pos, appendLen);
+    m_pos += appendLen;
+
+    if (m_buf.size() < neededLen)
+        return BufferedState::needMore;
+
+    return BufferedState::enough;
+}
+
+void MessageParser::processPart(
+    const char* data, 
+    int64_t len, 
+    int64_t neededLen,
+    ParseState nextState,
+    void (MessageParser::*processFunc)(const char* data, int64_t len))
+{
+    switch (bufferDataIfNeeded(data, len, neededLen))
+    {
+    case BufferedState::needMore:
+        break;
+    case BufferedState::notNeeded:
+        (this->*processFunc)(data, len);
+        m_state = nextState;
+        break;
+    case BufferedState::enough:
+        (this->*processFunc)(m_buf.constData(), m_buf.size());
+        m_state = nextState;
+        m_buf.clear();
+        break;
+    }
+}
+
+MessageParser::ParseState MessageParser::stateByPacketType() const
+{
+}
+
+void MessageParser::parse(const char* data, int64_t len)
 {
     switch (m_state)
     {
-    case ParseState::waitingHeader:
-        if (len < kHeaderLen)
-        {
-            m_buf.append(data, len);
-            if (m_buf.size() < kHeaderLen)
-            {
-                m_state = ParseState::readingHeader;
-                return;
-            }
+    case ParseState::readingHeaderFixedPart:
+        processPart(
+            data, 
+            len, 
+            kFixedHeaderLen, 
+            ParseState::readingHeaderExtension,
+            &MessageParser::readHeaderFixed);
+        break;
+    case ParseState::readingHeaderExtension:
+        processPart(
+            data,
+            len,
+            m_headerExtLen,
+            stateByPacketType(),
+            &MessageParser::readHeaderExtension);
+        break;
+    }
+}
 
-            parseHeader(m_buf.constData(), m_buf.size());
-        }
-        else
-        {
-            parseHeader(data, len);
-        }
-        return;
-    case ParseState::readingHeader:
+void MessageParser::consume(const char* data, int64_t len)
+{
+    m_pos = 0;
+    while (m_pos < len)
+        parse(data, len);
+
+    switch (m_state)
     {
-        int appendLen = std::min(kHeaderLen - m_buf.size(), len);
+
+    case ParseState::readingHeaderFixedPart:
+    {
+        int appendLen = std::min(kFixedHeaderLen - (int64_t)m_buf.size(), len);
         m_buf.append(data, appendLen);
-        if (m_buf.size() < kHeaderLen)
+        if (m_buf.size() < kFixedHeaderLen)
             return;
-        parseHeader(m_buf.constData()), m_buf.size());
+        readHeaderFixed(m_buf.data(), m_buf.size());
+        return;
+    }
+    case ParseState::readingHeaderExtension:
+    {
+        readHeaderExtension(data, len);
         return;
     }
     case ParseState::readingPingPayload:
@@ -54,68 +115,69 @@ void MessageParser::consume(const char* data, int len)
         else
             m_handler->pongReceived(m_buf.constData(), m_buf.size());
         reset();
-        parseHeader(data + appendLen, len - appendLen);
+        readHeaderFixed(data + appendLen, len - appendLen);
         return;
     }
     case ParseState::readingApplicationPayload:
     {
         int toRead = std::min(m_payloadLen - m_pos, len);
-        m_handler->payloadReceived(data, toRead);
         m_payloadLen -= toRead;
+        m_handler->payloadReceived(data, toRead, m_payloadLen == 0);
         if (m_payloadLen != 0)
             return;
         reset();
-        parseHeader(data + toRead, len - toRead);
+        readHeaderFixed(data + toRead, len - toRead);
         return;
     }
     }
 }
 
-bool MessageParser::parseHeader(const char* data, int len)
+bool MessageParser::readHeaderFixed(const char* data, int64_t len)
 {
-    char opCode = data[0] & 0x0F;
-    bool fin = (data[0] >> 7) & 0x01;
-    bool masked = (data[1] >> 7) & 0x01;
+    m_opCode = data[0] & 0x0F;
+    m_fin = (data[0] >> 7) & 0x01;
+    m_masked = (data[1] >> 7) & 0x01;
 
-    int lengthTypeField = data[1] & (~0x80);
-    unsigned int mask = 0;
-    int pos = 0;
+    m_lengthTypeField = data[1] & (~0x80);
+    unsigned int m_mask = 0;
+    int m_pos = 0;
 
-    if (lengthTypeField <= 125) 
+    m_headerLen = kFixedHeaderLen + (m_lengthTypeField <= 125 ? 0 : m_lengthTypeField == 126 ? 2 : 8) + (m_masked ? 4 : 0);
+    m_state = ParseState::readingHeaderExtension;
+
+    if (len < m_headerLen)
+        return;
+
+    readHeaderExtension(data, len);
+
+    if (m_lengthTypeField <= 125) 
     {
-        m_payloadLen = lengthTypeField;
+        m_payloadLen = m_lengthTypeField;
     }
-    else if (lengthTypeField == 126) 
+    else if (m_lengthTypeField == 126) 
     { 
         m_payloadLen = data[2] + (data[3] << 8);
         pos += 2;
     }
-    else if (lengthTypeField == 127) { 
+    else if (lengthTypeField == 127) 
+    { 
         m_payloadLen = data[2] + (data[3] << 8);
         pos += 8;
     }
 
-    if (msg_masked) {
-        mask = *((unsigned int*)(in_buffer + pos));
-        //printf("MASK: %08x\n", mask);
+    /** If we ever need masking readHeaderFixed() and previous function interfaces should be changed to 
+        accept char* to enable in place unmasking. */
+#if (0)
+    if (masked) 
+    {
+        mask = *((unsigned int*)(data + pos));
         pos += 4;
 
-        // unmask data:
-        unsigned char* c = in_buffer + pos;
-        for (int i = 0; i < payload_length; i++) {
+        char* c = data + pos;
+        for (int i = 0; i < m_payloadLen; i++)
             c[i] = c[i] ^ ((unsigned char*)(&mask))[i % 4];
-        }
     }
-
-    if (payload_length > out_size) {
-        //TODO: if output buffer is too small -- ERROR or resize(free and allocate bigger one) the buffer ?
-    }
-
-    memcpy((void*)out_buffer, (void*)(in_buffer + pos), payload_length);
-    out_buffer[payload_length] = 0;
-    *out_length = payload_length + 1;
-
-    //printf("TEXT: %s\n", out_buffer);
+#endif
 
     if (msg_opcode == 0x0) return (msg_fin) ? TEXT_FRAME : INCOMPLETE_TEXT_FRAME; // continuation frame ?
     if (msg_opcode == 0x1) return (msg_fin) ? TEXT_FRAME : INCOMPLETE_TEXT_FRAME;
@@ -124,6 +186,10 @@ bool MessageParser::parseHeader(const char* data, int len)
     if (msg_opcode == 0xA) return PONG_FRAME;
 
     return ERROR_FRAME;
+}
+
+bool MessageParser::readHeaderExtension(const char* data, int64_t len)
+{
 }
 
 void MessageParser::reset()
