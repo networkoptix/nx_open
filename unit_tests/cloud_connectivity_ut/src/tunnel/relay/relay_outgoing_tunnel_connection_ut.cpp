@@ -2,7 +2,9 @@
 
 #include <nx/network/cloud/tunnel/relay/relay_outgoing_tunnel_connection.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/thread/sync_queue.h>
 
 #include "cloud_relay_fixture_base.h"
 #include "client_to_relay_connection.h"
@@ -19,112 +21,6 @@ namespace test {
 class CloudRelayOutgoingTunnelConnection:
     public CloudRelayFixtureBase
 {
-public:
-    CloudRelayOutgoingTunnelConnection():
-        m_clientToRelayConnectionCounter(0),
-        m_destroyTunnelConnectionOnConnectFailure(false),
-        m_relayType(RelayType::happy),
-        m_connectTimeout(std::chrono::milliseconds::zero())
-    {
-    }
-
-    ~CloudRelayOutgoingTunnelConnection()
-    {
-        if (m_tunnelConnection)
-            m_tunnelConnection->pleaseStopSync();
-    }
-
-protected:
-    void givenHappyRelay()
-    {
-        m_relayType = RelayType::happy;
-    }
-
-    void givenUnhappyRelay()
-    {
-        m_relayType = RelayType::unhappy;
-    }
-    
-    void givenSilentRelay()
-    {
-        m_relayType = RelayType::silent;
-    }
-
-    void whenRequestingConnection()
-    {
-        using namespace std::placeholders;
-
-        if (!m_tunnelConnection)
-            createConnection();
-
-        m_tunnelConnection->establishNewConnection(
-            m_connectTimeout,
-            nx::network::SocketAttributes(),
-            std::bind(&CloudRelayOutgoingTunnelConnection::onConnectDone, this, _1, _2, _3));
-        m_connectDone.get_future().wait();
-    }
-
-    void whenRequestingConnectionWithTimeout()
-    {
-        m_connectTimeout = std::chrono::milliseconds(1);
-        whenRequestingConnection();
-    }
-
-    void thenRequestToRelayHasBeenIssued()
-    {
-        ASSERT_GT(m_clientToRelayConnectionCounter.load(), 0);
-        // TODO: Check that request has been made
-    }
-
-    void thenConnectionHasBeenProvided()
-    {
-        thenRequestToRelayHasBeenIssued();
-
-        ASSERT_EQ(SystemError::noError, m_connectResult.sysErrorCode);
-        ASSERT_NE(nullptr, m_connectResult.connection);
-        ASSERT_TRUE(m_connectResult.stillValid);
-    }
-
-    void thenErrorHasBeenReported()
-    {
-        thenRequestToRelayHasBeenIssued();
-
-        ASSERT_NE(SystemError::noError, m_connectResult.sysErrorCode);
-        ASSERT_EQ(nullptr, m_connectResult.connection);
-        ASSERT_FALSE(m_connectResult.stillValid);
-    }
-
-    void thenTimedOutHasBeenReported()
-    {
-        thenErrorHasBeenReported();
-        ASSERT_EQ(SystemError::timedOut, m_connectResult.sysErrorCode);
-    }
-
-    void thenTunnelReportedClosure()
-    {
-        ASSERT_NE(SystemError::noError, m_tunnelClosed.get_future().get());
-    }
-
-    void thenTunnelDidNotReportClosure()
-    {
-        ASSERT_EQ(
-            std::future_status::timeout,
-            m_tunnelClosed.get_future().wait_for(std::chrono::milliseconds::zero()));
-    }
-
-    void enableDestroyingTunnelConnectionOnConnectFailure()
-    {
-        m_destroyTunnelConnectionOnConnectFailure = true;
-    }
-
-private:
-    enum class RelayType
-    {
-        happy,
-        unhappy,
-        silent,
-    };
-
     struct Result
     {
         SystemError::ErrorCode sysErrorCode;
@@ -149,9 +45,169 @@ private:
         }
     };
 
+public:
+    CloudRelayOutgoingTunnelConnection():
+        m_clientToRelayConnectionCounter(0),
+        m_destroyTunnelConnectionOnConnectFailure(false),
+        m_relayType(RelayType::happy),
+        m_connectTimeout(std::chrono::milliseconds::zero()),
+        m_connectionsToCreateCount(1)
+    {
+    }
+
+    ~CloudRelayOutgoingTunnelConnection()
+    {
+        if (m_tunnelConnection)
+            m_tunnelConnection->pleaseStopSync();
+    }
+
+protected:
+    void enableInactivityTimeout()
+    {
+        m_tunnelInactivityTimeout = std::chrono::milliseconds(1);
+    }
+
+    void givenHappyRelay()
+    {
+        m_relayType = RelayType::happy;
+    }
+
+    void givenUnhappyRelay()
+    {
+        m_relayType = RelayType::unhappy;
+    }
+    
+    void givenSilentRelay()
+    {
+        m_relayType = RelayType::silent;
+    }
+
+    void givenIdleTunnel()
+    {
+        createConnection();
+    }
+
+    void whenRequestingConnection()
+    {
+        m_connectionsToCreateCount = 1;
+        requestConnections();
+    }
+
+    void whenRequestingMultipleConnection()
+    {
+        m_connectionsToCreateCount = nx::utils::random::number<int>(2, 10);
+        requestConnections();
+    }
+
+    void whenRequestingConnectionWithTimeout()
+    {
+        m_connectTimeout = std::chrono::milliseconds(1);
+        whenRequestingConnection();
+    }
+
+    void whenReceivedAndSavedConnection()
+    {
+        whenRequestingConnection();
+
+        m_connection = std::move(m_connectResultQueue.pop().connection);
+        ASSERT_NE(nullptr, m_connection);
+    }
+
+    void thenRequestToRelayHasBeenIssued()
+    {
+        ASSERT_GT(m_clientToRelayConnectionCounter.load(), 0);
+        // TODO: Check that request has been made
+    }
+
+    void thenConnectionIsProvided()
+    {
+        thenAllConnectionsHaveBeenProvided();
+    }
+
+    void thenAllConnectionsHaveBeenProvided()
+    {
+        for (int i = 0; i < m_connectionsToCreateCount; ++i)
+        {
+            const auto connectResult = m_connectResultQueue.pop();
+
+            thenRequestToRelayHasBeenIssued();
+
+            ASSERT_EQ(SystemError::noError, connectResult.sysErrorCode);
+            ASSERT_NE(nullptr, connectResult.connection);
+            ASSERT_TRUE(connectResult.stillValid);
+        }
+    }
+
+    void thenErrorIsReported()
+    {
+        thenErrorIsReported(m_connectResultQueue.pop());
+    }
+
+    void thenErrorIsReported(const Result& connectResult)
+    {
+        thenRequestToRelayHasBeenIssued();
+
+        ASSERT_NE(SystemError::noError, connectResult.sysErrorCode);
+        ASSERT_EQ(nullptr, connectResult.connection);
+        ASSERT_FALSE(connectResult.stillValid);
+    }
+
+    void thenTimedOutIsReported()
+    {
+        const auto connectResult = m_connectResultQueue.pop();
+        thenErrorIsReported(connectResult);
+        ASSERT_EQ(SystemError::timedOut, connectResult.sysErrorCode);
+    }
+
+    void thenTunnelReportedClosure()
+    {
+        ASSERT_NE(SystemError::noError, m_tunnelClosed.get_future().get());
+    }
+
+    void thenTunnelDidNotReportClosure()
+    {
+        ASSERT_EQ(
+            std::future_status::timeout,
+            m_tunnelClosed.get_future().wait_for(std::chrono::milliseconds::zero()));
+    }
+
+    void thenTunnelIsClosedByTimeout()
+    {
+        ASSERT_EQ(SystemError::timedOut, m_tunnelClosed.get_future().get());
+    }
+
+    void thenTunnelInactivityTimeoutIsNotTriggered()
+    {
+        ASSERT_EQ(
+            std::future_status::timeout,
+            m_tunnelClosed.get_future().wait_for(*m_tunnelInactivityTimeout * 3));
+    }
+
+    void enableDestroyingTunnelConnectionOnConnectFailure()
+    {
+        m_destroyTunnelConnectionOnConnectFailure = true;
+    }
+
+    void destroyTunnel()
+    {
+        m_tunnelConnection.reset();
+    }
+
+    void destroySavedConnection()
+    {
+        m_connection.reset();
+    }
+
+private:
+    enum class RelayType
+    {
+        happy,
+        unhappy,
+        silent,
+    };
+
     std::unique_ptr<relay::OutgoingTunnelConnection> m_tunnelConnection;
-    Result m_connectResult;
-    nx::utils::promise<void> m_connectDone;
+    nx::utils::SyncQueue<Result> m_connectResultQueue;
     SocketAddress m_relayEndpoint;
     std::atomic<int> m_clientToRelayConnectionCounter;
     bool m_isRelayHappy;
@@ -159,6 +215,10 @@ private:
     bool m_destroyTunnelConnectionOnConnectFailure;
     RelayType m_relayType;
     std::chrono::milliseconds m_connectTimeout;
+    int m_connectionsToCreateCount;
+    boost::optional<std::chrono::milliseconds> m_tunnelInactivityTimeout;
+    std::unique_ptr<AbstractStreamSocket> m_connection;
+    aio::BasicPollable m_aioThreadBinder;
 
     virtual void onClientToRelayConnectionInstanciated(
         ClientToRelayConnection* relayClient) override
@@ -189,8 +249,13 @@ private:
             m_relayEndpoint,
             nx::String(),
             std::move(clientToRelayConnection));
+        m_tunnelConnection->bindToAioThread(m_aioThreadBinder.getAioThread());
         m_tunnelConnection->setControlConnectionClosedHandler(
             std::bind(&CloudRelayOutgoingTunnelConnection::onTunnelClosed, this, _1));
+        if (m_tunnelInactivityTimeout)
+            m_tunnelConnection->setInactivityTimeout(*m_tunnelInactivityTimeout);
+
+        m_tunnelConnection->start();
 
         m_clientToRelayConnectionCounter = 0;
     }
@@ -211,8 +276,35 @@ private:
         if (m_destroyTunnelConnectionOnConnectFailure)
             m_tunnelConnection.reset();
 
-        m_connectResult = Result(sysErrorCode, std::move(connection), stillValid);
-        m_connectDone.set_value();
+        m_connectResultQueue.push(
+            Result(sysErrorCode, std::move(connection), stillValid));
+    }
+
+    void requestConnections()
+    {
+        using namespace std::placeholders;
+
+        nx::utils::promise<void> done;
+
+        m_aioThreadBinder.post(
+            [this, &done]()
+            {
+                if (!m_tunnelConnection)
+                    createConnection();
+
+                for (int i = 0; i < m_connectionsToCreateCount; ++i)
+                {
+                    m_tunnelConnection->establishNewConnection(
+                        m_connectTimeout,
+                        nx::network::SocketAttributes(),
+                        std::bind(&CloudRelayOutgoingTunnelConnection::onConnectDone, this,
+                            _1, _2, _3));
+                }
+
+                done.set_value();
+            });
+
+        done.get_future().wait();
     }
 };
 
@@ -223,7 +315,7 @@ TEST_F(CloudRelayOutgoingTunnelConnection, asks_relay_for_connection_using_prope
 {
     givenHappyRelay();
     whenRequestingConnection();
-    thenConnectionHasBeenProvided();
+    thenConnectionIsProvided();
 }
 
 TEST_F(CloudRelayOutgoingTunnelConnection, shuts_down_on_receiving_error_from_relay)
@@ -232,7 +324,7 @@ TEST_F(CloudRelayOutgoingTunnelConnection, shuts_down_on_receiving_error_from_re
 
     whenRequestingConnection();
 
-    thenErrorHasBeenReported();
+    thenErrorIsReported();
     thenTunnelReportedClosure();
 }
 
@@ -243,7 +335,7 @@ TEST_F(CloudRelayOutgoingTunnelConnection, tunnel_removed_from_closed_handler)
 
     whenRequestingConnection();
 
-    thenErrorHasBeenReported();
+    thenErrorIsReported();
     thenTunnelDidNotReportClosure();
 }
 
@@ -253,16 +345,58 @@ TEST_F(CloudRelayOutgoingTunnelConnection, connect_timeout)
 
     whenRequestingConnectionWithTimeout();
 
-    thenTimedOutHasBeenReported();
+    thenTimedOutIsReported();
     thenTunnelReportedClosure();
+}
+
+TEST_F(CloudRelayOutgoingTunnelConnection, multiple_concurrent_connections)
+{
+    givenHappyRelay();
+    whenRequestingMultipleConnection();
+    thenAllConnectionsHaveBeenProvided();
+}
+
+TEST_F(CloudRelayOutgoingTunnelConnection, inactivity_timeout_just_after_tunnel_creation)
+{
+    enableInactivityTimeout();
+
+    givenIdleTunnel();
+    thenTunnelIsClosedByTimeout();
+}
+
+TEST_F(CloudRelayOutgoingTunnelConnection, inactivity_timeout_just_after_some_activity)
+{
+    enableInactivityTimeout();
+
+    givenHappyRelay();
+
+    whenRequestingConnection();
+
+    thenConnectionIsProvided();
+    thenTunnelIsClosedByTimeout();
+}
+
+TEST_F(
+    CloudRelayOutgoingTunnelConnection,
+    inactivity_timer_does_not_start_while_provided_connections_are_in_use)
+{
+    enableInactivityTimeout();
+
+    givenHappyRelay();
+    whenReceivedAndSavedConnection();
+    thenTunnelInactivityTimeoutIsNotTriggered();
+}
+
+TEST_F(CloudRelayOutgoingTunnelConnection, provided_connection_destroyed_after_tunnel_connection)
+{
+    givenHappyRelay();
+    whenReceivedAndSavedConnection();
+    destroyTunnel();
+    destroySavedConnection();
 }
 
 //TEST_F(CloudRelayOutgoingTunnelConnection, reopens_control_connection_on_failure)
 //TEST_F(CloudRelayOutgoingTunnelConnection, shuts_down_on_control_connection_failure)
-//TEST_F(CloudRelayOutgoingTunnelConnection, multiple_concurrent_connections)
-//TEST_F(CloudRelayOutgoingTunnelConnection, inactivity_timeout)
-//TEST_F(CloudRelayOutgoingTunnelConnection, inactivity_timeout_does_not_start_while_provided_connections_are_in_use)
-//TEST_F(CloudRelayOutgoingTunnelConnection, provided_connection_destroyed_after_tunnel_connection)
 //TEST_F(CloudRelayOutgoingTunnelConnection, terminating)
 
 } // namespace test
