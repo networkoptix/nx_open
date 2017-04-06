@@ -1,6 +1,8 @@
 #include "runtime_info_rest_handler.h"
+
 #include <api/runtime_info_manager.h>
-#include <utils/network/http/httptypes.h>
+
+#include <nx/network/http/httptypes.h>
 
 int QnRuntimeInfoRestHandler::executeGet(
     const QString& /*path*/,
