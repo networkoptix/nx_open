@@ -19,6 +19,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/file_system.h>
 #include <nx/utils/raii_guard.h>
+#include <nx/utils/app_info.h>
 #include <utils/common/app_info.h>
 #include <utils/applauncher_utils.h>
 
@@ -50,14 +51,18 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
         m_clientVersion = nx::utils::SoftwareVersion(startupParams.engineVersion);
 
     QMap<Operation, Result> results;
+    // TODO: #3.1 #gdm #dklychkov Move function calls inside osCheck() method.
     results[Operation::RegisterUriHandler] = osCheck(Operation::RegisterUriHandler, registerUriHandler());
     results[Operation::UpdateApplauncher] = osCheck(Operation::UpdateApplauncher, updateApplauncher());
-    #if defined(Q_OS_LINUX)
+    if (nx::utils::AppInfo::isLinux() || nx::utils::AppInfo::isMacOsX())
+    {
         results[Operation::UpdateMinilauncher] = Result::Success;
-    #else
+    }
+    else
+    {
         results[Operation::UpdateMinilauncher] =
             osCheck(Operation::UpdateMinilauncher, updateMinilauncher());
-    #endif
+    }
 
     /* If we are already in self-update mode, just exit in any case. */
     if (startupParams.selfUpdateMode)

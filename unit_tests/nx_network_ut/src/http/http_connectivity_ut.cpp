@@ -18,10 +18,10 @@ namespace nx_http {
 static const nx::Buffer kPlayMessage("PLAY\r\n");
 static const nx::Buffer kTeardownMessage("TEARDOWN\r\n");
 
-class TestDataSendThread
+class ResumableThread
 {
 public:
-    TestDataSendThread(nx::utils::MoveOnlyFunc<void()> func):
+    ResumableThread(nx::utils::MoveOnlyFunc<void()> func):
         m_func(std::move(func))
     {
         m_thread = std::make_unique<nx::utils::thread>([this]() { threadFunc(); });
@@ -57,37 +57,45 @@ public:
         clear();
     }
 
-    void add(std::unique_ptr<TestDataSendThread> thread)
+    void add(std::unique_ptr<ResumableThread> thread)
     {
         QnMutexLocker lock(&m_mutex);
         m_threads.emplace_back(std::move(thread));
     }
 
-    TestDataSendThread& back()
+    ResumableThread& back()
     {
+        QnMutexLocker lock(&m_mutex);
         return *m_threads.back();
     }
 
     std::size_t size() const
     {
+        QnMutexLocker lock(&m_mutex);
         return m_threads.size();
     }
 
     bool empty() const
     {
+        QnMutexLocker lock(&m_mutex);
         return m_threads.empty();
     }
 
     void clear()
     {
-        for (auto& thread : m_threads)
+        decltype(m_threads) threads;
+        {
+            QnMutexLocker lock(&m_mutex);
+            threads.swap(m_threads);
+        }
+
+        for (auto& thread: threads)
             thread->join();
-        m_threads.clear();
     }
 
 private:
-    QnMutex m_mutex;
-    std::vector<std::unique_ptr<TestDataSendThread>> m_threads;
+    mutable QnMutex m_mutex;
+    std::vector<std::unique_ptr<ResumableThread>> m_threads;
 };
 
 class TakingSocketRestHandler:
@@ -110,7 +118,7 @@ public:
         events.onResponseHasBeenSent = 
             [threadStorage = m_threadStorage](nx_http::HttpServerConnection* connection)
             {
-                threadStorage->add(std::make_unique<TestDataSendThread>(
+                threadStorage->add(std::make_unique<ResumableThread>(
                     [sock = connection->takeSocket()]() mutable
                     {
                         ASSERT_TRUE(sock->setNonBlockingMode(false));
@@ -197,101 +205,97 @@ protected:
         const int kPlayMessageNumber = 1;
         const int kTeardownMessageNumber = 2;
 
-        // TODO: Following loop is here only for debugging. Remove it.
-        for (int i = 0; i < 20; ++i)
+        auto httpServer = testHttpServer();
+        ASSERT_TRUE(httpServer->registerRequestProcessor<TakingSocketRestHandler>(
+            kRestHandlerPath,
+            [this]()
+            {
+                return std::make_unique<TakingSocketRestHandler>(&m_threadStorage);
+            })) << "Failed to register request processor";
+
+        ASSERT_TRUE(httpServer->bindAndListen())
+            << "Failed to start test http server";
+
+        auto httpClient = std::make_unique<nx_http::HttpClient>();
+
+        const QUrl url(lit("%1://%2%3")
+            .arg(scheme)
+            .arg(httpServer->serverAddress().toString())
+            .arg(kRestHandlerPath));
+
+        ASSERT_TRUE(httpClient->doGet(url)) << "Failed to perform GET request";
+
+        std::unique_ptr<AbstractStreamSocket> tcpSocket;
         {
-            auto httpServer = testHttpServer();
-            ASSERT_TRUE(httpServer->registerRequestProcessor<TakingSocketRestHandler>(
-                kRestHandlerPath,
-                [this]()
-                {
-                    return std::make_unique<TakingSocketRestHandler>(&m_threadStorage);
-                })) << "Failed to register request processor";
-
-            ASSERT_TRUE(httpServer->bindAndListen())
-                << "Failed to start test http server";
-
-            auto httpClient = std::make_unique<nx_http::HttpClient>();
-
-            const QUrl url(lit("%1://%2%3")
-                .arg(scheme)
-                .arg(httpServer->serverAddress().toString())
-                .arg(kRestHandlerPath));
-
-            ASSERT_TRUE(httpClient->doGet(url)) << "Failed to perform GET request "<<i;
-
-            std::unique_ptr<AbstractStreamSocket> tcpSocket;
-            {
-                std::unique_ptr<nx_http::HttpClient> localHttpClient;
-                tcpSocket = takeSocketFromHttpClient(httpClient);
-                std::swap(httpClient, localHttpClient);
-            }
-
-            while (m_threadStorage.empty())
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-
-            m_threadStorage.back().resume();
-
-            ASSERT_TRUE(tcpSocket->isConnected())
-                << "Socket taken from HTTP client is not connected";
-
-            int bytesRead = 0;
-            int messageNumber = 1;
-
-            bool gotPlayMessage = false;
-            bool gotTeardownMessage = false;
-
-            while (tcpSocket->isConnected())
-            {
-                const std::size_t kReadBufferSize = 65536;
-                char readBuffer[kReadBufferSize];
-
-                bytesRead = tcpSocket->recv(readBuffer, kReadBufferSize);
-                if (bytesRead > 0)
-                    parse(readBuffer, bytesRead);
-
-                nx::Buffer message;
-                while (!(message = getMessage()).isEmpty())
-                {
-                    if (messageNumber == kPlayMessageNumber)
-                    {
-                        ASSERT_EQ(kPlayMessage, message)
-                            << "Expected '" << kPlayMessage.data() << "', got " << message.data();
-
-                        gotPlayMessage = true;
-                    }
-                    else if (messageNumber == kTeardownMessageNumber)
-                    {
-                        ASSERT_EQ(kTeardownMessage, message)
-                            << "Expected '" << kTeardownMessage.data() << "', got " << message.data();
-
-                        gotTeardownMessage = true;
-                    }
-                    else
-                    {
-                        FAIL() << "Unexpected message: " << message.data();
-                    }
-
-                    ++messageNumber;
-                }
-            }
-
-            ASSERT_EQ(messageNumber, kAwaitedMessageNumber)
-                << "Got wrong number of messages. Expected: "
-                << kAwaitedMessageNumber - 1
-                << ", got: " << messageNumber - 1;
-
-            ASSERT_TRUE(gotPlayMessage)
-                << "Have not got '" << kPlayMessage.data() << "' message";
-
-            ASSERT_TRUE(gotTeardownMessage)
-                << "Have not got '" << kTeardownMessage.data() << "' message";;
-
-            httpServer.reset();
-            tcpSocket.reset();
-
-            m_threadStorage.clear();
+            std::unique_ptr<nx_http::HttpClient> localHttpClient;
+            tcpSocket = takeSocketFromHttpClient(httpClient);
+            std::swap(httpClient, localHttpClient);
         }
+
+        while (m_threadStorage.empty())
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+
+        m_threadStorage.back().resume();
+
+        ASSERT_TRUE(tcpSocket->isConnected())
+            << "Socket taken from HTTP client is not connected";
+
+        int bytesRead = 0;
+        int messageNumber = 1;
+
+        bool gotPlayMessage = false;
+        bool gotTeardownMessage = false;
+
+        while (tcpSocket->isConnected())
+        {
+            const std::size_t kReadBufferSize = 65536;
+            char readBuffer[kReadBufferSize];
+
+            bytesRead = tcpSocket->recv(readBuffer, kReadBufferSize);
+            if (bytesRead > 0)
+                parse(readBuffer, bytesRead);
+
+            nx::Buffer message;
+            while (!(message = getMessage()).isEmpty())
+            {
+                if (messageNumber == kPlayMessageNumber)
+                {
+                    ASSERT_EQ(kPlayMessage, message)
+                        << "Expected '" << kPlayMessage.data() << "', got " << message.data();
+
+                    gotPlayMessage = true;
+                }
+                else if (messageNumber == kTeardownMessageNumber)
+                {
+                    ASSERT_EQ(kTeardownMessage, message)
+                        << "Expected '" << kTeardownMessage.data() << "', got " << message.data();
+
+                    gotTeardownMessage = true;
+                }
+                else
+                {
+                    FAIL() << "Unexpected message: " << message.data();
+                }
+
+                ++messageNumber;
+            }
+        }
+
+        ASSERT_EQ(messageNumber, kAwaitedMessageNumber)
+            << "Got wrong number of messages. Expected: "
+            << kAwaitedMessageNumber - 1
+            << ", got: " << messageNumber - 1;
+
+        ASSERT_TRUE(gotPlayMessage)
+            << "Have not got '" << kPlayMessage.data() << "' message";
+
+        ASSERT_TRUE(gotTeardownMessage)
+            << "Have not got '" << kTeardownMessage.data() << "' message";;
+
+        httpServer.reset();
+        tcpSocket.reset();
+
+        m_threadStorage.clear();
     }
 
 private:

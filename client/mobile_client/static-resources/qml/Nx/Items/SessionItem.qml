@@ -32,6 +32,28 @@ Pane
         systemId: control.systemId
         localSystemId: control.localId
     }
+    ModelDataAccessor
+    {
+        id: hostsModelAccessor
+        model: hostsModel
+
+        property string defaultAddress: ""
+
+        onDataChanged:
+        {
+            if (startRow === 0)
+                updateDefaultAddress()
+        }
+        onCountChanged: updateDefaultAddress()
+
+        function updateDefaultAddress()
+        {
+            defaultAddress = count > 0
+                ? Nx.url(getData(0, "url")).address()
+                : ""
+        }
+    }
+
     AuthenticationDataModel
     {
         id: authenticationDataModel
@@ -68,7 +90,7 @@ Pane
     {
         id: informationBlock
         enabled: compatible && online
-        address: Nx.url(hostsModel.firstHost).address()
+        address: hostsModelAccessor.defaultAddress
         user: authenticationDataModel.defaultCredentials.user
     }
 
