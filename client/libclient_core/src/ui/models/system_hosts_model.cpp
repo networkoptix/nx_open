@@ -40,8 +40,6 @@ public:
     QUuid localSystemId() const;
     void setLocalSystemId(const QUuid& id);
 
-    QUrl firstHost() const;
-
     UrlsList recentConnectionUrls() const;
 
 public: // overrides
@@ -133,11 +131,6 @@ void QnSystemHostsModel::HostsModel::setLocalSystemId(const QUuid& id)
 
     m_localSystemId = id;
     emit m_owner->localSystemIdChanged();
-}
-
-QUrl QnSystemHostsModel::HostsModel::firstHost() const
-{
-    return (m_hosts.isEmpty() ? QUrl() : m_hosts.front().second);
 }
 
 UrlsList QnSystemHostsModel::HostsModel::recentConnectionUrls() const
@@ -248,13 +241,9 @@ void QnSystemHostsModel::HostsModel::addServer(
     if (host.isEmpty())
         return;
 
-    bool onlineStatusChanged = (m_hosts.isEmpty());
     beginInsertRows(QModelIndex(), m_hosts.size(), m_hosts.size());
     m_hosts.append(ServerIdHostPair(serverId, host));
     endInsertRows();
-
-    if (onlineStatusChanged)
-        emit m_owner->firstHostChanged();
 }
 
 void QnSystemHostsModel::HostsModel::updateServerHost(
@@ -342,25 +331,6 @@ QnSystemHostsModel::QnSystemHostsModel(QObject* parent):
     base_type(parent)
 {
     setSourceModel(new HostsModel(this));
-
-    const auto rowsChangedHandler =
-        [this](const QModelIndex& /* parent */, int first, int /* last */)
-        {
-            if (first == 0)
-                emit firstHostChanged();
-        };
-
-    connect(this, &QnSystemHostsModel::modelReset, this, &QnSystemHostsModel::firstHostChanged);
-    connect(this, &QnSystemHostsModel::rowsInserted, this, rowsChangedHandler);
-    connect(this, &QnSystemHostsModel::rowsRemoved, this, rowsChangedHandler);
-
-    connect(this, &QnSystemHostsModel::rowsMoved, this,
-        [this](const QModelIndex& /* parent*/, int start, int /* end */,
-            const QModelIndex& /* destination */, int row)
-        {
-            if ((row == 0) || (start == 0))
-                emit firstHostChanged();
-        });
 }
 
 bool QnSystemHostsModel::lessThan(
@@ -419,11 +389,6 @@ QUuid QnSystemHostsModel::localSystemId() const
 void QnSystemHostsModel::setLocalSystemId(const QUuid& id)
 {
     hostsModel()->setLocalSystemId(id);
-}
-
-QUrl QnSystemHostsModel::firstHost() const
-{
-    return hostsModel()->firstHost();
 }
 
 QnSystemHostsModel::HostsModel* QnSystemHostsModel::hostsModel() const

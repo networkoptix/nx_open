@@ -1681,7 +1681,7 @@ void QnRtspConnectionProcessor::run()
 void QnRtspConnectionProcessor::resetTrackTiming()
 {
     Q_D(QnRtspConnectionProcessor);
-    for (ServerTrackInfoMap::iterator itr = d->trackInfo.begin(); itr != d->trackInfo.end(); ++itr)
+    for (ServerTrackInfoMap::const_iterator itr = d->trackInfo.constBegin(); itr != d->trackInfo.constEnd(); ++itr)
     {
         RtspServerTrackInfoPtr track = itr.value();
         track->sequence = 0;

@@ -12,6 +12,8 @@ Item
     property int videoRotation: 0
     property size sourceSize
 
+    property real videoCenterHeightOffsetFactor: 0
+
     property real visibleVideoWidth: Utils.isRotated90(videoRotation) ? item.height : item.width
     property real visibleVideoHeight: Utils.isRotated90(videoRotation) ? item.width : item.height
 
@@ -77,6 +79,11 @@ Item
 
         item.parent = videoPositioner
         item.anchors.centerIn = videoPositioner
+        item.anchors.verticalCenterOffset =
+            Qt.binding(function()
+            {
+                return -(height - visibleVideoHeight) / 2 * videoCenterHeightOffsetFactor
+            })
         item.rotation = Qt.binding(function() { return videoRotation })
     }
 

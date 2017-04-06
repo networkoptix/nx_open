@@ -65,6 +65,17 @@ std::chrono::milliseconds StatisticsCollector::aggregationPeriod() const
     return m_period;
 }
 
+void StatisticsCollector::clearStatistics()
+{
+    m_recordQueue.clear();
+    m_currentStatistics = QueryStatistics();
+    m_currentStatistics.statisticalPeriod = m_period;
+    m_requestExecutionTimesCalculationContext =
+        DurationStatisticsCalculationContext(&m_currentStatistics.requestExecutionTimes);
+    m_waitingForExecutionTimesCalculationContext = 
+        DurationStatisticsCalculationContext(&m_currentStatistics.waitingForExecutionTimes);
+}
+
 void StatisticsCollector::updateStatisticsWithNewValue(
     const QueryExecutionInfo& queryStatistics)
 {
