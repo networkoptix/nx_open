@@ -50,6 +50,8 @@ public:
 
     std::chrono::milliseconds aggregationPeriod() const;
 
+    void clearStatistics();
+
 private:
     struct DurationStatisticsCalculationContext
     {
