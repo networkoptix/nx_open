@@ -14,15 +14,15 @@ struct ApiLayoutTourItemData: ApiData
     int delayMs = 0;
 };
 
-#define ApiLayoutTourItemData_Fields ApiData_Fields (layoutId)(delayMs)
+#define ApiLayoutTourItemData_Fields (layoutId)(delayMs)
 
-struct ApiLayoutTourItemWithRefData: ApiLayoutTourItemData
-{
-    QnUuid tourId;
-};
-#define ApiLayoutTourItemWithRefData_Fields ApiLayoutTourItemData_Fields (tourId)
+// struct ApiLayoutTourItemWithRefData: ApiLayoutTourItemData
+// {
+//     QnUuid tourId;
+// };
+// #define ApiLayoutTourItemWithRefData_Fields ApiLayoutTourItemData_Fields (tourId)
 
-struct ApiLayoutTourData: public ApiIdData
+struct ApiLayoutTourData: ApiIdData
 {
     QString name;
     std::vector<ApiLayoutTourItemData> items;

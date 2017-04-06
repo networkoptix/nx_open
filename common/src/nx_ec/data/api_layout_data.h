@@ -34,10 +34,7 @@ namespace ec2
                                     (displayInfo)
 
 
-    struct ApiLayoutItemWithRefData: ApiLayoutItemData {
-        QnUuid layoutId;
-    };
-#define ApiLayoutItemWithRefData_Fields ApiLayoutItemData_Fields (layoutId)
+
 
 
     struct ApiLayoutData: ApiResourceData

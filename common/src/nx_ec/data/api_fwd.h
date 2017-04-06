@@ -27,10 +27,8 @@ namespace ec2 {
     struct ApiUpdateSequenceData;
     struct ApiIdData;
     struct ApiLayoutItemData;
-    struct ApiLayoutItemWithRefData;
     struct ApiLayoutData;
     struct ApiLayoutTourItemData;
-    struct ApiLayoutTourItemWithRefData;
     struct ApiLayoutTourData;
     struct ApiLicenseData;
     struct ApiDetailedLicenseData;
@@ -160,10 +158,8 @@ namespace ec2 {
     (ApiSyncMarkerRecord)\
     (ApiUpdateSequenceData)\
     (ApiLayoutItemData)\
-    (ApiLayoutItemWithRefData)\
     (ApiLayoutData)\
     (ApiLayoutTourItemData)\
-    (ApiLayoutTourItemWithRefData)\
     (ApiLayoutTourData)\
     (ApiLicenseData)\
     (ApiDetailedLicenseData)\
