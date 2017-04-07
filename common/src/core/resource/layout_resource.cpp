@@ -7,8 +7,8 @@
 #include "plugins/resource/avi/avi_resource.h"
 #include "core/resource_management/resource_pool.h"
 
-QnLayoutResource::QnLayoutResource():
-    base_type(),
+QnLayoutResource::QnLayoutResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_items(new QnThreadsafeItemStorage<QnLayoutItemData>(&m_mutex, this)),
     m_cellAspectRatio(-1.0),
     m_cellSpacing(-1.0),

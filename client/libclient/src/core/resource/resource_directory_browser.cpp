@@ -144,7 +144,7 @@ void QnResourceDirectoryBrowser::findResources(const QString& directory, QnResou
 QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& filename,
     QnResourcePool* resourcePool)
 {
-    QnLayoutFileStorageResource layoutStorage;
+    QnLayoutFileStorageResource layoutStorage(qnClientCoreModule->commonModule());
     layoutStorage.setUrl(filename);
     QScopedPointer<QIODevice> layoutFile(layoutStorage.open(lit("layout.pb"), QIODevice::ReadOnly));
     if (!layoutFile)
@@ -248,7 +248,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
             path += lit(".mkv");
         item.resource.uniqueId = QnLayoutFileStorageResource::itemUniqueId(filename, path);
 
-        QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
+        QnStorageResourcePtr storage(new QnLayoutFileStorageResource(qnClientCoreModule->commonModule()));
         storage->setUrl(filename);
 
         QnAviResourcePtr aviResource(new QnAviResource(item.resource.uniqueId));

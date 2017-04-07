@@ -15,7 +15,7 @@ class QnFakeMediaServerResource: public QnMediaServerResource
     using base_type = QnMediaServerResource;
 
 public:
-    QnFakeMediaServerResource();
+    QnFakeMediaServerResource(QnCommonModule* commonModule);
     virtual QnUuid getOriginalGuid() const override;
     void setFakeServerModuleInformation(const ec2::ApiDiscoveredServerData& serverData);
     virtual QnModuleInformation getModuleInformation() const override;

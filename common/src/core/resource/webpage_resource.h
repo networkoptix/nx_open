@@ -8,8 +8,8 @@ class QnWebPageResource: public QnResource
     using base_type = QnResource;
 
 public:
-    QnWebPageResource();
-    QnWebPageResource(const QUrl& url);
+    QnWebPageResource(QnCommonModule* commonModule = nullptr);
+    QnWebPageResource(const QUrl& url, QnCommonModule* commonModule = nullptr);
 
     virtual ~QnWebPageResource();
 

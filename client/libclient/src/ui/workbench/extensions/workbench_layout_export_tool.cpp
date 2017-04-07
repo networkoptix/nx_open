@@ -31,6 +31,7 @@
 #include <nx/fusion/model_functions.h>
 #include <utils/app_server_image_cache.h>
 #include <utils/local_file_cache.h>
+#include <client_core/client_core_module.h>
 
 #ifdef Q_OS_WIN
 #   include <launcher/nov_launcher_win.h>
@@ -111,7 +112,7 @@ bool QnLayoutExportTool::prepareStorage()
         QFile::remove(m_realFilename);
     }
 
-    m_storage = QnStorageResourcePtr(new QnLayoutFileStorageResource());
+    m_storage = QnStorageResourcePtr(new QnLayoutFileStorageResource(qnClientCoreModule->commonModule()));
     m_storage->setUrl(m_realFilename);
     return true;
 }

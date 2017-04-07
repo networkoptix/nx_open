@@ -531,7 +531,7 @@ QnNetworkResourcePtr QnResourceDiscoveryManager::findSameResource(const QnNetwor
     if (!camRes)
         return QnNetworkResourcePtr();
 
-    const auto& resPool = netRes->resourcePool();
+    const auto& resPool = netRes->commonModule()->resourcePool();
     auto existResource = resPool->getResourceByUniqueId<QnVirtualCameraResource>(camRes->getUniqueId());
     if (existResource)
         return existResource;

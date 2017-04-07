@@ -1,7 +1,7 @@
 #include "fake_media_server.h"
 
-QnFakeMediaServerResource::QnFakeMediaServerResource():
-    QnMediaServerResource()
+QnFakeMediaServerResource::QnFakeMediaServerResource(QnCommonModule* commonModule):
+    QnMediaServerResource(commonModule)
 {
     setId(QnUuid::createUuid());
     addFlags(Qn::fake_server);

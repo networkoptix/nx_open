@@ -673,7 +673,7 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiUserData& user, ec2:
 
 void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout, ec2::NotificationSource source)
 {
-    QnLayoutResourcePtr qnLayout(new QnLayoutResource());
+    QnLayoutResourcePtr qnLayout(new QnLayoutResource(commonModule()));
     if (!layout.url.isEmpty())
     {
         NX_LOG(lit("Invalid server layout with url %1").arg(layout.url), cl_logWARNING);
@@ -690,14 +690,14 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiLayoutData& layout, 
 
 void QnCommonMessageProcessor::updateResource(const ec2::ApiVideowallData& videowall, ec2::NotificationSource source)
 {
-    QnVideoWallResourcePtr qnVideowall(new QnVideoWallResource());
+    QnVideoWallResourcePtr qnVideowall(new QnVideoWallResource(commonModule()));
     fromApiToResource(videowall, qnVideowall);
     updateResource(qnVideowall, source);
 }
 
 void QnCommonMessageProcessor::updateResource(const ec2::ApiWebPageData& webpage, ec2::NotificationSource source)
 {
-    QnWebPageResourcePtr qnWebpage(new QnWebPageResource());
+    QnWebPageResourcePtr qnWebpage(new QnWebPageResource(commonModule()));
     fromApiToResource(webpage, qnWebpage);
     updateResource(qnWebpage, source);
 }
@@ -707,6 +707,7 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiCameraData& camera, 
     QnVirtualCameraResourcePtr qnCamera = getResourceFactory()->createResource(camera.typeId,
             QnResourceParams(camera.id, camera.url, camera.vendor))
         .dynamicCast<QnVirtualCameraResource>();
+    qnCamera->setCommonModule(commonModule());
 
     NX_ASSERT(qnCamera, Q_FUNC_INFO, QByteArray("Unknown resource type:") + camera.typeId.toByteArray());
     if (qnCamera)
@@ -737,6 +738,7 @@ void QnCommonMessageProcessor::updateResource(const ec2::ApiStorageData& storage
     QnStorageResourcePtr qnStorage = getResourceFactory()->createResource(resTypeId,
             QnResourceParams(storage.id, storage.url, QString()))
         .dynamicCast<QnStorageResource>();
+    qnStorage->setCommonModule(commonModule());
     NX_ASSERT(qnStorage, Q_FUNC_INFO, "Invalid resource type pool state");
     if (qnStorage)
     {

@@ -27,7 +27,7 @@ class QnLayoutResource: public QnResource,
     typedef QnResource base_type;
 
 public:
-    QnLayoutResource();
+    QnLayoutResource(QnCommonModule* commonModule = nullptr);
 
     virtual QString getUniqueId() const override;
     virtual Qn::ResourceStatus getStatus() const override;

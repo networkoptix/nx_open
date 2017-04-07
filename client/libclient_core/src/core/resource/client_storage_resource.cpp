@@ -3,9 +3,10 @@
 #include <cassert>
 
 #include <core/resource/media_server_resource.h>
+#include <client_core/client_core_module.h>
 
-QnClientStorageResource::QnClientStorageResource()
-    : base_type()
+QnClientStorageResource::QnClientStorageResource(QnCommonModule* commonModule)
+    : base_type(commonModule)
     , m_freeSpace(QnStorageResource::kUnknownSize)
     , m_totalSpace(QnStorageResource::kUnknownSize)
     , m_writable(false)
@@ -17,7 +18,7 @@ QnClientStorageResource::QnClientStorageResource()
 QnClientStorageResourcePtr QnClientStorageResource::newStorage( const QnMediaServerResourcePtr &parentServer, const QString &url ) {
     NX_ASSERT(parentServer, Q_FUNC_INFO, "Server must exist here");
 
-    QnClientStorageResourcePtr storage(new QnClientStorageResource());
+    QnClientStorageResourcePtr storage(new QnClientStorageResource(qnClientCoreModule->commonModule()));
 
     auto resTypeId = qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId);
     if (!resTypeId.isNull())
@@ -96,7 +97,7 @@ QIODevice* QnClientStorageResource::open(const QString&, QIODevice::OpenMode)
     return NULL;
 }
 
-Qn::StorageInitResult QnClientStorageResource::initOrUpdate() 
+Qn::StorageInitResult QnClientStorageResource::initOrUpdate()
 {
     NX_ASSERT(false);
     return Qn::StorageInit_CreateFailed;
