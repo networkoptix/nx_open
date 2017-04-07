@@ -698,9 +698,11 @@ QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
 
 void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProcessor)
 {
-    m_initStoragesAsyncPromise.reset(new std::promise<void>());
+    m_initStoragesAsyncPromise.reset(new nx::utils::promise<void>());
     QtConcurrent::run([messageProcessor, this]
     {
+        const auto setPromiseGuardFunc = makeScopedGuard([&]() { m_initStoragesAsyncPromise->set_value(); });
+
         //read server's storages
         ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
         ec2::ErrorCode rez;
@@ -711,10 +713,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             NX_LOG( lit("QnMain::run(): Can't get storage list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
-            {
-                m_initStoragesAsyncPromise->set_value();
                 return;
-            }
         }
 
         for(const auto& storage: storages)
@@ -768,7 +767,6 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         qnNormalStorageMan->initDone();
         qnBackupStorageMan->initDone();
-        m_initStoragesAsyncPromise->set_value();
     });
 }
 
