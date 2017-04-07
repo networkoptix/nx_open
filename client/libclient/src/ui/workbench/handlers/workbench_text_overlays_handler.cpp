@@ -169,8 +169,10 @@ void QnWorkbenchTextOverlaysHandler::at_businessActionReceived(
         if (text.isEmpty())
         {
             const auto runtimeParams = businessAction->getRuntimeParams();
-            const auto caption = QnBusinessStringsHelper::eventAtResource(runtimeParams, Qn::RI_WithUrl);
-            const auto description = QnBusinessStringsHelper::eventDetails(runtimeParams).join(L'\n');
+            const auto caption = QnBusinessStringsHelper::eventAtResource(
+                runtimeParams, Qn::RI_WithUrl).toHtmlEscaped();
+            const auto description = QnBusinessStringsHelper::eventDetails(
+                runtimeParams).join(L'\n').toHtmlEscaped();
 
             const auto captionHtml = htmlFormattedParagraph(caption, kCaptionPixelFontSize, true);
             const auto descriptionHtml = htmlFormattedParagraph(description, kDescriptionPixelFontSize);
@@ -277,10 +279,19 @@ void QnWorkbenchTextOverlaysHandlerPrivate::setupAutohideTimer(OverlayData& data
 {
     Q_Q(QnWorkbenchTextOverlaysHandler);
 
-    delete data.autohideTimer;
-    data.autohideTimer = executeDelayedParented(
-        [this, resource, id] { hideImmediately(resource, id); },
-        timeoutMs, q);
+    if (data.autohideTimer)
+    {
+        data.autohideTimer->stop();
+        data.autohideTimer->deleteLater();
+        data.autohideTimer = nullptr;
+    }
+
+    if (timeoutMs > 0)
+    {
+        data.autohideTimer = executeDelayedParented(
+            [this, resource, id] { hideImmediately(resource, id); },
+            timeoutMs, q);
+    }
 }
 
 QnWorkbenchTextOverlaysHandlerPrivate::OverlayData*
@@ -314,11 +325,8 @@ void QnWorkbenchTextOverlaysHandlerPrivate::removeData(
     if (dataIter == resourceOverlays.end())
         return;
 
-    if (auto timer = dataIter->autohideTimer)
-    {
-        timer->stop();
-        timer->deleteLater();
-    }
+    /* Clear auto-hide timer: */
+    setupAutohideTimer(dataIter.value(), resource, id, -1);
 
     resourceOverlays.erase(dataIter);
 
