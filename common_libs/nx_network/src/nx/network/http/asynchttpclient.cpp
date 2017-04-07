@@ -14,7 +14,6 @@
 
 #include <utils/crypt/linux_passwd_crypt.h>
 #include <nx/utils/system_error.h>
-#include <utils/common/util.h>
 
 #include "auth_tools.h"
 
