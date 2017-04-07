@@ -57,6 +57,7 @@
 #include <ui/workbench/handlers/workbench_cloud_handler.h>
 #include <ui/workbench/handlers/workbench_webpage_handler.h>
 #include <ui/workbench/handlers/workbench_screen_recording_handler.h>
+#include <ui/workbench/handlers/workbench_text_overlays_handler.h>
 
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
@@ -242,6 +243,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchResourcesSettingsHandler>();
     context->instance<QnWorkbenchBookmarksHandler>();
     context->instance<QnWorkbenchAlarmLayoutHandler>();
+    context->instance<QnWorkbenchTextOverlaysHandler>();
     context->instance<QnWorkbenchCloudHandler>();
     context->instance<workbench::LayoutToursHandler>();
 

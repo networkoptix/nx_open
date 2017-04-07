@@ -26,9 +26,9 @@ struct QnBusinessActionParameters
     // Recording
     int fps;
     Qn::StreamQuality streamQuality;
-    int recordingDuration;
+    int recordingDuration; //< Seconds.
     //! for bookmarks this represents epsilon, bookmark end time extended by
-    int recordAfter;
+    int recordAfter; //< Seconds.
 
     // Camera Output
     QString relayOutputId;

@@ -16,7 +16,12 @@ class QnCamDisplay;
 class QnLongRunnable;
 class QnAbstractRenderer;
 class QnClientVideoCamera;
-class QnCounter;
+
+namespace nx {
+namespace utils {
+class Counter;
+} // namespace utils
+} // namespace nx
 
 class QnResourceDisplay: public Connective<QObject>, protected QnResourceConsumer {
     Q_OBJECT
@@ -137,7 +142,7 @@ private:
     /** Whether this display was started. */
     bool m_started;
 
-    QPointer<QnCounter> m_counter;
+    QPointer<nx::utils::Counter> m_counter;
 };
 
 typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;

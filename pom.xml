@@ -772,6 +772,7 @@
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
                 <module>nx_cloud/libtraffic_relay</module>
+                <module>client/mobile_client</module>
             </modules>
         </profile>
 

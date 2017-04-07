@@ -465,8 +465,9 @@ void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemId, con
     if (!isLoggedInToCloud())
         return;
 
+    const bool autoLogin = qnCloudStatusWatcher->stayConnected();
     connectToSystemInternal(systemId, QUrl(serverUrl),
-        qnCloudStatusWatcher->credentials(), false, false);
+        qnCloudStatusWatcher->credentials(), false, autoLogin);
 }
 
 void QnWorkbenchWelcomeScreen::connectToAnotherSystem()
@@ -492,11 +493,11 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
             if (dialog->exec() != QDialog::Accepted)
                 return;
 
-            bool autoLogin = false;
+            static constexpr bool kNoAutoLogin = false;
             if (dialog->localCredentials().isValid())
             {
                 connectToSystemInternal(QString(), serverUrl, dialog->localCredentials(),
-                    dialog->savePassword(), autoLogin, controlsGuard);
+                    dialog->savePassword(), kNoAutoLogin, controlsGuard);
             }
             else if (dialog->cloudCredentials().isValid())
             {
@@ -506,11 +507,12 @@ void QnWorkbenchWelcomeScreen::setupFactorySystem(const QString& serverUrl)
                 {
                     qnClientCoreSettings->setCloudLogin(cloudCredentials.user);
                     qnClientCoreSettings->setCloudPassword(cloudCredentials.password.value());
+                    qnClientCoreSettings->save();
                 }
 
                 qnCloudStatusWatcher->setCredentials(cloudCredentials, true);
                 connectToSystemInternal(QString(), serverUrl, cloudCredentials,
-                    dialog->savePassword(), autoLogin, controlsGuard);
+                    dialog->savePassword(), kNoAutoLogin, controlsGuard);
             }
 
         };

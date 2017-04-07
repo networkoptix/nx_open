@@ -4,7 +4,7 @@
 #include <nx/utils/move_only_func.h>
 
 #include <transaction/transaction.h>
-#include <utils/common/subscription.h>
+#include <nx/utils/subscription.h>
 
 #include "serialization/serializable_transaction.h"
 #include "serialization/transaction_serializer.h"

@@ -20,6 +20,7 @@ public:
     AsyncSqlQueryExecutor& queryExecutor();
     const AsyncSqlQueryExecutor& queryExecutor() const;
     const StatisticsCollector& statisticsCollector() const;
+    StatisticsCollector& statisticsCollector();
 
 protected:
     DbStructureUpdater& dbStructureUpdater();
