@@ -96,6 +96,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceParamChanged,   this, &QnCommonMessageProcessor::on_resourceParamChanged, Qt::DirectConnection);
     connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceParamRemoved,   this, &QnCommonMessageProcessor::on_resourceParamRemoved, Qt::DirectConnection);
     connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceRemoved,        this, &QnCommonMessageProcessor::on_resourceRemoved, Qt::DirectConnection);
+    connect(resourceManager, &ec2::AbstractResourceNotificationManager::resourceStatusRemoved,  this, &QnCommonMessageProcessor::on_resourceStatusRemoved, Qt::DirectConnection);
 
     auto mediaServerManager = connection->getMediaServerNotificationManager();
     connect(mediaServerManager, &ec2::AbstractMediaServerNotificationManager::addedOrUpdated,   this, on_resourceUpdated(ec2::ApiMediaServerData), Qt::DirectConnection);
@@ -284,6 +285,19 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
     }
     else
         removeResourceIgnored(resourceId);
+}
+
+void QnCommonMessageProcessor::on_resourceStatusRemoved(const QnUuid& resourceId)
+{
+    if (!canRemoveResource(resourceId))
+    {
+        auto res = qnResPool->getResourceById(resourceId);
+        if (res)
+        {
+            auto connection = QnAppServerConnectionFactory::getConnection2();
+            connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusSync(resourceId, res->getStatus());
+        }
+    }
 }
 
 void QnCommonMessageProcessor::on_accessRightsChanged(const ec2::ApiAccessRightsData& accessRights)
