@@ -37,21 +37,21 @@ class MessageParser
     const int kFixedHeaderLen = 2;
 public:
     MessageParser(Role role, MessageParserHandler* handler);
-    void consume(const char* data, int64_t len);
+    void consume(char* data, int64_t len);
     void setRole(Role role);
 
 private:
-    void parse(const char* data, int64_t len);
+    void parse(char* data, int64_t len);
     void processPart(
-        const char* data, 
+        char* data, 
         int64_t len, 
         int64_t neededLen, 
         ParseState nextState,
-        void (MessageParser::*processFunc)(const char* data, int64_t len));
-    void processPayload(const char* data, int64_t len);
+        void (MessageParser::*processFunc)(char* data));
+    void processPayload(char* data, int64_t len);
     void reset();
-    void readHeaderFixed(const char* data, int64_t len);
-    void readHeaderExtension(const char* data, int64_t len);
+    void readHeaderFixed(char* data);
+    void readHeaderExtension(char* data);
     BufferedState bufferDataIfNeeded(const char* data, int64_t len, int64_t neededLen);
 
 private:

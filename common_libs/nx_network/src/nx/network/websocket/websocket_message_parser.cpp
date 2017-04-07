@@ -34,17 +34,17 @@ MessageParser::BufferedState MessageParser::bufferDataIfNeeded(const char* data,
     return BufferedState::enough;
 }
 
-void MessageParser::processPayload(const char* data, int64_t len)
+void MessageParser::processPayload(char* data, int64_t len)
 {
     int64_t outLen = std::min(len - m_pos, m_payloadLen);
     if (m_masked) 
     {
-        //for (int i = m_pos; i < m_pos + outLen; i++)
-        //    data[i] = data[i] ^ ((unsigned char*)(&m_mask))[i % 4];
+        for (int i = m_pos; i < m_pos + outLen; i++)
+            data[i] = data[i] ^ ((unsigned char*)(&m_mask))[i % 4];
     }
     m_handler->framePayload(data + m_pos, outLen);
     m_payloadLen -= outLen;
-    m_pos == outLen;
+    m_pos += outLen;
     if (m_payloadLen == 0)
     {
         m_handler->frameEnded();
@@ -55,29 +55,29 @@ void MessageParser::processPayload(const char* data, int64_t len)
 }
 
 void MessageParser::processPart(
-    const char* data, 
+    char* data, 
     int64_t len, 
     int64_t neededLen,
     ParseState nextState,
-    void (MessageParser::*processFunc)(const char* data, int64_t len))
+    void (MessageParser::*processFunc)(char* data))
 {
     switch (bufferDataIfNeeded(data, len, neededLen))
     {
     case BufferedState::needMore:
         break;
     case BufferedState::notNeeded:
-        (this->*processFunc)(data, len);
+        (this->*processFunc)(data);
         m_state = nextState;
         break;
     case BufferedState::enough:
-        (this->*processFunc)(m_buf.constData(), m_buf.size());
+        (this->*processFunc)(m_buf.data());
         m_state = nextState;
         m_buf.clear();
         break;
     }
 }
 
-void MessageParser::parse(const char* data, int64_t len)
+void MessageParser::parse(char* data, int64_t len)
 {
     switch (m_state)
     {
@@ -103,7 +103,7 @@ void MessageParser::parse(const char* data, int64_t len)
     }
 }
 
-void MessageParser::consume(const char* data, int64_t len)
+void MessageParser::consume(char* data, int64_t len)
 {
     m_pos = 0;
     while (m_pos < len)
@@ -115,24 +115,20 @@ void MessageParser::setRole(Role role)
     m_role = role;
 }
 
-void MessageParser::readHeaderFixed(const char* data, int64_t len)
+void MessageParser::readHeaderFixed(char* data)
 {
     m_opCode = (FrameType)(data[0] & 0x0F);
     m_fin = (data[0] >> 7) & 0x01;
     m_masked = (data[1] >> 7) & 0x01;
-
     if (!m_masked && m_role == Role::client)
         m_handler->handleError(Error::noMaskBit);
 
     m_lengthTypeField = data[1] & (~0x80);
-    unsigned int m_mask = 0;
-    int m_pos = 0;
-
     m_headerExtLen = (m_lengthTypeField <= 125 ? 0 : m_lengthTypeField == 126 ? 2 : 8) + (m_masked ? 4 : 0);
     m_handler->frameStarted(m_opCode, m_fin);
 }
 
-void MessageParser::readHeaderExtension(const char* data, int64_t len)
+void MessageParser::readHeaderExtension(char* data)
 {
     if (m_lengthTypeField <= 125)
     {
