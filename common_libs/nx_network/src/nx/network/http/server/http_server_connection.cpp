@@ -220,7 +220,7 @@ void HttpServerConnection::prepareAndSendResponse(
         nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString() ) );
     nx_http::insertOrReplaceHeader(
         &msg.response->headers,
-        nx_http::HttpHeader( "Date", nx_http::dateTimeToHttpFormat( QDateTime::currentDateTime() ) ) );
+        nx_http::HttpHeader( "Date", nx_http::formatDateTime( QDateTime::currentDateTime() ) ) );
 
     //TODO #ak connection persistency
 

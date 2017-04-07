@@ -1525,16 +1525,14 @@ void SystemManager::activateSystemIfNeeded(
         std::bind(&dao::AbstractSystemDataObject::activateSystem, m_systemDao.get(), _1, _2),
         systemIter->id,
         std::bind(&SystemManager::systemActivated, this,
-            m_startedAsyncCallsCounter.getScopedIncrement(),
-            _1, _2, _3, [](api::ResultCode) {}));
+            m_startedAsyncCallsCounter.getScopedIncrement(), _1, _2, _3));
 }
 
 void SystemManager::systemActivated(
     nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
-    std::string systemId,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::string systemId)
 {
     {
         QnMutexLocker lk(&m_mutex);
@@ -1560,8 +1558,6 @@ void SystemManager::systemActivated(
                 });
         }
     }
-
-    completionHandler(dbResultToApiResult(dbResult));
 }
 
 nx::db::DBResult SystemManager::saveUserSessionStart(

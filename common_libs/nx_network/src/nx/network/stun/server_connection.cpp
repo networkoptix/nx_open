@@ -1,14 +1,6 @@
-/**********************************************************
-* 19 dec 2013
-* a.kolesnikov
-***********************************************************/
-
 #include "server_connection.h"
 
-#include <common/common_globals.h>
-
 #include "message_dispatcher.h"
-
 
 namespace nx {
 namespace stun {
