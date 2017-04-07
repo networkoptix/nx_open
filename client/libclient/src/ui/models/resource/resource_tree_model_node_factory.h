@@ -14,6 +14,9 @@ public:
     static QnResourceTreeModelNodePtr createNode(Qn::NodeType nodeType,
         QnResourceTreeModel* model, bool initialize = true);
 
+    static QnResourceTreeModelNodePtr createNode(Qn::NodeType nodeType, const QnUuid& id,
+        QnResourceTreeModel* model, bool initialize = true);
+
     static QnResourceTreeModelNodePtr createLocalSystemNode(const QString& systemName,
         QnResourceTreeModel* model);
 

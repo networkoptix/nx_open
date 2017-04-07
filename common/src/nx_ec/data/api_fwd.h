@@ -27,8 +27,9 @@ namespace ec2 {
     struct ApiUpdateSequenceData;
     struct ApiIdData;
     struct ApiLayoutItemData;
-    struct ApiLayoutItemWithRefData;
     struct ApiLayoutData;
+    struct ApiLayoutTourItemData;
+    struct ApiLayoutTourData;
     struct ApiLicenseData;
     struct ApiDetailedLicenseData;
     struct ApiLockData;
@@ -102,6 +103,7 @@ namespace ec2 {
     typedef std::vector<ApiCameraDataEx> ApiCameraDataExList;
     typedef std::vector<ApiClientInfoData> ApiClientInfoDataList;
     typedef std::vector<ApiLayoutData> ApiLayoutDataList;
+    using ApiLayoutTourDataList = std::vector<ApiLayoutTourData>;
     typedef std::vector<ApiLicenseData> ApiLicenseDataList;
     typedef std::vector<ApiDetailedLicenseData> ApiDetailedLicenseDataList;
     typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;
@@ -157,8 +159,9 @@ namespace ec2 {
     (ApiSyncMarkerRecord)\
     (ApiUpdateSequenceData)\
     (ApiLayoutItemData)\
-    (ApiLayoutItemWithRefData)\
     (ApiLayoutData)\
+    (ApiLayoutTourItemData)\
+    (ApiLayoutTourData)\
     (ApiLicenseData)\
     (ApiDetailedLicenseData)\
     (ApiLockData)\

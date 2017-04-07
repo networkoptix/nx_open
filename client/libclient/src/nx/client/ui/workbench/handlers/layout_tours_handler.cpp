@@ -2,11 +2,17 @@
 
 #include <QtWidgets/QAction>
 
-#include <ui/style/skin.h>
-#include <ui/workbench/workbench.h>
-#include <ui/actions/action_manager.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/layout_tour_manager.h>
+
+#include <core/resource/layout_resource.h>
+
+#include <ui/actions/action_manager.h>
+#include <ui/dialogs/layout_tour_dialog.h>
+#include <ui/workbench/workbench.h>
+#include <ui/style/skin.h>
+
+#include <nx/utils/string.h>
 
 namespace nx {
 namespace client {
@@ -18,6 +24,63 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
+    connect(action(QnActions::NewLayoutTourAction), &QAction::triggered, this,
+        [this]()
+        {
+            QStringList usedNames;
+            for (const auto& tour: qnLayoutTourManager->tours())
+                usedNames << tour.name;
+
+            ec2::ApiLayoutTourData tour;
+            tour.id = QnUuid::createUuid();
+            tour.name = nx::utils::generateUniqueString(
+                usedNames, tr("Layout Tour"), tr("Layout Tour %1"));
+            qnLayoutTourManager->addOrUpdateTour(tour);
+        });
+
+    connect(action(QnActions::RenameLayoutTourAction), &QAction::triggered, this,
+        [this]()
+        {
+            QnActionParameters parameters = menu()->currentParameters(sender());
+            auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+            auto tour = qnLayoutTourManager->tour(id);
+            if (!tour.isValid())
+                return;
+            tour.name = parameters.argument<QString>(Qn::ResourceNameRole);
+            qnLayoutTourManager->addOrUpdateTour(tour);
+            qnLayoutTourManager->saveTour(tour);
+        });
+
+    connect(action(QnActions::RemoveLayoutTourAction), &QAction::triggered, this,
+        [this]()
+        {
+            QnActionParameters parameters = menu()->currentParameters(sender());
+            auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+            auto tour = qnLayoutTourManager->tour(id);
+            if (!tour.isValid())
+                return;
+            qnLayoutTourManager->removeTour(tour);
+        });
+
+    connect(action(QnActions::LayoutTourSettingsAction), &QAction::triggered, this,
+        [this]()
+        {
+            QnActionParameters parameters = menu()->currentParameters(sender());
+            auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+            auto tour = qnLayoutTourManager->tour(id);
+            if (!tour.isValid())
+                return;
+
+            QScopedPointer<QnLayoutTourDialog> dialog(new QnLayoutTourDialog(mainWindow()));
+            dialog->loadData(tour);
+            if (!dialog->exec())
+                return;
+
+            dialog->submitData(&tour);
+            qnLayoutTourManager->addOrUpdateTour(tour);
+            qnLayoutTourManager->saveTour(tour);
+        });
+
     connect(action(QnActions::OpenLayoutTourAction), &QAction::triggered,
         this, &LayoutToursHandler::openToursLayout);
 }

@@ -751,6 +751,22 @@ QnActionManager::QnActionManager(QObject *parent):
             ).
             autoRepeat(false);
 
+        factory(QnActions::NewLayoutTourAction).
+            flags(Qn::Main | Qn::Tree | Qn::NoTarget).
+            requiredGlobalPermission(Qn::GlobalAdminPermission).
+            text(tr("Layout Tour...")).
+            pulledText(tr("New Layout Tour...")).
+            condition(new QnConjunctionActionCondition(
+                new QnDisjunctionActionCondition(
+                    new QnTreeNodeTypeCondition(Qn::LayoutsNode, this),
+                    new QnTreeNodeTypeCondition(Qn::LayoutToursNode, this),
+                    this
+                ),
+                new QnForbiddenInSafeModeCondition(this),
+                this)
+            ).
+            autoRepeat(false);
+
     }
     factory.endSubMenu();
 
@@ -1511,6 +1527,18 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnForbiddenInSafeModeCondition(this)).
         autoRepeat(false);
 
+    //TODO: #GDM #3.1 #tbd
+    factory(QnActions::RenameLayoutTourAction).
+        flags(Qn::Tree | Qn::NoTarget | Qn::IntentionallyAmbiguous).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        text(tr("Rename")).
+        shortcut(lit("F2")).
+        condition(new QnConjunctionActionCondition(
+            new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this),
+            new QnForbiddenInSafeModeCondition(this),
+            this)).
+        autoRepeat(false);
+
     factory().
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
         separator();
@@ -1765,22 +1793,32 @@ QnActionManager::QnActionManager(QObject *parent):
         autoRepeat(false);
 
     factory(QnActions::StartLayoutTourAction).
-        flags(Qn::Scene | Qn::NoTarget).
+        flags(Qn::Scene | Qn::Tree | Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
         text(tr("Start Layouts Tour")).
         icon(qnSkin->icon("slider/navigation/play.png")).
         checkable().
-        checked(false);
+        condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this));
 
     factory(QnActions::StopLayoutTourAction).
         flags(Qn::Scene | Qn::NoTarget).
+        text(tr("Stop Layouts Tour")).
         mode(QnActionTypes::DesktopMode).
         icon(qnSkin->icon("slider/navigation/pause.png"));
 
-    factory(QnActions::RemoveLayoutTourAction).
-        flags(Qn::Scene | Qn::NoTarget).
+    factory(QnActions::LayoutTourSettingsAction).
+        flags(Qn::Scene | Qn::Tree | Qn::NoTarget).
         mode(QnActionTypes::DesktopMode).
-        text(tr("Delete Layouts Tour"));
+        text(tr("Layout Tour Settings...")).
+        requiredGlobalPermission(Qn::GlobalAdminPermission). //TODO: #GDM #3.1 #tbd
+        condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this));
+
+    factory(QnActions::RemoveLayoutTourAction).
+        flags(Qn::Scene | Qn::Tree | Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Delete Layout Tour")).
+        requiredGlobalPermission(Qn::GlobalAdminPermission). //TODO: #GDM #3.1 #tbd
+        condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this));
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).

@@ -4,6 +4,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <core/resource_management/layout_tour_manager.h>
 
 #include <core/resource_access/resource_access_manager.h>
 
@@ -46,6 +47,7 @@ bool nodeRequiresChildren(Qn::NodeType nodeType)
         << Qn::SystemNode
         << Qn::RoleUsersNode
         << Qn::LayoutsNode
+        << Qn::LayoutToursNode
         << Qn::SharedLayoutsNode
         << Qn::SharedResourcesNode
         ;
@@ -120,6 +122,9 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, Qn:
     case Qn::LayoutsNode:
         setNameInternal(tr("Layouts"));
         break;
+    case Qn::LayoutToursNode:
+        setNameInternal(tr("Layout Tours"));
+        break;
     case Qn::RecorderNode:
         m_state = Invalid;
         break;
@@ -190,7 +195,9 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, con
     NX_ASSERT(nodeType == Qn::LayoutItemNode
         || nodeType == Qn::VideoWallItemNode
         || nodeType == Qn::VideoWallMatrixNode
-        || nodeType == Qn::RoleNode);
+        || nodeType == Qn::RoleNode
+        || nodeType == Qn::LayoutTourNode
+    );
 
     m_state = Invalid;
     m_status = Qn::Offline;
@@ -201,6 +208,12 @@ QnResourceTreeModelNode::QnResourceTreeModelNode(QnResourceTreeModel* model, con
         {
             auto role = qnUserRolesManager->userRole(m_uuid);
             setNameInternal(role.name);
+            break;
+        }
+        case Qn::LayoutTourNode:
+        {
+            auto tour = qnLayoutTourManager->tour(m_uuid);
+            setNameInternal(tour.name);
             break;
         }
         default:
@@ -312,6 +325,12 @@ void QnResourceTreeModelNode::update()
                 setNameInternal(videowall->matrices()->getItem(m_uuid).name);
                 break;
             }
+            break;
+        }
+        case Qn::LayoutTourNode:
+        {
+            auto tour = qnLayoutTourManager->tour(m_uuid);
+            setNameInternal(tour.name.isEmpty() ? tr("Layout Tour") : tour.name);
             break;
         }
         case Qn::CurrentSystemNode:
@@ -459,6 +478,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         case Qn::RoleUsersNode:
         case Qn::SharedResourceNode:
         case Qn::RoleNode:
+        case Qn::LayoutTourNode: //TODO: #GDM #3.1 #tbd
         case Qn::SharedLayoutNode:
         case Qn::RecorderNode:
         case Qn::SystemNode:
@@ -487,6 +507,7 @@ bool QnResourceTreeModelNode::calculateBastard() const
         return !isLoggedIn || isAdmin;
 
     case Qn::LayoutsNode:
+    case Qn::LayoutToursNode:
         return !isLoggedIn;
 
     case Qn::EdgeNode:
@@ -678,6 +699,9 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
         case Qn::VideoWallItemNode:
         case Qn::VideoWallMatrixNode:
             m_editable.value = accessController()->hasGlobalPermission(Qn::GlobalControlVideoWallPermission);
+            break;
+        case Qn::LayoutTourNode:
+            m_editable.value = menu()->canTrigger(QnActions::RenameLayoutTourAction, QnActionParameters());
             break;
         case Qn::RecorderNode:
             m_editable.value = true;
@@ -872,6 +896,7 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
     bool isVideoWallEntity = false;
     if (m_type == Qn::VideoWallItemNode)
     {
+        //TODO: #GDM #3.1 get rid of all this logic, just pass uuid
         QnVideoWallItemIndex index = qnResPool->getVideoWallItemByUuid(m_uuid);
         if (index.isNull())
             return false;
@@ -903,8 +928,11 @@ bool QnResourceTreeModelNode::setData(const QVariant& value, int role, int colum
     }
     parameters.setArgument(Qn::ResourceNameRole, value.toString());
     parameters.setArgument(Qn::NodeTypeRole, m_type);
+    parameters.setArgument(Qn::UuidRole, m_uuid);
 
-    if (isVideoWallEntity)
+    if (m_type == Qn::LayoutTourNode)
+        menu()->trigger(QnActions::RenameLayoutTourAction, parameters);
+    else if (isVideoWallEntity)
         menu()->trigger(QnActions::RenameVideowallEntityAction, parameters);
     else
         menu()->trigger(QnActions::RenameResourceAction, parameters);
@@ -1109,6 +1137,7 @@ QIcon QnResourceTreeModelNode::calculateIcon() const
             return qnResIconCache->icon(QnResourceIconCache::Cameras);
 
         case Qn::LayoutsNode:
+        case Qn::LayoutTourNode:
             return qnResIconCache->icon(QnResourceIconCache::Layouts);
 
         case Qn::AllLayoutsAccessNode:

@@ -12,6 +12,16 @@
 #include <utils/db/db_helper.h>
 
 namespace ec2 {
+
+struct ApiLayoutItemWithRefData: ApiLayoutItemData
+{
+    QnUuid layoutId;
+};
+#define ApiLayoutItemWithRefData_Fields ApiLayoutItemData_Fields (layoutId)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ApiLayoutItemWithRefData, (sql_record),
+    ApiLayoutItemWithRefData_Fields)
+
 namespace database {
 namespace api {
 
