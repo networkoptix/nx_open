@@ -251,6 +251,7 @@ private:
     void createConnection()
     {
         using namespace std::placeholders;
+        using namespace nx::cloud::relay;
 
         auto clientToRelayConnection =
             api::ClientToRelayConnectionFactory::create(m_relayEndpoint);
@@ -411,7 +412,7 @@ TEST_F(CloudRelayOutgoingTunnelConnection, provided_connection_destroyed_after_t
 //    thenTunnelReopensControlConnection();
 //}
 //
-//TEST_F(CloudRelayOutgoingTunnelConnection, shuts_down_on_control_connection_failure)
+//TEST_F(CloudRelayOutgoingTunnelConnection, shuts_down_on_repeated_control_connection_failure)
 //TEST_F(CloudRelayOutgoingTunnelConnection, terminating)
 
 } // namespace test

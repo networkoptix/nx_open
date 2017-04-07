@@ -30,7 +30,7 @@ ClientToRelayConnection::~ClientToRelayConnection()
 void ClientToRelayConnection::startSession(
     const nx::String& desiredSessionId,
     const nx::String& /*targetPeerName*/,
-    api::StartClientConnectSessionHandler handler)
+    nx::cloud::relay::api::StartClientConnectSessionHandler handler)
 {
     ++m_scheduledRequestCount;
     if (m_ignoreRequests)
@@ -40,15 +40,15 @@ void ClientToRelayConnection::startSession(
         [this, handler = std::move(handler), desiredSessionId]()
         {
             if (m_failRequests)
-                handler(api::ResultCode::networkError, desiredSessionId);
+                handler(nx::cloud::relay::api::ResultCode::networkError, desiredSessionId);
             else
-                handler(api::ResultCode::ok, desiredSessionId);
+                handler(nx::cloud::relay::api::ResultCode::ok, desiredSessionId);
         });
 }
 
 void ClientToRelayConnection::openConnectionToTheTargetHost(
     const nx::String& /*sessionId*/,
-    api::OpenRelayConnectionHandler handler)
+    nx::cloud::relay::api::OpenRelayConnectionHandler handler)
 {
     ++m_scheduledRequestCount;
     if (m_ignoreRequests)
@@ -58,9 +58,17 @@ void ClientToRelayConnection::openConnectionToTheTargetHost(
         [this, handler = std::move(handler)]()
         {
             if (m_failRequests)
-                handler(api::ResultCode::networkError, nullptr);
+            {
+                handler(
+                    nx::cloud::relay::api::ResultCode::networkError,
+                    nullptr);
+            }
             else
-                handler(api::ResultCode::ok, std::make_unique<nx::network::TCPSocket>());
+            {
+                handler(
+                    nx::cloud::relay::api::ResultCode::ok,
+                    std::make_unique<nx::network::TCPSocket>());
+            }
         });
 }
 
