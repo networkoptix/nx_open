@@ -956,7 +956,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
     const QString workDirPath = *workDirResource.getDirName();
-    QString simplifiedGUID = serverModule->commonModule()->moduleGUID().toString();
+    QString simplifiedGUID = QnStorageDbPool::getLocalGuid(serverModule->commonModule());
     QString fileName = closeDirPath(workDirPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
     //QString fileName = closeDirPath(workDirPath) + lit("media.sqlite");
     auto sqlDb = std::unique_ptr<QSqlDatabase>(
@@ -1047,7 +1047,10 @@ TEST(MediaDbTest, Migration_from_sqlite)
                                      { return c->cameraUniqueId() == referenceCatalogs[i]->cameraUniqueId() &&
                                               c->getCatalog() == referenceCatalogs[i]->getCatalog(); });
         ASSERT_TRUE(mergedIt != mergedCatalogs.cend());
-        ASSERT_TRUE((*mergedIt)->getChunksUnsafe() == referenceCatalogs[i]->getChunksUnsafe());
+        auto left = (*mergedIt)->getChunksUnsafe();
+        auto right = referenceCatalogs[i]->getChunksUnsafe();
+        ASSERT_TRUE(left == right);
+
     }
 }
 
