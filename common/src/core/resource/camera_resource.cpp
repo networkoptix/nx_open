@@ -41,7 +41,8 @@ bool storeUrlForRole(Qn::ConnectionRole role)
 
 } //anonymous namespace
 
-QnVirtualCameraResource::QnVirtualCameraResource():
+QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_dtsFactory(0),
     m_issueCounter(0),
     m_lastIssueTimer()
@@ -66,8 +67,8 @@ QString QnVirtualCameraResource::toSearchString() const
     return result;
 }
 
-QnPhysicalCameraResource::QnPhysicalCameraResource():
-    QnVirtualCameraResource(),
+QnPhysicalCameraResource::QnPhysicalCameraResource(QnCommonModule* commonModule):
+    QnVirtualCameraResource(commonModule),
     m_channelNumber(0)
 {
     setFlags(Qn::local_live_cam);

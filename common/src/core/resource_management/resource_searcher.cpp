@@ -3,6 +3,7 @@
 #include <core/resource/resource_type.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
+#include <core/resource/resource.h>
 
 QnAbstractResourceSearcher::QnAbstractResourceSearcher(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule),
@@ -17,10 +18,14 @@ QnAbstractResourceSearcher::~QnAbstractResourceSearcher()
     return;
 }
 
-QnResourceList QnAbstractResourceSearcher::search() {
+QnResourceList QnAbstractResourceSearcher::search()
+{
     m_shouldStop = false;
 
-    return findResources();
+    auto result = findResources();
+    for (const auto& resource: result)
+        resource->setCommonModule(commonModule());
+    return result;
 }
 
 void QnAbstractResourceSearcher::setDiscoveryMode( DiscoveryMode mode )

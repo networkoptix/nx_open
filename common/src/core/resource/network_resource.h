@@ -25,7 +25,7 @@ public:
     };
     Q_DECLARE_FLAGS(NetworkStatus, NetworkStatusFlag)
 
-    QnNetworkResource();
+    QnNetworkResource(QnCommonModule* commonModule = nullptr);
     virtual ~QnNetworkResource();
 
     virtual QString getUniqueId() const;

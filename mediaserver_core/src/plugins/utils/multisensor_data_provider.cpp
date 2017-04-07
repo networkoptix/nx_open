@@ -138,7 +138,7 @@ QnPlOnvifResourcePtr MultisensorDataProvider::initSubChannelResource(quint32 cha
     url.setQuery(urlQuery);
 
     QnPlOnvifResourcePtr subChannelResource(
-        new nx::plugins::utils::IsolatedStreamReaderResource());
+        new nx::plugins::utils::IsolatedStreamReaderResource(m_resource->commonModule()));
 
     subChannelResource->setId(QnUuid::createUuid());
     subChannelResource->setTypeId(m_onvifRes->getTypeId());

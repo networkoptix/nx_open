@@ -255,8 +255,8 @@ QnPlOnvifResource::RelayOutputInfo::RelayOutputInfo(
 {
 }
 
-QnPlOnvifResource::QnPlOnvifResource()
-:
+QnPlOnvifResource::QnPlOnvifResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_iframeDistance(-1),
     m_minQuality(0),
     m_maxQuality(0),

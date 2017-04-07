@@ -20,8 +20,8 @@
 #include <nx_ec/data/api_camera_data.h>
 
 
-QnNetworkResource::QnNetworkResource():
-    base_type(),
+QnNetworkResource::QnNetworkResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_authenticated(true),
     m_networkStatus(0),
     m_networkTimeout(1000 * 10),

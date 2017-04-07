@@ -49,7 +49,8 @@ QnUuid QnSecurityCamResource::makeCameraIdFromUniqueId(const QString& uniqueId)
 //const int PRIMARY_ENCODER_INDEX = 0;
 //const int SECONDARY_ENCODER_INDEX = 1;
 
-QnSecurityCamResource::QnSecurityCamResource():
+QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_dpFactory(0),
     m_recActionCnt(0),
     m_statusFlags(Qn::CSF_NoFlags),
@@ -872,7 +873,7 @@ Qn::CameraBackupQualities QnSecurityCamResource::getActualBackupQualities() cons
     if (result == Qn::CameraBackup_Disabled)
         return result;
 
-    const auto& settings = resourcePool()->commonModule()->globalSettings();
+    const auto& settings = commonModule()->globalSettings();
 
     auto value = settings->backupQualities();
 
@@ -903,7 +904,7 @@ void QnSecurityCamResource::setCameraControlDisabled(bool value) {
 
 bool QnSecurityCamResource::isCameraControlDisabled() const
 {
-    const auto& settings = resourcePool()->commonModule()->globalSettings();
+    const auto& settings = commonModule()->globalSettings();
 
     if (settings && !settings->isCameraSettingsOptimizationEnabled())
         return true;

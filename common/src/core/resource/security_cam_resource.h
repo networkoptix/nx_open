@@ -32,12 +32,11 @@ class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
 {
     typedef QnNetworkResource base_type;
     Q_OBJECT
-
 public:
     static QnUuid makeCameraIdFromUniqueId(const QString& uniqueId);
 
 public:
-    QnSecurityCamResource();
+    QnSecurityCamResource(QnCommonModule* commonModule = nullptr);
     virtual ~QnSecurityCamResource();
 
     QnMediaServerResourcePtr getParentServer() const;
