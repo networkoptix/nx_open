@@ -19,7 +19,7 @@ QnStoredFileDataProvider::QnStoredFileDataProvider(
     QnAbstractStreamDataProvider(QnResourcePtr(new QnResource())),
     m_state(StoredFileDataProviderState::Waiting),
     m_filePath(kNotificationsPathPrefix + filePath),
-    m_storage(new QnExtIODeviceStorageResource()),
+    m_storage(new QnExtIODeviceStorageResource(connection->commonModule())),
     m_cyclesCount(cyclesCount)
 
 {

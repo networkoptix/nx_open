@@ -8,8 +8,8 @@
 const qint64 QnStorageResource::kNasStorageLimit = 50LL * 1024 * 1024 * 1024; // 50 gb
 const qint64 QnStorageResource::kThirdPartyStorageLimit = 10LL * 1024 * 1024 * 1024; // 10 gb
 
-QnStorageResource::QnStorageResource():
-    base_type(),
+QnStorageResource::QnStorageResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_spaceLimit(0),
     m_maxStoreTime(0),
     m_usedForWriting(false),

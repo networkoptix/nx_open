@@ -25,7 +25,7 @@ class QnMediaServerResource:
 
     typedef QnResource base_type;
 public:
-    QnMediaServerResource(QnCommonModule* commonModule = nullptr);
+    QnMediaServerResource(QnCommonModule* commonModule);
     virtual ~QnMediaServerResource();
 
     virtual QString getUniqueId() const;

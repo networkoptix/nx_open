@@ -59,20 +59,20 @@ protected:
         ASSERT_TRUE((bool)workDirResource.getDirName());
 
         QString fileStorageUrl = *workDirResource.getDirName();
-        QnStorageResourcePtr fileStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(fileStorageUrl));
+        QnStorageResourcePtr fileStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), fileStorageUrl));
         fileStorage->setUrl(fileStorageUrl);
         ASSERT_TRUE(fileStorage && fileStorage->initOrUpdate() == Qn::StorageInit_Ok);
         qnNormalStorageMan->addStorage(fileStorage);
 
         if (!config.ftpUrl.isEmpty())
         {
-            QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(config.ftpUrl, false));
+            QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), config.ftpUrl, false));
             EXPECT_TRUE(ftpStorage && ftpStorage->initOrUpdate() == Qn::StorageInit_Ok) << "Ftp storage is unavailable. Check if server is online and url is correct." << std::endl;
         }
 
         if (!config.smbUrl.isEmpty())
         {
-            QnStorageResourcePtr smbStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(config.smbUrl));
+            QnStorageResourcePtr smbStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), config.smbUrl));
             EXPECT_TRUE(smbStorage && smbStorage->initOrUpdate() == Qn::StorageInit_Ok);
             smbStorage->setUrl(smbStorageUrl);
             qnNormalStorageMan->addStorage(smbStorage);
@@ -102,6 +102,7 @@ protected:
                 std::bind(
                     &QnThirdPartyStorageResource::instance,
                     std::placeholders::_1,
+                    std::placeholders::_2,
                     storagePlugin
                 ),
                 false
@@ -117,7 +118,6 @@ protected:
     std::unique_ptr<QnPlatformAbstraction > platformAbstraction;
 };
 } // namespace <anonymous>
-
 
 TEST_F(AbstractStorageResourceTest, Capabilities)
 {

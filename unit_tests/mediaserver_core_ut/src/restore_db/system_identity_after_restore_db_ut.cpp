@@ -168,7 +168,7 @@ public:
         commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule(/*isClient*/false));
 
         admin = QnUserResourcePtr(new QnUserResource(QnUserType::Local));
-        mediaServer = QnMediaServerResourcePtr(new QnMediaServerResource);
+        mediaServer = QnMediaServerResourcePtr(new QnMediaServerResource(commonModule.get()));
     }
 
     void fillDefaultAdminAuth()

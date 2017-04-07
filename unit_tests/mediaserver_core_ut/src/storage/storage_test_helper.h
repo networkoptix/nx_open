@@ -15,7 +15,10 @@ class FileStorageTestHelper
 {
 public:
     FileStorageTestHelper();
-    QnStorageResourcePtr createStorage(const QString& url, qint64 spaceLimit);
+    QnStorageResourcePtr createStorage(
+        QnCommonModule* commonModule,
+        const QString& url,
+        qint64 spaceLimit);
 
 private:
     std::unique_ptr<QnCommonModule> m_commonModule;

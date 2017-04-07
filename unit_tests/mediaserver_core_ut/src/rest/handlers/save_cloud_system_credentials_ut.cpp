@@ -40,7 +40,7 @@ private:
 
     void insertSelfServerResource()
     {
-        auto selfServer = QnMediaServerResourcePtr(new QnMediaServerResource());
+        auto selfServer = QnMediaServerResourcePtr(new QnMediaServerResource(&m_commonModule));
         selfServer->setId(m_commonModule.moduleGUID());
         selfServer->setServerFlags(Qn::SF_HasPublicIP);
         m_commonModule.resourcePool()->addResource(selfServer);

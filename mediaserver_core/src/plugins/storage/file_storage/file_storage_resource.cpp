@@ -691,7 +691,8 @@ void QnFileStorageResource::setUrl(const QString& url)
     m_valid = false;
 }
 
-QnFileStorageResource::QnFileStorageResource():
+QnFileStorageResource::QnFileStorageResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_valid(false),
     m_capabilities(0),
     m_cachedTotalSpace(QnStorageResource::kUnknownSize),
@@ -876,16 +877,16 @@ QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
     return prefix == -1 ? url :QUrl(url).path().mid(1);
 }
 
-QnStorageResource* QnFileStorageResource::instance(const QString&)
+QnStorageResource* QnFileStorageResource::instance(QnCommonModule* commonModule, const QString&)
 {
-    return new QnFileStorageResource();
+    return new QnFileStorageResource(commonModule);
 }
 
 qint64 QnFileStorageResource::calcInitialSpaceLimit()
 {
     auto local = isLocal();
     qint64 baseSpaceLimit = calcSpaceLimit(
-        local ? QnPlatformMonitor::LocalDiskPartition : 
+        local ? QnPlatformMonitor::LocalDiskPartition :
         QnPlatformMonitor::NetworkPartition);
 
     if (m_cachedTotalSpace < 0)
@@ -923,7 +924,7 @@ bool QnFileStorageResource::isLocal()
     if (!storageTypeString.isEmpty())
     {
        if (storageTypeString == QnLexical::serialized(QnPlatformMonitor::LocalDiskPartition))
-          return true; 
+          return true;
        return false;
     }
 

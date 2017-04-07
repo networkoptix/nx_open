@@ -48,13 +48,17 @@ class TestHelper
    static const int DEFAULT_TIME_GAP_MS = 15001;
 
 public:
-    TestHelper(QStringList &&paths, int fileCount)
-        : m_storageUrls(std::move(paths)),
-          m_timeLine(DEFAULT_TIME_GAP_MS),
-          m_fileCount(fileCount)
+    TestHelper(
+        QnCommonModule* commonModule,
+        QStringList &&paths,
+        int fileCount)
+    :
+        m_storageUrls(std::move(paths)),
+        m_timeLine(DEFAULT_TIME_GAP_MS),
+        m_fileCount(fileCount)
     {
         generateTestData();
-        createStorages();
+        createStorages(commonModule);
         loadMedia();
     }
 
@@ -317,10 +321,10 @@ private:
         }
     }
 
-    void createStorages()
+    void createStorages(QnCommonModule* commonModule)
     {
         for (int i = 0; i < m_storageUrls.size(); ++i) {
-            QnStorageResourcePtr storage = QnStorageResourcePtr(new QnFileStorageResource);
+            QnStorageResourcePtr storage = QnStorageResourcePtr(new QnFileStorageResource(commonModule));
             storage->setUrl(m_storageUrls[i]);
             storage->setId(QnUuid::createUuid());
             storage->setUsedForWriting(true);
@@ -438,7 +442,10 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     MSSettings::roSettings()->remove(lit("NORMAL_SCAN_ARCHIVE_FROM"));
     MSSettings::roSettings()->remove(lit("BACKUP_SCAN_ARCHIVE_FROM"));
 
-    TestHelper testHelper(std::move(QStringList() << storageUrl_1 << storageUrl_2), 200);
+    TestHelper testHelper(
+        serverModule->commonModule(),
+        std::move(QStringList() << storageUrl_1 << storageUrl_2),
+        200);
     testHelper.print();
 
     QnNetworkResourcePtr cameraResource = QnNetworkResourcePtr(new QnNetworkResource());

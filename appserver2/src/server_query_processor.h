@@ -40,7 +40,7 @@ struct ServerQueryProcessorAccess
     QnTransactionMessageBus* messageBus() { return m_messageBus; }
     PostProcessList* postProcessList() { return &m_postProcessList; }
     QnMutex* updateMutex() { return &m_updateMutex; }
-    QnCommonModule* commonModule() const { return m_db->commonModule();  }
+    QnCommonModule* commonModule() const { return m_messageBus->commonModule();  }
 private:
     detail::QnDbManager* m_db;
     QnTransactionMessageBus* m_messageBus;

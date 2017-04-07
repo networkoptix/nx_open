@@ -825,7 +825,7 @@ TEST(MediaDbTest, StorageDB)
     auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
 
     bool result;
-    QnFileStorageResourcePtr storage(new QnFileStorageResource);
+    QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule->commonModule()));
     storage->setUrl(workDirPath);
     result = storage->initOrUpdate() == Qn::StorageInit_Ok;
     ASSERT_TRUE(result);
@@ -1013,7 +1013,7 @@ TEST(MediaDbTest, Migration_from_sqlite)
     }
 
     bool result;
-    QnFileStorageResourcePtr storage(new QnFileStorageResource);
+    QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule->commonModule()));
     storage->setUrl(workDirPath);
     result = storage->initOrUpdate() == Qn::StorageInit_Ok;
     ASSERT_TRUE(result);

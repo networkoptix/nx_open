@@ -79,8 +79,8 @@ namespace ec2
 
     void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData& dst);
     void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& dst);
-    void fromApiToResourceList(const ApiMediaServerDataList& src, QnResourceList& dst);
-    void fromApiToResourceList(const ApiMediaServerDataList& src, QnMediaServerResourceList& dst);
+    void fromApiToResourceList(const ApiMediaServerDataList& src, QnResourceList& dst, QnCommonModule* commonModule);
+    void fromApiToResourceList(const ApiMediaServerDataList& src, QnMediaServerResourceList& dst, QnCommonModule* commonModule);
     void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServerUserAttributesData& dst);
     void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServerUserAttributesPtr& dst);
     void fromApiToResourceList(const ApiMediaServerUserAttributesDataList& src, QnMediaServerUserAttributesList& dst);

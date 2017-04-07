@@ -453,8 +453,7 @@ QnStorageResourcePtr createStorage(
             .arg(Q_FUNC_INFO)
             .arg(path), cl_logDEBUG1);
 
-    QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage("ufile"));
-    storage->setCommonModule(commonModule);
+    QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage(commonModule,"ufile"));
     storage->setName("Initial");
     storage->setParentId(serverId);
     storage->setUrl(path);
@@ -2146,7 +2145,8 @@ void MediaServerProcess::run()
 
     SocketFactory::setIpVersion(m_cmdLineArguments.ipVersion);
 
-    m_serverModule.reset(new QnMediaServerModule(m_cmdLineArguments.enforcedMediatorEndpoint));
+    std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(m_cmdLineArguments.enforcedMediatorEndpoint));
+    m_serverModule = serverModule;
 
     if (!m_obsoleteGuid.isNull())
         commonModule()->setObsoleteServerGuid(m_obsoleteGuid);
@@ -2441,6 +2441,7 @@ void MediaServerProcess::run()
             std::bind(
                 &QnThirdPartyStorageResource::instance,
                 std::placeholders::_1,
+                std::placeholders::_2,
                 storagePlugin
             ),
             false
@@ -2942,8 +2943,6 @@ void MediaServerProcess::run()
     m_mediaServer.clear();
 
     performActionsOnExit();
-
-    m_serverModule.reset();
 
     nx::network::SocketGlobals::outgoingTunnelPool().clearOwnPeerId();
 }

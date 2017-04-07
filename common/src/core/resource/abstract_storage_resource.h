@@ -6,9 +6,15 @@
 #include <memory>
 
 class QnAbstractStorageResource: public QnResource
-
 {
+    using base_type = QnResource;
+
 public:
+    QnAbstractStorageResource(QnCommonModule* commonModule):
+        base_type(commonModule)
+    {
+    }
+
     enum cap
     {
         ListFile        = 0x0001,                   // capable of listing files

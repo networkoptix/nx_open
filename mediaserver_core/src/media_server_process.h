@@ -103,7 +103,13 @@ public:
 
     const CmdLineArguments cmdLineArguments() const;
     void setObsoleteGuid(const QnUuid& obsoleteGuid) { m_obsoleteGuid = obsoleteGuid; }
-    QnCommonModule* commonModule() const { return m_serverModule->commonModule(); }
+    QnCommonModule* commonModule() const
+    {
+        if (const auto& module = m_serverModule.lock())
+            return module->commonModule();
+        else
+            return nullptr;
+    }
 signals:
     void started();
 public slots:
@@ -180,7 +186,7 @@ private:
     std::unique_ptr<QnPlatformAbstraction> m_platform;
     CmdLineArguments m_cmdLineArguments;
     QnUuid m_obsoleteGuid;
-    std::unique_ptr<QnMediaServerModule> m_serverModule;
+    std::weak_ptr<QnMediaServerModule> m_serverModule;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

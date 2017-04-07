@@ -3,7 +3,7 @@
 namespace nx {
 
 StorageResourceStub::StorageResourceStub():
-    base_type()
+    base_type(nullptr)
 {
     setId(QnUuid::createUuid());
 }

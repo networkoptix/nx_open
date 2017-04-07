@@ -882,6 +882,7 @@ bool QnStreamRecorder::addRecordingContext(const QString &fileName)
     m_fixedFileName = true;
     auto storage = QnStorageResourcePtr(
         QnStoragePluginFactory::instance()->createStorage(
+            commonModule(),
             fileName
         )
     );

@@ -5,8 +5,8 @@
 #include <core/resource_access/user_access_data.h>
 #include <nx_ec//ec_api.h>
 
-QnDbStorageResource::QnDbStorageResource() :
-    QnStorageResource(),
+QnDbStorageResource::QnDbStorageResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_state(QnDbStorageResourceState::Waiting),
     m_capabilities(cap::ReadFile)
 {
@@ -17,9 +17,9 @@ QnDbStorageResource::~QnDbStorageResource()
 
 }
 
-QnStorageResource* QnDbStorageResource::instance(const QString& )
+QnStorageResource* QnDbStorageResource::instance(QnCommonModule* commonModule, const QString& )
 {
-    return new QnDbStorageResource();
+    return new QnDbStorageResource(commonModule);
 }
 
 QIODevice *QnDbStorageResource::open(const QString &fileName, QIODevice::OpenMode openMode)

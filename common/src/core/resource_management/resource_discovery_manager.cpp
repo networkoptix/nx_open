@@ -138,7 +138,7 @@ QnResourcePtr QnResourceDiscoveryManager::createResource(const QnUuid &resourceT
 
     if (resourceTypeId == qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kStorageTypeId))
     {
-        result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(params.url));
+        result = QnResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), params.url));
         NX_ASSERT(result); //storage can not be null
     }
     else

@@ -302,7 +302,7 @@ bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
         m_eofReached = false;
         QString url = m_resource->getUrl();
         if (m_storage == 0) {
-            m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(url));
+            m_storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(resource->commonModule(), url));
             if(!m_storage)
                 return false;
         }

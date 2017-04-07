@@ -8,6 +8,8 @@ class QnAbstractMediaStreamDataProvider;
 
 class QnStorageResource: public QnAbstractStorageResource
 {
+    using base_type = QnAbstractStorageResource;
+
     Q_OBJECT
 
     Q_PROPERTY(qint64 spaceLimit READ getSpaceLimit WRITE setSpaceLimit)
@@ -18,7 +20,7 @@ public:
     static const qint64 kNasStorageLimit;
     static const qint64 kThirdPartyStorageLimit;
 
-    QnStorageResource();
+    QnStorageResource(QnCommonModule* commonModule);
     virtual ~QnStorageResource();
 
     virtual QString getUniqueId() const;

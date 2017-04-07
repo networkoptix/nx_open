@@ -605,25 +605,25 @@ void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& 
 }
 
 template<class List>
-void fromApiToResourceList(const ApiMediaServerDataList& src, List& dst, const overload_tag&)
+void fromApiToResourceList(const ApiMediaServerDataList& src, List& dst, const overload_tag&, QnCommonModule* commonModule)
 {
     dst.reserve(dst.size() + (int)src.size());
     for (const ApiMediaServerData& srcServer: src)
     {
-        QnMediaServerResourcePtr dstServer(new QnMediaServerResource());
+        QnMediaServerResourcePtr dstServer(new QnMediaServerResource(commonModule));
         fromApiToResource(srcServer, dstServer);
         dst.push_back(std::move(dstServer));
     }
 }
 
-void fromApiToResourceList(const ApiMediaServerDataList& src, QnResourceList& dst)
+void fromApiToResourceList(const ApiMediaServerDataList& src, QnResourceList& dst, QnCommonModule* commonModule)
 {
-    fromApiToResourceList(src, dst, overload_tag());
+    fromApiToResourceList(src, dst, overload_tag(), commonModule);
 }
 
-void fromApiToResourceList(const ApiMediaServerDataList& src, QnMediaServerResourceList& dst)
+void fromApiToResourceList(const ApiMediaServerDataList& src, QnMediaServerResourceList& dst, QnCommonModule* commonModule)
 {
-    fromApiToResourceList(src, dst, overload_tag());
+    fromApiToResourceList(src, dst, overload_tag(), commonModule);
 }
 
 

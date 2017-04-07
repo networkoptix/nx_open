@@ -18,9 +18,12 @@ FileStorageTestHelper::FileStorageTestHelper() :
     m_commonModule->setModuleGUID(QnUuid::createUuid());
 }
 
-QnStorageResourcePtr FileStorageTestHelper::createStorage(const QString& url, qint64 spaceLimit)
+QnStorageResourcePtr FileStorageTestHelper::createStorage(
+    QnCommonModule* commonModule,
+    const QString& url,
+    qint64 spaceLimit)
 {
-    QnStorageResourcePtr result(new QnFileStorageResource);
+    QnStorageResourcePtr result(new QnFileStorageResource(commonModule));
     result->setUrl(url);
     result->setSpaceLimit(spaceLimit);
     result->setId(QnUuid::createUuid());
