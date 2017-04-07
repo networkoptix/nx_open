@@ -103,8 +103,6 @@ namespace {
 
 static constexpr int kMicroInMilliSeconds = 1000;
 
-static constexpr int kMinimumTextOverlayDurationMs = 5000;
-
 // TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
 // Note: -1 is used for invalid time
 // Now it is returned when there is no archive data and archive is played backwards.
@@ -691,70 +689,31 @@ void QnMediaResourceWidget::suspendHomePtzController()
 
 void QnMediaResourceWidget::hideTextOverlay(const QnUuid& id)
 {
-    setTextOverlayParameters(id, false, QString(), QnHtmlTextItemOptions(), -1);
+    setTextOverlayParameters(id, false, QString(), QnHtmlTextItemOptions());
 }
 
 void QnMediaResourceWidget::showTextOverlay(const QnUuid& id, const QString& text,
-    const QnHtmlTextItemOptions& options, int timeoutMs)
+    const QnHtmlTextItemOptions& options)
 {
-    setTextOverlayParameters(id, true, text, options, timeoutMs);
+    setTextOverlayParameters(id, true, text, options);
 }
 
 void QnMediaResourceWidget::setTextOverlayParameters(const QnUuid& id, bool visible,
-    const QString& text, const QnHtmlTextItemOptions& options, int timeoutMs)
+    const QString& text, const QnHtmlTextItemOptions& options)
 {
     if (!m_textOverlayWidget)
         return;
 
-    static QElapsedTimer referenceTimer =
-        []()
-        {
-            QElapsedTimer timer;
-            timer.start();
-            return timer;
-        }();
-
-    const auto scheduleTimedDelete =
-        [this](QPointer<QGraphicsWidget> item, int timeoutMs)
-        {
-            executeDelayedParented([item] { delete item; }, timeoutMs, this);
-        };
-
-    static const char* kReferenceTimePropertyName = "_qn_textOverlayReferenceTime";
+    m_textOverlayWidget->deleteItem(id);
 
     if (!visible)
-    {
-        auto item = m_textOverlayWidget->item(id);
-        if (!item)
-            return;
-
-        const auto elapsed = referenceTimer.elapsed()
-            - item->property(kReferenceTimePropertyName).value<qint64>();
-
-        if (elapsed > kMinimumTextOverlayDurationMs)
-            delete item;
-        else
-            scheduleTimedDelete(item, kMinimumTextOverlayDurationMs - elapsed);
-
         return;
-    }
-
-    m_textOverlayWidget->deleteItem(id);
 
     /* Do not add empty text items: */
     if (text.trimmed().isEmpty())
         return;
 
     m_textOverlayWidget->addItem(text, options, id);
-    auto item = m_textOverlayWidget->item(id);
-    NX_EXPECT(item);
-    if (!item)
-        return;
-
-    item->setProperty(kReferenceTimePropertyName, referenceTimer.elapsed());
-
-    if (timeoutMs >= 0)
-        scheduleTimedDelete(item, qMax(kMinimumTextOverlayDurationMs, timeoutMs));
 }
 
 void QnMediaResourceWidget::setupHud()

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
 
 #include <business/business_fwd.h>
 
@@ -8,7 +9,8 @@
 
 #include <utils/common/connective.h>
 
-class QnMediaResourceWidget;
+class QnResourceWidget;
+class QnWorkbenchTextOverlaysHandlerPrivate;
 
 class QnWorkbenchTextOverlaysHandler:
     public Connective<QObject>,
@@ -23,7 +25,9 @@ public:
 
 private:
     void at_businessActionReceived(const QnAbstractBusinessActionPtr& businessAction);
+    void at_resourceWidgetAdded(QnResourceWidget* widget);
 
-    void showTextOverlay(QnMediaResourceWidget* widget, const QnUuid& id,
-        const QString& captionHtml, const QString& descriptionHtml, int timeoutMs);
+private:
+    Q_DECLARE_PRIVATE(QnWorkbenchTextOverlaysHandler);
+    const QScopedPointer<QnWorkbenchTextOverlaysHandlerPrivate> d_ptr;
 };
