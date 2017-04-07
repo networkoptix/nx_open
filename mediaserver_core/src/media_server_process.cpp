@@ -709,7 +709,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
     m_initStoragesAsyncPromise.reset(new nx::utils::promise<void>());
     QtConcurrent::run([messageProcessor, this]
     {
-        const auto setPromiseGuardFunc = makeScopedGuard([&]() { m_initStoragesAsyncPromise->set_value(); });
+        const auto setPromiseGuardFunc = makeScopeGuard([&]() { m_initStoragesAsyncPromise->set_value(); });
 
         //read server's storages
         ec2::AbstractECConnectionPtr ec2Connection = messageProcessor->commonModule()->ec2Connection();
@@ -2968,7 +2968,7 @@ void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeI
     if (runtimeInfo.uuid != commonModule()->moduleGUID())
         return;
 
-    commonModule()->ec2Connection()
+    QnAppServerConnectionFactory::ec2Connection()
         ->getMiscManager(Qn::kSystemAccess)
         ->saveRuntimeInfo(
             runtimeInfo.data,

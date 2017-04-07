@@ -37,7 +37,7 @@ struct QnAviArchiveMetadata
     QnMediaDewarpingParams dewarpingParams;
     qreal overridenAr = 0.0;
 
-    static QnAviArchiveMetadata loadFromFile(const AVFormatContext* context);
+    static QnAviArchiveMetadata loadFromFile(const AVFormatContext* context, bool* found);
     void saveToFile(AVFormatContext* context, Format format);
 };
 #define QnAviArchiveMetadata_Fields (version)(signature)(timeZoneOffset)(startTimeMs) \

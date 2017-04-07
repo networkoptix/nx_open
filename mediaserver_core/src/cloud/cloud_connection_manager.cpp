@@ -203,7 +203,7 @@ bool CloudConnectionManager::resetCloudData()
         });
     for (const auto& user: usersToRemove)
     {
-        auto errCode = commonModule()->ec2Connection()
+        auto errCode = QnAppServerConnectionFactory::ec2Connection()
             ->getUserManager(Qn::kSystemAccess)->removeSync(user->getId());
         NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
         if (errCode != ec2::ErrorCode::ok)

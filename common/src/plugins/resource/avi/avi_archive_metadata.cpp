@@ -172,8 +172,10 @@ QString serializeLayout(const QnAviArchiveMetadata& metadata)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAviArchiveMetadata, (json), QnAviArchiveMetadata_Fields)
 
-QnAviArchiveMetadata QnAviArchiveMetadata::loadFromFile(const AVFormatContext* context)
+QnAviArchiveMetadata QnAviArchiveMetadata::loadFromFile(const AVFormatContext* context, bool* found)
 {
+    found = false;
+
     // Prevent standart tag name parsing in 'avi' format.
     const QString format = QString::fromLatin1(context->iformat->name).split(QLatin1Char(','))[0];
 

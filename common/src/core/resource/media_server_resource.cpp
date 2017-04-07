@@ -265,9 +265,9 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
         QnMediaServerResourcePtr thisPtr = toSharedPointer(this).dynamicCast<QnMediaServerResource>();
         m_apiConnection = QnMediaServerConnectionPtr(
             new QnMediaServerConnection(
-                resourcePool()->commonModule(),
+                commonModule(),
                 thisPtr,
-                resourcePool()->commonModule()->videowallGuid()),
+                commonModule()->videowallGuid()),
                 &qnDeleteLater);
     }
 
@@ -314,7 +314,7 @@ QString QnMediaServerResource::getUrl() const
 
 QnStorageResourceList QnMediaServerResource::getStorages() const
 {
-    return resourcePool()->getResourcesByParentId(getId()).filtered<QnStorageResource>();
+    return commonModule()->resourcePool()->getResourcesByParentId(getId()).filtered<QnStorageResource>();
 }
 
 void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddress)

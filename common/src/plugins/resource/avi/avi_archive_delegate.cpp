@@ -394,18 +394,27 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
     {
         m_videoLayout.reset( new QnCustomResourceVideoLayout(QSize(1, 1)) );
 
-        m_metadata = QnAviArchiveMetadata::loadFromFile(m_formatContext);
-
-        if (QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>())
+        bool found = false;
+        m_metadata = QnAviArchiveMetadata::loadFromFile(m_formatContext, &found);
+        if (found)
         {
-            if (m_metadata.timeZoneOffset != Qn::InvalidUtcOffset)
-                aviRes->setTimeZoneOffset(m_metadata.timeZoneOffset);
-        }
+            if (QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>())
+            {
+                if (m_metadata.timeZoneOffset != Qn::InvalidUtcOffset)
+                    aviRes->setTimeZoneOffset(m_metadata.timeZoneOffset);
+            }
 
-        if (!m_metadata.videoLayoutSize.isEmpty())
-        {
-            m_videoLayout->setSize(m_metadata.videoLayoutSize);
-            m_videoLayout->setChannels(m_metadata.videoLayoutChannels);
+            if (!m_metadata.videoLayoutSize.isEmpty())
+            {
+                m_videoLayout->setSize(m_metadata.videoLayoutSize);
+                m_videoLayout->setChannels(m_metadata.videoLayoutChannels);
+            }
+
+            if (QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>())
+            {
+                mediaRes->setDewarpingParams(m_metadata.dewarpingParams);
+                mediaRes->setCustomAspectRatio(m_metadata.overridenAr);
+            }
         }
 
         if (m_useAbsolutePos)
@@ -417,12 +426,6 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
                 if (qSharedPointerDynamicCast<QnLayoutFileStorageResource>(m_storage))
                     m_resource->addFlags(Qn::sync | Qn::periods | Qn::motion); // use sync for exported layout only
             }
-        }
-
-        if (QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>())
-        {
-            mediaRes->setDewarpingParams(m_metadata.dewarpingParams);
-            mediaRes->setCustomAspectRatio(m_metadata.overridenAr);
         }
     }
 

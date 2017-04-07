@@ -350,7 +350,7 @@ QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId
     result = OnvifResourceInformationFetcher::createOnvifResourceByManufacture(
         resourceType->getName() == lit("ONVIF") && !params.vendor.isEmpty()
         ? params.vendor
-        : resourceType->getName() ); // use name instead of manufacture to instanciate child onvif resource
+        : resourceType->getName() ); // use name instead of manufacture to instantiate child onvif resource
     if (!result )
         return result; // not found
 
@@ -359,7 +359,7 @@ QnResourcePtr OnvifResourceSearcher::createResource(const QnUuid &resourceTypeId
     NX_LOG(lit("OnvifResourceSearcher::createResource: create ONVIF camera resource. TypeID: %1.").arg(resourceTypeId.toString()), cl_logDEBUG1);
 
     //result->deserialize(parameters);
-
+    result->setCommonModule(commonModule());
     return result;
 
 }
