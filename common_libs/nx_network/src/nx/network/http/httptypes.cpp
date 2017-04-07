@@ -1785,7 +1785,7 @@ StringType serverString()
 static const char* weekDaysStr[] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
 static const char* months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
-QByteArray dateTimeToHttpFormat(const QDateTime& value)
+QByteArray formatDateTime(const QDateTime& value)
 {
     static const int SECONDS_PER_MINUTE = 60;
     static const int SECONDS_PER_HOUR = 3600;
