@@ -186,7 +186,7 @@ private:
     std::unique_ptr<QnPlatformAbstraction> m_platform;
     CmdLineArguments m_cmdLineArguments;
     QnUuid m_obsoleteGuid;
-    std::unique_ptr<std::promise<void>> m_initStoragesAsyncPromise;
+    std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     std::weak_ptr<QnMediaServerModule> m_serverModule;
 };
 
