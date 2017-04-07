@@ -1,10 +1,4 @@
-/**********************************************************
-* 19 dec 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef STUN_SERVER_CONNECTION_H
-#define STUN_SERVER_CONNECTION_H
+#pragma once 
 
 #include <functional>
 
@@ -72,5 +66,3 @@ private:
 
 } // namespace stun
 } // namespace nx
-
-#endif  //STUN_SERVER_CONNECTION_H

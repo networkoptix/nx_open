@@ -1,10 +1,10 @@
 #include "upnp_port_mapper.h"
 
-#include "common/common_globals.h"
-#include <nx/utils/log/log.h>
-
 #include <random>
+
 #include <QtCore/QDateTime>
+
+#include <nx/utils/log/log.h>
 
 static const size_t BREAK_FAULTS_COUNT = 5; // faults in a row
 static const size_t BREAK_TIME_PER_FAULT = 1 * 60; // wait 1 minute per fault in a row
