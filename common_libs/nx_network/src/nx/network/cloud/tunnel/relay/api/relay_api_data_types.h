@@ -47,11 +47,6 @@ struct ConnectToPeerRequest
 
 #define ConnectToPeerRequest_Fields (sessionId)
 
-//QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-//    (BeginListeningRequest)(BeginListeningResponse)(CreateClientSessionRequest) \
-//        (CreateClientSessionResponse)(ConnectToPeerRequest),
-//    (json));
-
 NX_NETWORK_API bool deserialize(QnJsonContext*, const QJsonValue&, BeginListeningRequest*);
 NX_NETWORK_API void serialize(QnJsonContext*, const BeginListeningRequest&, QJsonValue*);
 
