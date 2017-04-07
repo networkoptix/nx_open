@@ -49,7 +49,7 @@ Pane
         function updateDefaultAddress()
         {
             defaultAddress = count > 0
-                ? Nx.url(getData(0, "url")).address()
+                ? getData(0, "url")
                 : ""
         }
     }
@@ -90,7 +90,7 @@ Pane
     {
         id: informationBlock
         enabled: compatible && online
-        address: hostsModelAccessor.defaultAddress
+        address: Nx.url(hostsModelAccessor.defaultAddress).address()
         user: authenticationDataModel.defaultCredentials.user
     }
 
@@ -162,7 +162,7 @@ Pane
             if (!hostsModel.isEmpty)
             {
                 if (!connectionManager.connectToServer(
-                    hostsModel.firstHost,
+                    hostsModelAccessor.defaultAddress,
                     cloudStatusWatcher.credentials.user,
                     cloudStatusWatcher.credentials.password))
                 {
@@ -178,7 +178,7 @@ Pane
             if (authenticationDataModel.hasStoredPassword)
             {
                 if (!connectionManager.connectToServer(
-                    hostsModel.firstHost,
+                    hostsModelAccessor.defaultAddress,
                     authenticationDataModel.defaultCredentials.user,
                     authenticationDataModel.defaultCredentials.password))
                 {

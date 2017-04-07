@@ -121,6 +121,7 @@ private slots:
     void on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param );
     void on_resourceParamRemoved(const ec2::ApiResourceParamWithRefData& param );
     void on_resourceRemoved(const QnUuid& resourceId );
+    void on_resourceStatusRemoved(const QnUuid& resourceId);
 
     void on_accessRightsChanged(const ec2::ApiAccessRightsData& accessRights);
     void on_userRoleChanged(const ec2::ApiUserRoleData& userRole);
