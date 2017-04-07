@@ -698,6 +698,7 @@ QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
 
 void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProcessor)
 {
+    m_initStoragesAsyncPromise.reset(new std::promise<void>());
     QtConcurrent::run([messageProcessor, this]
     {
         //read server's storages
@@ -710,7 +711,10 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             NX_LOG( lit("QnMain::run(): Can't get storage list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
+            {
+                m_initStoragesAsyncPromise->set_value();
                 return;
+            }
         }
 
         for(const auto& storage: storages)
@@ -764,6 +768,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         qnNormalStorageMan->initDone();
         qnBackupStorageMan->initDone();
+        m_initStoragesAsyncPromise->set_value();
     });
 }
 
@@ -2879,6 +2884,8 @@ void MediaServerProcess::run()
     stopObjects();
 
     QnResource::stopCommandProc();
+    if (m_initStoragesAsyncPromise)
+        m_initStoragesAsyncPromise->get_future().wait();
     // todo: #rvasilenko some undeleted resources left in the QnMain event loop. I stopped TimerManager as temporary solution for it.
     nx::utils::TimerManager::instance()->stop();
 
