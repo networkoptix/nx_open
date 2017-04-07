@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QModelIndex>
+
 #include <ui/dialogs/common/session_aware_dialog.h>
 
 #include <nx_ec/data/api_fwd.h>
@@ -7,6 +9,8 @@
 namespace Ui {
 class LayoutTourDialog;
 }
+
+class QnLayoutTourItemsModel;
 
 class QnLayoutTourDialog: public QnSessionAwareButtonBoxDialog
 {
@@ -21,5 +25,9 @@ public:
     void submitData(ec2::ApiLayoutTourData* tour) const;
 
 private:
+    void at_view_clicked(const QModelIndex& index);
+
+private:
     QScopedPointer<Ui::LayoutTourDialog> ui;
+    QnLayoutTourItemsModel* m_model;
 };

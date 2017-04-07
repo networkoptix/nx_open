@@ -13,6 +13,10 @@ struct ApiLayoutTourItemData: ApiData
     QnUuid layoutId;
     int delayMs = 0;
 
+    ApiLayoutTourItemData() = default;
+    ApiLayoutTourItemData(const QnUuid& layoutId, int delayMs):
+        layoutId(layoutId), delayMs(delayMs) {}
+
     bool operator==(const ApiLayoutTourItemData& rhs) const;
 };
 
