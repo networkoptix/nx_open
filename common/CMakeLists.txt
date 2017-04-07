@@ -37,7 +37,7 @@ target_include_directories(common
         "${CMAKE_SOURCE_DIR}/common_libs/nx_network/src")
 
 target_compile_definitions(common
-    PUBLIC NX_NETWORK_API=${API_IMPORT_MACRO})
+    PRIVATE NX_NETWORK_API=${API_IMPORT_MACRO})
 
 if(MACOSX)
     find_library(CoreGraphics_LIBRARY CoreGraphics)

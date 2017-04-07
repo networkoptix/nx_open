@@ -7,6 +7,11 @@ if(LINUX)
     target_link_libraries(nx_audio PUBLIC openal)
 endif()
 
+if(WIN32)
+    rdep_add_package(openal)
+    target_link_libraries(nx_audio PUBLIC openal)
+endif()
+
 if(MACOSX)
     find_library(OpenAL_LIBRARY OpenAL)
     mark_as_advanced(OpenAL_LIBRARY)
