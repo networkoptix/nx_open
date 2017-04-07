@@ -12,6 +12,7 @@
 #include <ui/workbench/workbench.h>
 #include <ui/style/skin.h>
 
+#include <nx/utils/string.h>
 
 namespace nx {
 namespace client {
@@ -26,9 +27,14 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
     connect(action(QnActions::NewLayoutTourAction), &QAction::triggered, this,
         [this]()
         {
+            QStringList usedNames;
+            for (const auto& tour: qnLayoutTourManager->tours())
+                usedNames << tour.name;
+
             ec2::ApiLayoutTourData tour;
             tour.id = QnUuid::createUuid();
-            tour.name = tour.id.toSimpleString();
+            tour.name = nx::utils::generateUniqueString(
+                usedNames, tr("Layout Tour"), tr("Layout Tour %1"));
             qnLayoutTourManager->addOrUpdateTour(tour);
         });
 

@@ -112,6 +112,18 @@ QVariant QnLayoutTourItemsModel::data(const QModelIndex& index, int role) const
             return QVariant();
         }
 
+        case Qt::EditRole:
+            switch (column)
+            {
+                case QnLayoutTourItemsModel::DelayColumn:
+                    return item.delayMs;
+
+                default:
+                    break;
+            }
+
+            return QVariant();
+
         default:
             break;
     }
@@ -140,6 +152,35 @@ QVariant QnLayoutTourItemsModel::headerData(int section, Qt::Orientation orienta
     }
 
     return QVariant();
+}
+
+Qt::ItemFlags QnLayoutTourItemsModel::flags(const QModelIndex &index) const
+{
+    auto result = base_type::flags(index);
+    if (index.column() == DelayColumn)
+        result |= Qt::ItemIsEditable;
+    return result;
+}
+
+bool QnLayoutTourItemsModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (role != Qt::EditRole)
+        return false;
+
+    if (index.column() != DelayColumn)
+        return false;
+
+    if (value.toInt() <= 0)
+        return false;
+
+    const bool hasItem = qBetween(0, index.row(), (int)m_items.size());
+    NX_ASSERT(hasItem);
+    if (!hasItem)
+        return false;
+
+    auto& item = m_items[index.row()];
+    item.delayMs = value.toInt();
+    return true;
 }
 
 void QnLayoutTourItemsModel::reset(const QnLayoutTourItemList& items)

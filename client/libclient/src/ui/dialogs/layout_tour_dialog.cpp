@@ -1,6 +1,8 @@
 #include "layout_tour_dialog.h"
 #include "ui_layout_tour_dialog.h"
 
+#include <QtWidgets/QStyledItemDelegate>
+
 #include <nx_ec/data/api_layout_tour_data.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -25,7 +27,7 @@ QnLayoutResourcePtr selectLayout()
     QScopedPointer<QnMessageBox> dialog(new QnMessageBox());
     auto resourcesView = new QnResourceListView(layouts, dialog.data());
     resourcesView->setSelectionEnabled(true);
-    dialog->setText(QnLayoutTourDialog::tr("Select layout"));
+    dialog->setText(QnLayoutTourDialog::tr("Select layout..."));
     dialog->addCustomWidget(resourcesView);
     dialog->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     if (!dialog->exec())
@@ -33,6 +35,39 @@ QnLayoutResourcePtr selectLayout()
 
     return resourcesView->selectedResource().dynamicCast<QnLayoutResource>();
 }
+
+class DelayEditDelegate: public QStyledItemDelegate
+{
+    using base_type = QStyledItemDelegate;
+public:
+    DelayEditDelegate(QObject* parent = nullptr):
+        base_type(parent)
+    {}
+
+protected:
+    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& /*option*/,
+        const QModelIndex& index) const override
+    {
+        NX_ASSERT(index.column() == QnLayoutTourItemsModel::DelayColumn);
+        auto spinBox = new QSpinBox(parent);
+        spinBox->setMinimum(1);
+        spinBox->setMaximum(9999);
+        return spinBox;
+    }
+
+    virtual void setEditorData(QWidget* editor, const QModelIndex& index) const override
+    {
+        if (auto spinBox = qobject_cast<QSpinBox*>(editor))
+            spinBox->setValue(index.data(Qt::EditRole).toInt() / 1000);
+    }
+
+    virtual void setModelData(QWidget* editor, QAbstractItemModel* model,
+        const QModelIndex& index) const override
+    {
+        if (auto spinBox = qobject_cast<QSpinBox*>(editor))
+            model->setData(index, spinBox->value() * 1000);
+    }
+};
 
 }
 
@@ -49,7 +84,8 @@ QnLayoutTourDialog::QnLayoutTourDialog(QWidget* parent, Qt::WindowFlags windowFl
     ui->layoutsTreeView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
     ui->layoutsTreeView->setModel(m_model);
-    //     ui->layoutsTreeView->setItemDelegate();
+    ui->layoutsTreeView->setItemDelegateForColumn(QnLayoutTourItemsModel::DelayColumn,
+        new DelayEditDelegate(this));
     ui->layoutsTreeView->setProperty(style::Properties::kSuppressHoverPropery, true);
     ui->layoutsTreeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->layoutsTreeView->header()->setSectionResizeMode(QnLayoutTourItemsModel::ControlsColumn,

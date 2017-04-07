@@ -2,6 +2,8 @@
 
 #include <QtCore/QAbstractListModel>
 
+#include <client/client_globals.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/scoped_model_operations.h>
@@ -30,6 +32,8 @@ public:
     virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual QVariant data(const QModelIndex& index, int role) const override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
     void reset(const QnLayoutTourItemList& items);
     void addItem(const QnLayoutTourItem& item);
