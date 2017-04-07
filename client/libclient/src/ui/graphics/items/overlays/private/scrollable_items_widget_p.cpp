@@ -110,8 +110,13 @@ QnUuid QnScrollableItemsWidgetPrivate::insertItem(int index, QGraphicsWidget* it
     connect(item, &QObject::destroyed, this,
         [this, id]()
         {
-            if (m_items[id] == sender())
-                m_items.remove(id);
+            /* An item should be connected to this lambda only
+               if it's in the hash with exactly this id. */
+            auto iter = m_items.find(id);
+            const bool thisItem = iter != m_items.end() && iter.value() == sender();
+            NX_EXPECT(thisItem);
+            if (thisItem)
+                m_items.erase(iter);
         });
 
     m_items[id] = item;
