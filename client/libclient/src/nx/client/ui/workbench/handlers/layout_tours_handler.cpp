@@ -42,6 +42,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
                 return;
             tour.name = parameters.argument<QString>(Qn::ResourceNameRole);
             qnLayoutTourManager->addOrUpdateTour(tour);
+            qnLayoutTourManager->saveTour(tour);
         });
 
     connect(action(QnActions::RemoveLayoutTourAction), &QAction::triggered, this,
@@ -53,6 +54,25 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             if (!tour.isValid())
                 return;
             qnLayoutTourManager->removeTour(tour);
+        });
+
+    connect(action(QnActions::LayoutTourSettingsAction), &QAction::triggered, this,
+        [this]()
+        {
+            QnActionParameters parameters = menu()->currentParameters(sender());
+            auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+            auto tour = qnLayoutTourManager->tour(id);
+            if (!tour.isValid())
+                return;
+
+            QScopedPointer<QnLayoutTourDialog> dialog(new QnLayoutTourDialog(mainWindow()));
+            dialog->loadData(tour);
+            if (!dialog->exec())
+                return;
+
+            dialog->submitData(&tour);
+            qnLayoutTourManager->addOrUpdateTour(tour);
+            qnLayoutTourManager->saveTour(tour);
         });
 
     connect(action(QnActions::OpenLayoutTourAction), &QAction::triggered,
