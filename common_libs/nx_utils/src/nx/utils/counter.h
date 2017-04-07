@@ -8,87 +8,36 @@
 namespace nx {
 namespace utils {
 
-class Counter: public QObject
+class NX_UTILS_API Counter:
+    public QObject
 {
     Q_OBJECT;
 
 public:
-    class ScopedIncrement
+    class NX_UTILS_API ScopedIncrement
     {
     public:
-        ScopedIncrement(Counter* const counter):
-            m_counter(counter)
-        {
-            if (m_counter)
-                m_counter->increment();
-        }
-        ScopedIncrement(ScopedIncrement&& right):
-            m_counter(right.m_counter)
-        {
-            right.m_counter = nullptr;
-        }
-        /*!
-            TODO #ak remove this constructor after move to msvc2015
-        */
-        ScopedIncrement(const ScopedIncrement& right):
-            m_counter(right.m_counter)
-        {
-            if (m_counter)
-                m_counter->increment();
-        }
-        ~ScopedIncrement()
-        {
-            if (m_counter)
-                m_counter->decrement();
-        }
+        ScopedIncrement(Counter* const counter);
+        ScopedIncrement(ScopedIncrement&& right);
+        ScopedIncrement(const ScopedIncrement& right);
+
+        ~ScopedIncrement();
 
     private:
         Counter* m_counter;
     };
 
-    Counter(int initialCount = 0, QObject *parent = NULL):
-        QObject(parent),
-        m_count(initialCount)
-    {
-    }
+    Counter(int initialCount = 0, QObject* parent = NULL);
 
-    ScopedIncrement getScopedIncrement()
-    {
-        return Counter::ScopedIncrement(this);
-    }
-    /**
-     * Waits for internal counter to reach zero.
-     * @note It makes sense to use this method when there can be no calls to Counter::increment.
-     *   E.g., we started several async calls and waiting for their completion before destroying process.
-     */
-    void wait()
-    {
-        QnMutexLocker lk(&m_mutex);
-        while (m_count > 0)
-            m_counterReachedZeroCondition.wait(lk.mutex());
-    }
+    ScopedIncrement getScopedIncrement();
+    void wait();
 
 signals:
     void reachedZero();
 
 public slots:
-    void increment()
-    {
-        QnMutexLocker locker( &m_mutex );
-        m_count++;
-    }
-
-    void decrement()
-    {
-        QnMutexLocker locker( &m_mutex );
-        auto val = --m_count;
-        locker.unlock();
-        if(val == 0)
-        {
-            emit reachedZero();
-            m_counterReachedZeroCondition.wakeAll();
-        }
-    }
+    void increment();
+    void decrement();
 
 private:
     QnMutex m_mutex;
