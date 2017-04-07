@@ -395,26 +395,26 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
         m_videoLayout.reset( new QnCustomResourceVideoLayout(QSize(1, 1)) );
 
         bool found = false;
-        m_metadata = QnAviArchiveMetadata::loadFromFile(m_formatContext, &found);
-        if (found)
+        m_metadata = QnAviArchiveMetadata::loadFromFile(m_formatContext);
+
+        if (QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>())
         {
-            if (QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>())
-            {
-                if (m_metadata.timeZoneOffset != Qn::InvalidUtcOffset)
-                    aviRes->setTimeZoneOffset(m_metadata.timeZoneOffset);
-            }
+            if (m_metadata.timeZoneOffset != Qn::InvalidUtcOffset)
+                aviRes->setTimeZoneOffset(m_metadata.timeZoneOffset);
+        }
 
-            if (!m_metadata.videoLayoutSize.isEmpty())
-            {
-                m_videoLayout->setSize(m_metadata.videoLayoutSize);
-                m_videoLayout->setChannels(m_metadata.videoLayoutChannels);
-            }
+        if (!m_metadata.videoLayoutSize.isEmpty())
+        {
+            m_videoLayout->setSize(m_metadata.videoLayoutSize);
+            m_videoLayout->setChannels(m_metadata.videoLayoutChannels);
+        }
 
-            if (QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>())
-            {
+        if (QnMediaResourcePtr mediaRes = m_resource.dynamicCast<QnMediaResource>())
+        {
+            if (m_metadata.dewarpingParams != QnMediaDewarpingParams())
                 mediaRes->setDewarpingParams(m_metadata.dewarpingParams);
+            if (!qFuzzyIsNull(m_metadata.overridenAr))
                 mediaRes->setCustomAspectRatio(m_metadata.overridenAr);
-            }
         }
 
         if (m_useAbsolutePos)
