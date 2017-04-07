@@ -16,7 +16,6 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/system_socket.h>
-#include <utils/common/checked_cast.h>
 #include <nx/utils/scope_guard.h>
 
 #include "udt_common.h"

@@ -48,7 +48,7 @@
 
 #include <nx/utils/string.h>
 
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/scoped_value_rollback.h>

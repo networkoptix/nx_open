@@ -691,7 +691,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
 }
 
 void AccountManager::accountReactivated(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult resultCode,
@@ -754,7 +754,7 @@ nx::db::DBResult AccountManager::verifyAccount(
 }
 
 void AccountManager::sendActivateAccountResponse(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult resultCode,
     data::AccountConfirmationCode /*verificationCode*/,
@@ -947,7 +947,7 @@ nx::db::DBResult AccountManager::resetPassword(
 }
 
 void AccountManager::temporaryCredentialsSaved(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     api::ResultCode resultCode,
     const std::string& accountEmail,
     api::TemporaryCredentials temporaryCredentials,
