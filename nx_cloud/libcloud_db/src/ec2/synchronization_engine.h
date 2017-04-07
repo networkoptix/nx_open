@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/subscription.h>
 
 #include "connection_manager.h"
@@ -46,7 +46,7 @@ private:
     IncomingTransactionDispatcher m_incomingTransactionDispatcher;
     ConnectionManager m_connectionManager;
     nx::utils::SubscriptionId m_systemDeletedSubscriptionId;
-    QnCounter m_startedAsyncCallsCounter;
+    nx::utils::Counter m_startedAsyncCallsCounter;
 
     void onSystemDeleted(const std::string& systemId);
 };

@@ -1,7 +1,7 @@
 #include "workbench_stream_synchronizer.h"
 
 #include <utils/common/warnings.h>
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 #include <utils/common/checked_cast.h>
 
 #include <core/resource/resource.h>
@@ -41,10 +41,10 @@ QnWorkbenchStreamSynchronizer::QnWorkbenchStreamSynchronizer(QObject *parent):
     connect(workbench(),                &QnWorkbench::currentLayoutChanged,             this,       &QnWorkbenchStreamSynchronizer::at_workbench_currentLayoutChanged);
 
     /* Prepare counter. */
-    m_counter = new QnCounter(1, this);
-    connect(this,                       &QObject::destroyed,                            m_counter,  &QnCounter::decrement);
-    connect(m_counter,                  &QnCounter::reachedZero,                        m_syncPlay, &QnArchiveSyncPlayWrapper::deleteLater);
-    connect(m_counter,                  &QnCounter::reachedZero,                        m_counter,  &QnCounter::deleteLater);
+    m_counter = new nx::utils::Counter(1, this);
+    connect(this,                       &QObject::destroyed,                            m_counter,  &nx::utils::Counter::decrement);
+    connect(m_counter,                  &nx::utils::Counter::reachedZero,                        m_syncPlay, &QnArchiveSyncPlayWrapper::deleteLater);
+    connect(m_counter,                  &nx::utils::Counter::reachedZero,                        m_counter,  &nx::utils::Counter::deleteLater);
 
     /* Prepare render watcher instance. */
     connect(m_watcher,                  &QnWorkbenchRenderWatcher::displayChanged,      this,       &QnWorkbenchStreamSynchronizer::at_renderWatcher_displayChanged);

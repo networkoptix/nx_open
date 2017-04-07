@@ -113,6 +113,11 @@ protected:
         ASSERT_NE(nullptr, m_connection);
     }
 
+    //void whenControlConnectionIsBroken()
+    //{
+    //    // TODO
+    //}
+
     void thenRequestToRelayHasBeenIssued()
     {
         ASSERT_GT(m_clientToRelayConnectionCounter.load(), 0);
@@ -182,6 +187,11 @@ protected:
             std::future_status::timeout,
             m_tunnelClosed.get_future().wait_for(*m_tunnelInactivityTimeout * 3));
     }
+
+    //void thenTunnelReopensControlConnection()
+    //{
+    //    // TODO
+    //}
 
     void enableDestroyingTunnelConnectionOnConnectFailure()
     {
@@ -256,8 +266,6 @@ private:
             m_tunnelConnection->setInactivityTimeout(*m_tunnelInactivityTimeout);
 
         m_tunnelConnection->start();
-
-        m_clientToRelayConnectionCounter = 0;
     }
 
     void onTunnelClosed(SystemError::ErrorCode sysErrorCode)
@@ -396,6 +404,13 @@ TEST_F(CloudRelayOutgoingTunnelConnection, provided_connection_destroyed_after_t
 }
 
 //TEST_F(CloudRelayOutgoingTunnelConnection, reopens_control_connection_on_failure)
+//{
+//    givenHappyRelay();
+//    givenIdleTunnel();
+//    whenControlConnectionIsBroken();
+//    thenTunnelReopensControlConnection();
+//}
+//
 //TEST_F(CloudRelayOutgoingTunnelConnection, shuts_down_on_control_connection_failure)
 //TEST_F(CloudRelayOutgoingTunnelConnection, terminating)
 

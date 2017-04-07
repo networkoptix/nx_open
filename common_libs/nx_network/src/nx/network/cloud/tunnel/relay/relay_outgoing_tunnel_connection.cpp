@@ -69,7 +69,10 @@ void OutgoingTunnelConnection::establishNewConnection(
             m_activeRequests.back()->timer.bindToAioThread(getAioThread());
             auto requestIter = --m_activeRequests.end();
         
-            auto relayClient = api::ClientToRelayConnectionFactory::create(m_relayEndpoint);
+            auto relayClient =
+                m_controlConnection
+                ? std::move(m_controlConnection)
+                : api::ClientToRelayConnectionFactory::create(m_relayEndpoint);
             relayClient->bindToAioThread(getAioThread());
             relayClient->openConnectionToTheTargetHost(
                 m_relaySessionId,

@@ -5,9 +5,7 @@
 
 #include <boost/type_traits/is_same.hpp>
 
-#include <common/common_globals.h>
 #include <nx/utils/system_error.h>
-#include <utils/common/warnings.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/platform/win32_syscall_resolver.h>
@@ -253,10 +251,7 @@ bool Socket<SocketInterfaceToImplement>::setReuseAddrFlag(bool reuseAddr)
     int reuseAddrVal = reuseAddr;
 
     if (::setsockopt(m_fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuseAddrVal, sizeof(reuseAddrVal)))
-    {
-        qnWarning("Can't set SO_REUSEADDR flag to socket: %1.", SystemError::getLastOSErrorText());
         return false;
-    }
     return true;
 }
 
@@ -1583,7 +1578,6 @@ bool UDPSocket::setMulticastTTL(unsigned char multicastTTL)
             handle(), IPPROTO_IP, IP_MULTICAST_TTL,
             (raw_type *)&multicastTTL, sizeof(multicastTTL)) < 0)
     {
-        qnWarning("Multicast TTL set failed (setsockopt()).");
         return false;
     }
     return true;
@@ -1597,7 +1591,6 @@ bool UDPSocket::setMulticastIF(const QString& multicastIF)
             handle(), IPPROTO_IP, IP_MULTICAST_IF,
             (raw_type *)&localInterface, sizeof(localInterface)) < 0)
     {
-        qnWarning("Multicast TTL set failed (setsockopt()).");
         return false;
     }
     return true;
@@ -1649,7 +1642,6 @@ bool UDPSocket::leaveGroup(const QString &multicastGroup)
         (raw_type *)&multicastRequest,
         sizeof(multicastRequest)) < 0)
     {
-        qnWarning("Multicast group leave failed (setsockopt()).");
         return false;
     }
     return true;
