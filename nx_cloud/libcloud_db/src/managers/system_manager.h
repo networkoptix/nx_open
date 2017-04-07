@@ -394,8 +394,7 @@ private:
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
-        std::string systemId,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::string systemId);
 
     nx::db::DBResult saveUserSessionStart(
         nx::db::QueryContext* queryContext,
