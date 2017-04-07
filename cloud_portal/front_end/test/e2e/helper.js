@@ -133,6 +133,7 @@ var Helper = function () {
     this.userEmailAdvViewer = 'noptixqa+advviewer@gmail.com';
     this.userEmailLiveViewer = 'noptixqa+liveviewer@gmail.com';
     this.userEmailCustom = 'noptixqa+custom@gmail.com';
+    this.userEmailSmoke = 'noptixqa+smoke@gmail.com';
     this.userEmailNoPerm = 'noptixqa+noperm@gmail.com';
 
     this.roles = {
