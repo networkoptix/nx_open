@@ -215,6 +215,7 @@ private:
 
     boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
     bool m_isSendingData;
+    bool m_receiving = false;
 
     virtual void stopWhileInAioThread() override
     {

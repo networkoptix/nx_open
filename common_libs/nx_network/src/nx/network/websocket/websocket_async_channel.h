@@ -4,6 +4,7 @@
 #include <nx/network/websocket/websocket_message_parser.h>
 #include <nx/network/websocket/websocket_message_serializer.h>
 #include <nx/network/aio/abstract_async_channel.h>
+#include <nx/network/websocket/websocket_types.h>
 
 namespace nx {
 namespace network {
@@ -36,18 +37,6 @@ public:
         stream
     };
 
-    enum class PayloadType
-    {
-        binary,
-        text
-    };
-
-    enum class Role
-    {
-        Client,
-        Server,
-        Undefined
-    };
 
 public:
     AsyncChannel(

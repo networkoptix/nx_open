@@ -3,7 +3,6 @@
 #include <nx/network/connection_server/base_server_connection.h>
 #include <nx/network/websocket/websocket_message_parser.h>
 #include <nx/network/websocket/websocket_message_serializer.h>
-#include <nx/network/websocket/websocket_message.h>
 
 namespace nx {
 namespace network {
