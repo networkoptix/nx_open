@@ -86,3 +86,21 @@ void QnLayoutTourManager::saveTour(const ec2::ApiLayoutTourData& tour)
 //         return;
 //     connection->getLayoutTourManager(Qn::kSystemAccess)->save(tour, this, nullptr);
 }
+
+void QnLayoutTourManager::removeTour(const ec2::ApiLayoutTourData& tour)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto iter = std::find_if(m_tours.begin(), m_tours.end(),
+        [id = tour.id](const ec2::ApiLayoutTourData& data)
+        {
+            return data.id == id;
+        });
+
+    if (iter == m_tours.end())
+        return;
+
+    m_tours.erase(iter);
+    lock.unlock();
+
+    emit tourRemoved(tour);
+}

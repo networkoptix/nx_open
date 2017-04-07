@@ -44,6 +44,17 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             qnLayoutTourManager->addOrUpdateTour(tour);
         });
 
+    connect(action(QnActions::RemoveLayoutTourAction), &QAction::triggered, this,
+        [this]()
+        {
+            QnActionParameters parameters = menu()->currentParameters(sender());
+            auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+            auto tour = qnLayoutTourManager->tour(id);
+            if (!tour.isValid())
+                return;
+            qnLayoutTourManager->removeTour(tour);
+        });
+
     connect(action(QnActions::OpenLayoutTourAction), &QAction::triggered,
         this, &LayoutToursHandler::openToursLayout);
 }

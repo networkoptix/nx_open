@@ -37,6 +37,7 @@ public:
 
     void addOrUpdateTour(const ec2::ApiLayoutTourData& tour);
     void saveTour(const ec2::ApiLayoutTourData& tour);
+    void removeTour(const ec2::ApiLayoutTourData& tour);
 
 signals:
     void tourAdded(const ec2::ApiLayoutTourData& tour);
