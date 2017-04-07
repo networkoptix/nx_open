@@ -791,7 +791,7 @@ nx::db::DBResult SystemManager::insertOwnerSharingToDb(
 }
 
 void SystemManager::systemAdded(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemRegistrationDataWithAccount /*systemRegistrationData*/,
@@ -828,7 +828,7 @@ nx::db::DBResult SystemManager::markSystemAsDeleted(
 }
 
 void SystemManager::systemMarkedAsDeleted(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     std::string systemId,
@@ -884,7 +884,7 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
 }
 
 void SystemManager::systemDeleted(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemId systemId,
@@ -1482,7 +1482,7 @@ void SystemManager::updateSystemAttributesInCache(
 }
 
 void SystemManager::systemNameUpdated(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemAttributesUpdate data,
@@ -1530,7 +1530,7 @@ void SystemManager::activateSystemIfNeeded(
 }
 
 void SystemManager::systemActivated(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     std::string systemId,
@@ -1791,7 +1791,7 @@ void SystemManager::dropExpiredSystems(uint64_t /*timerId*/)
 }
 
 void SystemManager::expiredSystemsDeletedFromDb(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult)
 {

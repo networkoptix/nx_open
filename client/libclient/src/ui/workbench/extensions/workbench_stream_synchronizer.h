@@ -14,7 +14,7 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class QnCounter;
+class nx::utils::Counter;
 class QnResourceWidget;
 class QnResourceDisplay;
 typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;
@@ -94,7 +94,7 @@ private:
 
     /** Counter that is used to track the number of references to syncplay
      * instance. When it reaches zero, syncplay is destroyed. */
-    QnCounter *m_counter;
+    nx::utils::Counter *m_counter;
 
     /** Syncplay instance that performs the actual stream synchronization. */
     QnArchiveSyncPlayWrapper *m_syncPlay;

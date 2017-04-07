@@ -1,27 +1,28 @@
-#ifndef QN_COUNTER_H
-#define QN_COUNTER_H
+#pragma once
 
 #include <QtCore/QObject>
 
-#include <nx/utils/thread/wait_condition.h>
-#include <nx/utils/thread/mutex.h>
+#include "thread/mutex.h"
+#include "thread/wait_condition.h"
 
+namespace nx {
+namespace utils {
 
-class QnCounter: public QObject {
+class Counter: public QObject
+{
     Q_OBJECT;
+
 public:
     class ScopedIncrement
     {
     public:
-        ScopedIncrement(QnCounter* const counter)
-        :
+        ScopedIncrement(Counter* const counter):
             m_counter(counter)
         {
             if (m_counter)
                 m_counter->increment();
         }
-        ScopedIncrement(ScopedIncrement&& right)
-        :
+        ScopedIncrement(ScopedIncrement&& right):
             m_counter(right.m_counter)
         {
             right.m_counter = nullptr;
@@ -29,8 +30,7 @@ public:
         /*!
             TODO #ak remove this constructor after move to msvc2015
         */
-        ScopedIncrement(const ScopedIncrement& right)
-        :
+        ScopedIncrement(const ScopedIncrement& right):
             m_counter(right.m_counter)
         {
             if (m_counter)
@@ -43,23 +43,24 @@ public:
         }
 
     private:
-        QnCounter* m_counter;
+        Counter* m_counter;
     };
 
-    QnCounter(int initialCount = 0, QObject *parent = NULL):
+    Counter(int initialCount = 0, QObject *parent = NULL):
         QObject(parent),
         m_count(initialCount)
-    {}
+    {
+    }
 
     ScopedIncrement getScopedIncrement()
     {
-        return QnCounter::ScopedIncrement(this);
+        return Counter::ScopedIncrement(this);
     }
-    //!Waits for internal counter to reach zero
-    /*!
-        \note It makes sense to use this method when there can be no calls to \a QnCounter::increment.
-            E.g., we started several async calls and waiting for their completion before destroying process
-    */
+    /**
+     * Waits for internal counter to reach zero.
+     * @note It makes sense to use this method when there can be no calls to Counter::increment.
+     *   E.g., we started several async calls and waiting for their completion before destroying process.
+     */
     void wait()
     {
         QnMutexLocker lk(&m_mutex);
@@ -71,12 +72,14 @@ signals:
     void reachedZero();
 
 public slots:
-    void increment() {
+    void increment()
+    {
         QnMutexLocker locker( &m_mutex );
         m_count++;
     }
 
-    void decrement() {
+    void decrement()
+    {
         QnMutexLocker locker( &m_mutex );
         auto val = --m_count;
         locker.unlock();
@@ -93,4 +96,5 @@ private:
     int m_count;
 };
 
-#endif // QN_COUNTER_H
+} // namespace utils
+} // namespace nx
