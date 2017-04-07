@@ -250,7 +250,7 @@ private:
 
     void setupHud();
 
-    void showHideTextOverlay(const QnUuid& id, bool show, const QString& text,
+    void setTextOverlayParameters(const QnUuid& id, bool visible, const QString& text,
         const QnHtmlTextItemOptions& options, int timeoutMs);
 
 private:

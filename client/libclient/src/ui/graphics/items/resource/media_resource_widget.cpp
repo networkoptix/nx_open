@@ -692,16 +692,16 @@ void QnMediaResourceWidget::suspendHomePtzController()
 
 void QnMediaResourceWidget::hideTextOverlay(const QnUuid& id)
 {
-    showHideTextOverlay(id, false, QString(), QnHtmlTextItemOptions(), -1);
+    setTextOverlayParameters(id, false, QString(), QnHtmlTextItemOptions(), -1);
 }
 
 void QnMediaResourceWidget::showTextOverlay(const QnUuid& id, const QString& text,
     const QnHtmlTextItemOptions& options, int timeoutMs)
 {
-    showHideTextOverlay(id, true, text, options, timeoutMs);
+    setTextOverlayParameters(id, true, text, options, timeoutMs);
 }
 
-void QnMediaResourceWidget::showHideTextOverlay(const QnUuid& id, bool show,
+void QnMediaResourceWidget::setTextOverlayParameters(const QnUuid& id, bool visible,
     const QString& text, const QnHtmlTextItemOptions& options, int timeoutMs)
 {
     if (!m_textOverlayWidget)
@@ -723,7 +723,7 @@ void QnMediaResourceWidget::showHideTextOverlay(const QnUuid& id, bool show,
 
     static const char* kReferenceTimePropertyName = "_qn_textOverlayReferenceTime";
 
-    if (!show)
+    if (!visible)
     {
         auto item = m_textOverlayWidget->item(id);
         if (!item)

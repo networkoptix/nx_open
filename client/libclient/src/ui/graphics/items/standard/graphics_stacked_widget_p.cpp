@@ -37,10 +37,15 @@ QnGraphicsStackedWidgetPrivate::~QnGraphicsStackedWidgetPrivate()
 
 int QnGraphicsStackedWidgetPrivate::insertWidget(int index, QGraphicsWidget* widget)
 {
-    if (!widget) //< don't insert null widgets
+    /* Don't insert null widgets: */
+    NX_ASSERT(widget);
+    if (!widget)
         return kNoIndex;
 
-    if (indexOf(widget) != kNoIndex) //< don't insert the same widget multiple times
+    /* Don't insert the same widget multiple times: */
+    const bool alreadyExists = indexOf(widget) != kNoIndex;
+    NX_ASSERT(!alreadyExists);
+    if (alreadyExists)
         return kNoIndex;
 
     index = qBound(0, index, m_widgets.count());
@@ -80,7 +85,7 @@ QGraphicsWidget* QnGraphicsStackedWidgetPrivate::removeWidget(int index)
     auto widget = m_widgets.takeAt(index);
     NX_EXPECT(widget);
 
-    if (!QObjectPrivate::get(widget)->wasDeleted)
+    if (widget && !QObjectPrivate::get(widget)->wasDeleted)
     {
         widget->setParentItem(nullptr);
         widget->setParent(nullptr);
@@ -136,6 +141,7 @@ Qt::Alignment QnGraphicsStackedWidgetPrivate::alignment(QGraphicsWidget* widget)
 
 void QnGraphicsStackedWidgetPrivate::setAlignment(QGraphicsWidget* widget, Qt::Alignment alignment)
 {
+    NX_ASSERT(widget);
     if (!widget)
         return;
 
@@ -155,7 +161,9 @@ int QnGraphicsStackedWidgetPrivate::currentIndex() const
 
 QGraphicsWidget* QnGraphicsStackedWidgetPrivate::setCurrentIndex(int index)
 {
-    if (index < 0 || index >= m_widgets.size())
+    const bool indexIsValid = index >= 0 && index < m_widgets.size();
+    NX_ASSERT(indexIsValid);
+    if (!indexIsValid)
         return nullptr;
 
     const auto currentWidget = m_widgets[index];
@@ -185,6 +193,7 @@ QGraphicsWidget* QnGraphicsStackedWidgetPrivate::currentWidget() const
 int QnGraphicsStackedWidgetPrivate::setCurrentWidget(QGraphicsWidget* widget)
 {
     const int index = indexOf(widget);
+    NX_ASSERT(index != kNoIndex);
     if (index == kNoIndex)
         return kNoIndex;
 
