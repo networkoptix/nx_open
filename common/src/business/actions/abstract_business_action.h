@@ -109,11 +109,11 @@ public:
     QnBusiness::ActionType actionType;
     QnBusinessActionParameters actionParams;
     QnBusinessEventParameters eventParams;
-    QnUuid businessRuleId;
+    QnUuid businessRuleId; //< TODO: Should be renamed to eventRuleId, considering compatibility.
     int aggregationCount;
 
     int flags;
-    QString compareString; // todo: this string is used on a client side for internal purpose. Need to move it to separate class
+    QString compareString; //< TODO: This string is used on a client side for internal purpose. Need to move it to separate class.
 };
 
 #define QnBusinessActionData_Fields (actionType)(actionParams)(eventParams)(businessRuleId)(aggregationCount)(flags)

@@ -31,7 +31,7 @@ namespace QnUbjsonDetail {
         return tmp.f;
     }
 
-    inline float fromBigEndian(double value) {
+    inline double fromBigEndian(double value) {
         /* Avoid breaking strict aliasing rules by using a union. */
         union {
             quint64 i;

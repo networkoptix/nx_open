@@ -1,8 +1,12 @@
 #pragma once
 
 #include <list>
+#include <memory>
+
+#include <boost/optional.hpp>
 
 #include <nx/network/aio/timer.h>
+#include <nx/network/socket_delegate.h>
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/thread/mutex.h>
 
@@ -38,6 +42,8 @@ public:
     virtual void setControlConnectionClosedHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
+    void setInactivityTimeout(std::chrono::milliseconds timeout);
+
 private:
     struct RequestContext
     {
@@ -53,12 +59,32 @@ private:
     std::list<std::unique_ptr<RequestContext>> m_activeRequests;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_tunnelClosedHandler;
     utils::ObjectDestructionFlag m_objectDestructionFlag;
+    boost::optional<std::chrono::milliseconds> m_inactivityTimeout;
+    nx::network::aio::Timer m_inactivityTimer;
+    std::shared_ptr<int> m_usageCounter;
 
+    void startInactivityTimer();
+    void stopInactivityTimer();
     void onConnectionOpened(
         api::ResultCode resultCode,
         std::unique_ptr<AbstractStreamSocket> connection,
         std::list<std::unique_ptr<RequestContext>>::iterator requestIter);
     void reportTunnelClosure(SystemError::ErrorCode reason);
+    void onInactivityTimeout();
+};
+
+class OutgoingConnection:
+    public StreamSocketDelegate
+{
+public:
+    OutgoingConnection(
+        std::unique_ptr<AbstractStreamSocket> delegate,
+        std::shared_ptr<int> usageCounter);
+    virtual ~OutgoingConnection() override;
+
+private:
+    std::unique_ptr<AbstractStreamSocket> m_delegate;
+    std::shared_ptr<int> m_usageCounter;
 };
 
 } // namespace relay

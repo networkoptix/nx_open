@@ -22,7 +22,7 @@
 #include <transaction/connection_guard_shared_state.h>
 
 #include <utils/common/counter.h>
-#include <utils/common/subscription.h>
+#include <nx/utils/subscription.h>
 
 #include "access_control/auth_types.h"
 #include "serialization/transaction_serializer.h"

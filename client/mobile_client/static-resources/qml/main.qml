@@ -12,6 +12,11 @@ ApplicationWindow
 
     property real rightPadding: 0
     property real bottomPadding: 0
+    readonly property real keyboardHeight:
+        Qt.inputMethod.keyboardRectangle.height / Screen.devicePixelRatio
+
+    readonly property real availableWidth: width - rightPadding
+    readonly property real availableHeight: height - bottomPadding
 
     visible: true
     color: ColorTheme.windowBackground
@@ -26,10 +31,16 @@ ApplicationWindow
     StackView
     {
         id: stackView
-        anchors.fill: parent
-        anchors.rightMargin: mainWindow.rightPadding
-        anchors.bottomMargin: mainWindow.bottomPadding
-        onCurrentItemChanged: sideNavigation.close()
+
+        width: mainWindow.availableWidth
+        height: mainWindow.availableHeight - keyboardHeight
+
+        property real keyboardHeight: mainWindow.keyboardHeight
+        Behavior on keyboardHeight
+        {
+            enabled: Qt.platform.os === "android"
+            NumberAnimation { duration: 200; easing.type: Easing.InCubic }
+        }
 
         function restoreActiveFocus()
         {
@@ -37,6 +48,7 @@ ApplicationWindow
                 Workflow.focusCurrentScreen()
         }
 
+        onCurrentItemChanged: sideNavigation.close()
         onWidthChanged: autoScrollDelayTimer.restart()
         onHeightChanged: autoScrollDelayTimer.restart()
     }
@@ -86,34 +98,20 @@ ApplicationWindow
         connectionManager.disconnectFromServer(true)
     }
 
-    Connections
-    {
-        target: Qt.inputMethod
-        onKeyboardRectangleChanged: updateNavigationBarPadding()
-    }
-
-    Behavior on bottomPadding
-    {
-        enabled: Qt.platform.os == "android"
-        NumberAnimation  { duration: 200; easing.type: Easing.InCubic  }
-    }
-
     function updateNavigationBarPadding()
     {
-        if (Qt.platform.os != "android")
+        if (Qt.platform.os !== "android")
             return
 
-        var keyboardHeight = Qt.inputMethod.keyboardRectangle.height / Screen.devicePixelRatio
-
-        if (getDeviceIsPhone() && Screen.primaryOrientation == Qt.LandscapeOrientation)
+        if (getDeviceIsPhone() && Screen.primaryOrientation === Qt.LandscapeOrientation)
         {
             rightPadding = getNavigationBarHeight()
-            bottomPadding = keyboardHeight
+            bottomPadding = 0
         }
         else
         {
             rightPadding = 0
-            bottomPadding = getNavigationBarHeight() + keyboardHeight
+            bottomPadding = getNavigationBarHeight()
         }
     }
 

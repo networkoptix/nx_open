@@ -59,6 +59,11 @@ const StatisticsCollector& InstanceController::statisticsCollector() const
     return m_statisticsCollector;
 }
 
+StatisticsCollector& InstanceController::statisticsCollector()
+{
+    return m_statisticsCollector;
+}
+
 DbStructureUpdater& InstanceController::dbStructureUpdater()
 {
     return m_dbStructureUpdater;

@@ -717,12 +717,17 @@ void QnTimeline::setChunkProvider(QnCameraChunkProvider* chunkProvider)
 
     if (d->chunkProvider)
     {
-        connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated, this,
+        auto handleTimePeriodsUpdated =
             [this]()
             {
                 d->timePeriods[Qn::RecordingContent] = d->chunkProvider->timePeriods();
                 update();
-            });
+            };
+
+        connect(d->chunkProvider, &QnCameraChunkProvider::timePeriodsUpdated,
+            this, handleTimePeriodsUpdated);
+
+        handleTimePeriodsUpdated();
     }
 
     emit chunkProviderChanged();

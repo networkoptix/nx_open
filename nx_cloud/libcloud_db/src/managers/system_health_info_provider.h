@@ -5,7 +5,7 @@
 #include <cdb/result_code.h>
 
 #include <utils/common/counter.h>
-#include <utils/common/subscription.h>
+#include <nx/utils/subscription.h>
 #include <utils/db/async_sql_query_executor.h>
 
 #include "access_control/auth_types.h"

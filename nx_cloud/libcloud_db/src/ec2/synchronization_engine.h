@@ -1,7 +1,7 @@
 #pragma once
 
 #include <utils/common/counter.h>
-#include <utils/common/subscription.h>
+#include <nx/utils/subscription.h>
 
 #include "connection_manager.h"
 #include "incoming_transaction_dispatcher.h"
