@@ -1797,7 +1797,6 @@ QnActionManager::QnActionManager(QObject *parent):
         mode(QnActionTypes::DesktopMode).
         text(tr("Start Layouts Tour")).
         icon(qnSkin->icon("slider/navigation/play.png")).
-        checkable().
         condition(new QnTreeNodeTypeCondition(Qn::LayoutTourNode, this));
 
     factory(QnActions::StopLayoutTourAction).

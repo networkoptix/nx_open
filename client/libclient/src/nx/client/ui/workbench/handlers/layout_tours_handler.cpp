@@ -35,6 +35,20 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
+    connect(qnLayoutTourManager, &QnLayoutTourManager::tourChanged, this,
+        [this](const ec2::ApiLayoutTourData& tour)
+        {
+            if (tour.id == m_runningTourId)
+                stopTour();
+        });
+
+    connect(qnLayoutTourManager, &QnLayoutTourManager::tourRemoved, this,
+        [this](const ec2::ApiLayoutTourData& tour)
+        {
+            if (tour.id == m_runningTourId)
+                stopTour();
+        });
+
     connect(action(QnActions::NewLayoutTourAction), &QAction::triggered, this,
         [this]()
         {
@@ -103,6 +117,9 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
 
             startTour(tour);
         });
+
+    connect(action(QnActions::StopLayoutTourAction), &QAction::triggered, this,
+        &LayoutToursHandler::stopTour);
 
     connect(action(QnActions::OpenLayoutTourAction), &QAction::triggered,
         this, &LayoutToursHandler::openToursLayout);
@@ -189,6 +206,9 @@ void LayoutToursHandler::startTour(const ec2::ApiLayoutTourData& tour)
     m_currentIndex = 0;
     m_elapsed.start();
     workbench()->setCurrentLayout(firstLayout);
+
+    //action(QnActions::EffectiveMaximizeAction)->setChecked(false);
+    menu()->trigger(QnActions::FreespaceAction);
 }
 
 void LayoutToursHandler::processTourStep()
