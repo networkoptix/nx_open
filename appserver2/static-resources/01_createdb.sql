@@ -445,7 +445,7 @@ INSERT INTO "django_content_type" ( id,name,"app_label",model ) VALUES ( '26','c
 INSERT INTO "django_content_type" ( id,name,"app_label",model ) VALUES ( '27','business rule','vms','businessrule' );
 INSERT INTO "django_content_type" ( id,name,"app_label",model ) VALUES ( '28','kv pair','vms','kvpair' );
 INSERT INTO "django_content_type" ( id,name,"app_label",model ) VALUES ( '29','setting','vms','setting' );
-INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_condition",schedule,system,comments,disabled,"action_type","event_state",id,"event_type" ) VALUES ( '30','{ "userGroup" : 0 }','{  }',NULL,'0',NULL,'0','7','2','1','3' );
+INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_condition",schedule,system,comments,disabled,"action_type","event_state",id,"event_type" ) VALUES ( '30','{  }','{  }',NULL,'0',NULL,'0','7','2','1','3' );
 INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_condition",schedule,system,comments,disabled,"action_type","event_state",id,"event_type" ) VALUES ( '30','{  }','{  }',NULL,'0',NULL,'0','7','2','2','4' );
 INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_condition",schedule,system,comments,disabled,"action_type","event_state",id,"event_type" ) VALUES ( '30','{  }','{  }',NULL,'0',NULL,'0','7','2','3','5' );
 INSERT INTO "vms_businessrule" ( "aggregation_period","action_params","event_condition",schedule,system,comments,disabled,"action_type","event_state",id,"event_type" ) VALUES ( '30','{  }','{  }',NULL,'0',NULL,'0','7','2','4','6' );
