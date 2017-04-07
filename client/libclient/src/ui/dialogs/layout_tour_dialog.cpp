@@ -25,6 +25,7 @@ QnLayoutResourcePtr selectLayout()
     QScopedPointer<QnMessageBox> dialog(new QnMessageBox());
     auto resourcesView = new QnResourceListView(layouts, dialog.data());
     resourcesView->setSelectionEnabled(true);
+    dialog->setText(QnLayoutTourDialog::tr("Select layout"));
     dialog->addCustomWidget(resourcesView);
     dialog->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
     if (!dialog->exec())
@@ -100,7 +101,7 @@ void QnLayoutTourDialog::at_view_clicked(const QModelIndex& index)
         case QnLayoutTourItemsModel::LayoutColumn:
             if (auto layout = selectLayout())
             {
-                // model->updateLayout(index.row(), layout);
+                m_model->updateLayout(index.row(), layout);
             }
             break;
         case QnLayoutTourItemsModel::MoveUpColumn:
@@ -110,7 +111,7 @@ void QnLayoutTourDialog::at_view_clicked(const QModelIndex& index)
             m_model->moveDown(index.row());
             break;
         case QnLayoutTourItemsModel::ControlsColumn:
-            // model->removeItem(index.row());
+            m_model->removeItem(index.row());
             break;
         default:
             break;

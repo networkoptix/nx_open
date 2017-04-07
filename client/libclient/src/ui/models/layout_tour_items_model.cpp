@@ -144,15 +144,25 @@ QVariant QnLayoutTourItemsModel::headerData(int section, Qt::Orientation orienta
 
 void QnLayoutTourItemsModel::reset(const QnLayoutTourItemList& items)
 {
-    ScopedReset reset(this);
+    ScopedReset guard(this);
     m_items = items;
 }
 
 void QnLayoutTourItemsModel::addItem(const QnLayoutTourItem& item)
 {
     const int count = (int)m_items.size();
-    ScopedInsertRows add(this, QModelIndex(), count, count);
+    ScopedInsertRows guard(this, QModelIndex(), count, count);
     m_items.push_back(item);
+}
+
+void QnLayoutTourItemsModel::updateLayout(int row, const QnLayoutResourcePtr& layout)
+{
+    auto& item = m_items[row];
+    if (item.layout == layout)
+        return;
+
+    item.layout = layout;
+    emit dataChanged(index(row), index(row, ControlsColumn - 1));
 }
 
 void QnLayoutTourItemsModel::moveUp(int row)
@@ -169,6 +179,12 @@ void QnLayoutTourItemsModel::moveDown(int row)
     if (row >= m_items.size() - 1)
         return;
     moveUp(row + 1);
+}
+
+void QnLayoutTourItemsModel::removeItem(int row)
+{
+    ScopedRemoveRows guard(this, QModelIndex(), row, row);
+    m_items.erase(m_items.begin() + row);
 }
 
 QnLayoutTourItemList QnLayoutTourItemsModel::items() const

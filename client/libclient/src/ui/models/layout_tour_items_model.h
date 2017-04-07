@@ -33,8 +33,10 @@ public:
 
     void reset(const QnLayoutTourItemList& items);
     void addItem(const QnLayoutTourItem& item);
+    void updateLayout(int row, const QnLayoutResourcePtr& layout);
     void moveUp(int row);
     void moveDown(int row);
+    void removeItem(int row);
 
     QnLayoutTourItemList items() const;
 
