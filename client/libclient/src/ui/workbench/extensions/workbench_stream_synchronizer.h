@@ -11,10 +11,10 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/utils/counter.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
-class nx::utils::Counter;
 class QnResourceWidget;
 class QnResourceDisplay;
 typedef QSharedPointer<QnResourceDisplay> QnResourceDisplayPtr;

@@ -16,7 +16,12 @@ class QnCamDisplay;
 class QnLongRunnable;
 class QnAbstractRenderer;
 class QnClientVideoCamera;
-class nx::utils::Counter;
+
+namespace nx {
+namespace utils {
+class Counter;
+} // namespace utils
+} // namespace nx
 
 class QnResourceDisplay: public Connective<QObject>, protected QnResourceConsumer {
     Q_OBJECT
