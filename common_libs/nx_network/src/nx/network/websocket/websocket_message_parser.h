@@ -14,6 +14,7 @@ public:
     virtual void frameStarted(FrameType type, bool fin) = 0;
     virtual void framePayload(const char* data, int64_t len) = 0;
     virtual void frameEnded() = 0;
+    virtual void messageEnded() = 0;
     virtual void handleError(Error err) = 0;
 };
 

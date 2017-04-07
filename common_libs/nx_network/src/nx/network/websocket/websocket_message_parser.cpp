@@ -48,6 +48,8 @@ void MessageParser::processPayload(const char* data, int64_t len)
     if (m_payloadLen == 0)
     {
         m_handler->frameEnded();
+        if (m_fin)
+            m_handler->messageEnded();
         m_state = ParseState::readingHeaderFixedPart;
     }
 }
