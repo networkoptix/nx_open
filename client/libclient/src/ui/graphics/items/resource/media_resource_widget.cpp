@@ -436,7 +436,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     updateInfoText();
     updateDetailsText();
     updatePositionText();
-    updateCompositeOverlayMode();
     updateFisheye();
     updateStatusOverlay(false);
     updateOverlayButton();
@@ -791,16 +790,10 @@ void QnMediaResourceWidget::setupHud()
 
 void QnMediaResourceWidget::updateHud(bool animate)
 {
-    const auto compositeOverlayCouldBeVisible
-        = !options().testFlag(QnResourceWidget::InfoOverlaysForbidden);
-
-    animate &= (scene() != nullptr);
-
-    setOverlayWidgetVisible(m_compositeOverlay, compositeOverlayCouldBeVisible, animate);
-
     base_type::updateHud(animate);
-
     setOverlayWidgetVisible(m_triggersContainer, isOverlayWidgetVisible(titleBar()), animate);
+
+    updateCompositeOverlayMode();
 }
 
 void QnMediaResourceWidget::ensureTwoWayAudioWidget()
@@ -2187,20 +2180,18 @@ void QnMediaResourceWidget::updateCompositeOverlayMode()
     if (!m_compositeOverlay || m_camera.isNull())
         return;
 
-    bool visible = true;
-
     const bool isLive = (m_display && m_display->camDisplay()
         ? m_display->camDisplay()->isRealTimeSource() : false);
 
     const bool bookmarksEnabled = !isLive
         && navigator()->bookmarksModeEnabled();
 
-    if (bookmarksEnabled)
-        m_compositeOverlay->setCurrentWidget(m_bookmarksContainer);
-    else if (isLive)
-        m_compositeOverlay->setCurrentWidget(m_textOverlayWidget);
-    else
-        visible = false;
+    m_compositeOverlay->setCurrentWidget(bookmarksEnabled
+        ? m_bookmarksContainer
+        : m_textOverlayWidget);
+
+    const bool visible = !options().testFlag(QnResourceWidget::InfoOverlaysForbidden)
+        && (bookmarksEnabled || isLive);
 
     const bool animate = m_compositeOverlay->scene() != nullptr;
     setOverlayWidgetVisible(m_compositeOverlay, visible, animate);
