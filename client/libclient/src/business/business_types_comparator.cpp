@@ -18,13 +18,13 @@ bool QnBusinessTypesComparator::lexicographicalLessThan( QnBusiness::ActionType 
 
 void QnBusinessTypesComparator::initLexOrdering()
 {
-    auto helper = new QnBusinessStringsHelper(this);
+    QnBusinessStringsHelper helper(commonModule());
 
     // event types to lex order
     int maxType = 0;
     QMap<QString, int> eventTypes;
     for (auto eventType: QnBusiness::allEvents()) {
-        eventTypes.insert(helper->eventName(eventType), eventType);
+        eventTypes.insert(helper.eventName(eventType), eventType);
         if (maxType < eventType)
             maxType = eventType;
     }
@@ -38,7 +38,7 @@ void QnBusinessTypesComparator::initLexOrdering()
     maxType = 0;
     QMap<QString, int> actionTypes;
     for (auto actionType: QnBusiness::allActions()) {
-        actionTypes.insert(helper->actionName(actionType), actionType);
+        actionTypes.insert(helper.actionName(actionType), actionType);
         if (maxType < actionType)
             maxType = actionType;
     }

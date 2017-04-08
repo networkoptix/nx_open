@@ -89,5 +89,5 @@ private:
     QAction *m_clipboardAction;
     Qt::MouseButton m_lastMouseButton;
 
-    QnBusinessStringsHelper* m_helper {nullptr};
+    std::unique_ptr<QnBusinessStringsHelper> m_helper;
 };

@@ -12,7 +12,7 @@ class QnBusinessStringsHelper: public QObject, public QnCommonModuleAware
     Q_OBJECT
     using base_type = QObject;
 public:
-    QnBusinessStringsHelper(QObject* parent = nullptr);
+    QnBusinessStringsHelper(QnCommonModule* commonModule);
 
     QString actionName(QnBusiness::ActionType value) const;
 

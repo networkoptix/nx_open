@@ -79,7 +79,7 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
     base_type(parent, flags),
     QnWorkbenchContextAware(context),
     m_headerWidget(new GraphicsWidget(this)),
-    m_helper(new QnBusinessStringsHelper(this))
+    m_helper(new QnBusinessStringsHelper(commonModule()))
 {
     int maxIconSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, nullptr, nullptr);
     auto newButton = [this, maxIconSize](QnActions::IDType actionId, int helpTopicId)

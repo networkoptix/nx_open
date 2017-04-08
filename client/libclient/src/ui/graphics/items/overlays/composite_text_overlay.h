@@ -95,5 +95,5 @@ private:
 
     QnCompositeTextOverlayColors m_colors;
 
-    QnBusinessStringsHelper* m_helper;
+    std::unique_ptr<QnBusinessStringsHelper> m_helper;
 };

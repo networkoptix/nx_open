@@ -26,9 +26,9 @@
 #include <common/common_module.h>
 #include "business_event_rule.h"
 
-QnBusinessStringsHelper::QnBusinessStringsHelper(QObject* parent):
-    base_type(parent),
-    QnCommonModuleAware(parent)
+QnBusinessStringsHelper::QnBusinessStringsHelper(QnCommonModule* commonModule):
+    QObject(),
+    QnCommonModuleAware(commonModule)
 {
 }
 

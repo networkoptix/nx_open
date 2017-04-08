@@ -28,7 +28,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     m_systemHealthCheckBoxes(),
     m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this)),
     m_updating(false),
-    m_helper(new QnBusinessStringsHelper(this))
+    m_helper(new QnBusinessStringsHelper(commonModule()))
 {
     ui->setupUi(this);
 

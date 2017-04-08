@@ -80,5 +80,5 @@ private:
     QList<Column> m_columns;
     QBrush m_linkBrush;
     QScopedPointer<DataIndex> m_index;
-    QnBusinessStringsHelper* m_helper;
+    std::unique_ptr<QnBusinessStringsHelper> m_helper;
 };

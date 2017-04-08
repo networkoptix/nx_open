@@ -68,7 +68,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     m_updateDisabled(false),
     m_dirty(false),
     m_lastMouseButton(Qt::NoButton),
-    m_helper(new QnBusinessStringsHelper(this))
+    m_helper(new QnBusinessStringsHelper(commonModule()))
 {
     ui->setupUi(this);
 

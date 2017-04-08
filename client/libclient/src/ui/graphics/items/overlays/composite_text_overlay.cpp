@@ -48,7 +48,7 @@ QnCompositeTextOverlay::QnCompositeTextOverlay(const QnVirtualCameraResourcePtr 
     , m_data()
 
     , m_colors(),
-    m_helper(new QnBusinessStringsHelper(this))
+    m_helper(new QnBusinessStringsHelper(commonModule()))
 {
     m_counter.start();
     initTextMode();

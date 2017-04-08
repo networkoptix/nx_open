@@ -39,5 +39,5 @@ private:
     QMap<QnSystemHealth::MessageType, QCheckBox*> m_systemHealthCheckBoxes;
     QnBusinessEventsFilterResourcePropertyAdaptor* m_adaptor;
     bool m_updating;
-    QnBusinessStringsHelper* m_helper;
+    std::unique_ptr<QnBusinessStringsHelper> m_helper;
 };

@@ -164,7 +164,7 @@ private:
     QStandardItemModel *m_eventStatesModel;
     QStandardItemModel *m_actionTypesModel;
 
-    QnBusinessStringsHelper* m_helper;
+    std::unique_ptr<QnBusinessStringsHelper> m_helper;
 };
 
 typedef QSharedPointer<QnBusinessRuleViewModel> QnBusinessRuleViewModelPtr;

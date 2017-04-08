@@ -156,7 +156,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent)
     , m_eventTypesModel(new QStandardItemModel(this))
     , m_eventStatesModel(new QStandardItemModel(this))
     , m_actionTypesModel(new QStandardItemModel(this)),
-    m_helper(new QnBusinessStringsHelper(this))
+    m_helper(new QnBusinessStringsHelper(commonModule()))
 {
 
     QnBusinessTypesComparator lexComparator;

@@ -183,7 +183,7 @@ QnEventLogModel::QnEventLogModel(QObject* parent):
     m_columns(),
     m_linkBrush(QPalette().link()),
     m_index(new DataIndex(this)),
-    m_helper(new QnBusinessStringsHelper(this))
+    m_helper(new QnBusinessStringsHelper(commonModule()))
 {
 }
 
