@@ -404,8 +404,8 @@ QnCamLicenseUsageWatcher::QnCamLicenseUsageWatcher(const QnVirtualCameraResource
 /************************************************************************/
 /* QnCamLicenseUsageHelper                                              */
 /************************************************************************/
-QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(QObject* parent):
-    base_type(parent)
+QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(QnCommonModule* commonModule):
+    base_type(commonModule)
 {
     initWatcher();
 }
@@ -413,9 +413,9 @@ QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(QObject* parent):
 QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(
     const QnVirtualCameraResourceList& proposedCameras,
     bool proposedEnable,
-    QObject* parent)
+    QnCommonModule* commonModule)
     :
-    base_type(parent)
+    base_type(commonModule)
 {
     initWatcher();
     propose(proposedCameras, proposedEnable);
@@ -424,9 +424,9 @@ QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(
 QnCamLicenseUsageHelper::QnCamLicenseUsageHelper(
     const QnVirtualCameraResourcePtr& proposedCamera,
     bool proposedEnable,
-    QObject* parent)
-    :
-    base_type(parent)
+    QnCommonModule* commonModule)
+:
+    base_type(commonModule)
 {
     initWatcher(proposedCamera);
     propose(proposedCamera, proposedEnable);
@@ -520,7 +520,7 @@ QnSingleCamLicenceStatusHelper::QnSingleCamLicenceStatusHelper(
     if (!camera)
         return;
 
-    m_helper.reset(new QnCamLicenseUsageHelper(camera, true));
+    m_helper.reset(new QnCamLicenseUsageHelper(camera, true, camera->commonModule()));
     connect(m_helper, &QnCamLicenseUsageHelper::licenseUsageChanged,
         this, &QnSingleCamLicenceStatusHelper::licenceStatusChanged);
 }

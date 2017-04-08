@@ -40,7 +40,7 @@ QnLicensesProposeWidget::QnLicensesProposeWidget(QWidget *parent):
             updateLicenseText();
         };
 
-    QnCamLicenseUsageHelper helper(this);
+    QnCamLicenseUsageHelper helper(commonModule());
     ui->licensesUsageWidget->init(&helper);
 
     QnCamLicenseUsageWatcher* camerasUsageWatcher = new QnCamLicenseUsageWatcher(this);
@@ -65,7 +65,7 @@ void QnLicensesProposeWidget::updateLicenseText()
     if (isUpdating())
         return;
 
-    QnCamLicenseUsageHelper helper(this);
+    QnCamLicenseUsageHelper helper(commonModule());
 
     switch (ui->useLicenseCheckBox->checkState())
     {

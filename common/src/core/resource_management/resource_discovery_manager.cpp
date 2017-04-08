@@ -768,6 +768,8 @@ void QnResourceDiscoveryManager::updateSearchersUsage()
 
 void QnResourceDiscoveryManager::addResourcesImmediatly(QnResourceList& resources)
 {
+    for (const auto& resource: resources)
+        resource->setCommonModule(commonModule());
     processDiscoveredResources(resources, SearchType::Partial);
     m_resourceProcessor->processResources(resources);
 }

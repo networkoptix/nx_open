@@ -257,7 +257,7 @@ void QnLicenseManagerWidget::updateLicenses()
 
         QStringList messages;
 
-        QnCamLicenseUsageHelper camUsageHelper(this);
+        QnCamLicenseUsageHelper camUsageHelper(commonModule());
         QnVideoWallLicenseUsageHelper vwUsageHelper(this);
         QList<QnLicenseUsageHelper*> helpers{ &camUsageHelper, &vwUsageHelper };
 

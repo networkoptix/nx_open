@@ -105,7 +105,7 @@ public:
     {
         auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(selected);
 
-        QnCamLicenseUsageHelper helper(cameras, m_recordingEnabled);
+        QnCamLicenseUsageHelper helper(cameras, m_recordingEnabled, commonModule());
 
         QPalette palette = m_parentPalette;
         bool licensesOk = helper.isValid();
@@ -210,7 +210,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget* parent):
         &QnCameraScheduleWidget::updateColors);
     updateColors();
 
-    QnCamLicenseUsageHelper helper(this);
+    QnCamLicenseUsageHelper helper(commonModule());
     ui->licensesUsageWidget->init(&helper);
 
     QnCheckbox::autoCleanTristate(ui->enableRecordingCheckBox);
@@ -807,7 +807,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QnScheduleTaskList& value)
 
 bool QnCameraScheduleWidget::canEnableRecording() const
 {
-    QnCamLicenseUsageHelper licenseHelper(m_cameras, true);
+    QnCamLicenseUsageHelper licenseHelper(m_cameras, true, commonModule());
     return all_of(m_cameras,
         [&licenseHelper](const QnVirtualCameraResourcePtr& camera)
         {
@@ -930,7 +930,7 @@ void QnCameraScheduleWidget::updateGridEnabledState()
 
 void QnCameraScheduleWidget::updateLicensesLabelText()
 {
-    QnCamLicenseUsageHelper helper(this);
+    QnCamLicenseUsageHelper helper(commonModule());
 
     switch (ui->enableRecordingCheckBox->checkState())
     {
