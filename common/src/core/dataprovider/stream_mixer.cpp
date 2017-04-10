@@ -38,8 +38,9 @@ void QnStreamMixer::addDataSource(QnAbstractStreamDataProviderPtr& source)
     {
         QnProviderChannelInfo info;
         info.provider = source;
-
         m_sourceMap[sourceId] = info;
+
+        lock.unlock();
         source->addDataProcessor(this);
     }
     
@@ -52,8 +53,10 @@ void QnStreamMixer::removeDataSource(QnAbstractStreamDataProvider* source)
     
     if (m_sourceMap.contains(sourceId))
     {
-        m_sourceMap[sourceId].provider->removeDataProcessor(this);
         m_sourceMap.remove(sourceId);
+
+        lock.unlock();
+        source->removeDataProcessor(this);
     }
 
 }
