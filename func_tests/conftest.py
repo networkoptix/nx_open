@@ -7,6 +7,7 @@ import sys
 import os.path
 import logging
 import pytest
+from netaddr import IPNetwork
 from test_utils.utils import SimpleNamespace
 from test_utils.session import TestSession
 from test_utils.customization import read_customization_company_name
@@ -15,7 +16,7 @@ from test_utils.host import SshHostConfig
 from test_utils.vagrant_box_config import BoxConfigFactory
 from test_utils.cloud_host import resolve_cloud_host_from_registry, create_cloud_host
 from test_utils.server import ServerConfigFactory
-from test_utils.camera import SampleMediaFile, Camera
+from test_utils.camera import SampleMediaFile, CameraFactory
 
 
 DEFAULT_CLOUD_GROUP = 'test'
@@ -33,6 +34,7 @@ DEFAULT_VM_HOST_DIR = '/tmp/jenkins-test'
 DEFAULT_MAX_LOG_WIDTH = 500
 
 MEDIA_SAMPLE_FPATH = 'sample.mkv'
+MEDIA_STREAM_FPATH = 'sample.testcam-stream.data'
 
 
 log = logging.getLogger(__name__)
@@ -51,7 +53,9 @@ def pytest_addoption(parser):
                      help='directory with binary files for tests:'
                           ' debian distributive and media sample are expected there')
     parser.addoption('--media-sample-path', default=MEDIA_SAMPLE_FPATH,
-                     help='media sample file path, default is %s in binany directory' % MEDIA_SAMPLE_FPATH)
+                     help='media sample file path, default is %s at binary directory' % MEDIA_SAMPLE_FPATH)
+    parser.addoption('--media-stream-path', default=MEDIA_STREAM_FPATH,
+                     help='media sample test camera stream file path, default is %s at binary directory' % MEDIA_STREAM_FPATH)
     parser.addoption('--no-servers-reset', action='store_true',
                      help='skip servers reset/cleanup on test setup')
     parser.addoption('--recreate-boxes', action='store_true',
@@ -60,6 +64,10 @@ def pytest_addoption(parser):
                      help='prefix for virtualenv machine names')
     parser.addoption('--vm-port-base', type=int, default=DEFAULT_REST_API_FORWARDED_PORT_BASE,
                      help='base REST API port forwarded to host')
+    parser.addoption('--vm-bind-network', required=True, type=IPNetwork,
+                     help='Format: 10.20.0/24. Network to bind to virtual machine NaT interfaces.'
+                      ' Different virtual mechines will be distinguished by camera discoverer'
+                      ' by binding them to different IP addresses from this network')
     parser.addoption('--vm-host',
                      help='hostname or IP address for host with virtualbox,'
                           ' used to start virtual machines (by default it is local host)')
@@ -88,10 +96,12 @@ def run_options(request):
         work_dir=request.config.getoption('--work-dir'),
         bin_dir=request.config.getoption('--bin-dir'),
         media_sample_path=request.config.getoption('--media-sample-path'),
+        media_stream_path=request.config.getoption('--media-stream-path'),
         reset_servers=not request.config.getoption('--no-servers-reset'),
         recreate_boxes=request.config.getoption('--recreate-boxes'),
         vm_name_prefix=request.config.getoption('--vm-name-prefix'),
         vm_port_base=request.config.getoption('--vm-port-base'),
+        vm_bind_network=request.config.getoption('--vm-bind-network'),
         vm_ssh_host_config=vm_ssh_host_config,
         vm_host_work_dir=request.config.getoption('--vm-host-dir'),
         max_log_width=request.config.getoption('--max-log-width'),
@@ -130,8 +140,16 @@ def cloud_host(run_options, cloud_host_host):
 
 
 @pytest.fixture
-def camera():
-    return Camera()
+def camera_factory(run_options):
+    stream_path = os.path.abspath(os.path.join(run_options.bin_dir, run_options.media_stream_path))
+    assert os.path.isfile(stream_path), '%s is expected at %s' % (os.path.basename(stream_path), os.path.dirname(stream_path))
+    factory = CameraFactory(stream_path)
+    yield factory
+    factory.close()
+
+@pytest.fixture
+def camera(camera_factory):
+    return camera_factory()
 
 
 @pytest.fixture

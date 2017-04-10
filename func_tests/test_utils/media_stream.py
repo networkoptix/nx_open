@@ -123,7 +123,7 @@ class RtspMediaStream(object):
 
 def load_stream_metadata_from_http(stream_type, url, user, password, params, temp_file_path):
     log.info('%s request: %r, user=%r, password=%r, %s',
-             stream_type.upper(), password, url, user, ', '.join(str(p) for p in params))
+             stream_type.upper(), url, user, password, ', '.join(str(p) for p in params))
     response = requests.get(url, auth=HTTPDigestAuth(user, password), params=params, stream=True)
     return load_stream_metadata_from_http_response(stream_type, response, temp_file_path)
 

@@ -20,11 +20,11 @@ def env(env_builder, server):
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/23920667/Media+stream+loading+test
 def test_media_stream_should_be_loaded_correctly(env, camera, sample_media_file, stream_type):
     # prepare media archive
-    camera_id = env.server.add_camera(camera)
+    env.server.add_camera(camera)
     start_time = datetime(2017, 1, 27, tzinfo=pytz.utc)
     env.server.storage.save_media_sample(camera, start_time, sample_media_file)
     env.server.rebuild_archive()
-    assert [TimePeriod(start_time, sample_media_file.duration)] == env.server.get_recorded_time_periods(camera_id)
+    assert [TimePeriod(start_time, sample_media_file.duration)] == env.server.get_recorded_time_periods(camera)
 
     # load stream
     stream = env.server.get_media_stream(stream_type, camera)
@@ -34,6 +34,3 @@ def test_media_stream_should_be_loaded_correctly(env, camera, sample_media_file,
     for metadata in metadata_list:
         assert metadata.width == sample_media_file.width
         assert metadata.height == sample_media_file.height
-
-    camera_info_list = env.server.rest_api.ec2.getCamerasEx.GET()
-    # todo: check mediastream atrributes after test camera support is added
