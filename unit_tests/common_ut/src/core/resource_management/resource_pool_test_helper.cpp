@@ -97,7 +97,7 @@ QnVideoWallResourcePtr QnResourcePoolTestHelper::addVideoWall()
 
 QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer()
 {
-    QnMediaServerResourcePtr server(new QnMediaServerResource());
+    QnMediaServerResourcePtr server(new QnMediaServerResource(commonModule()));
     server->setId(QnUuid::createUuid());
     resourcePool()->addResource(server);
     return server;

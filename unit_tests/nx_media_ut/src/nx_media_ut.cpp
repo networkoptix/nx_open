@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/log/log.h>
+
+#include <common/common_module.h>
 #include <common/common_globals.h>
 
 #include <nx/media/abstract_video_decoder.h>
@@ -35,12 +37,22 @@ static std::string qSizeToStdString(const QSize& size)
 class TestPlayer: public Player
 {
 public:
-    TestPlayer(QnArchiveStreamReader* archiveReader)
+    TestPlayer(QnArchiveStreamReader* archiveReader, QnCommonModule* commonModule):
+        m_module(commonModule)
     {
         testSetOwnedArchiveReader(archiveReader);
     }
 
     using Player::testSetCamera;
+
+protected:
+    virtual QnCommonModule* commonModule() const override
+    {
+        return m_module;
+    }
+
+private:
+    QnCommonModule* m_module;
 };
 
 class MockVideoDecoder: public AbstractVideoDecoder
@@ -108,7 +120,8 @@ QSize MockVideoDecoder::s_maxTranscodedResolution{};
 class MockServer: public QnMediaServerResource
 {
 public:
-    MockServer()
+    MockServer(QnCommonModule* commonModule):
+        QnMediaServerResource(commonModule)
     {
         setId(QnUuid::createUuid());
     }
@@ -290,14 +303,14 @@ class PlayerSetQualityTest
 public:
     PlayerSetQualityTest()
     {
-        QnResourcePool::instance()->clear(); //< Just in case.
-        QnResourcePool::instance()->addResource(m_server);
-        QnResourcePool::instance()->addResource(m_camera);
+        m_module->resourcePool()->clear(); //< Just in case.
+        m_module->resourcePool()->addResource(m_server);
+        m_module->resourcePool()->addResource(m_camera);
     }
 
     ~PlayerSetQualityTest()
     {
-        QnResourcePool::instance()->clear();
+        m_module->resourcePool()->clear();
     }
 
     // Can be called multiple times.
@@ -397,7 +410,9 @@ private:
     }
 
 private:
-    QnSharedResourcePointer<MockServer> m_server{new MockServer()};
+    std::unique_ptr<QnCommonModule> m_module{new QnCommonModule(true)};
+
+    QnSharedResourcePointer<MockServer> m_server{new MockServer(m_module.get())};
 
     QnSharedResourcePointer<MockCamera> m_camera{new MockCamera(m_server->getId())};
 
@@ -409,7 +424,7 @@ private:
         }
     )};
 
-    std::unique_ptr<TestPlayer> m_player{new TestPlayer(m_archiveReader)};
+    std::unique_ptr<TestPlayer> m_player{new TestPlayer(m_archiveReader, m_module.get())};
 
     bool m_calledSetQuality;
 
@@ -426,7 +441,7 @@ protected:
     static void SetUpTestCase()
     {
         // Init singletons.
-        m_common = new QnCommonModule();
+        m_common = new QnCommonModule(true);
         m_common->setModuleGUID(QnUuid::createUuid());
         m_common->store(new QnFfmpegInitializer());
 
