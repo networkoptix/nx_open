@@ -7,7 +7,7 @@
 
 #include <rest/server/request_handler.h>
 #include <rest/server/rest_connection_processor.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/httptypes.h>
 

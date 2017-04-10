@@ -12,7 +12,7 @@
 
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 #include <nx/utils/timer_manager.h>

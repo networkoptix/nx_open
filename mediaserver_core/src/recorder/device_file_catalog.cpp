@@ -30,7 +30,7 @@
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
-#include "utils/common/concurrent.h"
+#include <nx/utils/concurrent.h>
 #include "storage_db_pool.h"
 
 QnMutex DeviceFileCatalog::m_rebuildMutex;

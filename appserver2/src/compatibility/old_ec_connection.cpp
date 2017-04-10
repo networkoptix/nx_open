@@ -5,7 +5,7 @@
 
 #include "old_ec_connection.h"
 
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <utils/common/scoped_thread_rollback.h>
 
 #include "ec2_thread_pool.h"

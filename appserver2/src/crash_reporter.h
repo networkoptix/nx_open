@@ -3,7 +3,7 @@
 
 #include "ec2_statictics_reporter.h"
 
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <nx/utils/thread/mutex.h>
 
 #include <QDir>

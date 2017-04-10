@@ -9,7 +9,7 @@
 #include <nx/network/system_socket.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 
 #include <QDateTime>
 

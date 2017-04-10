@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 
 #include "ec2_thread_pool.h"
 #include "fixed_url_client_query_processor.h"
