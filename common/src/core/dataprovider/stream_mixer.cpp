@@ -185,14 +185,18 @@ void QnStreamMixer::proxyOpenStream(
     bool /*isCameraControlRequired*/,
     const QnLiveStreamParams& /*params*/)
 {
-    QnMutexLocker lock(&m_mutex);
+    decltype(m_sourceMap) sourceMap;
+    {
+        QnMutexLocker lock(&m_mutex);
+        sourceMap = m_sourceMap;
+    }
 
-    std::vector<QnAbstractStreamDataProviderPtr> sources;
-    for (auto& source: m_sourceMap)
+    for (auto& source: sourceMap)
     {
         if (source.provider)
         {
-            sources.push_back(source.provider);
+            source.provider->stop();
+            source.provider->startIfNotRunning();
         }
         else
         {
@@ -203,29 +207,21 @@ void QnStreamMixer::proxyOpenStream(
             qDebug() << lit("Stream mixer, where is source's provider?");
         }
     }
-
-    lock.unlock();
-    for (const auto& s: sources)
-    {
-        s->stop();
-        s->startIfNotRunning();
-    }
 }
 
 void QnStreamMixer::proxyCloseStream()
 {
-    QnMutexLocker lock(&m_mutex);
-
-    std::vector<QnAbstractStreamDataProviderPtr> sources;
-    for (auto& source: m_sourceMap)
+    decltype(m_sourceMap) sourceMap;
     {
-        if (source.provider)
-            sources.push_back(source.provider);
+        QnMutexLocker lock(&m_mutex);
+        sourceMap = m_sourceMap;
     }
 
-    lock.unlock();
-    for (const auto& s: sources)
-        s->pleaseStop();
+    for (auto& source: sourceMap)
+    {
+        if (source.provider)
+            source.provider->pleaseStop();
+    }
 }
 
 QnAbstractMediaDataPtr QnStreamMixer::retrieveData()
@@ -249,9 +245,13 @@ QnAbstractMediaDataPtr QnStreamMixer::retrieveData()
 
 bool QnStreamMixer::isStreamOpened() const
 {
-    QnMutexLocker lock(&m_mutex);
+    decltype(m_sourceMap) sourceMap;
+    {
+        QnMutexLocker lock(&m_mutex);
+        sourceMap = m_sourceMap;
+    }
 
-    for (const auto& source: m_sourceMap)
+    for (const auto& source: sourceMap)
     {
         if (!source.provider)
         {
@@ -267,11 +267,8 @@ bool QnStreamMixer::isStreamOpened() const
             continue;
         }
 
-        {
-            QnMutexUnlocker unlocker(&lock);
-            if (mediaStreamProvider->isStreamOpened())
-                return true;
-        }
+        if (mediaStreamProvider->isStreamOpened())
+            return true;
     }
 
     return false;
