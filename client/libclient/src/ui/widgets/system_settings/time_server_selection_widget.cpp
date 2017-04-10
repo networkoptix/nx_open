@@ -8,6 +8,8 @@
 #include <api/app_server_connection.h>
 #include <api/runtime_info_manager.h>
 
+#include <common/common_module.h>
+
 #include <nx_ec/data/api_runtime_data.h>
 
 #include <ui/delegates/resource_item_delegate.h>
@@ -160,7 +162,7 @@ void QnTimeServerSelectionWidget::loadDataToUi()
 
 void QnTimeServerSelectionWidget::applyChanges()
 {
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule()->ec2Connection();
     if (!connection)
         return;
 
@@ -188,7 +190,7 @@ QnUuid QnTimeServerSelectionWidget::selectedServer() const
 {
     PRINT_DEBUG("check selected server by runtime info");
 
-    for (const auto& runtimeInfo : qnRuntimeInfoManager->items()->getItems())
+    for (const auto& runtimeInfo : runtimeInfoManager()->items()->getItems())
     {
         if (runtimeInfo.data.peer.peerType != Qn::PT_Server)
             continue;

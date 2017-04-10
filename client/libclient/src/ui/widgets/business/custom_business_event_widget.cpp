@@ -36,7 +36,7 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget *parent) :
     ui->hintLabel->setTextFormat(Qt::RichText);
     ui->hintLabel->setText(lit("%1<hr/>%2").arg(description, documentationHint));
     connect(ui->hintLabel,  &QnWordWrappedLabel::linkActivated, this, [this] {
-        auto server = qnCommon->currentServer();
+        auto server = commonModule()->currentServer();
         if (!server)
             return;
 

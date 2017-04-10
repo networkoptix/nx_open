@@ -3,12 +3,15 @@
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
 
+#include <licensing/license_validator.h>
+
 #include <ui/models/license_list_model.h>
 #include <ui/style/custom_style.h>
 
 
 QnLicenseListItemDelegate::QnLicenseListItemDelegate(QObject* parent, bool invalidLicensesDimmed):
     base_type(parent),
+    m_validator(new QnLicenseValidator(this)),
     m_invalidLicensesDimmed(invalidLicensesDimmed)
 {
 }
@@ -46,7 +49,7 @@ void QnLicenseListItemDelegate::initStyleOption(QStyleOptionViewItem* option, co
 
     if (auto license = index.data(QnLicenseListModel::LicenseRole).value<QnLicensePtr>())
     {
-        if (!license->isValid())
+        if (!m_validator->isValid(license))
             option->state &= ~QStyle::State_Enabled;
     }
 }

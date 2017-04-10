@@ -52,14 +52,14 @@ QnReconnectHelper::InterfaceInfo::InterfaceInfo():
 
 QnReconnectHelper::QnReconnectHelper(QObject *parent /* = NULL*/):
     QObject(parent),
-    m_currentServer(qnCommon->currentServer()),
-    m_currentUrl(QnAppServerConnectionFactory::url())
+    m_currentServer(commonModule()->currentServer()),
+    m_currentUrl(commonModule()->currentUrl())
 {
     m_userName = m_currentUrl.userName();
     m_password = m_currentUrl.password();
 
     /* List of all known servers. Should not be updated as we are disconnected. */
-    m_allServers = qnResPool->getResources<QnMediaServerResource>();
+    m_allServers = resourcePool()->getResources<QnMediaServerResource>();
     if (m_currentServer && !m_allServers.contains(m_currentServer))
         m_allServers << m_currentServer;
 
@@ -177,7 +177,7 @@ void QnReconnectHelper::updateInterfacesForServer(const QnUuid &id)
     if (iter == boost::end(modules))
         return;
 
-    if (!helpers::serverBelongsToCurrentSystem(*iter))
+    if (!helpers::serverBelongsToCurrentSystem(*iter, commonModule()))
     {
         printLog("Server has another system ID: " + iter->localSystemId.toByteArray());
         for (InterfaceInfo &item: interfaces)

@@ -1,5 +1,7 @@
 #include "client_core_camera.h"
 
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/status_dictionary.h>
 #include <core/resource/camera_user_attribute_pool.h>
@@ -28,7 +30,12 @@ void QnClientCoreCamera::setName(const QString& name)
     }
 
     {
-        QnCameraUserAttributePool::ScopedLock userAttributesLock(QnCameraUserAttributePool::instance(), getId());
+        if (!commonModule())
+            return;
+
+        QnCameraUserAttributePool::ScopedLock userAttributesLock(
+            commonModule()->cameraUserAttributesPool(), getId());
+
         if ((*userAttributesLock)->name == name)
             return;
         (*userAttributesLock)->name = name;
@@ -49,11 +56,15 @@ void QnClientCoreCamera::setIframeDistance(int frames, int timems) {
     Q_UNUSED(timems)
 }
 
-Qn::ResourceStatus QnClientCoreCamera::getStatus() const {
-    Qn::ResourceStatus serverStatus = qnStatusDictionary->value(getParentId());
-    if (serverStatus == Qn::Offline || serverStatus == Qn::Unauthorized)
-        return Qn::Offline;
-
+Qn::ResourceStatus QnClientCoreCamera::getStatus() const
+{
+    if (auto context = commonModule())
+    {
+        Qn::ResourceStatus serverStatus =
+            context->statusDictionary()->value(getParentId());
+        if (serverStatus == Qn::Offline || serverStatus == Qn::Unauthorized)
+            return Qn::Offline;
+    }
     return QnResource::getStatus();
 }
 

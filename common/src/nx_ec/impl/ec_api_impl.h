@@ -217,11 +217,13 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER(GetKvPairs,                  ec2::ErrorCode, ec2::ApiResourceParamWithRefDataList)
         DEFINE_TWO_ARG_HANDLER(GetStatusList,               ec2::ErrorCode, ec2::ApiResourceStatusDataList)
         DEFINE_TWO_ARG_HANDLER(SaveKvPairs,                 ec2::ErrorCode, ec2::ApiResourceParamWithRefDataList)
+        DEFINE_TWO_ARG_HANDLER(GetMiscParam,                ec2::ErrorCode, ec2::ApiMiscData)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractMediaServerManager
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER(GetServers,                  ec2::ErrorCode, ec2::ApiMediaServerDataList)
+        DEFINE_TWO_ARG_HANDLER(GetServersEx,                ec2::ErrorCode, ec2::ApiMediaServerDataExList)
         DEFINE_TWO_ARG_HANDLER(GetServerUserAttributes,     ec2::ErrorCode, ec2::ApiMediaServerUserAttributesDataList)
         DEFINE_TWO_ARG_HANDLER(GetStorages,                 ec2::ErrorCode, ec2::ApiStorageDataList)
 
@@ -229,6 +231,7 @@ namespace ec2
         ///////// Handlers for AbstractCameraManager
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER(GetCameras,                  ec2::ErrorCode, ec2::ApiCameraDataList)
+        DEFINE_TWO_ARG_HANDLER(GetCamerasEx,                ec2::ErrorCode, ec2::ApiCameraDataExList)
         DEFINE_TWO_ARG_HANDLER(GetCameraUserAttributes,     ec2::ErrorCode, ec2::ApiCameraAttributesDataList)
         DEFINE_TWO_ARG_HANDLER(GetCamerasHistory,           ec2::ErrorCode, ec2::ApiServerFootageDataList)
 

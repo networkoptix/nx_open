@@ -5,6 +5,8 @@
 
 #include <nx/utils/log/log.h>
 
+#include <common/common_module.h>
+
 #include "client/client_settings.h"
 #include "api/app_server_connection.h"
 
@@ -93,7 +95,7 @@ void QnDatabaseManagementWidget::backupDb()
             databaseData = dbData.data;
             dialog->reset();
         };
-    QnAppServerConnectionFactory::getConnection2()->dumpDatabaseAsync(dialog.data(), dumpDatabaseHandler);
+    commonModule()->ec2Connection()->dumpDatabaseAsync(dialog.data(), dumpDatabaseHandler);
     dialog->exec();
     if (dialog->wasCanceled())
         return;    //TODO: #ak is running request finish OK?
@@ -167,7 +169,7 @@ void QnDatabaseManagementWidget::restoreDb()
             errorCode = _errorCode;
             dialog->reset();
         };
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
     if (!conn)
     {
         QnMessageBox::critical(this, tr("You need to connect to a server prior to backup start."));

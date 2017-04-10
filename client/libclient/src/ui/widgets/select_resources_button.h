@@ -2,13 +2,15 @@
 
 #include <QtWidgets/QPushButton>
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource/resource_fwd.h>
 
 /**
 * Base class for push buttons displaying currently selected resources.
 * It's supposed that click on these buttons will invoke resource selection by the user.
 */
-class QnSelectResourcesButton : public QPushButton
+class QnSelectResourcesButton : public QPushButton, public QnConnectionContextAware
 {
     Q_OBJECT
     using base_type = QPushButton;

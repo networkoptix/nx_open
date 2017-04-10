@@ -15,8 +15,13 @@
 class RevealRequest
 {
 public:
-    static QByteArray serialize();
+    RevealRequest(const QnUuid& moduleGuid, Qn::PeerType peerType);
+
+    QByteArray serialize();
     static bool isValid(const quint8 *bufStart, const quint8 *bufEnd);
+private:
+    const QnUuid m_moduleGuid;
+    const Qn::PeerType m_peerType;
 };
 
 typedef QMap<QString, QString> TypeSpecificParamMap;

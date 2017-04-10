@@ -2,12 +2,14 @@
 
 #include <core/resource/storage_resource.h>
 
-class QnStorageResourceStub: public QnStorageResource
+namespace nx {
+
+class StorageResourceStub: public QnStorageResource
 {
     using base_type = QnStorageResource;
 public:
-    QnStorageResourceStub();
-    virtual ~QnStorageResourceStub();
+    StorageResourceStub();
+    virtual ~StorageResourceStub();
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
     virtual Qn::StorageInitResult initOrUpdate() override;
@@ -24,3 +26,4 @@ public:
     virtual int getCapabilities() const override;
 };
 
+} // namespace nx

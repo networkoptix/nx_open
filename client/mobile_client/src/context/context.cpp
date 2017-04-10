@@ -13,6 +13,7 @@
 #include <mobile_client/mobile_client_settings.h>
 #include <mobile_client/mobile_client_app_info.h>
 #include <mobile_client/mobile_client_ui_controller.h>
+#include <mobile_client/mobile_client_module.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
 #include <watchers/user_watcher.h>
@@ -62,7 +63,7 @@ QnContext::QnContext(QObject* parent) :
     {
         const bool compatibilityMode =
             m_connectionManager->connectionVersion() < kUserRightsRefactoredVersion;
-        const auto camerasWatcher = qnCommon->instance<QnAvailableCamerasWatcher>();
+        const auto camerasWatcher = commonModule()->instance<QnAvailableCamerasWatcher>();
         camerasWatcher->setCompatiblityMode(compatibilityMode);
     });
 
@@ -89,12 +90,12 @@ QnContext::~QnContext() {}
 
 QnCloudStatusWatcher* QnContext::cloudStatusWatcher() const
 {
-    return qnCommon->instance<QnCloudStatusWatcher>();
+    return commonModule()->instance<QnCloudStatusWatcher>();
 }
 
 QnUserWatcher* QnContext::userWatcher() const
 {
-    return qnCommon->instance<QnUserWatcher>();
+    return commonModule()->instance<QnUserWatcher>();
 }
 
 QmlSettingsAdaptor* QnContext::settings() const

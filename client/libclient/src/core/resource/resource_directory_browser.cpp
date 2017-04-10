@@ -4,6 +4,10 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QThread>
 
+
+#include <common/common_module.h>
+#include <client_core/client_core_module.h>
+
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/proto_message.h>
 #include <nx/utils/log/log.h>
@@ -38,17 +42,23 @@ namespace {
 
 QnResourceDirectoryBrowser::QnResourceDirectoryBrowser(QObject* parent) :
     base_type(parent),
+    QnAbstractResourceSearcher(qnClientCoreModule->commonModule()),
+    QnAbstractFileResourceSearcher(qnClientCoreModule->commonModule()),
     m_resourceReady(false)
-{}
+{
+}
 
-QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) {
+QnResourcePtr QnResourceDirectoryBrowser::createResource(const QnUuid &resourceTypeId,
+    const QnResourceParams& params)
+{
     QnResourcePtr result;
 
     if (!isResourceTypeSupported(resourceTypeId)) {
         return result;
     }
 
-    result = createArchiveResource(params.url);
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    result = createArchiveResource(params.url, resourcePool);
     result->setTypeId(resourceTypeId);
 
     return result;
@@ -100,7 +110,8 @@ QnResourceList QnResourceDirectoryBrowser::findResources()
 
 QnResourcePtr QnResourceDirectoryBrowser::checkFile(const QString &filename) const
 {
-    return resourceFromFile(filename);
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    return resourceFromFile(filename, resourcePool); //TODO: #GDM #3.1 refactor all the scheme. Adding must not be here
 }
 
 // =============================================================================================
@@ -120,7 +131,7 @@ void QnResourceDirectoryBrowser::findResources(const QString& directory, QnResou
             if (absoluteFilePath != directory)
                 findResources(absoluteFilePath, result);
         } else {
-            QnResourcePtr res = createArchiveResource(absoluteFilePath);
+            QnResourcePtr res = createArchiveResource(absoluteFilePath, resourcePool());
             if (res) {
                 if (res->getId().isNull() && !res->getUniqueId().isEmpty())
                     res->setId(guidFromArbitraryData(res->getUniqueId().toUtf8())); //create same IDs for the same files
@@ -130,9 +141,10 @@ void QnResourceDirectoryBrowser::findResources(const QString& directory, QnResou
     }
 }
 
-QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& filename)
+QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& filename,
+    QnResourcePool* resourcePool)
 {
-    QnLayoutFileStorageResource layoutStorage;
+    QnLayoutFileStorageResource layoutStorage(qnClientCoreModule->commonModule());
     layoutStorage.setUrl(filename);
     QScopedPointer<QIODevice> layoutFile(layoutStorage.open(lit("layout.pb"), QIODevice::ReadOnly));
     if (!layoutFile)
@@ -166,7 +178,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     }
 
     QnUuid layoutId = guidFromArbitraryData(filename);
-    QnLayoutResourcePtr existingLayout = qnResPool->getResourceById<QnLayoutResource>(layoutId);
+    QnLayoutResourcePtr existingLayout = resourcePool->getResourceById<QnLayoutResource>(layoutId);
     if (existingLayout)
         return existingLayout;
     layout->setId(layoutId);
@@ -236,7 +248,7 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
             path += lit(".mkv");
         item.resource.uniqueId = QnLayoutFileStorageResource::itemUniqueId(filename, path);
 
-        QnStorageResourcePtr storage(new QnLayoutFileStorageResource());
+        QnStorageResourcePtr storage(new QnLayoutFileStorageResource(qnClientCoreModule->commonModule()));
         storage->setUrl(filename);
 
         QnAviResourcePtr aviResource(new QnAviResource(item.resource.uniqueId));
@@ -252,8 +264,9 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
         if (timeZoneOffset != Qn::InvalidUtcOffset)
             aviResource->setTimeZoneOffset(timeZoneOffset);
 
-        qnResPool->addResource(aviResource);
-        aviResource = qnResPool->getResourceByUniqueId<QnAviResource>(aviResource->getUniqueId()); // It may have already been in the pool!
+        auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+        resourcePool->addResource(aviResource);
+        aviResource = resourcePool->getResourceByUniqueId<QnAviResource>(aviResource->getUniqueId()); // It may have already been in the pool!
         if (!aviResource)
         {
             qnWarning("ACHTUNG! Total mess up in exported layout loading!");
@@ -298,16 +311,18 @@ QnLayoutResourcePtr QnResourceDirectoryBrowser::layoutFromFile(const QString& fi
     return layout;
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::resourceFromFile(const QString &filename)
+QnResourcePtr QnResourceDirectoryBrowser::resourceFromFile(const QString &filename,
+    QnResourcePool* resourcePool)
 {
     QFile file(filename);
     if (!file.exists())
         return QnResourcePtr();
 
-    return createArchiveResource(filename);
+    return createArchiveResource(filename, resourcePool);
 }
 
-QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& filename)
+QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& filename,
+    QnResourcePool* resourcePool)
 {
     if (QnAviDvdResource::isAcceptedUrl(filename))
         return QnResourcePtr(new QnAviDvdResource(filename));
@@ -327,7 +342,7 @@ QnResourcePtr QnResourceDirectoryBrowser::createArchiveResource(const QString& f
     }
 
     if (FileTypeSupport::isLayoutFileExt(filename))
-        return layoutFromFile(filename);
+        return layoutFromFile(filename, resourcePool);
 
     return QnResourcePtr();
 }

@@ -3,8 +3,8 @@
 #include <core/resource_management/incompatible_server_watcher.h>
 #include <core/resource/client_camera_factory.h>
 
-QnDesktopClientMessageProcessor::QnDesktopClientMessageProcessor() :
-    base_type(),
+QnDesktopClientMessageProcessor::QnDesktopClientMessageProcessor(QObject* parent):
+    base_type(parent),
     m_incompatibleServerWatcher(new QnIncompatibleServerWatcher(this))
 {
     connect(this, &QnClientMessageProcessor::connectionClosed,

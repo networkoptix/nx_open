@@ -1,23 +1,21 @@
-
 #pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 
-#include <nx/utils/singleton.h>
+#include <common/common_module_aware.h>
+
 #include <utils/common/connective.h>
 #include <statistics/statistics_fwd.h>
 #include <api/server_rest_connection_fwd.h>
 
 #include <nx/utils/uuid.h>
 
-class QnStatisticsManager : public Connective<QObject>
-    , public Singleton<QnStatisticsManager>
+class QnStatisticsManager: public Connective<QObject>, public QnCommonModuleAware
 {
     Q_OBJECT
 
-    typedef Connective<QObject> base_type;
-
+    using base_type = Connective<QObject>;
 public:
     QnStatisticsManager(QObject *parent = nullptr);
 
@@ -37,7 +35,7 @@ public:
     /*!
      *  Sets settings source. Note: it will takes ownership under settings object
      */
-    void setSettings(QnStatisticsSettingsPtr settings);
+    void setSettings(QnStatisticsLoaderPtr settings);
 
 public:
     void sendStatistics();
@@ -64,10 +62,8 @@ private:
 
     rest::Handle m_handle;
 
-    QnStatisticsSettingsPtr m_settings;
+    QnStatisticsLoaderPtr m_settings;
     QnStatisticsStoragePtr m_storage;
 
     ModulesMap m_modules;
 };
-
-#define qnStatisticsManager QnStatisticsManager::instance()

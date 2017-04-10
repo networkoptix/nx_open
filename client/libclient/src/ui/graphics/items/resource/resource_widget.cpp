@@ -131,7 +131,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setTransformOrigin(Center);
 
     /* Initialize resource. */
-    m_resource = qnResPool->getResourceByUniqueId(item->resourceUid());
+    m_resource = resourcePool()->getResourceByUniqueId(item->resourceUid());
     connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
     connect(m_resource, &QnResource::statusChanged, this,
         [this]
@@ -173,7 +173,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setOverlayWidgetVisible(m_statusOverlay, false, false);
 
     /* Initialize resource. */
-    m_resource = qnResPool->getResourceByUniqueId(item->resourceUid());
+    m_resource = resourcePool()->getResourceByUniqueId(item->resourceUid());
     connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
     setChannelLayout(qn_resourceWidget_defaultContentLayout);
 

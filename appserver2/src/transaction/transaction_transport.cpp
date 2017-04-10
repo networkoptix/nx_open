@@ -1,5 +1,6 @@
-
 #include "transaction_transport.h"
+
+#include <common/common_module.h>
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
@@ -12,6 +13,7 @@
 namespace ec2 {
 
 QnTransactionTransport::QnTransactionTransport(
+    QnCommonModule* commonModule,
     const QnUuid& connectionGuid,
     ConnectionLockGuard connectionLockGuard,
     const ApiPeerData& localPeer,
@@ -22,7 +24,9 @@ QnTransactionTransport::QnTransactionTransport(
     const QByteArray& contentEncoding,
     const Qn::UserAccessData &userAccessData)
 :
+    QnCommonModuleAware(commonModule),
     QnTransactionTransportBase(
+        commonModule->globalSettings()->localSystemId(),
         connectionGuid,
         std::move(connectionLockGuard),
         localPeer,
@@ -30,22 +34,25 @@ QnTransactionTransport::QnTransactionTransport(
         connectionType,
         request,
         contentEncoding,
-        QnGlobalSettings::instance()->connectionKeepAliveTimeout(),
-        QnGlobalSettings::instance()->keepAliveProbeCount()),
+        commonModule->globalSettings()->connectionKeepAliveTimeout(),
+        commonModule->globalSettings()->keepAliveProbeCount()),
     m_userAccessData(userAccessData)
 {
     setOutgoingConnection(std::move(socket));
 }
 
 QnTransactionTransport::QnTransactionTransport(
+    QnCommonModule* commonModule,
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer)
 :
+    QnCommonModuleAware(commonModule),
     QnTransactionTransportBase(
+        commonModule->globalSettings()->localSystemId(),
         connectionGuardSharedState,
         localPeer,
-        QnGlobalSettings::instance()->connectionKeepAliveTimeout(),
-        QnGlobalSettings::instance()->keepAliveProbeCount()),
+        commonModule->globalSettings()->connectionKeepAliveTimeout(),
+        commonModule->globalSettings()->keepAliveProbeCount()),
     m_userAccessData(Qn::kSystemAccess)
 {
 }
@@ -71,16 +78,17 @@ void QnTransactionTransport::close()
 
 void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey)
 {
-    if (!QnAppServerConnectionFactory::videowallGuid().isNull())
+    if (!commonModule()->videowallGuid().isNull())
     {
         httpClient->addAdditionalHeader(
             "X-NetworkOptix-VideoWall",
-            QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
+            commonModule()->videowallGuid().toString().toUtf8());
         return;
     }
 
-    QnMediaServerResourcePtr ownServer = 
-        qnResPool->getResourceById<QnMediaServerResource>(localPeer().id);
+    const auto& resPool = commonModule()->resourcePool();
+    QnMediaServerResourcePtr ownServer =
+        resPool->getResourceById<QnMediaServerResource>(localPeer().id);
     if (ownServer && authByKey)
     {
         httpClient->setUserName(ownServer->getId().toString().toLower());
@@ -88,12 +96,14 @@ void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& htt
     }
     else
     {
-        QUrl url = QnAppServerConnectionFactory::url();
+        QUrl url;
+        if (const auto& connection = commonModule()->ec2Connection())
+            url = connection->connectionInfo().ecUrl;
         httpClient->setUserName(url.userName().toLower());
-        if (detail::QnDbManager::instance() && detail::QnDbManager::instance()->isInitialized())
+        if (ApiPeerData::isServer(localPeer().peerType))
         {
             // try auth by admin user if allowed
-            QnUserResourcePtr adminUser = qnResPool->getAdministrator();
+            QnUserResourcePtr adminUser = resPool->getAdministrator();
             if (adminUser)
             {
                 httpClient->setUserPassword(adminUser->getDigest());
@@ -128,7 +138,7 @@ bool QnTransactionTransport::sendSerializedTransaction(
 
     QnTransactionTransportHeader header(_header);
     NX_ASSERT(header.processedPeers.contains(localPeer().id));
-    header.fillSequence();
+    header.fillSequence(commonModule()->moduleGUID(), commonModule()->runningInstanceGUID());
     switch (remotePeer().dataFormat)
     {
         case Qn::JsonFormat:

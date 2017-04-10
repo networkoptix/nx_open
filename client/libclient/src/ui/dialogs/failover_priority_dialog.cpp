@@ -80,7 +80,7 @@ public:
         if (!m_placeholder)
             return true;
 
-        auto resources = qnResPool->getResources<QnVirtualCameraResource>(selected);
+        auto resources = resourcePool()->getResources<QnVirtualCameraResource>(selected);
         bool visible = !resources.isEmpty();
         m_placeholder->setCurrentWidget(visible
             ? m_buttonsPage
@@ -135,6 +135,7 @@ private:
         placeholder->setAutoFillBackground(true);
 
         const QString hint = QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
             tr("Select devices to setup failover priority"),
             tr("Select cameras to setup failover priority")
         );
@@ -180,17 +181,17 @@ QnFailoverPriorityDialog::QnFailoverPriorityDialog(QWidget* parent /*= nullptr*/
         connect(camera, &QnVirtualCameraResource::failoverPriorityChanged, m_customColumnDelegate, &QnResourceTreeModelCustomColumnDelegate::notifyDataChanged);
     };
 
-    for (const QnVirtualCameraResourcePtr &camera : qnResPool->getAllCameras(QnResourcePtr(), true))
+    for (const QnVirtualCameraResourcePtr &camera : resourcePool()->getAllCameras(QnResourcePtr(), true))
     {
         connectToCamera(camera);
     }
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, [connectToCamera](const QnResourcePtr &resource)
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this, [connectToCamera](const QnResourcePtr &resource)
     {
         if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
             connectToCamera(camera);
     });
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource)
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource)
     {
         disconnect(resource, nullptr, this, nullptr);
     });
@@ -228,7 +229,7 @@ void QnFailoverPriorityDialog::setColors(const QnFailoverPriorityColors &colors)
 
 void QnFailoverPriorityDialog::updatePriorityForSelectedCameras(Qn::FailoverPriority priority)
 {
-    auto cameras = qnResPool->getResources<QnVirtualCameraResource>(selectedResources());
+    auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(selectedResources());
     m_customColumnDelegate->forceCamerasPriority(cameras, priority);
     setSelectedResources(QSet<QnUuid>());
 }
@@ -242,7 +243,7 @@ void QnFailoverPriorityDialog::buttonBoxClicked(QDialogButtonBox::StandardButton
     auto forced = m_customColumnDelegate->forcedCamerasPriorities();
 
     /* Update all default cameras and all cameras that we have changed. */
-    auto modified = qnResPool->getAllCameras(QnResourcePtr(), true).filtered([this, &forced](const QnVirtualCameraResourcePtr &camera)
+    auto modified = resourcePool()->getAllCameras(QnResourcePtr(), true).filtered([this, &forced](const QnVirtualCameraResourcePtr &camera)
     {
         return forced.contains(camera->getId());
     });

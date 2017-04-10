@@ -6,7 +6,12 @@
 #include <core/resource_management/resource_properties.h>
 
 
-QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControllerPtr &baseController):
+QnActivityPtzController::QnActivityPtzController(
+    QnCommonModule* commonModule,
+    Mode mode,
+    const QnPtzControllerPtr &baseController)
+:
+    QnCommonModuleAware(commonModule),
     base_type(baseController),
     m_mode(mode)
 {
@@ -24,11 +29,12 @@ QnActivityPtzController::QnActivityPtzController(Mode mode, const QnPtzControlle
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::synchronizationNeeded, this,
         [this](const QnResourcePtr& resource)
         {
-            propertyDictionary->saveParamsAsync(resource->getId());
+            propertyDictionary()->saveParamsAsync(resource->getId());
         });
 }
 
-QnActivityPtzController::~QnActivityPtzController() {
+QnActivityPtzController::~QnActivityPtzController()
+{
     return;
 }
 

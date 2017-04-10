@@ -230,7 +230,7 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget* parent) :
     connect(ui->ldapSettingsButton,      &QPushButton::clicked,  this,  &QnUserManagementWidget::openLdapSettings);
     connect(ui->fetchButton,             &QPushButton::clicked,  this,  &QnUserManagementWidget::fetchUsers);
 
-    connect(qnCommon, &QnCommonModule::readOnlyChanged, this, &QnUserManagementWidget::loadDataToUi);
+    connect(commonModule(), &QnCommonModule::readOnlyChanged, this, &QnUserManagementWidget::loadDataToUi);
 
     m_sortModel->setDynamicSortFilter(true);
     m_sortModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -303,25 +303,25 @@ QnUserManagementWidget::~QnUserManagementWidget()
 
 void QnUserManagementWidget::loadDataToUi()
 {
-    ui->createUserButton->setEnabled(!qnCommon->isReadOnly());
+    ui->createUserButton->setEnabled(!commonModule()->isReadOnly());
     updateLdapState();
-    m_usersModel->resetUsers(qnResPool->getResources<QnUserResource>());
+    m_usersModel->resetUsers(resourcePool()->getResources<QnUserResource>());
 }
 
 void QnUserManagementWidget::updateLdapState()
 {
     bool currentUserIsLdap = context()->user() && context()->user()->isLdap();
     ui->ldapSettingsButton->setVisible(!currentUserIsLdap);
-    ui->ldapSettingsButton->setEnabled(!qnCommon->isReadOnly());
+    ui->ldapSettingsButton->setEnabled(!commonModule()->isReadOnly());
     ui->fetchButton->setVisible(!currentUserIsLdap);
-    ui->fetchButton->setEnabled(!qnCommon->isReadOnly() && qnGlobalSettings->ldapSettings().isValid());
+    ui->fetchButton->setEnabled(!commonModule()->isReadOnly() && qnGlobalSettings->ldapSettings().isValid());
 }
 
 void QnUserManagementWidget::applyChanges()
 {
     auto modelUsers = m_usersModel->users();
     QnUserResourceList usersToDelete;
-    for (auto user : qnResPool->getResources<QnUserResource>())
+    for (auto user : resourcePool()->getResources<QnUserResource>())
     {
         if (!modelUsers.contains(user))
         {
@@ -355,14 +355,14 @@ void QnUserManagementWidget::applyChanges()
     }
     else
     {
-        m_usersModel->resetUsers(qnResPool->getResources<QnUserResource>());
+        m_usersModel->resetUsers(resourcePool()->getResources<QnUserResource>());
     }
 }
 
 bool QnUserManagementWidget::hasChanges() const
 {
     using boost::algorithm::any_of;
-    return any_of(qnResPool->getResources<QnUserResource>(),
+    return any_of(resourcePool()->getResources<QnUserResource>(),
         [this, users = m_usersModel->users()](const QnUserResourcePtr& user)
         {
             return !users.contains(user)

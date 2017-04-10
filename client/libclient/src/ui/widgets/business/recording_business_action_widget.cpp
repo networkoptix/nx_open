@@ -51,7 +51,7 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fi
     int maxFps = 0;
 
     if (fields & QnBusiness::ActionResourcesField) {
-        auto cameras = qnResPool->getResources<QnVirtualCameraResource>(model()->actionResources());
+        auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(model()->actionResources());
         foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
             maxFps = maxFps == 0 ? camera->getMaxFps() : qMax(maxFps, camera->getMaxFps());
         }

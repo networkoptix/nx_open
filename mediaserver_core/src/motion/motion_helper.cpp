@@ -50,7 +50,7 @@ void QnMotionHelper::saveToArchive(const QnConstMetaDataV1Ptr& data)
 QnMotionArchiveConnectionPtr QnMotionHelper::createConnection(const QnResourcePtr& res, int channel)
 {
     QnMotionArchive* archive = getArchive(res, channel);
-    if (archive) 
+    if (archive)
         return archive->createConnection();
     else
         return QnMotionArchiveConnectionPtr();
@@ -90,24 +90,10 @@ void QnMotionHelper::matchImage(
         else
         {
             QnMotionArchive* archive = getArchive(res, i);
-            if (archive) 
+            if (archive)
                 timePeriods->push_back(archive->matchPeriod(regions[i], msStartTime, msEndTime, detailLevel));
         }
     }
-}
-
-//Q_GLOBAL_STATIC(QnMotionHelper, inst);
-static QnMotionHelper* globalInstance = NULL;
-
-void QnMotionHelper::initStaticInstance( QnMotionHelper* inst )
-{
-    globalInstance = inst;
-}
-
-QnMotionHelper* QnMotionHelper::instance()
-{
-    return globalInstance;
-    //return inst();
 }
 
 QString QnMotionHelper::getBaseDir(const QString& cameraUniqueId)

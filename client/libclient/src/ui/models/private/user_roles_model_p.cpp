@@ -63,12 +63,12 @@ QnUserRolesModelPrivate::QnUserRolesModelPrivate(
 
     if (flags.testFlag(QnUserRolesModel::UserRoleFlag))
     {
-        m_userRoles = qnUserRolesManager->userRoles();
+        m_userRoles = userRolesManager()->userRoles();
         std::sort(m_userRoles.begin(), m_userRoles.end(), lessRoleByName);
 
-        connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
+        connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
             &QnUserRolesModelPrivate::updateUserRole);
-        connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
+        connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
             &QnUserRolesModelPrivate::removeUserRole);
     }
 }
@@ -131,7 +131,7 @@ void QnUserRolesModelPrivate::updateStandardRoles()
     {
         for (auto role : allStandardRoles())
         {
-            if (qnResourceAccessManager->canCreateUser(user, role))
+            if (resourceAccessManager()->canCreateUser(user, role))
                 available << role;
         }
     }

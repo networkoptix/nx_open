@@ -50,7 +50,7 @@ QnLayoutTourItemList QnLayoutTourManager::tourItems(const ec2::ApiLayoutTourData
     result.reserve(tour.items.size());
     for (const auto& item: tour.items)
     {
-        if (const auto& layout = qnResPool->getResourceById<QnLayoutResource>(item.layoutId))
+        if (const auto& layout = resourcePool()->getResourceById<QnLayoutResource>(item.layoutId))
             result.emplace_back(layout, item.delayMs);
     }
     return result;

@@ -7,7 +7,7 @@
 QnResourceRuntimeDataManager::QnResourceRuntimeDataManager(QObject* parent):
     base_type(parent)
 {
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
             m_data.remove(resource->getId());
@@ -38,6 +38,22 @@ void QnResourceRuntimeDataManager::setResourceData(
     setDataInternal(resource->getId(), role, data);
 }
 
+void QnResourceRuntimeDataManager::cleanupResourceData(const QnResourcePtr& resource, Qn::ItemDataRole role)
+{
+    NX_ASSERT(resource);
+    if (!resource)
+        return;
+    cleanupData(resource->getId(), role);
+}
+
+void QnResourceRuntimeDataManager::cleanupResourceData(const QnResourcePtr& resource)
+{
+    NX_ASSERT(resource);
+    if (!resource)
+        return;
+    cleanupData(resource->getId());
+}
+
 QVariant QnResourceRuntimeDataManager::layoutItemData(const QnUuid& id, Qn::ItemDataRole role) const
 {
     return m_data.value(id).value(role);
@@ -51,13 +67,24 @@ void QnResourceRuntimeDataManager::setLayoutItemData(
     setDataInternal(id, role, data);
 }
 
+void QnResourceRuntimeDataManager::cleanupData(const QnUuid& id, Qn::ItemDataRole role)
+{
+    setDataInternal(id, role, QVariant());
+}
+
+void QnResourceRuntimeDataManager::cleanupData(const QnUuid& id)
+{
+    for (auto role: m_data.value(id).keys())
+        setDataInternal(id, role, QVariant());
+}
+
 void QnResourceRuntimeDataManager::setDataInternal(
     const QnUuid& id,
     Qn::ItemDataRole role,
     const QVariant& data)
 {
     const QVariant& oldData = m_data.value(id).value(role);
-    if (oldData == data)
+    if (data.isValid() && oldData == data)
         return;
 
     if (data.isValid())
@@ -67,6 +94,9 @@ void QnResourceRuntimeDataManager::setDataInternal(
     else
     {
         if (!m_data.contains(id))
+            return;
+
+        if (!m_data[id].contains(role))
             return;
 
         m_data[id].remove(role);

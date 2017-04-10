@@ -40,8 +40,8 @@ StreamingChunkTranscoder::TranscodeContext::TranscodeContext()
 }
 
 
-StreamingChunkTranscoder::StreamingChunkTranscoder( Flags flags )
-:
+StreamingChunkTranscoder::StreamingChunkTranscoder(QnResourcePool* resPool, Flags flags ):
+    m_resPool(resPool),
     m_terminated( false ),
     m_flags( flags ),
     m_transcodeIDSeq( 1 )
@@ -58,7 +58,7 @@ StreamingChunkTranscoder::StreamingChunkTranscoder( Flags flags )
     }
 
     Qn::directConnect(
-        qnResPool, &QnResourcePool::resourceRemoved,
+        resPool, &QnResourcePool::resourceRemoved,
         this, &StreamingChunkTranscoder::onResourceRemoved );
 }
 
@@ -89,6 +89,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
     // Searching for resource.
     QnSecurityCamResourcePtr cameraResource =
         nx::camera_id_helper::findCameraByFlexibleId(
+            m_resPool,
             transcodeParams.srcResourceUniqueID());
     if( !cameraResource )
     {

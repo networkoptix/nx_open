@@ -5,6 +5,8 @@
 #include <QtCore/QVariant>
 #include <QtCore/QList>
 
+#include <client_core/connection_context_aware.h>
+
 #include <utils/common/id.h>
 #include "api/model/recording_stats_reply.h"
 #include "core/resource/resource_fwd.h"
@@ -29,7 +31,8 @@ struct QnFooterData: public QnCamRecordingStatsData {
     QnCamRecordingStatsData maxValues;
 };
 
-class QnRecordingStatsModel : public Customized<QAbstractListModel>
+class QnRecordingStatsModel : public Customized<QAbstractListModel>,
+    public QnConnectionContextAware
 {
     Q_OBJECT
     typedef Customized<QAbstractListModel> base_type;

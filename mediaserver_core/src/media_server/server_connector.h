@@ -5,21 +5,27 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/singleton.h>
 #include <nx/network/socket_common.h>
+#include <common/common_module_aware.h>
 
 class QnModuleFinder;
 struct QnModuleInformation;
 class SocketAddress;
 
-class QnServerConnector : public QObject, public Singleton<QnServerConnector> {
+class QnServerConnector:
+    public QObject,
+    public Singleton<QnServerConnector>,
+    public QnCommonModuleAware
+{
     Q_OBJECT
 
-    struct AddressInfo {
+    struct AddressInfo
+    {
         QString urlString;
         QnUuid peerId;
     };
 
 public:
-    explicit QnServerConnector(QnModuleFinder *moduleFinder, QObject *parent = 0);
+    explicit QnServerConnector(QnCommonModule* commonModule);
 
     void addConnection(const QnModuleInformation &moduleInformation, const SocketAddress &address);
     void removeConnection(const QnModuleInformation &moduleInformation, const SocketAddress &address);
@@ -35,7 +41,6 @@ private slots:
 
 private:
     QnMutex m_mutex;
-    const QnModuleFinder *m_moduleFinder;
     QHash<QString, AddressInfo> m_usedAddresses;
 };
 

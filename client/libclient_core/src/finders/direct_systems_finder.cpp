@@ -1,5 +1,6 @@
-
 #include "direct_systems_finder.h"
+
+#include <common/common_module.h>
 
 #include <network/module_finder.h>
 #include <network/system_helpers.h>

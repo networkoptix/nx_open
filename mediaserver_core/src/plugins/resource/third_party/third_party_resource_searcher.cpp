@@ -18,11 +18,15 @@
 #include "core/resource_management/resource_pool.h"
 #include "common/common_module.h"
 #include "plugins/plugin_manager.h"
-
+#include <common/static_common_module.h>
 
 static const QLatin1String THIRD_PARTY_MANUFACTURER_NAME( "THIRD_PARTY" );
 
-ThirdPartyResourceSearcher::ThirdPartyResourceSearcher()
+ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
+    QnMdnsResourceSearcher(commonModule),
+    QnUpnpResourceSearcherAsync(commonModule)
 {
     QList<nxcip::CameraDiscoveryManager*> pluginList = PluginManager::instance()->findNxPlugins<nxcip::CameraDiscoveryManager>( nxcip::IID_CameraDiscoveryManager );
     std::copy(
@@ -218,7 +222,7 @@ QnResourceList ThirdPartyResourceSearcher::findResources()
 QnResourceList ThirdPartyResourceSearcher::doCustomSearch()
 {
     QString dafaultURL;
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     if( server )
         dafaultURL = server->getApiUrl().toString();
 
@@ -307,12 +311,12 @@ QnThirdPartyResourcePtr ThirdPartyResourceSearcher::createResourceFromCameraInfo
     if( strlen(cameraInfo.firmware) > 0 )
         resource->setProperty( Qn::FIRMWARE_PARAM_NAME, QString::fromLatin1(cameraInfo.firmware) );
 
-    if( !qnResPool->getNetResourceByPhysicalId( resource->getPhysicalId() ) )
+    if( !resourcePool()->getNetResourceByPhysicalId( resource->getPhysicalId() ) )
     {
         //new resource
         //TODO #ak reading MaxFPS here is a workaround of camera integration API defect:
             //it does not not allow plugin to return hard-coded max fps, it can only be read in initInternal
-        const QnResourceData& resourceData = qnCommon->dataPool()->data(resource);
+        const QnResourceData& resourceData = qnStaticCommon->dataPool()->data(resource);
         const float maxFps = resourceData.value<float>( Qn::MAX_FPS_PARAM_NAME, 0.0 );
         if( maxFps > 0.0 )
             resource->setProperty( Qn::MAX_FPS_PARAM_NAME, maxFps);

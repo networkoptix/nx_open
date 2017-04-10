@@ -31,6 +31,7 @@
 #include <utils/common/id.h>
 
 #include "connection_guard.h"
+#include <common/common_module_aware.h>
 
 
 namespace ec2
@@ -103,6 +104,7 @@ public:
 
     /** Initializer for incoming connection. */
     QnTransactionTransportBase(
+        const QnUuid& localSystemId,
         const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
@@ -114,6 +116,7 @@ public:
         int keepAliveProbeCount);
     //!Initializer for outgoing connection
     QnTransactionTransportBase(
+        const QnUuid& localSystemId,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer,
         std::chrono::milliseconds tcpKeepAliveTimeout,
@@ -225,7 +228,7 @@ protected:
     {
         QnTransactionTransportHeader header(_header);
         NX_ASSERT(header.processedPeers.contains(m_localPeer.id));
-        header.fillSequence();
+        header.fillSequence(m_localPeer.id, m_localPeer.instanceId);
 #ifdef _DEBUG
 
         for (const QnUuid& peer : header.dstPeers)
@@ -290,6 +293,7 @@ private:
         none,
     };
 
+    QnUuid m_localSystemId;
     const ApiPeerData m_localPeer;
     ApiPeerData m_remotePeer;
 
@@ -357,6 +361,7 @@ private:
 
 private:
     QnTransactionTransportBase(
+        const QnUuid& localSystemId,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer,
         PeerRole peerRole,

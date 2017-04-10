@@ -12,6 +12,7 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/user_access_data.h>
+#include <common/common_module.h>
 
 static const QByteArray NOT_AUTHORIZED_HTML("\
     <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
@@ -60,11 +61,11 @@ const QnRestProcessorPool::Handlers& QnRestProcessorPool::handlers() const
 class QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
-    QnTcpListener* owner;
+    QnTcpListener* owner = nullptr;
 };
 
 QnRestConnectionProcessor::QnRestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket),
+    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket, _owner->commonModule()),
     m_noAuth(false)
 {
     Q_D(QnRestConnectionProcessor);
@@ -107,13 +108,13 @@ void QnRestConnectionProcessor::run()
     {
         if (!m_noAuth && d->accessRights != Qn::kSystemAccess)
         {
-            QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(d->accessRights.userId);
+            QnUserResourcePtr user = resourcePool()->getResourceById<QnUserResource>(d->accessRights.userId);
             if (!user)
             {
                 sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
                 return;
             }
-            if (!qnResourceAccessManager->hasGlobalPermission(user, handler->permissions()))
+            if (!resourceAccessManager()->hasGlobalPermission(user, handler->permissions()))
             {
                 sendUnauthorizedResponse(nx_http::StatusCode::forbidden, NOT_AUTHORIZED_HTML);
                 return;

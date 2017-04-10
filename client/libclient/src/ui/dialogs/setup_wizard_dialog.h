@@ -2,12 +2,14 @@
 
 #include <QtWidgets/QDialog>
 
+#include <client_core/connection_context_aware.h>
+
 #include <ui/dialogs/common/dialog.h>
 
 #include <utils/common/encoded_credentials.h>
 
 class QnSetupWizardDialogPrivate;
-class QnSetupWizardDialog : public QnDialog
+class QnSetupWizardDialog : public QnDialog, public QnConnectionContextAware
 {
     Q_OBJECT
 

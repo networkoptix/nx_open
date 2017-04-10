@@ -198,7 +198,7 @@ QString AxHDWitness::resourceListXml()
     writer.writeStartDocument();
     writer.writeStartElement(lit("resources"));
 
-    for (const QnVirtualCameraResourcePtr &camera : qnResPool->getAllCameras(QnResourcePtr(), true))
+    for (const QnVirtualCameraResourcePtr &camera : resourcePool()->getAllCameras(QnResourcePtr(), true))
     {
         writer.writeStartElement(lit("resource"));
         writer.writeAttribute(lit("uniqueId"), camera->getUniqueId());

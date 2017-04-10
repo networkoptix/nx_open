@@ -43,9 +43,9 @@ QString kCreateAccountPath = lit("/static/index.html#/register");
 const int kHeaderFontSizePixels = 15;
 const int kHeaderFontWeight = QFont::DemiBold;
 
-rest::QnConnectionPtr getPublicServerConnection()
+rest::QnConnectionPtr getPublicServerConnection(QnResourcePool* resourcePool)
 {
-    for (const QnMediaServerResourcePtr server: qnResPool->getAllServers(Qn::Online))
+    for (const QnMediaServerResourcePtr server: resourcePool->getAllServers(Qn::Online))
     {
         if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
             continue;
@@ -57,7 +57,7 @@ rest::QnConnectionPtr getPublicServerConnection()
 
 }
 
-class QnConnectToCloudDialogPrivate : public QObject
+class QnConnectToCloudDialogPrivate: public QObject, public QnConnectionContextAware
 {
     QnConnectToCloudDialog *q_ptr;
 
@@ -230,7 +230,7 @@ void QnConnectToCloudDialogPrivate::bindSystem()
 
     q->ui->invalidCredentialsLabel->hide();
 
-    auto serverConnection = getPublicServerConnection();
+    auto serverConnection = getPublicServerConnection(resourcePool());
     if (!serverConnection)
     {
         showFailure(tr("None of your servers is connected to the Internet."));
@@ -313,7 +313,7 @@ void QnConnectToCloudDialogPrivate::at_bindFinished(
         return;
     }
 
-    const auto& admin = qnResPool->getAdministrator();
+    const auto& admin = resourcePool()->getAdministrator();
     if (!admin)
     {
         q->reject();

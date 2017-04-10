@@ -103,14 +103,22 @@ public:
 
     const CmdLineArguments cmdLineArguments() const;
     void setObsoleteGuid(const QnUuid& obsoleteGuid) { m_obsoleteGuid = obsoleteGuid; }
-
+    QnCommonModule* commonModule() const
+    {
+        if (const auto& module = m_serverModule.lock())
+            return module->commonModule();
+        else
+            return nullptr;
+    }
 signals:
     void started();
 public slots:
     void stopAsync();
     void stopSync();
 private slots:
-    void loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor);
+    void loadResourcesFromECS(
+        ec2::AbstractECConnectionPtr ec2Connection,
+        QnCommonMessageProcessor* messageProcessor);
     void at_portMappingChanged(QString address);
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
@@ -128,7 +136,6 @@ private slots:
     void at_databaseDumped();
     void at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void at_updatePublicAddress(const QHostAddress& publicIP);
-
 private:
 
     void updateDisabledVendorsIfNeeded();
@@ -136,8 +143,12 @@ private:
     void moveHandlingCameras();
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
-    void registerRestHandlers(CloudManagerGroup* const cloudManagerGroup);
-    bool initTcpListener(CloudManagerGroup* const cloudManagerGroup);
+    void registerRestHandlers(
+        CloudManagerGroup* const cloudManagerGroup,
+        ec2::QnTransactionMessageBus* messageBus);
+    bool initTcpListener(
+        CloudManagerGroup* const cloudManagerGroup,
+        ec2::QnTransactionMessageBus* messageBus);
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
@@ -157,7 +168,6 @@ private:
     bool m_startMessageSent;
     qint64 m_firstRunningTime;
 
-    QnModuleFinder* m_moduleFinder;
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
     std::unique_ptr<nx_http::HttpModManager> m_httpModManager;
     QnUniversalTcpListener* m_universalTcpListener;
@@ -177,6 +187,7 @@ private:
     CmdLineArguments m_cmdLineArguments;
     QnUuid m_obsoleteGuid;
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
+    std::weak_ptr<QnMediaServerModule> m_serverModule;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

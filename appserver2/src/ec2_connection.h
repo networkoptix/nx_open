@@ -22,6 +22,7 @@ namespace ec2
     {
     public:
         Ec2DirectConnection(
+            const Ec2DirectConnectionFactory* connectionFactory,
             ServerQueryProcessorAccess* queryProcessor,
             const QnConnectionInfo& connectionInfo,
             const QUrl& dbUrl);
@@ -36,8 +37,10 @@ namespace ec2
 
         Ec2StaticticsReporter* getStaticticsReporter();
 
+        virtual Timestamp getTransactionLogTime() const override;
+        virtual void setTransactionLogTime(Timestamp value) override;
+
     private:
-        std::unique_ptr<QnTransactionLog> m_transactionLog;
         const QnConnectionInfo m_connectionInfo;
         bool m_isInitialized;
         std::unique_ptr<Ec2StaticticsReporter> m_staticticsReporter;

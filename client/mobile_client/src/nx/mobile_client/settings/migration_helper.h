@@ -3,12 +3,14 @@
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 
+#include <client_core/connection_context_aware.h>
+
 namespace nx {
 namespace mobile_client {
 namespace settings {
 
 class SessionsMigrationHelperPrivate;
-class SessionsMigrationHelper: public QObject
+class SessionsMigrationHelper: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
 

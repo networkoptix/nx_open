@@ -1,133 +1,13 @@
 #include "app_server_connection.h"
 
-#include <QtNetwork/QAuthenticator>
-#include <QtNetwork/QHostAddress>
-
-#include <business/business_event_rule.h>
-
-#include "core/resource/resource_type.h"
-#include "core/resource/resource.h"
-#include "core/resource/network_resource.h"
-#include "core/resource/media_server_resource.h"
-#include "core/resource/camera_resource.h"
-#include "core/resource/layout_resource.h"
-#include "core/resource/user_resource.h"
-
-#include <nx/utils/log/log.h>
-#include <utils/common/sleep.h>
-#include <nx/fusion/model_functions.h>
-#include <utils/common/synctime.h>
-
-#include "session_manager.h"
-#include "common_message_processor.h"
-
-
-// -------------------------------------------------------------------------- //
-// QnAppServerConnectionFactory
-// -------------------------------------------------------------------------- //
-Q_GLOBAL_STATIC(QnAppServerConnectionFactory, qn_appServerConnectionFactory_instance)
-
-QnAppServerConnectionFactory::QnAppServerConnectionFactory()
-{}
-
-QnAppServerConnectionFactory::~QnAppServerConnectionFactory() {
-    return;
-}
-
-QnResourceFactory* QnAppServerConnectionFactory::defaultFactory()
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        return factory->m_resourceFactory;
-    }
-
-    return 0;
-}
-
-QUrl QnAppServerConnectionFactory::url() {
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        QnMutexLocker locker( &factory->m_mutex );
-        NX_ASSERT(factory->m_url.isValid(), "QnAppServerConnectionFactory::initialize()", "an invalid url was requested");
-        return factory->m_url;
-    }
-
-    return QUrl();
-}
-
-void QnAppServerConnectionFactory::setUrl(const QUrl &url) {
-    if (url.isValid())
-        NX_ASSERT(!url.isRelative(), "QnAppServerConnectionFactory::initialize()", "relative urls aren't supported");
-
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        QnMutexLocker locker( &factory->m_mutex );
-        factory->m_url = url;
-    }
-}
-
-void QnAppServerConnectionFactory::setDefaultFactory(QnResourceFactory* resourceFactory)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_resourceFactory = resourceFactory;
-    }
-}
-
-QnUuid QnAppServerConnectionFactory::videowallGuid() {
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
-        return factory->m_videowallGuid;
-    return QnUuid();
-}
-
-void QnAppServerConnectionFactory::setVideowallGuid(const QnUuid &uuid)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_videowallGuid = uuid;
-    }
-}
-
-QnUuid QnAppServerConnectionFactory::instanceGuid() {
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance())
-        return factory->m_instanceGuid;
-    return QnUuid();
-}
-
-void QnAppServerConnectionFactory::setInstanceGuid(const QnUuid &uuid)
-{
-    if (QnAppServerConnectionFactory *factory = qn_appServerConnectionFactory_instance()) {
-        factory->m_instanceGuid = uuid;
-    }
-}
-
-QnConnectionInfo QnAppServerConnectionFactory::connectionInfo()
-{
-    if (auto factory = qn_appServerConnectionFactory_instance())
-        return factory->m_connectionInfo;
-
-    return QnConnectionInfo();
-}
-
-void QnAppServerConnectionFactory::setConnectionInfo(const QnConnectionInfo& connectionInfo)
-{
-    if (auto factory = qn_appServerConnectionFactory_instance())
-        factory->m_connectionInfo = connectionInfo;
-}
-
-static ec2::AbstractECConnectionFactory* ec2ConnectionFactoryInstance = nullptr;
-
-void QnAppServerConnectionFactory::setEC2ConnectionFactory( ec2::AbstractECConnectionFactory* _ec2ConnectionFactory )
-{
-    ec2ConnectionFactoryInstance = _ec2ConnectionFactory;
-}
-
-ec2::AbstractECConnectionFactory* QnAppServerConnectionFactory::ec2ConnectionFactory()
-{
-    return ec2ConnectionFactoryInstance;
-}
-
 static ec2::AbstractECConnectionPtr currentlyUsedEc2Connection;
+
 void QnAppServerConnectionFactory::setEc2Connection(const ec2::AbstractECConnectionPtr &ec2Connection )
 {
     currentlyUsedEc2Connection = ec2Connection;
 }
 
-ec2::AbstractECConnectionPtr QnAppServerConnectionFactory::getConnection2() {
+ec2::AbstractECConnectionPtr QnAppServerConnectionFactory::ec2Connection()
+{
     return currentlyUsedEc2Connection;
 }

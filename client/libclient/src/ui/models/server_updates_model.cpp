@@ -87,10 +87,10 @@ QnServerUpdatesModel::QnServerUpdatesModel(QnMediaServerUpdateTool* tool, QObjec
         emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));
     });
 
-    connect(qnResPool,  &QnResourcePool::resourceAdded,     this,   &QnServerUpdatesModel::at_resourceAdded);
-    connect(qnResPool,  &QnResourcePool::resourceRemoved,   this,   &QnServerUpdatesModel::at_resourceRemoved);
-    connect(qnResPool,  &QnResourcePool::resourceChanged,   this,   &QnServerUpdatesModel::at_resourceChanged);
-    connect(qnResPool,  &QnResourcePool::statusChanged,     this,   &QnServerUpdatesModel::at_resourceChanged);
+    connect(resourcePool(),  &QnResourcePool::resourceAdded,     this,   &QnServerUpdatesModel::at_resourceAdded);
+    connect(resourcePool(),  &QnResourcePool::resourceRemoved,   this,   &QnServerUpdatesModel::at_resourceRemoved);
+    connect(resourcePool(),  &QnResourcePool::resourceChanged,   this,   &QnServerUpdatesModel::at_resourceChanged);
+    connect(resourcePool(),  &QnResourcePool::statusChanged,     this,   &QnServerUpdatesModel::at_resourceChanged);
     connect(context()->instance<QnWorkbenchVersionMismatchWatcher>(), &QnWorkbenchVersionMismatchWatcher::mismatchDataChanged,  this, &QnServerUpdatesModel::updateVersionColumn);
 
     resetResourses();
@@ -172,14 +172,14 @@ void QnServerUpdatesModel::resetResourses() {
     qDeleteAll(m_items);
     m_items.clear();
 
-    const auto allServers = qnResPool->getAllServers(Qn::AnyStatus);
+    const auto allServers = resourcePool()->getAllServers(Qn::AnyStatus);
     for (const QnMediaServerResourcePtr &server: allServers)
         m_items.append(new Item(server));
 
-    for (const QnResourcePtr &resource: qnResPool->getAllIncompatibleResources())
+    for (const QnResourcePtr &resource: resourcePool()->getAllIncompatibleResources())
     {
         QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        if (!server || !helpers::serverBelongsToCurrentSystem(server->getModuleInformation()))
+        if (!server || !helpers::serverBelongsToCurrentSystem(server))
             continue;
 
         // Adds newly added to system server which is not authorized
@@ -233,7 +233,7 @@ void QnServerUpdatesModel::at_resourceAdded(const QnResourcePtr &resource)
         return;
 
     if (server->hasFlags(Qn::fake_server)
-        && !helpers::serverBelongsToCurrentSystem(server->getModuleInformation()))
+        && !helpers::serverBelongsToCurrentSystem(server))
     {
         return;
     }
@@ -268,7 +268,7 @@ void QnServerUpdatesModel::at_resourceChanged(const QnResourcePtr &resource) {
     QModelIndex idx = index(server);
     bool exists = idx.isValid();
     bool isOurServer = !server->hasFlags(Qn::fake_server)
-        || helpers::serverBelongsToCurrentSystem(server->getModuleInformation());
+        || helpers::serverBelongsToCurrentSystem(server);
 
     if (exists == isOurServer) {
         emit dataChanged(idx, idx.sibling(idx.row(), ColumnCount - 1));

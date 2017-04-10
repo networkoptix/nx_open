@@ -81,7 +81,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
     connect(ui->backToScanButton,   SIGNAL(clicked()),                              this,   SLOT(at_backToScanButton_clicked()));
     connect(m_header,               SIGNAL(checkStateChanged(Qt::CheckState)),      this,   SLOT(at_header_checkStateChanged(Qt::CheckState)));
     connect(ui->portAutoCheckBox,   SIGNAL(toggled(bool)),                          this,   SLOT(at_portAutoCheckBox_toggled(bool)));
-    connect(qnResPool,              SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceRemoved(const QnResourcePtr &)));
+    connect(resourcePool(),              SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resPool_resourceRemoved(const QnResourcePtr &)));
 
     setWarningStyle(ui->validateLabelSearch);
     ui->validateLabelSearch->setVisible(false);

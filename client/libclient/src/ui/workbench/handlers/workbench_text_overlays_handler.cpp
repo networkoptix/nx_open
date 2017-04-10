@@ -10,6 +10,8 @@
 
 #include <client/client_message_processor.h>
 
+#include <common/common_module.h>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -94,7 +96,8 @@ private:
 QnWorkbenchTextOverlaysHandler::QnWorkbenchTextOverlaysHandler(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
-    d_ptr(new QnWorkbenchTextOverlaysHandlerPrivate(this))
+    d_ptr(new QnWorkbenchTextOverlaysHandlerPrivate(this)),
+    m_helper(new QnBusinessStringsHelper(commonModule()))
 {
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::businessActionReceived,
         this, &QnWorkbenchTextOverlaysHandler::at_businessActionReceived);
@@ -126,12 +129,12 @@ void QnWorkbenchTextOverlaysHandler::at_businessActionReceived(
     if (isProlongedAction && couldBeInstantEvent)
         return;
 
-    auto cameras = qnResPool->getResources<QnVirtualCameraResource>(
+    auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(
         businessAction->getResources());
 
     if (actionParams.useSource)
     {
-        cameras << qnResPool->getResources<QnVirtualCameraResource>(
+        cameras << resourcePool()->getResources<QnVirtualCameraResource>(
             businessAction->getSourceResources());
     }
 
@@ -169,9 +172,9 @@ void QnWorkbenchTextOverlaysHandler::at_businessActionReceived(
         if (text.isEmpty())
         {
             const auto runtimeParams = businessAction->getRuntimeParams();
-            const auto caption = QnBusinessStringsHelper::eventAtResource(
+            const auto caption = m_helper->eventAtResource(
                 runtimeParams, Qn::RI_WithUrl).toHtmlEscaped();
-            const auto description = QnBusinessStringsHelper::eventDetails(
+            const auto description = m_helper->eventDetails(
                 runtimeParams).join(L'\n').toHtmlEscaped();
 
             const auto captionHtml = htmlFormattedParagraph(caption, kCaptionPixelFontSize, true);

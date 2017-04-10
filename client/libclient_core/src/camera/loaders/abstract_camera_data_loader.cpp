@@ -4,7 +4,7 @@
 
 #include <recording/time_period.h>
 
-QnAbstractCameraDataLoader::QnAbstractCameraDataLoader(const QnResourcePtr &resource, const Qn::TimePeriodContent dataType, QObject *parent): 
+QnAbstractCameraDataLoader::QnAbstractCameraDataLoader(const QnResourcePtr &resource, const Qn::TimePeriodContent dataType, QObject *parent):
     QObject(parent),
     m_resource(resource),
     m_dataType(dataType)
@@ -16,7 +16,7 @@ QnAbstractCameraDataLoader::~QnAbstractCameraDataLoader() {
 }
 
 void QnAbstractCameraDataLoader::discardCachedData(const qint64 resolutionMs /* = 0*/) {
-    Q_UNUSED(resolutionMs) 
+    Q_UNUSED(resolutionMs)
 }
 
 QnResourcePtr QnAbstractCameraDataLoader::resource() const {

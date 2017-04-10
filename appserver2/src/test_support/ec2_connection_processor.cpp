@@ -10,9 +10,8 @@ Ec2ConnectionProcessor::Ec2ConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(socket),
-    m_owner(owner),
-    m_processor(nullptr)
+    QnTCPConnectionProcessor(socket, owner->commonModule()),
+    m_owner(owner)
 {
     setObjectName(QLatin1String("Ec2ConnectionProcessor"));
 }

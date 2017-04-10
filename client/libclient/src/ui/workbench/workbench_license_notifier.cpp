@@ -7,6 +7,7 @@
 #include <core/resource/user_resource.h>
 
 #include <licensing/license.h>
+#include <licensing/license_validator.h>
 
 #include <ui/dialogs/license_notification_dialog.h>
 #include <ui/workbench/workbench_context.h>
@@ -48,7 +49,7 @@ QnWorkbenchLicenseNotifier::QnWorkbenchLicenseNotifier(QObject *parent):
             executeDelayedParented([this]{ checkLicenses(); }, kMessagesDelayMs, this);
         };
 
-    connect(qnLicensePool, &QnLicensePool::licensesChanged, this, checkLicensesDelayed);
+    connect(licensePool(), &QnLicensePool::licensesChanged, this, checkLicensesDelayed);
     connect(accessController(), &QnWorkbenchAccessController::globalPermissionsChanged, this,
         checkLicensesDelayed);
     connect(context(), &QnWorkbenchContext::userChanged, this,
@@ -80,7 +81,7 @@ void QnWorkbenchLicenseNotifier::checkLicenses()
     bool warn = false;
 
     bool someLicenseWillBeBlocked = false;
-    for (const auto& runtimeInfo: QnRuntimeInfoManager::instance()->items()->getItems())
+    for (const auto& runtimeInfo: runtimeInfoManager()->items()->getItems())
     {
         if (runtimeInfo.data.prematureLicenseExperationDate)
         {
@@ -89,13 +90,13 @@ void QnWorkbenchLicenseNotifier::checkLicenses()
         }
     }
 
-    for (const auto& license: qnLicensePool->getLicenses())
+    for (const auto& license: licensePool()->getLicenses())
     {
-        QnLicense::ErrorCode errorCode;
+        QnLicenseErrorCode errorCode = licensePool()->validateLicense(license);
 
         if (someLicenseWillBeBlocked
-            && !qnLicensePool->isLicenseValid(license, &errorCode)
-            && errorCode != QnLicense::Expired)
+            && errorCode != QnLicenseErrorCode::NoError
+            && errorCode != QnLicenseErrorCode::Expired)
         {
             licenses.push_back(license);
             licenseWarningStates[license->key()].lastWarningTime = currentTime;

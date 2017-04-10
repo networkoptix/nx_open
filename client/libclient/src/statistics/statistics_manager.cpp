@@ -114,14 +114,15 @@ namespace
     }
 }
 
-QnStatisticsManager::QnStatisticsManager(QObject *parent)
-    : base_type(parent)
-    , m_updateSettingsTimer(new QTimer())
-    , m_clientId()
-    , m_handle()
-    , m_settings()
-    , m_storage()
-    , m_modules()
+QnStatisticsManager::QnStatisticsManager(QObject *parent):
+    base_type(parent),
+    QnCommonModuleAware(parent),
+    m_updateSettingsTimer(new QTimer()),
+    m_clientId(),
+    m_handle(),
+    m_settings(),
+    m_storage(),
+    m_modules()
 {
     enum { kUpdatePeriodMs = 4 * 60 * 60 * 1000 };  // every 4 hours
     m_updateSettingsTimer->setSingleShot(false);
@@ -173,7 +174,7 @@ void QnStatisticsManager::setStorage(QnStatisticsStoragePtr storage)
     m_storage = std::move(storage);
 }
 
-void QnStatisticsManager::setSettings(QnStatisticsSettingsPtr settings)
+void QnStatisticsManager::setSettings(QnStatisticsLoaderPtr settings)
 {
     if (m_settings)
     {
@@ -278,7 +279,7 @@ void QnStatisticsManager::sendStatistics()
     if (totalFiltered.empty())
         return;
 
-    const auto server = qnCommon->currentServer();
+    const auto server = commonModule()->currentServer();
     if (!server)
         return;
 

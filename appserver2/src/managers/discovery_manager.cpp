@@ -4,14 +4,15 @@
 #include "network/direct_module_finder.h"
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
+#include <common/common_module.h>
 
 namespace {
 
-ec2::QnPeerSet getDirectClientPeers()
+ec2::QnPeerSet getDirectClientPeers(ec2::QnTransactionMessageBus* messageBus)
 {
     ec2::QnPeerSet result;
 
-    auto clients = ec2::QnTransactionMessageBus::instance()->aliveClientPeers();
+    auto clients = messageBus->aliveClientPeers();
     for (auto it = clients.begin(); it != clients.end(); ++it)
     {
         const auto& clientId = it.key();
@@ -38,13 +39,18 @@ ApiDiscoveryData toApiDiscoveryData(
     return params;
 }
 
+QnDiscoveryNotificationManager::QnDiscoveryNotificationManager(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
+{
+
+}
 
 void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<ApiDiscoverPeerData> &transaction, NotificationSource /*source*/)
 {
     NX_ASSERT(transaction.command == ApiCommand::discoverPeer, "Invalid command for this function", Q_FUNC_INFO);
 
     // TODO: maybe it's better to move it out and use signal?..
-    QnModuleFinder *moduleFinder = qnModuleFinder;
+    QnModuleFinder *moduleFinder = commonModule()->moduleFinder();
     if (moduleFinder && moduleFinder->directModuleFinder())
         moduleFinder->directModuleFinder()->checkUrl(QUrl(transaction.params.url));
 
@@ -83,7 +89,10 @@ void QnDiscoveryNotificationManager::triggerNotification(const QnTransaction<Api
 
 
 template<class QueryProcessorType>
-QnDiscoveryManager<QueryProcessorType>::QnDiscoveryManager(QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData) :
+QnDiscoveryManager<QueryProcessorType>::QnDiscoveryManager(
+    QueryProcessorType * const queryProcessor,
+    const Qn::UserAccessData &userAccessData)
+:
     m_queryProcessor(queryProcessor),
     m_userAccessData(userAccessData)
 {
@@ -174,19 +183,22 @@ int QnDiscoveryManager<QueryProcessorType>::getDiscoveryData(impl::GetDiscoveryD
 
 template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
-        const ApiDiscoveredServerData &discoveredServer,
-        impl::SimpleHandlerPtr handler)
+    QnTransactionMessageBus* messageBus,
+    const ApiDiscoveredServerData &discoveredServer,
+    impl::SimpleHandlerPtr handler)
 {
-    const auto peers = getDirectClientPeers();
+    const auto peers = getDirectClientPeers(messageBus);
     if (peers.isEmpty())
         return -1;
 
     QnTransaction<ApiDiscoveredServerData> transaction(
-        ApiCommand::discoveredServerChanged, discoveredServer);
+        ApiCommand::discoveredServerChanged,
+        messageBus->commonModule()->moduleGUID(),
+        discoveredServer);
 
     const int reqId = generateRequestID();
 
-    QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
+    messageBus->sendTransaction(transaction, peers);
     QnConcurrent::run(Ec2ThreadPool::instance(),
         [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });
 
@@ -195,19 +207,22 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
 
 template<class QueryProcessorType>
 int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServersList(
-        const ApiDiscoveredServerDataList &discoveredServersList,
-        impl::SimpleHandlerPtr handler)
+    QnTransactionMessageBus* messageBus,
+    const ApiDiscoveredServerDataList &discoveredServersList,
+    impl::SimpleHandlerPtr handler)
 {
-    const auto peers = getDirectClientPeers();
+    const auto peers = getDirectClientPeers(messageBus);
     if (peers.isEmpty())
         return -1;
 
     QnTransaction<ApiDiscoveredServerDataList> transaction(
-        ApiCommand::discoveredServersList, discoveredServersList);
+        ApiCommand::discoveredServersList,
+        messageBus->commonModule()->moduleGUID(),
+        discoveredServersList);
 
     const int reqId = generateRequestID();
 
-    QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
+    messageBus->sendTransaction(transaction, peers);
     QnConcurrent::run(Ec2ThreadPool::instance(),
         [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });
 

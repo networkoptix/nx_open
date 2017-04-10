@@ -143,7 +143,8 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
 
 QByteArray QnUpnpResourceSearcher::getDeviceDescription(const QByteArray& uuidStr, const QUrl& url)
 {
-    if (m_cacheLivetime.elapsed() > nx_upnp::DeviceSearcher::cacheTimeout()) {
+    if (m_cacheLivetime.elapsed() > nx_upnp::DeviceSearcher::instance()->cacheTimeout())
+    {
         m_cacheLivetime.restart();
         m_deviceXmlCache.clear();
     }
@@ -297,6 +298,11 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
 ////////////////////////////////////////////////////////////
 //// class QnUpnpResourceSearcherAsync
 ////////////////////////////////////////////////////////////
+
+QnUpnpResourceSearcherAsync::QnUpnpResourceSearcherAsync(QnCommonModule* commonModule) :
+    QnAbstractNetworkResourceSearcher(commonModule)
+{
+}
 
 QnResourceList QnUpnpResourceSearcherAsync::findResources()
 {

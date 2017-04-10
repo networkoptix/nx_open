@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <functional>
 #include <list>
@@ -11,8 +11,7 @@
 namespace nx_http {
 
 //!This class is to manage all modifications to HTTP request/response
-class NX_NETWORK_API HttpModManager : public QObject,
-    public Singleton<HttpModManager>
+class NX_NETWORK_API HttpModManager: public QObject, public Singleton<HttpModManager>
 {
     Q_OBJECT
 

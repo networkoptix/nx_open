@@ -11,6 +11,7 @@
 
 #include <core/resource_management/resource_data_pool.h>
 #include <core/resource/resource_data.h>
+#include <common/static_common_module.h>
 
 #include "axis_resource.h"
 
@@ -76,7 +77,7 @@ QnAxisPtzController::QnAxisPtzController(const QnPlAxisResourcePtr &resource):
 {
     updateState();
 
-    QnResourceData data = qnCommon->dataPool()->data(resource);
+    QnResourceData data = qnStaticCommon->dataPool()->data(resource);
     m_maxDeviceSpeed = QVector3D(
         data.value<qreal>(lit("axisMaxPanSpeed"), 100),
         data.value<qreal>(lit("axisMaxTiltSpeed"), 100),
@@ -126,16 +127,16 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
 
     if(params.value<bool>(lit("root.PTZ.Support.S%1.AbsolutePan").arg(channel), false))
         m_capabilities |= Qn::AbsolutePanCapability;
-        
+
     if(params.value<bool>(lit("root.PTZ.Support.S%1.AbsoluteTilt").arg(channel), false))
         m_capabilities |= Qn::AbsoluteTiltCapability;
-        
+
     if(params.value<bool>(lit("root.PTZ.Support.S%1.AbsoluteZoom").arg(channel), false))
         m_capabilities |= Qn::AbsoluteZoomCapability;
 
     if(!params.value<bool>(lit("root.PTZ.Various.V%1.PanEnabled").arg(channel), true))
         m_capabilities &= ~(Qn::ContinuousPanCapability | Qn::AbsolutePanCapability);
-        
+
     if(!params.value<bool>(lit("root.PTZ.Various.V%1.TiltEnabled").arg(channel), true))
         m_capabilities &= ~(Qn::ContinuousTiltCapability | Qn::AbsoluteTiltCapability);
 
@@ -156,7 +157,7 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
         params.value(lit("root.PTZ.Limit.L%1.MaxTilt").arg(channel), &limits.maxTilt) &&
         params.value(lit("root.PTZ.Limit.L%1.MinFieldAngle").arg(channel), &limits.minFov) &&
         params.value(lit("root.PTZ.Limit.L%1.MaxFieldAngle").arg(channel), &limits.maxFov) &&
-        limits.minPan <= limits.maxPan && 
+        limits.minPan <= limits.maxPan &&
         limits.minTilt <= limits.maxTilt &&
         limits.minFov <= limits.maxFov
     ) {
@@ -193,8 +194,8 @@ void QnAxisPtzController::updateState(const QnAxisParameterMap &params) {
 CLSimpleHTTPClient *QnAxisPtzController::newHttpClient() const
 {
     return new CLSimpleHTTPClient(
-        m_resource->getHostAddress(), 
-        QUrl(m_resource->getUrl()).port(DEFAULT_AXIS_API_PORT), 
+        m_resource->getHostAddress(),
+        QUrl(m_resource->getUrl()).port(DEFAULT_AXIS_API_PORT),
         m_resource->getNetworkTimeout(),  // TODO: #Elric use int in getNetworkTimeout
         m_resource->getAuth()
     );
@@ -243,7 +244,7 @@ bool QnAxisPtzController::queryInternal(const QString &request, QByteArray *body
             qnWarning("Failed to execute request '%1' for camera %2. Result: %3.", request, m_resource->getName(), ::toString(status));
             return false;
         }
-        
+
         /* If we do not return, repeat request with cookie on the second loop step. */
     }
 
@@ -366,7 +367,7 @@ bool QnAxisPtzController::getPresets(QnPtzPresetList *presets)
 {
     if (!(m_capabilities & Qn::PresetsPtzCapability))
         return base_type::getPresets(presets);
-    
+
     if (!m_cacheUpdateTimer.isValid() || m_cacheUpdateTimer.elapsed() > CACHE_UPDATE_TIMEOUT)
     {
         QByteArray body;
@@ -406,7 +407,7 @@ bool QnAxisPtzController::activatePreset(const QString &presetId, qreal speed)
 {
     if (!(m_capabilities & Qn::PresetsPtzCapability))
         return base_type::activatePreset(presetId, speed);
-    
+
     return query(lit("com/ptz.cgi?gotoserverpresetno=%1").arg(extractPresetNum(presetId)));
 }
 

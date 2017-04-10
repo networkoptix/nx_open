@@ -4,6 +4,8 @@
 
 #include <api/server_rest_connection_fwd.h>
 
+#include <client_core/connection_context_aware.h>
+
 #include <client/client_color_types.h>
 
 #include <core/resource/resource_fwd.h>
@@ -19,7 +21,7 @@ class QnSingleCamLicenceStatusHelper;
 
 typedef decltype(QnSpectrumData::data) VisualizerData;
 
-class QnTwoWayAudioWidgetPrivate: public Connective<QObject>
+class QnTwoWayAudioWidgetPrivate: public Connective<QObject>, public QnConnectionContextAware
 {
     Q_OBJECT
 

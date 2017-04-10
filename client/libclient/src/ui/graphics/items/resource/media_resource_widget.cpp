@@ -21,6 +21,7 @@
 #include <client/client_settings.h>
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
+#include <client/client_module.h>
 
 #include <common/common_module.h>
 
@@ -306,7 +307,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged, this,
         &QnMediaResourceWidget::updateCompositeOverlayMode);
 
-    const auto messageProcessor = QnCommonMessageProcessor::instance();
+    const auto messageProcessor = qnCommonMessageProcessor;
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         [this](const QnAbstractBusinessActionPtr &businessAction)
         {
@@ -568,13 +569,22 @@ void QnMediaResourceWidget::createButtons()
 
 void QnMediaResourceWidget::createPtzController()
 {
+    auto threadPool = qnClientModule->ptzControllerPool()->commandThreadPool();
+    auto executorThread = qnClientModule->ptzControllerPool()->executorThread();
+
     /* Set up PTZ controller. */
     QnPtzControllerPtr fisheyeController;
     fisheyeController.reset(new QnFisheyePtzController(this), &QObject::deleteLater);
     fisheyeController.reset(new QnViewportPtzController(fisheyeController));
     fisheyeController.reset(new QnPresetPtzController(fisheyeController));
-    fisheyeController.reset(new QnTourPtzController(fisheyeController));
-    fisheyeController.reset(new QnActivityPtzController(QnActivityPtzController::Local, fisheyeController));
+    fisheyeController.reset(new QnTourPtzController(
+        fisheyeController,
+        threadPool,
+        executorThread));
+    fisheyeController.reset(new QnActivityPtzController(
+        commonModule(),
+        QnActivityPtzController::Local,
+        fisheyeController));
 
     // Small hack because widget's zoomRect is set only in Synchronize method, not instantly --gdm
     if (item() && item()->zoomRect().isNull())
@@ -588,7 +598,8 @@ void QnMediaResourceWidget::createPtzController()
     {
         if (QnPtzControllerPtr serverController = qnPtzPool->controller(m_camera))
         {
-            serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
+            serverController.reset(new QnActivityPtzController(commonModule(),
+                QnActivityPtzController::Client, serverController));
             m_ptzController.reset(new QnFallbackPtzController(fisheyeController, serverController));
         }
         else
@@ -2354,7 +2365,7 @@ void QnMediaResourceWidget::resetTriggers()
         return;
 
     /* Create new relevant triggers: */
-    for (const auto& rule: QnCommonMessageProcessor::instance()->businessRules())
+    for (const auto& rule: qnCommonMessageProcessor->businessRules())
         createTriggerIfRelevant(rule); //< creates a trigger only if the rule is relevant
 }
 
@@ -2404,7 +2415,7 @@ void QnMediaResourceWidget::invokeTrigger(
                 cl_logERROR);
         };
 
-    qnCommon->currentServer()->restConnection()->softwareTriggerCommand(
+    commonModule()->currentServer()->restConnection()->softwareTriggerCommand(
         m_resource->toResource()->getId(), id, toggleState,
         responseHandler, QThread::currentThread());
 }

@@ -17,7 +17,7 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
     QnWorkbenchContextAware(parent),
     m_currentServer()
 {
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr &resource)
         {
             if (resource != m_currentServer)
@@ -30,28 +30,29 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
     connect(qnClientMessageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, this,
         [this]()
         {
-            const auto currentServer = qnCommon->currentServer();
+            const auto currentServer = commonModule()->currentServer();
 
-            NX_ASSERT(!currentServer.isNull(), Q_FUNC_INFO, "qnCommon->currentServer() is NULL!");
+            NX_ASSERT(!currentServer.isNull(), Q_FUNC_INFO, "commonModule()->currentServer() is NULL!");
             if (!currentServer)
                 return;
 
             m_currentServer = currentServer;
-            connect(currentServer, &QnMediaServerResource::portChanged, this
-                , [this](const QnResourcePtr &resource)
-            {
-                const auto currentServer = resource.dynamicCast<QnMediaServerResource>();
-                if (!currentServer)
-                    return;
+            connect(currentServer, &QnMediaServerResource::portChanged, this,
+                [this](const QnResourcePtr &resource)
+                {
+                    const auto currentServer = resource.dynamicCast<QnMediaServerResource>();
+                    if (!currentServer)
+                        return;
 
-                QUrl url = QnAppServerConnectionFactory::url();
-                if (url.isEmpty() || (url.port() == currentServer->getPort()))
-                    return;
+                    QUrl url = commonModule()->currentUrl();
+                    if (url.isEmpty() || (url.port() == currentServer->getPort()))
+                        return;
 
-                url.setPort(currentServer->getPort());
-                QnAppServerConnectionFactory::setUrl(url);
-                menu()->trigger(QnActions::ReconnectAction);
-            });
+                       //TODO: #GDM #FIXME #3.1 Restore functionality
+    //                 url.setPort(currentServer->getPort());
+    //                 QnAppServerConnectionFactory::setUrl(url);
+    //                 menu()->trigger(QnActions::ReconnectAction);
+                });
         });
 }
 

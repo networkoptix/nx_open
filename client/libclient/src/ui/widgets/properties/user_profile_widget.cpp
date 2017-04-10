@@ -124,7 +124,7 @@ void QnUserProfileWidget::loadDataToUi()
 
     ui->loginInputField->setText(m_model->user()->getName());
     ui->nameInputField->setText(m_model->user()->fullName());
-    ui->groupInputField->setText(qnUserRolesManager->userRoleName(m_model->user()));
+    ui->groupInputField->setText(userRolesManager()->userRoleName(m_model->user()));
     ui->emailInputField->setText(m_model->user()->getEmail());
     m_newPassword.clear();
 
@@ -166,13 +166,14 @@ void QnUserProfileWidget::applyChanges()
         {
             /* Password was changed. Change it in global settings and hope for the best. */
             context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_newPassword);
-            QUrl url = QnAppServerConnectionFactory::url();
+            QUrl url = commonModule()->currentUrl();
             url.setPassword(m_newPassword);
-            QnAppServerConnectionFactory::setUrl(url);
+            //TODO: #GDM #FIXME #3.1 Restore functionality
+            //QnAppServerConnectionFactory::setUrl(url);
 
             using namespace nx::client::core::helpers;
 
-            const auto localSystemId = helpers::getLocalSystemId(qnCommon->moduleInformation());
+            const auto localSystemId = helpers::getLocalSystemId(commonModule()->moduleInformation());
             if (getCredentials(localSystemId, url.userName()).isValid())
                 storeCredentials(localSystemId, QnEncodedCredentials(url));
             qnClientCoreSettings->save();

@@ -14,6 +14,7 @@
 #include <rest/server/rest_connection_processor.h>
 
 #include <nx/fusion/serialization/json_functions.h>
+#include <common/common_module.h>
 
 class ManualSearchThreadPoolHolder
 {
@@ -48,7 +49,9 @@ QnManualCameraAdditionRestHandler::~QnManualCameraAdditionRestHandler()
 }
 
 int QnManualCameraAdditionRestHandler::searchStartAction(
-    const QnRequestParams& params, QnJsonRestResult& result)
+    const QnRequestParams& params,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
 {
     QAuthenticator auth;
     auth.setUser(params.value("user", "admin"));
@@ -67,7 +70,7 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
 
     QnUuid processUuid = QnUuid::createUuid();
 
-    QnManualCameraSearcher* searcher = new QnManualCameraSearcher();
+    QnManualCameraSearcher* searcher = new QnManualCameraSearcher(owner->commonModule());
 
     {
         QnMutexLocker lock( &m_searchProcessMutex );
@@ -215,7 +218,7 @@ int QnManualCameraAdditionRestHandler::addCameras(
         infoMap.insert(camera.url, info);
     }
 
-    int registered = QnResourceDiscoveryManager::instance()->registerManualCameras(infoMap);
+    int registered = owner->commonModule()->resourceDiscoveryManager()->registerManualCameras(infoMap);
     if (registered > 0)
     {
         QnAuditRecord auditRecord =
@@ -237,7 +240,7 @@ int QnManualCameraAdditionRestHandler::executeGet(
 {
     QString action = extractAction(path);
     if (action == "search")
-        return searchStartAction(params, result);
+        return searchStartAction(params, result, owner);
     else if (action == "status")
         return searchStatusAction(params, result);
     else if (action == "stop")

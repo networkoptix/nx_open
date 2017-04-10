@@ -1,5 +1,6 @@
-
 #pragma once
+
+#include <QtCore/QDir>
 
 #include <statistics/abstract_statistics_storage.h>
 

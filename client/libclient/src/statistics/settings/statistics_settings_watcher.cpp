@@ -81,7 +81,7 @@ void QnStatisticsSettingsWatcher::updateSettingsImpl(int delayMs)
         return;
     }
 
-    const auto server = qnCommon->currentServer();
+    const auto server = commonModule()->currentServer();
     if (!server)
         return;
 

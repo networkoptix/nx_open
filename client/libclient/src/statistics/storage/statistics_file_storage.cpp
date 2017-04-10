@@ -1,6 +1,6 @@
-
 #include "statistics_file_storage.h"
 
+#include <QtCore/QDateTime>
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
 

@@ -43,7 +43,8 @@ QnChunksRequestData::QnChunksRequestData():
 {
 }
 
-QnChunksRequestData QnChunksRequestData::fromParams(const QnRequestParamList& params)
+QnChunksRequestData QnChunksRequestData::fromParams(QnResourcePool* resourcePool,
+    const QnRequestParamList& params)
 {
     static const qint64 kUsPerMs = 1000;
 
@@ -75,7 +76,7 @@ QnChunksRequestData QnChunksRequestData::fromParams(const QnRequestParamList& pa
     request.isLocal = params.contains(kLocalParam);
     QnLexical::deserialize(params.value(kFormatParam), &request.format);
 
-    nx::camera_id_helper::findAllCamerasByFlexibleIds(&request.resList, params,
+    nx::camera_id_helper::findAllCamerasByFlexibleIds(resourcePool, &request.resList, params,
         {kCameraIdParam, kDeprecatedIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam});
 
     return request;

@@ -35,7 +35,7 @@ void QnUploadUpdatesPeerTask::doStart() {
     NX_LOG(lit("Update: QnUploadUpdatesPeerTask: Starting upload."), cl_logDEBUG1);
 
     foreach (const QnUuid &id, peers()) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
+        QnMediaServerResourcePtr server = resourcePool()->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 

@@ -62,7 +62,7 @@ CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bo
     m_FrameCnt = 0;
     bool isInitialized = m_resource->isInitialized();
     if (!isInitialized) {
-        if (m_openStreamResult == CameraDiagnostics::NoErrorResult())
+        if (m_openStreamResult)
             m_openStreamResult = CameraDiagnostics::InitializationInProgress();
     }
     else {

@@ -34,6 +34,7 @@
 #include "decoders/video/ffmpeg_video_decoder.h"
 #include "export/sign_helper.h"
 #include "transcoding/filters/scale_image_filter.h"
+#include <common/common_module.h>
 
 static const int DEFAULT_VIDEO_STREAM_ID = 4113;
 static const int DEFAULT_AUDIO_STREAM_ID = 4352;
@@ -81,6 +82,7 @@ QString QnStreamRecorder::errorString(StreamRecorderError errCode)
 
 QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
+    QnCommonModuleAware(dev->commonModule()),
     QnResourceConsumer(dev),
     m_device(dev),
     m_firstTime(true),
@@ -641,7 +643,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 #ifndef SIGN_FRAME_ENABLED
         if (m_needCalcSignature)
         {
-            QByteArray signPattern = QnSignHelper::getSignPattern();
+            QByteArray signPattern = QnSignHelper::getSignPattern(licensePool());
 
             // Add server time zone as one more column to sign pattern.
             if (m_serverTimeZoneMs != Qn::InvalidUtcOffset)
@@ -880,6 +882,7 @@ bool QnStreamRecorder::addRecordingContext(const QString &fileName)
     m_fixedFileName = true;
     auto storage = QnStorageResourcePtr(
         QnStoragePluginFactory::instance()->createStorage(
+            commonModule(),
             fileName
         )
     );
@@ -969,7 +972,7 @@ QByteArray QnStreamRecorder::getSignature() const
 
 bool QnStreamRecorder::addSignatureFrame() {
 #ifndef SIGN_FRAME_ENABLED
-    QByteArray signText = QnSignHelper::getSignPattern();
+    QByteArray signText = QnSignHelper::getSignPattern(licensePool());
     if (m_serverTimeZoneMs != Qn::InvalidUtcOffset)
         signText.append(QByteArray::number(m_serverTimeZoneMs)); // I've included server timezone to sign to prevent modification this attribute
     QnSignHelper::updateDigest(nullptr, m_mdctx, (const quint8*) signText.data(), signText.size());

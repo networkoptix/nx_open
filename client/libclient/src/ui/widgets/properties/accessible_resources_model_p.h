@@ -2,6 +2,8 @@
 
 #include <QtCore/QSortFilterProxyModel>
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource_access/resource_access_subject.h>
 
 /*
@@ -9,7 +11,7 @@
 *  and inserts a virtual column that displays an icon of a resource through
 *  which a user gains implicit access to the resource of corresponding row.
 */
-class QnAccessibleResourcesModel : public QSortFilterProxyModel
+class QnAccessibleResourcesModel : public QSortFilterProxyModel, public QnConnectionContextAware
 {
     //TODO: #vkutin Implement "QnRelayoutColumnsProxyModel" and use it as a base
     using base_type = QSortFilterProxyModel;

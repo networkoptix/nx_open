@@ -97,14 +97,14 @@ int QnProxySenderConnection::sendRequest(const QByteArray& data)
     return totalSend;
 }
 
-static QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url)
+QByteArray QnProxySenderConnection::makeProxyRequest(const QnUuid& serverUuid, const QUrl& url) const
 {
     const QByteArray H_REALM("NX");
     const QByteArray H_METHOD("CONNECT");
     const QByteArray H_PATH("/proxy-reverse");
     const QByteArray H_AUTH("auth-int");
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(serverUuid);
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(serverUuid);
     if (!server)
         return QByteArray();
 

@@ -13,6 +13,8 @@ public:
     const static QString CAM_UPD_PREFIX;
     const static QString CAM_HISTORY_PREFIX;
 
+    QnMutexCameraDataHandler(QnCommonModule* commonModule);
+
     virtual QByteArray getUserData(const QString& name) override;
     virtual bool checkUserData(const QString& name, const QByteArray& data) override;
 };

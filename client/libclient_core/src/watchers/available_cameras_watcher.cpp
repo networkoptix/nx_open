@@ -25,11 +25,12 @@ public:
 
 QnAvailableCamerasWatcher::QnAvailableCamerasWatcher(QObject* parent):
     base_type(parent),
+    QnCommonModuleAware(parent),
     d_ptr(new QnAvailableCamerasWatcherPrivate(this))
 {
     Q_D(QnAvailableCamerasWatcher);
 
-    connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
+    connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
         this,
         [this, d](const QnResourceAccessSubject& subject, Qn::GlobalPermissions value)
         {
@@ -63,7 +64,7 @@ void QnAvailableCamerasWatcher::setUser(const QnUserResourcePtr& user)
 
     d->user = user;
     d->userHasAllMediaAccess = user &&
-        qnGlobalPermissionsManager->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission);
+        globalPermissionsManager()->hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission);
     d->updateWatcher();
 }
 
@@ -115,9 +116,9 @@ void QnAvailableCamerasWatcherPrivate::updateWatcher()
         return;
 
     if (compatibilityMode && !userHasAllMediaAccess)
-        watcher.reset(new detail::LayoutBasedWatcher(user));
+        watcher.reset(new detail::LayoutBasedWatcher(user, q->commonModule()));
     else
-        watcher.reset(new detail::PermissionsBasedWatcher(user));
+        watcher.reset(new detail::PermissionsBasedWatcher(user, q->commonModule()));
 
     QObject::connect(watcher.data(), &detail::Watcher::cameraAdded,
         q, &QnAvailableCamerasWatcher::cameraAdded);

@@ -73,7 +73,7 @@ void QnUserSettingsModel::setUser(const QnUserResourcePtr& value)
 void QnUserSettingsModel::updatePermissions()
 {
     m_accessibleResources = m_user && m_mode != NewUser
-        ? qnSharedResourcesManager->sharedResources(m_user)
+        ? sharedResourcesManager()->sharedResources(m_user)
         : QSet<QnUuid>();
 }
 

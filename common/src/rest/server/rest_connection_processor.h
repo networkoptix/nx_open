@@ -29,7 +29,8 @@ private:
 
 class QnRestConnectionProcessorPrivate;
 
-class QnRestConnectionProcessor: public QnTCPConnectionProcessor {
+class QnRestConnectionProcessor: public QnTCPConnectionProcessor
+{
     Q_OBJECT
 
 public:
