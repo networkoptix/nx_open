@@ -59,11 +59,16 @@ start()
     fi
 
     process_core_dump
+    
     DISK=$(fdisk -l |grep "Disk" |grep "dev/sd" |awk '{print substr($2, 0, length($2))}')
-    if [ ! -z "$DISK" ]; then
-        hdparm -I /dev/sd? |grep Model >/tmp/hddlist
+    local HDPARM="hdparm"
+    if ! which hdparm; then
+        HDPARM="$PREFIX/bin/hdparm"
     fi
-
+    if [ ! -z "$DISK" ]; then
+        "$HDPARM" -I /dev/sd? |grep Model >/tmp/hddlist
+    fi
+    
     if [ -f "$LOG_OUTPUT_FLAG" ]; then
         mkdir -p "$LOGS_PATH"
         REDIRECT_OUTPUT="$LOGS_PATH/mediaserver-out.log"
