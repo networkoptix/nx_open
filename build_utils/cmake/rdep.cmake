@@ -26,12 +26,56 @@ function(get_full_package_name package var)
 endfunction()
 
 function(rdep_sync_package package)
+    cmake_parse_arguments(RDEP "" "RESULT_VARIABLE" "" ${ARGN})
+
     execute_process(
         COMMAND
             ${PYTHON_EXECUTABLE}
             ${RDEP_DIR}/sync.py
             ${package}
-        RESULT_VARIABLE RDEP_RESULT)
+        RESULT_VARIABLE result)
+
+    if(RDEP_RESULT_VARIABLE)
+        set(${RDEP_RESULT_VARIABLE} ${result} PARENT_SCOPE)
+    endif()
+endfunction()
+
+function(_rdep_load_package_from_dir package_dir)
+    file(GLOB cmake_files "${package_dir}/*.cmake")
+    foreach(file ${cmake_files})
+        include("${file}")
+    endforeach()
+endfunction()
+
+function(_rdep_try_package package)
+    cmake_parse_arguments(RDEP "" "PATH_VARIABLE;RESULT_VARIABLE" "" ${ARGN})
+
+    set(package_dir "${PACKAGES_DIR}/${package}")
+
+    if(rdepSync)
+        rdep_sync_package(${package} RESULT_VARIABLE result)
+    else()
+        message(STATUS "Looking for the existing package ${package}")
+    endif()
+
+    if(IS_DIRECTORY "${package_dir}")
+        if(NOT result EQUAL 0)
+            message(WARNING "Could not sync package ${package}. Using the existing copy in ${package_dir}.")
+        endif()
+
+        _rdep_load_package_from_dir("${package_dir}")
+
+        if(RDEP_PATH_VARIABLE)
+            set(${RDEP_PATH_VARIABLE} "${package_dir}" PARENT_SCOPE)
+        endif()
+        if(RDEP_RESULT_VARIABLE)
+            set(${RDEP_RESULT_VARIABLE} 1 PARENT_SCOPE)
+        endif()
+    else()
+        if(RDEP_RESULT_VARIABLE)
+            set(${RDEP_RESULT_VARIABLE} 0 PARENT_SCOPE)
+        endif()
+    endif()
 endfunction()
 
 function(rdep_add_package package)
@@ -39,29 +83,30 @@ function(rdep_add_package package)
 
     get_full_package_name(${package} package)
 
-    set(package_dir ${PACKAGES_DIR}/${package})
+    set(package_found 0)
 
-    if(rdepSync)
-        rdep_sync_package(${package})
-    else()
-        message(STATUS "Using existing package ${package}")
+    if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+        _rdep_try_package("${package}-debug"
+             PATH_VARIABLE package_dir
+             RESULT_VARIABLE package_found)
     endif()
 
-    if(NOT IS_DIRECTORY ${package_dir})
+    if(NOT package_found)
+        _rdep_try_package("${package}"
+             PATH_VARIABLE package_dir
+             RESULT_VARIABLE package_found)
+    endif()
+
+    if(NOT package_found)
         if(RDEP_OPTIONAL)
             message(STATUS "Package ${package} not found")
-            return()
         else()
             message(FATAL_ERROR "Package ${package} not found")
         endif()
+        return()
     endif()
 
-    file(GLOB CMAKE_FILES ${package_dir}/*.cmake)
-    foreach(file ${CMAKE_FILES})
-        include(${file})
-    endforeach()
-
     if(RDEP_PATH_VARIABLE)
-        set(${RDEP_PATH_VARIABLE} ${package_dir} PARENT_SCOPE)
+        set(${RDEP_PATH_VARIABLE} "${package_dir}" PARENT_SCOPE)
     endif()
 endfunction()
