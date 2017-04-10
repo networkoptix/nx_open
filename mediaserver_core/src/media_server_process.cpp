@@ -698,8 +698,11 @@ QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
 
 void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProcessor)
 {
+    m_initStoragesAsyncPromise.reset(new nx::utils::promise<void>());
     QtConcurrent::run([messageProcessor, this]
     {
+        const auto setPromiseGuardFunc = makeScopedGuard([&]() { m_initStoragesAsyncPromise->set_value(); });
+
         //read server's storages
         ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
         ec2::ErrorCode rez;
@@ -2879,6 +2882,8 @@ void MediaServerProcess::run()
     stopObjects();
 
     QnResource::stopCommandProc();
+    if (m_initStoragesAsyncPromise)
+        m_initStoragesAsyncPromise->get_future().wait();
     // todo: #rvasilenko some undeleted resources left in the QnMain event loop. I stopped TimerManager as temporary solution for it.
     nx::utils::TimerManager::instance()->stop();
 
