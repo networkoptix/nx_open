@@ -191,7 +191,7 @@ class Server(object):
         if reset:
             if was_started:
                 self.stop_service()
-            self.host.run_command(['rm', '-rf', os.path.join(self.dir, MEDIASERVER_VAR_PATH, '*')])
+            self._cleanup_var_dir()
             if patch_set_cloud_host:
                 self.patch_binary_set_cloud_host(patch_set_cloud_host)  # may be changed by previous tests...
             self.reset_config(logLevel=log_level, tranLogLevel=log_level, **(config_file_params or {}))
@@ -204,6 +204,9 @@ class Server(object):
         if self._is_started:
             self.load_system_settings()
             assert not reset or not self.is_system_set_up(), 'Failed to properly reinit server - it reported to be already set up'
+
+    def _cleanup_var_dir(self):
+        self.host.run_command(['rm', '-rf', os.path.join(self.dir, MEDIASERVER_VAR_PATH, '*')])
 
     def list_core_files(self):
         return (self.host.run_command(
@@ -269,8 +272,12 @@ class Server(object):
             return 'local'
 
     def reset(self):
-        self.reset_config()
-        self.restart()
+        was_started = self.service.get_status()
+        if was_started:
+            self.stop_service()
+        self._cleanup_var_dir()
+        if was_started:
+            self.start_service()
 
     def reset_config(self, **kw):
         self.host.run_command(['cp', self._config_path_initial, self._config_path])
