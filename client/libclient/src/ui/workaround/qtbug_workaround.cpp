@@ -4,10 +4,7 @@
 #include <QtGui/QWindow>
 
 #include <nx/utils/app_info.h>
-
-#if defined(Q_OS_MACX)
 #include <utils/common/delayed.h>
-#endif
 
 #ifdef Q_OS_WIN
 #   include <Windows.h>
