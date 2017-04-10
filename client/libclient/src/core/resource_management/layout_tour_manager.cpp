@@ -39,23 +39,6 @@ ec2::ApiLayoutTourData QnLayoutTourManager::tour(const QnUuid& id) const
     return iter != m_tours.cend() ? *iter : ec2::ApiLayoutTourData();
 }
 
-QnLayoutTourItemList QnLayoutTourManager::tourItems(const QnUuid& id) const
-{
-    return tourItems(tour(id));
-}
-
-QnLayoutTourItemList QnLayoutTourManager::tourItems(const ec2::ApiLayoutTourData& tour) const
-{
-    QnLayoutTourItemList result;
-    result.reserve(tour.items.size());
-    for (const auto& item: tour.items)
-    {
-        if (const auto& layout = qnResPool->getResourceById<QnLayoutResource>(item.layoutId))
-            result.emplace_back(layout, item.delayMs);
-    }
-    return result;
-}
-
 void QnLayoutTourManager::addOrUpdateTour(const ec2::ApiLayoutTourData& tour)
 {
     QnMutexLocker lock(&m_mutex);
