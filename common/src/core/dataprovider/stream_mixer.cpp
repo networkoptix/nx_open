@@ -187,12 +187,12 @@ void QnStreamMixer::proxyOpenStream(
 {
     QnMutexLocker lock(&m_mutex);
 
+    std::vector<QnAbstractStreamDataProviderPtr> sources;
     for (auto& source: m_sourceMap)
     {
         if (source.provider)
         {
-            source.provider->stop();
-            source.provider->startIfNotRunning();
+            sources.push_back(source.provider);
         }
         else
         {
@@ -203,17 +203,29 @@ void QnStreamMixer::proxyOpenStream(
             qDebug() << lit("Stream mixer, where is source's provider?");
         }
     }
+
+    lock.unlock();
+    for (const auto& s: sources)
+    {
+        s->stop();
+        s->startIfNotRunning();
+    }
 }
 
 void QnStreamMixer::proxyCloseStream()
 {
     QnMutexLocker lock(&m_mutex);
 
+    std::vector<QnAbstractStreamDataProviderPtr> sources;
     for (auto& source: m_sourceMap)
     {
         if (source.provider)
-            source.provider->pleaseStop();
+            sources.push_back(source.provider);
     }
+
+    lock.unlock();
+    for (const auto& s: sources)
+        s->pleaseStop();
 }
 
 QnAbstractMediaDataPtr QnStreamMixer::retrieveData()
@@ -255,8 +267,11 @@ bool QnStreamMixer::isStreamOpened() const
             continue;
         }
 
-        if (mediaStreamProvider->isStreamOpened())
-            return true;
+        {
+            QnMutexUnlocker unlocker(&lock);
+            if (mediaStreamProvider->isStreamOpened())
+                return true;
+        }
     }
 
     return false;
