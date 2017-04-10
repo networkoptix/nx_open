@@ -248,9 +248,6 @@ int Appserver2Process::exec()
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 
-    std::unique_ptr<QnRestProcessorPool> restProcessorPool(new QnRestProcessorPool());
-    ec2ConnectionFactory->registerRestHandlers(restProcessorPool.get());
-
     //QnAppServerConnectionFactory appServerConnectionFactory;
     //appServerConnectionFactory.setUrl(dbUrl);
     //appServerConnectionFactory.setEC2ConnectionFactory(ec2ConnectionFactory.get());
@@ -265,6 +262,9 @@ int Appserver2Process::exec()
         settings.endpoint().port,
         QnTcpListener::DEFAULT_MAX_CONNECTIONS,
         true);
+
+    ec2ConnectionFactory->registerRestHandlers(tcpListener.processorPool());
+
     if (!tcpListener.bindToLocalAddress())
     {
         //Must call messageProcessor->init(ec2Connection)

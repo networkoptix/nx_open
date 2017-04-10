@@ -145,6 +145,7 @@ private:
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
     void registerRestHandlers(
         CloudManagerGroup* const cloudManagerGroup,
+        QnUniversalTcpListener* tcpListener,
         ec2::QnTransactionMessageBus* messageBus);
     bool initTcpListener(
         CloudManagerGroup* const cloudManagerGroup,

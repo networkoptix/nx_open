@@ -1,11 +1,15 @@
 #include <gtest/gtest.h>
 
+#include <qtcore/QElapsedTimer>
+
 #include <nx/utils/test_support/module_instance_launcher.h>
 #include <test_support/appserver2_process.h>
 #include <nx_ec/data/api_camera_data.h>
 #include <core/resource_access/user_access_data.h>
 #include <nx_ec/ec_api.h>
 #include <transaction/transaction_message_bus.h>
+#include <core/resource_management/resource_pool.h>
+
 
 void initResourceTypes(ec2::AbstractECConnection* ec2Connection)
 {
@@ -23,12 +27,12 @@ Appserver2Ptr createAppserver()
     static int instanceCounter = 0;
 
     const auto tmpDir =
-        (QDir::homePath() + "/ec2_server_sync_ut.data");
+        (QDir::homePath() + "/ec2_server_sync_ut.data") + QString::number(instanceCounter++);
     QDir(tmpDir).removeRecursively();
 
     Appserver2Ptr result(new Appserver2());
 
-    const QString dbFileArg = lit("--dbFile=%1%2").arg(tmpDir).arg(instanceCounter++);
+    const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
     result->addArg(dbFileArg.toStdString().c_str());
 
     result->start();
@@ -45,9 +49,10 @@ void createData(const Appserver2Ptr& server)
     auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
     ASSERT_TRUE(!resTypePtr.isNull());
     cameraData.typeId = resTypePtr->getId();
-    //cameraData.parentId = commonModule()->moduleGUID();
+    cameraData.parentId = server->moduleInstance()->commonModule()->moduleGUID();
     cameraData.vendor = "Invalid camera";
     cameraData.physicalId = QnUuid::createUuid().toString();
+    cameraData.name = server->moduleInstance()->endpoint().toString();
     cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
 
     auto cameraManager = connection->getCameraManager(Qn::kSystemAccess);
@@ -57,15 +62,24 @@ void createData(const Appserver2Ptr& server)
 TEST(SympleSyncTest, main)
 {
     static const int kInstanceCount = 3;
+    static const int kMaxSyncTimeoutMs = 1000 * 5;
 
     std::vector<Appserver2Ptr> servers;
     for (int i = 0; i < kInstanceCount; ++i)
         servers.push_back(createAppserver());
-    for(const auto& server: servers)
+
+    for (const auto& server : servers)
+    {
         ASSERT_TRUE(server->waitUntilStarted());
+        NX_LOG(lit("Server started at url %1").arg(server->moduleInstance()->endpoint().toString()),
+            cl_logINFO);
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
     for (const auto& server: servers)
         createData(server);
+
     for (int i = 1; i < servers.size(); ++i)
     {
         const auto addr = servers[i]->moduleInstance()->endpoint();
@@ -73,5 +87,21 @@ TEST(SympleSyncTest, main)
         servers[i - 1]->moduleInstance()->ecConnection()->messageBus()->addConnectionToPeer(url);
     }
 
-    std::this_thread::sleep_for(std::chrono::seconds(10));
+    // wait for data sync
+    QElapsedTimer timer;
+    timer.restart();
+    int syncDoneCounter = 0;
+    do
+    {
+        syncDoneCounter = 0;
+        for (const auto& server : servers)
+        {
+            const auto& resPool = server->moduleInstance()->commonModule()->resourcePool();
+            const auto& cameraList = resPool->getAllCameras(QnResourcePtr());
+            if (cameraList.size() == kInstanceCount)
+                ++syncDoneCounter;
+        }
+        ASSERT_TRUE(timer.elapsed() < kMaxSyncTimeoutMs);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    } while (syncDoneCounter != kInstanceCount);
 }
