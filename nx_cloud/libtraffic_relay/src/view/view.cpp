@@ -5,9 +5,9 @@ namespace cloud {
 namespace relay {
 
 View::View(
-    const conf::Settings& settings,
-    const Model& model,
-    Controller* controller)
+    const conf::Settings& /*settings*/,
+    const Model& /*model*/,
+    Controller* /*controller*/)
 {
 }
 
