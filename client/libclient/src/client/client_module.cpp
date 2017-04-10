@@ -304,7 +304,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     commonModule->store(new QnPlatformAbstraction());
 
-    commonModule->setMessageProcessor(commonModule->instance<QnDesktopClientMessageProcessor>());
+    commonModule->createMessageProcessor<QnDesktopClientMessageProcessor>();
     commonModule->store(new QnClientResourceFactory());
 
     commonModule->store(new QnCameraBookmarksManager());

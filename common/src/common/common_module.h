@@ -215,7 +215,12 @@ public:
     QDateTime startupTime() const;
 
     QnCommonMessageProcessor* messageProcessor() const;
-    void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
+
+    template <class MessageProcessorType> void createMessageProcessor()
+    {
+        createMessageProcessorInternal(new MessageProcessorType(this));
+    }
+    void deleteMessageProcessor();
 
     std::shared_ptr<ec2::AbstractECConnection> ec2Connection() const;
 
@@ -228,6 +233,7 @@ signals:
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
     void runningInstanceGUIDChanged();
 private:
+    void createMessageProcessorInternal(QnCommonMessageProcessor* messageProcessor);
     void resetCachedValue();
     void updateModuleInformationUnsafe();
 

@@ -82,8 +82,7 @@ QnMobileClientModule::QnMobileClientModule(
     settings::migrateSettings();
 
     commonModule->store(new QnLongRunnablePool());
-    auto messageProcessor = commonModule->instance<QnMobileClientMessageProcessor>();
-    commonModule->setMessageProcessor(messageProcessor);
+    commonModule->createMessageProcessor<QnMobileClientMessageProcessor>();
 
     commonModule->instance<QnCameraHistoryPool>();
     commonModule->store(new QnMobileClientCameraFactory());

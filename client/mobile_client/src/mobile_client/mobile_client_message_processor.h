@@ -4,7 +4,8 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 
-class QnMobileClientMessageProcessor : public QnClientMessageProcessor {
+class QnMobileClientMessageProcessor : public QnClientMessageProcessor
+{
     Q_OBJECT
     typedef QnClientMessageProcessor base_type;
 

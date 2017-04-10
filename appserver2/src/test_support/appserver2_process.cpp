@@ -193,8 +193,7 @@ int Appserver2Process::exec()
 
     QnResourceDiscoveryManager resourceDiscoveryManager(m_commonModule.get());
     // Starting receiving notifications.
-    m_commonModule->setMessageProcessor(new Appserver2MessageProcessor(
-        m_commonModule.get()));
+    m_commonModule->createMessageProcessor<Appserver2MessageProcessor>();
 
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = m_commonModule->moduleGUID();

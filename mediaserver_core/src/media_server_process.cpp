@@ -2212,7 +2212,7 @@ void MediaServerProcess::run()
         QnAppInfo::productName().toUtf8(), "US",
         QnAppInfo::organizationName().toUtf8());
 
-    commonModule()->setMessageProcessor(new QnServerMessageProcessor(commonModule()));
+    commonModule()->createMessageProcessor<QnServerMessageProcessor>();
     QScopedPointer<QnMasterServerStatusWatcher> masterServerWatcher(new QnMasterServerStatusWatcher(commonModule()));
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer(commonModule()) );
     std::unique_ptr<QnServerDb> serverDB(new QnServerDb(commonModule()));
@@ -2924,7 +2924,7 @@ void MediaServerProcess::run()
 
     //ptzPool.reset();
 
-    commonModule()->setMessageProcessor(nullptr); // stop receiving notifications
+    commonModule()->deleteMessageProcessor(); // stop receiving notifications
 
     //disconnecting from EC2
     clearEc2ConnectionGuard.reset();

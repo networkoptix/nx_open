@@ -375,19 +375,21 @@ QnCommonMessageProcessor* QnCommonModule::messageProcessor() const
     return m_messageProcessor;
 }
 
-void QnCommonModule::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
+void QnCommonModule::createMessageProcessorInternal(QnCommonMessageProcessor* messageProcessor)
 {
-    if (m_messageProcessor)
-    {
-        m_messageProcessor->init(nullptr); // stop receiving notifications
-        m_runtimeInfoManager->setMessageProcessor(nullptr);
-        m_cameraHistory->setMessageProcessor(nullptr);
-        delete m_messageProcessor;
-    }
-
     m_messageProcessor = messageProcessor;
     m_runtimeInfoManager->setMessageProcessor(messageProcessor);
     m_cameraHistory->setMessageProcessor(messageProcessor);
+}
+
+void QnCommonModule::deleteMessageProcessor()
+{
+    if (!m_messageProcessor)
+        return;
+    m_messageProcessor->init(nullptr); // stop receiving notifications
+    m_runtimeInfoManager->setMessageProcessor(nullptr);
+    m_cameraHistory->setMessageProcessor(nullptr);
+    delete m_messageProcessor;
 }
 
 std::shared_ptr<ec2::AbstractECConnection> QnCommonModule::ec2Connection() const
