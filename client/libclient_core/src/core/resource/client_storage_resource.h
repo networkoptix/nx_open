@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/resource/client_resource_fwd.h>
+#include <core/resource/client_core_resource_fwd.h>
 
 #include <core/resource/storage_resource.h>
 

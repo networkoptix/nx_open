@@ -39,7 +39,7 @@ QVariant QnLayoutTourItemsModel::data(const QModelIndex& index, int role) const
         return QVariant();
 
     const bool hasItem = qBetween(0, index.row(), (int)m_items.size());
-    NX_ASSERT(hasItem);
+    NX_EXPECT(hasItem);
     if (!hasItem)
         return QVariant();
 
@@ -174,7 +174,7 @@ bool QnLayoutTourItemsModel::setData(const QModelIndex &index, const QVariant &v
         return false;
 
     const bool hasItem = qBetween(0, index.row(), (int)m_items.size());
-    NX_ASSERT(hasItem);
+    NX_EXPECT(hasItem);
     if (!hasItem)
         return false;
 

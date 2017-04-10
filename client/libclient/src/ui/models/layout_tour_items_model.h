@@ -4,7 +4,7 @@
 
 #include <client/client_globals.h>
 
-#include <core/resource/resource_fwd.h>
+#include <core/resource/client_resource_fwd.h>
 
 #include <nx/utils/scoped_model_operations.h>
 

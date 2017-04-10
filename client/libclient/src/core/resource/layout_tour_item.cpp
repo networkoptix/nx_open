@@ -17,13 +17,17 @@ QnLayoutTourItem::QnLayoutTourItem(
         : QnLayoutResourcePtr()),
     delayMs(data.delayMs)
 {
-    NX_ASSERT(resourcePool);
+    NX_EXPECT(resourcePool);
 }
 
 QnLayoutTourItemList QnLayoutTourItem::createList(const ec2::ApiLayoutTourItemDataList& items,
     QnResourcePool* resourcePool)
 {
     QnLayoutTourItemList result;
+    NX_EXPECT(resourcePool);
+    if (!resourcePool)
+        return result;
+
     result.reserve(items.size());
     for (const auto& item: items)
     {

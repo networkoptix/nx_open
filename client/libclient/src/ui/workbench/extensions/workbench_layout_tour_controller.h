@@ -5,7 +5,7 @@
 
 #include <client/client_model_types.h>
 
-#include <core/resource/resource_fwd.h>
+#include <core/resource/client_resource_fwd.h>
 
 #include <nx_ec/data/api_fwd.h>
 

@@ -110,7 +110,7 @@ QnLayoutTourDialog::~QnLayoutTourDialog()
 void QnLayoutTourDialog::loadData(const ec2::ApiLayoutTourData& tour)
 {
     ui->nameInputField->setText(tour.name);
-    m_model->reset(qnLayoutTourManager->tourItems(tour));
+    m_model->reset(QnLayoutTourItem::createList(tour.items, qnResPool));
 }
 
 void QnLayoutTourDialog::submitData(ec2::ApiLayoutTourData* tour) const

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <nx_ec/data/api_fwd.h>
+#include <core/resource/client_resource_fwd.h>
 
-#include <core/resource/resource_fwd.h>
+#include <nx_ec/data/api_fwd.h>
 
 struct QnLayoutTourItem
 {
@@ -19,4 +19,5 @@ struct QnLayoutTourItem
 
     static QnLayoutTourItemList createList(const ec2::ApiLayoutTourItemDataList& items,
         QnResourcePool* resourcePool);
+
 };
