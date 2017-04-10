@@ -275,7 +275,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
             return 7;
         }
 
-        const auto certificate = network::SslEngine::makeCertificateAndKey(
+        const auto certificate = network::ssl::Engine::makeCertificateAndKey(
             "cloud_connect_test_util", "US", "NX");
 
         if (certificate.isEmpty())
@@ -284,7 +284,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
             return 4;
         }
 
-        NX_CRITICAL(network::SslEngine::useCertificateAndPkey(certificate));
+        NX_CRITICAL(network::ssl::Engine::useCertificateAndPkey(certificate));
         serverSocket.reset(new deprecated::SslServerSocket(serverSocket.release(), false));
     }
 

@@ -161,7 +161,7 @@ int VmsGatewayProcess::exec()
 
         if (settings.http().sslSupport)
         {
-            network::SslEngine::useOrCreateCertificate(
+            network::ssl::Engine::useOrCreateCertificate(
                 settings.http().sslCertPath, QnAppInfo::productName().toUtf8(),
                 "US", QnAppInfo::organizationName().toUtf8());
         }
