@@ -2,8 +2,6 @@
 
 #include <QtCore/QObject>
 
-
-
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace nx {
@@ -21,12 +19,10 @@ class LayoutToursHandler: public QObject, public QnWorkbenchContextAware
 
 public:
     LayoutToursHandler(QObject* parent = nullptr);
-
+    virtual ~LayoutToursHandler() override;
 
 private:
     void openToursLayout();
-
-
 
 private:
     LayoutTourController* m_controller;

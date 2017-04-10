@@ -1,7 +1,8 @@
 #pragma once
 
-#include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QObject>
+#include <QtCore/QPointer>
 
 #include <client/client_model_types.h>
 
@@ -15,6 +16,7 @@
 
 #include <nx/utils/uuid.h>
 
+class QnGraphicsMessageBox;
 class QTimerEvent;
 
 namespace nx {
@@ -38,6 +40,9 @@ public:
     /** Stop tour with given id if it is running. */
     void stopTour(const QnUuid& id);
 
+    /** Start/stop tour over the current layout. */
+    void toggleLayoutTour(bool started);
+
     QnUuid runningTour() const;
 
 protected:
@@ -50,6 +55,8 @@ private:
 
     void clearWorkbenchState();
     void restoreWorkbenchState();
+
+    void setHintVisible(bool visible);
 
 private:
     enum class Mode
@@ -71,6 +78,7 @@ private:
     } m_tour;
 
     QnWorkbenchState m_lastState;
+    QPointer<QnGraphicsMessageBox> m_hintLabel;
 };
 
 } // namespace workbench

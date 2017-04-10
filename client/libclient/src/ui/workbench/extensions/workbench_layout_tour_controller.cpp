@@ -8,11 +8,12 @@
 
 #include <nx_ec/data/api_layout_tour_data.h>
 
+#include <ui/graphics/items/generic/graphics_message_box.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
 #include <nx/client/ui/workbench/layouts/layout_factory.h>
 
-#include <ui/actions/action_manager.h> //TODO: #GDM #3.1 think about deps inversion
+#include <ui/actions/action_manager.h>
 
 #include <utils/math/math.h>
 
@@ -80,6 +81,7 @@ void LayoutTourController::startTour(const ec2::ApiLayoutTourData& tour)
 
     //action(QnActions::EffectiveMaximizeAction)->setChecked(false);
     menu()->trigger(QnActions::FreespaceAction);
+    setHintVisible(true);
 }
 
 void LayoutTourController::updateTour(const ec2::ApiLayoutTourData& tour)
@@ -102,6 +104,17 @@ void LayoutTourController::stopTour(const QnUuid& id)
 {
     if (m_mode == Mode::MultipleLayouts && m_tour.id == id)
         stopTourInternal();
+}
+
+void LayoutTourController::toggleLayoutTour(bool started)
+{
+    setHintVisible(started);
+
+    // Stop layouts tour if running
+    if (m_mode == Mode::MultipleLayouts)
+        stopTourInternal();
+
+
 }
 
 QnUuid LayoutTourController::runningTour() const
@@ -135,6 +148,7 @@ void LayoutTourController::stopTourInternal()
             m_tour.id = QnUuid();
             m_tour.items.clear();
 
+            setHintVisible(false);
             restoreWorkbenchState();
             break;
         }
@@ -201,6 +215,20 @@ void LayoutTourController::restoreWorkbenchState()
 
     if (workbench()->layouts().empty() || !workbench()->currentLayout()->resource())
         menu()->trigger(QnActions::OpenNewTabAction);
+}
+
+void LayoutTourController::setHintVisible(bool visible)
+{
+    if (visible)
+    {
+        m_hintLabel = QnGraphicsMessageBox::information(
+            tr("Press any key to stop the tour."));
+    }
+    else if (m_hintLabel)
+    {
+        m_hintLabel->hideImmideately();
+        m_hintLabel.clear();
+    }
 }
 
 } // namespace workbench

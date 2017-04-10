@@ -9,9 +9,7 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/layout_tour_dialog.h>
-
 #include <ui/style/skin.h>
-
 #include <ui/workbench/extensions/workbench_layout_tour_controller.h>
 
 #include <nx/utils/string.h>
@@ -111,8 +109,15 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             m_controller->stopTour(m_controller->runningTour());
         });
 
-    connect(action(QnActions::OpenLayoutTourAction), &QAction::triggered,
-        this, &LayoutToursHandler::openToursLayout);
+    connect(action(QnActions::OpenLayoutTourAction), &QAction::triggered, this,
+        &LayoutToursHandler::openToursLayout);
+
+    connect(action(QnActions::ToggleTourModeAction), &QAction::triggered, m_controller,
+        &LayoutTourController::toggleLayoutTour);
+}
+
+LayoutToursHandler::~LayoutToursHandler()
+{
 }
 
 void LayoutToursHandler::openToursLayout()
@@ -158,7 +163,6 @@ void LayoutToursHandler::openToursLayout()
     qnResPool->addResource(resource);
     menu()->trigger(QnActions::OpenSingleLayoutAction, resource);
 }
-
 
 } // namespace workbench
 } // namespace ui
