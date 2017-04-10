@@ -66,6 +66,11 @@ public:
         return m_settings.value("dbFile", "ecs.sqlite").toString();
     }
 
+    int moduleInstance() const
+    {
+        return m_settings.value("moduleInstance").toInt();
+    }
+
     SocketAddress endpoint() const
     {
         return SocketAddress(m_settings.value("endpoint", "0.0.0.0:0").toString());
@@ -221,6 +226,7 @@ int Appserver2Process::exec()
         //TODO
         return 0;
     }
+    m_commonModule->setInstanceCounter(settings.moduleInstance());
 
     //initializeLogging(settings);
     std::unique_ptr<ec2::AbstractECConnectionFactory>
