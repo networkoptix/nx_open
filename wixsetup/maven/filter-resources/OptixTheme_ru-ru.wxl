@@ -58,7 +58,7 @@
   <String Id="FilesInUseDontCloseRadioButton">Не закрывать приложения. Потребуется перезагрузка</String>
   <String Id="FilesInUseOkButton">OK</String>
   <String Id="FilesInUseCancelButton">Отмена</String>
-  <String Id="InstallLicenseText">Нажав кнопку \"Принять и установить\", вы соглашаетесь с</String>
+  <String Id="InstallLicenseText">Нажав кнопку «Принять и установить», вы соглашаетесь с</String>
   <String Id="Options">Параметры</String>
   <String Id="SelectApps">Выбор приложений для установки:</String>
 </WixLocalization>
