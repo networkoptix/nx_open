@@ -6,9 +6,7 @@ namespace ec2
 {
 
 QnDistributedMutexManager::QnDistributedMutexManager(QnTransactionMessageBus* messageBus):
-    m_messageBus(messageBus),
-    m_timestamp(1),
-    m_userDataHandler(0)
+    m_messageBus(messageBus)
 {
     connect(m_messageBus, &QnTransactionMessageBus::gotLockRequest,    this, &QnDistributedMutexManager::at_gotLockRequest);
     connect(m_messageBus, &QnTransactionMessageBus::gotLockResponse,   this, &QnDistributedMutexManager::at_gotLockResponse);
