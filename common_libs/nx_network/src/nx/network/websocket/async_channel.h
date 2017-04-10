@@ -16,28 +16,19 @@ class AsyncChannel :
 {
     friend struct BaseServerConnectionAccess;
 public:
-    /** frameSingle     - wrap whole buffer in a websocket message
-        frameMultiple   - subsequent frames is a part of one multi-framed message (except the last frame)
-        frameFin        - next frame will be marked as a final in a message
-    */
     enum class SendMode
     {
-        frameSingle,
-        frameMultiple,
-        frameFin,
+        singleMessage,
+        multiFrameMessage,
+        multiFrameMessageLastFrame
     };
 
-    /** frame   - readSomeAsync() callback will be called when the whole frame is buffered 
-        message - readSomeAsync() callback will be called when the whole message is buffered
-        stream  - readSomeAsync() callback will be called when any amount of payload has been read from the socket
-    */
     enum class ReceiveMode
     {
         frame,
         message,
         stream
     };
-
 
 public:
     AsyncChannel(
