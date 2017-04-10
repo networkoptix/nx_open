@@ -220,7 +220,7 @@ public:
         HandlerType handler,
         const QnRestConnectionProcessor* connection)
     {
-        QnConcurrent::run(Ec2ThreadPool::instance(),
+        nx::utils::concurrent::run(Ec2ThreadPool::instance(),
             [this, inputData, handler, connection]()
             {
                 OutputData output;

@@ -1429,7 +1429,7 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
     {
         QnUuid id = res->getId();
-        QnConcurrent::run(
+        nx::utils::concurrent::run(
             QThreadPool::globalInstance(),
             [id]()
             {

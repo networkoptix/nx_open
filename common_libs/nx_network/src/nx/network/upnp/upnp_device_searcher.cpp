@@ -540,7 +540,7 @@ void DeviceSearcher::updateItemInCache( DiscoveredDeviceInfo info )
     cacheItem.xmlDevInfo = info.xmlDevInfo;
     cacheItem.creationTimestamp = m_cacheTimer.elapsed();
 
-    QnConcurrent::run(
+    nx::utils::concurrent::run(
         QThreadPool::globalInstance(),
         [ this, info = std::move(info), guard = m_handlerGuard.sharedGuard() ]()
         {

@@ -66,7 +66,7 @@ namespace ec2 {
         transaction.params.offset = offset;
 
         QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
-        QnConcurrent::run( Ec2ThreadPool::instance(),[handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
+        nx::utils::concurrent::run( Ec2ThreadPool::instance(),[handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
 
         return reqId;
     }
@@ -97,7 +97,7 @@ namespace ec2 {
         transaction.params = updateId;
 
         QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
-        QnConcurrent::run( Ec2ThreadPool::instance(),[handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
+        nx::utils::concurrent::run( Ec2ThreadPool::instance(),[handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
 
         return reqId;
     }

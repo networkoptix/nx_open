@@ -491,7 +491,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
             break;
         }
 
-        QnConcurrent::run( &tp, [&]()
+        nx::utils::concurrent::run( &tp, [&]()
         {
             //QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());
             QString fileName = fi.absoluteFilePath();

@@ -42,7 +42,7 @@ struct ScopeHandlerGuard
 
     ~ScopeHandlerGuard()
     {
-        QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(std::move(handler), *ecode));
+        nx::utils::concurrent::run(Ec2ThreadPool::instance(), std::bind(std::move(handler), *ecode));
     }
 };
 
@@ -288,7 +288,7 @@ public:
         QN_UNUSED(cmdCode);
 
         Qn::UserAccessData accessDataCopy(m_userAccessData);
-        QnConcurrent::run(Ec2ThreadPool::instance(),
+        nx::utils::concurrent::run(Ec2ThreadPool::instance(),
             [accessDataCopy, input, handler]()
             {
                 OutputData output;
@@ -310,7 +310,7 @@ public:
         QN_UNUSED(cmdCode);
 
         Qn::UserAccessData accessDataCopy(m_userAccessData);
-        QnConcurrent::run(Ec2ThreadPool::instance(),
+        nx::utils::concurrent::run(Ec2ThreadPool::instance(),
             [accessDataCopy, input1, input2, handler]()
             {
                 OutputData output;

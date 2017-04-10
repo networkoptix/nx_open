@@ -41,7 +41,7 @@ private:
     friend class ReportData;
 
     QnMutex m_mutex;
-    QnConcurrent::QnFuture<bool> m_activeCollection;
+    nx::utils::concurrent::QnFuture<bool> m_activeCollection;
     nx_http::AsyncHttpClientPtr m_activeHttpClient;
     bool m_terminated;
     boost::optional<qint64> m_timerId;
