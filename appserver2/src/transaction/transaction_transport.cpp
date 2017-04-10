@@ -46,13 +46,13 @@ QnTransactionTransport::QnTransactionTransport(
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer)
 :
-    QnCommonModuleAware(commonModule),
     QnTransactionTransportBase(
         commonModule->globalSettings()->localSystemId(),
         connectionGuardSharedState,
         localPeer,
         commonModule->globalSettings()->connectionKeepAliveTimeout(),
         commonModule->globalSettings()->keepAliveProbeCount()),
+    QnCommonModuleAware(commonModule),
     m_userAccessData(Qn::kSystemAccess)
 {
 }
