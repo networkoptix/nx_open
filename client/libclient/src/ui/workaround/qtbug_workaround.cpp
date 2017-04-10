@@ -5,6 +5,10 @@
 
 #include <nx/utils/app_info.h>
 
+#if defined(Q_OS_MACX)
+#include <utils/common/delayed.h>
+#endif
+
 #ifdef Q_OS_WIN
 #   include <Windows.h>
 
@@ -87,17 +91,26 @@ QnQtbugWorkaround::QnQtbugWorkaround(QObject *parent):
     {
         // Workaround of QTBUG-34767
         QObject::connect(qApp, &QGuiApplication::focusWindowChanged, qApp,
+             []()
+             {
+                 const auto modalWindow = qApp->modalWindow();
+                 if (modalWindow && !qApp->focusWindow())
+                     modalWindow->requestActivate();
+             });
+
+        QObject::connect(qApp, &QGuiApplication::applicationStateChanged, qApp,
             []()
             {
-                const auto modalWindow = qApp->modalWindow();
-                if (!modalWindow)
-                    return;
+                const auto raiseModelaWindow =
+                    []()
+                    {
+                        const auto modalWindow = qApp->modalWindow();
+                        if (modalWindow && qApp->applicationState() == Qt::ApplicationActive)
+                            modalWindow->raise();
+                    };
 
-                const auto focusedWindow = qApp->focusWindow();
-                if (!focusedWindow || focusedWindow == modalWindow)
-                    return;
-
-                modalWindow->requestActivate();
+                static constexpr int kRaiseDelay = 1000;
+                executeDelayed(raiseModelaWindow, kRaiseDelay);
             });
     }
 
