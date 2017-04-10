@@ -32,7 +32,7 @@ protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
-        m_staticCommon.reset(new QnStaticCommonModule(Qn::PT_NotDefined, QString(), QString()));
+        m_staticCommon.reset(new QnStaticCommonModule());
         m_module.reset(new QnClientCoreModule());
         m_runtime.reset(new QnClientRuntimeSettings());
         m_accessController.reset(new QnWorkbenchAccessController(m_module.data()));

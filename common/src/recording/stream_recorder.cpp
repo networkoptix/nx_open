@@ -82,8 +82,8 @@ QString QnStreamRecorder::errorString(StreamRecorderError errCode)
 
 QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
-    QnCommonModuleAware(dev->commonModule()),
     QnResourceConsumer(dev),
+    QnCommonModuleAware(dev->commonModule()),
     m_device(dev),
     m_firstTime(true),
     m_truncateInterval(0),

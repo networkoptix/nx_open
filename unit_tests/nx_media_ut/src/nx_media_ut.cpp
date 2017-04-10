@@ -4,6 +4,7 @@
 
 #include <common/common_module.h>
 #include <common/common_globals.h>
+#include <common/static_common_module.h>
 
 #include <nx/media/abstract_video_decoder.h>
 #include <nx/media/video_decoder_registry.h>
@@ -410,6 +411,7 @@ private:
     }
 
 private:
+    QnStaticCommonModule m_staticCommon;
     std::unique_ptr<QnCommonModule> m_module{new QnCommonModule(true)};
 
     QnSharedResourcePointer<MockServer> m_server{new MockServer(m_module.get())};
@@ -438,10 +440,11 @@ private:
 class NxMediaPlayerTest: public ::testing::Test
 {
 protected:
-    static void SetUpTestCase()
+    virtual void SetUp()
     {
+        m_staticCommon.reset(new QnStaticCommonModule());
         // Init singletons.
-        m_common = new QnCommonModule(true);
+        m_common.reset(new QnCommonModule(true));
         m_common->setModuleGUID(QnUuid::createUuid());
         m_common->store(new QnFfmpegInitializer());
 
@@ -449,17 +452,17 @@ protected:
         VideoDecoderRegistry::instance()->addPlugin<MockVideoDecoder>();
     }
 
-    static void TearDownTestCase()
+    virtual void TearDown()
     {
-        delete m_common;
-        m_common = nullptr;
+        m_common.reset();
+        m_staticCommon.reset();
         VideoDecoderRegistry::instance()->reinitialize();
     }
 
 private:
-    static QnCommonModule* m_common;
+    QScopedPointer<QnStaticCommonModule> m_staticCommon;
+    QScopedPointer<QnCommonModule> m_common;
 };
-QnCommonModule* NxMediaPlayerTest::m_common = nullptr;
 
 //-------------------------------------------------------------------------------------------------
 // Test cases.
