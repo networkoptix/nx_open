@@ -1,3 +1,5 @@
+@import 'native-theme/_theme_palette';
+
 
 ::-webkit-scrollbar {
   width: 12px;
@@ -218,8 +220,8 @@ table.webclient-window>tbody>tr>td.alert{
 div.text-left{
   width:168px;
   height:100px;
-  background-color: #F0F3F4;
-  border-right: 1px solid #F0F3F4;
+  background-color: $additional_light2;
+  border-right: 1px solid $additional_light2;
 }
 
 .player-controls{
@@ -234,8 +236,8 @@ div.text-left{
 div.text-right{
   width:104px;
   height:100px;
-  background-color: #F0F3F4;
-  border-left: 1px solid #F0F3F4;
+  background-color: $additional_light2;
+  border-left: 1px solid $additional_light2;
 }
 
 .live-button .webclient-button{
@@ -245,7 +247,7 @@ div.text-right{
 live-circle{
   padding: 3px;
   margin: 2px 8px 2px 0;
-  background-color: #CDD7DC;
+  background-color: $light6;
   display: inline-block;
   -moz-border-radius: 100px;
   -webkit-border-radius: 100px;
@@ -260,33 +262,33 @@ live-circle{
   height: 100px;
   text-align: center;
   line-height: 100px;
-  border-left: 1px solid #CDD7DC !important;
-  border-right: 1px solid #E1E7EA !important;
+  border-left: 1px solid $light6 !important;
+  border-right: 1px solid $light4 !important;
 }
 
 .live-button.active{
-  background-color: #CDD7DC !important;
-  border-left: 1px solid #B9C7CE !important;
-  border-right: 1px solid #C3CFD5 !important; 
+  background-color: $light6 !important;
+  border-left: 1px solid $light8 !important;
+  border-right: 1px solid $light7 !important; 
 }
 
 .live-button:hover{
-  background-color: #E1E7EA !important;
-  border-left: 1px solid #CDD7DC !important;
-  border-right: 1px solid #E1E7EA !important; 
+  background-color: $light4 !important;
+  border-left: 1px solid $light6 !important;
+  border-right: 1px solid $light4 !important; 
 }
 
 .live-button.active:hover{
-  background-color: #E1E7EA !important;
-  border-left: 1px solid #C3CFD5 !important;
-  border-right: 1px solid #CDD7DC !important; 
+  background-color: $light4 !important;
+  border-left: 1px solid $light7 !important;
+  border-right: 1px solid $light6 !important; 
 }
 
 .live-button:active,
 .live-button.active:active {
-  background-color: #E1E7EA !important;
-  border-left: 1px solid #B9C7CE !important;
-  border-right: 1px solid #C3CFD5 !important; 
+  background-color: $light4 !important;
+  border-left: 1px solid $light8 !important;
+  border-right: 1px solid $light7 !important; 
 }
 
 .live-button.active live-circle{
@@ -323,11 +325,11 @@ div.text-center{
 }
 
 .webclient-button:hover{
-  background-color: #E1E7EA;
+  background-color: $light8;
 }
 
 .webclient-button:active{
-  background-color: #CDD7DC;
+  background-color: $light6;
 }
 
 .webclient-button.disabled{
@@ -335,18 +337,13 @@ div.text-center{
   cursor:default;
 }
 
-.webclient-button.active{
-  background-color: #CDD7DC;
-  /*color:#121517 !important;*/
-}
-
 .webclient-button.active:hover{
-  background-color: #D7DFE3 !important;
+  background-color: $light5 !important;
   /*opacity:0.9;*/
 }
 
 .webclient-button.active:active{
-  background-color: #CDD7DC;
+  background-color: $light6;
 }
 
 .webclient-button .glyphicon{
@@ -451,7 +448,7 @@ div.text-center{
   position: relative;
   vertical-align: top;
   margin: 5px 10px;
-  border-left: 1px solid #263137;
+  border-left: 1px solid $dark8;
   display: inline-block;
 }
 
@@ -459,7 +456,7 @@ div.text-center{
   height: 100px;
   position: relative;
   vertical-align: top;
-  border-left: 1px solid #E1E7EA;
+  border-left: 1px solid $light4;
   display: inline-block;
 }
 
