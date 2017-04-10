@@ -104,6 +104,7 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
         setExpectedLengthMsInternal(m_sourcePeriodLengthMs / absoluteValue);
     });
 
+    // TODO: Refactor this in 3.1
     auto resultLengthChangedInternal =
         [this](double value)
         {
@@ -141,7 +142,7 @@ QnExportTimelapseDialog::QnExportTimelapseDialog(QWidget *parent, Qt::WindowFlag
             // Here we must adjust time value to keep speed as near to previous as possible
             qreal valueInUnits = expectedLength / expectedLengthMeasureUnit(value);
             ui->resultLengthSpinBox->setValue(valueInUnits);
-            //resultLengthChangedInternal(ui->resultLengthSpinBox->value());
+            resultLengthChangedInternal(ui->resultLengthSpinBox->value());
         });
 
     initControls();
