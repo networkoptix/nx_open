@@ -19,10 +19,7 @@ Parser::Parser(Role role, ParserHandler* handler):
 Parser::BufferedState Parser::bufferDataIfNeeded(const char* data, int64_t len, int64_t neededLen)
 {
     if (neededLen < len - m_pos && m_buf.isEmpty())
-    {
-        m_pos += neededLen;
         return BufferedState::notNeeded;
-    }
 
     auto appendLen = std::min(neededLen - (int64_t)m_buf.size(), len - m_pos);
     m_buf.append(data + m_pos, appendLen);
@@ -68,6 +65,7 @@ void Parser::processPart(
     case BufferedState::notNeeded:
         (this->*processFunc)(data);
         m_state = nextState;
+        m_pos += neededLen;
         break;
     case BufferedState::enough:
         (this->*processFunc)(m_buf.data());
@@ -120,7 +118,7 @@ void Parser::readHeaderFixed(char* data)
     m_opCode = (FrameType)(data[0] & 0x0F);
     m_fin = (data[0] >> 7) & 0x01;
     m_masked = (data[1] >> 7) & 0x01;
-    if (!m_masked && m_role == Role::client)
+    if (!m_masked && m_role == Role::server)
         m_handler->handleError(Error::noMaskBit);
 
     m_lengthTypeField = data[1] & (~0x80);

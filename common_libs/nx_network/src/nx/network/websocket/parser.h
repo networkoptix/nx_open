@@ -18,7 +18,7 @@ public:
     virtual void handleError(Error err) = 0;
 };
 
-class Parser
+class NX_NETWORK_API Parser
 {
     enum class ParseState
     {
