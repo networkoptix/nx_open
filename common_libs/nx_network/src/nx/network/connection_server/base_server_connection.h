@@ -251,7 +251,6 @@ private:
         {
             nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
             BaseServerConnectionAccess::bytesReceived<CustomConnectionType>(this, m_readBuffer);
-            //static_cast<CustomConnectionType*>(this)->bytesReceived(m_readBuffer);
             if (watcher.objectDestroyed() || !m_receiving)
                 return; //< Connection has been removed by handler.
         }
@@ -276,7 +275,6 @@ private:
         static_cast<void>(count);
         NX_ASSERT(count == m_bytesToSend);
 
-        //static_cast<CustomConnectionType*>(this)->readyToSendData();
         BaseServerConnectionAccess::readyToSendData<CustomConnectionType>(this);
     }
 
