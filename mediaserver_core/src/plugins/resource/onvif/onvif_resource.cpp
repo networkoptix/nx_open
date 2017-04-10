@@ -938,8 +938,11 @@ QString QnPlOnvifResource::getDeviceOnvifUrl() const
 
 void QnPlOnvifResource::setDeviceOnvifUrl(const QString& src)
 {
-	QnMutexLocker lock(&m_mutex);
-	m_serviceUrls.deviceServiceUrl = src;
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_serviceUrls.deviceServiceUrl = src;
+    }
+
     setProperty(ONVIF_URL_PARAM_NAME, src);
 }
 QString QnPlOnvifResource::fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort)
