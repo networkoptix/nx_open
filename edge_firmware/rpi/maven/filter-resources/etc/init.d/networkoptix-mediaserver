@@ -137,11 +137,20 @@ run_watchdog()
     done
 }
 
+register_autostart_if_needed()
+{
+    if ! grep -- "$CUSTOMIZATION-mediaserver" /etc/init.d/.depend.stop 2>/dev/null; then
+        echo "Enabling mediaserver autostart via update-rc.d"
+        update-rc.d -f "$CUSTOMIZATION-mediaserver" defaults
+    fi
+}
+
 #--------------------------------------------------------------------------------------------------
 # main
 
 case "$1" in
     start)
+        register_autostart_if_needed    
         start
         start_watchdog
         ;;
