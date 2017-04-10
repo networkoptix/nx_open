@@ -5,23 +5,23 @@
     "Note: 1/2.8 is 5.2mm x 3.9mm, D=6.5mm.                          ",
     "                                                                ",
     "Calculate width-based crop factor C = 36/W.                     ",
-    "                                                                ",                                                                    
+    "                                                                ",
     "Multiply focal lengths by width-based crop factor to get        ",
     "width-based equivalent focal length.                            ",
     "                                                                ",
-    "Another important note.                                         ",  
+    "Another important note.                                         ",
     "If the camera overshoots on movement, then it means that 35m    ",
     "fov in this file should be increased.                           ",
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
-    
+
     "version": "1.0",
     "data": [
         {
             "keys": [
                 "Sony|SNC-VM772R"
             ],
-            "forcedOnvifParams": 
+            "forcedOnvifParams":
             {
                 "videoEncoders": [
                     "video_encoder_config1,video_encoder_config3"
@@ -419,7 +419,7 @@
             ],
             "isRebrendedActiCamera": true
         },
-		
+
         {
             "keys": [
                 "ISD|*"
@@ -446,11 +446,11 @@
             "showUrl": true,
             "urlLocalePath": "priv/cam.html"
         },
-		
+
         {
             "keys": [
-                "DW|DWCA-C128-64", 
-                "DW|DWCA-C12C-64", 
+                "DW|DWCA-C128-64",
+                "DW|DWCA-C12C-64",
                 "DW|DWCA-VF25W28-64",
                 "DW|DWCA-VF25WIR4-64",
                 "DW|DWCA-VF25WIR8-64",
@@ -458,7 +458,7 @@
             ],
             "isdDwCam": true
         },
-		
+
         {
             "keys": [
                 "vista|*"
@@ -489,10 +489,10 @@
         },
         {
             "keys": [
-                "VIVOTEK|DM368", "VIVOTEK|FD8161", "VIVOTEK|FD8362E", "VIVOTEK|FD8361", "VIVOTEK|FD8136", 
-                "VIVOTEK|FD8162", "VIVOTEK|FD8372", "VIVOTEK|FD8135H", "VIVOTEK|IP8151", "VIVOTEK|IP8335H", 
+                "VIVOTEK|DM368", "VIVOTEK|FD8161", "VIVOTEK|FD8362E", "VIVOTEK|FD8361", "VIVOTEK|FD8136",
+                "VIVOTEK|FD8162", "VIVOTEK|FD8372", "VIVOTEK|FD8135H", "VIVOTEK|IP8151", "VIVOTEK|IP8335H",
                 "VIVOTEK|IP8362", "VIVOTEK|MD8562", "VIVOTEK|IP8371E", "VIVOTEK|FD8363",
-                "ACTI|KCM5211", "ACTI|TCM3511", 
+                "ACTI|KCM5211", "ACTI|TCM3511",
                 "AXIS|AXISP3344", "AXIS|AXISP1344",
                 "*|IPC-HDB3200C", "*|N53F-F",
                 "*|LR01", "*|IPCAM_M1", "*|RL01",
@@ -518,7 +518,7 @@
                 "*|FW3471-PS-E",
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04", "*|DW-CP16",
-                "ACTI|I96","ACTI|I98", 
+                "ACTI|I96","ACTI|I98",
                 "UNIVIEW|IPC6242SR-X22"
             ],
             "ptzTraits": "EightWayPtz"
@@ -645,7 +645,7 @@
             "keys": [
                 "Honeywell|HVE4", "Hikvision|DS-6704HFI"
             ],
-            "forcedOnvifParams": 
+            "forcedOnvifParams":
             {
                 "videoEncoders":
                 [
@@ -698,7 +698,7 @@
                     "VideoEncoderConfigurationA13,VideoEncoderConfigurationA29",
                     "VideoEncoderConfigurationA14,VideoEncoderConfigurationA30",
                     "VideoEncoderConfigurationA15,VideoEncoderConfigurationA31",
-                    "VideoEncoderConfigurationA16,VideoEncoderConfigurationA32"   
+                    "VideoEncoderConfigurationA16,VideoEncoderConfigurationA32"
                 ]
             }
         },
@@ -708,7 +708,7 @@
         },
         {
             "keys": [
-                "DW|DWC-MPTZ20X", 
+                "DW|DWC-MPTZ20X",
                 "DW|DWC-MPZ20XFM|2.1.0.8", "DW|DWC-MPZ20XFM"
             ],
             "ptzMapper": {
@@ -735,8 +735,8 @@
         },
         {
             "keys":[
-                "Honeywell|H4D3PRV3", 
-                "Honeywell|H4D3PRV2", 
+                "Honeywell|H4D3PRV3",
+                "Honeywell|H4D3PRV2",
                 "Honeywell|HBD2PR1",
                 "Honeywell|H2D2PR1",
                 "Honeywell|HED1PR3",
@@ -1084,7 +1084,7 @@
                     }
                 }
             }
-        },    
+        },
         {
             "keys": [
                 "VISTA|VK2-1080XPTZF"
@@ -1111,7 +1111,7 @@
                     }
                 }
             }
-        },            
+        },
         {
             "keys": [
                 "VISTA|VK2-HD30IR-PM", "VISTA|VK2-1080XIRPTZF", "VISTA|NFX-22053H3", "HITRON|NFX-22053H3", "VISTA|VK2-HD30LRIR-PM"
@@ -1165,7 +1165,7 @@
                     }
                 }
             }
-        },        
+        },
         {
             "keys": [
                 "eneo|PXD-2030PTZ1080"
@@ -1193,7 +1193,7 @@
                 }
             },
             "onvifPtzDigitsAfterDecimalPoint": 0
-        },        
+        },
         {
             "keys": [
                 "SONY|SNC-EP580|unknown"
@@ -1364,7 +1364,7 @@
                     }
                 }
             }
-        },        
+        },
         {
             "keys": [
                 "VIVOTEK|SD8363E", "VIVOTEK|SD8363E|SD8363-VVTK-0200f", "SD8363|SD8363"
@@ -1731,9 +1731,9 @@
         },
         {
             "keys": [
-                "*|WH-D5216A" 
+                "*|WH-D5216A"
             ],
-            "forcedOnvifParams": 
+            "forcedOnvifParams":
             {
                 "videoEncoders":
                 [
@@ -1772,7 +1772,7 @@
         },
         {
             "keys":["Digital_Watchdog|DWC-PB6M4T"],
-            "forcedOnvifParams": 
+            "forcedOnvifParams":
             {
                 "videoEncoders":
                 [
@@ -1873,7 +1873,7 @@
             "keys": [
                 "Bosch|IP5000*"
             ],
-            "onvifPtzStopBroken": true
+            "onvifPtzSpeedBroken": true
         }
     ]
 }
