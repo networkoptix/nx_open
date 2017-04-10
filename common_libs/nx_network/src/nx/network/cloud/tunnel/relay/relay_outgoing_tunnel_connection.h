@@ -27,7 +27,7 @@ public:
     OutgoingTunnelConnection(
         SocketAddress relayEndpoint,
         nx::String relaySessionId,
-        std::unique_ptr<api::ClientToRelayConnection> clientToRelayConnection);
+        std::unique_ptr<nx::cloud::relay::api::ClientToRelayConnection> clientToRelayConnection);
     virtual ~OutgoingTunnelConnection();
 
     virtual void stopWhileInAioThread() override;
@@ -47,14 +47,14 @@ public:
 private:
     struct RequestContext
     {
-        std::unique_ptr<api::ClientToRelayConnection> relayClient;
+        std::unique_ptr<nx::cloud::relay::api::ClientToRelayConnection> relayClient;
         OnNewConnectionHandler completionHandler;
         nx::network::aio::Timer timer;
     };
 
     const SocketAddress m_relayEndpoint;
     const nx::String m_relaySessionId;
-    std::unique_ptr<api::ClientToRelayConnection> m_controlConnection;
+    std::unique_ptr<nx::cloud::relay::api::ClientToRelayConnection> m_controlConnection;
     QnMutex m_mutex;
     std::list<std::unique_ptr<RequestContext>> m_activeRequests;
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> m_tunnelClosedHandler;
@@ -66,7 +66,7 @@ private:
     void startInactivityTimer();
     void stopInactivityTimer();
     void onConnectionOpened(
-        api::ResultCode resultCode,
+        nx::cloud::relay::api::ResultCode resultCode,
         std::unique_ptr<AbstractStreamSocket> connection,
         std::list<std::unique_ptr<RequestContext>>::iterator requestIter);
     void reportTunnelClosure(SystemError::ErrorCode reason);

@@ -568,7 +568,7 @@ void QnManualCameraSearcher::runTasksUnsafe(QThreadPool* threadPool)
             QnSearchTask task = queue.dequeue();
 
             auto taskFn = std::bind(&QnSearchTask::doSearch, task);
-            QnConcurrent::run(threadPool, taskFn);
+            nx::utils::concurrent::run(threadPool, taskFn);
 
             context.runningTaskCount++;
             totalRunningTasks++;

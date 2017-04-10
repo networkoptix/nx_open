@@ -2186,14 +2186,14 @@ void MediaServerProcess::run()
     const auto allowedSslVersions = MSSettings::roSettings()->value(
         nx_ms_conf::ALLOWED_SSL_VERSIONS, QString()).toString();
     if (!allowedSslVersions.isEmpty())
-        nx::network::SslEngine::setAllowedServerVersions(allowedSslVersions.toUtf8());
+        nx::network::ssl::Engine::setAllowedServerVersions(allowedSslVersions.toUtf8());
 
     const auto allowedSslCiphers = MSSettings::roSettings()->value(
         nx_ms_conf::ALLOWED_SSL_CIPHERS, QString()).toString();
     if (!allowedSslCiphers.isEmpty())
-        nx::network::SslEngine::setAllowedServerCiphers(allowedSslCiphers.toUtf8());
+        nx::network::ssl::Engine::setAllowedServerCiphers(allowedSslCiphers.toUtf8());
 
-    nx::network::SslEngine::useOrCreateCertificate(
+    nx::network::ssl::Engine::useOrCreateCertificate(
         MSSettings::roSettings()->value(
             nx_ms_conf::SSL_CERTIFICATE_PATH,
             getDataDirectory() + lit( "/ssl/cert.pem")).toString(),

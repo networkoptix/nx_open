@@ -10,7 +10,7 @@ int main(int argc, char** argv)
         argc, argv,
         [](const nx::utils::ArgumentParser& args)
         {
-            nx::network::SslEngine::useRandomCertificate("cloud_connect_ut");
+            nx::network::ssl::Engine::useRandomCertificate("cloud_connect_ut");
             if (const auto value = args.get("tmp"))
                 nx::db::test::TestWithDbHelper::setTemporaryDirectoryPath(*value);
 

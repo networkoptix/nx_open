@@ -8,6 +8,8 @@ namespace cloud {
 namespace relay {
 namespace test {
 
+using namespace nx::cloud::relay;
+
 CloudRelayFixtureBase::CloudRelayFixtureBase()
 {
     using namespace std::placeholders;

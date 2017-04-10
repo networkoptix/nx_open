@@ -30,7 +30,7 @@
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
-#include "utils/common/concurrent.h"
+#include <nx/utils/concurrent.h>
 #include "storage_db_pool.h"
 
 QnMutex DeviceFileCatalog::m_rebuildMutex;
@@ -491,7 +491,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
             break;
         }
 
-        QnConcurrent::run( &tp, [&]()
+        nx::utils::concurrent::run( &tp, [&]()
         {
             //QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());
             QString fileName = fi.absoluteFilePath();
