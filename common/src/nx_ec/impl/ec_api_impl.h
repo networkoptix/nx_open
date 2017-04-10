@@ -172,6 +172,7 @@ namespace ec2
             void onGetKvPairsDone               (int reqID, const ec2::ErrorCode, const ec2::ApiResourceParamWithRefDataList&);
             void onGetStatusListDone            (int reqID, const ec2::ErrorCode, const ec2::ApiResourceStatusDataList&);
             void onSaveKvPairsDone              (int reqID, const ec2::ErrorCode, const ec2::ApiResourceParamWithRefDataList&);
+            void onGetMiscParamDone             (int reqID, const ec2::ErrorCode, const ec2::ApiMiscData&);
             void onSaveBusinessRuleDone         (int reqID, const ec2::ErrorCode, const QnBusinessEventRulePtr&);
             void onGetServersDone               (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerDataList&);
             void onGetServerUserAttributesDone  (int reqID, const ec2::ErrorCode, const QnMediaServerUserAttributesList&);
