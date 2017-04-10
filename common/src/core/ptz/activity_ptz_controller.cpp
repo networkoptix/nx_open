@@ -11,8 +11,8 @@ QnActivityPtzController::QnActivityPtzController(
     Mode mode,
     const QnPtzControllerPtr &baseController)
 :
-    QnCommonModuleAware(commonModule),
     base_type(baseController),
+    QnCommonModuleAware(commonModule),
     m_mode(mode)
 {
     m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(lit("ptzActiveObject"), QnPtzObject(), this);
