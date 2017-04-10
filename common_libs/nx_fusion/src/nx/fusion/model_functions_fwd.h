@@ -1,6 +1,8 @@
 #ifndef QN_MODEL_FUNCTIONS_FWD_H
 #define QN_MODEL_FUNCTIONS_FWD_H
 
+#include <QtCore/QMetaType>
+
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/fusion/serialization/binary_fwd.h>
 #include <nx/fusion/serialization/csv_fwd.h>
