@@ -1,10 +1,10 @@
 #pragma once
 
 #include <nx/network/connection_server/base_server_connection.h>
-#include <nx/network/websocket/websocket_message_parser.h>
-#include <nx/network/websocket/websocket_message_serializer.h>
+#include <nx/network/websocket/parser.h>
+#include <nx/network/websocket/serializer.h>
 #include <nx/network/aio/abstract_async_channel.h>
-#include <nx/network/websocket/websocket_types.h>
+#include <nx/network/websocket/common_types.h>
 
 namespace nx {
 namespace network {
@@ -14,6 +14,7 @@ class AsyncChannel :
     public aio::AbstractAsyncChannel,
     private nx_api::BaseServerConnection<AsyncChannel>
 {
+    friend struct BaseServerConnectionAccess;
 public:
     /** frameSingle     - wrap whole buffer in a websocket message
         frameMultiple   - subsequent frames is a part of one multi-framed message (except the last frame)
@@ -42,7 +43,7 @@ public:
     AsyncChannel(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
         const nx::Buffer& requestData,
-        Role role = Role::Undefined); //< if role is undefined, payload won't be masked (unmasked)
+        Role role = Role::undefined); //< if role is undefined, payload won't be masked (unmasked)
 
     void setSendMode(SendMode mode);
     SendMode sendMode() const;
@@ -53,8 +54,18 @@ public:
     void setPayloadType(PayloadType type);
     PayloadType prevFramePayloadType() const;
 
-    /** Needed by BaseServerConnection */
-    void bytesReceived(const nx::Buffer& buf);
+    template<typename Rep, typename Period>
+    void setKeepAliveTimeout(std::chrono::duration<Rep, Period> timeout)
+    {
+        m_keepAliveTimeout = timeout;
+    }
+
+private:
+    void on_bytesReceived(const nx::Buffer& buf);
+    void on_readyToSendData();
+
+private:
+    std::chrono::milliseconds m_keepAliveTimeout;
 };
 
 }

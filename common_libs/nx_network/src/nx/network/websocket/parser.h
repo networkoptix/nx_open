@@ -2,13 +2,13 @@
 
 #include <cstdint>
 #include <nx/network/buffer.h>
-#include <nx/network/websocket/websocket_types.h>
+#include <nx/network/websocket/common_types.h>
 
 namespace nx {
 namespace network {
 namespace websocket {
 
-class MessageParserHandler
+class ParserHandler
 {
 public:
     virtual void frameStarted(FrameType type, bool fin) = 0;
@@ -18,7 +18,7 @@ public:
     virtual void handleError(Error err) = 0;
 };
 
-class MessageParser
+class Parser
 {
     enum class ParseState
     {
@@ -36,7 +36,7 @@ class MessageParser
 
     const int kFixedHeaderLen = 2;
 public:
-    MessageParser(Role role, MessageParserHandler* handler);
+    Parser(Role role, ParserHandler* handler);
     void consume(char* data, int64_t len);
     void setRole(Role role);
 
@@ -47,7 +47,7 @@ private:
         int64_t len, 
         int64_t neededLen, 
         ParseState nextState,
-        void (MessageParser::*processFunc)(char* data));
+        void (Parser::*processFunc)(char* data));
     void processPayload(char* data, int64_t len);
     void reset();
     void readHeaderFixed(char* data);
@@ -55,7 +55,7 @@ private:
     BufferedState bufferDataIfNeeded(const char* data, int64_t len, int64_t neededLen);
 
 private:
-    MessageParserHandler* m_handler;
+    ParserHandler* m_handler;
     nx::Buffer m_buf;
     ParseState m_state = ParseState::readingHeaderFixedPart;
     int64_t m_pos = 0;

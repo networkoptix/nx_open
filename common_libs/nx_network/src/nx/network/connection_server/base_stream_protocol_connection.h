@@ -67,7 +67,7 @@ public:
     {
     }
 
-    void bytesReceived(const nx::Buffer& buf)
+    void on_bytesReceived(const nx::Buffer& buf)
     {
         size_t pos = 0;
         if (buf.isEmpty())
@@ -87,7 +87,7 @@ public:
         }
     }
 
-    void readyToSendData()
+    void on_readyToSendData()
     {
         // Using clear will clear the reserved buffer in QByteArray --dpeng
         m_writeBuffer.resize(0);
@@ -287,7 +287,7 @@ private:
         //serializing message
         m_serializer.setMessage( &msg );
         m_serializerState = SerializerState::needMoreBufferSpace;
-        readyToSendData();
+        on_readyToSendData();
     }
 
     void addNewTaskToQueue( std::shared_ptr<SendTask> newTask )

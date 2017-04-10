@@ -18,6 +18,21 @@ namespace nx_api {
 
 static constexpr size_t READ_BUFFER_CAPACITY = 16 * 1024;
 
+struct BaseServerConnectionAccess
+{
+    template<typename Derived, typename Base>
+    static void bytesReceived(Base* base, nx::Buffer& buffer)
+    {
+        static_cast<Derived*>(base)->on_bytesReceived(buffer);
+    }
+
+    template<typename Derived, typename Base>
+    static void readyToSendData(Base* base)
+    {
+        static_cast<Derived*>(base)->on_readyToSendData();
+    }
+};
+
 /**
  * Contains common logic for server-side connection created by StreamSocketServer.
  * CustomConnectionType MUST implement following methods:
@@ -235,7 +250,8 @@ private:
 
         {
             nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
-            static_cast<CustomConnectionType*>(this)->bytesReceived(m_readBuffer);
+            BaseServerConnectionAccess::bytesReceived<CustomConnectionType>(this, m_readBuffer);
+            //static_cast<CustomConnectionType*>(this)->bytesReceived(m_readBuffer);
             if (watcher.objectDestroyed() || !m_receiving)
                 return; //< Connection has been removed by handler.
         }
@@ -260,7 +276,8 @@ private:
         static_cast<void>(count);
         NX_ASSERT(count == m_bytesToSend);
 
-        static_cast<CustomConnectionType*>(this)->readyToSendData();
+        //static_cast<CustomConnectionType*>(this)->readyToSendData();
+        BaseServerConnectionAccess::readyToSendData<CustomConnectionType>(this);
     }
 
     void handleSocketError(SystemError::ErrorCode errorCode)

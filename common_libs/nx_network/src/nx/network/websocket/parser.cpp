@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <nx/network/websocket/websocket_message_parser.h>
+#include <nx/network/websocket/parser.h>
 
 namespace nx {
 namespace network {
@@ -10,13 +10,13 @@ namespace websocket {
 #define ntohll(x) ((1==ntohl(1)) ? (x) : ((uint64_t)ntohl((x) & 0xFFFFFFFF) << 32) | ntohl((x) >> 32))
 */
 
-MessageParser::MessageParser(Role role, MessageParserHandler* handler):
+Parser::Parser(Role role, ParserHandler* handler):
     m_role(role),
     m_handler(handler)
 {
 }
 
-MessageParser::BufferedState MessageParser::bufferDataIfNeeded(const char* data, int64_t len, int64_t neededLen)
+Parser::BufferedState Parser::bufferDataIfNeeded(const char* data, int64_t len, int64_t neededLen)
 {
     if (neededLen < len - m_pos && m_buf.isEmpty())
     {
@@ -34,7 +34,7 @@ MessageParser::BufferedState MessageParser::bufferDataIfNeeded(const char* data,
     return BufferedState::enough;
 }
 
-void MessageParser::processPayload(char* data, int64_t len)
+void Parser::processPayload(char* data, int64_t len)
 {
     int64_t outLen = std::min(len - m_pos, m_payloadLen);
     if (m_masked) 
@@ -54,12 +54,12 @@ void MessageParser::processPayload(char* data, int64_t len)
     }
 }
 
-void MessageParser::processPart(
+void Parser::processPart(
     char* data, 
     int64_t len, 
     int64_t neededLen,
     ParseState nextState,
-    void (MessageParser::*processFunc)(char* data))
+    void (Parser::*processFunc)(char* data))
 {
     switch (bufferDataIfNeeded(data, len, neededLen))
     {
@@ -77,7 +77,7 @@ void MessageParser::processPart(
     }
 }
 
-void MessageParser::parse(char* data, int64_t len)
+void Parser::parse(char* data, int64_t len)
 {
     switch (m_state)
     {
@@ -87,7 +87,7 @@ void MessageParser::parse(char* data, int64_t len)
             len, 
             kFixedHeaderLen, 
             ParseState::readingHeaderExtension,
-            &MessageParser::readHeaderFixed);
+            &Parser::readHeaderFixed);
         break;
     case ParseState::readingHeaderExtension:
         processPart(
@@ -95,7 +95,7 @@ void MessageParser::parse(char* data, int64_t len)
             len,
             m_headerExtLen,
             ParseState::readingPayload,
-            &MessageParser::readHeaderExtension);
+            &Parser::readHeaderExtension);
         break;
     case ParseState::readingPayload:
         processPayload(data, len);
@@ -103,19 +103,19 @@ void MessageParser::parse(char* data, int64_t len)
     }
 }
 
-void MessageParser::consume(char* data, int64_t len)
+void Parser::consume(char* data, int64_t len)
 {
     m_pos = 0;
     while (m_pos < len)
         parse(data, len);
 }
 
-void MessageParser::setRole(Role role)
+void Parser::setRole(Role role)
 {
     m_role = role;
 }
 
-void MessageParser::readHeaderFixed(char* data)
+void Parser::readHeaderFixed(char* data)
 {
     m_opCode = (FrameType)(data[0] & 0x0F);
     m_fin = (data[0] >> 7) & 0x01;
@@ -128,7 +128,7 @@ void MessageParser::readHeaderFixed(char* data)
     m_handler->frameStarted(m_opCode, m_fin);
 }
 
-void MessageParser::readHeaderExtension(char* data)
+void Parser::readHeaderExtension(char* data)
 {
     if (m_lengthTypeField <= 125)
     {
@@ -149,7 +149,7 @@ void MessageParser::readHeaderExtension(char* data)
         m_mask = *((unsigned int*)(data));
 }
 
-void MessageParser::reset()
+void Parser::reset()
 {
     m_buf.clear();
     m_state = ParseState::readingHeaderFixedPart;
