@@ -51,7 +51,11 @@ Rectangle
             anchors.bottomMargin: 16
             anchors.horizontalCenter: parent.horizontalCenter
 
-            onQueryChanged: { grid.model.setFilterWildcard(query); }
+            onQueryChanged:
+            {
+                if (grid.model)
+                    grid.model.setFilterWildcard(query);
+            }
             z: (grid.watcher.isSomeoneActive ? 0 : 1000);
         }
 

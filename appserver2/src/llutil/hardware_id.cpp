@@ -132,6 +132,11 @@ namespace LLUtil {
 
             g_hardwareInfo.date = QDateTime::currentDateTime().toString(Qt::ISODate);
             QStringList macs = getMacAddressList(g_hardwareInfo.nics);
+            if (macs.isEmpty())
+            {
+                qWarning() << "No network cards detected. HardwareID can't be calculated.";
+            }
+
             g_storedMac = saveMac(macs, settings);
             if (!g_storedMac.isEmpty())
                 g_hardwareInfo.mac = g_storedMac;

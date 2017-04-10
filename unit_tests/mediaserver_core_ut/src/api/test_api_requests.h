@@ -28,13 +28,20 @@ PreprocessRequestFunc removeJsonFields(const QSet<QString>& fields);
 #define NX_TEST_API_GET(...) ASSERT_NO_FATAL_FAILURE(api_requests_detail::executeGet(__VA_ARGS__))
 
 //-------------------------------------------------------------------------------------------------
-// Private
+// Implementation
 
 namespace api_requests_detail {
 
-void doExecutePost(const MediaServerLauncher* const launcher, const QString& urlStr,
-    const QByteArray& request, PreprocessRequestFunc preprocessRequestFunc, int httpStatus);
+void doExecutePost(
+    const MediaServerLauncher* const launcher,
+    const QString& urlStr,
+    const QByteArray& request,
+    PreprocessRequestFunc preprocessRequestFunc,
+    int httpStatus);
 
+/**
+ * @param urlStr Part of the URL after the origin - staring with a slash, path and query.
+ */
 template<class RequestData>
 void executePost(
     const MediaServerLauncher* const launcher,
@@ -48,9 +55,15 @@ void executePost(
         launcher, urlStr, request, std::move(preprocessRequestFunc), httpStatus));
 }
 
-void doExecuteGet(const MediaServerLauncher* const launcher, const QString& urlStr,
-    nx_http::BufferType* outResponse, int httpStatus);
+void doExecuteGet(
+    const MediaServerLauncher* const launcher,
+    const QString& urlStr,
+    nx_http::BufferType* outResponse,
+    int httpStatus);
 
+/**
+ * @param urlStr Part of the URL after the origin - staring with a slash, path and query.
+ */
 template<class ResponseData>
 void executeGet(
     const MediaServerLauncher* const launcher,

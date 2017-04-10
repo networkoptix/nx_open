@@ -321,9 +321,9 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
 #ifdef Q_OS_WIN
     common->store(new QnIexploreUrlHandler());
-    common->store(new QnQtbugWorkaround());
 #endif
 
+    common->store(new QnQtbugWorkaround());
     common->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
 }
 

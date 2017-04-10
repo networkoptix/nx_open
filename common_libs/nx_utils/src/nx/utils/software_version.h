@@ -8,6 +8,10 @@
 #include <boost/operators.hpp>
 #endif
 
+/* On some Linux systems "major" and "minor" are pre-defined macros in sys/types.h */
+#undef major
+#undef minor
+
 namespace nx {
 namespace utils {
 

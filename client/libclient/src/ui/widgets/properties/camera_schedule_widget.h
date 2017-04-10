@@ -72,6 +72,7 @@ private:
 
     void updateRecordThresholds(QnScheduleTaskList& tasks);
 
+    void updateScheduleTypeControls();
     void updateGridParams(bool pickedFromGrid = false);
     void updateGridEnabledState();
     void updateArchiveRangeEnabledState();

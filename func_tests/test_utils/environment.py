@@ -13,7 +13,6 @@ from .vagrant_box_config import BoxConfig
 from .vagrant_box import Vagrant
 from .server_rest_api import REST_API_USER, REST_API_PASSWORD
 from .server import (
-    MEDIASERVER_LISTEN_PORT,
     ServerConfig,
     Server,
     )
@@ -41,15 +40,21 @@ class EnvironmentBuilder(object):
         self._reset_servers = options.reset_servers
         self._recreate_boxes = options.recreate_boxes
         self._vm_name_prefix = options.vm_name_prefix
+        self._vm_port_base = options.vm_port_base
         self._vm_is_local_host = options.vm_ssh_host_config is None
         self._vm_host = host_from_config(options.vm_ssh_host_config)
         self._vm_host_work_dir = options.vm_host_work_dir
         self._boxes_config = []
+        self._boxes_config_is_loaded = False
         self._last_box_idx = 0
 
     def _load_boxes_config_from_cache(self):
-        return [BoxConfig.from_dict(d, self._vm_name_prefix)
-                for d in self._cache.get(self.vagrant_boxes_cache_key, [])]
+        try:
+            self._boxes_config = [BoxConfig.from_dict(d)
+                                  for d in self._cache.get(self.vagrant_boxes_cache_key, [])]
+            self._boxes_config_is_loaded = True
+        except KeyError as x:  # may be due to changed version
+            log.warning('Failed to load boxes config: %s; will try to remove old boxes using old Vagrantfile' % x)
 
     def _save_boxes_config_to_cache(self):
         self._cache.set(self.vagrant_boxes_cache_key, [config.to_dict() for config in self._boxes_config])
@@ -72,10 +77,11 @@ class EnvironmentBuilder(object):
         if config:
             config.name = required_config.name
         else:
-            config = required_config
             self._last_box_idx += 1
-            config.idx = self._last_box_idx
-            config.vm_name_prefix = self._vm_name_prefix
+            config = required_config.clone(
+                idx=self._last_box_idx,
+                vm_name_prefix=self._vm_name_prefix,
+                vm_port_base=self._vm_port_base)
             self._boxes_config.append(config)
         config.is_allocated = True
         log.info('BOX CONFIG %s: %s', config.box_name(), config)
@@ -91,7 +97,7 @@ class EnvironmentBuilder(object):
 
     def _init_server(self, box_config_to_box, http_schema, config):
         box = box_config_to_box[config.box]
-        url = '%s://%s:%d/' % (http_schema, box.ip_address, MEDIASERVER_LISTEN_PORT)
+        url = '%s://%s:%d/' % (http_schema, self._vm_host.host, config.box.rest_api_forwarded_port())
         server = Server(self._company_name, config.name, box, url)
         if config.leave_initial_cloud_host:
             patch_set_cloud_host = None
@@ -119,17 +125,20 @@ class EnvironmentBuilder(object):
             boxes = []
         log.info('TEST_DIR=%r, WORK_DIR=%r, BIN_DIR=%r, CLOUD_HOST=%r, COMPANY_NAME=%r',
                  self._test_dir, self._work_dir, self._bin_dir, self._cloud_host_host, self._company_name)
-        self._boxes_config = self._load_boxes_config_from_cache()
+        self._load_boxes_config_from_cache()
         ssh_config_path = os.path.join(self._work_dir, 'ssh.config')
 
         if self._vm_is_local_host:
             vagrant_dir = os.path.join(self._work_dir, 'vagrant')
         else:
             vagrant_dir = os.path.join(self._vm_host_work_dir, 'vagrant')
-        vagrant = Vagrant(self._test_dir, self._vm_host, self._bin_dir, vagrant_dir,
+        vagrant = Vagrant(self._test_dir, self._vm_name_prefix, self._vm_host, self._bin_dir, vagrant_dir,
                           self._test_session.vagrant_private_key_path, ssh_config_path)
 
-        if self._test_session.must_recreate_boxes():
+        if not self._boxes_config_is_loaded:
+            vagrant.destroy_all_boxes()
+            self._test_session.set_boxes_recreated_flag()  # no more recreation is required
+        elif self._test_session.must_recreate_boxes():
             # to be able to destroy all old boxes we need old boxes config to create Vagrantfile with them
             vagrant.destroy_all_boxes(self._boxes_config)
             self._boxes_config = []  # now we can start afresh
@@ -147,12 +156,10 @@ class EnvironmentBuilder(object):
                     boxes.append(value.box)
 
         self._allocate_boxes(servers_config, boxes)
+        self._save_boxes_config_to_cache()
 
-        try:
-            vagrant.init(self._boxes_config)
-            box_config_to_box = {box.config: box for box in vagrant.boxes.values()}
-        finally:
-            self._save_boxes_config_to_cache()  # vagrant.init may change config, must save it after this
+        vagrant.init(self._boxes_config)
+        box_config_to_box = {box.config: box for box in vagrant.boxes.values()}
 
         for box in vagrant.boxes.values():
             log.info('BOX %s', box)
@@ -163,8 +170,8 @@ class EnvironmentBuilder(object):
         self._run_servers_merge(merge_servers or [], servers)
 
         for name, server in servers.items():
-            log.info('SERVER %s: %r at %s %s ecs_guid=%r local_system_id=%r',
-                     name.upper(), server.name, server.box.name, server.url, server.ecs_guid, server.local_system_id)
+            log.info('SERVER %s: %r at %s, rest_api=%s ecs_guid=%r local_system_id=%r',
+                     name.upper(), server.name, server.box.name, server.rest_api_url, server.ecs_guid, server.local_system_id)
         log.info('----- build environment setup is complete ----------------------------->8 ----------------------------------------------')
         artifact_path_prefix = os.path.join(
             self._work_dir,
@@ -189,10 +196,23 @@ class Environment(object):
         for name, server in servers.items():
             setattr(self, name, server)
 
+    def perform_post_checks(self):
+        log.info('----- test is finished, performing post-test checks ------------------------>8 -----------------------------------------')
+        core_dumped_servers = []
+        for name, server in self.servers.items():
+            if server.list_core_files():
+                core_dumped_servers.append(name.upper())
+        assert not core_dumped_servers, 'Following server(s) left core dump(s): %s' % ', '.join(core_dumped_servers)
+
     def finalizer(self):
         log.info('FINALIZER for %s', self.artifact_path_prefix)
         for name, server in self.servers.items():
-            log_path = '%s-server-%s.log' % (self.artifact_path_prefix, name)
+            path_prefix = '%s-server-%s' % (self.artifact_path_prefix, name)
+            log_path = '%s.log' % path_prefix
             with open(log_path, 'wb') as f:
                 f.write(server.get_log_file())
             log.debug('log file for server %s, %s is stored to %s', name.upper(), server, log_path)
+            for remote_core_path in server.list_core_files():
+                local_core_path = '%s.%s' % (path_prefix, os.path.basename(remote_core_path))
+                server.host.get_file(remote_core_path, local_core_path)
+                log.debug('core file for server %s, %s is stored to %s', name.upper(), server, local_core_path)

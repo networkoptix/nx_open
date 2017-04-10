@@ -249,8 +249,13 @@ void QnFfmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
     // TODO: #vasilenko check return value
     if (avcodec_open2(m_context, m_codec, NULL) < 0)
     {
-        m_codec = 0;
-        NX_ASSERT(1, Q_FUNC_INFO, "Can't open decoder");
+	    // try to reopen decoder without passed context
+        if (m_passedContext)
+        {
+            QnFfmpegHelper::deleteAvCodecContext(m_passedContext);
+            m_passedContext = nullptr;
+            resetDecoder(data);
+        }
     }
     //NX_ASSERT(m_context->codec);
 

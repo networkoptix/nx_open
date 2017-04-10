@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "async_sql_query_executor.h"
+#include "db_statistics_collector.h"
 #include "db_structure_updater.h"
 #include "types.h"
 
@@ -16,7 +17,10 @@ public:
 
     bool initialize();
 
-    const std::unique_ptr<AsyncSqlQueryExecutor>& queryExecutor();
+    AsyncSqlQueryExecutor& queryExecutor();
+    const AsyncSqlQueryExecutor& queryExecutor() const;
+    const StatisticsCollector& statisticsCollector() const;
+    StatisticsCollector& statisticsCollector();
 
 protected:
     DbStructureUpdater& dbStructureUpdater();
@@ -24,6 +28,7 @@ protected:
 private:
     const ConnectionOptions m_dbConnectionOptions;
     std::unique_ptr<AsyncSqlQueryExecutor> m_queryExecutor;
+    StatisticsCollector m_statisticsCollector;
     DbStructureUpdater m_dbStructureUpdater;
 
     bool updateDbStructure();
