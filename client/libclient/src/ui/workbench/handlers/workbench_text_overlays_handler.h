@@ -11,6 +11,7 @@
 
 class QnResourceWidget;
 class QnWorkbenchTextOverlaysHandlerPrivate;
+class QnBusinessStringsHelper;
 
 class QnWorkbenchTextOverlaysHandler:
     public Connective<QObject>,
@@ -30,4 +31,5 @@ private:
 private:
     Q_DECLARE_PRIVATE(QnWorkbenchTextOverlaysHandler);
     const QScopedPointer<QnWorkbenchTextOverlaysHandlerPrivate> d_ptr;
+    QScopedPointer<QnBusinessStringsHelper> m_helper;
 };

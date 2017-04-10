@@ -20,9 +20,9 @@ namespace {
 
 static const int kDefaultDelayMs = 5 * 1000; // 5 seconds
 
-QnLayoutResourcePtr selectLayout()
+QnLayoutResourcePtr selectLayout(QnResourcePool* resourcePool)
 {
-    auto layouts = qnResPool->getResources<QnLayoutResource>();
+    auto layouts = resourcePool->getResources<QnLayoutResource>();
 
     QScopedPointer<QnMessageBox> dialog(new QnMessageBox());
     auto resourcesView = new QnResourceListView(layouts, dialog.data());
@@ -98,7 +98,7 @@ QnLayoutTourDialog::QnLayoutTourDialog(QWidget* parent, Qt::WindowFlags windowFl
     connect(ui->addLayoutButton, &QPushButton::clicked, this,
         [this]
         {
-            if (auto layout = selectLayout())
+            if (auto layout = selectLayout(resourcePool()))
                 m_model->addItem(QnLayoutTourItem(layout, kDefaultDelayMs));
         });
 }
@@ -135,7 +135,7 @@ void QnLayoutTourDialog::at_view_clicked(const QModelIndex& index)
     switch (column)
     {
         case QnLayoutTourItemsModel::LayoutColumn:
-            if (auto layout = selectLayout())
+            if (auto layout = selectLayout(resourcePool()))
             {
                 m_model->updateLayout(index.row(), layout);
             }

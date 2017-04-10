@@ -244,7 +244,7 @@ void LayoutToursHandler::processTourStep()
     m_currentIndex = (m_currentIndex + 1) % tour.items.size();
     const auto& next = tour.items[m_currentIndex];
 
-    auto layout = qnResPool->getResourceById<QnLayoutResource>(next.layoutId);
+    auto layout = resourcePool()->getResourceById<QnLayoutResource>(next.layoutId);
     if (!layout)
     {
         stopTour();
