@@ -831,8 +831,8 @@ private:
         getTransactionDescriptorByParam<T>()->filterByReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, target);
     }
 
-    Qn::UserAccessData m_userAccessData;
     detail::QnDbManager* m_dbManager;
+    Qn::UserAccessData m_userAccessData;
 };
 
 } // namespace ec2
