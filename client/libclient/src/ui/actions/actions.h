@@ -925,6 +925,9 @@ enum IDType
      */
     ToggleTourModeAction,
 
+    NewLayoutTourAction,
+    LayoutTourSettingsAction,
+    RenameLayoutTourAction,
     OpenLayoutTourAction,
     StartLayoutTourAction,
     StopLayoutTourAction,

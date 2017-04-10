@@ -1,5 +1,4 @@
-#ifndef QN_RESOURCE_FWD_H
-#define QN_RESOURCE_FWD_H
+#pragma once
 
 #include <memory>
 
@@ -33,6 +32,9 @@ class QnVideoWallControlMessage;
 
 struct QnLayoutItemData;
 struct QnLayoutItemResourceDescriptor;
+
+struct QnLayoutTourItem;
+using QnLayoutTourItemList = std::vector<QnLayoutTourItem>;
 
 struct QnServerBackupSchedule;
 
@@ -197,6 +199,3 @@ typedef QnSharedResourcePointerList<QnFlirEIPResource> QnFlirEIPResourceList;
 
 class QnAdamResource;
 typedef QnSharedResourcePointer<QnAdamResource> QnAdamResourcePtr;
-
-
-#endif // QN_RESOURCE_FWD_H

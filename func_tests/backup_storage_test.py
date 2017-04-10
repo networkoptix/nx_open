@@ -42,9 +42,9 @@ BACKUP_BITRATE_NOT_LIMITED = -1  # -1 means not limited.
 
 
 # Global system 'backupQualities' setting parametrization:
-#   * low - CameraBackup_LowQuality, backup only high quality media stream
-#   * high - CameraBackup_HighQuality, backup only low quality media stream
-#   * both - CameraBackup_BothQuality, backup both (high & low quality) media streams
+#   * low - CameraBackup_LowQuality, backup only high quality media stream;
+#   * high - CameraBackup_HighQuality, backup only low quality media stream;
+#   * both - CameraBackup_BothQuality, backup both (high & low quality) media streams.
 @pytest.fixture(params=['low', 'high', 'both'])
 def system_backup_type(request):
     if request.param == 'low':
@@ -56,8 +56,8 @@ def system_backup_type(request):
 
 
 # Global system 'backupNewCamerasByDefault' setting parametrization:
-#  * backup - backup new cameras by default
-#  * skip - slip new cameras backup
+#  * backup - backup new cameras by default;
+#  * skip - skip new cameras backup.
 @pytest.fixture(params=['backup', 'skip'])
 def backup_new_camera(request):
     if request.param == 'backup':
@@ -67,8 +67,8 @@ def backup_new_camera(request):
 
 
 # Second camera 'backupType' attribute parametrization:
-#   * default - backup attribute isn't set
-#   * disabled - CameraBackup_Disabled
+#   * default - backup attribute isn't set;
+#   * disabled - CameraBackup_Disabled.
 @pytest.fixture(params=['default', 'disabled'])
 def second_camera_backup_type(request):
     if request.param == 'disabled':
@@ -172,8 +172,8 @@ def assert_path_does_not_exist(server, path):
 
 def assert_paths_are_equal(server, path_1, path_2):
     server.box.host.run_command(['diff',
-                                 '-r',            # recursively compare any subdirectories found
-                                 '-s',            # report when two files are the same
+                                 '--recursive',
+                                 '--report-identical-files',
                                  path_1,  path_2])
 
 

@@ -83,7 +83,8 @@ namespace ec2
         void statusChanged( const QnUuid& resourceId, Qn::ResourceStatus status, ec2::NotificationSource source);
         void resourceParamChanged( const ApiResourceParamWithRefData& param );
         void resourceParamRemoved( const ApiResourceParamWithRefData& param );
-        void resourceRemoved( const QnUuid& resourceId );
+        void resourceRemoved(const QnUuid& resourceId);
+        void resourceStatusRemoved(const QnUuid& resourceId);
     };
 
     typedef std::shared_ptr<AbstractResourceNotificationManager> AbstractResourceNotificationManagerPtr;

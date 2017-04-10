@@ -37,7 +37,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <nx/utils/uuid.h>
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/string.h>
 #include <utils/common/variant.h>
 #include <utils/common/event_processors.h>

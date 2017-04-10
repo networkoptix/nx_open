@@ -100,7 +100,7 @@
 
 #include <utils/license_usage_helper.h>
 #include <utils/common/uuid_pool.h>
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 #include <utils/unity_launcher_workaround.h>
 
 #include <nx/vms/utils/platform/autorun.h>
@@ -627,8 +627,8 @@ void QnWorkbenchVideoWallHandler::swapLayouts(const QnVideoWallItemIndex firstIn
             /* Avoiding double swap */
             //TODO: #GDM refactor it
             bool bothSuccess = true;
-            QnCounter *counter = new QnCounter(2);
-            connect(counter, &QnCounter::reachedZero, this, [callback, &bothSuccess, counter]()
+            nx::utils::Counter *counter = new nx::utils::Counter(2);
+            connect(counter, &nx::utils::Counter::reachedZero, this, [callback, &bothSuccess, counter]()
             {
                 callback(bothSuccess, QnLayoutResourcePtr());
                 counter->deleteLater();

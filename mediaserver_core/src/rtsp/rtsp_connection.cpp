@@ -458,7 +458,7 @@ void QnRtspConnectionProcessor::sendResponse(int httpStatusCode, const QByteArra
         nx_http::HttpHeader(nx_http::header::Server::NAME, nx_http::serverString()));
     nx_http::insertOrReplaceHeader(
         &d->response.headers,
-        nx_http::HttpHeader("Date", nx_http::dateTimeToHttpFormat(QDateTime::currentDateTime())));
+        nx_http::HttpHeader("Date", nx_http::formatDateTime(QDateTime::currentDateTime())));
 
     if (!contentType.isEmpty())
         nx_http::insertOrReplaceHeader(
@@ -1685,7 +1685,7 @@ void QnRtspConnectionProcessor::run()
 void QnRtspConnectionProcessor::resetTrackTiming()
 {
     Q_D(QnRtspConnectionProcessor);
-    for (ServerTrackInfoMap::iterator itr = d->trackInfo.begin(); itr != d->trackInfo.end(); ++itr)
+    for (ServerTrackInfoMap::const_iterator itr = d->trackInfo.constBegin(); itr != d->trackInfo.constEnd(); ++itr)
     {
         RtspServerTrackInfoPtr track = itr.value();
         track->sequence = 0;

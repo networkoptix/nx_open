@@ -19,6 +19,7 @@ namespace Qn
         ServersNode,            /**< Root node for servers for admin user. */
         UserResourcesNode,      /**< Root node for cameras, i/o modules and statistics for non-admin user. */
         LayoutsNode,            /**< Root node for current user's layouts and shared layouts. */
+        LayoutToursNode,        /**< Root node for the layout tours. */
         WebPagesNode,           /**< Root node for web pages. */
         UsersNode,              /**< Root node for user resources. */
         OtherSystemsNode,       /**< Root node for remote systems. */
@@ -42,6 +43,8 @@ namespace Qn
         ResourceNode,           /**< Node that represents a resource. Has only resource. */
         LayoutItemNode,         /**< Node that represents a layout item. Has both guid and resource. */
         EdgeNode,               /**< Node that represents an EDGE server with a camera. Has only resource - server's only camera. */
+
+        LayoutTourNode,         /**< Node that represents a layout tour. Has a guid. */
 
         VideoWallItemNode,      /**< Node that represents a videowall item. Has a guid and can have resource. */
         VideoWallMatrixNode,    /**< Node that represents a videowall saved matrix. Has a guid. */

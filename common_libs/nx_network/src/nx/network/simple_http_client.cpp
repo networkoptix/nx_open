@@ -1,14 +1,13 @@
 #include "simple_http_client.h"
 
+#include <sstream>
+
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QUrl>
 
-#include <sstream>
+#include <nx/utils/string.h>
 
 #include "http/httptypes.h"
-#include "utils/common/util.h"
-#include "network/authutil.h"
-
 
 //static const int MAX_LINE_LENGTH = 1024*16;
 
@@ -482,7 +481,7 @@ void CLSimpleHTTPClient::getAuthInfo()
     QList<QByteArray> authParams = wwwAuth.split(',');
     for (int i = 0; i < authParams.size(); ++i)
     {
-        QList<QByteArray> param = smartSplit(authParams[i], '=');
+        QList<QByteArray> param = nx::utils::smartSplit(authParams[i], '=');
         if (param.size() > 1)
         {
             param[0] = param[0].trimmed();

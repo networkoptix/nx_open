@@ -406,10 +406,13 @@ bool QnConnectionManagerPrivate::doConnect()
             const auto localId = helpers::getLocalSystemId(connectionInfo);
 
             using namespace nx::client::core::helpers;
-            storeConnection(localId, connectionInfo.systemName, url);
-            storeCredentials(localId, QnEncodedCredentials(url));
-            updateWeightData(localId);
-            qnClientCoreSettings->save();
+            if (!nx::network::SocketGlobals::addressResolver().isCloudHostName(url.host()))
+            {
+                storeConnection(localId, connectionInfo.systemName, url);
+                storeCredentials(localId, QnEncodedCredentials(url));
+                updateWeightData(localId);
+                qnClientCoreSettings->save();
+            }
 
             LastConnectionData connectionData{
                 connectionInfo.systemName,

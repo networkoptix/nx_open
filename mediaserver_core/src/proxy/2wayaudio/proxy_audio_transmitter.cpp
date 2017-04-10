@@ -113,7 +113,7 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
         quint16* lenPtr = (quint16*) (sendBuffer.data() + 2);
         *lenPtr = htons(sendBuffer.size() - 4);
 
-        if (m_socket->send(sendBuffer) != sendBuffer.size())
+        if (m_socket->send(sendBuffer.constData(), sendBuffer.size()) != sendBuffer.size())
             m_needStop = true;
 
         sendBuffer.clear();

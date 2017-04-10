@@ -3,12 +3,14 @@
 #include <QtCore/QHash>
 #include <QtCore/QPointer>
 
-#include <client/client_color_types.h>
+#include <ui/customization/customized.h>
+
+#include <ui/graphics/items/controls/html_text_item.h>
 
 class QGraphicsWidget;
 class QnResourceTitleItem;
-class QnHtmlTextItem;
-
+class QnHudDetailsItem;
+class QnHudPositionItem;
 class QnHudOverlayWidget;
 
 class QnHudOverlayWidgetPrivate
@@ -19,14 +21,28 @@ class QnHudOverlayWidgetPrivate
 public:
     QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main);
 
-    void updateTextOptions();
-
     QnResourceTitleItem* const title;
-    QnHtmlTextItem* const details;
-    QnHtmlTextItem* const position;
+    QnHudDetailsItem* const details;
+    QnHudPositionItem* const position;
 
     QGraphicsWidget* const left;
     QGraphicsWidget* const right;
+};
 
-    QnResourceHudColors colors;
+class QnHudDetailsItem: public Customized<QnHtmlTextItem> //< solely for possible customization
+{
+    Q_OBJECT
+    using base_type = Customized<QnHtmlTextItem>;
+
+public:
+    using base_type::base_type; //< forward constructors
+};
+
+class QnHudPositionItem: public Customized<QnHtmlTextItem> //< solely for possible customization
+{
+    Q_OBJECT
+    using base_type = Customized<QnHtmlTextItem>;
+
+public:
+    using base_type::base_type; //< forward constructors
 };

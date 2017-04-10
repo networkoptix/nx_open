@@ -274,7 +274,6 @@ void QnServerMessageProcessor::removeResourceIgnored(const QnUuid& resourceId)
         ec2::fromResourceToApi(mServer, apiServer);
         auto connection = commonModule()->ec2Connection();
         connection->getMediaServerManager(Qn::kSystemAccess)->saveSync(apiServer);
-        connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusSync(apiServer.id, Qn::Online);
     }
     else if (isOwnStorage && !storage->isExternal() && storage->isWritable())
     {

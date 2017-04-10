@@ -14,7 +14,6 @@
 
 #include <utils/crypt/linux_passwd_crypt.h>
 #include <nx/utils/system_error.h>
-#include <utils/common/util.h>
 
 #include "auth_tools.h"
 
@@ -1062,7 +1061,7 @@ void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
 
     nx_http::insertOrReplaceHeader(
         &m_request.headers,
-        HttpHeader("Date", nx_http::dateTimeToHttpFormat(QDateTime::currentDateTime())));
+        HttpHeader("Date", nx_http::formatDateTime(QDateTime::currentDateTime())));
     m_request.headers.emplace(
         "User-Agent",
         m_userAgent.isEmpty() ? nx_http::userAgentString() : m_userAgent.toLatin1());

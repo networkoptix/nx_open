@@ -202,7 +202,7 @@ bool QnDesktopCameraConnectionProcessor::isConnected() const
 void QnDesktopCameraConnectionProcessor::sendData(const QnByteArray& data)
 {
     Q_D(QnDesktopCameraConnectionProcessor);
-    int sended = d->socket->send(data);
+    int sended = d->socket->send(data.constData(), data.size());
     if (sended < (int)data.size())
         d->socket->close();
 }

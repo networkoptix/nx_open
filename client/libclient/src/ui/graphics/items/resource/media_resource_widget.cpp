@@ -53,6 +53,7 @@
 #include <ui/common/text_pixmap_cache.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
+#include <ui/graphics/items/controls/html_text_item.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
@@ -62,12 +63,11 @@
 #include <ui/graphics/items/resource/two_way_audio_widget.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
-#include <ui/graphics/items/overlays/composite_text_overlay.h>
-#include <ui/graphics/items/overlays/text_overlay_widget.h>
 #include <ui/graphics/items/overlays/hud_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_title_item.h>
-#include <ui/graphics/items/overlays/scrollable_items_widget.h>
+#include <ui/graphics/items/overlays/scrollable_text_items_widget.h>
 #include <ui/graphics/items/overlays/status_overlay_controller.h>
+#include <ui/graphics/items/standard/graphics_stacked_widget.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
@@ -268,8 +268,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     m_ptzController(nullptr),
     m_homePtzController(nullptr),
     m_dewarpingParams(),
-    m_compositeTextOverlay(new QnCompositeTextOverlay(m_camera, navigator(),
-        [this]() { return getUtcCurrentTimeMs(); }, this)),
     m_ioModuleOverlayWidget(nullptr),
     m_ioCouldBeShown(false),
     m_ioLicenceStatusHelper(), /// Will be created only for I/O modules
@@ -437,7 +435,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     updateInfoText();
     updateDetailsText();
     updatePositionText();
-    updateCompositeOverlayMode();
     updateFisheye();
     updateStatusOverlay(false);
     updateOverlayButton();
@@ -701,6 +698,35 @@ void QnMediaResourceWidget::suspendHomePtzController()
         m_homePtzController->suspend();
 }
 
+void QnMediaResourceWidget::hideTextOverlay(const QnUuid& id)
+{
+    setTextOverlayParameters(id, false, QString(), QnHtmlTextItemOptions());
+}
+
+void QnMediaResourceWidget::showTextOverlay(const QnUuid& id, const QString& text,
+    const QnHtmlTextItemOptions& options)
+{
+    setTextOverlayParameters(id, true, text, options);
+}
+
+void QnMediaResourceWidget::setTextOverlayParameters(const QnUuid& id, bool visible,
+    const QString& text, const QnHtmlTextItemOptions& options)
+{
+    if (!m_textOverlayWidget)
+        return;
+
+    m_textOverlayWidget->deleteItem(id);
+
+    if (!visible)
+        return;
+
+    /* Do not add empty text items: */
+    if (text.trimmed().isEmpty())
+        return;
+
+    m_textOverlayWidget->addItem(text, options, id);
+}
+
 void QnMediaResourceWidget::setupHud()
 {
     m_triggersContainer = new QnScrollableItemsWidget(m_hudOverlay->right());
@@ -711,25 +737,33 @@ void QnMediaResourceWidget::setupHud()
     m_triggersContainer->setFlag(QGraphicsItem::ItemClipsChildrenToShape, false);
     setOverlayWidgetVisible(m_triggersContainer, false, /*animate=*/false);
 
-    setOverlayWidgetVisible(m_hudOverlay->right(), true, /*animate=*/false);
+    m_compositeOverlay = new QnGraphicsStackedWidget(m_hudOverlay->right());
+
+    m_textOverlayWidget = new QnScrollableTextItemsWidget(m_compositeOverlay);
+    m_textOverlayWidget->setAlignment(Qt::AlignRight | Qt::AlignBottom);
+
+    m_bookmarksContainer = new QnScrollableTextItemsWidget(m_compositeOverlay);
+    m_bookmarksContainer->setAlignment(Qt::AlignRight | Qt::AlignBottom);
+    m_bookmarksContainer->hide();
+
+    m_compositeOverlay->addWidget(m_textOverlayWidget);
+    m_compositeOverlay->addWidget(m_bookmarksContainer);
 
     auto rightLayout = new QGraphicsLinearLayout(Qt::Horizontal, m_hudOverlay->right());
-    rightLayout->addItem(m_compositeTextOverlay);
+    rightLayout->addItem(m_compositeOverlay);
     rightLayout->addItem(m_triggersContainer);
 
-    m_compositeTextOverlay->stackBefore(m_triggersContainer);
+    m_compositeOverlay->stackBefore(m_triggersContainer);
+
+    setOverlayWidgetVisible(m_hudOverlay->right(), true, /*animate=*/false);
 }
 
 void QnMediaResourceWidget::updateHud(bool animate)
 {
-    const auto compositeOverlayCouldBeVisible
-        = !options().testFlag(QnResourceWidget::InfoOverlaysForbidden);
-
-    setOverlayWidgetVisible(m_compositeTextOverlay, compositeOverlayCouldBeVisible, animate);
-
     base_type::updateHud(animate);
-
     setOverlayWidgetVisible(m_triggersContainer, isOverlayWidgetVisible(titleBar()), animate);
+
+    updateCompositeOverlayMode();
 }
 
 void QnMediaResourceWidget::ensureTwoWayAudioWidget()
@@ -1610,8 +1644,6 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (qnRuntime->isDevMode())
         result |= Qn::DbgScreenshotButton;
 
-    const bool isVideoWall = qnRuntime->isVideoWallMode();
-
     if (hasVideo && !resource()->toResource()->hasFlags(Qn::still_image))
         result |= Qn::ScreenshotButton;
 
@@ -2115,13 +2147,24 @@ void QnMediaResourceWidget::at_item_imageEnhancementChanged()
 
 void QnMediaResourceWidget::updateCompositeOverlayMode()
 {
+    if (!m_compositeOverlay || m_camera.isNull())
+        return;
+
     const bool isLive = (m_display && m_display->camDisplay()
         ? m_display->camDisplay()->isRealTimeSource() : false);
 
-    const bool bookmarksEnabled = (!isLive && navigator()->bookmarksModeEnabled() && !m_camera.isNull());
-    const auto mode = (bookmarksEnabled ? QnCompositeTextOverlay::kBookmarksMode
-        : (isLive ? QnCompositeTextOverlay::kTextOutputMode : QnCompositeTextOverlay::kUndefinedMode));
-    m_compositeTextOverlay->setMode(mode);
+    const bool bookmarksEnabled = !isLive
+        && navigator()->bookmarksModeEnabled();
+
+    m_compositeOverlay->setCurrentWidget(bookmarksEnabled
+        ? m_bookmarksContainer
+        : m_textOverlayWidget);
+
+    const bool visible = !options().testFlag(QnResourceWidget::InfoOverlaysForbidden)
+        && (bookmarksEnabled || isLive);
+
+    const bool animate = m_compositeOverlay->scene() != nullptr;
+    setOverlayWidgetVisible(m_compositeOverlay, visible, animate);
 }
 
 qint64 QnMediaResourceWidget::getUtcCurrentTimeUsec() const
@@ -2158,9 +2201,9 @@ qint64 QnMediaResourceWidget::getDisplayTimeUsec() const
     return result;
 }
 
-QnCompositeTextOverlay *QnMediaResourceWidget::compositeTextOverlay()
+QnScrollableTextItemsWidget* QnMediaResourceWidget::bookmarksContainer()
 {
-    return m_compositeTextOverlay;
+    return m_bookmarksContainer;
 }
 
 QVector<QColor> QnMediaResourceWidget::motionSensitivityColors() const

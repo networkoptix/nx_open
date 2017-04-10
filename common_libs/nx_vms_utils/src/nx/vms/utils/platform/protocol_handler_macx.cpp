@@ -112,12 +112,11 @@ bool nx::vms::utils::registerSystemUriProtocolHandler(
     const auto handlerBundleId = lit("%1%2").arg(
         macHandlerBundleIdBase, targetVersion.toString());
 
-    bool result = true;
-    if (targetVersion == version)
-        result = registerAsLaunchService(applicationBinaryPath);
+    if (targetVersion == version && !registerAsLaunchService(applicationBinaryPath))
+        return false;
 
     const auto cfId = cf::QnCFString(handlerBundleId);
-    return  (result
-        && (LSSetDefaultHandlerForURLScheme(cf::QnCFString(protocol).ref(), cfId.ref()) != noErr));
+    const auto cfProtocol = cf::QnCFString(protocol);
+    return LSSetDefaultHandlerForURLScheme(cfProtocol.ref(), cfId.ref()) != noErr;
 }
 

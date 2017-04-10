@@ -46,6 +46,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_runtime_data.h>
+#include <core/resource_management/layout_tour_manager.h>
 
 #include <decoders/video/abstract_video_decoder.h>
 
@@ -309,6 +310,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     commonModule->store(new QnCameraBookmarksManager());
     commonModule->store(new QnServerStorageManager());
+    commonModule->instance<QnLayoutTourManager>();
 
     commonModule->store(new QnVoiceSpectrumAnalyzer());
     commonModule->instance<QnClientPtzControllerPool>();
@@ -328,9 +330,9 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
 #ifdef Q_OS_WIN
     commonModule->store(new QnIexploreUrlHandler());
-    commonModule->store(new QnQtbugWorkaround());
 #endif
 
+    commonModule->store(new QnQtbugWorkaround());
     commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
 }
 

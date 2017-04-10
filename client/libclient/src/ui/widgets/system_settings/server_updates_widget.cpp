@@ -462,10 +462,9 @@ void QnServerUpdatesWidget::discardChanges()
         dialog.addButton(
             tr("Continue in Background"), QDialogButtonBox::RejectRole);
 
+        dialog.exec();
         if (dialog.clickedButton() == cancelUpdateButton)
-        {
             cancelUpdate();
-        }
     }
     else
     {

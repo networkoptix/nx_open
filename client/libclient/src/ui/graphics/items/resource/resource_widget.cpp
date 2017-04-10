@@ -841,7 +841,7 @@ void QnResourceWidget::updateHud(bool animate)
     bool alwaysShowName = m_options.testFlag(AlwaysShowName);
 
     const bool showOnlyCameraName = ((overlaysCanBeVisible && detailsVisible) || alwaysShowName)
-		&& (!m_mouseInWidget || qnRuntime->isVideoWallMode());
+        && !m_mouseInWidget;
     const bool showCameraNameWithButtons = overlaysCanBeVisible && m_mouseInWidget;
     const bool showPosition = overlaysCanBeVisible && (detailsVisible || m_mouseInWidget);
     const bool showDetailedInfo = overlaysCanBeVisible && detailsVisible && (m_mouseInWidget || qnRuntime->showFullInfo());

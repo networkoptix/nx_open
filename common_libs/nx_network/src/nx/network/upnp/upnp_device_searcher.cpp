@@ -5,7 +5,6 @@
 
 #include <QtXml/QXmlDefaultHandler>
 
-#include <common/common_globals.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 

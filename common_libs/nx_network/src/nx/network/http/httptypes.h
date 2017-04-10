@@ -747,6 +747,6 @@ StringType NX_NETWORK_API serverString();
 /**
  * Convert QDateTime to HTTP header date format (rfc822#section-5)
  */
-QByteArray NX_NETWORK_API dateTimeToHttpFormat(const QDateTime& value);
+QByteArray NX_NETWORK_API formatDateTime(const QDateTime& value);
 
 } // nx_http
