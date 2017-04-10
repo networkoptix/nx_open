@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "../socket_delegate.h"
 
 namespace nx {
@@ -20,7 +22,7 @@ class NX_NETWORK_API StreamSocket:
 public:
     // TODO: #ak encryptionUse here looks strange.
     StreamSocket(
-        AbstractStreamSocket* wrappedSocket,
+        std::unique_ptr<AbstractStreamSocket> wrappedSocket,
         bool isServerSide,  // TODO: #ak Get rid of this one.
         EncryptionUse encryptionUse = EncryptionUse::autoDetectByReceivedData);
 

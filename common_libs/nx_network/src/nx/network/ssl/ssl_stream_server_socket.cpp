@@ -5,10 +5,10 @@ namespace network {
 namespace ssl {
 
 StreamServerSocket::StreamServerSocket(
-    AbstractStreamServerSocket* delegateSocket,
+    std::unique_ptr<AbstractStreamServerSocket> delegateSocket,
     EncryptionUse encryptionUse)
     :
-    base_type(delegateSocket),
+    base_type(std::move(delegateSocket)),
     m_encryptionUse(encryptionUse)
 {
 }

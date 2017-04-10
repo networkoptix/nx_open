@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "abstract_socket.h"
 
 namespace nx {
@@ -18,8 +20,8 @@ class SocketDelegate:
         "You MUST use class derived of AbstractSocket as a template argument");
 
 public:
-    SocketDelegate(SocketInterfaceToImplement* target):
-        m_target(target)
+    SocketDelegate(std::unique_ptr<SocketInterfaceToImplement> target):
+        m_target(std::move(target))
     {
     }
 
@@ -154,7 +156,7 @@ public:
     }
 
 protected:
-    SocketInterfaceToImplement* m_target;
+    std::unique_ptr<SocketInterfaceToImplement> m_target;
 };
 
 template<typename SocketInterfaceToImplement>
@@ -168,8 +170,8 @@ class CommunicatingSocketDelegate:
     using base_type = SocketDelegate<SocketInterfaceToImplement>;
 
 public:
-    CommunicatingSocketDelegate(SocketInterfaceToImplement* target):
-        base_type(target)
+    CommunicatingSocketDelegate(std::unique_ptr<SocketInterfaceToImplement> target):
+        base_type(std::move(target))
     {
     }
 
@@ -254,8 +256,8 @@ class StreamSocketDelegate:
     using base_type = CommunicatingSocketDelegate<AbstractStreamSocket>;
 
 public:
-    StreamSocketDelegate(AbstractStreamSocket* target):
-        base_type(target)
+    StreamSocketDelegate(std::unique_ptr<AbstractStreamSocket> target):
+        base_type(std::move(target))
     {
     }
 
@@ -301,8 +303,8 @@ class StreamServerSocketDelegate:
     using base_type = SocketDelegate<AbstractStreamServerSocket>;
 
 public:
-    StreamServerSocketDelegate(AbstractStreamServerSocket* target):
-        base_type(target)
+    StreamServerSocketDelegate(std::unique_ptr<AbstractStreamServerSocket> target):
+        base_type(std::move(target))
     {
     }
 

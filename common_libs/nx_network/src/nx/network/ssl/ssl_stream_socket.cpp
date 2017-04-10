@@ -5,11 +5,11 @@ namespace network {
 namespace ssl {
 
 StreamSocket::StreamSocket(
-    AbstractStreamSocket* wrappedSocket,
+    std::unique_ptr<AbstractStreamSocket> wrappedSocket,
     bool /*isServerSide*/,
     EncryptionUse /*encryptionUse*/)
     :
-    base_type(wrappedSocket)
+    base_type(std::move(wrappedSocket))
 {
 }
 

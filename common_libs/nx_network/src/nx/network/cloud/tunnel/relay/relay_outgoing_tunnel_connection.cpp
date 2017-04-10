@@ -200,8 +200,7 @@ OutgoingConnection::OutgoingConnection(
     std::unique_ptr<AbstractStreamSocket> delegate,
     std::shared_ptr<int> usageCounter)
     :
-    StreamSocketDelegate(delegate.get()),
-    m_delegate(std::move(delegate)),
+    StreamSocketDelegate(std::move(delegate)),
     m_usageCounter(std::move(usageCounter))
 {
     ++(*m_usageCounter);
