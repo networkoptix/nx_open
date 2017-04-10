@@ -43,6 +43,7 @@ static const std::size_t kSslAsyncRecvBufferSize(1024 * 100);
 
 namespace nx {
 namespace network {
+namespace deprecated {
 
 class SslAsyncOperation
 {
@@ -1918,6 +1919,7 @@ void SslServerSocket::connectionAccepted(
     handler(errorCode, newSocket);
 }
 
+} // namespace deprecated
 } // namespace network
 } // namespace nx
 

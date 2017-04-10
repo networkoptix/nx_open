@@ -285,7 +285,7 @@ int runInListenMode(const nx::utils::ArgumentParser& args)
         }
 
         NX_CRITICAL(network::SslEngine::useCertificateAndPkey(certificate));
-        serverSocket.reset(new SslServerSocket(serverSocket.release(), false));
+        serverSocket.reset(new deprecated::SslServerSocket(serverSocket.release(), false));
     }
 
     server.setServerSocket(std::move(serverSocket));
