@@ -4,8 +4,8 @@
 #include <common/common_module.h>
 
 QnResourcePropertyDictionary::QnResourcePropertyDictionary(QObject *parent):
-    QnCommonModuleAware(parent),
-    QObject(parent)
+    QObject(parent),
+    QnCommonModuleAware(parent)
 {
 }
 

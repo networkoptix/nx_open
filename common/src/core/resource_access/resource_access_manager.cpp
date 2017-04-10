@@ -35,8 +35,8 @@
 
 QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
     base_type(parent),
-    QnCommonModuleAware(parent),
     QnUpdatable(),
+    QnCommonModuleAware(parent),
     m_mutex(QnMutex::NonRecursive),
     m_permissionsCache()
 {
