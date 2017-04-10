@@ -295,5 +295,55 @@ public:
     }
 };
 
+class StreamServerSocketDelegate:
+    public SocketDelegate<AbstractStreamServerSocket>
+{
+    using base_type = SocketDelegate<AbstractStreamServerSocket>;
+
+public:
+    StreamServerSocketDelegate(AbstractStreamServerSocket* target):
+        base_type(target)
+    {
+    }
+
+    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
+    {
+        this->m_target->pleaseStop(std::move(handler));
+    }
+
+    virtual void pleaseStopSync(bool assertIfCalledUnderLock = true)
+    {
+        this->m_target->pleaseStopSync(assertIfCalledUnderLock);
+    }
+
+    virtual bool listen(int backlog = kDefaultBacklogSize) override
+    {
+        return this->m_target->listen(backlog);
+    }
+
+    virtual AbstractStreamSocket* accept()
+    {
+        return this->m_target->accept();
+    }
+
+    virtual void acceptAsync(
+        nx::utils::MoveOnlyFunc<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler)
+    {
+        return this->m_target->acceptAsync(std::move(handler));
+    }
+
+    virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler)
+    {
+        return this->m_target->cancelIOAsync(std::move(handler));
+    }
+
+    virtual void cancelIOSync()
+    {
+        return this->m_target->cancelIOSync();
+    }
+};
+
 } // namespace network
 } // namespace nx

@@ -7,23 +7,25 @@
 
 namespace nx {
 namespace network {
+namespace deprecated {
 namespace test {
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
-    TEST, SslFreeTcpSockets,
+    TEST, DeprecatedSslFreeTcpSockets,
     [](){ return std::make_unique<deprecated::SslServerSocket>(new TCPServerSocket(AF_INET), true); },
     [](){ return std::make_unique<TCPSocket>(AF_INET); });
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
-    TEST, SslEnabledTcpSockets,
+    TEST, DeprecatedSslEnabledTcpSockets,
     [](){ return std::make_unique<deprecated::SslServerSocket>(new TCPServerSocket(AF_INET), true); },
     [](){ return std::make_unique<deprecated::SslSocket>(new TCPSocket(AF_INET), false); });
 
 NX_NETWORK_BOTH_SOCKET_TEST_CASE(
-    TEST, SslEnforcedTcpSockets,
+    TEST, DeprecatedSslEnforcedTcpSockets,
     [](){ return std::make_unique<deprecated::SslServerSocket>(new TCPServerSocket(AF_INET), false); },
     [](){ return std::make_unique<deprecated::SslSocket>(new TCPSocket(AF_INET), false); });
 
 } // namespace test
+} // namespace deprecated
 } // namespace network
 } // namespace nx
