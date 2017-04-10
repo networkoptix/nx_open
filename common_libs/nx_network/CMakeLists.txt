@@ -18,5 +18,5 @@ if(LINUX)
 endif()
 
 if(WIN32)
-    target_link_libraries(nx_network PRIVATE Iphlpapi Winmm)
+    target_link_libraries(nx_network PRIVATE Iphlpapi)
 endif()

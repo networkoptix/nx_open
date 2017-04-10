@@ -39,6 +39,10 @@ target_include_directories(common
 target_compile_definitions(common
     PRIVATE NX_NETWORK_API=${API_IMPORT_MACRO})
 
+if(WIN32)
+    target_link_libraries(common PUBLIC Winmm)
+endif()
+
 if(MACOSX)
     find_library(CoreGraphics_LIBRARY CoreGraphics)
     mark_as_advanced(CoreGraphics_LIBRARY)
