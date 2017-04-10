@@ -52,6 +52,7 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     m_resource(resource),
     m_capabilities(Qn::NoPtzCapabilities),
     m_stopBroken(false),
+    m_speedBroken(false),
     m_ptzPresetsReaded(false)
 {
     m_limits.minPan = -1.0;
@@ -66,9 +67,12 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
 
     QnResourceData data = qnCommon->dataPool()->data(resource);
     m_stopBroken = qnCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzStopBroken"), false);
+    m_speedBroken = qnCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzSpeedBroken"), false);
+
     bool absoluteMoveBroken = data.value<bool>(lit("onvifPtzAbsoluteMoveBroken"),   false);
     bool focusEnabled       = data.value<bool>(lit("onvifPtzFocusEnabled"),         false);
     bool presetsEnabled     = data.value<bool>(lit("onvifPtzPresetsEnabled"),       false);
+
     const int digitsAfterDecimalPoint  = data.value<int>(lit("onvifPtzDigitsAfterDecimalPoint"), 4);
     sprintf( m_floatFormat, "%%.%df", digitsAfterDecimalPoint );
     sprintf( m_doubleFormat, "%%.%dlf", digitsAfterDecimalPoint );
@@ -379,21 +383,25 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
     onvifPosition.PanTilt = &onvifPanTilt;
     onvifPosition.Zoom = &onvifZoom;
 
-    onvifXsd__Vector2D onvifPanTiltSpeed;
-    onvifPanTiltSpeed.x = speed; // TODO: #Elric #PTZ do we need to adjust speed to speed limits here?
-    onvifPanTiltSpeed.y = speed;
-
-    onvifXsd__Vector1D onvifZoomSpeed;
-    onvifZoomSpeed.x = speed;
-
-    onvifXsd__PTZSpeed onvifSpeed;
-    onvifSpeed.PanTilt = &onvifPanTiltSpeed;
-    onvifSpeed.Zoom = &onvifZoomSpeed;
-
     _onvifPtz__AbsoluteMove request;
     request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
     request.Position = &onvifPosition;
-    request.Speed = &onvifSpeed;
+    if (!m_speedBroken)
+    {
+        // TODO: #Elric #PTZ do we need to adjust speed to speed limits here?
+        onvifXsd__Vector2D onvifPanTiltSpeed;
+        onvifPanTiltSpeed.x = speed;
+        onvifPanTiltSpeed.y = speed;
+
+        onvifXsd__Vector1D onvifZoomSpeed;
+        onvifZoomSpeed.x = speed;
+
+        onvifXsd__PTZSpeed onvifSpeed;
+        onvifSpeed.PanTilt = &onvifPanTiltSpeed;
+        onvifSpeed.Zoom = &onvifZoomSpeed;
+
+        request.Speed = &onvifSpeed;
+    }
 
 #if 0
     qDebug() << "";
@@ -526,22 +534,26 @@ bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed) 
     ptz.getProxy()->soap->float_format = m_floatFormat;
     ptz.getProxy()->soap->double_format = m_doubleFormat;
 
-    onvifXsd__Vector2D onvifPanTiltSpeed;
-    onvifPanTiltSpeed.x = speed; // TODO: #Elric #PTZ do we need to adjust speed to speed limits here?
-    onvifPanTiltSpeed.y = speed;
-
-    onvifXsd__Vector1D onvifZoomSpeed;
-    onvifZoomSpeed.x = speed;
-
-    onvifXsd__PTZSpeed onvifSpeed;
-    onvifSpeed.PanTilt = &onvifPanTiltSpeed;
-    onvifSpeed.Zoom = &onvifZoomSpeed;
-
     GotoPresetReq request;
     GotoPresetResp response;
     request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
     request.PresetToken = presetToken(presetId).toStdString();
-    request.Speed = &onvifSpeed;
+    if (!m_speedBroken)
+    {
+        // TODO: #Elric #PTZ do we need to adjust speed to speed limits here?
+        onvifXsd__Vector2D onvifPanTiltSpeed;
+        onvifPanTiltSpeed.x = speed;
+        onvifPanTiltSpeed.y = speed;
+
+        onvifXsd__Vector1D onvifZoomSpeed;
+        onvifZoomSpeed.x = speed;
+
+        onvifXsd__PTZSpeed onvifSpeed;
+        onvifSpeed.PanTilt = &onvifPanTiltSpeed;
+        onvifSpeed.Zoom = &onvifZoomSpeed;
+
+        request.Speed = &onvifSpeed;
+    }
 
     if (ptz.gotoPreset(request, response) != SOAP_OK) {
         qnWarning("Execution of PTZ goto preset command for resource '%1' has failed with error %2.", m_resource->getName(), ptz.getLastError());

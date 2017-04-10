@@ -1868,7 +1868,13 @@
                 }
             },
             "onvifPtzDigitsAfterDecimalPoint": 7
-        }		
+        },
+        {
+            "keys": [
+                "Bosch|IP5000*"
+            ],
+            "onvifPtzStopBroken": true
+        }
     ]
 }
 
