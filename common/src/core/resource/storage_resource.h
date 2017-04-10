@@ -14,8 +14,6 @@ class QnStorageResource: public QnAbstractStorageResource
 
     Q_PROPERTY(qint64 spaceLimit READ getSpaceLimit WRITE setSpaceLimit)
     Q_PROPERTY(int maxStoreTime READ getMaxStoreTime WRITE setMaxStoreTime)
-
-    using base_type = QnAbstractStorageResource;
 public:
     static const qint64 kNasStorageLimit;
     static const qint64 kThirdPartyStorageLimit;
