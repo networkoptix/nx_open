@@ -19,7 +19,7 @@ function(detect_package_versions)
     set(_gcc_version "4.9.4")
 
     if(WIN32)
-        set(_qt_version "5.6.1")
+        set(_qt_version "5.6.1-1")
     endif()
 
     if(MACOSX)
