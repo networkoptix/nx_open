@@ -299,11 +299,14 @@ void QnCommonMessageProcessor::on_resourceStatusRemoved(const QnUuid& resourceId
 {
     if (!canRemoveResource(resourceId))
     {
-        auto res = qnResPool->getResourceById(resourceId);
-        if (res)
+        if (auto res = resourcePool()->getResourceById(resourceId))
         {
-            auto connection = QnAppServerConnectionFactory::getConnection2();
-            connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusSync(resourceId, res->getStatus());
+            if (auto connection = commonModule()->ec2Connection())
+            {
+                connection->getResourceManager(Qn::kSystemAccess)->setResourceStatusSync(
+                    resourceId,
+                    res->getStatus());
+            }
         }
     }
 }
