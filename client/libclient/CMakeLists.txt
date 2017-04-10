@@ -51,6 +51,6 @@ if(LINUX)
 endif()
 
 if(WIN32)
-    rdep_add_package(directx)
+    nx_rdep_add_package(directx)
     target_link_libraries(libclient PRIVATE d3d9 Winmm)
 endif()

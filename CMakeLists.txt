@@ -43,7 +43,7 @@ include(project_utils)
 
 find_python()
 detect_platform()
-rdep_configure()
+nx_rdep_configure()
 
 include(android-ndk-workaround)
 
@@ -64,9 +64,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-rdep_add_package(qt)
-get_full_package_name(qt QT_DIR)
-set(QT_DIR "${PACKAGES_DIR}/${QT_DIR}")
+nx_rdep_add_package(qt PATH_VARIABLE QT_DIR)
 if(CMAKE_CROSSCOMPILING)
     set(QT_PREFIX "..")
 else()
@@ -83,10 +81,10 @@ if(NOT WIN32)
         "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
 endif()
 
-rdep_add_package(any/boost)
-rdep_add_package(any/qtservice)
-rdep_add_package(any/qtsinglecoreapplication)
-rdep_add_package(any/qtsingleapplication)
+nx_rdep_add_package(any/boost)
+nx_rdep_add_package(any/qtservice)
+nx_rdep_add_package(any/qtsinglecoreapplication)
+nx_rdep_add_package(any/qtsingleapplication)
 
 find_package(Qt5
     COMPONENTS
@@ -121,7 +119,7 @@ add_subdirectory(appserver2)
 add_subdirectory(nx_cloud)
 
 if(withMediaServer)
-    rdep_add_package(any/apidoctool PATH_VARIABLE APIDOCTOOL_PATH)
+    nx_rdep_add_package(any/apidoctool PATH_VARIABLE APIDOCTOOL_PATH)
     add_subdirectory(mediaserver_core)
     add_subdirectory(mediaserver)
     add_subdirectory(plugins)
@@ -133,8 +131,8 @@ if(withDesktopClient OR withMobileClient)
 endif()
 
 if(withTests)
-    rdep_add_package(gtest)
-    rdep_add_package(gmock)
+    nx_rdep_add_package(gtest)
+    nx_rdep_add_package(gmock)
     add_subdirectory(unit_tests)
 endif()
 

@@ -1,7 +1,7 @@
-rdep_add_package(any/nx_sdk-1.6.0)
-rdep_add_package(any/nx_storage_sdk-1.6.0)
-rdep_add_package(onvif)
-rdep_add_package(sigar)
+nx_rdep_add_package(any/nx_sdk-1.6.0)
+nx_rdep_add_package(any/nx_storage_sdk-1.6.0)
+nx_rdep_add_package(onvif)
+nx_rdep_add_package(sigar)
 
 set(product.title "${mediaserver.name}")
 set(product.display.title "${mediaserver.display.name}")

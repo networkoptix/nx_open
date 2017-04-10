@@ -3,11 +3,11 @@ mark_as_advanced(RDEP_DIR)
 set(PACKAGES_DIR "$ENV{environment}/packages" CACHE STRING "Path to local rdep repository")
 mark_as_advanced(PACKAGES_DIR)
 
-function(rdep_configure)
+function(nx_rdep_configure)
     execute_process(COMMAND ${PYTHON_EXECUTABLE} ${RDEP_DIR}/rdep_configure.py)
 endfunction()
 
-function(get_full_package_name package var)
+function(_rdep_get_full_package_name package var)
     string(FIND ${package} "/" pos)
     if(pos EQUAL -1)
         set(target ${rdep_target})
@@ -25,7 +25,7 @@ function(get_full_package_name package var)
     set(${var} "${target}/${package}" PARENT_SCOPE)
 endfunction()
 
-function(rdep_sync_package package)
+function(nx_rdep_sync_package package)
     cmake_parse_arguments(RDEP "" "RESULT_VARIABLE" "" ${ARGN})
 
     execute_process(
@@ -80,10 +80,10 @@ function(_rdep_try_package package)
     endif()
 endfunction()
 
-function(rdep_add_package package)
+function(nx_rdep_add_package package)
     cmake_parse_arguments(RDEP "OPTIONAL" "PATH_VARIABLE" "" ${ARGN})
 
-    get_full_package_name(${package} package)
+    _rdep_get_full_package_name(${package} package)
 
     set(package_found 0)
 

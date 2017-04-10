@@ -1,5 +1,5 @@
-rdep_add_package(openssl)
-rdep_add_package(ffmpeg)
+nx_rdep_add_package(openssl)
+nx_rdep_add_package(ffmpeg)
 
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/qt.conf"
     ${CMAKE_CURRENT_BINARY_DIR}/resources/qt/etc/qt.conf)
@@ -25,7 +25,7 @@ nx_add_target(common LIBRARY
         nx_utils nx_fusion)
 
 if(NOT ANDROID AND NOT IOS)
-    rdep_add_package(quazip)
+    nx_rdep_add_package(quazip)
     target_link_libraries(common PUBLIC quazip)
 endif()
 
