@@ -15,6 +15,7 @@
 
 namespace nx {
 namespace utils {
+
 /**
  * Contains analogous functions for some of QtConcurrent namespace, 
  * but provides a way to run concurrent computations in custom thread pool with custom priority.
@@ -25,23 +26,26 @@ namespace concurrent {
 // TODO: #ak nx::utils::concurrent::run must accept any number of arguments (requires msvc2013).
 
 namespace detail {
+
 template<typename Function>
-class QnRunnableTask: public QRunnable
+class RunnableTask: public QRunnable
 {
-    Function m_function;
 public:
-    QnRunnableTask(Function function): m_function(function) { setAutoDelete(true); }
+    RunnableTask(Function function): m_function(function) { setAutoDelete(true); }
     virtual void run() override { m_function(); }
+
+private:
+    Function m_function;
 };
 
 template<class T>
-class QnFutureImplBase
+class FutureImplBase
 {
 public:
     typedef T value_type;
     typedef std::vector<bool>::size_type size_type;
 
-    QnFutureImplBase(size_type totalTasksToWaitFor = 0):
+    FutureImplBase(size_type totalTasksToWaitFor = 0):
         m_totalTasksToRun(totalTasksToWaitFor),
         m_tasksCompleted(0),
         m_startedTaskCount(totalTasksToWaitFor),
@@ -50,7 +54,7 @@ public:
         m_completionMarks.resize(m_totalTasksToRun);
     }
 
-    ~QnFutureImplBase()
+    ~FutureImplBase()
     {
         if (m_cleanupFunc)
             m_cleanupFunc();
@@ -64,66 +68,66 @@ public:
 
     void waitForFinished()
     {
-        QnMutexLocker lk(&m_mutex);
-        while ((!m_isCancelled && (m_tasksCompleted < m_totalTasksToRun)) ||
-            (m_isCancelled && (m_startedTaskCount > 0)))
+        QnMutexLocker lock(&m_mutex);
+        while ((!m_isCancelled && m_tasksCompleted < m_totalTasksToRun) ||
+            (m_isCancelled && m_startedTaskCount > 0))
         {
-            m_cond.wait(lk.mutex());
+            m_cond.wait(lock.mutex());
         }
     }
 
     void cancel()
     {
-        QnMutexLocker lk(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         m_isCancelled = true;
     }
 
     bool isInProgress() const
     {
-        QnMutexLocker lk(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         return (!m_isCancelled && (m_tasksCompleted < m_totalTasksToRun)) ||
             (m_isCancelled && (m_startedTaskCount > 0));
     }
 
     bool isCanceled() const
     {
-        QnMutexLocker lk(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         return m_isCancelled;
     }
 
     size_type progressValue() const
     {
-        QnMutexLocker lk(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         return m_tasksCompleted;
     }
 
     size_type progressMinimum() const
     {
-        QnMutexLocker lk(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         return 0;
     }
 
     size_type progressMaximum() const
     {
-        QnMutexLocker lk(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         return m_totalTasksToRun;
     }
 
     size_type resultCount() const
     {
-        QnMutexLocker lk(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         return m_tasksCompleted;
     }
 
     bool isResultReadyAt(size_type index) const
     {
-        QnMutexLocker lk(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         return m_completionMarks[index];
     }
 
     bool incStartedTaskCountIfAllowed()
     {
-        QnMutexLocker lk(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         if (m_isCancelled)
             return false;
         ++m_startedTaskCount;
@@ -164,9 +168,9 @@ private:
 
 template<class T>
 class QnFutureImpl:
-    public QnFutureImplBase<T>
+    public FutureImplBase<T>
 {
-    typedef QnFutureImplBase<T> base_type;
+    typedef FutureImplBase<T> base_type;
 
 public:
     typedef typename base_type::size_type size_type;
@@ -187,13 +191,13 @@ public:
 
     reference resultAt(size_type index)
     {
-        QnMutexLocker lk(&this->m_mutex);
+        QnMutexLocker lock(&this->m_mutex);
         return m_results[index];
     }
 
     const_reference resultAt(size_type index) const
     {
-        QnMutexLocker lk(&this->m_mutex);
+        QnMutexLocker lock(&this->m_mutex);
         return m_results[index];
     }
 
@@ -212,7 +216,7 @@ public:
     template<class ResultType>
     void setResultAt(size_type index, ResultType&& result)
     {
-        QnMutexLocker lk(&this->m_mutex);
+        QnMutexLocker lock(&this->m_mutex);
         m_results[index] = std::forward<ResultType>(result);
         this->setCompletedAtNonSafe(index);
     }
@@ -223,9 +227,9 @@ private:
 
 template<>
 class QnFutureImpl<void>:
-    public QnFutureImplBase<void>
+    public FutureImplBase<void>
 {
-    typedef QnFutureImplBase<void> base_type;
+    typedef FutureImplBase<void> base_type;
 
 public:
     QnFutureImpl(size_type totalTasksToWaitFor = 0):
@@ -249,7 +253,7 @@ public:
 
     void setResultAt(size_type index)
     {
-        QnMutexLocker lk(&this->m_mutex);
+        QnMutexLocker lock(&this->m_mutex);
         this->setCompletedAtNonSafe(index);
     }
 };
@@ -269,10 +273,10 @@ public:
 
     std::pair<typename Container::iterator, int> fetchAndMoveToNextPos()
     {
-        QnMutexLocker lk(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
 
         //TODO #ak is int appropriate here?
-        std::pair<typename Container::iterator, int> curVal(m_currentIter, (int)m_currentIndex);
+        std::pair<typename Container::iterator, int> curVal(m_currentIter, (int) m_currentIndex);
         if (m_currentIter != m_container.end())
         {
             ++m_currentIter;
@@ -283,7 +287,7 @@ public:
 
     void moveToEnd()
     {
-        QnMutexLocker lk(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         m_currentIter = m_container.end();
         m_currentIndex = m_container.size();
     }
@@ -312,7 +316,7 @@ public:
         Container& container,
         Function function,
         QSharedPointer<FutureImplType> futureImpl,
-        QSharedPointer<detail::safe_forward_iterator<Container> > safeIter)
+        QSharedPointer<detail::safe_forward_iterator<Container>> safeIter)
         :
         m_threadPool(threadPool),
         m_priority(priority),
@@ -337,7 +341,7 @@ public:
             auto functor = std::bind(
                 &detail::TaskExecuter<Container, Function>::operator(), this, nextElement);
             m_threadPool.start(
-                new detail::QnRunnableTask<decltype(functor)>(std::move(functor)),
+                new detail::RunnableTask<decltype(functor)>(std::move(functor)),
                 m_priority);
         }
         futureImplStrongRef->executeFunctionOnDataAtPos(val.second, m_function, *val.first);
@@ -349,7 +353,7 @@ private:
     Container& m_container;
     Function m_function;
     QWeakPointer<FutureImplType> m_futureImpl;
-    QSharedPointer<detail::safe_forward_iterator<Container> > m_safeIter;
+    QSharedPointer<detail::safe_forward_iterator<Container>> m_safeIter;
 };
 
 } // namespace detail
@@ -390,7 +394,7 @@ protected:
  * @note Contains array of T elements
  */
 template<class T>
-class QnFuture:
+class Future:
     public QnFutureBase<T>
 {
     typedef QnFutureBase<T> base_type;
@@ -400,7 +404,7 @@ public:
     typedef typename base_type::FutureImplType::reference reference;
     typedef typename base_type::FutureImplType::const_reference const_reference;
 
-    QnFuture(size_type totalTasksToWaitFor = 0):
+    Future(size_type totalTasksToWaitFor = 0):
         base_type(totalTasksToWaitFor)
     {
     }
@@ -423,13 +427,13 @@ public:
 };
 
 template<>
-class QnFuture<void>:
+class Future<void>:
     public QnFutureBase<void>
 {
     typedef QnFutureBase<void> base_type;
 
 public:
-    QnFuture(size_type totalTasksToWaitFor = 0):
+    Future(size_type totalTasksToWaitFor = 0):
         base_type(totalTasksToWaitFor)
     {
     }
@@ -440,25 +444,26 @@ public:
     }
 };
 
+static constexpr int kDefaultTaskPriority = 0;
+
 /**
- * @param threadPool
  * @param priority Priority of execution in threadPool. 0 is a default priority
- * @param container
  * @param function To pass member-function here, you have to use std::mem_fn (for now)
  */
 template<typename Container, typename Function>
-QnFuture<typename std::result_of<Function(typename Container::value_type)>::type> mapped(
+Future<typename std::result_of<Function(typename Container::value_type)>::type> mapped(
     QThreadPool* threadPool,
     int priority,
     Container& container,
     Function function)
 {
-    typedef QnFuture<typename std::result_of<Function(typename Container::value_type)>::type> FutureType;
+    using FutureType = 
+        Future<typename std::result_of<Function(typename Container::value_type)>::type>;
 
     FutureType future;
     auto futureImpl = future.impl();
     futureImpl->setTotalTasksToRun(container.size());
-    QSharedPointer<detail::safe_forward_iterator<Container> > safeIter(
+    QSharedPointer<detail::safe_forward_iterator<Container>> safeIter(
         new detail::safe_forward_iterator<Container>(container, container.begin()));
 
     typename detail::TaskExecuter<Container, Function>* taskExecutor =
@@ -474,7 +479,8 @@ QnFuture<typename std::result_of<Function(typename Container::value_type)>::type
         tasksLaunched < maxTasksToLaunch;
         ++tasksLaunched)
     {
-        const typename std::pair<typename Container::iterator, int>& nextElement = safeIter->fetchAndMoveToNextPos();
+        const typename std::pair<typename Container::iterator, int>&
+            nextElement = safeIter->fetchAndMoveToNextPos();
         if (nextElement.first == container.end())
             break;  //all tasks processed
 
@@ -484,7 +490,7 @@ QnFuture<typename std::result_of<Function(typename Container::value_type)>::type
         }
         auto functor = std::bind(&detail::TaskExecuter<Container, Function>::operator(), taskExecutor, nextElement);
         threadPool->start(
-            new detail::QnRunnableTask<decltype(functor)>(std::move(functor)),
+            new detail::RunnableTask<decltype(functor)>(std::move(functor)),
             priority);
     }
     return future;
@@ -495,12 +501,12 @@ QnFuture<typename std::result_of<Function(typename Container::value_type)>::type
  * @param function To pass member-function here, you have to use std::mem_fn (for now).
  */
 template<typename Container, typename Function>
-QnFuture<typename std::result_of<Function(typename Container::value_type)>::type> mapped(
+Future<typename std::result_of<Function(typename Container::value_type)>::type> mapped(
     QThreadPool* threadPool,
     Container& container,
     Function function)
 {
-    return mapped(threadPool, 0, container, function);
+    return mapped(threadPool, kDefaultTaskPriority, container, function);
 }
 
 /**
@@ -508,11 +514,11 @@ QnFuture<typename std::result_of<Function(typename Container::value_type)>::type
  * @param function To pass member-function here, you have to use std::mem_fn (for now).
  */
 template<typename Container, typename Function>
-QnFuture<typename std::result_of<Function(typename Container::value_type)>::type> mapped(
+Future<typename std::result_of<Function(typename Container::value_type)>::type> mapped(
     Container& container,
     Function function)
 {
-    return mapped(QThreadPool::globalInstance(), 0, container, function);
+    return mapped(QThreadPool::globalInstance(), kDefaultTaskPriority, container, function);
 }
 
 /**
@@ -520,12 +526,12 @@ QnFuture<typename std::result_of<Function(typename Container::value_type)>::type
  * @note Execution cannot be canceled.
  */
 template<typename Function>
-QnFuture<typename std::result_of<Function()>::type> run(
+Future<typename std::result_of<Function()>::type> run(
     QThreadPool* threadPool,
     int priority,
     Function function)
 {
-    QnFuture<typename std::result_of<Function()>::type> future;
+    Future<typename std::result_of<Function()>::type> future;
     auto futureImpl = future.impl();
     futureImpl->setTotalTasksToRun(1);
     auto taskRunFunction =
@@ -538,7 +544,7 @@ QnFuture<typename std::result_of<Function()>::type> run(
         NX_ASSERT(false);
     }
     threadPool->start(
-        new detail::QnRunnableTask<decltype(taskRunFunction)>(taskRunFunction),
+        new detail::RunnableTask<decltype(taskRunFunction)>(taskRunFunction),
         priority);
     return future;
 }
@@ -547,20 +553,20 @@ QnFuture<typename std::result_of<Function()>::type> run(
  * Runs function in threadPool with default priority.
  */
 template<typename Function>
-QnFuture<typename std::result_of<Function()>::type> run(
+Future<typename std::result_of<Function()>::type> run(
     QThreadPool* threadPool,
     Function function)
 {
-    return run(threadPool, 0, function);
+    return run(threadPool, kDefaultTaskPriority, function);
 }
 
 /**
  * Runs function in global thread pool with default priority.
  */
 template<typename Function>
-QnFuture<typename std::result_of<Function()>::type> run(Function function)
+Future<typename std::result_of<Function()>::type> run(Function function)
 {
-    return run(*QThreadPool::globalInstance(), 0, function);
+    return run(*QThreadPool::globalInstance(), kDefaultTaskPriority, function);
 }
 
 } // namespace concurrent
