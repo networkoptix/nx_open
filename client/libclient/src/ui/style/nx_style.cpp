@@ -2461,12 +2461,6 @@ void QnNxStyle::drawControl(
 
                     /* Measurements don't support Qt::TextHideMnemonic, must use Qt::TextShowMnemonic: */
                     const auto fixedText = nx::utils::removeMnemonics(buttonOption->text);
-
-                    const auto source = lit("& && &a &&a &&& b&b &a a& a&");
-                    const auto changed = nx::utils::removeMnemonics(source);
-                    const auto target = lit("& && a &&a &&& bb a a& a&");
-                    NX_EXPECT(changed == target);
-
                     const QString text = buttonOption->fontMetrics.elidedText(fixedText,
                         Qt::ElideRight, textRect.width(), Qt::TextShowMnemonic);
 
