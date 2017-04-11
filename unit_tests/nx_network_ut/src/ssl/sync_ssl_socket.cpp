@@ -184,6 +184,20 @@ int SyncSslSocket::send(const void* buffer, unsigned int bufferLen)
     return SSL_write(m_ssl, buffer, bufferLen);
 }
 
+void SyncSslSocket::readSomeAsync(
+    nx::Buffer* const /*buffer*/,
+    std::function<void(SystemError::ErrorCode, size_t)> /*handler*/)
+{
+    NX_CRITICAL(false);
+}
+
+void SyncSslSocket::sendAsync(
+    const nx::Buffer& /*buffer*/,
+    std::function<void(SystemError::ErrorCode, size_t)> /*handler*/)
+{
+    NX_CRITICAL(false);
+}
+
 int SyncSslSocket::recvInternal(void* buffer, unsigned int bufferLen, int /*flags*/)
 {
     if (m_extraBufferLen > 0)

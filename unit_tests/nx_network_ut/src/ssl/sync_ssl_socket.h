@@ -30,6 +30,14 @@ public:
     virtual int recv(void* buffer, unsigned int bufferLen, int flags = 0) override;
     virtual int send(const void* buffer, unsigned int bufferLen) override;
 
+    virtual void readSomeAsync(
+        nx::Buffer* const buffer,
+        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+
+    virtual void sendAsync(
+        const nx::Buffer& buffer,
+        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+
 protected:
     quint8 m_extraBuffer[32];
     int m_extraBufferLen;
