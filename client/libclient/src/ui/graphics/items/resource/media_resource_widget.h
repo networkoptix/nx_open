@@ -8,6 +8,7 @@
 
 #include <camera/camera_bookmarks_manager_fwd.h>
 
+#include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>
 
 struct QnMetaDataV1;
@@ -34,7 +35,10 @@ class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
 class QnIoModuleOverlayWidget;
 class QnCompositeTextOverlay;
+class QnScrollableItemsWidget;
+class QnTextOverlayWidget;
 class QnTwoWayAudioWidget;
+class QnSoftwareTriggerButton;
 
 class QnMediaResourceWidget: public Customized<QnResourceWidget>
 {
@@ -184,10 +188,13 @@ protected:
     void suspendHomePtzController();
     void resumeHomePtzController();
 
-    virtual void updateHud(bool animate);
+    virtual void updateHud(bool animate) override;
 
     void ensureTwoWayAudioWidget();
     bool animationAllowed() const;
+
+    void invokeTrigger(const QString& id,
+        QnBusiness::EventState toggleState = QnBusiness::UndefinedState);
 
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
@@ -207,6 +214,9 @@ private slots:
 
     void at_item_imageEnhancementChanged();
     void at_videoLayoutChanged();
+
+    void at_businessRuleChanged(const QnBusinessEventRulePtr& rule);
+    void at_businessRuleDeleted(const QnUuid& ruleId);
 
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
@@ -231,6 +241,36 @@ private:
     qint64 getUtcCurrentTimeMs() const;
 
     void updateCurrentUtcPosMs();
+
+    void setupHud();
+
+private:
+    struct SoftwareTriggerInfo
+    {
+        QString triggerId;
+        QString name;
+        QString icon;
+        bool prolonged;
+
+        bool operator == (const SoftwareTriggerInfo& other) const
+        {
+            return triggerId == other.triggerId
+                && name == other.name
+                && icon == other.icon
+                && prolonged == other.prolonged;
+        }
+    };
+
+    struct SoftwareTrigger
+    {
+        SoftwareTriggerInfo info;
+        QnUuid overlayItemId;
+    };
+
+    SoftwareTrigger* createTriggerIfRelevant(const QnBusinessEventRulePtr& rule);
+    bool isRelevantTriggerRule(const QnBusinessEventRulePtr& rule) const;
+    void configureTriggerButton(QnSoftwareTriggerButton* button, const SoftwareTriggerInfo& info);
+    void resetTriggers();
 
 private:
     struct ResourceStates
@@ -306,7 +346,11 @@ private:
 
     QVector<QColor> m_motionSensitivityColors;
 
-    QnTwoWayAudioWidget* m_twoWayAudioWidget;
+    QnScrollableItemsWidget* m_triggersContainer = nullptr;
+
+    QnTwoWayAudioWidget* m_twoWayAudioWidget = nullptr;
+
+    QHash<QnUuid, SoftwareTrigger> m_softwareTriggers; //< ruleId -> softwareTrigger
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

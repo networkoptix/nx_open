@@ -2,6 +2,12 @@
 #include "abstract_joystick.h"
 #include "joystick_config.h"
 
+#include <QtCore/QStandardPaths>
+
+#include <QtGui/QVector3D>
+
+#include <QtWidgets/QApplication>
+
 #include <plugins/io_device/joystick/controls/joystick_stick_control.h>
 
 #if defined(Q_OS_WIN)

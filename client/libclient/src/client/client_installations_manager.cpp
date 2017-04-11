@@ -1,5 +1,8 @@
 #include "client_installations_manager.h"
 
+#include <QtCore/QDir>
+#include <QtCore/QStandardPaths>
+
 #include <client/client_app_info.h>
 
 #include <utils/common/app_info.h>

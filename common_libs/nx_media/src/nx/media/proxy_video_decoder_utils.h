@@ -5,14 +5,12 @@
 #include <deque>
 
 #include <QtCore/QtGlobal>
-#include <QtCore/QElapsedTimer>
-
-#include <proxy_decoder.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/flag_config.h>
-#include <nx/utils/debug_utils.h>
 #include <nx/streaming/video_data_packet.h>
+
+#include <proxy_decoder.h>
 
 #include "media_fwd.h"
 
@@ -75,8 +73,7 @@ typedef std::shared_ptr<const YuvBuffer> ConstYuvBufferPtr;
 class YuvBuffer
 {
 public:
-    YuvBuffer(const QSize& frameSize)
-        :
+    YuvBuffer(const QSize& frameSize):
         m_frameSize(frameSize),
         m_yBuffer(qMallocAligned(m_frameSize.width() * m_frameSize.height(), kMediaAlignment)),
         m_uBuffer(qMallocAligned(m_frameSize.width() * m_frameSize.height() / 4, kMediaAlignment)),

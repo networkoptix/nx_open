@@ -225,7 +225,7 @@ void ProxyHandler::onConnected(
     static const auto isSsl =
         [](const std::unique_ptr<AbstractStreamSocket>& s)
         {
-            return (bool) dynamic_cast<nx::network::SslSocket*>(s.get());
+            return (bool) dynamic_cast<nx::network::deprecated::SslSocket*>(s.get());
         };
 
     if (errorCode != SystemError::noError)

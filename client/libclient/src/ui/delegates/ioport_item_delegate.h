@@ -1,7 +1,8 @@
 #pragma once
 
-#include <ui/widgets/common/widget_table_delegate.h>
+#include <QtCore/QAbstractItemModel>
 
+#include <ui/widgets/common/widget_table_delegate.h>
 
 class QnIoPortItemDelegate: public QnWidgetTableDelegate
 {

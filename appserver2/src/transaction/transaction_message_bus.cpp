@@ -32,7 +32,7 @@
 #include <utils/common/checked_cast.h>
 #include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
-#include "utils/common/systemerror.h"
+#include <nx/utils/system_error.h>
 #include "utils/common/warnings.h"
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 #include <core/resource/media_server_resource.h>

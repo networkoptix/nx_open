@@ -2,6 +2,9 @@
 
 #include <QtCore/QCoreApplication> //for Q_DECLARE_TR_FUNCTIONS
 
+#include <QtWidgets/QLayout>
+#include <QtWidgets/QLabel>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/shared_resource_pointer.h>
 

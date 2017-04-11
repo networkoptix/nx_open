@@ -9,11 +9,8 @@
 #include <limits>
 #include <memory>
 
-#include <utils/common/stoppable.h>
-
 #include "aio/basic_pollable.h"
 #include "aio/timer.h"
-
 
 namespace nx {
 namespace network {

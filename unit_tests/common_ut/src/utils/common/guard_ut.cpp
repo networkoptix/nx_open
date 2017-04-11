@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 TEST(UtilsCommon, Guard)
 {

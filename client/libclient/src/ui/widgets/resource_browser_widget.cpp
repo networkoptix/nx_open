@@ -1,16 +1,19 @@
 ﻿#include "resource_browser_widget.h"
 #include "ui_resource_browser_widget.h"
 
+#include <QtCore/QItemSelectionModel>
+
+#include <QtGui/QWheelEvent>
+
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
-#include <QtCore/QItemSelectionModel>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QMenu>
+#include <QtWidgets/QScrollBar>
 #include <QtWidgets/QTabWidget>
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QTreeView>
-#include <QtGui/QWheelEvent>
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <camera/camera_thumbnail_manager.h>
@@ -674,7 +677,7 @@ void QnResourceBrowserWidget::hideToolTip()
     if (!m_tooltipWidget)
         return;
 
-    using namespace nx::client::ui::workbench;
+    using namespace nx::client::desktop::ui::workbench;
     //todo: #GDM add parameter 'animated'
     if (hasOpacityAnimator(m_tooltipWidget))
     {
@@ -693,7 +696,7 @@ void QnResourceBrowserWidget::showToolTip()
     if (!m_tooltipWidget)
         return;
 
-    using namespace nx::client::ui::workbench;
+    using namespace nx::client::desktop::ui::workbench;
 
     auto animator = opacityAnimator(m_tooltipWidget);
     qnWorkbenchAnimations->setupAnimator(animator, Animations::Id::ResourcesPanelTooltipShow);

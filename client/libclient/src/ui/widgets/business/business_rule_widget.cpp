@@ -57,7 +57,9 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
     m_model(),
     m_eventParameters(NULL),
     m_actionParameters(NULL),
-    m_updating(false)
+    m_updating(false),
+    m_eventAligner(new QnAligner(this)),
+    m_actionAligner(new QnAligner(this))
 {
     ui->setupUi(this);
 
@@ -81,11 +83,8 @@ QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
 
     connect(ui->commentsLineEdit, SIGNAL(textChanged(QString)), this, SLOT(at_commentsLineEdit_textChanged(QString)));
 
-    auto aligner1 = new QnAligner(this);
-    aligner1->addWidgets({ ui->eventDoLabel, ui->eventAtLabel });
-
-    auto aligner2 = new QnAligner(this);
-    aligner2->addWidgets({ ui->actionDoLabel, ui->actionAtLabel });
+    m_eventAligner->addWidgets({ ui->eventDoLabel, ui->eventAtLabel });
+    m_actionAligner->addWidgets({ ui->actionDoLabel, ui->actionAtLabel });
 
     retranslateUi();
 }
@@ -211,8 +210,16 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusiness::Fields fields)
 
     if (fields & (QnBusiness::EventTypeField | QnBusiness::ActionTypeField | QnBusiness::ActionParamsField))
     {
-        bool isEventProlonged = QnBusiness::hasToggleState(m_model->eventType());
-        ui->eventStatesComboBox->setVisible(isEventProlonged && !m_model->isActionProlonged());
+        if (m_model->eventType() == QnBusiness::SoftwareTriggerEvent)
+        {
+            /* SoftwareTriggerEvent is prolonged if its action is prolonged. */
+            ui->eventStatesComboBox->setVisible(false);
+        }
+        else
+        {
+            const bool isEventProlonged = QnBusiness::hasToggleState(m_model->eventType());
+            ui->eventStatesComboBox->setVisible(isEventProlonged && !m_model->isActionProlonged());
+        }
     }
 
     if (fields & (QnBusiness::ActionResourcesField | QnBusiness::ActionTypeField | QnBusiness::ActionParamsField))
@@ -262,6 +269,9 @@ void QnBusinessRuleWidget::initEventParameters()
         m_eventParameters->updateTabOrder(ui->eventResourcesHolder, ui->scheduleButton);
         m_eventParameters->setVisible(true);
         m_eventParameters->setModel(m_model);
+
+        if (const auto aligner = m_eventParameters->findChild<QnAligner*>())
+            m_eventAligner->addAligner(aligner);
     }
     else
     {
@@ -310,6 +320,9 @@ void QnBusinessRuleWidget::initActionParameters()
         m_actionParameters->updateTabOrder(getTabBeforeTarget(), ui->commentsLineEdit);
         m_actionParameters->setVisible(true);
         m_actionParameters->setModel(m_model);
+
+        if (const auto aligner = m_actionParameters->findChild<QnAligner*>())
+            m_actionAligner->addAligner(aligner);
     }
     else
     {

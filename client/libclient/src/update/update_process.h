@@ -1,5 +1,6 @@
-#ifndef QN_UPDATE_PROCESS_H
-#define QN_UPDATE_PROCESS_H
+#pragma once
+
+#include <QtCore/QPointer>
 
 #include <core/resource/resource_fwd.h>
 
@@ -116,6 +117,3 @@ private:
     bool m_protocolChanged;
     QSet<QnUuid> m_failedPeerIds;
 };
-
-
-#endif //QN_UPDATE_PROCESS_H

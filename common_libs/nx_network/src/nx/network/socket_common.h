@@ -15,13 +15,16 @@
 
 #include <stdint.h>
 
-#include <QString>
+#include <QtCore/QObject>
+#include <QtCore/QHash>
+#include <QtCore/QString>
+#include <QtCore/QUrl>
 
 #ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
 #endif
-#include <utils/common/hash.h>
-#include <utils/common/systemerror.h>
+
+#include <nx/utils/system_error.h>
 
 namespace nx {
 namespace network {

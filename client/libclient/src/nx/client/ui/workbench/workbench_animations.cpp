@@ -7,6 +7,7 @@
 
 namespace nx {
 namespace client {
+namespace desktop {
 namespace ui {
 namespace workbench {
 
@@ -117,5 +118,6 @@ void Animations::setTimeLimit(Id id, int value)
 
 } // namespace workbench
 } // namespace ui
+} // namespace desktop
 } // namespace client
 } // namespace nx

@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <QtGui/QGuiApplication>
+
 #include <QtWidgets/QAction>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QGraphicsItem>
@@ -1482,6 +1484,17 @@ QnActionManager::QnActionManager(QObject *parent):
         flags(Qn::Scene | Qn::Tree).
         separator();
 
+    factory(QnActions::WebPageSettingsAction).
+        flags(Qn::Scene | Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
+        requiredGlobalPermission(Qn::GlobalAdminPermission).
+        text(tr("Edit...")).
+        autoRepeat(false).
+        condition(new QnConjunctionActionCondition(
+            new QnResourceActionCondition(hasFlags(Qn::web_page), Qn::ExactlyOne, this),
+            new QnForbiddenInSafeModeCondition(this),
+            this)
+        );
+
     factory(QnActions::RenameResourceAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::IntentionallyAmbiguous).
         requiredTargetPermissions(Qn::WritePermission | Qn::WriteNamePermission).
@@ -1743,6 +1756,31 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(lit("Alt+T")).
         autoRepeat(false).
         condition(new QnToggleTourActionCondition(this));
+
+    factory(QnActions::OpenLayoutTourAction).
+        flags(Qn::Scene | Qn::NoTarget | Qn::GlobalHotkey).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Open Layouts Tour")).
+        shortcut(lit("Alt+L")).
+        autoRepeat(false);
+
+    factory(QnActions::StartLayoutTourAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Start Layouts Tour")).
+        icon(qnSkin->icon("slider/navigation/play.png")).
+        checkable().
+        checked(false);
+
+    factory(QnActions::StopLayoutTourAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        icon(qnSkin->icon("slider/navigation/pause.png"));
+
+    factory(QnActions::RemoveLayoutTourAction).
+        flags(Qn::Scene | Qn::NoTarget).
+        mode(QnActionTypes::DesktopMode).
+        text(tr("Delete Layouts Tour"));
 
     factory().
         flags(Qn::Scene | Qn::NoTarget).

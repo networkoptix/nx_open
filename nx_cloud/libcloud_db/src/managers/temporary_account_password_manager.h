@@ -11,7 +11,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 #include <utils/db/async_sql_query_executor.h>
 
 #include "access_control/auth_types.h"
@@ -120,7 +120,7 @@ private:
 
     const conf::Settings& m_settings;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
-    QnCounter m_startedAsyncCallsCounter;
+    nx::utils::Counter m_startedAsyncCallsCounter;
     TemporaryCredentialsDictionary m_temporaryCredentials;
     mutable QnMutex m_mutex;
 

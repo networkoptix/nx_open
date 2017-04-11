@@ -1,5 +1,7 @@
 #include "desktop_camera_connection.h"
 
+#include <QtCore/QElapsedTimer>
+
 #include <common/common_module.h>
 
 #include "core/resource/media_server_resource.h"
@@ -197,7 +199,7 @@ bool QnDesktopCameraConnectionProcessor::isConnected() const
 void QnDesktopCameraConnectionProcessor::sendData(const QnByteArray& data)
 {
     Q_D(QnDesktopCameraConnectionProcessor);
-    int sended = d->socket->send(data);
+    int sended = d->socket->send(data.constData(), data.size());
     if (sended < (int)data.size())
         d->socket->close();
 }

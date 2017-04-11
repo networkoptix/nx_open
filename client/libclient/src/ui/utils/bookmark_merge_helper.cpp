@@ -5,6 +5,8 @@
 
 #include <core/resource/camera_bookmark.h>
 
+#include <nx/utils/datetime.h>
+
 namespace {
 
 struct BookmarkItem;

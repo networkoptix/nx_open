@@ -14,7 +14,7 @@
 #include <api/global_settings.h>
 #include <core/resource/param.h>
 #include <core/resource/user_resource.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 #include <utils/common/id.h>
 #include <utils/common/sync_call.h>
 
@@ -121,7 +121,7 @@ void SystemManager::authenticateByName(
     nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
     api::ResultCode result = api::ResultCode::notAuthorized;
-    auto scopedGuard = makeScopedGuard(
+    auto scopedGuard = makeScopeGuard(
         [&completionHandler, &result]() { completionHandler(result); });
 
     QnMutexLocker lock(&m_mutex);
@@ -791,7 +791,7 @@ nx::db::DBResult SystemManager::insertOwnerSharingToDb(
 }
 
 void SystemManager::systemAdded(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemRegistrationDataWithAccount /*systemRegistrationData*/,
@@ -828,7 +828,7 @@ nx::db::DBResult SystemManager::markSystemAsDeleted(
 }
 
 void SystemManager::systemMarkedAsDeleted(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     std::string systemId,
@@ -884,7 +884,7 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
 }
 
 void SystemManager::systemDeleted(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemId systemId,
@@ -1482,7 +1482,7 @@ void SystemManager::updateSystemAttributesInCache(
 }
 
 void SystemManager::systemNameUpdated(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemAttributesUpdate data,
@@ -1525,16 +1525,14 @@ void SystemManager::activateSystemIfNeeded(
         std::bind(&dao::AbstractSystemDataObject::activateSystem, m_systemDao.get(), _1, _2),
         systemIter->id,
         std::bind(&SystemManager::systemActivated, this,
-            m_startedAsyncCallsCounter.getScopedIncrement(),
-            _1, _2, _3, [](api::ResultCode) {}));
+            m_startedAsyncCallsCounter.getScopedIncrement(), _1, _2, _3));
 }
 
 void SystemManager::systemActivated(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
-    std::string systemId,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::string systemId)
 {
     {
         QnMutexLocker lk(&m_mutex);
@@ -1560,8 +1558,6 @@ void SystemManager::systemActivated(
                 });
         }
     }
-
-    completionHandler(dbResultToApiResult(dbResult));
 }
 
 nx::db::DBResult SystemManager::saveUserSessionStart(
@@ -1791,7 +1787,7 @@ void SystemManager::dropExpiredSystems(uint64_t /*timerId*/)
 }
 
 void SystemManager::expiredSystemsDeletedFromDb(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult)
 {

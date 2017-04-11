@@ -1,5 +1,11 @@
 #include "resource_status_overlay_widget.h"
 
+#include <cmath>
+
+#include <QtWidgets/QBoxLayout>
+#include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QPushButton>
+
 #include <ui/style/nx_style.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>

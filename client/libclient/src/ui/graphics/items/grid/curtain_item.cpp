@@ -2,6 +2,8 @@
 
 #include <limits>
 
+#include <QtOpenGL/QGLContext>
+
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <utils/common/warnings.h>

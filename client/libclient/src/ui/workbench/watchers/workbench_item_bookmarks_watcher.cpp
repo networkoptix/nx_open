@@ -18,6 +18,8 @@
 #include <utils/common/scoped_timer.h>
 #include <utils/common/synctime.h>
 
+#include <nx/utils/datetime.h>
+
 namespace
 {
     enum

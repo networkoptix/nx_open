@@ -84,9 +84,8 @@ QnCamDisplay* QnRedAssController::findDisplay(FindMethod method, MediaQuality fi
     return 0;
 }
 
-bool QnRedAssController::isForcedHQDisplay(QnCamDisplay* display, QnArchiveStreamReader* reader) const
+bool QnRedAssController::isForcedHQDisplay(QnCamDisplay* display, QnArchiveStreamReader* /*reader*/) const
 {
-    QN_UNUSED(reader);
     return display->isFullScreen() || display->isZoomWindow() || display->isFisheyeEnabled();
 }
 

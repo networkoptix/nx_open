@@ -1,5 +1,7 @@
 #include "workbench_selection_watcher.h"
 
+#include <QtWidgets/QAction>
+
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_target_provider.h>
 

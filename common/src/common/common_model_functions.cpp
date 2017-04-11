@@ -90,7 +90,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzTrait,
 )
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, RecordingType)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PropertyDataType)
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, StreamQuality,
     (Qn::QualityLowest,     "lowest")
@@ -99,15 +98,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, StreamQuality,
     (Qn::QualityHigh,       "high")
     (Qn::QualityHighest,    "highest")
     (Qn::QualityPreSet,     "preset")
-)
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, SerializationFormat,
-    (Qn::JsonFormat,        "json")
-    (Qn::UbjsonFormat,      "ubjson")
-    (Qn::BnsFormat,         "bns")
-    (Qn::CsvFormat,         "csv")
-    (Qn::XmlFormat,         "xml")
-    (Qn::CompressedPeriodsFormat, "periods")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, BookmarkSortField,

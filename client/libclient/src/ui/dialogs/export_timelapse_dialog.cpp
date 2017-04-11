@@ -1,6 +1,8 @@
 #include "export_timelapse_dialog.h"
 #include "ui_export_timelapse_dialog.h"
 
+#include <QtGui/QStandardItemModel>
+
 #include <text/time_strings.h>
 
 #include <ui/workaround/widgets_signals_workaround.h>

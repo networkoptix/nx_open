@@ -5,12 +5,11 @@
 
 #include <QtXml/QXmlDefaultHandler>
 
-#include <common/common_globals.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 
 #include <QDateTime>
 
@@ -541,7 +540,7 @@ void DeviceSearcher::updateItemInCache( DiscoveredDeviceInfo info )
     cacheItem.xmlDevInfo = info.xmlDevInfo;
     cacheItem.creationTimestamp = m_cacheTimer.elapsed();
 
-    QnConcurrent::run(
+    nx::utils::concurrent::run(
         QThreadPool::globalInstance(),
         [ this, info = std::move(info), guard = m_handlerGuard.sharedGuard() ]()
         {

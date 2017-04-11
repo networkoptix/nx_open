@@ -1,5 +1,8 @@
 #include "two_way_audio_widget.h"
 
+#include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QStyleOptionGraphicsItem>
+
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 

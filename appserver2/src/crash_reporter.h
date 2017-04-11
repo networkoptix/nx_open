@@ -3,7 +3,7 @@
 
 #include "ec2_statictics_reporter.h"
 
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <nx/utils/thread/mutex.h>
 
 #include <QDir>
@@ -41,7 +41,7 @@ private:
     friend class ReportData;
 
     QnMutex m_mutex;
-    QnConcurrent::QnFuture<bool> m_activeCollection;
+    nx::utils::concurrent::Future<bool> m_activeCollection;
     nx_http::AsyncHttpClientPtr m_activeHttpClient;
     bool m_terminated;
     boost::optional<qint64> m_timerId;

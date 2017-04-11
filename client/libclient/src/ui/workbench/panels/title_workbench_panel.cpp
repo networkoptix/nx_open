@@ -1,5 +1,7 @@
 #include "title_workbench_panel.h"
 
+#include <QtWidgets/QAction>
+
 #include <nx/client/ui/workbench/workbench_animations.h>
 
 #include <ui/help/help_topic_accessor.h>
@@ -97,7 +99,7 @@ bool TitleWorkbenchPanel::isOpened() const
 
 void TitleWorkbenchPanel::setOpened(bool opened, bool animate)
 {
-    using namespace nx::client::ui::workbench;
+    using namespace nx::client::desktop::ui::workbench;
 
     ensureAnimationAllowed(&animate);
 

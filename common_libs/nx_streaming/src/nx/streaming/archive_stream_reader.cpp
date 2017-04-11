@@ -186,17 +186,6 @@ qint64 QnArchiveStreamReader::currentTime() const
         return m_currentTime;
 }
 
-QString QnArchiveStreamReader::serializeLayout(const QnResourceVideoLayout* layout)
-{
-    QString rez;
-    QTextStream ost(&rez);
-    ost << layout->size().width() << ',' << layout->size().height();
-    for (int i = 0; i < layout->channelCount(); ++i)
-        ost << ';' << layout->position(i).x() << ',' << layout->position(i).y();
-    ost.flush();
-    return rez;
-}
-
 QnConstResourceVideoLayoutPtr QnArchiveStreamReader::getDPVideoLayout() const
 {
     if (!(m_delegate->getFlags() & QnAbstractArchiveDelegate::Flag_CanOfflineLayout))

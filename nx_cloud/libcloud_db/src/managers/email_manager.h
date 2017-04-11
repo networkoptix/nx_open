@@ -16,7 +16,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/thread/mutex.h>
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 
 #include "notification.h"
 #include "settings.h"
@@ -63,11 +63,11 @@ private:
     mutable QnMutex m_mutex;
     QUrl m_notificationModuleUrl;
     std::set<nx_http::AsyncHttpClientPtr> m_ongoingRequests;
-    QnCounter m_startedAsyncCallsCounter;
+    nx::utils::Counter m_startedAsyncCallsCounter;
     std::atomic<std::uint64_t> m_notificationSequence;
 
     void onSendNotificationRequestDone(
-        QnCounter::ScopedIncrement asyncCallLocker,
+        nx::utils::Counter::ScopedIncrement asyncCallLocker,
         nx_http::AsyncHttpClientPtr client,
         std::uint64_t notificationIndex,
         std::function<void(bool)> completionHandler);

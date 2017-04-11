@@ -6,6 +6,10 @@
 #include <QtCore/QUrlQuery>
 #include <QtCore/QTimer>
 
+#include <QtGui/QClipboard>
+
+#include <QtWidgets/QMenu>
+
 #include <api/global_settings.h>
 
 #include <common/common_module.h>

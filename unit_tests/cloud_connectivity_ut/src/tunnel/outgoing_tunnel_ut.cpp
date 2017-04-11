@@ -17,7 +17,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/test_options.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace network {
@@ -473,7 +473,7 @@ TEST_F(OutgoingTunnel, general)
 
         AddressEntry addressEntry("nx_test.com:12345");
         cloud::OutgoingTunnel tunnel(std::move(addressEntry));
-        auto tunnelGuard = makeScopedGuard([&tunnel]() { tunnel.pleaseStopSync(); });
+        auto tunnelGuard = makeScopeGuard([&tunnel]() { tunnel.pleaseStopSync(); });
 
         setConnectorFactoryFunc(
             [connectorWillSucceed, connectionWillSucceed, singleShotConnection](
@@ -754,7 +754,7 @@ TEST_F(OutgoingTunnel, connectTimeout2)
 TEST_F(OutgoingTunnel, pool)
 {
     OutgoingTunnelPool tunnelPool;
-    auto tunnelPoolGuard = makeScopedGuard(
+    auto tunnelPoolGuard = makeScopeGuard(
         [&tunnelPool]() { tunnelPool.pleaseStopSync(); });
 
     AddressEntry addressEntry("nx_test.com:12345");

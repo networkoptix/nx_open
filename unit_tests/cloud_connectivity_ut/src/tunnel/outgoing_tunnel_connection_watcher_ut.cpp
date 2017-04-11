@@ -6,7 +6,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace network {
@@ -59,7 +59,7 @@ class OutgoingTunnelConnectionWatcher:
     public ::testing::Test
 {
 public:
-    typedef ScopedGuard<std::function<void()>> InitializationGuard;
+    typedef ScopeGuard<std::function<void()>> InitializationGuard;
 
     OutgoingTunnelConnectionWatcher():
         m_tunnelAioThread(nullptr),

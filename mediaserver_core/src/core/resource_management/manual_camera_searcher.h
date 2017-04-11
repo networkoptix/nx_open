@@ -10,7 +10,7 @@
 #include <api/model/manual_camera_seach_reply.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_searcher.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <utils/common/threadqueue.h>
 #include <nx/network/ip_range_checker_async.h>
 

@@ -2,7 +2,7 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <QElapsedTimer>
+#include <QtCore/QElapsedTimer>
 #include <nx/utils/timer_manager.h>
 
 namespace nx_http {

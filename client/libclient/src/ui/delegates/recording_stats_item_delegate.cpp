@@ -1,5 +1,7 @@
 #include "recording_stats_item_delegate.h"
 
+#include <QtWidgets/QApplication>
+
 #include <client/client_globals.h>
 
 #include <ui/delegates/resource_item_delegate.h>

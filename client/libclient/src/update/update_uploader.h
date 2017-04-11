@@ -24,6 +24,7 @@ public:
     };
 
     QnUpdateUploader(QObject *parent = 0);
+    virtual ~QnUpdateUploader() override;
 
     bool uploadUpdate(const QString &updateId, const QString &fileName, const QSet<QnUuid> &peers);
 

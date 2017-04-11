@@ -1,9 +1,11 @@
 #include "self_updater.h"
 
+#include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 #include <QtCore/QLockFile>
+#include <QtCore/QProcess>
 #include <QtCore/QStandardPaths>
-#include <QtCore/QCoreApplication>
+#include <QtCore/QThread>
 
 #include <api/applauncher_api.h>
 
@@ -572,7 +574,7 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
         auto iconName = AppInfo::iconFileName();
 
         const auto iconPath =
-            QDir(QApplication::applicationDirPath()).absoluteFilePath(
+            QDir(QCoreApplication::applicationDirPath()).absoluteFilePath(
                 lit("../share/icons/%1").arg(iconName));
 
         if (QFile::exists(iconPath))

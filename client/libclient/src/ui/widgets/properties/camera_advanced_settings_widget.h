@@ -11,6 +11,8 @@ class CameraAdvancedSettingsWidget;
 }
 
 class QNetworkReply;
+class QNetworkProxy;
+class QAuthenticator;
 class CameraAdvancedSettingsWebPage;
 
 class QnCameraAdvancedSettingsWidget: public Connective<QWidget>

@@ -1,12 +1,11 @@
-#ifndef QN_IMAGE_BUTTON_WIDGET_H
-#define QN_IMAGE_BUTTON_WIDGET_H
+#pragma once
 
-#ifndef Q_MOC_RUN
-#include <boost/array.hpp>
-#endif
+#include <array>
 
 #include <QtGui/QPixmap>
+#include <QtGui/QOpenGLBuffer>
 #include <QtGui/QOpenGLFunctions>
+#include <QtGui/QOpenGLVertexArrayObject>
 
 #include <ui/common/margins.h>
 #include <ui/processors/clickable.h>
@@ -136,7 +135,7 @@ protected:
 private:
     friend class QnImageButtonHoverProgressAccessor;
 
-    boost::array<QPixmap, MaxState + 1> m_pixmaps;
+    std::array<QPixmap, MaxState + 1> m_pixmaps;
 
     StateFlags m_state;
     bool m_checkable;
@@ -186,6 +185,3 @@ private:
     qreal m_rotationSpeed;
     qreal m_rotation;
 };
-
-
-#endif // QN_IMAGE_BUTTON_WIDGET_H

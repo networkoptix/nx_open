@@ -1,5 +1,7 @@
 #pragma once
 
+class QLabel;
+
 class QnWorkbenchSafeModeWatcher: public QObject {
     Q_OBJECT
 public:

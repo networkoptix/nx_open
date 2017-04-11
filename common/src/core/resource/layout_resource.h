@@ -9,7 +9,7 @@
 #include <core/resource/layout_item_data.h>
 
 #include <utils/common/threadsafe_item_storage.h>
-
+#include <common/common_globals.h>
 
 /**
  * QnLayoutResource class describes the set of resources together with their view options.
@@ -69,6 +69,8 @@ public:
 
     void setData(int role, const QVariant &value);
 
+    QVariant data(int role) const; // TODO: #ynikitenkov Possibly move to QnResourceRuntimeDataManager
+
     QHash<int, QVariant> data() const;
 
     void requestStore() { emit storeRequested(::toSharedPointer(this)); } // TODO: #Elric hack
@@ -122,6 +124,8 @@ signals:
     void backgroundImageChanged(const QnLayoutResourcePtr &resource);
     void backgroundOpacityChanged(const QnLayoutResourcePtr &resource);
     void lockedChanged(const QnLayoutResourcePtr &resource);
+
+    void dataChanged(int role);
 
 protected:
     virtual Qn::Notifier storedItemAdded(const QnLayoutItemData& item) override;

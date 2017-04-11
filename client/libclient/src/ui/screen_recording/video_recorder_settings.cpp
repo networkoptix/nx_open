@@ -1,9 +1,12 @@
 #include "video_recorder_settings.h"
 
+#include <QtCore/QDir>
 #include <QtCore/QSettings>
+
+#include <QtMultimedia/QAudioDeviceInfo>
+
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QDesktopWidget>
-#include <QtMultimedia/QAudioDeviceInfo>
 
 #ifdef Q_OS_WIN
 #   include <d3d9.h>

@@ -1,8 +1,11 @@
 #include "notifications_collection_widget.h"
 
+#include <QtGui/QDesktopServices>
+
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QStyle>
 
 #include <nx/utils/log/log.h>
 
@@ -40,6 +43,7 @@
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/style/software_trigger_pixmaps.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -328,6 +332,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         switch (eventType)
         {
             case QnBusiness::CameraMotionEvent:
+            case QnBusiness::SoftwareTriggerEvent:
             {
                 item->addActionButton(
                     icon,
@@ -514,6 +519,13 @@ QIcon QnNotificationsCollectionWidget::iconForAction(const QnAbstractBusinessAct
             return resource
                 ? qnResIconCache->icon(resource)
                 : qnResIconCache->icon(QnResourceIconCache::Camera);
+        }
+
+        case QnBusiness::SoftwareTriggerEvent:
+        {
+            return QnSoftwareTriggerPixmaps::colorizedPixmap(
+                businessAction->getRuntimeParams().description,
+                palette().color(QPalette::WindowText));
         }
 
         case QnBusiness::StorageFailureEvent:

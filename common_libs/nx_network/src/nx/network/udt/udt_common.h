@@ -6,7 +6,7 @@
 #ifndef NX_NETWORK_UDT_SOCKET_H
 #define NX_NETWORK_UDT_SOCKET_H
 
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 
 namespace nx {

@@ -1,6 +1,7 @@
 #include "text_overlay_widget.h"
 
 #include <QtCore/QTimer>
+
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <core/resource/camera_bookmark.h>
@@ -23,22 +24,27 @@ QnOverlayTextItemData::QnOverlayTextItemData(const QnUuid &initId
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnOverlayTextItemData, (eq), QnOverlayTextItemData_Fields);
 
-QnTextOverlayWidget::QnTextOverlayWidget(QGraphicsWidget *parent)
-    : base_type(Qt::AlignRight, parent)
+QnTextOverlayWidget::QnTextOverlayWidget(QGraphicsWidget* parent):
+    base_type(parent)
 {
     enum
     {
-        kDefaultHorMargin = 2
-        , kDefaultBottomMargin = 2
-        , kDefaultTopMargin = 28
+        kDefaultHorMargin = 2,
+        kDefaultBottomMargin = 2,
+        kDefaultTopMargin = 28
     };
 
-    setContentsMargins(kDefaultHorMargin, kDefaultTopMargin
-        , kDefaultHorMargin, kDefaultBottomMargin);
+    setContentsMargins(kDefaultHorMargin, kDefaultTopMargin,
+        kDefaultHorMargin, kDefaultBottomMargin);
+
+    setAlignment(Qt::AlignRight | Qt::AlignBottom);
+
+    setFlag(QGraphicsItem::ItemClipsChildrenToShape);
 }
 
 QnTextOverlayWidget::~QnTextOverlayWidget()
-{}
+{
+}
 
 void QnTextOverlayWidget::addTextItem(const QnOverlayTextItemData &data)
 {
@@ -70,7 +76,7 @@ void QnTextOverlayWidget::removeTextItem(const QnUuid &id)
     }
 
     m_textItems.remove(id);
-    removeItem(id);
+    deleteItem(id);
 }
 
 void QnTextOverlayWidget::setTextItems(const QnOverlayTextItemDataList &data) {

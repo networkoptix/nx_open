@@ -1,5 +1,6 @@
 #include "search_bookmarks_dialog_p.h"
 
+#include <QtWidgets/QMenu>
 #include <QtWidgets/QStyledItemDelegate>
 
 #include "ui_search_bookmarks_dialog.h"

@@ -5,24 +5,10 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/thread.h>
 #include <nx/utils/thread/mutex.h>
-#include <utils/common/stoppable.h>
 
 namespace nx {
 namespace utils {
 namespace test {
-
-struct StoppableAsyncTester: QnStoppableAsync
-{
-    void pleaseStop(nx::utils::MoveOnlyFunc<void()> h) override { h(); }
-};
-
-TEST(MutexAnalyzer, DISABLED_PleaseStop)
-{
-    StoppableAsyncTester t;
-    QnMutex m1;
-    QnMutexLocker lock1(&m1);
-    t.pleaseStopSync();
-}
 
 TEST(MutexAnalyzer, DISABLED_Deadlock2)
 {

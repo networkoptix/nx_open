@@ -5,8 +5,13 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsLinearLayout>
 
 #include <api/app_server_connection.h>
+#include <api/server_rest_connection.h>
+
+#include <business/business_event_rule.h>
+#include <business/business_strings_helper.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -17,7 +22,10 @@
 #include <client/client_globals.h>
 #include <client/client_runtime_settings.h>
 
+#include <common/common_module.h>
+
 #include <core/resource/media_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
@@ -36,9 +44,12 @@
 
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/collection.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/recording_status_helper.h>
+#include <ui/common/text_pixmap_cache.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/proxy_label.h>
@@ -46,18 +57,24 @@
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
+#include <ui/graphics/items/resource/software_trigger_button.h>
 #include <ui/graphics/items/resource/two_way_audio_widget.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/overlays/composite_text_overlay.h>
-#include <ui/graphics/items/overlays/buttons_overlay.h>
+#include <ui/graphics/items/overlays/text_overlay_widget.h>
+#include <ui/graphics/items/overlays/hud_overlay_widget.h>
+#include <ui/graphics/items/overlays/resource_title_item.h>
+#include <ui/graphics/items/overlays/scrollable_items_widget.h>
 #include <ui/graphics/items/overlays/status_overlay_controller.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/statistics/modules/controls_statistics_module.h>
 #include <ui/style/globals.h>
+#include <ui/style/helper.h>
 #include <ui/style/skin.h>
 #include <ui/style/nx_style.h>
+#include <ui/style/software_trigger_pixmaps.h>
 #include <ui/widgets/properties/camera_settings_tab.h>
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workbench/workbench_context.h>
@@ -73,7 +90,6 @@
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
-#include <nx/utils/collection.h>
 #include <utils/common/html.h>
 #include <utils/common/delayed.h>
 #include <utils/license_usage_helper.h>
@@ -93,13 +109,19 @@ static constexpr int kMicroInMilliSeconds = 1000;
 // Who returns it? --gdm?
 static constexpr int kNoTimeValue = 0;
 
-static constexpr qreal kTwoWayAudioButtonSize = 44.0;
-
 static constexpr qreal kMotionRegionAlpha = 0.4;
 
 static constexpr qreal kMaxForwardSpeed = 16.0;
 static constexpr qreal kMaxBackwardSpeed = 16.0;
 
+static constexpr int kTriggersSpacing = 4;
+static constexpr int kTriggerButtonSize = 40;
+
+template<class Cont, class Item>
+bool contains(const Cont& cont, const Item& item)
+{
+    return std::find(cont.cbegin(), cont.cend(), item) != cont.cend();
+}
 
 bool isSpecialDateTimeValueUsec(qint64 dateTimeUsec)
 {
@@ -250,10 +272,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     m_ioModuleOverlayWidget(nullptr),
     m_ioCouldBeShown(false),
     m_ioLicenceStatusHelper(), /// Will be created only for I/O modules
-    m_posUtcMs(DATETIME_INVALID),
-    m_twoWayAudioWidget(nullptr)
+    m_posUtcMs(DATETIME_INVALID)
 {
     NX_ASSERT(m_resource, "Media resource widget was created with a non-media resource.");
+
+    setupHud();
 
     // TODO: #Elric
     // Strictly speaking, this is a hack.
@@ -311,37 +334,16 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     updateAspectRatio();
     createPtzController();
 
-
     /* Set up info updates. */
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateInfoText, Qt::QueuedConnection);
-
-    {
-        m_compositeTextOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
-        addOverlayWidget(m_compositeTextOverlay, detail::OverlayParams(UserVisible, true, true));
-        auto updateContentsMargins = [this]()
-            {
-                auto positionOverlayGeometry = overlayWidgets()->positionOverlay->contentSize();
-                auto margins = m_compositeTextOverlay->contentsMargins();
-                margins.setBottom(positionOverlayGeometry.height() + 4);
-                m_compositeTextOverlay->setContentsMargins(margins);
-            };
-
-        connect(overlayWidgets()->positionOverlay, &GraphicsWidget::geometryChanged, this,
-            updateContentsMargins);
-        connect(overlayWidgets()->positionOverlay, &QnScrollableOverlayWidget::contentSizeChanged,
-            this, updateContentsMargins);
-        /* Let widgets to be displayed before updating margins. */
-        executeDelayedParented(updateContentsMargins, kDefaultDelay, this);
-    }
-
 
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module))
     {
         //TODO: #vkutin #gdm #common Make a style metric that holds this value.
-        auto topMargin = overlayWidgets()->buttonsOverlay
-            ? overlayWidgets()->buttonsOverlay->leftButtonsBar()->uniformButtonSize().height()
+        auto topMargin = titleBar()
+            ? titleBar()->leftButtonsBar()->uniformButtonSize().height()
             : 0.0;
 
         m_ioLicenceStatusHelper.reset(new QnSingleCamLicenceStatusHelper(m_camera));
@@ -440,6 +442,17 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     updateOverlayButton();
     setImageEnhancement(item->imageEnhancement());
 
+    resetTriggers();
+
+    connect(messageProcessor, &QnCommonMessageProcessor::businessRuleReset,
+        this, &QnMediaResourceWidget::resetTriggers);
+
+    connect(messageProcessor, &QnCommonMessageProcessor::businessRuleChanged,
+        this, &QnMediaResourceWidget::at_businessRuleChanged);
+
+    connect(messageProcessor, &QnCommonMessageProcessor::businessRuleDeleted,
+        this, &QnMediaResourceWidget::at_businessRuleDeleted);
+
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
 }
@@ -468,7 +481,7 @@ void QnMediaResourceWidget::createButtons()
         setHelpTopic(screenshotButton, Qn::MainWindow_MediaItem_Screenshot_Help);
         connect(screenshotButton, &QnImageButtonWidget::clicked, this,
             &QnMediaResourceWidget::at_screenshotButton_clicked);
-        buttonsOverlay()->rightButtonsBar()->addButton(Qn::ScreenshotButton, screenshotButton);
+        titleBar()->rightButtonsBar()->addButton(Qn::ScreenshotButton, screenshotButton);
     }
 
     {
@@ -479,7 +492,7 @@ void QnMediaResourceWidget::createButtons()
         setHelpTopic(searchButton, Qn::MainWindow_MediaItem_SmartSearch_Help);
         connect(searchButton, &QnImageButtonWidget::toggled, this,
             &QnMediaResourceWidget::setMotionSearchModeEnabled);
-        buttonsOverlay()->rightButtonsBar()->addButton(Qn::MotionSearchButton, searchButton);
+        titleBar()->rightButtonsBar()->addButton(Qn::MotionSearchButton, searchButton);
     }
 
     {
@@ -490,7 +503,7 @@ void QnMediaResourceWidget::createButtons()
         setHelpTopic(ptzButton, Qn::MainWindow_MediaItem_Ptz_Help);
         connect(ptzButton, &QnImageButtonWidget::toggled, this,
             &QnMediaResourceWidget::at_ptzButton_toggled);
-        buttonsOverlay()->rightButtonsBar()->addButton(Qn::PtzButton, ptzButton);
+        titleBar()->rightButtonsBar()->addButton(Qn::PtzButton, ptzButton);
     }
 
     {
@@ -502,7 +515,7 @@ void QnMediaResourceWidget::createButtons()
         setHelpTopic(fishEyeButton, Qn::MainWindow_MediaItem_Dewarping_Help);
         connect(fishEyeButton, &QnImageButtonWidget::toggled, this,
             &QnMediaResourceWidget::at_fishEyeButton_toggled);
-        buttonsOverlay()->rightButtonsBar()->addButton(Qn::FishEyeButton, fishEyeButton);
+        titleBar()->rightButtonsBar()->addButton(Qn::FishEyeButton, fishEyeButton);
     }
 
     {
@@ -513,7 +526,7 @@ void QnMediaResourceWidget::createButtons()
         setHelpTopic(zoomWindowButton, Qn::MainWindow_MediaItem_ZoomWindows_Help);
         connect(zoomWindowButton, &QnImageButtonWidget::toggled, this,
             &QnMediaResourceWidget::setZoomWindowCreationModeEnabled);
-        buttonsOverlay()->rightButtonsBar()->addButton(Qn::ZoomWindowButton, zoomWindowButton);
+        titleBar()->rightButtonsBar()->addButton(Qn::ZoomWindowButton, zoomWindowButton);
     }
 
     {
@@ -525,7 +538,7 @@ void QnMediaResourceWidget::createButtons()
         setHelpTopic(enhancementButton, Qn::MainWindow_MediaItem_ImageEnhancement_Help);
         connect(enhancementButton, &QnImageButtonWidget::toggled, this,
             &QnMediaResourceWidget::at_histogramButton_toggled);
-        buttonsOverlay()->rightButtonsBar()->addButton(Qn::EnhancementButton, enhancementButton);
+        titleBar()->rightButtonsBar()->addButton(Qn::EnhancementButton, enhancementButton);
     }
 
     {
@@ -536,7 +549,7 @@ void QnMediaResourceWidget::createButtons()
         ioModuleButton->setToolTip(tr("I/O Module"));
         connect(ioModuleButton, &QnImageButtonWidget::toggled, this,
             &QnMediaResourceWidget::at_ioModuleButton_toggled);
-        buttonsOverlay()->rightButtonsBar()->addButton(Qn::IoModuleButton, ioModuleButton);
+        titleBar()->rightButtonsBar()->addButton(Qn::IoModuleButton, ioModuleButton);
     }
 
     if (qnRuntime->isDevMode())
@@ -551,7 +564,7 @@ void QnMediaResourceWidget::createButtons()
                 menu()->trigger(QnActions::TakeScreenshotAction, QnActionParameters(this)
                     .withArgument<QString>(Qn::FileNameRole, lit("_DEBUG_SCREENSHOT_KEY_")));
             });
-        buttonsOverlay()->rightButtonsBar()->addButton(Qn::DbgScreenshotButton, debugScreenshotButton);
+        titleBar()->rightButtonsBar()->addButton(Qn::DbgScreenshotButton, debugScreenshotButton);
     }
 
 }
@@ -677,6 +690,25 @@ void QnMediaResourceWidget::suspendHomePtzController()
         m_homePtzController->suspend();
 }
 
+void QnMediaResourceWidget::setupHud()
+{
+    m_triggersContainer = new QnScrollableItemsWidget(m_hudOverlay->right());
+    m_triggersContainer->setAlignment(Qt::AlignRight | Qt::AlignBottom);
+
+    m_triggersContainer->setSpacing(kTriggersSpacing);
+    m_triggersContainer->setMaximumWidth(kTriggerButtonSize);
+    m_triggersContainer->setFlag(QGraphicsItem::ItemClipsChildrenToShape, false);
+    setOverlayWidgetVisible(m_triggersContainer, false, /*animate=*/false);
+
+    setOverlayWidgetVisible(m_hudOverlay->right(), true, /*animate=*/false);
+
+    auto rightLayout = new QGraphicsLinearLayout(Qt::Horizontal, m_hudOverlay->right());
+    rightLayout->addItem(m_compositeTextOverlay);
+    rightLayout->addItem(m_triggersContainer);
+
+    m_compositeTextOverlay->stackBefore(m_triggersContainer);
+}
+
 void QnMediaResourceWidget::updateHud(bool animate)
 {
     const auto compositeOverlayCouldBeVisible
@@ -684,7 +716,9 @@ void QnMediaResourceWidget::updateHud(bool animate)
 
     setOverlayWidgetVisible(m_compositeTextOverlay, compositeOverlayCouldBeVisible, animate);
 
-    QnResourceWidget::updateHud(animate);
+    base_type::updateHud(animate);
+
+    setOverlayWidgetVisible(m_triggersContainer, isOverlayWidgetVisible(titleBar()), animate);
 }
 
 void QnMediaResourceWidget::ensureTwoWayAudioWidget()
@@ -701,12 +735,11 @@ void QnMediaResourceWidget::ensureTwoWayAudioWidget()
 
     m_twoWayAudioWidget = new QnTwoWayAudioWidget();
     m_twoWayAudioWidget->setCamera(m_camera);
-    m_twoWayAudioWidget->setFixedHeight(kTwoWayAudioButtonSize);
+    m_twoWayAudioWidget->setFixedHeight(kTriggerButtonSize);
     context()->statisticsModule()->registerButton(lit("two_way_audio"), m_twoWayAudioWidget);
 
     /* Items are ordered left-to-right and top-to bottom, so we are inserting two-way audio item on top. */
-    overlayWidgets()->positionOverlay->insertItem(0, m_twoWayAudioWidget);
-    overlayWidgets()->positionOverlay->setMaxFillCoeff(QSizeF(1.0, 0.8));
+    m_triggersContainer->insertItem(0, m_twoWayAudioWidget);
 }
 
 bool QnMediaResourceWidget::animationAllowed() const
@@ -1073,7 +1106,7 @@ void QnMediaResourceWidget::updateDisplay()
 
 void QnMediaResourceWidget::updateIconButton()
 {
-    auto buttonsBar = buttonsOverlay()->leftButtonsBar();
+    auto buttonsBar = titleBar()->leftButtonsBar();
     if (!zoomRect().isNull())
     {
         auto iconButton = buttonsBar->button(Qn::RecordingStatusIconButton);
@@ -1116,7 +1149,7 @@ ImageCorrectionParams QnMediaResourceWidget::imageEnhancement() const
 
 void QnMediaResourceWidget::setImageEnhancement(const ImageCorrectionParams &imageEnhancement)
 {
-    buttonsOverlay()->rightButtonsBar()->button(Qn::EnhancementButton)->setChecked(imageEnhancement.enabled);
+    titleBar()->rightButtonsBar()->button(Qn::EnhancementButton)->setChecked(imageEnhancement.enabled);
     item()->setImageEnhancement(imageEnhancement);
     m_renderer->setImageCorrection(imageEnhancement);
 }
@@ -1448,7 +1481,7 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
         if (QnAbstractArchiveStreamReader *reader = m_display->archiveReader())
             reader->setSendMotion(options() & DisplayMotion);
 
-        buttonsOverlay()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton, options() & DisplayMotion);
+        titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton, options() & DisplayMotion);
 
         if (options().testFlag(DisplayMotion))
         {
@@ -1824,7 +1857,7 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged()
 
     if (!isLive)
     {
-        buttonsOverlay()->rightButtonsBar()->setButtonsChecked(Qn::PtzButton, false);
+        titleBar()->rightButtonsBar()->setButtonsChecked(Qn::PtzButton, false);
         suspendHomePtzController();
     }
     else
@@ -1849,7 +1882,7 @@ void QnMediaResourceWidget::at_ptzButton_toggled(bool checked)
     setOption(DisplayCrosshair, ptzEnabled);
     if (checked)
     {
-        buttonsOverlay()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
+        titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
         action(QnActions::JumpToLiveAction)->trigger(); // TODO: #Elric evil hack! Won't work if SYNC is off and this item is not selected?
     }
 }
@@ -1938,10 +1971,10 @@ void QnMediaResourceWidget::updateFisheye()
     setOption(ControlPtz, fisheyeEnabled && zoomRect().isEmpty());
     setOption(DisplayCrosshair, fisheyeEnabled && zoomRect().isEmpty());
     setOption(DisplayDewarped, fisheyeEnabled);
-    if (fisheyeEnabled && buttonsOverlay()->rightButtonsBar()->button(Qn::FishEyeButton))
-        buttonsOverlay()->rightButtonsBar()->button(Qn::FishEyeButton)->setChecked(fisheyeEnabled);
+    if (fisheyeEnabled && titleBar()->rightButtonsBar()->button(Qn::FishEyeButton))
+        titleBar()->rightButtonsBar()->button(Qn::FishEyeButton)->setChecked(fisheyeEnabled);
     if (enabled)
-        buttonsOverlay()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
+        titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
 
     bool flip = fisheyeEnabled
         && m_dewarpingParams.viewMode == QnMediaDewarpingParams::VerticalDown;
@@ -1960,8 +1993,8 @@ void QnMediaResourceWidget::updateFisheye()
 
     emit fisheyeChanged();
 
-    if (buttonsOverlay()->rightButtonsBar()->visibleButtons() & Qn::PtzButton)
-        at_ptzButton_toggled(buttonsOverlay()->rightButtonsBar()->checkedButtons() & Qn::PtzButton); // TODO: #Elric doesn't belong here, hack
+    if (titleBar()->rightButtonsBar()->visibleButtons() & Qn::PtzButton)
+        at_ptzButton_toggled(titleBar()->rightButtonsBar()->checkedButtons() & Qn::PtzButton); // TODO: #Elric doesn't belong here, hack
 }
 
 void QnMediaResourceWidget::updateCustomAspectRatio()
@@ -1994,7 +2027,7 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate)
     if (!m_camera || !m_camera->hasFlags(Qn::io_module) || !m_ioLicenceStatusHelper)
         return;
 
-    const QnImageButtonWidget * const button = buttonsOverlay()->rightButtonsBar()->button(Qn::IoModuleButton);
+    const QnImageButtonWidget * const button = titleBar()->rightButtonsBar()->button(Qn::IoModuleButton);
     const bool ioBtnChecked = (button && button->isChecked());
     const bool onlyIoData = !hasVideo();
     const bool correctLicenceStatus = (m_ioLicenceStatusHelper->status() == QnSingleCamLicenceStatusHelper::LicenseUsed);
@@ -2130,10 +2163,10 @@ void QnMediaResourceWidget::setMotionSensitivityColors(const QVector<QColor>& va
 void QnMediaResourceWidget::setZoomWindowCreationModeEnabled(bool enabled)
 {
     setOption(ControlZoomWindow, enabled);
-    buttonsOverlay()->rightButtonsBar()->setButtonsChecked(Qn::ZoomWindowButton, enabled);
+    titleBar()->rightButtonsBar()->setButtonsChecked(Qn::ZoomWindowButton, enabled);
     if (enabled)
     {
-        buttonsOverlay()->rightButtonsBar()->setButtonsChecked(
+        titleBar()->rightButtonsBar()->setButtonsChecked(
             Qn::PtzButton | Qn::FishEyeButton | Qn::MotionSearchButton, false);
     }
 
@@ -2145,11 +2178,11 @@ void QnMediaResourceWidget::setZoomWindowCreationModeEnabled(bool enabled)
 void QnMediaResourceWidget::setMotionSearchModeEnabled(bool enabled)
 {
     setOption(DisplayMotion, enabled);
-    buttonsOverlay()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton, enabled);
+    titleBar()->rightButtonsBar()->setButtonsChecked(Qn::MotionSearchButton, enabled);
 
     if (enabled)
     {
-        buttonsOverlay()->rightButtonsBar()->setButtonsChecked(
+        titleBar()->rightButtonsBar()->setButtonsChecked(
             Qn::PtzButton | Qn::FishEyeButton | Qn::ZoomWindowButton, false);
     }
 
@@ -2180,4 +2213,153 @@ const QnSpeedRange& QnMediaResourceWidget::availableSpeedRange()
 {
     static const QnSpeedRange kAvailableSpeedRange(kMaxForwardSpeed, kMaxBackwardSpeed);
     return kAvailableSpeedRange;
+}
+
+/*
+* Software Triggers
+*/
+
+QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRelevant(
+    const QnBusinessEventRulePtr& rule)
+{
+    NX_ASSERT(!m_softwareTriggers.contains(rule->id()));
+
+    if (!isRelevantTriggerRule(rule))
+        return nullptr;
+
+    const SoftwareTriggerInfo info({
+        rule->eventParams().inputPortId,
+        rule->eventParams().caption,
+        rule->eventParams().description,
+        rule->isActionProlonged() });
+
+    const auto button = new QnSoftwareTriggerButton(this);
+    configureTriggerButton(button, info);
+
+    //TODO: #vkutin For now rule buttons are NOT sorted. Implement some sane sorting later.
+    const auto overlayItemId = m_triggersContainer->insertItem(0, button);
+
+    auto& trigger = m_softwareTriggers[rule->id()];
+    trigger = SoftwareTrigger({ info, overlayItemId });
+    return &trigger;
+}
+
+bool QnMediaResourceWidget::isRelevantTriggerRule(const QnBusinessEventRulePtr& rule) const
+{
+    if (rule->isDisabled() || rule->eventType() != QnBusiness::SoftwareTriggerEvent)
+        return false;
+
+    const auto users = rule->eventParams().metadata.instigators;
+    if (!users.empty() && !::contains(users, accessController()->user()->getId()))
+        return false;
+
+    const auto resourceId = m_resource->toResource()->getId();
+    if (!rule->eventResources().empty() && !rule->eventResources().contains(resourceId))
+        return false;
+
+    return true;
+}
+
+void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* button,
+    const SoftwareTriggerInfo& info)
+{
+    NX_EXPECT(button);
+
+    const auto name = QnBusinessStringsHelper::getSoftwareTriggerName(info.name);
+    button->setIcon(info.icon);
+    button->setProlonged(info.prolonged);
+    button->setToolTip(info.prolonged
+        ? lit("%1 (%2)").arg(name).arg(tr("press and hold", "Software Trigger"))
+        : name);
+
+    if (info.prolonged)
+    {
+        connect(button, &QnImageButtonWidget::pressed, this,
+            [this, id = info.triggerId]()
+            {
+                invokeTrigger(id, QnBusiness::ActiveState);
+            });
+
+        connect(button, &QnImageButtonWidget::released, this,
+            [this, id = info.triggerId]()
+            {
+                invokeTrigger(id, QnBusiness::InactiveState);
+            });
+    }
+    else
+    {
+        connect(button, &QnImageButtonWidget::clicked, this,
+            [this, id = info.triggerId]()
+            {
+                invokeTrigger(id);
+            });
+    }
+}
+
+void QnMediaResourceWidget::resetTriggers()
+{
+    /* Delete all buttons: */
+    for (const auto& trigger: m_softwareTriggers)
+        m_triggersContainer->deleteItem(trigger.overlayItemId);
+
+    /* Clear triggers information: */
+    m_softwareTriggers.clear();
+
+    if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
+        return;
+
+    /* Create new relevant triggers: */
+    for (const auto& rule: QnCommonMessageProcessor::instance()->businessRules())
+        createTriggerIfRelevant(rule); //< creates a trigger only if the rule is relevant
+}
+
+void QnMediaResourceWidget::at_businessRuleDeleted(const QnUuid& id)
+{
+    const auto iter = m_softwareTriggers.find(id);
+    if (iter == m_softwareTriggers.end())
+        return;
+
+    m_triggersContainer->deleteItem(iter->overlayItemId);
+    m_softwareTriggers.erase(iter);
+};
+
+void QnMediaResourceWidget::at_businessRuleChanged(const QnBusinessEventRulePtr& rule)
+{
+    const auto iter = m_softwareTriggers.find(rule->id());
+    if (iter == m_softwareTriggers.end())
+    {
+        /* Create trigger if the rule is relevant: */
+        createTriggerIfRelevant(rule);
+    }
+    else
+    {
+        /* Delete trigger: */
+        at_businessRuleDeleted(rule->id());
+
+        /* Recreate trigger if the rule is still relevant: */
+        createTriggerIfRelevant(rule);
+    }
+};
+
+void QnMediaResourceWidget::invokeTrigger(
+    const QString& id,
+    QnBusiness::EventState toggleState)
+{
+    if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
+        return;
+
+    const auto responseHandler =
+        [this, id](bool success, rest::Handle handle, const QnJsonRestResult& result)
+        {
+            Q_UNUSED(handle);
+            if (success && result.error == QnRestResult::NoError)
+                return;
+
+            NX_LOG(tr("Failed to invoke trigger %1 (%2)").arg(id).arg(result.errorString),
+                cl_logERROR);
+        };
+
+    qnCommon->currentServer()->restConnection()->softwareTriggerCommand(
+        m_resource->toResource()->getId(), id, toggleState,
+        responseHandler, QThread::currentThread());
 }

@@ -48,14 +48,14 @@ public:
 
     /**
      * \param margins                   Margins.
-     * \returns                         Amount by which the size of some rectangle 
+     * \returns                         Amount by which the size of some rectangle
      *                                  will change if the given margins are applied to it.
      */
     static QSizeF sizeDelta(const MarginsF &margins);
 
     /**
      * \param margins                   Margins.
-     * \returns                         Amount by which the size of some rectangle 
+     * \returns                         Amount by which the size of some rectangle
      *                                  will change if the given margins are applied to it.
      */
     static QSize sizeDelta(const QMargins &margins);
@@ -144,21 +144,21 @@ public:
 
     /**
      * \param point                     Point, treated as a vector.
-     * \returns                         Normal of the same length for the given vector. 
+     * \returns                         Normal of the same length for the given vector.
      */
     static QPointF normal(const QPointF &point);
 
     /**
      * \param point                     Point, treated as a vector.
-     * \returns                         Angle between the positive x-axis and the given vector, in radians. 
-     *                                  The angle is positive for counter-clockwise angles (upper half-plane, y > 0), 
+     * \returns                         Angle between the positive x-axis and the given vector, in radians.
+     *                                  The angle is positive for counter-clockwise angles (upper half-plane, y > 0),
      *                                  and negative for clockwise angles (lower half-plane, y < 0).
      */
     static qreal atan2(const QPointF &point);
 
     /**
      * \param polygon                   Polygon.
-     * \returns                         Centroid of the set of vertices of the given polygon. 
+     * \returns                         Centroid of the set of vertices of the given polygon.
      *                                  Note that this NOT centroid of the polygon itself.
      */
     static QPointF pointCentroid(const QPolygonF &polygon);
@@ -166,10 +166,10 @@ public:
     /**
      * Calculates the factor by which the given size must be scaled to fit into
      * the given bounds.
-     * 
+     *
      * Note that <tt>Qt::IgnoreAspectRatio</tt> mode is treated the same way
      * as <tt>Qt::KeepAspectRatio</tt> mode.
-     * 
+     *
      * \param size                      Size to scale.
      * \param bounds                    Size bounds.
      * \param mode                      Aspect ratio mode.
@@ -185,16 +185,16 @@ public:
      * a rectangle of bounded size.
      *
      * \param size                      Size to bound.
-     * \param maxSize                   Maximal size. 
+     * \param maxSize                   Maximal size.
      * \param mode                      Aspect ratio mode.
      */
     static QSizeF bounded(const QSizeF &size, const QSizeF &maxSize, Qt::AspectRatioMode mode);
 
     /**
      * Expands the given size to given minSize.
-     * 
+     *
      * \param size                      Size to expand.
-     * \param maxSize                   Maximal size. 
+     * \param maxSize                   Maximal size.
      * \param mode                      Aspect ratio mode.
      */
     static QSizeF expanded(const QSizeF &size, const QSizeF &maxSize, Qt::AspectRatioMode mode);
@@ -202,7 +202,7 @@ public:
     /**
      * Expands an infinitely small size with the given aspect ratio (width to
      * height ratio) to given maximal size.
-     * 
+     *
      * \param aspectRatio               Aspect ratio.
      * \param maxSize                   Maximal size.
      * \param mode                      Aspect ratio mode.
@@ -212,7 +212,7 @@ public:
     /**
      * Expands an infinitely small rectangle with the given aspect ratio (width to
      * height ratio) to given maximal rectangle.
-     * 
+     *
      * \param aspectRatio               Aspect ratio.
      * \param maxRect                   Maximal rectangle.
      * \param mode                      Aspect ratio mode.
@@ -232,7 +232,7 @@ public:
 
     /**
      * Dilates the given rectangle by the given amount.
-     * 
+     *
      * \param rect                      Rectangle to dilate.
      * \param amount                    Dilation amount.
      * \returns                         Dilated rectangle.
@@ -241,7 +241,7 @@ public:
 
     /**
      * Dilates the given rectangle by the given amount.
-     * 
+     *
      * \param rect                      Rectangle to dilate.
      * \param amount                    Dilation amount.
      * \returns                         Dilated rectangle.
@@ -250,7 +250,7 @@ public:
 
     /**
      * Dilates the given rectangle by the given amount.
-     * 
+     *
      * \param rect                      Rectangle to dilate.
      * \param amount                    Dilation amount.
      * \returns                         Dilated rectangle.
@@ -259,7 +259,7 @@ public:
 
     /**
      * Dilates the given rectangle by the given amount.
-     * 
+     *
      * \param rect                      Rectangle to dilate.
      * \param amount                    Dilation amount.
      * \returns                         Dilated rectangle.
@@ -268,7 +268,7 @@ public:
 
     /**
      * Dilates the given size by the given amount.
-     * 
+     *
      * \param size                      Size to dilate.
      * \param amount                    Dilation amount.
      * \returns                         Dilated size.
@@ -277,7 +277,7 @@ public:
 
     /**
      * Erodes the given rectangle by the given amount.
-     * 
+     *
      * \param rect                      Rectangle to erode.
      * \param amount                    Erosion amount.
      * \returns                         Eroded rectangle.
@@ -286,7 +286,7 @@ public:
 
     /**
      * Erodes the given rectangle by the given amount.
-     * 
+     *
      * \param rect                      Rectangle to erode.
      * \param amount                    Erosion amount.
      * \returns                         Eroded rectangle.
@@ -295,7 +295,7 @@ public:
 
     /**
      * Erodes the given rectangle by the given amount.
-     * 
+     *
      * \param rect                      Rectangle to erode.
      * \param amount                    Erosion amount.
      * \returns                         Eroded rectangle.
@@ -304,7 +304,7 @@ public:
 
     /**
      * Erodes the given rectangle by the given amount.
-     * 
+     *
      * \param rect                      Rectangle to erode.
      * \param amount                    Erosion amount.
      * \returns                         Eroded rectangle.
@@ -313,7 +313,7 @@ public:
 
     /**
      * Erodes the given size by the given amount.
-     * 
+     *
      * \param size                      Size to erode.
      * \param amount                    Erosion amount.
      * \returns                         Eroded size.
@@ -322,7 +322,7 @@ public:
 
     /**
      * Erodes the given size by the given amount.
-     * 
+     *
      * \param size                      Size to erode.
      * \param amount                    Erosion amount.
      * \returns                         Eroded size.
@@ -363,7 +363,7 @@ public:
 
     /**
      * Calculates the area of the given rectangle.
-     * 
+     *
      * \param rect                      Target rectangle.
      * \returns                         Area of the provided rectangle or 0 if it is not valid.
      */
@@ -375,7 +375,7 @@ public:
     static QRectF unsubRect(const QRectF &rect, const QRectF &relativeSubRect);
     static QRectF toSubRect(const QRectF &rect, const QRectF &absoluteSubRect);
 
-    static QPointF corner(const QRectF &rect, Qn::Corner corner);
+    static QPointF corner(const QRectF &rect, Qt::Corner corner);
 
     static QPointF closestPoint(const QRectF &rect, const QPointF &point);
     static QPointF closestPoint(const QPointF &a, const QPointF &b, const QPointF &point, qreal *t);

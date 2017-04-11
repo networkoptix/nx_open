@@ -28,6 +28,7 @@
 #include <ui/models/notification_sound_model.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+#include <ui/style/software_trigger_pixmaps.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench_context.h>
 
@@ -458,6 +459,22 @@ void QnBusinessRuleViewModel::setEventType(const QnBusiness::EventType value)
         }
     }
 
+    switch (m_eventType)
+    {
+        case QnBusiness::CameraInputEvent:
+            m_eventParams.inputPortId = QString();
+            break;
+
+        case QnBusiness::SoftwareTriggerEvent:
+            m_eventParams.inputPortId = QnUuid::createUuid().toSimpleString();
+            m_eventParams.description = QnSoftwareTriggerPixmaps::defaultPixmapName();
+            m_eventParams.caption = QString();
+            break;
+
+        default:
+            m_eventParams.caption = m_eventParams.description = QString();
+    }
+
     updateActionTypesModel();
     updateEventStateModel();
 
@@ -858,6 +875,8 @@ bool QnBusinessRuleViewModel::isValid(int column) const
 {
     switch (column)
     {
+        //TODO: #vkutin Add Software Triggers support
+
         case QnBusiness::SourceColumn:
         {
             auto filtered = filterEventResources(m_eventResources, m_eventType);

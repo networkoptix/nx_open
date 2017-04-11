@@ -1,17 +1,18 @@
-#ifndef RESOURCE_TREE_WIDGET_H
-#define RESOURCE_TREE_WIDGET_H
+#pragma once
 
 #include <QtCore/QAbstractItemModel>
+#include <QtCore/QItemSelectionModel>
 
 #include <QtWidgets/QWidget>
-#include <QtCore/QItemSelectionModel>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_criterion.h>
 
+class QAbstractItemView;
+class QSortFilterProxyModel;
+
 class QnResourceItemDelegate;
 class QnWorkbench;
-class QSortFilterProxyModel;
 class QnResourceTreeSortProxyModel;
 class QnResourceTreeModelCustomColumnDelegate;
 
@@ -175,5 +176,3 @@ private:
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Qn::GraphicsTweaksFlags)
-
-#endif // RESOURCE_TREE_WIDGET_H

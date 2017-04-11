@@ -2,12 +2,14 @@
 #include "ui_business_rules_dialog.h"
 
 #include <QtCore/QEvent>
+#include <QtCore/QSortFilterProxyModel>
+
+#include <QtGui/QPainter>
+#include <QtGui/QKeyEvent>
 
 #include <QtWidgets/QStyledItemDelegate>
 #include <QtWidgets/QItemEditorFactory>
 #include <QtWidgets/QComboBox>
-#include <QtGui/QPainter>
-#include <QtGui/QKeyEvent>
 
 #include <api/app_server_connection.h>
 

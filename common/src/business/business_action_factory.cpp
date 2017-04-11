@@ -22,7 +22,7 @@ QVector<QnUuid> toIdList(const QnResourceList& list)
 }
 
 QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, QnBusiness::EventState state) {
-    QnBusinessEventParameters runtimeParams = event->getRuntimeParams();
+    QnBusinessEventParameters runtimeParams = event->getRuntimeParamsEx(rule->eventParams());
     runtimeParams.sourceServerId = qnCommon->moduleGUID();
 
     QnAbstractBusinessActionPtr result = createAction(rule->actionType(), runtimeParams);

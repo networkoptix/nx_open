@@ -1,5 +1,4 @@
-#ifndef STYLED_TOOLTIP_WIDGET_H
-#define STYLED_TOOLTIP_WIDGET_H
+#pragma once
 
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 
@@ -17,11 +16,14 @@ public:
     qreal tailLength() const;
     void setTailLength(qreal tailLength);
 
+    Qt::Edge tailEdge() const;
+    void setTailEdge(Qt::Edge tailEdge);
+
 protected:
+    using base_type::setTailPos;
     virtual void updateTailPos();
 
 private:
     qreal m_tailLength;
+    Qt::Edge m_tailEdge;
 };
-
-#endif // STYLED_TOOLTIP_WIDGET_H

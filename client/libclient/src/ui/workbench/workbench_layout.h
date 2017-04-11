@@ -18,6 +18,18 @@
 class QnWorkbenchItem;
 
 // TODO: #Elric review doxydocs
+
+enum class QnLayoutFlag
+{
+    Empty               = 0x00,
+    NoDrop              = 0x01,
+    NoZoom              = 0x02,
+    NoMove              = 0x04,
+    NoTimeline          = 0x08,
+    SpecialBackground   = 0x10
+};
+Q_DECLARE_FLAGS(QnLayoutFlags, QnLayoutFlag)
+
 /**
  * Layout of a workbench.
  *
@@ -42,13 +54,6 @@ public:
     /**
      * Constructor.
      *
-     * \param parent                    Parent object for this layout.
-     */
-    QnWorkbenchLayout(QObject *parent = NULL);
-
-    /**
-     * Constructor.
-     *
      * \param resource                  Layout resource that this layout will
      *                                  be in sync with.
      * \param parent                    Parent object for this layout.
@@ -65,16 +70,21 @@ public:
      */
     static QnWorkbenchLayout *instance(const QnLayoutResourcePtr &layout);
 
-
     /**
      * \returns                         Layout associated with the given resource, if any.
      */
+    // TODO: #ynikitenkov remove function below. Inherite video wall resoure from layout?
     static QnWorkbenchLayout *instance(const QnVideoWallResourcePtr &videowall);
 
     /**
      * Virtual destructor.
      */
     virtual ~QnWorkbenchLayout();
+
+    QIcon icon() const;
+
+    QnLayoutFlags flags() const;
+    void setFlags(QnLayoutFlags value);
 
     /**
      * \returns                         Name of this layout.
@@ -316,6 +326,10 @@ public:
     bool isSearchLayout() const;
 
 signals:
+    void flagsChanged();
+
+    void iconChanged();
+
     /**
      * This signal is emitted when this layout is about to be destroyed
      * (i.e. its destructor has started).
@@ -430,6 +444,9 @@ private:
 
     /** User data by role. */
     QHash<int, QVariant> m_dataByRole;
+
+    QnLayoutFlags m_flags = QnLayoutFlag::Empty;
+    QIcon m_icon;
 };
 
 typedef QList<QnWorkbenchLayout *> QnWorkbenchLayoutList;

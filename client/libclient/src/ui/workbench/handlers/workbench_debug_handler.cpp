@@ -1,6 +1,11 @@
 #include "workbench_debug_handler.h"
 
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QLineEdit>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QToolButton>
+
 #include <QtWebKitWidgets/QWebView>
 
 #include <common/common_module.h>
@@ -80,7 +85,7 @@ public:
         base_type(parent),
         QnWorkbenchContextAware(parent)
     {
-        using namespace nx::client::ui::dialogs;
+        using namespace nx::client::desktop::ui::dialogs;
 
         QVBoxLayout *layout = new QVBoxLayout(this);
         layout->addWidget(newActionButton(QnActions::DebugDecrementCounterAction));

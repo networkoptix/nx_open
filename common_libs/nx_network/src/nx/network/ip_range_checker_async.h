@@ -11,12 +11,12 @@
 #include <QtCore/QObject>
 #include <QtNetwork/QHostAddress>
 
-#include <utils/common/joinable.h>
+#include <nx/utils/thread/joinable.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
 #include "http/asynchttpclient.h"
-#include "utils/common/stoppable.h"
+#include "nx/utils/thread/stoppable.h"
 
 
 //!Asynchronously scans specified ip address range for specified port to be opened and listening

@@ -3,6 +3,8 @@
 
 #include <QtCore/QSortFilterProxyModel>
 
+#include <QtGui/QKeyEvent>
+
 #include <api/global_settings.h>
 
 #include <client/client_settings.h>
@@ -339,7 +341,7 @@ void QnUserManagementWidget::applyChanges()
     }
 
     /* User still can press cancel on 'Confirm Remove' dialog. */
-    if (nx::client::messages::Resources::deleteResources(this, usersToDelete))
+    if (nx::client::desktop::messages::Resources::deleteResources(this, usersToDelete))
     {
         setEnabled(false);
         qnResourcesChangesManager->deleteResources(usersToDelete,

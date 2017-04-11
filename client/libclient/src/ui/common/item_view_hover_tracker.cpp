@@ -1,5 +1,7 @@
 #include "item_view_hover_tracker.h"
 
+#include <QtGui/QHoverEvent>
+
 #include <client/client_globals.h>
 #include <nx/utils/log/assert.h>
 #include <ui/style/helper.h>

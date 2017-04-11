@@ -22,7 +22,7 @@
 #include <network/authenticate_helper.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/av_codec_helper.h>
 #include <utils/media/media_stream_cache.h>

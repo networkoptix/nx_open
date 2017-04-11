@@ -1,7 +1,11 @@
 #include "html_text_item.h"
 
+#include <QtGui/QAbstractTextDocumentLayout>
+#include <QtGui/QTextDocument>
 #include <QtGui/QPainter>
 #include <QtGui/QFontMetrics>
+
+#include <QtWidgets/QApplication>
 
 #include <core/resource/camera_bookmark.h>
 
@@ -123,7 +127,8 @@ void QnHtmlTextItemPrivate::updatePixmap() {
 
     painter.translate(options.horPadding, options.vertPadding);
     td.drawContents(&painter);
-    q->resize(baseSize);
+    q->setMinimumSize(baseSize);
+    q->setMaximumSize(baseSize);
     q->update();
 }
 
