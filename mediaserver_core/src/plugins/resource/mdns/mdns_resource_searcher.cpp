@@ -7,7 +7,8 @@
 #include "mdns_listener.h"
 
 QnMdnsResourceSearcher::QnMdnsResourceSearcher(QnCommonModule* commonModule):
-    base_type(commonModule)
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule)
 {
     QnMdnsListener::instance()->registerConsumer((std::uintptr_t) this);
 }
