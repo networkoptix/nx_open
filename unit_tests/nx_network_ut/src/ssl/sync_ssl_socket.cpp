@@ -12,7 +12,7 @@ namespace test {
 static const int BUFFER_SIZE = 1024;
 const unsigned char sid[] = "Network Optix SSL socket";
 
-static int sock_read(BIO *b, char *out, int outl)
+int sock_read(BIO *b, char *out, int outl)
 {
     SyncSslSocket* sslSock = (SyncSslSocket*) BIO_get_app_data(b);
     int ret=0;
@@ -31,7 +31,7 @@ static int sock_read(BIO *b, char *out, int outl)
     return ret;
 }
 
-static int sock_write(BIO *b, const char *in, int inl)
+int sock_write(BIO *b, const char *in, int inl)
 {
     SyncSslSocket* sslSock = (SyncSslSocket*) BIO_get_app_data(b);
     //clear_socket_error();

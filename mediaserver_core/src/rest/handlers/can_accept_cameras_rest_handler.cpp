@@ -60,7 +60,7 @@ int QnCanAcceptCameraRestHandler::executePost(const QString &path, const QnReque
     // add manual cameras
     QFuture<QnResourceList> manualDiscoveryResults = QtConcurrent::mapped(manualCamList, &CheckHostAddrAsync);
     //checking cameras with unicast
-    nx::utils::concurrent::QnFuture<bool> camerasToPingResults( camerasToPing.size() );
+    nx::utils::concurrent::Future<bool> camerasToPingResults( camerasToPing.size() );
     for( size_t i = 0; i < camerasToPing.size(); ++i )
     {
         camerasToPing[i]->checkIfOnlineAsync(

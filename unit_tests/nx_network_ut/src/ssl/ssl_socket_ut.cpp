@@ -129,7 +129,7 @@ private:
 
     void onReflectorDone(
         std::list<AcceptedConnectionContext>::iterator reflectorIter,
-        SystemError::ErrorCode sysErrorCode)
+        SystemError::ErrorCode /*sysErrorCode*/)
     {
         QnMutexLocker lock(&m_mutex);
         if (!m_terminated)
