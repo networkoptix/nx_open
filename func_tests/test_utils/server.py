@@ -280,7 +280,9 @@ class Server(object):
 
     def reset_config(self, **kw):
         self.host.run_command(['cp', self._config_path_initial, self._config_path])
-        self.change_config(**kw)
+        default_config = dict(removeDbOnStartup=1)
+        config = dict(default_config, **kw)
+        self.change_config(**config)
 
     def restart(self, timeout=30):
         t = time.time()
