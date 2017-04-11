@@ -146,7 +146,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 // Test cases
 
-TEST_F(SslSocketServerSide, send_receive_data)
+TEST_F(SslSocketServerSide, DISABLED_send_receive_data)
 {
     whenSentRandomData();
     thenSameDataHasBeenReceivedInResponse();
