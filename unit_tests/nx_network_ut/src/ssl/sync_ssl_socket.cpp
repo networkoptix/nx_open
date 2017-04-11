@@ -127,8 +127,8 @@ SyncSslSocket::SyncSslSocket(
     bool isServerSide)
     :
     base_type(delegatee.get()),
-    m_delegatee(std::move(delegatee)),
     m_extraBufferLen(0),
+    m_delegatee(std::move(delegatee)),
     m_ssl(nullptr),
     m_isServerSide(isServerSide)
 {

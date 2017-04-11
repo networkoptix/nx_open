@@ -49,9 +49,9 @@ protected:
     int sendInternal(const void* buffer, unsigned int bufferLen);
 
 private:
+    std::unique_ptr<AbstractStreamSocket> m_delegatee;
     SSL* m_ssl;
     bool m_isServerSide;
-    std::unique_ptr<AbstractStreamSocket> m_delegatee;
 
     bool doServerHandshake();
     bool doClientHandshake();
