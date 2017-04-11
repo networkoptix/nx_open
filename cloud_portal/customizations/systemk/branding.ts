@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>marketing@systemk.co.jp</translation>
+      <translation>mailto:marketing@systemk.co.jp</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>{{companyUrl}}</source>
-      <translation>http://http://systemk.co.jp/</translation>
+      <translation>http://systemk.co.jp/</translation>
     </message>
     <message>
       <source>{{iOSappID}}</source>

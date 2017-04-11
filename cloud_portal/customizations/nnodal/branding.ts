@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>info@nnodal.com</translation>
+      <translation>mailto:info@nnodal.com</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>

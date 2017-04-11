@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>support@vista-cctv.com</translation>
+      <translation>mailto:support@vista-cctv.com</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
