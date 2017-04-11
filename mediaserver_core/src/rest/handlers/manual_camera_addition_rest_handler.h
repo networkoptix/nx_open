@@ -4,7 +4,7 @@
 
 #include <core/resource_management/manual_camera_searcher.h>
 #include <rest/server/json_rest_handler.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <api/model/manual_camera_data.h>
 
 class QnManualCameraAdditionRestHandler: public QnJsonRestHandler
@@ -57,5 +57,5 @@ private:
     QnMutex m_searchProcessMutex;
 
     QHash<QnUuid, QnManualCameraSearcher*> m_searchProcesses;
-    QHash<QnUuid, QnConcurrent::QnFuture<bool>> m_searchProcessRuns;
+    QHash<QnUuid, nx::utils::concurrent::QnFuture<bool>> m_searchProcessRuns;
 };

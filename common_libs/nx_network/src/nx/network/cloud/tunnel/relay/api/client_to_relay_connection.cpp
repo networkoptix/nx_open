@@ -1,7 +1,6 @@
 #include "client_to_relay_connection.h"
 
 namespace nx {
-namespace network {
 namespace cloud {
 namespace relay {
 namespace api {
@@ -70,5 +69,4 @@ void ClientToRelayConnectionImpl::stopWhileInAioThread()
 } // namespace api
 } // namespace relay
 } // namespace cloud
-} // namespace network
 } // namespace nx

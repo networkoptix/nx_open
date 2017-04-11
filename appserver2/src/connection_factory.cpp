@@ -11,7 +11,7 @@
 #include <nx/network/simple_http_client.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <network/http_connection_listener.h>
 #include <nx_ec/ec_proto_version.h>
 #include <nx_ec/data/api_access_rights_data.h>
@@ -1376,7 +1376,7 @@ int Ec2DirectConnectionFactory::establishDirectConnection(
 
         }
     }
-    QnConcurrent::run(
+    nx::utils::concurrent::run(
         Ec2ThreadPool::instance(),
         std::bind(
             &impl::ConnectHandler::done,
@@ -1433,7 +1433,7 @@ void Ec2DirectConnectionFactory::tryConnectToOldEC(const QUrl& ecUrl,
     impl::ConnectHandlerPtr handler, int reqId)
 {
     // Checking for old EC.
-    QnConcurrent::run(
+    nx::utils::concurrent::run(
         Ec2ThreadPool::instance(),
         [this, ecUrl, handler, reqId]()
     {
@@ -1617,7 +1617,7 @@ void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
     }
 
     // Checking for old EC.
-    QnConcurrent::run(
+    nx::utils::concurrent::run(
         Ec2ThreadPool::instance(),
         [this, ecUrl, handler, reqId]()
         {
@@ -1703,7 +1703,7 @@ int Ec2DirectConnectionFactory::testDirectConnection(
     const int reqId = generateRequestID();
     QnConnectionInfo connectionInfo;
     fillConnectionInfo(ApiLoginData(), &connectionInfo);
-    QnConcurrent::run(
+    nx::utils::concurrent::run(
         Ec2ThreadPool::instance(),
         std::bind(
             &impl::TestConnectionHandler::done,

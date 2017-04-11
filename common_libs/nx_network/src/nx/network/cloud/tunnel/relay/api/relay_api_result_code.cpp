@@ -3,7 +3,6 @@
 #include <nx/fusion/model_functions.h>
 
 namespace nx {
-namespace network {
 namespace cloud {
 namespace relay {
 namespace api {
@@ -29,12 +28,11 @@ hpm::api::NatTraversalResultCode toNatTraversalResultCode(
 } // namespace api
 } // namespace relay
 } // namespace cloud
-} // namespace network
 } // namespace nx
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::network::cloud::relay::api, ResultCode,
-    (nx::network::cloud::relay::api::ResultCode::ok, "ok")
-    (nx::network::cloud::relay::api::ResultCode::notFound, "notFound")
-    (nx::network::cloud::relay::api::ResultCode::timedOut, "timedOut")
-    (nx::network::cloud::relay::api::ResultCode::networkError, "networkError")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::cloud::relay::api, ResultCode,
+    (nx::cloud::relay::api::ResultCode::ok, "ok")
+    (nx::cloud::relay::api::ResultCode::notFound, "notFound")
+    (nx::cloud::relay::api::ResultCode::timedOut, "timedOut")
+    (nx::cloud::relay::api::ResultCode::networkError, "networkError")
 )

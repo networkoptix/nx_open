@@ -21,7 +21,7 @@
 #include <api/model/api_ioport_data.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/model_functions.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_data_pool.h>
@@ -1430,7 +1430,7 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
     {
         QnUuid id = res->getId();
-        QnConcurrent::run(
+        nx::utils::concurrent::run(
             QThreadPool::globalInstance(),
             [id, this]()
             {

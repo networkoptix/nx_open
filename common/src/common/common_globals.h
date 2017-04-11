@@ -8,6 +8,7 @@
 #include <QtCore/QStringList>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/fusion/serialization_format.h>
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
@@ -16,7 +17,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
     PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
-    StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType SerializationFormat PeerType StatisticsDeviceType
+    StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PeerType StatisticsDeviceType
     ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction FailoverPriority
     Permission GlobalPermission UserRole ConnectionResult
@@ -505,22 +506,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
 
-    enum SerializationFormat {
-        JsonFormat          = 0,
-        UbjsonFormat        = 1,
-        BnsFormat           = 2,
-        CsvFormat           = 3,
-        XmlFormat           = 4,
-        CompressedPeriodsFormat = 5, // used for chunks data only
-        UrlQueryFormat      = 6,     //will be added in future for parsing url query (e.g., name1=val1&name2=val2)
-
-        UnsupportedFormat   = -1
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SerializationFormat)
-
-    const char* serializationFormatToHttpContentType(SerializationFormat format);
-    SerializationFormat serializationFormatFromHttpContentType(const QByteArray& httpContentType);
-
     enum TTHeaderFlag
     {
         TT_None          = 0x0,
@@ -837,7 +822,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
         (Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
-        (Qn::SerializationFormat)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
+        (Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
         (Qn::BookmarkSortField)(Qt::SortOrder)
         (Qn::RebuildAction)(Qn::BackupAction)
         (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)

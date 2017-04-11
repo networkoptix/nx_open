@@ -5,7 +5,7 @@
 
 #include <utils/common/scoped_thread_rollback.h>
 #include <nx/fusion/model_functions.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 
 #include "ec2_thread_pool.h"
 #include "database/db_manager.h"
@@ -70,7 +70,7 @@ struct ScopeHandlerGuard
 
     ~ScopeHandlerGuard()
     {
-        QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(std::move(handler), *ecode));
+        nx::utils::concurrent::run(Ec2ThreadPool::instance(), std::bind(std::move(handler), *ecode));
     }
 };
 
@@ -322,7 +322,7 @@ public:
         QN_UNUSED(cmdCode);
 
         QnDbManagerAccess accessDataCopy(m_db);
-        QnConcurrent::run(Ec2ThreadPool::instance(),
+        nx::utils::concurrent::run(Ec2ThreadPool::instance(),
             [accessDataCopy, input, handler]() mutable
             {
                 OutputData output;
@@ -344,7 +344,7 @@ public:
         QN_UNUSED(cmdCode);
 
         QnDbManagerAccess accessDataCopy(m_db);
-        QnConcurrent::run(Ec2ThreadPool::instance(),
+        nx::utils::concurrent::run(Ec2ThreadPool::instance(),
             [accessDataCopy, input1, input2, handler]()
             {
                 OutputData output;

@@ -199,7 +199,7 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
     const int reqId = generateRequestID();
 
     messageBus->sendTransaction(transaction, peers);
-    QnConcurrent::run(Ec2ThreadPool::instance(),
+    nx::utils::concurrent::run(Ec2ThreadPool::instance(),
         [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });
 
     return reqId;
@@ -223,7 +223,7 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServersList(
     const int reqId = generateRequestID();
 
     messageBus->sendTransaction(transaction, peers);
-    QnConcurrent::run(Ec2ThreadPool::instance(),
+    nx::utils::concurrent::run(Ec2ThreadPool::instance(),
         [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });
 
     return reqId;

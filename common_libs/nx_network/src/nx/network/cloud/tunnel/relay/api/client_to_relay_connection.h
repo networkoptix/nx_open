@@ -6,7 +6,6 @@
 #include "relay_api_result_code.h"
 
 namespace nx {
-namespace network {
 namespace cloud {
 namespace relay {
 namespace api {
@@ -21,7 +20,7 @@ using OpenRelayConnectionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode, std::unique_ptr<AbstractStreamSocket>)>;
 
 class NX_NETWORK_API ClientToRelayConnection:
-    public aio::BasicPollable
+    public network::aio::BasicPollable
 {
 public:
     virtual void startSession(
@@ -82,5 +81,4 @@ private:
 } // namespace api
 } // namespace relay
 } // namespace cloud
-} // namespace network
 } // namespace nx

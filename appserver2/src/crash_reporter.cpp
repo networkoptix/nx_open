@@ -169,8 +169,8 @@ void CrashReporter::scanAndReportAsync(QSettings* settings)
     }
 
     NX_LOGX(lit("Start new async report"), cl_logINFO);
-    m_activeCollection = QnConcurrent::run(Ec2ThreadPool::instance(), [=](){
-        // \class QnConcurrent posts a job to \class Ec2ThreadPool rather than create new
+    m_activeCollection = nx::utils::concurrent::run(Ec2ThreadPool::instance(), [=](){
+        // \class nx::utils::concurrent posts a job to \class Ec2ThreadPool rather than create new
         // real thread, we need to reverve a thread to avoid possible deadlock
         QnScopedThreadRollback reservedThread( 1, Ec2ThreadPool::instance() );
         return scanAndReport(settings);

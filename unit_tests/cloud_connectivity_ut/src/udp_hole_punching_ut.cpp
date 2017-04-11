@@ -99,8 +99,8 @@ NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE_EX(
 TEST_F(UdpHolePunching, TransferSyncSsl)
 {
     network::test::socketTransferSync(
-        [&]() { return std::make_unique<SslServerSocket>(cloudServerSocket().release(), false); },
-        []() { return std::make_unique<SslSocket>(new CloudStreamSocket(AF_INET), false); },
+        [&]() { return std::make_unique<deprecated::SslServerSocket>(cloudServerSocket().release(), false); },
+        []() { return std::make_unique<deprecated::SslSocket>(new CloudStreamSocket(AF_INET), false); },
         SocketAddress(m_server->fullName()));
 }
 

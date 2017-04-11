@@ -14,7 +14,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <api/app_server_connection.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/common/scoped_thread_rollback.h>
 #include <nx/network/http/asynchttpclient.h>

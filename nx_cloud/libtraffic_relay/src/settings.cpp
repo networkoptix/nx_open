@@ -12,10 +12,48 @@ namespace relay {
 namespace conf {
 
 namespace {
+
 const QLatin1String kDataDir("dataDir");
+
+//-------------------------------------------------------------------------------------------------
+// Http
+
+const QLatin1String kHttpEndpointsToListen("listenOn");
+const QLatin1String kDefaultHttpEndpointsToListen("0.0.0.0:3349");
+
+const QLatin1String kHttpTcpBacklogSize("http/tcpBacklogSize");
+constexpr int kDefaultHttpTcpBacklogSize = 4096;
+
+//-------------------------------------------------------------------------------------------------
+// ListeningPeer
+
+const QLatin1String kRecommendedPreemptiveConnectionCount(
+    "listeningPeer/recommendedPreemptiveConnectionCount");
+constexpr int kDefaultRecommendedPreemptiveConnectionCount = 7;
+
+const QLatin1String kMaxPreemptiveConnectionCount(
+    "listeningPeer/maxPreemptiveConnectionCount");
+constexpr int kDefaultMaxPreemptiveConnectionCount = 
+    kDefaultRecommendedPreemptiveConnectionCount * 2;
+
 } // namespace
 
 static const QString kModuleName = lit("traffic_relay");
+
+Http::Http():
+    tcpBacklogSize(kDefaultHttpTcpBacklogSize)
+{
+    endpointsToListen.push_back(SocketAddress(kDefaultHttpEndpointsToListen));
+}
+
+ListeningPeer::ListeningPeer():
+    recommendedPreemptiveConnectionCount(kDefaultRecommendedPreemptiveConnectionCount),
+    maxPreemptiveConnectionCount(kDefaultMaxPreemptiveConnectionCount)
+{
+}
+
+//-------------------------------------------------------------------------------------------------
+// Settings
 
 Settings::Settings():
     m_settings(
@@ -36,7 +74,7 @@ void Settings::load(int argc, char **argv)
     m_commandLineParser.parse(argc, (const char**) argv, stderr);
     m_settings.parseArgs(argc, (const char**) argv);
 
-    m_logging.load(m_settings, QLatin1String("log"));
+    loadSettings();
 }
 
 void Settings::printCmdLineArgsHelp()
@@ -65,6 +103,53 @@ QString Settings::dataDir() const
 const utils::log::Settings& Settings::logging() const
 {
     return m_logging;
+}
+
+const ListeningPeer& Settings::listeningPeer() const
+{
+    return m_listeningPeer;
+}
+
+const Http& Settings::http() const
+{
+    return m_http;
+}
+
+void Settings::loadSettings()
+{
+    m_logging.load(m_settings, QLatin1String("log"));
+    loadHttp();
+    loadListeningPeer();
+}
+
+void Settings::loadHttp()
+{
+    const QStringList& httpAddrToListenStrList = m_settings.value(
+        kHttpEndpointsToListen,
+        kDefaultHttpEndpointsToListen).toString().split(',');
+    if (!httpAddrToListenStrList.isEmpty())
+    {
+        m_http.endpointsToListen.clear();
+        std::transform(
+            httpAddrToListenStrList.begin(),
+            httpAddrToListenStrList.end(),
+            std::back_inserter(m_http.endpointsToListen),
+            [](const QString& str) { return SocketAddress(str); });
+    }
+
+    m_http.tcpBacklogSize = m_settings.value(
+        kHttpTcpBacklogSize, kDefaultHttpTcpBacklogSize).toInt();
+}
+
+void Settings::loadListeningPeer()
+{
+    m_listeningPeer.recommendedPreemptiveConnectionCount = m_settings.value(
+        kRecommendedPreemptiveConnectionCount,
+        kDefaultRecommendedPreemptiveConnectionCount).toInt();
+
+    m_listeningPeer.maxPreemptiveConnectionCount = m_settings.value(
+        kMaxPreemptiveConnectionCount,
+        kDefaultMaxPreemptiveConnectionCount).toInt();
 }
 
 } // namespace conf

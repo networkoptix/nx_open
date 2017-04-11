@@ -10,7 +10,7 @@ namespace relay {
 OutgoingTunnelConnection::OutgoingTunnelConnection(
     SocketAddress relayEndpoint,
     nx::String relaySessionId,
-    std::unique_ptr<api::ClientToRelayConnection> clientToRelayConnection)
+    std::unique_ptr<nx::cloud::relay::api::ClientToRelayConnection> clientToRelayConnection)
     :
     m_relayEndpoint(std::move(relayEndpoint)),
     m_relaySessionId(std::move(relaySessionId)),
@@ -72,7 +72,7 @@ void OutgoingTunnelConnection::establishNewConnection(
             auto relayClient =
                 m_controlConnection
                 ? std::move(m_controlConnection)
-                : api::ClientToRelayConnectionFactory::create(m_relayEndpoint);
+                : nx::cloud::relay::api::ClientToRelayConnectionFactory::create(m_relayEndpoint);
             relayClient->bindToAioThread(getAioThread());
             relayClient->openConnectionToTheTargetHost(
                 m_relaySessionId,
@@ -84,7 +84,7 @@ void OutgoingTunnelConnection::establishNewConnection(
                 m_activeRequests.back()->timer.start(
                     timeout,
                     std::bind(&OutgoingTunnelConnection::onConnectionOpened, this,
-                        api::ResultCode::timedOut, nullptr, requestIter));
+                        nx::cloud::relay::api::ResultCode::timedOut, nullptr, requestIter));
             }
 
             m_activeRequests.back()->relayClient = std::move(relayClient);
@@ -97,17 +97,18 @@ void OutgoingTunnelConnection::setControlConnectionClosedHandler(
     m_tunnelClosedHandler = std::move(handler);
 }
 
-static SystemError::ErrorCode toSystemError(api::ResultCode resultCode)
+static SystemError::ErrorCode toSystemError(
+    nx::cloud::relay::api::ResultCode resultCode)
 {
     switch (resultCode)
     {
-        case api::ResultCode::ok:
+        case nx::cloud::relay::api::ResultCode::ok:
             return SystemError::noError;
 
-        case api::ResultCode::timedOut:
+        case nx::cloud::relay::api::ResultCode::timedOut:
             return SystemError::timedOut;
 
-        case api::ResultCode::notFound:
+        case nx::cloud::relay::api::ResultCode::notFound:
             return SystemError::hostNotFound;
 
         default:
@@ -136,7 +137,7 @@ void OutgoingTunnelConnection::stopInactivityTimer()
 }
 
 void OutgoingTunnelConnection::onConnectionOpened(
-    api::ResultCode resultCode,
+    nx::cloud::relay::api::ResultCode resultCode,
     std::unique_ptr<AbstractStreamSocket> connection,
     std::list<std::unique_ptr<RequestContext>>::iterator requestIter)
 {
@@ -158,11 +159,11 @@ void OutgoingTunnelConnection::onConnectionOpened(
     completionHandler(
         errorCodeToReport,
         std::move(connection),
-        resultCode == api::ResultCode::ok);
+        resultCode == nx::cloud::relay::api::ResultCode::ok);
     if (watcher.objectDestroyed())
         return;
 
-    if (resultCode != api::ResultCode::ok)
+    if (resultCode != nx::cloud::relay::api::ResultCode::ok)
         return reportTunnelClosure(errorCodeToReport);
 
     if (m_activeRequests.empty())

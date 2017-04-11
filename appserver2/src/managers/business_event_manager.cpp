@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 
 #include "ec2_thread_pool.h"
 #include "fixed_url_client_query_processor.h"
@@ -82,7 +82,7 @@ int QnBusinessEventManager<T>::broadcastBusinessAction( const QnAbstractBusiness
     const int reqID = generateRequestID();
     auto tran = prepareTransaction( ApiCommand::broadcastAction, businessAction );
     m_messageBus->sendTransaction(tran);
-    QnConcurrent::run(
+    nx::utils::concurrent::run(
         Ec2ThreadPool::instance(),
         std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
     return reqID;
@@ -94,7 +94,7 @@ int QnBusinessEventManager<T>::sendBusinessAction( const QnAbstractBusinessActio
     const int reqID = generateRequestID();
     auto tran = prepareTransaction( ApiCommand::execAction, businessAction );
     m_messageBus->sendTransaction(tran, dstPeer);
-    QnConcurrent::run(
+    nx::utils::concurrent::run(
         Ec2ThreadPool::instance(),
         std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
     return reqID;

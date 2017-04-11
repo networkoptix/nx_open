@@ -12,7 +12,7 @@
 
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 #include <nx/utils/timer_manager.h>
@@ -136,7 +136,7 @@ void QnPlAreconVisionResource::setHostAddress(const QString& hostAddr)
 
 bool QnPlAreconVisionResource::ping()
 {
-    QnConcurrent::QnFuture<bool> result(1);
+    nx::utils::concurrent::QnFuture<bool> result(1);
     checkIfOnlineAsync(
         [&result]( bool onlineOrNot ) {
             result.setResultAt(0, onlineOrNot);
