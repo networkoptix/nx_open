@@ -6,14 +6,13 @@
 
 #include <nx/utils/log/assert.h>
 
-QnLayoutTourManager::QnLayoutTourManager(QObject* parent)
+QnLayoutTourManager::QnLayoutTourManager(QObject* parent):
+    base_type(parent)
 {
-
 }
 
 QnLayoutTourManager::~QnLayoutTourManager()
 {
-
 }
 
 const ec2::ApiLayoutTourDataList& QnLayoutTourManager::tours() const

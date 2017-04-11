@@ -48,7 +48,7 @@ void LayoutTourController::startTour(const ec2::ApiLayoutTourData& tour)
     if (!tour.isValid())
         return;
 
-    const auto items = QnLayoutTourItem::createList(tour.items, qnResPool);
+    const auto items = QnLayoutTourItem::createList(tour.items, resourcePool());
     if (items.empty())
         return;
 
@@ -91,7 +91,7 @@ void LayoutTourController::updateTour(const ec2::ApiLayoutTourData& tour)
         return;
 
     NX_EXPECT(tour.isValid());
-    m_tour.items = QnLayoutTourItem::createList(tour.items, qnResPool);
+    m_tour.items = QnLayoutTourItem::createList(tour.items, resourcePool());
     if (m_tour.items.empty())
         stopCurrentTour();
     else if (m_tour.currentIndex >= tour.items.size())

@@ -122,7 +122,6 @@ protected slots:
     void submitDelayedDrops();
     void submitInstantDrop();
 
-    protected slots:
     void at_context_userChanged(const QnUserResourcePtr &user);
 
     void at_workbench_cellSpacingChanged();

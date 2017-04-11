@@ -1978,21 +1978,18 @@ void ActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
     }
 }
 
-void ActionHandler::at_whatsThisAction_triggered() {
+void ActionHandler::at_whatsThisAction_triggered()
+{
     if (QWhatsThis::inWhatsThisMode())
         QWhatsThis::leaveWhatsThisMode();
     else
         QWhatsThis::enterWhatsThisMode();
 }
 
-void ActionHandler::at_escapeHotkeyAction_triggered() {
-    if (QWhatsThis::inWhatsThisMode()) {
+void ActionHandler::at_escapeHotkeyAction_triggered()
+{
+    if (QWhatsThis::inWhatsThisMode())
         QWhatsThis::leaveWhatsThisMode();
-        return;
-    }
-
-    if (action(QnActions::ToggleTourModeAction)->isChecked())
-        menu()->trigger(QnActions::ToggleTourModeAction);
 }
 
 void ActionHandler::at_browseUrlAction_triggered() {
