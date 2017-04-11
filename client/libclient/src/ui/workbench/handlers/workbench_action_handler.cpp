@@ -207,10 +207,8 @@ using utils::UnityLauncherWorkaround;
 ActionHandler::ActionHandler(QObject *parent) :
     QObject(parent),
     QnWorkbenchContextAware(parent),
-    m_delayedDropGuard(false),
-    m_tourTimer(new QTimer(this))
+    m_delayedDropGuard(false)
 {
-    connect(m_tourTimer, SIGNAL(timeout()), this, SLOT(at_tourTimer_timeout()));
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &ActionHandler::at_context_userChanged);
 
@@ -337,7 +335,7 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(QnActions::SelectTimeServerAction), SIGNAL(triggered()), this, SLOT(at_selectTimeServerAction_triggered()));
 
     connect(action(QnActions::TogglePanicModeAction), SIGNAL(toggled(bool)), this, SLOT(at_togglePanicModeAction_toggled(bool)));
-    connect(action(QnActions::ToggleTourModeAction), SIGNAL(toggled(bool)), this, SLOT(at_toggleTourAction_toggled(bool)));
+
     //connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(), SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
 
@@ -1925,44 +1923,6 @@ void ActionHandler::at_togglePanicModeAction_toggled(bool checked) {
             propertyDictionary()->saveParamsAsync(resource->getId());
         }
     }
-}
-
-void ActionHandler::at_toggleTourAction_toggled(bool checked) {
-    if (!checked) {
-        m_tourTimer->stop();
-        context()->workbench()->setItem(Qn::ZoomedRole, NULL);
-    }
-    else {
-        m_tourTimer->start(qnSettings->tourCycleTime());
-        at_tourTimer_timeout();
-    }
-}
-
-struct ItemPositionCmp {
-    bool operator()(QnWorkbenchItem *l, QnWorkbenchItem *r) const {
-        QRect lg = l->geometry();
-        QRect rg = r->geometry();
-        return lg.y() < rg.y() || (lg.y() == rg.y() && lg.x() < rg.x());
-    }
-};
-
-void ActionHandler::at_tourTimer_timeout() {
-    QList<QnWorkbenchItem *> items = context()->workbench()->currentLayout()->items().toList();
-    std::sort(items.begin(), items.end(), ItemPositionCmp());
-
-    if (items.empty()) {
-        action(QnActions::ToggleTourModeAction)->setChecked(false);
-        return;
-    }
-
-    QnWorkbenchItem *item = context()->workbench()->item(Qn::ZoomedRole);
-    if (item) {
-        item = items[(items.indexOf(item) + 1) % items.size()];
-    }
-    else {
-        item = items[0];
-    }
-    context()->workbench()->setItem(Qn::ZoomedRole, item);
 }
 
 void ActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {

@@ -44,7 +44,7 @@ public:
     void stopCurrentTour();
 
     /** Start/stop tour over the current layout. */
-    void toggleLayoutTour(bool started);
+    void toggleLayoutTour(bool start);
 
     QnUuid runningTour() const;
 
@@ -59,6 +59,8 @@ private:
 
     void setHintVisible(bool visible);
 
+    void startTimer();
+    void stopTimer();
 private:
     enum class Mode
     {
