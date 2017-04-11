@@ -11,8 +11,10 @@ nx_configure_file(
     ${CMAKE_CURRENT_BINARY_DIR})
 
 file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
-nx_copy_if_different(${NX_SDK_PACKAGE} "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
-nx_copy_if_different(${NX_STORAGE_SDK_PACKAGE} "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
+nx_copy(IF_NEWER "${NX_SDK_PACKAGE}"
+    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
+nx_copy(IF_NEWER "${NX_STORAGE_SDK_PACKAGE}"
+    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
 
 execute_process(
     COMMAND
@@ -21,8 +23,8 @@ execute_process(
         -vms-path "${PROJECT_SOURCE_DIR}"
         -template-xml "${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml"
         -output-xml "${CMAKE_CURRENT_BINARY_DIR}/api.xml")
-nx_copy_if_different(${CMAKE_CURRENT_BINARY_DIR}/api.xml
-    ${CMAKE_CURRENT_BINARY_DIR}/resources/static)
+nx_copy(IF_DIFFERENT "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
+    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
 
 nx_add_target(mediaserver_core LIBRARY
     ADDITIONAL_SOURCES

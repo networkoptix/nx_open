@@ -66,6 +66,7 @@ function(_rdep_try_package package)
         endif()
 
         _rdep_load_package_from_dir("${package_dir}")
+        nx_copy_package("${package_dir}")
 
         if(RDEP_PATH_VARIABLE)
             set(${RDEP_PATH_VARIABLE} "${package_dir}" PARENT_SCOPE)
