@@ -61,6 +61,8 @@ private:
 
     void startTimer();
     void stopTimer();
+    void startTourInternal();
+
 private:
     enum class Mode
     {
@@ -73,10 +75,13 @@ private:
 
     struct
     {
+        // Section for layout tour only
         QnUuid id;
         QnLayoutTourItemList items;
-        int timerId = 0;
-        int currentIndex = 0;
+        int currentIndex{0};
+
+        // Common section
+        int timerId{0};
         QElapsedTimer elapsed;
     } m_tour;
 

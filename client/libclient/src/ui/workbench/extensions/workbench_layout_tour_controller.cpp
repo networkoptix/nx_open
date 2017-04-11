@@ -20,11 +20,9 @@
 
 #include <utils/math/math.h>
 
-
 namespace {
 
 static const int kTimerPrecisionMs = 500;
-
 
 } // namespace
 
@@ -59,27 +57,13 @@ void LayoutTourController::startTour(const ec2::ApiLayoutTourData& tour)
     m_mode = Mode::MultipleLayouts;
     m_tour.id = tour.id;
     m_tour.items = std::move(items);
+    m_tour.currentIndex = -1;
     clearWorkbenchState();
 
-    QnWorkbenchLayout* firstLayout = nullptr;
-    for (const auto& item: m_tour.items)
-    {
-        auto layout = QnWorkbenchLayout::instance(item.layout);
-        if (!layout)
-        {
-            layout = qnWorkbenchLayoutsFactory->create(item.layout, workbench());
-            workbench()->addLayout(layout);
-        }
-        if (!firstLayout)
-            firstLayout = layout;
-    }
-    startTimer();
-    workbench()->setCurrentLayout(firstLayout);
-    NX_EXPECT(m_tour.currentIndex == 0);
+    startTourInternal();
 
     //action(QnActions::EffectiveMaximizeAction)->setChecked(false);
     menu()->trigger(QnActions::FreespaceAction);
-    setHintVisible(true);
 }
 
 void LayoutTourController::updateTour(const ec2::ApiLayoutTourData& tour)
@@ -113,11 +97,8 @@ void LayoutTourController::toggleLayoutTour(bool start)
     if (start)
     {
         m_mode = Mode::SingleLayout;
-        startTimer();
-        setHintVisible(true);
-        processTourStep();
+        startTourInternal();
     }
-
 }
 
 QnUuid LayoutTourController::runningTour() const
@@ -155,6 +136,7 @@ void LayoutTourController::stopCurrentTour()
             m_tour.items.clear();
 
             restoreWorkbenchState();
+            menu()->trigger(QnActions::FreespaceAction);
             break;
         }
 
@@ -203,22 +185,25 @@ void LayoutTourController::processTourStep()
         case Mode::MultipleLayouts:
         {
             NX_EXPECT(!m_tour.id.isNull());
-            NX_EXPECT(m_tour.items.size() > 0);
-            const bool hasItem = qBetween(0, m_tour.currentIndex, (int)m_tour.items.size());
-            NX_EXPECT(hasItem);
-            if (!hasItem)
+            const bool hasItems = m_tour.items.size() > 0;
+            NX_EXPECT(hasItems);
+            if (!hasItems)
             {
                 stopCurrentTour();
                 return;
             }
 
-            // No need to switch the only item.
-            if (m_tour.items.size() < 2)
-                return;
+            const bool isRunning = qBetween(0, m_tour.currentIndex, (int) m_tour.items.size());
+            if (isRunning)
+            {
+                // No need to switch the only item.
+                if (m_tour.items.size() < 2)
+                    return;
 
-            const auto& item = m_tour.items[m_tour.currentIndex];
-            if (!m_tour.elapsed.hasExpired(item.delayMs))
-                return;
+                const auto& item = m_tour.items[m_tour.currentIndex];
+                if (!m_tour.elapsed.hasExpired(item.delayMs))
+                    return;
+            }
 
             m_tour.currentIndex = (m_tour.currentIndex + 1) % m_tour.items.size();
             const auto& next = m_tour.items[m_tour.currentIndex];
@@ -295,6 +280,13 @@ void LayoutTourController::stopTimer()
     m_tour.timerId = 0;
     NX_EXPECT(m_tour.elapsed.isValid());
     m_tour.elapsed.invalidate();
+}
+
+void LayoutTourController::startTourInternal()
+{
+    setHintVisible(true);
+    startTimer();
+    processTourStep();
 }
 
 } // namespace workbench
