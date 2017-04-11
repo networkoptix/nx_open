@@ -47,8 +47,8 @@ private:
     nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_onStartedEventHandler;
     std::atomic<AbstractECConnection*> m_ecConnection;
     QnSimpleHttpConnectionListener* m_tcpListener;
-    QnWaitCondition m_cond;
     mutable QnMutex m_mutex;
+    QEventLoop m_eventLoop;
 };
 
 
