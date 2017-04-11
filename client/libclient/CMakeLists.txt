@@ -49,3 +49,8 @@ target_include_directories(libclient
 if(LINUX)
     target_link_libraries(libclient PRIVATE Qt5::X11Extras Xss Xfixes X11)
 endif()
+
+if(WIN32)
+    nx_rdep_add_package(directx)
+    target_link_libraries(libclient PRIVATE d3d9 Winmm)
+endif()

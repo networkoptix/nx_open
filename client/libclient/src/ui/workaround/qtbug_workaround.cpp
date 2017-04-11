@@ -4,6 +4,7 @@
 #include <QtGui/QWindow>
 
 #include <nx/utils/app_info.h>
+#include <utils/common/delayed.h>
 
 #ifdef Q_OS_WIN
 #   include <Windows.h>
@@ -90,17 +91,26 @@ QnQtbugWorkaround::QnQtbugWorkaround(QObject *parent):
     {
         // Workaround of QTBUG-34767
         QObject::connect(qApp, &QGuiApplication::focusWindowChanged, qApp,
+             []()
+             {
+                 const auto modalWindow = qApp->modalWindow();
+                 if (modalWindow && !qApp->focusWindow())
+                     modalWindow->requestActivate();
+             });
+
+        QObject::connect(qApp, &QGuiApplication::applicationStateChanged, qApp,
             []()
             {
-                const auto modalWindow = qApp->modalWindow();
-                if (!modalWindow)
-                    return;
+                const auto raiseModelWindow =
+                    []()
+                    {
+                        const auto modalWindow = qApp->modalWindow();
+                        if (modalWindow && qApp->applicationState() == Qt::ApplicationActive)
+                            modalWindow->raise();
+                    };
 
-                const auto focusedWindow = qApp->focusWindow();
-                if (!focusedWindow || focusedWindow == modalWindow)
-                    return;
-
-                modalWindow->requestActivate();
+                static constexpr int kRaiseDelay = 1000;
+                executeDelayed(raiseModelWindow, kRaiseDelay);
             });
     }
 
