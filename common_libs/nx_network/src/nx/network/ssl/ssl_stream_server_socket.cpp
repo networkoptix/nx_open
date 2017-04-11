@@ -30,6 +30,14 @@ void StreamServerSocket::onAcceptCompletion(
     SystemError::ErrorCode sysErrorCode,
     AbstractStreamSocket* streamSocket)
 {
+    if (streamSocket)
+    {
+        streamSocket = new StreamSocket(
+            std::unique_ptr<AbstractStreamSocket>(streamSocket),
+            true,
+            m_encryptionUse);
+    }
+
     handler(sysErrorCode, streamSocket);
 }
 
