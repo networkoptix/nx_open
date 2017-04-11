@@ -16,6 +16,7 @@
 #include <utils/common/synctime.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/datetime.h>
 
 namespace {
     /** Fake handle for simultaneous load request. Initial value is big enough to not conflict with real request handles. */
