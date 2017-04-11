@@ -2479,10 +2479,6 @@ void MediaServerProcess::run()
 
     QnResource::startCommandProc();
 
-    std::unique_ptr<QnRestProcessorPool> restProcessorPool( new QnRestProcessorPool() );
-
-    if(appServerUrl.scheme().toLower() == lit("file") )
-        ec2ConnectionFactory->registerRestHandlers( restProcessorPool.get() );
 
     std::unique_ptr<StreamingChunkTranscoder> streamingChunkTranscoder(
         new StreamingChunkTranscoder(
@@ -2496,6 +2492,9 @@ void MediaServerProcess::run()
         QCoreApplication::quit();
         return;
     }
+
+    if (appServerUrl.scheme().toLower() == lit("file"))
+        ec2ConnectionFactory->registerRestHandlers(m_universalTcpListener->processorPool());
 
     std::unique_ptr<QnMulticast::HttpServer> multicastHttp(new QnMulticast::HttpServer(commonModule()->moduleGUID().toQUuid(), m_universalTcpListener));
 
@@ -2901,8 +2900,6 @@ void MediaServerProcess::run()
     streamingChunkTranscoder.reset();
 
     recordingManager.reset();
-
-    restProcessorPool.reset();
 
     mserverResourceSearcher.reset();
 
