@@ -120,7 +120,7 @@ private:
             return reportDone(sysErrorCode);
         }
 
-        NX_ASSERT(bytesSent == m_sendQueue.front().size());
+        NX_ASSERT(bytesSent == (std::size_t)m_sendQueue.front().size());
 
         m_sendQueue.pop_front();
         if (!m_sendQueue.empty())
