@@ -45,7 +45,9 @@
                 </file>
             </activation>
             <modules>
+            <!-- Temporary disable until it will be really needed
                 <module>activex_client</module>
+              -->
             </modules>
         </profile>
     </profiles>
