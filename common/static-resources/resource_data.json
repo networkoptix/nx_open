@@ -224,8 +224,7 @@
         },
         {
             "keys":[
-                "Axis|P7216*",
-                "Axis|AXISP7216*"
+                "Axis|P7216*"
             ],
             "ignoreONVIF": true
         },
@@ -798,8 +797,10 @@
                 "Honeywell|H4D3S2",
                 "Honeywell|H4D5S2",
                 "Honeywell|HDZ302LIW",
-
-                "Dahua|DH-SD6AL240-HNI"
+                "Dahua|DH-SD6AL240-HNI",
+                "Dahua|RPZ-230F-HNI",
+                "Dahua|DH-SD6AL230F-HNI",
+                "General|RPZ-230F-HNI"
             ],
             "preferredAuthScheme": "Automatic"
         },

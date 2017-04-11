@@ -605,7 +605,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>About...</source>
-        <translation>Nx Witnessについて...</translation>
+        <translation>について...</translation>
     </message>
     <message>
         <source>Exit</source>

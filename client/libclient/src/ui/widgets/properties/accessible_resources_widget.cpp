@@ -29,6 +29,7 @@
 #include <utils/common/event_processors.h>
 
 #include <nx/utils/string.h>
+#include <nx/utils/app_info.h>
 
 namespace {
 
@@ -125,6 +126,23 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
         {
             return qnSkin->maximumSize(option.icon);
         });
+
+    if (nx::utils::AppInfo::isLinux() || nx::utils::AppInfo::isMacOsX())
+    {
+        /**
+          * Workaround for incorrect selection behaviour on MacOS. For some reason QTreeview
+          * assumes that column 0 and 2 are selected, but column 1 is not.
+          */
+        indirectAccessDelegate->setCustomInitStyleOption(
+            [this](QStyleOptionViewItem* option, const QModelIndex& index)
+            {
+                const auto selectionModel = ui->resourcesTreeView->selectionModel();
+                const auto nameIndex = index.sibling(index.row(),
+                    QnAccessibleResourcesModel::NameColumn);
+                if (selectionModel->isSelected(nameIndex))
+                    option->state |= QStyle::State_Selected;
+            });
+    }
 
     indirectAccessDelegate->setCustomPaint(
         [](QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index)
@@ -316,6 +334,7 @@ void QnAccessibleResourcesWidget::initControlsModel()
             m_controlsModel->index(0, QnResourceListModel::CheckColumn);
 
         bool checked = checkedIdx.data(Qt::CheckStateRole).toInt() == Qt::Checked;
+        ui->resourcesTreeView->selectionModel()->reset();
         ui->resourcesTreeView->setEnabled(!checked);
         ui->filter->setEnabled(!checked);
         emit controlsChanged(checked);

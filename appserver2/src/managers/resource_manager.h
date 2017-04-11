@@ -50,8 +50,12 @@ namespace ec2
             }
         }
 
-        void triggerNotification( const QnTransaction<ApiIdData>& tran, NotificationSource /*source*/) {
-            emit resourceRemoved( tran.params.id );
+        void triggerNotification( const QnTransaction<ApiIdData>& tran, NotificationSource /*source*/)
+        {
+            if (tran.command == ApiCommand::removeResourceStatus)
+                emit resourceStatusRemoved(tran.params.id);
+            else
+                emit resourceRemoved(tran.params.id);
         }
 
         void triggerNotification( const QnTransaction<ApiIdDataList>& tran, NotificationSource /*source*/) {

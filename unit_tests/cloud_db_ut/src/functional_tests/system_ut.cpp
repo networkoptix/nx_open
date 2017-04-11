@@ -14,6 +14,9 @@
 #include <nx/utils/string.h>
 #include <nx/utils/time.h>
 #include <nx/utils/test_support/utils.h>
+#include <nx/utils/thread/sync_queue.h>
+
+#include <dao/rdb/system_data_object.h>
 
 #include "test_setup.h"
 
@@ -30,15 +33,20 @@ public:
     {
         CdbFunctionalTest::SetUp();
         ASSERT_TRUE(startAndWaitUntilStarted());
+    
+        auto owner = addActivatedAccount2();
+        m_registeredAccounts.emplace(owner.email, owner);
+    }
+
+    AccountWithPassword owner()
+    {
+        return m_registeredAccounts.begin()->second;
     }
 
 protected:
     api::SystemData givenSystem()
     {
-        auto owner = addActivatedAccount2();
-        m_registeredAccounts.emplace(owner.email, owner);
-        auto system = addRandomSystemToAccount(owner);
-        return system;
+        return addRandomSystemToAccount(owner());
     }
 
     AccountWithPassword givenUserOfSystem(const api::SystemData& system)
@@ -61,6 +69,11 @@ protected:
         const api::AccountData& user)
     {
         updateSharing(system, user, makeField(&api::SystemSharing::isEnabled, true));
+    }
+
+    void whenCdbIsRestarted()
+    {
+        ASSERT_TRUE(restart());
     }
 
     void assertUserCannotSeeSystem(
@@ -413,79 +426,200 @@ TEST_F(FtSystemGetFilter, filter_by_customization)
     thenSystemsOfRequestedCustomizationHaveBeenReturned();
 }
 
-TEST_F(FtSystem, activation)
+//-------------------------------------------------------------------------------------------------
+// FtSystemActivation
+
+class TestSystemDataObject:
+    public dao::rdb::SystemDataObject
 {
-    api::AccountData account1;
-    std::string account1Password;
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        addActivatedAccount(&account1, &account1Password));
+    using base_type = dao::rdb::SystemDataObject;
 
-    for (int i = 0; i < 1; ++i)
+public:
+    TestSystemDataObject(const conf::Settings& settings):
+        base_type(settings),
+        m_failEveryActivateSystemRequest(false)
     {
-        //adding system1 to account1
-        api::SystemData system1;
-        ASSERT_EQ(
-            api::ResultCode::ok,
-            bindRandomNotActivatedSystem(account1.email, account1Password, &system1));
-
-        //checking account1 system list
-        {
-            std::vector<api::SystemDataEx> systems;
-            ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_EQ(systems.size(), 0U);   //only activated systems are provided
-            //ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
-            //ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
-            //ASSERT_EQ(api::SystemStatus::ssNotActivated, systems[0].status);
-        }
-
-        if (i == 0)
-        {
-            api::NonceData nonceData;
-            auto resultCode = getCdbNonce(
-                system1.id,
-                system1.authKey,
-                &nonceData);
-            ASSERT_EQ(api::ResultCode::ok, resultCode);
-        }
-        //else if (i == 1)
-        //{
-        //    //activating with ping
-        //    api::NonceData nonceData;
-        //    auto resultCode = ping(
-        //        system1.id,
-        //        system1.authKey);
-        //    ASSERT_EQ(api::ResultCode::ok, resultCode);
-        //}
-        system1.status = api::SystemStatus::ssActivated;
-
-        //checking account1 system list
-        {
-            std::vector<api::SystemDataEx> systems;
-            ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_EQ(systems.size(), 1U);
-            ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
-            ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
-            ASSERT_EQ(api::SystemStatus::ssActivated, systems[0].status);
-        }
-
-        ASSERT_TRUE(restart());
-
-        //checking account1 system list
-        {
-            std::vector<api::SystemDataEx> systems;
-            ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_EQ(systems.size(), 1U);
-            ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
-            ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
-            ASSERT_EQ(api::SystemStatus::ssActivated, systems[0].status);
-        }
-
-        ASSERT_EQ(
-            api::ResultCode::ok,
-            unbindSystem(account1.email, account1Password, system1.id));
     }
+
+    virtual nx::db::DBResult activateSystem(
+        nx::db::QueryContext* const queryContext,
+        const std::string& systemId) override
+    {
+        nx::db::DBResult result = nx::db::DBResult::ok;
+        if (m_failEveryActivateSystemRequest)
+            result = nx::db::DBResult::ioError;
+        else
+            result = base_type::activateSystem(queryContext, systemId);
+        if (m_onActivateSystemDone)
+            m_onActivateSystemDone(result);
+        return result;
+    }
+
+    void failEveryActivateSystemRequest()
+    {
+        m_failEveryActivateSystemRequest = true;
+    }
+
+    void switchToNormalState()
+    {
+        m_failEveryActivateSystemRequest = false;
+    }
+
+    void setOnActivateSystemDone(nx::utils::MoveOnlyFunc<void(nx::db::DBResult)> handler)
+    {
+        m_onActivateSystemDone = std::move(handler);
+    }
+
+private:
+    bool m_failEveryActivateSystemRequest;
+    nx::utils::MoveOnlyFunc<void(nx::db::DBResult)> m_onActivateSystemDone;
+};
+
+class FtSystemActivation:
+    public FtSystem
+{
+public:
+    FtSystemActivation():
+        m_systemDao(nullptr)
+    {
+        using namespace std::placeholders;
+
+        m_systemDaoFactoryBak = dao::SystemDataObjectFactory::setCustomFactoryFunc(
+            std::bind(&FtSystemActivation::createSystemDao, this, _1));
+    }
+
+    ~FtSystemActivation()
+    {
+        dao::SystemDataObjectFactory::setCustomFactoryFunc(std::move(m_systemDaoFactoryBak));
+    }
+
+protected:
+    void givenNotActivatedSystem()
+    {
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            bindRandomNotActivatedSystem(owner().email, owner().password, &m_system));
+    }
+
+    void givenActivatedSystem()
+    {
+        givenNotActivatedSystem();
+        whenIssuedRequestUsingSystemCredentials();
+    }
+
+    void whenIssuedRequestUsingSystemCredentials()
+    {
+        api::NonceData nonceData;
+        auto resultCode = getCdbNonce(
+            m_system.id,
+            m_system.authKey,
+            &nonceData);
+        ASSERT_EQ(api::ResultCode::ok, resultCode);
+    }
+
+    void assertGetSystemsReturnedEmptyList()
+    {
+        std::vector<api::SystemDataEx> systems;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystems(owner().email, owner().password, &systems));
+        ASSERT_TRUE(systems.empty());
+    }
+
+    void assertActivatedSystemPresentInGetSystemsResponse()
+    {
+        std::vector<api::SystemDataEx> systems;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystems(owner().email, owner().password, &systems));
+        ASSERT_EQ(1U, systems.size());
+
+        m_system.status = api::SystemStatus::ssActivated;
+        ASSERT_TRUE(std::find(systems.begin(), systems.end(), m_system) != systems.end());
+        ASSERT_EQ(api::SystemStatus::ssActivated, systems[0].status);
+
+        ASSERT_EQ(owner().email, systems[0].ownerAccountEmail);
+    }
+
+    void assertDaoHasFailedActivateSystemRequest()
+    {
+        ASSERT_NE(nx::db::DBResult::ok, m_activateSystemResults.pop());
+    }
+
+    void assertSystemActivationHasBeenSavedToDb()
+    {
+        ASSERT_EQ(nx::db::DBResult::ok, m_activateSystemResults.pop());
+    }
+
+    TestSystemDataObject& systemDao()
+    {
+        return *m_systemDao;
+    }
+
+private:
+    api::SystemData m_system;
+    dao::SystemDataObjectFactory::CustomFactoryFunc m_systemDaoFactoryBak;
+    TestSystemDataObject* m_systemDao;
+    nx::utils::SyncQueue<nx::db::DBResult> m_activateSystemResults;
+
+    std::unique_ptr<dao::AbstractSystemDataObject> createSystemDao(
+        const conf::Settings& settings)
+    {
+        using namespace std::placeholders;
+
+        auto systemDao = std::make_unique<TestSystemDataObject>(settings);
+        m_systemDao = systemDao.get();
+        m_systemDao->setOnActivateSystemDone(
+            std::bind(&FtSystemActivation::onActivateSystemDone, this, _1));
+        return std::move(systemDao);
+    }
+
+    void onActivateSystemDone(nx::db::DBResult dbResult)
+    {
+        m_activateSystemResults.push(dbResult);
+    }
+};
+
+TEST_F(FtSystemActivation, not_activated_system_does_not_present_in_system_list)
+{
+    givenNotActivatedSystem();
+    assertGetSystemsReturnedEmptyList();
 }
+
+TEST_F(
+    FtSystemActivation,
+    system_becomes_activated_after_issuing_request_authenticated_with_system_credentials)
+{
+    givenNotActivatedSystem();
+    whenIssuedRequestUsingSystemCredentials();
+    assertActivatedSystemPresentInGetSystemsResponse();
+}
+
+TEST_F(FtSystemActivation, system_activation_is_persistent)
+{
+    givenActivatedSystem();
+    whenCdbIsRestarted();
+    assertActivatedSystemPresentInGetSystemsResponse();
+}
+
+TEST_F(FtSystemActivation, system_activation_is_saved_to_db_after_db_error)
+{
+    systemDao().failEveryActivateSystemRequest();
+    
+    givenNotActivatedSystem();
+    whenIssuedRequestUsingSystemCredentials();
+    assertDaoHasFailedActivateSystemRequest();
+
+    systemDao().switchToNormalState();
+    whenIssuedRequestUsingSystemCredentials();
+    assertSystemActivationHasBeenSavedToDb();
+
+    whenCdbIsRestarted();
+    assertActivatedSystemPresentInGetSystemsResponse();
+}
+
+//-------------------------------------------------------------------------------------------------
+// FtSystemNotification
 
 constexpr static auto kSystemGoneForeverPeriod = std::chrono::seconds(5);
 constexpr static auto kDropExpiredSystemsPeriodSec = std::chrono::seconds(1);
@@ -1072,11 +1206,6 @@ protected:
         const auto system = fetchSystem(m_system.id);
         ASSERT_GE(system.registrationTime, m_registrationTimeValidRange.first);
         ASSERT_LE(system.registrationTime, m_registrationTimeValidRange.second);
-    }
-
-    void whenCdbIsRestarted()
-    {
-        ASSERT_TRUE(restart());
     }
     
 private:

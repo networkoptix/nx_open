@@ -16,7 +16,10 @@ public:
         ::ec2::ApiPeerData localPeer,
         const std::string& systemId,
         const std::string& systemAuthKey,
-        int protocolVersion = nx_ec::EC2_PROTO_VERSION);
+        int protocolVersion,
+        int connectionId);
+
+    int connectionId() const;
 
 protected:
     virtual void fillAuthInfo(
@@ -26,6 +29,7 @@ protected:
 private:
     const std::string m_systemId;
     const std::string m_systemAuthKey;
+    const int m_connectionId;
 };
 
 } // namespace test

@@ -503,6 +503,12 @@ namespace nx_hls
             }
         }
 
+        if (!session->isLive() &&
+            !qnResourceAccessManager->hasGlobalPermission(accessRights, Qn::GlobalViewArchivePermission))
+        {
+            return nx_http::StatusCode::forbidden;
+        }
+
         ensureChunkCacheFilledEnoughForPlayback(session, session->streamQuality());
 
         QByteArray serializedPlaylist;
@@ -812,6 +818,12 @@ namespace nx_hls
             chunkDuration,
             streamQuality,
             requestParams );
+
+        if (!currentChunkKey.live() &&
+            !qnResourceAccessManager->hasGlobalPermission(d_ptr->accessRights, Qn::GlobalViewArchivePermission))
+        {
+            return nx_http::StatusCode::forbidden;
+        }
 
         //retrieving streaming chunk
         StreamingChunkPtr chunk;

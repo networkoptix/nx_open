@@ -81,6 +81,17 @@ public:
     QString cloudModulesXmlTemplatePath;
 };
 
+class Http
+{
+public:
+    /**
+     * Backlog value to pass to tcpServerSocket->listen call.
+     */
+    int tcpBacklogSize;
+
+    Http();
+};
+
 /**
  * @note Values specified via command-line have priority over conf file (or win32 registry) values.
  */
@@ -109,6 +120,7 @@ public:
     const ec2::Settings& p2pDb() const;
     const QString& changeUser() const;
     const ModuleFinder& moduleFinder() const;
+    const Http& http() const;
 
     /** Loads settings from both command line and conf file (or win32 registry). */
     void load( int argc, const char **argv );
@@ -130,6 +142,7 @@ private:
     ec2::Settings m_p2pDb;
     QString m_changeUser;
     ModuleFinder m_moduleFinder;
+    Http m_http;
 
     void fillSupportedCmdParameters();
     void loadConfiguration();

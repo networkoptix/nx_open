@@ -28,6 +28,8 @@
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <nx_ec/managers/abstract_server_manager.h>
 
+#include <utils/common/delayed.h>
+
 QnResourcesChangesManager::QnResourcesChangesManager(QObject* parent /*= nullptr*/):
     base_type(parent)
 {}
@@ -39,16 +41,31 @@ QnResourcesChangesManager::~QnResourcesChangesManager()
 /* Generic block                                                        */
 /************************************************************************/
 
-void QnResourcesChangesManager::deleteResources(const QnResourceList &resources)
+void QnResourcesChangesManager::deleteResources(
+    const QnResourceList& resources,
+    const ActionResultCallback& callback)
 {
+    const auto safeCallback =
+        [callback](bool success)
+        {
+            if (callback)
+                callback(success);
+        };
+
     if (resources.isEmpty())
+    {
+        safeCallback(false);
         return;
+    }
 
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    const auto connection = QnAppServerConnectionFactory::getConnection2();
     if (!connection)
+    {
+        safeCallback(false);
         return;
+    }
 
-    auto sessionGuid = qnCommon->runningInstanceGUID();
+    const auto sessionGuid = qnCommon->runningInstanceGUID();
 
     QVector<QnUuid> idToDelete;
     for(const QnResourcePtr& resource: resources) {
@@ -62,19 +79,21 @@ void QnResourcesChangesManager::deleteResources(const QnResourceList &resources)
         idToDelete << resource->getId();
     }
 
-    connection->getResourceManager(Qn::kSystemAccess)->remove( idToDelete, this, [this, resources, sessionGuid](int reqID, ec2::ErrorCode errorCode) {
-        Q_UNUSED(reqID);
+    connection->getResourceManager(Qn::kSystemAccess)->remove(idToDelete, this,
+        [this, safeCallback, resources, sessionGuid,
+            thread = QPointer<QThread>(QThread::currentThread())]
+            (int /* reqID */ , ec2::ErrorCode errorCode)
+        {
+            // Check if all OK or we have already changed session or attributes pool was recreated.
+            const bool success = errorCode == ec2::ErrorCode::ok
+                || qnCommon->runningInstanceGUID() != sessionGuid;
 
-        /* Check if all OK */
-        if (errorCode == ec2::ErrorCode::ok)
-            return;
+            if (thread)
+                executeInThread(thread, [safeCallback, success]() { safeCallback(success); });
 
-        /* Check if we have already changed session or attributes pool was recreated. */
-        if (qnCommon->runningInstanceGUID() != sessionGuid)
-            return;
-
-        emit resourceDeletingFailed(resources);
-    });
+            if (!success)
+                emit resourceDeletingFailed(resources);
+        });
 }
 
 
