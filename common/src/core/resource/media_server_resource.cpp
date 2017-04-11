@@ -6,6 +6,7 @@
 
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/fusion/serialization/lexical.h>
 
@@ -312,12 +313,16 @@ void QnMediaServerResource::setUrl(const QString& url)
 
 QUrl QnMediaServerResource::getApiUrl() const
 {
-    return getPrimaryAddress().toUrl(apiUrlScheme(isSslAllowed()));
+    return nx::network::url::Builder()
+        .setScheme(apiUrlScheme(isSslAllowed()))
+        .setEndpoint(getPrimaryAddress()).toUrl();
 }
 
 QString QnMediaServerResource::getUrl() const
 {
-    return getPrimaryAddress().toUrl(kUrlScheme).toString();
+    return nx::network::url::Builder()
+        .setScheme(kUrlScheme)
+        .setEndpoint(getPrimaryAddress()).toUrl().toString();
 }
 
 QnStorageResourceList QnMediaServerResource::getStorages() const
@@ -334,7 +339,7 @@ void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddres
 
         m_primaryAddress = primaryAddress;
         if (m_apiConnection)
-            m_apiConnection->setUrl(m_primaryAddress.toUrl(apiUrlScheme(m_sslAllowed)));
+            m_apiConnection->setUrl(buildApiUrl());
     }
 
     emit primaryAddressChanged(toSharedPointer(this));
@@ -355,13 +360,7 @@ void QnMediaServerResource::setSslAllowed(bool sslAllowed)
 
         m_sslAllowed = sslAllowed;
         if (m_apiConnection)
-        {
-            auto url = m_primaryAddress.isNull()
-                ? m_apiConnection->url()
-                : m_primaryAddress.toUrl(apiUrlScheme(m_sslAllowed));
-            url.setScheme(apiUrlScheme(m_sslAllowed));
-            m_apiConnection->setUrl(url);
-        }
+            m_apiConnection->setUrl(buildApiUrl());
     }
 
     emit primaryAddressChanged(toSharedPointer(this));
@@ -624,4 +623,22 @@ void QnMediaServerResource::setAuthKey(const QString& authKey)
 QString QnMediaServerResource::realm() const
 {
     return QnAppInfo::realm();
+}
+
+QUrl QnMediaServerResource::buildApiUrl() const
+{
+    QUrl url;
+    if (m_primaryAddress.isNull())
+    {
+        url = m_apiConnection->url();
+        url.setScheme(apiUrlScheme(m_sslAllowed));
+    }
+    else
+    {
+        url = nx::network::url::Builder()
+            .setScheme(apiUrlScheme(m_sslAllowed))
+            .setEndpoint(m_primaryAddress).toUrl();
+    }
+
+    return url;
 }

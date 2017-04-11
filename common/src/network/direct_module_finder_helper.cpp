@@ -6,20 +6,20 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
-#include <nx/utils/url_builder.h>
+#include <nx/network/url/url_builder.h>
 
 #include "module_finder.h"
 #include "multicast_module_finder.h"
 #include "direct_module_finder.h"
 
-using nx::utils::UrlBuilder;
+using namespace nx::network;
 
 namespace {
     const int checkInterval = 3000;
 
     QUrl makeUrl(const QString& host, int port)
     {
-        return UrlBuilder()
+        return url::Builder()
             .setScheme(lit("http"))
             .setHost(host)
             .setPort(port);
@@ -27,7 +27,7 @@ namespace {
 
     QUrl clearUrl(const QUrl& url)
     {
-        return UrlBuilder()
+        return url::Builder()
             .setScheme(lit("http"))
             .setHost(url.host())
             .setPort(url.port());

@@ -13,8 +13,8 @@
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/cloud/data/connection_parameters.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/timer_manager.h>
-#include <nx/utils/url_builder.h>
 
 #include <utils/common/app_info.h>
 
@@ -245,7 +245,7 @@ void Settings::loadConfiguration()
             if (m_cloudDB.url->host().isEmpty() || m_cloudDB.url->scheme().isEmpty())
             {
                 const SocketAddress endpoint(endpointString);
-                *m_cloudDB.url = nx::utils::UrlBuilder()
+                *m_cloudDB.url = nx::network::url::Builder()
                     .setScheme("http").setHost(endpoint.address.toString())
                     .setPort(endpoint.port).toUrl();
             }
