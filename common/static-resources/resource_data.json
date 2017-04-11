@@ -408,7 +408,9 @@
                 "Pelco|NET5516",
                 "Samsung*|SPE-100",
                 "Samsung*|SPE-101",
-                "Samsung*|SPE-1600*"
+                "Samsung*|SPE-1600*",
+                "BOSCH|VIDEO JET multi 4000",
+                "DW-CP16|Digital Watchdog*"                
             ],
             "analogEncoder": true
         },
