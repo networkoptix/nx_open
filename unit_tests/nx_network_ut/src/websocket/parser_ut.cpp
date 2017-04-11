@@ -17,6 +17,7 @@ public:
 
 unsigned char kShortTextMessageFinNoMask[] = { 0x81, 0x5, 'h', 'e', 'l', 'l', 'o' };
 using ::testing::_;
+using ::testing::AtLeast;
 
 TEST(WebsocketParser, SimpleTextMessage_OneBuffer)
 {
@@ -78,19 +79,31 @@ int fillHeader(char* data, bool fin, int opCode, int payloadLenType, int64_t pay
 TEST(WebsocketParser, BinaryMessage_2Frames_LengthShort_NoMask)
 {
     TestParserHandler ph;
-    std::vector<char> message;
+    Parser p(Role::client, &ph);
+    const int kMessageSize = 1004;
+    std::vector<char> message(kMessageSize, 0);
 
-    message.reserve(4 + 1000);
     ASSERT_EQ(fillHeader(message.data(), false, FrameType::binary, 126, 500, false, 0), 4);
-    for (int i = 0; i < 100; ++i)
+    for (int i = 0; i < 500; i += 5)
         memcpy(message.data() + i + 4, "hello", 5);
 
     ASSERT_EQ(fillHeader(message.data() + 504, false, FrameType::binary, 126, 500, false, 0), 4);
-    for (int i = 0; i < 100; ++i)
+    for (int i = 0; i < 500; i += 5)
         memcpy(message.data() + i + 504, "hello", 5);
 
     EXPECT_CALL(ph, frameStarted(FrameType::binary, false)).Times(1);
     EXPECT_CALL(ph, frameStarted(FrameType::binary, true)).Times(1);
+    EXPECT_CALL(ph, framePayload(_, _)).Times(AtLeast(1));
+    EXPECT_CALL(ph, frameEnded()).Times(2);
+    EXPECT_CALL(ph, messageEnded()).Times(1);
 
-
+    int messageOffset = 0;
+    for (int i = 0; ; ++i) 
+    {
+        int consumeLen = std::min(kMessageSize - messageOffset, 13);
+        p.consume(message.data() + i * 13, consumeLen);
+        messageOffset += consumeLen;
+        if (messageOffset >= kMessageSize)
+            break;
+    }
 }

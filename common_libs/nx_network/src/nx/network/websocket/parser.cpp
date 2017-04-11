@@ -22,7 +22,7 @@ Parser::BufferedState Parser::bufferDataIfNeeded(const char* data, int64_t len, 
         return BufferedState::notNeeded;
 
     auto appendLen = std::min(neededLen - (int64_t)m_buf.size(), len - m_pos);
-    m_buf.append(data + m_pos, appendLen);
+    m_buf.append(data, appendLen);
     m_pos += appendLen;
 
     if (m_buf.size() < neededLen)
@@ -39,7 +39,7 @@ void Parser::processPayload(char* data, int64_t len)
         for (int i = m_pos; i < m_pos + outLen; i++)
             data[i] = data[i] ^ ((unsigned char*)(&m_mask))[i % 4];
     }
-    m_handler->framePayload(data + m_pos, outLen);
+    m_handler->framePayload(data, outLen);
     m_payloadLen -= outLen;
     m_pos += outLen;
     if (m_payloadLen == 0)
@@ -105,7 +105,7 @@ void Parser::consume(char* data, int64_t len)
 {
     m_pos = 0;
     while (m_pos < len)
-        parse(data, len);
+        parse(data + m_pos, len);
 }
 
 void Parser::setRole(Role role)
