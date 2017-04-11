@@ -18,7 +18,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QHash>
 #include <QtCore/QString>
-#include <QtCore/QUrl>
 
 #ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
