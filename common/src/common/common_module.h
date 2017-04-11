@@ -226,6 +226,10 @@ public:
 
     QnUuid videowallGuid() const;
     void setVideowallGuid(const QnUuid &uuid);
+
+    /** instanceCounter used for unit test purpose only */
+    void setInstanceCounter(int value);
+    int instanceCounter() const;
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -279,4 +283,5 @@ private:
     QnResourceDiscoveryManager* m_resourceDiscoveryManager = nullptr;
 
     QnUuid m_videowallGuid;
+    int m_instanceCounter = 0;
 };

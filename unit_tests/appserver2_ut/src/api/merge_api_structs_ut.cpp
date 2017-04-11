@@ -12,6 +12,7 @@
 #include "mock_stream_socket.h"
 #include <network/tcp_listener.h>
 #include "network/http_connection_listener.h"
+#include <rest/server/rest_connection_processor.h>
 
 namespace ec2 {
 namespace test {
@@ -21,11 +22,11 @@ namespace {
 //-------------------------------------------------------------------------------------------------
 // Test/mock classes.
 
-class MockTcpListener: public QnTcpListener
+class MockQnHttpConnectionListener: public QnHttpConnectionListener
 {
 public:
-    MockTcpListener(QnCommonModule* commonModule):
-        QnTcpListener(commonModule, QHostAddress::Any, /*port*/ 0)
+    MockQnHttpConnectionListener(QnCommonModule* commonModule):
+        QnHttpConnectionListener(commonModule, QHostAddress::Any, /*port*/ 0)
     {
     }
 
@@ -320,8 +321,8 @@ private:
     )};
 
     QnCommonModule m_commonModule{/*clientMode*/ false};
-    MockTcpListener m_tcpListener{&m_commonModule};
-    QnRestConnectionProcessor m_restConnectionProcessor{m_socket, /*owner*/ &m_tcpListener};
+    MockQnHttpConnectionListener listener{&m_commonModule};
+    QnRestConnectionProcessor m_restConnectionProcessor{m_socket, /*owner*/ &listener };
 
     std::unique_ptr<TestUpdateHttpHandler> m_updateHttpHandler{new TestUpdateHttpHandler(
         m_connection)};

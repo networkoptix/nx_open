@@ -1763,13 +1763,15 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 
 void MediaServerProcess::registerRestHandlers(
     CloudManagerGroup* cloudManagerGroup,
+    QnUniversalTcpListener* tcpListener,
     ec2::QnTransactionMessageBus* messageBus)
 {
+    auto processorPool = tcpListener->processorPool();
     auto reg =
-        [](const QString& path, QnRestRequestHandler* handler,
+        [processorPool](const QString& path, QnRestRequestHandler* handler,
             Qn::GlobalPermission permissions = Qn::NoGlobalPermissions)
         {
-            QnRestProcessorPool::instance()->registerHandler(path, handler, permissions);
+            processorPool->registerHandler(path, handler, permissions);
         };
 
     // TODO: When supported by apidoctool, the comment to these constants should be parsed.
@@ -1875,12 +1877,10 @@ bool MediaServerProcess::initTcpListener(
         m_autoRequestForwarder.get(),
         std::placeholders::_1 ) );
 
-    registerRestHandlers(cloudManagerGroup, messageBus);
-
     const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
-    QnRestProcessorPool::instance()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
+    m_universalTcpListener->processorPool()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
 #endif
 
     // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
@@ -1896,6 +1896,9 @@ bool MediaServerProcess::initTcpListener(
         rtspPort,
         maxConnections,
         acceptSslConnections );
+
+    registerRestHandlers(cloudManagerGroup, m_universalTcpListener, messageBus);
+
     if( !m_universalTcpListener->bindToLocalAddress() )
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");

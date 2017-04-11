@@ -9,6 +9,7 @@
 #include "network/tcp_connection_processor.h"
 
 #include <nx/network/http/httptypes.h>
+#include <rest/server/rest_connection_processor.h>
 
 class QnHttpConnectionListener;
 
@@ -113,6 +114,7 @@ public:
     bool isProxy(const nx_http::Request& request);
     bool needAuth() const;
 
+    QnRestProcessorPool* processorPool() { return &m_processorPool; }
 protected:
     virtual void doPeriodicTasks() override;
 
@@ -141,6 +143,7 @@ private:
     QMap<QString, ServerProxyPool> m_proxyPool;
     QnWaitCondition m_proxyCondition;
     bool m_needAuth;
+    QnRestProcessorPool m_processorPool;
 };
 
 #endif // __HTTP_CONNECTION_LISTENER_H__
