@@ -80,16 +80,16 @@ TEST(WebsocketParser, BinaryMessage_2Frames_LengthShort_NoMask)
 {
     TestParserHandler ph;
     Parser p(Role::client, &ph);
-    const int kMessageSize = 1004;
+    const int kMessageSize = 1008;
     std::vector<char> message(kMessageSize, 0);
 
     ASSERT_EQ(fillHeader(message.data(), false, FrameType::binary, 126, 500, false, 0), 4);
     for (int i = 0; i < 500; i += 5)
         memcpy(message.data() + i + 4, "hello", 5);
 
-    ASSERT_EQ(fillHeader(message.data() + 504, false, FrameType::binary, 126, 500, false, 0), 4);
+    ASSERT_EQ(fillHeader(message.data() + 504, true, FrameType::binary, 126, 500, false, 0), 4);
     for (int i = 0; i < 500; i += 5)
-        memcpy(message.data() + i + 504, "hello", 5);
+        memcpy(message.data() + i + 508, "hello", 5);
 
     EXPECT_CALL(ph, frameStarted(FrameType::binary, false)).Times(1);
     EXPECT_CALL(ph, frameStarted(FrameType::binary, true)).Times(1);
