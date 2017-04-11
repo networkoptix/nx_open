@@ -22,7 +22,7 @@ namespace {
 
 static const int kTimerPrecisionMs = 500;
 
-}
+} // namespace
 
 namespace nx {
 namespace client {
@@ -34,18 +34,16 @@ LayoutTourController::LayoutTourController(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-
 }
 
 LayoutTourController::~LayoutTourController()
 {
-
 }
 
 void LayoutTourController::startTour(const ec2::ApiLayoutTourData& tour)
 {
     if (m_mode != Mode::Stopped)
-        stopTourInternal();
+        stopCurrentTour();
 
     if (!tour.isValid())
         return;
@@ -95,7 +93,7 @@ void LayoutTourController::updateTour(const ec2::ApiLayoutTourData& tour)
     NX_EXPECT(tour.isValid());
     m_tour.items = QnLayoutTourItem::createList(tour.items, qnResPool);
     if (m_tour.items.empty())
-        stopTourInternal();
+        stopCurrentTour();
     else if (m_tour.currentIndex >= tour.items.size())
         m_tour.currentIndex = 0;
 }
@@ -103,7 +101,7 @@ void LayoutTourController::updateTour(const ec2::ApiLayoutTourData& tour)
 void LayoutTourController::stopTour(const QnUuid& id)
 {
     if (m_mode == Mode::MultipleLayouts && m_tour.id == id)
-        stopTourInternal();
+        stopCurrentTour();
 }
 
 void LayoutTourController::toggleLayoutTour(bool started)
@@ -112,7 +110,7 @@ void LayoutTourController::toggleLayoutTour(bool started)
 
     // Stop layouts tour if running
     if (m_mode == Mode::MultipleLayouts)
-        stopTourInternal();
+        stopCurrentTour();
 
 
 }
@@ -131,7 +129,7 @@ void LayoutTourController::timerEvent(QTimerEvent* event)
     base_type::timerEvent(event);
 }
 
-void LayoutTourController::stopTourInternal()
+void LayoutTourController::stopCurrentTour()
 {
     switch (m_mode)
     {
@@ -169,7 +167,7 @@ void LayoutTourController::processTourStep()
     NX_EXPECT(hasItem);
     if (!hasItem)
     {
-        stopTourInternal();
+        stopCurrentTour();
         return;
     }
 
@@ -187,7 +185,7 @@ void LayoutTourController::processTourStep()
     auto layout = next.layout;
     if (!layout)
     {
-        stopTourInternal();
+        stopCurrentTour();
         return;
     }
 

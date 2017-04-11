@@ -103,17 +103,17 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             m_controller->startTour(tour);
         });
 
-    connect(action(QnActions::StopLayoutTourAction), &QAction::triggered, this,
-        [this]
-        {
-            m_controller->stopTour(m_controller->runningTour());
-        });
-
     connect(action(QnActions::OpenLayoutTourAction), &QAction::triggered, this,
         &LayoutToursHandler::openToursLayout);
 
+    connect(action(QnActions::StopLayoutTourAction), &QAction::triggered, m_controller,
+        &LayoutTourController::stopCurrentTour);
+
     connect(action(QnActions::ToggleTourModeAction), &QAction::triggered, m_controller,
         &LayoutTourController::toggleLayoutTour);
+
+    connect(action(QnActions::EscapeHotkeyAction), &QAction::triggered, m_controller,
+        &LayoutTourController::stopCurrentTour);
 }
 
 LayoutToursHandler::~LayoutToursHandler()

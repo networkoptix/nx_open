@@ -40,6 +40,9 @@ public:
     /** Stop tour with given id if it is running. */
     void stopTour(const QnUuid& id);
 
+    /** Stop currently running tour (if any). */
+    void stopCurrentTour();
+
     /** Start/stop tour over the current layout. */
     void toggleLayoutTour(bool started);
 
@@ -49,8 +52,6 @@ protected:
     virtual void timerEvent(QTimerEvent* event) override;
 
 private:
-    /** Stop currently running tour (if any). */
-    void stopTourInternal();
     void processTourStep();
 
     void clearWorkbenchState();

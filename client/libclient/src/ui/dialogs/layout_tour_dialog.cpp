@@ -69,7 +69,7 @@ protected:
     }
 };
 
-}
+} // namespace
 
 QnLayoutTourDialog::QnLayoutTourDialog(QWidget* parent, Qt::WindowFlags windowFlags):
     base_type(parent, windowFlags),

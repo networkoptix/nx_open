@@ -19,5 +19,4 @@ struct QnLayoutTourItem
 
     static QnLayoutTourItemList createList(const ec2::ApiLayoutTourItemDataList& items,
         QnResourcePool* resourcePool);
-
 };

@@ -8,7 +8,7 @@
 
 namespace Ui {
 class LayoutTourDialog;
-}
+} // namespace Ui
 
 class QnLayoutTourItemsModel;
 
