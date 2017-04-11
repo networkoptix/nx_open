@@ -1496,6 +1496,10 @@
             ]
         },
         {
+            "keys": ["Samsung Techwin|SNP-6320RH"],
+            "forceLexicographicalProfileOrder": true
+        },
+        {
             "keys": [
                 "*Grandeye*|EVO-05NxD"
             ],

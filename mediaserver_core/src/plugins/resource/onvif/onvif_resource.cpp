@@ -1,4 +1,3 @@
-
 #ifdef ENABLE_ONVIF
 
 #include <algorithm>
@@ -179,6 +178,7 @@ public:
     int govMin;
     int govMax;
     bool usedInProfiles;
+    QString currentProfile;
 
 private:
     int restrictFrameRate(int frameRate, QnBounds frameRateBounds) const
@@ -227,6 +227,28 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
         return true;
 
     return s1.id < s2.id; // sort by name
+}
+
+bool videoOptsGreaterThanWithLexicographicalProfileOrder(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2)
+{
+    if (!s1.isH264 && s2.isH264)
+        return false;
+    else if (s1.isH264 && !s2.isH264)
+        return true; 
+
+    if (s1.currentProfile.isEmpty() && s2.currentProfile.isEmpty())
+        return videoOptsGreaterThan(s1, s2);
+
+    if (s1.currentProfile.isEmpty() && !s2.currentProfile.isEmpty())
+        return false;
+
+    if (!s1.currentProfile.isEmpty() && s2.currentProfile.isEmpty())
+        return true;
+    
+    if (s1.currentProfile != s2.currentProfile)
+        return s1.currentProfile < s2.currentProfile;
+        
+    return videoOptsGreaterThan(s1, s2);
 }
 
 //
@@ -1836,7 +1858,10 @@ CameraDiagnostics::Result QnPlOnvifResource::updateVEncoderUsage(QList<VideoOpti
             QString vEncoderID = QString::fromStdString(profile->VideoEncoderConfiguration->token);
             for (int i = 0; i < optionsList.size(); ++i) {
                 if (optionsList[i].id == vEncoderID)
+                {
                     optionsList[i].usedInProfiles = true;
+                    optionsList[i].currentProfile = QString::fromStdString(profile->Name);
+                }
             }
         }
         return CameraDiagnostics::NoErrorResult();
@@ -2011,7 +2036,16 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     CameraDiagnostics::Result result = updateVEncoderUsage(optionsList);
     if (!result)
         return result;
-    qSort(optionsList.begin(), optionsList.end(), videoOptsGreaterThan);
+
+    bool forceLexicographicalProfileOrder = resourceData.value<bool>(
+        Qn::FORCE_LEXICOGRAPHICAL_PROFILE_ORDER_PARAM_NAME,
+        false);
+
+    auto comparator = forceLexicographicalProfileOrder 
+        ? videoOptsGreaterThanWithLexicographicalProfileOrder
+        : videoOptsGreaterThan;
+
+    qSort(optionsList.begin(), optionsList.end(), comparator);
 
     /*
     if (optionsList.size() <= m_channelNumer)
