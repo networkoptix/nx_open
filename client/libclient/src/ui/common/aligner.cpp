@@ -72,6 +72,12 @@ void QnAligner::addWidgets(std::initializer_list<QWidget*> widgets)
 
 void QnAligner::addAligner(QnAligner* aligner)
 {
+    if (aligner->m_masterAligner == this)
+    {
+        NX_ASSERT(m_aligners.contains(aligner));
+        return;
+    }
+
     NX_ASSERT(aligner->m_masterAligner.isNull());
     if (aligner->m_masterAligner)
         return;
