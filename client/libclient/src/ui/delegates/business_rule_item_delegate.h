@@ -52,6 +52,10 @@ public:
     ~QnBusinessRuleItemDelegate();
 
     static int optimalWidth(int column, const QFontMetrics &metrics);
+
+    virtual void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option,
+        const QModelIndex& index) const override;
+
 protected:
     virtual QWidget* createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     virtual void initStyleOption(QStyleOptionViewItem *option, const QModelIndex &index) const override;

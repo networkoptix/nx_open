@@ -41,6 +41,7 @@ public:
     AVCodecContext* codecContext;
     QnConstMediaContextPtr abstractContext;
     qint64 lastPts;
+    std::unique_ptr<QnFfmpegAudioHelper> audioHelper;
 };
 
 void FfmpegAudioDecoderPrivate::initContext(const QnConstCompressedAudioDataPtr& frame)
@@ -137,7 +138,12 @@ bool FfmpegAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame, Audi
         1); //< buffer size alignment. 1 - no alignment (exact size)
 
     nx::AudioFrame* audioFrame = new nx::AudioFrame();
-    audioFrame->data.write((const char*)d->frame->data[0], frameSize);
+
+    if (!d->audioHelper)
+        d->audioHelper.reset(new QnFfmpegAudioHelper(d->codecContext));
+    audioFrame->data.resize(frameSize);
+    d->audioHelper->copyAudioSamples((quint8*) audioFrame->data.data(), d->frame);
+
     audioFrame->context = d->abstractContext;
 
     // Ffmpeg pts/dts are mixed up here, so it's pkt_dts. Also Convert usec to msec.

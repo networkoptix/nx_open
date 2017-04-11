@@ -1,5 +1,11 @@
 #include "qtbug_workaround.h"
 
+#include <QtGui/QGuiApplication>
+#include <QtGui/QWindow>
+
+#include <nx/utils/app_info.h>
+#include <utils/common/delayed.h>
+
 #ifdef Q_OS_WIN
 #   include <Windows.h>
 
@@ -77,7 +83,35 @@ class QnQtbugWorkaroundPrivate {};
 
 QnQtbugWorkaround::QnQtbugWorkaround(QObject *parent):
     QObject(parent)
-{}
+{
+    if (nx::utils::AppInfo::isMacOsX())
+    {
+        // Workaround of QTBUG-34767
+        QObject::connect(qApp, &QGuiApplication::focusWindowChanged, qApp,
+             []()
+             {
+                 const auto modalWindow = qApp->modalWindow();
+                 if (modalWindow && !qApp->focusWindow())
+                     modalWindow->requestActivate();
+             });
+
+        QObject::connect(qApp, &QGuiApplication::applicationStateChanged, qApp,
+            []()
+            {
+                const auto raiseModelWindow =
+                    []()
+                    {
+                        const auto modalWindow = qApp->modalWindow();
+                        if (modalWindow && qApp->applicationState() == Qt::ApplicationActive)
+                            modalWindow->raise();
+                    };
+
+                static constexpr int kRaiseDelay = 1000;
+                executeDelayed(raiseModelWindow, kRaiseDelay);
+            });
+    }
+
+}
 
 QnQtbugWorkaround::~QnQtbugWorkaround() {
     return;

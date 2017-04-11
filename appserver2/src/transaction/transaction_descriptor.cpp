@@ -243,6 +243,7 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
         case ApiCommand::removeServerUserAttributes:
             return notificationParams.mediaServerNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeResource:
+        case ApiCommand::removeResourceStatus:
             return notificationParams.resourceNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::removeCamera:
             return notificationParams.cameraNotificationManager->triggerNotification(tran, notificationParams.source);
@@ -264,7 +265,6 @@ void apiIdDataTriggerNotificationHelper(const QnTransaction<ApiIdData> &tran, co
             return notificationParams.cameraNotificationManager->triggerNotification(tran, notificationParams.source);
         case ApiCommand::forcePrimaryTimeServer:
         case ApiCommand::removeAccessRights:
-        case ApiCommand::removeResourceStatus:
             //#ak no notification needed
             break;
         default:

@@ -12,7 +12,6 @@ class QnSystemHostsModel: public QnSortFilterListModel
     Q_PROPERTY(QString systemId READ systemId WRITE setSystemId NOTIFY systemIdChanged)
     Q_PROPERTY(QUuid localSystemId READ localSystemId WRITE setLocalSystemId
         NOTIFY localSystemIdChanged)
-    Q_PROPERTY(QUrl firstHost READ firstHost NOTIFY firstHostChanged)
 
     using base_type = QnSortFilterListModel;
 
@@ -35,12 +34,9 @@ public: // properties
     QUuid localSystemId() const;
     void setLocalSystemId(const QUuid& id);
 
-    QUrl firstHost() const;
-
 signals:
     void systemIdChanged();
     void localSystemIdChanged();
-    void firstHostChanged();
 
 private:
     class HostsModel;

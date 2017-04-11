@@ -1,15 +1,3 @@
-set(_fullRpath ON)
-
-if(CMAKE_CROSSCOMPILING)
-    set(_fullRpath OFF)
-endif()
-
-option(fullRpath
-    "Unset to leave only relative RPATHs (Must be OFF for production builds)."
-    ${_fullRpath})
-
-unset(_fullRpath)
-
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -31,7 +19,7 @@ add_definitions(
 if(WIN32)
     add_definitions(
         -DENABLE_VMAX
-        -DENABLE_DESKTOP_CAMERA    )
+        -DENABLE_DESKTOP_CAMERA)
 endif()
 
 if(UNIX)
@@ -89,6 +77,33 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     endif()
 endif()
 
+if(WIN32)
+    add_definitions(
+        -DNOMINMAX=
+        -DUNICODE)
+    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
+        $<$<STREQUAL:$<TARGET_PROPERTY:TYPE>,STATIC_LIBRARY>:QN_EXPORT=>
+        $<$<NOT:$<STREQUAL:$<TARGET_PROPERTY:TYPE>,STATIC_LIBRARY>>:QN_EXPORT=Q_DECL_EXPORT>)
+
+    add_compile_options(
+        /MP
+        /bigobj
+        /wd4290
+        /wd4661
+        /wd4100
+        /we4717)
+
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        add_compile_options(/wd4250)
+    endif()
+
+    set(_extra_linker_flags "/LARGEADDRESSAWARE /OPT:NOREF /ignore:4221")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${_extra_linker_flags}")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${_extra_linker_flags}")
+    set(CMAKE_STATIC_LINKER_FLAGS "${CMAKE_STATIC_LINKER_FLAGS} /ignore:4221")
+    unset(_extra_linker_flags)
+endif()
+
 if(UNIX)
     add_compile_options(
         -Werror=enum-compare
@@ -113,12 +128,10 @@ if(LINUX)
         -Wno-unknown-pragmas
         -Wno-ignored-qualifiers)
 
-    if(fullRpath)
-        set(CMAKE_SKIP_BUILD_RPATH OFF)
-        set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF)
-    else()
-        set(CMAKE_SKIP_BUILD_RPATH ON)
-        set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+    set(CMAKE_SKIP_BUILD_RPATH ON)
+    set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
+
+    if(LINUX)
         set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
     endif()
 
@@ -138,16 +151,3 @@ option(qml_debug "Enable QML debugger" ON)
 if(qml_debug)
     add_definitions(-DQT_QML_DEBUG)
 endif()
-
-# set(CMAKE_AUTOMOC_MOC_OPTIONS "-bstdafx.h")
-#
-# if(WIN32)
-#     set(platform "windows")
-#     set(additional.compiler "msvc2012u3")
-#     set(modification "winxp")
-#     set(platformToolSet "v110_xp")
-#     if(MSVC)
-#         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
-#         message(STATUS "Added parallel build arguments to CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-#     endif()
-# endif()

@@ -22,6 +22,7 @@
 #include <nx/network/http/httpstreamreader.h>
 
 #include "soap_wrapper.h"
+#include <onvif/soapDeviceBindingProxy.h>
 
 
 class GSoapAsyncCallWrapperBase

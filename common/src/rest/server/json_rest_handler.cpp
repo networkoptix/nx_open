@@ -1,4 +1,9 @@
 #include "json_rest_handler.h"
+#include <utils/common/util.h>
+
+namespace {
+    const static QLatin1String kExtraFormatting("extraFormatting");
+} // namespace
 
 QnJsonRestHandler::QnJsonRestHandler():
     m_contentType("application/json")
@@ -14,9 +19,13 @@ int QnJsonRestHandler::executeGet(
     QByteArray& contentType, const QnRestConnectionProcessor* owner)
 {
     QnJsonRestResult jsonResult;
-    int returnCode = executeGet(path, processParams(params), jsonResult, owner);
+    const auto paramsMap = processParams(params);
+    int returnCode = executeGet(path, paramsMap, jsonResult, owner);
 
     result = QJson::serialized(jsonResult);
+    if (paramsMap.contains(kExtraFormatting))
+        result  = formatJSonString(result);
+
     contentType = m_contentType;
 
     return returnCode;
@@ -28,9 +37,12 @@ int QnJsonRestHandler::executePost(
     const QnRestConnectionProcessor* owner)
 {
     QnJsonRestResult jsonResult;
-    int returnCode = executePost(path, processParams(params), body, jsonResult, owner);
+    const auto paramsMap = processParams(params);
+    int returnCode = executePost(path, paramsMap, body, jsonResult, owner);
 
     result = QJson::serialized(jsonResult);
+    if (paramsMap.contains(kExtraFormatting))
+        result  = formatJSonString(result);
     contentType = m_contentType;
 
     return returnCode;

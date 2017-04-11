@@ -589,7 +589,7 @@
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_settings_widget.ui"/>
         <source>about:blank</source>
-        <translation>about:blank</translation>
+        <translation type="unfinished">about:blank</translation>
     </message>
     <message>
         <location/>
@@ -1881,7 +1881,7 @@
     <message>
         <location/>
         <source>Enable tile interface</source>
-        <translation>Включите интерфейс &quot;плитка&quot;</translation>
+        <translation>Плиточный интерфейс</translation>
     </message>
 </context>
 <context>
@@ -1973,7 +1973,7 @@
     <message>
         <location/>
         <source>Delete...</source>
-        <translation>&amp;Удалить...</translation>
+        <translation>Удалить...</translation>
     </message>
 </context>
 <context>
@@ -2784,7 +2784,7 @@
         <source>System time is synchronized with the Internet and is independent from server local time.
 Selected server will be used as a time server if System has no Internet access.</source>
         <translation>Системное время синхронизируется с Интернетом и не зависит от местного времени сервера. 
-Выбранный сервер будет использоваться как сервер времени, если у системе нет доступа в сеть Интернет.</translation>
+Выбранный сервер будет использоваться как сервер времени, если у системы нет доступа в сеть Интернет.</translation>
     </message>
 </context>
 <context>

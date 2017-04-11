@@ -1404,7 +1404,7 @@
     <name>QnTranscoder</name>
     <message>
         <source>OpenCL transcoding is not implemented.</source>
-        <translation>OpenCL кодирование не реализовано.</translation>
+        <translation>OpenCL перекодирование не реализовано.</translation>
     </message>
     <message>
         <source>Unknown transcoding method.</source>

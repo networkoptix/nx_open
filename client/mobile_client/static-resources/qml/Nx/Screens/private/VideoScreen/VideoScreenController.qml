@@ -54,6 +54,8 @@ Object
         property real lastPosition: -1
         property bool waitForLastPosition: false
         property bool waitForFirstPosition: true
+        property string previousResourceId: ""
+        property bool firstResource: true
 
         function savePosition()
         {
@@ -133,9 +135,22 @@ Object
 
     onResourceIdChanged:
     {
+        if (d.previousResourceId)
+            d.firstResource = false
+        d.previousResourceId = resourceId
+
         playerJump(d.lastPosition)
         mediaPlayer.position = d.lastPosition
-        d.waitForFirstPosition = true
+
+        if (resourceHelper.resourceStatus !== MediaResourceHelper.Online)
+        {
+            d.waitForFirstPosition = false
+            gotFirstPosition(mediaPlayer.position)
+        }
+        else
+        {
+            d.waitForFirstPosition = true
+        }
     }
 
     Component.onCompleted:
