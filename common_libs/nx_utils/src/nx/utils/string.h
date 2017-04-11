@@ -162,5 +162,11 @@ NX_UTILS_API void serializeNameValuePairs(
     const QMap<QByteArray, QByteArray>& params,
     QByteArray* const dstBuffer);
 
+/**
+ * Removes all ampersands that are not concatenated with others
+ * and not followed by whitespace.
+ */
+QString removeMnemonics(QString text);
+
 } // namespace utils
 } // namespace nx

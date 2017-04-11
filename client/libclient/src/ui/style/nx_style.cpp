@@ -46,6 +46,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <utils/math/color_transformations.h>
+#include <nx/utils/string.h>
 #include <nx/utils/math/fuzzy.h>
 
 
@@ -2458,21 +2459,14 @@ void QnNxStyle::drawControl(
                         | Qt::TextSingleLine
                         | Qt::TextHideMnemonic;
 
-                    const auto removeAmpersands =
-                        [](QString text) -> QString
-                        {
-                            /**
-                             * Removes all ampersands that are not concatenated with others
-                             * and not followed by whitespace.
-                             * Regular expression is:
-                             * (not match '&') match '&' (not match whitespace or '&')
-                             */
-                            return text.remove(QRegularExpression(lit("(?<!&)&(?![\\s&])")));
-
-                        };
-
                     /* Measurements don't support Qt::TextHideMnemonic, must use Qt::TextShowMnemonic: */
-                    const auto fixedText = removeAmpersands(buttonOption->text);
+                    const auto fixedText = nx::utils::removeMnemonics(buttonOption->text);
+
+                    const auto source = lit("& && &a &&a &&& b&b &a a& a&");
+                    const auto changed = nx::utils::removeMnemonics(source);
+                    const auto target = lit("& && a &&a &&& bb a a& a&");
+                    NX_EXPECT(changed == target);
+
                     const QString text = buttonOption->fontMetrics.elidedText(fixedText,
                         Qt::ElideRight, textRect.width(), Qt::TextShowMnemonic);
 
