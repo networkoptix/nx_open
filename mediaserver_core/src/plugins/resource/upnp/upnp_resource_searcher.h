@@ -24,7 +24,7 @@
 class QnUpnpResourceSearcher : virtual public QnAbstractNetworkResourceSearcher
 {
 public:
-    QnUpnpResourceSearcher();
+    QnUpnpResourceSearcher(QnCommonModule* commonModule);
     ~QnUpnpResourceSearcher();
 
     void setSendRequests(bool value);
