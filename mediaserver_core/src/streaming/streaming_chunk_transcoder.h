@@ -91,17 +91,17 @@ private:
         TranscodeContext();
     };
 
-    bool m_terminated;
+    bool m_terminated{false};
     Flags m_flags;
     QnMutex m_mutex;
     //!map<transcoding id, data>
     std::map<int, TranscodeContext> m_scheduledTranscodings;
     //!map<task id, transcoding id>
     std::map<quint64, int> m_taskIDToTranscode;
-    QAtomicInt m_transcodeIDSeq;
+    QAtomicInt m_transcodeIDSeq{1};
     std::vector<StreamingChunkTranscoderThread*> m_transcodeThreads;
     DataSourceCache m_dataSourceCache;
-    QnResourcePool* m_resPool;
+    QnResourcePool* m_resPool{nullptr};
 
     bool startTranscoding(
         int transcodingID,

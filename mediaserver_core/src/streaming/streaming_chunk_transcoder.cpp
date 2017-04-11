@@ -40,11 +40,9 @@ StreamingChunkTranscoder::TranscodeContext::TranscodeContext()
 }
 
 
-StreamingChunkTranscoder::StreamingChunkTranscoder(QnResourcePool* resPool, Flags flags ):
-    m_resPool(resPool),
-    m_terminated( false ),
-    m_flags( flags ),
-    m_transcodeIDSeq( 1 )
+StreamingChunkTranscoder::StreamingChunkTranscoder(QnResourcePool* resPool, Flags flags):
+    m_flags(flags),
+    m_resPool(resPool)
 {
     m_transcodeThreads.resize( TRANSCODE_THREAD_COUNT );
     for( size_t i = 0; i < m_transcodeThreads.size(); ++i )
