@@ -1,3 +1,4 @@
+#include <vector>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <nx/network/websocket/parser.h>
@@ -47,4 +48,49 @@ TEST(WebsocketParser, SimpleTestMessage_SeveralParts)
     Parser p(Role::client, &ph);
     for (int i = 0; i < sizeof(kShortTextMessageFinNoMask); ++i)
         p.consume((char*)kShortTextMessageFinNoMask + i, 1);
+}
+
+int fillHeader(char* data, bool fin, int opCode, int payloadLenType, int64_t payloadLen, bool masked, int mask)
+{
+    data[0] |= (int)fin << 7;
+    data[0] |= opCode & 0xf;
+    data[1] |= (int)masked << 7;
+    data[1] |= payloadLenType & 0x7f;
+
+    int maskOffset = 2;
+    if (payloadLenType == 126)
+    {
+        *reinterpret_cast<unsigned short*>(data + 2) = htons(payloadLen);
+        maskOffset = 4;
+    }
+    else
+    {
+        *reinterpret_cast<uint64_t*>(data + 2) = htonll(payloadLen);
+        maskOffset = 10;
+    }
+
+    if (masked)
+        *reinterpret_cast<uint64_t*>(data + maskOffset) = mask;
+
+    return maskOffset;
+}
+
+TEST(WebsocketParser, BinaryMessage_2Frames_LengthShort_NoMask)
+{
+    TestParserHandler ph;
+    std::vector<char> message;
+
+    message.reserve(4 + 1000);
+    ASSERT_EQ(fillHeader(message.data(), false, FrameType::binary, 126, 500, false, 0), 4);
+    for (int i = 0; i < 100; ++i)
+        memcpy(message.data() + i + 4, "hello", 5);
+
+    ASSERT_EQ(fillHeader(message.data() + 504, false, FrameType::binary, 126, 500, false, 0), 4);
+    for (int i = 0; i < 100; ++i)
+        memcpy(message.data() + i + 504, "hello", 5);
+
+    EXPECT_CALL(ph, frameStarted(FrameType::binary, false)).Times(1);
+    EXPECT_CALL(ph, frameStarted(FrameType::binary, true)).Times(1);
+
+
 }

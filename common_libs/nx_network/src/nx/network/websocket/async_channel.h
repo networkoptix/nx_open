@@ -19,8 +19,7 @@ public:
     enum class SendMode
     {
         singleMessage,
-        multiFrameMessage,
-        multiFrameMessageLastFrame
+        multiFrameMessage
     };
 
     enum class ReceiveMode
@@ -34,10 +33,14 @@ public:
     AsyncChannel(
         std::unique_ptr<AbstractStreamSocket> streamSocket,
         const nx::Buffer& requestData,
-        Role role = Role::undefined); //< if role is undefined, payload won't be masked (unmasked)
+        Role role = Role::undefined); /**< if role is undefined, payload won't be masked (unmasked) */
 
     void setSendMode(SendMode mode);
     SendMode sendMode() const;
+
+    /** Makes sense only in multiFrameMessage mode. 
+        Indicates that the next sendAsync will close current message */
+    void setIsLastFrame();
 
     void setReceiveMode(ReceiveMode mode);
     ReceiveMode receiveMode() const;
@@ -60,5 +63,8 @@ private:
 };
 
 }
+
+using Websocket = websocket::AsyncChannel;
+
 }
 }
