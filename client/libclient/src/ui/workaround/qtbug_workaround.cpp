@@ -98,7 +98,7 @@ QnQtbugWorkaround::QnQtbugWorkaround(QObject *parent):
         QObject::connect(qApp, &QGuiApplication::applicationStateChanged, qApp,
             []()
             {
-                const auto raiseModelaWindow =
+                const auto raiseModelWindow =
                     []()
                     {
                         const auto modalWindow = qApp->modalWindow();
@@ -107,7 +107,7 @@ QnQtbugWorkaround::QnQtbugWorkaround(QObject *parent):
                     };
 
                 static constexpr int kRaiseDelay = 1000;
-                executeDelayed(raiseModelaWindow, kRaiseDelay);
+                executeDelayed(raiseModelWindow, kRaiseDelay);
             });
     }
 
