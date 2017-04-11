@@ -60,7 +60,7 @@ int ReflectingPipeline::write(const void* data, size_t count)
 {
     QnMutexLocker lock(&m_mutex);
 
-    if (m_maxSize > 0 && m_buffer.size() >= m_maxSize)
+    if ((m_maxSize > 0) && ((std::size_t)m_buffer.size() >= m_maxSize))
         return StreamIoError::wouldBlock;
 
     m_buffer.append(static_cast<const char*>(data), count);
