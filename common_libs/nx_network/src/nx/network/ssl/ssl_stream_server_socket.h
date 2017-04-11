@@ -20,8 +20,8 @@ public:
     virtual void acceptAsync(AcceptCompletionHandler handler) override;
 
 private:
-    EncryptionUse m_encryptionUse;
     std::unique_ptr<AbstractStreamServerSocket> m_delegatee;
+    EncryptionUse m_encryptionUse;
 
     void onAcceptCompletion(
         AcceptCompletionHandler handler,
