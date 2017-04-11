@@ -1,7 +1,5 @@
 <div class="timeline">
-    <div>
-        <volume-control></volume-control>
-    </div>
+    <volume-control ng-show="activeVolume" volume-level="volumeLevel"></volume-control>
     <div class="webclient-top-border webclient-bottom-border">
         <div class="text-right pull-right" >
             <span class="live-button inline-block pull-left "
@@ -9,7 +7,7 @@
               ng-click="goToLive()">
                 <live-circle></live-circle>LIVE
             </span>
-            <span class="webclient-button volume inline-block pull-right">
+            <span class="webclient-button volume inline-block pull-right" ng-click="activeVolume = !activeVolume">
                 <span class="glyphicon glyphicon-volume-up"></span>
             </span>
         </div>

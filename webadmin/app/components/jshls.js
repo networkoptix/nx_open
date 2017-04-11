@@ -467,6 +467,10 @@ JsHlsAPI.prototype.pause = function(){
     this.video.pause();
 };
 
+JsHlsAPI.prototype.volume = function(volumeLevel){
+    this.video.volume = volumeLevel/100;
+}
+
 JsHlsAPI.prototype.load = function(url){
     this.hls.loadSource(url);
     this.hls.autoLevelCapping = -1; //levelCapping;

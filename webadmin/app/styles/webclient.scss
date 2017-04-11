@@ -303,6 +303,109 @@ live-circle{
   margin: 40px auto !important;
 }
 
+volume-control{
+  width: 212px;
+  height: 44px;
+  position: absolute;
+  right: 0;
+  top: -44px;
+  background-color: #333333;
+}
+
+.volume-icons{
+  width: 44px;
+  height: 44px;
+}
+.volume-icons .glyphicon-volume-up{
+  position: relative;
+  top: 14px;
+  left: 16px;
+}
+
+.volume-icons output{
+  position: relative;
+  top: 4px;
+  left: 6px;
+}
+
+.rangeslider,
+.rangeslider__fill {
+  display: block;
+  -moz-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0px 1px 3px rgba(0, 0, 0, 0.3);
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+}
+
+.rangeslider {
+  background: gray;
+  position: relative;
+}
+
+.rangeslider--horizontal {
+  height: 2px;
+  width: 108px;
+  position: relative;
+  top: 22px;
+  left: 47px;
+}
+
+.rangeslider__fill {
+  background: white;
+  position: absolute;
+}
+.rangeslider--horizontal .rangeslider__fill {
+  top: 0;
+  height: 100%;
+}
+
+.rangeslider__handle {
+  background: gray;
+  margin-top: 3px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  position: absolute;
+  -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+}
+.rangeslider__handle:after {
+  content: "";
+  display: block;
+  width: 18px;
+  height: 18px;
+  margin: auto;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+}
+
+.rangeslider--horizontal .rangeslider__handle {
+  top: -10px;
+  touch-action: pan-y;
+  -ms-touch-action: pan-y;
+}
+
+input[type="range"]:focus + .rangeslider .rangeslider__handle {
+  -moz-box-shadow: 0 0 8px rgba(255, 0, 255, 0.9);
+  -webkit-box-shadow: 0 0 8px rgba(255, 0, 255, 0.9);
+  box-shadow: 0 0 8px rgba(255, 0, 255, 0.9);
+}
+
+
 div.text-center{
   margin: 0 104px 0 168px;
   height:100px;

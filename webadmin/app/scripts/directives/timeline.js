@@ -11,14 +11,14 @@ angular.module('webadminApp')
                 liveOnly: '=',
                 canPlayLive: '=',
                 ngClick: '&',
-                positionHandler: '='
+                positionHandler: '=',
+                volumeLevel:'='
             },
             templateUrl: Config.viewsDir + 'components/timeline.html',
             link: function (scope, element/*, attrs*/) {
 
                 var debugEventsMode = Config.debug.chunksOnTimeline && Config.allowDebugMode;
                 var debugTime = Config.debug.chunksOnTimeline && Config.allowDebugMode;
-
 
                 var timelineConfig = {
                     initialInterval: 1000*60*60 /* *24*365*/, // no records - show small interval
@@ -132,8 +132,6 @@ angular.module('webadminApp')
 
                     end: 0
                 };
-
-
 
 
 

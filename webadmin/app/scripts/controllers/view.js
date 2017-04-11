@@ -68,6 +68,7 @@ angular.module('webadminApp').controller('ViewCtrl',
         ];
 
         $scope.settings = {id: ''};
+        $scope.volumeLevel = 50;
 
         mediaserver.getModuleInformation().then(function (r) {
             $scope.settings = {
@@ -710,6 +711,10 @@ angular.module('webadminApp').controller('ViewCtrl',
         });
 
         $scope.$watch('player', updateVideoSource);
+
+        $scope.$watch('volumeLevel', function(){
+            $scope.playerAPI.volume($scope.volumeLevel);
+        });
 
         mediaserver.getTime().then(function(result){
             var serverTime = parseInt(result.data.reply.utcTime);
