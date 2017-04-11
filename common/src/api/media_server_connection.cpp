@@ -44,7 +44,9 @@
 #include "model/recording_stats_reply.h"
 #include <api/model/getnonce_reply.h>
 #include "common/common_module.h"
+
 #include <nx/utils/log/log.h>
+#include <nx/utils/datetime.h>
 
 namespace {
 

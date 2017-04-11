@@ -16,7 +16,7 @@ QString QnResourcePoolTestHelper::kTestUserName2 = QStringLiteral("user_2");
 
 QnResourcePoolTestHelper::QnResourcePoolTestHelper():
     QnCommonModuleAware(nullptr, true),
-    m_staticCommon(new QnStaticCommonModule(Qn::PT_NotDefined, QString(), QString()))
+    m_staticCommon(new QnStaticCommonModule())
 {
 
 }
@@ -97,7 +97,7 @@ QnVideoWallResourcePtr QnResourcePoolTestHelper::addVideoWall()
 
 QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer()
 {
-    QnMediaServerResourcePtr server(new QnMediaServerResource());
+    QnMediaServerResourcePtr server(new QnMediaServerResource(commonModule()));
     server->setId(QnUuid::createUuid());
     resourcePool()->addResource(server);
     return server;

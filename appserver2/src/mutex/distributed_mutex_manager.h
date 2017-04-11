@@ -39,8 +39,8 @@ namespace ec2
     private:
         QMap<QString, QnDistributedMutex*> m_mutexList;
         mutable QnMutex m_mutex;
-        qint64 m_timestamp;
-        QnMutexUserDataHandler* m_userDataHandler;
-        QnTransactionMessageBus* m_messageBus;
+        qint64 m_timestamp{1};
+        QnMutexUserDataHandler* m_userDataHandler{nullptr};
+        QnTransactionMessageBus* m_messageBus{nullptr};
     };
 }

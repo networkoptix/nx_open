@@ -2,9 +2,11 @@
 
 #include <api/runtime_info_manager.h>
 
-#include <nx/network/http/httptypes.h>
-#include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>
+
+#include <rest/server/rest_connection_processor.h>
+
+#include <nx/network/http/httptypes.h>
 
 int QnRuntimeInfoRestHandler::executeGet(
     const QString& /*path*/,
@@ -13,6 +15,7 @@ int QnRuntimeInfoRestHandler::executeGet(
     const QnRestConnectionProcessor* owner)
 {
     auto runtimeInfoManager = owner->commonModule()->runtimeInfoManager();
+
     std::vector<ec2::ApiRuntimeData> items;
     if (params.contains("local"))
     {

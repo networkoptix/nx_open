@@ -27,9 +27,10 @@ class QnStaticCommonModule:
 {
     Q_OBJECT
 public:
-    QnStaticCommonModule(Qn::PeerType localPeerType,
-        const QString& brand,
-        const QString& customization,
+    QnStaticCommonModule(
+        Qn::PeerType localPeerType = Qn::PeerType::PT_NotDefined,
+        const QString& brand = QString(),
+        const QString& customization = QString(),
         QObject *parent = nullptr);
     virtual ~QnStaticCommonModule();
 

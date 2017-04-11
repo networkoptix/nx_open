@@ -182,7 +182,7 @@ ClientPool::HttpConnection* ClientPool::getUnusedConnection(const QUrl& url)
         result = new HttpConnection();
         result->client = createHttpConnection();
 
-        m_connectionPool.emplace(requestAddress, std::move(HttpConnectionPtr(result)));
+        m_connectionPool.emplace(requestAddress, HttpConnectionPtr(result));
     }
 
     return result;

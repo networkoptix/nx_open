@@ -8,6 +8,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/string.h>
+#include <nx/utils/datetime.h>
 
 #include <api/helpers/camera_id_helper.h>
 

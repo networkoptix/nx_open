@@ -24,7 +24,6 @@ QnTransactionTransport::QnTransactionTransport(
     const QByteArray& contentEncoding,
     const Qn::UserAccessData &userAccessData)
 :
-    QnCommonModuleAware(commonModule),
     QnTransactionTransportBase(
         commonModule->globalSettings()->localSystemId(),
         connectionGuid,
@@ -36,6 +35,7 @@ QnTransactionTransport::QnTransactionTransport(
         contentEncoding,
         commonModule->globalSettings()->connectionKeepAliveTimeout(),
         commonModule->globalSettings()->keepAliveProbeCount()),
+    QnCommonModuleAware(commonModule),
     m_userAccessData(userAccessData)
 {
     setOutgoingConnection(std::move(socket));
@@ -46,13 +46,13 @@ QnTransactionTransport::QnTransactionTransport(
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer)
 :
-    QnCommonModuleAware(commonModule),
     QnTransactionTransportBase(
         commonModule->globalSettings()->localSystemId(),
         connectionGuardSharedState,
         localPeer,
         commonModule->globalSettings()->connectionKeepAliveTimeout(),
         commonModule->globalSettings()->keepAliveProbeCount()),
+    QnCommonModuleAware(commonModule),
     m_userAccessData(Qn::kSystemAccess)
 {
 }

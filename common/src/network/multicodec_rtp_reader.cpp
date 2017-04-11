@@ -70,9 +70,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_role(Qn::CR_Default),
     m_gotData(false),
     m_rtpStarted(false),
-    m_prefferedAuthScheme(nx_http::header::AuthScheme::basic),
-    m_rtpFrameTimeoutMs(0),
-    m_maxRtpRetryCount(0)
+    m_prefferedAuthScheme(nx_http::header::AuthScheme::basic)
 {
     const auto& globalSettings = res->commonModule()->globalSettings();
     m_rtpFrameTimeoutMs = globalSettings->rtpFrameTimeoutMs();
