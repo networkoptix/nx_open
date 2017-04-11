@@ -75,13 +75,12 @@ def make_schedule_task(day_of_week):
 
 class Camera(object):
 
-    def __init__(self, discovery_listener, name, mac_addr):
+    def __init__(self, vm_address, discovery_listener, name, mac_addr):
+        self._vm_address = vm_address
         self._discovery_listener = discovery_listener
         self.name = name
         self.mac_addr = mac_addr
         self.id = None  # camera guid on server, set when registered on server
-        self._streaming_to_servers = set()
-        self._streaming_cond = threading.Condition()
 
     def __str__(self):
         return '%s at %s' % (self.name, self.mac_addr)
@@ -92,16 +91,16 @@ class Camera(object):
     def get_info(self, parent_id):
         return make_camera_info(parent_id, self.name, self.mac_addr)
 
-    def wait_until_discovered_by_server(self, server_list, timeout=CAMERA_DISCOVERY_WAIT_TIMEOUT_SEC):
+    def wait_until_discovered_by_server(self, server_list, timeout_sec=CAMERA_DISCOVERY_WAIT_TIMEOUT_SEC):
         #assert is_list_inst(server_list, Server), repr(server_list)
         log.info('Waiting for camera %s to be discovered by servers %s', self, ', '.join(map(str, server_list)))
         t = time.time()
-        while time.time() - t < CAMERA_DISCOVERY_WAIT_TIMEOUT_SEC:
+        while time.time() - t < timeout_sec:
             for server in server_list:
                 for d in server.rest_api.ec2.getCamerasEx.GET():
-                    if d['name'] == self.name:
+                    if d['physicalId'].replace('-', ':') == self.mac_addr:
                         self.id = d['id']
-                        log.info('Camera %s is discovered by server, registered with id %r', self, self.id)
+                        log.info('Camera %s is discovered by server %s, registered with id %r', self, server, self.id)
                         return
             time.sleep(5)
         pytest.fail('Camera %s was not discovered by servers %s in %s seconds'
@@ -117,34 +116,19 @@ class Camera(object):
             pytest.fail('Camera %s is unknown for server %s' % (self, server))
         assert d['parentId'] == server.ecs_guid
 
-    def stream_to(self, server):
+    def start_streaming(self):
         # assert isinstance(server, Server), repr(server)  # import circular dependency
-        self._discovery_listener.stream_to(self, server)
-
-    def is_streaming_to(self, server):
-        with self._streaming_cond:
-            return server in self._streaming_to_servers
-
-    def wait_for_streaming_to_server_started(self, server, timeout_sec):
-        log.info('Camera %s: waiting for streaming to %s...', self, server)
-        with self._streaming_cond:
-            while server not in self._streaming_to_servers:
-                self._streaming_cond.wait(timeout_sec)
-        log.info('Camera %s: streaming to %s is started', self, server)
-
-    def _add_streaming_to(self, server):
-        with self._streaming_cond:
-            self._streaming_to_servers.add(server)
-            self._streaming_cond.notify_all()
+        self._discovery_listener.stream_to(self, self._vm_address)
 
 
 class CameraFactory(object):
 
-    def __init__(self, media_stream_path):
+    def __init__(self, vm_address, media_stream_path):
+        self._vm_address = vm_address
         self._discovery_listener = DiscoveryUdpListener(media_stream_path)
 
     def __call__(self, name=TEST_CAMERA_NAME, mac_addr=DEFAULT_CAMERA_MAC_ADDR):
-        return Camera(self._discovery_listener, name, mac_addr)
+        return Camera(self._vm_address, self._discovery_listener, name, mac_addr)
 
     def close(self):
         self._discovery_listener.stop()
@@ -152,16 +136,10 @@ class CameraFactory(object):
 
 class DiscoveryUdpListener(object):
 
-    class CameraRec(object):
-
-        def __init__(self, camera, server, server_ip_address):
-            self.camera = camera  # Camera
-            self.server = server  # Server
-            self.server_ip_address = server_ip_address  # str
-
     def __init__(self, media_stream_path):
         self._media_stream_path = media_stream_path
-        self._streaming_cameras = []  # CameraRec list
+        self._stream_to_camera = None  # Camera or None
+        self._stream_to_address_list = []  # string list
         self._thread = None
         self._stop_flag = False
         self._media_listeners = []
@@ -175,10 +153,11 @@ class DiscoveryUdpListener(object):
             listener.stop()
         log.info('Test camera UDP discovery listener is stopped.')
 
-    def stream_to(self, camera, server):
-        server_ip_address = socket.gethostbyname(str(server.external_ip_address))
-        log.info('Test camera %s: will stream to %s at %s', camera.name, server, server_ip_address)
-        self._streaming_cameras.append(self.CameraRec(camera, server, server_ip_address))
+    def stream_to(self, camera, ip_address):
+        assert not self._stream_to_camera  # Already streaming to a camera
+        log.info('Test camera %s: will stream to %s', camera.name, ip_address)
+        self._stream_to_camera = camera
+        self._stream_to_address_list.append(str(ip_address))
         if not self._thread:
             self._start()
 
@@ -196,27 +175,24 @@ class DiscoveryUdpListener(object):
         log.info('Test camera UDP discovery listener thread is started.')
         while not self._stop_flag:
             data, addr = listen_socket.recvfrom(1024)
-            #log.debug('Received discovery message from %s:%d: %r', addr[0], addr[1], data)
+            log.debug('Received discovery message from %s:%d: %r', addr[0], addr[1], data)
             if data != TEST_CAMERA_FIND_MSG:
                 continue
-            for rec in self._streaming_cameras:
-                if addr[0] != rec.server_ip_address:
-                    continue  # request came not from a server we stream to
-                listener = MediaListener(self._media_stream_path, rec.camera, rec.server)
-                response = '%s;%d;%s' % (TEST_CAMERA_ID_MSG, listener.port, rec.camera.mac_addr)
-                log.info('Responding to %s:%d: %r', addr[0], addr[1], response)
-                listen_socket.sendto(response, addr)
-                self._media_listeners.append(listener)
+            if addr[0] not in self._stream_to_address_list:
+                continue  # request came not from our server
+            listener = MediaListener(self._media_stream_path)
+            response = '%s;%d;%s' % (TEST_CAMERA_ID_MSG, listener.port, self._stream_to_camera.mac_addr)
+            log.info('Responding to %s:%d: %r', addr[0], addr[1], response)
+            listen_socket.sendto(response, addr)
+            self._media_listeners.append(listener)
         listen_socket.close()
         log.debug('Test camera UDP discovery listener thread is finished.')
 
 
 class MediaListener(object):
 
-    def __init__(self, media_stream_path, camera, server):
+    def __init__(self, media_stream_path):
         self._media_stream_path = media_stream_path
-        self._camera = camera
-        self._server = server
         self._stop_flag = False
         self._streamers = []
         listen_host = '0.0.0.0'
@@ -230,8 +206,7 @@ class MediaListener(object):
         self._thread.start()
 
     def __str__(self):
-        return ('Test camera media listener for %s server %s at %s:%d'
-                % (self._camera, self._server.name, self.host, self.port))
+        return ('Test camera media listener at %s:%d' % (self.host, self.port))
 
     def stop(self):
         log.info('%s with %d active streamers: stopping...', self, len(self._streamers))
@@ -249,7 +224,7 @@ class MediaListener(object):
                 continue
             sock, addr = listen_socket.accept()
             log.info('%s: accepted connection from %s:%d', self, addr[0], addr[1])
-            streamer = MediaStreamer(self._media_stream_path, self._camera, self._server, sock, addr)
+            streamer = MediaStreamer(self._media_stream_path, sock, addr)
             self._streamers.append(streamer)
         listen_socket.close()
         log.info('%s: thread is finished.', self)
@@ -257,10 +232,8 @@ class MediaListener(object):
 
 class MediaStreamer(object):
 
-    def __init__(self, media_stream_path, camera, server, sock, peer_address):
+    def __init__(self, media_stream_path, sock, peer_address):
         self._media_stream_path = media_stream_path
-        self._camera = camera
-        self._server = server
         self._peer_address = peer_address
         self._stop_flag = False
         self._thread = threading.Thread(target=self._thread_main, args=(sock,))
@@ -269,8 +242,7 @@ class MediaStreamer(object):
 
     def __str__(self):
         host, port = self._peer_address
-        return ('Test camera media streamer for %s server %s for %s:%d'
-                % (self._camera, self._server.name, host, port))
+        return ('Test camera media streamer for %s:%d' % (host, port))
 
     def stop(self):
         self._stop_flag = True
@@ -286,7 +258,6 @@ class MediaStreamer(object):
     def _run(self, sock):
         request = sock.recv(1024)            
         log.info('%s: received request %r; starting streaming %s', self, request, self._media_stream_path)
-        self._camera._add_streaming_to(self._server)
         while not self._stop_flag:
             with open(self._media_stream_path, 'rb') as f:
                 while True:

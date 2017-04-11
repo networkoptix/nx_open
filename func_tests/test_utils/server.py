@@ -168,7 +168,6 @@ class Server(object):
         self.settings = None
         self.local_system_id = None
         self.ecs_guid = None
-        self.external_ip_address = box.config.vm_bind_address if box else 'localhost'
         self.internal_ip_address = None
         self.storage = self._get_storage()
         self._is_started = None
