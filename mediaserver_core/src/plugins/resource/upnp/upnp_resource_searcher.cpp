@@ -302,6 +302,7 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
 ////////////////////////////////////////////////////////////
 
 QnUpnpResourceSearcherAsync::QnUpnpResourceSearcherAsync(QnCommonModule* commonModule) :
+    QnAbstractResourceSearcher(commonModule),
     QnAbstractNetworkResourceSearcher(commonModule)
 {
 }
