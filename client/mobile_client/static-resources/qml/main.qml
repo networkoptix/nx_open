@@ -12,8 +12,10 @@ ApplicationWindow
 
     property real rightPadding: 0
     property real bottomPadding: 0
-    readonly property real keyboardHeight:
-        Qt.inputMethod.keyboardRectangle.height / Screen.devicePixelRatio
+    readonly property real keyboardHeight: Qt.inputMethod.visible
+        ? Qt.inputMethod.keyboardRectangle.height
+            / (Qt.platform.os !== "ios" ? Screen.devicePixelRatio : 1)
+        : 0
 
     readonly property real availableWidth: width - rightPadding
     readonly property real availableHeight: height - bottomPadding
