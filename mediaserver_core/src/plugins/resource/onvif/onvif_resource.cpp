@@ -2056,7 +2056,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     auto channel = getChannel();
     QString channelProfiles;
 
-    if (profiles.size() > getChannel())
+    if (profiles.size() > channel)
         channelProfiles = profiles[channel];
 
     auto comparator = createComparator(channelProfiles);
