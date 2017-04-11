@@ -1499,7 +1499,15 @@
         },
         {
             "keys": ["Samsung Techwin|SNP-6320RH"],
-            "forceLexicographicalProfileOrder": true
+            "forcedOnvifParams": {
+                "profiles": ["H.264,MOBILE"]
+            }
+        },
+        {
+            "keys": ["Samsung Techwin|SNF-8010"],
+            "forcedOnvifParams": {
+                "profiles": ["SourceH264,MOBILE"]
+            }
         },
         {
             "keys": [

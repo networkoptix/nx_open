@@ -190,6 +190,8 @@ private:
     }
 };
 
+typedef std::function<bool(const VideoOptionsLocal&, const VideoOptionsLocal&)> VideoOptionsComparator;
+
 bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2)
 {
     int square1Max = 0;
@@ -229,26 +231,39 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
     return s1.id < s2.id; // sort by name
 }
 
-bool videoOptsGreaterThanWithLexicographicalProfileOrder(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2)
+bool compareByProfiles(const VideoOptionsLocal &s1, const VideoOptionsLocal &s2, const QMap<QString, int>& profilePriorities)
 {
-    if (!s1.isH264 && s2.isH264)
-        return false;
-    else if (s1.isH264 && !s2.isH264)
-        return true; 
+    auto firstPriority = profilePriorities.contains(s1.currentProfile)
+        ? profilePriorities[s1.currentProfile]
+        : -1;
 
-    if (s1.currentProfile.isEmpty() && s2.currentProfile.isEmpty())
-        return videoOptsGreaterThan(s1, s2);
+    auto secondPriority = profilePriorities.contains(s2.currentProfile)
+        ? profilePriorities[s2.currentProfile]
+        : -1;
 
-    if (s1.currentProfile.isEmpty() && !s2.currentProfile.isEmpty())
-        return false;
-
-    if (!s1.currentProfile.isEmpty() && s2.currentProfile.isEmpty())
-        return true;
+    if (firstPriority != secondPriority)
+        return firstPriority > secondPriority;
     
-    if (s1.currentProfile != s2.currentProfile)
-        return s1.currentProfile < s2.currentProfile;
-        
     return videoOptsGreaterThan(s1, s2);
+}
+
+VideoOptionsComparator createComparator(const QString& profiles)
+{
+    if (!profiles.isEmpty())
+    {
+        auto profileList = profiles.split(L',');
+        QMap<QString, int> profilePriorities;
+        for (auto i = 0; i < profileList.size(); ++i)
+            profilePriorities[profileList[i]] = profileList.size() - i;
+
+        return 
+            [profilePriorities](const VideoOptionsLocal &s1, const VideoOptionsLocal &s2) -> bool
+            {
+                return compareByProfiles(s1, s2, profilePriorities);
+            };
+    }
+
+    return videoOptsGreaterThan;
 }
 
 //
@@ -1960,7 +1975,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
 
     auto frameRateBounds = resourceData.value<QnBounds>(Qn::FPS_BOUNDS_PARAM_NAME, QnBounds());
 
-    if (forcedParams && forcedParams->videoEncoders.size() >= getChannel()) 
+    if (forcedParams && forcedParams->videoEncoders.size() > getChannel()) 
     {
         videoEncodersTokens = forcedParams->videoEncoders[getChannel()].split(L',');
     }
@@ -2037,14 +2052,14 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions(Medi
     if (!result)
         return result;
 
-    bool forceLexicographicalProfileOrder = resourceData.value<bool>(
-        Qn::FORCE_LEXICOGRAPHICAL_PROFILE_ORDER_PARAM_NAME,
-        false);
+    auto profiles = forcedParams ? forcedParams->profiles : QVector<QString>();
+    auto channel = getChannel();
+    QString channelProfiles;
 
-    auto comparator = forceLexicographicalProfileOrder 
-        ? videoOptsGreaterThanWithLexicographicalProfileOrder
-        : videoOptsGreaterThan;
+    if (profiles.size() > getChannel())
+        channelProfiles = profiles[channel];
 
+    auto comparator = createComparator(channelProfiles);
     qSort(optionsList.begin(), optionsList.end(), comparator);
 
     /*
