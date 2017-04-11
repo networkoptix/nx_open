@@ -39,6 +39,14 @@ QnGraphicsStackedWidgetPrivate::QnGraphicsStackedWidgetPrivate(QnGraphicsStacked
 
 QnGraphicsStackedWidgetPrivate::~QnGraphicsStackedWidgetPrivate()
 {
+    Q_Q(const QnGraphicsStackedWidget);
+    for (auto widget: m_widgets)
+    {
+        const auto parentLayoutItem = widget->parentLayoutItem();
+        NX_EXPECT(parentLayoutItem == q);
+        if (parentLayoutItem == q)
+            widget->setParentLayoutItem(nullptr);
+    }
 }
 
 int QnGraphicsStackedWidgetPrivate::insertWidget(int index, QGraphicsWidget* widget)
