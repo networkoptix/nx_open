@@ -92,7 +92,7 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NU
 
     ui->syncWithInternetCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
     ui->syncWithInternetCheckBox->setForegroundRole(QPalette::ButtonText);
-    connect(ui->syncWithInternetCheckBox, &QAbstractButton::clicked, this,
+    connect(ui->syncWithInternetCheckBox, &QAbstractButton::toggled, this,
         [this](bool checked)
         {
             ui->serversTable->setEnabled(!checked);
