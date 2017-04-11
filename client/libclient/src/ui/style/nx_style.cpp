@@ -2456,8 +2456,7 @@ void QnNxStyle::drawControl(
                     const int textFlags = textHorizontalAlignment
                         | Qt::AlignVCenter
                         | Qt::TextSingleLine
-                        | Qt::TextHideMnemonic
-                        | Qt::TextLongestVariant | Qt::TextBypassShaping;
+                        | Qt::TextHideMnemonic;
 
                     const auto removeAmpersands =
                         [](QString text) -> QString
