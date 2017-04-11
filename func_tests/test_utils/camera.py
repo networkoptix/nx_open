@@ -1,3 +1,17 @@
+'''Camera support classes
+
+Server has separate protocol created specifically for test cameras. It multicast UDP packets on port 4984
+and expects UDP responses from test cameras, with camera mac address and TCP endpoint for media streaming.
+Then it connects to that endpoint using TCP, with one-line request and expects media stream with specific
+formatting in response.
+All this is supported by 3 classes:
+* DiscoveryUdpListener - listens and responds to UDP requets
+* MediaListener - listens on TCP port to receive media stream requests
+* MediaStreamer - reads TCP request on connected socket and sends media stream from file.
+All these 3 classes are internal for this module; Tests only see and use Camera and CameraFactory instances,
+created using 'camera' or 'camera_factory' fixtures.
+'''
+
 import logging
 import hashlib
 import time
@@ -19,15 +33,10 @@ TEST_CAMERA_NAME = 'TestCameraLive'  # hardcoded to server, mandatory for auto-d
 
 CAMERA_DISCOVERY_WAIT_TIMEOUT_SEC = 60
 
-TEST_CAMERA_DISCOVERY_PORT = 4984
-TEST_CAMERA_FIND_MSG = 'Network optix camera emulator 3.0 discovery'
-TEST_CAMERA_ID_MSG = 'Network optix camera emulator 3.0 responce'
+TEST_CAMERA_DISCOVERY_PORT = 4984  # hardcoded to server UDP multicast address for test camera
+TEST_CAMERA_FIND_MSG = 'Network optix camera emulator 3.0 discovery'  # UDP discovery multicast request
+TEST_CAMERA_ID_MSG = 'Network optix camera emulator 3.0 responce'  # UDP discovery response from test camera
 
-
-# obsolete, not used anymore; strange server requirements for camera id
-def generate_camera_id_from_mac_addr(mac_addr):
-    v = hashlib.md5(mac_addr).digest()
-    return '{%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x}' % tuple(ord(b) for b in v)
 
 def make_camera_info(parent_id, name, mac_addr):
     return dict(
@@ -175,7 +184,7 @@ class DiscoveryUdpListener(object):
         log.info('Test camera UDP discovery listener thread is started.')
         while not self._stop_flag:
             data, addr = listen_socket.recvfrom(1024)
-            log.debug('Received discovery message from %s:%d: %r', addr[0], addr[1], data)
+            #log.debug('Received discovery message from %s:%d: %r', addr[0], addr[1], data)
             if data != TEST_CAMERA_FIND_MSG:
                 continue
             if addr[0] not in self._stream_to_address_list:
