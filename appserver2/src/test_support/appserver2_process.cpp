@@ -169,7 +169,7 @@ void Appserver2Process::pleaseStop()
     //m_processTerminationEvent.set_value();
     QnMutexLocker lk(&m_mutex);
     m_terminated = true;
-    m_cond.wakeAll();
+    m_eventLoop.quit();
 }
 
 void Appserver2Process::setOnStartedEventHandler(
@@ -297,14 +297,9 @@ int Appserver2Process::exec()
 
     m_ecConnection = ec2Connection.get();
 
-    {
-        QnMutexLocker lk(&m_mutex);
-        while (!m_terminated)
-            m_cond.wait(lk.mutex());
+    m_eventLoop.exec();
 
-        m_tcpListener = nullptr;
-    }
-
+    m_tcpListener = nullptr;
     tcpListener.pleaseStop();
 
     ec2Connection->stopReceivingNotifications();

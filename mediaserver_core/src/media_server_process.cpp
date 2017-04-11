@@ -1878,10 +1878,6 @@ bool MediaServerProcess::initTcpListener(
         std::placeholders::_1 ) );
 
     const int rtspPort = MSSettings::roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
-#ifdef ENABLE_ACTI
-    QnActiResource::setEventPort(rtspPort);
-    m_universalTcpListener->processorPool()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
-#endif
 
     // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
     // config value only affects server preference listed in moduleInformation.
@@ -1896,6 +1892,11 @@ bool MediaServerProcess::initTcpListener(
         rtspPort,
         maxConnections,
         acceptSslConnections );
+
+#ifdef ENABLE_ACTI
+    QnActiResource::setEventPort(rtspPort);
+    m_universalTcpListener->processorPool()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
+#endif
 
     registerRestHandlers(cloudManagerGroup, m_universalTcpListener, messageBus);
 
