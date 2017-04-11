@@ -11,7 +11,7 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/string.h>
 #include <nx/utils/time.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include "stree/cdb_ns.h"
 

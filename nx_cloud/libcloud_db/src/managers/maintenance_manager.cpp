@@ -84,7 +84,7 @@ void MaintenanceManager::getStatistics(
 }
 
 void MaintenanceManager::onTransactionLogRead(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     const std::string& systemId,
     api::ResultCode resultCode,
     std::vector<ec2::dao::TransactionLogRecord> serializedTransactions,

@@ -188,6 +188,7 @@
 #include <utils/common/command_line_parser.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
@@ -701,7 +702,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
     m_initStoragesAsyncPromise.reset(new nx::utils::promise<void>());
     QtConcurrent::run([messageProcessor, this]
     {
-        const auto setPromiseGuardFunc = makeScopedGuard([&]() { m_initStoragesAsyncPromise->set_value(); });
+        const auto setPromiseGuardFunc = makeScopeGuard([&]() { m_initStoragesAsyncPromise->set_value(); });
 
         //read server's storages
         ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
@@ -2185,14 +2186,14 @@ void MediaServerProcess::run()
     const auto allowedSslVersions = MSSettings::roSettings()->value(
         nx_ms_conf::ALLOWED_SSL_VERSIONS, QString()).toString();
     if (!allowedSslVersions.isEmpty())
-        nx::network::SslEngine::setAllowedServerVersions(allowedSslVersions.toUtf8());
+        nx::network::ssl::Engine::setAllowedServerVersions(allowedSslVersions.toUtf8());
 
     const auto allowedSslCiphers = MSSettings::roSettings()->value(
         nx_ms_conf::ALLOWED_SSL_CIPHERS, QString()).toString();
     if (!allowedSslCiphers.isEmpty())
-        nx::network::SslEngine::setAllowedServerCiphers(allowedSslCiphers.toUtf8());
+        nx::network::ssl::Engine::setAllowedServerCiphers(allowedSslCiphers.toUtf8());
 
-    nx::network::SslEngine::useOrCreateCertificate(
+    nx::network::ssl::Engine::useOrCreateCertificate(
         MSSettings::roSettings()->value(
             nx_ms_conf::SSL_CERTIFICATE_PATH,
             getDataDirectory() + lit( "/ssl/cert.pem")).toString(),

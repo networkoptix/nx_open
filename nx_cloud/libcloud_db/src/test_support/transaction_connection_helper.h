@@ -5,7 +5,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <transaction/transaction_transport_base.h>
-#include <utils/common/subscription.h>
+#include <nx/utils/subscription.h>
 
 #include "test_transaction_transport.h"
 

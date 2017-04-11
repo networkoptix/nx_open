@@ -1,43 +1,67 @@
 #include "client_to_relay_connection.h"
 
 namespace nx {
-namespace network {
 namespace cloud {
 namespace relay {
 namespace api {
 
-ClientToRelayConnection::ClientToRelayConnection(const SocketAddress& relayEndpoint):
+//-------------------------------------------------------------------------------------------------
+// ClientToRelayConnectionFactory
+
+static ClientToRelayConnectionFactory::CustomFactoryFunc factoryFunc;
+
+std::unique_ptr<ClientToRelayConnection> ClientToRelayConnectionFactory::create(
+    const SocketAddress& relayEndpoint)
+{
+    if (factoryFunc)
+        return factoryFunc(relayEndpoint);
+    return std::make_unique<ClientToRelayConnectionImpl>(relayEndpoint);
+}
+
+ClientToRelayConnectionFactory::CustomFactoryFunc 
+    ClientToRelayConnectionFactory::setCustomFactoryFunc(CustomFactoryFunc newFactoryFunc)
+{
+    CustomFactoryFunc oldFunc;
+    oldFunc.swap(factoryFunc);
+    factoryFunc = std::move(newFactoryFunc);
+    return oldFunc;
+}
+
+//-------------------------------------------------------------------------------------------------
+// ClientToRelayConnectionImpl
+
+ClientToRelayConnectionImpl::ClientToRelayConnectionImpl(const SocketAddress& relayEndpoint):
     m_relayEndpoint(relayEndpoint)
 {
 }
 
-ClientToRelayConnection::~ClientToRelayConnection()
+ClientToRelayConnectionImpl::~ClientToRelayConnectionImpl()
 {
     if (isInSelfAioThread())
         stopWhileInAioThread();
 }
 
-void ClientToRelayConnection::startSession(
+void ClientToRelayConnectionImpl::startSession(
     const nx::String& /*desiredSessionId*/,
     const nx::String& /*targetPeerName*/,
-    nx::utils::MoveOnlyFunc<void(ResultCode, nx::String /*sessionId*/)> /*handler*/)
+    StartClientConnectSessionHandler /*handler*/)
 {
     // TODO
 }
 
-void ClientToRelayConnection::openConnectionToTheTargetHost(
-    nx::String& /*sessionId*/,
-    nx::utils::MoveOnlyFunc<void(ResultCode, std::unique_ptr<AbstractStreamSocket>)> /*handler*/)
+void ClientToRelayConnectionImpl::openConnectionToTheTargetHost(
+    const nx::String& /*sessionId*/,
+    OpenRelayConnectionHandler /*handler*/)
 {
     // TODO
 }
 
-SystemError::ErrorCode ClientToRelayConnection::prevRequestSysErrorCode() const
+SystemError::ErrorCode ClientToRelayConnectionImpl::prevRequestSysErrorCode() const
 {
     return SystemError::noError;
 }
 
-void ClientToRelayConnection::stopWhileInAioThread()
+void ClientToRelayConnectionImpl::stopWhileInAioThread()
 {
     // TODO
 }
@@ -45,5 +69,4 @@ void ClientToRelayConnection::stopWhileInAioThread()
 } // namespace api
 } // namespace relay
 } // namespace cloud
-} // namespace network
 } // namespace nx

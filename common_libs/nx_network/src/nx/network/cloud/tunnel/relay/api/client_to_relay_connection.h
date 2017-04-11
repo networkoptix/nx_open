@@ -6,30 +6,71 @@
 #include "relay_api_result_code.h"
 
 namespace nx {
-namespace network {
 namespace cloud {
 namespace relay {
 namespace api {
 
+//-------------------------------------------------------------------------------------------------
+// ClientToRelayConnection
+
+using StartClientConnectSessionHandler = 
+    nx::utils::MoveOnlyFunc<void(ResultCode, nx::String /*sessionId*/)>;
+
+using OpenRelayConnectionHandler = 
+    nx::utils::MoveOnlyFunc<void(ResultCode, std::unique_ptr<AbstractStreamSocket>)>;
+
 class NX_NETWORK_API ClientToRelayConnection:
-    public aio::BasicPollable
+    public network::aio::BasicPollable
 {
 public:
-    ClientToRelayConnection(const SocketAddress& relayEndpoint);
-    virtual ~ClientToRelayConnection() override;
-
-    void startSession(
+    virtual void startSession(
         const nx::String& desiredSessionId,
         const nx::String& targetPeerName,
-        nx::utils::MoveOnlyFunc<void(ResultCode, nx::String /*sessionId*/)> handler);
+        StartClientConnectSessionHandler handler) = 0;
     /**
      * After successful call socket provided represents connection to the requested peer.
      */
-    void openConnectionToTheTargetHost(
-        nx::String& sessionId,
-        nx::utils::MoveOnlyFunc<void(ResultCode, std::unique_ptr<AbstractStreamSocket>)> handler);
+    virtual void openConnectionToTheTargetHost(
+        const nx::String& sessionId,
+        OpenRelayConnectionHandler handler) = 0;
 
-    SystemError::ErrorCode prevRequestSysErrorCode() const;
+    virtual SystemError::ErrorCode prevRequestSysErrorCode() const = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
+// ClientToRelayConnectionFactory
+
+class NX_NETWORK_API ClientToRelayConnectionFactory
+{
+public:
+    using CustomFactoryFunc = 
+        nx::utils::MoveOnlyFunc<std::unique_ptr<ClientToRelayConnection>(const SocketAddress&)>;
+
+    static std::unique_ptr<ClientToRelayConnection> create(const SocketAddress& relayEndpoint);
+
+    static CustomFactoryFunc setCustomFactoryFunc(CustomFactoryFunc newFactoryFunc);
+};
+
+//-------------------------------------------------------------------------------------------------
+// ClientToRelayConnectionImpl
+
+class NX_NETWORK_API ClientToRelayConnectionImpl:
+    public ClientToRelayConnection
+{
+public:
+    ClientToRelayConnectionImpl(const SocketAddress& relayEndpoint);
+    virtual ~ClientToRelayConnectionImpl() override;
+
+    virtual void startSession(
+        const nx::String& desiredSessionId,
+        const nx::String& targetPeerName,
+        StartClientConnectSessionHandler handler) override;
+
+    virtual void openConnectionToTheTargetHost(
+        const nx::String& sessionId,
+        OpenRelayConnectionHandler handler) override;
+
+    virtual SystemError::ErrorCode prevRequestSysErrorCode() const override;
 
 private:
     const SocketAddress m_relayEndpoint;
@@ -40,5 +81,4 @@ private:
 } // namespace api
 } // namespace relay
 } // namespace cloud
-} // namespace network
 } // namespace nx

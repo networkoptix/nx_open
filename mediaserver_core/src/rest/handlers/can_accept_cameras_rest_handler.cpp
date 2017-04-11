@@ -7,7 +7,7 @@
 #include <api/model/camera_list_reply.h>
 #include <common/common_module.h>
 #include <media_server/serverutil.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <nx/network/http/httptypes.h>
 #include "core/resource_management/resource_discovery_manager.h"
 #include "core/resource/camera_resource.h"
@@ -60,7 +60,7 @@ int QnCanAcceptCameraRestHandler::executePost(const QString &path, const QnReque
     // add manual cameras
     QFuture<QnResourceList> manualDiscoveryResults = QtConcurrent::mapped(manualCamList, &CheckHostAddrAsync);
     //checking cameras with unicast
-    QnConcurrent::QnFuture<bool> camerasToPingResults( camerasToPing.size() );
+    nx::utils::concurrent::QnFuture<bool> camerasToPingResults( camerasToPing.size() );
     for( size_t i = 0; i < camerasToPing.size(); ++i )
     {
         camerasToPing[i]->checkIfOnlineAsync(

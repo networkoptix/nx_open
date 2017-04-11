@@ -58,7 +58,7 @@ namespace ec2
     int QnTimeManager<QueryProcessorType>::getCurrentTimeImpl( impl::CurrentTimeHandlerPtr handler )
     {
         const int reqID = generateRequestID();
-        QnConcurrent::run(
+        nx::utils::concurrent::run(
             Ec2ThreadPool::instance(),
             std::bind( &impl::CurrentTimeHandler::done, handler, reqID, ec2::ErrorCode::ok, TimeSynchronizationManager::instance()->getSyncTime() ) );
         return reqID;

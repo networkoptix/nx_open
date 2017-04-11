@@ -67,31 +67,12 @@ function(_add_msvc_precompiled_header target input)
     get_filename_component(pch_name "${input}" NAME)
     set(pch_file "${CMAKE_CFG_INTDIR}/${target}.pch")
 
-    set(pch_flags "/FI${pch_name} /Yu${pch_name} \"/Fp${pch_file}\"")
-
-    get_target_property(sources ${target} SOURCES)
-    foreach(source ${sources})
-        if(NOT source MATCHES "\\.\(cpp|cxx|cc\)$")
-            continue()
-        endif()
-
-        get_source_file_property(flags "${source}" COMPILE_FLAGS)
-        if(NOT flags)
-            set(flags)
-        endif()
-        list(APPEND flags ${pch_flags})
-
-        set_source_files_properties("${source}"
-            PROPERTIES
-                COMPILE_FLAGS "${flags}")
-    endforeach()
-
-    set_source_files_properties("${pch_cpp}"
-        PROPERTIES
-            COMPILE_FLAGS "/Yc${pch_name} \"/Fp${pch_file}\"")
-
-    list(APPEND sources "${pch_cpp}")
-    set_target_properties(${target} PROPERTIES SOURCES "${sources}")
+    set_property(TARGET "${target}"
+        APPEND PROPERTY COMPILE_FLAGS "/FI${pch_name} /Yu${pch_name} \"/Fp${pch_file}\"")
+    set_property(TARGET ${target}
+        APPEND PROPERTY SOURCES "${pch_cpp}")
+    set_property(SOURCE "${pch_cpp}"
+        APPEND PROPERTY COMPILE_FLAGS "/Yc \"/FI$(NOINHERIT)\"")
 endfunction()
 
 function(_add_xcode_precompiled_header target input)

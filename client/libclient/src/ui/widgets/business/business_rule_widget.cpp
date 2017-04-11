@@ -210,8 +210,16 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusiness::Fields fields)
 
     if (fields & (QnBusiness::EventTypeField | QnBusiness::ActionTypeField | QnBusiness::ActionParamsField))
     {
-        bool isEventProlonged = QnBusiness::hasToggleState(m_model->eventType());
-        ui->eventStatesComboBox->setVisible(isEventProlonged && !m_model->isActionProlonged());
+        if (m_model->eventType() == QnBusiness::SoftwareTriggerEvent)
+        {
+            /* SoftwareTriggerEvent is prolonged if its action is prolonged. */
+            ui->eventStatesComboBox->setVisible(false);
+        }
+        else
+        {
+            const bool isEventProlonged = QnBusiness::hasToggleState(m_model->eventType());
+            ui->eventStatesComboBox->setVisible(isEventProlonged && !m_model->isActionProlonged());
+        }
     }
 
     if (fields & (QnBusiness::ActionResourcesField | QnBusiness::ActionTypeField | QnBusiness::ActionParamsField))

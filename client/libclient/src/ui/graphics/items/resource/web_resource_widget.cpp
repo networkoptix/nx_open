@@ -9,7 +9,7 @@
 #include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
-#include <ui/graphics/items/overlays/buttons_overlay.h>
+#include <ui/graphics/items/overlays/resource_title_item.h>
 
 
 QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /*= NULL*/ )
@@ -19,7 +19,7 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
     setOption(AlwaysShowName, true);
 
     m_webView->installEventFilter(this);
-    const auto iconButton = buttonsOverlay()->leftButtonsBar()->button(Qn::RecordingStatusIconButton);
+    const auto iconButton = titleBar()->leftButtonsBar()->button(Qn::RecordingStatusIconButton);
     const auto contentMargins = QMarginsF(0, iconButton->preferredHeight(), 0, 0);
     const auto webParams = detail::OverlayParams(Visible
         , false, true, BaseLayer, contentMargins);
@@ -41,6 +41,12 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
 
     connect(m_webView, &QnGraphicsWebView::statusChanged, this, updateStatusesHandler);
 
+    connect(resource(), &QnResource::urlChanged, this,
+        [this]()
+        {
+            m_webView->setUrl(resource()->getUrl());
+        });
+
     setupOverlays();
     updateButtonsVisibility();
 }
@@ -55,7 +61,7 @@ void QnWebResourceWidget::setupOverlays()
 {
     {
         // Left buttons bar setup
-        auto buttonsBar = buttonsOverlay()->leftButtonsBar();
+        auto buttonsBar = titleBar()->leftButtonsBar();
 
         auto backButton = createStatisticAwareButton(lit("web_widget_back"));
         backButton->setIcon(qnSkin->icon("item/back.png"));
@@ -91,7 +97,7 @@ void QnWebResourceWidget::setupOverlays()
             const auto newFullscreenItem = (options().testFlag(FullScreenMode) ? nullptr : item());
             workbench()->setItem(Qn::ZoomedRole, newFullscreenItem);
         });
-        buttonsOverlay()->rightButtonsBar()->addButton(Qn::FullscreenButton, fullscreenButton);
+        titleBar()->rightButtonsBar()->addButton(Qn::FullscreenButton, fullscreenButton);
     }
 }
 
@@ -122,7 +128,7 @@ void QnWebResourceWidget::optionsChangedNotify(Options changedFlags)
             ? qnSkin->icon("item/exit_fullscreen.png")
             : qnSkin->icon("item/fullscreen.png");
 
-        buttonsOverlay()->rightButtonsBar()->button(Qn::FullscreenButton)->setIcon(newIcon);
+        titleBar()->rightButtonsBar()->button(Qn::FullscreenButton)->setIcon(newIcon);
     }
 
     return base_type::optionsChangedNotify(changedFlags);

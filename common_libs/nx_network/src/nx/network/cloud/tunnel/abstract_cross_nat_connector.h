@@ -5,7 +5,7 @@
 #include <memory>
 
 #include <nx/utils/move_only_func.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "abstract_outgoing_tunnel_connection.h"
 #include "nx/network/aio/basic_pollable.h"

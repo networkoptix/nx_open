@@ -127,7 +127,8 @@ void QnHtmlTextItemPrivate::updatePixmap() {
 
     painter.translate(options.horPadding, options.vertPadding);
     td.drawContents(&painter);
-    q->resize(baseSize);
+    q->setMinimumSize(baseSize);
+    q->setMaximumSize(baseSize);
     q->update();
 }
 

@@ -23,7 +23,7 @@
 #include <common/common_globals.h> //for Qn::SerializationFormat
 #include <http/custom_headers.h>
 #include <utils/common/app_info.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include "abstract_authentication_data_provider.h"
 #include "stree/cdb_ns.h"
@@ -62,7 +62,7 @@ void AuthenticationManager::authenticate(
     std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
 
     api::ResultCode authResult = api::ResultCode::notAuthorized;
-    auto guard = makeScopedGuard(
+    auto guard = makeScopeGuard(
         [&authResult, &wwwAuthenticate, &authProperties,
         &responseHeaders, &msgBody, &completionHandler]()
         {

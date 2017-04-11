@@ -100,15 +100,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, StreamQuality,
     (Qn::QualityPreSet,     "preset")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, SerializationFormat,
-    (Qn::JsonFormat,        "json")
-    (Qn::UbjsonFormat,      "ubjson")
-    (Qn::BnsFormat,         "bns")
-    (Qn::CsvFormat,         "csv")
-    (Qn::XmlFormat,         "xml")
-    (Qn::CompressedPeriodsFormat, "periods")
-)
-
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, BookmarkSortField,
     (Qn::BookmarkName,          "name")
     (Qn::BookmarkStartTime,     "startTime")

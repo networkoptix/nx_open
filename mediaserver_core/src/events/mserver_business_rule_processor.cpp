@@ -66,7 +66,7 @@
 #include <nx/streaming/abstract_archive_stream_reader.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
 #include <rest/handlers/multiserver_chunks_rest_handler.h>

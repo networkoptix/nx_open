@@ -12,10 +12,10 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <common/common_globals.h>
-#include <nx/utils/std/cpp14.h>
+#include <nx/fusion/serialization_format.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "../fusion_request_result.h"
 #include "../../buffer_source.h"

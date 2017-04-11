@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 #include <utils/db/async_sql_query_executor.h>
 
 #include "connection_statistics_info.h"
@@ -36,7 +36,7 @@ private:
     const conf::Statistics m_settings;
     nx::db::AsyncSqlQueryExecutor* m_sqlQueryExecutor;
     std::unique_ptr<dao::AbstractDataObject> m_dataObject;
-    QnCounter m_startedAsyncCallsCounter;
+    nx::utils::Counter m_startedAsyncCallsCounter;
 };
 
 } // namespace stats

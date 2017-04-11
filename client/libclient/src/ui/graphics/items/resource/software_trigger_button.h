@@ -26,6 +26,12 @@ public:
     /* Set icon by name. Pixmap will be obtained from QnSoftwareTriggerIcons::pixmapByName. */
     void setIcon(const QString& name);
 
+    bool prolonged() const;
+    void setProlonged(bool value);
+
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
+        QWidget* widget) override;
+
 protected:
     using base_type::setIcon;
 
@@ -33,7 +39,7 @@ private:
     void updateToolTipPosition();
     void updateToolTipTailEdge();
     void updateToolTipVisibility();
-    void generateIcon();
+    void ensureIcon();
 
 private:
     QnStyledTooltipWidget* const m_toolTip;
@@ -41,4 +47,6 @@ private:
     Qt::Edge m_toolTipEdge;
     QString m_iconName;
     QSize m_buttonSize;
+    bool m_prolonged = false;
+    bool m_iconDirty = false;
 };

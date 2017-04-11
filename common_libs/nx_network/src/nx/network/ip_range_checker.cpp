@@ -1,15 +1,11 @@
-
 #include "ip_range_checker.h"
 
 #include <QtNetwork/QTcpSocket>
 #include <QtCore/QThreadPool>
 #include <QtConcurrent/QtConcurrentMap>
 
-#include "utils/common/sleep.h"
 #include "socket.h"
 #include "simple_http_client.h"
-
-#include <utils/common/scoped_thread_rollback.h>
 
 struct QnTestAddress {
     quint32 ip;

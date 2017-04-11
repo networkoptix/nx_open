@@ -1,14 +1,8 @@
-/**********************************************************
-* 19 dec 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef STUN_SERVER_CONNECTION_H
-#define STUN_SERVER_CONNECTION_H
+#pragma once 
 
 #include <functional>
 
-#include <utils/common/stoppable.h>
+#include <nx/network/async_stoppable.h>
 #include <nx/network/stun/message.h>
 #include <nx/network/stun/message_parser.h>
 #include <nx/network/stun/message_serializer.h>
@@ -72,5 +66,3 @@ private:
 
 } // namespace stun
 } // namespace nx
-
-#endif  //STUN_SERVER_CONNECTION_H

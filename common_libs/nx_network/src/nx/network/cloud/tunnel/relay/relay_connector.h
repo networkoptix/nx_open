@@ -37,14 +37,14 @@ private:
     const SocketAddress m_relayEndpoint;
     const AddressEntry m_targetHostAddress;
     nx::String m_connectSessionId;
-    std::unique_ptr<api::ClientToRelayConnection> m_clientToRelayConnection;
+    std::unique_ptr<nx::cloud::relay::api::ClientToRelayConnection> m_clientToRelayConnection;
     ConnectCompletionHandler m_handler;
     aio::Timer m_timer;
 
     virtual void stopWhileInAioThread() override;
 
     void onStartRelaySessionResponse(
-        api::ResultCode resultCode,
+        nx::cloud::relay::api::ResultCode resultCode,
         SystemError::ErrorCode sysErrorCode,
         nx::String sessionId);
     void connectTimedOut();

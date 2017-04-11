@@ -18,6 +18,7 @@ typedef struct bio_st BIO;
 
 namespace nx {
 namespace network {
+namespace deprecated {
 
 class SslSocketPrivate;
 class MixedSslSocketPrivate;
@@ -191,6 +192,7 @@ private:
             AbstractStreamSocket* newSocket);
 };
 
+} // namespace deprecated
 } // namespace network
 } // namespace nx
 

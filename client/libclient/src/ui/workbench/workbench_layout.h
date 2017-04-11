@@ -4,7 +4,6 @@
 #include <QtCore/QObject>
 #include <QtCore/QSet>
 #include <QtCore/QHash>
-#include <QtCore/QPointer>
 
 #include <utils/common/matrix_map.h>
 #include <utils/common/rect_set.h>

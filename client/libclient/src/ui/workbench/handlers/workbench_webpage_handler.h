@@ -4,17 +4,18 @@
 
 #include <utils/common/connective.h>
 
-class QnWorkbenchWebPageHandler : public Connective<QObject>, public QnWorkbenchContextAware
+class QnWorkbenchWebPageHandler:
+    public Connective<QObject>,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
-
-    typedef Connective<QObject> base_type;
+    using base_type = Connective<QObject>;
 
 public:
-    QnWorkbenchWebPageHandler(QObject *parent = 0);
+    QnWorkbenchWebPageHandler(QObject* parent = nullptr);
     virtual ~QnWorkbenchWebPageHandler();
 
 private:
     void at_newWebPageAction_triggered();
-
+    void at_editWebPageAction_triggered();
 };

@@ -16,8 +16,7 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/system_socket.h>
-#include <utils/common/checked_cast.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include "udt_common.h"
 #include "udt_socket_impl.h"
@@ -609,7 +608,7 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
         return -1;
     }
 
-    ScopedGuard<std::function<void()>> socketModeGuard;
+    ScopeGuard<std::function<void()>> socketModeGuard;
 
     boost::optional<bool> newRecvMode;
     if (!checkIfRecvModeSwitchIsRequired(flags, &newRecvMode))
@@ -619,7 +618,7 @@ int UdtStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     {
         if (!setRecvMode(*newRecvMode))
             return -1;
-        socketModeGuard = ScopedGuard<std::function<void()>>(
+        socketModeGuard = ScopeGuard<std::function<void()>>(
             [newRecvMode = *newRecvMode, this]() { setRecvMode(!newRecvMode); });
     }
 

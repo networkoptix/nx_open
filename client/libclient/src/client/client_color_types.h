@@ -327,7 +327,14 @@ struct QnPasswordStrengthColors
 };
 #define QnPasswordStrengthColors_Fields (inacceptable)(acceptable)(good)
 
-#define QN_CLIENT_COLOR_TYPES                                                   \
+struct QnResourceHudColors
+{
+    QColor detailsBackgroundColor  = Qt::black;
+    QColor positionBackgroundColor = Qt::black;
+};
+#define QnResourceHudColors_Fields (detailsBackgroundColor)(positionBackgroundColor)
+
+#define QN_CLIENT_COLOR_TYPES \
     (QnTimeSliderColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
     (QnHistogramColors)(QnResourceWidgetFrameColors) \
@@ -340,14 +347,12 @@ struct QnPasswordStrengthColors
     (QnCompositeTextOverlayColors) \
     (QnGraphicsMessageBoxColors) \
     (QnResourceItemColors) \
-    (QnPasswordStrengthColors)
-
+    (QnPasswordStrengthColors) \
+    (QnResourceHudColors)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,
     (metatype)(json)(eq)
-
-
 );
 
 #endif // QN_CLIENT_COLOR_TYPES_H

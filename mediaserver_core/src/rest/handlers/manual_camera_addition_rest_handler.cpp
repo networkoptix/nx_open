@@ -76,10 +76,10 @@ int QnManualCameraAdditionRestHandler::searchStartAction(
         // TODO: #ak: better not to use concurrent here, since calling QtConcurrent::run from
         // running task looks unreliable in some extreme case.
         // Consider using async fsm here (this one should be quite simple).
-        // NOTE: boost::bind is here temporarily, until QnConcurrent::run supports arbitrary
+        // NOTE: boost::bind is here temporarily, until nx::utils::concurrent::run supports arbitrary
         // number of arguments.
         m_searchProcessRuns.insert(processUuid,
-            QnConcurrent::run(
+            nx::utils::concurrent::run(
                 &manualSearchThreadPoolHolder.pool,
                 boost::bind(
                     &QnManualCameraSearcher::run,

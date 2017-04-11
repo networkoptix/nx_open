@@ -13,7 +13,7 @@
 #include <QtCore/QString>
 #include <fcntl.h>
 
-#include "../common/systemerror.h"
+#include <nx/utils/system_error.h>
 
 #ifdef WIN32
 #pragma warning( disable : 4290 )

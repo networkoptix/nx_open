@@ -8,7 +8,7 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/string.h>
 
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace network {
@@ -39,7 +39,7 @@ void udpSocketTransferTest(int ipVersion, const HostAddress& targetHost)
     static const Buffer kTestMessage = QnUuid::createUuid().toSimpleString().toUtf8();
 
     UDPSocket sender(ipVersion);
-    const auto senderCleanupGuard = makeScopedGuard([&sender]() { sender.pleaseStopSync(); });
+    const auto senderCleanupGuard = makeScopeGuard([&sender]() { sender.pleaseStopSync(); });
 
     ASSERT_TRUE(sender.bind(SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(sender.setSendTimeout(1000));
@@ -49,7 +49,7 @@ void udpSocketTransferTest(int ipVersion, const HostAddress& targetHost)
     ASSERT_FALSE(senderHost.isIpAddress());
 
     UDPSocket receiver(ipVersion);
-    const auto receiverCleanupGuard = makeScopedGuard([&receiver]() { receiver.pleaseStopSync(); });
+    const auto receiverCleanupGuard = makeScopeGuard([&receiver]() { receiver.pleaseStopSync(); });
     ASSERT_TRUE(receiver.bind(SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(receiver.setRecvTimeout(1000));
 
@@ -109,7 +109,7 @@ TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
     constexpr int socketCount = 2;
 
     std::vector<SocketContext> sockets;
-    const auto socketsCleanupGuard = makeScopedGuard(
+    const auto socketsCleanupGuard = makeScopeGuard(
         [&sockets]()
         {
             for (auto& ctx : sockets)

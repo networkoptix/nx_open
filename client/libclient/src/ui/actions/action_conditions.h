@@ -346,7 +346,6 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
-
 /**
  * Condition for removal of a layout item.
  */

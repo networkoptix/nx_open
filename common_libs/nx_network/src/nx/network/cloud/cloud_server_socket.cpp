@@ -379,7 +379,7 @@ void CloudServerSocket::startAcceptor(
 void CloudServerSocket::onListenRequestCompleted(
     nx::hpm::api::ResultCode resultCode, hpm::api::ListenResponse response)
 {
-    const auto registrationHandlerGuard = makeScopedGuard(
+    const auto registrationHandlerGuard = makeScopeGuard(
         [handler = std::move(m_registrationHandler), resultCode]()
         {
             if (handler)

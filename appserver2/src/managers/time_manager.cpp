@@ -25,7 +25,7 @@
 #include <nx_ec/data/api_runtime_data.h>
 #include <nx_ec/data/api_misc_data.h>
 
-#include <utils/common/joinable.h>
+#include <nx/utils/thread/joinable.h>
 #include <utils/common/rfc868_servers.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>

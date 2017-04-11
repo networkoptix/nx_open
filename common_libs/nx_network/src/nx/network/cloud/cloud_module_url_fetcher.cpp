@@ -4,12 +4,12 @@
 
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/software_version.h>
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 #include <plugins/videodecoder/stree/stree_manager.h>
 #include <utils/common/app_info.h>
-#include <utils/common/guard.h>
-#include <utils/common/software_version.h>
 
 #include "cloud_modules_xml_sax_handler.h"
 
@@ -195,7 +195,7 @@ bool CloudModuleUrlFetcher::findModuleUrl(
     QUrl* const moduleUrl)
 {
     stree::ResourceContainer inputData;
-    const QnSoftwareVersion productVersion(QnAppInfo::applicationVersion());
+    const nx::utils::SoftwareVersion productVersion(QnAppInfo::applicationVersion());
     inputData.put(
         CloudInstanceSelectionAttributeNameset::vmsVersionMajor,
         productVersion.major());
