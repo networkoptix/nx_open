@@ -36,8 +36,8 @@ QnAppserverResourceProcessor::QnAppserverResourceProcessor(
     QnUuid serverId)
 :
     QnCommonModuleAware(commonModule),
-    m_distributedMutexManager(distributedMutexManager),
-    m_serverId(serverId)
+    m_serverId(serverId),
+    m_distributedMutexManager(distributedMutexManager)
 {
     m_cameraDataHandler = new ec2::QnMutexCameraDataHandler(commonModule);
     m_distributedMutexManager->setUserDataHandler(m_cameraDataHandler);

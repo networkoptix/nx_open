@@ -96,7 +96,7 @@ QnConnectionManager::QnConnectionManager(QObject* parent):
     Q_D(QnConnectionManager);
 
     QPointer<QnGlobalSettings> settings(qnGlobalSettings);
-    connect(settings, &QnGlobalSettings::systemNameChanged, this,
+    connect(settings.data(), &QnGlobalSettings::systemNameChanged, this,
         [d, settings]()
         {
 
