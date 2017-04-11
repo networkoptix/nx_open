@@ -20,11 +20,11 @@
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>844-601-5890</translation>
+      <translation>https://www.cox.com/business/contact-us.html</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
-      <translation>844-601-5890</translation>
+      <translation>www.cox.com/business/contact-us.html</translation>
     </message>
     <message>
       <source>{{companyUrl}}</source>

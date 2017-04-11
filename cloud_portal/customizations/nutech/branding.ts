@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>admin@nutechnational.com</translation>
+      <translation>mailto:admin@nutechnational.com</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>

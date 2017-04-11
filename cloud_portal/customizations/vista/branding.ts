@@ -20,11 +20,11 @@
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>http://vista-cctv.com/technical-support/contact/</translation>
+      <translation>mailto:support@vista-cctv.com</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
-      <translation>vista-cctv.com/technical-support/contact</translation>
+      <translation>support@vista-cctv.com</translation>
     </message>
     <message>
       <source>{{companyUrl}}</source>

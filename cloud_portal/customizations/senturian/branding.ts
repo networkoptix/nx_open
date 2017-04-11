@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>{{supportLink}}</source>
-      <translation>info@senturiansolutions.com</translation>
+      <translation>mailto:info@senturiansolutions.com</translation>
     </message>
     <message>
       <source>{{supportLinkText}}</source>
