@@ -9,55 +9,13 @@
 #include <nx/network/aio/test/aio_test_async_channel.h>
 #include <nx/utils/pipeline.h>
 #include <nx/utils/random.h>
+#include <nx/utils/test_support/test_pipeline.h>
 #include <nx/utils/thread/wait_condition.h>
 
 namespace nx {
 namespace network {
 namespace aio {
 namespace test {
-
-class NotifyingOutput:
-    public utils::pipeline::AbstractOutput
-{
-public:
-    virtual int write(const void* data, size_t count) override
-    {
-        NX_ASSERT(count <= std::numeric_limits<int>::max());
-
-        QnMutexLocker lock(&m_mutex);
-        m_receivedData.append(static_cast<const char*>(data), (int)count);
-        m_cond.wakeAll();
-        return (int)count;
-    }
-
-    void waitForReceivedDataToMatch(const QByteArray& referenceData)
-    {
-        waitFor([this, &referenceData]() { return m_receivedData.startsWith(referenceData); });
-    }
-
-    void waitForSomeDataToBeReceived()
-    {
-        waitFor([this]() { return !m_receivedData.isEmpty(); });
-    }
-
-    const QByteArray& internalBuffer() const
-    {
-        return m_receivedData;
-    }
-
-private:
-    QByteArray m_receivedData;
-    QnMutex m_mutex;
-    QnWaitCondition m_cond;
-
-    template<typename ConditionFunc>
-    void waitFor(ConditionFunc func)
-    {
-        QnMutexLocker lock(&m_mutex);
-        while (!func())
-            m_cond.wait(lock.mutex());
-    }
-};
 
 //-------------------------------------------------------------------------------------------------
 // Test fixture
@@ -185,9 +143,9 @@ protected:
 private:
     QByteArray m_originalData;
     std::unique_ptr<utils::pipeline::AbstractInput> m_leftSource;
-    NotifyingOutput m_leftDest;
+    utils::pipeline::test::NotifyingOutput m_leftDest;
     std::unique_ptr<utils::pipeline::AbstractInput> m_rightSource;
-    NotifyingOutput m_rightDest;
+    utils::pipeline::test::NotifyingOutput m_rightDest;
     std::unique_ptr<aio::AsyncChannelBridge> m_bridge;
     std::unique_ptr<AsyncChannel> m_leftFile;
     std::unique_ptr<AsyncChannel> m_rightFile;

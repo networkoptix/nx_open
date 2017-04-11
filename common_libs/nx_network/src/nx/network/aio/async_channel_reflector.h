@@ -68,7 +68,7 @@ private:
     {
         using namespace std::placeholders;
 
-        m_readBuffer.reserve(m_readBufferSize);
+        m_readBuffer.reserve(static_cast<int>(m_readBufferSize));
         m_channelToReflect->readSomeAsync(
             &m_readBuffer,
             std::bind(&self_type::onDataRead, this, _1, _2));
@@ -82,7 +82,7 @@ private:
             return reportDone(sysErrorCode);
         }
 
-        m_readBuffer.resize(bytesRead);
+        m_readBuffer.resize(static_cast<int>(bytesRead));
         decltype(m_readBuffer) readBuffer;
         readBuffer.swap(m_readBuffer);
 
