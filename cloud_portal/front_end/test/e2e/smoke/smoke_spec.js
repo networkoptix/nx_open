@@ -14,6 +14,10 @@ describe('Smoke test:', function () {
         helper.logout();
     });
 
+    fit("check needed user exists of create one", function () {
+        helper.createUserIfMissing(null, null, helper.userEmailCustom);
+    });
+
     fit("can login and logout", function () {
         helper.login();
     });

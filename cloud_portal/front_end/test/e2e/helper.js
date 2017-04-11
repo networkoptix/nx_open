@@ -19,7 +19,7 @@ var Helper = function () {
     var h = this;
 
     this.basePassword = 'qweasd123';
-    this.systemLink = '/17c7acef-14c5-4a14-8a71-40cf1385de71';
+    this.systemLink = '/c76e0f50-49ce-41c2-a47d-7d831a375f23';
     this.systemName = 'ek-U16';
 
     this.get = function (opt_url) {
@@ -425,6 +425,23 @@ var Helper = function () {
             h.getEmailedLink(userEmail, h.emailSubjects.register, 'activate').then( function(url) {
                 h.get(url);
                 expect(h.htmlBody.getText()).toContain(h.alert.alertMessages.registerConfirmSuccess);
+                deferred.fulfill(userEmail);
+            });
+        }, function(errorMessage) { // on reject
+            console.log(errorMessage);
+            deferred.fulfill(userEmail);
+        });
+
+        return deferred.promise;
+    };
+
+    this.createUserIfMissing = function(firstName, lastName, email, password) {
+        var deferred = protractor.promise.defer();
+        var userEmail = email;
+
+        h.register(firstName, lastName, userEmail, password).then(function () {
+            h.getEmailedLink(userEmail, h.emailSubjects.register, 'activate').then( function(url) {
+                h.get(url);
                 deferred.fulfill(userEmail);
             });
         }, function(errorMessage) { // on reject
