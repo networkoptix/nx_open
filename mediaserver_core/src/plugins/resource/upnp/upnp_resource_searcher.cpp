@@ -82,7 +82,9 @@ public:
 
 
 // ====================================================================
-QnUpnpResourceSearcher::QnUpnpResourceSearcher():
+QnUpnpResourceSearcher::QnUpnpResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
     m_receiveSocket(0)
 {
     m_cacheLivetime.restart();
