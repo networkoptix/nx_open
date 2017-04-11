@@ -97,6 +97,7 @@
 #include <utils/screen_manager.h>
 
 #include <nx/client/ui/workbench/handlers/layout_tours_handler.h>
+#include <nx/utils/app_info.h>
 
 #include "resource_browser_widget.h"
 #include "layout_tab_bar.h"
@@ -313,10 +314,14 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     if (auto screenRecordingAction = action(QnActions::ToggleScreenRecordingAction))
         addAction(screenRecordingAction);
 
-    connect(action(QnActions::MaximizeAction),     SIGNAL(toggled(bool)),                          this,                                   SLOT(setMaximized(bool)));
-    connect(action(QnActions::FullscreenAction),   SIGNAL(toggled(bool)),                          this,                                   SLOT(setFullScreen(bool)));
-    connect(action(QnActions::MinimizeAction),     SIGNAL(triggered()),                            this,                                   SLOT(minimize()));
-    connect(action(QnActions::FullscreenMaximizeHotkeyAction), SIGNAL(triggered()),                action(QnActions::EffectiveMaximizeAction),    SLOT(trigger()));
+    connect(action(QnActions::MaximizeAction), &QAction::toggled, this,
+        &MainWindow::setMaximized);
+    connect(action(QnActions::FullscreenAction), &QAction::toggled, this,
+        &MainWindow::setFullScreen);
+    connect(action(QnActions::MinimizeAction), &QAction::triggered, this,
+        &QWidget::showMinimized);
+    connect(action(QnActions::FullscreenMaximizeHotkeyAction), &QAction::triggered,
+        action(QnActions::EffectiveMaximizeAction), &QAction::trigger);
 
     menu()->setTargetProvider(m_ui.data());
 
@@ -344,18 +349,15 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     m_currentPageHolder->addWidget(m_view.data());
     m_currentPageHolder->addWidget(welcomeScreen->widget());
 
-/* Post-initialize. */
+    // Post-initialize.
+    if (nx::utils::AppInfo::isMacOsX())
+        setOptions(Options());
+    else
+        setOptions(TitleBarDraggable);
 
-#ifdef Q_OS_MACX
-    setOptions(Options());
-#else
-    setOptions(TitleBarDraggable);
-#endif
-
-#ifdef Q_OS_MACX
-    //initialize system-wide menu
-    menu()->newMenu(Qn::MainScope);
-#endif
+    // Initialize system-wide menu
+    if (nx::utils::AppInfo::isMacOsX())
+        menu()->newMenu(Qn::MainScope);
 
     /* VSync workaround must always be enabled to limit fps usage in following cases:
      * * VSync is not supported by drivers
@@ -368,7 +370,8 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     updateWidgetsVisibility();
 }
 
-MainWindow::~MainWindow() {
+MainWindow::~MainWindow()
+{
     m_dwm = NULL;
 }
 
@@ -519,36 +522,35 @@ void MainWindow::updateScreenInfo() {
     context()->instance<QnScreenManager>()->updateCurrentScreens(this);
 }
 
-void MainWindow::updateHelpTopic() {
-    if (action(QnActions::ToggleTourModeAction)->isChecked()) {
-        setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_TourInProgress_Help, true);
-        return;
-    }
+std::pair<int, bool> MainWindow::calculateHelpTopic() const
+{
+    if (action(QnActions::ToggleTourModeAction)->isChecked())
+        return {Qn::MainWindow_Scene_TourInProgress_Help, true};
 
-    if (QnWorkbenchLayout *layout = workbench()->currentLayout()) {
-        if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull()) {
-            setHelpTopic(m_scene.data(), Qn::Videowall_Appearance_Help);
-            return;
-        }
-        if (layout->isSearchLayout()) {
-            setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_PreviewSearch_Help, true);
-            return;
-        }
+    if (auto layout = workbench()->currentLayout())
+    {
+        if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
+            return {Qn::Videowall_Appearance_Help, false};
+
+        if (layout->isSearchLayout())
+            return {Qn::MainWindow_Scene_PreviewSearch_Help, true};
+
         if (QnLayoutResourcePtr resource = layout->resource())
         {
             if (resource->isFile())
-            {
-                setHelpTopic(m_scene.data(), Qn::MainWindow_Tree_MultiVideo_Help, true);
-                return;
-            }
+                return{Qn::MainWindow_Tree_MultiVideo_Help, true};
+
             if (!resource->backgroundImageFilename().isEmpty())
-            {
-                setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_EMapping_Help);
-                return;
-            }
+                return {Qn::MainWindow_Scene_EMapping_Help, false};
         }
     }
-    setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_Help);
+    return {Qn::MainWindow_Scene_Help, false};
+}
+
+void MainWindow::updateHelpTopic()
+{
+    auto topic = calculateHelpTopic();
+    setHelpTopic(m_scene.data(), topic.first, topic.second);
 }
 
 void MainWindow::minimize() {
