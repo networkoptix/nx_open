@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
 
 #include <client/client_startup_parameters.h>
 
@@ -10,6 +11,7 @@ class QGLWidget;
 class QnClientCoreModule;
 class QnPtzControllerPool;
 class QnNetworkProxyFactory;
+class QnStaticCommonModule;
 
 class QnClientModule: public QObject, public Singleton<QnClientModule>
 {
@@ -37,7 +39,8 @@ private:
     void initLocalResources (const QnStartupParameters& startupParams);
 
 private:
-    QnClientCoreModule* m_clientCoreModule;
+    QScopedPointer<QnStaticCommonModule> m_staticCommon;
+    QScopedPointer<QnClientCoreModule> m_clientCoreModule;
     QnNetworkProxyFactory* m_networkProxyFactory;
 };
 

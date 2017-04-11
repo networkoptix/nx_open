@@ -5,15 +5,19 @@
 
 QnDesktopClientMessageProcessor::QnDesktopClientMessageProcessor(QObject* parent):
     base_type(parent),
-    m_incompatibleServerWatcher(new QnIncompatibleServerWatcher(this))
+    m_incompatibleServerWatcher(new QnIncompatibleServerWatcher())
 {
     connect(this, &QnClientMessageProcessor::connectionClosed,
             m_incompatibleServerWatcher, &QnIncompatibleServerWatcher::stop);
 }
 
+QnDesktopClientMessageProcessor::~QnDesktopClientMessageProcessor()
+{
+}
+
 QnIncompatibleServerWatcher *QnDesktopClientMessageProcessor::incompatibleServerWatcher() const
 {
-    return m_incompatibleServerWatcher;
+    return m_incompatibleServerWatcher.data();
 }
 
 void QnDesktopClientMessageProcessor::connectToConnection(const ec2::AbstractECConnectionPtr &connection)

@@ -256,6 +256,15 @@ void QnClientModule::initMetaInfo()
 
 void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 {
+    Qn::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
+        ? Qn::PT_DesktopClient
+        : Qn::PT_VideowallClient;
+    const auto brand = startupParams.isDevMode() ? QString() : QnAppInfo::productNameShort();
+    const auto customization = startupParams.isDevMode() ? QString() : QnAppInfo::customizationName();
+
+    //TODO: #GDM #3.1 move to client library
+    m_staticCommon.reset(new QnStaticCommonModule(clientPeerType, brand, customization));
+
     /* Just to feel safe */
     QScopedPointer<QnClientSettings> clientSettingsPtr(new QnClientSettings(startupParams.forceLocalSettings));
     QnClientSettings* clientSettings = clientSettingsPtr.data();
@@ -271,7 +280,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     /* Init singletons. */
 
-    m_clientCoreModule = new QnClientCoreModule(this);
+    m_clientCoreModule.reset(new QnClientCoreModule());
     auto commonModule = m_clientCoreModule->commonModule();
 
     commonModule->store(new QnResourceRuntimeDataManager());

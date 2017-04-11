@@ -42,7 +42,6 @@
 
 #include <nx/network/socket_global.h>
 
-#include <nx/utils/timer_manager.h>
 #include <api/session_manager.h>
 #include <network/module_finder.h>
 #include <network/router.h>

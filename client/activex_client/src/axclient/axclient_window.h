@@ -1,5 +1,7 @@
 #pragma once
 
+#include <client_core/connection_context_aware.h>
+
 #include <nx/utils/singleton.h>
 #include <nx/utils/uuid.h>
 
@@ -21,7 +23,10 @@ namespace workbench {
 class QnWorkbenchContext;
 class QnWorkbenchAccessController;
 
-class QnAxClientWindow: public QObject, public Singleton<QnAxClientWindow> {
+class QnAxClientWindow: public QObject,
+    public Singleton<QnAxClientWindow>,
+    public QnConnectionContextAware
+{
     Q_OBJECT
 
     typedef QObject base_type;

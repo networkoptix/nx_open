@@ -2,6 +2,8 @@
 
 #include <client/client_message_processor.h>
 
+#include <common/common_module.h>
+
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/network_resource.h>

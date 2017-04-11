@@ -11,6 +11,7 @@ class QnDesktopClientMessageProcessor: public QnClientMessageProcessor
     using base_type = QnClientMessageProcessor;
 public:
     explicit QnDesktopClientMessageProcessor(QObject* parent = nullptr);
+    virtual ~QnDesktopClientMessageProcessor() override;
 
     QnIncompatibleServerWatcher *incompatibleServerWatcher() const;
 
@@ -25,7 +26,7 @@ private slots:
     void at_gotInitialDiscoveredServers(const ec2::ApiDiscoveredServerDataList &discoveredServers);
 
 private:
-    QnIncompatibleServerWatcher *m_incompatibleServerWatcher;
+    QScopedPointer<QnIncompatibleServerWatcher> m_incompatibleServerWatcher;
 };
 
 #define qnDesktopClientMessageProcessor \

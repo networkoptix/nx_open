@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QPointer>
+
 class QnCommonModule;
 class QnGlobalPermissionsManager;
 class QnLicensePool;
@@ -52,6 +54,6 @@ private:
     void init(QObject *parent);
 
 private:
-    QnCommonModule* m_commonModule {nullptr};
+    QPointer<QnCommonModule> m_commonModule;
     bool m_initialized {false};
 };

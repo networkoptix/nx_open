@@ -91,8 +91,12 @@ void QnIncompatibleServerWatcher::stop()
 {
     Q_D(QnIncompatibleServerWatcher);
 
-    if (qnClientMessageProcessor)
-        qnClientMessageProcessor->disconnect(this);
+    if (!commonModule())
+        return;
+
+    if (auto messageProcessor = commonModule()->messageProcessor())
+        messageProcessor->disconnect(this);
+
     resourcePool()->disconnect(this);
 
     QList<QnUuid> ids;
