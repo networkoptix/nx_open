@@ -115,6 +115,11 @@ def http_schema(request):
     return request.param
 
 
+@pytest.fixture(params=['rtsp', 'webm', 'hls', 'direct-hls'])
+def stream_type(request):
+    return request.param
+
+
 @pytest.fixture
 def box(run_options, customization_company_name):
     return BoxConfigFactory(customization_company_name)
