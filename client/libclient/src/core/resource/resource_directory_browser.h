@@ -2,7 +2,7 @@
 
 #include "core/resource_management/resource_searcher.h"
 
-class QnResourceDirectoryBrowser :
+class QnResourceDirectoryBrowser:
     public QObject,
     public QnAbstractFileResourceSearcher
 {
@@ -26,7 +26,7 @@ public:
     static QnResourcePtr resourceFromFile(const QString& filename, QnResourcePool* resourcePool);
 
 protected:
-    bool m_resourceReady;
+    bool m_resourceReady{false};
 
     static QnResourcePtr createArchiveResource(const QString& filename, QnResourcePool* resourcePool);
 

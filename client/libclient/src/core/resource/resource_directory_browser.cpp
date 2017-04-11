@@ -41,10 +41,9 @@ namespace {
 }
 
 QnResourceDirectoryBrowser::QnResourceDirectoryBrowser(QObject* parent):
-    base_type(parent),
+    QObject(parent),
     QnAbstractResourceSearcher(qnClientCoreModule->commonModule()),
-    QnAbstractFileResourceSearcher(qnClientCoreModule->commonModule()),
-    m_resourceReady(false)
+    QnAbstractFileResourceSearcher(qnClientCoreModule->commonModule())
 {
 }
 
